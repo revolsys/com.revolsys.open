@@ -90,7 +90,7 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
 
   @Override
   public void inverse(final double x, final double y, final double[] targetCoordinates,
-    final int targetOffset, final int targetAxisCount) {
+    final int targetOffset) {
 
     final double phi1 = footPointLatitude(y - this.y0);
     final double cosPhi1 = Math.cos(phi1);
@@ -120,13 +120,13 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
 
     final double lon = Math.toDegrees(lambda);
     final double lat = Math.toDegrees(phi);
-    targetCoordinates[targetOffset * targetAxisCount] = lon;
-    targetCoordinates[targetOffset * targetAxisCount + 1] = lat;
+    targetCoordinates[targetOffset] = lon;
+    targetCoordinates[targetOffset + 1] = lat;
   }
 
   @Override
   public void project(final double lon, final double lat, final double[] targetCoordinates,
-    final int targetOffset, final int targetAxisCount) {
+    final int targetOffset) {
     // ep2 = the second eccentricity squared.
     // N = the radius of curvature of the spheroid in the prime vertical plane
     final double n = this.spheroid.primeVerticalRadiusOfCurvature(lat);
@@ -168,8 +168,8 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
     v3 = 1385.0 - 311.0 * t2 + 543.0 * t4 - t6;
     final double y = s0(lat) / n + u0 + u1 * v1 + u2 * v2 + u3 * v3;
 
-    targetCoordinates[targetOffset * targetAxisCount] = this.x0 - n * x * this.k0;
-    targetCoordinates[targetOffset * targetAxisCount + 1] = this.y0 - n * y * this.k0;
+    targetCoordinates[targetOffset] = this.x0 - n * x * this.k0;
+    targetCoordinates[targetOffset + 1] = this.y0 - n * y * this.k0;
   }
 
   private double s0(final double lat) {

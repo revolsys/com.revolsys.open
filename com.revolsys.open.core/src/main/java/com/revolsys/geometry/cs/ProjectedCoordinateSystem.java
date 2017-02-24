@@ -15,7 +15,6 @@ import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.util.Equals;
 
 public class ProjectedCoordinateSystem implements CoordinateSystem {
   private static final long serialVersionUID = 1902383026085071877L;
@@ -99,13 +98,13 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       return true;
     } else if (object instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
-      if (!Equals.equals(this.geographicCoordinateSystem, cs.geographicCoordinateSystem)) {
+      if (!this.geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
         return false;
-      } else if (!Equals.equals(this.projection, cs.projection)) {
+      } else if (!this.projection.equals(cs.projection)) {
         return false;
-      } else if (!Equals.equals(this.normalizedParameters, cs.normalizedParameters)) {
+      } else if (!this.normalizedParameters.equals(cs.normalizedParameters)) {
         return false;
-      } else if (!Equals.equals(this.linearUnit, cs.linearUnit)) {
+      } else if (!this.linearUnit.equals(cs.linearUnit)) {
         return false;
       } else {
         return true;

@@ -7,8 +7,6 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.util.Equals;
-
 public class AngularUnit implements Serializable {
   /**
    *
@@ -110,7 +108,7 @@ public class AngularUnit implements Serializable {
       return true;
     } else if (object instanceof AngularUnit) {
       final AngularUnit unit = (AngularUnit)object;
-      if (!Equals.equals(this.name, unit.name)) {
+      if (!this.name.equals(unit.name)) {
         return false;
       } else if (Math.abs(this.conversionFactor - unit.conversionFactor) > 1.0e-10) {
         return false;

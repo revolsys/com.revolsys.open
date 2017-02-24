@@ -5,9 +5,7 @@ public interface CoordinatesProjection {
 
   CoordinatesOperation getProjectOperation();
 
-  void inverse(final double x, double y, final double[] targetCoordinates, int targetOffset,
-    int targetAxisCount);
+  void inverse(final double x, double y, final double[] targetCoordinates, int targetOffset);
 
-  void project(final double x, double y, final double[] targetCoordinates, int targetOffset,
-    int targetAxisCount);
+  void project(final double x, double y, final double[] targetCoordinates, int targetOffset);
 }

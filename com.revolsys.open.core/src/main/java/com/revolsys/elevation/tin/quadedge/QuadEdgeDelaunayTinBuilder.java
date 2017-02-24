@@ -70,7 +70,9 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
 
   private GeometryFactory geometryFactory;
 
-  private double scaleXY;
+  private double scaleX;
+
+  private double scaleY;
 
   private double scaleZ;
 
@@ -81,20 +83,28 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
       throw new NullPointerException("A geometryFactory must be specified");
     } else {
       this.geometryFactory = geometryFactory.convertAxisCount(3);
-      this.scaleXY = geometryFactory.getScaleXY();
-      if (this.scaleXY <= 0) {
+      this.scaleY = geometryFactory.getScaleY();
+      if (this.scaleY <= 0) {
         if (geometryFactory.isGeographics()) {
-          this.scaleXY = 10000000;
+          this.scaleY = 10000000;
         } else {
-          this.scaleXY = 1000;
+          this.scaleY = 1000;
+        }
+      }
+      this.scaleX = geometryFactory.getScaleX();
+      if (this.scaleX <= 0) {
+        if (geometryFactory.isGeographics()) {
+          this.scaleX = 10000000;
+        } else {
+          this.scaleX = 1000;
         }
       }
       this.scaleZ = geometryFactory.getScaleZ();
       if (this.scaleZ <= 0) {
         this.scaleZ = 1000;
       }
-      this.geometryFactory = geometryFactory.convertAxisCountAndScales(3, this.scaleXY,
-        this.scaleXY, this.scaleZ);
+      this.geometryFactory = geometryFactory.convertAxisCountAndScales(3, this.scaleX, this.scaleY,
+        this.scaleZ);
     }
   }
 
@@ -212,11 +222,15 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
 
   @Override
   public void insertVertex(double x, double y, double z) {
-    x = Math.round(x * this.scaleXY) / this.scaleXY;
-    y = Math.round(y * this.scaleXY) / this.scaleXY;
-    z = Math.round(z * this.scaleZ) / this.scaleZ;
-    BoundingBoxUtil.expand(this.bounds, 2, 0, x);
-    BoundingBoxUtil.expand(this.bounds, 2, 1, y);
+    final double scaleX = this.scaleX;
+    final double scaleY = this.scaleY;
+    final double scaleZ = this.scaleZ;
+    x = Math.round(x * scaleX) / scaleX;
+    y = Math.round(y * scaleY) / scaleY;
+    z = Math.round(z * scaleZ) / scaleZ;
+    final double[] bounds = this.bounds;
+    BoundingBoxUtil.expand(bounds, 2, 0, x);
+    BoundingBoxUtil.expand(bounds, 2, 1, y);
     final Point vertex = newVertex(x, y, z);
     this.vertices.add(vertex);
     if (this.subdivision != null) {
@@ -291,24 +305,18 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
       @Override
       public void accept(final double x1, final double y1, final double z1, final double x2,
         final double y2, final double z2, final double x3, final double y3, final double z3) {
-        triangleXCoordinates[this.coordinateIndex] = (int)Math
-          .round(x1 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
-        triangleYCoordinates[this.coordinateIndex] = (int)Math
-          .round(y1 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
-        triangleZCoordinates[this.coordinateIndex++] = (int)Math
-          .round(z1 * QuadEdgeDelaunayTinBuilder.this.scaleZ);
-        triangleXCoordinates[this.coordinateIndex] = (int)Math
-          .round(x2 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
-        triangleYCoordinates[this.coordinateIndex] = (int)Math
-          .round(y2 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
-        triangleZCoordinates[this.coordinateIndex++] = (int)Math
-          .round(z2 * QuadEdgeDelaunayTinBuilder.this.scaleZ);
-        triangleXCoordinates[this.coordinateIndex] = (int)Math
-          .round(x3 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
-        triangleYCoordinates[this.coordinateIndex] = (int)Math
-          .round(y3 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
-        triangleZCoordinates[this.coordinateIndex++] = (int)Math
-          .round(z3 * QuadEdgeDelaunayTinBuilder.this.scaleZ);
+        final double scaleX = QuadEdgeDelaunayTinBuilder.this.scaleX;
+        final double scaleY = QuadEdgeDelaunayTinBuilder.this.scaleY;
+        final double scaleZ = QuadEdgeDelaunayTinBuilder.this.scaleZ;
+        triangleXCoordinates[this.coordinateIndex] = (int)Math.round(x1 * scaleX);
+        triangleYCoordinates[this.coordinateIndex] = (int)Math.round(y1 * scaleY);
+        triangleZCoordinates[this.coordinateIndex++] = (int)Math.round(z1 * scaleZ);
+        triangleXCoordinates[this.coordinateIndex] = (int)Math.round(x2 * scaleX);
+        triangleYCoordinates[this.coordinateIndex] = (int)Math.round(y2 * scaleY);
+        triangleZCoordinates[this.coordinateIndex++] = (int)Math.round(z2 * scaleZ);
+        triangleXCoordinates[this.coordinateIndex] = (int)Math.round(x3 * scaleX);
+        triangleYCoordinates[this.coordinateIndex] = (int)Math.round(y3 * scaleY);
+        triangleZCoordinates[this.coordinateIndex++] = (int)Math.round(z3 * scaleZ);
       }
     });
     return new IntArrayScaleTriangulatedIrregularNetwork(this.geometryFactory, boundingBox,

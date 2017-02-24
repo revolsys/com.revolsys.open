@@ -49,7 +49,7 @@ public class Datum implements Serializable {
   public boolean equals(final Object object) {
     if (object instanceof Datum) {
       final Datum datum = (Datum)object;
-      if (Equals.equals(this.authority, datum.getAuthority())) {
+      if (Equals.equals(this.authority, datum.authority)) {
         return true;
       } else if (this.name == null) {
         if (datum.name != null) {
@@ -57,7 +57,7 @@ public class Datum implements Serializable {
         }
         // } else if (!name.equalsIgnoreCase(datum.name)) {
         // return false;
-      } else if (!Equals.equals(this.spheroid, datum.spheroid)) {
+      } else if (this.spheroid.equals(datum.spheroid)) {
         return false;
       } else {
         return true;
