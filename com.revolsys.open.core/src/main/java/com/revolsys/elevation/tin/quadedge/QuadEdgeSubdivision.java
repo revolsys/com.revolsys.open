@@ -83,25 +83,33 @@ import com.revolsys.geometry.model.impl.TriangleDoubleXYZ;
  * @author Martin Davis
  */
 public class QuadEdgeSubdivision {
-  private final double[] frameCoordinates;
+  private final QuadEdge edge1;
+
+  private final QuadEdge edge2;
+
+  private final QuadEdge edge3;
+
+  private int edgeCount = 0;
+
+  private final double frameX1;
+
+  private final double frameX2;
+
+  private final double frameX3;
+
+  private final double frameYBottom;
+
+  private final double frameYTop;
 
   private final GeometryFactory geometryFactory;
 
   private QuadEdge lastEdge = null;
-
-  private int edgeCount = 0;
-
-  private final QuadEdge edge1;
 
   private final double resolutionXY;
 
   private int triangleCount = 1;
 
   private short visitIndex = 0;
-
-  private final QuadEdge edge2;
-
-  private final QuadEdge edge3;
 
   /**
    * Creates a new instance of a quad-edge subdivision based on a frame triangle
@@ -129,21 +137,17 @@ public class QuadEdgeSubdivision {
       offset = height * 10.0;
     }
 
-    final double x1 = this.geometryFactory.makeXPrecise(minX + width / 2.0);
-    final double y1 = this.geometryFactory.makeYPrecise(maxY + offset);
+    this.frameX1 = this.geometryFactory.makeXPrecise(minX + width / 2.0);
+    this.frameYTop = this.geometryFactory.makeYPrecise(maxY + offset);
 
-    final double x2 = this.geometryFactory.makeXPrecise(minX - offset);
-    final double y2 = this.geometryFactory.makeYPrecise(minY - offset);
+    this.frameX2 = this.geometryFactory.makeXPrecise(minX - offset);
+    this.frameYBottom = this.geometryFactory.makeYPrecise(minY - offset);
 
-    final double x3 = this.geometryFactory.makeYPrecise(maxX + offset);
-    final double y3 = y2;
+    this.frameX3 = this.geometryFactory.makeYPrecise(maxX + offset);
 
-    final Point frameVertex1 = new PointDoubleXY(x1, y1);
-    final Point frameVertex2 = new PointDoubleXY(x2, y2);
-    final Point frameVertex3 = new PointDoubleXY(x3, y3);
-    this.frameCoordinates = new double[] {
-      x1, y1, x2, y2, x3, y3
-    };
+    final Point frameVertex1 = new PointDoubleXY(this.frameX1, this.frameYTop);
+    final Point frameVertex2 = new PointDoubleXY(this.frameX2, this.frameYBottom);
+    final Point frameVertex3 = new PointDoubleXY(this.frameX3, this.frameYBottom);
 
     this.edge1 = makeEdge(frameVertex1, frameVertex2);
     this.edge2 = makeEdge(frameVertex2, frameVertex3);
@@ -449,10 +453,11 @@ public class QuadEdgeSubdivision {
     final double x = vertex.getX();
     final double y = vertex.getY();
     /*
-     * This code is based on Guibas and Stolfi (1985), with minor modifications and a bug fix from
-     * Dani Lischinski (Graphic Gems 1993). (The modification I believe is the test for the inserted
-     * site falling exactly on an existing edge. Without this test zero-width triangles have been
-     * observed to be created)
+     * This code is based on Guibas and Stolfi (1985), with minor modifications
+     * and a bug fix from Dani Lischinski (Graphic Gems 1993). (The modification
+     * I believe is the test for the inserted site falling exactly on an
+     * existing edge. Without this test zero-width triangles have been observed
+     * to be created)
      */
     QuadEdge edge = findQuadEdge(x, y);
 
@@ -484,8 +489,8 @@ public class QuadEdgeSubdivision {
       }
     }
     /*
-     * Connect the new point to the vertices of the containing triangle (or quadrilateral, if the
-     * new point fell on an existing edge.)
+     * Connect the new point to the vertices of the containing triangle (or
+     * quadrilateral, if the new point fell on an existing edge.)
      */
     final QuadEdge base = makeEdge(edgeFromPoint, vertex);
     base.splice(edge);
@@ -520,11 +525,12 @@ public class QuadEdgeSubdivision {
   }
 
   private boolean isFrameCoordinate(final double x, final double y) {
-    final double[] frameCoordinates = this.frameCoordinates;
-    for (int coordinateIndex = 0; coordinateIndex < 6;) {
-      final double frameX = frameCoordinates[coordinateIndex++];
-      final double frameY = frameCoordinates[coordinateIndex++];
-      if (x == frameX && y == frameY) {
+    if (y == this.frameYTop && x == this.frameX1) {
+      return true;
+    } else if (y == this.frameYBottom) {
+      if (x == this.frameX2) {
+        return true;
+      } else if (x == this.frameX3) {
         return true;
       }
     }

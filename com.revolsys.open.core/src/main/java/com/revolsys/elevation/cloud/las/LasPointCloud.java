@@ -389,18 +389,23 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
   }
 
   public void read() {
-    forEachPoint(this.points::add);
+    if (this.reader != null) {
+      this.points = new ArrayList<>((int)this.pointCount);
+      forEachPoint(this.points::add);
+    }
   }
 
   @SuppressWarnings("unchecked")
-  public <P extends Point> void read(final Predicate<P> filter) {
+  public <P extends Point> int read(final Predicate<P> filter) {
     if (this.reader != null) {
+      this.points = new ArrayList<>((int)this.pointCount);
       forEachPoint((point) -> {
         if (filter.test((P)point)) {
           this.points.add(point);
         }
       });
     }
+    return this.points.size();
   }
 
   @SuppressWarnings("unused")
@@ -488,7 +493,6 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         this.reader.skipBytes(skipCount); // Skip to first point record
 
         this.recordDefinition = this.pointFormat.newRecordDefinition(this.geometryFactory);
-        this.points = new ArrayList<>((int)this.pointCount);
 
       } else {
         throw new IllegalArgumentException(resource + " is not a valid LAS file");
