@@ -107,6 +107,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     return getElevation(x, y);
   }
 
+  double getElevationFast(int gridX, int gridY);
+
   @Override
   default GeometryFactory getGeometryFactory() {
     final BoundingBox boundingBox = getBoundingBox();
@@ -199,7 +201,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   default BufferedImage newBufferedImage() {
     getBoundingBox();
     final ColorModel colorModel = ColorModel.getRGBdefault();
-    final DataBuffer imageBuffer = new GriddedElevationModelDataBuffer(this);
+    final DataBuffer imageBuffer = new GriddedElevationModelHillshadeDataBuffer(this);
     final int width = getGridWidth();
     final int height = getGridHeight();
 

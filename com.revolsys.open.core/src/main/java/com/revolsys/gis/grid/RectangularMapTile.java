@@ -15,6 +15,16 @@ public interface RectangularMapTile extends BoundingBoxProxy, Record {
 
   RectangularMapGrid getGrid();
 
+  default double getMinX() {
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.getMinX();
+  }
+
+  default double getMinY() {
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.getMinY();
+  }
+
   String getName();
 
   Polygon getPolygon(GeometryFactory factory, int numPoints);

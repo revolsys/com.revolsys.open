@@ -181,7 +181,7 @@ public class TriangulationVisualization {
   //
   // public static void testDem() throws IOException {
   // final GeometryFactory geometryFactory = GeometryFactory.fixed(3005, 1000.0);
-  // final GbaDemConfig config = new GbaDemConfig();
+  // final gbaElevationConfig config = new gbaElevationConfig();
   // final Path basePath = config.getBasePath();
   // final boolean processAll = false;
   // final RecordDefinition extentRecordDefinition = new RecordDefinitionBuilder("extents") //
@@ -216,7 +216,7 @@ public class TriangulationVisualization {
   // .newGriddedElevationModel(demFile, properties);
   // final BoundingBox sourceBoundingBox = sourceModel.getBoundingBox();
   // if (!processAll) {
-  // for (final RectangularMapTile targetTile : GbaDemConfig.GRID_25m
+  // for (final RectangularMapTile targetTile : gbaElevationConfig.GRID_25m
   // .getTiles(sourceBoundingBox)) {
   // final BoundingBox targetBoundingBox = targetTile.getBoundingBox();
   // final boolean contained = sourceBoundingBox.covers(targetBoundingBox);

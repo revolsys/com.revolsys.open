@@ -6,7 +6,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.AbstractGeoreferencedImage;
 
 public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
-  public GriddedElevationModelImage(final GriddedElevationModel elevationModel) {
+  public GriddedElevationModelImage(final GriddedElevationModel elevationModel,
+    final BufferedImage image) {
     final BoundingBox boundingBox = elevationModel.getBoundingBox();
     setBoundingBox(boundingBox);
 
@@ -16,7 +17,6 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
     final int height = elevationModel.getGridHeight();
     setImageHeight(height);
 
-    final BufferedImage image = elevationModel.newBufferedImage();
     setRenderedImage(image);
   }
 }

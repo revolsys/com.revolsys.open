@@ -1,5 +1,7 @@
 package com.revolsys.elevation.gridded;
 
+import java.awt.image.BufferedImage;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -163,6 +165,11 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   protected abstract double getElevationDo(int gridX, int gridY, int gridWidth);
 
   @Override
+  public double getElevationFast(final int gridX, final int gridY) {
+    return getElevationDo(gridX, gridY, this.gridWidth);
+  }
+
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
@@ -203,7 +210,8 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   @Override
   public GriddedElevationModelImage getImage() {
     if (this.image == null) {
-      this.image = new GriddedElevationModelImage(this);
+      final BufferedImage bufferedImage = newBufferedImage();
+      this.image = new GriddedElevationModelImage(this, bufferedImage);
     }
     return this.image;
   }
