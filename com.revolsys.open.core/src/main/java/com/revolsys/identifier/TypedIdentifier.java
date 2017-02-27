@@ -24,6 +24,11 @@ public class TypedIdentifier extends AbstractIdentifier implements Comparable<Ob
         }
         return new TypedIdentifier(type, identifier);
       }
+      try {
+        final Long longValue = Long.valueOf(string);
+        return Identifier.newIdentifier(longValue);
+      } catch (final Exception e) {
+      }
     }
     return Identifier.newIdentifier(id);
   }
