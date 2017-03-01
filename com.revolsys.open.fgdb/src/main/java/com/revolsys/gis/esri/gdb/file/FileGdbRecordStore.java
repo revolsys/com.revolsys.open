@@ -1499,7 +1499,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         }
       }
     }
-    return new FileGdbEnumRowsIterator(rows);
+    return new FileGdbEnumRowsIterator(this, rows);
   }
 
   @Override
@@ -1691,7 +1691,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
         }
       }
-      return new FileGdbEnumRowsIterator(rows);
+      return new FileGdbEnumRowsIterator(this, rows);
     }
   }
 
@@ -1730,7 +1730,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         }
       }
     }
-    return new FileGdbEnumRowsIterator(rows);
+    return new FileGdbEnumRowsIterator(this, rows);
   }
 
   public void setCreateAreaField(final boolean createAreaField) {

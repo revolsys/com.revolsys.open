@@ -172,6 +172,12 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
           throw new NoSuchElementException();
         }
         return record;
+      } catch (final RuntimeException e) {
+        if (this.closed) {
+          throw new NoSuchElementException();
+        } else {
+          throw e;
+        }
       } finally {
         row.delete();
       }
