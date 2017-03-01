@@ -7,9 +7,13 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
 public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
+
+  private final FileGdbRecordStore recordStore;
+
   private EnumRows rows;
 
-  FileGdbEnumRowsIterator(final EnumRows rows) {
+  FileGdbEnumRowsIterator(final FileGdbRecordStore recordStore, final EnumRows rows) {
+    this.recordStore = recordStore;
     this.rows = rows;
   }
 
@@ -38,7 +42,7 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
 
   @Override
   protected Row getNext() {
-    synchronized (this) {
+    synchronized (this.recordStore.getApiSync()) {
       if (this.rows == null) {
         throw new NoSuchElementException();
       } else {
