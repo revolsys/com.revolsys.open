@@ -330,24 +330,26 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.cancellable = cancellable;
   }
 
-  public void setFieldNames(final List<String> fieldNames) {
+  public Query setFieldNames(final List<String> fieldNames) {
     this.fieldNames = fieldNames;
+    return this;
   }
 
-  public void setFieldNames(final String... fieldNames) {
-    setFieldNames(Arrays.asList(fieldNames));
+  public Query setFieldNames(final String... fieldNames) {
+    return setFieldNames(Arrays.asList(fieldNames));
   }
 
   public void setFromClause(final String fromClause) {
     this.fromClause = fromClause;
   }
 
-  public void setLimit(final int limit) {
+  public Query setLimit(final int limit) {
     if (limit < 0) {
       this.limit = Integer.MAX_VALUE;
     } else {
       this.limit = limit;
     }
+    return this;
   }
 
   public void setLockResults(final boolean lockResults) {

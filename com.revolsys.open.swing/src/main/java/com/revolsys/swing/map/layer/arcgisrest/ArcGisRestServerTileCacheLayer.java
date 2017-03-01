@@ -117,6 +117,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
       final UrlResource serviceUrl = mapService.getServiceUrl();
       setUrl(serviceUrl);
     }
+    setName(mapService.getParent().getName());
   }
 
   @Override

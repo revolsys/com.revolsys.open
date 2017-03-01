@@ -20,10 +20,10 @@ public class JdbcWriterResourceHolder extends ResourceHolderSupport {
   }
 
   public JdbcWriterWrapper getWriterWrapper(final AbstractJdbcRecordStore recordStore,
-    final boolean throwExceptions) {
+    final boolean throwExceptions, final int batchSize) {
     requested();
     if (this.writer == null) {
-      this.writer = recordStore.newRecordWriter(1);
+      this.writer = recordStore.newRecordWriter(batchSize);
       this.writer.setThrowExceptions(throwExceptions);
     }
     return new JdbcWriterWrapper(this.writer);
