@@ -57,8 +57,10 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     if (Property.hasValue(fieldNames)) {
       setFieldNamesAndTitles(fieldNames, Collections.<String> emptyList());
     }
-    final String idFieldName = recordDefinition.getIdFieldName();
-    setSortOrder(idFieldName);
+    if (recordDefinition != null) {
+      final String idFieldName = recordDefinition.getIdFieldName();
+      setSortOrder(idFieldName);
+    }
   }
 
   public <V extends Record> RunnableAction addMenuItem(final String groupName,

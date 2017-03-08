@@ -20,6 +20,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.elevation.cloud.PointCloudReaderFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.io.FileUtil;
@@ -406,6 +407,8 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       if (!this.hasFile) {
         return false;
       } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, path)) {
+        return true;
+      } else if (IoFactory.hasFactory(PointCloudReaderFactory.class, path)) {
         return true;
       } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
         return true;

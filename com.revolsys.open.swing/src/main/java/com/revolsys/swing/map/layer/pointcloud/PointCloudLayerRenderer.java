@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.layer.raster;
+package com.revolsys.swing.map.layer.pointcloud;
 
 import java.awt.AlphaComposite;
 import java.awt.Composite;
@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.BaseCloseable;
@@ -14,11 +15,9 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
-public class GeoreferencedImageLayerRenderer
-  extends AbstractLayerRenderer<GeoreferencedImageLayer> {
+public class PointCloudLayerRenderer extends AbstractLayerRenderer<PointCloudLayer> {
 
-  private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle
-    .line(WebColors.Red, 4);
+  private static final GeometryStyle STYLE_BOUNDING_BOX = GeometryStyle.line(WebColors.Green, 1);
 
   public static void render(final Viewport2D viewport, final Graphics2D graphics,
     final GeoreferencedImage image, final boolean useTransform) {
@@ -52,30 +51,30 @@ public class GeoreferencedImageLayerRenderer
       try (
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
         final Polygon polygon = boundingBox.toPolygon(0);
-        viewport.drawGeometryOutline(polygon, STYLE_DIFFERENT_COORDINATE_SYSTEM);
+        viewport.drawGeometryOutline(polygon, STYLE_BOUNDING_BOX);
       }
     }
   }
 
-  public GeoreferencedImageLayerRenderer(final GeoreferencedImageLayer layer) {
+  public PointCloudLayerRenderer(final PointCloudLayer layer) {
     super("raster", layer);
   }
 
   @Override
-  public void render(final Viewport2D viewport, final GeoreferencedImageLayer layer) {
+  public void render(final Viewport2D viewport, final PointCloudLayer layer) {
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
-        final GeoreferencedImage image = layer.getImage();
-        if (image != null) {
-          BoundingBox boundingBox = layer.getBoundingBox();
-          if (boundingBox == null || boundingBox.isEmpty()) {
-            boundingBox = layer.fitToViewport();
-          }
+        final PointCloud<?> pointCloud = layer.getPointCloud();
+        if (pointCloud != null) {
+          final BoundingBox boundingBox = layer.getBoundingBox();
           final Graphics2D graphics = viewport.getGraphics();
           if (graphics != null) {
-            renderAlpha(viewport, graphics, image, true, layer.getOpacity() / 255.0);
-            renderDifferentCoordinateSystem(viewport, graphics, boundingBox);
+            try (
+              BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
+              final Polygon polygon = boundingBox.toPolygon(0);
+              viewport.drawGeometryOutline(polygon, STYLE_BOUNDING_BOX);
+            }
           }
         }
       }

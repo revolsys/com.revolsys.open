@@ -22,6 +22,7 @@ import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.elevation.cloud.PointCloudReaderFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.geometry.model.BoundingBox;
@@ -43,6 +44,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLayer;
+import com.revolsys.swing.map.layer.pointcloud.PointCloudLayer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
@@ -743,6 +745,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layer = new GriddedElevationModelLayer(properties);
     } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, url)) {
       layer = new GeoreferencedImageLayer(properties);
+    } else if (IoFactory.hasFactory(PointCloudReaderFactory.class, url)) {
+      layer = new PointCloudLayer(properties);
     } else if (IoFactory.hasFactory(RecordReaderFactory.class, url)) {
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = recordLayer.getRenderer();
