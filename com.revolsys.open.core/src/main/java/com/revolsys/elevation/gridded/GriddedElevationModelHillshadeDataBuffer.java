@@ -32,7 +32,7 @@ public class GriddedElevationModelHillshadeDataBuffer extends DataBuffer {
     this.width = elevationModel.getGridWidth();
     this.height = elevationModel.getGridHeight();
     final int cellSize = elevationModel.getGridCellSize();
-    this.oneDivCellSizeTimes8 = 1.0 / 8 * cellSize;
+    this.oneDivCellSizeTimes8 = 1.0 / (8 * cellSize);
 
     setZenithDegrees(45.0);
     setAzimuthDegrees(315.0);

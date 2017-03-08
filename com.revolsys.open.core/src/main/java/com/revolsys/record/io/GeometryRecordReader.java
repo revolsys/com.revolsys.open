@@ -3,16 +3,15 @@ package com.revolsys.record.io;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.format.csv.AbstractRecordReader;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionBuilder;
 
 public class GeometryRecordReader extends AbstractRecordReader {
   private GeometryReader geometryReader;
@@ -69,10 +68,11 @@ public class GeometryRecordReader extends AbstractRecordReader {
   protected void initDo() {
     this.geometryIterator = this.geometryReader.iterator();
     this.geometryIterator.hasNext();
-    setGeometryFactory(this.geometryReader.getGeometryFactory());
-    final RecordDefinition recordDefinition = new RecordDefinitionBuilder(this.baseName) //
-      .addField("GEOMETRY", DataTypes.GEOMETRY) //
-      .getRecordDefinition();
+    final GeometryFactory geometryFactory = this.geometryReader.getGeometryFactory();
+    setGeometryFactory(geometryFactory);
+
+    final RecordDefinition recordDefinition = this.geometryReader
+      .newRecordDefinition(this.baseName);
     setRecordDefinition(recordDefinition);
   }
 

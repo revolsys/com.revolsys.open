@@ -62,7 +62,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  *
  */
 public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
-  private double[] bounds = BoundingBoxUtil.newBounds(2);
+  private final double[] bounds = BoundingBoxUtil.newBounds(2);
 
   private final List<Point> vertices = new ArrayList<>();
 
@@ -111,7 +111,10 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
   public QuadEdgeDelaunayTinBuilder(final GeometryFactory geometryFactory, final double minX,
     final double minY, final double maxX, final double maxY) {
     this(geometryFactory);
-    this.bounds = BoundingBoxUtil.newBounds(this.geometryFactory, minX, minY, maxX, maxY);
+    this.bounds[0] = minX;
+    this.bounds[1] = minY;
+    this.bounds[2] = maxX;
+    this.bounds[3] = maxY;
   }
 
   public void addVertex(final Point vertex) {
@@ -216,12 +219,16 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     return this.subdivision.getTrianglesPolygonal(this.geometryFactory);
   }
 
-  protected final List<Point> getVertices() {
+  public int getVertexCount() {
+    return this.vertices.size();
+  }
+
+  public final List<Point> getVertices() {
     return this.vertices;
   }
 
   @Override
-  public void insertVertex(double x, double y, double z) {
+  public Point insertVertex(double x, double y, double z) {
     final double scaleX = this.scaleX;
     final double scaleY = this.scaleY;
     final double scaleZ = this.scaleZ;
@@ -236,6 +243,7 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     if (this.subdivision != null) {
       this.subdivision.insertVertex(vertex);
     }
+    return vertex;
   }
 
   @Override
@@ -280,6 +288,15 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
       Collections.sort(vertices);
     }
     subdivision.insertVertices(vertices);
+  }
+
+  public void insertVerticesFast(final Iterable<? extends Point> points) {
+    for (final Point point : points) {
+      final double x = point.getX();
+      final double y = point.getY();
+      final double z = point.getZ();
+      insertVertex(x, y, z);
+    }
   }
 
   public final boolean isSortVertices() {

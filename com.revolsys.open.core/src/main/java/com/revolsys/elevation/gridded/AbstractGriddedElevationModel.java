@@ -1,7 +1,5 @@
 package com.revolsys.elevation.gridded;
 
-import java.awt.image.BufferedImage;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -26,8 +24,6 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   private int gridCellSize;
 
   private Resource resource;
-
-  private GriddedElevationModelImage image;
 
   private GeometryFactory geometryFactory;
 
@@ -208,15 +204,6 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
-  public GriddedElevationModelImage getImage() {
-    if (this.image == null) {
-      final BufferedImage bufferedImage = newBufferedImage();
-      this.image = new GriddedElevationModelImage(this, bufferedImage);
-    }
-    return this.image;
-  }
-
-  @Override
   public double getMaxX() {
     return this.bounds[3];
   }
@@ -262,6 +249,10 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   public boolean isEmpty() {
     getBoundingBox();
     return Double.isNaN(this.bounds[2]);
+  }
+
+  public boolean isModified() {
+    return this.zBoundsUpdateRequired;
   }
 
   @Override
@@ -362,7 +353,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     this.resource = resource;
   }
 
-  public void setzBoundsUpdateRequired(final boolean zBoundsUpdateRequired) {
+  public void setZBoundsUpdateRequired(final boolean zBoundsUpdateRequired) {
     this.zBoundsUpdateRequired = zBoundsUpdateRequired;
   }
 

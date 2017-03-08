@@ -1,11 +1,5 @@
 package com.revolsys.elevation.gridded;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.SampleModel;
-import java.awt.image.SinglePixelPackedSampleModel;
-import java.awt.image.WritableRaster;
 import java.util.Collections;
 import java.util.Map;
 
@@ -25,7 +19,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
-import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 
 public interface GriddedElevationModel extends ObjectWithProperties, GeometryFactoryProxy {
@@ -133,8 +126,6 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
 
   int getGridWidth();
 
-  GeoreferencedImage getImage();
-
   default double getMaxX() {
     final BoundingBox boundingBox = getBoundingBox();
     return boundingBox.getMaxX();
@@ -196,26 +187,6 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   default boolean isNull(final int x, final int y) {
     final double elevation = getElevation(x, y);
     return Double.isNaN(elevation);
-  }
-
-  default BufferedImage newBufferedImage() {
-    getBoundingBox();
-    final ColorModel colorModel = ColorModel.getRGBdefault();
-    final DataBuffer imageBuffer = new GriddedElevationModelHillshadeDataBuffer(this);
-    final int width = getGridWidth();
-    final int height = getGridHeight();
-
-    final SampleModel sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_INT, width,
-      height,
-      new int[] { //
-        0x00ff0000, // Red
-        0x0000ff00, // Green
-        0x000000ff, // Blue
-        0xff000000 // Alpha
-      });
-
-    final WritableRaster raster = new IntegerRaster(sampleModel, imageBuffer);
-    return new BufferedImage(colorModel, raster, false, null);
   }
 
   default GriddedElevationModel newElevationModel(final BoundingBox boundingBox,
@@ -420,6 +391,50 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
           }
         }
       }
+    }
+  }
+
+  default void setElevationsNull(final GriddedElevationModel elevationModel) {
+    final double minX1 = elevationModel.getMinX();
+    final double minY1 = elevationModel.getMinY();
+
+    int startX = getGridCellX(minX1);
+    if (startX < 0) {
+      startX = 0;
+    }
+    int startY = getGridCellY(minY1);
+    if (startY < 0) {
+      startY = 0;
+    }
+
+    final int gridCellSize = getGridCellSize();
+    final int minX = (int)getMinX() + startX * gridCellSize;
+    final int minY = (int)getMinY() + startY * gridCellSize;
+
+    double y = minY;
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+    for (int gridY = startY; gridY < gridHeight; gridY++) {
+      double x = minX;
+      for (int gridX = startX; gridX < gridWidth; gridX++) {
+        final GriddedElevationModel elevationModel1 = elevationModel;
+        final double elevation = elevationModel1.getElevation(x, y);
+        if (Double.isFinite(elevation)) {
+          setElevationNull(gridX, gridY);
+        }
+        x += gridCellSize;
+      }
+      y += gridCellSize;
+    }
+  }
+
+  default void setElevationsNullFast(final Iterable<? extends Point> points) {
+    for (final Point point : points) {
+      final double x = point.getX();
+      final double y = point.getY();
+      final int gridX = getGridCellX(x);
+      final int gridY = getGridCellY(y);
+      setElevationNull(gridX, gridY);
     }
   }
 

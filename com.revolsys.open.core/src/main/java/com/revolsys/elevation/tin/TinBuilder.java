@@ -13,7 +13,7 @@ public interface TinBuilder {
 
   GeometryFactory getGeometryFactory();
 
-  void insertVertex(double x, double y, double z);
+  Point insertVertex(double x, double y, double z);
 
   default void insertVertex(final Point point) {
     final double x = point.getX();

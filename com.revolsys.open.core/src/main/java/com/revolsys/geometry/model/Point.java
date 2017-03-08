@@ -40,7 +40,6 @@ import java.util.List;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.editor.PointEditor;
 import com.revolsys.geometry.model.impl.BaseBoundingBox;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
@@ -183,11 +182,23 @@ public interface Point extends Punctual, Serializable {
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final Point convertedPoint = point.convertPoint2d(geometryFactory);
-      final double x2 = convertedPoint.getX();
-      final double y2 = convertedPoint.getY();
       final double x1 = this.getX();
-      final double y1 = this.getY();
-      return CoordinatesUtil.compare(x1, y1, x2, y2);
+      final double x2 = convertedPoint.getX();
+      if (x1 < x2) {
+        return -1;
+      } else if (x1 > x2) {
+        return 1;
+      } else {
+        final double y1 = this.getY();
+        final double y2 = convertedPoint.getY();
+        if (y1 < y2) {
+          return -1;
+        } else if (y1 > y2) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
     }
   }
 

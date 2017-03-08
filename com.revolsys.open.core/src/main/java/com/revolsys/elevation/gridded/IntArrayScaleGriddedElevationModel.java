@@ -1,12 +1,17 @@
 package com.revolsys.elevation.gridded;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevationWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.util.Debug;
 
 public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevationModel {
   private static final int NULL_VALUE = Integer.MIN_VALUE;
@@ -75,6 +80,104 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     } else {
       return NULL_VALUE;
     }
+  }
+
+  public List<Point> getNullBoundaryPoints() {
+    final List<Point> points = new ArrayList<>();
+    final double minX = getMinX();
+    final double minY = getMinY();
+
+    final int gridCellSize = getGridCellSize();
+    final int gridHeight = getGridHeight();
+    final int gridWidth = getGridWidth();
+    final int[] elevations = this.elevations;
+    int index = 0;
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      for (int gridX = 0; gridX < gridWidth; gridX++) {
+        final int elevation = elevations[index];
+        if (index != gridY * gridWidth + gridX) {
+          Debug.noOp();
+        }
+        if (elevation == NULL_VALUE) {
+          boolean hasNeighbour = false;
+          if (gridX == 0) {
+            if (gridY == 0) {
+              hasNeighbour = elevations[index + 1] != NULL_VALUE //
+                || elevations[index + gridWidth] != NULL_VALUE //
+                || elevations[index + gridWidth + 1] != NULL_VALUE//
+              ;
+            } else if (gridY == gridHeight - 1) {
+              hasNeighbour = elevations[index - 1] != NULL_VALUE //
+                || elevations[index - gridWidth - 1] != NULL_VALUE //
+                || elevations[index - gridWidth] != NULL_VALUE //
+              ;
+            } else {
+              hasNeighbour = elevations[index + 1] != NULL_VALUE //
+                || elevations[index - gridWidth] != NULL_VALUE //
+                || elevations[index - gridWidth + 1] != NULL_VALUE //
+                || elevations[index + gridWidth] != NULL_VALUE //
+                || elevations[index + gridWidth + 1] != NULL_VALUE//
+              ;
+            }
+          } else if (gridX == gridWidth - 1) {
+            if (gridY == 0) {
+              hasNeighbour = elevations[index - 1] != NULL_VALUE //
+                || elevations[index + gridWidth - 1] != NULL_VALUE //
+                || elevations[index + gridWidth] != NULL_VALUE //
+              ;
+
+            } else if (gridY == gridHeight - 1) {
+              hasNeighbour = elevations[index - 1] != NULL_VALUE //
+                || elevations[index - gridWidth - 1] != NULL_VALUE //
+                || elevations[index - gridWidth] != NULL_VALUE //
+              ;
+            } else {
+              hasNeighbour = elevations[index - 1] != NULL_VALUE //
+                || elevations[index - gridWidth - 1] != NULL_VALUE //
+                || elevations[index - gridWidth] != NULL_VALUE //
+                || elevations[index + gridWidth - 1] != NULL_VALUE //
+                || elevations[index + gridWidth] != NULL_VALUE //
+              ;
+            }
+          } else {
+            if (gridY == 0) {
+              hasNeighbour = elevations[index - 1] != NULL_VALUE //
+                || elevations[index + 1] != NULL_VALUE //
+                || elevations[index + gridWidth - 1] != NULL_VALUE //
+                || elevations[index + gridWidth] != NULL_VALUE //
+                || elevations[index + gridWidth + 1] != NULL_VALUE//
+              ;
+
+            } else if (gridY == gridHeight - 1) {
+              hasNeighbour = elevations[index - 1] != NULL_VALUE //
+                || elevations[index + 1] != NULL_VALUE //
+                || elevations[index - gridWidth - 1] != NULL_VALUE //
+                || elevations[index - gridWidth] != NULL_VALUE //
+                || elevations[index - gridWidth + 1] != NULL_VALUE //
+              ;
+            } else {
+              hasNeighbour = elevations[index - 1] != NULL_VALUE //
+                || elevations[index + 1] != NULL_VALUE //
+                || elevations[index - gridWidth - 1] != NULL_VALUE //
+                || elevations[index - gridWidth] != NULL_VALUE //
+                || elevations[index - gridWidth + 1] != NULL_VALUE //
+                || elevations[index + gridWidth - 1] != NULL_VALUE //
+                || elevations[index + gridWidth] != NULL_VALUE //
+                || elevations[index + gridWidth + 1] != NULL_VALUE//
+              ;
+            }
+          }
+          if (hasNeighbour) {
+            final double x = minX + gridCellSize * gridX;
+            final double y = minY + gridCellSize * gridY;
+            final PointDoubleXY point = new PointDoubleXY(x, y);
+            points.add(point);
+          }
+        }
+        index++;
+      }
+    }
+    return points;
   }
 
   @Override

@@ -500,13 +500,13 @@ public class MeasureOverlay extends AbstractOverlay {
           measureTextStyle.setTextDx(Measure.valueOf(-5, NonSI.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n-1)");
           measureTextStyle.setTextVerticalAlignment("middle");
-          textPoint = this.measureGeometry.getVertex(0, -2);
+          textPoint = this.measureGeometry.getToVertex(0, 1);
         } else {
           measureTextStyle.setTextDx(Measure.valueOf(-7, NonSI.PIXEL));
           measureTextStyle.setTextDy(Measure.valueOf(-2, NonSI.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n)");
           measureTextStyle.setTextVerticalAlignment("top");
-          textPoint = this.measureGeometry.getVertex(-1);
+          textPoint = this.measureGeometry.getToVertex(0);
         }
         TextStyleRenderer.renderText(viewport, graphics, this.measureLabel, textPoint,
           measureTextStyle);

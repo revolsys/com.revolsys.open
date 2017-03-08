@@ -71,7 +71,7 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
     final int gridHeight, final int gridCellSize) {
     super(geometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize,
       CompactBinaryGriddedElevation.HEADER_SIZE, 4);
-    setzBoundsUpdateRequired(false);
+    setZBoundsUpdateRequired(false);
     this.openOptions = Sets.newHashSet(StandardOpenOption.READ, StandardOpenOption.WRITE,
       StandardOpenOption.SYNC);
     this.createMissing = true;
