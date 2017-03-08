@@ -24,7 +24,6 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Projection;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.Buffers;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
@@ -44,12 +43,12 @@ public class LasProjection {
   private static final int LASF_PROJECTION_WKT_COORDINATE_SYSTEM = 2112;
 
   @SuppressWarnings("unused")
-  private static Object convertGeoTiffProjection(final LasPointCloud lasPointCloud,
+  private static Object convertGeoTiffProjection(final LasPointCloudHeader header,
     final byte[] bytes) {
     try {
       final List<Double> doubleParams = new ArrayList<>();
       {
-        final LasVariableLengthRecord doubleParamsProperty = lasPointCloud
+        final LasVariableLengthRecord doubleParamsProperty = header
           .getLasProperty(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS));
         if (doubleParamsProperty != null) {
           final byte[] doubleParamBytes = doubleParamsProperty.getBytes();
@@ -63,7 +62,7 @@ public class LasProjection {
       }
       byte[] asciiParamsBytes;
       {
-        final LasVariableLengthRecord asciiParamsProperty = lasPointCloud
+        final LasVariableLengthRecord asciiParamsProperty = header
           .getLasProperty(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS));
         if (asciiParamsProperty == null) {
           asciiParamsBytes = new byte[0];
@@ -140,7 +139,7 @@ public class LasProjection {
       } else {
         coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
       }
-      lasPointCloud.setCoordinateSystemInternal(coordinateSystem);
+      header.setCoordinateSystemInternal(coordinateSystem);
       return coordinateSystem;
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
@@ -148,16 +147,16 @@ public class LasProjection {
   }
 
   public static void init(
-    final Map<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> vlrfactory) {
+    final Map<Pair<String, Integer>, BiFunction<LasPointCloudHeader, byte[], Object>> vlrfactory) {
     vlrfactory.put(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG),
       LasProjection::convertGeoTiffProjection);
   }
 
-  protected static void setCoordinateSystem(final LasPointCloud pointCloud,
+  protected static void setCoordinateSystem(final LasPointCloudHeader header,
     final CoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
-      pointCloud.removeLasProperties(LASF_PROJECTION);
-      final LasPointFormat pointFormat = pointCloud.getPointFormat();
+      header.removeLasProperties(LASF_PROJECTION);
+      final LasPointFormat pointFormat = header.getPointFormat();
       if (pointFormat.getId() <= 5) {
         final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
         int keyId;
@@ -185,7 +184,7 @@ public class LasProjection {
         final LasVariableLengthRecord property = new LasVariableLengthRecord(LASF_PROJECTION,
           LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG, "TIFF GeoKeyDirectoryTag", bytes,
           coordinateSystem);
-        pointCloud.addProperty(property);
+        header.addProperty(property);
       } else {
         final String wkt = EpsgCoordinateSystems.toWkt(coordinateSystem);
         final byte[] stringBytes = wkt.getBytes(StandardCharsets.UTF_8);
@@ -193,7 +192,7 @@ public class LasProjection {
         System.arraycopy(stringBytes, 0, bytes, 0, stringBytes.length);
         final LasVariableLengthRecord property = new LasVariableLengthRecord(LASF_PROJECTION,
           LASF_PROJECTION_WKT_COORDINATE_SYSTEM, "WKT", bytes, coordinateSystem);
-        pointCloud.addProperty(property);
+        header.addProperty(property);
       }
     }
   }

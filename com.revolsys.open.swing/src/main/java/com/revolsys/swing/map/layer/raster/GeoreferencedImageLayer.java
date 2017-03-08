@@ -284,7 +284,6 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (this.image != null) {
-      System.out.println(boundingBox);
       this.image.setBoundingBox(boundingBox);
     }
   }

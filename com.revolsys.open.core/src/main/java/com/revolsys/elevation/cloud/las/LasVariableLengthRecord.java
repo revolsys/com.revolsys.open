@@ -33,9 +33,9 @@ public class LasVariableLengthRecord {
     this.value = value;
   }
 
-  void convertValue(final BiFunction<LasPointCloud, byte[], Object> converter,
-    final LasPointCloud lasPointCloud) {
-    this.value = converter.apply(lasPointCloud, this.bytes);
+  void convertValue(final BiFunction<LasPointCloudHeader, byte[], Object> converter,
+    final LasPointCloudHeader header) {
+    this.value = converter.apply(header, this.bytes);
   }
 
   public byte[] getBytes() {

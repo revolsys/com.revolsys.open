@@ -24,15 +24,15 @@ public class LasZipHeader {
   private static final int LAS_ZIP_TAG = 22204;
 
   public static void init(
-    final Map<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> vlrfactory) {
+    final Map<Pair<String, Integer>, BiFunction<LasPointCloudHeader, byte[], Object>> vlrfactory) {
     vlrfactory.put(new Pair<>(LAS_ZIP, LAS_ZIP_TAG), LasZipHeader::newLasZipHeader);
   }
 
-  private static LasZipHeader newLasZipHeader(final LasPointCloud lasPointCloud,
+  private static LasZipHeader newLasZipHeader(final LasPointCloudHeader header,
     final byte[] bytes) {
     try {
-      final LasZipHeader lasZipHeader = new LasZipHeader(lasPointCloud, bytes);
-      lasPointCloud.setLasZipHeader(lasZipHeader);
+      final LasZipHeader lasZipHeader = new LasZipHeader(bytes);
+      header.setLasZipHeader(lasZipHeader);
       return lasZipHeader;
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
@@ -63,7 +63,7 @@ public class LasZipHeader {
 
   private final Version version;
 
-  private LasZipHeader(final LasPointCloud lasPointCloud, final byte[] bytes) throws IOException {
+  private LasZipHeader(final byte[] bytes) throws IOException {
     final ByteBuffer buffer = ByteBuffer.wrap(bytes);
     this.compressor = Buffers.getLEUnsignedShort(buffer);
     this.coder = Buffers.getLEUnsignedShort(buffer);
@@ -118,12 +118,12 @@ public class LasZipHeader {
     return this.version;
   }
 
-  public int[] getVersions() {
-    return this.versions;
-  }
-
   public int getVersion(final int i) {
     return this.versions[i];
+  }
+
+  public int[] getVersions() {
+    return this.versions;
   }
 
   public boolean isCompressor(final byte compressor) {

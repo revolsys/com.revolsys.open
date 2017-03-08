@@ -21,3 +21,4 @@ com.revolsys.record.io.format.wkt.Wkt
 com.revolsys.record.io.format.xbase.XBase
 com.revolsys.record.io.format.xlsx.Xlsx
 com.revolsys.record.io.format.xml.Xml
+com.revolsys.elevation.cloud.las.LasPointCloudFactory

@@ -108,6 +108,9 @@
       "methodName": "newLayer"
     },
     {
+      "typeClass": "com.revolsys.swing.map.layer.pointcloud.PointCloudLayer"
+    },
+    {
       "typeClass": "com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer"
     },
     {

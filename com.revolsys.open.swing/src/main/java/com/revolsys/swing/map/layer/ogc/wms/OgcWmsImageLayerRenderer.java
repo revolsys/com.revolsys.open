@@ -88,7 +88,9 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
     }
     this.image = image;
     final OgcWmsImageLayer layer = getLayer();
-    layer.firePropertyChange("imageLoaded", false, true);
+    if (layer != null) {
+      layer.firePropertyChange("imageLoaded", false, true);
+    }
   }
 
   @Override

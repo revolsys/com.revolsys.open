@@ -41,6 +41,7 @@ import com.revolsys.util.Property;
 
 public class GriddedElevationModelLayer extends AbstractLayer {
   public static final String J_TYPE = "griddedElevationModelLayer";
+
   static {
     final MenuFactory menu = MenuFactory.getMenu(GriddedElevationModelLayer.class);
     menu.addGroup(0, "table");
