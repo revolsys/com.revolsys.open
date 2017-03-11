@@ -232,14 +232,6 @@ public final class LineStringUtil {
     return z;
   }
 
-  public static Point getEndPoint(final LineString line, final boolean fromPoint) {
-    if (fromPoint) {
-      return line.getPoint(0);
-    } else {
-      return line.getPoint(-1);
-    }
-  }
-
   public static boolean hasEqualExact2d(final List<LineString> lines, final LineString newLine) {
     for (final LineString line : lines) {
       if (line.equals(2, newLine)) {

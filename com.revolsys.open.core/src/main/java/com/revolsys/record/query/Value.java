@@ -10,6 +10,7 @@ import java.util.List;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
@@ -23,7 +24,10 @@ import com.revolsys.util.Strings;
 
 public class Value implements QueryValue {
   public static Object getValue(final Object value) {
-    if (value instanceof Identifier) {
+    if (value instanceof TypedIdentifier) {
+      final Identifier identifier = (Identifier)value;
+      return identifier;
+    } else if (value instanceof Identifier) {
       final Identifier identifier = (Identifier)value;
       return identifier.toSingleValue();
     } else {

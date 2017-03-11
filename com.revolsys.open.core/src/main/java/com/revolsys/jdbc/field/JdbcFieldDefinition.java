@@ -12,6 +12,7 @@ import java.util.Map;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 
@@ -57,7 +58,9 @@ public class JdbcFieldDefinition extends FieldDefinition {
     DataTypes.OBJECT, Types.OTHER, 0, 0, false, null, null);
 
   public static JdbcFieldDefinition newFieldDefinition(Object value) {
-    if (value instanceof Identifier) {
+    if (value instanceof TypedIdentifier) {
+      return FIELD_STRING;
+    } else if (value instanceof Identifier) {
       final Identifier identifier = (Identifier)value;
       value = identifier.toSingleValue();
     }

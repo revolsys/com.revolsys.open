@@ -38,6 +38,24 @@ public class PointRecordMap {
     this.comparator = comparator;
   }
 
+  public void addAll(final Iterable<Record> records) {
+    for (final Record record : records) {
+      addRecord(record);
+    }
+  }
+
+  public void addRecord(final Point point, final Record record) {
+    final PointDouble key = getKey(point);
+    final List<Record> records = getOrCreateRecords(key);
+    if (!record.contains(records)) {
+      records.add(record);
+    }
+    if (this.comparator != null) {
+      Collections.sort(records, this.comparator);
+    }
+    this.size++;
+  }
+
   /**
    * Add a {@link Point} {@link Record} to the list of objects at the given
    * coordinate.
@@ -45,20 +63,9 @@ public class PointRecordMap {
    * @param pointObjects The map of point objects.
    * @param record The object to add.
    */
-  public void add(final Record record) {
-    final PointDouble key = getKey(record);
-    final List<Record> records = getOrCreateRecords(key);
-    records.add(record);
-    if (this.comparator != null) {
-      Collections.sort(records, this.comparator);
-    }
-    this.size++;
-  }
-
-  public void addAll(final Iterable<Record> records) {
-    for (final Record record : records) {
-      add(record);
-    }
+  public void addRecord(final Record record) {
+    final Point point = record.getGeometry();
+    addRecord(point, record);
   }
 
   public void clear() {
@@ -104,8 +111,8 @@ public class PointRecordMap {
     return new PointDouble(point, 2);
   }
 
-  private PointDouble getKey(final Record object) {
-    final Point point = object.getGeometry();
+  private PointDouble getKey(final Record record) {
+    final Point point = record.getGeometry();
     return getKey(point);
   }
 
@@ -144,6 +151,12 @@ public class PointRecordMap {
     return objects;
   }
 
+  public boolean hasRecord(final Point point) {
+    final PointDouble key = getKey(point);
+    final List<Record> records = this.recordMap.get(key);
+    return records != null && !records.isEmpty();
+  }
+
   public void initialize(final Point point) {
     if (!isRemoveEmptyLists()) {
       final PointDouble key = getKey(point);
@@ -155,24 +168,25 @@ public class PointRecordMap {
     return this.removeEmptyLists;
   }
 
-  public void remove(final Record record) {
+  public void removeRecord(final Record record) {
     final PointDouble key = getKey(record);
-    final List<Record> objects = this.recordMap.get(key);
-    if (objects != null) {
-      objects.remove(record);
-      if (objects.isEmpty()) {
+    final List<Record> records = this.recordMap.get(key);
+    if (records != null) {
+      records.remove(record);
+      if (records.isEmpty()) {
         if (isRemoveEmptyLists()) {
           this.recordMap.remove(key);
         }
       } else if (this.comparator != null) {
-        Collections.sort(objects, this.comparator);
+        Collections.sort(records, this.comparator);
       }
     }
     this.size--;
   }
 
-  public void setRemoveEmptyLists(final boolean removeEmptyLists) {
+  public PointRecordMap setRemoveEmptyLists(final boolean removeEmptyLists) {
     this.removeEmptyLists = removeEmptyLists;
+    return this;
   }
 
   public int size() {
@@ -186,6 +200,11 @@ public class PointRecordMap {
         Collections.sort(records, this.comparator);
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return this.recordMap.toString();
   }
 
   public void write(final Channel<Record> out) {

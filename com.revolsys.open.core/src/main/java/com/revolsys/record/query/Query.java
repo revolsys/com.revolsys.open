@@ -413,7 +413,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     setWhereCondition(whereCondition);
   }
 
-  public void setWhereCondition(final Condition whereCondition) {
+  public Query setWhereCondition(final Condition whereCondition) {
     if (whereCondition == null) {
       this.whereCondition = Condition.ALL;
     } else {
@@ -423,6 +423,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
         whereCondition.setRecordDefinition(recordDefinition);
       }
     }
+    return this;
   }
 
   public <V extends Record> void sort(final List<V> records) {
