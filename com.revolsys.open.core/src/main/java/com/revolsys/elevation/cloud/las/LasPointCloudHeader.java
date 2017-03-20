@@ -67,7 +67,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   private final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = new LinkedHashMap<>();
 
-  private Version version = LasPointCloudHeader.VERSION_1_4;
+  private Version version = LasPointCloudHeader.VERSION_1_2;
 
   private long pointCount = 0;
 
