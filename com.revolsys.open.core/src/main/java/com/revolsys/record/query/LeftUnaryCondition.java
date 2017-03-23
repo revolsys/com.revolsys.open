@@ -1,21 +1,15 @@
 package com.revolsys.record.query;
 
-import java.sql.PreparedStatement;
-import java.util.Collections;
-import java.util.List;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.record.schema.RecordStore;
 
-public class LeftUnaryCondition extends Condition {
+public class LeftUnaryCondition extends AbstractUnaryQueryValue implements Condition {
 
   private final String operator;
 
-  private QueryValue value;
-
   public LeftUnaryCondition(final String operator, final QueryValue value) {
+    super(value);
     this.operator = operator;
-    this.value = value;
   }
 
   @Override
@@ -23,29 +17,20 @@ public class LeftUnaryCondition extends Condition {
     final StringBuilder buffer) {
     buffer.append(this.operator);
     buffer.append(" ");
-    this.value.appendSql(query, recordStore, buffer);
-  }
-
-  @Override
-  public int appendParameters(final int index, final PreparedStatement statement) {
-    return this.value.appendParameters(index, statement);
+    super.appendDefaultSql(query, recordStore, buffer);
   }
 
   @Override
   public LeftUnaryCondition clone() {
-    final LeftUnaryCondition clone = (LeftUnaryCondition)super.clone();
-    clone.value = this.value.clone();
-    return clone;
+    return (LeftUnaryCondition)super.clone();
   }
 
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof LeftUnaryCondition) {
-      final LeftUnaryCondition value = (LeftUnaryCondition)obj;
-      if (DataType.equal(value.getQueryValue(), this.getQueryValue())) {
-        if (DataType.equal(value.getOperator(), this.getOperator())) {
-          return true;
-        }
+      final LeftUnaryCondition condition = (LeftUnaryCondition)obj;
+      if (DataType.equal(condition.getOperator(), this.getOperator())) {
+        return super.equals(condition);
       }
     }
     return false;
@@ -55,18 +40,8 @@ public class LeftUnaryCondition extends Condition {
     return this.operator;
   }
 
-  @SuppressWarnings("unchecked")
-  public <V extends QueryValue> V getQueryValue() {
-    return (V)this.value;
-  }
-
-  @Override
-  public List<QueryValue> getQueryValues() {
-    return Collections.singletonList(this.value);
-  }
-
   @Override
   public String toString() {
-    return this.operator + " " + this.value;
+    return this.operator + " " + super.toString();
   }
 }

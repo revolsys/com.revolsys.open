@@ -3,6 +3,7 @@ package com.revolsys.record.query.functions;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -12,8 +13,9 @@ import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.util.Exceptions;
 
-public class WithinDistance extends Condition {
+public class WithinDistance implements Condition {
   private QueryValue distanceValue;
 
   private QueryValue geometry1Value;
@@ -59,17 +61,21 @@ public class WithinDistance extends Condition {
 
   @Override
   public WithinDistance clone() {
-    final WithinDistance clone = (WithinDistance)super.clone();
-    if (this.geometry1Value != null) {
-      clone.geometry1Value = this.geometry1Value.clone();
+    try {
+      final WithinDistance clone = (WithinDistance)super.clone();
+      if (this.geometry1Value != null) {
+        clone.geometry1Value = this.geometry1Value.clone();
+      }
+      if (this.geometry2Value != null) {
+        clone.geometry2Value = this.geometry2Value.clone();
+      }
+      if (this.distanceValue != null) {
+        clone.distanceValue = this.distanceValue.clone();
+      }
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      throw Exceptions.wrap(e);
     }
-    if (this.geometry2Value != null) {
-      clone.geometry2Value = this.geometry2Value.clone();
-    }
-    if (this.distanceValue != null) {
-      clone.distanceValue = this.distanceValue.clone();
-    }
-    return clone;
   }
 
   @Override
@@ -129,6 +135,26 @@ public class WithinDistance extends Condition {
     final Object value2 = this.distanceValue;
     return "DWithin(" + DataTypes.toString(value) + "," + DataTypes.toString(value1) + ","
       + DataTypes.toString(value2) + ")";
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <QV extends QueryValue> QV updateQueryValues(
+    final Function<QueryValue, QueryValue> valueHandler) {
+    final QueryValue distanceValue = valueHandler.apply(this.distanceValue);
+    final QueryValue geometry1Value = valueHandler.apply(this.geometry1Value);
+    final QueryValue geometry2Value = valueHandler.apply(this.geometry2Value);
+
+    if (distanceValue == this.distanceValue && geometry1Value == this.geometry1Value
+      && geometry2Value == this.geometry2Value) {
+      return (QV)this;
+    } else {
+      final WithinDistance clone = clone();
+      clone.distanceValue = distanceValue;
+      clone.geometry1Value = geometry1Value;
+      clone.geometry2Value = geometry2Value;
+      return (QV)clone;
+    }
   }
 
 }

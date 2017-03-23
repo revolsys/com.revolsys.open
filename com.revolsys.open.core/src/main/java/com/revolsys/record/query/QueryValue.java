@@ -405,4 +405,10 @@ public interface QueryValue extends Cloneable {
     return toString();
   }
 
+  @SuppressWarnings("unchecked")
+  default <QV extends QueryValue> QV updateQueryValues(
+    final java.util.function.Function<QueryValue, QueryValue> valueHandler) {
+    return (QV)this;
+  }
+
 }

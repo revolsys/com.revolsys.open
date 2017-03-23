@@ -254,7 +254,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     } else if (condition instanceof LeftUnaryCondition) {
       final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
       final String operator = unaryCondition.getOperator();
-      final QueryValue right = unaryCondition.getQueryValue();
+      final QueryValue right = unaryCondition.getValue();
       buffer.append(operator);
       buffer.append(" ");
       appendQueryValue(query, buffer, right);

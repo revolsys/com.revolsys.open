@@ -1,68 +1,35 @@
 package com.revolsys.record.query.functions;
 
-import java.sql.PreparedStatement;
-import java.util.Arrays;
-import java.util.List;
-
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
+import com.revolsys.record.query.AbstractBinaryQueryValue;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
 
-public class EnvelopeIntersects extends Condition {
-  private QueryValue boundingBox1Value;
-
-  private QueryValue boundingBox2Value;
+public class EnvelopeIntersects extends AbstractBinaryQueryValue implements Condition {
 
   public EnvelopeIntersects(final QueryValue boundingBox1Value,
     final QueryValue boundingBox2Value) {
-    this.boundingBox1Value = boundingBox1Value;
-    this.boundingBox2Value = boundingBox2Value;
+    super(boundingBox1Value, boundingBox2Value);
   }
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
     buffer.append("ST_INTERSECTS(");
-    if (this.boundingBox1Value == null) {
-      buffer.append("NULL");
-    } else {
-      this.boundingBox1Value.appendSql(query, recordStore, buffer);
-    }
+    appendLeft(buffer, query, recordStore);
     buffer.append(", ");
-    if (this.boundingBox2Value == null) {
-      buffer.append("NULL");
-    } else {
-      this.boundingBox2Value.appendSql(query, recordStore, buffer);
-    }
+    appendRight(buffer, query, recordStore);
     buffer.append(")");
-  }
-
-  @Override
-  public int appendParameters(int index, final PreparedStatement statement) {
-    if (this.boundingBox1Value != null) {
-      index = this.boundingBox1Value.appendParameters(index, statement);
-    }
-    if (this.boundingBox2Value != null) {
-      index = this.boundingBox2Value.appendParameters(index, statement);
-    }
-    return index;
   }
 
   @Override
   public EnvelopeIntersects clone() {
     final EnvelopeIntersects clone = (EnvelopeIntersects)super.clone();
-    if (this.boundingBox1Value != null) {
-      clone.boundingBox1Value = this.boundingBox1Value.clone();
-    }
-    if (this.boundingBox2Value != null) {
-      clone.boundingBox2Value = this.boundingBox2Value.clone();
-    }
     return clone;
   }
 
@@ -70,11 +37,7 @@ public class EnvelopeIntersects extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof EnvelopeIntersects) {
       final EnvelopeIntersects condition = (EnvelopeIntersects)obj;
-      if (DataType.equal(condition.boundingBox1Value, this.boundingBox1Value)) {
-        if (DataType.equal(condition.boundingBox2Value, this.boundingBox1Value)) {
-          return true;
-        }
-      }
+      return super.equals(condition);
     }
     return false;
   }
@@ -96,22 +59,19 @@ public class EnvelopeIntersects extends Condition {
   }
 
   public QueryValue getBoundingBox1Value() {
-    return this.boundingBox1Value;
+    return getLeft();
   }
 
   public QueryValue getBoundingBox2Value() {
-    return this.boundingBox2Value;
-  }
-
-  @Override
-  public List<QueryValue> getQueryValues() {
-    return Arrays.asList(this.boundingBox1Value, this.boundingBox2Value);
+    return getRight();
   }
 
   @Override
   public boolean test(final Record record) {
-    final BoundingBox boundingBox1 = getBoundingBox(this.boundingBox1Value, record);
-    final BoundingBox boundingBox2 = getBoundingBox(this.boundingBox2Value, record);
+    final QueryValue left = getLeft();
+    final BoundingBox boundingBox1 = getBoundingBox(left, record);
+    final QueryValue right = getRight();
+    final BoundingBox boundingBox2 = getBoundingBox(right, record);
     if (boundingBox1 == null || boundingBox2 == null) {
       return false;
     } else {
@@ -121,9 +81,9 @@ public class EnvelopeIntersects extends Condition {
 
   @Override
   public String toString() {
-    final Object value = this.boundingBox1Value;
-    final Object value1 = this.boundingBox2Value;
-    return "ST_INTERSECTS(" + DataTypes.toString(value) + "," + DataTypes.toString(value1) + ")";
+    final QueryValue left = getLeft();
+    final QueryValue right = getRight();
+    return "ST_INTERSECTS(" + DataTypes.toString(left) + "," + DataTypes.toString(right) + ")";
   }
 
 }

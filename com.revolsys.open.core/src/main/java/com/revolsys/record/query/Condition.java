@@ -6,11 +6,11 @@ import com.revolsys.record.Record;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
 
-public abstract class Condition implements QueryValue, Predicate<Record>, Emptyable {
+public interface Condition extends QueryValue, Predicate<Record>, Emptyable {
 
-  public static final AcceptAllCondition ALL = new AcceptAllCondition();
+  static final AcceptAllCondition ALL = new AcceptAllCondition();
 
-  public Condition and(final Condition condition) {
+  default Condition and(final Condition condition) {
     if (Property.isEmpty(condition)) {
       return this;
     } else if (Property.isEmpty(this)) {
@@ -21,27 +21,21 @@ public abstract class Condition implements QueryValue, Predicate<Record>, Emptya
   }
 
   @Override
-  public Condition clone() {
-    try {
-      return (Condition)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      return null;
-    }
-  }
+  Condition clone();
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V getValue(final Record record) {
+  default <V> V getValue(final Record record) {
     final Boolean value = test(record);
     return (V)value;
   }
 
   @Override
-  public boolean isEmpty() {
+  default boolean isEmpty() {
     return false;
   }
 
-  public Condition not() {
+  default Condition not() {
     if (Property.isEmpty(this)) {
       return this;
     } else {
@@ -49,7 +43,7 @@ public abstract class Condition implements QueryValue, Predicate<Record>, Emptya
     }
   }
 
-  public Condition or(final Condition condition) {
+  default Condition or(final Condition condition) {
     if (Property.isEmpty(condition)) {
       return this;
     } else if (Property.isEmpty(this)) {
@@ -60,12 +54,12 @@ public abstract class Condition implements QueryValue, Predicate<Record>, Emptya
   }
 
   @Override
-  public boolean test(final Record record) {
+  default boolean test(final Record record) {
     throw new UnsupportedOperationException("Cannot filter using " + toString());
   }
 
   @Override
-  public String toFormattedString() {
+  default String toFormattedString() {
     return toString();
   }
 }

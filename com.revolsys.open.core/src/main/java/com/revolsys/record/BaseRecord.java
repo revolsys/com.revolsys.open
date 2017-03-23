@@ -28,6 +28,11 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
   }
 
   @Override
+  public boolean isState(final RecordState state) {
+    return this.state == state;
+  }
+
+  @Override
   public RecordState setState(final RecordState state) {
     final RecordState oldState = this.getState();
     this.state = state;

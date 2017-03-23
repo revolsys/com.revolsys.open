@@ -69,6 +69,7 @@ import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.MathUtil;
@@ -1420,6 +1421,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public BoundingBox newBoundingBoxEmpty() {
     return new BoundingBoxDoubleGf(this);
+  }
+
+  public double[] newBounds(final int axisCount) {
+    return BoundingBoxUtil.newBounds(axisCount);
   }
 
   /**

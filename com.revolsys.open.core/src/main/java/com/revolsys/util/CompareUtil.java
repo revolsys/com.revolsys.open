@@ -1,11 +1,15 @@
 package com.revolsys.util;
 
+import java.text.Collator;
 import java.util.Comparator;
 
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.datatype.DataTypes;
 
 public class CompareUtil {
+
+  public static final Comparator<?> INSTANCE = CompareUtil::compare;
+
   public static <T> int compare(final Comparable<T> object1, final T object2) {
     if (object1 == null) {
       if (object2 == null) {
@@ -82,6 +86,16 @@ public class CompareUtil {
       return comparable.compareTo(object2);
     } else {
       return object1.toString().compareTo(object2.toString());
+    }
+  }
+
+  public static Comparator<?> getComparator(final Class<?> columnClass) {
+    if (Number.class.isAssignableFrom(columnClass)) {
+      return new NumericComparator<>();
+    } else if (Comparable.class.isAssignableFrom(columnClass)) {
+      return INSTANCE;
+    } else {
+      return Collator.getInstance();
     }
   }
 }

@@ -1,9 +1,7 @@
 package com.revolsys.swing.map.layer.record.table;
 
-import java.text.Collator;
 import java.util.Comparator;
 
-import com.revolsys.comparator.NumericComparator;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
@@ -29,19 +27,11 @@ public class RecordLayerTableRowSorter extends BaseRowSorter {
     final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
     final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
     if (codeTable == null) {
-      final Class<?> columnClass = model.getColumnClass(columnIndex);
       final Comparator<?> comparator = super.getComparator(columnIndex);
-      if (comparator != null) {
-        return comparator;
-      }
-      if (columnClass == String.class) {
-        return Collator.getInstance();
-      } else if (Number.class.isAssignableFrom(columnClass)) {
-        return new NumericComparator<>();
-      } else if (Comparable.class.isAssignableFrom(columnClass)) {
-        return COMPARABLE_COMPARATOR;
+      if (comparator == null) {
+        return this.layer.getComparator(fieldName);
       } else {
-        return Collator.getInstance();
+        return comparator;
       }
     } else {
       return codeTable;

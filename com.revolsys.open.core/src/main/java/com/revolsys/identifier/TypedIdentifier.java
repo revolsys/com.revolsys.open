@@ -80,20 +80,32 @@ public class TypedIdentifier extends AbstractIdentifier implements Comparable<Ob
   }
 
   @Override
-  public int compareTo(final Object other) {
-    int compare = -1;
-    if (other instanceof TypedIdentifier) {
-      final TypedIdentifier typedIdentifier2 = (TypedIdentifier)other;
+  public int compareTo(final Identifier identifier) {
+    if (identifier == this) {
+      return 0;
+    } else if (identifier instanceof TypedIdentifier) {
+      final TypedIdentifier typedIdentifier2 = (TypedIdentifier)identifier;
       final String type1 = getType();
       final String type2 = typedIdentifier2.getType();
-      compare = type1.compareTo(type2);
+      int compare = type1.compareTo(type2);
       if (compare == 0) {
         final Identifier identifier1 = getIdentifier();
         final Identifier identifier2 = typedIdentifier2.getIdentifier();
         compare = CompareUtil.compare(identifier1, identifier2);
       }
+      return compare;
+    } else {
+      return 1;
     }
-    return compare;
+  }
+
+  @Override
+  public int compareTo(final Object other) {
+    if (other instanceof Identifier) {
+      return compareTo(this.identifier);
+    } else {
+      return -1;
+    }
   }
 
   public boolean equalsType(final String type) {

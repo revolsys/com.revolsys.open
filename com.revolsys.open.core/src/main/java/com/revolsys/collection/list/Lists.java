@@ -325,6 +325,13 @@ public interface Lists {
     }
   }
 
+  public static <V> List<V> to(final Supplier<List<V>> factory,
+    final Iterable<? extends V> values) {
+    final List<V> list = factory.get();
+    addAll(list, values);
+    return list;
+  }
+
   public static <V> List<V> toArray(final Iterable<? extends V> values) {
     final List<V> list = new ArrayList<>();
     addAll(list, values);

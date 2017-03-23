@@ -1,27 +1,25 @@
 package com.revolsys.record.query.functions;
 
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
+import com.revolsys.record.query.AbstractMultiQueryValue;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Strings;
 
-public class Function implements QueryValue {
+public class Function extends AbstractMultiQueryValue {
 
   private final String name;
 
-  private List<QueryValue> parameters;
-
   public Function(final String name, final List<QueryValue> parameters) {
+    super(parameters);
     this.name = name;
-    this.parameters = new ArrayList<>(parameters);
   }
 
   public Function(final String name, final QueryValue... parameters) {
@@ -29,7 +27,7 @@ public class Function implements QueryValue {
   }
 
   public void add(final QueryValue value) {
-    this.parameters.add(value);
+    addValue(value);
   }
 
   @Override
@@ -57,19 +55,10 @@ public class Function implements QueryValue {
     return index;
   }
 
-  public void clear() {
-    this.parameters.clear();
-  }
-
   @Override
   public Function clone() {
-    try {
-      final Function clone = (Function)super.clone();
-      clone.parameters = QueryValue.cloneQueryValues(this.parameters);
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      return null;
-    }
+    final Function clone = (Function)super.clone();
+    return clone;
   }
 
   @Override
@@ -108,7 +97,7 @@ public class Function implements QueryValue {
   }
 
   public List<QueryValue> getParameters() {
-    return Collections.unmodifiableList(this.parameters);
+    return Collections.unmodifiableList(getQueryValues());
   }
 
   public String getParameterStringValue(final int index, final Record record) {
@@ -128,12 +117,6 @@ public class Function implements QueryValue {
       final V value = parameter.getValue(record);
       return value;
     }
-  }
-
-  @Override
-  public List<QueryValue> getQueryValues() {
-    return Collections.<QueryValue> unmodifiableList(this.parameters);
-
   }
 
   @Override

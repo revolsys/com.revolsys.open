@@ -902,6 +902,8 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     }
   }
 
+  boolean isState(RecordState state);
+
   default boolean isValid(final CharSequence fieldName) {
     return true;
   }

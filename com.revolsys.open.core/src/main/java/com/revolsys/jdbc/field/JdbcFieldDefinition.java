@@ -174,7 +174,11 @@ public class JdbcFieldDefinition extends FieldDefinition {
 
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
-    statement.setObject(parameterIndex, value);
+    if (value == null) {
+      statement.setNull(parameterIndex, this.sqlType);
+    } else {
+      statement.setObject(parameterIndex, value);
+    }
     return parameterIndex + 1;
   }
 
