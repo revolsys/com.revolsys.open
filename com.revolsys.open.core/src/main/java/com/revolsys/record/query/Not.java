@@ -23,7 +23,7 @@ public class Not extends LeftUnaryCondition {
 
   @Override
   public boolean test(final Record object) {
-    final Condition condition = getQueryValue();
+    final Condition condition = getValue();
     if (condition.test(object)) {
       return false;
     } else {

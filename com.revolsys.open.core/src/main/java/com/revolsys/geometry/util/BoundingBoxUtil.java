@@ -1,6 +1,7 @@
 package com.revolsys.geometry.util;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 
@@ -41,11 +42,14 @@ public class BoundingBoxUtil {
 
   public static void expand(final double[] bounds, final int axisCount,
     final BoundingBox boundingBox) {
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double min = boundingBox.getMin(axisIndex);
-      expand(bounds, axisCount, axisIndex, min);
-      final double max = boundingBox.getMax(axisIndex);
-      expand(bounds, axisCount, axisIndex, max);
+    if (boundingBox != null) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double min = boundingBox.getMin(axisIndex);
+        expand(bounds, axisCount, axisIndex, min);
+
+        final double max = boundingBox.getMax(axisIndex);
+        expand(bounds, axisCount, axisIndex, max);
+      }
     }
   }
 
@@ -54,6 +58,13 @@ public class BoundingBoxUtil {
     for (int axisIndex = 0; axisIndex < axisCount && axisIndex < coordinates.length; axisIndex++) {
       final double coordinate = coordinates[axisIndex];
       expand(bounds, axisCount, axisIndex, coordinate);
+    }
+  }
+
+  public static void expand(final double[] bounds, final int axisCount, final Geometry geometry) {
+    if (geometry != null) {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      expand(bounds, axisCount, boundingBox);
     }
   }
 

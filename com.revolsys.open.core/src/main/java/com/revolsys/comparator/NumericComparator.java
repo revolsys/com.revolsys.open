@@ -31,9 +31,29 @@ public class NumericComparator<T> implements Comparator<T> {
     } else if (value2 == null) {
       return -1;
     } else {
-      final BigDecimal number1 = BigDecimals.toValid(value1);
-      final BigDecimal number2 = BigDecimals.toValid(value2);
-      return number1.compareTo(number2);
+      BigDecimal number1 = null;
+      try {
+        number1 = BigDecimals.toValid(value1);
+      } catch (final Exception e) {
+      }
+      BigDecimal number2 = null;
+      try {
+        number2 = BigDecimals.toValid(value2);
+      } catch (final Exception e) {
+      }
+      if (number1 == null) {
+        if (number2 == null) {
+          return value1.toString().compareTo(value2.toString());
+        } else {
+          return 1;
+        }
+      } else {
+        if (number2 == null) {
+          return -1;
+        } else {
+          return number1.compareTo(number2);
+        }
+      }
     }
   }
 
@@ -47,9 +67,29 @@ public class NumericComparator<T> implements Comparator<T> {
     } else if (value2 == null) {
       return 1;
     } else {
-      final BigDecimal number1 = BigDecimals.toValid(value1);
-      final BigDecimal number2 = BigDecimals.toValid(value2);
-      return number1.compareTo(number2);
+      BigDecimal number1 = null;
+      try {
+        number1 = BigDecimals.toValid(value1);
+      } catch (final Exception e) {
+      }
+      BigDecimal number2 = null;
+      try {
+        number2 = BigDecimals.toValid(value2);
+      } catch (final Exception e) {
+      }
+      if (number1 == null) {
+        if (number2 == null) {
+          return value1.toString().compareTo(value2.toString());
+        } else {
+          return -1;
+        }
+      } else {
+        if (number2 == null) {
+          return 1;
+        } else {
+          return number1.compareTo(number2);
+        }
+      }
     }
   }
 

@@ -346,7 +346,7 @@ public class FieldFilterPanel extends JComponent
           simple = true;
         } else if (filter instanceof Not) {
           final Not not = (Not)filter;
-          final QueryValue condition = not.getQueryValue();
+          final QueryValue condition = not.getValue();
           if (condition instanceof IsNull) {
             final IsNull isNull = (IsNull)condition;
             final IsNotNull isNotNull = new IsNotNull(isNull.getValue());
@@ -559,8 +559,7 @@ public class FieldFilterPanel extends JComponent
           }
           this.codeTable = null;
         } else {
-          searchField = QueryWhereConditionField.newSearchField(this.layer, this.field,
-            this.codeTable);
+          searchField = this.layer.newSearchField(this.field, this.codeTable);
         }
 
         setSearchField(searchField);
@@ -596,16 +595,9 @@ public class FieldFilterPanel extends JComponent
           } else {
             Object value = null;
             if (this.codeTable == null) {
-              try {
-                value = this.field.toFieldValueException(searchValue);
-              } catch (final Throwable t) {
-                return;
-              }
+              value = this.layer.getValidSearchValue(this.field, searchValue);
             } else {
               value = this.codeTable.getIdentifier(searchValue);
-              if (value == null) {
-                return;
-              }
             }
             if (value != null) {
               condition = Q.binary(this.field, searchOperator, value);

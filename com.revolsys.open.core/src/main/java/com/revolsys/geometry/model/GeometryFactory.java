@@ -1931,6 +1931,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return lineBuilder;
   }
 
+  public double[] newBounds(final int axisCount) {
+    return BoundingBoxUtil.newBounds(axisCount);
+  }
+
   /**
    * <p>Construct a newn empty {@link Point}.</p>
    *

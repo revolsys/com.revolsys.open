@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,6 +30,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -65,6 +67,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.Records;
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordIo;
 import com.revolsys.record.io.RecordReader;
@@ -91,6 +94,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.RecordReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
+import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.swing.map.MapPanel;
@@ -103,6 +107,7 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.component.MergeRecordsDialog;
+import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
@@ -958,6 +963,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return Collections.<Class<?>> singleton(AbstractRecordLayerRenderer.class);
   }
 
+  public Comparator<?> getComparator(final String fieldName) {
+    final FieldDefinition field = getFieldDefinition(fieldName);
+    if (field == null) {
+      return CompareUtil.INSTANCE;
+    } else {
+      final Class<?> typeClass = field.getTypeClass();
+      return CompareUtil.getComparator(typeClass);
+    }
+  }
+
   @Override
   public CoordinateSystem getCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
@@ -1443,17 +1458,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public <R extends LayerRecord> List<R> getRecords(final Map<String, ? extends Object> filter) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final Query query = Query.and(recordDefinition, filter);
-    return getRecords(query);
-  }
-
-  public <R extends LayerRecord> List<R> getRecords(final PathName pathName) {
-    final Query query = new Query(pathName);
-    return getRecords(query);
-  }
-
   public <R extends LayerRecord> List<R> getRecords(final Query query) {
     final List<R> records = new ArrayList<>();
     forEachRecord(query, (final LayerRecord record) -> {
@@ -1584,6 +1588,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public Collection<String> getUserReadOnlyFieldNames() {
     return Collections.unmodifiableSet(this.userReadOnlyFieldNames);
+  }
+
+  public Object getValidSearchValue(final FieldDefinition field, final Object fieldValue) {
+    try {
+      return field.toFieldValueException(fieldValue);
+    } catch (final Throwable t) {
+      return null;
+    }
   }
 
   public String getWhere() {
@@ -2142,6 +2154,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       proxyRecords.add(proxyRecord);
     }
     return proxyRecords;
+  }
+
+  public JComponent newSearchField(final FieldDefinition fieldDefinition,
+    final CodeTable codeTable) {
+    if (fieldDefinition == null) {
+      return new TextField(20);
+    } else {
+      final String fieldName = fieldDefinition.getName();
+      return RecordLayerFields.newCompactField(this, fieldName, true);
+    }
   }
 
   public UndoableEdit newSetFieldUndo(final LayerRecord record, final String fieldName,

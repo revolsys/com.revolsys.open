@@ -67,7 +67,11 @@ public class Value implements QueryValue {
   @Override
   public int appendParameters(final int index, final PreparedStatement statement) {
     try {
-      return this.jdbcField.setPreparedStatementValue(statement, index, this.queryValue);
+      try {
+        return this.jdbcField.setPreparedStatementValue(statement, index, this.queryValue);
+      } catch (final IllegalArgumentException e) {
+        return this.jdbcField.setPreparedStatementValue(statement, index, null);
+      }
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to set value: " + this.queryValue, e);
     }
@@ -239,5 +243,4 @@ public class Value implements QueryValue {
       return "'" + string.replaceAll("'", "''") + "'";
     }
   }
-
 }

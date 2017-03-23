@@ -12,7 +12,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 
 // TODO accept (how?)
-public class SqlCondition extends Condition {
+public class SqlCondition implements Condition {
   private List<FieldDefinition> parameterAttributes = new ArrayList<>();
 
   private List<Object> parameterValues = new ArrayList<>();

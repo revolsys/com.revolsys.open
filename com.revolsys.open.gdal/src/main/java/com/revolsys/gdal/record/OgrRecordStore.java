@@ -122,7 +122,7 @@ public class OgrRecordStore extends AbstractRecordStore {
     } else if (condition instanceof LeftUnaryCondition) {
       final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
       final String operator = unaryCondition.getOperator();
-      final QueryValue right = unaryCondition.getQueryValue();
+      final QueryValue right = unaryCondition.getValue();
       sql.append(operator);
       sql.append(" ");
       appendQueryValue(query, sql, right);

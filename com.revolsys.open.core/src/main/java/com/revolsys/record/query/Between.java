@@ -3,6 +3,7 @@ package com.revolsys.record.query;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
@@ -10,16 +11,14 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
 
-public class Between extends Condition {
-
-  private Column column;
+public class Between extends AbstractUnaryQueryValue implements Condition {
 
   private Value max;
 
   private Value min;
 
   public Between(final Column column, final Value min, final Value max) {
-    this.column = column;
+    super(column);
     this.min = min;
     this.max = max;
   }
@@ -27,7 +26,7 @@ public class Between extends Condition {
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
-    this.column.appendSql(query, recordStore, buffer);
+    super.appendDefaultSql(query, recordStore, buffer);
     buffer.append(" BETWEEN ");
     this.min.appendSql(query, recordStore, buffer);
     buffer.append(" AND ");
@@ -36,7 +35,7 @@ public class Between extends Condition {
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    index = this.column.appendParameters(index, statement);
+    index = super.appendParameters(index, statement);
     index = this.min.appendParameters(index, statement);
     index = this.max.appendParameters(index, statement);
     return index;
@@ -45,7 +44,6 @@ public class Between extends Condition {
   @Override
   public Between clone() {
     final Between clone = (Between)super.clone();
-    clone.column = JavaBeanUtil.clone(getColumn());
     clone.min = JavaBeanUtil.clone(getMin());
     clone.max = JavaBeanUtil.clone(getMax());
     return clone;
@@ -55,11 +53,9 @@ public class Between extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof Between) {
       final Between condition = (Between)obj;
-      if (DataType.equal(condition.getColumn(), this.getColumn())) {
-        if (DataType.equal(condition.getMin(), this.getMin())) {
-          if (DataType.equal(condition.getMax(), this.getMax())) {
-            return true;
-          }
+      if (DataType.equal(condition.getMin(), this.getMin())) {
+        if (DataType.equal(condition.getMax(), this.getMax())) {
+          return super.equals(condition);
         }
       }
     }
@@ -67,7 +63,7 @@ public class Between extends Condition {
   }
 
   public Column getColumn() {
-    return this.column;
+    return super.getValue();
   }
 
   public Value getMax() {
@@ -80,7 +76,7 @@ public class Between extends Condition {
 
   @Override
   public List<QueryValue> getQueryValues() {
-    return Arrays.<QueryValue> asList(this.column, this.min, this.max);
+    return Arrays.<QueryValue> asList(getValue(), this.min, this.max);
   }
 
   @Override
@@ -108,6 +104,25 @@ public class Between extends Condition {
 
   @Override
   public String toString() {
-    return this.column + " BETWEEN " + this.min + " AND " + this.max;
+    return getColumn() + " BETWEEN " + this.min + " AND " + this.max;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <QV extends QueryValue> QV updateQueryValues(
+    final Function<QueryValue, QueryValue> valueHandler) {
+    Between between = super.updateQueryValues(valueHandler);
+    final Value min = (Value)valueHandler.apply(this.min);
+    final Value max = (Value)valueHandler.apply(this.max);
+    if (between == this) {
+      if (min == this.min && max == this.max) {
+        return (QV)this;
+      } else {
+        between = clone();
+      }
+    }
+    between.min = min;
+    between.max = max;
+    return (QV)between;
   }
 }

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.util.number.Integers;
+import com.revolsys.util.number.Longs;
 
 public final class IntegerIdentifier extends Number implements Identifier, Comparable<Object> {
   private static final long serialVersionUID = 1L;
@@ -16,20 +16,51 @@ public final class IntegerIdentifier extends Number implements Identifier, Compa
   }
 
   @Override
-  public int compareTo(final Object object) {
-    int intValue;
-    if (object instanceof Number) {
-      final Number number = (Number)object;
-      intValue = number.intValue();
+  public int compareTo(final Identifier identifier2) {
+    if (identifier2 == this) {
+      return 0;
+    } else if (identifier2 == null) {
+      return -1;
+    } else if (identifier2 instanceof Number) {
+      final Number number2 = (Number)identifier2;
+      return Long.compare(this.value, number2.longValue());
+    } else if (identifier2.isSingle()) {
+      final Object value2 = identifier2.getValue(0);
+      return compareTo(value2);
     } else {
-      final Integer integer = Integers.toInteger(object);
-      if (integer == null) {
+      return -1;
+    }
+  }
+
+  @Override
+  public int compareTo(final Object object) {
+    if (object == null) {
+      return -1;
+    } else if (object instanceof Number) {
+      final Number number = (Number)object;
+      final long longValue = number.intValue();
+      return Long.compare(this.value, longValue);
+    } else if (object instanceof Identifier) {
+      final Identifier identifier = (Identifier)object;
+      return compareTo(identifier);
+    } else {
+      return compareToObject(object);
+    }
+  }
+
+  private int compareToObject(final Object object) {
+    try {
+      final Long longValue = Longs.toValid(object);
+      if (longValue == null) {
         return -1;
       } else {
-        intValue = integer;
+        return Long.compare(this.value, longValue);
       }
+    } catch (final Exception e) {
+      final String string = Integer.toString(this.value);
+      final String string2 = object.toString();
+      return string.compareTo(string2);
     }
-    return Integer.compare(this.value, intValue);
   }
 
   @Override

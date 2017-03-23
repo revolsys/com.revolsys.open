@@ -43,8 +43,7 @@ public class ModeAllPaged extends ModeAbstractCached {
     addListeners( //
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_INSERTED,
         this::addCachedRecords), //
-      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
-        this::recordsDeleted) //
+      newRecordsDeletedListener(layer)//
     );
     final RecordLayerTableModel model = getTableModel();
     for (final String propertyName : new String[] {

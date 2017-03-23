@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 
 import com.ctc.wstx.util.ExceptionUtil;
-import com.revolsys.datatype.DataType;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
@@ -16,12 +15,10 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Strings;
 
-public class CollectionValue implements QueryValue {
+public class CollectionValue extends AbstractMultiQueryValue {
   private FieldDefinition field;
 
   private JdbcFieldDefinition jdbcField;
-
-  private List<QueryValue> queryValues = new ArrayList<>();
 
   public CollectionValue(final Collection<? extends Object> values) {
     this(null, values);
@@ -36,8 +33,7 @@ public class CollectionValue implements QueryValue {
       } else {
         queryValue = new Value(value);
       }
-      this.queryValues.add(queryValue);
-
+      addValue(queryValue);
     }
   }
 
@@ -45,12 +41,15 @@ public class CollectionValue implements QueryValue {
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
     buffer.append('(');
-    for (int i = 0; i < this.queryValues.size(); i++) {
+
+    final List<QueryValue> values = getQueryValues();
+    final int valueCount = values.size();
+    for (int i = 0; i < valueCount; i++) {
       if (i > 0) {
         buffer.append(", ");
       }
 
-      final QueryValue queryValue = this.queryValues.get(i);
+      final QueryValue queryValue = getQueryValues().get(i);
       if (queryValue instanceof Value) {
         if (this.jdbcField == null) {
           queryValue.appendSql(query, recordStore, buffer);
@@ -67,7 +66,7 @@ public class CollectionValue implements QueryValue {
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    for (final QueryValue queryValue : this.queryValues) {
+    for (final QueryValue queryValue : getQueryValues()) {
       JdbcFieldDefinition jdbcField = this.jdbcField;
       if (queryValue instanceof Value) {
         final Value valueWrapper = (Value)queryValue;
@@ -89,20 +88,15 @@ public class CollectionValue implements QueryValue {
 
   @Override
   public CollectionValue clone() {
-    try {
-      final CollectionValue clone = (CollectionValue)super.clone();
-      clone.queryValues = QueryValue.cloneQueryValues(this.queryValues);
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      return null;
-    }
+    final CollectionValue clone = (CollectionValue)super.clone();
+    return clone;
   }
 
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof CollectionValue) {
       final CollectionValue condition = (CollectionValue)obj;
-      return DataType.equal(condition.getQueryValues(), this.getQueryValues());
+      return super.equals(condition);
     } else {
       return false;
     }
@@ -112,16 +106,11 @@ public class CollectionValue implements QueryValue {
     return this.field;
   }
 
-  @Override
-  public List<QueryValue> getQueryValues() {
-    return this.queryValues;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public <V> V getValue(final Record record) {
     final List<Object> values = new ArrayList<>();
-    for (final QueryValue queryValue : this.queryValues) {
+    for (final QueryValue queryValue : getQueryValues()) {
       final Object value = queryValue.getValue(record);
       values.add(value);
     }
@@ -155,10 +144,6 @@ public class CollectionValue implements QueryValue {
     return values;
   }
 
-  public boolean isEmpty() {
-    return this.queryValues.isEmpty();
-  }
-
   @Override
   public void setFieldDefinition(final FieldDefinition field) {
     this.field = field;
@@ -170,7 +155,7 @@ public class CollectionValue implements QueryValue {
       } else {
         this.jdbcField = null;
       }
-      for (final QueryValue queryValue : this.queryValues) {
+      for (final QueryValue queryValue : getQueryValues()) {
         if (queryValue instanceof Value) {
           final Value value = (Value)queryValue;
           value.setFieldDefinition(field);
@@ -181,6 +166,6 @@ public class CollectionValue implements QueryValue {
 
   @Override
   public String toString() {
-    return "(" + Strings.toString(this.queryValues) + ")";
+    return "(" + Strings.toString(getQueryValues()) + ")";
   }
 }
