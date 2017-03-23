@@ -1,4 +1,4 @@
-package com.revolsys.geometry.algorithm.index;
+package com.revolsys.geometry.index;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,23 +9,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 
 public class PointRecordMap {
 
-  public static PointRecordMap newMap(final Iterable<Record> records) {
-    final PointRecordMap map = new PointRecordMap();
-    map.addAll(records);
-    return map;
+  public static PointRecordMap newMap(final Iterable<? extends Record> records) {
+    return new PointRecordMap(records);
   }
 
   private Comparator<Record> comparator;
 
-  private Map<PointDouble, List<Record>> recordMap = new HashMap<>();
+  private Map<Point, List<Record>> recordMap = new HashMap<>();
 
   private boolean removeEmptyLists;
 
@@ -38,22 +36,20 @@ public class PointRecordMap {
     this.comparator = comparator;
   }
 
-  public void addAll(final Iterable<Record> records) {
+  public PointRecordMap(final Comparator<Record> comparator,
+    final Iterable<? extends Record> records) {
+    this.comparator = comparator;
+    addAll(records);
+  }
+
+  public PointRecordMap(final Iterable<? extends Record> records) {
+    addAll(records);
+  }
+
+  public void addAll(final Iterable<? extends Record> records) {
     for (final Record record : records) {
       addRecord(record);
     }
-  }
-
-  public void addRecord(final Point point, final Record record) {
-    final PointDouble key = getKey(point);
-    final List<Record> records = getOrCreateRecords(key);
-    if (!record.contains(records)) {
-      records.add(record);
-    }
-    if (this.comparator != null) {
-      Collections.sort(records, this.comparator);
-    }
-    this.size++;
   }
 
   /**
@@ -63,9 +59,18 @@ public class PointRecordMap {
    * @param pointObjects The map of point objects.
    * @param record The object to add.
    */
-  public void addRecord(final Record record) {
-    final Point point = record.getGeometry();
-    addRecord(point, record);
+  public boolean addRecord(final Record record) {
+    final Point key = getKey(record);
+    final List<Record> records = getOrCreateRecords(key);
+    if (records.add(record)) {
+      if (this.comparator != null) {
+        Collections.sort(records, this.comparator);
+      }
+      this.size++;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public void clear() {
@@ -74,7 +79,7 @@ public class PointRecordMap {
   }
 
   public boolean containsKey(final Point point) {
-    final PointDouble key = getKey(point);
+    final Point key = getKey(point);
     return this.recordMap.containsKey(key);
   }
 
@@ -107,11 +112,11 @@ public class PointRecordMap {
     return null;
   }
 
-  private PointDouble getKey(final Point point) {
-    return new PointDouble(point, 2);
+  private Point getKey(final Point point) {
+    return point.newPoint2D();
   }
 
-  private PointDouble getKey(final Record record) {
+  private Point getKey(final Record record) {
     final Point point = record.getGeometry();
     return getKey(point);
   }
@@ -126,7 +131,7 @@ public class PointRecordMap {
     return filteredRecords;
   }
 
-  protected List<Record> getOrCreateRecords(final PointDouble key) {
+  protected List<Record> getOrCreateRecords(final Point key) {
     List<Record> objects = this.recordMap.get(key);
     if (objects == null) {
       objects = new ArrayList<>(1);
@@ -135,31 +140,24 @@ public class PointRecordMap {
     return objects;
   }
 
-  public List<Record> getRecords(final Point point) {
-    final PointDouble key = getKey(point);
-    final List<Record> records = this.recordMap.get(key);
-    if (records == null) {
-      return Collections.emptyList();
-    } else {
-      return new ArrayList<>(records);
-    }
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public <R extends Record> List<R> getRecords(final Point point) {
+    final Point key = getKey(point);
+    final List<R> records = (List)this.recordMap.get(key);
+    return Lists.toArray(records);
   }
 
-  public List<Record> getRecords(final Record record) {
+  public <R extends Record> List<R> getRecords(final Record record) {
     final Point point = record.getGeometry();
-    final List<Record> objects = getRecords(point);
-    return objects;
-  }
-
-  public boolean hasRecord(final Point point) {
-    final PointDouble key = getKey(point);
-    final List<Record> records = this.recordMap.get(key);
-    return records != null && !records.isEmpty();
+    final List<R> records = getRecords(point);
+    return records;
   }
 
   public void initialize(final Point point) {
     if (!isRemoveEmptyLists()) {
-      final PointDouble key = getKey(point);
+      final Point key = getKey(point);
       getOrCreateRecords(key);
     }
   }
@@ -169,24 +167,23 @@ public class PointRecordMap {
   }
 
   public void removeRecord(final Record record) {
-    final PointDouble key = getKey(record);
-    final List<Record> records = this.recordMap.get(key);
-    if (records != null) {
-      records.remove(record);
-      if (records.isEmpty()) {
+    final Point key = getKey(record);
+    final List<Record> objects = this.recordMap.get(key);
+    if (objects != null) {
+      objects.remove(record);
+      if (objects.isEmpty()) {
         if (isRemoveEmptyLists()) {
           this.recordMap.remove(key);
         }
       } else if (this.comparator != null) {
-        Collections.sort(records, this.comparator);
+        Collections.sort(objects, this.comparator);
       }
     }
     this.size--;
   }
 
-  public PointRecordMap setRemoveEmptyLists(final boolean removeEmptyLists) {
+  public void setRemoveEmptyLists(final boolean removeEmptyLists) {
     this.removeEmptyLists = removeEmptyLists;
-    return this;
   }
 
   public int size() {
@@ -200,11 +197,6 @@ public class PointRecordMap {
         Collections.sort(records, this.comparator);
       }
     }
-  }
-
-  @Override
-  public String toString() {
-    return this.recordMap.toString();
   }
 
   public void write(final Channel<Record> out) {
