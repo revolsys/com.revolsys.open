@@ -52,6 +52,16 @@ public class PointRecordMap {
     }
   }
 
+  public boolean addKey(final Point point) {
+    final Point key = getKey(point);
+    if (this.recordMap.get(key) == null) {
+      this.recordMap.put(key, new ArrayList<>());
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /**
    * Add a {@link Point} {@link Record} to the list of objects at the given
    * coordinate.
@@ -153,6 +163,11 @@ public class PointRecordMap {
     final Point point = record.getGeometry();
     final List<R> records = getRecords(point);
     return records;
+  }
+
+  public boolean hasRecords(final Point point) {
+    final List<Record> records = this.recordMap.get(point);
+    return records != null && !records.isEmpty();
   }
 
   public void initialize(final Point point) {
