@@ -24,6 +24,11 @@ public class TypedIdentifier extends AbstractIdentifier implements Comparable<Ob
         }
         return new TypedIdentifier(type, identifier);
       }
+      try {
+        final Long longValue = Long.valueOf(string);
+        return Identifier.newIdentifier(longValue);
+      } catch (final Exception e) {
+      }
     }
     return Identifier.newIdentifier(id);
   }
@@ -97,7 +102,8 @@ public class TypedIdentifier extends AbstractIdentifier implements Comparable<Ob
   @Override
   public int compareTo(final Object other) {
     if (other instanceof Identifier) {
-      return compareTo(this.identifier);
+      final Identifier identifier = (Identifier)other;
+      return compareTo(identifier);
     } else {
       return -1;
     }
