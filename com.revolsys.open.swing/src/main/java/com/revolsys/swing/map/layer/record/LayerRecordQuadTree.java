@@ -9,6 +9,10 @@ public class LayerRecordQuadTree extends RecordQuadTree<LayerRecord> {
   public LayerRecordQuadTree() {
   }
 
+  public LayerRecordQuadTree(final AbstractRecordLayer layer) {
+    this(layer.getGeometryFactory());
+  }
+
   public LayerRecordQuadTree(final GeometryFactory geometryFactory) {
     super(geometryFactory);
   }

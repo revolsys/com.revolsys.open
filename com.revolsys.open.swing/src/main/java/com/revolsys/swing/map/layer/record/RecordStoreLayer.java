@@ -1002,7 +1002,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   public void setRecordsToCache(final Label cacheId,
-    final Collection<? extends LayerRecord> records) {
+    final Iterable<? extends LayerRecord> records) {
     synchronized (getSync()) {
       this.recordIdentifiersByCacheId.put(cacheId, new HashSet<>());
       addRecordsToCache(cacheId, records);

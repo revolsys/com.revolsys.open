@@ -480,7 +480,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected void addRecordsToCache(final Label cacheId,
-    final Collection<? extends LayerRecord> records) {
+    final Iterable<? extends LayerRecord> records) {
     synchronized (getSync()) {
       for (final LayerRecord record : records) {
         addRecordToCache(cacheId, record);

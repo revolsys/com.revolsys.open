@@ -102,7 +102,8 @@ public class TypedIdentifier extends AbstractIdentifier implements Comparable<Ob
   @Override
   public int compareTo(final Object other) {
     if (other instanceof Identifier) {
-      return compareTo(this.identifier);
+      final Identifier identifier = (Identifier)other;
+      return compareTo(identifier);
     } else {
       return -1;
     }

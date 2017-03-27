@@ -12,6 +12,7 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Doubles;
 
@@ -198,6 +199,9 @@ public final class JsonWriter implements BaseCloseable {
         } else {
           this.out.write(Doubles.toString(doubleValue));
         }
+      } else if (value instanceof MapSerializer) {
+        final Map<String, ? extends Object> map = ((MapSerializer)value).toMap();
+        write(map);
       } else if (value instanceof Collection) {
         final Collection<? extends Object> list = (Collection<? extends Object>)value;
         write(list);
@@ -246,7 +250,8 @@ public final class JsonWriter implements BaseCloseable {
       final int size = fields.size();
       final Iterator<String> iterator = fields.iterator();
       while (i < size - 1) {
-        final String key = iterator.next();
+        final Object keyObject = iterator.next();
+        final String key = keyObject.toString();
         final Object value = values.get(key);
         label(key);
         value(value);
@@ -254,7 +259,8 @@ public final class JsonWriter implements BaseCloseable {
         i++;
       }
       if (iterator.hasNext()) {
-        final String key = iterator.next();
+        final Object keyObject = iterator.next();
+        final String key = keyObject.toString();
         final Object value = values.get(key);
         label(key);
         value(value);
