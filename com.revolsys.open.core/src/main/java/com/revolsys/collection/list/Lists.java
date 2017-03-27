@@ -17,11 +17,8 @@ import java.util.stream.Stream;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Consumer3;
 
 public interface Lists {
   static final Supplier<List<?>> FACTORY_ARRAY = () -> {
@@ -282,17 +279,6 @@ public interface Lists {
     return list;
   }
 
-  public static <V> List<V> newArray(
-    final BiConsumer<BoundingBoxProxy, Consumer<V>> forEachFunction,
-    final BoundingBoxProxy boundingBoxProxy) {
-    final List<V> values = new ArrayList<>();
-    if (boundingBoxProxy != null) {
-      final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
-      forEachFunction.accept(boundingBox, values::add);
-    }
-    return values;
-  }
-
   public static <V> List<V> newArray(final BiConsumer<Consumer<V>, Predicate<V>> forEachFunction,
     final Predicate<V> filter) {
     final List<V> values = new ArrayList<>();
@@ -304,17 +290,6 @@ public interface Lists {
     final ArrayList<V> list = new ArrayList<>();
     action.accept(list::add);
     return list;
-  }
-
-  public static <V> List<V> newArray(
-    final Consumer3<BoundingBoxProxy, Predicate<? super V>, Consumer<V>> forEachFunction,
-    final BoundingBoxProxy boundingBoxProxy, final Predicate<? super V> filter) {
-    final List<V> values = new ArrayList<>();
-    if (boundingBoxProxy != null) {
-      final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
-      forEachFunction.accept(boundingBox, filter, values::add);
-    }
-    return values;
   }
 
   static List<Double> newArray(final double... values) {
@@ -348,39 +323,10 @@ public interface Lists {
   }
 
   public static <V> List<V> newArraySorted(
-    final BiConsumer<BoundingBoxProxy, Consumer<V>> forEachFunction,
-    final BoundingBoxProxy boundingBoxProxy) {
-    return newArraySorted(forEachFunction, boundingBoxProxy, null);
-  }
-
-  public static <V> List<V> newArraySorted(
-    final BiConsumer<BoundingBoxProxy, Consumer<V>> forEachFunction,
-    final BoundingBoxProxy boundingBoxProxy, final Comparator<V> comparator) {
-    final List<V> values = newArray(forEachFunction, boundingBoxProxy);
-    values.sort(comparator);
-    return values;
-  }
-
-  public static <V> List<V> newArraySorted(
     final BiConsumer<Consumer<V>, Predicate<V>> forEachFunction, final Predicate<V> filter,
     final Comparator<V> comparator) {
     final List<V> values = new ArrayList<>();
     forEachFunction.accept(values::add, filter);
-    values.sort(comparator);
-    return values;
-  }
-
-  public static <V> List<V> newArraySorted(
-    final Consumer3<BoundingBoxProxy, Predicate<? super V>, Consumer<V>> forEachFunction,
-    final BoundingBoxProxy boundingBoxProxy, final Predicate<? super V> filter) {
-    return newArraySorted(forEachFunction, boundingBoxProxy, filter, null);
-  }
-
-  public static <V> List<V> newArraySorted(
-    final Consumer3<BoundingBoxProxy, Predicate<? super V>, Consumer<V>> forEachFunction,
-    final BoundingBoxProxy boundingBoxProxy, final Predicate<? super V> filter,
-    final Comparator<V> comparator) {
-    final List<V> values = newArray(forEachFunction, boundingBoxProxy, filter);
     values.sort(comparator);
     return values;
   }

@@ -23,7 +23,6 @@ import java.util.function.Predicate;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.bplus.BPlusTreeMap;
-import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.comparator.ComparatorProxy;
@@ -569,17 +568,17 @@ public class Graph<T> implements GeometryFactoryProxy {
   }
 
   public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy) {
-    return Lists.newArraySorted(this::forEachEdge, boundingBoxProxy);
+    return BoundingBox.newArraySorted(this::forEachEdge, boundingBoxProxy);
   }
 
   public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy,
     final Predicate<? super Edge<T>> filter) {
-    return Lists.newArraySorted(this::forEachEdge, boundingBoxProxy, filter);
+    return BoundingBox.newArraySorted(this::forEachEdge, boundingBoxProxy, filter);
   }
 
   public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy,
     final Predicate<? super Edge<T>> filter, final Comparator<Edge<T>> comparator) {
-    return Lists.newArraySorted(this::forEachEdge, boundingBoxProxy, filter, comparator);
+    return BoundingBox.newArraySorted(this::forEachEdge, boundingBoxProxy, filter, comparator);
 
   }
 
@@ -598,7 +597,7 @@ public class Graph<T> implements GeometryFactoryProxy {
           return false;
         }
       };
-      return Lists.newArraySorted(this::forEachEdge, boundingBox, filter);
+      return BoundingBox.newArraySorted(this::forEachEdge, boundingBox, filter);
     }
 
   }
@@ -642,7 +641,7 @@ public class Graph<T> implements GeometryFactoryProxy {
           return false;
         }
       };
-      return Lists.newArraySorted(this::forEachEdge, boundingBox, filter);
+      return BoundingBox.newArraySorted(this::forEachEdge, boundingBox, filter);
     }
 
   }
@@ -793,7 +792,7 @@ public class Graph<T> implements GeometryFactoryProxy {
       final double distance = geometry.distancePoint(node);
       return distance <= maxDistance;
     };
-    return Lists.newArraySorted(nodeIndex::forEach, boundingBox, filter);
+    return BoundingBox.newArraySorted(nodeIndex::forEach, boundingBox, filter);
   }
 
   public List<Node<T>> getNodes(final List<Integer> nodeIds) {
