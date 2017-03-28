@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.predicate.Predicates;
@@ -45,6 +46,22 @@ public class PointRecordMap {
     addAll(records);
   }
 
+  public void addAll(final Iterable<? extends Record> records) {
+    for (final Record record : records) {
+      addRecord(record);
+    }
+  }
+
+  public boolean addKey(final Point point) {
+    final Point key = getKey(point);
+    if (this.recordMap.get(key) == null) {
+      this.recordMap.put(key, new ArrayList<>());
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /**
    * Add a {@link Point} {@link Record} to the list of objects at the given
    * coordinate.
@@ -52,19 +69,17 @@ public class PointRecordMap {
    * @param pointObjects The map of point objects.
    * @param record The object to add.
    */
-  public void addRecord(final Record record) {
+  public boolean addRecord(final Record record) {
     final Point key = getKey(record);
     final List<Record> records = getOrCreateRecords(key);
-    records.add(record);
-    if (this.comparator != null) {
-      Collections.sort(records, this.comparator);
-    }
-    this.size++;
-  }
-
-  public void addAll(final Iterable<? extends Record> records) {
-    for (final Record record : records) {
-      addRecord(record);
+    if (records.add(record)) {
+      if (this.comparator != null) {
+        Collections.sort(records, this.comparator);
+      }
+      this.size++;
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -135,20 +150,24 @@ public class PointRecordMap {
     return objects;
   }
 
-  public List<Record> getRecords(final Point point) {
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public <R extends Record> List<R> getRecords(final Point point) {
     final Point key = getKey(point);
-    final List<Record> records = this.recordMap.get(key);
-    if (records == null) {
-      return Collections.emptyList();
-    } else {
-      return new ArrayList<>(records);
-    }
+    final List<R> records = (List)this.recordMap.get(key);
+    return Lists.toArray(records);
   }
 
-  public List<Record> getRecords(final Record record) {
+  public <R extends Record> List<R> getRecords(final Record record) {
     final Point point = record.getGeometry();
-    final List<Record> objects = getRecords(point);
-    return objects;
+    final List<R> records = getRecords(point);
+    return records;
+  }
+
+  public boolean hasRecords(final Point point) {
+    final List<Record> records = this.recordMap.get(point);
+    return records != null && !records.isEmpty();
   }
 
   public void initialize(final Point point) {
