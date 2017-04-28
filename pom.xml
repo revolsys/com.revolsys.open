@@ -9,7 +9,7 @@
   <artifactId>com.revolsys.open.parent</artifactId>
   <packaging>pom</packaging>
   <name>Revolution Systems Open Library</name>
-  <version>MTEC-SNAPSHOT</version>
+  <version>2014.09.10-MTEC1</version>
   <description>The parent module of the Revolution Systems Open Library.</description>
   <url>http://revolsys.github.com/com.revolsys.open/</url>
 

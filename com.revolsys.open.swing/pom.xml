@@ -10,7 +10,7 @@
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>MTEC-SNAPSHOT</version>
+    <version>2014.09.10-MTEC1</version>
   </parent>
   <licenses>
     <license>

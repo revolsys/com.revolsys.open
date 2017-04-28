@@ -7,14 +7,14 @@
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>MTEC-SNAPSHOT</version>
+    <version>2014.09.10-MTEC1</version>
   </parent>
   
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
   <artifactId>tests</artifactId>
   <name>GIS Tools</name>
-  <version>MTEC-SNAPSHOT</version>
+  <version>2014.09.10-MTEC1</version>
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>

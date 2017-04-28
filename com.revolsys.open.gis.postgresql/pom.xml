@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
-    <version>MTEC-SNAPSHOT</version>
+    <version>2014.09.10-MTEC1</version>
   </parent>
   <dependencies>
     <dependency>
