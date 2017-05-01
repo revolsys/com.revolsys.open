@@ -23,6 +23,7 @@ public class GriddedElevationModelLayerRenderer
     final GriddedElevationModel elevationModel = layer.getElevationModel();
     if (elevationModel != null) {
       this.image = new GriddedElevationModelImage(elevationModel);
+      layer.addPropertyChangeListener("refresh", this.image = null);
     }
   }
 
@@ -40,6 +41,7 @@ public class GriddedElevationModelLayerRenderer
                   final GriddedElevationModelImage image = new GriddedElevationModelImage(
                     elevationModel);
                   image.refresh(new HillShadeConfiguration(elevationModel));
+                  // image.refresh(elevationModel);
                   this.image = image;
                   layer.refresh();
                 });

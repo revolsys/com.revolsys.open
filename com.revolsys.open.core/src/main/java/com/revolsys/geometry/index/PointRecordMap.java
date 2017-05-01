@@ -52,7 +52,7 @@ public class PointRecordMap {
    * @param pointObjects The map of point objects.
    * @param record The object to add.
    */
-  public void add(final Record record) {
+  public void addRecord(final Record record) {
     final Point key = getKey(record);
     final List<Record> records = getOrCreateRecords(key);
     records.add(record);
@@ -64,7 +64,7 @@ public class PointRecordMap {
 
   public void addAll(final Iterable<? extends Record> records) {
     for (final Record record : records) {
-      add(record);
+      addRecord(record);
     }
   }
 
@@ -162,7 +162,7 @@ public class PointRecordMap {
     return this.removeEmptyLists;
   }
 
-  public void remove(final Record record) {
+  public void removeRecord(final Record record) {
     final Point key = getKey(record);
     final List<Record> objects = this.recordMap.get(key);
     if (objects != null) {

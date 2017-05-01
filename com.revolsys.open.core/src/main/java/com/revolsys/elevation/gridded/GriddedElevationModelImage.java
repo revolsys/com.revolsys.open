@@ -45,6 +45,17 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
     setRenderedImage(image);
   }
 
+  public void refresh(final GriddedElevationModel elevationModel) {
+    int index = 0;
+    for (int y = this.height - 1; y >= 0; y--) {
+      for (int x = 0; x < this.width; x++) {
+        final int hillShade = elevationModel.getColour(x, y);
+        this.imageBuffer.setElem(index, hillShade);
+        index++;
+      }
+    }
+  }
+
   public void refresh(final HillShadeConfiguration hillShadeConfiguration) {
     int index = 0;
     for (int y = this.height - 1; y >= 0; y--) {

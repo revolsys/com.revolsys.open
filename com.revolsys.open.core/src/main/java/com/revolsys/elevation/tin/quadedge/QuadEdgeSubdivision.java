@@ -313,7 +313,9 @@ public class QuadEdgeSubdivision {
         }
       }
     }
-    throw new LocateFailureException(currentEdge.newLineString(this.geometryFactory));
+    return null;
+    // throw new
+    // LocateFailureException(currentEdge.newLineString(this.geometryFactory));
   }
 
   public void forEachTriangle(final TriangleConsumer action) {
@@ -460,44 +462,46 @@ public class QuadEdgeSubdivision {
      * to be created)
      */
     QuadEdge edge = findQuadEdge(x, y);
-
-    Point edgeFromPoint = edge.getFromPoint();
-    {
-      final double x1 = edgeFromPoint.getX();
-      final double y1 = edgeFromPoint.getY();
-      if (x1 == x && y1 == y) {
-        return;
-      } else {
-        final Point toPoint = edge.getToPoint();
-        final double x2 = toPoint.getX();
-        final double y2 = toPoint.getY();
-
-        if (x2 == x && y2 == y) {
+    if (edge != null) {
+      Point edgeFromPoint = edge.getFromPoint();
+      {
+        final double x1 = edgeFromPoint.getX();
+        final double y1 = edgeFromPoint.getY();
+        if (x1 == x && y1 == y) {
           return;
         } else {
-          final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
-          if (distance < this.resolutionXY) {
-            // the point lies exactly on an edge, so delete the edge
-            // (it will be replaced by a pair of edges which have the point as a
-            // vertex)
-            edge = edge.oPrev();
-            delete(edge.getFromNextEdge());
-            edgeFromPoint = edge.getFromPoint();
-            this.triangleCount -= 2;
+          final Point toPoint = edge.getToPoint();
+          final double x2 = toPoint.getX();
+          final double y2 = toPoint.getY();
+
+          if (x2 == x && y2 == y) {
+            return;
+          } else {
+            final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+            if (distance < this.resolutionXY) {
+              // the point lies exactly on an edge, so delete the edge
+              // (it will be replaced by a pair of edges which have the point as
+              // a
+              // vertex)
+              edge = edge.oPrev();
+              delete(edge.getFromNextEdge());
+              edgeFromPoint = edge.getFromPoint();
+              this.triangleCount -= 2;
+            }
           }
         }
       }
+      /*
+       * Connect the new point to the vertices of the containing triangle (or
+       * quadrilateral, if the new point fell on an existing edge.)
+       */
+      final QuadEdge base = makeEdge(edgeFromPoint, vertex);
+      base.splice(edge);
+
+      edge = connectEdges(edge, base);
+
+      swapEdges(base, edge, x, y);
     }
-    /*
-     * Connect the new point to the vertices of the containing triangle (or
-     * quadrilateral, if the new point fell on an existing edge.)
-     */
-    final QuadEdge base = makeEdge(edgeFromPoint, vertex);
-    base.splice(edge);
-
-    edge = connectEdges(edge, base);
-
-    swapEdges(base, edge, x, y);
   }
 
   /**

@@ -73,7 +73,7 @@ public class CompareProcessor extends AbstractMergeProcess {
           add = !Predicates.matches(objects, filter);
         }
         if (add) {
-          this.otherPointMap.add(record);
+          this.otherPointMap.addRecord(record);
         } else {
           this.duplicateOtherStatistics.addCount(record);
         }
@@ -96,7 +96,7 @@ public class CompareProcessor extends AbstractMergeProcess {
         }
       }
       if (add) {
-        this.sourcePointMap.add(object);
+        this.sourcePointMap.addRecord(object);
       } else {
         this.duplicateSourceStatistics.addCount(object);
       }
@@ -307,7 +307,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   private void removeOtherObject(final Record object) {
     final Geometry geometry = object.getGeometry();
     if (geometry instanceof Point) {
-      this.otherPointMap.remove(object);
+      this.otherPointMap.removeRecord(object);
     } else {
       this.otherIndex.removeRecord(object);
     }

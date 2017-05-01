@@ -1,10 +1,13 @@
 package com.revolsys.elevation.cloud.las;
 
+import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -31,7 +34,9 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Exceptions;
 
 public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSerializer {
 
@@ -53,6 +58,8 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
 
   private Resource resource;
 
+  private ZipInputStream zipIn;
+
   public LasPointCloud(final GeometryFactory geometryFactory) {
     this(LasPointFormat.Core, geometryFactory);
   }
@@ -65,8 +72,30 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
     this(resource, null);
   }
 
-  public LasPointCloud(final Resource resource, final GeometryFactory geometryFactory) {
+  public LasPointCloud(Resource resource, final GeometryFactory geometryFactory) {
     this.resource = resource;
+    if (resource.getFileNameExtension().equals("zip")) {
+      boolean found = false;
+      final String baseName = resource.getBaseName();
+      final String fileName = baseName + ".las";
+      this.zipIn = this.resource.newBufferedInputStream(ZipInputStream::new);
+      try {
+        for (ZipEntry zipEntry = this.zipIn.getNextEntry(); zipEntry != null; zipEntry = this.zipIn
+          .getNextEntry()) {
+          final String name = zipEntry.getName();
+          if (name.equalsIgnoreCase(fileName)) {
+            resource = new InputStreamResource(this.zipIn);
+            found = true;
+            break;
+          }
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap("Error reading: " + resource, e);
+      }
+      if (!found) {
+        throw new IllegalArgumentException("Cannot find file: " + resource + "!" + fileName);
+      }
+    }
     this.reader = resource.newChannelReader(8096, ByteOrder.LITTLE_ENDIAN);
     this.setHeader(new LasPointCloudHeader(this.reader, geometryFactory));
   }
@@ -89,6 +118,14 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
     this.reader = null;
     if (reader != null) {
       reader.close();
+    }
+    if (this.zipIn != null) {
+      try {
+        this.zipIn.close();
+      } catch (final IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
   }
 

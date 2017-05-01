@@ -264,6 +264,7 @@ public class GriddedElevationModelLayer extends AbstractLayer {
       }
     }
     firePropertyChange("hasChanges", true, false);
+    firePropertyChange("refresh", false, true);
   }
 
   public void saveAs() {
