@@ -224,6 +224,11 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     }
   }
 
+  protected PropertyChangeListener newRecordsDeletedListener(final AbstractRecordLayer layer) {
+    return Property.<List<LayerRecord>> addListenerNewValueSource(layer,
+      AbstractRecordLayer.RECORDS_DELETED, this::recordsDeleted);
+  }
+
   protected ListSelectionModel newSelectionModel(final RecordLayerTableModel tableModel) {
     return new RecordLayerListSelectionModel(tableModel);
   }
@@ -316,4 +321,5 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     this.recordCount = recordCount;
     this.model.firePropertyChange("rowCount", oldValue, getRecordCount());
   }
+
 }

@@ -6,7 +6,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
-public class AcceptAllCondition extends Condition {
+public class AcceptAllCondition implements Condition {
   @Override
   public Condition and(final Condition condition) {
     if (condition == null) {
@@ -24,6 +24,11 @@ public class AcceptAllCondition extends Condition {
   @Override
   public int appendParameters(final int index, final PreparedStatement statement) {
     return 0;
+  }
+
+  @Override
+  public Condition clone() {
+    return this;
   }
 
   @Override

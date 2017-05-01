@@ -49,7 +49,8 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   public int getHorizontalZone(final double lat, final double lon) {
-    return getHorizontalZone(getMapTileName(lon, lat));
+    final String mapTileName = getMapTileName(lon, lat);
+    return getHorizontalZone(mapTileName);
   }
 
   public int getHorizontalZone(final String sheet) {

@@ -4,6 +4,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.record.RecordState;
 
 public class SimpleRectangularMapTile implements RectangularMapTile {
 
@@ -97,6 +98,11 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
   @Override
   public int hashCode() {
     return this.name.hashCode();
+  }
+
+  @Override
+  public boolean isState(final RecordState state) {
+    return RecordState.NEW == state;
   }
 
   @Override

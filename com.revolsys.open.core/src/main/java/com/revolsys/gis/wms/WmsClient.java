@@ -134,6 +134,7 @@ public class WmsClient extends AbstractWebService<WmsLayerDefinition>
     final WmsCapabilities capabilities = getCapabilities();
     final String version = capabilities.getVersion();
     final Map<String, Object> parameters = new LinkedHashMap<>();
+    parameters.put("SERVICE", "WMS");
     if (version.equals("1.0.0")) {
       parameters.put(WmsParameters.WMTVER, version);
       parameters.put(WmsParameters.REQUEST, WmsParameterValues.MAP);

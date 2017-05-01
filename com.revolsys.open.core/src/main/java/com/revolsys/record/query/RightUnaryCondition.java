@@ -1,39 +1,28 @@
 package com.revolsys.record.query;
 
-import java.sql.PreparedStatement;
-import java.util.Collections;
-import java.util.List;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.record.schema.RecordStore;
 
-public class RightUnaryCondition extends Condition {
+public class RightUnaryCondition extends AbstractUnaryQueryValue implements Condition {
 
   private final String operator;
 
-  private final QueryValue value;
-
   public RightUnaryCondition(final QueryValue value, final String operator) {
+    super(value);
     this.operator = operator;
-    this.value = value;
   }
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
-    this.value.appendSql(query, recordStore, buffer);
+    super.appendDefaultSql(query, recordStore, buffer);
     buffer.append(" ");
     buffer.append(this.operator);
   }
 
   @Override
-  public int appendParameters(final int index, final PreparedStatement statement) {
-    return this.value.appendParameters(index, statement);
-  }
-
-  @Override
   public RightUnaryCondition clone() {
-    return new RightUnaryCondition(this.value.clone(), this.operator);
+    return (RightUnaryCondition)super.clone();
   }
 
   @Override
@@ -51,15 +40,6 @@ public class RightUnaryCondition extends Condition {
 
   public String getOperator() {
     return this.operator;
-  }
-
-  @Override
-  public List<QueryValue> getQueryValues() {
-    return Collections.singletonList(this.value);
-  }
-
-  public QueryValue getValue() {
-    return this.value;
   }
 
   @Override

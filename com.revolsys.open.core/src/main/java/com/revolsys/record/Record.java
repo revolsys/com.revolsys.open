@@ -39,6 +39,23 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
 
   String EXCLUDE_ID = Record.class.getName() + ".excludeId";
 
+  Comparator<Record> IDENTIFIER_COMPARATOR = (final Record record1,
+    final Record record2) -> {
+    final Identifier identifier1 = record1.getIdentifier();
+    final Identifier identifier2 = record2.getIdentifier();
+    if (identifier1 == null) {
+      if (identifier2 == null) {
+        return 0;
+      } else {
+        return 1;
+      }
+    } else if (identifier2 == null) {
+      return -1;
+    } else {
+      return identifier1.compareTo(identifier2);
+    }
+  };
+
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
@@ -935,6 +952,8 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
       }
     }
   }
+
+  boolean isState(RecordState state);
 
   default boolean isValid(final CharSequence fieldName) {
     return true;

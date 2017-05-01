@@ -88,6 +88,6 @@ public class GeoJson extends GeometryRecordReaderFactory implements RecordWriter
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.newUtf8Writer(outputStream);
-    return new GeoJsonRecordWriter(writer);
+    return new GeoJsonRecordWriter(writer, recordDefinition);
   }
 }

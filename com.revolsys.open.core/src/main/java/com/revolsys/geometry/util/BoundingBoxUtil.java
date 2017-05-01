@@ -1,6 +1,7 @@
 package com.revolsys.geometry.util;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 
@@ -41,11 +42,14 @@ public class BoundingBoxUtil {
 
   public static void expand(final double[] bounds, final int axisCount,
     final BoundingBox boundingBox) {
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double min = boundingBox.getMin(axisIndex);
-      expand(bounds, axisCount, axisIndex, min);
-      final double max = boundingBox.getMax(axisIndex);
-      expand(bounds, axisCount, axisIndex, max);
+    if (boundingBox != null) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double min = boundingBox.getMin(axisIndex);
+        expand(bounds, axisCount, axisIndex, min);
+
+        final double max = boundingBox.getMax(axisIndex);
+        expand(bounds, axisCount, axisIndex, max);
+      }
     }
   }
 
@@ -57,9 +61,16 @@ public class BoundingBoxUtil {
     }
   }
 
+  public static void expand(final double[] bounds, final int axisCount, final Geometry geometry) {
+    if (geometry != null) {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      expand(bounds, axisCount, boundingBox);
+    }
+  }
+
   public static void expand(final double[] bounds, final int axisCount, final int axisIndex,
     final double coordinate) {
-    if (!!Double.isFinite(coordinate)) {
+    if (Double.isFinite(coordinate)) {
       final double min = bounds[axisIndex];
       if (coordinate < min || Double.isNaN(min)) {
         bounds[axisIndex] = coordinate;
@@ -93,8 +104,7 @@ public class BoundingBoxUtil {
     if (geometryFactory != null) {
       coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
     }
-    final double value = coordinate;
-    if (!!Double.isFinite(value)) {
+    if (Double.isFinite(coordinate)) {
       final int axisCount = bounds.length / 2;
       final double min = bounds[axisIndex];
       if (coordinate < min || Double.isNaN(min)) {
@@ -112,8 +122,7 @@ public class BoundingBoxUtil {
     if (geometryFactory != null) {
       coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
     }
-    final double value = coordinate;
-    if (!!Double.isFinite(value)) {
+    if (Double.isFinite(coordinate)) {
       final double min = bounds[axisIndex];
       if (coordinate < min || Double.isNaN(min)) {
         bounds[axisIndex] = coordinate;
@@ -132,7 +141,7 @@ public class BoundingBoxUtil {
     final int count = Math.min(axisCount, point.getAxisCount());
     for (int axisIndex = 0; axisIndex < count; axisIndex++) {
       final double coordinate = point.getCoordinate(axisIndex);
-      if (!!Double.isFinite(coordinate)) {
+      if (Double.isFinite(coordinate)) {
         expand(geometryFactory, bounds, axisCount, axisIndex, coordinate);
       }
     }
@@ -415,7 +424,7 @@ public class BoundingBoxUtil {
     final double[] newBounds = newBounds(axisCount);
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       final double coordinate = bounds[axisIndex];
-      if (!!Double.isFinite(coordinate)) {
+      if (Double.isFinite(coordinate)) {
         newBounds[axisIndex] = coordinate;
         newBounds[axisCount + axisCount] = coordinate;
       }
@@ -431,8 +440,7 @@ public class BoundingBoxUtil {
       if (geometryFactory != null) {
         coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
       }
-      final double value = coordinate;
-      if (!!Double.isFinite(value)) {
+      if (Double.isFinite(coordinate)) {
         newBounds[axisIndex] = coordinate;
         newBounds[axisCount + axisIndex] = coordinate;
       }
@@ -449,8 +457,7 @@ public class BoundingBoxUtil {
       if (geometryFactory != null) {
         coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
       }
-      final double value = coordinate;
-      if (!!Double.isFinite(value)) {
+      if (Double.isFinite(coordinate)) {
         bounds[axisIndex] = coordinate;
         bounds[axisCount + axisIndex] = coordinate;
       }
@@ -475,7 +482,7 @@ public class BoundingBoxUtil {
     final double[] bounds = newBounds(axisCount);
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       final double coordinate = point.getCoordinate(axisIndex);
-      if (!!Double.isFinite(coordinate)) {
+      if (Double.isFinite(coordinate)) {
         bounds[axisIndex] = coordinate;
         bounds[axisCount + axisIndex] = coordinate;
       }

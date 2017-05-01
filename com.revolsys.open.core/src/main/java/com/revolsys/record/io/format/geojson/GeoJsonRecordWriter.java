@@ -36,14 +36,17 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
   private int srid = -1;
 
-  public GeoJsonRecordWriter(final Writer out) {
-    this(out, false);
-  }
+  private RecordDefinition recordDefinition;
 
   public GeoJsonRecordWriter(final Writer out, final boolean cogo) {
     this.out = new JsonWriter(new BufferedWriter(out));
     this.out.setIndent(true);
     this.cogo = cogo;
+  }
+
+  public GeoJsonRecordWriter(final Writer out, final RecordDefinition recordDefinition) {
+    this(out, false);
+    this.recordDefinition = recordDefinition;
   }
 
   /**
@@ -178,6 +181,11 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   @Override
   public ClockDirection getPolygonRingDirection() {
     return ClockDirection.COUNTER_CLOCKWISE;
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   public boolean isCogo() {

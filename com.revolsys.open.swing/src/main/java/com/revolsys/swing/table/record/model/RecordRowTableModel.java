@@ -319,10 +319,14 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         return LOADING_VALUE;
       } else {
         final String name = getColumnFieldName(columnIndex);
-        final Object value = record.getValue(name);
-        return value;
+        return getRecordValue(record, name);
       }
     }
+  }
+
+  protected Object getRecordValue(final Record record, final String name) {
+    final Object value = record.getValue(name);
+    return value;
   }
 
   @Override

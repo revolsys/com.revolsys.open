@@ -15,9 +15,6 @@ public final class ThreadBooleanValue implements BooleanValue {
     setValue(Boolean.FALSE);
   };
 
-  public ThreadBooleanValue() {
-  }
-
   public ThreadBooleanValue(final boolean defaultValue) {
     this.defaultValue = defaultValue;
   }

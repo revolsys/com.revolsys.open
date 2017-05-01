@@ -117,15 +117,20 @@ public class MapService extends ArcGisRestAbstractLayerService {
 
   public BufferedImage getTileImage(final int zoomLevel, final int tileX, final int tileY) {
     final String url = getTileUrl(zoomLevel, tileX, tileY);
-    try {
-
-      final URLConnection connection = new URL(url).openConnection();
-      final InputStream in = connection.getInputStream();
-      return ImageIO.read(in);
-    } catch (final FileNotFoundException e) {
-      return null;
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
+    boolean retry = true;
+    while (true) {
+      try {
+        final URLConnection connection = new URL(url).openConnection();
+        final InputStream in = connection.getInputStream();
+        return ImageIO.read(in);
+      } catch (final FileNotFoundException e) {
+        return null;
+      } catch (final IOException e) {
+        if (!retry) {
+          throw Exceptions.wrap(e);
+        }
+      }
+      retry = false;
     }
   }
 

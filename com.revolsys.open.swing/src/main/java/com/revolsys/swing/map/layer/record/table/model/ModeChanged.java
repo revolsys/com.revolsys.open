@@ -28,8 +28,7 @@ public class ModeChanged extends ModeAbstractCached {
     addListeners( //
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_INSERTED,
         this::addCachedRecords), //
-      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
-        this::recordsDeleted), //
+      newRecordsDeletedListener(layer), //
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_CACHE_MODIFIED,
         this::addCachedRecord) //
     );
