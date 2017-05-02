@@ -16,6 +16,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.util.Cancellable;
 
 /**
  * Use all the specified renderers to render the layer. All features are
@@ -73,20 +74,20 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  protected void renderRecords(final Viewport2D viewport, final AbstractRecordLayer layer,
-    final List<LayerRecord> records) {
+  protected void renderRecords(final Viewport2D viewport, final Cancellable cancellable,
+    final AbstractRecordLayer layer, final List<LayerRecord> records) {
     final List<LayerRecord> visibleRecords = new ArrayList<>();
-    for (final LayerRecord record : records) {
+    for (final LayerRecord record : cancellable.cancellable(records)) {
       if (isVisible(record) && !layer.isHidden(record)) {
         visibleRecords.add(record);
       }
     }
 
-    for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
+    for (final AbstractRecordLayerRenderer renderer : cancellable.cancellable(getRenderers())) {
       final long scaleForVisible = (long)viewport.getScaleForVisible();
       if (renderer.isVisible(scaleForVisible)) {
         try {
-          renderer.renderRecords(viewport, layer, visibleRecords);
+          renderer.renderRecords(viewport, cancellable, layer, visibleRecords);
         } catch (final TopologyException e) {
         }
       }

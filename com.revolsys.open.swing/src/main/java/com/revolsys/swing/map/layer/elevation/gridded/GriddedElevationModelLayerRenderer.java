@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
+import com.revolsys.util.Cancellable;
 
 public class GriddedElevationModelLayerRenderer
   extends AbstractLayerRenderer<GriddedElevationModelLayer> {
@@ -28,7 +29,9 @@ public class GriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final Viewport2D viewport, final GriddedElevationModelLayer layer) {
+  public void render(final Viewport2D viewport, final Cancellable cancellable,
+    final GriddedElevationModelLayer layer) {
+    // TODO cancel
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {

@@ -9,6 +9,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.util.Cancellable;
 
 public class TriangulatedIrregularNetworkLayerRenderer
   extends AbstractLayerRenderer<TriangulatedIrregularNetworkLayer> {
@@ -21,7 +22,8 @@ public class TriangulatedIrregularNetworkLayerRenderer
   }
 
   @Override
-  public void render(final Viewport2D viewport, final TriangulatedIrregularNetworkLayer layer) {
+  public void render(final Viewport2D viewport, final Cancellable cancellable,
+    final TriangulatedIrregularNetworkLayer layer) {
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
@@ -29,7 +31,8 @@ public class TriangulatedIrregularNetworkLayerRenderer
         if (tin != null) {
           try (
             BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
-            for (final Triangle triangle : tin.getTriangles(viewport.getBoundingBox())) {
+            for (final Triangle triangle : cancellable
+              .cancellable(tin.getTriangles(viewport.getBoundingBox()))) {
               final Geometry convertedTriangle = tin.convertGeometry(triangle);
               viewport.drawGeometry(convertedTriangle, this.style);
             }

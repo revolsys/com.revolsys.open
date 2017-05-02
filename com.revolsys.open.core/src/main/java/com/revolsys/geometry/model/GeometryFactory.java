@@ -1901,6 +1901,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return this.boundingBoxEmpty;
   }
 
+  public double[] newBounds(final int axisCount) {
+    return BoundingBoxUtil.newBounds(axisCount);
+  }
+
   public LineStringDoubleBuilder newLineStringBuilder() {
     return new LineStringDoubleBuilder(this);
   }
@@ -1929,10 +1933,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       }
     }
     return lineBuilder;
-  }
-
-  public double[] newBounds(final int axisCount) {
-    return BoundingBoxUtil.newBounds(axisCount);
   }
 
   /**

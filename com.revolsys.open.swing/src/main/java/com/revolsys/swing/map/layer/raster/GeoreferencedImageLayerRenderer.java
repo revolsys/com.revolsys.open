@@ -13,6 +13,7 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.util.Cancellable;
 
 public class GeoreferencedImageLayerRenderer
   extends AbstractLayerRenderer<GeoreferencedImageLayer> {
@@ -62,7 +63,8 @@ public class GeoreferencedImageLayerRenderer
   }
 
   @Override
-  public void render(final Viewport2D viewport, final GeoreferencedImageLayer layer) {
+  public void render(final Viewport2D viewport, final Cancellable cancellable,
+    final GeoreferencedImageLayer layer) {
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
@@ -74,8 +76,12 @@ public class GeoreferencedImageLayerRenderer
           }
           final Graphics2D graphics = viewport.getGraphics();
           if (graphics != null) {
-            renderAlpha(viewport, graphics, image, true, layer.getOpacity() / 255.0);
-            renderDifferentCoordinateSystem(viewport, graphics, boundingBox);
+            if (!cancellable.isCancelled()) {
+              renderAlpha(viewport, graphics, image, true, layer.getOpacity() / 255.0);
+            }
+            if (!cancellable.isCancelled()) {
+              renderDifferentCoordinateSystem(viewport, graphics, boundingBox);
+            }
           }
         }
       }

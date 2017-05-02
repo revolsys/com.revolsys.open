@@ -14,6 +14,7 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.util.Cancellable;
 
 public class PointCloudLayerRenderer extends AbstractLayerRenderer<PointCloudLayer> {
 
@@ -61,7 +62,9 @@ public class PointCloudLayerRenderer extends AbstractLayerRenderer<PointCloudLay
   }
 
   @Override
-  public void render(final Viewport2D viewport, final PointCloudLayer layer) {
+  public void render(final Viewport2D viewport, final Cancellable cancellable,
+    final PointCloudLayer layer) {
+    // TODO cancellable
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {

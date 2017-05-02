@@ -5,6 +5,7 @@ import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
+import com.revolsys.util.Cancellable;
 
 public class OgcWmsImageLayerSwingWorker extends AbstractSwingWorker<GeoreferencedImage, Void> {
 
@@ -18,9 +19,13 @@ public class OgcWmsImageLayerSwingWorker extends AbstractSwingWorker<Georeferenc
 
   private final int imageHeight;
 
+  private final Cancellable cancellable;
+
   public OgcWmsImageLayerSwingWorker(final OgcWmsImageLayerRenderer renderer,
-    final BoundingBox boundingBox, final int imageWidth, final int imageHeight) {
+    final Cancellable cancellable, final BoundingBox boundingBox, final int imageWidth,
+    final int imageHeight) {
     this.renderer = renderer;
+    this.cancellable = cancellable;
     this.boundingBox = boundingBox;
     this.imageWidth = imageWidth;
     this.imageHeight = imageHeight;
@@ -45,12 +50,14 @@ public class OgcWmsImageLayerSwingWorker extends AbstractSwingWorker<Georeferenc
       if (layer != null) {
         final WmsLayerDefinition wmsLayerDefinition = layer.getWmsLayerDefinition();
         if (wmsLayerDefinition != null) {
-          return wmsLayerDefinition.getMapImage(this.boundingBox, this.imageWidth,
-            this.imageHeight);
+          if (!this.cancellable.isCancelled()) {
+            return wmsLayerDefinition.getMapImage(this.boundingBox, this.imageWidth,
+              this.imageHeight);
+          }
         }
       }
     } catch (final Throwable t) {
-      if (!isCancelled()) {
+      if (!isCancelled() && !this.cancellable.isCancelled()) {
         Logs.error(this, "Unable to paint", t);
       }
     }
@@ -64,7 +71,9 @@ public class OgcWmsImageLayerSwingWorker extends AbstractSwingWorker<Georeferenc
 
   @Override
   protected void handleDone(final GeoreferencedImage image) {
-    this.renderer.setImage(this, image);
+    if (!this.cancellable.isCancelled()) {
+      this.renderer.setImage(this, image);
+    }
   }
 
   @Override

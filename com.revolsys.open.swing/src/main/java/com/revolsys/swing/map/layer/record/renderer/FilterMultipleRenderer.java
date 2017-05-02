@@ -18,6 +18,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.util.Cancellable;
 
 /**
  * For each object render using the first renderer that matches the filter.
@@ -63,17 +64,17 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  protected void renderRecords(final Viewport2D viewport, final AbstractRecordLayer layer,
-    final List<LayerRecord> records) {
+  protected void renderRecords(final Viewport2D viewport, final Cancellable cancellable,
+    final AbstractRecordLayer layer, final List<LayerRecord> records) {
     final Map<AbstractRecordLayerRenderer, List<LayerRecord>> rendererToRecordMap = new LinkedHashMap<>();
     final BoundingBox visibleArea = viewport.getBoundingBox();
     final double scaleForVisible = viewport.getScaleForVisible();
     if (isVisible(scaleForVisible)) {
       final List<AbstractRecordLayerRenderer> renderers = new ArrayList<>(getRenderers());
       for (final AbstractRecordLayerRenderer renderer : renderers) {
-        rendererToRecordMap.put(renderer, new ArrayList<LayerRecord>());
+        rendererToRecordMap.put(renderer, new ArrayList<>());
       }
-      for (final LayerRecord record : records) {
+      for (final LayerRecord record : cancellable.cancellable(records)) {
         if (isFilterAccept(record) && !layer.isHidden(record)) {
           final AbstractRecordLayerRenderer renderer = getRenderer(layer, renderers, record,
             scaleForVisible);
@@ -82,17 +83,19 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
           }
         }
       }
-      for (final Entry<AbstractRecordLayerRenderer, List<LayerRecord>> entry : rendererToRecordMap
-        .entrySet()) {
+      for (final Entry<AbstractRecordLayerRenderer, List<LayerRecord>> entry : cancellable
+        .cancellable(rendererToRecordMap.entrySet())) {
         final AbstractRecordLayerRenderer renderer = entry.getKey();
         final List<LayerRecord> rendererRecords = entry.getValue();
-        for (final LayerRecord record : rendererRecords) {
+        for (final LayerRecord record : cancellable.cancellable(rendererRecords)) {
           try {
             renderer.renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            Logs.error(this, "Unabled to render " + layer.getName() + " #" + record.getIdentifier(),
-              e);
+            if (!cancellable.isCancelled()) {
+              Logs.error(this,
+                "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
+            }
           }
         }
 
