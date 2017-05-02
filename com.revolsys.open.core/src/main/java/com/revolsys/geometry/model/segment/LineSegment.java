@@ -608,32 +608,36 @@ public interface LineSegment extends LineString {
     return false;
   }
 
+  default boolean isPointOnLineMiddle(final double x, final double y, final double maxDistance) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    if (Doubles.equal(x, x1) && Doubles.equal(y, y1)) {
+      return false;
+    } else if (Doubles.equal(x, x2) && Doubles.equal(y, y2)) {
+      return false;
+    } else {
+      final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+      if (distance < maxDistance) {
+        final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
+        if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
   default boolean isPointOnLineMiddle(Point point, final double maxDistance) {
     if (point == null || point.isEmpty()) {
       return false;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       point = point.convertGeometry(geometryFactory, 2);
-      final double x1 = getX(0);
-      final double y1 = getY(0);
-      final double x2 = getX(1);
-      final double y2 = getY(1);
       final double x = point.getX();
       final double y = point.getY();
-      if (Doubles.equal(x, x1) && Doubles.equal(y, y1)) {
-        return false;
-      } else if (Doubles.equal(x, x2) && Doubles.equal(y, y2)) {
-        return false;
-      } else {
-        final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
-        if (distance < maxDistance) {
-          final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
-          if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-            return true;
-          }
-        }
-        return false;
-      }
+      return isPointOnLineMiddle(x, y, maxDistance);
     }
   }
 

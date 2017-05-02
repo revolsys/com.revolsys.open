@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import org.jdesktop.swingx.JXBusyLabel;
 
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.component.BusyLabelPainter;
 import com.revolsys.util.Property;
 
 public class SwingWorkerProgressBar extends JPanel implements PropertyChangeListener {
@@ -20,7 +21,8 @@ public class SwingWorkerProgressBar extends JPanel implements PropertyChangeList
 
   public SwingWorkerProgressBar() {
     super(new BorderLayout(2, 2));
-    this.busyLabel.setDelay(200);
+    this.busyLabel.setBusyPainter(new BusyLabelPainter());
+    this.busyLabel.setDelay(400);
     this.busyLabel.setFocusable(false);
     Invoke.getPropertyChangeSupport().addPropertyChangeListener("workers", this);
     add(this.busyLabel, BorderLayout.WEST);

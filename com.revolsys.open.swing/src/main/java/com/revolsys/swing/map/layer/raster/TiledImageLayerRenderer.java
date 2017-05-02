@@ -18,6 +18,7 @@ import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.parallel.RunnableSwingWorkerManager;
+import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
 public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiledImageLayer>
@@ -69,7 +70,8 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
   }
 
   @Override
-  public void render(final Viewport2D viewport, final AbstractTiledImageLayer layer) {
+  public void render(final Viewport2D viewport, final Cancellable cancellable,
+    final AbstractTiledImageLayer layer) {
     final GeometryFactory geometryFactory = viewport.getGeometryFactory();
     final double resolution = layer.getResolution(viewport);
     synchronized (this.cachedTiles) {
@@ -83,7 +85,7 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
     }
     final List<Runnable> tasks = new ArrayList<>();
     final List<MapTile> mapTiles = layer.getOverlappingMapTiles(viewport);
-    for (final MapTile mapTile : mapTiles) {
+    for (final MapTile mapTile : cancellable.cancellable(mapTiles)) {
       if (mapTile != null) {
         MapTile cachedTile = null;
         synchronized (this.cachedTiles) {
@@ -91,14 +93,16 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
           if (cachedTile == null) {
             cachedTile = mapTile;
             this.cachedTiles.put(cachedTile, cachedTile);
-            final Runnable task = new TileLoadTask(this, geometryFactory, cachedTile);
+            final Runnable task = new TileLoadTask(this, cancellable, geometryFactory, cachedTile);
             tasks.add(task);
           }
         }
-        final GeoreferencedImage image = cachedTile.getImage(geometryFactory);
-        final Graphics2D graphics = viewport.getGraphics();
-        if (graphics != null) {
-          GeoreferencedImageLayerRenderer.render(viewport, graphics, image, false);
+        if (!cancellable.isCancelled()) {
+          final GeoreferencedImage image = cachedTile.getImage(geometryFactory);
+          final Graphics2D graphics = viewport.getGraphics();
+          if (graphics != null) {
+            GeoreferencedImageLayerRenderer.render(viewport, graphics, image, false);
+          }
         }
       }
     }

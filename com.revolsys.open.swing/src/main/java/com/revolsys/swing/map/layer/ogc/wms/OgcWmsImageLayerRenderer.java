@@ -11,6 +11,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
 public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageLayer>
@@ -33,7 +34,8 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
   }
 
   @Override
-  public void render(final Viewport2D viewport, final OgcWmsImageLayer layer) {
+  public void render(final Viewport2D viewport, final Cancellable cancellable,
+    final OgcWmsImageLayer layer) {
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
@@ -58,7 +60,7 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
           final int imageWidth = viewport.getViewWidthPixels();
           final int imageHeight = viewport.getViewHeightPixels();
           final OgcWmsImageLayerSwingWorker worker = new OgcWmsImageLayerSwingWorker(this,
-            queryBoundingBox, imageWidth, imageHeight);
+            cancellable, queryBoundingBox, imageWidth, imageHeight);
           synchronized (this) {
             if (this.worker != null) {
               this.worker.cancel(true);

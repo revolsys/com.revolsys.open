@@ -10,6 +10,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.util.Cancellable;
 
 public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
   PropertyChangeListener, PropertyChangeSupportProxy, MapSerializer, Cloneable {
@@ -38,7 +39,13 @@ public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
 
   Form newStylePanel();
 
-  void render(Viewport2D viewport);
+  default void render(final Viewport2D viewport) {
+    render(viewport, () -> {
+      return false;
+    });
+  }
+
+  void render(Viewport2D viewport, Cancellable cancellable);
 
   void setEditing(boolean editing);
 
