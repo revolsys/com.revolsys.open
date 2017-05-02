@@ -636,7 +636,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   @Override
   public Component newPanelComponent(final Map<String, Object> config) {
     if (isInitialized()) {
-      return newTableViewComponent(config);
+      if (isExists()) {
+        return newTableViewComponent(config);
+      } else {
+        return new BasePanel(new BorderLayout());
+      }
     } else {
       final BasePanel basePanel = new BasePanel(new BorderLayout());
       addPropertyChangeListener("initialized", (event) -> {

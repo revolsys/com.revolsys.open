@@ -20,6 +20,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.util.Cancellable;
 
 public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
 
@@ -28,7 +29,8 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final GridLayer layer) {
+  public void render(final Viewport2D viewport, final Cancellable cancellable,
+    final GridLayer layer) {
     try {
       final double scaleForVisible = viewport.getScaleForVisible();
       if (layer.isVisible(scaleForVisible)) {
@@ -38,7 +40,7 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
         final Graphics2D graphics = viewport.getGraphics();
         if (graphics != null) {
           final Font font = graphics.getFont();
-          for (final RectangularMapTile tile : tiles) {
+          for (final RectangularMapTile tile : cancellable.cancellable(tiles)) {
             final BoundingBox tileBoundingBox = tile.getBoundingBox();
             final BoundingBox intersectBoundingBox = boundingBox.intersection(tileBoundingBox);
             if (!intersectBoundingBox.isEmpty()) {

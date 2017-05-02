@@ -41,6 +41,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.RecordDefinitionSqlFilter;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.util.Cancellable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -328,13 +329,14 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   }
 
   @Override
-  public void render(final Viewport2D viewport, final AbstractRecordLayer layer) {
+  public void render(final Viewport2D viewport, final Cancellable cancellable,
+    final AbstractRecordLayer layer) {
     if (layer.hasGeometryField()) {
       final BoundingBox boundingBox = viewport.getBoundingBox();
       final List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
       try (
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
-        renderRecords(viewport, layer, records);
+        renderRecords(viewport, cancellable, layer, records);
       }
     }
   }
@@ -343,18 +345,20 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     final AbstractLayer layer, final LayerRecord record) {
   }
 
-  protected void renderRecords(final Viewport2D viewport, final AbstractRecordLayer layer,
-    final List<LayerRecord> records) {
+  protected void renderRecords(final Viewport2D viewport, final Cancellable cancellable,
+    final AbstractRecordLayer layer, final List<LayerRecord> records) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
-    for (final LayerRecord record : records) {
+    for (final LayerRecord record : cancellable.cancellable(records)) {
       if (record != null) {
         if (isVisible(record) && !layer.isHidden(record)) {
           try {
             renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            Logs.error(this, "Unabled to render " + layer.getName() + " #" + record.getIdentifier(),
-              e);
+            if (!cancellable.isCancelled()) {
+              Logs.error(this,
+                "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
+            }
           }
         }
       }

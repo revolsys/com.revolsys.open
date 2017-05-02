@@ -182,7 +182,9 @@ public class XlsxRecordReader extends AbstractRecordReader {
           default:
             if (cellValue == null) {
               final CTRst is = cell.getIs();
-              value = is.getT().getValue();
+              if (is != null) {
+                value = is.getT().getValue();
+              }
             } else {
               value = cellValue;
             }

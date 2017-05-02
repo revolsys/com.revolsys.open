@@ -10,8 +10,10 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
+import com.revolsys.util.Cancellable;
 
-public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, Void> {
+public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, Void>
+  implements Cancellable {
 
   private final LayerRendererOverlay overlay;
 
@@ -44,11 +46,13 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
             if (layer != null && layer.isExists() && layer.isVisible()) {
               final LayerRenderer<Layer> renderer = layer.getRenderer();
               if (renderer != null) {
-                renderer.render(viewport);
+                renderer.render(viewport, this);
               }
             }
-            final BufferedImage image = viewport.getImage();
-            this.referencedImage.setRenderedImage(image);
+            if (!isCancelled()) {
+              final BufferedImage image = viewport.getImage();
+              this.referencedImage.setRenderedImage(image);
+            }
           }
         }
       }

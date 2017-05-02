@@ -194,15 +194,16 @@ public class ZoomOverlay extends AbstractOverlay {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent event) {
     if (canOverrideOverlayAction(ACTION_ZOOM)) {
-      int numSteps = event.getWheelRotation();
+      int numSteps = 1;
+      if (event.getUnitsToScroll() < 0) {
+        numSteps = -1;
+      }
       if (SwingUtil.isScrollReversed()) {
         numSteps = -numSteps;
       }
       if (!isWheelForwardsZoomIn()) {
         numSteps = -numSteps;
       }
-
-      numSteps = Math.max(-4, Math.min(4, numSteps));
 
       final int x = event.getX();
       final int y = event.getY();

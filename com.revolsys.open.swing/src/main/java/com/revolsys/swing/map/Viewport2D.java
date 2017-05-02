@@ -747,7 +747,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       return geometryFactory.point();
     } else {
       final Point point = this.geometryFactory2d.point(coordinates);
-      return (Point)point.newGeometry(geometryFactory);
+      return point.newGeometry(geometryFactory);
     }
   }
 
