@@ -156,7 +156,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  public List<T> query(final BoundingBox boundingBox, final Predicate<T> filter) {
+  public List<T> getItems(final BoundingBox boundingBox, final Predicate<T> filter) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<>(filter);
     forEach(visitor, boundingBox);
     return visitor.getList();

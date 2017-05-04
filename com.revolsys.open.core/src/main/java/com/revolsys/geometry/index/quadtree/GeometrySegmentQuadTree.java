@@ -73,7 +73,7 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
     boundingBox = boundingBox.expand(maxDistance);
     final LineSegmentCoordinateDistanceFilter filter = new LineSegmentCoordinateDistanceFilter(
       point, maxDistance);
-    return query(boundingBox, filter);
+    return getItems(boundingBox, filter);
   }
 
 }
