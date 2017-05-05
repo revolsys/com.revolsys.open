@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import javax.swing.JMenuItem;
 import javax.swing.ListSelectionModel;
@@ -21,6 +22,7 @@ import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 import com.revolsys.record.query.Condition;
@@ -146,6 +148,18 @@ public class RecordLayerTableModel extends RecordRowTableModel
     if (tableRecordsMode != null) {
       final Query query = getFilterQuery();
       tableRecordsMode.exportRecords(query, target);
+    }
+  }
+
+  public void forEachRecord(final Consumer<? super LayerRecord> action) {
+    final TableRecordsMode tableRecordsMode = getTableRecordsMode();
+    if (tableRecordsMode != null) {
+      final Query query = getFilterQuery();
+      try (
+        BaseCloseable eventsDisabled = this.layer.eventsDisabled()) {
+        tableRecordsMode.forEachRecord(query, action);
+      }
+      refresh();
     }
   }
 

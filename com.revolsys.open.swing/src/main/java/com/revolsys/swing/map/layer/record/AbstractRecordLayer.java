@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -847,7 +848,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (recordDefinition != null) {
       try (
         RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, target)) {
-        forEachRecord(query, writer::write);
+        forEachRecordInternal(query, writer::write);
       }
     }
   }
@@ -880,7 +881,28 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     firePropertyChange("selectionCount", -1, selectionCount);
   }
 
-  protected void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
+  public void forEachRecord(final Iterable<LayerRecord> records,
+    final Predicate<? super LayerRecord> filter, final Map<String, Boolean> orderBy,
+    final Consumer<? super LayerRecord> action) {
+    try {
+      if (Property.hasValue(records) && action != null) {
+        final List<LayerRecord> exportRecords = Lists.toArray(records);
+
+        Records.filterAndSort(exportRecords, filter, orderBy);
+
+        if (!exportRecords.isEmpty()) {
+          exportRecords.forEach(action);
+        }
+      }
+    } catch (final CancellationException e) {
+    }
+  }
+
+  public void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
+    forEachRecordInternal(query, (record) -> {
+      final LayerRecord proxyRecord = newProxyLayerRecord(record);
+      consumer.accept(proxyRecord);
+    });
   }
 
   public void forEachRecordChanged(final Query query,
@@ -889,12 +911,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     query.forEachRecord(records, consumer);
   }
 
-  protected void forEachRecordProxy(final Query query,
+  protected void forEachRecordInternal(final Query query,
     final Consumer<? super LayerRecord> consumer) {
-    forEachRecord(query, (record) -> {
-      final LayerRecord proxyRecord = newProxyLayerRecord(record);
-      consumer.accept(proxyRecord);
-    });
   }
 
   @SuppressWarnings("unchecked")
@@ -1460,10 +1478,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public <R extends LayerRecord> List<R> getRecords(final Query query) {
     final List<R> records = new ArrayList<>();
-    forEachRecord(query, (final LayerRecord record) -> {
-      final R proxyRecord = newProxyLayerRecord(record);
-      records.add(proxyRecord);
-    });
+    final Consumer<LayerRecord> action = (Consumer<LayerRecord>)(Consumer<R>)records::add;
+    forEachRecord(query, action);
     return records;
   }
 

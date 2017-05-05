@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.util.function.Consumer;
+
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.ListSelectionModel;
@@ -10,6 +12,10 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 public class ModeEmpty implements TableRecordsMode {
   @Override
   public void exportRecords(final Query query, final Object target) {
+  }
+
+  @Override
+  public void forEachRecord(Query query, final Consumer<? super LayerRecord> action) {
   }
 
   @Override

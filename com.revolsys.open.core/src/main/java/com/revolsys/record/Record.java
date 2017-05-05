@@ -235,13 +235,17 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     }
   }
 
-  default boolean equalValue(final CharSequence fieldName, final Object value) {
+  default boolean equalValue(final CharSequence fieldName, Object value) {
     final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
     if (fieldDefinition == null) {
       return false;
     } else {
       final int fieldIndex = fieldDefinition.getIndex();
       final Object fieldValue = getValue(fieldIndex);
+      final CodeTable codeTable = fieldDefinition.getCodeTable();
+      if (codeTable != null) {
+        value = codeTable.getIdentifier(value);
+      }
       return fieldDefinition.equals(fieldValue, value);
     }
   }

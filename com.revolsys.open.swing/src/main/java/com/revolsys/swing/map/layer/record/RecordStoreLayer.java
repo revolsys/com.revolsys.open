@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -214,7 +215,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void forEachRecord(Query query, final Consumer<? super LayerRecord> consumer) {
+  protected void forEachRecordInternal(Query query, final Consumer<? super LayerRecord> consumer) {
     if (isExists()) {
       try {
         final RecordStore recordStore = getRecordStore();
@@ -263,6 +264,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             }
           }
         }
+      } catch (final CancellationException e) {
       } catch (final RuntimeException e) {
         Logs.error(this, "Error executing query: " + query, e);
         throw e;

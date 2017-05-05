@@ -49,7 +49,7 @@ public class TextField extends JTextField implements Field, FocusListener {
     setText(text);
     addFocusListener(new WeakFocusListener(this));
     MenuFactory.getPopupMenuFactory(this);
-    EventQueue.addAction(this, () -> updateFieldValue());
+    EventQueue.addAction(this, this::updateFieldValue);
   }
 
   public TextField(final String fieldName, final Object fieldValue, final int columns) {
@@ -78,8 +78,7 @@ public class TextField extends JTextField implements Field, FocusListener {
 
   @Override
   public void focusLost(final FocusEvent e) {
-    final String text = getText();
-    setFieldValue(text);
+    updateFieldValue();
   }
 
   protected String getDisplayText(final Object value) {
@@ -200,6 +199,7 @@ public class TextField extends JTextField implements Field, FocusListener {
 
   @Override
   public void updateFieldValue() {
-    setFieldValue(getText());
+    final String text = getText();
+    setFieldValue(text);
   }
 }

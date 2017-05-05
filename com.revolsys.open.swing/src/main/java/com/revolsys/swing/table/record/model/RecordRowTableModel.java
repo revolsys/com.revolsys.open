@@ -357,6 +357,29 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return false;
   }
 
+  public boolean isFieldEditable(final int columnIndex) {
+    final String fieldName = getColumnFieldName(columnIndex);
+    if (fieldName != null) {
+      if (!isReadOnly(fieldName)) {
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        final Class<?> fieldClass = recordDefinition.getFieldClass(fieldName);
+        if (!Geometry.class.isAssignableFrom(fieldClass)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public boolean isIdField(final int columnIndex) {
+    final String fieldName = getColumnFieldName(columnIndex);
+    if (fieldName != null) {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      return recordDefinition.getIdFieldNames().contains(fieldName);
+    }
+    return false;
+  }
+
   @Override
   public boolean isSelected(boolean selected, final int rowIndex, final int columnIndex) {
     final RecordRowTable table = getTable();
