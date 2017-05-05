@@ -1,21 +1,27 @@
 package com.revolsys.swing.map.layer.record.table;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellEditor;
+
+import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -34,7 +40,9 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
+import com.revolsys.swing.map.layer.record.component.FieldCalculator;
 import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
+import com.revolsys.swing.map.layer.record.component.SetRecordsFieldValue;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.model.TableRecordsMode;
 import com.revolsys.swing.menu.BaseJPopupMenu;
@@ -79,6 +87,10 @@ public class RecordLayerTablePanel extends TablePanel
 
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+
+    final MenuFactory headerMenu = getHeaderMenu();
+    SetRecordsFieldValue.addMenuItem(headerMenu);
+    FieldCalculator.addMenuItem(headerMenu);
 
     final LayerRecordMenu menu = this.layer.getRecordMenu();
 
@@ -162,6 +174,30 @@ public class RecordLayerTablePanel extends TablePanel
       this.fieldFilterPanel.close();
       this.fieldFilterPanel = null;
     }
+  }
+
+  @Override
+  public JPopupMenu getHeaderMenu(final int columnIndex) {
+    final JPopupMenu headerMenu = super.getHeaderMenu(columnIndex);
+    final String columnName = this.tableModel.getColumnName(columnIndex);
+    final JMenuItem menuItem = new JMenuItem();
+    final JLabel title = new JLabel(columnName);
+    title.setFont(menuItem.getFont().deriveFont(Font.BOLD));
+    title.setBackground(menuItem.getBackground());
+    title.setHorizontalAlignment(JLabel.CENTER);
+    title.setHorizontalTextPosition(JLabel.CENTER);
+    final JPanel labelPanel = new JPanel(new VerticalLayout());
+    labelPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+    labelPanel.setOpaque(false);
+    labelPanel.add(title);
+    headerMenu.add(labelPanel, 0);
+    headerMenu.add(new JPopupMenu.Separator(), 1);
+    return headerMenu;
+  }
+
+  @Override
+  protected RecordLayerTable getHeaderMenuSource() {
+    return getTable();
   }
 
   public AbstractRecordLayer getLayer() {

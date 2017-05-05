@@ -10,6 +10,10 @@ public interface EnableCheck {
     return false;
   };
 
+  static EnableCheck property(final Object object, final String propertyName) {
+    return new ObjectPropertyEnableCheck(object, propertyName);
+  }
+
   default EnableCheck and(final EnableCheck enableCheck) {
     if (enableCheck == null || enableCheck == this) {
       return this;
