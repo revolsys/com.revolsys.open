@@ -96,6 +96,11 @@ public class ToolBar extends JToolBar {
     return addButton(groupName, action);
   }
 
+  public JButton addButton(final String groupName, final String title, final String iconName,
+    final Runnable runnable) {
+    return addButton(groupName, title, iconName, (EnableCheck)null, runnable);
+  }
+
   public JButton addButtonTitleIcon(final String groupName, final int index, final String title,
     final String iconName, final Runnable runnable) {
     final Icon icon = Icons.getIcon(iconName);
