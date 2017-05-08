@@ -343,6 +343,15 @@ public class RecordLayerTableModel extends RecordRowTableModel
     return super.isEditable() && this.layer.isEditable() && this.layer.isCanEditRecords();
   }
 
+  @Override
+  public boolean isFieldEditable(final int columnIndex) {
+    if (this.layer.isEditable()) {
+      return super.isFieldEditable(columnIndex);
+    } else {
+      return false;
+    }
+  }
+
   public boolean isFilterByBoundingBox() {
     return this.filterByBoundingBox;
   }

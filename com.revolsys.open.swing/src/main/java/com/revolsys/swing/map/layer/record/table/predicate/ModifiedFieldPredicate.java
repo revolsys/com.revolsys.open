@@ -74,6 +74,9 @@ public class ModifiedFieldPredicate implements HighlightPredicate {
             }
             toolTip = text;
           }
+          if (columnIndex < this.model.getColumnFieldsOffset()) {
+            highlighted = false;
+          }
         }
       }
     } catch (final IndexOutOfBoundsException e) {

@@ -50,7 +50,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrors;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
@@ -924,7 +924,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean saveChangesDo(final RecordSaveErrors errors, final LayerRecord record) {
+  protected boolean saveChangesDo(final RecordLayerErrors errors, final LayerRecord record) {
     boolean deleted = super.isDeleted(record);
 
     if (isExists()) {

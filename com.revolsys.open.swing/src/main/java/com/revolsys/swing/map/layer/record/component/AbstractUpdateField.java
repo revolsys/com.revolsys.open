@@ -1,33 +1,40 @@
 package com.revolsys.swing.map.layer.record.component;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 
+import org.jdesktop.swingx.VerticalLayout;
+
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
-import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.table.TablePanel;
+import com.revolsys.util.WrappedException;
 
 public abstract class AbstractUpdateField extends JDialog {
   private static final long serialVersionUID = 1L;
@@ -103,11 +110,22 @@ public abstract class AbstractUpdateField extends JDialog {
     final SwingWorker<?, ?> task = new SwingWorker<Void, Void>() {
       @Override
       protected Void doInBackground() throws Exception {
+        final Set<String> fieldNames = new LinkedHashSet<>();
+        fieldNames.add(AbstractUpdateField.this.fieldDefinition.getName());
+        fieldNames.addAll(AbstractUpdateField.this.layer.getFieldNames());
+        final RecordLayerErrors errors = new RecordLayerErrors("Setting Field Values",
+          AbstractUpdateField.this.layer, fieldNames);
         AbstractUpdateField.this.tableModel.forEachRecord((record) -> {
           if (progressMonitor.isCanceled()) {
             throw new CancellationException();
           } else {
-            updateRecord(record);
+            try {
+              updateRecord(record);
+            } catch (final WrappedException e) {
+              errors.addRecord(record, e.getCause());
+            } catch (final Throwable e) {
+              errors.addRecord(record, e);
+            }
             final int updateCount = progress.incrementAndGet();
             if (updateCount < AbstractUpdateField.this.recordCount) {
               final int updatePercent = (int)Math
@@ -119,6 +137,9 @@ public abstract class AbstractUpdateField extends JDialog {
           }
         });
         setProgress(100);
+        if (!isCancelled()) {
+          errors.showErrorDialog();
+        }
         return null;
       }
 
@@ -154,6 +175,7 @@ public abstract class AbstractUpdateField extends JDialog {
   }
 
   protected void initDialog() {
+    setLayout(new VerticalLayout());
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     setMinimumSize(new Dimension(300, 100));
     addWindowListener(new WindowAdapter() {
@@ -163,14 +185,24 @@ public abstract class AbstractUpdateField extends JDialog {
       }
     });
 
-    final BasePanel panel = new BasePanel(new BorderLayout());
-    add(panel);
-
     final JPanel fieldPanel = initFieldPanel();
-    panel.add(fieldPanel, BorderLayout.CENTER);
+    final String fieldTitle = this.fieldDefinition.getTitle();
+    fieldPanel.setBorder(BorderFactory.createTitledBorder("Set " + fieldTitle + " = "));
+
+    add(fieldPanel);
+
+    final JLabel recordCountLabel = new JLabel("<html><b style='color:#32CD32'>"
+      + getRecordCountString() + "</b> records will be updated.</html>");
+    recordCountLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+    add(recordCountLabel);
+
+    final JComponent errorsPanel = initErrorsPanel();
+    if (errorsPanel != null) {
+      add(errorsPanel);
+    }
 
     final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    add(buttonsPanel, BorderLayout.SOUTH);
+    add(buttonsPanel);
 
     final JButton cancelButton = RunnableAction.newButton("Cancel", this::cancel);
     buttonsPanel.add(cancelButton);
@@ -183,6 +215,10 @@ public abstract class AbstractUpdateField extends JDialog {
 
     pack();
     SwingUtil.autoAdjustPosition(this);
+  }
+
+  protected JComponent initErrorsPanel() {
+    return null;
   }
 
   protected abstract JPanel initFieldPanel();

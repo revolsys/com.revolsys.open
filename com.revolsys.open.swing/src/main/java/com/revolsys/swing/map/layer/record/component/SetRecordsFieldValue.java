@@ -2,13 +2,10 @@ package com.revolsys.swing.map.layer.record.component;
 
 import java.awt.Component;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayouts;
@@ -46,14 +43,8 @@ public class SetRecordsFieldValue extends AbstractUpdateField {
   @Override
   protected JPanel initFieldPanel() {
     final FieldDefinition fieldDefinition = this.getFieldDefinition();
-    final String title = "<html>Enter the new value for <b style='color:#32CD32'>"
-      + getRecordCountString() + "</b> records</html>";
 
     final JPanel fieldPanel = new JPanel();
-    fieldPanel.setBorder(BorderFactory.createTitledBorder(title));
-    final String fieldTitle = fieldDefinition.getTitle();
-    fieldPanel.add(SwingUtil.newLabel(fieldTitle));
-    fieldPanel.add(new JLabel("="));
     final String fieldName = fieldDefinition.getName();
     final AbstractRecordLayer layer = getLayer();
     this.editField = RecordLayerFields.newFormField(layer, fieldName, true);
