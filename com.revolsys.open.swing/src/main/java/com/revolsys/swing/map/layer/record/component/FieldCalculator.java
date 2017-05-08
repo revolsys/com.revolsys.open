@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer.record.component;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -11,6 +13,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -28,7 +31,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.TextArea;
@@ -36,6 +38,7 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class FieldCalculator extends AbstractUpdateField implements DocumentListener {
@@ -93,35 +96,17 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
   private TextArea errorsField;
 
   private FieldCalculator() {
-    super("Set Field Value");
+    super("Field Calculator");
 
   }
 
-  public void addTextButton(final ToolBar toolBar, final String label, final String text) {
+  private void addTextButton(final String groupName, final ToolBar toolBar, final String label,
+    final String text) {
     final Runnable action = () -> {
-      final int newLocation = this.expressionField.getCaretPosition();
-      int location = newLocation;
-      final Document document = this.expressionField.getDocument();
-
-      boolean needsWhitespaceNext = false;
-      try {
-        if (location < document.getLength() - 1
-          && !Character.isWhitespace(document.getText(location + 1, 1).charAt(0))) {
-          needsWhitespaceNext = true;
-        }
-        if (location > 0 && !Character.isWhitespace(document.getText(location - 1, 1).charAt(0))) {
-          this.expressionField.insert(" ", location);
-          location++;
-        }
-        this.expressionField.insert(text, location);
-        if (needsWhitespaceNext) {
-          this.expressionField.insert(" ", newLocation);
-        }
-      } catch (final BadLocationException e) {
-        this.expressionField.append(text);
-      }
+      insertText(text);
     };
-    toolBar.addButton("text", label, action);
+    toolBar.addButton(groupName, label, action) //
+      .setBorderPainted(true);
   }
 
   @Override
@@ -130,30 +115,39 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
   }
 
   @Override
-  protected JPanel initFieldPanel() {
-    final FieldDefinition fieldDefinition = this.getFieldDefinition();
-    final String title = "<html>Enter the new value for <b style='color:#32CD32'>"
-      + getRecordCountString() + "</b> records</html>";
+  protected String getProgressMonitorTitle() {
+    return "Calculating " + this.getFieldDefinition().getName() + " values";
+  }
 
-    final JPanel fieldPanel = new JPanel(new VerticalLayout());
-    fieldPanel.setBorder(BorderFactory.createTitledBorder(title));
-    final String fieldTitle = fieldDefinition.getTitle();
-    fieldPanel.add(SwingUtil.newLabel(fieldTitle));
-
-    this.expressionField = new TextArea("script", 5, 60);
-    fieldPanel.add(new JScrollPane(this.expressionField));
-    this.expressionField.getDocument().addDocumentListener(this);
-
+  @Override
+  protected JComponent initErrorsPanel() {
+    final Color background = new JPanel().getBackground();
     this.errorsField = new TextArea("errors", 5, 60);
     this.errorsField.setEditable(false);
     this.errorsField.setForeground(WebColors.Red);
-    fieldPanel.add(new JScrollPane(this.errorsField));
+    this.errorsField.setBackground(background);
+    final JScrollPane errorScroll = new JScrollPane(this.errorsField);
+    errorScroll.setBorder(BorderFactory.createTitledBorder("Errors"));
+    errorScroll.setBackground(background);
+    return errorScroll;
+
+  }
+
+  @Override
+  protected JPanel initFieldPanel() {
+    final FieldDefinition fieldDefinition = this.getFieldDefinition();
+    final String fieldName = fieldDefinition.getName();
+
+    final JPanel fieldPanel = new JPanel(new VerticalLayout());
 
     final ToolBar toolBar = new ToolBar();
     fieldPanel.add(toolBar);
 
-    final AbstractRecordLayer layer = getLayer();
+    this.expressionField = new TextArea("script", 8, 50);
+    fieldPanel.add(new JScrollPane(this.expressionField));
+    this.expressionField.getDocument().addDocumentListener(this);
 
+    final AbstractRecordLayer layer = getLayer();
     final List<String> fieldNames = layer.getFieldNames();
     final ComboBox<String> fieldNamesField = ComboBox.newComboBox("fieldNames", fieldNames,
       (final Object name) -> {
@@ -161,22 +155,55 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
       });
     toolBar.addComponent("fieldName", fieldNamesField);
     toolBar.add(fieldNamesField);
+    fieldNamesField.setMaximumSize(new Dimension(250, 30));
 
     final Runnable addFieldAction = () -> {
-      final int pos = this.expressionField.getCaretPosition();
-      final String fieldName = fieldNamesField.getFieldValue();
-      this.expressionField.insert(fieldName, pos);
+      final String selectedFieldName = fieldNamesField.getFieldValue();
+      insertText(selectedFieldName);
     };
     toolBar.addButton("fieldName", "Add field name", "add", addFieldAction);
 
     for (final String text : Arrays.asList("+", "-", "*", "/")) {
-      addTextButton(toolBar, text, text);
+      addTextButton("operators", toolBar, text, text);
     }
-    final String fieldName = fieldDefinition.getName();
-    addTextButton(toolBar, "if", "if (expression) {\nnewValue;\n} else {\n" + fieldName + ";\n}");
-    addTextButton(toolBar, "Code ID", "codeId(" + fieldName + ", value)");
-    addTextButton(toolBar, "Code Value", "codeValue(" + fieldName + ", id)");
+    addTextButton("condition", toolBar, "if",
+      "if (expression) {\n  newValue;\n} else {\n  " + fieldName + ";\n}");
+    addTextButton("codeTable", toolBar, "Code ID", "codeId('codeFieldName', codeValue)");
+    addTextButton("codeTable", toolBar, "Code Value", "codeValue('codeFieldName', codeValue)");
+
     return fieldPanel;
+  }
+
+  private void insertText(final String text) {
+    int location = this.expressionField.getCaretPosition();
+    final Document document = this.expressionField.getDocument();
+
+    boolean needsWhitespaceNext = false;
+    try {
+      // Remove selected text
+      final int selectionStart = this.expressionField.getSelectionStart();
+      final int selectionEnd = this.expressionField.getSelectionEnd();
+      final int selectionLength = selectionEnd - selectionStart;
+      if (selectionLength > 0) {
+        document.remove(selectionStart, selectionLength);
+      }
+      if (location > 0 && !Character.isWhitespace(document.getText(location - 1, 1).charAt(0))) {
+        this.expressionField.insert(" ", location);
+        location++;
+      }
+      final int newLocation = location + text.length();
+
+      if (location < document.getLength() - 1
+        && !Character.isWhitespace(document.getText(location + 1, 1).charAt(0))) {
+        needsWhitespaceNext = true;
+      }
+      this.expressionField.insert(text, location);
+      if (needsWhitespaceNext) {
+        this.expressionField.insert(" ", newLocation);
+      }
+    } catch (final BadLocationException e) {
+      this.expressionField.append(text);
+    }
   }
 
   @Override
@@ -202,15 +229,17 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
     bindings.putAll(record);
     bindings.put("record", new ArrayRecord(record));
     try {
-      final String fieldName = getFieldDefinition().getName();
-      final Object value = this.script.eval(bindings);
+      final FieldDefinition fieldDefinition = getFieldDefinition();
+      final String fieldName = fieldDefinition.getName();
+      Object value = this.script.eval(bindings);
+      value = fieldDefinition.toFieldValueException(value);
       record.setValue(fieldName, value);
     } catch (final ScriptException e) {
-      System.out.println(e.getMessage());
+      Exceptions.throwUncheckedException(e);
     }
   }
 
-  public void validateExpression() {
+  private void validateExpression() {
     boolean valid = true;
     final String scriptText = this.expressionField.getText();
     if (scriptText.isEmpty()) {
@@ -227,7 +256,6 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
         }
         bindings.put("record", record);
         this.script.eval(bindings);
-        this.expressionField.setForeground(WebColors.Black);
         this.errorsField.setText(null);
       } catch (final Throwable e) {
         String errorMessage = e.getMessage();
@@ -235,9 +263,9 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
           errorMessage = "null pointer";
         }
         this.errorsField.setText(errorMessage);
+        this.errorsField.setCaretPosition(0);
         valid = false;
         this.script = null;
-        this.expressionField.setForeground(WebColors.Red);
       }
     }
     setFormValid(valid);

@@ -21,7 +21,7 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.ListRecordLayerTableModel;
-import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrors;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 
 public class ListRecordLayer extends AbstractRecordLayer {
 
@@ -248,7 +248,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean saveChangesDo(final RecordSaveErrors errors, final LayerRecord record) {
+  protected boolean saveChangesDo(final RecordLayerErrors errors, final LayerRecord record) {
     if (record.isDeleted()) {
       return true;
     } else {

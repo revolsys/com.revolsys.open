@@ -98,7 +98,7 @@ public class Shorts extends AbstractDataType {
           case '+':
             // The following applies to both + and - prefixes
             if (length == 1) {
-              throw new IllegalArgumentException(string + " is not a valid int");
+              throw new IllegalArgumentException(string + " is not a valid short");
             }
             index++;
           break;
@@ -119,17 +119,17 @@ public class Shorts extends AbstractDataType {
             case '8':
             case '9':
               if (result < multmin) {
-                throw new IllegalArgumentException(string + " is not a valid int");
+                throw new IllegalArgumentException(string + " is not a valid short");
               }
               final int digit = character - '0';
               result *= 10;
               if (result < limit + digit) {
-                throw new IllegalArgumentException(string + " is not a valid int");
+                throw new IllegalArgumentException(string + " is not a valid short");
               }
               result -= digit;
             break;
             default:
-              throw new IllegalArgumentException(string + " is not a valid int");
+              throw new IllegalArgumentException(string + " is not a valid short");
           }
         }
         if (negative) {
@@ -153,7 +153,7 @@ public class Shorts extends AbstractDataType {
   @Override
   protected Object toObjectDo(final Object value) {
     final String string = DataTypes.toString(value);
-    return Short.valueOf(string);
+    return toValid(string);
   }
 
   @Override

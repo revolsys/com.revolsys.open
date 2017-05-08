@@ -119,8 +119,8 @@ import com.revolsys.swing.map.layer.record.style.panel.QueryFilterField;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordDefinitionTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
-import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordValidationDialog;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
@@ -1799,7 +1799,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return null;
   }
 
-  protected boolean internalSaveChanges(final RecordSaveErrors errors, final LayerRecord record) {
+  protected boolean internalSaveChanges(final RecordLayerErrors errors, final LayerRecord record) {
     final RecordState originalState = record.getState();
     final LayerRecord layerRecord = getProxiedRecord(record);
     final boolean saved = saveChangesDo(errors, layerRecord);
@@ -2555,7 +2555,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             // Save the valid records
             final List<LayerRecord> validRecords = validator.getValidRecords();
             if (!validRecords.isEmpty()) {
-              final RecordSaveErrors errors = new RecordSaveErrors(this);
+              final RecordLayerErrors errors = new RecordLayerErrors("Saving Changes", this);
               try (
                 BaseCloseable eventsEnabled = eventsDisabled()) {
                 for (final LayerRecord record : validRecords) {
@@ -2610,7 +2610,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         // Save the valid records
         final List<LayerRecord> validRecords = validator.getValidRecords();
         if (!validRecords.isEmpty()) {
-          final RecordSaveErrors errors = new RecordSaveErrors(this);
+          final RecordLayerErrors errors = new RecordLayerErrors("Saving Changes", this);
           try (
             BaseCloseable eventsEnabled = eventsDisabled()) {
             synchronized (this.getSync()) {
@@ -2646,7 +2646,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     throw new UnsupportedOperationException();
   }
 
-  protected boolean saveChangesDo(final RecordSaveErrors errors, final LayerRecord record) {
+  protected boolean saveChangesDo(final RecordLayerErrors errors, final LayerRecord record) {
     return true;
   }
 

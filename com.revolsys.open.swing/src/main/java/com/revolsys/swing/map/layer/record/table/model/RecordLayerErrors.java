@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JDialog;
@@ -19,8 +20,11 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Property;
 
-public class RecordSaveErrors {
+public class RecordLayerErrors {
+  private final String title;
+
   private final List<Throwable> exceptions = new ArrayList<>();
 
   private final AbstractRecordLayer layer;
@@ -29,8 +33,17 @@ public class RecordSaveErrors {
 
   private final List<Record> records = new ArrayList<>();
 
-  public RecordSaveErrors(final AbstractRecordLayer layer) {
+  private final Collection<String> fieldNames;
+
+  public RecordLayerErrors(final String title, final AbstractRecordLayer layer) {
+    this(title, layer, layer.getFieldNames());
+  }
+
+  public RecordLayerErrors(final String title, final AbstractRecordLayer layer,
+    final Collection<String> fieldNames) {
+    this.title = title;
     this.layer = layer;
+    this.fieldNames = fieldNames;
   }
 
   public void addRecord(final LayerRecord record, final String errorMessage) {
@@ -49,6 +62,9 @@ public class RecordSaveErrors {
     } else {
       message = exception.getMessage();
     }
+    if (!Property.hasValue(message)) {
+      message = "Null pointer";
+    }
     this.messages.add(message);
     this.exceptions.add(exception);
   }
@@ -58,12 +74,12 @@ public class RecordSaveErrors {
       return true;
     } else {
       Invoke.later(() -> {
-        final RecordSaveErrorTableModel tableModel = new RecordSaveErrorTableModel(this.layer,
-          this.records, this.messages, this.exceptions);
+        final RecordLayerErrorsTableModel tableModel = new RecordLayerErrorsTableModel(this.layer,
+          this.records, this.messages, this.exceptions, this.fieldNames);
         final String layerPath = this.layer.getPath();
         final BasePanel panel = new BasePanel(new VerticalLayout(),
-          new JLabel("<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>"
-            + layerPath + "</p>"),
+          new JLabel("<html><p><b style=\"color:red\">Error " + this.title
+            + " for layer:</b></p><p>" + layerPath + "</p>"),
           tableModel.newPanel());
         final Rectangle screenBounds = SwingUtil.getScreenBounds();
         panel.setPreferredSize(
@@ -75,7 +91,7 @@ public class RecordSaveErrors {
 
         pane.setComponentOrientation(window.getComponentOrientation());
 
-        final JDialog dialog = pane.createDialog(window, "Error Saving Changes: " + layerPath);
+        final JDialog dialog = pane.createDialog(window, "Error " + this.title + ": " + layerPath);
 
         dialog.pack();
         SwingUtil.setLocationCentre(screenBounds, dialog);

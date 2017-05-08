@@ -1,21 +1,27 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
+
+import com.revolsys.awt.WebColors;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.TablePanel;
+import com.revolsys.swing.table.highlighter.ColorHighlighter;
 import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
 
-public class RecordSaveErrorTableModel extends RecordListTableModel
+public class RecordLayerErrorsTableModel extends RecordListTableModel
   implements SortableTableModel, ListSelectionListener {
   private static final long serialVersionUID = 1L;
 
@@ -25,13 +31,13 @@ public class RecordSaveErrorTableModel extends RecordListTableModel
 
   private final List<String> messages;
 
-  public RecordSaveErrorTableModel(final AbstractRecordLayer layer, final List<Record> records,
-    final List<String> messages, final List<Throwable> exceptions) {
-    super(layer.getRecordDefinition(), records, layer.getFieldNames());
+  public RecordLayerErrorsTableModel(final AbstractRecordLayer layer, final List<Record> records,
+    final List<String> messages, final List<Throwable> exceptions,
+    final Collection<String> fieldNames) {
+    super(layer.getRecordDefinition(), records, fieldNames, 1);
     this.layer = layer;
     this.messages = messages;
     this.exceptions = exceptions;
-    setFieldsOffset(1);
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
   }
@@ -103,6 +109,19 @@ public class RecordSaveErrorTableModel extends RecordListTableModel
     table.setSortable(true);
     table.getSelectionModel().addListSelectionListener(this);
     table.resizeColumnsToContent();
+
+    final HighlightPredicate predicate = (renderer, adapter) -> {
+      final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
+      return columnIndex == 0;
+    };
+    table.addHighlighter(
+      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
+        WebColors.newAlpha(WebColors.Pink, 127), WebColors.FireBrick, WebColors.LightCoral,
+        WebColors.FireBrick));
+
+    table.addHighlighter(
+      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
+        WebColors.Pink, WebColors.FireBrick, WebColors.Crimson, WebColors.White));
     return new TablePanel(table);
   }
 

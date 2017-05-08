@@ -53,10 +53,16 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   public RecordRowTableModel(final RecordDefinition recordDefinition,
     final Collection<String> fieldNames) {
+    this(recordDefinition, fieldNames, 0);
+  }
+
+  public RecordRowTableModel(final RecordDefinition recordDefinition,
+    final Collection<String> fieldNames, final int fieldsOffset) {
     super(recordDefinition);
     if (Property.hasValue(fieldNames)) {
       setFieldNamesAndTitles(fieldNames, Collections.<String> emptyList());
     }
+    this.fieldsOffset = fieldsOffset;
     if (recordDefinition != null) {
       final String idFieldName = recordDefinition.getIdFieldName();
       setSortOrder(idFieldName);
@@ -510,7 +516,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         return SortOrder.ASCENDING;
       }
     }
-    return setSortOrder(index, SortOrder.ASCENDING);
+    return setSortOrder(index + this.fieldsOffset, SortOrder.ASCENDING);
   }
 
   @Override

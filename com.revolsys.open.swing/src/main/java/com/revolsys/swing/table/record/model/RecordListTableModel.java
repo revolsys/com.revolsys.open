@@ -49,8 +49,14 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
   private final List<Record> records = new ArrayList<>();
 
   public RecordListTableModel(final RecordDefinition recordDefinition,
-    final Collection<? extends Record> records, final Collection<String> columnNames) {
-    super(recordDefinition, columnNames);
+    final Collection<? extends Record> records, final Collection<String> fieldNames) {
+    this(recordDefinition, records, fieldNames, 0);
+  }
+
+  public RecordListTableModel(final RecordDefinition recordDefinition,
+    final Collection<? extends Record> records, final Collection<String> fieldNames,
+    final int fieldsOffset) {
+    super(recordDefinition, fieldNames, fieldsOffset);
     if (records != null) {
       this.records.addAll(records);
     }
