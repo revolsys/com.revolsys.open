@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.util.function.Consumer;
+
 import javax.swing.Icon;
 import javax.swing.ListSelectionModel;
 
@@ -15,6 +17,8 @@ public interface TableRecordsMode {
   }
 
   void exportRecords(final Query query, final Object target);
+
+  void forEachRecord(Query query, final Consumer<? super LayerRecord> action);
 
   default EnableCheck getEnableCheck() {
     return EnableCheck.ENABLED;

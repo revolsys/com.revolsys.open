@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -49,7 +50,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrors;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
@@ -214,7 +215,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void forEachRecord(Query query, final Consumer<? super LayerRecord> consumer) {
+  protected void forEachRecordInternal(Query query, final Consumer<? super LayerRecord> consumer) {
     if (isExists()) {
       try {
         final RecordStore recordStore = getRecordStore();
@@ -263,6 +264,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             }
           }
         }
+      } catch (final CancellationException e) {
       } catch (final RuntimeException e) {
         Logs.error(this, "Error executing query: " + query, e);
         throw e;
@@ -922,7 +924,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean saveChangesDo(final RecordSaveErrors errors, final LayerRecord record) {
+  protected boolean saveChangesDo(final RecordLayerErrors errors, final LayerRecord record) {
     boolean deleted = super.isDeleted(record);
 
     if (isExists()) {

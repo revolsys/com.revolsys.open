@@ -108,6 +108,11 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     this.cellRenderer = null;
   }
 
+  public FieldDefinition getColumnFieldDefinition(final int columnIndex) {
+    final RecordRowTableModel model = getModel();
+    return model.getColumnFieldDefinition(columnIndex);
+  }
+
   public String getColumnFieldName(final int columnIndex) {
     final RecordRowTableModel model = getModel();
     return model.getColumnFieldName(columnIndex);

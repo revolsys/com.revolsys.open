@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.Closeable;
@@ -15,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
@@ -77,11 +79,41 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
     }
   }
 
+  protected static void setHeaderEventColumn(final BaseJTable table, final JTableHeader tableHeader,
+    final MouseEvent e) {
+    final Object source = e.getSource();
+    if (source == tableHeader) {
+      final Point point = e.getPoint();
+      eventTable = new WeakReference<>(table);
+      final int modelColumn = tableHeader.columnAtPoint(point);
+      TablePanel.eventRow = -1;
+      if (modelColumn > -1) {
+        TablePanel.eventColumn = table.convertColumnIndexToModel(modelColumn);
+      } else {
+        TablePanel.eventColumn = -1;
+      }
+    }
+  }
+
+  private final MouseListener tableHeaderMouseListener = new MouseAdapter() {
+    @Override
+    public void mousePressed(final MouseEvent e) {
+      doHeaderMenu(e);
+    }
+
+    @Override
+    public void mouseReleased(final MouseEvent e) {
+      doHeaderMenu(e);
+    }
+  };
+
   private JScrollPane scrollPane;
 
   private BaseJTable table;
 
   private ToolBar toolBar = new ToolBar();
+
+  private final MenuFactory headerMenu = new MenuFactory(getClass().getName());
 
   public TablePanel(final BaseJTable table) {
     super(new BorderLayout());
@@ -95,6 +127,8 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
     this.scrollPane = new JScrollPane(table);
     table.addMouseListener(this);
+    table.getTableHeader().addMouseListener(this.tableHeaderMouseListener);
+
     add(this.scrollPane, BorderLayout.CENTER);
 
     final MenuFactory menu = model.getMenu();
@@ -164,6 +198,26 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
     }
   }
 
+  protected void doHeaderMenu(final MouseEvent e) {
+    setHeaderEventColumn(this.table, this.table.getTableHeader(), e);
+    if (eventColumn > -1 && e.isPopupTrigger()) {
+      e.consume();
+      final Object menuSource = getHeaderMenuSource();
+      MenuFactory.setMenuSource(menuSource);
+      final JPopupMenu menu = getHeaderMenu(eventColumn);
+      if (menu != null) {
+        final TableCellEditor cellEditor = this.table.getCellEditor();
+        if (cellEditor != null) {
+          cellEditor.stopCellEditing();
+        }
+        popupMouseEvent = new WeakReference<>(e);
+        final int x = e.getX();
+        final int y = e.getY();
+        MenuFactory.showMenu(menu, this.table, x, y);
+      }
+    }
+  }
+
   protected void doMenu(final MouseEvent e) {
     setEventRow(this.table, e);
     if (eventRow > -1 && e.isPopupTrigger()) {
@@ -192,6 +246,18 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
         }
       }
     }
+  }
+
+  public MenuFactory getHeaderMenu() {
+    return this.headerMenu;
+  }
+
+  public JPopupMenu getHeaderMenu(final int eventColumn) {
+    return this.headerMenu.newJPopupMenu();
+  }
+
+  protected Object getHeaderMenuSource() {
+    return null;
   }
 
   protected Object getMenuSource() {

@@ -45,7 +45,7 @@ public class MergedRecordsTableModel extends RecordListTableModel
 
   public MergedRecordsTableModel(final AbstractRecordLayer layer, final Record mergedRecord,
     final Collection<LayerRecord> records) {
-    super(layer.getRecordDefinition(), records, layer.getFieldNames());
+    super(layer.getRecordDefinition(), records, layer.getFieldNames(), 1);
     this.layer = layer;
     setFieldsOffset(1);
     this.mergedRecord = mergedRecord;
