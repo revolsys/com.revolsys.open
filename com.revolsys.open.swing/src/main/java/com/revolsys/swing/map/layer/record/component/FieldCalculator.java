@@ -97,7 +97,6 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
 
   private FieldCalculator() {
     super("Field Calculator");
-
   }
 
   private void addTextButton(final String groupName, final ToolBar toolBar, final String label,
@@ -120,9 +119,15 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
   }
 
   @Override
+  protected void initDialog() {
+    setMinimumSize(new Dimension(700, 300));
+    super.initDialog();
+  }
+
+  @Override
   protected JComponent initErrorsPanel() {
     final Color background = new JPanel().getBackground();
-    this.errorsField = new TextArea("errors", 5, 60);
+    this.errorsField = new TextArea("errors", 5, 1);
     this.errorsField.setEditable(false);
     this.errorsField.setForeground(WebColors.Red);
     this.errorsField.setBackground(background);
@@ -143,7 +148,7 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
     final ToolBar toolBar = new ToolBar();
     fieldPanel.add(toolBar);
 
-    this.expressionField = new TextArea("script", 8, 50);
+    this.expressionField = new TextArea("script", 8, 1);
     fieldPanel.add(new JScrollPane(this.expressionField));
     this.expressionField.getDocument().addDocumentListener(this);
 
@@ -186,6 +191,7 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
       final int selectionLength = selectionEnd - selectionStart;
       if (selectionLength > 0) {
         document.remove(selectionStart, selectionLength);
+        location = selectionStart;
       }
       if (location > 0 && !Character.isWhitespace(document.getText(location - 1, 1).charAt(0))) {
         this.expressionField.insert(" ", location);

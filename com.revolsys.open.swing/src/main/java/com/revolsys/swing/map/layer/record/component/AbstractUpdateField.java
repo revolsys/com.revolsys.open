@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.record.component;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -176,8 +175,8 @@ public abstract class AbstractUpdateField extends JDialog {
 
   protected void initDialog() {
     setLayout(new VerticalLayout());
-    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-    setMinimumSize(new Dimension(300, 100));
+    setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    setResizable(false);
     addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(final WindowEvent e) {
