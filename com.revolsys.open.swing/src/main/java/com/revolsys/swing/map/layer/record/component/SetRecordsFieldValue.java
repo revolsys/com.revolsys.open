@@ -41,6 +41,12 @@ public class SetRecordsFieldValue extends AbstractUpdateField {
   }
 
   @Override
+  protected void initDialog() {
+    // setMinimumSize(new Dimension(300, 50));
+    super.initDialog();
+  }
+
+  @Override
   protected JPanel initFieldPanel() {
     final FieldDefinition fieldDefinition = this.getFieldDefinition();
 
@@ -55,7 +61,7 @@ public class SetRecordsFieldValue extends AbstractUpdateField {
       validateField(this.editField, fieldDefinition);
     });
     fieldPanel.add((Component)this.editField);
-    GroupLayouts.makeColumns(fieldPanel, 3, true);
+    GroupLayouts.makeColumns(fieldPanel, 1, true);
     return fieldPanel;
   }
 
