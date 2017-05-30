@@ -153,6 +153,14 @@ public final class JsonWriter implements BaseCloseable {
     }
   }
 
+  public void newLineForce() {
+    try {
+      this.out.write('\n');
+    } catch (final Exception e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
   public void print(final char value) {
     try {
       this.out.write(value);
