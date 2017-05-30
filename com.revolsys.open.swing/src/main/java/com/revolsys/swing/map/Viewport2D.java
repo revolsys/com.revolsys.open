@@ -560,18 +560,18 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       final Measurable<Length> viewWidthLength = getViewWidthLength();
       final Measurable<Length> modelWidthLength = boundingBox.getWidthLength();
 
-      if (Double.isInfinite(unitsPerPixel) || Double.isNaN(unitsPerPixel)) {
-        this.unitsPerPixel = 0;
-        setModelToScreenTransform(null);
-        this.screenToModelTransform = null;
-        this.scale = 0;
-      } else {
+      if (Double.isFinite(unitsPerPixel)) {
         this.unitsPerPixel = unitsPerPixel;
         setModelToScreenTransform(
           newModelToScreenTransform(boundingBox, viewWidthPixels, viewHeightPixels));
         this.screenToModelTransform = newScreenToModelTransform(boundingBox, viewWidthPixels,
           viewHeightPixels);
         this.scale = getScale(viewWidthLength, modelWidthLength);
+      } else {
+        this.unitsPerPixel = 0;
+        setModelToScreenTransform(null);
+        this.screenToModelTransform = null;
+        this.scale = 0;
       }
       setBoundingBoxInternal(boundingBox);
     }

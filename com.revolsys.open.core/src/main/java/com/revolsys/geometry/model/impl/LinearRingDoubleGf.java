@@ -32,6 +32,7 @@
  */
 package com.revolsys.geometry.model.impl;
 
+import java.io.StringWriter;
 import java.util.Arrays;
 
 import com.revolsys.geometry.model.Dimension;
@@ -43,6 +44,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
  * Models an OGC SFS <code>LinearRing</code>.
@@ -314,11 +316,14 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
     if (isClosed()) {
       final int vertexCount = getVertexCount();
       if (vertexCount >= 1 && vertexCount <= 2) {
-        throw new IllegalArgumentException(
-          "Invalid number of points in LinearRing (found " + vertexCount + " - must be 0 or >= 3)");
+        throw new IllegalArgumentException("Invalid number of points in LinearRing (found "
+          + vertexCount + " - must be 0 or >= 3): " + this);
       }
     } else {
-      throw new IllegalArgumentException("Points of LinearRing do not form a closed linestring");
+      final StringWriter out = new StringWriter();
+      EWktWriter.write(out, (LineString)this);
+      throw new IllegalArgumentException(
+        "Points of LinearRing do not form a closed linestring: " + out);
     }
   }
 }

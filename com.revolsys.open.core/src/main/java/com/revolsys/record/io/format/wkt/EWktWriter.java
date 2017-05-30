@@ -212,7 +212,7 @@ public class EWktWriter {
     }
   }
 
-  private static void write(final Writer out, final Lineal lineal) {
+  public static void write(final Writer out, final Lineal lineal) {
     final int axisCount = Math.min(lineal.getAxisCount(), 4);
     try {
       write(out, lineal, axisCount);
@@ -241,7 +241,7 @@ public class EWktWriter {
     }
   }
 
-  private static void write(final Writer out, final LinearRing line) {
+  public static void write(final Writer out, final LinearRing line) {
     final int axisCount = Math.min(line.getAxisCount(), 4);
     try {
       write(out, line, axisCount);
@@ -261,7 +261,7 @@ public class EWktWriter {
     }
   }
 
-  private static void write(final Writer out, final LineString line) {
+  public static void write(final Writer out, final LineString line) {
     final int axisCount = Math.min(line.getAxisCount(), 4);
     try {
       write(out, line, axisCount);
@@ -290,7 +290,7 @@ public class EWktWriter {
     }
   }
 
-  private static void write(final Writer out, final Point point) {
+  public static void write(final Writer out, final Point point) {
     final int axisCount = Math.min(point.getAxisCount(), 4);
     try {
       write(out, point, axisCount);
@@ -311,7 +311,7 @@ public class EWktWriter {
     }
   }
 
-  private static void write(final Writer out, final Polygon polygon) {
+  public static void write(final Writer out, final Polygon polygon) {
     final int axisCount = Math.min(polygon.getAxisCount(), 4);
     try {
       write(out, polygon, axisCount);
@@ -330,7 +330,7 @@ public class EWktWriter {
     }
   }
 
-  private static void write(final Writer out, final Polygonal polygonal) {
+  public static void write(final Writer out, final Polygonal polygonal) {
     final int axisCount = Math.min(polygonal.getAxisCount(), 4);
     try {
       write(out, polygonal, axisCount);
@@ -358,7 +358,7 @@ public class EWktWriter {
     }
   }
 
-  private static void write(final Writer out, final Punctual punctual) {
+  public static void write(final Writer out, final Punctual punctual) {
     final int axisCount = Math.min(punctual.getAxisCount(), 4);
     try {
       write(out, punctual, axisCount);
@@ -395,13 +395,15 @@ public class EWktWriter {
 
   private static void writeCoordinates(final Writer out, final LineString coordinates,
     final int axisCount) throws IOException {
-    out.write('(');
-    write(out, coordinates, 0, axisCount);
-    for (int i = 1; i < coordinates.getVertexCount(); i++) {
-      out.write(',');
-      write(out, coordinates, i, axisCount);
+    if (coordinates != null) {
+      out.write('(');
+      write(out, coordinates, 0, axisCount);
+      for (int i = 1; i < coordinates.getVertexCount(); i++) {
+        out.write(',');
+        write(out, coordinates, i, axisCount);
+      }
+      out.write(')');
     }
-    out.write(')');
   }
 
   private static void writeCoordinates(final Writer out, final Point point, final int axisCount)
@@ -413,7 +415,7 @@ public class EWktWriter {
     }
   }
 
-  private static void writeGeometryCollection(final Writer out, final Geometry multiGeometry) {
+  public static void writeGeometryCollection(final Writer out, final Geometry multiGeometry) {
     final int axisCount = Math.min(multiGeometry.getAxisCount(), 4);
     try {
       writeGeometryCollection(out, multiGeometry, axisCount);
@@ -448,14 +450,16 @@ public class EWktWriter {
 
   private static void writeOrdinate(final Writer out, final LineString coordinates, final int index,
     final int ordinateIndex) throws IOException {
-    if (ordinateIndex > coordinates.getAxisCount()) {
-      out.write('0');
-    } else {
-      final double ordinate = coordinates.getCoordinate(index, ordinateIndex);
-      if (Double.isNaN(ordinate)) {
+    if (coordinates != null) {
+      if (ordinateIndex > coordinates.getAxisCount()) {
         out.write('0');
       } else {
-        out.write(Doubles.toString(ordinate));
+        final double ordinate = coordinates.getCoordinate(index, ordinateIndex);
+        if (Double.isNaN(ordinate)) {
+          out.write('0');
+        } else {
+          out.write(Doubles.toString(ordinate));
+        }
       }
     }
   }

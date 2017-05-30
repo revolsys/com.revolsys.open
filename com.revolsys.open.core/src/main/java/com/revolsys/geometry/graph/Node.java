@@ -482,16 +482,15 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return this.graph == null;
   }
 
-  public boolean move(final Point newCoordinates) {
+  public boolean move(final Point newPoint) {
     if (isRemoved()) {
       return false;
     } else {
-      final Node<T> newNode = this.graph.getNode(newCoordinates);
+      final Node<T> newNode = this.graph.getNode(newPoint);
       if (equals(newNode)) {
         return false;
       } else {
         this.graph.nodeMoved(this, newNode);
-        final int numEdges = getDegree();
         final Set<Edge<T>> edges = new HashSet<>(getInEdges());
         edges.addAll(getOutEdges());
         for (final Edge<T> edge : edges) {
@@ -504,16 +503,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
               newLine = line.subLine(null, 0, line.getVertexCount() - 1, newNode);
             }
             this.graph.replaceEdge(edge, newLine);
-            if (!edge.isRemoved()) {
-              throw new RuntimeException("Not node Removed");
-            }
           }
-        }
-        if (!isRemoved()) {
-          throw new RuntimeException("Not node Removed");
-        }
-        if (newNode.getDegree() != numEdges) {
-          throw new RuntimeException("numEdges");
         }
         return true;
       }

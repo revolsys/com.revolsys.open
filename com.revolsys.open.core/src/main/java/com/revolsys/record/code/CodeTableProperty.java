@@ -195,6 +195,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return this.typePath.getPath();
   }
 
+  public PathName getTypePath() {
+    return this.typePath;
+  }
+
   @Override
   public <V> V getValue(final Object id) {
     if (id instanceof Identifier) {

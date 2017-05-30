@@ -137,17 +137,20 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
         final Set<CloseLocation> locations = entry.getValue();
         final CloseLocation firstLocation = CollectionUtil.get(locations, 0);
         final String idFieldName = firstLocation.getIdFieldName();
+        final boolean hasId = Property.hasValue(idFieldName);
         text.append("<b><i>");
         text.append(typePath);
+        if (hasId) {
+          text.append(" - ");
+          text.append(idFieldName);
+        }
         text.append("</i></b>\n");
         text.append(
           "<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">");
         text.append(
           "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">");
-        final boolean hasId = Property.hasValue(idFieldName);
         if (hasId) {
-          text.append(idFieldName);
-          text.append("</th><th style=\"border-right: solid black 1px\">");
+          text.append("ID</th><th style=\"border-right: solid black 1px\">");
         }
         text.append(
           "INDEX</th><th style=\"border-right: solid black 1px\">SRID</th><th>POINT</th></tr></th><tbody>");

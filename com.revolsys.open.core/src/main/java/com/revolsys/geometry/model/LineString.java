@@ -1177,11 +1177,12 @@ public interface LineString extends Lineal {
     if (isEmpty()) {
       return false;
     } else {
+      final int lastVertexIndex = getLastVertexIndex();
       final double x1 = getCoordinate(0, 0);
-      final double xn = getCoordinate(-1, 0);
+      final double xn = getCoordinate(lastVertexIndex, 0);
       if (x1 == xn) {
         final double y1 = getCoordinate(0, 1);
-        final double yn = getCoordinate(-1, 1);
+        final double yn = getCoordinate(lastVertexIndex, 1);
         if (y1 == yn) {
           return true;
         }

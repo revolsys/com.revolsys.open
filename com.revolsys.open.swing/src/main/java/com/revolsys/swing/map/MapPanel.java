@@ -100,7 +100,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public static final List<Long> SCALES = Arrays.asList(500000000L, 250000000L, 100000000L,
     50000000L, 25000000L, 10000000L, 5000000L, 2500000L, 1000000L, 500000L, 250000L, 100000L,
-    50000L, 25000L, 10000L, 5000L, 2500L, 1000L, 500L, 250L, 100L, 50L, 25L, 10L, 5L);
+    50000L, 25000L, 10000L, 5000L, 2500L, 1000L, 500L, 250L, 100L, 50L, 25L, 10L, 5L, 1L);
 
   private static final long serialVersionUID = 1L;
 
