@@ -7,8 +7,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.lang.model.element.AnnotationValue;
-
 import com.revolsys.collection.set.Sets;
 import com.revolsys.doclet.BaseDoclet;
 import com.revolsys.doclet.DocletUtil;
@@ -17,6 +15,7 @@ import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
+import com.sun.javadoc.AnnotationValue;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.javadoc.ExecutableMemberDoc;
@@ -24,7 +23,9 @@ import com.sun.javadoc.FieldDoc;
 import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.PackageDoc;
+import com.sun.javadoc.Parameter;
 import com.sun.javadoc.RootDoc;
+import com.sun.javadoc.Tag;
 
 public class RestDoclet extends BaseDoclet {
   private static Set<String> PARAMETER_IGNORE_CLASS_NAMES = Sets

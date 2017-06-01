@@ -13,7 +13,9 @@ import com.sun.javadoc.AnnotationTypeDoc;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.ExecutableMemberDoc;
 import com.sun.javadoc.PackageDoc;
+import com.sun.javadoc.Parameter;
 import com.sun.javadoc.RootDoc;
+import com.sun.javadoc.Type;
 
 public class BaseDoclet {
   public static Map<String, AnnotationTypeDoc> getAnnotations(final PackageDoc packageDoc) {

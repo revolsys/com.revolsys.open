@@ -2,6 +2,7 @@ package com.revolsys.doclet.tags;
 
 import java.util.Map;
 
+import com.sun.javadoc.Tag;
 import com.sun.tools.doclets.Taglet;
 
 public class WebResponseCodeTaglet implements Taglet {
