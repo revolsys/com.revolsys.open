@@ -69,18 +69,18 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public void addColumnName(final StringBuilder sql, final String tablePrefix) {
-    sql.append(tablePrefix);
-    sql.append(".GEOMETRY.SDO_GTYPE, ");
-    sql.append(tablePrefix);
-    sql.append(".GEOMETRY.SDO_POINT.X, ");
-    sql.append(tablePrefix);
-    sql.append(".GEOMETRY.SDO_POINT.Y, ");
-    sql.append(tablePrefix);
-    sql.append(".GEOMETRY.SDO_POINT.Z, ");
-    sql.append(tablePrefix);
-    sql.append(".GEOMETRY.SDO_ELEM_INFO, ");
-    sql.append(tablePrefix);
-    sql.append(".GEOMETRY.SDO_ORDINATES");
+    super.addColumnName(sql, tablePrefix);
+    sql.append(".SDO_GTYPE, ");
+    super.addColumnName(sql, tablePrefix);
+    sql.append(".SDO_POINT.X, ");
+    super.addColumnName(sql, tablePrefix);
+    sql.append(".SDO_POINT.Y, ");
+    super.addColumnName(sql, tablePrefix);
+    sql.append(".SDO_POINT.Z, ");
+    super.addColumnName(sql, tablePrefix);
+    sql.append(".SDO_ELEM_INFO, ");
+    super.addColumnName(sql, tablePrefix);
+    sql.append(".SDO_ORDINATES");
   }
 
   @Override

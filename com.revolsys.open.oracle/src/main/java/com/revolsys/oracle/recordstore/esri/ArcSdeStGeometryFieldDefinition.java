@@ -91,12 +91,12 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public void addColumnName(final StringBuilder sql, final String tablePrefix) {
-    sql.append(tablePrefix);
-    sql.append(".GEOMETRY.ENTITY, ");
-    sql.append(tablePrefix);
-    sql.append(".GEOMETRY.NUMPTS, ");
-    sql.append(tablePrefix);
-    sql.append(".GEOMETRY.POINTS");
+    super.addColumnName(sql, tablePrefix);
+    sql.append(".ENTITY, ");
+    super.addColumnName(sql, tablePrefix);
+    sql.append(".NUMPTS, ");
+    super.addColumnName(sql, tablePrefix);
+    sql.append(".POINTS");
   }
 
   @Override
