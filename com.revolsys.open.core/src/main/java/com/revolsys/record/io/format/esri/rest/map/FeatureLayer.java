@@ -280,8 +280,8 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
   public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
     final BoundingBox boundingBox) {
     final Map<String, Object> parameters = newQueryParameters(boundingBox);
-    final ArcGisRestServerFeatureReader reader = new ArcGisRestServerFeatureReader(this,
-      parameters, 0, Integer.MAX_VALUE, recordFactory, !isSupportsPagination());
+    final ArcGisRestServerFeatureReader reader = new ArcGisRestServerFeatureReader(this, parameters,
+      0, Integer.MAX_VALUE, recordFactory, !isSupportsPagination());
     return reader;
   }
 

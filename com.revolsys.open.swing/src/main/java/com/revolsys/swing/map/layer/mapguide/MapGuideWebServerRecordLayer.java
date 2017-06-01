@@ -88,7 +88,8 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void forEachRecordInternal(final Query query, final Consumer<? super LayerRecord> consumer) {
+  protected void forEachRecordInternal(final Query query,
+    final Consumer<? super LayerRecord> consumer) {
     try (
       RecordReader reader = this.webServiceLayer.newRecordReader(this::newLayerRecord, query)) {
       for (final Record record : reader) {

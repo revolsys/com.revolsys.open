@@ -12,106 +12,78 @@ package com.revolsys.elevation.cloud.las.zip;
 
 public class StreamingMedian5 {
 
-    public static StreamingMedian5[] newStreamingMedian5(int num) {
-        StreamingMedian5[] medians = new StreamingMedian5[num];
-        for (int i = 0; i < num; i++) {
-            medians[i] = new StreamingMedian5();
+  public static StreamingMedian5[] newStreamingMedian5(final int num) {
+    final StreamingMedian5[] medians = new StreamingMedian5[num];
+    for (int i = 0; i < num; i++) {
+      medians[i] = new StreamingMedian5();
+    }
+    return medians;
+  }
+
+  public int[] values = new int[5];
+
+  public boolean high;
+
+  StreamingMedian5() {
+    init();
+  }
+
+  public void add(final int v) {
+    if (this.high) {
+      if (v < this.values[2]) {
+        this.values[4] = this.values[3];
+        this.values[3] = this.values[2];
+        if (v < this.values[0]) {
+          this.values[2] = this.values[1];
+          this.values[1] = this.values[0];
+          this.values[0] = v;
+        } else if (v < this.values[1]) {
+          this.values[2] = this.values[1];
+          this.values[1] = v;
+        } else {
+          this.values[2] = v;
         }
-        return medians;
-    }
-
-    public int[] values = new int[5];
-    public boolean high;
-
-    public void init()
-    {
-        values[0] = values[1] = values[2] = values[3] = values[4] = 0;
-        high = true;
-    }
-
-    public void add(int v)
-    {
-        if (high)
-        {
-            if (v < values[2])
-            {
-                values[4] = values[3];
-                values[3] = values[2];
-                if (v < values[0])
-                {
-                    values[2] = values[1];
-                    values[1] = values[0];
-                    values[0] = v;
-                }
-                else if (v < values[1])
-                {
-                    values[2] = values[1];
-                    values[1] = v;
-                }
-                else
-                {
-                    values[2] = v;
-                }
-            }
-            else
-            {
-                if (v < values[3])
-                {
-                    values[4] = values[3];
-                    values[3] = v;
-                }
-                else
-                {
-                    values[4] = v;
-                }
-                high = false;
-            }
+      } else {
+        if (v < this.values[3]) {
+          this.values[4] = this.values[3];
+          this.values[3] = v;
+        } else {
+          this.values[4] = v;
         }
-        else
-        {
-            if (values[2] < v)
-            {
-                values[0] = values[1];
-                values[1] = values[2];
-                if (values[4] < v)
-                {
-                    values[2] = values[3];
-                    values[3] = values[4];
-                    values[4] = v;
-                }
-                else if (values[3] < v)
-                {
-                    values[2] = values[3];
-                    values[3] = v;
-                }
-                else
-                {
-                    values[2] = v;
-                }
-            }
-            else
-            {
-                if (values[1] < v)
-                {
-                    values[0] = values[1];
-                    values[1] = v;
-                }
-                else
-                {
-                    values[0] = v;
-                }
-                high = true;
-            }
+        this.high = false;
+      }
+    } else {
+      if (this.values[2] < v) {
+        this.values[0] = this.values[1];
+        this.values[1] = this.values[2];
+        if (this.values[4] < v) {
+          this.values[2] = this.values[3];
+          this.values[3] = this.values[4];
+          this.values[4] = v;
+        } else if (this.values[3] < v) {
+          this.values[2] = this.values[3];
+          this.values[3] = v;
+        } else {
+          this.values[2] = v;
         }
+      } else {
+        if (this.values[1] < v) {
+          this.values[0] = this.values[1];
+          this.values[1] = v;
+        } else {
+          this.values[0] = v;
+        }
+        this.high = true;
+      }
     }
+  }
 
-    public int get()
-    {
-        return values[2];
-    }
+  public int get() {
+    return this.values[2];
+  }
 
-    StreamingMedian5()
-    {
-        init();
-    }
+  public void init() {
+    this.values[0] = this.values[1] = this.values[2] = this.values[3] = this.values[4] = 0;
+    this.high = true;
+  }
 }

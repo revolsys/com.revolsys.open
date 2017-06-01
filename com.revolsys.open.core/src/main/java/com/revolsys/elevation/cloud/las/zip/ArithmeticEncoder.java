@@ -67,8 +67,6 @@ public class ArithmeticEncoder implements ArithmeticConstants {
 
   private int base;
 
-  private int value;
-
   private int length;
 
   public ArithmeticEncoder(final ChannelWriter out) {

@@ -6,6 +6,11 @@ import com.revolsys.geometry.model.segment.Segment;
 
 public class SegmentError extends AbstractGeometryValidationError {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final int[] segmentId;
 
   public SegmentError(final String message, final Segment segment) {

@@ -421,7 +421,7 @@ public class BaseTreeNode
     }
 
     final Object userData = getUserData();
-    JComponent component = (JComponent)renderer;
+    final JComponent component = (JComponent)renderer;
     if (userData instanceof ToolTipProxy) {
       final ToolTipProxy toolTipProxy = (ToolTipProxy)userData;
       final String toolTip = toolTipProxy.getToolTip();

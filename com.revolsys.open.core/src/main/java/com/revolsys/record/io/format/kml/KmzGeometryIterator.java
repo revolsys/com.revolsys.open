@@ -35,6 +35,7 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry> implements G
     this.zipIn = null;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.kmlIterator.getGeometryFactory();
   }

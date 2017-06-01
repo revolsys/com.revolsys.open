@@ -62,8 +62,6 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
 
   private int deletedCount = 0;
 
-  private long firstIndex;
-
   private ReadableByteChannel in;
 
   private Runnable initCallback;

@@ -173,7 +173,8 @@ public class JdbcFieldAdder {
           field = new JdbcLongFieldDefinition(dbName, name, sqlType, required, description, null);
         break;
         case Types.INTEGER:
-          field = new JdbcIntegerFieldDefinition(dbName, name, sqlType, required, description, null);
+          field = new JdbcIntegerFieldDefinition(dbName, name, sqlType, required, description,
+            null);
         break;
         case Types.SMALLINT:
           field = new JdbcShortFieldDefinition(dbName, name, sqlType, required, description, null);
@@ -198,14 +199,17 @@ public class JdbcFieldAdder {
               description, null);
           } else {
             if (length <= 2) {
-              field = new JdbcByteFieldDefinition(dbName, name, sqlType, required, description, null);
+              field = new JdbcByteFieldDefinition(dbName, name, sqlType, required, description,
+                null);
             } else if (length <= 4) {
-              field = new JdbcShortFieldDefinition(dbName, name, sqlType, required, description, null);
+              field = new JdbcShortFieldDefinition(dbName, name, sqlType, required, description,
+                null);
             } else if (length <= 9) {
               field = new JdbcIntegerFieldDefinition(dbName, name, sqlType, required, description,
                 null);
             } else if (length <= 18) {
-              field = new JdbcLongFieldDefinition(dbName, name, sqlType, required, description, null);
+              field = new JdbcLongFieldDefinition(dbName, name, sqlType, required, description,
+                null);
             } else {
               field = new JdbcBigIntegerFieldDefinition(dbName, name, sqlType, length, required,
                 description, null);

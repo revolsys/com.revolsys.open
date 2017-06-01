@@ -5,6 +5,11 @@ import com.revolsys.geometry.model.Point;
 
 public abstract class GeometryValidationError extends RuntimeException {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public GeometryValidationError(final String message) {
     super(message);
   }

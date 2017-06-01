@@ -421,16 +421,16 @@ public class EWktWriter {
   private static void writeCoordinates(final Writer out, final Point point, final int axisCount)
     throws IOException {
     final double x = point.getX();
-    String xString = Doubles.toString(x);
+    final String xString = Doubles.toString(x);
     out.write(xString);
     out.write(' ');
     final double y = point.getY();
-    String yString = Doubles.toString(y);
+    final String yString = Doubles.toString(y);
     out.write(yString);
     for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
       out.write(' ');
       final double cordinate = point.getCoordinate(axisIndex);
-      String coordinateString = Doubles.toString(cordinate);
+      final String coordinateString = Doubles.toString(cordinate);
       out.write(coordinateString);
     }
   }

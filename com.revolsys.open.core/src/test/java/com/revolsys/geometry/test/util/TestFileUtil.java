@@ -95,10 +95,6 @@ public class TestFileUtil {
     return directory.exists();
   }
 
-  public static String getFileNameExtension(final String path) {
-    return com.revolsys.io.FileUtil.getFileNameExtension(path);
-  }
-
   /**
    * Returns a List of the String's in the text file, one per line.
    */
@@ -113,6 +109,10 @@ public class TestFileUtil {
       line = bufferedReader.readLine();
     }
     return contents;
+  }
+
+  public static String getFileNameExtension(final String path) {
+    return com.revolsys.io.FileUtil.getFileNameExtension(path);
   }
 
   public static String name(final String path) {

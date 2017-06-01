@@ -25,8 +25,6 @@ import com.revolsys.geometry.model.impl.Circle;
 import com.revolsys.spring.resource.PathResource;
 
 public class TriangulationVisualization {
-  private static final int COUNT = Integer.MAX_VALUE;
-
   private static boolean showCircumcircle = false;
 
   private static boolean writeFile = false;

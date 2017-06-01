@@ -5,6 +5,11 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 
 public class GeometryFactoryWithOffsets extends GeometryFactory {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final double offsetX;
 
   private final double offsetY;

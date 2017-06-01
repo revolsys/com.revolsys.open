@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellEditor;
 
@@ -184,8 +185,8 @@ public class RecordLayerTablePanel extends TablePanel
     final JLabel title = new JLabel(columnName);
     title.setFont(menuItem.getFont().deriveFont(Font.BOLD));
     title.setBackground(menuItem.getBackground());
-    title.setHorizontalAlignment(JLabel.CENTER);
-    title.setHorizontalTextPosition(JLabel.CENTER);
+    title.setHorizontalAlignment(SwingConstants.CENTER);
+    title.setHorizontalTextPosition(SwingConstants.CENTER);
     final JPanel labelPanel = new JPanel(new VerticalLayout());
     labelPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
     labelPanel.setOpaque(false);

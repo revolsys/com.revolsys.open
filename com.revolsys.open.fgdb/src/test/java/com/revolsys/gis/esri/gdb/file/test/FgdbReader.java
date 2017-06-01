@@ -2,7 +2,6 @@ package com.revolsys.gis.esri.gdb.file.test;
 
 import java.nio.channels.ReadableByteChannel;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.FileSystemResource;
 
@@ -47,15 +46,7 @@ public class FgdbReader {
   //
   // }
 
-  private int fieldDescriptionOffset;
-
-  private DataType geometryType;
-
   private final ReadableByteChannel in;
-
-  private int numValidRows;
-
-  private int optionalFieldCount;
 
   private final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl();
 

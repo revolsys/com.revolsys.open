@@ -128,7 +128,8 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void forEachRecordInternal(final Query query, final Consumer<? super LayerRecord> consumer) {
+  protected void forEachRecordInternal(final Query query,
+    final Consumer<? super LayerRecord> consumer) {
     final List<LayerRecord> records = getRecordsPersisted(query);
     records.forEach(consumer);
   }

@@ -25,10 +25,7 @@ import java.util.function.Predicate;
 import com.revolsys.geometry.model.LineString;
 
 public class SharesLineSegmentsFilter implements Predicate<LineString> {
-  private final LineString line;
-
   public SharesLineSegmentsFilter(final LineString line) {
-    this.line = line;
   }
 
   @Override

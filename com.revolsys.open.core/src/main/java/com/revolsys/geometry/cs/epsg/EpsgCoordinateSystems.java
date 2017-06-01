@@ -651,17 +651,17 @@ public final class EpsgCoordinateSystems {
     return spheroids;
   }
 
-  public static CoordinateSystem wgs84() {
-    return EpsgCoordinateSystems.<CoordinateSystem> getCoordinateSystem(4326);
-  }
-
-  private EpsgCoordinateSystems() {
-  }
-
   public static String toWkt(final CoordinateSystem coordinateSystem) {
     final StringWriter stringWriter = new StringWriter();
     final PrintWriter out = new PrintWriter(stringWriter);
     EpsgCsWktWriter.write(out, coordinateSystem);
     return stringWriter.toString();
+  }
+
+  public static CoordinateSystem wgs84() {
+    return EpsgCoordinateSystems.<CoordinateSystem> getCoordinateSystem(4326);
+  }
+
+  private EpsgCoordinateSystems() {
   }
 }

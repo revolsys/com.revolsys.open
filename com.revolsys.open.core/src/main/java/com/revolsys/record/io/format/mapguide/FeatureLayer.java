@@ -63,6 +63,7 @@ public class FeatureLayer implements WebServiceFeatureLayer {
     return webService.getResource("SELECTFEATURES", "text/xml", queryParameters);
   }
 
+  @Override
   public MapGuideWebService getWebService() {
     return this.webService;
   }

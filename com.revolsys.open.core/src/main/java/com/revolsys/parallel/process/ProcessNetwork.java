@@ -21,6 +21,27 @@ import com.revolsys.spring.TargetBeanProcess;
 
 public class ProcessNetwork {
 
+  public static void processTasks(final int processCount, final Channel<Runnable> tasks) {
+    final ProcessNetwork processNetwork = new ProcessNetwork();
+    for (int i = 0; i < processCount; i++) {
+      processNetwork.addProcess(() -> {
+        while (true) {
+          final Runnable task = tasks.read(1000);
+          if (task == null) {
+            return;
+          } else {
+            try {
+              task.run();
+            } catch (final Throwable e) {
+              Logs.error(ProcessNetwork.class, "Error procesing task", e);
+            }
+          }
+        }
+      });
+    }
+    processNetwork.startAndWait();
+  }
+
   public static void startAndWait(final Process... processes) {
     final ProcessNetwork processNetwork = new ProcessNetwork(processes);
     processNetwork.startAndWait();
@@ -307,27 +328,6 @@ public class ProcessNetwork {
     } else {
       this.parent.waitTillFinished();
     }
-  }
-
-  public static void processTasks(final int processCount, final Channel<Runnable> tasks) {
-    final ProcessNetwork processNetwork = new ProcessNetwork();
-    for (int i = 0; i < processCount; i++) {
-      processNetwork.addProcess(() -> {
-        while (true) {
-          final Runnable task = tasks.read(1000);
-          if (task == null) {
-            return;
-          } else {
-            try {
-              task.run();
-            } catch (final Throwable e) {
-              Logs.error(ProcessNetwork.class, "Error procesing task", e);
-            }
-          }
-        }
-      });
-    }
-    processNetwork.startAndWait();
   }
 
 }

@@ -18,10 +18,7 @@ import com.sun.javadoc.ExecutableMemberDoc;
 import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.PackageDoc;
-import com.sun.javadoc.Parameter;
 import com.sun.javadoc.RootDoc;
-import com.sun.javadoc.Tag;
-import com.sun.javadoc.Type;
 
 public class JavaDoclet extends BaseDoclet {
   public static LanguageVersion languageVersion() {
