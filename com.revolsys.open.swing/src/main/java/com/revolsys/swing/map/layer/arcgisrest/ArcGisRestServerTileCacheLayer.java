@@ -113,11 +113,11 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     if (webService instanceof ArcGisRestCatalog) {
       this.connectionName = webService.getName();
       this.servicePath = mapService.getPathName();
-      setName(mapService.getParent().getName());
     } else {
       final UrlResource serviceUrl = mapService.getServiceUrl();
       setUrl(serviceUrl);
     }
+    setName(mapService.getParent().getName());
   }
 
   @Override

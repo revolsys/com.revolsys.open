@@ -5,6 +5,18 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 
 public interface Exceptions {
+  static boolean isException(Throwable e, final Class<? extends Throwable> clazz) {
+    while (e != null) {
+      if (e instanceof WrappedException) {
+        final WrappedException wrappedException = (WrappedException)e;
+        e = wrappedException.getCause();
+      } else if (clazz.isAssignableFrom(e.getClass())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @SuppressWarnings("unchecked")
   static <T> T throwCauseException(final Throwable e) {
     final Throwable cause = e.getCause();

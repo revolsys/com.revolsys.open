@@ -214,7 +214,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     double modelHeight = validBoundingBox.getHeight();
 
     /*
-     * If the new bounding box has a zero width and height, expand it by 50 view units.
+     * If the new bounding box has a zero width and height, expand it by 50 view
+     * units.
      */
     if (modelWidth == 0 && modelHeight == 0) {
       validBoundingBox = validBoundingBox.expand(getModelUnitsPerViewUnit() * 50,

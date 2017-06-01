@@ -69,7 +69,6 @@ public interface MapObjectFactory {
   static void setType(final Map<String, ? super Object> map, final String type) {
     if (Property.hasValue(type)) {
       map.put(TYPE, type);
-      map.put("type", type);
     }
   }
 

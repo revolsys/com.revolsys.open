@@ -606,6 +606,11 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     }
   }
 
+  default TypedIdentifier getIdentifierTyped(final String type) {
+    final Identifier identifier = getIdentifier();
+    return TypedIdentifier.newIdentifier(type, identifier);
+  }
+
   @Override
   default Integer getInteger(final CharSequence name) {
     final Object value = getValue(name);
@@ -697,9 +702,9 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     }
   }
 
-  default TypedIdentifier getTypedIdentifier(final String type) {
-    final Identifier identifier = getIdentifier();
-    return TypedIdentifier.newIdentifier(type, identifier);
+  default Identifier getTypedIdentifier(final String fieldName) {
+    final Object identifier = getValue(fieldName);
+    return TypedIdentifier.newIdentifier(identifier);
   }
 
   /**

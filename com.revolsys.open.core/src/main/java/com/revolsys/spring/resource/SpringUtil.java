@@ -8,7 +8,6 @@ import org.springframework.context.support.GenericApplicationContext;
 import com.revolsys.spring.config.AttributesBeanConfigurer;
 
 public class SpringUtil {
-
   public static void close(final ConfigurableApplicationContext applicationContext) {
     if (applicationContext != null) {
       if (applicationContext.isActive()) {

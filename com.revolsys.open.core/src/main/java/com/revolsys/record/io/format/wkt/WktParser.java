@@ -302,8 +302,10 @@ public class WktParser {
         }
       }
     } else {
+      reader.unread(character);
       throw new IllegalArgumentException(
-        "Expecting start of coordinates '(' not: " + FileUtil.getString(reader, 50));
+        "Invalid WKT geometry. Expecting start of coordinates '(' not: "
+          + FileUtil.getString(reader, 50));
     }
   }
 

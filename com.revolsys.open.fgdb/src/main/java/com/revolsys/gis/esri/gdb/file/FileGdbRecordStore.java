@@ -972,6 +972,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               throw new IllegalArgumentException(
                 "ESRI file geodatabase not found " + this.fileName);
             }
+            if (geodatabase == null) {
+              throw new IllegalArgumentException(
+                "Unable to open ESRI file geodatabase not found " + this.fileName);
+            }
             final VectorOfWString domainNames = geodatabase.getDomains();
             for (int i = 0; i < domainNames.size(); i++) {
               final String domainName = domainNames.get(i);

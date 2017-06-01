@@ -275,7 +275,6 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
-
   default Polygonal newGeometry(final GeometryFactory geometryFactory) {
     final List<Polygon> polygons = new ArrayList<>();
     for (final Polygon polygon : polygons()) {

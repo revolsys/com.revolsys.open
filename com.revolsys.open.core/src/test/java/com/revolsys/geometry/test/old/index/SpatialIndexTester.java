@@ -133,7 +133,7 @@ public class SpatialIndexTester {
   }
 
   private void insert(final List<BoundingBox> sourceData, final SpatialIndex<BoundingBox> index) {
-    for (BoundingBox envelope : sourceData) {
+    for (final BoundingBox envelope : sourceData) {
       index.insertItem(envelope, envelope);
     }
   }

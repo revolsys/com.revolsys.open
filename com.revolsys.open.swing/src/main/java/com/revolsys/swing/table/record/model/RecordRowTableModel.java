@@ -297,6 +297,11 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return records;
   }
 
+  protected Object getRecordValue(final Record record, final String name) {
+    final Object value = record.getValue(name);
+    return value;
+  }
+
   public Map<Integer, SortOrder> getSortedColumns() {
     return this.sortedColumns;
   }
@@ -328,11 +333,6 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         return getRecordValue(record, name);
       }
     }
-  }
-
-  protected Object getRecordValue(final Record record, final String name) {
-    final Object value = record.getValue(name);
-    return value;
   }
 
   @Override

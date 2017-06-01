@@ -1476,6 +1476,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  @SuppressWarnings("unchecked")
   public <R extends LayerRecord> List<R> getRecords(final Query query) {
     final List<R> records = new ArrayList<>();
     final Consumer<LayerRecord> action = (Consumer<LayerRecord>)(Consumer<R>)records::add;

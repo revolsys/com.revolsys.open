@@ -178,6 +178,7 @@ public final class LineStringUtil {
     return z;
   }
 
+  @Deprecated
   public static Point getEndPoint(final LineString line, final boolean fromPoint) {
     if (fromPoint) {
       return line.getPoint(0);

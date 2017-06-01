@@ -76,4 +76,5 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
     final BoundingBox boundingBox = segment.getBoundingBox();
     return boundingBox.intersects(minX, minY, maxX, maxY);
   }
+
 }

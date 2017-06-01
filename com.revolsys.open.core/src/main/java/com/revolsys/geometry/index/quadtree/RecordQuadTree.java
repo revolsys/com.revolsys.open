@@ -139,6 +139,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
     final Comparator<R> comparator) {
     final CreateListVisitor<R> listVisitor = new CreateListVisitor<>(filter);
     forEach(boundingBox, listVisitor);
+
     final List<R> list = listVisitor.getList();
     if (comparator != null) {
       Collections.sort(list, comparator);

@@ -382,6 +382,66 @@ public abstract class XmlProcessor {
   }
 
   @SuppressWarnings("unchecked")
+  public <T> T process(final StaxReader parser, final boolean skipToEnd) throws IOException {
+    final QName element = parser.getName();
+
+    final String tagName = element.getLocalPart();
+    final QName xsiName = parser.getQNameAttribute(XsiConstants.TYPE);
+    boolean hasMapping = false;
+    Class<?> objectClass = null;
+    if (xsiName == null) {
+      objectClass = this.tagNameClassMap.get(tagName);
+      if (this.tagNameClassMap.containsKey(tagName)) {
+        objectClass = this.tagNameClassMap.get(tagName);
+        hasMapping = true;
+      }
+    } else {
+      final String xsiLocalName = xsiName.getLocalPart();
+      final Converter converter = this.typePathConverterMap.get(xsiName);
+      if (converter != null) {
+        final String text = parser.getElementText();
+        return (T)converter.convert(null, text);
+      } else if (this.tagNameClassMap.containsKey(xsiLocalName)) {
+        objectClass = this.tagNameClassMap.get(xsiLocalName);
+        hasMapping = true;
+      } else if (this.tagNameClassMap.containsKey(tagName)) {
+        objectClass = this.tagNameClassMap.get(tagName);
+        hasMapping = true;
+      }
+    }
+    if (hasMapping) {
+      return (T)parseObject(parser, objectClass);
+    } else {
+      try {
+        final Method method = getProcessMethod(element);
+        if (method == null) {
+          if (skipToEnd) {
+            parser.skipToEndElement(element);
+          }
+          return (T)parser.getElementText();
+        } else {
+          return (T)method.invoke(this, new Object[] {
+            parser
+          });
+        }
+      } catch (final IllegalAccessException e) {
+        throw new RuntimeException(e);
+      } catch (final InvocationTargetException e) {
+        final Throwable t = e.getTargetException();
+        if (t instanceof RuntimeException) {
+          throw (RuntimeException)t;
+        } else if (t instanceof Error) {
+          throw (Error)t;
+        } else if (t instanceof IOException) {
+          throw (IOException)t;
+        } else {
+          throw Exceptions.wrap(e);
+        }
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   public <T> T process(final String xml) {
     try {
       final StringReader reader = new StringReader(xml);
