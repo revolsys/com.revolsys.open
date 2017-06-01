@@ -82,6 +82,53 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     sql.append(".SDO_ORDINATES");
   }
 
+  private int addRingComplex(final List<LinearRing> rings, final int axisCount,
+    final BigDecimal[] elemInfo, final int type, final BigDecimal[] coordinatesArray,
+    int elemInfoOffset, final int offset, final long interpretation) {
+    if (interpretation > 1) {
+      int length = 0;
+      for (int part = 0; part < interpretation; part++) {
+        elemInfoOffset += 3;
+        if (elemInfoOffset + 3 < elemInfo.length) {
+          final long nextOffset = elemInfo[elemInfoOffset + 3].longValue();
+          length = (int)(nextOffset - offset);
+        } else {
+          final int coordinateCount = coordinatesArray.length;
+          length = coordinateCount + 1 - offset;
+        }
+      }
+      final double[] coordinates = Numbers.toDoubleArray(coordinatesArray, offset - 1, length);
+      final LinearRing ring = this.geometryFactory.linearRing(axisCount, coordinates);
+      rings.add(ring);
+    } else {
+      throw new IllegalArgumentException(
+        "Unsupported geometry type " + type + " interpretation " + interpretation);
+    }
+    return elemInfoOffset + 3;
+  }
+
+  private int addRingSimple(final List<LinearRing> rings, final int axisCount,
+    final BigDecimal[] elemInfo, final int type, final BigDecimal[] coordinatesArray,
+    final int elemInfoOffset, final int offset, final long interpretation) {
+    if (interpretation == 1) {
+      int length;
+      if (elemInfoOffset + 3 < elemInfo.length) {
+        final long nextOffset = elemInfo[elemInfoOffset + 3].longValue();
+        length = (int)(nextOffset - offset);
+      } else {
+        final int coordinateCount = coordinatesArray.length;
+        length = coordinateCount + 1 - offset;
+      }
+      final double[] coordinates = Numbers.toDoubleArray(coordinatesArray, offset - 1, length);
+      final LinearRing ring = this.geometryFactory.linearRing(axisCount, coordinates);
+      rings.add(ring);
+    } else {
+      throw new IllegalArgumentException(
+        "Unsupported geometry type " + type + " interpretation " + interpretation);
+    }
+    return elemInfoOffset + 3;
+  }
+
   @Override
   public OracleSdoGeometryJdbcFieldDefinition clone() {
     return new OracleSdoGeometryJdbcFieldDefinition(getDbName(), getName(), getDataType(),
@@ -214,44 +261,48 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final List<LinearRing> rings = new ArrayList<>();
     int numInteriorRings = 0;
 
-    for (int i = 0; i < elemInfo.length; i += 3) {
-      final int offset = elemInfo[i].intValue();
-      final long type = elemInfo[i + 1].longValue();
-      final long interpretation = elemInfo[i + 2].longValue();
-      int length;
-      if (i + 3 < elemInfo.length) {
-        final long nextOffset = elemInfo[i + 3].longValue();
-        length = (int)(nextOffset - offset);
-      } else {
-        length = coordinatesArray.length - offset + 1;
-      }
-      if (interpretation == 1) {
-        final double[] coordinates = Numbers.toDoubleArray(coordinatesArray, offset - 1, length);
-        final LinearRing ring = this.geometryFactory.linearRing(axisCount, coordinates);
+    for (int elemInfoOffset = 0; elemInfoOffset < elemInfo.length;) {
+      final int offset = elemInfo[elemInfoOffset].intValue();
+      final int type = (int)elemInfo[elemInfoOffset + 1].longValue();
+      final long interpretation = elemInfo[elemInfoOffset + 2].longValue();
+      switch (type) {
+        case 1003:
+          if (rings.isEmpty()) {
+            elemInfoOffset = addRingSimple(rings, axisCount, elemInfo, type, coordinatesArray,
+              elemInfoOffset, offset, interpretation);
+          } else {
+            throw new IllegalArgumentException("Cannot have two exterior rings on a geometry");
+          }
+        break;
+        case 1005:
+          if (rings.isEmpty()) {
+            elemInfoOffset = addRingComplex(rings, axisCount, elemInfo, type, coordinatesArray,
+              elemInfoOffset, offset, interpretation);
+          } else {
+            throw new IllegalArgumentException("Cannot have two exterior rings on a geometry");
+          }
+        break;
+        case 2003:
+          if (numInteriorRings == rings.size()) {
+            throw new IllegalArgumentException("Too many interior rings");
+          } else {
+            numInteriorRings++;
+            elemInfoOffset = addRingSimple(rings, axisCount, elemInfo, type, coordinatesArray,
+              elemInfoOffset, offset, interpretation);
+          }
+        break;
+        case 2005:
+          if (numInteriorRings == rings.size()) {
+            throw new IllegalArgumentException("Too many interior rings");
+          } else {
+            numInteriorRings++;
+            elemInfoOffset = addRingSimple(rings, axisCount, elemInfo, type, coordinatesArray,
+              elemInfoOffset, offset, interpretation);
+          }
+        break;
 
-        switch ((int)type) {
-          case 1003:
-            if (rings.isEmpty()) {
-              rings.add(ring);
-            } else {
-              throw new IllegalArgumentException("Cannot have two exterior rings on a geometry");
-            }
-          break;
-          case 2003:
-            if (numInteriorRings == rings.size()) {
-              throw new IllegalArgumentException("Too many interior rings");
-            } else {
-              numInteriorRings++;
-              rings.add(ring);
-            }
-          break;
-
-          default:
-            throw new IllegalArgumentException("Unsupported geometry type " + type);
-        }
-      } else {
-        throw new IllegalArgumentException(
-          "Unsupported geometry type " + type + " interpretation " + interpretation);
+        default:
+          throw new IllegalArgumentException("Unsupported geometry type " + type);
       }
     }
     final Polygon polygon = this.geometryFactory.polygon(rings);
@@ -264,45 +315,43 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
     final BigDecimal[] elemInfo = JdbcUtils.getBigDecimalArray(resultSet, columnIndex + 4);
     final BigDecimal[] coordinatesArray = JdbcUtils.getBigDecimalArray(resultSet, columnIndex + 5);
-    final int coordinateCount = coordinatesArray.length;
 
     List<LinearRing> rings = Collections.emptyList();
 
-    for (int i = 0; i < elemInfo.length; i += 3) {
-      final int offset = elemInfo[i].intValue();
-      final long type = elemInfo[i + 1].longValue();
-      final long interpretation = elemInfo[i + 2].longValue();
-      int length;
-      if (i + 3 < elemInfo.length) {
-        final long nextOffset = elemInfo[i + 3].longValue();
-        length = (int)(nextOffset - offset);
-      } else {
-        length = coordinateCount + 1 - offset;
-      }
-      if (interpretation == 1) {
-        final double[] coordinates = Numbers.toDoubleArray(coordinatesArray, offset - 1, length);
-        final LinearRing ring = this.geometryFactory.linearRing(axisCount, coordinates);
+    for (int elemInfoOffset = 0; elemInfoOffset < elemInfo.length;) {
+      final int offset = elemInfo[elemInfoOffset].intValue();
+      final int type = (int)elemInfo[elemInfoOffset + 1].longValue();
+      final long interpretation = elemInfo[elemInfoOffset + 2].longValue();
 
-        switch ((int)type) {
-          case 1003:
-            if (!rings.isEmpty()) {
-              final Polygon polygon = this.geometryFactory.polygon(rings);
-              polygons.add(polygon);
-            }
-            rings = new ArrayList<>();
-            rings.add(ring);
-
-          break;
-          case 2003:
-            rings.add(ring);
-          break;
-
-          default:
-            throw new IllegalArgumentException("Unsupported geometry type " + type);
-        }
-      } else {
-        throw new IllegalArgumentException(
-          "Unsupported geometry type " + type + " interpretation " + interpretation);
+      switch (type) {
+        case 1003:
+          if (!rings.isEmpty()) {
+            final Polygon polygon = this.geometryFactory.polygon(rings);
+            polygons.add(polygon);
+          }
+          rings = new ArrayList<>();
+          elemInfoOffset = addRingSimple(rings, axisCount, elemInfo, type, coordinatesArray,
+            elemInfoOffset, offset, interpretation);
+        break;
+        case 1005:
+          if (!rings.isEmpty()) {
+            final Polygon polygon = this.geometryFactory.polygon(rings);
+            polygons.add(polygon);
+          }
+          rings = new ArrayList<>();
+          elemInfoOffset = addRingComplex(rings, axisCount, elemInfo, type, coordinatesArray,
+            elemInfoOffset, offset, interpretation);
+        break;
+        case 2003:
+          elemInfoOffset = addRingSimple(rings, axisCount, elemInfo, type, coordinatesArray,
+            elemInfoOffset, offset, interpretation);
+        break;
+        case 2005:
+          elemInfoOffset = addRingComplex(rings, axisCount, elemInfo, type, coordinatesArray,
+            elemInfoOffset, offset, interpretation);
+        break;
+        default:
+          throw new IllegalArgumentException("Unsupported geometry type " + type);
       }
     }
     if (!rings.isEmpty()) {
