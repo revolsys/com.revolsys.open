@@ -48,9 +48,8 @@ import com.revolsys.geometry.model.Geometry;
  */
 public class AreaSimilarityMeasure implements SimilarityMeasure {
   /*
-   * public static double measure(Geometry a, Geometry b) {
-   * AreaSimilarityMeasure gv = new AreaSimilarityMeasure(a, b); return
-   * gv.measure(); }
+   * public static double measure(Geometry a, Geometry b) { AreaSimilarityMeasure gv = new
+   * AreaSimilarityMeasure(a, b); return gv.measure(); }
    */
 
   public AreaSimilarityMeasure() {

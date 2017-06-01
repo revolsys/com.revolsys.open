@@ -212,9 +212,8 @@ public class GeometryFunctionRegistry {
   }
 
   /*
-   * int index = functions.indexOf(func); if (index == -1) {
-   * sortedFunctions.put(func.getName(), func); } else { functions.set(index,
-   * func); } }
+   * int index = functions.indexOf(func); if (index == -1) { sortedFunctions.put(func.getName(),
+   * func); } else { functions.set(index, func); } }
    */
 
   public List getGeometryFunctions() {

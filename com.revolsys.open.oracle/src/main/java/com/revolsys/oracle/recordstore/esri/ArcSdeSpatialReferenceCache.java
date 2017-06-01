@@ -35,7 +35,7 @@ public class ArcSdeSpatialReferenceCache {
 
   protected static ArcSdeSpatialReference getSpatialReference(final Connection connection,
     final RecordStoreSchema schema, final int esriSrid) {
-    ArcSdeSpatialReferenceCache cache = get(schema);
+    final ArcSdeSpatialReferenceCache cache = get(schema);
     return cache.getSpatialReference(connection, esriSrid);
   }
 

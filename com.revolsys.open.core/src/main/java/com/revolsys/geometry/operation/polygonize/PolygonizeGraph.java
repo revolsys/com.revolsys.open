@@ -412,7 +412,7 @@ class PolygonizeGraph extends PlanarGraph {
    */
   public Collection<LineString> deleteDangles() {
     final List nodesToRemove = findNodesOfDegree(1);
-    final Set<LineString> dangleLines = new HashSet<LineString>();
+    final Set<LineString> dangleLines = new HashSet<>();
 
     final Stack nodeStack = new Stack();
     for (final Iterator i = nodesToRemove.iterator(); i.hasNext();) {

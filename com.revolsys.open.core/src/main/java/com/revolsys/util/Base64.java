@@ -375,8 +375,7 @@ public class Base64 {
   /** The 64 valid Base64 values. */
   // private final static byte[] ALPHABET;
   /*
-   * Host platform me be something funny like EBCDIC, so we hardcode these
-   * values.
+   * Host platform me be something funny like EBCDIC, so we hardcode these values.
    */
   private final static byte[] _STANDARD_ALPHABET = {
     (byte)'A', (byte)'B', (byte)'C', (byte)'D', (byte)'E', (byte)'F', (byte)'G', (byte)'H',

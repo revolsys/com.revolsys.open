@@ -70,23 +70,20 @@ public class RobustDeterminant {
   // public static int callCount = 0; // debugging only
 
   /*
-   * // test point to allow injecting test code public static int
-   * signOfDet2x2(double x1, double y1, double x2, double y2) { int d1 =
-   * originalSignOfDet2x2(x1, y1, x2, y2); int d2 = -originalSignOfDet2x2(y1,
-   * x1, x2, y2); assert d1 == -d2; return d1; }
+   * // test point to allow injecting test code public static int signOfDet2x2(double x1, double y1,
+   * double x2, double y2) { int d1 = originalSignOfDet2x2(x1, y1, x2, y2); int d2 =
+   * -originalSignOfDet2x2(y1, x1, x2, y2); assert d1 == -d2; return d1; }
    */
 
   /*
-   * Test code to force a standard ordering of input ordinates. A possible fix
-   * for a rare problem where evaluation is order-dependent.
+   * Test code to force a standard ordering of input ordinates. A possible fix for a rare problem
+   * where evaluation is order-dependent.
    */
   /*
-   * public static int signOfDet2x2(double x1, double y1, double x2, double y2)
-   * { if (x1 > x2) { return -signOfDet2x2ordX(x2, y2, x1, y1); } return
-   * signOfDet2x2ordX(x1, y1, x2, y2); } private static int
-   * signOfDet2x2ordX(double x1, double y1, double x2, double y2) { if (y1 > y2)
-   * { return -originalSignOfDet2x2(y1, x1, y2, x2); } return
-   * originalSignOfDet2x2(x1, y1, x2, y2); } //
+   * public static int signOfDet2x2(double x1, double y1, double x2, double y2) { if (x1 > x2) {
+   * return -signOfDet2x2ordX(x2, y2, x1, y1); } return signOfDet2x2ordX(x1, y1, x2, y2); } private
+   * static int signOfDet2x2ordX(double x1, double y1, double x2, double y2) { if (y1 > y2) { return
+   * -originalSignOfDet2x2(y1, x1, y2, x2); } return originalSignOfDet2x2(x1, y1, x2, y2); } //
    */
 
   /**

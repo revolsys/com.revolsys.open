@@ -21,9 +21,9 @@ public class Distance3DOpTest extends TestCase {
   }
 
   /*
-   * public void testTest() { checkDistance( "LINESTRING (250 250 0, 260 260 0)"
-   * , "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0))",
-   * 70.71067811865476); testLinePolygonFlat(); }
+   * public void testTest() { checkDistance( "LINESTRING (250 250 0, 260 260 0)" ,
+   * "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0))", 70.71067811865476);
+   * testLinePolygonFlat(); }
    */
 
   String poly2HoleFlat = "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0), (110 110 0, 110 130 0, 130 130 0, 130 110 0, 110 110 0), (190 110 0, 170 110 0, 170 130 0, 190 130 0, 190 110 0))";

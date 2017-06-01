@@ -256,9 +256,9 @@ public class RobustLineIntersector extends LineIntersector {
     Point intPt = intersectionWithNormalization(p1, p2, q1, q2);
 
     /*
-     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1,
-     * q2); double dist = intPt.distance(intPtDD); System.out.println(intPt +
-     * " - " + intPtDD + " dist = " + dist); //intPt = intPtDD;
+     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1, q2); double dist =
+     * intPt.distance(intPtDD); System.out.println(intPt + " - " + intPtDD + " dist = " + dist);
+     * //intPt = intPtDD;
      */
 
     /**
@@ -312,10 +312,9 @@ public class RobustLineIntersector extends LineIntersector {
     final double normY = (intMinY + intMaxY) / 2.0;
 
     /*
-     * // equilavalent code using more modular but slower method BoundingBox
-     * env0 = new BoundingBoxDoubleGf(n00, n01); BoundingBox env1 = new
-     * BoundingBoxDoubleGf(n10, n11); BoundingBox intEnv =
-     * env0.intersection(env1); Point intMidPt = intEnv.centre(); normPt.getX()
+     * // equilavalent code using more modular but slower method BoundingBox env0 = new
+     * BoundingBoxDoubleGf(n00, n01); BoundingBox env1 = new BoundingBoxDoubleGf(n10, n11);
+     * BoundingBox intEnv = env0.intersection(env1); Point intMidPt = intEnv.centre(); normPt.getX()
      * = intMidPt.getX(); normPt.getY() = intMidPt.getY();
      */
 

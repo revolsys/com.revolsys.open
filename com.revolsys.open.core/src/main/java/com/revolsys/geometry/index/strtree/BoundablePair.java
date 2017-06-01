@@ -80,21 +80,18 @@ class BoundablePair implements Comparable {
   }
 
   /*
-   * public double getMaximumDistance() { if (maxDistance < 0.0) maxDistance =
-   * maxDistance(); return maxDistance; }
+   * public double getMaximumDistance() { if (maxDistance < 0.0) maxDistance = maxDistance(); return
+   * maxDistance; }
    */
 
   /*
-   * private double maxDistance() { return maximumDistance(
-   * (BoundingBoxDoubleGf) boundable1.getBounds(), (BoundingBoxDoubleGf)
-   * boundable2.getBounds()); } private static double
-   * maximumDistance(BoundingBoxDoubleGf env1, BoundingBoxDoubleGf env2) {
-   * double minx = Math.min(env1.getMinX(), env2.getMinX()); double miny =
-   * Math.min(env1.getMinY(), env2.getMinY()); double maxx =
-   * Math.max(env1.getMaxX(), env2.getMaxX()); double maxy =
-   * Math.max(env1.getMaxY(), env2.getMaxY()); Point min = new
-   * PointDouble((double)minx, miny); Point max = new PointDouble((double)maxx,
-   * maxy); return min.distance(max); }
+   * private double maxDistance() { return maximumDistance( (BoundingBoxDoubleGf)
+   * boundable1.getBounds(), (BoundingBoxDoubleGf) boundable2.getBounds()); } private static double
+   * maximumDistance(BoundingBoxDoubleGf env1, BoundingBoxDoubleGf env2) { double minx =
+   * Math.min(env1.getMinX(), env2.getMinX()); double miny = Math.min(env1.getMinY(),
+   * env2.getMinY()); double maxx = Math.max(env1.getMaxX(), env2.getMaxX()); double maxy =
+   * Math.max(env1.getMaxY(), env2.getMaxY()); Point min = new PointDouble((double)minx, miny);
+   * Point max = new PointDouble((double)maxx, maxy); return min.distance(max); }
    */
 
   /**

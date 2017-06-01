@@ -80,10 +80,9 @@ public class IndexedFacetDistance {
    */
   // TODO: implement this
   /*
-   * public boolean isWithinDistance(Geometry g, double maximumDistance) {
-   * STRtree tree2 = FacetSequenceTreeBuilder.build(g); double dist =
-   * findMinDistance(cachedTree.getRoot(), tree2.getRoot(), maximumDistance); if
-   * (dist <= maximumDistance) return false; return true; }
+   * public boolean isWithinDistance(Geometry g, double maximumDistance) { STRtree tree2 =
+   * FacetSequenceTreeBuilder.build(g); double dist = findMinDistance(cachedTree.getRoot(),
+   * tree2.getRoot(), maximumDistance); if (dist <= maximumDistance) return false; return true; }
    */
 
   private static class FacetSequenceDistance implements ItemDistance {
@@ -150,10 +149,9 @@ public class IndexedFacetDistance {
    */
   // TODO: implement this
   /*
-   * public double getDistanceWithin(Geometry g, double maximumDistance) {
-   * STRtree tree2 = FacetSequenceTreeBuilder.build(g); Object[] obj =
-   * cachedTree.nearestNeighbours(tree2, new FacetSequenceDistance()); return
-   * facetDistance(obj); }
+   * public double getDistanceWithin(Geometry g, double maximumDistance) { STRtree tree2 =
+   * FacetSequenceTreeBuilder.build(g); Object[] obj = cachedTree.nearestNeighbours(tree2, new
+   * FacetSequenceDistance()); return facetDistance(obj); }
    */
 
   /**

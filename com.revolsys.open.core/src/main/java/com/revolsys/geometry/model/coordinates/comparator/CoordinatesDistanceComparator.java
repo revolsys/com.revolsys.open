@@ -18,7 +18,6 @@ public class CoordinatesDistanceComparator implements Comparator<Point> {
     this(point.getX(), point.getY());
   }
 
-
   @Override
   public int compare(final Point point1, final Point point2) {
     int compare;

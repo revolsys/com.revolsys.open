@@ -64,11 +64,13 @@ public abstract class AbstractKeySerializer extends BaseObjectWithProperties
     return this.width;
   }
 
+  @Override
   public AbstractKeySerializer setKey(final String key) {
     this.key = key;
     return this;
   }
 
+  @Override
   public AbstractKeySerializer setLabel(final String label) {
     this.label = label;
     return this;

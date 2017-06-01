@@ -122,8 +122,7 @@ public class UnionPerfTester {
   }
 
   /*
-   * public Geometry unionAllOrdered(List geoms) { // return
-   * OrderedUnion.union(geoms); }
+   * public Geometry unionAllOrdered(List geoms) { // return OrderedUnion.union(geoms); }
    */
 
   public Geometry unionCascaded(final List geoms) {

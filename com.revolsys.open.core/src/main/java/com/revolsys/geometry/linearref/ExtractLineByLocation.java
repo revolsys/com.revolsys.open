@@ -130,13 +130,11 @@ class ExtractLineByLocation {
    */
   /*
    * private LinearLocation normalize(LinearLocation loc) { int componentIndex =
-   * loc.getComponentIndex(); int segmentIndex = loc.getSegmentIndex(); double
-   * segmentFraction = loc.getSegmentFraction(); if (segmentFraction < 0.0) {
-   * segmentFraction = 0.0; } if (segmentFraction > 1.0) { segmentFraction =
-   * 1.0; } if (componentIndex < 0) { componentIndex = 0; segmentIndex = 0;
-   * segmentFraction = 0.0; } if (segmentIndex < 0) { segmentIndex = 0;
-   * segmentFraction = 0.0; } if (segmentFraction == 1.0) { segmentFraction =
-   * 0.0; segmentIndex += 1; } return new LinearLocation(componentIndex,
-   * segmentIndex, segmentFraction); }
+   * loc.getComponentIndex(); int segmentIndex = loc.getSegmentIndex(); double segmentFraction =
+   * loc.getSegmentFraction(); if (segmentFraction < 0.0) { segmentFraction = 0.0; } if
+   * (segmentFraction > 1.0) { segmentFraction = 1.0; } if (componentIndex < 0) { componentIndex =
+   * 0; segmentIndex = 0; segmentFraction = 0.0; } if (segmentIndex < 0) { segmentIndex = 0;
+   * segmentFraction = 0.0; } if (segmentFraction == 1.0) { segmentFraction = 0.0; segmentIndex +=
+   * 1; } return new LinearLocation(componentIndex, segmentIndex, segmentFraction); }
    */
 }

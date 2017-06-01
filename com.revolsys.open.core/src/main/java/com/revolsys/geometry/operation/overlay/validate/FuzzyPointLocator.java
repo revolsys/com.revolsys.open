@@ -90,9 +90,8 @@ public class FuzzyPointLocator {
     if (isWithinToleranceOfBoundary(pt)) {
       return Location.BOUNDARY;
       /*
-       * double dist = linework.distance(point); // if point is close to
-       * boundary, it is considered to be on the boundary if (dist < tolerance)
-       * return Location.BOUNDARY;
+       * double dist = linework.distance(point); // if point is close to boundary, it is considered
+       * to be on the boundary if (dist < tolerance) return Location.BOUNDARY;
        */
     }
 

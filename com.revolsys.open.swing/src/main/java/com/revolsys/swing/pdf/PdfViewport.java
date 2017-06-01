@@ -344,16 +344,13 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
                * final double textHaloRadius = Viewport2D.toDisplayValue(this,
                * style.getTextHaloRadius()); if (textHaloRadius > 0) {
                * graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-               * RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB); final Stroke
-               * savedStroke = graphics.getStroke(); final Stroke outlineStroke
-               * = new BasicStroke( (float)textHaloRadius, BasicStroke.CAP_BUTT,
-               * BasicStroke.JOIN_BEVEL);
-               * graphics.setColor(style.getTextHaloFill());
-               * graphics.setStroke(outlineStroke); final Font font =
-               * graphics.getFont(); final FontRenderContext fontRenderContext =
-               * graphics.getFontRenderContext(); final TextLayout textLayout =
-               * new TextLayout(line, font, fontRenderContext); final Shape
-               * outlineShape =
+               * RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB); final Stroke savedStroke =
+               * graphics.getStroke(); final Stroke outlineStroke = new BasicStroke(
+               * (float)textHaloRadius, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
+               * graphics.setColor(style.getTextHaloFill()); graphics.setStroke(outlineStroke);
+               * final Font font = graphics.getFont(); final FontRenderContext fontRenderContext =
+               * graphics.getFontRenderContext(); final TextLayout textLayout = new TextLayout(line,
+               * font, fontRenderContext); final Shape outlineShape =
                * textLayout.getOutline(TextStyleRenderer.NOOP_TRANSFORM);
                * graphics.draw(outlineShape); graphics.setStroke(savedStroke); }
                */

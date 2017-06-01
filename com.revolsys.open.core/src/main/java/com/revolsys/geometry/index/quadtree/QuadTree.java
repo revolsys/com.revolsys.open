@@ -137,6 +137,12 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return visitor.getList();
   }
 
+  public List<T> getItems(final BoundingBox boundingBox, final Predicate<T> filter) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>(filter);
+    forEach(visitor, boundingBox);
+    return visitor.getList();
+  }
+
   public int getSize() {
     return this.size;
   }
@@ -154,12 +160,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
         this.root.insertRoot(this, bounds, item);
       }
     }
-  }
-
-  public List<T> getItems(final BoundingBox boundingBox, final Predicate<T> filter) {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<>(filter);
-    forEach(visitor, boundingBox);
-    return visitor.getList();
   }
 
   public List<T> queryBoundingBox(final Geometry geometry) {

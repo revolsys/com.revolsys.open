@@ -57,11 +57,10 @@ public class NonRobustLineIntersector extends LineIntersector {
   }
 
   /*
-   * p1-p2 and p3-p4 are assumed to be collinear (although not necessarily
-   * intersecting). Returns: DONT_INTERSECT : the two segments do not intersect
-   * COLLINEAR : the segments intersect, in the line segment pa-pb. pa-pb is in
-   * the same direction as p1-p2 DO_INTERSECT : the inputLines intersect in a
-   * single point only, pa
+   * p1-p2 and p3-p4 are assumed to be collinear (although not necessarily intersecting). Returns:
+   * DONT_INTERSECT : the two segments do not intersect COLLINEAR : the segments intersect, in the
+   * line segment pa-pb. pa-pb is in the same direction as p1-p2 DO_INTERSECT : the inputLines
+   * intersect in a single point only, pa
    */
   private int computeCollinearIntersection(final Point p1, final Point p2, final Point p3,
     final Point p4) {
@@ -145,8 +144,7 @@ public class NonRobustLineIntersector extends LineIntersector {
     this.isProper = false;
 
     /*
-     * Compute a1, b1, c1, where line joining points 1 and 2 is
-     * "a1 x  +  b1 y  +  c1  =  0".
+     * Compute a1, b1, c1, where line joining points 1 and 2 is "a1 x  +  b1 y  +  c1  =  0".
      */
     a1 = p2.getY() - p1.getY();
     b1 = p1.getX() - p2.getX();
@@ -159,8 +157,8 @@ public class NonRobustLineIntersector extends LineIntersector {
     r4 = a1 * p4.getX() + b1 * p4.getY() + c1;
 
     /*
-     * Check signs of r3 and r4. If both point 3 and point 4 lie on same side of
-     * line 1, the line segments do not intersect.
+     * Check signs of r3 and r4. If both point 3 and point 4 lie on same side of line 1, the line
+     * segments do not intersect.
      */
     if (r3 != 0 && r4 != 0 && isSameSignAndNonZero(r3, r4)) {
       return NO_INTERSECTION;
@@ -180,8 +178,8 @@ public class NonRobustLineIntersector extends LineIntersector {
     r2 = a2 * p2.getX() + b2 * p2.getY() + c2;
 
     /*
-     * Check signs of r1 and r2. If both point 1 and point 2 lie on same side of
-     * second line segment, the line segments do not intersect.
+     * Check signs of r1 and r2. If both point 1 and point 2 lie on same side of second line
+     * segment, the line segments do not intersect.
      */
     if (r1 != 0 && r2 != 0 && isSameSignAndNonZero(r1, r2)) {
       return NO_INTERSECTION;
@@ -196,10 +194,9 @@ public class NonRobustLineIntersector extends LineIntersector {
     }
     final double numX = b1 * c2 - b2 * c1;
     /*
-     * TESTING ONLY double valX = (( num < 0 ? num - offset : num + offset ) /
-     * denom); double valXInt = (int) (( num < 0 ? num - offset : num + offset )
-     * / denom); if (valXInt != pa.x) // TESTING ONLY System.out.println(val +
-     * " - int: " + valInt + ", floor: " + pa.x);
+     * TESTING ONLY double valX = (( num < 0 ? num - offset : num + offset ) / denom); double
+     * valXInt = (int) (( num < 0 ? num - offset : num + offset ) / denom); if (valXInt != pa.x) //
+     * TESTING ONLY System.out.println(val + " - int: " + valInt + ", floor: " + pa.x);
      */
     final double numY = a2 * c1 - a1 * c2;
     this.pa = new PointDouble(numX / denom, numY / denom);
@@ -230,8 +227,7 @@ public class NonRobustLineIntersector extends LineIntersector {
     this.isProper = false;
 
     /*
-     * Compute a1, b1, c1, where line joining points 1 and 2 is
-     * "a1 x  +  b1 y  +  c1  =  0".
+     * Compute a1, b1, c1, where line joining points 1 and 2 is "a1 x  +  b1 y  +  c1  =  0".
      */
     a1 = p2.getY() - p1.getY();
     b1 = p1.getX() - p2.getX();

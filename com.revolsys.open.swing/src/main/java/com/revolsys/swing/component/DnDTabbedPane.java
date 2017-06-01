@@ -277,14 +277,12 @@ public class DnDTabbedPane extends TabbedPane {
         }
 
         /*
-         * Point tabPt = e.getLocation();
-         * SwingUtilities.convertPointFromScreen(tabPt, DnDTabbedPane.this); if
-         * (DnDTabbedPane.this.contains(tabPt)) { int targetIdx =
+         * Point tabPt = e.getLocation(); SwingUtilities.convertPointFromScreen(tabPt,
+         * DnDTabbedPane.this); if (DnDTabbedPane.this.contains(tabPt)) { int targetIdx =
          * getTargetTabIndex(tabPt); int sourceIndex = data.getTabIndex(); if
-         * (getTabAreaBound().contains(tabPt) && (targetIdx >= 0) && (targetIdx
-         * != sourceIndex) && (targetIdx != sourceIndex + 1)) {
-         * e.getDragSourceContext().setCursor( DragSource.DefaultMoveDrop);
-         * return; } e.getDragSourceContext().setCursor(
+         * (getTabAreaBound().contains(tabPt) && (targetIdx >= 0) && (targetIdx != sourceIndex) &&
+         * (targetIdx != sourceIndex + 1)) { e.getDragSourceContext().setCursor(
+         * DragSource.DefaultMoveDrop); return; } e.getDragSourceContext().setCursor(
          * DragSource.DefaultMoveNoDrop); return; }
          */
 

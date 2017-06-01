@@ -222,9 +222,8 @@ public class ImageInfo {
 
   /*
    * public static final int COLOR_TYPE_UNKNOWN = -1; public static final int
-   * COLOR_TYPE_TRUECOLOR_RGB = 0; public static final int COLOR_TYPE_PALETTED =
-   * 1; public static final int COLOR_TYPE_GRAYSCALE= 2; public static final int
-   * COLOR_TYPE_BLACK_AND_WHITE = 3;
+   * COLOR_TYPE_TRUECOLOR_RGB = 0; public static final int COLOR_TYPE_PALETTED = 1; public static
+   * final int COLOR_TYPE_GRAYSCALE= 2; public static final int COLOR_TYPE_BLACK_AND_WHITE = 3;
    */
 
   /**
@@ -562,9 +561,8 @@ public class ImageInfo {
           flags = a[8] & 0xff;
           this.progressive = (flags & 0x40) != 0;
           /*
-           * int locWidth = getShortLittleEndian(a, 4); int locHeight =
-           * getShortLittleEndian(a, 6); System.out.println("LOCAL: " + locWidth
-           * + " x " + locHeight);
+           * int locWidth = getShortLittleEndian(a, 4); int locHeight = getShortLittleEndian(a, 6);
+           * System.out.println("LOCAL: " + locWidth + " x " + locHeight);
            */
           final int localBitsPerPixel = (flags & 0x07) + 1;
           if (localBitsPerPixel > this.bitsPerPixel) {

@@ -336,14 +336,12 @@ public strictfp final class DD implements Serializable, Comparable, Cloneable {
   private double hi = 0.0;
 
   /*
-   * double getHighComponent() { return hi; } double getLowComponent() { return
-   * lo; }
+   * double getHighComponent() { return hi; } double getLowComponent() { return lo; }
    */
 
   // Testing only - should not be public
   /*
-   * public void RENORM() { double s = hi + lo; double err = lo - (s - hi); hi =
-   * s; lo = err; }
+   * public void RENORM() { double s = hi + lo; double err = lo - (s - hi); hi = s; lo = err; }
    */
 
   /**
@@ -1201,10 +1199,9 @@ public strictfp final class DD implements Serializable, Comparable, Cloneable {
    */
   public DD sqrt() {
     /*
-     * Strategy: Use Karp's trick: if x is an approximation to sqrt(a), then
-     * sqrt(a) = a*x + [a - (a*x)^2] * x / 2 (approx) The approximation is
-     * accurate to twice the accuracy of x. Also, the multiplication (a*x) and
-     * [-]*x can be done with only half the precision.
+     * Strategy: Use Karp's trick: if x is an approximation to sqrt(a), then sqrt(a) = a*x + [a -
+     * (a*x)^2] * x / 2 (approx) The approximation is accurate to twice the accuracy of x. Also, the
+     * multiplication (a*x) and [-]*x can be done with only half the precision.
      */
 
     if (isZero()) {

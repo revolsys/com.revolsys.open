@@ -79,8 +79,8 @@ public class DistanceLineLineStressTest extends TestCase {
       final Point[] seg = randomDisjointCollinearSegments();
       if (0 == LineSegmentUtil.distanceLineLine(seg[0], seg[1], seg[2], seg[3])) {
         /*
-         * System.out.println("FAILED! - " + WKTWriter.toLineString(seg[0],
-         * seg[1]) + "  -  " + WKTWriter.toLineString(seg[2], seg[3]));
+         * System.out.println("FAILED! - " + WKTWriter.toLineString(seg[0], seg[1]) + "  -  " +
+         * WKTWriter.toLineString(seg[2], seg[3]));
          */
         failCount++;
       }

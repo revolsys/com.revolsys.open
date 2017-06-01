@@ -12,6 +12,11 @@ import com.revolsys.geometry.model.Point;
 public class TopologyValidationError extends AbstractGeometryValidationError {
 
   /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Indicates that the interior of a polygon is disjoint
    * (often caused by set of contiguous holes splitting the polygon into two parts)
    */

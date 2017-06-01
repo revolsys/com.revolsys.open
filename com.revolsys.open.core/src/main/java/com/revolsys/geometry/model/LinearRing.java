@@ -220,12 +220,6 @@ public interface LinearRing extends LineString {
   }
 
   @Override
-  default LinearRing newLineStringEmpty() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.linearRing(this);
-  }
-
-  @Override
   default LinearRing newLineString(final double... coordinates) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = getAxisCount();
@@ -237,6 +231,12 @@ public interface LinearRing extends LineString {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = getAxisCount();
     return geometryFactory.linearRing(axisCount, vertexCount, coordinates);
+  }
+
+  @Override
+  default LinearRing newLineStringEmpty() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.linearRing(this);
   }
 
   default Polygon newPolygon() {

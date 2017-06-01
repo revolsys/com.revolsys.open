@@ -57,7 +57,7 @@ public class RestDoclet extends BaseDoclet {
     final String code, final String description) {
     List<String> descriptions = responseCodes.get(code);
     if (descriptions == null) {
-      descriptions = new ArrayList<String>();
+      descriptions = new ArrayList<>();
       responseCodes.put(code, descriptions);
     }
     descriptions.add(description);
@@ -70,7 +70,7 @@ public class RestDoclet extends BaseDoclet {
     this.writer.element(HtmlElem.H1, this.docTitle);
     DocletUtil.description(this.writer, null, this.root);
     for (final PackageDoc packageDoc : this.root.specifiedPackages()) {
-      final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
+      final Map<String, ClassDoc> classes = new TreeMap<>();
       for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
         classes.put(classDoc.name(), classDoc);
       }
@@ -170,7 +170,7 @@ public class RestDoclet extends BaseDoclet {
   }
 
   private void parameters(final MethodDoc method) {
-    final List<Parameter> parameters = new ArrayList<Parameter>();
+    final List<Parameter> parameters = new ArrayList<>();
     for (final Parameter parameter : method.parameters()) {
       final AnnotationDesc[] annotations = parameter.annotations();
       if (DocletUtil.hasAnnotation(annotations,
@@ -286,7 +286,7 @@ public class RestDoclet extends BaseDoclet {
   }
 
   private void responseStatus(final MethodDoc method) {
-    final Map<String, List<String>> responseStatusDescriptions = new TreeMap<String, List<String>>();
+    final Map<String, List<String>> responseStatusDescriptions = new TreeMap<>();
 
     for (final Tag tag : method.tags()) {
       if (tag.name().equals("@web.response.status")) {
@@ -351,7 +351,7 @@ public class RestDoclet extends BaseDoclet {
   }
 
   private void uriTemplateParameters(final MethodDoc method) {
-    final List<Parameter> parameters = new ArrayList<Parameter>();
+    final List<Parameter> parameters = new ArrayList<>();
     for (final Parameter parameter : method.parameters()) {
       if (DocletUtil.hasAnnotation(parameter.annotations(),
         "org.springframework.web.bind.annotation.PathVariable")) {

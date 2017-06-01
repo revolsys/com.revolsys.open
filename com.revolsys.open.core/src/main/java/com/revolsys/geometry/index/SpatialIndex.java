@@ -50,11 +50,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
  */
 public interface SpatialIndex<V> {
   /**
-   * Adds a spatial item with an extent specified by the given {@link BoundingBoxDoubleGf} to the index
-   */
-  void insert(BoundingBox boundingBox, V item);
-
-  /**
    * Queries the index for all items whose extents intersect the given search {@link BoundingBoxDoubleGf}
    * Note that some kinds of indexes may also return objects which do not in fact
    * intersect the query envelope.
@@ -63,6 +58,11 @@ public interface SpatialIndex<V> {
    * @return a list of the items found by the query
    */
   List<V> getItems(BoundingBox searchEnv);
+
+  /**
+   * Adds a spatial item with an extent specified by the given {@link BoundingBoxDoubleGf} to the index
+   */
+  void insert(BoundingBox boundingBox, V item);
 
   // /**
   // * Queries the index for all items whose extents intersect the given search

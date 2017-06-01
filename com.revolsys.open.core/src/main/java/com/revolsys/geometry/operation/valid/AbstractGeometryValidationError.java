@@ -5,6 +5,11 @@ import com.revolsys.geometry.model.Point;
 
 public abstract class AbstractGeometryValidationError extends GeometryValidationError {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final Geometry geometry;
 
   public AbstractGeometryValidationError(final String message, final Geometry geometry) {

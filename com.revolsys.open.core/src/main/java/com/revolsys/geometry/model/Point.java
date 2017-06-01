@@ -334,6 +334,7 @@ public interface Point extends Punctual, Serializable {
    * @param c a point
    * @return the 2-dimensional Euclidean distance between the locations
    */
+  @Override
   default double distancePoint(Point point) {
     if (isEmpty()) {
       return 0;

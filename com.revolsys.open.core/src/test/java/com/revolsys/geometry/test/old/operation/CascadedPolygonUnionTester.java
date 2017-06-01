@@ -51,15 +51,13 @@ public class CascadedPolygonUnionTester {
   }
 
   /*
-   * private void OLDdoTest(String filename, double distanceTolerance) throws
-   * IOException, ParseException { WKTFileReader fileRdr = new
-   * WKTFileReader(filename, wktRdr); List geoms = fileRdr.read();
-   * System.out.println("Computing Iterated union"); Geometry union1 =
-   * unionIterated(geoms); System.out.println("Computing Cascaded union");
-   * Geometry union2 = unionCascaded(geoms); System.out.println(
-   * "Testing similarity with tolerance = " + distanceTolerance); boolean
-   * isSameWithinTolerance = SimilarityValidator.isSimilar(union1, union2,
-   * distanceTolerance); assertTrue(isSameWithinTolerance); }
+   * private void OLDdoTest(String filename, double distanceTolerance) throws IOException,
+   * ParseException { WKTFileReader fileRdr = new WKTFileReader(filename, wktRdr); List geoms =
+   * fileRdr.read(); System.out.println("Computing Iterated union"); Geometry union1 =
+   * unionIterated(geoms); System.out.println("Computing Cascaded union"); Geometry union2 =
+   * unionCascaded(geoms); System.out.println( "Testing similarity with tolerance = " +
+   * distanceTolerance); boolean isSameWithinTolerance = SimilarityValidator.isSimilar(union1,
+   * union2, distanceTolerance); assertTrue(isSameWithinTolerance); }
    */
 
   public Geometry unionCascaded(final Collection geoms) {

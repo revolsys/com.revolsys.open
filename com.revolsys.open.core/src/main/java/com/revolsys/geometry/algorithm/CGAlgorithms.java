@@ -91,8 +91,8 @@ public class CGAlgorithms {
   public static double distancePointLinePerpendicular(final Point p, final Point A, final Point B) {
     // use comp.graphics.algorithms Frequently Asked Questions method
     /*
-     * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) ----------------------------- L^2
-     * Then the distance from C to P = |s|*L.
+     * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) ----------------------------- L^2 Then the distance
+     * from C to P = |s|*L.
      */
     final double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX())
       + (B.getY() - A.getY()) * (B.getY() - A.getY());

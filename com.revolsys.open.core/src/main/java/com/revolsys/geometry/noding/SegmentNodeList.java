@@ -202,8 +202,8 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
       final SegmentNode ei = it.next();
       final SegmentString newEdge = newSplitEdge(eiPrev, ei);
       /*
-       * if (newEdge.size() < 2) throw new RuntimeException(
-       * "created single point edge: " + newEdge.toString());
+       * if (newEdge.size() < 2) throw new RuntimeException( "created single point edge: " +
+       * newEdge.toString());
        */
       edgeList.add(newEdge);
       eiPrev = ei;

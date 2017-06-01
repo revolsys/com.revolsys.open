@@ -344,7 +344,7 @@ public class MeasureOverlay extends AbstractOverlay {
             if (getSnapPoint() == null) {
               point = getPoint(geometryFactory, event);
             } else {
-              point = (Point)getSnapPoint().newGeometry(geometryFactory);
+              point = getSnapPoint().newGeometry(geometryFactory);
             }
             final int[] vertexIndex = location.getVertexId();
             Geometry newGeometry;

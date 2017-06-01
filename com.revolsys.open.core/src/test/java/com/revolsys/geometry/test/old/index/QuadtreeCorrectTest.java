@@ -49,13 +49,11 @@ public class QuadtreeCorrectTest {
   static final double MIN_EXTENT = -1000.0;
 
   /*
-   * public static void testBinaryPower() { printBinaryPower(1004573397.0);
-   * printBinaryPower(100.0); printBinaryPower(0.234);
-   * printBinaryPower(0.000003455); } public static void printBinaryPower(double
-   * num) { BinaryPower pow2 = new BinaryPower(); int exp =
-   * BinaryPower.exponent(num); double p2 = pow2.power(exp);
-   * System.out.println(num + " : pow2 = " + Math.pow(2.0, exp) + "   exp = " +
-   * exp + "   2^exp = " + p2); }
+   * public static void testBinaryPower() { printBinaryPower(1004573397.0); printBinaryPower(100.0);
+   * printBinaryPower(0.234); printBinaryPower(0.000003455); } public static void
+   * printBinaryPower(double num) { BinaryPower pow2 = new BinaryPower(); int exp =
+   * BinaryPower.exponent(num); double p2 = pow2.power(exp); System.out.println(num + " : pow2 = " +
+   * Math.pow(2.0, exp) + "   exp = " + exp + "   2^exp = " + p2); }
    */
   static final int NUM_ITEMS = 2000;
 

@@ -27,7 +27,7 @@ public class BaseDoclet {
   }
 
   public static Map<String, ClassDoc> getClasses(final PackageDoc packageDoc) {
-    final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
+    final Map<String, ClassDoc> classes = new TreeMap<>();
     for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
       classes.put(classDoc.name(), classDoc);
     }
@@ -35,7 +35,7 @@ public class BaseDoclet {
   }
 
   public static Map<String, ClassDoc> getEnums(final PackageDoc packageDoc) {
-    final Map<String, ClassDoc> enums = new TreeMap<String, ClassDoc>();
+    final Map<String, ClassDoc> enums = new TreeMap<>();
     for (final ClassDoc enumDoc : packageDoc.enums()) {
       enums.put(enumDoc.name(), enumDoc);
     }
@@ -43,7 +43,7 @@ public class BaseDoclet {
   }
 
   public static Map<String, ClassDoc> getInterfaces(final PackageDoc packageDoc) {
-    final Map<String, ClassDoc> interfaces = new TreeMap<String, ClassDoc>();
+    final Map<String, ClassDoc> interfaces = new TreeMap<>();
     for (final ClassDoc classDoc : packageDoc.interfaces()) {
       interfaces.put(classDoc.name(), classDoc);
     }

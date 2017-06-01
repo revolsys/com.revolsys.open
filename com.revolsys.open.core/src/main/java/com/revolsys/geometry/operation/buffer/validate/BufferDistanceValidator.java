@@ -232,15 +232,13 @@ public class BufferDistanceValidator {
   }
 
   /*
-   * private void OLDcheckMaximumDistance(Geometry input, Geometry bufCurve,
-   * double maxDist) { BufferCurveMaximumDistanceFinder maxDistFinder = new
-   * BufferCurveMaximumDistanceFinder(input); maxDistanceFound =
-   * maxDistFinder.findDistance(bufCurve); if (maxDistanceFound > maxDist) {
-   * isValid = false; PointPairDistance ptPairDist =
-   * maxDistFinder.getDistancePoints(); errorLocation =
-   * ptPairDist.getCoordinate(1); errMsg =
-   * "Distance between buffer curve and input is too large " + "(" +
-   * ptPairDist.getDistance() + " at " + ptPairDist.toString() +")"; } }
+   * private void OLDcheckMaximumDistance(Geometry input, Geometry bufCurve, double maxDist) {
+   * BufferCurveMaximumDistanceFinder maxDistFinder = new BufferCurveMaximumDistanceFinder(input);
+   * maxDistanceFound = maxDistFinder.findDistance(bufCurve); if (maxDistanceFound > maxDist) {
+   * isValid = false; PointPairDistance ptPairDist = maxDistFinder.getDistancePoints();
+   * errorLocation = ptPairDist.getCoordinate(1); errMsg =
+   * "Distance between buffer curve and input is too large " + "(" + ptPairDist.getDistance() +
+   * " at " + ptPairDist.toString() +")"; } }
    */
 
 }

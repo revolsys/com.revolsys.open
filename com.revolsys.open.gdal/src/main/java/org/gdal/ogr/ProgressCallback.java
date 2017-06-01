@@ -9,38 +9,40 @@
 package org.gdal.ogr;
 
 public class ProgressCallback {
+  protected static long getCPtr(final ProgressCallback obj) {
+    return obj == null ? 0 : obj.swigCPtr;
+  }
+
   private long swigCPtr;
+
   protected boolean swigCMemOwn;
 
-  protected ProgressCallback(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
+  public ProgressCallback() {
+    this(ogrJNI.new_ProgressCallback(), true);
   }
 
-  protected static long getCPtr(ProgressCallback obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
+  protected ProgressCallback(final long cPtr, final boolean cMemoryOwn) {
+    this.swigCMemOwn = cMemoryOwn;
+    this.swigCPtr = cPtr;
   }
 
+  public synchronized void delete() {
+    if (this.swigCPtr != 0) {
+      if (this.swigCMemOwn) {
+        this.swigCMemOwn = false;
+        ogrJNI.delete_ProgressCallback(this.swigCPtr);
+      }
+      this.swigCPtr = 0;
+    }
+  }
+
+  @Override
   protected void finalize() {
     delete();
   }
 
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        ogrJNI.delete_ProgressCallback(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
-  }
-
-  public int run(double dfComplete, String pszMessage) {
-    return ogrJNI.ProgressCallback_run(swigCPtr, this, dfComplete, pszMessage);
-  }
-
-  public ProgressCallback() {
-    this(ogrJNI.new_ProgressCallback(), true);
+  public int run(final double dfComplete, final String pszMessage) {
+    return ogrJNI.ProgressCallback_run(this.swigCPtr, this, dfComplete, pszMessage);
   }
 
 }

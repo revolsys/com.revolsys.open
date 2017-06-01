@@ -170,6 +170,18 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
   }
 
   /**
+   * Returns items whose bounds intersect the given envelope.
+   */
+  @Override
+  public List getItems(final BoundingBox searchEnv) {
+    // Yes this method does something. It specifies that the bounds is an
+    // BoundingBoxDoubleGf. super.query takes an Object, not an
+    // BoundingBoxDoubleGf. [Jon Aquino
+    // 10/24/2003]
+    return super.query(searchEnv);
+  }
+
+  /**
    * Inserts an item having the given bounds into the tree.
    */
   @Override
@@ -225,8 +237,8 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
         // testing - does allowing a tolerance improve speed?
         // Ans: by only about 10% - not enough to matter
         /*
-         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 <
-         * lastComputedDistance) return; //
+         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 < lastComputedDistance)
+         * return; //
          */
 
         /**
@@ -336,18 +348,6 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
       parentBoundables.addAll(newParentBoundablesFromVerticalSlice(verticalSlice, newLevel));
     }
     return parentBoundables;
-  }
-
-  /**
-   * Returns items whose bounds intersect the given envelope.
-   */
-  @Override
-  public List getItems(final BoundingBox searchEnv) {
-    // Yes this method does something. It specifies that the bounds is an
-    // BoundingBoxDoubleGf. super.query takes an Object, not an
-    // BoundingBoxDoubleGf. [Jon Aquino
-    // 10/24/2003]
-    return super.query(searchEnv);
   }
 
   /**

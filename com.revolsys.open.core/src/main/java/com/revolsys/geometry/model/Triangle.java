@@ -56,18 +56,15 @@ public interface Triangle extends LinearRing {
    * @return the circumcentre of the triangle
    */
   /*
-   * // original non-robust algorithm public static Coordinate
-   * circumcentre(Point a, Point b, Point c) { // compute the perpendicular
-   * bisector of chord ab HCoordinate cab = perpendicularBisector(a, b); //
-   * compute the perpendicular bisector of chord bc HCoordinate cbc =
-   * perpendicularBisector(b, c); // compute the intersection of the bisectors
-   * (circle radii) HCoordinate hcc = new HCoordinate(cab, cbc); Point cc =
-   * null; try { cc = new Coordinate(hcc.getX(), hcc.getY()); } catch
-   * (NotRepresentableException ex) { // MD - not sure what we can do to prevent
-   * this (robustness problem) // Idea - can we condition which edges we choose?
-   * throw new IllegalStateException(ex.getMessage()); } //System.out.println(
-   * "Acc = " + a.distance(cc) + ", Bcc = " + b.distance(cc) + ", Ccc = " +
-   * c.distance(cc) ); return cc; }
+   * // original non-robust algorithm public static Coordinate circumcentre(Point a, Point b, Point
+   * c) { // compute the perpendicular bisector of chord ab HCoordinate cab =
+   * perpendicularBisector(a, b); // compute the perpendicular bisector of chord bc HCoordinate cbc
+   * = perpendicularBisector(b, c); // compute the intersection of the bisectors (circle radii)
+   * HCoordinate hcc = new HCoordinate(cab, cbc); Point cc = null; try { cc = new
+   * Coordinate(hcc.getX(), hcc.getY()); } catch (NotRepresentableException ex) { // MD - not sure
+   * what we can do to prevent this (robustness problem) // Idea - can we condition which edges we
+   * choose? throw new IllegalStateException(ex.getMessage()); } //System.out.println( "Acc = " +
+   * a.distance(cc) + ", Bcc = " + b.distance(cc) + ", Ccc = " + c.distance(cc) ); return cc; }
    */
 
   // /**

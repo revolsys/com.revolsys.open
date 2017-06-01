@@ -52,7 +52,7 @@ public class ClientDoclet extends BaseDoclet {
     final String code, final String description) {
     List<String> descriptions = responseCodes.get(code);
     if (descriptions == null) {
-      descriptions = new ArrayList<String>();
+      descriptions = new ArrayList<>();
       responseCodes.put(code, descriptions);
     }
     descriptions.add(description);
@@ -401,7 +401,7 @@ public class ClientDoclet extends BaseDoclet {
   }
 
   private void parameters(final ExecutableMemberDoc method) {
-    final List<Parameter> parameters = new ArrayList<Parameter>();
+    final List<Parameter> parameters = new ArrayList<>();
     for (final Parameter parameter : method.parameters()) {
       parameters.add(parameter);
     }
