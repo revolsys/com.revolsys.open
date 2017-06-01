@@ -85,7 +85,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   private int addRingComplex(final List<LinearRing> rings, final int axisCount,
     final BigDecimal[] elemInfo, final int type, final BigDecimal[] coordinatesArray,
     int elemInfoOffset, final int offset, final long interpretation) {
-    if (interpretation > 1) {
+    if (interpretation > 0) {
       int length = 0;
       for (int part = 0; part < interpretation; part++) {
         elemInfoOffset += 3;
