@@ -46,6 +46,7 @@
   </issueManagement>
 
   <modules>
+    <module>com.revolsys.open.javac</module>
     <module>com.revolsys.open.core</module>
     <module>com.revolsys.open.doclet</module>
     <module>com.revolsys.open.fgdb</module>
