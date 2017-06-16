@@ -122,7 +122,9 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
     if (geometryFactory == null) {
       geometryFactory = schema.getGeometryFactory();
     }
-
+    if (geometryFactory == null) {
+      geometryFactory = GeometryFactory.DEFAULT;
+    }
     DataType dataType = getColumnProperty(schema, typePath, columnName, GEOMETRY_TYPE);
     if (dataType == null) {
       dataType = DataTypes.GEOMETRY;
@@ -136,11 +138,11 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
     if (oracleSrid == -1) {
       oracleSrid = 0;
     }
-    final FieldDefinition attribute = new OracleSdoGeometryJdbcFieldDefinition(dbName, name,
+    final FieldDefinition fieldDefinition = new OracleSdoGeometryJdbcFieldDefinition(dbName, name,
       dataType, sqlType, required, description, null, geometryFactory, axisCount, oracleSrid);
-    recordDefinition.addField(attribute);
-    attribute.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
-    return attribute;
+    recordDefinition.addField(fieldDefinition);
+    fieldDefinition.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+    return fieldDefinition;
 
   }
 

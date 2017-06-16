@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Struct;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -176,8 +177,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final String name = getName();
     final Object value = record.getValue(name);
     if (Property.isEmpty(value)) {
-      final int sqlType = getSqlType();
-      statement.setNull(parameterIndex, sqlType);
+      setNull(statement, parameterIndex);
     } else {
       final Connection connection = statement.getConnection();
       final Struct oracleValue = toSdoGeometry(connection, value, this.axisCount);
@@ -186,12 +186,16 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     return parameterIndex + 1;
   }
 
+  private void setNull(final PreparedStatement statement, final int parameterIndex)
+    throws SQLException {
+    statement.setNull(parameterIndex, Types.STRUCT, "SDO_GEOMETRY");
+  }
+
   @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
     if (Property.isEmpty(value)) {
-      final int sqlType = getSqlType();
-      statement.setNull(parameterIndex, sqlType);
+      setNull(statement, parameterIndex);
     } else {
       final Connection connection = statement.getConnection();
       final Struct oracleValue = toSdoGeometry(connection, value, 2);

@@ -141,12 +141,13 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
   private void close(final Map<JdbcRecordDefinition, String> sqlMap,
     final Map<JdbcRecordDefinition, PreparedStatement> statementMap,
     final Map<JdbcRecordDefinition, Integer> batchCountMap,
-    final Map<JdbcRecordDefinition, List<Record>> recordsByType) {
+    final Map<JdbcRecordDefinition, List<Record>> recordsByType, final boolean hasGeneratedKeys) {
     for (final Entry<JdbcRecordDefinition, PreparedStatement> entry : statementMap.entrySet()) {
       final JdbcRecordDefinition recordDefinition = entry.getKey();
       final PreparedStatement statement = entry.getValue();
       try {
-        processCurrentBatch(recordDefinition, sqlMap, statement, batchCountMap, recordsByType);
+        processCurrentBatch(recordDefinition, sqlMap, statement, batchCountMap, recordsByType,
+          hasGeneratedKeys);
       } catch (final DataAccessException e) {
         if (this.throwExceptions) {
           throw e;
@@ -161,17 +162,21 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
   protected synchronized void closeDo() {
     if (this.recordStore != null) {
       try {
-
         close(this.typeInsertSqlMap, this.typeInsertStatementMap, this.typeInsertBatchCountMap,
-          this.typeInsertRecords);
+          this.typeInsertRecords, false);
+
         close(this.typeInsertSequenceSqlMap, this.typeInsertSequenceStatementMap,
-          this.typeInsertSequenceBatchCountMap, this.typeInsertSequenceRecords);
+          this.typeInsertSequenceBatchCountMap, this.typeInsertSequenceRecords, true);
+
         close(this.typeInsertRowIdSqlMap, this.typeInsertRowIdStatementMap,
-          this.typeInsertRowIdBatchCountMap, this.typeInsertRowIdRecords);
+          this.typeInsertRowIdBatchCountMap, this.typeInsertRowIdRecords, true);
+
         close(this.typeUpdateSqlMap, this.typeUpdateStatementMap, this.typeUpdateBatchCountMap,
-          this.typeUpdateRecords);
+          this.typeUpdateRecords, false);
+
         close(this.typeDeleteSqlMap, this.typeDeleteStatementMap, this.typeDeleteBatchCountMap,
-          this.typeDeleteRecords);
+          this.typeDeleteRecords, false);
+
         if (this.statistics != null) {
           this.statistics.disconnect();
           this.statistics = null;
@@ -235,27 +240,32 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
   @Override
   public synchronized void flush() {
     flush(this.typeInsertSqlMap, this.typeInsertStatementMap, this.typeInsertBatchCountMap,
-      this.typeInsertRecords);
+      this.typeInsertRecords, false);
+
     flush(this.typeInsertSequenceSqlMap, this.typeInsertSequenceStatementMap,
-      this.typeInsertSequenceBatchCountMap, this.typeInsertSequenceRecords);
+      this.typeInsertSequenceBatchCountMap, this.typeInsertSequenceRecords, true);
+
     flush(this.typeInsertRowIdSqlMap, this.typeInsertRowIdStatementMap,
-      this.typeInsertRowIdBatchCountMap, this.typeInsertRowIdRecords);
+      this.typeInsertRowIdBatchCountMap, this.typeInsertRowIdRecords, true);
+
     flush(this.typeUpdateSqlMap, this.typeUpdateStatementMap, this.typeUpdateBatchCountMap,
-      this.typeUpdateRecords);
+      this.typeUpdateRecords, false);
+
     flush(this.typeDeleteSqlMap, this.typeDeleteStatementMap, this.typeDeleteBatchCountMap,
-      this.typeDeleteRecords);
+      this.typeDeleteRecords, false);
   }
 
   private void flush(final Map<JdbcRecordDefinition, String> sqlMap,
     final Map<JdbcRecordDefinition, PreparedStatement> statementMap,
     final Map<JdbcRecordDefinition, Integer> batchCountMap,
-    final Map<JdbcRecordDefinition, List<Record>> recordsByType) {
+    final Map<JdbcRecordDefinition, List<Record>> recordsByType, final boolean hasGeneratedKeys) {
     if (statementMap != null) {
       for (final Entry<JdbcRecordDefinition, PreparedStatement> entry : statementMap.entrySet()) {
         final JdbcRecordDefinition recordDefinition = entry.getKey();
         final PreparedStatement statement = entry.getValue();
         try {
-          processCurrentBatch(recordDefinition, sqlMap, statement, batchCountMap, recordsByType);
+          processCurrentBatch(recordDefinition, sqlMap, statement, batchCountMap, recordsByType,
+            hasGeneratedKeys);
         } catch (final DataAccessException e) {
           if (this.throwExceptions) {
             throw e;
@@ -477,7 +487,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
       insertSetValuesNonId(record, recordDefinition, statement);
 
       insertStatementAddBatch(recordDefinition, record, statement, this.typeInsertRowIdSqlMap,
-        this.typeInsertRowIdBatchCountMap, this.typeInsertRowIdRecords, false);
+        this.typeInsertRowIdBatchCountMap, this.typeInsertRowIdRecords, true);
     }
   }
 
@@ -509,13 +519,14 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
     final Record record, final PreparedStatement statement,
     final Map<JdbcRecordDefinition, String> sqlMap,
     final Map<JdbcRecordDefinition, Integer> countMap,
-    final Map<JdbcRecordDefinition, List<Record>> typeRecords, final boolean generatePrimaryKey)
+    final Map<JdbcRecordDefinition, List<Record>> typeRecords, final boolean hasGeneratedKeys)
     throws SQLException {
     statement.addBatch();
     Maps.addToList(typeRecords, recordDefinition, record);
     final Integer batchCount = Maps.addCount(countMap, recordDefinition);
     if (batchCount >= this.batchSize) {
-      processCurrentBatch(recordDefinition, sqlMap, statement, countMap, typeRecords);
+      processCurrentBatch(recordDefinition, sqlMap, statement, countMap, typeRecords,
+        hasGeneratedKeys);
     }
   }
 
@@ -557,7 +568,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
   private void processCurrentBatch(final JdbcRecordDefinition recordDefinition,
     final Map<JdbcRecordDefinition, String> sqlMap, final PreparedStatement statement,
     final Map<JdbcRecordDefinition, Integer> batchCountMap,
-    final Map<JdbcRecordDefinition, List<Record>> recordsByType) {
+    final Map<JdbcRecordDefinition, List<Record>> recordsByType, final boolean hasGeneratedKeys) {
     Integer batchCount = batchCountMap.get(recordDefinition);
     if (batchCount == null) {
       batchCount = 0;
@@ -572,16 +583,18 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
       this.typeCountMap.put(recordDefinition, typeCount);
       statement.executeBatch();
 
-      final List<Record> records = recordsByType.remove(recordDefinition);
-      if (records != null) {
-        final ResultSet generatedKeyResultSet = statement.getGeneratedKeys();
-        int recordIndex = 0;
-        while (generatedKeyResultSet.next()) {
-          final Record record = records.get(recordIndex++);
-          int columnIndex = 1;
-          for (final FieldDefinition idField : recordDefinition.getIdFields()) {
-            ((JdbcFieldDefinition)idField).setFieldValueFromResultSet(generatedKeyResultSet,
-              columnIndex++, record);
+      if (hasGeneratedKeys) {
+        final List<Record> records = recordsByType.remove(recordDefinition);
+        if (records != null) {
+          final ResultSet generatedKeyResultSet = statement.getGeneratedKeys();
+          int recordIndex = 0;
+          while (generatedKeyResultSet.next()) {
+            final Record record = records.get(recordIndex++);
+            int columnIndex = 1;
+            for (final FieldDefinition idField : recordDefinition.getIdFields()) {
+              ((JdbcFieldDefinition)idField).setFieldValueFromResultSet(generatedKeyResultSet,
+                columnIndex++, record);
+            }
           }
         }
       }
@@ -669,7 +682,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
     final Integer batchCount = Maps.addCount(this.typeUpdateBatchCountMap, recordDefinition);
     if (batchCount >= this.batchSize) {
       processCurrentBatch(recordDefinition, this.typeUpdateSqlMap, statement,
-        this.typeUpdateBatchCountMap, this.typeUpdateRecords);
+        this.typeUpdateBatchCountMap, this.typeUpdateRecords, false);
     }
     this.recordStore.addStatistic("Update", record);
   }
