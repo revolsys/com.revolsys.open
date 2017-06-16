@@ -27,7 +27,11 @@ public class Column implements QueryValue {
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
-    buffer.append(toString());
+    if (this.fieldDefinition == null) {
+      buffer.append(toString());
+    } else {
+      this.fieldDefinition.appendColumnName(buffer, null);
+    }
   }
 
   @Override
@@ -37,7 +41,11 @@ public class Column implements QueryValue {
 
   @Override
   public Column clone() {
-    return new Column(this.name);
+    try {
+      return (Column)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   @Override

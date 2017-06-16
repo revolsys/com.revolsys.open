@@ -18,7 +18,7 @@ public class In extends Condition {
   private CollectionValue values;
 
   public In(final FieldDefinition field, final Collection<? extends Object> values) {
-    this(field.getName(), new CollectionValue(field, values));
+    this(new Column(field), new CollectionValue(field, values));
   }
 
   public In(final QueryValue left, final CollectionValue values) {
@@ -35,10 +35,6 @@ public class In extends Condition {
 
   public In(final String name, final Collection<? extends Object> values) {
     this(new Column(name), new CollectionValue(values));
-  }
-
-  public In(final String name, final CollectionValue values) {
-    this(new Column(name), values);
   }
 
   public In(final String name, final Object... values) {

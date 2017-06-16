@@ -297,6 +297,15 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     }
   }
 
+  private void addIdField(final FieldDefinition fieldDefinition) {
+    fieldDefinition.setIdField(true);
+    final int index = fieldDefinition.getIndex();
+    final String fieldName = fieldDefinition.getName();
+    this.idFieldDefinitionIndexes.add(index);
+    this.idFieldDefinitionNames.add(fieldName);
+    this.idFieldDefinitions.add(fieldDefinition);
+  }
+
   public void addRestriction(final String fieldPath, final Collection<Object> values) {
     this.restrictions.put(fieldPath, values);
   }
@@ -305,6 +314,16 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     if (!this.superClasses.contains(superClass)) {
       this.superClasses.add(superClass);
     }
+  }
+
+  private void clearIdFields() {
+    for (final FieldDefinition fieldDefinition : this.fields) {
+      fieldDefinition.setIdField(false);
+    }
+    this.idFieldDefinitionIndex = -1;
+    this.idFieldDefinitionIndexes.clear();
+    this.idFieldDefinitionNames.clear();
+    this.idFieldDefinitions.clear();
   }
 
   public void cloneProperties(final Map<String, Object> properties) {
@@ -668,6 +687,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
+  public boolean hasIdField() {
+    return !this.idFieldDefinitions.isEmpty();
+  }
+
+  @Override
   public boolean isFieldRequired(final CharSequence name) {
     final FieldDefinition field = getField(name);
     if (field == null) {
@@ -776,13 +800,17 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
    * @param idFieldDefinitionIndex the idFieldDefinitionIndex to set
    */
   public void setIdFieldIndex(final int idFieldDefinitionIndex) {
-    this.idFieldDefinitionIndex = idFieldDefinitionIndex;
-    this.idFieldDefinitionIndexes.clear();
-    this.idFieldDefinitionIndexes.add(idFieldDefinitionIndex);
-    this.idFieldDefinitionNames.clear();
-    this.idFieldDefinitionNames.add(getIdFieldName());
-    this.idFieldDefinitions.clear();
-    this.idFieldDefinitions.add(getIdField());
+    clearIdFields();
+    if (idFieldDefinitionIndex != -1) {
+      final FieldDefinition fieldDefinition = getField(idFieldDefinitionIndex);
+      if (fieldDefinition == null) {
+        throw new ArrayIndexOutOfBoundsException(
+          "Cannot set ID " + getPath() + "[" + idFieldDefinitionIndex + "] does not exist");
+      } else {
+        this.idFieldDefinitionIndex = idFieldDefinitionIndex;
+        addIdField(fieldDefinition);
+      }
+    }
   }
 
   public void setIdFieldName(final String name) {
@@ -791,19 +819,19 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   public void setIdFieldNames(final Collection<String> names) {
+    clearIdFields();
     if (names != null) {
       if (names.size() == 1) {
         final String name = CollectionUtil.get(names, 0);
         setIdFieldName(name);
       } else {
         for (final String name : names) {
-          final int index = getFieldIndex(name);
-          if (index == -1) {
-            Logs.error(this, "Cannot set ID " + getPath() + "." + name + " does not exist");
+          final FieldDefinition fieldDefinition = getField(name);
+          if (fieldDefinition == null) {
+            throw new IllegalArgumentException(
+              "Cannot set ID " + getPath() + "." + name + " does not exist");
           } else {
-            this.idFieldDefinitionIndexes.add(index);
-            this.idFieldDefinitionNames.add(name);
-            this.idFieldDefinitions.add(getField(index));
+            addIdField(fieldDefinition);
           }
         }
       }

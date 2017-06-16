@@ -235,6 +235,10 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     this.geometryFactory = geometryFactory;
   }
 
+  public void setGeometryType(final DataType geometryType) {
+    this.geometryType = geometryType;
+  }
+
   public void setPointXFieldName(final String pointXFieldName) {
     this.pointXFieldName = pointXFieldName;
   }

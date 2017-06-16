@@ -9,10 +9,11 @@ import java.util.Collections;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
 
-public class PostgreSQLOidFiedDefinition extends JdbcFieldDefinition {
+public class PostgreSQLOidFieldDefinition extends JdbcFieldDefinition {
 
-  public PostgreSQLOidFiedDefinition() {
+  public PostgreSQLOidFieldDefinition() {
     super("ctid", "ctid", DataTypes.LONG, Types.OTHER, 0, 0, true, "Row Identifier",
       Collections.emptyMap());
   }
@@ -46,4 +47,14 @@ public class PostgreSQLOidFiedDefinition extends JdbcFieldDefinition {
     statement.setObject(parameterIndex, value);
     return parameterIndex + 1;
   }
+
+  @Override
+  public Object validate(final Record record, final Object value) {
+    if (record.getState() == RecordState.NEW) {
+      return true;
+    } else {
+      return super.validate(record, value);
+    }
+  }
+
 }

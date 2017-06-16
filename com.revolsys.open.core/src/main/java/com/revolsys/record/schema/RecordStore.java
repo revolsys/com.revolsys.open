@@ -319,7 +319,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   int getRecordCount(Query query);
 
-  default RecordDefinition getRecordDefinition(final PathName path) {
+  default <RD extends RecordDefinition> RD getRecordDefinition(final PathName path) {
     if (path == null) {
       return null;
     } else {
@@ -333,15 +333,17 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
-  default RecordDefinition getRecordDefinition(final RecordDefinition objectRecordDefinition) {
+  default <RD extends RecordDefinition> RD getRecordDefinition(
+    final RecordDefinition objectRecordDefinition) {
     final String typePath = objectRecordDefinition.getPath();
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    final RD recordDefinition = getRecordDefinition(typePath);
     return recordDefinition;
   }
 
   @Override
-  default RecordDefinition getRecordDefinition(final String path) {
-    return getRecordDefinition(PathName.newPathName(path));
+  default <RD extends RecordDefinition> RD getRecordDefinition(final String path) {
+    PathName pathName = PathName.newPathName(path);
+    return getRecordDefinition(pathName);
   }
 
   default List<RecordDefinition> getRecordDefinitions(final PathName path) {
@@ -394,14 +396,14 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   String getRecordStoreType();
 
-  RecordStoreSchema getRootSchema();
+  <RSS extends RecordStoreSchema> RSS getRootSchema();
 
-  default RecordStoreSchema getSchema(final PathName pathName) {
+  default <RSS extends RecordStoreSchema> RSS getSchema(final PathName pathName) {
     final RecordStoreSchema rootSchema = getRootSchema();
     return rootSchema.getSchema(pathName);
   }
 
-  default RecordStoreSchema getSchema(final String path) {
+  default <RSS extends RecordStoreSchema> RSS getSchema(final String path) {
     return getSchema(PathName.newPathName(path));
   }
 
@@ -480,6 +482,20 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   default Identifier newPrimaryIdentifier(final PathName typePath) {
     return null;
+  }
+
+  default Query newQuery(final PathName pathName) {
+    final RecordDefinition recordDefinition = getRecordDefinition(pathName);
+    if (recordDefinition == null) {
+      throw new IllegalArgumentException("Cannot find table: " + pathName);
+    } else {
+      return new Query(recordDefinition);
+    }
+  }
+
+  default Query newQuery(final String typeName) {
+    final PathName typePath = PathName.newPathName(typeName);
+    return new Query(typePath);
   }
 
   default Query newQuery(final String typePath, final String whereClause,

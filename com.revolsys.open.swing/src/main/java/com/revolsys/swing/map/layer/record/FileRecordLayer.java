@@ -134,7 +134,7 @@ public class FileRecordLayer extends ListRecordLayer {
         } catch (final Throwable e) {
           Logs.error(this, "Error reading: " + this.resource, e);
         } finally {
-          fireRecordsChanged();
+          refresh();
         }
       } else {
         Logs.error(this, "Cannot find: " + this.url);

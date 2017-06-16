@@ -221,7 +221,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         final RecordStore recordStore = getRecordStore();
         if (recordStore != null && query != null) {
           final Predicate<Record> filter = query.getWhereCondition();
-          final Map<String, Boolean> orderBy = query.getOrderBy();
+          final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
 
           final List<LayerRecord> changedRecords = new ArrayList<>();
           changedRecords.addAll(getRecordsNew());
@@ -240,7 +240,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             for (LayerRecord record : reader.<LayerRecord> i()) {
               boolean write = true;
               final Identifier identifier = getId(record);
-              if (identifier != null) {
+              if (identifier == null) {
+                record = newProxyLayerRecordNoId(record);
+              } else {
                 final LayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
                 if (cachedRecord != null) {
                   record = cachedRecord;
@@ -272,6 +274,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public <R extends LayerRecord> void forEachRecordsPersisted(final Query query,
     final Consumer<? super R> consumer) {
     if (query != null && isExists()) {
@@ -286,7 +289,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             final Identifier identifier = getId(record);
             R proxyRecord = null;
             if (identifier == null) {
-              proxyRecord = newProxyLayerRecord(record);
+              proxyRecord = (R)newProxyLayerRecordNoId(record);
             } else {
               synchronized (getSync()) {
                 final LayerRecord cachedRecord = getCachedRecord(identifier, record, true);
@@ -322,14 +325,14 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   protected <R extends LayerRecord> R getCachedRecord(final Identifier identifier) {
     final RecordDefinition recordDefinition = getInternalRecordDefinition();
-    final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-    if (idFieldNames.isEmpty()) {
-      Logs.error(this, this.typePath + " does not have a primary key");
-      return null;
-    } else {
-      synchronized (getSync()) {
-        LayerRecord record = this.recordsByIdentifier.get(identifier);
-        if (record == null) {
+
+    synchronized (getSync()) {
+      LayerRecord record = this.recordsByIdentifier.get(identifier);
+      if (record == null) {
+        final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+        if (idFieldNames.isEmpty()) {
+          return null;
+        } else {
           final Condition where = getCachedRecordQuery(idFieldNames, identifier);
           final Query query = new Query(recordDefinition, where);
           final RecordStore recordStore = this.recordStore;
@@ -344,8 +347,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             }
           }
         }
-        return (R)record;
       }
+      return (R)record;
     }
   }
 
@@ -615,9 +618,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return records;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public RecordStore getRecordStore() {
-    return this.recordStore;
+  public <RS extends RecordStore> RS getRecordStore() {
+    return (RS)this.recordStore;
   }
 
   @Override
@@ -658,6 +662,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         Logs.error(this, "Cannot find table " + typePath + " for layer " + getPath());
         return false;
       } else {
+        final MapEx recordDefinitionProperties = getProperty("recordDefinitionProperties",
+          MapEx.EMPTY);
+        recordDefinition.setProperties(recordDefinitionProperties);
         setRecordDefinition(recordDefinition);
       }
     }
@@ -674,6 +681,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       }
     }
     return false;
+  }
+
+  @Override
+  public boolean isReadOnly() {
+    return !hasIdField() || super.isReadOnly();
   }
 
   @Override
@@ -799,10 +811,24 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       record = new NewProxyLayerRecord(this, record);
     } else {
       final Identifier identifier = record.getIdentifier();
-      addCachedRecord(identifier, record);
-      record = newProxyLayerRecord(identifier);
+      if (identifier == null) {
+        record = new NoIdProxyLayerRecord(this, record);
+      } else {
+        addCachedRecord(identifier, record);
+        record = newProxyLayerRecord(identifier);
+      }
     }
     return (R)record;
+  }
+
+  protected LayerRecord newProxyLayerRecordNoId(LayerRecord record) {
+    final AbstractProxyLayerRecord proxyRecord = new NoIdProxyLayerRecord(this, record);
+    final Identifier identifier2 = proxyRecord.getIdentifier();
+    if (identifier2 != null) {
+      this.recordsByIdentifier.put(identifier2, (RecordStoreLayerRecord)record);
+    }
+    record = proxyRecord;
+    return record;
   }
 
   protected RecordReader newRecordStoreRecordReader(final Query query) {
@@ -844,29 +870,31 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (codeTable != null) {
       codeTable.refresh();
     }
-    final List<Identifier> identifiers = new ArrayList<>();
-    synchronized (getSync()) {
-      identifiers.addAll(this.recordsByIdentifier.keySet());
-    }
-    if (!identifiers.isEmpty()) {
-      identifiers.sort(Identifier.comparator());
-      final RecordDefinition recordDefinition = recordStore.getRecordDefinition(pathName);
-      final String idFieldName = recordDefinition.getIdFieldName();
-      final int pageSize = 999;
-      final int identifierCount = identifiers.size();
-      for (int i = 0; i < identifiers.size(); i += pageSize) {
-        final List<Identifier> queryIdentifiers = identifiers.subList(i,
-          Math.min(identifierCount, i + pageSize));
-        final In in = Q.in(idFieldName, queryIdentifiers);
-        final Query query = new Query(recordDefinition, in);
-        try (
-          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
-          RecordReader reader = recordStore.getRecords(query)) {
-          for (final Record record : reader) {
-            final Identifier identifier = record.getIdentifier();
-            final RecordStoreLayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
-            if (cachedRecord != null) {
-              cachedRecord.refreshFromRecordStore(record);
+    if (hasIdField()) {
+      final List<Identifier> identifiers = new ArrayList<>();
+      synchronized (getSync()) {
+        identifiers.addAll(this.recordsByIdentifier.keySet());
+      }
+      if (!identifiers.isEmpty()) {
+        identifiers.sort(Identifier.comparator());
+        final RecordDefinition recordDefinition = recordStore.getRecordDefinition(pathName);
+        final FieldDefinition idField = recordDefinition.getIdField();
+        final int pageSize = 999;
+        final int identifierCount = identifiers.size();
+        for (int i = 0; i < identifiers.size(); i += pageSize) {
+          final List<Identifier> queryIdentifiers = identifiers.subList(i,
+            Math.min(identifierCount, i + pageSize));
+          final In in = Q.in(idField, queryIdentifiers);
+          final Query query = new Query(recordDefinition, in);
+          try (
+            Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
+            RecordReader reader = recordStore.getRecords(query)) {
+            for (final Record record : reader) {
+              final Identifier identifier = record.getIdentifier();
+              final RecordStoreLayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
+              if (cachedRecord != null) {
+                cachedRecord.refreshFromRecordStore(record);
+              }
             }
           }
         }

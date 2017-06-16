@@ -35,10 +35,11 @@ public interface MapSerializer {
    * @param name
    * @param value
    */
-  default void addToMap(final Map<String, Object> map, final String name, final Object value) {
+  default void addToMap(final Map<String, Object> map, final CharSequence name,
+    final Object value) {
     final Object mapValue = toMapValue(value);
     if (Property.hasValue(mapValue)) {
-      map.put(name, mapValue);
+      map.put(name.toString(), mapValue);
     } else {
       map.remove(mapValue);
     }
@@ -110,7 +111,7 @@ public interface MapSerializer {
         }
         final MapEx map = new LinkedHashMapEx();
         for (final Entry<String, Object> entry : mapObject.entrySet()) {
-          final String name = entry.getKey();
+          final CharSequence name = entry.getKey();
           final Object object = entry.getValue();
           addToMap(map, name, object);
         }

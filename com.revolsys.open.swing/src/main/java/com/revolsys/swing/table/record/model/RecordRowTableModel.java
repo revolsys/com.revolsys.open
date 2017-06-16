@@ -536,8 +536,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       fieldIndex -= this.fieldsOffset;
       String text;
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final String idFieldName = recordDefinition.getIdFieldName();
-      final String name = getColumnFieldName(fieldIndex);
+      final String fieldName = getColumnFieldName(fieldIndex);
       if (recordValue == null) {
         return null;
       } else {
@@ -546,8 +545,8 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
           return geometry.toString();
         }
         CodeTable codeTable = null;
-        if (!name.equals(idFieldName)) {
-          codeTable = recordDefinition.getCodeTableByFieldName(name);
+        if (!recordDefinition.isIdField(fieldName)) {
+          codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
         }
         if (codeTable == null) {
           text = DataTypes.toString(recordValue);

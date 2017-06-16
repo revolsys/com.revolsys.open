@@ -9,6 +9,7 @@ import java.util.Collections;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
 
 import oracle.sql.ROWID;
 
@@ -16,12 +17,6 @@ public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
   public OracleJdbcRowIdFieldDefinition() {
     super("rowid", "ORACLE_ROWID", DataTypes.STRING, Types.ROWID, 18, 0, true, "Row identifier",
       Collections.emptyMap());
-  }
-
-  @Override
-  public void addColumnName(final StringBuilder sql, final String tablePrefix) {
-    super.addColumnName(sql, tablePrefix);
-    sql.append(" \"ORACLE_ROWID\"");
   }
 
   @Override
@@ -33,6 +28,12 @@ public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
     sql.append("chartorowid(");
     super.addStatementPlaceHolder(sql);
     sql.append(")");
+  }
+
+  @Override
+  public void appendSelectColumnName(final StringBuilder sql, final String tablePrefix) {
+    super.appendSelectColumnName(sql, tablePrefix);
+    sql.append(" \"ORACLE_ROWID\"");
   }
 
   @Override
@@ -64,5 +65,14 @@ public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
       statement.setString(parameterIndex, string);
     }
     return parameterIndex + 1;
+  }
+
+  @Override
+  public Object validate(final Record record, final Object value) {
+    if (record.getState() == RecordState.NEW) {
+      return true;
+    } else {
+      return super.validate(record, value);
+    }
   }
 }

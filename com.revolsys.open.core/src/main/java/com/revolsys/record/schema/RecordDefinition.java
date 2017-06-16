@@ -205,6 +205,8 @@ public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchem
 
   boolean hasGeometryField();
 
+  boolean hasIdField();
+
   boolean isFieldRequired(CharSequence name);
 
   /**

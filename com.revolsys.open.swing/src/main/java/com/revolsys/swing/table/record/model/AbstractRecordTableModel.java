@@ -114,10 +114,9 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
     final Object objectValue) {
     String text;
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final String idFieldName = recordDefinition.getIdFieldName();
-    final String name = getColumnFieldName(attributeIndex);
-    if (objectValue == null || name == null) {
-      if (name.equals(idFieldName)) {
+    final String fieldName = getColumnFieldName(attributeIndex);
+    if (objectValue == null || fieldName == null) {
+      if (recordDefinition.isIdField(fieldName)) {
         return "NEW";
       } else {
         text = "-";
@@ -128,8 +127,8 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
         return geometry.getGeometryType();
       }
       CodeTable codeTable = null;
-      if (!name.equals(idFieldName)) {
-        codeTable = recordDefinition.getCodeTableByFieldName(name);
+      if (!recordDefinition.isIdField(fieldName)) {
+        codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
       }
       if (codeTable == null) {
         text = DataTypes.toString(objectValue);

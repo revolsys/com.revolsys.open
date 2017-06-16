@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
+import com.revolsys.util.Property;
 
 public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   private final int axisCount;
@@ -22,10 +23,10 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   private final int srid;
 
   public PostgreSQLGeometryJdbcFieldDefinition(final String dbName, final String name,
-    final DataType dataType, final boolean required, final String description,
+    final DataType dataType, final int sqlType, final boolean required, final String description,
     final Map<String, Object> properties, final int srid, final int axisCount,
     final GeometryFactory geometryFactory) {
-    super(dbName, name, dataType, -1, 0, 0, required, description, properties);
+    super(dbName, name, dataType, sqlType, 0, 0, required, description, properties);
     this.srid = srid;
     this.geometryFactory = geometryFactory;
     setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
@@ -35,27 +36,29 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   @Override
   public JdbcFieldDefinition clone() {
     return new PostgreSQLGeometryJdbcFieldDefinition(getDbName(), getName(), getDataType(),
-      isRequired(), getDescription(), getProperties(), this.srid, this.axisCount,
+      getSqlType(), isRequired(), getDescription(), getProperties(), this.srid, this.axisCount,
       this.geometryFactory);
   }
 
-  public Object getInsertUpdateValue(final Object object) throws SQLException {
-    if (object == null) {
+  public Object getInsertUpdateValue(final Object value) throws SQLException {
+    if (value == null) {
       return null;
-    } else if (object instanceof Geometry) {
-      final Geometry geometry = (Geometry)object;
+    } else if (value instanceof Geometry) {
+      final Geometry geometry = (Geometry)value;
       if (geometry.isEmpty()) {
         return geometry;
       } else {
         final DataType dataType = getDataType();
         return new PostgreSQLGeometryWrapper(dataType, this.geometryFactory, geometry);
       }
-    } else if (object instanceof BoundingBox) {
-      BoundingBox boundingBox = (BoundingBox)object;
+    } else if (value instanceof BoundingBox) {
+      BoundingBox boundingBox = (BoundingBox)value;
       boundingBox = boundingBox.convert(this.geometryFactory);
       return new PostgreSQLBoundingBoxWrapper(boundingBox);
+    } else if (Property.hasValue(value)) {
+      return value;
     } else {
-      return object;
+      return null;
     }
   }
 

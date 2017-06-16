@@ -195,6 +195,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return this.typePath.getPath();
   }
 
+  public PathName getTypePath() {
+    return this.typePath;
+  }
+
   @Override
   public <V> V getValue(final Object id) {
     if (id instanceof Identifier) {
@@ -255,10 +259,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         try {
           final RecordDefinition recordDefinition = this.recordStore
             .getRecordDefinition(this.typePath);
-          final Query query = new Query(this.typePath);
+          final Query query = new Query(recordDefinition);
           query.setFieldNames(recordDefinition.getFieldNames());
           for (final String order : this.orderBy) {
-            query.addOrderBy(order, true);
+            query.addOrderBy(order);
           }
           try (
             Reader<Record> reader = this.recordStore.getRecords(query)) {

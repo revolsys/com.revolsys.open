@@ -30,6 +30,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.ObjectPropertyException;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -236,8 +237,8 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
       final LayerRecord record = (LayerRecord)source;
       if (this.layer.isLayerRecord(record)) {
         final String fieldName = e.getPropertyName();
-        final int fieldIndex = record.getFieldIndex(fieldName);
-        validateField(record, fieldIndex);
+        final FieldDefinition fieldDefinition = record.getFieldDefinition(fieldName);
+        validateField(record, fieldDefinition);
       }
     }
   }
@@ -296,25 +297,23 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     });
   }
 
-  private boolean validateField(final LayerRecord record, final int fieldIndex) {
-    final String fieldName = record.getFieldName(fieldIndex);
-    if (Property.hasValue(fieldName)) {
-      try {
-        record.validateField(fieldIndex);
-        final int recordIndex = getInvalidRecordIndex(record);
-        if (recordIndex > -1) {
-          final Map<String, String> fieldErrors = this.invalidRecordErrors.get(recordIndex);
-          fieldErrors.remove(fieldName);
-        }
-      } catch (final ObjectPropertyException e) {
-        final String errorMessage = e.getLocalizedMessage();
-        addRecordFieldError(record, fieldName, errorMessage);
-        return false;
-      } catch (final Throwable e) {
-        final String errorMessage = e.getLocalizedMessage();
-        addRecordFieldError(record, fieldName, errorMessage);
-        return false;
+  private boolean validateField(final LayerRecord record, final FieldDefinition fieldDefinition) {
+    final String fieldName = fieldDefinition.getName();
+    try {
+      record.validateField(fieldDefinition);
+      final int recordIndex = getInvalidRecordIndex(record);
+      if (recordIndex > -1) {
+        final Map<String, String> fieldErrors = this.invalidRecordErrors.get(recordIndex);
+        fieldErrors.remove(fieldName);
       }
+    } catch (final ObjectPropertyException e) {
+      final String errorMessage = e.getLocalizedMessage();
+      addRecordFieldError(record, fieldName, errorMessage);
+      return false;
+    } catch (final Throwable e) {
+      final String errorMessage = e.getLocalizedMessage();
+      addRecordFieldError(record, fieldName, errorMessage);
+      return false;
     }
     return true;
   }
@@ -323,9 +322,8 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     if (this.layer.isLayerRecord(record)) {
       boolean valid = true;
       if (!this.layer.isDeleted(record)) {
-        final int fieldCount = record.getFieldCount();
-        for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
-          valid &= validateField(record, fieldIndex);
+        for (final FieldDefinition fieldDefinition : record.getFieldDefinitions()) {
+          valid &= validateField(record, fieldDefinition);
         }
       }
       if (valid && !wasInvalid) {

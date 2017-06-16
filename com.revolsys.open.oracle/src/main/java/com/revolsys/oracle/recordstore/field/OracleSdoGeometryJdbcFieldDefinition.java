@@ -66,22 +66,6 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
   }
 
-  @Override
-  public void addColumnName(final StringBuilder sql, final String tablePrefix) {
-    super.addColumnName(sql, tablePrefix);
-    sql.append(".SDO_GTYPE, ");
-    super.addColumnName(sql, tablePrefix);
-    sql.append(".SDO_POINT.X, ");
-    super.addColumnName(sql, tablePrefix);
-    sql.append(".SDO_POINT.Y, ");
-    super.addColumnName(sql, tablePrefix);
-    sql.append(".SDO_POINT.Z, ");
-    super.addColumnName(sql, tablePrefix);
-    sql.append(".SDO_ELEM_INFO, ");
-    super.addColumnName(sql, tablePrefix);
-    sql.append(".SDO_ORDINATES");
-  }
-
   private int addRingComplex(final List<LinearRing> rings, final int axisCount,
     final BigDecimal[] elemInfo, final int type, final BigDecimal[] coordinatesArray,
     int elemInfoOffset, final int offset, final long interpretation) {
@@ -127,6 +111,22 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         "Unsupported geometry type " + type + " interpretation " + interpretation);
     }
     return elemInfoOffset + 3;
+  }
+
+  @Override
+  public void appendSelectColumnName(final StringBuilder sql, final String tablePrefix) {
+    super.appendSelectColumnName(sql, tablePrefix);
+    sql.append(".SDO_GTYPE, ");
+    super.appendSelectColumnName(sql, tablePrefix);
+    sql.append(".SDO_POINT.X, ");
+    super.appendSelectColumnName(sql, tablePrefix);
+    sql.append(".SDO_POINT.Y, ");
+    super.appendSelectColumnName(sql, tablePrefix);
+    sql.append(".SDO_POINT.Z, ");
+    super.appendSelectColumnName(sql, tablePrefix);
+    sql.append(".SDO_ELEM_INFO, ");
+    super.appendSelectColumnName(sql, tablePrefix);
+    sql.append(".SDO_ORDINATES");
   }
 
   @Override

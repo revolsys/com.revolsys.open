@@ -146,8 +146,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
         final RecordDefinition recordDefinition = getRecordDefinition();
         final FieldDefinition idField = recordDefinition.getIdField();
         if (idField != null) {
-          final String idFieldName = idField.getName();
-          if (fieldName.equals(idFieldName)) {
+          if (recordDefinition.isIdField(fieldName)) {
             if (this.record != null && this.record.getState() == RecordState.NEW) {
               if (!Number.class.isAssignableFrom(idField.getTypeClass())) {
                 return true;
@@ -212,7 +211,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
 
       maxHeight = Math.min(bounds.height, maxHeight);
     }
-    final int preferredHeight = Math.min(maxHeight, (this.getRowCount() + 1) * 20);
+    final int preferredHeight = Math.min(maxHeight, (this.getRowCount() + 1) * 20 + 45);
     tablePanel.setMinimumSize(new Dimension(100, preferredHeight));
     tablePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, maxHeight));
     tablePanel.setPreferredSize(new Dimension(800, preferredHeight));
