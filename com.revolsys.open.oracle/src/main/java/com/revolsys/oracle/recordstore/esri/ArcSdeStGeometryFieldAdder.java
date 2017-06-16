@@ -5,11 +5,11 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.jdbc.io.JdbcRecordDefinition;
+import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.record.schema.RecordStoreSchema;
 
 public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
   private final AbstractJdbcRecordStore recordStore;
@@ -21,13 +21,13 @@ public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
 
   @Override
   public FieldDefinition addField(final AbstractJdbcRecordStore recordStore,
-    final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
+    final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
     final String dataTypeName, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final RecordStoreSchema schema = recordDefinition.getSchema();
+    final JdbcRecordStoreSchema schema = recordDefinition.getSchema();
     final PathName typePath = recordDefinition.getPathName();
-    final String owner = this.recordStore.getDatabaseSchemaName(schema);
-    final String tableName = this.recordStore.getDatabaseTableName(typePath);
+    final String owner = schema.getDbName();
+    final String tableName = recordDefinition.getDbTableName();
     final String columnName = name.toUpperCase();
     final int esriSrid = JdbcFieldAdder.getIntegerColumnProperty(schema, typePath, columnName,
       ArcSdeConstants.ESRI_SRID_PROPERTY);

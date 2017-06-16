@@ -127,7 +127,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   @Override
   public void exportRecords(final Query query, final Object target) {
     final Condition filter = query.getWhereCondition();
-    final Map<String, Boolean> orderBy = query.getOrderBy();
+    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
     final AbstractRecordLayer layer = getLayer();
     final Iterable<LayerRecord> records = new ListByIndexIterator<>(this.records);
     layer.exportRecords(records, filter, orderBy, target);
@@ -146,7 +146,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   @Override
   public void forEachRecord(final Query query, final Consumer<? super LayerRecord> action) {
     final Condition filter = query.getWhereCondition();
-    final Map<String, Boolean> orderBy = query.getOrderBy();
+    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
     final AbstractRecordLayer layer = getLayer();
     final Iterable<LayerRecord> records = new ListByIndexIterator<>(this.records);
     layer.forEachRecord(records, filter, orderBy, action);

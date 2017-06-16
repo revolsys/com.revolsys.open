@@ -59,6 +59,7 @@ import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.query.functions.F;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -82,7 +83,7 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(16, 16));
 
-  private final String displayFieldName;
+  private final FieldDefinition displayField;
 
   private final ThreadBooleanValue eventsEnabled = new ThreadBooleanValue(true);
 
@@ -113,13 +114,13 @@ public abstract class AbstractRecordQueryField extends ValueField
   private final PathName typePath;
 
   public AbstractRecordQueryField(final String fieldName, final PathName typePath,
-    final String displayFieldName) {
+    final FieldDefinition displayField) {
     super(fieldName, null);
     this.typePath = typePath;
-    this.displayFieldName = displayFieldName;
+    this.displayField = displayField;
     this.queries = Arrays.asList(
-      new Query(typePath, new Equal(F.upper(displayFieldName), new Value(null))),
-      new Query(typePath, Q.iLike(displayFieldName, "")));
+      new Query(typePath, new Equal(F.upper(displayField), new Value(null))),
+      new Query(typePath, Q.iLike(displayField, "")));
 
     final Document document = this.searchField.getDocument();
     document.addDocumentListener(this);
@@ -136,7 +137,7 @@ public abstract class AbstractRecordQueryField extends ValueField
     this.menu.add(this.oldValueItem, BorderLayout.NORTH);
 
     this.list = new JXList(this.listModel);
-    this.list.setCellRenderer(new RecordListCellRenderer(displayFieldName));
+    this.list.setCellRenderer(new RecordListCellRenderer(displayField.getName()));
     this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.list.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
     this.list.addMouseListener(this);
@@ -209,7 +210,7 @@ public abstract class AbstractRecordQueryField extends ValueField
   }
 
   public String getDisplayFieldName() {
-    return this.displayFieldName;
+    return this.displayField.getName();
   }
 
   protected String getDisplayText(final Identifier identifier) {
@@ -224,7 +225,7 @@ public abstract class AbstractRecordQueryField extends ValueField
           try {
             final Record record = getRecord(identifier);
             if (record != null) {
-              displayText = record.getString(this.displayFieldName);
+              displayText = record.getString(this.displayField);
             }
           } catch (final Exception e) {
           }
@@ -292,7 +293,7 @@ public abstract class AbstractRecordQueryField extends ValueField
   public boolean isHighlighted(final Component renderer, final ComponentAdapter adapter) {
     final Record object = this.listModel.getElementAt(adapter.row);
     final String text = this.searchField.getText();
-    final String value = object.getString(this.displayFieldName);
+    final String value = object.getString(this.displayField);
     if (DataType.equal(text, value)) {
       return true;
     } else {
@@ -391,8 +392,8 @@ public abstract class AbstractRecordQueryField extends ValueField
       final Map<String, Record> allRecords = new TreeMap<>();
       for (Query query : this.queries) {
         if (allRecords.size() < this.maxResults) {
-          query = query.clone();
-          query.addOrderBy(this.displayFieldName, true);
+          query = query.clone()//
+            .addOrderBy(this.displayField);
           final Condition whereCondition = query.getWhereCondition();
           if (whereCondition instanceof BinaryCondition) {
             final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
@@ -408,7 +409,7 @@ public abstract class AbstractRecordQueryField extends ValueField
           final List<Record> records = getRecords(query);
           for (final Record record : records) {
             if (allRecords.size() < this.maxResults) {
-              final String key = record.getString(this.displayFieldName);
+              final String key = record.getString(this.displayField);
               if (!allRecords.containsKey(key)) {
                 if (queryText.equals(key)) {
                   selectedRecord = record;
@@ -576,7 +577,7 @@ public abstract class AbstractRecordQueryField extends ValueField
         if (record != null) {
           setSelectedRecord(record);
           final Identifier identifier = record.getIdentifier();
-          final String label = record.getString(this.displayFieldName);
+          final String label = record.getString(this.displayField);
           this.idToDisplayMap.put(identifier, label);
           if (!DataType.equal(label, this.searchField.getText())) {
             this.searchField.setFieldValue(label);

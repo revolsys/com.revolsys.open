@@ -105,8 +105,8 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private void loadAreas() throws IOException {
-    final Query query = new Query("/public/epsg_area");
-    query.addOrderBy("area_code", true);
+    final Query query = new Query("/public/epsg_area") //
+      .setOrderBy("area_code");
     final Reader<Record> reader = this.recordStore.getRecords(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/area.csv");
@@ -133,9 +133,8 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadCoordinateAxises() throws IOException {
     final Map<Integer, String> coordinateAxisNames = loadCoordinateAxisNames();
     final Map<Integer, List<Axis>> coordinateAxises = new HashMap<>();
-    final Query query = new Query("/public/epsg_coordinateaxis");
-    query.addOrderBy("coord_sys_code", true);
-    query.addOrderBy("coord_axis_order", true);
+    final Query query = new Query("/public/epsg_coordinateaxis") //
+      .setOrderByFieldNames("coord_sys_code", "coord_axis_order");
     final Reader<Record> reader = this.recordStore.getRecords(query);
 
     try {
@@ -271,8 +270,8 @@ public final class EpsgCoordinateSystemsLoader {
   private Map<Integer, Integer> loadCoordinateOperations() {
 
     final Map<Integer, Integer> coordinateOperationMethods = new HashMap<>();
-    final Query query = new Query("/public/epsg_coordoperation");
-    query.addOrderBy("coord_op_code", true);
+    final Query query = new Query("/public/epsg_coordoperation") //
+      .setOrderBy("coord_op_code");
     final Reader<Record> reader = this.recordStore.getRecords(query);
     try {
       for (final Record object : reader) {
@@ -288,8 +287,8 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private void loadDatums() throws IOException {
-    final Query query = new Query("/public/epsg_datum");
-    query.addOrderBy("datum_code", true);
+    final Query query = new Query("/public/epsg_datum") //
+      .setOrderBy("datum_code");
     final Reader<Record> reader = this.recordStore.getRecords(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/datum.csv");
@@ -346,8 +345,8 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private void loadPrimeMeridians() throws IOException {
-    final Query query = new Query("/public/epsg_primemeridian");
-    query.addOrderBy("prime_meridian_code", true);
+    final Query query = new Query("/public/epsg_primemeridian") //
+      .setOrderBy("prime_meridian_code");
     final Reader<Record> reader = this.recordStore.getRecords(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/primemeridian.csv");
@@ -419,8 +418,8 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private void loadSpheroids() throws IOException {
-    final Query query = new Query("/public/epsg_ellipsoid");
-    query.addOrderBy("ellipsoid_code", true);
+    final Query query = new Query("/public/epsg_ellipsoid") //
+      .setOrderBy("ellipsoid_code");
     final Reader<Record> reader = this.recordStore.getRecords(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/spheroid.csv");
@@ -450,8 +449,8 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private void loadUnits() throws IOException {
-    final Query query = new Query("/public/epsg_unitofmeasure");
-    query.addOrderBy("uom_code", true);
+    final Query query = new Query("/public/epsg_unitofmeasure") //
+      .setOrderBy("uom_code");
     final Reader<Record> reader = this.recordStore.getRecords(query);
     final File linearFile = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/linearunit.csv");

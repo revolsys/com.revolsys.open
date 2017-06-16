@@ -57,18 +57,19 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private final Set<RecordStoreExtension> recordStoreExtensions = new LinkedHashSet<>();
 
-  private final RecordStoreSchema rootSchema = new RecordStoreSchema(this);
+  private final RecordStoreSchema rootSchema;
 
   private final CategoryLabelCountMap statistics = new CategoryLabelCountMap();
 
   private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<>();
 
-  public AbstractRecordStore() {
+  protected AbstractRecordStore() {
     this(ArrayRecord.FACTORY);
   }
 
-  public AbstractRecordStore(final RecordFactory<? extends Record> recordFactory) {
+  protected AbstractRecordStore(final RecordFactory<? extends Record> recordFactory) {
     setRecordFactory(recordFactory);
+    this.rootSchema = newRootSchema();
   }
 
   @Override
@@ -103,10 +104,9 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
         addCodeTableFieldNames(childSchema, codeTable, codeTableFieldName);
       }
       for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
-        final String idFieldName = recordDefinition.getIdFieldName();
         for (final FieldDefinition field : recordDefinition.getFields()) {
           final String fieldName = field.getName();
-          if (!fieldName.equals(idFieldName) && fieldName.equals(codeTableFieldName)) {
+          if (!recordDefinition.isIdField(fieldName) && fieldName.equals(codeTableFieldName)) {
             field.setCodeTable(codeTable);
           }
         }
@@ -233,9 +233,10 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     return this.recordStoreExtensions;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public RecordStoreSchema getRootSchema() {
-    return this.rootSchema;
+  public <RSS extends RecordStoreSchema> RSS getRootSchema() {
+    return (RSS)this.rootSchema;
   }
 
   @Override
@@ -260,10 +261,9 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   protected void initRecordDefinition(final RecordDefinition recordDefinition) {
-    final String idFieldName = recordDefinition.getIdFieldName();
     for (final FieldDefinition field : recordDefinition.getFields()) {
       final String fieldName = field.getName();
-      if (!fieldName.equals(idFieldName)) {
+      if (!recordDefinition.isIdField(fieldName)) {
         final CodeTable codeTable = getCodeTableByFieldName(fieldName);
         if (codeTable != null) {
           field.setCodeTable(codeTable);
@@ -280,6 +280,10 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public boolean isLoadFullSchema() {
     return this.loadFullSchema;
+  }
+
+  protected RecordStoreSchema newRootSchema() {
+    return new RecordStoreSchema(this);
   }
 
   protected void obtainConnected() {

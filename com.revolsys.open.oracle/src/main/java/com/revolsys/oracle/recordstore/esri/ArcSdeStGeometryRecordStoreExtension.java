@@ -11,6 +11,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
+import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.logging.Logs;
 import com.revolsys.oracle.recordstore.OracleRecordStore;
 import com.revolsys.record.io.RecordStoreExtension;
@@ -146,12 +147,13 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
 
   @Override
   public void preProcess(final RecordStoreSchema schema) {
+    final JdbcRecordStoreSchema jdbcSchema = (JdbcRecordStoreSchema)schema;
     final RecordStore recordStore = schema.getRecordStore();
     final OracleRecordStore oracleRecordStore = (OracleRecordStore)recordStore;
     try {
       try (
         final Connection connection = oracleRecordStore.getJdbcConnection()) {
-        final String schemaName = oracleRecordStore.getDatabaseSchemaName(schema);
+        final String schemaName = jdbcSchema.getDbName();
         loadTableProperties(connection, schema, schemaName);
         loadColumnProperties(schema, schemaName, connection);
       }

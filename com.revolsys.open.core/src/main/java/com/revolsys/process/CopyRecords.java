@@ -69,7 +69,7 @@ public class CopyRecords extends AbstractProcess {
   @Override
   public void run() {
     try {
-      final Query query = new Query(this.typePath);
+      final Query query = this.sourceRecordStore.newQuery(this.typePath);
       query.setOrderBy(this.orderBy);
 
       try (

@@ -71,6 +71,10 @@ public class F {
     return new RegexpReplace(value, pattern, replace, flags);
   }
 
+  public static Upper upper(final FieldDefinition fieldDefinition) {
+    return upper(new Column(fieldDefinition));
+  }
+
   public static Upper upper(final QueryValue value) {
     return new Upper(value);
   }

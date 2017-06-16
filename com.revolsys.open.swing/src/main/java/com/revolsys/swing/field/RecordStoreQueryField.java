@@ -32,7 +32,8 @@ public class RecordStoreQueryField extends AbstractRecordQueryField {
 
   public RecordStoreQueryField(final String fieldName, final RecordStore recordStore,
     final PathName typePath, final String displayFieldName) {
-    super(fieldName, typePath, displayFieldName);
+    super(fieldName, typePath,
+      recordStore.getRecordDefinition(typePath).getFieldDefinition(displayFieldName));
     this.recordStore = recordStore;
     this.recordDefinition = recordStore.getRecordDefinition(typePath);
   }

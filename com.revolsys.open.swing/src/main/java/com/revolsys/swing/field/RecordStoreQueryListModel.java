@@ -93,7 +93,7 @@ public class RecordStoreQueryListModel implements ListModel {
       for (Query query : this.queries) {
         if (allObjects.size() < this.maxResults) {
           query = query.clone();
-          query.addOrderBy(this.displayFieldName, true);
+          query.setOrderBy(this.displayFieldName);
           final Condition whereCondition = query.getWhereCondition();
           if (whereCondition instanceof BinaryCondition) {
             final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;

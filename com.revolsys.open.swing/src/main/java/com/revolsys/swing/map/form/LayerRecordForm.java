@@ -1548,8 +1548,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
       if (requiredFieldNames.contains(fieldName)) {
         boolean run = true;
         if (this.record.getState() == RecordState.NEW) {
-          final String idFieldName = getRecordDefinition().getIdFieldName();
-          if (fieldName.equals(idFieldName)) {
+          final RecordDefinition recordDefinition2 = getRecordDefinition();
+          if (this.recordDefinition.isIdField(fieldName)) {
             run = false;
           }
         }

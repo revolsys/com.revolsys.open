@@ -379,7 +379,7 @@ public class RecordLayerTablePanel extends TablePanel
     final Object orderBy = config.get("orderBy");
     if (orderBy instanceof Map) {
       @SuppressWarnings("unchecked")
-      final Map<String, Boolean> order = (Map<String, Boolean>)orderBy;
+      final Map<CharSequence, Boolean> order = (Map<CharSequence, Boolean>)orderBy;
       this.tableModel.setOrderBy(order);
     }
     final String tableRecordsMode = Maps.getString(config, "fieldFilterMode");

@@ -191,7 +191,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public List<LayerRecord> getRecordsPersisted(final Query query) {
     final List<LayerRecord> records = getRecords();
     final Condition filter = query.getWhereCondition();
-    final Map<String, Boolean> orderBy = query.getOrderBy();
+    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
     Records.filterAndSort(records, filter, orderBy);
     return records;
   }

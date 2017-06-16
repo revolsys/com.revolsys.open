@@ -52,7 +52,7 @@ public final class JdbcUtils {
         sql.append(", ");
       }
       final FieldDefinition fieldDefinition = recordDefinition.getField(i);
-      addFieldName(sql, tablePrefix, fieldDefinition);
+      addSelectColumnName(sql, tablePrefix, fieldDefinition);
     }
   }
 
@@ -67,40 +67,46 @@ public final class JdbcUtils {
       if (attribute == null) {
         sql.append(fieldName);
       } else {
-        addFieldName(sql, tablePrefix, attribute);
+        addSelectColumnName(sql, tablePrefix, attribute);
       }
       hasColumns = true;
     }
   }
 
-  public static void addFieldName(final StringBuilder sql, final String tablePrefix,
-    final FieldDefinition fieldDefinition) {
-    if (fieldDefinition instanceof JdbcFieldDefinition) {
-      final JdbcFieldDefinition jdbcFieldDefinition = (JdbcFieldDefinition)fieldDefinition;
-      jdbcFieldDefinition.addColumnName(sql, tablePrefix);
-    } else {
-      sql.append(fieldDefinition.getName());
-    }
-  }
-
-  public static void addOrderBy(final StringBuilder sql, final Map<String, Boolean> orderBy) {
+  public static void addOrderBy(final StringBuilder sql,
+    final Map<? extends CharSequence, Boolean> orderBy) {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
       appendOrderByFields(sql, orderBy);
     }
   }
 
+  public static void addSelectColumnName(final StringBuilder sql, final String tablePrefix,
+    final FieldDefinition fieldDefinition) {
+    if (fieldDefinition instanceof JdbcFieldDefinition) {
+      final JdbcFieldDefinition jdbcFieldDefinition = (JdbcFieldDefinition)fieldDefinition;
+      jdbcFieldDefinition.appendSelectColumnName(sql, tablePrefix);
+    } else {
+      sql.append(fieldDefinition.getName());
+    }
+  }
+
   public static StringBuilder appendOrderByFields(final StringBuilder sql,
-    final Map<String, Boolean> orderBy) {
+    final Map<? extends CharSequence, Boolean> orderBy) {
     boolean first = true;
-    for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+    for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
       if (first) {
         first = false;
       } else {
         sql.append(", ");
       }
-      final String column = entry.getKey();
-      sql.append(column);
+      final CharSequence fieldName = entry.getKey();
+      if (fieldName instanceof FieldDefinition) {
+        final FieldDefinition fieldDefinition = (FieldDefinition)fieldName;
+        fieldDefinition.appendColumnName(sql);
+      } else {
+        sql.append(fieldName);
+      }
       final Boolean ascending = entry.getValue();
       if (!ascending) {
         sql.append(" DESC");
@@ -309,7 +315,7 @@ public final class JdbcUtils {
     final String dbTableName = getQualifiedTableName(tableName);
 
     String sql = query.getSql();
-    final Map<String, Boolean> orderBy = query.getOrderBy();
+    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
     RecordDefinition recordDefinition = query.getRecordDefinition();
     if (sql == null) {
       if (recordDefinition == null) {
@@ -380,7 +386,8 @@ public final class JdbcUtils {
 
   public static String newSelectSql(final RecordDefinition recordDefinition,
     final String tablePrefix, final String fromClause, final boolean lockResults,
-    final List<String> fieldNames, final Query query, final Map<String, Boolean> orderBy) {
+    final List<String> fieldNames, final Query query,
+    final Map<? extends CharSequence, Boolean> orderBy) {
     final String typePath = recordDefinition.getPath();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");

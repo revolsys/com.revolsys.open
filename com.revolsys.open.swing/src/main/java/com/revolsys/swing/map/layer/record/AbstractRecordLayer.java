@@ -829,7 +829,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void exportRecords(final Iterable<LayerRecord> records,
-    final Predicate<? super LayerRecord> filter, final Map<String, Boolean> orderBy,
+    final Predicate<? super LayerRecord> filter, final Map<? extends CharSequence, Boolean> orderBy,
     final Object target) {
     if (Property.hasValue(records) && target != null) {
       final List<LayerRecord> exportRecords = Lists.toArray(records);
@@ -882,7 +882,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void forEachRecord(final Iterable<LayerRecord> records,
-    final Predicate<? super LayerRecord> filter, final Map<String, Boolean> orderBy,
+    final Predicate<? super LayerRecord> filter, final Map<? extends CharSequence, Boolean> orderBy,
     final Consumer<? super LayerRecord> action) {
     try {
       if (Property.hasValue(records) && action != null) {
@@ -1078,12 +1078,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public BoundingBox getHighlightedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
-    for (final Record record : getHighlightedRecords()) {
-      final Geometry geometry = record.getGeometry();
-      boundingBox = boundingBox.expandToInclude(geometry);
+    if (geometryFactory == null) {
+      return BoundingBox.empty();
+    } else {
+      BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
+      for (final Record record : getHighlightedRecords()) {
+        final Geometry geometry = record.getGeometry();
+        boundingBox = boundingBox.expandToInclude(geometry);
+      }
+      return boundingBox;
     }
-    return boundingBox;
   }
 
   public int getHighlightedCount() {
@@ -2012,7 +2016,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       synchronized (getSync()) {
         final Collection<LayerRecord> cachedRecords = this.recordsByCacheId.get(cacheId);
         if (cachedRecords != null) {
-          return cachedRecords.contains(record);
+          return record.contains(cachedRecords);
         }
       }
     }
@@ -2921,11 +2925,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void setSelectedRecordsById(final Identifier id) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition != null) {
-      final String idFieldName = recordDefinition.getIdFieldName();
-      if (idFieldName == null) {
+      final FieldDefinition idField = recordDefinition.getIdField();
+      if (idField == null) {
         clearSelectedRecords();
       } else {
-        final Query query = Query.equal(recordDefinition, idFieldName, id);
+        final Query query = Query.where(Q::equal, idField, id);
         setSelectedRecords(query);
       }
     }

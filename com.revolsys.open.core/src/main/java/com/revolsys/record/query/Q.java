@@ -110,6 +110,11 @@ public class Q {
     return equal(name, valueCondition);
   }
 
+  public static Equal equal(final FieldDefinition field, final QueryValue right) {
+    final Column leftCondition = new Column(field);
+    return new Equal(leftCondition, right);
+  }
+
   public static Equal equal(final QueryValue left, final Object value) {
     final Value valueCondition = new Value(value);
     return new Equal(left, valueCondition);

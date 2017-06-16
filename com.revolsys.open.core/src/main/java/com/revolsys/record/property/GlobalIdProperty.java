@@ -1,13 +1,16 @@
 package com.revolsys.record.property;
 
+import java.util.UUID;
+
+import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
   static final String PROPERTY_NAME = "http://revolsys.com/gis/globalId";
 
-  public static GlobalIdProperty getProperty(final Record object) {
-    final RecordDefinition recordDefinition = object.getRecordDefinition();
+  public static GlobalIdProperty getProperty(final Record record) {
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
     return getProperty(recordDefinition);
   }
 
@@ -17,6 +20,19 @@ public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
     } else {
       return recordDefinition.getProperty(PROPERTY_NAME);
     }
+  }
+
+  public static Identifier setIdentifier(final Record record) {
+    final GlobalIdProperty globalIdProperty = getProperty(record);
+    if (globalIdProperty != null) {
+      final String globalIdFieldName = globalIdProperty.getFieldName();
+      if (!record.hasValue(globalIdFieldName)) {
+        final String id = UUID.randomUUID().toString();
+        record.setValue(globalIdFieldName, id);
+        return Identifier.newIdentifier(id);
+      }
+    }
+    return null;
   }
 
   private String fieldName;

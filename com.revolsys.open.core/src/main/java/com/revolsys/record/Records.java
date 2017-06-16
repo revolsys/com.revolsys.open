@@ -183,7 +183,7 @@ public interface Records {
    * @param orderBy
    */
   static <V extends Record> void filterAndSort(final List<V> records,
-    final Predicate<? super V> filter, final Map<String, Boolean> orderBy) {
+    final Predicate<? super V> filter, final Map<? extends CharSequence, Boolean> orderBy) {
     // Filter records
     if (!Property.isEmpty(filter)) {
       Predicates.retain(records, filter);
@@ -461,14 +461,15 @@ public interface Records {
     };
   }
 
-  static <R extends Record> Comparator<R> newComparatorOrderBy(final Map<String, Boolean> orderBy) {
+  static <R extends Record> Comparator<R> newComparatorOrderBy(
+    final Map<? extends CharSequence, Boolean> orderBy) {
     return (record1, record2) -> {
       if (record1 == record2) {
         return 0;
       } else {
         if (Property.hasValue(orderBy)) {
-          for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
-            final String fieldName = entry.getKey();
+          for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
+            final CharSequence fieldName = entry.getKey();
             final Boolean ascending = entry.getValue();
             final Object value1 = record1.getValue(fieldName);
             final Object value2 = record2.getValue(fieldName);
@@ -490,14 +491,14 @@ public interface Records {
   }
 
   static <R extends Record> Comparator<R> newComparatorOrderByIdentifier(
-    final Map<String, Boolean> orderBy) {
+    final Map<? extends CharSequence, Boolean> orderBy) {
     return (record1, record2) -> {
       if (record1 == record2) {
         return 0;
       } else {
         if (Property.hasValue(orderBy)) {
-          for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
-            final String fieldName = entry.getKey();
+          for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
+            final CharSequence fieldName = entry.getKey();
             final Boolean ascending = entry.getValue();
             final Object value1 = record1.getValue(fieldName);
             final Object value2 = record2.getValue(fieldName);

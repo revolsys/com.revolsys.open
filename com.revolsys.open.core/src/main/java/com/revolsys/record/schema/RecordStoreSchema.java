@@ -175,10 +175,11 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
     return "folder:table";
   }
 
-  public RecordDefinition getRecordDefinition(final PathName path) {
+  @SuppressWarnings("unchecked")
+  public <RD extends RecordDefinition> RD getRecordDefinition(final PathName path) {
     final RecordStoreSchemaElement element = getElement(path);
     if (element instanceof RecordDefinition) {
-      return (RecordDefinition)element;
+      return (RD)element;
     } else {
       return null;
     }
@@ -200,10 +201,11 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
     }
   }
 
-  public RecordStoreSchema getSchema(final PathName path) {
+  @SuppressWarnings("unchecked")
+  public <RSS extends RecordStoreSchema> RSS getSchema(final PathName path) {
     final RecordStoreSchemaElement element = getElement(path);
     if (element instanceof RecordStoreSchema) {
-      return (RecordStoreSchema)element;
+      return (RSS)element;
     } else {
       return null;
     }
@@ -303,39 +305,42 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
             extension.preProcess(this);
           }
         } catch (final Throwable e) {
-          Logs.error(extension.getClass(), "Unable to pre-process schema " + this, e);
+          Logs.error(extension, "Unable to pre-process schema: " + this, e);
         }
       }
-
-      final Map<PathName, ? extends RecordStoreSchemaElement> elementsByPath = recordStore
-        .refreshSchemaElements(this);
-
-      final Set<PathName> removedPaths = new HashSet<>(this.elementsByPath.keySet());
-      for (final Entry<PathName, ? extends RecordStoreSchemaElement> entry : elementsByPath
-        .entrySet()) {
-        final PathName path = entry.getKey();
-        removedPaths.remove(path);
-        final RecordStoreSchemaElement newElement = entry.getValue();
-        final RecordStoreSchemaElement oldElement = this.elementsByPath.get(path);
-        if (oldElement == null) {
-          addElement(newElement);
-        } else {
-          replaceElement(path, oldElement, newElement);
+      try {
+        final Map<PathName, ? extends RecordStoreSchemaElement> elementsByPath = recordStore
+          .refreshSchemaElements(this);
+        final Set<PathName> removedPaths = new HashSet<>(this.elementsByPath.keySet());
+        for (final Entry<PathName, ? extends RecordStoreSchemaElement> entry : elementsByPath
+          .entrySet()) {
+          final PathName path = entry.getKey();
+          removedPaths.remove(path);
+          final RecordStoreSchemaElement newElement = entry.getValue();
+          final RecordStoreSchemaElement oldElement = this.elementsByPath.get(path);
+          if (oldElement == null) {
+            addElement(newElement);
+          } else {
+            replaceElement(path, oldElement, newElement);
+          }
         }
+        for (final PathName removedPath : removedPaths) {
+          removeElement(removedPath);
+        }
+        for (final RecordDefinition recordDefinition : getRecordDefinitions()) {
+          recordStore.initRecordDefinition(recordDefinition);
+        }
+      } catch (final Throwable e) {
+        Logs.error(this, "Unable to refresh schema: " + this, e);
       }
-      for (final PathName removedPath : removedPaths) {
-        removeElement(removedPath);
-      }
-      for (final RecordDefinition recordDefinition : getRecordDefinitions()) {
-        recordStore.initRecordDefinition(recordDefinition);
-      }
+
       for (final RecordStoreExtension extension : extensions) {
         try {
           if (extension.isEnabled(recordStore)) {
             extension.postProcess(this);
           }
         } catch (final Throwable e) {
-          Logs.error(extension.getClass(), "Unable to post-process schema " + this, e);
+          Logs.error(extension, "Unable to post-process schema: " + this, e);
         }
       }
     }

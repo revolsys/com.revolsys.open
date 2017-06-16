@@ -1110,8 +1110,7 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     String codeTableValueName = null;
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (dotIndex == -1) {
-      final String idFieldName = recordDefinition.getIdFieldName();
-      if (name.equals(idFieldName)) {
+      if (recordDefinition.isIdField(name)) {
         codeTableFieldName = null;
       } else {
         codeTableFieldName = name;
@@ -1241,6 +1240,14 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
   default int size() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getFieldCount();
+  }
+
+  default void validateField(final FieldDefinition field) {
+    if (field != null) {
+      final int index = field.getIndex();
+      final Object value = getValue(index);
+      field.validate(this, value);
+    }
   }
 
   default void validateField(final int fieldIndex) {

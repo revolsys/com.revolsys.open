@@ -468,7 +468,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   protected String getSql(final Query query) {
     final RecordDefinition recordDefinition = query.getRecordDefinition();
     final String typePath = recordDefinition.getPath();
-    final Map<String, Boolean> orderBy = query.getOrderBy();
+    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
 
@@ -487,15 +487,20 @@ public class OgrRecordStore extends AbstractRecordStore {
       sql.append(whereClause);
     }
     boolean first = true;
-    for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
-      final String column = entry.getKey();
+    for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
+      final CharSequence fieldName = entry.getKey();
       if (first) {
         sql.append(" ORDER BY ");
         first = false;
       } else {
         sql.append(", ");
       }
-      sql.append(column);
+      if (fieldName instanceof FieldDefinition) {
+        final FieldDefinition field = (FieldDefinition)fieldName;
+        field.appendColumnName(sql);
+      } else {
+        sql.append(fieldName);
+      }
       final Boolean ascending = entry.getValue();
       if (!ascending) {
         sql.append(" DESC");

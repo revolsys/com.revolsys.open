@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -71,6 +72,15 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return query;
   }
 
+  public static Query equal(final FieldDefinition field, final Object value) {
+    final RecordDefinition recordDefinition = field.getRecordDefinition();
+    final Query query = new Query(recordDefinition);
+    final Value valueCondition = new Value(field, value);
+    final BinaryCondition equal = Q.equal(field, valueCondition);
+    query.setWhereCondition(equal);
+    return query;
+  }
+
   public static Query equal(final RecordDefinitionProxy recordDefinition, final String name,
     final Object value) {
     final FieldDefinition fieldDefinition = recordDefinition.getFieldDefinition(name);
@@ -125,6 +135,17 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return query;
   }
 
+  public static Query where(
+    final BiFunction<FieldDefinition, Object, BinaryCondition> whereFunction,
+    final FieldDefinition field, final Object value) {
+    final RecordDefinition recordDefinition = field.getRecordDefinition();
+    final Query query = new Query(recordDefinition);
+    final Value valueCondition = new Value(field, value);
+    final BinaryCondition equal = whereFunction.apply(field, valueCondition);
+    query.setWhereCondition(equal);
+    return query;
+  }
+
   private Cancellable cancellable;
 
   private RecordFactory<Record> recordFactory;
@@ -139,7 +160,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   private int offset = 0;
 
-  private Map<String, Boolean> orderBy = new HashMap<>();
+  private Map<CharSequence, Boolean> orderBy = new HashMap<>();
 
   private List<Object> parameters = new ArrayList<>();
 
@@ -185,12 +206,36 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this(PathName.newPathName(typePath), whereCondition);
   }
 
-  public Query addOrderBy(final String column) {
-    return addOrderBy(column, true);
+  public Query addOrderBy(final CharSequence field) {
+    return addOrderBy(field, true);
   }
 
-  public Query addOrderBy(final String column, final boolean ascending) {
-    this.orderBy.put(column, ascending);
+  public Query addOrderBy(final CharSequence field, final boolean ascending) {
+    this.orderBy.put(field, ascending);
+    return this;
+  }
+
+  public Query addOrderBy(final String fieldName) {
+    return addOrderBy(fieldName, true);
+  }
+
+  public Query addOrderBy(final String fieldName, final boolean ascending) {
+    if (this.recordDefinition != null) {
+      final FieldDefinition fieldDefinition = this.recordDefinition.getField(fieldName);
+      if (fieldDefinition != null) {
+        return this.addOrderBy(fieldDefinition, ascending);
+      }
+    }
+    this.orderBy.put(fieldName, ascending);
+    return this;
+  }
+
+  public Query addOrderById() {
+    if (this.recordDefinition != null) {
+      for (final FieldDefinition idField : this.recordDefinition.getIdFields()) {
+        addOrderBy(idField);
+      }
+    }
     return this;
   }
 
@@ -206,6 +251,36 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
       setWhereCondition(whereCondition);
     }
     return this;
+  }
+
+  public Query and(final Condition... conditions) {
+    if (conditions != null) {
+      Condition whereCondition = getWhereCondition();
+      for (final Condition condition : conditions) {
+        if (Property.hasValue(condition)) {
+          whereCondition = whereCondition.and(condition);
+        }
+      }
+      setWhereCondition(whereCondition);
+    }
+    return this;
+  }
+
+  public Query and(final Iterable<? extends Condition> conditions) {
+    if (conditions != null) {
+      Condition whereCondition = getWhereCondition();
+      for (final Condition condition : conditions) {
+        if (Property.hasValue(condition)) {
+          whereCondition = whereCondition.and(condition);
+        }
+      }
+      setWhereCondition(whereCondition);
+    }
+    return this;
+  }
+
+  public void clearOrderBy() {
+    this.orderBy.clear();
   }
 
   @Override
@@ -226,9 +301,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   @SuppressWarnings("unchecked")
   public <R extends Record> void forEachRecord(final Iterable<R> records,
     final Consumer<? super R> consumer) {
-    final Map<String, Boolean> orderBy = getOrderBy();
+    final Map<? extends CharSequence, Boolean> orderBy = getOrderBy();
     final Predicate<R> filter = (Predicate<R>)getWhereCondition();
-    if (orderBy == null) {
+    if (orderBy.isEmpty()) {
       if (filter == null) {
         records.forEach(consumer);
       } else {
@@ -271,7 +346,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.offset;
   }
 
-  public Map<String, Boolean> getOrderBy() {
+  public Map<CharSequence, Boolean> getOrderBy() {
     return this.orderBy;
   }
 
@@ -379,20 +454,30 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public Query setOrderBy(final Map<String, Boolean> orderBy) {
+  public Query setOrderBy(final CharSequence field) {
+    this.orderBy.clear();
+    return addOrderBy(field);
+  }
+
+  public Query setOrderBy(final Map<? extends CharSequence, Boolean> orderBy) {
     if (orderBy != this.orderBy) {
       this.orderBy.clear();
       if (orderBy != null) {
+        for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
+          final CharSequence field = entry.getKey();
+          final Boolean ascending = entry.getValue();
+          addOrderBy(field, ascending);
+        }
         this.orderBy.putAll(orderBy);
       }
     }
     return this;
   }
 
-  public Query setOrderByFieldNames(final List<String> orderBy) {
+  public Query setOrderByFieldNames(final List<? extends CharSequence> orderBy) {
     this.orderBy.clear();
-    for (final String column : orderBy) {
-      this.orderBy.put(column, Boolean.TRUE);
+    for (final CharSequence field : orderBy) {
+      addOrderBy(field);
     }
     return this;
   }
@@ -448,7 +533,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   }
 
   public <V extends Record> void sort(final List<V> records) {
-    final Map<String, Boolean> orderBy = getOrderBy();
+    final Map<? extends CharSequence, Boolean> orderBy = getOrderBy();
     if (Property.hasValue(orderBy)) {
       final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
       records.sort(comparator);

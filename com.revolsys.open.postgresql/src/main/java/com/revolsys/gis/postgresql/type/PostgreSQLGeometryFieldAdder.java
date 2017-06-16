@@ -11,10 +11,11 @@ import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.jdbc.io.JdbcRecordDefinition;
+import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.Property;
 
 public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
@@ -38,16 +39,16 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
 
   @Override
   public FieldDefinition addField(final AbstractJdbcRecordStore recordStore,
-    final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
+    final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
     final String dataTypeName, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
+    final JdbcRecordStoreSchema schema = recordDefinition.getSchema();
     final PathName typePath = recordDefinition.getPathName();
-    final PathName schemaPath = typePath.getParent();
-    String dbSchemaName = this.recordStore.getDatabaseSchemaName(schemaPath);
+    String dbSchemaName = schema.getDbName();
     if (!Property.hasValue(dbSchemaName)) {
       dbSchemaName = "public";
     }
-    final String tableName = this.recordStore.getDatabaseTableName(typePath);
+    final String tableName = recordDefinition.getDbTableName();
     final String columnName = name.toLowerCase();
     try {
       int srid = 0;
@@ -74,7 +75,7 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
           storeGeometryFactory.getScaleY(), storeGeometryFactory.getScaleZ());
       }
       final FieldDefinition field = new PostgreSQLGeometryJdbcFieldDefinition(dbName, name,
-        dataType, required, description, null, srid, axisCount, geometryFactory);
+        dataType, sqlType, required, description, null, srid, axisCount, geometryFactory);
       recordDefinition.addField(field);
       field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       return field;
