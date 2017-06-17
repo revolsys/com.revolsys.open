@@ -20,20 +20,18 @@ import org.apache.commons.dbcp2.DelegatingConnection;
 import org.sqlite.core.CoreConnection;
 import org.sqlite.core.DB;
 
-import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.jdbc.io.JdbcRecordDefinition;
+import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 
 public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
-
   private boolean initialized;
 
   public GeoPackageRecordStore(final DataSource dataSource) {
@@ -61,7 +59,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public String getSequenceName(final RecordDefinition recordDefinition) {
+  public String getSequenceName(final JdbcRecordDefinition recordDefinition) {
     return null;
   }
 
@@ -124,40 +122,35 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
+  public PreparedStatement insertStatementPrepareRowId(final JdbcConnection connection,
+    final RecordDefinition recordDefinition, final String sql) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public boolean isSchemaExcluded(final String schemaName) {
     return false;
   }
 
   @Override
   protected Map<PathName, ? extends RecordStoreSchemaElement> refreshSchemaElementsDo(
-    final RecordStoreSchema schema, final PathName schemaPath) {
+    final JdbcRecordStoreSchema schema, final PathName schemaPath) {
     final String schemaName = schema.getPath();
     final Map<String, String> tableDescriptionMap = new HashMap<>();
     final Map<String, List<String>> tablePermissionsMap = new TreeMap<>();
-    loadSchemaTablePermissions("", tablePermissionsMap, tableDescriptionMap);
+    final Map<PathName, JdbcRecordDefinition> recordDefinitionMap = loadRecordDefinitionsPermissions(
+      schema);
 
     final Map<PathName, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
-    final Map<PathName, RecordDefinitionImpl> recordDefinitionMap = new TreeMap<>();
     try {
       try (
         final Connection connection = getJdbcConnection()) {
-        final Set<String> tableNames = tablePermissionsMap.keySet();
-        for (final String dbTableName : tableNames) {
-          final String tableName = dbTableName.toUpperCase();
-          final PathName typePath = schemaPath.newChild(tableName);
-          setDbSchemaAndTableName(typePath, null, dbTableName);
-          final RecordDefinitionImpl recordDefinition = newRecordDefinition(schema, typePath);
-          final String description = tableDescriptionMap.get(dbTableName);
-          recordDefinition.setDescription(description);
-          final List<String> permissions = Maps.get(tablePermissionsMap, dbTableName,
-            DEFAULT_PERMISSIONS);
-          recordDefinition.setProperty("permissions", permissions);
-          recordDefinitionMap.put(typePath, recordDefinition);
+        for (final JdbcRecordDefinition recordDefinition : recordDefinitionMap.values()) {
+          final PathName typePath = recordDefinition.getPathName();
           elementsByPath.put(typePath, recordDefinition);
         }
-        for (final RecordDefinitionImpl recordDefinition : recordDefinitionMap.values()) {
-          final PathName pathName = recordDefinition.getPathName();
-          final String tableName = getDatabaseTableName(pathName);
+        for (final JdbcRecordDefinition recordDefinition : recordDefinitionMap.values()) {
+          final String tableName = recordDefinition.getDbTableName();
           final List<String> idFieldNames = new ArrayList<>();
           try (
             PreparedStatement columnStatement = connection

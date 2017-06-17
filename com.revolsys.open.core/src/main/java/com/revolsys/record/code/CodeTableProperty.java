@@ -418,7 +418,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   public void setFieldAliases(final String... fieldAliases) {
-    setFieldAliases(Lists.newArrayList(fieldAliases));
+    setFieldAliases(Lists.newArray(fieldAliases));
   }
 
   public void setIdFieldName(final String idFieldName) {

@@ -72,7 +72,7 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
     super(geometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize,
       CompactBinaryGriddedElevation.HEADER_SIZE, 4);
     setZBoundsUpdateRequired(false);
-    this.openOptions = Sets.newHashSet(StandardOpenOption.READ, StandardOpenOption.WRITE,
+    this.openOptions = Sets.newHash(StandardOpenOption.READ, StandardOpenOption.WRITE,
       StandardOpenOption.SYNC);
     this.createMissing = true;
     this.path = path;

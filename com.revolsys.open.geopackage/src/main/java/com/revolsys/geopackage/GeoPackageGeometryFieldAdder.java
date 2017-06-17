@@ -11,10 +11,10 @@ import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public class GeoPackageGeometryFieldAdder extends JdbcFieldAdder {
   private static final Map<String, DataType> DATA_TYPE_MAP = new HashMap<>();
@@ -34,11 +34,11 @@ public class GeoPackageGeometryFieldAdder extends JdbcFieldAdder {
 
   @Override
   public FieldDefinition addField(final AbstractJdbcRecordStore recordStore,
-    final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
-    final String dataTypeName, final int sqlType, final int length, final int scale,
+    final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
+    final String columnDataType, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
     final PathName typePath = recordDefinition.getPathName();
-    final String tableName = recordStore.getDatabaseTableName(typePath);
+    final String tableName = recordDefinition.getDbTableName();
     final String columnName = name.toLowerCase();
     try {
       int srid = 0;
