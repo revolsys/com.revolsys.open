@@ -19,6 +19,7 @@ import com.revolsys.geometry.cs.CoordinateSystems;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.StringWriter;
 import com.revolsys.logging.Logs;
@@ -33,23 +34,28 @@ public class EsriCoordinateSystems {
   private static Map<String, CoordinateSystem> coordinateSystemsByName = new HashMap<>();
 
   static {
-    final List<GeographicCoordinateSystem> geographicCoordinateSystems = CoordinateSystemParser
-      .getGeographicCoordinateSystems("ESRI", EsriCoordinateSystems.class
-        .getResourceAsStream("/com/revolsys/gis/cs/esri/geographicCoordinateSystem.txt"));
-    for (final GeographicCoordinateSystem cs : geographicCoordinateSystems) {
-      final int id = getCrsId(cs);
-      coordinateSystemsById.put(id, cs);
-      coordinateSystemsByName.put(cs.getCoordinateSystemName(), cs);
-      coordinateSystems.put(cs, cs);
-    }
-    final List<ProjectedCoordinateSystem> projectedCoordinateSystems = CoordinateSystemParser
-      .getProjectedCoordinateSystems(coordinateSystemsById, "ESRI", EsriCoordinateSystems.class
-        .getResourceAsStream("/com/revolsys/gis/cs/esri/projectedCoordinateSystem.txt"));
-    for (final ProjectedCoordinateSystem cs : projectedCoordinateSystems) {
-      final int id = getCrsId(cs);
-      coordinateSystemsById.put(id, cs);
-      coordinateSystemsByName.put(cs.getCoordinateSystemName(), cs);
-      coordinateSystems.put(cs, cs);
+    try {
+      final List<GeographicCoordinateSystem> geographicCoordinateSystems = CoordinateSystemParser
+        .getGeographicCoordinateSystems("ESRI", EpsgCoordinateSystems.newReader(
+          EsriCoordinateSystems.class, "/com/revolsys/gis/cs/esri/geographicCoordinateSystem.txt"));
+      for (final GeographicCoordinateSystem cs : geographicCoordinateSystems) {
+        final int id = getCrsId(cs);
+        coordinateSystemsById.put(id, cs);
+        coordinateSystemsByName.put(cs.getCoordinateSystemName(), cs);
+        coordinateSystems.put(cs, cs);
+      }
+      final List<ProjectedCoordinateSystem> projectedCoordinateSystems = CoordinateSystemParser
+        .getProjectedCoordinateSystems(coordinateSystemsById, "ESRI",
+          EpsgCoordinateSystems.newReader(EsriCoordinateSystems.class,
+            "/com/revolsys/gis/cs/esri/projectedCoordinateSystem.txt"));
+      for (final ProjectedCoordinateSystem cs : projectedCoordinateSystems) {
+        final int id = getCrsId(cs);
+        coordinateSystemsById.put(id, cs);
+        coordinateSystemsByName.put(cs.getCoordinateSystemName(), cs);
+        coordinateSystems.put(cs, cs);
+      }
+    } catch (final IOException e) {
+      Logs.error(EsriCoordinateSystems.class, e);
     }
   }
 

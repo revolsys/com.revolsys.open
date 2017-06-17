@@ -14,9 +14,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.logging.Logs;
 
 public interface Dates {
   String DATE_TIME_NANOS_PATTERN = "\\s*(\\d{4})-(\\d{2})-(\\d{2})(?:[\\sT]+(\\d{2})\\:(\\d{2})\\:(\\d{2})(?:\\.(\\d{1,9}))?)?\\s*";
+
+  static long debugEllapsedTime(final Class<?> clazz, final String message, final long startTime) {
+    final long endTime = System.currentTimeMillis();
+    final String timeString = toEllapsedTime(startTime, endTime);
+    Logs.debug(clazz, message + "\t" + timeString);
+    return endTime;
+  }
+
+  static long debugEllapsedTime(final Object object, final String message, final long startTime) {
+    final long endTime = System.currentTimeMillis();
+    final String timeString = toEllapsedTime(startTime, endTime);
+    Logs.debug(object, message + "\t" + timeString);
+    return endTime;
+  }
 
   static boolean equalsNotNull(final Object date1, final Object date2) {
     return ((Date)date1).compareTo((Date)date2) == 0;

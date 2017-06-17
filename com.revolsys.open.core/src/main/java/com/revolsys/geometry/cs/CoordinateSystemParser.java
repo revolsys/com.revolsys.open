@@ -2,7 +2,7 @@ package com.revolsys.geometry.cs;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,16 +10,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.io.FileUtil;
 
 public class CoordinateSystemParser {
   public static List<GeographicCoordinateSystem> getGeographicCoordinateSystems(
-    final String authorityName, final InputStream in) {
+    final String authorityName, final Reader reader) {
     final Map<String, AngularUnit> angularUnitsByName = new TreeMap<>();
     final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<>();
-    final BufferedReader reader = new BufferedReader(FileUtil.newUtf8Reader(in));
-    try {
-      for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+    try (
+      BufferedReader bufferedReader = new BufferedReader(reader)) {
+      for (String line = bufferedReader.readLine(); line != null; line = bufferedReader
+        .readLine()) {
         final String[] fields = line.split("\t");
         final String id = fields[0];
         final String csName = fields[1];
@@ -50,23 +50,19 @@ public class CoordinateSystemParser {
       }
     } catch (final IOException e) {
       e.printStackTrace();
-    } finally {
-      try {
-        reader.close();
-      } catch (final IOException e) {
-      }
     }
     return coordinateSystems;
   }
 
   public static List<ProjectedCoordinateSystem> getProjectedCoordinateSystems(
     final Map<Integer, CoordinateSystem> geoCsById, final String authorityName,
-    final InputStream in) {
+    final Reader reader) {
     final Map<String, LinearUnit> linearUnitsByName = new TreeMap<>();
     final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<>();
-    final BufferedReader reader = new BufferedReader(FileUtil.newUtf8Reader(in));
+    final BufferedReader bufferedReader = new BufferedReader(reader);
     try {
-      for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+      for (String line = bufferedReader.readLine(); line != null; line = bufferedReader
+        .readLine()) {
         final String[] fields = line.split("\t");
         try {
           final String id = fields[0];
@@ -109,7 +105,7 @@ public class CoordinateSystemParser {
       e.printStackTrace();
     } finally {
       try {
-        reader.close();
+        bufferedReader.close();
       } catch (final IOException e) {
       }
     }
