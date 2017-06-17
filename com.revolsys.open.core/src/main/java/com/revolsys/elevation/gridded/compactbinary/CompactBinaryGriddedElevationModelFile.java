@@ -12,7 +12,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
+import com.revolsys.collection.set.Sets;
 import com.revolsys.elevation.gridded.DirectFileElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;

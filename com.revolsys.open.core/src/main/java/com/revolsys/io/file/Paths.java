@@ -28,8 +28,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import com.google.common.collect.Sets;
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.set.Sets;
 import com.revolsys.io.FileNames;
 import com.revolsys.logging.Logs;
 import com.revolsys.util.Exceptions;
@@ -44,13 +44,13 @@ public interface Paths {
 
   Set<OpenOption> OPEN_OPTIONS_NONE_SET = Collections.emptySet();
 
-  Set<OpenOption> OPEN_OPTIONS_WRITE_SET = Sets.newHashSet(StandardOpenOption.WRITE,
+  Set<OpenOption> OPEN_OPTIONS_WRITE_SET = Sets.newHash(StandardOpenOption.WRITE,
     StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 
-  Set<OpenOption> OPEN_OPTIONS_READ_WRITE_SET = Sets.newHashSet(StandardOpenOption.READ,
+  Set<OpenOption> OPEN_OPTIONS_READ_WRITE_SET = Sets.newHash(StandardOpenOption.READ,
     StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.SYNC);
 
-  Set<OpenOption> OPEN_OPTIONS_READ_SET = Sets.newHashSet(StandardOpenOption.READ);
+  Set<OpenOption> OPEN_OPTIONS_READ_SET = Sets.newHash(StandardOpenOption.READ);
 
   static void createDirectories(final Path path) {
     try {
