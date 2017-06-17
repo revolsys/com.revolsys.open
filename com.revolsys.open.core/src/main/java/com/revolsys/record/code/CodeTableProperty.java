@@ -23,6 +23,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 
 public class CodeTableProperty extends AbstractCodeTable implements RecordDefinitionProperty {
@@ -244,6 +245,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   public synchronized void loadAll() {
+    final long time = System.currentTimeMillis();
     if (this.threadLoading.get() != Boolean.TRUE) {
       if (this.loading) {
         while (this.loading) {
@@ -281,6 +283,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         }
       }
     }
+    Dates.debugEllapsedTime(this, "Load All: " + getTypePath(), time);
   }
 
   @Override
