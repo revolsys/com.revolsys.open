@@ -14,6 +14,7 @@ import com.revolsys.logging.Logs;
 import com.revolsys.parallel.InvokeMethodRunnable;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 
 @SuppressWarnings("unchecked")
@@ -21,6 +22,7 @@ public class MapObjectFactoryRegistry {
   public static final Map<String, MapObjectFactory> TYPE_NAME_TO_FACTORY = new HashMap<>();
 
   static {
+    final long startTime = System.currentTimeMillis();
     final List<Runnable> postInitMethods = new ArrayList<>();
     try {
       final ClassLoader classLoader = MapObjectFactoryRegistry.class.getClassLoader();
@@ -92,6 +94,7 @@ public class MapObjectFactoryRegistry {
     for (final Runnable runnable : postInitMethods) {
       runnable.run();
     }
+    Dates.debugEllapsedTime(MapObjectFactoryRegistry.class, "init", startTime);
   }
 
   public static void addFactory(final MapObjectFactory factory) {
