@@ -8,6 +8,10 @@ import com.revolsys.collection.iterator.CancelIterable;
 import com.revolsys.collection.iterator.Iterators;
 
 public interface Cancellable {
+  static Cancellable FALSE = () -> {
+    return false;
+  };
+
   default <V> Iterable<V> cancellable(final Iterable<V> iterable) {
     return new CancelIterable<>(this, iterable);
   }
