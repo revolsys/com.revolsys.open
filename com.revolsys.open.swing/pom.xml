@@ -10,7 +10,7 @@
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>GBA-SNAPSHOT</version>
+    <version>0.20170621.112519-GBA_2_0_29-RELEASE</version>
   </parent>
   <licenses>
     <license>
