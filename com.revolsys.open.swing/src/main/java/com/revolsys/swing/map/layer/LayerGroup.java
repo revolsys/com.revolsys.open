@@ -61,17 +61,18 @@ import com.revolsys.util.UrlUtil;
 public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable<Layer> {
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
-    menu.addGroup(0, "group");
-    Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
-      Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "add"), LayerGroup::actionAddLayerGroup,
-      false);
+    MenuFactory.addMenuInitializer(LayerGroup.class, (menu) -> {
+      menu.addGroup(0, "group");
+      Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
+        Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "add"), LayerGroup::actionAddLayerGroup,
+        false);
 
-    Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer...", "page_add",
-      LayerGroup::actionOpenFileLayer, false);
+      Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer...", "page_add",
+        LayerGroup::actionOpenFileLayer, false);
 
-    Menus.<LayerGroup> addMenuItem(menu, "group", "Import Project...", "map:import",
-      LayerGroup::actionImportProject, false);
+      Menus.<LayerGroup> addMenuItem(menu, "group", "Import Project...", "map:import",
+        LayerGroup::actionImportProject, false);
+    });
   }
 
   private static Layer getLayer(LayerGroup group, final String name) {
@@ -102,9 +103,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return null;
   }
 
-  public static LayerGroup newLayer(final Map<String, Object> properties) {
+  public static LayerGroup newLayer(final Map<String, ? extends Object> config) {
     final LayerGroup layerGroup = new LayerGroup();
-    layerGroup.loadLayers(properties);
+    layerGroup.loadLayers(config);
     return layerGroup;
   }
 
@@ -684,9 +685,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   @SuppressWarnings("unchecked")
-  protected void loadLayers(final Map<String, Object> properties) {
-    final List<String> layerFiles = (List<String>)properties.remove("layers");
-    setProperties(properties);
+  protected void loadLayers(final Map<String, ? extends Object> config) {
+    final List<String> layerFiles = (List<String>)config.remove("layers");
+    setProperties(config);
     if (layerFiles != null) {
       for (String fileName : layerFiles) {
         if (!fileName.endsWith("rgobject")) {

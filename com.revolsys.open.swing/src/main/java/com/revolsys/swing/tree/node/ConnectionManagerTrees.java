@@ -21,15 +21,16 @@ public class ConnectionManagerTrees {
 
   static {
     // AbstractConnectionRegistry
-    final MenuFactory connectionRegistryMenu = MenuFactory
-      .getMenu(AbstractConnectionRegistry.class);
-    LazyLoadTreeNode.addRefreshMenuItem(connectionRegistryMenu);
+    MenuFactory.addMenuInitializer(AbstractConnectionRegistry.class, (menu) -> {
+      LazyLoadTreeNode.addRefreshMenuItem(menu);
+    });
 
     // AbstractConnection
-    final MenuFactory connectionMenu = MenuFactory.getMenu(AbstractConnection.class);
-    LazyLoadTreeNode.addRefreshMenuItem(connectionMenu);
-    TreeNodes.addMenuItemNodeValue(connectionMenu, "default", "Delete Connection", "delete",
-      Connection::isEditable, ConnectionManagerTrees::deleteConnection);
+    MenuFactory.addMenuInitializer(AbstractConnection.class, (menu) -> {
+      LazyLoadTreeNode.addRefreshMenuItem(menu);
+      TreeNodes.addMenuItemNodeValue(menu, "default", "Delete Connection", "delete",
+        Connection::isEditable, ConnectionManagerTrees::deleteConnection);
+    });
   }
 
   private static void deleteConnection(final Connection connection) {

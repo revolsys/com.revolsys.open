@@ -21,7 +21,7 @@ import com.revolsys.swing.parallel.AbstractSwingWorker;
 
 public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<LayerRecord>, Void> {
 
-  public static BoundingBoxRecordLayer newLayer(final Map<String, Object> properties) {
+  public static BoundingBoxRecordLayer newLayer(final Map<String, ? extends Object> config) {
     final GeometryFactory wgs84 = GeometryFactory.floating3(4326);
     final BoundingBoxRecordLayer layer = new BoundingBoxRecordLayer("geoname", "Geo Names",
       GeoNamesBoundingBoxLayerWorker.class, wgs84);
@@ -31,7 +31,7 @@ public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<Lay
     final MarkerStyle style = new MarkerStyle();
     style.setMarker(marker);
     layer.setRenderer(new MarkerStyleRenderer(layer, style));
-    layer.setProperties(properties);
+    layer.setProperties(config);
     return layer;
   }
 

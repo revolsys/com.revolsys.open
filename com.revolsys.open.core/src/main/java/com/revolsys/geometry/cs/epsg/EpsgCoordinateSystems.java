@@ -45,6 +45,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.record.io.format.csv.CsvIterator;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.UrlResource;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 
 public final class EpsgCoordinateSystems {
@@ -334,6 +335,7 @@ public final class EpsgCoordinateSystems {
 
   public synchronized static void initialize() {
     if (!initialized) {
+      final long startTime = System.currentTimeMillis();
       try {
         final Map<Integer, List<Axis>> axisMap = loadAxis();
         final Map<Integer, Area> areas = loadAreas();
@@ -347,6 +349,7 @@ public final class EpsgCoordinateSystems {
         coordinateSystems = Collections
           .unmodifiableSet(new LinkedHashSet<>(coordinateSystemsById.values()));
         initialized = true;
+        Dates.debugEllapsedTime(EpsgCoordinateSystems.class, "initialize", startTime);
       } catch (final Throwable t) {
         t.printStackTrace();
       }

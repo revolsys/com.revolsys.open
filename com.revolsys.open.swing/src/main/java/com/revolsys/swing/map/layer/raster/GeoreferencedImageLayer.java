@@ -40,33 +40,34 @@ import com.revolsys.util.number.Doubles;
 public class GeoreferencedImageLayer extends AbstractLayer {
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(GeoreferencedImageLayer.class);
-    menu.addGroup(0, "table");
-    menu.addGroup(2, "edit");
+    MenuFactory.addMenuInitializer(GeoreferencedImageLayer.class, (menu) -> {
+      menu.addGroup(0, "table");
+      menu.addGroup(2, "edit");
 
-    final Predicate<GeoreferencedImageLayer> notReadOnly = ((Predicate<GeoreferencedImageLayer>)GeoreferencedImageLayer::isReadOnly)
-      .negate();
-    final Predicate<GeoreferencedImageLayer> editable = GeoreferencedImageLayer::isEditable;
+      final Predicate<GeoreferencedImageLayer> notReadOnly = ((Predicate<GeoreferencedImageLayer>)GeoreferencedImageLayer::isReadOnly)
+        .negate();
+      final Predicate<GeoreferencedImageLayer> editable = GeoreferencedImageLayer::isEditable;
 
-    Menus.<GeoreferencedImageLayer> addMenuItem(menu, "table", "View Tie-Points", "table_go",
-      GeoreferencedImageLayer::showTableView, false);
+      Menus.<GeoreferencedImageLayer> addMenuItem(menu, "table", "View Tie-Points", "table_go",
+        GeoreferencedImageLayer::showTableView, false);
 
-    Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
-      notReadOnly, GeoreferencedImageLayer::toggleEditable, editable, true);
+      Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
+        notReadOnly, GeoreferencedImageLayer::toggleEditable, editable, true);
 
-    Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Show Original Image",
-      (String)null, editable.and(GeoreferencedImageLayer::isHasTransform),
-      GeoreferencedImageLayer::toggleShowOriginalImage,
-      GeoreferencedImageLayer::isShowOriginalImage, true);
+      Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Show Original Image",
+        (String)null, editable.and(GeoreferencedImageLayer::isHasTransform),
+        GeoreferencedImageLayer::toggleShowOriginalImage,
+        GeoreferencedImageLayer::isShowOriginalImage, true);
 
-    Menus.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Fit to Screen", "arrow_out",
-      editable, GeoreferencedImageLayer::fitToViewport, true);
+      Menus.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Fit to Screen", "arrow_out",
+        editable, GeoreferencedImageLayer::fitToViewport, true);
 
-    menu.deleteMenuItem("refresh", "Refresh");
+      menu.deleteMenuItem("refresh", "Refresh");
+    });
   }
 
-  public static GeoreferencedImageLayer newLayer(final Map<String, Object> properties) {
-    return new GeoreferencedImageLayer(properties);
+  public static GeoreferencedImageLayer newLayer(final Map<String, ? extends Object> config) {
+    return new GeoreferencedImageLayer(config);
   }
 
   private GeoreferencedImage image;
@@ -79,13 +80,13 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
   private String url;
 
-  public GeoreferencedImageLayer(final Map<String, Object> properties) {
+  public GeoreferencedImageLayer(final Map<String, ? extends Object> config) {
     super("geoReferencedImageLayer");
-    setProperties(properties);
+    setProperties(config);
     setSelectSupported(false);
     setQuerySupported(false);
     setRenderer(new GeoreferencedImageLayerRenderer(this));
-    final int opacity = Maps.getInteger(properties, "opacity", 255);
+    final int opacity = Maps.getInteger(config, "opacity", 255);
     setOpacity(opacity);
     setIcon(Icons.getIcon("picture"));
   }

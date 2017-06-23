@@ -21,7 +21,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileNameExtensionFilter;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.spring.resource.Resource;
@@ -61,11 +60,6 @@ public class GriddedElevationModelLayer extends AbstractLayer {
       "page:refresh", GriddedElevationModelLayer::revertDo, true);
 
     menu.deleteMenuItem("refresh", "Refresh");
-  }
-
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "Gridded Elevation Model Layer",
-      GriddedElevationModelLayer::new);
   }
 
   public static void saveAs(final String title, final Consumer<File> exportAction) {

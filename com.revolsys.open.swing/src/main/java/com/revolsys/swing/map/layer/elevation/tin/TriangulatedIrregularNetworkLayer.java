@@ -9,7 +9,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.spring.resource.Resource;
@@ -35,11 +34,6 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
     Menus.<TriangulatedIrregularNetworkLayer> addMenuItem(menu, "refresh", "Reload from File",
       Icons.getIconWithBadge("page", "refresh"), TriangulatedIrregularNetworkLayer::revertDo, true);
     menu.deleteMenuItem("refresh", "Refresh");
-  }
-
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "Triangulated Irregular Network Layer",
-      TriangulatedIrregularNetworkLayer::new);
   }
 
   private TriangulatedIrregularNetwork tin;

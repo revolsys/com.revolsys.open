@@ -6,16 +6,17 @@ import com.revolsys.swing.menu.MenuFactory;
 
 public class BaseMapLayerGroup extends LayerGroup {
   static {
-    final MenuFactory menu = MenuFactory.getMenu(BaseMapLayerGroup.class);
-    menu.deleteGroup("scale");
-    menu.deleteMenuItem("zoom", "Zoom to Layer");
-    menu.deleteMenuItem("group", "Add Group");
-    menu.deleteMenuItem("group", "Open File Layer...");
-    menu.deleteMenuItem("layer", "Delete");
-    menu.deleteMenuItem("layer", "Layer Properties");
+    MenuFactory.addMenuInitializer(BaseMapLayerGroup.class, (menu) -> {
+      menu.deleteGroup("scale");
+      menu.deleteMenuItem("zoom", "Zoom to Layer");
+      menu.deleteMenuItem("group", "Add Group");
+      menu.deleteMenuItem("group", "Open File Layer...");
+      menu.deleteMenuItem("layer", "Delete");
+      menu.deleteMenuItem("layer", "Layer Properties");
+    });
   }
 
-  public static LayerGroup newLayer(final Map<String, Object> properties) {
+  public static LayerGroup newLayer(final Map<String, ? extends Object> properties) {
     final BaseMapLayerGroup layerGroup = new BaseMapLayerGroup();
     layerGroup.loadLayers(properties);
     return layerGroup;

@@ -29,17 +29,17 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
 
   private static final double TILE_WIDTH = 1.0 / TILE_SCALE_X;
 
-  public static AbstractLayer newLayer(final Map<String, Object> properties) {
-    return new OpenStreetMapApiLayer(properties);
+  public static AbstractLayer newLayer(final Map<String, ? extends Object> config) {
+    return new OpenStreetMapApiLayer(config);
   }
 
   private Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
 
   private String serverUrl = "http://www.overpass-api.de/api/xapi?";
 
-  public OpenStreetMapApiLayer(final Map<String, Object> properties) {
+  public OpenStreetMapApiLayer(final Map<String, ? extends Object> config) {
     super("openStreetMapVectorApi");
-    setProperties(properties);
+    setProperties(config);
   }
 
   @Override

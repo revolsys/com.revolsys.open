@@ -41,7 +41,8 @@ public class MacApplicationListenerHandler implements InvocationHandler {
       final Object event = args[0];
       openFiles(event);
     } else if (method.getName().equals("handlePreferences")) {
-      PreferencesDialog.get().showPanel();
+      final PreferencesDialog preferencesDialog = new PreferencesDialog();
+      preferencesDialog.showPanel();
     }
     return null;
   }

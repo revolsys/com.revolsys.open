@@ -11,7 +11,6 @@ import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
 import com.revolsys.record.ArrayRecord;
@@ -24,46 +23,44 @@ import com.revolsys.util.function.SupplierWithProperties;
 
 public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFactory {
   @SuppressWarnings("unchecked")
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory("recordReaderFactoryFile",
-      "Factory to create a RecordReader from a file", (properties) -> {
-        final String fileName = (String)properties.get("fileName");
-        final String fileUrl = (String)properties.get("fileUrl");
-        String defaultFileExtension;
-        Object source;
-        if (Property.hasValue(fileName)) {
-          source = Paths.get(fileName);
-          defaultFileExtension = FileUtil.getFileNameExtension(fileName);
-        } else if (Property.hasValue(fileUrl)) {
-          source = new UrlResource(fileUrl);
-          defaultFileExtension = FileUtil.getFileNameExtension(fileUrl);
+  static Supplier<RecordReader> newRecordReaderSupplier(
+    final Map<String, ? extends Object> properties) {
+    final String fileName = (String)properties.get("fileName");
+    final String fileUrl = (String)properties.get("fileUrl");
+    String defaultFileExtension;
+    Object source;
+    if (Property.hasValue(fileName)) {
+      source = Paths.get(fileName);
+      defaultFileExtension = FileUtil.getFileNameExtension(fileName);
+
+    } else if (Property.hasValue(fileUrl)) {
+      source = new UrlResource(fileUrl);
+      defaultFileExtension = FileUtil.getFileNameExtension(fileName);
+    } else {
+      throw new IllegalArgumentException("Config must have fileName or fileUrl:" + properties);
+    }
+    final String fileExtension = Maps.getString(properties, "fileExtension", defaultFileExtension);
+    final Supplier<RecordReader> factory = () -> {
+      final RecordReader reader;
+      if ("zip".equals(fileExtension)) {
+        final String baseFileExtension = (String)properties.get("baseFileExtension");
+        final String baseName = (String)properties.get("baseName");
+        if (Property.hasValue(baseName)) {
+          reader = RecordReader.newZipRecordReader(source, baseName, baseFileExtension);
         } else {
-          throw new IllegalArgumentException("Config must have fileName or fileUrl:" + properties);
+          reader = RecordReader.newZipRecordReader(source, baseFileExtension);
         }
-        final String fileExtension = Maps.getString(properties, "fileExtension",
-          defaultFileExtension);
-        final Supplier<RecordReader> factory = () -> {
-          final RecordReader reader;
-          if ("zip".equals(fileExtension)) {
-            final String baseFileExtension = (String)properties.get("baseFileExtension");
-            final String baseName = (String)properties.get("baseName");
-            if (Property.hasValue(baseName)) {
-              reader = RecordReader.newZipRecordReader(source, baseName, baseFileExtension);
-            } else {
-              reader = RecordReader.newZipRecordReader(source, baseFileExtension);
-            }
-          } else {
-            reader = RecordReader.newRecordReader(source);
-          }
-          if (reader != null) {
-            final Map<String, Object> readerProperties = (Map<String, Object>)properties
-              .get("readerProperties");
-            reader.setProperties(readerProperties);
-          }
-          return reader;
-        };
-        return new SupplierWithProperties<>(factory, properties);
-      });
+      } else {
+        reader = RecordReader.newRecordReader(source);
+      }
+      if (reader != null) {
+        final Map<String, Object> readerProperties = (Map<String, Object>)properties
+          .get("readerProperties");
+        reader.setProperties(readerProperties);
+      }
+      return reader;
+    };
+    return new SupplierWithProperties<>(factory, properties);
   }
 
   /**

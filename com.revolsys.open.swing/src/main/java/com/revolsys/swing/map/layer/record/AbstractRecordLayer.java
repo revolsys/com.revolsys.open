@@ -159,58 +159,60 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public static final String RECORDS_SELECTED = "recordsSelected";
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayer.class);
-    menu.setName("Layer");
-    menu.addGroup(0, "table");
-    menu.addGroup(2, "edit");
-    menu.addGroup(3, "dnd");
+    MenuFactory.addMenuInitializer(AbstractRecordLayer.class, (menu) -> {
+      menu.setName("Layer");
+      menu.addGroup(0, "table");
+      menu.addGroup(2, "edit");
+      menu.addGroup(3, "dnd");
 
-    final Predicate<AbstractRecordLayer> exists = AbstractRecordLayer::isExists;
+      final Predicate<AbstractRecordLayer> exists = AbstractRecordLayer::isExists;
 
-    Menus.addMenuItem(menu, "table", "View Records", "table_go", exists,
-      AbstractRecordLayer::showRecordsTable, false);
+      Menus.addMenuItem(menu, "table", "View Records", "table_go", exists,
+        AbstractRecordLayer::showRecordsTable, false);
 
-    final Predicate<AbstractRecordLayer> hasSelectedRecords = AbstractRecordLayer::isHasSelectedRecords;
-    final Predicate<AbstractRecordLayer> hasSelectedRecordsWithGeometry = AbstractRecordLayer::isHasSelectedRecordsWithGeometry;
+      final Predicate<AbstractRecordLayer> hasSelectedRecords = AbstractRecordLayer::isHasSelectedRecords;
+      final Predicate<AbstractRecordLayer> hasSelectedRecordsWithGeometry = AbstractRecordLayer::isHasSelectedRecordsWithGeometry;
 
-    Menus.addMenuItem(menu, "zoom", "Zoom to Selected", "magnifier_zoom_selected",
-      hasSelectedRecordsWithGeometry, AbstractRecordLayer::zoomToSelected, true);
+      Menus.addMenuItem(menu, "zoom", "Zoom to Selected", "magnifier_zoom_selected",
+        hasSelectedRecordsWithGeometry, AbstractRecordLayer::zoomToSelected, true);
 
-    Menus.addMenuItem(menu, "zoom", "Pan to Selected", "pan_selected",
-      hasSelectedRecordsWithGeometry, AbstractRecordLayer::panToSelected, true);
+      Menus.addMenuItem(menu, "zoom", "Pan to Selected", "pan_selected",
+        hasSelectedRecordsWithGeometry, AbstractRecordLayer::panToSelected, true);
 
-    final Predicate<AbstractRecordLayer> notReadOnly = ((Predicate<AbstractRecordLayer>)AbstractRecordLayer::isReadOnly)
-      .negate();
-    final Predicate<AbstractRecordLayer> canAdd = AbstractRecordLayer::isCanAddRecords;
+      final Predicate<AbstractRecordLayer> notReadOnly = ((Predicate<AbstractRecordLayer>)AbstractRecordLayer::isReadOnly)
+        .negate();
+      final Predicate<AbstractRecordLayer> canAdd = AbstractRecordLayer::isCanAddRecords;
 
-    Menus.addCheckboxMenuItem(menu, "edit", "Editable", "pencil", notReadOnly,
-      AbstractRecordLayer::toggleEditable, AbstractRecordLayer::isEditable, false);
+      Menus.addCheckboxMenuItem(menu, "edit", "Editable", "pencil", notReadOnly,
+        AbstractRecordLayer::toggleEditable, AbstractRecordLayer::isEditable, false);
 
-    Menus.addMenuItem(menu, "edit", "Save Changes", "table_save", AbstractLayer::isHasChanges,
-      AbstractLayer::saveChanges, true);
+      Menus.addMenuItem(menu, "edit", "Save Changes", "table_save", AbstractLayer::isHasChanges,
+        AbstractLayer::saveChanges, true);
 
-    Menus.addMenuItem(menu, "edit", "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
-      AbstractRecordLayer::cancelChanges, true);
+      Menus.addMenuItem(menu, "edit", "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
+        AbstractRecordLayer::cancelChanges, true);
 
-    Menus.addMenuItem(menu, "edit", "Add New Record", "table_row_insert", canAdd,
-      AbstractRecordLayer::addNewRecord, false);
+      Menus.addMenuItem(menu, "edit", "Add New Record", "table_row_insert", canAdd,
+        AbstractRecordLayer::addNewRecord, false);
 
-    Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
-      hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords),
-      AbstractRecordLayer::deleteSelectedRecords, true);
+      Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
+        hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords),
+        AbstractRecordLayer::deleteSelectedRecords, true);
 
-    Menus.addMenuItem(menu, "edit", "Merge Selected Records", "table_row_merge",
-      AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false);
+      Menus.addMenuItem(menu, "edit", "Merge Selected Records", "table_row_merge",
+        AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false);
 
-    Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
-      AbstractRecordLayer::copySelectedRecords, true);
+      Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
+        AbstractRecordLayer::copySelectedRecords, true);
 
-    Menus.addMenuItem(menu, "dnd", "Paste New Records", "paste_plain",
-      canAdd.and(AbstractRecordLayer::isCanPasteRecords), AbstractRecordLayer::pasteRecords, true);
+      Menus.addMenuItem(menu, "dnd", "Paste New Records", "paste_plain",
+        canAdd.and(AbstractRecordLayer::isCanPasteRecords), AbstractRecordLayer::pasteRecords,
+        true);
 
-    Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
-      AbstractRecordLayer::isHasGeometry,
-      (final AbstractRecordLayer layer) -> layer.showProperties("Style"), false);
+      Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
+        AbstractRecordLayer::isHasGeometry,
+        (final AbstractRecordLayer layer) -> layer.showProperties("Style"), false);
+    });
   }
 
   public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
@@ -250,7 +252,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));
       for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
         fileChooser.addChoosableFileFilter(fileFilter);
-        if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
+        if (fileFilter.getExtensions().contains(defaultFileExtension)) {
           fileChooser.setFileFilter(fileFilter);
         }
       }

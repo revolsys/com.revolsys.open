@@ -24,7 +24,6 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.ArrayRecord;
@@ -59,25 +58,6 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     return false;
   }
 
-  @SuppressWarnings("unchecked")
-  static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory("recordStore",
-      (final Map<String, ? extends Object> config) -> {
-        final Map<String, Object> connectionProperties = (Map<String, Object>)config
-          .get("connection");
-        if (Property.isEmpty(connectionProperties)) {
-          throw new IllegalArgumentException(
-            "Record store must include a 'connection' map property: " + config);
-        } else {
-          final RecordStore recordStore = RecordStore.newRecordStore(connectionProperties);
-          recordStore.setProperties(config);
-          recordStore.initialize();
-          return recordStore;
-        }
-      });
-    MapObjectFactoryRegistry.newFactory("codeTable", CodeTableProperty::new);
-  }
-
   static <T extends RecordStore> T newRecordStore(final File file) {
     return newRecordStore(FileUtil.toUrlString(file));
   }
@@ -95,7 +75,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   /**
-   * Construct a newn initialized record store.
+   * Construct a new initialized record store.
    * @param connectionProperties
    * @return
    */
@@ -135,6 +115,21 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
       connectionProperties.put("user", user);
       connectionProperties.put("password", password);
       return (T)factory.newRecordStore(connectionProperties);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  static <T extends RecordStore> T newRecordStoreInitialized(
+    final Map<String, ? extends Object> config) {
+    final Map<String, Object> connectionProperties = (Map<String, Object>)config.get("connection");
+    if (Property.isEmpty(connectionProperties)) {
+      throw new IllegalArgumentException(
+        "Record store must include a 'connection' map property: " + config);
+    } else {
+      final RecordStore recordStore = RecordStore.newRecordStore(connectionProperties);
+      recordStore.setProperties(config);
+      recordStore.initialize();
+      return (T)recordStore;
     }
   }
 
@@ -342,7 +337,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   @Override
   default <RD extends RecordDefinition> RD getRecordDefinition(final String path) {
-    PathName pathName = PathName.newPathName(path);
+    final PathName pathName = PathName.newPathName(path);
     return getRecordDefinition(pathName);
   }
 

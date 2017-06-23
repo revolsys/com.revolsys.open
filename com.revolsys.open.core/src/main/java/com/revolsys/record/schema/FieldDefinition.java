@@ -39,8 +39,8 @@ import com.revolsys.util.Strings;
  */
 public class FieldDefinition extends BaseObjectWithProperties
   implements CharSequence, Cloneable, MapSerializer, DataTypeProxy {
-  public static FieldDefinition newFieldDefinition(final Map<String, Object> properties) {
-    return new FieldDefinition(properties);
+  public static FieldDefinition newFieldDefinition(final Map<String, ? extends Object> config) {
+    return new FieldDefinition(config);
   }
 
   private final Map<Object, Object> allowedValues = new LinkedHashMap<>();
@@ -103,7 +103,7 @@ public class FieldDefinition extends BaseObjectWithProperties
     this.index = index;
   }
 
-  public FieldDefinition(final Map<String, Object> properties) {
+  public FieldDefinition(final Map<String, ? extends Object> properties) {
     this.name = Maps.getString(properties, "name");
     final String title = Maps.getString(properties, "title");
     setTitle(title);

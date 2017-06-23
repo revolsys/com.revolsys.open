@@ -8,7 +8,6 @@ import com.revolsys.elevation.cloud.PointCloudReaderFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
@@ -17,20 +16,11 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Property;
 
 public class PointCloudLayer extends AbstractLayer {
 
   public static final String J_TYPE = "pointCloudLayer";
-
-  static {
-    final MenuFactory menu = MenuFactory.getMenu(PointCloudLayer.class);
-  }
-
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "Point Cloud Layer", PointCloudLayer::new);
-  }
 
   private PointCloud<?> pointCloud;
 

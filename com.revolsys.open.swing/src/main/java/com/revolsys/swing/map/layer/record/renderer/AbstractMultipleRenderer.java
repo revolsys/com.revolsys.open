@@ -24,21 +24,22 @@ import com.revolsys.util.Property;
 
 public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRenderer {
   static {
-    final MenuFactory menu = MenuFactory.getMenu(AbstractMultipleRenderer.class);
+    MenuFactory.addMenuInitializer(AbstractMultipleRenderer.class, (menu) -> {
 
-    addAddMenuItem(menu, "Geometry", GeometryStyleRenderer::new);
-    addAddMenuItem(menu, "Text", TextStyleRenderer::new);
-    addAddMenuItem(menu, "Marker", MarkerStyleRenderer::new);
-    addAddMenuItem(menu, "Multiple", MultipleRenderer::new);
-    addAddMenuItem(menu, "Filter", FilterMultipleRenderer::new);
-    addAddMenuItem(menu, "Scale", ScaleMultipleRenderer::new);
+      addAddMenuItem(menu, "Geometry", GeometryStyleRenderer::new);
+      addAddMenuItem(menu, "Text", TextStyleRenderer::new);
+      addAddMenuItem(menu, "Marker", MarkerStyleRenderer::new);
+      addAddMenuItem(menu, "Multiple", MultipleRenderer::new);
+      addAddMenuItem(menu, "Filter", FilterMultipleRenderer::new);
+      addAddMenuItem(menu, "Scale", ScaleMultipleRenderer::new);
 
-    addConvertMenuItem(menu, "Multiple", MultipleRenderer.class,
-      AbstractMultipleRenderer::convertToMultipleStyle);
-    addConvertMenuItem(menu, "Filter", FilterMultipleRenderer.class,
-      AbstractMultipleRenderer::convertToFilterStyle);
-    addConvertMenuItem(menu, "Scale", ScaleMultipleRenderer.class,
-      AbstractMultipleRenderer::convertToScaleStyle);
+      addConvertMenuItem(menu, "Multiple", MultipleRenderer.class,
+        AbstractMultipleRenderer::convertToMultipleStyle);
+      addConvertMenuItem(menu, "Filter", FilterMultipleRenderer.class,
+        AbstractMultipleRenderer::convertToFilterStyle);
+      addConvertMenuItem(menu, "Scale", ScaleMultipleRenderer.class,
+        AbstractMultipleRenderer::convertToScaleStyle);
+    });
   }
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
