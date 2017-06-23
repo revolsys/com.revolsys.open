@@ -57,8 +57,9 @@ public class Project extends LayerGroup {
   private static WeakReference<Project> projectReference = new WeakReference<>(null);
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(Project.class);
-    menu.deleteMenuItem("layer", "Delete");
+    MenuFactory.addMenuInitializer(Project.class, (menu) -> {
+      menu.deleteMenuItem("layer", "Delete");
+    });
   }
 
   public static synchronized void clearProject(final Project project) {

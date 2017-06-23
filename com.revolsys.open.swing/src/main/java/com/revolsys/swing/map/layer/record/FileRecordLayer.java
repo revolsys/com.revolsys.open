@@ -26,14 +26,14 @@ import com.revolsys.util.Property;
 public class FileRecordLayer extends ListRecordLayer {
 
   static {
-    final Class<AbstractRecordLayer> clazz = AbstractRecordLayer.class;
-    final MenuFactory menu = MenuFactory.getMenu(clazz);
-    Menus.<FileRecordLayer> addMenuItem(menu, "refresh", "Reload from File",
-      Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revertDo, true);
+    MenuFactory.addMenuInitializer(FileRecordLayer.class, (menu) -> {
+      Menus.<FileRecordLayer> addMenuItem(menu, "refresh", "Reload from File",
+        Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revertDo, true);
+    });
   }
 
-  public static FileRecordLayer newLayer(final Map<String, Object> properties) {
-    return new FileRecordLayer(properties);
+  public static FileRecordLayer newLayer(final Map<String, ? extends Object> config) {
+    return new FileRecordLayer(config);
   }
 
   private Resource resource;

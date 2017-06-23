@@ -18,7 +18,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.capabilities.WmsCapabilities;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.spring.resource.UrlResource;
@@ -49,10 +48,6 @@ public class WmsClient extends AbstractWebService<WmsLayerDefinition>
     final int coordinateSystemId = getCoordinateSystemId(srs);
     final GeometryFactory geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
     return geometryFactory;
-  }
-
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "OGC WMS Server", WmsClient::newOgcWmsClient);
   }
 
   public static WmsClient newOgcWmsClient(final Map<String, ? extends Object> properties) {

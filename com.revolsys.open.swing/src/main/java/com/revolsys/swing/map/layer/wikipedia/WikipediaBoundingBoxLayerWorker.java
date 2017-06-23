@@ -21,7 +21,7 @@ import com.revolsys.swing.parallel.AbstractSwingWorker;
 
 public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<LayerRecord>, Void> {
 
-  public static BoundingBoxRecordLayer newLayer(final Map<String, Object> properties) {
+  public static BoundingBoxRecordLayer newLayer(final Map<String, ? extends Object> config) {
     final GeometryFactory wgs84 = GeometryFactory.floating3(4326);
     final BoundingBoxRecordLayer layer1 = new BoundingBoxRecordLayer("wikipedia",
       "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class, wgs84);
@@ -32,7 +32,7 @@ public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<La
     style.setMarker(marker);
     layer1.setRenderer(new MarkerStyleRenderer(layer1, style));
     final BoundingBoxRecordLayer layer = layer1;
-    layer.setProperties(properties);
+    layer.setProperties(config);
     return layer;
   }
 

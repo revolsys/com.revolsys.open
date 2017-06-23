@@ -69,7 +69,7 @@ import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.preferences.PreferencesDialog;
+import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.OS;
@@ -79,8 +79,6 @@ import com.revolsys.value.ThreadBooleanValue;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties implements Layer,
   PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel, ToolTipProxy {
-  public static final Icon ICON_LAYER = Icons.getIcon("map");
-
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   public static final String PLUGIN_TABLE_VIEW = "tableView";
@@ -92,33 +90,32 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer";
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
+    MenuFactory.addMenuInitializer(AbstractLayer.class, (menu) -> {
+      Menus.addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",
+        AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer, true);
 
-    Menus.addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",
-      AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer, true);
+      final Predicate<AbstractLayer> hasGeometry = AbstractLayer::isHasGeometry;
+      menu.addComponentFactory("scale", new TreeItemScaleMenu<>(true, hasGeometry,
+        AbstractLayer::getMinimumScale, AbstractLayer::setMinimumScale));
+      menu.addComponentFactory("scale", new TreeItemScaleMenu<>(false, hasGeometry,
+        AbstractLayer::getMaximumScale, AbstractLayer::setMaximumScale));
 
-    final Predicate<AbstractLayer> hasGeometry = AbstractLayer::isHasGeometry;
-    menu.addComponentFactory("scale", new TreeItemScaleMenu<>(true, hasGeometry,
-      AbstractLayer::getMinimumScale, AbstractLayer::setMinimumScale));
-    menu.addComponentFactory("scale", new TreeItemScaleMenu<>(false, hasGeometry,
-      AbstractLayer::getMaximumScale, AbstractLayer::setMaximumScale));
+      final Predicate<AbstractLayer> exists = AbstractLayer::isExists;
 
-    final Predicate<AbstractLayer> exists = AbstractLayer::isExists;
+      Menus.<AbstractLayer> addMenuItem(menu, "refresh", "Refresh", "arrow_refresh",
+        AbstractLayer::refreshAll, true);
 
-    Menus.<AbstractLayer> addMenuItem(menu, "refresh", "Refresh", "arrow_refresh",
-      AbstractLayer::refreshAll, true);
+      Menus.<AbstractLayer> addMenuItem(menu, "layer", "Delete", "delete",
+        AbstractLayer::deleteWithConfirm, false);
 
-    Menus.<AbstractLayer> addMenuItem(menu, "layer", "Delete", "delete",
-      AbstractLayer::deleteWithConfirm, false);
+      Menus.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information", exists,
+        AbstractLayer::showProperties, false);
 
-    Menus.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information", exists,
-      AbstractLayer::showProperties, false);
-
-    final PreferencesDialog preferencesDialog = PreferencesDialog.get();
-    preferencesDialog.addPreference("Layers", "com.revolsys.gis", PREFERENCE_PATH,
-      PREFERENCE_NEW_LAYERS_VISIBLE, DataTypes.BOOLEAN, false);
-    preferencesDialog.addPreference("Layers", "com.revolsys.gis", PREFERENCE_PATH,
-      PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, DataTypes.BOOLEAN, false);
+      PreferenceFields.addField("Layers", "com.revolsys.gis", PREFERENCE_PATH,
+        PREFERENCE_NEW_LAYERS_VISIBLE, DataTypes.BOOLEAN, false);
+      PreferenceFields.addField("Layers", "com.revolsys.gis", PREFERENCE_PATH,
+        PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, DataTypes.BOOLEAN, false);
+    });
   }
 
   private String errorMessage;
@@ -139,7 +136,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   private GeometryFactory geometryFactory;
 
-  private Icon icon = ICON_LAYER;
+  private Icon icon = Icons.getIcon("map");
 
   private long id = ID_GEN.incrementAndGet();
 

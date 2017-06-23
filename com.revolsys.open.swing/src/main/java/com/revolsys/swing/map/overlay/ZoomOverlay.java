@@ -26,7 +26,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.preferences.PreferencesDialog;
+import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.OS;
 
@@ -55,7 +55,7 @@ public class ZoomOverlay extends AbstractOverlay {
     }, 0f);
 
   static {
-    PreferencesDialog.get().addPreference("Zoom", "com.revolsys.gis", PREFERENCE_PATH,
+    PreferenceFields.addField("Zoom", "com.revolsys.gis", PREFERENCE_PATH,
       PREFERENCE_WHEEL_FORWARDS_ZOOM_IN, DataTypes.BOOLEAN, true);
   }
 

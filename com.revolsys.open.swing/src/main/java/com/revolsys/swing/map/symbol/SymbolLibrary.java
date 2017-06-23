@@ -19,15 +19,34 @@ import com.revolsys.util.Property;
 public class SymbolLibrary extends SymbolGroup {
   private static final Map<String, SymbolLibrary> SYMBOL_LIBRARIES = new LinkedHashMap<>();
 
+  private static boolean initialized = false;
+
   public static void addSymbolLibrary(final SymbolLibrary symbolLibrary) {
     final String name = symbolLibrary.getName();
-    synchronized (SYMBOL_LIBRARIES) {
-      SYMBOL_LIBRARIES.put(name, symbolLibrary);
+    final Map<String, SymbolLibrary> symbolLibraries = getSymbolLibraries();
+    synchronized (symbolLibraries) {
+      symbolLibraries.put(name, symbolLibrary);
     }
   }
 
+  public static void factoryInit() {
+    MapObjectFactoryRegistry.newFactory("symbolLibrary", (config) -> {
+      return new SymbolLibrary(config);
+    });
+    MapObjectFactoryRegistry.newFactory("symbolGroup", (config) -> {
+      return new SymbolGroup(config);
+    });
+    MapObjectFactoryRegistry.newFactory("symbolShape", (config) -> {
+      return new ShapeSymbol(config);
+    });
+    MapObjectFactoryRegistry.newFactory("symbolSvg", (config) -> {
+      return new SvgSymbol(config);
+    });
+  }
+
   public static Symbol findSymbol(final String name) {
-    for (final SymbolLibrary symbolLibrary : SYMBOL_LIBRARIES.values()) {
+    final Map<String, SymbolLibrary> symbolLibraries = getSymbolLibraries();
+    for (final SymbolLibrary symbolLibrary : symbolLibraries.values()) {
       final Symbol symbol = symbolLibrary.getSymbol(name);
       if (symbol != null) {
         return symbol;
@@ -47,45 +66,46 @@ public class SymbolLibrary extends SymbolGroup {
 
   public static List<Symbol> getAllSymbols() {
     final List<Symbol> symbols = new ArrayList<>();
-    for (final SymbolLibrary symbolLibrary : SYMBOL_LIBRARIES.values()) {
+    final Map<String, SymbolLibrary> symbolLibraries = getSymbolLibraries();
+    for (final SymbolLibrary symbolLibrary : symbolLibraries.values()) {
       symbolLibrary.addSymbolsToList(symbols);
     }
     return symbols;
   }
 
   public static Map<String, SymbolLibrary> getSymbolLibraries() {
+    initialize();
     return SYMBOL_LIBRARIES;
   }
 
   public static SymbolLibrary getSymbolLibrary(final String name) {
-    return SYMBOL_LIBRARIES.get(name);
+    final Map<String, SymbolLibrary> symbolLibraries = getSymbolLibraries();
+    return symbolLibraries.get(name);
   }
 
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory("symbolLibrary", SymbolLibrary::new);
-    MapObjectFactoryRegistry.newFactory("symbolGroup", SymbolGroup::new);
-    MapObjectFactoryRegistry.newFactory("symbolShape", ShapeSymbol::new);
-    MapObjectFactoryRegistry.newFactory("symbolSvg", SvgSymbol::new);
-  }
-
-  public static void mapObjectFactoryPostInit() {
-    ShapeMarker.init();
-    try {
-      final ClassLoader classLoader = MapObjectFactoryRegistry.class.getClassLoader();
-      final String resourceName = "META-INF/" + SymbolLibrary.class.getName() + ".json";
-      final Enumeration<URL> resources = classLoader.getResources(resourceName);
-      while (resources.hasMoreElements()) {
-        final URL url = resources.nextElement();
+  private static void initialize() {
+    synchronized (SYMBOL_LIBRARIES) {
+      if (!initialized) {
+        initialized = true;
+        ShapeMarker.init();
         try {
-          final Resource resource = Resource.getResource(url);
-          final SymbolLibrary symbolLibrary = MapObjectFactory.toObject(resource);
-          addSymbolLibrary(symbolLibrary);
+          final ClassLoader classLoader = MapObjectFactoryRegistry.class.getClassLoader();
+          final String resourceName = "META-INF/" + SymbolLibrary.class.getName() + ".json";
+          final Enumeration<URL> resources = classLoader.getResources(resourceName);
+          while (resources.hasMoreElements()) {
+            final URL url = resources.nextElement();
+            try {
+              final Resource resource = Resource.getResource(url);
+              final SymbolLibrary symbolLibrary = MapObjectFactory.toObject(resource);
+              addSymbolLibrary(symbolLibrary);
+            } catch (final Throwable e) {
+              Logs.error(MapObjectFactoryRegistry.class, "Unable to read resource" + url, e);
+            }
+          }
         } catch (final Throwable e) {
-          Logs.error(MapObjectFactoryRegistry.class, "Unable to read resource" + url, e);
+          Logs.error(MapObjectFactoryRegistry.class, "Unable to read resources", e);
         }
       }
-    } catch (final Throwable e) {
-      Logs.error(MapObjectFactoryRegistry.class, "Unable to read resources", e);
     }
   }
 
@@ -100,8 +120,9 @@ public class SymbolLibrary extends SymbolGroup {
   }
 
   public static SymbolLibrary newSymbolLibrary(final String name, final String title) {
-    synchronized (SYMBOL_LIBRARIES) {
-      SymbolLibrary symbolLibrary = SYMBOL_LIBRARIES.get(name);
+    final Map<String, SymbolLibrary> symbolLibraries = getSymbolLibraries();
+    synchronized (symbolLibraries) {
+      SymbolLibrary symbolLibrary = symbolLibraries.get(name);
       if (symbolLibrary == null) {
         symbolLibrary = new SymbolLibrary(name, title);
         addSymbolLibrary(symbolLibrary);

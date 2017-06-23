@@ -2,6 +2,7 @@ package com.revolsys.swing.preferences;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.swing.field.Field;
@@ -27,9 +28,9 @@ public class SimplePreferencesPanel extends AbstractPreferencesPanel {
 
   public Preference addPreference(final String applicationName, final String path,
     final String propertyName, final DataType valueClass, final Object defaultValue,
-    final Field field) {
+    final Function<Preference, Field> fieldFactory) {
     final Preference preference = new Preference(applicationName, path, propertyName, valueClass,
-      defaultValue, field);
+      defaultValue, fieldFactory);
     if (this.preferences.contains(preference)) {
       for (final Preference preference2 : this.preferences) {
         if (preference2.equals(preference)) {

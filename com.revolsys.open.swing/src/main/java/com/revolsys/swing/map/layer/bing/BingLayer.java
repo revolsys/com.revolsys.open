@@ -12,16 +12,9 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.field.ComboBox;
-import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.MapTile;
-import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
 
 public class BingLayer extends AbstractTiledImageLayer {
@@ -30,49 +23,18 @@ public class BingLayer extends AbstractTiledImageLayer {
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2,
     -180, -85, 180, 85);
 
-  private static void actionAddLayer(final BaseMapLayerGroup parent) {
-    final ValueField dialog = new ValueField();
-    dialog.setTitle("Add Bing Layer");
-    dialog.setIconImage("bing");
-
-    SwingUtil.addLabel(dialog, "Imagery Set");
-    final ComboBox<ImagerySet> imagerySetField = ComboBox.newComboBox("imagerySet", ImagerySet.Road,
-      ImagerySet.Aerial, ImagerySet.AerialWithLabels, ImagerySet.CollinsBart,
-      ImagerySet.OrdnanceSurvey);
-    dialog.add(imagerySetField);
-
-    GroupLayouts.makeColumns(dialog, 2, true, true);
-
-    dialog.setSaveAction(() -> {
-      final BingLayer layer = new BingLayer();
-      final ImagerySet imagerySet = imagerySetField.getSelectedItem();
-      layer.setImagerySet(imagerySet);
-      layer.setVisible(true);
-      parent.addLayer(layer);
-    });
-
-    dialog.showDialog();
-  }
-
-  public static void mapObjectFactoryInit() {
-    final MenuFactory baseMapsMenu = MenuFactory.getMenu(BaseMapLayerGroup.class);
-
-    Menus.addMenuItem(baseMapsMenu, "group", "Add Bing Layer", "bing", BingLayer::actionAddLayer,
-      false);
-  }
-
   private BingClient client;
 
   private ImagerySet imagerySet = ImagerySet.Road;
 
   private MapLayer mapLayer;
 
-  private BingLayer() {
+  BingLayer() {
     super("bing");
     setIcon(Icons.getIcon("bing"));
   }
 
-  public BingLayer(final Map<String, Object> properties) {
+  public BingLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
   }

@@ -22,19 +22,19 @@ import com.revolsys.swing.tree.node.ConnectionManagerTrees;
 public class FolderConnectionsTrees extends ConnectionManagerTrees {
   static {
     // FolderConnectionRegistry
-    final MenuFactory connectionRegistryMenu = MenuFactory.getMenu(FolderConnectionRegistry.class);
+    MenuFactory.addMenuInitializer(FolderConnectionRegistry.class, (menu) -> {
+      TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Add Connection", "folder:add",
+        ConnectionRegistry::isEditable, FolderConnectionsTrees::addConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 0, "Add Connection",
-      "folder:add", ConnectionRegistry::isEditable, FolderConnectionsTrees::addConnection);
-
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Import Connection...",
-      "folder:import", FolderConnectionRegistry::isEditable,
-      FolderConnectionsTrees::importConnection);
+      TreeNodes.addMenuItemNodeValue(menu, "default", 1, "Import Connection...", "folder:import",
+        FolderConnectionRegistry::isEditable, FolderConnectionsTrees::importConnection);
+    });
 
     // FolderConnection
-    final MenuFactory connectionMenu = MenuFactory.getMenu(FolderConnection.class);
-    TreeNodes.<FolderConnection> addMenuItemNodeValue(connectionMenu, "default", 1,
-      "Export Connection", "folder:export", ConnectionManagerTrees::exportConnection);
+    MenuFactory.addMenuInitializer(FolderConnection.class, (menu) -> {
+      TreeNodes.<FolderConnection> addMenuItemNodeValue(menu, "default", 1, "Export Connection",
+        "folder:export", ConnectionManagerTrees::exportConnection);
+    });
   }
 
   private static void addConnection(final FolderConnectionRegistry registry) {

@@ -24,7 +24,6 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
@@ -54,28 +53,30 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   public static final Pattern PATTERN_VERTEX_INDEX = Pattern.compile("vertex\\((.*)\\)");
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayerRenderer.class);
+    MenuFactory.addMenuInitializer(AbstractRecordLayerRenderer.class, (menu) -> {
+      Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
+        ((Predicate<AbstractRecordLayerRenderer>)AbstractRecordLayerRenderer::isEditing).negate(),
+        AbstractRecordLayerRenderer::showProperties, false);
 
-    Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
-      ((Predicate<AbstractRecordLayerRenderer>)AbstractRecordLayerRenderer::isEditing).negate(),
-      AbstractRecordLayerRenderer::showProperties, false);
+      Menus.addMenuItem(menu, "layer", "Delete", "delete", AbstractRecordLayerRenderer::isHasParent,
+        AbstractRecordLayerRenderer::delete, true);
 
-    Menus.addMenuItem(menu, "layer", "Delete", "delete", AbstractRecordLayerRenderer::isHasParent,
-      AbstractRecordLayerRenderer::delete, true);
+      menu.addComponentFactory("scale",
+        new TreeItemScaleMenu<>(true, null, AbstractRecordLayerRenderer::getMinimumScale,
+          AbstractRecordLayerRenderer::setMinimumScale));
+      menu.addComponentFactory("scale",
+        new TreeItemScaleMenu<>(false, null, AbstractRecordLayerRenderer::getMaximumScale,
+          AbstractRecordLayerRenderer::setMaximumScale));
 
-    menu.addComponentFactory("scale", new TreeItemScaleMenu<>(true, null,
-      AbstractRecordLayerRenderer::getMinimumScale, AbstractRecordLayerRenderer::setMinimumScale));
-    menu.addComponentFactory("scale", new TreeItemScaleMenu<>(false, null,
-      AbstractRecordLayerRenderer::getMaximumScale, AbstractRecordLayerRenderer::setMaximumScale));
+      Menus.addMenuItem(menu, "wrap", "Wrap With Multiple Style", "style_multiple_wrap",
+        AbstractRecordLayerRenderer::wrapWithMultipleStyle, false);
 
-    Menus.addMenuItem(menu, "wrap", "Wrap With Multiple Style", "style_multiple_wrap",
-      AbstractRecordLayerRenderer::wrapWithMultipleStyle, false);
+      Menus.addMenuItem(menu, "wrap", "Wrap With Filter Style", "style_filter_wrap",
+        AbstractRecordLayerRenderer::wrapWithFilterStyle, false);
 
-    Menus.addMenuItem(menu, "wrap", "Wrap With Filter Style", "style_filter_wrap",
-      AbstractRecordLayerRenderer::wrapWithFilterStyle, false);
-
-    Menus.addMenuItem(menu, "wrap", "Wrap With Scale Style", "style_scale_wrap",
-      AbstractRecordLayerRenderer::wrapWithScaleStyle, false);
+      Menus.addMenuItem(menu, "wrap", "Wrap With Scale Style", "style_scale_wrap",
+        AbstractRecordLayerRenderer::wrapWithScaleStyle, false);
+    });
   }
 
   public static Predicate<Record> getFilter(final RecordDefinitionProxy recordDefinitionProxy,
@@ -242,15 +243,6 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
       point = point.convertPoint2d(viewportGeometryFactory);
     }
     return new PointWithOrientation(point, orientation);
-  }
-
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory("geometryStyle", GeometryStyleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("textStyle", TextStyleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("markerStyle", MarkerStyleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("multipleStyle", MultipleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("scaleStyle", ScaleMultipleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("filterStyle", FilterMultipleRenderer::new);
   }
 
   private Predicate<Record> filter = Predicates.all();

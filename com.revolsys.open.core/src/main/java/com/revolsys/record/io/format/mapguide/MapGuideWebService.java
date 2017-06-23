@@ -11,7 +11,6 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.PathName;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
@@ -35,11 +34,6 @@ public class MapGuideWebService extends AbstractWebService<MapGuideResource> {
     .add("SymbolLibrary", SymbolLibrary::new)
     .add("WatermarkDefinition", WatermarkDefinition::new)
     .getMap();
-
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "Map Guide Web Server",
-      MapGuideWebService::newMapGuideWebService);
-  }
 
   public static MapGuideWebService newMapGuideWebService(
     final Map<String, ? extends Object> properties) {

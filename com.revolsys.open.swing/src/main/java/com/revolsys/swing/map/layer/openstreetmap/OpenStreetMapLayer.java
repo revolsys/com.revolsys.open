@@ -11,8 +11,8 @@ public class OpenStreetMapLayer extends WebMercatorTileCacheLayer {
     setIcon(Icons.getIcon("openStreetMap"));
   }
 
-  public OpenStreetMapLayer(final Map<String, Object> properties) {
+  public OpenStreetMapLayer(final Map<String, ? extends Object> config) {
     this();
-    setProperties(properties);
+    setProperties(config);
   }
 }
