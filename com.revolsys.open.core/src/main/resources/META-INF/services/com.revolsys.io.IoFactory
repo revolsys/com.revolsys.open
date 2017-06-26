@@ -22,4 +22,4 @@ com.revolsys.record.io.format.xbase.XBase
 com.revolsys.record.io.format.xlsx.Xlsx
 com.revolsys.record.io.format.xml.Xml
 com.revolsys.elevation.cloud.las.LasPointCloudFactory
-com.revolsys.gis.elevation.gridded.esriascii.EsriAsciiGriddedElevation
+com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation
