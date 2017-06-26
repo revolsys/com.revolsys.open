@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.ListIdentifier;
 import com.revolsys.identifier.SingleIdentifier;
@@ -28,8 +29,7 @@ import com.revolsys.util.Property;
 
 public class CodeTableProperty extends AbstractCodeTable implements RecordDefinitionProperty {
 
-  private static final ArrayList<String> DEFAULT_FIELD_NAMES = new ArrayList<>(
-    Arrays.asList("VALUE"));
+  private static final List<String> DEFAULT_FIELD_NAMES = Lists.newArray("VALUE");
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
 
@@ -42,7 +42,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   private String creationTimestampFieldName;
 
-  private List<String> fieldAliases = new ArrayList<>();
+  private List<String> fieldNameAliases = new ArrayList<>();
 
   private String idFieldName;
 
@@ -80,7 +80,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   public void addFieldAlias(final String columnName) {
-    this.fieldAliases.add(columnName);
+    this.fieldNameAliases.add(columnName);
   }
 
   public void addValue(final Record code) {
@@ -117,7 +117,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   public CodeTableProperty clone() {
     final CodeTableProperty clone = (CodeTableProperty)super.clone();
     clone.recordDefinition = null;
-    clone.fieldAliases = new ArrayList<>(this.fieldAliases);
+    clone.fieldNameAliases = new ArrayList<>(this.fieldNameAliases);
     clone.valueFieldNames = new ArrayList<>(this.valueFieldNames);
     return clone;
   }
@@ -135,7 +135,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   @Override
   public List<String> getFieldNameAliases() {
-    return this.fieldAliases;
+    return this.fieldNameAliases;
   }
 
   @Override
@@ -416,8 +416,12 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     this.creationTimestampFieldName = creationTimestampFieldName;
   }
 
-  public void setFieldAliases(final List<String> fieldAliases) {
-    this.fieldAliases = new ArrayList<>(fieldAliases);
+  public void setFieldNameAliases(final List<String> fieldNameAliases) {
+    this.fieldNameAliases = new ArrayList<>(fieldNameAliases);
+  }
+
+  public void setFieldAliases(final String... fieldNameAliases) {
+    setFieldNameAliases(Lists.newArray(fieldNameAliases));
   }
 
   public void setIdFieldName(final String idFieldName) {
@@ -438,6 +442,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   public void setOrderBy(final List<String> orderBy) {
     this.orderBy = new ArrayList<>(orderBy);
+  }
+
+  public void setOrderByFieldName(final String orderBy) {
+    this.orderBy = Lists.newArray(orderBy);
   }
 
   @Override
