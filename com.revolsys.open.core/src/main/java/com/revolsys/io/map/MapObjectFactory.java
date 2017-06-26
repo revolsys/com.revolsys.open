@@ -77,6 +77,7 @@ public interface MapObjectFactory {
     if (map == null) {
       return null;
     } else {
+      // final long startTime = System.currentTimeMillis();
       final MapEx objectMap = new LinkedHashMapEx();
       for (final Entry<String, ? extends Object> entry : map.entrySet()) {
         final String key = entry.getKey();
@@ -85,25 +86,26 @@ public interface MapObjectFactory {
         objectMap.put(key, value);
       }
       final String typeClass = getTypeClass(objectMap);
+      final V object;
       if (Property.hasValue(typeClass)) {
         final Constructor<V> configConstructor = JavaBeanUtil.getConstructor(typeClass, Map.class);
-        final V object;
         if (configConstructor == null) {
           object = (V)JavaBeanUtil.createInstance(typeClass);
           ObjectWithProperties.setProperties(object, objectMap);
         } else {
           object = JavaBeanUtil.invokeConstructor(configConstructor, objectMap);
         }
-        return object;
       } else {
         final String type = getType(objectMap);
         final MapObjectFactory objectFactory = MapObjectFactoryRegistry.getFactory(type);
         if (objectFactory == null) {
-          return (V)objectMap;
+          object = (V)objectMap;
         } else {
-          return (V)objectFactory.mapToObject(objectMap);
+          object = (V)objectFactory.mapToObject(objectMap);
         }
       }
+      // Dates.debugEllapsedTime(MapObjectFactory.class, map.toString(), startTime);
+      return object;
     }
   }
 

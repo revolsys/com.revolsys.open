@@ -43,8 +43,9 @@ import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
+import com.revolsys.util.ServiceInitializer;
 
-public class Gdal {
+public class Gdal implements ServiceInitializer {
   private static boolean available = false;
 
   static {
@@ -548,5 +549,9 @@ public class Gdal {
     if (spatialReference != null) {
       dataset.SetProjection(spatialReference.ExportToWkt());
     }
+  }
+
+  @Override
+  public void initializeService() {
   }
 }

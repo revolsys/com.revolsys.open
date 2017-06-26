@@ -41,6 +41,7 @@ import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.transaction.Transactionable;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.CategoryLabelCountMap;
 import com.revolsys.util.count.LabelCountMap;
@@ -126,9 +127,13 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
       throw new IllegalArgumentException(
         "Record store must include a 'connection' map property: " + config);
     } else {
+      long startTime = System.currentTimeMillis();
       final RecordStore recordStore = RecordStore.newRecordStore(connectionProperties);
+      Dates.debugEllapsedTime(RecordStore.class, "new", startTime);
       recordStore.setProperties(config);
+      Dates.debugEllapsedTime(RecordStore.class, "setProperties", startTime);
       recordStore.initialize();
+      startTime = Dates.debugEllapsedTime(RecordStore.class, "init", startTime);
       return (T)recordStore;
     }
   }
@@ -137,8 +142,10 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
     } else {
-      for (final RecordStoreFactory factory : IoFactory.factories(RecordStoreFactory.class)) {
-        if (factory.canOpenUrl(url)) {
+      final List<RecordStoreFactory> factories = IoFactory.factories(RecordStoreFactory.class);
+      for (final RecordStoreFactory factory : factories) {
+        final boolean canOpenUrl = factory.canOpenUrl(url);
+        if (canOpenUrl) {
           return factory;
         }
       }

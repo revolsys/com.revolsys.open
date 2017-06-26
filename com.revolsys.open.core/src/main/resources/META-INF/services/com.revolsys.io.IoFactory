@@ -25,3 +25,5 @@ com.revolsys.record.io.format.xbase.XBase
 com.revolsys.record.io.format.xlsx.Xlsx
 com.revolsys.record.io.format.xml.XmlMapIoFactory
 com.revolsys.record.io.format.xml.XmlRecordIoFactory
+com.revolsys.gis.elevation.gridded.esriascii.EsriAsciiGriddedElevation
+
