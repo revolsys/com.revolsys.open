@@ -1,9 +1,7 @@
 package com.revolsys.record.io;
 
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
-import com.revolsys.record.io.format.pointz.PointZIoFactory;
 import com.revolsys.record.schema.RecordDefinition;
 
 public interface RecordIo {
@@ -57,9 +55,5 @@ public interface RecordIo {
       final RecordDefinition recordDefinition = reader.getRecordDefinition();
       copyRecords(recordDefinition, reader, target);
     }
-  }
-
-  public static void ioFactoryInit() {
-    IoFactoryRegistry.addFactory(new PointZIoFactory());
   }
 }

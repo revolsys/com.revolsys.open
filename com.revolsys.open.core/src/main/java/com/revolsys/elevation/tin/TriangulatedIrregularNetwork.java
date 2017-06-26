@@ -66,11 +66,6 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
     return OPPOSITE_INDEXES[i1 + i2 - 1];
   }
 
-  public static void ioFactoryInit() {
-    IoFactoryRegistry.addFactory(new CompactBinaryTin());
-    IoFactoryRegistry.addFactory(new AsciiTin());
-  }
-
   static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final Object source) {
     final Map<String, Object> properties = Collections.emptyMap();
     return newTriangulatedIrregularNetwork(source, properties);
@@ -88,6 +83,11 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
         properties);
       return dem;
     }
+  }
+
+  public static void serviceInit() {
+    IoFactoryRegistry.addFactory(new CompactBinaryTin());
+    IoFactoryRegistry.addFactory(new AsciiTin());
   }
 
   default void cancelChanges() {

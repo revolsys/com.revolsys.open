@@ -40,12 +40,6 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     return gridY;
   }
 
-  public static void ioFactoryInit() {
-    IoFactoryRegistry.addFactory(new CompactBinaryGriddedElevation());
-    IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());
-    IoFactoryRegistry.addFactory(new UsgsGriddedElevation());
-  }
-
   static GriddedElevationModel newGriddedElevationModel(final Object source) {
     final Map<String, Object> properties = Collections.emptyMap();
     return newGriddedElevationModel(source, properties);
@@ -62,6 +56,12 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
       final GriddedElevationModel dem = factory.newGriddedElevationModel(resource, properties);
       return dem;
     }
+  }
+
+  public static void sericeInit() {
+    IoFactoryRegistry.addFactory(new CompactBinaryGriddedElevation());
+    IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());
+    IoFactoryRegistry.addFactory(new UsgsGriddedElevation());
   }
 
   default void cancelChanges() {
