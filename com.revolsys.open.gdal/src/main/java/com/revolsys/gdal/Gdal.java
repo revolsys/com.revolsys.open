@@ -451,11 +451,6 @@ public class Gdal implements ServiceInitializer {
   public static void init() {
   }
 
-  public static void ioFactoryInit() {
-    addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
-    addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
-  }
-
   public static boolean isAvailable() {
     return available;
   }
@@ -553,5 +548,7 @@ public class Gdal implements ServiceInitializer {
 
   @Override
   public void initializeService() {
+    addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
+    addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
   }
 }
