@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -14,7 +15,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.io.format.json.Json;
-import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.JavaBeanUtil;
@@ -45,15 +45,31 @@ public interface MapObjectFactory {
     return type;
   }
 
+  @SuppressWarnings("unchecked")
+  static <V> V objectToObject(final Object value) {
+    try {
+      if (value instanceof Map) {
+        final Map<String, ? extends Object> valueMap = (Map<String, ? extends Object>)value;
+        return toObject(valueMap);
+      } else if (value instanceof List) {
+        final List<Object> newList = new ArrayList<>();
+        final List<?> values = (List<?>)value;
+        for (final Object listValue : values) {
+          final Object newValue = objectToObject(listValue);
+          newList.add(newValue);
+        }
+        return (V)newList;
+      }
+    } catch (final Throwable e) {
+      Logs.debug(MapObjectFactory.class, "Unable to convert:" + value, e);
+    }
+    return (V)value;
+  }
+
   static void setType(final Map<String, ? super Object> map, final String type) {
     if (Property.hasValue(type)) {
       map.put(TYPE, type);
     }
-  }
-
-  static <V> V toObject(final File file) {
-    final FileSystemResource resource = new FileSystemResource(file);
-    return toObject(resource);
   }
 
   @SuppressWarnings("unchecked")
@@ -65,7 +81,7 @@ public interface MapObjectFactory {
       for (final Entry<String, ? extends Object> entry : map.entrySet()) {
         final String key = entry.getKey();
         Object value = entry.getValue();
-        value = toObject(value);
+        value = objectToObject(value);
         objectMap.put(key, value);
       }
       final String typeClass = getTypeClass(objectMap);
@@ -74,6 +90,7 @@ public interface MapObjectFactory {
         final V object;
         if (configConstructor == null) {
           object = (V)JavaBeanUtil.createInstance(typeClass);
+          ObjectWithProperties.setProperties(object, objectMap);
         } else {
           object = JavaBeanUtil.invokeConstructor(configConstructor, objectMap);
         }
@@ -90,33 +107,8 @@ public interface MapObjectFactory {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  static <V> V toObject(final Object value) {
-    try {
-      if (value instanceof Map) {
-        final Map<String, ? extends Object> valueMap = (Map<String, ? extends Object>)value;
-        return toObject(valueMap);
-      } else if (value instanceof List) {
-        final List<Object> newList = new ArrayList<>();
-        final List<?> values = (List<?>)value;
-        for (final Object listValue : values) {
-          final Object newValue = toObject(listValue);
-          newList.add(newValue);
-        }
-        return (V)newList;
-      }
-    } catch (final Throwable e) {
-      Logs.debug(MapObjectFactory.class, "Unable to convert:" + value, e);
-    }
-    return (V)value;
-  }
-
-  static <V> V toObject(final Path path) {
-    final PathResource resource = new PathResource(path);
-    return toObject(resource);
-  }
-
-  static <V> V toObject(final Resource resource) {
+  static <V> V toObject(final Object source) {
+    final Resource resource = Resource.getResource(source);
     final Resource oldResource = Resource.setBaseResource(resource.getParent());
 
     try {
@@ -124,6 +116,55 @@ public interface MapObjectFactory {
       return toObject(properties);
     } catch (final Throwable t) {
       Logs.error(MapObjectFactoryRegistry.class, "Cannot load object from " + resource, t);
+      return null;
+    } finally {
+      Resource.setBaseResource(oldResource);
+    }
+  }
+
+  /**
+   * Convert the resource specified in the source parameter to an object. The properties parameter
+   * will override those specific properties.
+   *
+   * @param source
+   * @param properties
+   * @return
+   */
+  static <V> V toObject(final Object source, final Map<String, ? extends Object> properties) {
+    final Resource resource = Resource.getResource(source);
+    final Resource oldResource = Resource.setBaseResource(resource.getParent());
+
+    try {
+      final MapEx resourceProperties = Json.toMap(resource);
+      resourceProperties.putAll(properties);
+      return toObject(resourceProperties);
+    } catch (final Throwable t) {
+      Logs.error(MapObjectFactoryRegistry.class, "Cannot load object from " + resource, t);
+      return null;
+    } finally {
+      Resource.setBaseResource(oldResource);
+    }
+  }
+
+  /**
+   * Convert the resource specified in the source parameter to an object. The properties parameter
+   * will override those specific properties.
+   *
+   * @param source
+   * @param properties
+   * @return
+   */
+  static <V> V toObject(final Object source, final Map<String, ? extends Object> properties,
+    final BiConsumer<Resource, Throwable> errorHandler) {
+    final Resource resource = Resource.getResource(source);
+    final Resource oldResource = Resource.setBaseResource(resource.getParent());
+
+    try {
+      final MapEx resourceProperties = Json.toMap(resource);
+      resourceProperties.putAll(properties);
+      return toObject(resourceProperties);
+    } catch (final Throwable t) {
+      errorHandler.accept(resource, t);
       return null;
     } finally {
       Resource.setBaseResource(oldResource);
