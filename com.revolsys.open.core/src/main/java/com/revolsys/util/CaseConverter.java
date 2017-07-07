@@ -35,19 +35,10 @@ public final class CaseConverter {
               continue;
             }
           } else if (separator) {
-            if (tokenStart < pos) {
-              list.add(text.substring(tokenStart, pos));
-            }
-            tokenStart = pos + 1;
+            tokenStart = addWordSeparator(text, list, tokenStart, pos);
           } else if (type == Character.LOWERCASE_LETTER
             && currentType == Character.UPPERCASE_LETTER) {
-            final int newTokenStart = pos - 1;
-            if (newTokenStart != tokenStart) {
-              if (tokenStart < newTokenStart) {
-                list.add(text.substring(tokenStart, newTokenStart));
-              }
-              tokenStart = newTokenStart;
-            }
+            tokenStart = addWordCharacter(text, list, tokenStart, pos);
           } else {
             if (tokenStart != pos) {
               list.add(text.substring(tokenStart, pos));
@@ -57,12 +48,37 @@ public final class CaseConverter {
           currentType = type;
         }
         if (tokenStart < length) {
-          final String lastWord = text.substring(tokenStart);
-          list.add(lastWord);
+          addWord(text, list, tokenStart);
         }
         return list;
       }
     }
+  }
+
+  private static int addWordCharacter(final String text, final List<String> list, int tokenStart,
+    int pos) {
+    final int newTokenStart = pos - 1;
+    if (newTokenStart != tokenStart) {
+      if (tokenStart < newTokenStart) {
+        list.add(text.substring(tokenStart, newTokenStart));
+      }
+      tokenStart = newTokenStart;
+    }
+    return tokenStart;
+  }
+
+  private static int addWordSeparator(final String text, final List<String> list, int tokenStart,
+    int pos) {
+    if (tokenStart < pos) {
+      list.add(text.substring(tokenStart, pos));
+    }
+    tokenStart = pos + 1;
+    return tokenStart;
+  }
+
+  private static void addWord(final String text, final List<String> list, int tokenStart) {
+    final String lastWord = text.substring(tokenStart);
+    list.add(lastWord);
   }
 
   public static String toCapitalizedWords(final String text) {
