@@ -24,7 +24,7 @@ public interface RecordStoreSchemaElement extends GeometryFactoryProxy, ObjectWi
 
   <R extends RecordStore> R getRecordStore();
 
-  RecordStoreSchema getSchema();
+  <RSS extends RecordStoreSchema> RSS getSchema();
 
   default boolean isClosed() {
     final RecordStoreSchema schema = getSchema();

@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import javax.swing.JMenuItem;
 import javax.swing.ListSelectionModel;
@@ -21,6 +22,7 @@ import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 import com.revolsys.record.query.Condition;
@@ -97,7 +99,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private final AbstractRecordLayer layer;
 
-  private Map<String, Boolean> orderBy;
+  private Map<? extends CharSequence, Boolean> orderBy;
 
   private Comparator<Record> orderByComparatorIdentifier = null;
 
@@ -146,6 +148,18 @@ public class RecordLayerTableModel extends RecordRowTableModel
     if (tableRecordsMode != null) {
       final Query query = getFilterQuery();
       tableRecordsMode.exportRecords(query, target);
+    }
+  }
+
+  public void forEachRecord(final Consumer<? super LayerRecord> action) {
+    final TableRecordsMode tableRecordsMode = getTableRecordsMode();
+    if (tableRecordsMode != null) {
+      final Query query = getFilterQuery();
+      try (
+        BaseCloseable eventsDisabled = this.layer.eventsDisabled()) {
+        tableRecordsMode.forEachRecord(query, action);
+      }
+      refresh();
     }
   }
 
@@ -232,7 +246,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     return null;
   }
 
-  public Map<String, Boolean> getOrderBy() {
+  public Map<? extends CharSequence, Boolean> getOrderBy() {
     return this.orderBy;
   }
 
@@ -327,6 +341,15 @@ public class RecordLayerTableModel extends RecordRowTableModel
   @Override
   public boolean isEditable() {
     return super.isEditable() && this.layer.isEditable() && this.layer.isCanEditRecords();
+  }
+
+  @Override
+  public boolean isFieldEditable(final int columnIndex) {
+    if (this.layer.isEditable()) {
+      return super.isFieldEditable(columnIndex);
+    } else {
+      return false;
+    }
   }
 
   public boolean isFilterByBoundingBox() {
@@ -457,14 +480,14 @@ public class RecordLayerTableModel extends RecordRowTableModel
     return getGeometryFilterMode();
   }
 
-  public void setOrderBy(final Map<String, Boolean> orderBy) {
+  public void setOrderBy(final Map<? extends CharSequence, Boolean> orderBy) {
     setOrderByInternal(orderBy);
     final Map<Integer, SortOrder> sortedColumns = new LinkedHashMap<>();
-    for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+    for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
       if (orderBy != null) {
-        final String fieldName = entry.getKey();
+        final CharSequence fieldName = entry.getKey();
         final Boolean order = entry.getValue();
-        final int index = getColumnFieldIndex(fieldName);
+        final int index = getColumnFieldIndex(fieldName.toString());
         if (index != -1) {
           SortOrder sortOrder;
           if (order) {
@@ -479,7 +502,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     setSortedColumns(sortedColumns);
   }
 
-  private void setOrderByInternal(final Map<String, Boolean> orderBy) {
+  private void setOrderByInternal(final Map<? extends CharSequence, Boolean> orderBy) {
     if (Property.hasValue(orderBy)) {
       this.orderBy = orderBy;
       this.orderByComparatorIdentifier = Records.newComparatorOrderByIdentifier(orderBy);
@@ -492,9 +515,9 @@ public class RecordLayerTableModel extends RecordRowTableModel
   @Override
   public SortOrder setSortOrder(final int columnIndex) {
     final SortOrder sortOrder = super.setSortOrder(columnIndex);
-    final String fieldName = getColumnFieldName(columnIndex);
+    final FieldDefinition fieldName = getColumnFieldDefinition(columnIndex);
     if (Property.hasValue(fieldName)) {
-      Map<String, Boolean> orderBy;
+      Map<FieldDefinition, Boolean> orderBy;
       if (sortOrder == SortOrder.ASCENDING) {
         orderBy = Collections.singletonMap(fieldName, true);
       } else if (sortOrder == SortOrder.DESCENDING) {
@@ -515,15 +538,15 @@ public class RecordLayerTableModel extends RecordRowTableModel
   @Override
   public SortOrder setSortOrder(final int columnIndex, final SortOrder sortOrder) {
     super.setSortOrder(columnIndex, sortOrder);
-    final String fieldName = getColumnFieldName(columnIndex);
-    if (Property.hasValue(fieldName)) {
-      Map<String, Boolean> orderBy;
+    final FieldDefinition fieldDefinition = getColumnFieldDefinition(columnIndex);
+    if (fieldDefinition != null) {
+      Map<FieldDefinition, Boolean> orderBy;
       if (sortOrder == SortOrder.ASCENDING) {
-        orderBy = Collections.singletonMap(fieldName, true);
+        orderBy = Collections.singletonMap(fieldDefinition, true);
       } else if (sortOrder == SortOrder.DESCENDING) {
-        orderBy = Collections.singletonMap(fieldName, false);
+        orderBy = Collections.singletonMap(fieldDefinition, false);
       } else {
-        orderBy = Collections.singletonMap(fieldName, true);
+        orderBy = Collections.singletonMap(fieldDefinition, true);
       }
       if (this.sync == null) {
         setOrderByInternal(orderBy);

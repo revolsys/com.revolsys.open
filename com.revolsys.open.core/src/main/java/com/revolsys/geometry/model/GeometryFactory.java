@@ -362,7 +362,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  public static GeometryFactory newGeometryFactory(final Map<String, Object> properties) {
+  public static GeometryFactory newGeometryFactory(final Map<String, ? extends Object> properties) {
     final int coordinateSystemId = Maps.getInteger(properties, "srid", 0);
     final int axisCount = Maps.getInteger(properties, "axisCount", 2);
     final double scaleXY = Maps.getDouble(properties, "scaleXy", 0.0);
@@ -398,7 +398,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   protected GeometryFactory(final int coordinateSystemId, final int axisCount,
     final double... scales) {
     this.coordinateSystemId = coordinateSystemId;
-    this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
+    if (coordinateSystemId > 0) {
+      this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
+    } else {
+      this.coordinateSystem = null;
+    }
     init(axisCount, scales);
   }
 

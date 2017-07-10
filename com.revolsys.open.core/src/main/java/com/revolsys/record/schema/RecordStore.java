@@ -24,7 +24,6 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.ArrayRecord;
@@ -42,6 +41,7 @@ import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.transaction.Transactionable;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.CategoryLabelCountMap;
 import com.revolsys.util.count.LabelCountMap;
@@ -57,25 +57,6 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
       }
     }
     return false;
-  }
-
-  @SuppressWarnings("unchecked")
-  static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory("recordStore",
-      (final Map<String, ? extends Object> config) -> {
-        final Map<String, Object> connectionProperties = (Map<String, Object>)config
-          .get("connection");
-        if (Property.isEmpty(connectionProperties)) {
-          throw new IllegalArgumentException(
-            "Record store must include a 'connection' map property: " + config);
-        } else {
-          final RecordStore recordStore = RecordStore.newRecordStore(connectionProperties);
-          recordStore.setProperties(config);
-          recordStore.initialize();
-          return recordStore;
-        }
-      });
-    MapObjectFactoryRegistry.newFactory("codeTable", CodeTableProperty::new);
   }
 
   static <T extends RecordStore> T newRecordStore(final File file) {
@@ -95,7 +76,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   /**
-   * Construct a newn initialized record store.
+   * Construct a new initialized record store.
    * @param connectionProperties
    * @return
    */
@@ -138,12 +119,33 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
+  @SuppressWarnings("unchecked")
+  static <T extends RecordStore> T newRecordStoreInitialized(
+    final Map<String, ? extends Object> config) {
+    final Map<String, Object> connectionProperties = (Map<String, Object>)config.get("connection");
+    if (Property.isEmpty(connectionProperties)) {
+      throw new IllegalArgumentException(
+        "Record store must include a 'connection' map property: " + config);
+    } else {
+      long startTime = System.currentTimeMillis();
+      final RecordStore recordStore = RecordStore.newRecordStore(connectionProperties);
+      Dates.debugEllapsedTime(RecordStore.class, "new", startTime);
+      recordStore.setProperties(config);
+      Dates.debugEllapsedTime(RecordStore.class, "setProperties", startTime);
+      recordStore.initialize();
+      startTime = Dates.debugEllapsedTime(RecordStore.class, "init", startTime);
+      return (T)recordStore;
+    }
+  }
+
   static RecordStoreFactory recordStoreFactory(final String url) {
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
     } else {
-      for (final RecordStoreFactory factory : IoFactory.factories(RecordStoreFactory.class)) {
-        if (factory.canOpenUrl(url)) {
+      final List<RecordStoreFactory> factories = IoFactory.factories(RecordStoreFactory.class);
+      for (final RecordStoreFactory factory : factories) {
+        final boolean canOpenUrl = factory.canOpenUrl(url);
+        if (canOpenUrl) {
           return factory;
         }
       }
@@ -319,7 +321,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   int getRecordCount(Query query);
 
-  default RecordDefinition getRecordDefinition(final PathName path) {
+  default <RD extends RecordDefinition> RD getRecordDefinition(final PathName path) {
     if (path == null) {
       return null;
     } else {
@@ -333,15 +335,17 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
-  default RecordDefinition getRecordDefinition(final RecordDefinition objectRecordDefinition) {
+  default <RD extends RecordDefinition> RD getRecordDefinition(
+    final RecordDefinition objectRecordDefinition) {
     final String typePath = objectRecordDefinition.getPath();
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    final RD recordDefinition = getRecordDefinition(typePath);
     return recordDefinition;
   }
 
   @Override
-  default RecordDefinition getRecordDefinition(final String path) {
-    return getRecordDefinition(PathName.newPathName(path));
+  default <RD extends RecordDefinition> RD getRecordDefinition(final String path) {
+    final PathName pathName = PathName.newPathName(path);
+    return getRecordDefinition(pathName);
   }
 
   default List<RecordDefinition> getRecordDefinitions(final PathName path) {
@@ -394,14 +398,14 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   String getRecordStoreType();
 
-  RecordStoreSchema getRootSchema();
+  <RSS extends RecordStoreSchema> RSS getRootSchema();
 
-  default RecordStoreSchema getSchema(final PathName pathName) {
+  default <RSS extends RecordStoreSchema> RSS getSchema(final PathName pathName) {
     final RecordStoreSchema rootSchema = getRootSchema();
     return rootSchema.getSchema(pathName);
   }
 
-  default RecordStoreSchema getSchema(final String path) {
+  default <RSS extends RecordStoreSchema> RSS getSchema(final String path) {
     return getSchema(PathName.newPathName(path));
   }
 
@@ -480,6 +484,20 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   default Identifier newPrimaryIdentifier(final PathName typePath) {
     return null;
+  }
+
+  default Query newQuery(final PathName pathName) {
+    final RecordDefinition recordDefinition = getRecordDefinition(pathName);
+    if (recordDefinition == null) {
+      throw new IllegalArgumentException("Cannot find table: " + pathName);
+    } else {
+      return new Query(recordDefinition);
+    }
+  }
+
+  default Query newQuery(final String typeName) {
+    final PathName typePath = PathName.newPathName(typeName);
+    return new Query(typePath);
   }
 
   default Query newQuery(final String typePath, final String whereClause,

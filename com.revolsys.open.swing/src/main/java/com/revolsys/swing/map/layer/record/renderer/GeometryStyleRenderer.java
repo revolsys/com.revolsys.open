@@ -224,7 +224,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
       final Graphics2D graphics = image.createGraphics();
       graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-      if (DataTypes.POLYGON.equals(geometryDataType)) {
+      if (DataTypes.POLYGON.equals(geometryDataType)
+        || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         graphics.setPaint(geometryStyle.getPolygonFill());
         graphics.fill(shape);
       }

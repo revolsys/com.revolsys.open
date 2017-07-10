@@ -69,8 +69,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
           }
           try (
             final PreparedStatement statement = connection.prepareStatement(sql);
-            final ResultSet resultSet = JdbcQueryIterator.getResultSet(recordDefinition, statement,
-              getQuery());) {
+            final ResultSet resultSet = JdbcQueryIterator.getResultSet(statement, getQuery());) {
             if (resultSet.next()) {
               int i = 0;
               do {

@@ -95,9 +95,10 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public RecordStoreSchema getSchema() {
-    return this.schema;
+  public <RSS extends RecordStoreSchema> RSS getSchema() {
+    return (RSS)this.schema;
   }
 
   @Override

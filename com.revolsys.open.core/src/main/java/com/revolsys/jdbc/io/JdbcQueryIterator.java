@@ -13,6 +13,7 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
@@ -23,7 +24,6 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.count.LabelCountMap;
 
@@ -50,8 +50,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     return record;
   }
 
-  public static ResultSet getResultSet(final RecordDefinition recordDefinition,
-    final PreparedStatement statement, final Query query) throws SQLException {
+  public static ResultSet getResultSet(final PreparedStatement statement, final Query query)
+    throws SQLException {
     JdbcUtils.setPreparedStatementParameters(statement, query);
 
     return statement.executeQuery();
@@ -69,7 +69,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
   private Query query;
 
-  private RecordDefinition recordDefinition;
+  private JdbcRecordDefinition recordDefinition;
 
   private RecordFactory<Record> recordFactory;
 
@@ -165,23 +165,38 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
   protected ResultSet getResultSet() {
     final String tableName = this.query.getTypeName();
-    this.recordDefinition = this.query.getRecordDefinition();
+    final RecordDefinition queryRecordDefinition = this.query.getRecordDefinition();
+    if (queryRecordDefinition != null) {
+      this.recordDefinition = this.recordStore.getRecordDefinition(queryRecordDefinition);
+      if (this.recordDefinition != null) {
+        this.query.setRecordDefinition(this.recordDefinition);
+      }
+    }
     if (this.recordDefinition == null) {
       if (tableName != null) {
         this.recordDefinition = this.recordStore.getRecordDefinition(tableName);
         this.query.setRecordDefinition(this.recordDefinition);
       }
     }
+    String dbTableName;
+    if (this.recordDefinition == null) {
+      final PathName pathName = PathName.newPathName(tableName);
+      dbTableName = pathName.getName();
+    } else {
+      dbTableName = this.recordDefinition.getDbTableName();
+    }
+
     final String sql = getSql(this.query);
     try {
       this.statement = this.connection.prepareStatement(sql);
       this.statement.setFetchSize(this.fetchSize);
 
-      this.resultSet = getResultSet(this.recordDefinition, this.statement, this.query);
+      this.resultSet = getResultSet(this.statement, this.query);
       final ResultSetMetaData resultSetMetaData = this.resultSet.getMetaData();
 
       if (this.recordDefinition == null) {
-        this.recordDefinition = this.recordStore.getRecordDefinition(tableName, resultSetMetaData);
+        this.recordDefinition = this.recordStore.getRecordDefinition(tableName, resultSetMetaData,
+          dbTableName);
       }
       final List<String> fieldNames = new ArrayList<>(this.query.getFieldNames());
       if (fieldNames.isEmpty()) {
@@ -207,8 +222,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
       final String typePath = this.query.getTypeNameAlias();
       if (typePath != null) {
-        final RecordDefinitionImpl newRecordDefinition = ((RecordDefinitionImpl)this.recordDefinition)
-          .rename(typePath);
+        final JdbcRecordDefinition newRecordDefinition = this.recordDefinition.rename(typePath);
         this.recordDefinition = newRecordDefinition;
       }
     } catch (final SQLException e) {

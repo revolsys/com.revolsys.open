@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.swing.Icon;
 import javax.swing.SwingWorker;
@@ -91,6 +92,12 @@ public class ModeAllPaged extends ModeAbstractCached {
       }
     }
     return accept;
+  }
+
+  @Override
+  public void forEachRecord(final Query query, final Consumer<? super LayerRecord> action) {
+    final AbstractRecordLayer layer = getLayer();
+    layer.forEachRecord(query, action);
   }
 
   @Override

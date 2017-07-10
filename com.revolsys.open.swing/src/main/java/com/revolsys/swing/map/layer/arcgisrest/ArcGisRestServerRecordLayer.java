@@ -15,7 +15,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.PathName;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
@@ -25,8 +24,6 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.UrlResource;
-import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
@@ -39,16 +36,10 @@ import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
-import com.revolsys.swing.tree.node.WebServiceConnectionTrees;
-import com.revolsys.util.OS;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 
 public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
-  public static final String J_TYPE = "arcGisRestServerRecordLayer";
-
   private static final Map<String, List<Double>> LINE_STYLE_PATTERNS = Maps
     .<String, List<Double>> buildHash() //
     .add("esriSLSDash", GeometryStyle.DASH_5) //
@@ -58,18 +49,6 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     .add("esriSLSNull", null) //
     .add("esriSLSSolid", Collections.emptyList()) //
     .getMap();
-
-  private static void actionAddLayer(final FeatureLayer layerDescription) {
-    final LayerGroup layerGroup = WebServiceConnectionTrees.getLayerGroup(layerDescription);
-    if (layerGroup != null) {
-      final ArcGisRestServerRecordLayer layer = new ArcGisRestServerRecordLayer(layerDescription);
-      layerGroup.addLayer(layer);
-      if (OS.getPreferenceBoolean("com.revolsys.gis", AbstractLayer.PREFERENCE_PATH,
-        AbstractLayer.PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false)) {
-        layer.showTableView();
-      }
-    }
-  }
 
   public static Color getColor(final MapEx properties) {
     final String fieldName = "color";
@@ -88,16 +67,6 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     return null;
   }
 
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "Arc GIS REST Server Record Layer",
-      ArcGisRestServerRecordLayer::new);
-
-    final MenuFactory recordLayerDescriptionMenu = MenuFactory.getMenu(FeatureLayer.class);
-
-    Menus.addMenuItem(recordLayerDescriptionMenu, "default", "Add Layer", "map_add",
-      ArcGisRestServerRecordLayer::actionAddLayer, false);
-  }
-
   private FeatureLayer layerDescription;
 
   private String url;
@@ -109,7 +78,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   private String password;
 
   public ArcGisRestServerRecordLayer() {
-    super(J_TYPE);
+    super(ArcGisRestServer.J_TYPE_RECORD);
     setReadOnly(true);
   }
 
@@ -225,7 +194,8 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
+  protected void forEachRecordInternal(final Query query,
+    final Consumer<? super LayerRecord> consumer) {
     try (
       RecordReader reader = this.layerDescription.newRecordReader(this::newLayerRecord, query)) {
       for (final Record record : reader) {

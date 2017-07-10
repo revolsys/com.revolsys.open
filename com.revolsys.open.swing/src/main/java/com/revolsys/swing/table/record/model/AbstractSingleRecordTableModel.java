@@ -219,14 +219,14 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
       String text;
       final RecordDefinition recordDefinition = getRecordDefinition();
       final String idFieldName = recordDefinition.getIdFieldName();
-      final String name = getColumnFieldName(rowIndex);
+      final String fieldName = getColumnFieldName(rowIndex);
       if (objectValue instanceof Geometry) {
         final Geometry geometry = (Geometry)objectValue;
         return geometry.toString();
       }
       CodeTable codeTable = null;
-      if (!name.equals(idFieldName)) {
-        codeTable = recordDefinition.getCodeTableByFieldName(name);
+      if (!recordDefinition.isIdField(fieldName)) {
+        codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
       }
       if (codeTable == null) {
         text = DataTypes.toString(objectValue);

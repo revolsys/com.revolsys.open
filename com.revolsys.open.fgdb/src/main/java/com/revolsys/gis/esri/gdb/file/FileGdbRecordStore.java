@@ -1231,7 +1231,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
     final String catalogPath = getCatalogPath(typePath);
     final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
-    final Map<String, Boolean> orderBy = query.getOrderBy();
+    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
     final StringBuilder whereClause = getWhereClause(query);
     StringBuilder sql = new StringBuilder();
     if (orderBy.isEmpty() || boundingBox != null) {
@@ -1256,9 +1256,9 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         sql.append(whereClause);
       }
       boolean first = true;
-      for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
-        final String column = entry.getKey();
-        final DataType dataType = recordDefinition.getFieldType(column);
+      for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
+        final CharSequence fieldName = entry.getKey();
+        final DataType dataType = recordDefinition.getFieldType(fieldName);
         if (dataType != null && !Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
           if (first) {
             sql.append(" ORDER BY ");
@@ -1266,14 +1266,19 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           } else {
             sql.append(", ");
           }
-          sql.append(column);
+          if (fieldName instanceof FieldDefinition) {
+            final FieldDefinition field = (FieldDefinition)fieldName;
+            field.appendColumnName(sql);
+          } else {
+            sql.append(fieldName);
+          }
           final Boolean ascending = entry.getValue();
           if (!ascending) {
             sql.append(" DESC");
           }
 
         } else {
-          Logs.error(this, "Unable to sort on " + recordDefinition.getPath() + "." + column
+          Logs.error(this, "Unable to sort on " + recordDefinition.getPath() + "." + fieldName
             + " as the ESRI library can't sort on " + dataType + " columns");
         }
       }

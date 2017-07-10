@@ -21,7 +21,6 @@ import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServerRecordLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
@@ -52,13 +51,14 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
   }
 
   public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "Map Guide Web Server Record Layer",
-      ArcGisRestServerRecordLayer::new);
+    MapObjectFactoryRegistry.newFactory(J_TYPE, "Map Guide Web Server Record Layer", (config) -> {
+      return new MapGuideWebServerRecordLayer(config);
+    });
 
-    final MenuFactory recordLayerDescriptionMenu = MenuFactory.getMenu(FeatureLayer.class);
-
-    Menus.addMenuItem(recordLayerDescriptionMenu, "default", "Add Layer", "map_add",
-      MapGuideWebServerRecordLayer::actionAddLayer, false);
+    MenuFactory.addMenuInitializer(FeatureLayer.class, (menu) -> {
+      Menus.addMenuItem(menu, "default", "Add Layer", "map_add",
+        MapGuideWebServerRecordLayer::actionAddLayer, false);
+    });
   }
 
   private FeatureLayer webServiceLayer;
@@ -88,7 +88,8 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
+  protected void forEachRecordInternal(final Query query,
+    final Consumer<? super LayerRecord> consumer) {
     try (
       RecordReader reader = this.webServiceLayer.newRecordReader(this::newLayerRecord, query)) {
       for (final Record record : reader) {

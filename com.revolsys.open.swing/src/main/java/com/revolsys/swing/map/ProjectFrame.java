@@ -48,7 +48,6 @@ import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.logging.Logs;
 import com.revolsys.process.JavaProcess;
-import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
@@ -62,7 +61,6 @@ import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.component.DnDTabbedPane;
 import com.revolsys.swing.component.TabClosableTitle;
 import com.revolsys.swing.logging.Log4jTableModel;
-import com.revolsys.swing.map.form.RecordStoreConnectionForm;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -101,32 +99,6 @@ public class ProjectFrame extends BaseFrame {
   public static final String SAVE_PROJECT_KEY = "Save Project";
 
   private static final long serialVersionUID = 1L;
-
-  static {
-    RecordStoreConnectionManager.setInvalidRecordStoreFunction((connection, exception) -> {
-      return Invoke.andWait(() -> {
-        final RecordStoreConnectionRegistry registry = connection.getRegistry();
-        final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection,
-          exception);
-        return form.showDialog();
-      });
-    });
-
-    RecordStoreConnectionManager.setMissingRecordStoreFunction((name) -> {
-      final RecordStoreConnectionRegistry registry = RecordStoreConnectionManager.get()
-        .getUserConnectionRegistry();
-      Invoke.andWait(() -> {
-        final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, name);
-        form.showDialog();
-      });
-      final RecordStoreConnection connection = registry.getConnection(name);
-      if (connection == null) {
-        return null;
-      } else {
-        return connection.getRecordStore();
-      }
-    });
-  }
 
   public static void addSaveActions(final JComponent component, final Project project) {
     final InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -621,8 +593,9 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory tools = newMenuTools();
 
     if (OS.isWindows()) {
-      tools.addMenuItem("options", "Options...", "Options...", (String)null,
-        PreferencesDialog.get()::showPanel);
+      tools.addMenuItem("options", "Options...", "Options...", (String)null, () -> {
+        new PreferencesDialog().showPanel();
+      });
     }
     addMenu(menuBar, tools);
     return menuBar;

@@ -43,8 +43,9 @@ import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
+import com.revolsys.util.ServiceInitializer;
 
-public class Gdal {
+public class Gdal implements ServiceInitializer {
   private static boolean available = false;
 
   static {
@@ -450,11 +451,6 @@ public class Gdal {
   public static void init() {
   }
 
-  public static void ioFactoryInit() {
-    addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
-    addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
-  }
-
   public static boolean isAvailable() {
     return available;
   }
@@ -548,5 +544,11 @@ public class Gdal {
     if (spatialReference != null) {
       dataset.SetProjection(spatialReference.ExportToWkt());
     }
+  }
+
+  @Override
+  public void initializeService() {
+    addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
+    addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
   }
 }

@@ -173,13 +173,17 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     }
   }
 
-  default boolean equalValue(final CharSequence fieldName, final Object value) {
+  default boolean equalValue(final CharSequence fieldName, Object value) {
     final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
     if (fieldDefinition == null) {
       return false;
     } else {
       final int fieldIndex = fieldDefinition.getIndex();
       final Object fieldValue = getValue(fieldIndex);
+      final CodeTable codeTable = fieldDefinition.getCodeTable();
+      if (codeTable != null) {
+        value = codeTable.getIdentifier(value);
+      }
       return fieldDefinition.equals(fieldValue, value);
     }
   }
@@ -1036,8 +1040,7 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     String codeTableValueName = null;
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (dotIndex == -1) {
-      final String idFieldName = recordDefinition.getIdFieldName();
-      if (name.equals(idFieldName)) {
+      if (recordDefinition.isIdField(name)) {
         codeTableFieldName = null;
       } else {
         codeTableFieldName = name;
@@ -1156,6 +1159,14 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
   default int size() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getFieldCount();
+  }
+
+  default void validateField(final FieldDefinition field) {
+    if (field != null) {
+      final int index = field.getIndex();
+      final Object value = getValue(index);
+      field.validate(this, value);
+    }
   }
 
   default void validateField(final int fieldIndex) {

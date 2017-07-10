@@ -20,6 +20,7 @@ import javax.swing.ImageIcon;
 import com.revolsys.awt.CloseableAffineTransform;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.swing.Fonts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 
@@ -30,8 +31,8 @@ public class TextMarker extends AbstractMarker {
 
   private String textFaceName = "san-serif";
 
-  public TextMarker(final Map<String, Object> properties) {
-    setProperties(properties);
+  public TextMarker(final Map<String, ? extends Object> config) {
+    setProperties(config);
   }
 
   public TextMarker(final String textFaceName, final String text) {
@@ -80,7 +81,7 @@ public class TextMarker extends AbstractMarker {
       RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
     final String textFaceName = getTextFaceName();
-    final Font font = new Font(textFaceName, 0, 14);
+    final Font font = Fonts.newFont(textFaceName, 0, 14);
     graphics.setFont(font);
     final FontMetrics fontMetrics = graphics.getFontMetrics();
 
@@ -131,7 +132,7 @@ public class TextMarker extends AbstractMarker {
       }
       final int fontSize = (int)mapHeight;
       if (this.font == null || this.font.getSize() != fontSize) {
-        this.font = new Font(this.textFaceName, 0, fontSize);
+        this.font = Fonts.newFont(this.textFaceName, 0, fontSize);
       }
 
       final FontRenderContext fontRenderContext = graphics.getFontRenderContext();

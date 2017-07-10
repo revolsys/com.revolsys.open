@@ -1,6 +1,7 @@
 package com.revolsys.swing.preferences;
 
 import java.beans.PropertyChangeSupport;
+import java.util.function.Function;
 
 import javax.swing.JComponent;
 
@@ -37,6 +38,23 @@ public class Preference implements PropertyChangeSupportProxy {
   public Preference(final String applicationName, final String path, final String propertyName,
     final DataType dataType, final Object defaultValue, final Field field) {
     this(applicationName, path, propertyName, dataType, defaultValue, (JComponent)field);
+  }
+
+  public Preference(final String applicationName, final String path, final String propertyName,
+    final DataType dataType, final Object defaultValue,
+    final Function<Preference, Field> fieldFactory) {
+    this.applicationName = applicationName;
+    this.path = path;
+    this.propertyName = propertyName;
+    this.dataType = dataType;
+    this.savedValue = OS.getPreference(applicationName, path, propertyName, defaultValue);
+    if (fieldFactory == null) {
+      this.fieldComponent = SwingUtil.newField(dataType, propertyName, defaultValue);
+    } else {
+      this.fieldComponent = (JComponent)fieldFactory.apply(this);
+    }
+    this.field = (Field)this.fieldComponent;
+    cancelChanges();
   }
 
   public Preference(final String applicationName, final String path, final String propertyName,

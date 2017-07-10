@@ -26,6 +26,7 @@ import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.FileRecordStoreFactory;
 import com.revolsys.record.io.RecordStoreConnection;
+import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.swing.component.Form;
@@ -35,6 +36,7 @@ import com.revolsys.swing.field.FileField;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.PasswordField;
 import com.revolsys.swing.field.TextField;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -44,6 +46,32 @@ public final class RecordStoreConnectionForm extends Form {
     "password");
 
   private static final long serialVersionUID = 2750736040832727823L;
+
+  public static void addHandlers() {
+    RecordStoreConnectionManager.setInvalidRecordStoreFunction((connection, exception) -> {
+      return Invoke.andWait(() -> {
+        final RecordStoreConnectionRegistry registry = connection.getRegistry();
+        final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection,
+          exception);
+        return form.showDialog();
+      });
+    });
+
+    RecordStoreConnectionManager.setMissingRecordStoreFunction((name) -> {
+      final RecordStoreConnectionRegistry registry = RecordStoreConnectionManager.get()
+        .getUserConnectionRegistry();
+      Invoke.andWait(() -> {
+        final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, name);
+        form.showDialog();
+      });
+      final RecordStoreConnection connection = registry.getConnection(name);
+      if (connection == null) {
+        return null;
+      } else {
+        return connection.getRecordStore();
+      }
+    });
+  }
 
   private final List<String> recordStoreTypes;
 

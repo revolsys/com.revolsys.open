@@ -8,8 +8,9 @@ import java.util.Map;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.jdbc.io.JdbcRecordDefinition;
+import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 
 public class JdbcFieldAdder {
@@ -153,7 +154,7 @@ public class JdbcFieldAdder {
   }
 
   public FieldDefinition addField(final AbstractJdbcRecordStore recordStore,
-    final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
+    final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
     final String dataType, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
     JdbcFieldDefinition field;
@@ -247,6 +248,6 @@ public class JdbcFieldAdder {
     return field;
   }
 
-  public void initialize(final RecordStoreSchema schema) {
+  public void initialize(final JdbcRecordStoreSchema schema) {
   }
 }

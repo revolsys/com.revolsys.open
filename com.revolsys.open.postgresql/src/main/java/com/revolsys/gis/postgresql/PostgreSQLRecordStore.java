@@ -1,6 +1,7 @@
 package com.revolsys.gis.postgresql;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -18,10 +19,9 @@ import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryFieldAdder;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLJdbcBlobFieldDefinition;
-import com.revolsys.gis.postgresql.type.PostgreSQLOidFiedDefinition;
+import com.revolsys.gis.postgresql.type.PostgreSQLOidFieldDefinition;
 import com.revolsys.gis.postgresql.type.PostgreSQLTidWrapper;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
@@ -29,6 +29,8 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldFactory;
 import com.revolsys.jdbc.field.JdbcFieldFactoryAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.jdbc.io.JdbcRecordDefinition;
+import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -37,8 +39,8 @@ import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
@@ -81,12 +83,12 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  protected JdbcFieldDefinition addField(final RecordDefinitionImpl recordDefinition,
+  protected JdbcFieldDefinition addField(final JdbcRecordDefinition recordDefinition,
     final String dbColumnName, final String name, final String dataType, final int sqlType,
     final int length, final int scale, final boolean required, final String description) {
     final JdbcFieldDefinition field = super.addField(recordDefinition, dbColumnName, name, dataType,
       sqlType, length, scale, required, description);
-    if (!dbColumnName.matches("[a-z_]")) {
+    if (!dbColumnName.matches("[a-z_]+")) {
       field.setQuoteName(true);
     }
     return field;
@@ -121,7 +123,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public String getGeneratePrimaryKeySql(final RecordDefinition recordDefinition) {
+  public String getGeneratePrimaryKeySql(final JdbcRecordDefinition recordDefinition) {
     final String sequenceName = getSequenceName(recordDefinition);
     return "nextval('" + sequenceName + "')";
   }
@@ -149,13 +151,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public Identifier getNextPrimaryKey(final RecordDefinition recordDefinition) {
-    final String sequenceName = getSequenceName(recordDefinition);
-    return getNextPrimaryKey(sequenceName);
-  }
-
-  @Override
-  public Identifier getNextPrimaryKey(final String sequenceName) {
+  protected Identifier getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT nextval(?)";
     return Identifier.newIdentifier(JdbcUtils.selectLong(this, sql, sequenceName));
   }
@@ -166,10 +162,9 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public String getSequenceName(final RecordDefinition recordDefinition) {
-    final PathName typePath = recordDefinition.getPathName();
-    final PathName schemaPath = typePath.getParent();
-    final String dbSchemaName = getDatabaseSchemaName(schemaPath);
+  protected String getSequenceName(final JdbcRecordDefinition recordDefinition) {
+    final JdbcRecordStoreSchema schema = recordDefinition.getSchema();
+    final String dbSchemaName = schema.getDbName();
     final String shortName = ShortNameProperty.getShortName(recordDefinition);
     final String sequenceName;
     if (Property.hasValue(shortName)) {
@@ -179,7 +174,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
         sequenceName = shortName.toLowerCase() + "_seq";
       }
     } else {
-      final String tableName = getDatabaseTableName(typePath);
+      final String tableName = recordDefinition.getDbTableName();
       final String idFieldName = recordDefinition.getIdFieldName().toLowerCase();
       if (this.useSchemaSequencePrefix) {
         sequenceName = dbSchemaName + "." + tableName + "_" + idFieldName + "_seq";
@@ -248,16 +243,48 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       + "t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) and "
       + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') ");
     setSchemaTablePermissionsSql(
-      "select distinct t.table_schema as \"SCHEMA_NAME\", t.table_name, t.privilege_type as \"PRIVILEGE\", d.description as \"REMARKS\" from information_schema.role_table_grants t join pg_namespace n on t.table_schema = n.nspname join pg_class c on (n.oid = c.relnamespace AND t.table_name = c.relname) left join pg_description d on d.objoid = c.oid "
-        + "where t.table_schema = ? and "
-        + "(t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
-        + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
-        + "order by t.table_schema, t.table_name, t.privilege_type");
+      "select distinct t.table_schema as \"SCHEMA_NAME\", t.table_name, t.privilege_type as \"PRIVILEGE\", d.description as \"REMARKS\", "
+        + "  CASE WHEN relkind = 'r' THEN 'TABLE' WHEN relkind = 'v' THEN 'VIEW' ELSE relkind || '' END \"TABLE_TYPE\" "
+        + "from" //
+        + "  information_schema.role_table_grants t"//
+        + "    join pg_namespace n on t.table_schema = n.nspname"//
+        + "    join pg_class c on (n.oid = c.relnamespace AND t.table_name = c.relname)"//
+        + "    left join pg_description d on d.objoid = c.oid "//
+        + "where" //
+        + "  t.table_schema = ? and "//
+        + "  (t.grantee in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
+        + "  privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
+        + "  order by t.table_schema, t.table_name, t.privilege_type");
   }
 
   protected void initSettings() {
     setIteratorFactory(
       new RecordStoreIteratorFactory(PostgreSQLRecordStore::newPostgreSQLIterator));
+  }
+
+  @Override
+  public PreparedStatement insertStatementPrepareRowId(final JdbcConnection connection,
+    final RecordDefinition recordDefinition, final String sql) throws SQLException {
+    final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+    final String[] idColumnNames = new String[idFields.size()];
+    for (int i = 0; i < idFields.size(); i++) {
+      final FieldDefinition idField = idFields.get(0);
+      final String columnName = ((JdbcFieldDefinition)idField).getDbName();
+      idColumnNames[i] = columnName;
+    }
+    return connection.prepareStatement(sql, idColumnNames);
+  }
+
+  @Override
+  public boolean isIdFieldRowid(final RecordDefinition recordDefinition) {
+    final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+    if (idFields.size() == 1) {
+      final FieldDefinition idField = idFields.get(0);
+      if (idField instanceof PostgreSQLOidFieldDefinition) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -271,7 +298,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   @Override
   protected JdbcFieldDefinition newRowIdFieldDefinition() {
-    return new PostgreSQLOidFiedDefinition();
+    return new PostgreSQLOidFieldDefinition();
   }
 
   @Override

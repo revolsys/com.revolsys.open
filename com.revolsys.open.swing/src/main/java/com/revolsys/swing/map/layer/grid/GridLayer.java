@@ -24,26 +24,25 @@ import com.revolsys.util.Property;
 
 public class GridLayer extends AbstractLayer {
   static {
-    final MenuFactory menu = MenuFactory.getMenu(GridLayer.class);
-
-    menu.deleteMenuItem("zoom", "Zoom to Layer");
-    menu.deleteMenuItem("refresh", "Refresh");
-
-    Menus.<GridLayer> addMenuItem(menu, "zoom", "Zoom to Mapsheet", "magnifier_zoom_grid",
-      GridLayer::zoomToSheet, false);
+    MenuFactory.addMenuInitializer(GridLayer.class, (menu) -> {
+      menu.deleteMenuItem("zoom", "Zoom to Layer");
+      menu.deleteMenuItem("refresh", "Refresh");
+      Menus.<GridLayer> addMenuItem(menu, "zoom", "Zoom to Mapsheet", "magnifier_zoom_grid",
+        GridLayer::zoomToSheet, false);
+    });
   }
 
-  public static GridLayer newLayer(final Map<String, Object> properties) {
-    return new GridLayer(properties);
+  public static GridLayer newLayer(final Map<String, ? extends Object> config) {
+    return new GridLayer(config);
   }
 
   private String gridName;
 
   private RectangularMapGrid grid;
 
-  public GridLayer(final Map<String, Object> properties) {
+  public GridLayer(final Map<String, ? extends Object> config) {
     super("gridLayer");
-    setProperties(properties);
+    setProperties(config);
     setReadOnly(true);
     setSelectSupported(false);
     setRenderer(new GridLayerRenderer(this));

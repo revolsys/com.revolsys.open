@@ -14,9 +14,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.logging.Logs;
 
 public interface Dates {
   String DATE_TIME_NANOS_PATTERN = "\\s*(\\d{4})-(\\d{2})-(\\d{2})(?:[\\sT]+(\\d{2})\\:(\\d{2})\\:(\\d{2})(?:\\.(\\d{1,9}))?)?\\s*";
+
+  static long debugEllapsedTime(final Class<?> clazz, final String message, final long startTime) {
+    final long endTime = System.currentTimeMillis();
+    final String timeString = toEllapsedTime(startTime, endTime);
+    Logs.debug(clazz, message + "\t" + timeString);
+    return endTime;
+  }
+
+  static long debugEllapsedTime(final Object object, final String message, final long startTime) {
+    final long endTime = System.currentTimeMillis();
+    final String timeString = toEllapsedTime(startTime, endTime);
+    Logs.debug(object, message + "\t" + timeString);
+    return endTime;
+  }
 
   static boolean equalsNotNull(final Object date1, final Object date2) {
     return ((Date)date1).compareTo((Date)date2) == 0;
@@ -374,8 +389,108 @@ public interface Dates {
     return calendar.get(Calendar.YEAR);
   }
 
+  static long printEllapsedTime(final long startTime) {
+    final long endTime = System.currentTimeMillis();
+    System.out.println(toEllapsedTime(startTime, endTime));
+    return endTime;
+  }
+
+  static long printEllapsedTime(final String message, final long startTime) {
+    final long endTime = System.currentTimeMillis();
+    System.out.println(message + "\t" + toEllapsedTime(startTime, endTime));
+    return endTime;
+  }
+
   static String toDateTimeString(final Date date) {
-    return format("yyyy-MM-dd HH:mm:ss.SSS", date);
+    if (date == null) {
+      return null;
+    } else {
+      final StringBuilder string = new StringBuilder(23);
+      int year = date.getYear() + 1900;
+      if (year < 0) {
+        string.append('-');
+        year = -year;
+      }
+      if (year < 1000) {
+        string.append('0');
+        if (year < 100) {
+          string.append('0');
+        }
+        if (year < 10) {
+          string.append('0');
+        }
+      }
+      string.append(year);
+
+      string.append('-');
+
+      final int month = date.getMonth() + 1;
+      if (month < 10) {
+        string.append('0');
+      }
+      string.append(month);
+
+      string.append('-');
+
+      final int day = date.getDate();
+      if (day < 10) {
+        string.append('0');
+      }
+      string.append(day);
+
+      if (date instanceof java.sql.Date) {
+        string.append(" 00:00:00");
+      } else {
+
+        string.append(' ');
+
+        final int hour = date.getHours();
+
+        if (hour < 10) {
+          string.append('0');
+        }
+        string.append(hour);
+
+        string.append(':');
+
+        final int minutes = date.getMinutes();
+        if (minutes < 10) {
+          string.append('0');
+        }
+        string.append(minutes);
+
+        string.append(':');
+
+        final int seconds = date.getSeconds();
+        if (seconds < 10) {
+          string.append('0');
+        }
+        string.append(seconds);
+
+        string.append('.');
+        final int milliseconds = (int)(date.getTime() % 1000);
+        if (milliseconds == 0) {
+          string.append('0');
+        } else {
+          String millisecondsString = Integer.toString(milliseconds);
+
+          // Add leading zeros
+          millisecondsString = "000".substring(0, 3 - millisecondsString.length())
+            + millisecondsString;
+
+          // Truncate trailing zeros
+          final char[] nanosChar = new char[millisecondsString.length()];
+          millisecondsString.getChars(0, millisecondsString.length(), nanosChar, 0);
+          int truncIndex = 2;
+          while (nanosChar[truncIndex] == '0') {
+            truncIndex--;
+          }
+          string.append(millisecondsString, 0, truncIndex + 1);
+        }
+
+      }
+      return string.toString();
+    }
   }
 
   static String toDateTimeString(final Object value) {
@@ -387,11 +502,91 @@ public interface Dates {
     }
   }
 
+  static String toEllapsedTime(final long time) {
+    final StringBuilder string = new StringBuilder();
+    final long totalSeconds = Math.floorDiv(time, 1000);
+    final long days = Math.floorDiv(totalSeconds, 24 * 60 * 60);
+    if (days > 0) {
+      string.append(days);
+      string.append(' ');
+    }
+    final long hours = Math.floorDiv(totalSeconds, 60 * 60);
+    if (hours > 0) {
+      if (hours < 10 && string.length() > 0) {
+        string.append('0');
+      }
+      string.append(hours);
+      string.append(':');
+    }
+    final long minutes = Math.floorDiv(totalSeconds, 60) % 60;
+    if (minutes > 0) {
+      if (minutes < 10 && string.length() > 0) {
+        string.append('0');
+      }
+      string.append(minutes);
+      string.append(':');
+    }
+    final long seconds = totalSeconds % 60;
+    if (seconds < 10 && string.length() > 0) {
+      string.append('0');
+    }
+    string.append(seconds);
+    final long milliSeconds = time % 1000;
+    if (milliSeconds > 0) {
+      string.append('.');
+      if (milliSeconds < 10) {
+        string.append('0');
+      }
+      if (milliSeconds < 100) {
+        string.append('0');
+      }
+      string.append(milliSeconds);
+    }
+    return string.toString();
+  }
+
+  static String toEllapsedTime(final long startTime, final long endTime) {
+    return toEllapsedTime(endTime - startTime);
+  }
+
   static String toSqlDateString(final Date date) {
     if (date == null) {
       return null;
     } else {
-      return format("yyyy-MM-dd", date);
+      final StringBuilder string = new StringBuilder(10);
+      int year = date.getYear() + 1900;
+      if (year < 0) {
+        string.append('-');
+        year = -year;
+      }
+      if (year < 1000) {
+        string.append('0');
+        if (year < 100) {
+          string.append('0');
+        }
+        if (year < 10) {
+          string.append('0');
+        }
+      }
+      string.append(year);
+
+      string.append('-');
+
+      final int month = date.getMonth() + 1;
+      if (month < 10) {
+        string.append('0');
+      }
+      string.append(month);
+
+      string.append('-');
+
+      final int day = date.getDate();
+      if (day < 10) {
+        string.append('0');
+      }
+      string.append(day);
+
+      return string.toString();
     }
   }
 
@@ -417,7 +612,86 @@ public interface Dates {
     if (date == null) {
       return null;
     } else {
-      return date.toString();
+      int year = date.getYear() + 1900;
+
+      final StringBuilder string = new StringBuilder(26);
+
+      if (year < 0) {
+        string.append('-');
+        year = -year;
+      }
+      if (year < 1000) {
+        string.append('0');
+        if (year < 100) {
+          string.append('0');
+        }
+        if (year < 10) {
+          string.append('0');
+        }
+      }
+      string.append(year);
+
+      string.append('-');
+
+      final int month = date.getMonth() + 1;
+      if (month < 10) {
+        string.append('0');
+      }
+      string.append(month);
+
+      string.append('-');
+
+      final int day = date.getDate();
+      if (day < 10) {
+        string.append('0');
+      }
+      string.append(day);
+
+      string.append(' ');
+
+      final int hour = date.getHours();
+      if (hour < 10) {
+        string.append('0');
+      }
+      string.append(hour);
+
+      string.append(':');
+
+      final int minutes = date.getMinutes();
+      if (minutes < 10) {
+        string.append('0');
+      }
+      string.append(minutes);
+
+      string.append(':');
+
+      final int seconds = date.getSeconds();
+      if (seconds < 10) {
+        string.append('0');
+      }
+      string.append(seconds);
+
+      string.append('.');
+      final int nanos = date.getNanos();
+      if (nanos == 0) {
+        string.append('0');
+      } else {
+        String nanosString = Integer.toString(nanos);
+
+        // Add leading zeros
+        nanosString = "000000000".substring(0, 9 - nanosString.length()) + nanosString;
+
+        // Truncate trailing zeros
+        final char[] nanosChar = new char[nanosString.length()];
+        nanosString.getChars(0, nanosString.length(), nanosChar, 0);
+        int truncIndex = 8;
+        while (nanosChar[truncIndex] == '0') {
+          truncIndex--;
+        }
+        string.append(nanosString, 0, truncIndex + 1);
+      }
+
+      return string.toString();
     }
   }
 }

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -113,8 +114,8 @@ import com.revolsys.swing.map.layer.record.style.panel.QueryFilterField;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordDefinitionTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
-import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordValidationDialog;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
@@ -153,58 +154,60 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public static final String RECORDS_SELECTED = "recordsSelected";
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayer.class);
-    menu.setName("Layer");
-    menu.addGroup(0, "table");
-    menu.addGroup(2, "edit");
-    menu.addGroup(3, "dnd");
+    MenuFactory.addMenuInitializer(AbstractRecordLayer.class, (menu) -> {
+      menu.setName("Layer");
+      menu.addGroup(0, "table");
+      menu.addGroup(2, "edit");
+      menu.addGroup(3, "dnd");
 
-    final Predicate<AbstractRecordLayer> exists = AbstractRecordLayer::isExists;
+      final Predicate<AbstractRecordLayer> exists = AbstractRecordLayer::isExists;
 
-    Menus.addMenuItem(menu, "table", "View Records", "table_go", exists,
-      AbstractRecordLayer::showRecordsTable, false);
+      Menus.addMenuItem(menu, "table", "View Records", "table_go", exists,
+        AbstractRecordLayer::showRecordsTable, false);
 
-    final Predicate<AbstractRecordLayer> hasSelectedRecords = AbstractRecordLayer::isHasSelectedRecords;
-    final Predicate<AbstractRecordLayer> hasSelectedRecordsWithGeometry = AbstractRecordLayer::isHasSelectedRecordsWithGeometry;
+      final Predicate<AbstractRecordLayer> hasSelectedRecords = AbstractRecordLayer::isHasSelectedRecords;
+      final Predicate<AbstractRecordLayer> hasSelectedRecordsWithGeometry = AbstractRecordLayer::isHasSelectedRecordsWithGeometry;
 
-    Menus.addMenuItem(menu, "zoom", "Zoom to Selected", "magnifier_zoom_selected",
-      hasSelectedRecordsWithGeometry, AbstractRecordLayer::zoomToSelected, true);
+      Menus.addMenuItem(menu, "zoom", "Zoom to Selected", "magnifier_zoom_selected",
+        hasSelectedRecordsWithGeometry, AbstractRecordLayer::zoomToSelected, true);
 
-    Menus.addMenuItem(menu, "zoom", "Pan to Selected", "pan_selected",
-      hasSelectedRecordsWithGeometry, AbstractRecordLayer::panToSelected, true);
+      Menus.addMenuItem(menu, "zoom", "Pan to Selected", "pan_selected",
+        hasSelectedRecordsWithGeometry, AbstractRecordLayer::panToSelected, true);
 
-    final Predicate<AbstractRecordLayer> notReadOnly = ((Predicate<AbstractRecordLayer>)AbstractRecordLayer::isReadOnly)
-      .negate();
-    final Predicate<AbstractRecordLayer> canAdd = AbstractRecordLayer::isCanAddRecords;
+      final Predicate<AbstractRecordLayer> notReadOnly = ((Predicate<AbstractRecordLayer>)AbstractRecordLayer::isReadOnly)
+        .negate();
+      final Predicate<AbstractRecordLayer> canAdd = AbstractRecordLayer::isCanAddRecords;
 
-    Menus.addCheckboxMenuItem(menu, "edit", "Editable", "pencil", notReadOnly,
-      AbstractRecordLayer::toggleEditable, AbstractRecordLayer::isEditable, false);
+      Menus.addCheckboxMenuItem(menu, "edit", "Editable", "pencil", notReadOnly,
+        AbstractRecordLayer::toggleEditable, AbstractRecordLayer::isEditable, false);
 
-    Menus.addMenuItem(menu, "edit", "Save Changes", "table_save", AbstractLayer::isHasChanges,
-      AbstractLayer::saveChanges, true);
+      Menus.addMenuItem(menu, "edit", "Save Changes", "table_save", AbstractLayer::isHasChanges,
+        AbstractLayer::saveChanges, true);
 
-    Menus.addMenuItem(menu, "edit", "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
-      AbstractRecordLayer::cancelChanges, true);
+      Menus.addMenuItem(menu, "edit", "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
+        AbstractRecordLayer::cancelChanges, true);
 
-    Menus.addMenuItem(menu, "edit", "Add New Record", "table_row_insert", canAdd,
-      AbstractRecordLayer::addNewRecord, false);
+      Menus.addMenuItem(menu, "edit", "Add New Record", "table_row_insert", canAdd,
+        AbstractRecordLayer::addNewRecord, false);
 
-    Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
-      hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords),
-      AbstractRecordLayer::deleteSelectedRecords, true);
+      Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
+        hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords),
+        AbstractRecordLayer::deleteSelectedRecords, true);
 
-    Menus.addMenuItem(menu, "edit", "Merge Selected Records", "table_row_merge",
-      AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false);
+      Menus.addMenuItem(menu, "edit", "Merge Selected Records", "table_row_merge",
+        AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false);
 
-    Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
-      AbstractRecordLayer::copySelectedRecords, true);
+      Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
+        AbstractRecordLayer::copySelectedRecords, true);
 
-    Menus.addMenuItem(menu, "dnd", "Paste New Records", "paste_plain",
-      canAdd.and(AbstractRecordLayer::isCanPasteRecords), AbstractRecordLayer::pasteRecords, true);
+      Menus.addMenuItem(menu, "dnd", "Paste New Records", "paste_plain",
+        canAdd.and(AbstractRecordLayer::isCanPasteRecords), AbstractRecordLayer::pasteRecords,
+        true);
 
-    Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
-      AbstractRecordLayer::isHasGeometry,
-      (final AbstractRecordLayer layer) -> layer.showProperties("Style"), false);
+      Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
+        AbstractRecordLayer::isHasGeometry,
+        (final AbstractRecordLayer layer) -> layer.showProperties("Style"), false);
+    });
   }
 
   public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
@@ -244,7 +247,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));
       for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
         fileChooser.addChoosableFileFilter(fileFilter);
-        if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
+        if (fileFilter.getExtensions().contains(defaultFileExtension)) {
           fileChooser.setFileFilter(fileFilter);
         }
       }
@@ -823,7 +826,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void exportRecords(final Iterable<LayerRecord> records,
-    final Predicate<? super LayerRecord> filter, final Map<String, Boolean> orderBy,
+    final Predicate<? super LayerRecord> filter, final Map<? extends CharSequence, Boolean> orderBy,
     final Object target) {
     if (Property.hasValue(records) && target != null) {
       final List<LayerRecord> exportRecords = Lists.toArray(records);
@@ -842,7 +845,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (recordDefinition != null) {
       try (
         RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, target)) {
-        forEachRecord(query, writer::write);
+        forEachRecordInternal(query, writer::write);
       }
     }
   }
@@ -875,7 +878,28 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     firePropertyChange("selectionCount", -1, selectionCount);
   }
 
-  protected void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
+  public void forEachRecord(final Iterable<LayerRecord> records,
+    final Predicate<? super LayerRecord> filter, final Map<? extends CharSequence, Boolean> orderBy,
+    final Consumer<? super LayerRecord> action) {
+    try {
+      if (Property.hasValue(records) && action != null) {
+        final List<LayerRecord> exportRecords = Lists.toArray(records);
+
+        Records.filterAndSort(exportRecords, filter, orderBy);
+
+        if (!exportRecords.isEmpty()) {
+          exportRecords.forEach(action);
+        }
+      }
+    } catch (final CancellationException e) {
+    }
+  }
+
+  public void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
+    forEachRecordInternal(query, (record) -> {
+      final LayerRecord proxyRecord = newProxyLayerRecord(record);
+      consumer.accept(proxyRecord);
+    });
   }
 
   public void forEachRecordChanged(final Query query,
@@ -884,12 +908,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     query.forEachRecord(records, consumer);
   }
 
-  protected void forEachRecordProxy(final Query query,
+  protected void forEachRecordInternal(final Query query,
     final Consumer<? super LayerRecord> consumer) {
-    forEachRecord(query, (record) -> {
-      final LayerRecord proxyRecord = newProxyLayerRecord(record);
-      consumer.accept(proxyRecord);
-    });
   }
 
   @SuppressWarnings("unchecked")
@@ -1045,12 +1065,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public BoundingBox getHighlightedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
-    for (final Record record : getHighlightedRecords()) {
-      final Geometry geometry = record.getGeometry();
-      boundingBox = boundingBox.expandToInclude(geometry);
+    if (geometryFactory == null) {
+      return BoundingBox.empty();
+    } else {
+      BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
+      for (final Record record : getHighlightedRecords()) {
+        final Geometry geometry = record.getGeometry();
+        boundingBox = boundingBox.expandToInclude(geometry);
+      }
+      return boundingBox;
     }
-    return boundingBox;
   }
 
   public int getHighlightedCount() {
@@ -1454,12 +1478,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecords(query);
   }
 
+  @SuppressWarnings("unchecked")
   public <R extends LayerRecord> List<R> getRecords(final Query query) {
     final List<R> records = new ArrayList<>();
-    forEachRecord(query, (final LayerRecord record) -> {
-      final R proxyRecord = newProxyLayerRecord(record);
-      records.add(proxyRecord);
-    });
+    final Consumer<LayerRecord> action = (Consumer<LayerRecord>)(Consumer<R>)records::add;
+    forEachRecord(query, action);
     return records;
   }
 
@@ -1771,7 +1794,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return null;
   }
 
-  protected boolean internalSaveChanges(final RecordSaveErrors errors, final LayerRecord record) {
+  protected boolean internalSaveChanges(final RecordLayerErrors errors, final LayerRecord record) {
     final RecordState originalState = record.getState();
     final LayerRecord layerRecord = getProxiedRecord(record);
     final boolean saved = saveChangesDo(errors, layerRecord);
@@ -1983,7 +2006,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       synchronized (getSync()) {
         final Collection<LayerRecord> cachedRecords = this.recordsByCacheId.get(cacheId);
         if (cachedRecords != null) {
-          return cachedRecords.contains(record);
+          return record.contains(cachedRecords);
         }
       }
     }
@@ -2517,7 +2540,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             // Save the valid records
             final List<LayerRecord> validRecords = validator.getValidRecords();
             if (!validRecords.isEmpty()) {
-              final RecordSaveErrors errors = new RecordSaveErrors(this);
+              final RecordLayerErrors errors = new RecordLayerErrors("Saving Changes", this);
               try (
                 BaseCloseable eventsEnabled = eventsDisabled()) {
                 for (final LayerRecord record : validRecords) {
@@ -2572,7 +2595,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         // Save the valid records
         final List<LayerRecord> validRecords = validator.getValidRecords();
         if (!validRecords.isEmpty()) {
-          final RecordSaveErrors errors = new RecordSaveErrors(this);
+          final RecordLayerErrors errors = new RecordLayerErrors("Saving Changes", this);
           try (
             BaseCloseable eventsEnabled = eventsDisabled()) {
             synchronized (this.getSync()) {
@@ -2608,7 +2631,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     throw new UnsupportedOperationException();
   }
 
-  protected boolean saveChangesDo(final RecordSaveErrors errors, final LayerRecord record) {
+  protected boolean saveChangesDo(final RecordLayerErrors errors, final LayerRecord record) {
     return true;
   }
 
@@ -2882,11 +2905,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void setSelectedRecordsById(final Identifier id) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition != null) {
-      final String idFieldName = recordDefinition.getIdFieldName();
-      if (idFieldName == null) {
+      final FieldDefinition idField = recordDefinition.getIdField();
+      if (idField == null) {
         clearSelectedRecords();
       } else {
-        final Query query = Query.equal(recordDefinition, idFieldName, id);
+        final Query query = Query.where(Q::equal, idField, id);
         setSelectedRecords(query);
       }
     }

@@ -87,6 +87,11 @@ public class RecordStoreConnection
     return this.savePassword;
   }
 
+  public RecordStore newRecordStore() {
+    final MapEx config = toMapInternal();
+    return MapObjectFactory.toObject(config);
+  }
+
   @Override
   public void refresh() {
     final RecordStore recordStore = getRecordStore();

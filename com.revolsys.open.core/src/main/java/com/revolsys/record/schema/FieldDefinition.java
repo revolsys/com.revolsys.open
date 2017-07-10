@@ -39,8 +39,8 @@ import com.revolsys.util.Strings;
  */
 public class FieldDefinition extends BaseObjectWithProperties
   implements CharSequence, Cloneable, MapSerializer, DataTypeProxy {
-  public static FieldDefinition newFieldDefinition(final Map<String, Object> properties) {
-    return new FieldDefinition(properties);
+  public static FieldDefinition newFieldDefinition(final Map<String, ? extends Object> config) {
+    return new FieldDefinition(config);
   }
 
   private final Map<Object, Object> allowedValues = new LinkedHashMap<>();
@@ -53,6 +53,8 @@ public class FieldDefinition extends BaseObjectWithProperties
   private String description;
 
   private int index;
+
+  private boolean idField;
 
   /** The maximum length of an field value. */
   private int length;
@@ -101,7 +103,7 @@ public class FieldDefinition extends BaseObjectWithProperties
     this.index = index;
   }
 
-  public FieldDefinition(final Map<String, Object> properties) {
+  public FieldDefinition(final Map<String, ? extends Object> properties) {
     this.name = Maps.getString(properties, "name");
     final String title = Maps.getString(properties, "title");
     setTitle(title);
@@ -289,6 +291,32 @@ public class FieldDefinition extends BaseObjectWithProperties
 
   public void addAllowedValue(final Object value, final Object text) {
     this.allowedValues.put(value, text);
+  }
+
+  public void appendColumnName(final StringBuilder sql) {
+    sql.append(this.name);
+  }
+
+  public void appendColumnName(final StringBuilder sql, final boolean quoteName) {
+    if (quoteName) {
+      sql.append('"');
+    }
+    sql.append(this.name);
+    if (quoteName) {
+      sql.append('"');
+    }
+  }
+
+  public void appendColumnName(final StringBuilder sql, final String tablePrefix) {
+    if (tablePrefix != null) {
+      sql.append(tablePrefix);
+      sql.append(".");
+    }
+    appendColumnName(sql);
+  }
+
+  public void appendSelectColumnName(final StringBuilder sql, final String tablePrefix) {
+    appendColumnName(sql, tablePrefix);
   }
 
   public void appendType(final StringBuilder string) {
@@ -485,6 +513,10 @@ public class FieldDefinition extends BaseObjectWithProperties
     return this.name.hashCode();
   }
 
+  public boolean isIdField() {
+    return this.idField;
+  }
+
   /**
    * Get the flag indicating if a value is required for the field.
    *
@@ -534,6 +566,10 @@ public class FieldDefinition extends BaseObjectWithProperties
   public FieldDefinition setDescription(final String description) {
     this.description = description;
     return this;
+  }
+
+  public void setIdField(final boolean idField) {
+    this.idField = idField;
   }
 
   void setIndex(final int index) {

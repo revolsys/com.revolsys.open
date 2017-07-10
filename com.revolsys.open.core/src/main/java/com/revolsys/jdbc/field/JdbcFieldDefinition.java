@@ -113,21 +113,6 @@ public class JdbcFieldDefinition extends FieldDefinition {
     this.sqlType = sqlType;
   }
 
-  public void addColumnName(final StringBuilder sql, final String tablePrefix) {
-    if (tablePrefix != null) {
-      sql.append(tablePrefix);
-      sql.append(".");
-    }
-    final String dbName = getDbName();
-    if (this.quoteName) {
-      sql.append('"');
-    }
-    sql.append(dbName);
-    if (this.quoteName) {
-      sql.append('"');
-    }
-  }
-
   public void addInsertStatementPlaceHolder(final StringBuilder sql, final boolean generateKeys) {
     addStatementPlaceHolder(sql);
   }
@@ -138,6 +123,24 @@ public class JdbcFieldDefinition extends FieldDefinition {
 
   public void addStatementPlaceHolder(final StringBuilder sql) {
     sql.append('?');
+  }
+
+  @Override
+  public void appendColumnName(final StringBuilder sql) {
+    appendColumnName(sql, this.quoteName);
+  }
+
+  @Override
+  public void appendColumnName(final StringBuilder sql, boolean quoteName) {
+    quoteName |= this.quoteName;
+    if (quoteName) {
+      sql.append('"');
+    }
+    final String dbName = getDbName();
+    sql.append(dbName);
+    if (quoteName) {
+      sql.append('"');
+    }
   }
 
   @Override

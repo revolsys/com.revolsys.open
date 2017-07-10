@@ -1,5 +1,8 @@
 package com.revolsys.oracle.recordstore;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +21,12 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
+import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryFieldDefinition;
@@ -277,7 +281,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public String getGeneratePrimaryKeySql(final RecordDefinition recordDefinition) {
+  public String getGeneratePrimaryKeySql(final JdbcRecordDefinition recordDefinition) {
     final String sequenceName = getSequenceName(recordDefinition);
     return sequenceName + ".NEXTVAL";
   }
@@ -312,13 +316,11 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public String getSequenceName(final RecordDefinition recordDefinition) {
+  protected String getSequenceName(final JdbcRecordDefinition recordDefinition) {
     if (recordDefinition == null) {
       return null;
     } else {
-      final PathName typePath = recordDefinition.getPathName();
-      final PathName schemaPath = typePath.getParent();
-      final String dbSchemaName = getDatabaseSchemaName(schemaPath);
+      final String dbSchemaName = recordDefinition.getDbSchemaName();
       final String shortName = ShortNameProperty.getShortName(recordDefinition);
       final String sequenceName;
       if (Property.hasValue(shortName)) {
@@ -328,7 +330,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
           sequenceName = shortName.toLowerCase() + "_SEQ";
         }
       } else {
-        final String tableName = getDatabaseTableName(typePath);
+        final String tableName = recordDefinition.getDbTableName();
         if (this.useSchemaSequencePrefix) {
           sequenceName = dbSchemaName + "." + tableName + "_SEQ";
         } else {
@@ -379,12 +381,13 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
         + "from ALL_TAB_PRIVS_RECD P "
         + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
       setSchemaTablePermissionsSql(
-        "select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\" "
-          + "from ALL_TAB_PRIVS_RECD P "
-          + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
+        "select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\", c.table_type \"TABLE_TYPE\" "
+          + "  from ALL_TAB_PRIVS_RECD P "
+          + "    join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
           + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') "
-          + " union all "
-          + "select user \"SCHEMA_NAME\", t.table_name, 'ALL', comments from user_tables t join user_tab_comments c on (t.table_name = c.table_name) and c.table_type in ('TABLE', 'VIEW')");
+          + "  union all "
+          + "select user \"SCHEMA_NAME\", t.table_name, 'ALL', comments, c.table_type \"TABLE_TYPE\" "
+          + "from user_tables t join user_tab_comments c on (t.table_name = c.table_name) and c.table_type in ('TABLE', 'VIEW')");
 
       addRecordStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
     }
@@ -392,9 +395,27 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   private void initSettings() {
     setExcludeTablePatterns(".*\\$");
-    setSqlPrefix("BEGIN ");
-    setSqlSuffix(";END;");
+    // setSqlPrefix("BEGIN ");
+    // setSqlSuffix(";END;");
     setIteratorFactory(new RecordStoreIteratorFactory(this::newOracleIterator));
+  }
+
+  @Override
+  public PreparedStatement insertStatementPrepareRowId(final JdbcConnection connection,
+    final RecordDefinition recordDefinition, final String sql) throws SQLException {
+    return connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+  }
+
+  @Override
+  public boolean isIdFieldRowid(final RecordDefinition recordDefinition) {
+    final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+    if (idFields.size() == 1) {
+      final FieldDefinition idField = idFields.get(0);
+      if (idField instanceof OracleJdbcRowIdFieldDefinition) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
