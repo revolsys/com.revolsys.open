@@ -90,8 +90,7 @@ public class RandomOffsetLineStringGenerator {
     this.pts[0] = new PointDouble();
 
     final double ang = Math.PI * Math.random();
-    this.endPoint = new PointDouble(this.maxSegLen * Math.cos(ang), this.maxSegLen * Math.sin(ang),
-      Geometry.NULL_ORDINATE);
+    this.endPoint = new PointDouble(this.maxSegLen * Math.cos(ang), this.maxSegLen * Math.sin(ang));
     this.pts[this.numPts - 1] = this.endPoint;
 
     int interval = this.numPts / 2;

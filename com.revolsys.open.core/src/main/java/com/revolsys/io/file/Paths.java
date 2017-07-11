@@ -8,46 +8,62 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
+import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.set.Sets;
 import com.revolsys.io.FileNames;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public interface Paths {
+  LinkOption[] LINK_OPTIONS_NONE = new LinkOption[0];
+
+  FileAttribute<?>[] FILE_ATTRIBUTES_NONE = new FileAttribute[0];
+
+  OpenOption[] OPEN_OPTIONS_NONE = new OpenOption[0];
+
+  Set<OpenOption> OPEN_OPTIONS_NONE_SET = Collections.emptySet();
+
+  Set<OpenOption> OPEN_OPTIONS_WRITE_SET = Sets.newHash(StandardOpenOption.WRITE,
+    StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+
+  Set<OpenOption> OPEN_OPTIONS_READ_WRITE_SET = Sets.newHash(StandardOpenOption.READ,
+    StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.SYNC);
+
+  Set<OpenOption> OPEN_OPTIONS_READ_SET = Sets.newHash(StandardOpenOption.READ);
+
   static void createDirectories(final Path path) {
-    if (!Paths.exists(path)) {
-      try {
-        Files.createDirectories(path);
-      } catch (final IOException e) {
-        throw new WrappedException(e);
-      }
+    try {
+      Files.createDirectories(path, FILE_ATTRIBUTES_NONE);
+    } catch (final FileAlreadyExistsException e) {
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 
   static void createParentDirectories(final Path path) {
-    if (!Paths.exists(path)) {
-      try {
-        final Path parent = path.getParent();
-        Files.createDirectories(parent);
-      } catch (final FileAlreadyExistsException e) {
-      } catch (final IOException e) {
-        throw new WrappedException(e);
-      }
-    }
+    final Path parent = path.getParent();
+    createDirectories(parent);
   }
 
   static boolean deleteDirectories(final Path path) {
@@ -82,8 +98,39 @@ public interface Paths {
     return true;
   }
 
+  public static boolean deleteFiles(final Path path, final String glob) {
+    boolean success = true;
+    try (
+      DirectoryStream<Path> newDirectoryStream = Files.newDirectoryStream(path, glob)) {
+      for (final Path newDirectoryStreamItem : newDirectoryStream) {
+        try {
+          Files.delete(newDirectoryStreamItem);
+
+        } catch (final Throwable e) {
+          Logs.error("Unable to delete file: " + newDirectoryStreamItem, e);
+          success = false;
+        }
+      }
+    } catch (final Exception e) {
+      Logs.error("Unable to delete files: " + path + "  " + glob, e);
+      success = false;
+    }
+    return success;
+  }
+
   static boolean exists(final Path path) {
-    return Files.exists(path);
+    return Files.exists(path, LINK_OPTIONS_NONE);
+  }
+
+  static void forEachTree(final Path path, final Consumer<? super Path> action) {
+    if (exists(path)) {
+      try (
+        Stream<Path> paths = Files.walk(path)) {
+        paths.forEach(action);
+      } catch (final IOException e) {
+        throw Exceptions.wrap("Error walking path: " + path, e);
+      }
+    }
   }
 
   static Path get(final File file) {
@@ -93,10 +140,6 @@ public interface Paths {
       return file.toPath();
     }
     return null;
-  }
-
-  static Path get(final String first, final String... more) {
-    return java.nio.file.Paths.get(first, more);
   }
 
   static String getBaseName(final java.nio.file.Path path) {
@@ -169,11 +212,15 @@ public interface Paths {
 
   static Path getPath(final String name) {
     if (Property.hasValue(name)) {
-      final Path path = Paths.get(name);
+      final Path path = java.nio.file.Paths.get(name);
       return getPath(path);
     } else {
       return null;
     }
+  }
+
+  static Path getPath(final String first, final String... more) {
+    return java.nio.file.Paths.get(first, more);
   }
 
   static Path getPath(final URI uri) {
@@ -219,15 +266,15 @@ public interface Paths {
     try {
       return Files.newBufferedWriter(path, StandardCharsets.UTF_8);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
   static OutputStream outputStream(final Path path) {
     try {
-      return Files.newOutputStream(path);
+      return Files.newOutputStream(path, OPEN_OPTIONS_NONE);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -239,7 +286,7 @@ public interface Paths {
     try {
       return path.toUri().toURL();
     } catch (final MalformedURLException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

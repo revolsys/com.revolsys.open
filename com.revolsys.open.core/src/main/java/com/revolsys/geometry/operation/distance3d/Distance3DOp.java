@@ -131,10 +131,10 @@ public class Distance3DOp {
   private static Point segmentPoint(final Point p0, final Point p1, final double d0,
     final double d1) {
     if (d0 <= 0) {
-      return new PointDouble(p0);
+      return p0;
     }
     if (d1 <= 0) {
-      return new PointDouble(p1);
+      return p1;
     }
 
     final double f = Math.abs(d0) / (Math.abs(d0) + Math.abs(d1));

@@ -24,7 +24,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   public T add(final T object) {
     final BoundingBox envelope = getEnvelope(object);
     final int id = getId(object);
-    this.index.insert(envelope, id);
+    this.index.insertItem(envelope, id);
     return object;
   }
 

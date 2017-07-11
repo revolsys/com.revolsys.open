@@ -62,9 +62,9 @@ public class IsValidTest extends TestCase {
   }
 
   public void testNaNCoordinate() throws Exception {
-    final Point badCoord = new PointDouble(1.0, Double.NaN, Geometry.NULL_ORDINATE);
+    final Point badCoord = new PointDouble(1.0, Double.NaN);
     final Point[] pts = {
-      new PointDouble(0.0, 0.0, Geometry.NULL_ORDINATE), badCoord
+      new PointDouble(0.0, 0.0), badCoord
     };
     final Geometry line = this.geometryFactory.lineString(pts);
     final IsValidOp isValidOp = new IsValidOp(line);

@@ -23,8 +23,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 
@@ -48,7 +46,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   public GeometryGraph(final GeometryFactory geometryFactory) {
     super(false);
     setGeometryFactory(geometryFactory);
-    this.boundingBox = new BoundingBoxDoubleGf(geometryFactory);
+    this.boundingBox = geometryFactory.newBoundingBoxEmpty();
     final double scaleXY = getGeometryFactory().getScaleXY();
     if (scaleXY > 0) {
       this.maxDistance = 1 / scaleXY;
@@ -63,7 +61,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   private void addEdges(final LineString points, final Map<String, Object> attributes) {
-    this.startPoints.add(new PointDouble(points.getPoint(0), 2));
+    this.startPoints.add(points.getPoint(0).newPoint2D());
     int index = 0;
     for (LineSegment lineSegment : points.segments()) {
       lineSegment = (LineSegment)lineSegment.clone();
@@ -219,7 +217,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   public BoundingBox getBoundingBox(final Geometry geometry) {
     if (geometry == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       BoundingBox boundingBox = geometry.getBoundingBox();
       boundingBox = boundingBox.expand(this.maxDistance);

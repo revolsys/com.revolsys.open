@@ -74,7 +74,7 @@ public class OverlayNodingStressTest extends TestCase {
   public Geometry[] generateGeometryAccum(final double angle1, final double angle2) {
     final RotatedRectangleFactory rrFact = new RotatedRectangleFactory();
     final double basex = angle2 * MAX_DISPLACEMENT - MAX_DISPLACEMENT / 2;
-    final Point base = new PointDouble(basex, basex, Geometry.NULL_ORDINATE);
+    final Point base = new PointDouble(basex, basex);
     final Polygon rr1 = rrFact.newRectangle(100, 20, angle1, base);
 
     // limit size of accumulated star
@@ -144,8 +144,7 @@ class RotatedRectangleFactory {
   }
 
   public Polygon newRectangle(final double length, final double width, final double angle) {
-    return newRectangle(length, width, angle,
-      new PointDouble((double)0, 0, Geometry.NULL_ORDINATE));
+    return newRectangle(length, width, angle, new PointDouble(0, 0));
   }
 
   public Polygon newRectangle(final double length, final double width, final double angle,
@@ -158,18 +157,14 @@ class RotatedRectangleFactory {
     final double widthOffsety = width / 2 * Math.sin(angle + PI_OVER_2);
 
     final Point[] pts = new Point[] {
-      new PointDouble(base.getX() + posx + widthOffsetx, base.getY() + posy + widthOffsety,
-        Geometry.NULL_ORDINATE),
-      new PointDouble(base.getX() + posx - widthOffsetx, base.getY() + posy - widthOffsety,
-        Geometry.NULL_ORDINATE),
-      new PointDouble(base.getX() + negx - widthOffsetx, base.getY() + negy - widthOffsety,
-        Geometry.NULL_ORDINATE),
-      new PointDouble(base.getX() + negx + widthOffsetx, base.getY() + negy + widthOffsety,
-        Geometry.NULL_ORDINATE),
-      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
+      new PointDouble(base.getX() + posx + widthOffsetx, base.getY() + posy + widthOffsety),
+      new PointDouble(base.getX() + posx - widthOffsetx, base.getY() + posy - widthOffsety),
+      new PointDouble(base.getX() + negx - widthOffsetx, base.getY() + negy - widthOffsety),
+      new PointDouble(base.getX() + negx + widthOffsetx, base.getY() + negy + widthOffsety),
+      new PointDouble(0.0, 0),
     };
     // close polygon
-    pts[4] = new PointDouble(pts[0]);
+    pts[4] = pts[0];
     final Polygon poly = this.fact.polygon(this.fact.linearRing(pts));
     return poly;
   }

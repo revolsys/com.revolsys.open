@@ -375,7 +375,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
   public BoundingBox getImageBoundingBox() {
     if (this.image == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       return this.layer.getBoundingBox();
     }
@@ -1085,7 +1085,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
   public void setImageBoundingBox(BoundingBox boundingBox) {
     if (boundingBox == null) {
       final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
-      boundingBox = new BoundingBoxDoubleGf(viewportGeometryFactory);
+      boundingBox = viewportGeometryFactory.newBoundingBoxEmpty();
     }
     setGeometryFactory(boundingBox.getGeometryFactory());
     if (this.image != null) {

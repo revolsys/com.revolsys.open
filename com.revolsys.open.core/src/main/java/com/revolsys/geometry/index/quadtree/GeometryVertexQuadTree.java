@@ -17,7 +17,7 @@ public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
 
   private static final WeakKeyValueMap<Geometry, GeometryVertexQuadTree> CACHE = new WeakKeyValueMap<>();
 
-  public static GeometryVertexQuadTree getGeometryVertexQuadTree(final Geometry geometry) {
+  public static GeometryVertexQuadTree getGeometryVertexIndex(final Geometry geometry) {
     if (Property.hasValue(geometry)) {
       GeometryVertexQuadTree index = CACHE.get(geometry);
       if (index == null) {
@@ -43,7 +43,7 @@ public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
       setGeometryFactory(geometry.getGeometryFactory());
       for (final Vertex vertex : geometry.vertices()) {
         final BoundingBox boundingBox = vertex.getBoundingBox();
-        insert(boundingBox, vertex);
+        insertItem(boundingBox, vertex);
       }
     }
   }

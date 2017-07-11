@@ -49,7 +49,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.page.PageValueManager;
@@ -761,7 +760,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     if (node == null) {
       final int nodeId = ++this.nextNodeId;
       node = new Node<>(nodeId, this, point);
-      this.nodesIdsByCoordinates.put(new PointDouble(node, 2), nodeId);
+      this.nodesIdsByCoordinates.put(node.newPoint2D(), nodeId);
       this.nodesById.put(nodeId, node);
       if (this.nodeIndex != null) {
         this.nodeIndex.add(node);
@@ -822,7 +821,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
     final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point, distance,
       results);
-    BoundingBox envelope = new BoundingBoxDoubleGf(point);
+    BoundingBox envelope = point.getBoundingBox();
     envelope = envelope.expand(distance);
     getNodeIndex().forEach(visitor, envelope);
     final List<Node<T>> nodes = results.getList();

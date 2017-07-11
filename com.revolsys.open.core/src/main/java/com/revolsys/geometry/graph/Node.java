@@ -212,7 +212,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
           }
           if (point != null) {
             final double z = point.getZ();
-            if (z == 0 || Double.isNaN(z)) {
+            if (z == 0 || java.lang.Double.isNaN(z)) {
               coordinates = point;
             } else {
               return point;
@@ -235,7 +235,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
         return this.getY();
 
       default:
-        return Double.NaN;
+        return java.lang.Double.NaN;
     }
   }
 

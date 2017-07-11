@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
@@ -25,7 +24,7 @@ public class PointRecordMap {
 
   private Comparator<Record> comparator;
 
-  private Map<PointDouble, List<Record>> recordMap = new HashMap<>();
+  private Map<Point, List<Record>> recordMap = new HashMap<>();
 
   private boolean removeEmptyLists;
 
@@ -45,7 +44,7 @@ public class PointRecordMap {
   }
 
   public void addRecord(final Point point, final Record record) {
-    final PointDouble key = getKey(point);
+    final Point key = getKey(point);
     final List<Record> records = getOrCreateRecords(key);
     if (!record.contains(records)) {
       records.add(record);
@@ -74,7 +73,7 @@ public class PointRecordMap {
   }
 
   public boolean containsKey(final Point point) {
-    final PointDouble key = getKey(point);
+    final Point key = getKey(point);
     return this.recordMap.containsKey(key);
   }
 
@@ -107,11 +106,11 @@ public class PointRecordMap {
     return null;
   }
 
-  private PointDouble getKey(final Point point) {
-    return new PointDouble(point, 2);
+  private Point getKey(final Point point) {
+    return point.newPoint2D();
   }
 
-  private PointDouble getKey(final Record record) {
+  private Point getKey(final Record record) {
     final Point point = record.getGeometry();
     return getKey(point);
   }
@@ -126,7 +125,7 @@ public class PointRecordMap {
     return filteredRecords;
   }
 
-  protected List<Record> getOrCreateRecords(final PointDouble key) {
+  protected List<Record> getOrCreateRecords(final Point key) {
     List<Record> objects = this.recordMap.get(key);
     if (objects == null) {
       objects = new ArrayList<>(1);
@@ -136,7 +135,7 @@ public class PointRecordMap {
   }
 
   public List<Record> getRecords(final Point point) {
-    final PointDouble key = getKey(point);
+    final Point key = getKey(point);
     final List<Record> records = this.recordMap.get(key);
     if (records == null) {
       return Collections.emptyList();
@@ -152,14 +151,14 @@ public class PointRecordMap {
   }
 
   public boolean hasRecord(final Point point) {
-    final PointDouble key = getKey(point);
+    final Point key = getKey(point);
     final List<Record> records = this.recordMap.get(key);
     return records != null && !records.isEmpty();
   }
 
   public void initialize(final Point point) {
     if (!isRemoveEmptyLists()) {
-      final PointDouble key = getKey(point);
+      final Point key = getKey(point);
       getOrCreateRecords(key);
     }
   }
@@ -169,7 +168,7 @@ public class PointRecordMap {
   }
 
   public void removeRecord(final Record record) {
-    final PointDouble key = getKey(record);
+    final Point key = getKey(record);
     final List<Record> records = this.recordMap.get(key);
     if (records != null) {
       records.remove(record);

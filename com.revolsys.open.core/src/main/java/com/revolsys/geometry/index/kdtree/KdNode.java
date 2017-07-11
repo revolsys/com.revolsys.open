@@ -33,7 +33,6 @@
 
 package com.revolsys.geometry.index.kdtree;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 
@@ -62,7 +61,7 @@ public class KdNode {
    * @param data a data objects to associate with this node
    */
   public KdNode(final double _x, final double _y, final Object data) {
-    this.p = new PointDouble(_x, _y, Geometry.NULL_ORDINATE);
+    this.p = new PointDouble(_x, _y);
     this.left = null;
     this.right = null;
     this.count = 1;
@@ -76,7 +75,7 @@ public class KdNode {
    * @param data a data objects to associate with this node
    */
   public KdNode(final Point p, final Object data) {
-    this.p = new PointDouble(p);
+    this.p = p;
     this.left = null;
     this.right = null;
     this.count = 1;

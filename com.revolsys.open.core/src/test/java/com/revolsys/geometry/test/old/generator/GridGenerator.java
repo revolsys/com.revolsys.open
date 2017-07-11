@@ -37,7 +37,7 @@ import java.util.NoSuchElementException;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 /**
  * This class should be used to generate a grid of bounding boxes,
@@ -124,7 +124,7 @@ public class GridGenerator extends GeometryGenerator {
     minx = x + col * sx;
     miny = y + row * sy;
 
-    final BoundingBox box = new BoundingBoxDoubleGf(2, this.geometryFactory.makePrecise(0, minx),
+    final BoundingBox box = new BoundingBoxDoubleXY(this.geometryFactory.makePrecise(0, minx),
       this.geometryFactory.makePrecise(1, miny), this.geometryFactory.makePrecise(0, minx + sx),
       this.geometryFactory.makePrecise(1, miny + sy));
 

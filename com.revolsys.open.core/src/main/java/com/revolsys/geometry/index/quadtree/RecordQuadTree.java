@@ -42,7 +42,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
       final Geometry geometry = record.getGeometry();
       if (geometry != null && !geometry.isEmpty()) {
         final BoundingBox boundingBox = geometry.getBoundingBox();
-        insert(boundingBox, record);
+        insertItem(boundingBox, record);
       }
     }
   }

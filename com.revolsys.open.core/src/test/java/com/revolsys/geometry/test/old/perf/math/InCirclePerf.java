@@ -19,13 +19,13 @@ public class InCirclePerf {
     test.run();
   }
 
-  Point pa = new PointDouble(687958.05, 7460725.97, Point.NULL_ORDINATE);
+  Point pa = new PointDouble(687958.05, 7460725.97);
 
-  Point pb = new PointDouble(687957.43, 7460725.93, Point.NULL_ORDINATE);
+  Point pb = new PointDouble(687957.43, 7460725.93);
 
-  Point pc = new PointDouble(687957.58, 7460721, Point.NULL_ORDINATE);
+  Point pc = new PointDouble(687957.58, 7460721);
 
-  Point pp = new PointDouble(687958.13, 7460720.99, Point.NULL_ORDINATE);
+  Point pp = new PointDouble(687958.13, 7460720.99);
 
   public InCirclePerf() {
   }

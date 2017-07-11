@@ -78,7 +78,7 @@ public class CoordinateTest extends TestCase {
 
   public void testCopyConstructor3D() {
     final Point orig = new PointDouble(350.2, 4566.8, 5266.3);
-    final Point c = new PointDouble(orig);
+    final Point c = orig;
     assertEquals(c, 350.2, 4566.8, 5266.3);
   }
 

@@ -95,7 +95,7 @@ public class IsSimpleTest extends TestCase {
    */
   public void test2TouchAtEndpoint() throws Exception {
     final String a = "MULTILINESTRING((0 1, 1 1, 2 1), (0 0, 1 0, 2 1))";
-    runIsSimpleTest(a, true, new PointDouble((double)2, 1, Geometry.NULL_ORDINATE));
+    runIsSimpleTest(a, true, new PointDouble((double)2, 1));
   }
 
   /**
@@ -107,12 +107,12 @@ public class IsSimpleTest extends TestCase {
     final String a = "MULTILINESTRING ((0 1, 1 1, 2 1),   (0 0, 1 0, 2 1),  (0 2, 1 2, 2 1))";
 
     // rings are simple under all rules
-    runIsSimpleTest(a, true, new PointDouble((double)2, 1, Geometry.NULL_ORDINATE));
+    runIsSimpleTest(a, true, new PointDouble((double)2, 1));
   }
 
   public void testCross() throws Exception {
     final String a = "MULTILINESTRING ((20 120, 120 20), (20 20, 120 120))";
-    runIsSimpleTest(a, false, new PointDouble((double)70, 70, Geometry.NULL_ORDINATE));
+    runIsSimpleTest(a, false, new PointDouble((double)70, 70));
   }
 
   public void testMultiLineStringWithRingTouchAtEndpoint() throws Exception {
@@ -120,7 +120,7 @@ public class IsSimpleTest extends TestCase {
 
     // under Mod-2, the ring has no boundary, so the line intersects the
     // interior ==> not simple
-    runIsSimpleTest(a, false, new PointDouble((double)100, 100, Geometry.NULL_ORDINATE));
+    runIsSimpleTest(a, false, new PointDouble((double)100, 100));
   }
 
   public void testRing() throws Exception {

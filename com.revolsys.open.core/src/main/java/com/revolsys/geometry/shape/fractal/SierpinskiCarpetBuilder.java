@@ -95,11 +95,11 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
 
   private LinearRing newSquareHole(final double x, final double y, final double width) {
     final Point[] pts = new Point[] {
-      new PointDouble(x, y, Geometry.NULL_ORDINATE),
-      new PointDouble(x + width, y, Geometry.NULL_ORDINATE),
-      new PointDouble(x + width, y + width, Geometry.NULL_ORDINATE),
-      new PointDouble(x, y + width, Geometry.NULL_ORDINATE),
-      new PointDouble(x, y, Geometry.NULL_ORDINATE)
+      new PointDouble(x, y),
+      new PointDouble(x + width, y),
+      new PointDouble(x + width, y + width),
+      new PointDouble(x, y + width),
+      new PointDouble(x, y)
     };
     return this.geometryFactory.linearRing(pts);
   }

@@ -33,10 +33,8 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Computes whether a rectangle intersects line segments.
@@ -69,10 +67,10 @@ public class RectangleLineIntersector {
 
   /**
    * Creates a new intersector for the given query rectangle,
-   * specified as an {@link BoundingBoxDoubleGf}.
+   * specified as an {@link BoundingBox}.
    *
    *
-   * @param rectEnv the query rectangle, specified as an BoundingBoxDoubleGf
+   * @param rectEnv the query rectangle, specified as an BoundingBox
    */
   public RectangleLineIntersector(final BoundingBox rectEnv) {
     this.rectEnv = rectEnv;
@@ -82,10 +80,10 @@ public class RectangleLineIntersector {
      * relative to the Left side of the rectangle.
      * Index 0 is the left side, 1 is the right side.
      */
-    this.diagUp0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
-    this.diagUp1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
-    this.diagDown0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
-    this.diagDown1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
+    this.diagUp0 = new PointDoubleXY(rectEnv.getMinX(), rectEnv.getMinY());
+    this.diagUp1 = new PointDoubleXY(rectEnv.getMaxX(), rectEnv.getMaxY());
+    this.diagDown0 = new PointDoubleXY(rectEnv.getMinX(), rectEnv.getMaxY());
+    this.diagDown1 = new PointDoubleXY(rectEnv.getMaxX(), rectEnv.getMinY());
   }
 
   /**
@@ -103,7 +101,8 @@ public class RectangleLineIntersector {
      * If the segment envelope is disjoint from the
      * rectangle envelope, there is no intersection
      */
-    final BoundingBox segEnv = new BoundingBoxDoubleGf(p0, p1);
+    final BoundingBox segEnv = this.rectEnv.newBoundingBox(p0.getX(), p0.getY(), p1.getX(),
+      p1.getY());
     if (!this.rectEnv.intersects(segEnv)) {
       return false;
     }
@@ -161,9 +160,9 @@ public class RectangleLineIntersector {
      * still sufficient.)
      */
     if (isSegUpwards) {
-      this.li.computeIntersection(p0, p1, this.diagDown0, this.diagDown1);
+      this.li.computeIntersectionPoints(p0, p1, this.diagDown0, this.diagDown1);
     } else {
-      this.li.computeIntersection(p0, p1, this.diagUp0, this.diagUp1);
+      this.li.computeIntersectionPoints(p0, p1, this.diagUp0, this.diagUp1);
     }
     if (this.li.hasIntersection()) {
       return true;

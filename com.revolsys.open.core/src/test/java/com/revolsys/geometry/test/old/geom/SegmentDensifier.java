@@ -47,9 +47,9 @@ public class SegmentDensifier {
     for (int i = 0; i <= nPtsToAdd; i++) {
       final double addedPtFrac = i * segLenFrac;
       final Point pt = new PointDouble(p0.getX() + addedPtFrac * delx,
-        p0.getY() + addedPtFrac * dely, Geometry.NULL_ORDINATE);
+        p0.getY() + addedPtFrac * dely);
       this.newCoords.add(pt, false);
     }
-    this.newCoords.add(new PointDouble(p1), false);
+    this.newCoords.add(p1, false);
   }
 }

@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.test.old.geom;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
@@ -56,24 +55,24 @@ public class GeometryTestFactory {
     for (i = 0; i < nSide; i++) {
       final double x = minx + i * segLen;
       final double y = miny;
-      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y);
     }
     for (i = 0; i < nSide; i++) {
       final double x = maxx;
       final double y = miny + i * segLen;
-      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y);
     }
     for (i = 0; i < nSide; i++) {
       final double x = maxx - i * segLen;
       final double y = maxy;
-      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y);
     }
     for (i = 0; i < nSide; i++) {
       final double x = minx;
       final double y = maxy - i * segLen;
-      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y);
     }
-    pts[ipt++] = new PointDouble(pts[0]);
+    pts[ipt++] = pts[0];
 
     return pts;
   }
@@ -104,7 +103,7 @@ public class GeometryTestFactory {
       final double ang = i * (2 * Math.PI / nPts);
       final double x = len * Math.cos(ang) + basex;
       final double y = len * Math.sin(ang) + basey;
-      final Point pt = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+      final Point pt = new PointDouble(x, y);
       pts[iPt++] = pt;
     }
     pts[iPt] = pts[0];
@@ -153,7 +152,7 @@ public class GeometryTestFactory {
         final double len = armLen * (1 - Math.cos(ang) / 2) + armBaseLen;
         final double x = len * Math.cos(starAng + iArmPt * angInc / nArmPt) + basex;
         final double y = len * Math.sin(starAng + iArmPt * angInc / nArmPt) + basey;
-        final Point pt = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+        final Point pt = new PointDouble(x, y);
         pts[iPt++] = pt;
       }
       starAng += angInc;

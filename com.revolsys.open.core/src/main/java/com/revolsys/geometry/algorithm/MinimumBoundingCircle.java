@@ -182,7 +182,7 @@ public class MinimumBoundingCircle {
       case 2:
         this.centre = new PointDouble(
           (this.extremalPts[0].getX() + this.extremalPts[1].getX()) / 2.0,
-          (this.extremalPts[0].getY() + this.extremalPts[1].getY()) / 2.0, Geometry.NULL_ORDINATE);
+          (this.extremalPts[0].getY() + this.extremalPts[1].getY()) / 2.0);
       break;
       case 3:
         this.centre = Triangles.circumcentre(this.extremalPts[0], this.extremalPts[1],
@@ -247,7 +247,7 @@ public class MinimumBoundingCircle {
       // if PRQ is obtuse, then MBC is determined by P and Q
       if (Angle.isObtuse(P, R, Q)) {
         this.extremalPts = new Point[] {
-          new PointDouble(P), new PointDouble(Q)
+          P, Q
         };
         return;
       }
@@ -264,7 +264,7 @@ public class MinimumBoundingCircle {
       // otherwise all angles are acute, and the MBC is determined by the
       // triangle PQR
       this.extremalPts = new Point[] {
-        new PointDouble(P), new PointDouble(Q), new PointDouble(R)
+        P, Q, R
       };
       return;
     }

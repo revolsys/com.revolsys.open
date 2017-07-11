@@ -96,14 +96,14 @@ class RectangleLineIntersectorValidator {
 
   private BoundingBox newRectangle() {
     final BoundingBox rectEnv = new BoundingBoxDoubleGf(
-      new PointDouble(this.baseX, this.baseY, Geometry.NULL_ORDINATE), new PointDouble(
-        this.baseX + this.rectSize, this.baseY + this.rectSize, Geometry.NULL_ORDINATE));
+      new PointDouble(this.baseX, this.baseY), new PointDouble(
+        this.baseX + this.rectSize, this.baseY + this.rectSize));
     return rectEnv;
   }
 
   private Point[] newTestPoints(final int nPts) {
     final Point pt = this.geomFact
-      .point(new PointDouble(this.baseX, this.baseY, Geometry.NULL_ORDINATE));
+      .point(new PointDouble(this.baseX, this.baseY));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
     return CoordinatesListUtil.getPointArray(circle);
   }
@@ -163,10 +163,10 @@ class SimpleRectangleIntersector {
   }
 
   private void initCorners(final BoundingBox rectEnv) {
-    this.corner[0] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
-    this.corner[1] = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
-    this.corner[2] = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
-    this.corner[3] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
+    this.corner[0] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY());
+    this.corner[1] = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY());
+    this.corner[2] = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY());
+    this.corner[3] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY());
   }
 
   public boolean intersects(final Point p0, final Point p1) {
@@ -175,19 +175,19 @@ class SimpleRectangleIntersector {
       return false;
     }
 
-    this.li.computeIntersection(p0, p1, this.corner[0], this.corner[1]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[0], this.corner[1]);
     if (this.li.hasIntersection()) {
       return true;
     }
-    this.li.computeIntersection(p0, p1, this.corner[1], this.corner[2]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[1], this.corner[2]);
     if (this.li.hasIntersection()) {
       return true;
     }
-    this.li.computeIntersection(p0, p1, this.corner[2], this.corner[3]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[2], this.corner[3]);
     if (this.li.hasIntersection()) {
       return true;
     }
-    this.li.computeIntersection(p0, p1, this.corner[3], this.corner[0]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[3], this.corner[0]);
     if (this.li.hasIntersection()) {
       return true;
     }

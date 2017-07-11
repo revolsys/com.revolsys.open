@@ -70,7 +70,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     };
   }
 
-  private BoundingBox boundingBox = BoundingBox.EMPTY;
+  private BoundingBox boundingBox = BoundingBox.empty();
 
   private int[] dpi;
 

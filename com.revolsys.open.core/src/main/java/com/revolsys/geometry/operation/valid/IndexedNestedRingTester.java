@@ -59,7 +59,7 @@ public class IndexedNestedRingTester {
 
   private final List rings = new ArrayList();
 
-  private final BoundingBox totalEnv = BoundingBox.EMPTY;
+  private final BoundingBox totalEnv = BoundingBox.empty();
 
   public IndexedNestedRingTester(final GeometryGraph graph) {
     this.graph = graph;
@@ -76,7 +76,7 @@ public class IndexedNestedRingTester {
     for (int i = 0; i < this.rings.size(); i++) {
       final LinearRing ring = (LinearRing)this.rings.get(i);
       final BoundingBox env = ring.getBoundingBox();
-      this.index.insert(env, ring);
+      this.index.insertItem(env, ring);
     }
   }
 

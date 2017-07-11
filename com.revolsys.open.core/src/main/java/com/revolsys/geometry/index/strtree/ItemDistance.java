@@ -33,6 +33,8 @@
 
 package com.revolsys.geometry.index.strtree;
 
+import com.revolsys.geometry.model.BoundingBox;
+
 /**
  * A function method which computes the distance
  * between two {@link ItemBoundable}s in an {@link STRtree}.
@@ -41,7 +43,7 @@ package com.revolsys.geometry.index.strtree;
  * @author Martin Davis
  *
  */
-public interface ItemDistance {
+public interface ItemDistance<I> {
   /**
    * Computes the distance between two items.
    *
@@ -51,6 +53,6 @@ public interface ItemDistance {
    *
    * @throws IllegalArgumentException if the metric is not applicable to the arguments
    */
-  double distance(ItemBoundable item1, ItemBoundable item2);
+  double distance(ItemBoundable<BoundingBox, I> item1, ItemBoundable<BoundingBox, I> item2);
 
 }

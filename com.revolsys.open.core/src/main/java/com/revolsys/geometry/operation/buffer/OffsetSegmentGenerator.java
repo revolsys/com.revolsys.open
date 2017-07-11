@@ -39,7 +39,6 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.geomgraph.Position;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.model.LineString;
@@ -169,7 +168,11 @@ class OffsetSegmentGenerator {
      * This test could probably be done more efficiently,
      * but the situation of exact collinearity should be fairly rare.
      */
-    this.li.computeIntersection(this.s0, this.s1, this.s1, this.s2);
+    final Point p1 = this.s0;
+    final Point p2 = this.s1;
+    final Point p3 = this.s1;
+    final Point p4 = this.s2;
+    this.li.computeIntersectionPoints(p1, p2, p3, p4);
     final int numInt = this.li.getIntersectionCount();
     /**
      * if numInt is < 2, the lines are parallel and in the same direction. In
@@ -283,8 +286,8 @@ class OffsetSegmentGenerator {
     /**
      * add intersection point of offset segments (if any)
      */
-    this.li.computeIntersection(this.offset0.getP0(), this.offset0.getP1(), this.offset1.getP0(),
-      this.offset1.getP1());
+    this.li.computeIntersectionPoints(this.offset0.getP0(), this.offset0.getP1(),
+      this.offset1.getP0(), this.offset1.getP1());
     if (this.li.hasIntersection()) {
       this.segList.addPt(this.li.getIntersection(0));
     } else {
@@ -332,15 +335,13 @@ class OffsetSegmentGenerator {
             (this.closingSegLengthFactor * this.offset0.getP1().getX() + this.s1.getX())
               / (this.closingSegLengthFactor + 1),
             (this.closingSegLengthFactor * this.offset0.getP1().getY() + this.s1.getY())
-              / (this.closingSegLengthFactor + 1),
-            Geometry.NULL_ORDINATE);
+              / (this.closingSegLengthFactor + 1));
           this.segList.addPt(mid0);
           final Point mid1 = new PointDouble(
             (this.closingSegLengthFactor * this.offset1.getP0().getX() + this.s1.getX())
               / (this.closingSegLengthFactor + 1),
             (this.closingSegLengthFactor * this.offset1.getP0().getY() + this.s1.getY())
-              / (this.closingSegLengthFactor + 1),
-            Geometry.NULL_ORDINATE);
+              / (this.closingSegLengthFactor + 1));
           this.segList.addPt(mid1);
         } else {
           /**
@@ -401,7 +402,7 @@ class OffsetSegmentGenerator {
     // compute the midpoint of the bevel segment
     final double bevelMidX = basePt.getX() + mitreDist * Math.cos(mitreMidAng);
     final double bevelMidY = basePt.getY() + mitreDist * Math.sin(mitreMidAng);
-    final Point bevelMidPt = new PointDouble(bevelMidX, bevelMidY, Geometry.NULL_ORDINATE);
+    final Point bevelMidPt = new PointDouble(bevelMidX, bevelMidY);
 
     // compute the mitre midline segment from the corner point to the bevel
     // segment midpoint
@@ -496,7 +497,7 @@ class OffsetSegmentGenerator {
         isMitreWithinLimit = false;
       }
     } catch (final NotRepresentableException ex) {
-      intPt = new PointDouble(0.0, 0.0, Geometry.NULL_ORDINATE);
+      intPt = new PointDouble(0.0, 0.0);
       isMitreWithinLimit = false;
     }
 

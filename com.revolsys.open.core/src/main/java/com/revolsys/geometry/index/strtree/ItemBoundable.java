@@ -33,6 +33,8 @@
 package com.revolsys.geometry.index.strtree;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * Boundable wrapper for a non-Boundable spatial object. Used internally by
@@ -40,27 +42,40 @@ import java.io.Serializable;
  *
  * @version 1.7
  */
-public class ItemBoundable implements Boundable, Serializable {
-  /**
-   *
-   */
+public class ItemBoundable<B, I> implements Boundable<B, I>, Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final Object bounds;
+  private final B bounds;
 
-  private final Object item;
+  private final I item;
 
-  public ItemBoundable(final Object bounds, final Object item) {
+  public ItemBoundable(final B bounds, final I item) {
     this.bounds = bounds;
     this.item = item;
   }
 
   @Override
-  public Object getBounds() {
+  public void boundablesAtLevel(final int level, final Collection<Boundable<B, I>> boundables) {
+    if (level == -1) {
+      boundables.add(this);
+    }
+  }
+
+  @Override
+  public B getBounds() {
     return this.bounds;
   }
 
-  public Object getItem() {
+  @Override
+  public I getItem() {
     return this.item;
+  }
+
+  @Override
+  public void query(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds,
+    final Consumer<? super I> action) {
+    if (tree.intersects(getBounds(), searchBounds)) {
+      action.accept(this.item);
+    }
   }
 }

@@ -33,7 +33,6 @@
 package com.revolsys.geometry.test.old.algorithm;
 
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 
@@ -48,9 +47,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public static boolean isAllOrientationsEqual(final double p0x, final double p0y, final double p1x,
     final double p1y, final double p2x, final double p2y) {
     final Point[] pts = {
-      new PointDouble(p0x, p0y, Geometry.NULL_ORDINATE),
-      new PointDouble(p1x, p1y, Geometry.NULL_ORDINATE),
-      new PointDouble(p2x, p2y, Geometry.NULL_ORDINATE)
+      new PointDouble(p0x, p0y),
+      new PointDouble(p1x, p1y),
+      new PointDouble(p2x, p2y)
     };
     if (!isAllOrientationsEqualDD(pts)) {
       throw new IllegalStateException("High-precision orientation computation FAILED");
@@ -109,9 +108,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW() throws Exception {
     // this case fails because subtraction of small from large loses precision
     final Point[] pts = {
-      new PointDouble(1.4540766091864998, -7.989685402102996, Geometry.NULL_ORDINATE),
-      new PointDouble(23.131039116367354, -7.004368924503866, Geometry.NULL_ORDINATE),
-      new PointDouble(1.4540766091865, -7.989685402102996, Geometry.NULL_ORDINATE),
+      new PointDouble(1.4540766091864998, -7.989685402102996),
+      new PointDouble(23.131039116367354, -7.004368924503866),
+      new PointDouble(1.4540766091865, -7.989685402102996),
     };
     checkOrientation(pts);
   }
@@ -119,9 +118,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW2() throws Exception {
     // this case fails because subtraction of small from large loses precision
     final Point[] pts = {
-      new PointDouble(219.3649559090992, 140.84159161824724, Geometry.NULL_ORDINATE),
-      new PointDouble(168.9018919682399, -5.713787599646864, Geometry.NULL_ORDINATE),
-      new PointDouble(186.80814046338352, 46.28973405831556, Geometry.NULL_ORDINATE),
+      new PointDouble(219.3649559090992, 140.84159161824724),
+      new PointDouble(168.9018919682399, -5.713787599646864),
+      new PointDouble(186.80814046338352, 46.28973405831556),
     };
     checkOrientation(pts);
   }
@@ -129,9 +128,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW3() throws Exception {
     // this case fails because subtraction of small from large loses precision
     final Point[] pts = {
-      new PointDouble(279.56857838488514, -186.3790522565901, Geometry.NULL_ORDINATE),
-      new PointDouble(-20.43142161511487, 13.620947743409914, Geometry.NULL_ORDINATE),
-      new PointDouble((double)0, 0, Geometry.NULL_ORDINATE)
+      new PointDouble(279.56857838488514, -186.3790522565901),
+      new PointDouble(-20.43142161511487, 13.620947743409914),
+      new PointDouble((double)0, 0)
     };
     checkOrientation(pts);
   }
@@ -139,9 +138,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW4() throws Exception {
     // from JTS list - 5/15/2012 strange case for the GeometryNoder
     final Point[] pts = {
-      new PointDouble(-26.2, 188.7, Geometry.NULL_ORDINATE),
-      new PointDouble(37.0, 290.7, Geometry.NULL_ORDINATE),
-      new PointDouble(21.2, 265.2, Geometry.NULL_ORDINATE)
+      new PointDouble(-26.2, 188.7),
+      new PointDouble(37.0, 290.7),
+      new PointDouble(21.2, 265.2)
     };
     checkOrientation(pts);
   }
@@ -149,9 +148,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW5() throws Exception {
     // from JTS list - 6/15/2012 another case from Tomas Fa
     final Point[] pts = {
-      new PointDouble(-5.9, 163.1, Geometry.NULL_ORDINATE),
-      new PointDouble(76.1, 250.7, Geometry.NULL_ORDINATE),
-      new PointDouble(14.6, 185, Geometry.NULL_ORDINATE)
+      new PointDouble(-5.9, 163.1),
+      new PointDouble(76.1, 250.7),
+      new PointDouble(14.6, 185)
         // new PointDouble((double)96.6, 272.6)
     };
     checkOrientation(pts);
@@ -160,9 +159,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW6() throws Exception {
     // from JTS Convex Hull "Almost collinear" unit test
     final Point[] pts = {
-      new PointDouble(-140.8859438214298, 140.88594382142983, Geometry.NULL_ORDINATE),
-      new PointDouble(-57.309236848216706, 57.30923684821671, Geometry.NULL_ORDINATE),
-      new PointDouble(-190.9188309203678, 190.91883092036784, Geometry.NULL_ORDINATE)
+      new PointDouble(-140.8859438214298, 140.88594382142983),
+      new PointDouble(-57.309236848216706, 57.30923684821671),
+      new PointDouble(-190.9188309203678, 190.91883092036784)
     };
     checkOrientation(pts);
   }
@@ -170,9 +169,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW7() throws Exception {
     // from JTS list - 6/26/2012 another case from Tomas Fa
     final Point[] pts = {
-      new PointDouble(-0.9575, 0.4511, Geometry.NULL_ORDINATE),
-      new PointDouble(-0.9295, 0.3291, Geometry.NULL_ORDINATE),
-      new PointDouble(-0.8945, 0.1766, Geometry.NULL_ORDINATE)
+      new PointDouble(-0.9575, 0.4511),
+      new PointDouble(-0.9295, 0.3291),
+      new PointDouble(-0.8945, 0.1766)
     };
     checkDD(pts, true);
     checkShewchuk(pts, false);
@@ -183,9 +182,9 @@ public class OrientationIndexFailureTest extends TestCase {
     // from JTS list - 6/26/2012 another case from Tomas Fa
     // scale to integers - all methods work on this
     final Point[] pts = {
-      new PointDouble((double)-9575, 4511, Geometry.NULL_ORDINATE),
-      new PointDouble((double)-9295, 3291, Geometry.NULL_ORDINATE),
-      new PointDouble((double)-8945, 1766, Geometry.NULL_ORDINATE)
+      new PointDouble((double)-9575, 4511),
+      new PointDouble((double)-9295, 3291),
+      new PointDouble((double)-8945, 1766)
     };
     checkDD(pts, true);
     checkShewchuk(pts, true);

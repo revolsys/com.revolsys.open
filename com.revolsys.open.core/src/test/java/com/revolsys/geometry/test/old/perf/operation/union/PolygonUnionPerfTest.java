@@ -82,7 +82,7 @@ public class PolygonUnionPerfTest {
     final double yInc = height / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new PointDouble(i * xInc, j * yInc, Geometry.NULL_ORDINATE);
+        final Point base = new PointDouble(i * xInc, j * yInc);
         final Geometry poly = newPolygon(base, size, nPts);
         geoms.add(poly);
         // System.out.println(poly);

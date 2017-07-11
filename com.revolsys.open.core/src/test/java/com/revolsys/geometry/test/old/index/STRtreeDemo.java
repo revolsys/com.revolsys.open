@@ -37,26 +37,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.geometry.index.strtree.AbstractNode;
 import com.revolsys.geometry.index.strtree.Boundable;
+import com.revolsys.geometry.index.strtree.BoundingBoxNode;
 import com.revolsys.geometry.index.strtree.STRtree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * @version 1.7
  */
 public class STRtreeDemo {
 
-  public static class TestTree extends STRtree {
-    /**
-     *
-     */
+  public static class TestTree extends STRtree<Object> {
     private static final long serialVersionUID = 1L;
 
     public TestTree(final int nodeCapacity) {
@@ -69,7 +65,7 @@ public class STRtreeDemo {
     }
 
     @Override
-    public AbstractNode getRoot() {
+    public BoundingBoxNode<Object> getRoot() {
       return this.root;
     }
 
@@ -85,7 +81,8 @@ public class STRtreeDemo {
     }
 
     @Override
-    public List[] verticalSlices(final List childBoundables, final int size) {
+    public List<List<Boundable<BoundingBox, Object>>> verticalSlices(final List childBoundables,
+      final int size) {
       return super.verticalSlices(childBoundables, size);
     }
   }
@@ -108,8 +105,8 @@ public class STRtreeDemo {
 
   private static void initTree(final TestTree t, final List sourceEnvelopes) {
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
-      final BoundingBoxDoubleGf sourceEnvelope = (BoundingBoxDoubleGf)i.next();
-      t.insert(sourceEnvelope, sourceEnvelope);
+      final BoundingBox sourceEnvelope = (BoundingBox)i.next();
+      t.insertItem(sourceEnvelope, sourceEnvelope);
     }
     t.build();
   }
@@ -153,11 +150,9 @@ public class STRtreeDemo {
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
       final BoundingBox e = (BoundingBox)i.next();
       final Geometry g = factory.polygon(factory.linearRing(new Point[] {
-        new PointDouble(e.getMinX(), e.getMinY(), Geometry.NULL_ORDINATE),
-        new PointDouble(e.getMinX(), e.getMaxY(), Geometry.NULL_ORDINATE),
-        new PointDouble(e.getMaxX(), e.getMaxY(), Geometry.NULL_ORDINATE),
-        new PointDouble(e.getMaxX(), e.getMinY(), Geometry.NULL_ORDINATE),
-        new PointDouble(e.getMinX(), e.getMinY(), Geometry.NULL_ORDINATE)
+        new PointDoubleXY(e.getMinX(), e.getMinY()), new PointDoubleXY(e.getMinX(), e.getMaxY()),
+        new PointDoubleXY(e.getMaxX(), e.getMaxY()), new PointDoubleXY(e.getMaxX(), e.getMinY()),
+        new PointDoubleXY(e.getMinX(), e.getMinY())
       }));
       if (first) {
         first = false;
@@ -177,11 +172,8 @@ public class STRtreeDemo {
     final double top = bottom + height;
     final double right = left + width;
     return factory.polygon(factory.linearRing(new Point[] {
-      new PointDouble(left, bottom, Geometry.NULL_ORDINATE),
-      new PointDouble(right, bottom, Geometry.NULL_ORDINATE),
-      new PointDouble(right, top, Geometry.NULL_ORDINATE),
-      new PointDouble(left, top, Geometry.NULL_ORDINATE),
-      new PointDouble(left, bottom, Geometry.NULL_ORDINATE)
+      new PointDoubleXY(left, bottom), new PointDoubleXY(right, bottom),
+      new PointDoubleXY(right, top), new PointDoubleXY(left, top), new PointDoubleXY(left, bottom)
     }));
   }
 

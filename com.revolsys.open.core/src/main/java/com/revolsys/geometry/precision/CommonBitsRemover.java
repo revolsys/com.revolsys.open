@@ -106,8 +106,7 @@ public class CommonBitsRemover {
       this.commonBitsY.add(vertex.getY());
 
     }
-    this.commonCoord = new PointDouble(this.commonBitsX.getCommon(), this.commonBitsY.getCommon(),
-      Geometry.NULL_ORDINATE);
+    this.commonCoord = new PointDouble(this.commonBitsX.getCommon(), this.commonBitsY.getCommon());
   }
 
   /**

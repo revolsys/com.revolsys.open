@@ -40,8 +40,8 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Stopwatch;
 
 public class RectangleLineIntersectorPerfTest {
@@ -79,15 +79,13 @@ public class RectangleLineIntersectorPerfTest {
   }
 
   private BoundingBox newRectangle() {
-    final BoundingBox rectEnv = new BoundingBoxDoubleGf(
-      new PointDouble(this.baseX, this.baseY, Geometry.NULL_ORDINATE), new PointDouble(
-        this.baseX + this.rectSize, this.baseY + this.rectSize, Geometry.NULL_ORDINATE));
+    final BoundingBox rectEnv = new BoundingBoxDoubleXY(this.baseX, this.baseY,
+      this.baseX + this.rectSize, this.baseY + this.rectSize);
     return rectEnv;
   }
 
   private Point[] newTestPoints(final int nPts) {
-    final Point pt = this.geomFact
-      .point(new PointDouble(this.baseX, this.baseY, Geometry.NULL_ORDINATE));
+    final Point pt = this.geomFact.point(new PointDoubleXY(this.baseX, this.baseY));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
     return CoordinatesListUtil.getPointArray(circle);
   }
@@ -168,31 +166,34 @@ class SimpleRectangleIntersector {
   }
 
   private void initCorners(final BoundingBox rectEnv) {
-    this.corner[0] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
-    this.corner[1] = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
-    this.corner[2] = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
-    this.corner[3] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
+    this.corner[0] = new PointDoubleXY(rectEnv.getMaxX(), rectEnv.getMaxY());
+    this.corner[1] = new PointDoubleXY(rectEnv.getMinX(), rectEnv.getMaxY());
+    this.corner[2] = new PointDoubleXY(rectEnv.getMinX(), rectEnv.getMinY());
+    this.corner[3] = new PointDoubleXY(rectEnv.getMaxX(), rectEnv.getMinY());
   }
 
   public boolean intersects(final Point p0, final Point p1) {
-    final BoundingBoxDoubleGf segEnv = new BoundingBoxDoubleGf(p0, p1);
-    if (!this.rectEnv.intersects(segEnv)) {
+    final double x1 = p0.getX();
+    final double y1 = p0.getY();
+    final double x2 = p1.getX();
+    final double y2 = p1.getY();
+    if (!this.rectEnv.intersects(x1, y1, x2, y2)) {
       return false;
     }
 
-    this.li.computeIntersection(p0, p1, this.corner[0], this.corner[1]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[0], this.corner[1]);
     if (this.li.hasIntersection()) {
       return true;
     }
-    this.li.computeIntersection(p0, p1, this.corner[1], this.corner[2]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[1], this.corner[2]);
     if (this.li.hasIntersection()) {
       return true;
     }
-    this.li.computeIntersection(p0, p1, this.corner[2], this.corner[3]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[2], this.corner[3]);
     if (this.li.hasIntersection()) {
       return true;
     }
-    this.li.computeIntersection(p0, p1, this.corner[3], this.corner[0]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[3], this.corner[0]);
     if (this.li.hasIntersection()) {
       return true;
     }

@@ -37,12 +37,12 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
 public abstract class GeometricShapeBuilder {
-  protected BoundingBox extent = new BoundingBoxDoubleGf(2, 0, 0, 1, 1);
+  protected BoundingBox extent = new BoundingBoxDoubleXY(0, 0, 1, 1);
 
   protected GeometryFactory geometryFactory;
 
@@ -84,7 +84,7 @@ public abstract class GeometricShapeBuilder {
     final double radius = getRadius();
 
     final Point centre = getCentre();
-    return new BoundingBoxDoubleGf(2, centre.getX() - radius, centre.getY() - radius,
+    return new BoundingBoxDoubleXY(centre.getX() - radius, centre.getY() - radius,
       centre.getX() + radius, centre.getY() + radius);
   }
 

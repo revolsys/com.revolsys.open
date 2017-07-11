@@ -35,9 +35,8 @@ package com.revolsys.geometry.noding.snapround;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.util.Assert;
@@ -103,7 +102,7 @@ public class HotPixel {
       throw new IllegalArgumentException("Scale factor must be non-zero");
     }
     if (scaleFactor != 1.0) {
-      this.pt = new PointDouble(scale(pt.getX()), scale(pt.getY()), Geometry.NULL_ORDINATE);
+      this.pt = new PointDouble(scale(pt.getX()), scale(pt.getY()));
     }
     initCorners(this.pt);
   }
@@ -149,7 +148,7 @@ public class HotPixel {
   public BoundingBox getSafeEnvelope() {
     if (this.safeEnv == null) {
       final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / this.scaleFactor;
-      this.safeEnv = new BoundingBoxDoubleGf(2, this.originalPt.getX() - safeTolerance,
+      this.safeEnv = new BoundingBoxDoubleXY(this.originalPt.getX() - safeTolerance,
         this.originalPt.getY() - safeTolerance, this.originalPt.getX() + safeTolerance,
         this.originalPt.getY() + safeTolerance);
     }
@@ -167,10 +166,10 @@ public class HotPixel {
     this.miny = pt.getY() - tolerance;
     this.maxy = pt.getY() + tolerance;
 
-    this.corner[0] = new PointDouble(this.maxx, this.maxy, Geometry.NULL_ORDINATE);
-    this.corner[1] = new PointDouble(this.minx, this.maxy, Geometry.NULL_ORDINATE);
-    this.corner[2] = new PointDouble(this.minx, this.miny, Geometry.NULL_ORDINATE);
-    this.corner[3] = new PointDouble(this.maxx, this.miny, Geometry.NULL_ORDINATE);
+    this.corner[0] = new PointDouble(this.maxx, this.maxy);
+    this.corner[1] = new PointDouble(this.minx, this.maxy);
+    this.corner[2] = new PointDouble(this.minx, this.miny);
+    this.corner[3] = new PointDouble(this.maxx, this.miny);
   }
 
   /**
@@ -230,12 +229,12 @@ public class HotPixel {
     boolean intersectsLeft = false;
     boolean intersectsBottom = false;
 
-    this.li.computeIntersection(p0, p1, this.corner[0], this.corner[1]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[0], this.corner[1]);
     if (this.li.isProper()) {
       return true;
     }
 
-    this.li.computeIntersection(p0, p1, this.corner[1], this.corner[2]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[1], this.corner[2]);
     if (this.li.isProper()) {
       return true;
     }
@@ -243,7 +242,7 @@ public class HotPixel {
       intersectsLeft = true;
     }
 
-    this.li.computeIntersection(p0, p1, this.corner[2], this.corner[3]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[2], this.corner[3]);
     if (this.li.isProper()) {
       return true;
     }
@@ -251,7 +250,7 @@ public class HotPixel {
       intersectsBottom = true;
     }
 
-    this.li.computeIntersection(p0, p1, this.corner[3], this.corner[0]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[3], this.corner[0]);
     if (this.li.isProper()) {
       return true;
     }

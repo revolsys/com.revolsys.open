@@ -114,7 +114,7 @@ public class WKBTest extends TestCase {
 
   public void testBigPolygon() throws IOException, ParseException {
     final GeometricShapeFactory shapeFactory = new GeometricShapeFactory(this.geomFactory);
-    shapeFactory.setBase(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE));
+    shapeFactory.setBase(new PointDouble((double)0, 0));
     shapeFactory.setSize(1000);
     shapeFactory.setNumPoints(1000);
     final Geometry geom = shapeFactory.newRectangle();

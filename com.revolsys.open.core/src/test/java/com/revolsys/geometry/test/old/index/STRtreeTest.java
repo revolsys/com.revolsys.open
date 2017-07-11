@@ -37,14 +37,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.index.strtree.AbstractNode;
+import com.revolsys.geometry.index.strtree.Boundable;
 import com.revolsys.geometry.index.strtree.ItemBoundable;
 import com.revolsys.geometry.index.strtree.STRtree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.test.old.util.SerializationUtil;
 
 import junit.framework.TestCase;
@@ -73,27 +74,28 @@ public class STRtreeTest extends TestCase {
       0);
     for (int i = 0; i < parentBoundables.size() - 1; i++) {// -1
       final AbstractNode parentBoundable = (AbstractNode)parentBoundables.get(i);
-      assertEquals(expectedChildrenPerParentBoundable, parentBoundable.getChildBoundables().size());
+      assertEquals(expectedChildrenPerParentBoundable, parentBoundable.getChildCount());
     }
     final AbstractNode lastParent = (AbstractNode)parentBoundables.get(parentBoundables.size() - 1);
-    assertEquals(expectedChildrenOfLastParent, lastParent.getChildBoundables().size());
+    assertEquals(expectedChildrenOfLastParent, lastParent.getChildCount());
   }
 
   private void doTestVerticalSlices(final int itemCount, final int sliceCount,
     final int expectedBoundablesPerSlice, final int expectedBoundablesOnLastSlice) {
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(2);
-    final List[] slices = t.verticalSlices(itemWrappers(itemCount), sliceCount);
-    assertEquals(sliceCount, slices.length);
+    final List<List<Boundable<BoundingBox, Object>>> slices = t
+      .verticalSlices(itemWrappers(itemCount), sliceCount);
+    assertEquals(sliceCount, slices.size());
     for (int i = 0; i < sliceCount - 1; i++) {// -1
-      assertEquals(expectedBoundablesPerSlice, slices[i].size());
+      assertEquals(expectedBoundablesPerSlice, slices.get(i).size());
     }
-    assertEquals(expectedBoundablesOnLastSlice, slices[sliceCount - 1].size());
+    assertEquals(expectedBoundablesOnLastSlice, slices.get(sliceCount - 1).size());
   }
 
   private List itemWrappers(final int size) {
     final ArrayList itemWrappers = new ArrayList();
     for (int i = 0; i < size; i++) {
-      itemWrappers.add(new ItemBoundable(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object()));
+      itemWrappers.add(new ItemBoundable(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object()));
     }
     return itemWrappers;
   }
@@ -106,11 +108,11 @@ public class STRtreeTest extends TestCase {
 
   public void testDisallowedInserts() {
     final STRtree t = new STRtree(5);
-    t.insert(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object());
-    t.insert(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object());
-    t.getItems(BoundingBox.EMPTY);
+    t.insertItem(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
+    t.insertItem(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
+    t.getItems(BoundingBox.empty());
     try {
-      t.insert(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object());
+      t.insertItem(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
       assertTrue(false);
     } catch (final AssertionError e) {
       assertTrue(true);
@@ -119,42 +121,39 @@ public class STRtreeTest extends TestCase {
 
   public void testEmptyTreeUsingItemVisitorQuery() {
     final STRtree tree = new STRtree();
-    tree.query(new BoundingBoxDoubleGf(2, 0, 1, 0, 1), (item) -> {
+    tree.query(new BoundingBoxDoubleXY(0, 1, 0, 1), (item) -> {
       assertTrue("Should never reach here", true);
     });
   }
 
   public void testEmptyTreeUsingListQuery() {
     final STRtree tree = new STRtree();
-    final List list = tree.getItems(new BoundingBoxDoubleGf(2, 0, 1, 0, 1));
+    final List list = tree.getItems(new BoundingBoxDoubleXY(0, 1, 0, 1));
     assertTrue(list.isEmpty());
   }
 
   public void testQuery() throws Throwable {
     final ArrayList geometries = new ArrayList();
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDouble((double)0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble((double)10, 10, Geometry.NULL_ORDINATE)
+      new PointDoubleXY(0, 0), new PointDoubleXY(10, 10)
     }));
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDouble((double)20, 20, Geometry.NULL_ORDINATE),
-      new PointDouble((double)30, 30, Geometry.NULL_ORDINATE)
+      new PointDoubleXY(20, 20), new PointDoubleXY(30, 30)
     }));
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDouble((double)20, 20, Geometry.NULL_ORDINATE),
-      new PointDouble((double)30, 30, Geometry.NULL_ORDINATE)
+      new PointDoubleXY(20, 20), new PointDoubleXY(30, 30)
     }));
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(4);
     for (final Iterator i = geometries.iterator(); i.hasNext();) {
       final Geometry g = (Geometry)i.next();
-      t.insert(g.getBoundingBox(), new Object());
+      t.insertItem(g.getBoundingBox(), new Object());
     }
     t.build();
     try {
-      assertEquals(1, t.getItems(new BoundingBoxDoubleGf(2, 5, 5, 6, 6)).size());
-      assertEquals(0, t.getItems(new BoundingBoxDoubleGf(2, 20, 0, 30, 10)).size());
-      assertEquals(2, t.getItems(new BoundingBoxDoubleGf(2, 25, 25, 26, 26)).size());
-      assertEquals(3, t.getItems(new BoundingBoxDoubleGf(2, 0, 0, 100, 100)).size());
+      assertEquals(1, t.getItems(new BoundingBoxDoubleXY(5, 5, 6, 6)).size());
+      assertEquals(0, t.getItems(new BoundingBoxDoubleXY(20, 0, 30, 10)).size());
+      assertEquals(2, t.getItems(new BoundingBoxDoubleXY(25, 25, 26, 26)).size());
+      assertEquals(3, t.getItems(new BoundingBoxDoubleXY(0, 0, 100, 100)).size());
     } catch (final Throwable x) {
       STRtreeDemo.printSourceData(geometries, System.out);
       STRtreeDemo.printLevels(t, System.out);
@@ -169,7 +168,7 @@ public class STRtreeTest extends TestCase {
 
     STRtree tree = (STRtree)tester.getSpatialIndex();
     // create the index before serialization
-    tree.getItems(BoundingBox.EMPTY);
+    tree.getItems(BoundingBox.empty());
 
     final byte[] data = SerializationUtil.serialize(tree);
     tree = (STRtree)SerializationUtil.deserialize(data);

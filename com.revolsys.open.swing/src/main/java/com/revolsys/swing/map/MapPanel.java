@@ -577,7 +577,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     if (geometryFactory != null) {
       boundingBox = viewport.getBoundingBox(geometryFactory, event, 8);
     } else {
-      boundingBox = BoundingBox.EMPTY;
+      boundingBox = BoundingBox.empty();
     }
     return boundingBox;
   }

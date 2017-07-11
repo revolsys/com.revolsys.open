@@ -89,7 +89,7 @@ public class MCIndexNoder extends SinglePassNoder {
       segStr);
     for (final MonotoneChain mc : segChains) {
       mc.setId(this.idCounter++);
-      this.index.insert(mc.getEnvelope(), mc);
+      this.index.insertItem(mc.getEnvelope(), mc);
       this.monoChains.add(mc);
     }
   }

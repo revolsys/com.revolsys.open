@@ -157,7 +157,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   @Override
-  public void insert(final BoundingBox boundingBox, final T item) {
+  public void insertItem(final BoundingBox boundingBox, final T item) {
     if (boundingBox == null) {
       throw new IllegalArgumentException("Item envelope must not be null");
     } else {

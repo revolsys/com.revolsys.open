@@ -186,7 +186,7 @@ public class LasProjection {
           coordinateSystem);
         header.addProperty(property);
       } else {
-        final String wkt = EpsgCoordinateSystems.`(coordinateSystem);
+        final String wkt = EpsgCoordinateSystems.toWkt(coordinateSystem);
         final byte[] stringBytes = wkt.getBytes(StandardCharsets.UTF_8);
         final byte[] bytes = new byte[stringBytes.length + 1];
         System.arraycopy(stringBytes, 0, bytes, 0, stringBytes.length);

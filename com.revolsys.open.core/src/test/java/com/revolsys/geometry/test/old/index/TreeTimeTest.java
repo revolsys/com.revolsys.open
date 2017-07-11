@@ -75,7 +75,7 @@ public class TreeTimeTest {
 
     @Override
     public void insert(final BoundingBoxDoubleGf itemEnv, final Object item) {
-      this.index.insert(itemEnv, item);
+      this.index.insertItem(itemEnv, item);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class TreeTimeTest {
 
     @Override
     public void insert(final BoundingBoxDoubleGf itemEnv, final Object item) {
-      this.index.insert(itemEnv, item);
+      this.index.insertItem(itemEnv, item);
     }
 
     @Override

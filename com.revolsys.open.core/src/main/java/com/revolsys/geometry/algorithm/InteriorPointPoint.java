@@ -34,7 +34,6 @@ package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * Computes a point in the interior of an point geometry.
@@ -74,7 +73,7 @@ public class InteriorPointPoint {
   private void add(final Point point) {
     final double dist = point.distance(this.centroid);
     if (dist < this.minDistance) {
-      this.interiorPoint = new PointDouble(point);
+      this.interiorPoint = point;
       this.minDistance = dist;
     }
   }

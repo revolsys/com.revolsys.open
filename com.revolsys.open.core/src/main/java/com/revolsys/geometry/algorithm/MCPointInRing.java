@@ -44,7 +44,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 
 /**
@@ -106,7 +106,7 @@ public class MCPointInRing implements PointInRing {
 
     // test all segments intersected by ray from pt in positive x direction
     final double y = pt.getY();
-    final BoundingBox rayEnv = new BoundingBoxDoubleGf(2, -Double.MAX_VALUE, y, Double.MAX_VALUE,
+    final BoundingBox rayEnv = new BoundingBoxDoubleXY(-Double.MAX_VALUE, y, Double.MAX_VALUE,
       y);
 
     this.interval.min = y;

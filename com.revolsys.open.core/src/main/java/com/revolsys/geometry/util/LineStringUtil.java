@@ -182,9 +182,10 @@ public final class LineStringUtil {
 
       for (int i2 = 1; i2 < numCoordinates2; i2++) {
         final Point currentCoord2 = coordinates2.getPoint(i2);
+        final Point p1 = previousCoord1;
+        final Point p3 = previousCoord2;
 
-        intersector.computeIntersection(previousCoord1, currentCoord1, previousCoord2,
-          currentCoord2);
+        intersector.computeIntersectionPoints(p1, currentCoord1, p3, currentCoord2);
         final int numIntersections = intersector.getIntersectionCount();
         if (intersector.hasIntersection()) {
           if (intersector.isProper()) {

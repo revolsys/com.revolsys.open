@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.index.quadtree.QuadTree;
-import com.revolsys.geometry.index.visitor.LineSegmentIntersectionVisitor;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
