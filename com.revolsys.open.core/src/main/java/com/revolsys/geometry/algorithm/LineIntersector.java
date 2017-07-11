@@ -101,13 +101,33 @@ public abstract class LineIntersector {
     return dist;
   }
 
-  protected double intersectionX1 = Double.NaN;
+  protected int intersectionCount;
 
-  protected double intersectionY1 = Double.NaN;
+  protected double intersectionX1 = Double.NaN;
 
   protected double intersectionX2 = Double.NaN;
 
+  protected double intersectionY1 = Double.NaN;
+
   protected double intersectionY2 = Double.NaN;
+
+  protected boolean isProper;
+
+  protected double line1x1;
+
+  protected double line1x2;
+
+  protected double line1y1;
+
+  protected double line1y2;
+
+  protected double line2x1;
+
+  protected double line2x2;
+
+  protected double line2y1;
+
+  protected double line2y2;
 
   protected double pointAX = Double.NaN;
 
@@ -117,27 +137,7 @@ public abstract class LineIntersector {
 
   protected double pointBY = Double.NaN;
 
-  protected boolean isProper;
-
-  protected int intersectionCount;
-
   protected final double scale;
-
-  protected double line1x1;
-
-  protected double line1y1;
-
-  protected double line1x2;
-
-  protected double line1y2;
-
-  protected double line2x1;
-
-  protected double line2y1;
-
-  protected double line2x2;
-
-  protected double line2y2;
 
   public LineIntersector() {
     this.intersectionCount = 0;

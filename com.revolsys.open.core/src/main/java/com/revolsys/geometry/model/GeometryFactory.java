@@ -2293,7 +2293,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   @Override
   public int toIntX(final double x) {
     if (Double.isFinite(x)) {
-      return (int)Math.round(x * this.scaleZ);
+      return (int)Math.round(x * this.scaleX);
     } else {
       return Integer.MIN_VALUE;
     }
