@@ -94,26 +94,26 @@ public class TriangulatedIrregularNetwork {
         final Point corner = triangle.getPoint(i);
         final Point nextCorner = triangle.getPoint((i + 1) % 3);
 
-        final double startCorner = corner.distance(lc0);
+        final double startCorner = corner.distancePoint(lc0);
         if (startClosestCorner == -1 || startCorner < startCornerDistance) {
           startClosestCorner = i;
           startCornerDistance = startCorner;
         }
 
-        final double endCorner = corner.distance(lc1);
+        final double endCorner = corner.distancePoint(lc1);
         if (endClosestCorner == -1 || endCorner < endCornerDistance) {
           endClosestCorner = i;
           endCornerDistance = endCorner;
         }
 
         final LineSegment edge = new LineSegmentDoubleGF(corner, nextCorner);
-        final double startEdge = edge.distance(lc0);
+        final double startEdge = edge.distancePoint(lc0);
         if (startClosestEdge == -1 || startEdge < startEdgeDistance) {
           startClosestEdge = i;
           startEdgeDistance = startEdge;
         }
 
-        final double endEdge = edge.distance(lc1);
+        final double endEdge = edge.distancePoint(lc1);
         if (endClosestEdge == -1 || endEdge < endEdgeDistance) {
           endClosestEdge = i;
           endEdgeDistance = endEdge;
@@ -164,7 +164,7 @@ public class TriangulatedIrregularNetwork {
       final Point triCorner = triangle.getPoint(i);
       if (!triCorner.equals(2, intersectCoord) && !previousPoint.equals(2, intersectCoord)) {
         final double distance = new LineSegmentDoubleGF(previousPoint, triCorner)
-          .distance(intersectCoord);
+          .distancePoint(intersectCoord);
         if (distance == 0) {
           final Point nextPoint = triangle.getPoint((i + 1) % 3);
           replaceTriangle(triangle,
@@ -657,7 +657,7 @@ public class TriangulatedIrregularNetwork {
     if (geometryFactory.getAxisCount() != 3) {
       final int srid = geometryFactory.getCoordinateSystemId();
       final double scaleXY = geometryFactory.getScaleXY();
-      this.geometryFactory = GeometryFactory.fixed(srid, scaleXY, 1.0);
+      this.geometryFactory = GeometryFactory.fixed(srid, scaleXY, scaleXY, 1.0);
     } else {
       this.geometryFactory = geometryFactory;
     }

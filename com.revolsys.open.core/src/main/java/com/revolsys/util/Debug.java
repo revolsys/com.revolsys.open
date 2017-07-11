@@ -38,15 +38,6 @@ public class Debug {
     }
   }
 
-  public static boolean equals(final Point coordinates1End, final double... coordinates) {
-    if (coordinates1End.equals(coordinates)) {
-      noOp();
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   public static void equals(final Record object, final double x, final double y) {
     final Geometry geometry = object.getGeometry();
     equals(geometry, x, y);

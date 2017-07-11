@@ -32,7 +32,7 @@ public class ArcGisRestService extends ArcGisResponse<CatalogElement>
 
   private BoundingBox initialExtent = BoundingBox.EMPTY;
 
-  private GeometryFactory spatialReference = GeometryFactory.DEFAULT;
+  private GeometryFactory spatialReference = GeometryFactory.DEFAULT_3D;
 
   public ArcGisRestService() {
   }

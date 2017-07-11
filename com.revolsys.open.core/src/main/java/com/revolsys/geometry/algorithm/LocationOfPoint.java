@@ -72,7 +72,7 @@ public class LocationOfPoint {
 
     int i = 0;
     for (final Segment segment : this.line.segments()) {
-      final double segDistance = segment.distance(inputPt);
+      final double segDistance = segment.distancePoint(inputPt);
       final double segFrac = segmentFraction(segment, inputPt);
 
       if (segDistance < minDistance) {
@@ -113,7 +113,7 @@ public class LocationOfPoint {
       int i = startIndex;
       while (segment.hasNext()) {
         segment.next();
-        final double segDistance = segment.distance(inputPt);
+        final double segDistance = segment.distancePoint(inputPt);
         final double segFrac = segment.segmentFraction(inputPt);
 
         if (segDistance < minDistance && isGreater(i, segFrac, minLocation)) {

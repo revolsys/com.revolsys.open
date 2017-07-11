@@ -15,23 +15,32 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.ByteOrder;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.file.Paths;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public interface Resource extends org.springframework.core.io.Resource {
   static String CLASSPATH_URL_PREFIX = "classpath:";
+
+  ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<>();
 
   static boolean exists(final Resource resource) {
     if (resource == null) {
@@ -41,8 +50,55 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
+  static Resource getBaseResource() {
+    final Resource baseResource = Resource.BASE_RESOURCE.get();
+    if (baseResource == null) {
+      return new FileSystemResource(FileUtil.getCurrentDirectory());
+    } else {
+      return baseResource;
+    }
+  }
+
+  static Resource getBaseResource(final String childPath) {
+    final Resource baseResource = getBaseResource();
+    return baseResource.newChildResource(childPath);
+  }
+
+  static File getFileOrCreateTempFile(final Resource resource) {
+    try {
+      if (resource instanceof FileSystemResource) {
+        return resource.getFile();
+      } else {
+        final String filename = resource.getFilename();
+        final String baseName = FileUtil.getBaseName(filename);
+        final String fileExtension = FileNames.getFileNameExtension(filename);
+        return File.createTempFile(baseName, fileExtension);
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to get file for " + resource, e);
+    }
+  }
+
+  static File getOrDownloadFile(final Resource resource) {
+    try {
+      return resource.getFile();
+    } catch (final Throwable e) {
+      if (resource.exists()) {
+        final String baseName = resource.getBaseName();
+        final String fileNameExtension = resource.getFileNameExtension();
+        final File file = FileUtil.newTempFile(baseName, fileNameExtension);
+        FileUtil.copy(resource.getInputStream(), file);
+        return file;
+      } else {
+        throw new IllegalArgumentException("Cannot get File for resource " + resource, e);
+      }
+    }
+  }
+
   static Resource getResource(final Object source) {
-    if (source instanceof Resource) {
+    if (source == null) {
+      return null;
+    } else if (source instanceof Resource) {
       return (Resource)source;
     } else if (source instanceof Path) {
       return new PathResource((Path)source);
@@ -73,7 +129,7 @@ public interface Resource extends org.springframework.core.io.Resource {
         try {
           return new UrlResource(springResource.getURL());
         } catch (final IOException e) {
-          throw new WrappedException(e);
+          throw Exceptions.wrap(e);
         }
       }
     }
@@ -96,7 +152,11 @@ public interface Resource extends org.springframework.core.io.Resource {
     return null;
   }
 
-  ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<>();
+  static Resource setBaseResource(final Resource baseResource) {
+    final Resource oldResource = Resource.BASE_RESOURCE.get();
+    Resource.BASE_RESOURCE.set(baseResource);
+    return oldResource;
+  }
 
   default String contentsAsString() {
     final Reader reader = newReader();
@@ -109,7 +169,7 @@ public interface Resource extends org.springframework.core.io.Resource {
       final OutputStream out = newBufferedOutputStream();) {
       FileUtil.copy(in2, out);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -119,7 +179,7 @@ public interface Resource extends org.springframework.core.io.Resource {
         final InputStream in = source.newBufferedInputStream()) {
         copyFrom(in);
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }
@@ -130,7 +190,7 @@ public interface Resource extends org.springframework.core.io.Resource {
       final InputStream in = newBufferedInputStream();) {
       FileUtil.copy(in, out2);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -138,6 +198,10 @@ public interface Resource extends org.springframework.core.io.Resource {
     if (target != null) {
       target.copyFrom(this);
     }
+  }
+
+  default boolean createParentDirectories() {
+    return false;
   }
 
   @Override
@@ -243,14 +307,51 @@ public interface Resource extends org.springframework.core.io.Resource {
     return new BufferedInputStream(in);
   }
 
+  default <IS, IS2 extends IS> IS newBufferedInputStream(final Function<InputStream, IS2> factory) {
+    final InputStream out = newBufferedInputStream();
+    return factory.apply(out);
+  }
+
   default OutputStream newBufferedOutputStream() {
     final OutputStream out = newOutputStream();
     return new BufferedOutputStream(out);
   }
 
+  default <OS extends OutputStream> OS newBufferedOutputStream(
+    final Function<OutputStream, OS> factory) {
+    final OutputStream out = newBufferedOutputStream();
+    return factory.apply(out);
+  }
+
   default BufferedReader newBufferedReader() {
     final Reader in = newReader();
     return new BufferedReader(in);
+  }
+
+  default ChannelReader newChannelReader() {
+    return newChannelReader(8096, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelReader newChannelReader(final int capacity) {
+    return newChannelReader(capacity, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelReader newChannelReader(final int capacity, final ByteOrder byteOrder) {
+    final ReadableByteChannel in = newReadableByteChannel();
+    return new ChannelReader(in, capacity, byteOrder);
+  }
+
+  default ChannelWriter newChannelWriter() {
+    return newChannelWriter(8096, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelWriter newChannelWriter(final int capacity) {
+    return newChannelWriter(capacity, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelWriter newChannelWriter(final int capacity, final ByteOrder byteOrder) {
+    final WritableByteChannel in = newWritableByteChannel();
+    return new ChannelWriter(in, capacity, byteOrder);
   }
 
   default Resource newChildResource(final CharSequence childPath) {
@@ -278,13 +379,18 @@ public interface Resource extends org.springframework.core.io.Resource {
         return connection.getOutputStream();
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
   default PrintWriter newPrintWriter() {
     final Writer writer = newWriter();
     return new PrintWriter(writer);
+  }
+
+  default ReadableByteChannel newReadableByteChannel() {
+    final InputStream in = newInputStream();
+    return Channels.newChannel(in);
   }
 
   default Reader newReader() {
@@ -314,6 +420,11 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
+  default WritableByteChannel newWritableByteChannel() {
+    final OutputStream out = newOutputStream();
+    return Channels.newChannel(out);
+  }
+
   default Writer newWriter() {
     final OutputStream stream = newOutputStream();
     return FileUtil.newUtf8Writer(stream);
@@ -324,23 +435,20 @@ public interface Resource extends org.springframework.core.io.Resource {
     return new OutputStreamWriter(stream, charset);
   }
 
-  static Resource getBaseResource() {
-    final Resource baseResource = Resource.BASE_RESOURCE.get();
-    if (baseResource == null) {
-      return new FileSystemResource(FileUtil.getCurrentDirectory());
+  default Path toPath() {
+    if (isFile()) {
+      final Path path = getFile().toPath();
+      if (Paths.exists(path)) {
+        try {
+          return path.toRealPath();
+        } catch (final IOException e) {
+          return path;
+        }
+      } else {
+        return path;
+      }
     } else {
-      return baseResource;
+      return null;
     }
-  }
-
-  static Resource getBaseResource(final String childPath) {
-    final Resource baseResource = getBaseResource();
-    return baseResource.newChildResource(childPath);
-  }
-
-  static Resource setBaseResource(final Resource baseResource) {
-    final Resource oldResource = Resource.BASE_RESOURCE.get();
-    Resource.BASE_RESOURCE.set(baseResource);
-    return oldResource;
   }
 }

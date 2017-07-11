@@ -79,8 +79,6 @@ public class PolygonImpl extends AbstractPolygon {
 
   private LinearRing[] rings;
 
-  private Object userData;
-
   public PolygonImpl(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
@@ -137,13 +135,19 @@ public class PolygonImpl extends AbstractPolygon {
   @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
+  }
+
+  @Override
+  public double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex) {
+    if (partIndex == 0) {
+      return getCoordinate(ringIndex, vertexIndex, axisIndex);
+    } else {
+      return Double.NaN;
+    }
   }
 
   @Override
@@ -174,33 +178,8 @@ public class PolygonImpl extends AbstractPolygon {
     return Lists.newArray(this.rings);
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getUserData() {
-    return this.userData;
-  }
-
   @Override
   public boolean isEmpty() {
     return this.rings == null;
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserData(final Object userData) {
-    this.userData = userData;
   }
 }

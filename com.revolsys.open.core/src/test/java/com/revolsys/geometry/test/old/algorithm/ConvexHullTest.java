@@ -74,7 +74,7 @@ public class ConvexHullTest extends TestCase {
     return new TestSuite(ConvexHullTest.class);
   }
 
-  GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
+  GeometryFactory geometryFactory = GeometryFactory.fixed(0, 2, 1000.0, 1000.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -83,14 +83,14 @@ public class ConvexHullTest extends TestCase {
   }
 
   public void test1() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 2, 1.0, 1.0));
     final LineString lineString = (LineString)reader.read("LINESTRING (30 220, 240 220, 240 220)");
     final LineString convexHull = (LineString)reader.read("LINESTRING (30 220, 240 220)");
     assertTrue(convexHull.equals(2, lineString.convexHull()));
   }
 
   public void test2() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 2, 1.0, 1.0));
     final Geometry geometry = reader
       .read("MULTIPOINT (130 240, 130 240, 130 240, 570 240, 570 240, 570 240, 650 240)");
     final LineString convexHull = (LineString)reader.read("LINESTRING (130 240, 650 240)");
@@ -98,35 +98,35 @@ public class ConvexHullTest extends TestCase {
   }
 
   public void test3() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 2, 1.0, 1.0));
     final Geometry geometry = reader.read("MULTIPOINT (0 0, 0 0, 10 0)");
     final LineString convexHull = (LineString)reader.read("LINESTRING (0 0, 10 0)");
     assertTrue(convexHull.equals(2, geometry.convexHull()));
   }
 
   public void test4() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 2, 1.0, 1.0));
     final Geometry geometry = reader.read("MULTIPOINT (0 0, 10 0, 10 0)");
     final LineString convexHull = (LineString)reader.read("LINESTRING (0 0, 10 0)");
     assertTrue(convexHull.equals(2, geometry.convexHull()));
   }
 
   public void test5() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 2, 1.0, 1.0));
     final Geometry geometry = reader.read("MULTIPOINT (0 0, 5 0, 10 0)");
     final LineString convexHull = (LineString)reader.read("LINESTRING (0 0, 10 0)");
     assertTrue(convexHull.equals(2, geometry.convexHull()));
   }
 
   public void test6() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 2, 1.0, 1.0));
     final Geometry actualGeometry = reader.read("MULTIPOINT (0 0, 5 1, 10 0)").convexHull();
     final Geometry expectedGeometry = reader.read("POLYGON ((0 0, 5 1, 10 0, 0 0))");
     assertEquals(expectedGeometry.toString(), actualGeometry.toString());
   }
 
   public void test7() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 2, 1.0, 1.0));
     final Geometry geometry = reader.read("MULTIPOINT (0 0, 0 0, 5 0, 5 0, 10 0, 10 0)");
     final LineString convexHull = (LineString)reader.read("LINESTRING (0 0, 10 0)");
     assertTrue(convexHull.equals(2, geometry.convexHull()));

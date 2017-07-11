@@ -1,16 +1,23 @@
 package com.revolsys.geometry.model;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.ProjectionFactory;
 
 public interface GeometryFactoryProxy {
-  default BoundingBox convertBoundingBox(final BoundingBox boundingBox) {
-    if (boundingBox != null) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (geometryFactory != null) {
-        return boundingBox.convert(geometryFactory);
+  default BoundingBox convertBoundingBox(final BoundingBoxProxy boundingBoxProxy) {
+    if (boundingBoxProxy != null) {
+      final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+      if (boundingBox != null) {
+
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        if (geometryFactory != null) {
+          return boundingBox.convert(geometryFactory);
+        }
       }
+      return boundingBox;
     }
-    return boundingBox;
+    return null;
   }
 
   default <G extends Geometry> G convertGeometry(final G geometry) {
@@ -31,6 +38,32 @@ public interface GeometryFactoryProxy {
       }
     }
     return geometry;
+  }
+
+  default CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return null;
+    } else {
+      final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+      final int coordinateSystemIdThis = getCoordinateSystemId();
+      if (coordinateSystemId == coordinateSystemIdThis) {
+        return null;
+      } else if (coordinateSystemId == 0 || coordinateSystemIdThis == 0) {
+        return null;
+      } else {
+        final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
+        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        if (coordinateSystem == coordinateSystemThis) {
+          return null;
+        } else if (coordinateSystem == null || coordinateSystemThis == null) {
+          return null;
+        } else if (coordinateSystem.equals(coordinateSystemThis)) {
+          return null;
+        } else {
+          return ProjectionFactory.getCoordinatesOperation(coordinateSystemThis, coordinateSystem);
+        }
+      }
+    }
   }
 
   default CoordinateSystem getCoordinateSystem() {
@@ -61,7 +94,23 @@ public interface GeometryFactoryProxy {
   }
 
   default GeometryFactory getGeometryFactory() {
-    return GeometryFactory.DEFAULT;
+    return GeometryFactory.DEFAULT_3D;
+  }
+
+  default GeometryFactory getNonZeroGeometryFactory(GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactoryThis = getGeometryFactory();
+    if (geometryFactory == null) {
+      return geometryFactoryThis;
+    } else {
+      final int srid = geometryFactory.getCoordinateSystemId();
+      if (srid == 0) {
+        final int geometrySrid = geometryFactoryThis.getCoordinateSystemId();
+        if (geometrySrid != 0) {
+          geometryFactory = geometryFactory.convertSrid(geometrySrid);
+        }
+      }
+      return geometryFactory;
+    }
   }
 
   default boolean isSameCoordinateSystem(final GeometryFactory geometryFactory) {
@@ -80,5 +129,35 @@ public interface GeometryFactoryProxy {
       final GeometryFactory geometryFactory = proxy.getGeometryFactory();
       return isSameCoordinateSystem(geometryFactory);
     }
+  }
+
+  default double toDoubleX(final int x) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toDoubleX(x);
+  }
+
+  default double toDoubleY(final int y) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toDoubleY(y);
+  }
+
+  default double toDoubleZ(final int z) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toDoubleZ(z);
+  }
+
+  default int toIntX(final double x) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toIntX(x);
+  }
+
+  default int toIntY(final double y) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toIntY(y);
+  }
+
+  default int toIntZ(final double z) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toIntZ(z);
   }
 }

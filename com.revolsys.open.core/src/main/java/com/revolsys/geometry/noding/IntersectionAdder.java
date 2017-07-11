@@ -139,7 +139,7 @@ public class IntersectionAdder implements SegmentIntersector {
   private boolean isTrivialIntersection(final SegmentString e0, final int segIndex0,
     final SegmentString e1, final int segIndex1) {
     if (e0 == e1) {
-      if (this.li.getIntersectionNum() == 1) {
+      if (this.li.getIntersectionCount() == 1) {
         if (isAdjacentSegments(segIndex0, segIndex1)) {
           return true;
         }

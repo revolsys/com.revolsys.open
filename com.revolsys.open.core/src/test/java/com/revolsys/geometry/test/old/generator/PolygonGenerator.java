@@ -116,7 +116,7 @@ public class PolygonGenerator extends GeometryGenerator {
       coords[i] = new PointDouble(gf.makePrecise(0, cx + fx), gf.makePrecise(1, cy + fy));
     }
 
-    coords[npoints] = coords[0].newPointDouble();
+    coords[npoints] = coords[0].newPoint2D();
 
     return gf.linearRing(coords);
   }

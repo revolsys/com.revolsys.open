@@ -78,7 +78,7 @@ public class RobustLineIntersectionTest extends TestCase {
     final LineIntersector li = new RobustLineIntersector();
     li.computeIntersection(pt[0], pt[1], pt[2], pt[3]);
 
-    final int intNum = li.getIntersectionNum();
+    final int intNum = li.getIntersectionCount();
     assertEquals("Number of intersections not as expected", expectedIntersectionNum, intNum);
 
     if (expectedIntPt != null) {
@@ -122,7 +122,7 @@ public class RobustLineIntersectionTest extends TestCase {
       l1.getPoint(0), l1.getPoint(1), l2.getPoint(0), l2.getPoint(1)
     };
     final Geometry g = this.reader.read(expectedWKT);
-    final Point[] intPt = CoordinatesListUtil.getCoordinateArray(g);
+    final Point[] intPt = CoordinatesListUtil.getPointArray(g);
     checkIntersection(pt, expectedIntersectionNum, intPt, distanceTolerance);
   }
 

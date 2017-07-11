@@ -22,7 +22,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.properties.ObjectPropertyProxy;
 import com.revolsys.properties.ObjectWithProperties;
@@ -38,7 +37,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
   public static List<Point> getCoordinates(final Collection<Node<Record>> nodes) {
     final List<Point> points = new ArrayList<>(nodes.size());
     for (final Node<Record> node : nodes) {
-      final Point point = node.newPointDouble();
+      final Point point = node.newPoint2D();
       points.add(point);
     }
     return points;
@@ -482,7 +481,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return this.graph == null;
   }
 
-  public boolean move(final Point newCoordinates) {
+  public boolean moveNode(final Point newCoordinates) {
     if (isRemoved()) {
       return false;
     } else {
@@ -518,11 +517,6 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
         return true;
       }
     }
-  }
-
-  @Override
-  public PointDouble newPointDouble() {
-    return new PointDouble(this.getX(), this.getY());
   }
 
   @Override

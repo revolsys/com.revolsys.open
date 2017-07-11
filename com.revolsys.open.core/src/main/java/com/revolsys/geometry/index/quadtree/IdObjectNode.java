@@ -48,7 +48,7 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected void forEachItem(final QuadTree<T> tree, final Consumer<T> action) {
+  protected void forEachItem(final QuadTree<T> tree, final Consumer<? super T> action) {
     synchronized (this.nodes) {
       final IdObjectQuadTree<T> idTree = (IdObjectQuadTree<T>)tree;
       for (final Object id : this.ids) {
@@ -60,7 +60,7 @@ public class IdObjectNode<T> extends AbstractNode<T> {
 
   @Override
   protected void forEachItem(final QuadTree<T> tree, final double[] bounds,
-    final Consumer<T> action) {
+    final Consumer<? super T> action) {
     synchronized (this.nodes) {
       final IdObjectQuadTree<T> idTree = (IdObjectQuadTree<T>)tree;
       for (final Object id : this.ids) {

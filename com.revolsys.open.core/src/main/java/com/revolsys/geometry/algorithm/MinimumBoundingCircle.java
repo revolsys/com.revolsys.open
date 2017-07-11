@@ -210,7 +210,7 @@ public class MinimumBoundingCircle {
      */
     final Geometry convexHull = this.input.convexHull();
 
-    final Point[] hullPts = CoordinatesListUtil.getCoordinateArray(convexHull);
+    final Point[] hullPts = CoordinatesListUtil.getPointArray(convexHull);
 
     // strip duplicate final point, if any
     Point[] pts = hullPts;

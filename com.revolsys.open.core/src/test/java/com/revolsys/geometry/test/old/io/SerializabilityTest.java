@@ -44,7 +44,7 @@ import junit.textui.TestRunner;
 
 public class SerializabilityTest extends TestCase {
 
-  static GeometryFactory fact = GeometryFactory.DEFAULT;
+  static GeometryFactory fact = GeometryFactory.DEFAULT_3D;
 
   public static void main(final String args[]) {
     TestRunner.run(SerializabilityTest.class);

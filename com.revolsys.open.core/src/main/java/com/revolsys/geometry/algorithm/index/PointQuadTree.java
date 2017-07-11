@@ -1,13 +1,12 @@
 package com.revolsys.geometry.algorithm.index;
 
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
+import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -15,27 +14,17 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.util.ExitLoopException;
+import com.revolsys.util.Property;
 
 public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
-  private static final String POINT_QUAD_TREE = "_PointQuadTree";
+  private static final WeakKeyValueMap<Geometry, PointQuadTree<int[]>> CACHE = new WeakKeyValueMap<>();
 
   public static PointQuadTree<int[]> get(final Geometry geometry) {
-    if (geometry == null || geometry.isEmpty()) {
-      return new PointQuadTree<>();
-    } else {
-      final Reference<PointQuadTree<int[]>> reference = GeometryProperties
-        .getGeometryProperty(geometry, PointQuadTree.POINT_QUAD_TREE);
-      PointQuadTree<int[]> index;
-      if (reference == null) {
-        index = null;
-      } else {
-        index = reference.get();
-      }
+    if (Property.hasValue(geometry)) {
+      PointQuadTree<int[]> index = CACHE.get(geometry);
       if (index == null) {
-
         final GeometryFactory geometryFactory = geometry.getGeometryFactory();
         index = new PointQuadTree<>(geometryFactory);
         for (final Vertex vertex : geometry.vertices()) {
@@ -44,10 +33,11 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
           final int[] vertexId = vertex.getVertexId();
           index.put(x, y, vertexId);
         }
-        GeometryProperties.setGeometryProperty(geometry, PointQuadTree.POINT_QUAD_TREE,
-          new SoftReference<>(index));
+        CACHE.put(geometry, index);
       }
       return index;
+    } else {
+      return null;
     }
   }
 

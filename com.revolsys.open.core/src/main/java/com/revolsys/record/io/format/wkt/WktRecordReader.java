@@ -71,13 +71,13 @@ public class WktRecordReader extends AbstractIterator<Record> implements RecordR
     GeometryFactory geometryFactory;
     final FieldDefinition geometryField = this.recordDefinition.getGeometryField();
     if (geometryField == null) {
-      geometryFactory = GeometryFactory.DEFAULT;
+      geometryFactory = GeometryFactory.DEFAULT_3D;
     } else {
       geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
       if (geometryFactory == null) {
         geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         if (geometryFactory == null) {
-          geometryFactory = GeometryFactory.DEFAULT;
+          geometryFactory = GeometryFactory.DEFAULT_3D;
         }
         geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       }

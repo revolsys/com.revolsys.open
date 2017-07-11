@@ -55,13 +55,13 @@ public class NonRobustLineIntersectorTest extends TestCase {
     super(Name_);
   }// public NonRobustLineIntersectorTest(String Name_)
 
-  public void testGetIntersectionNum() {
+  public void testgetIntersectionCount() {
     // MD: NonRobustLineIntersector may have different semantics for
-    // getIntersectionNumber
+    // getIntersectionCountber
     // li.computeIntersection(new PointDouble((double)220, 0), new
     // PointDouble((double)110, 0),
     // new PointDouble((double)0, 0), new PointDouble((double)110, 0));
-    // assertEquals(1, li.getIntersectionNum());
+    // assertEquals(1, li.getIntersectionCount());
   }
 
   public void testNegativeZero() {

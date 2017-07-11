@@ -82,7 +82,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     if (this.geometryFactory != null) {
       boundingBox = boundingBox.convert(this.geometryFactory);
     }
-    return boundingBox.getBounds(2);
+    return boundingBox.getMinMaxValues(2);
   }
 
   public int depth() {
@@ -93,16 +93,30 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return item1 == item2;
   }
 
-  public void forEach(final Consumer<T> action) {
+  @Override
+  public void forEach(final Consumer<? super T> action) {
     try {
       this.root.forEach(this, action);
     } catch (final ExitLoopException e) {
     }
   }
 
-  public void forEach(final Consumer<T> action, final BoundingBox boundingBox) {
+  public void forEach(final Consumer<? super T> action, final BoundingBox boundingBox) {
     final double[] bounds = convert(boundingBox);
     this.root.forEach(this, bounds, action);
+  }
+
+  @Override
+  public void forEach(final double x, final double y, final Consumer<? super T> action) {
+    final BoundingBox boundingBox = getGeometryFactory().newBoundingBox(x, y);
+    forEach(action, boundingBox);
+  }
+
+  @Override
+  public void forEach(final double minX, final double minY, final double maxX, final double maxY,
+    final Consumer<? super T> action) {
+    final BoundingBox boundingBox = getGeometryFactory().newBoundingBox(minX, minY, maxX, maxY);
+    forEach(action, boundingBox);
   }
 
   public List<T> getAll() {
@@ -126,6 +140,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }

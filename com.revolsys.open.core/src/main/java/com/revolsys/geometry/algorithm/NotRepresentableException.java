@@ -39,7 +39,7 @@ package com.revolsys.geometry.algorithm;
  * @version 1.7
  * @see HCoordinate
  */
-public class NotRepresentableException extends Exception {
+public class NotRepresentableException extends RuntimeException {
 
   /**
    *
@@ -48,6 +48,10 @@ public class NotRepresentableException extends Exception {
 
   public NotRepresentableException() {
     super("Projective point not representable on the Cartesian plane.");
+  }
+
+  public NotRepresentableException(final String message) {
+    super(message);
   }
 
 }

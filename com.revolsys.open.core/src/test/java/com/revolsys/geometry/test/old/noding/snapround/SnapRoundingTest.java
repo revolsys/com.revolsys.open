@@ -80,7 +80,7 @@ public class SnapRoundingTest extends TestCase {
       return true;
     }
     final LineSegment seg = new LineSegmentDouble(p0, p1);
-    final double dist = seg.distance(v);
+    final double dist = seg.distancePoint(v);
     if (dist < SNAP_TOLERANCE / 2.05) {
       return false;
     }

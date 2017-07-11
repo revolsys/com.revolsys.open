@@ -22,7 +22,7 @@ import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 public class Triangle extends AbstractLineString {
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(0, 1.0);
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(0, 2, 1.0, 1.0);
 
   private static final long serialVersionUID = -4513931832875328029L;
 

@@ -58,7 +58,7 @@ public class JTSFunctions {
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(jTop, false);
-    coordList.add(CoordinatesListUtil.getCoordinateArray(jArc.reverse()), false, 1,
+    coordList.add(CoordinatesListUtil.getPointArray(jArc.reverse()), false, 1,
       jArc.getVertexCount() - 1);
     coordList.add(jBottom, false);
 
@@ -91,10 +91,10 @@ public class JTSFunctions {
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(top, false);
-    coordList.add(CoordinatesListUtil.getCoordinateArray(arcTop), false, 1,
+    coordList.add(CoordinatesListUtil.getPointArray(arcTop), false, 1,
       arcTop.getVertexCount() - 1);
     coordList.add(new PointDouble(centreX, HEIGHT / 2));
-    coordList.add(CoordinatesListUtil.getCoordinateArray(arcBottom), false, 1,
+    coordList.add(CoordinatesListUtil.getPointArray(arcBottom), false, 1,
       arcBottom.getVertexCount() - 1);
     coordList.add(bottom, false);
 

@@ -49,7 +49,7 @@ public class CoordinateTest extends TestCase {
       new PointDouble(100.0, 200.0), //
       new PointDouble(100.0, 200.0, 50.0), //
       new PointDouble(100.0, 200.0, 50.0, 4.0))) {
-      final Point clone = point.newPointDouble();
+      final Point clone = point.newPoint2D();
       assertEquals3d(point, clone);
     }
   }

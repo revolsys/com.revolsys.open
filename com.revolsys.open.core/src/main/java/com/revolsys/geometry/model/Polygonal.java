@@ -33,13 +33,14 @@
 
 package com.revolsys.geometry.model;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.editor.MultiPolygonEditor;
+import com.revolsys.geometry.model.editor.PolygonalEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 
 public interface Polygonal extends Geometry {
   @SuppressWarnings("unchecked")
@@ -54,7 +55,7 @@ public interface Polygonal extends Geometry {
         "Expecting a Polygonal geometry not " + geometry.getGeometryType() + "\n" + geometry);
     } else {
       final String string = DataTypes.toString(value);
-      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      final Geometry geometry = GeometryFactory.DEFAULT_3D.geometry(string, false);
       return (G)newPolygonal(geometry);
     }
   }
@@ -71,20 +72,18 @@ public interface Polygonal extends Geometry {
     return false;
   }
 
-  @Override
-  default boolean contains(final Point2D point) {
-    final double x = point.getX();
-    final double y = point.getY();
-    return contains(x, y);
+  default double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex) {
+    final Polygon polygon = getGeometry(partIndex);
+    if (polygon == null) {
+      return Double.NaN;
+    } else {
+      return polygon.getCoordinate(ringIndex, vertexIndex, axisIndex);
+    }
   }
 
-  @Override
-  default boolean contains(final Rectangle2D rectangle) {
-    final double x = rectangle.getX();
-    final double y = rectangle.getY();
-    final double width = rectangle.getWidth();
-    final double height = rectangle.getHeight();
-    return contains(x, y, width, height);
+  default double getM(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, M);
   }
 
   Polygon getPolygon(int partIndex);
@@ -96,10 +95,48 @@ public interface Polygonal extends Geometry {
     return (List)getGeometries();
   }
 
+  default double getX(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, X);
+  }
+
+  default double getY(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, Y);
+  }
+
+  default double getZ(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, Z);
+  }
+
+  @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    return false;
+  }
+
+  @Override
+  default PolygonalEditor newGeometryEditor() {
+    return new MultiPolygonEditor(this);
+  }
+
+  @Override
+  default PolygonalEditor newGeometryEditor(final int axisCount) {
+    final PolygonalEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
+  default Polygonal newPolygonal(final GeometryFactory geometryFactory, final Polygon... polygons) {
+    return geometryFactory.polygonal(polygons);
+  }
+
   @Override
   Polygonal normalize();
 
   default Iterable<Polygon> polygons() {
     return getGeometries();
+  }
+
+  @Override
+  default Polygonal prepare() {
+    return new PreparedMultiPolygon(this);
   }
 }

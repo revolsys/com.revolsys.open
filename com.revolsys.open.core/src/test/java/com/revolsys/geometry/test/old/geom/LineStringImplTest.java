@@ -61,7 +61,7 @@ public class LineStringImplTest extends TestCase {
     return new TestSuite(LineStringImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 2, 1000.0, 1000.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -76,7 +76,7 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals10() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 2, 1.0, 1.0));
     Geometry l1 = reader.read(
       "POLYGON((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     Geometry l2 = reader.read(
@@ -127,7 +127,7 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals8() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1000.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 2, 1000.0, 1000.0));
     final Lineal l1 = (Lineal)reader.read(
       "MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     final Lineal l2 = (Lineal)reader.read(
@@ -136,7 +136,7 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals9() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 2, 1.0, 1.0));
     final Lineal l1 = (Lineal)reader.read(
       "MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     final Lineal l2 = (Lineal)reader.read(
@@ -181,7 +181,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testLinearRingConstructor() throws Exception {
     try {
-      final LinearRing ring = GeometryFactory.DEFAULT.linearRing(2, 0.0, 0, 10.0, 10);
+      final LinearRing ring = GeometryFactory.DEFAULT_3D.linearRing(2, 0.0, 0, 10.0, 10);
       assertTrue(false);
     } catch (final IllegalArgumentException e) {
       assertTrue(true);

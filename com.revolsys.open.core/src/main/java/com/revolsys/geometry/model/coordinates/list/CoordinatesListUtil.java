@@ -2,7 +2,6 @@ package com.revolsys.geometry.model.coordinates.list;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -11,16 +10,13 @@ import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.linestring.LineStringGraph;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.math.Angle;
 import com.revolsys.util.number.Doubles;
@@ -34,15 +30,6 @@ public class CoordinatesListUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
-  public static double angle(final LineString points, final int i1, final int i2) {
-    final double x1 = points.getX(i1);
-    final double y1 = points.getY(i1);
-    final double x2 = points.getX(i2);
-    final double y2 = points.getY(i2);
-    final double angle = Angle.angle2d(x1, x2, y1, y2);
-    return angle;
-  }
-
   public static double angleToNext(final LineString points, final int i) {
     final double x1 = points.getX(i);
     final double y1 = points.getY(i);
@@ -54,7 +41,7 @@ public class CoordinatesListUtil {
       y2 = points.getY(j);
       j++;
     } while (x1 == x2 && y1 == y2 && j < points.getVertexCount());
-    final double angle = Angle.angle2d(x1, x2, y1, y2);
+    final double angle = Angle.angle2d(x1, y1, x2, y2);
     return angle;
   }
 
@@ -70,7 +57,7 @@ public class CoordinatesListUtil {
         y2 = points.getY(j);
         j--;
       } while (x1 == x2 && y1 == y2 && j > -1);
-      final double angle = Angle.angle2d(x1, x2, y1, y2);
+      final double angle = Angle.angle2d(x1, y1, x2, y2);
       return angle;
     } else {
       throw new IllegalArgumentException("Index must be > 0 to calculate previous angle");
@@ -205,26 +192,20 @@ public class CoordinatesListUtil {
     return false;
   }
 
-  public static BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
-    final LineString points) {
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, points);
-    return boundingBox;
+  public static Point[] getPointArray(final Geometry geometry) {
+    return getPointArray(geometry, geometry.getVertexCount());
   }
 
-  public static Point[] getCoordinateArray(final Geometry geometry) {
-    return getCoordinates(geometry, geometry.getVertexCount());
-  }
-
-  public static Point[] getCoordinates(final Geometry g, final int vertexCount) {
-    final List<Point> coordinates = new ArrayList<>();
-    final int i = 0;
-    for (final Vertex vertex : g.vertices()) {
+  public static Point[] getPointArray(final Geometry geometry, final int vertexCount) {
+    final Point[] points = new Point[vertexCount];
+    int i = 0;
+    for (final Vertex vertex : geometry.vertices()) {
       if (i > vertexCount) {
         break;
       }
-      coordinates.add(vertex.newPointDouble());
+      points[i++] = vertex.newPoint();
     }
-    return coordinates.toArray(new Point[coordinates.size()]);
+    return points;
   }
 
   public static List<LineString> intersection(final GeometryFactory geometryFactory,
@@ -300,7 +281,7 @@ public class CoordinatesListUtil {
   public static <T> boolean movePointsWithinTolerance(final Map<Point, Point> movedNodes,
     final Graph<T> graph2, final double maxDistance, final Node<T> node1) {
     final Graph<T> graph1 = node1.getGraph();
-    final List<Node<T>> nodes2 = graph2.findNodes(node1, maxDistance);
+    final List<Node<T>> nodes2 = graph2.getNodes(node1, maxDistance);
     if (nodes2.size() == 1) {
       final Node<T> node2 = nodes2.get(0);
       if (graph1.findNode(node2) == null) {
@@ -308,15 +289,15 @@ public class CoordinatesListUtil {
         final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1, node2);
         if (!node1.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node1.newPointDouble(), midPoint);
+            movedNodes.put(node1.newPoint2D(), midPoint);
           }
-          node1.move(midPoint);
+          node1.moveNode(midPoint);
         }
         if (!node2.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node2.newPointDouble(), midPoint);
+            movedNodes.put(node2.newPoint2D(), midPoint);
           }
-          node2.move(midPoint);
+          node2.moveNode(midPoint);
         }
       }
     }
@@ -324,8 +305,8 @@ public class CoordinatesListUtil {
   }
 
   /**
-   * Returns the index of the direction of the point <code>q</code> relative to
-   * a vector specified by <code>p1-p2</code>.
+   * Returns the index of the direction of the point <code>x,y</code> relative to
+   * a vector specified by <code>(x1,y1)->(x2,y2)</code>.
    *
    * @param p1 the origin point of the vector
    * @param p2 the final point of the vector
@@ -335,14 +316,14 @@ public class CoordinatesListUtil {
    * @return 0 if q is collinear with p1-p2
    */
   public static int orientationIndex(final double x1, final double y1, final double x2,
-    final double y2, final double x, final double y) {
+    final double y2, final double x, final double y3) {
     // travelling along p1->p2, turn counter clockwise to get to q return 1,
     // travelling along p1->p2, turn clockwise to get to q return -1,
     // p1, p2 and q are colinear return 0.
     final double dx1 = x2 - x1;
     final double dy1 = y2 - y1;
     final double dx2 = x - x2;
-    final double dy2 = y - y2;
+    final double dy2 = y3 - y2;
     return RobustDeterminant.signOfDet2x2(dx1, dy1, dx2, dy2);
   }
 
@@ -409,9 +390,11 @@ public class CoordinatesListUtil {
 
   public static void setCoordinates(final double[] coordinates, final int axisCount, final int i,
     final Point point) {
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double value = point.getCoordinate(axisIndex);
-      coordinates[i * axisCount + axisIndex] = value;
+    if (point != null && !point.isEmpty()) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double value = point.getCoordinate(axisIndex);
+        coordinates[i * axisCount + axisIndex] = value;
+      }
     }
   }
 

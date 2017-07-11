@@ -45,6 +45,7 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.prep.PreparedMultiLineString;
 import com.revolsys.geometry.model.segment.MultiLineStringSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiLineStringVertex;
@@ -91,9 +92,9 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   @Override
   default double distance(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       geometry = geometry.convertGeometry(geometryFactory, 2);
@@ -151,6 +152,16 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
+  default double getCoordinate(final int partIndex, final int vertexIndex, final int axisIndex) {
+    final LineString line = getGeometry(partIndex);
+    if (line == null) {
+      return Double.NaN;
+    } else {
+      return line.getCoordinate(vertexIndex, axisIndex);
+    }
+  }
+
+  @Override
   default DataType getDataType() {
     return DataTypes.MULTI_LINE_STRING;
   }
@@ -182,7 +193,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
         final LineString line = getLineString(partIndex);
         final int segmentIndex = segmentId[1];
         if (segmentIndex >= 0 && segmentIndex < line.getSegmentCount()) {
-          return new MultiLineStringSegment(this, segmentId);
+          return new MultiLineStringSegment(this, partIndex, segmentIndex);
         }
       }
       return null;
@@ -240,6 +251,16 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       }
       return null;
     }
+  }
+
+  @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final LineString line : lineStrings()) {
+      if (line.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -351,8 +372,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       return this;
     } else {
       final List<LineString> geometries = new ArrayList<>();
-      for (final Geometry part : geometries()) {
-        final LineString normalizedPart = (LineString)part.normalize();
+      for (final LineString part : lineStrings()) {
+        final LineString normalizedPart = part.normalize();
         geometries.add(normalizedPart);
       }
       Collections.sort(geometries);
@@ -360,6 +381,11 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       final Lineal normalizedGeometry = geometryFactory.lineal(geometries);
       return normalizedGeometry;
     }
+  }
+
+  @Override
+  default Lineal prepare() {
+    return new PreparedMultiLineString(this);
   }
 
   @Override

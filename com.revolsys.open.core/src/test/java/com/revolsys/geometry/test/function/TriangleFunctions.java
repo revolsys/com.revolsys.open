@@ -95,7 +95,7 @@ public class TriangleFunctions {
   }
 
   private static Point[] trianglePts(final Geometry g) {
-    final Point[] pts = CoordinatesListUtil.getCoordinates(g, 3);
+    final Point[] pts = CoordinatesListUtil.getPointArray(g, 3);
     if (pts.length < 3) {
       throw new IllegalArgumentException("Input geometry must have at least 3 points");
     }

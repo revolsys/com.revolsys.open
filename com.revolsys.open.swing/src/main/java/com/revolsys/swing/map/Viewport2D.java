@@ -48,7 +48,7 @@ import com.revolsys.util.Property;
 
 public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportProxy {
 
-  public static final Geometry EMPTY_GEOMETRY = GeometryFactory.DEFAULT.geometry();
+  public static final Geometry EMPTY_GEOMETRY = GeometryFactory.DEFAULT_3D.geometry();
 
   public static double getScale(final Measurable<Length> viewWidth,
     final Measurable<Length> modelWidth) {
@@ -732,7 +732,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public Point toModelPoint(final double... viewCoordinates) {
     if (this.geometryFactory2d == null) {
-      return GeometryFactory.DEFAULT.point();
+      return GeometryFactory.DEFAULT_3D.point();
     } else {
       final double[] coordinates = toModelCoordinates(viewCoordinates);
       return this.geometryFactory2d.point(coordinates);

@@ -34,8 +34,12 @@
 package com.revolsys.geometry.model;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.editor.MultiPointEditor;
+import com.revolsys.geometry.model.editor.PunctualEditor;
 
 /**
  * Identifies {@link Geometry} subclasses which
@@ -57,12 +61,38 @@ public interface Punctual extends Geometry {
         "Expecting a Punctual geometry not " + geometry.getGeometryType() + "\n" + geometry);
     } else {
       final String string = DataTypes.toString(value);
-      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      final Geometry geometry = GeometryFactory.DEFAULT_3D.geometry(string, false);
       return (G)newPunctual(geometry);
     }
   }
 
   double getCoordinate(int partIndex, int axisIndex);
+
+  @Override
+  default Point getInteriorPoint() {
+    if (isEmpty()) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.point();
+    } else {
+      final Point centroid = getCentroid();
+      final double centroidX = centroid.getX();
+      final double centroidY = centroid.getY();
+      double minDistance = Double.MAX_VALUE;
+      Point interiorPoint = null;
+      for (final Point point : points()) {
+        final double distance = point.distance(centroidX, centroidY);
+        if (distance < minDistance) {
+          interiorPoint = point;
+          minDistance = distance;
+        }
+      }
+      return interiorPoint;
+    }
+  }
+
+  default double getM(final int partIndex) {
+    return getCoordinate(partIndex, M);
+  }
 
   Point getPoint(int i);
 
@@ -70,7 +100,54 @@ public interface Punctual extends Geometry {
     return getGeometries();
   }
 
+  default double getX(final int partIndex) {
+    return getCoordinate(partIndex, X);
+  }
+
+  default double getY(final int partIndex) {
+    return getCoordinate(partIndex, Y);
+  }
+
+  default double getZ(final int partIndex) {
+    return getCoordinate(partIndex, Z);
+  }
+
+  @Override
+  Punctual newGeometry(final GeometryFactory geometryFactory);
+
+  @Override
+  default PunctualEditor newGeometryEditor() {
+    return new MultiPointEditor(this);
+  }
+
+  @Override
+  default PunctualEditor newGeometryEditor(final int axisCount) {
+    final PunctualEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
+  default Punctual newPunctual(final GeometryFactory geometryFactory, final Point... points) {
+    return geometryFactory.punctual(points);
+  }
+
   default Iterable<Point> points() {
     return getGeometries();
+  }
+
+  @Override
+  default Punctual union() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final Set<Point> newPoints = new TreeSet<>();
+      for (final Point point : points()) {
+        if (!point.isEmpty()) {
+          newPoints.add(point);
+        }
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.punctual(newPoints);
+    }
   }
 }

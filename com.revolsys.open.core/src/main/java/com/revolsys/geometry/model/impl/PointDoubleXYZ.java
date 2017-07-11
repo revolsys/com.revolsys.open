@@ -29,6 +29,16 @@ public class PointDoubleXYZ extends PointDoubleXY {
   }
 
   @Override
+  public void copyCoordinates(final double[] coordinates) {
+    coordinates[X] = this.x;
+    coordinates[Y] = this.y;
+    coordinates[Z] = this.z;
+    for (int i = 3; i < coordinates.length; i++) {
+      coordinates[i] = java.lang.Double.NaN;
+    }
+  }
+
+  @Override
   public int getAxisCount() {
     return 3;
   }

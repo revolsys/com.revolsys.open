@@ -37,14 +37,14 @@ public class MaximalNearestSubline {
     }
 
     if (!start.isVertex()) {
-      newCoordinates.add(start.getCoordinate(), false);
+      newCoordinates.add(start.getPoint(), false);
     }
 
     for (int i = includedStartIndex; i <= includedEndIndex; i++) {
       newCoordinates.add(line.getPoint(i), false);
     }
     if (!end.isVertex()) {
-      newCoordinates.add(end.getCoordinate(), false);
+      newCoordinates.add(end.getPoint(), false);
     }
     if (Double.isNaN(newCoordinates.get(0).getX())) {
       newCoordinates.remove(0);
@@ -129,7 +129,7 @@ public class MaximalNearestSubline {
     for (int ia = 0; ia < aCoords.getVertexCount(); ia++) {
       if (isOutsideInterval(ia)) {
         final LineStringLocation bLoc = bPtLocator.locate(aCoords.getPoint(ia));
-        final Point bPt = bLoc.getCoordinate();
+        final Point bPt = bLoc.getPoint();
         findNearestOnA(bPt);
       }
     }

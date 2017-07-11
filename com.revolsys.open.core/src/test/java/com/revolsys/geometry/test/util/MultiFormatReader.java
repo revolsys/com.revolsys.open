@@ -111,7 +111,7 @@ public class MultiFormatReader {
   private final WKTReader wktReader;
 
   public MultiFormatReader() {
-    this(GeometryFactory.DEFAULT);
+    this(GeometryFactory.DEFAULT_3D);
   }
 
   public MultiFormatReader(final GeometryFactory geomFactory) {

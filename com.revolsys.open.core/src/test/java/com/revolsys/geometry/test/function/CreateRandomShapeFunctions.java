@@ -132,7 +132,7 @@ public class CreateRandomShapeFunctions {
 
   public static Geometry randomPointsInTriangle(final Geometry g, final int nPts) {
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
-    final Point[] gpts = CoordinatesListUtil.getCoordinateArray(g);
+    final Point[] gpts = CoordinatesListUtil.getPointArray(g);
     final Point tri0 = gpts[0];
     final Point tri1 = gpts[1];
     final Point tri2 = gpts[2];

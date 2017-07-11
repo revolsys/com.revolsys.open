@@ -490,7 +490,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     });
     Segment closestSegment = null;
     for (final Segment segment : segments) {
-      final double distance = segment.distance(point);
+      final double distance = segment.distancePoint(point);
       if (distance < closestDistance) {
         closestSegment = segment;
         closestDistance = distance;

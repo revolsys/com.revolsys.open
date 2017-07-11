@@ -36,7 +36,7 @@ public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSy
       if (geometryFactory == null) {
         geometryFactory = Maps.get(properties, GriddedElevationModel.GEOMETRY_FACTORY);
         if (geometryFactory == null) {
-          geometryFactory = GeometryFactory.DEFAULT;
+          geometryFactory = GeometryFactory.DEFAULT_3D;
         }
       }
       double xCentre = Double.NaN;

@@ -42,8 +42,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.prep.PreparedMultiLineString;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * Models a collection of (@link LineString}s.
@@ -59,12 +58,6 @@ public class MultiLineStringImpl implements MultiLineString {
    *  The bounding box of this <code>Geometry</code>.
    */
   private BoundingBox boundingBox;
-
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
 
   private final GeometryFactory geometryFactory;
 
@@ -96,7 +89,7 @@ public class MultiLineStringImpl implements MultiLineString {
     try {
       return (Lineal)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -140,13 +133,14 @@ public class MultiLineStringImpl implements MultiLineString {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
   }
@@ -186,16 +180,6 @@ public class MultiLineStringImpl implements MultiLineString {
   }
 
   /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getUserData() {
-    return this.userData;
-  }
-
-  /**
    * Gets a hash code for the Geometry.
    *
    * @return an integer value suitable for use as a hashcode
@@ -209,26 +193,6 @@ public class MultiLineStringImpl implements MultiLineString {
   @Override
   public boolean isEmpty() {
     return this.lines == null;
-  }
-
-  @Override
-  public Lineal prepare() {
-    return new PreparedMultiLineString(this);
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserData(final Object userData) {
-    this.userData = userData;
   }
 
   @Override

@@ -163,8 +163,8 @@ public class TriangleTest extends TestCase {
   }
 
   public TriangleImpl newTriangle(final LineString line) {
-    final TriangleImpl t = new TriangleImpl(line.getVertex(0).newPointDouble(),
-      line.getVertex(1).newPointDouble(), line.getVertex(2).newPointDouble());
+    final TriangleImpl t = new TriangleImpl(line.getVertex(0).newPoint2D(),
+      line.getVertex(1).newPoint2D(), line.getVertex(2).newPoint2D());
     return t;
   }
 

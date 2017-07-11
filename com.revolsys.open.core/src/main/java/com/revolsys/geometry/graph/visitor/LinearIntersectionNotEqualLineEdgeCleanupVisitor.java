@@ -78,7 +78,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
             if (!firstEqual) {
               final Node<Record> fromNode1 = edge.getFromNode();
               final Node<Record> fromNode2 = edge2.getFromNode();
-              if (fromNode1.distance(fromNode2) < 2) {
+              if (fromNode1.distancePoint(fromNode2) < 2) {
                 graph.moveNodesToMidpoint(typePath, fromNode1, fromNode2);
                 return;
               }
@@ -88,7 +88,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
             if (!lastEqual) {
               final Node<Record> toNode1 = edge.getToNode();
               final Node<Record> toNode2 = edge2.getToNode();
-              if (toNode1.distance(toNode2) < 2) {
+              if (toNode1.distancePoint(toNode2) < 2) {
                 graph.moveNodesToMidpoint(typePath, toNode1, toNode2);
                 return;
               }

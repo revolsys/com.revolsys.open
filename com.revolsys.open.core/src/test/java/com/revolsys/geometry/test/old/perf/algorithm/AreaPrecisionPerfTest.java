@@ -44,8 +44,8 @@ public class AreaPrecisionPerfTest {
       // close ring
       coordinates[nrVertices] = coordinates[0];
 
-      final LinearRing g1 = GeometryFactory.DEFAULT.linearRing(coordinates);
-      final Polygon polygon = GeometryFactory.DEFAULT.polygon(g1);
+      final LinearRing g1 = GeometryFactory.DEFAULT_3D.linearRing(coordinates);
+      final Polygon polygon = GeometryFactory.DEFAULT_3D.polygon(g1);
       // System.out.println(polygon);
 
       final double area = originalSignedArea(coordinates);

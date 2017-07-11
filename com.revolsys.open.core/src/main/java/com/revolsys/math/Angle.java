@@ -81,8 +81,8 @@ public class Angle {
    */
   public static double angle(final double x1, final double y1, final double x2, final double y2,
     final double x3, final double y3) {
-    final double angle1 = angle2d(x2, x1, y2, y1);
-    final double angle2 = angle2d(x2, x3, y2, y3);
+    final double angle1 = angle2d(x2, y2, x1, y1);
+    final double angle2 = angle2d(x2, y2, x3, y3);
     return angleDiff(angle1, angle2);
   }
 
@@ -109,7 +109,7 @@ public class Angle {
     return angle(x1, y1, x2, y2, x3, y3);
   }
 
-  public static double angle2d(final double x1, final double x2, final double y1, final double y2) {
+  public static double angle2d(final double x1, final double y1, final double x2, final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
     return Math.atan2(dy, dx);

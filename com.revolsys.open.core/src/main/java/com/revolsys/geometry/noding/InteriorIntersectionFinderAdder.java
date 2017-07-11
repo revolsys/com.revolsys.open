@@ -103,7 +103,7 @@ public class InteriorIntersectionFinderAdder implements SegmentIntersector {
 
     if (this.li.hasIntersection()) {
       if (this.li.isInteriorIntersection()) {
-        for (int intIndex = 0; intIndex < this.li.getIntersectionNum(); intIndex++) {
+        for (int intIndex = 0; intIndex < this.li.getIntersectionCount(); intIndex++) {
           this.interiorIntersections.add(this.li.getIntersection(intIndex));
         }
         ((NodedSegmentString)e0).addIntersections(this.li, segIndex0, 0);

@@ -150,7 +150,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   protected void initDo() {
     this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (this.geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.DEFAULT;
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
     }
   }
 

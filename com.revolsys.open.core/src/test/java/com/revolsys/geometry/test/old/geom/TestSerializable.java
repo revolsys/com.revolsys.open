@@ -53,7 +53,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
  */
 public class TestSerializable {
 
-  public static final GeometryFactory fact = GeometryFactory.DEFAULT;
+  public static final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
 
   public static final String FILENAME = "c:\\testSerial.txt";
 

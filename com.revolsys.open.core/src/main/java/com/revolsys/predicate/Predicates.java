@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.CollectionUtil;
@@ -115,6 +116,19 @@ public interface Predicates {
       } else {
         return false;
       }
+    }
+  }
+
+  static <T> Consumer<? super T> newConsumer(final Predicate<? super T> filter,
+    final Consumer<? super T> consumer) {
+    if (filter == null) {
+      return consumer;
+    } else {
+      return (value) -> {
+        if (filter.test(value)) {
+          consumer.accept(value);
+        }
+      };
     }
   }
 

@@ -43,7 +43,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * A prepared version for {@link Lineal} geometries.
@@ -55,12 +55,6 @@ import com.revolsys.util.WrappedException;
  */
 public class PreparedMultiLineString implements MultiLineString {
   private static final long serialVersionUID = 1L;
-
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
 
   private final Lineal lineal;
 
@@ -81,7 +75,7 @@ public class PreparedMultiLineString implements MultiLineString {
     try {
       return (Lineal)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -125,6 +119,11 @@ public class PreparedMultiLineString implements MultiLineString {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.lineal.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return this.lineal.getBoundingBox();
   }
@@ -161,16 +160,6 @@ public class PreparedMultiLineString implements MultiLineString {
         SegmentStringUtil.extractSegmentStrings(this.lineal));
     }
     return this.segIntFinder;
-  }
-
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getUserData() {
-    return this.userData;
   }
 
   /**
@@ -255,21 +244,6 @@ public class PreparedMultiLineString implements MultiLineString {
   @Override
   public Lineal prepare() {
     return this;
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserData(final Object userData) {
-    this.userData = userData;
   }
 
   @Override

@@ -19,6 +19,9 @@ public class EpsgAuthority implements Authority, Serializable {
       return false;
     } else if (object == this) {
       return true;
+    } else if (object instanceof EpsgAuthority) {
+      final EpsgAuthority authority = (EpsgAuthority)object;
+      return this.code == authority.code;
     } else if (object instanceof Authority) {
       final Authority authority = (Authority)object;
       if (!getName().equals(authority.getName())) {

@@ -32,8 +32,9 @@
  */
 package com.revolsys.geometry.model.impl;
 
+import java.awt.geom.Point2D;
+
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.WrappedException;
 
 /**
  * Represents a single point.
@@ -46,7 +47,7 @@ import com.revolsys.util.WrappedException;
  *
  *@version 1.7
  */
-public abstract class AbstractPoint implements Point {
+public abstract class AbstractPoint extends Point2D implements Point {
   private static final long serialVersionUID = 4902022702746614570L;
 
   /**
@@ -57,11 +58,7 @@ public abstract class AbstractPoint implements Point {
    */
   @Override
   public Point clone() {
-    try {
-      return (Point)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
-    }
+    return (Point)super.clone();
   }
 
   @Override
@@ -76,18 +73,21 @@ public abstract class AbstractPoint implements Point {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    long temp;
-    temp = Double.doubleToLongBits(getX());
-    result = prime * result + (int)(temp ^ temp >>> 32);
-    temp = Double.doubleToLongBits(getY());
-    result = prime * result + (int)(temp ^ temp >>> 32);
-    return result;
+    final double x = getX();
+    final double y = getY();
+    long bits = java.lang.Double.doubleToLongBits(x);
+    bits ^= java.lang.Double.doubleToLongBits(y) * 31;
+    return (int)bits ^ (int)(bits >> 32);
+  }
+
+  @Override
+  public void setLocation(final double x, final double y) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public String toString() {
     return toEwkt();
   }
+
 }

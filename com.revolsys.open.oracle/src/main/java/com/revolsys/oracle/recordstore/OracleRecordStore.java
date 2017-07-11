@@ -231,7 +231,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
         final Geometry geometry = (Geometry)geometryObject;
         boundingBox = geometry.getBoundingBox();
       } else {
-        boundingBox = geometryFactory.boundingBox();
+        boundingBox = geometryFactory.newBoundingBoxEmpty();
       }
       boundingBox = boundingBox.expand(distance.doubleValue());
       boundingBox = boundingBox.convert(geometryFactory);

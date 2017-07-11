@@ -56,8 +56,10 @@ import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
+import com.revolsys.geometry.model.impl.BoundingBoxGeometryFactory;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
 import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
@@ -67,19 +69,20 @@ import com.revolsys.geometry.model.impl.MultiPointImpl;
 import com.revolsys.geometry.model.impl.MultiPolygonImpl;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
+import com.revolsys.geometry.model.impl.PointDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 /**
  * Supplies a set of utility methods for building Geometry objects from lists
  * of Coordinates.
- * <p>
+ *
  * Note that the factory constructor methods do <b>not</b> change the input coordinates in any way.
  * In particular, they are not rounded to the supplied <tt>PrecisionModel</tt>.
  * It is assumed that input Point meet the given precision.
@@ -88,20 +91,83 @@ import com.revolsys.util.number.Doubles;
  * @version 1.7
  */
 public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapSerializer {
+  private class EmptyPoint extends AbstractPoint {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Point clone() {
+      return this;
+    }
+
+    @Override
+    public void copyCoordinates(final double[] coordinates) {
+      Arrays.fill(coordinates, java.lang.Double.NaN);
+    }
+
+    @Override
+    public int getAxisCount() {
+      return GeometryFactory.this.axisCount;
+    }
+
+    @Override
+    public double getCoordinate(final int axisIndex) {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public GeometryFactory getGeometryFactory() {
+      return GeometryFactory.this;
+    }
+
+    @Override
+    public double getM() {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getX() {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getY() {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getZ() {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return toEwkt();
+    }
+  }
+
   private static final IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
+
+  private static final double[] SCALES_FLOATING_2 = new double[2];
+
+  public static final double[] SCALES_FLOATING_3 = new double[3];
+
+  public static final GeometryFactory DEFAULT_2D = fixed(0, SCALES_FLOATING_2);
 
   /**
    * The default GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a floating precision model.
    */
-  public static final GeometryFactory DEFAULT = fixed(0, 0.0, 0.0);
-
-  public static final GeometryFactory DEFAULT_3D = fixed(0, 0.0, 0.0);
+  public static final GeometryFactory DEFAULT_3D = fixed(0, SCALES_FLOATING_3);
 
   private static final long serialVersionUID = 4328651897279304108L;
 
   public static final BoundingBox boundingBox(final Geometry geometry) {
     if (geometry == null) {
-      return DEFAULT.boundingBox();
+      return DEFAULT_3D.newBoundingBoxEmpty();
     } else {
       return geometry.getBoundingBox();
     }
@@ -120,10 +186,61 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       if (coordinateSystemId == 0) {
         return new GeometryFactory(coordinateSystem, axisCount, scales);
       } else {
-        return fixed(coordinateSystemId, axisCount, scales);
+        return fixed(coordinateSystem, coordinateSystemId, axisCount, scales);
       }
     }
 
+  }
+
+  /**
+   * <p>
+   * Get a GeometryFactory with the coordinate system, number of axis and a
+   * fixed x, y &amp; fixed z precision models.
+   * </p>
+   *
+   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   *          coordinate system id</a>.
+   * @param axisCount The number of coordinate axis. 2 for 2D x &amp; y
+   *          coordinates. 3 for 3D x, y &amp; z coordinates.
+   * @param scaleXY The scale factor used to round the x, y coordinates. The
+   *          precision is 1 / scaleXy. A scale factor of 1000 will give a
+   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
+   *          metres.
+   * @param scaleZ The scale factor used to round the z coordinates. The
+   *          precision is 1 / scaleZ. A scale factor of 1000 will give a
+   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
+   *          metres.
+   * @return The geometry factory.
+   */
+  private static GeometryFactory fixed(final CoordinateSystem coordinateSystem,
+    final int coordinateSystemId, final int axisCount, final double... scales) {
+    synchronized (factoriesBySrid) {
+      GeometryFactory factory = null;
+      IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid
+        .get(coordinateSystemId);
+      if (factoriesByAxisCount == null) {
+        factoriesByAxisCount = new IntHashMap<>();
+        factoriesBySrid.put(coordinateSystemId, factoriesByAxisCount);
+      }
+      List<GeometryFactory> factories = factoriesByAxisCount.get(axisCount);
+      if (factories == null) {
+        factories = new ArrayList<>();
+        factoriesByAxisCount.put(axisCount, factories);
+      } else {
+        final int size = factories.size();
+        for (int i = 0; i < size; i++) {
+          final GeometryFactory matchFactory = factories.get(i);
+          if (matchFactory.equalsScales(scales)) {
+            return matchFactory;
+          }
+        }
+      }
+      if (factory == null) {
+        factory = new GeometryFactory(coordinateSystem, coordinateSystemId, axisCount, scales);
+        factories.add(factory);
+      }
+      return factory;
+    }
   }
 
   /**
@@ -141,7 +258,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The geometry factory.
    */
   public static GeometryFactory fixed(final int coordinateSystemId, final double... scales) {
-    return fixed(coordinateSystemId, scales.length + 1, scales);
+    return fixed(coordinateSystemId, scales.length, scales);
   }
 
   /**
@@ -165,9 +282,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The geometry factory.
    */
   public static GeometryFactory fixed(final int coordinateSystemId, final int axisCount,
-    double... scales) {
+    final double... scales) {
     synchronized (factoriesBySrid) {
-      scales = getScales(axisCount, scales);
       GeometryFactory factory = null;
       IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid
         .get(coordinateSystemId);
@@ -183,7 +299,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         final int size = factories.size();
         for (int i = 0; i < size; i++) {
           final GeometryFactory matchFactory = factories.get(i);
-          if (matchFactory.scalesEqual(scales)) {
+          if (matchFactory.equalsScales(scales)) {
             return matchFactory;
           }
         }
@@ -222,7 +338,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else {
       final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId <= 0) {
-        return new GeometryFactory(coordinateSystem, axisCount);
+        final double[] scales = newScalesFloating(axisCount);
+        return new GeometryFactory(coordinateSystem, axisCount, scales);
       } else {
         return floating(coordinateSystemId, axisCount);
       }
@@ -242,7 +359,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The geometry factory.
    */
   public static GeometryFactory floating(final int coordinateSystemId, final int axisCount) {
-    return fixed(coordinateSystemId, axisCount);
+    final double[] scales = newScalesFloating(axisCount);
+    return fixed(coordinateSystemId, axisCount, scales);
   }
 
   /**
@@ -250,11 +368,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    */
   public static GeometryFactory floating3(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
-      return DEFAULT;
+      return DEFAULT_3D;
     } else {
       final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId == 0) {
-        return new GeometryFactory(coordinateSystem, 3);
+        return new GeometryFactory(coordinateSystem, 3, SCALES_FLOATING_3);
       } else {
         return floating3(coordinateSystemId);
       }
@@ -272,7 +390,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The geometry factory.
    */
   public static GeometryFactory floating3(final int coordinateSystemId) {
-    return fixed(coordinateSystemId, 0.0, 0.0);
+    return fixed(coordinateSystemId, SCALES_FLOATING_3);
   }
 
   public static GeometryFactory get(final Object factory) {
@@ -315,12 +433,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   public static GeometryFactory getFactory(final String wkt) {
     final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
     if (esriCoordinateSystem == null) {
-      return DEFAULT;
+      return DEFAULT_3D;
     } else {
       final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
         .getCoordinateSystem(esriCoordinateSystem);
       final int coordinateSystemId = epsgCoordinateSystem.getCoordinateSystemId();
-      return fixed(coordinateSystemId, 0.0, 0.0);
+      return floating(coordinateSystemId, 3);
     }
   }
 
@@ -334,28 +452,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return dataTypes;
   }
 
-  public static double[] getScales(final int axisCount, final double... scales) {
-    final double[] newScales = new double[Math.max(2, axisCount)];
-    for (int i = 0; i < newScales.length; i++) {
-      int scaleIndex = i;
-      if (i > 0) {
-        scaleIndex--;
-      }
-      double scale = 0;
-      if (scaleIndex < scales.length) {
-        scale = scales[scaleIndex];
-      }
-      if (scale > 0) {
-        newScales[i] = scale;
-      }
-    }
-    return newScales;
-  }
-
   @SuppressWarnings("unchecked")
   public static <G extends Geometry> G newGeometry(final List<? extends Geometry> geometries) {
     if (geometries == null || geometries.size() == 0) {
-      return (G)GeometryFactory.DEFAULT.geometry();
+      return (G)GeometryFactory.DEFAULT_3D.geometry();
     } else {
       final GeometryFactory geometryFactory = geometries.get(0).getGeometryFactory();
       return geometryFactory.geometry(geometries);
@@ -366,8 +466,56 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     final int coordinateSystemId = Maps.getInteger(properties, "srid", 0);
     final int axisCount = Maps.getInteger(properties, "axisCount", 2);
     final double scaleXY = Maps.getDouble(properties, "scaleXy", 0.0);
+    final double scaleX = Maps.getDouble(properties, "scaleX", scaleXY);
+    final double scaleY = Maps.getDouble(properties, "scaleY", scaleXY);
     final double scaleZ = Maps.getDouble(properties, "scaleZ", 0.0);
-    return GeometryFactory.fixed(coordinateSystemId, axisCount, scaleXY, scaleZ);
+    return GeometryFactory.fixed(coordinateSystemId, axisCount, scaleX, scaleY, scaleZ);
+  }
+
+  public static double[] newScalesFixed(final int axisCount, final double scale) {
+    final double[] scales = new double[Math.max(axisCount, 2)];
+    Arrays.fill(scales, scale);
+    return scales;
+  }
+
+  public static double[] newScalesFloating(final int axisCount) {
+    if (axisCount < 3) {
+      return SCALES_FLOATING_2;
+    } else if (axisCount == 3) {
+      return SCALES_FLOATING_3;
+    } else {
+      return new double[axisCount];
+    }
+  }
+
+  public static GeometryFactory newWithOffsets(final CoordinateSystem coordinateSystem,
+    final double offsetX, final double scaleX, final double offsetY, final double scaleY,
+    final double offsetZ, final double scaleZ) {
+    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
+      return fixed(coordinateSystem, 3, scaleX, scaleY, scaleZ);
+    } else {
+      return new GeometryFactoryWithOffsets(coordinateSystem, offsetX, scaleX, offsetY, scaleY,
+        offsetZ, scaleZ);
+    }
+  }
+
+  public static GeometryFactory newWithOffsets(final int coordinateSystemId, final double offsetX,
+    final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
+    final double scaleZ) {
+    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
+      return fixed(coordinateSystemId, 3, scaleX, scaleY, scaleZ);
+    } else {
+      return new GeometryFactoryWithOffsets(coordinateSystemId, offsetX, scaleX, offsetY, scaleY,
+        offsetZ, scaleZ);
+    }
+  }
+
+  public static double toResolution(final double scale) {
+    if (scale > 0) {
+      return 1 / scale;
+    } else {
+      return 0;
+    }
   }
 
   public static GeometryFactory wgs84() {
@@ -380,18 +528,49 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   private int axisCount = 2;
 
+  private final BoundingBox boundingBoxEmpty = new BoundingBoxGeometryFactory(this);
+
   private final CoordinateSystem coordinateSystem;
 
   private final int coordinateSystemId;
 
-  private final WktParser parser = new WktParser(this);
+  private final EmptyPoint emptyPoint = new EmptyPoint();
 
-  private double[] scales;
+  private transient final WktParser parser = new WktParser(this);
+
+  protected double resolutionX = 0;
+
+  protected double resolutionY = 0;
+
+  protected double resolutionZ = 0;
+
+  protected double[] scales;
+
+  protected double scaleX = 0;
+
+  protected double scaleY = 0;
+
+  protected double scaleZ = 0;
 
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount,
     final double... scales) {
-    this.coordinateSystemId = coordinateSystem.getCoordinateSystemId();
     this.coordinateSystem = coordinateSystem;
+    if (coordinateSystem == null) {
+      this.coordinateSystemId = 0;
+    } else {
+      this.coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+    }
+    init(axisCount, scales);
+  }
+
+  protected GeometryFactory(final CoordinateSystem coordinateSystem, final int coordinateSystemId,
+    final int axisCount, final double... scales) {
+    this.coordinateSystemId = coordinateSystemId;
+    if (coordinateSystem == null && coordinateSystemId > 0) {
+      this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
+    } else {
+      this.coordinateSystem = coordinateSystem;
+    }
     init(axisCount, scales);
   }
 
@@ -414,15 +593,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         }
       }
     }
-  }
-
-  public BoundingBox boundingBox() {
-    return new BoundingBoxDoubleGf(this);
-  }
-
-  public BoundingBox boundingBox(final double x1, final double y1, final double x2,
-    final double y2) {
-    return new BoundingBoxDoubleGf(this, 2, x1, y1, x2, y2);
   }
 
   /**
@@ -495,29 +665,40 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  @Override
+  public GeometryFactory clone() {
+    return this;
+  }
+
   public GeometryFactory convertAxisCount(final int axisCount) {
     if (axisCount == getAxisCount()) {
       return this;
     } else {
-      final int coordinateSystemId = getCoordinateSystemId();
-      final double[] scales = new double[this.scales.length - 1];
-      System.arraycopy(this.scales, 1, scales, 0, scales.length);
-      return GeometryFactory.fixed(coordinateSystemId, axisCount, scales);
+      return fixed(this.coordinateSystem, this.coordinateSystemId, axisCount, this.scales);
+    }
+  }
+
+  public GeometryFactory convertAxisCountAndScales(final int axisCount, final double... scales) {
+    return fixed(this.coordinateSystem, this.coordinateSystemId, axisCount, scales);
+  }
+
+  public GeometryFactory convertCoordinateSystem(final CoordinateSystem coordinateSystem) {
+    if (isSameCoordinateSystem(coordinateSystem)) {
+      return this;
+    } else {
+      return GeometryFactory.fixed(coordinateSystem, this.axisCount, this.scales);
     }
   }
 
   public GeometryFactory convertScales(final double... scales) {
-    final int coordinateSystemId = getCoordinateSystemId();
-    final int axisCount = getAxisCount();
-    return GeometryFactory.fixed(coordinateSystemId, axisCount, scales);
+    return fixed(this.coordinateSystem, this.coordinateSystemId, this.axisCount, scales);
   }
 
   public GeometryFactory convertSrid(final int coordinateSystemId) {
     if (coordinateSystemId == getCoordinateSystemId()) {
       return this;
     } else {
-      final int axisCount = getAxisCount();
-      return GeometryFactory.fixed(coordinateSystemId, axisCount, this.scales);
+      return GeometryFactory.fixed(coordinateSystemId, this.axisCount, this.scales);
     }
   }
 
@@ -527,8 +708,20 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return valuesPrecise;
   }
 
+  private boolean equalsScales(final double[] scales) {
+    final int minLength = Math.min(this.scales.length, scales.length);
+    for (int i = 0; i < minLength; i++) {
+      final double scale1 = this.scales[i];
+      final double scale2 = scales[i];
+      if (scale1 != scale2) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public Geometry geometry() {
-    return point();
+    return this.emptyPoint;
   }
 
   /**
@@ -662,7 +855,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       final int geometrySrid = geometry.getCoordinateSystemId();
       if (coordinateSystemId == 0 && geometrySrid != 0) {
         final GeometryFactory geometryFactory = GeometryFactory.fixed(geometrySrid, this.axisCount,
-          getScaleXY(), getScaleZ());
+          getScaleX(), getScaleY(), getScaleZ());
         return geometryFactory.geometry(geometry);
       } else if (coordinateSystemId != 0 && geometrySrid != 0
         && geometrySrid != coordinateSystemId) {
@@ -808,14 +1001,28 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * <p>Get the {@link CoordinatesOperation} to convert between this factory's and the other factory's
    * {@link CoordinateSystem}.</p>
    *
-   * @author Paul Austin <paul.austin@revolsys.com>
    * @param geometryFactory The geometry factory to convert to.
    * @return The coordinates operation or null if no conversion is available.
    */
+  @Override
   public CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
-    final CoordinateSystem otherCoordinateSystem = geometryFactory.getCoordinateSystem();
-    return ProjectionFactory.getCoordinatesOperation(coordinateSystem, otherCoordinateSystem);
+    if (geometryFactory == this) {
+      return null;
+    } else if (geometryFactory == null) {
+      return null;
+    } else if (!geometryFactory.isHasCoordinateSystem()) {
+      return null;
+    } else if (!isHasCoordinateSystem()) {
+      return null;
+    } else {
+      if (hasSameCoordinateSystem(geometryFactory)) {
+        return null;
+      } else {
+        final CoordinateSystem coordinateSystem = getCoordinateSystem();
+        final CoordinateSystem otherCoordinateSystem = geometryFactory.getCoordinateSystem();
+        return ProjectionFactory.getCoordinatesOperation(coordinateSystem, otherCoordinateSystem);
+      }
+    }
   }
 
   @Override
@@ -835,9 +1042,9 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)this.coordinateSystem;
       final GeographicCoordinateSystem geographicCs = projectedCs.getGeographicCoordinateSystem();
       final int coordinateSystemId = geographicCs.getCoordinateSystemId();
-      return fixed(coordinateSystemId, getAxisCount(), 0.0, 0.0);
+      return floating(coordinateSystemId, getAxisCount());
     } else {
-      return fixed(4326, getAxisCount(), 0.0, 0.0);
+      return floating(4326, getAxisCount());
     }
   }
 
@@ -899,9 +1106,25 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (isFloating()) {
       maxSigDigits = 16;
     } else {
-      maxSigDigits = 1 + (int)Math.ceil(Math.log(getScale(0)) / Math.log(10));
+      maxSigDigits = 1 + (int)Math.ceil(Math.log(this.scaleX) / Math.log(10));
     }
     return maxSigDigits;
+  }
+
+  public double getOffset(final int axisIndex) {
+    return 0;
+  }
+
+  public double getOffsetX() {
+    return 0;
+  }
+
+  public double getOffsetY() {
+    return 0;
+  }
+
+  public double getOffsetZ() {
+    return 0;
   }
 
   public Point[] getPointArray(final Iterable<?> pointsList) {
@@ -962,38 +1185,53 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public double getResolutionX() {
+    return this.resolutionX;
+  }
+
   public double getResolutionXy() {
-    final double scaleXy = getScaleXY();
-    if (scaleXy <= 0) {
-      return 0;
-    } else {
-      return 1 / scaleXy;
-    }
+    return this.resolutionX;
+  }
+
+  public double getResolutionY() {
+    return this.resolutionY;
   }
 
   public double getResolutionZ() {
-    final double scaleZ = getScaleZ();
-    if (scaleZ <= 0) {
-      return 0;
-    } else {
-      return 1 / scaleZ;
-    }
+    return this.resolutionZ;
   }
 
   public double getScale(final int axisIndex) {
-    if (axisIndex < 0 || axisIndex >= this.scales.length) {
-      return 0;
-    } else {
-      return this.scales[0];
+    switch (axisIndex) {
+      case 0:
+        return this.scaleX;
+      case 1:
+        return this.scaleY;
+      case 2:
+        return this.scaleZ;
+      default:
+        if (axisIndex < 0 || axisIndex >= this.scales.length) {
+          return 0;
+        } else {
+          return this.scales[axisIndex - 1];
+        }
     }
   }
 
+  public double getScaleX() {
+    return this.scaleX;
+  }
+
   public double getScaleXY() {
-    return getScale(0);
+    return this.scaleX;
+  }
+
+  public double getScaleY() {
+    return this.scaleY;
   }
 
   public double getScaleZ() {
-    return getScale(2);
+    return this.scaleZ;
   }
 
   @Override
@@ -1009,20 +1247,23 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (geometryFactory == null) {
       return false;
     } else {
+      final int coordinateSystemId1 = getCoordinateSystemId();
+      final int coordinateSystemId2 = geometryFactory.getCoordinateSystemId();
+      if (coordinateSystemId1 == coordinateSystemId2) {
+        if (coordinateSystemId1 >= 0) {
+          return true;
+        }
+      }
       final CoordinateSystem coordinateSystem1 = getCoordinateSystem();
       final CoordinateSystem coordinateSystem2 = geometryFactory.getCoordinateSystem();
-      if (DataType.equal(coordinateSystem1, coordinateSystem2)) {
+      if (coordinateSystem1 == coordinateSystem2) {
+        return true;
+      } else if (coordinateSystem1 == null || coordinateSystem2 == null) {
+        return false;
+      } else if (coordinateSystem1.equals(coordinateSystem2)) {
         return true;
       } else {
-        final int coordinateSystemId1 = getCoordinateSystemId();
-        final int coordinateSystemId2 = geometryFactory.getCoordinateSystemId();
-        if (coordinateSystemId1 <= 0) {
-          return coordinateSystemId2 <= 0;
-        } else if (coordinateSystemId1 == coordinateSystemId2) {
-          return true;
-        } else {
-          return false;
-        }
+        return false;
       }
     }
   }
@@ -1033,11 +1274,26 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   protected void init(final int axisCount, final double... scales) {
     this.axisCount = Math.max(axisCount, 2);
-    this.scales = getScales(axisCount, scales);
+    this.scales = new double[axisCount];
+    for (int axisIndex = 0; axisIndex < axisCount && axisIndex < scales.length; axisIndex++) {
+      final double scale = scales[axisIndex];
+      this.scales[axisIndex] = scale;
+    }
+
+    this.scaleX = this.scales[0];
+    this.resolutionX = toResolution(this.scaleX);
+
+    this.scaleY = this.scales[1];
+    this.resolutionY = toResolution(this.scaleY);
+
+    if (axisCount > 2) {
+      this.scaleZ = this.scales[2];
+      this.resolutionZ = toResolution(this.scaleZ);
+    }
   }
 
   public boolean isFloating() {
-    return getScale(0) == 0;
+    return this.scaleX == 0;
   }
 
   public boolean isGeographics() {
@@ -1050,6 +1306,31 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public boolean isProjected() {
     return this.coordinateSystem instanceof ProjectedCoordinateSystem;
+  }
+
+  public boolean isSameCoordinateSystem(final CoordinateSystem coordinateSystem) {
+    final int coordinateSystemId = getCoordinateSystemId();
+    if (coordinateSystem == null) {
+      return this.coordinateSystem == null;
+    } else {
+      final int coordinateSystemId2 = coordinateSystem.getCoordinateSystemId();
+      if (coordinateSystemId == coordinateSystemId2) {
+        return true;
+      } else {
+        final CoordinateSystem coordinateSystem2 = this.coordinateSystem;
+        if (coordinateSystem2 == null) {
+          if (coordinateSystemId2 <= 0) {
+            return true;
+          } else if (coordinateSystemId <= 0) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return coordinateSystem.equals(coordinateSystem2);
+        }
+      }
+    }
   }
 
   @Override
@@ -1184,51 +1465,20 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (points.isEmpty()) {
       return linearRing();
     } else {
-      if (points == null || points.isEmpty()) {
-        return null;
-      } else {
-        final int numPoints = points.size();
-        final int axisCount = getAxisCount();
-        final double[] coordinates = new double[numPoints * axisCount];
-        int vertexCount = 0;
-        for (final Object object : points) {
-          Point point;
-          if (object == null) {
-            point = null;
-          } else if (object instanceof Point) {
-            final Point projectedPoint = ((Point)object).convertGeometry(this);
-            point = projectedPoint;
-          } else if (object instanceof double[]) {
-            point = new PointDouble((double[])object);
-          } else if (object instanceof List<?>) {
-            @SuppressWarnings("unchecked")
-            final List<Number> list = (List<Number>)object;
-            final double[] pointCoordinates = MathUtil.toDoubleArray(list);
-            point = new PointDouble(pointCoordinates);
-          } else if (object instanceof LineString) {
-            final LineString LineString = (LineString)object;
-            point = LineString.getPoint(0);
-          } else {
-            throw new IllegalArgumentException("Unexepected data type: " + object);
-          }
-
-          if (point != null && point.getAxisCount() > 1) {
-            CoordinatesListUtil.setCoordinates(this, coordinates, axisCount, vertexCount, point);
-            vertexCount++;
-          }
-        }
-        return linearRing(axisCount, vertexCount, coordinates);
-      }
+      final LineStringDoubleBuilder lineBuilder = newLineStringBuilder(points);
+      return lineBuilder.newLinearRing();
     }
   }
 
-  public LinearRing linearRing(final int axisCount, final double... coordinates) {
-    return new LinearRingDoubleGf(this, axisCount, coordinates);
+  public LinearRing linearRing(final int axisCount, double... coordinates) {
+    final int vertexCount = coordinates.length / axisCount;
+    coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount, vertexCount, coordinates);
+    return new LinearRingDoubleGf(this, this.axisCount, vertexCount, coordinates);
   }
 
-  public LinearRing linearRing(final int axisCount, final int vertexCount,
-    final double... coordinates) {
-    return new LinearRingDoubleGf(this, axisCount, vertexCount, coordinates);
+  public LinearRing linearRing(final int axisCount, final int vertexCount, double... coordinates) {
+    coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount, vertexCount, coordinates);
+    return new LinearRingDoubleGf(this, this.axisCount, vertexCount, coordinates);
   }
 
   /**
@@ -1240,8 +1490,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return the created LinearRing
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    */
-  public LinearRing linearRing(final LineString points) {
-    return new LinearRingDoubleGf(this, points);
+  public LinearRing linearRing(final LineString line) {
+    if (line == null || line.isEmpty()) {
+      return linearRing();
+    } else {
+      final int vertexCount = line.getVertexCount();
+      final double[] coordinates = LineStringDoubleGf.getNewCoordinates(this, line);
+      return new LinearRingDoubleGf(this, this.axisCount, vertexCount, coordinates);
+    }
   }
 
   /**
@@ -1272,58 +1528,42 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (points == null || points.isEmpty()) {
       return lineString();
     } else {
-      final int numPoints = points.size();
-      final int axisCount = getAxisCount();
-      final double[] coordinates = new double[numPoints * axisCount];
-      int vertexCount = 0;
-      for (final Object object : points) {
-        Point point;
-        if (object == null) {
-          point = null;
-        } else if (object instanceof Point) {
-          final Point projectedPoint = ((Point)object).convertGeometry(this);
-          point = projectedPoint;
-        } else if (object instanceof double[]) {
-          point = new PointDouble((double[])object);
-        } else if (object instanceof List<?>) {
-          @SuppressWarnings("unchecked")
-          final List<Number> list = (List<Number>)object;
-          final double[] pointCoordinates = MathUtil.toDoubleArray(list);
-          point = new PointDouble(pointCoordinates);
-        } else if (object instanceof LineString) {
-          final LineString LineString = (LineString)object;
-          point = LineString.getPoint(0);
-        } else {
-          throw new IllegalArgumentException("Unexepected data type: " + object);
-        }
-
-        if (point != null && point.getAxisCount() > 1) {
-          CoordinatesListUtil.setCoordinates(this, coordinates, axisCount, vertexCount, point);
-          vertexCount++;
-        }
-      }
-      return lineString(axisCount, vertexCount, coordinates);
+      final LineStringDoubleBuilder lineBuilder = newLineStringBuilder(points);
+      return lineBuilder.newLineString();
     }
   }
 
-  public LineString lineString(final int axisCount, final double... coordinates) {
-    return new LineStringDoubleGf(this, axisCount, coordinates);
+  public LineString lineString(final int axisCount, double... coordinates) {
+    if (coordinates == null || coordinates.length == 1) {
+      return lineString();
+    } else if (axisCount < 2) {
+      return lineString();
+    } else {
+      final int vertexCount = coordinates.length / axisCount;
+      coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount, vertexCount, coordinates);
+      return new LineStringDoubleGf(this, this.axisCount, vertexCount, coordinates);
+    }
   }
 
-  public LineString lineString(final int axisCount, final int vertexCount,
-    final double... coordinates) {
-    return new LineStringDoubleGf(this, axisCount, vertexCount, coordinates);
+  public LineString lineString(final int axisCount, final int vertexCount, double... coordinates) {
+    coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount, vertexCount, coordinates);
+    return new LineStringDoubleGf(this, this.axisCount, vertexCount, coordinates);
   }
 
   public LineString lineString(final int axisCount, final Number[] coordinates) {
-    return new LineStringDoubleGf(this, axisCount, coordinates);
+    final int vertexCount = coordinates.length / axisCount;
+    final double[] coordinatesDouble = LineStringDoubleGf.getNewCoordinates(this, axisCount,
+      vertexCount, coordinates);
+    return new LineStringDoubleGf(this, this.axisCount, vertexCount, coordinatesDouble);
   }
 
-  public LineString lineString(final LineString lineString) {
-    if (lineString == null || lineString.isEmpty()) {
+  public LineString lineString(final LineString line) {
+    if (line == null || line.isEmpty()) {
       return lineString();
     } else {
-      return new LineStringDoubleGf(this, lineString);
+      final int vertexCount = line.getVertexCount();
+      final double[] coordinates = LineStringDoubleGf.getNewCoordinates(this, line);
+      return new LineStringDoubleGf(this, this.axisCount, vertexCount, coordinates);
     }
   }
 
@@ -1341,10 +1581,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  public void makePrecise(final double... values) {
-    makePrecise(values, values);
-  }
-
   public void makePrecise(final double[] values, final double[] valuesPrecise) {
     for (int i = 0; i < valuesPrecise.length; i++) {
       final int axisIndex = i % this.axisCount;
@@ -1354,7 +1590,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public double makePrecise(final int axisIndex, final double value) {
     final double scale = getScale(axisIndex);
-    return Doubles.makePrecise(scale, value);
+    if (scale > 0 && Double.isFinite(value)) {
+      final double multiple = value * scale;
+      final double scaledValue = Math.round(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
   }
 
   public void makePrecise(final int axisCount, final double... coordinates) {
@@ -1362,7 +1605,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       final double value = coordinates[i];
       final int axisIndex = i % axisCount;
       final double scale = getScale(axisIndex);
-      coordinates[i] = Doubles.makePrecise(scale, value);
+      if (scale > 0) {
+        final double multiple = value * scale;
+        final long scaledValue = Math.round(multiple);
+        final double preciseValue = scaledValue / scale;
+        coordinates[i] = preciseValue;
+      }
     }
   }
 
@@ -1390,45 +1638,301 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public double makeXPrecise(final double value) {
+    final double scale = this.scaleX;
+    if (scale > 0 && Double.isFinite(value)) {
+      final double multiple = value * scale;
+      final double scaledValue = Math.round(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makeXPreciseCeil(final double value) {
+    final double scale = this.scaleX;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.ceil(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makeXPreciseFloor(final double value) {
+    final double scale = this.scaleX;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.floor(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
   public double makeXyPrecise(final double value) {
-    return makePrecise(0, value);
+    final double scale = this.scaleX;
+    if (scale > 0 && Double.isFinite(value)) {
+      final double multiple = value * scale;
+      final double scaledValue = Math.round(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
   }
 
   public double makeXyPreciseCeil(final double value) {
-    return makePreciseCeil(0, value);
+    final double scale = this.scaleX;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.ceil(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
   }
 
   public double makeXyPreciseFloor(final double value) {
-    return makePreciseFloor(0, value);
+    final double scale = this.scaleX;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.floor(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makeYPrecise(final double value) {
+    final double scale = this.scaleY;
+    if (scale > 0 && Double.isFinite(value)) {
+      final double multiple = value * scale;
+      final double scaledValue = Math.round(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makeYPreciseCeil(final double value) {
+    final double scale = this.scaleY;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.ceil(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makeYPreciseFloor(final double value) {
+    final double scale = this.scaleY;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.floor(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
   }
 
   public double makeZPrecise(final double value) {
-    return makePrecise(2, value);
+    final double scale = this.scaleZ;
+    if (scale > 0 && Double.isFinite(value)) {
+      final double multiple = value * scale;
+      final double scaledValue = Math.round(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
   }
 
   public double makeZPreciseCeil(final double value) {
-    return makePreciseCeil(2, value);
+    final double scale = this.scaleZ;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.ceil(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
   }
 
   public double makeZPreciseFloor(final double value) {
-    return makePreciseFloor(2, value);
+    final double scale = this.scaleZ;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.floor(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public BoundingBox newBoundingBox(final double x, final double y) {
+    return new BoundingBoxDoubleXYGeometryFactory(this, x, y);
   }
 
   public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
-    return new BoundingBoxDoubleGf(this, 2, minX, minY, maxX, maxY);
+    return new BoundingBoxDoubleXYGeometryFactory(this, minX, minY, maxX, maxY);
+  }
+
+  public BoundingBox newBoundingBox(final int axisCount) {
+    return new BoundingBoxDoubleGf(this, axisCount);
   }
 
   public BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
-    return new BoundingBoxDoubleGf(this, axisCount, bounds);
+    if (axisCount == 2) {
+      final double x1 = bounds[0];
+      final double y1 = bounds[1];
+      final double x2 = bounds[2];
+      final double y2 = bounds[3];
+      return new BoundingBoxDoubleXYGeometryFactory(this, x1, y1, x2, y2);
+    } else {
+      return new BoundingBoxDoubleGf(this, axisCount, bounds);
+    }
+  }
+
+  public BoundingBox newBoundingBox(int axisCount, final Iterable<? extends Point> points) {
+    axisCount = Math.min(axisCount, getAxisCount());
+    double[] bounds = null;
+    if (points != null) {
+      for (final Point point : points) {
+        if (point != null) {
+          if (bounds == null) {
+            bounds = BoundingBoxUtil.newBounds(this, axisCount, point);
+          } else {
+            BoundingBoxUtil.expand(this, bounds, point);
+          }
+        }
+      }
+    }
+    if (bounds == null) {
+      return this.boundingBoxEmpty;
+    } else {
+      return newBoundingBox(axisCount, bounds);
+    }
+  }
+
+  public BoundingBox newBoundingBox(int axisCount, final Point... points) {
+    axisCount = Math.min(axisCount, getAxisCount());
+    double[] bounds = null;
+    if (points != null) {
+      for (final Point point : points) {
+        if (point != null) {
+          if (bounds == null) {
+            bounds = BoundingBoxUtil.newBounds(this, axisCount, point);
+          } else {
+            BoundingBoxUtil.expand(this, bounds, point);
+          }
+        }
+      }
+    }
+    if (bounds == null) {
+      return this.boundingBoxEmpty;
+    } else {
+      return newBoundingBox(axisCount, bounds);
+    }
+  }
+
+  public BoundingBox newBoundingBox(final Iterable<? extends Point> points) {
+    double minX = Double.POSITIVE_INFINITY;
+    double maxX = Double.NEGATIVE_INFINITY;
+    double minY = Double.POSITIVE_INFINITY;
+    double maxY = Double.NEGATIVE_INFINITY;
+
+    for (final Point point : points) {
+      final double x = point.getX();
+      final double y = point.getY();
+      if (x < minX) {
+        minX = x;
+      }
+      if (y < minY) {
+        minY = y;
+      }
+
+      if (x > maxX) {
+        maxX = x;
+      }
+      if (y > maxY) {
+        maxY = y;
+      }
+    }
+    final boolean nullX = minX > maxX;
+    final boolean nullY = minY > maxY;
+    if (nullX) {
+      if (nullY) {
+        return this.boundingBoxEmpty;
+      } else {
+        return new BoundingBoxDoubleXYGeometryFactory(this, Double.NEGATIVE_INFINITY, minY,
+          Double.POSITIVE_INFINITY, maxY);
+      }
+    } else {
+      if (nullY) {
+        return new BoundingBoxDoubleXYGeometryFactory(this, minX, Double.NEGATIVE_INFINITY, maxX,
+          Double.POSITIVE_INFINITY);
+      } else {
+        return new BoundingBoxDoubleXYGeometryFactory(this, minX, minY, maxX, maxY);
+      }
+    }
+  }
+
+  public BoundingBox newBoundingBox(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return newBoundingBox(x, y);
   }
 
   public BoundingBox newBoundingBoxEmpty() {
-    return new BoundingBoxDoubleGf(this);
+    return this.boundingBoxEmpty;
+  }
+
+  public double[] newBounds(final int axisCount) {
+    return BoundingBoxUtil.newBounds(axisCount);
   }
 
   public LineStringDoubleBuilder newLineStringBuilder() {
     return new LineStringDoubleBuilder(this);
+  }
+
+  private LineStringDoubleBuilder newLineStringBuilder(final Collection<?> points) {
+    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(this, points.size());
+    for (final Object object : points) {
+      if (object == null) {
+      } else if (object instanceof Point) {
+        final Point point = (Point)object;
+        lineBuilder.appendVertex(point);
+      } else if (object instanceof double[]) {
+        final double[] coordinates = (double[])object;
+        lineBuilder.appendVertex(coordinates);
+      } else if (object instanceof List<?>) {
+        @SuppressWarnings("unchecked")
+        final List<Number> list = (List<Number>)object;
+        final double[] coordinates = MathUtil.toDoubleArray(list);
+        lineBuilder.appendVertex(coordinates);
+      } else if (object instanceof LineString) {
+        final LineString LineString = (LineString)object;
+        final Point point = LineString.getPoint(0);
+        lineBuilder.appendVertex(point);
+      } else {
+        throw new IllegalArgumentException("Unexepected data type: " + object);
+      }
+    }
+    return lineBuilder;
   }
 
   /**
@@ -1437,7 +1941,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The point.
    */
   public Point point() {
-    return new PointDoubleGf(this);
+    return this.emptyPoint;
   }
 
   /**
@@ -1453,9 +1957,15 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   public Point point(final double... coordinates) {
     if (coordinates == null || coordinates.length < 2) {
       return point();
+    } else if (this.axisCount == 2) {
+      return new PointDoubleXYGeometryFactory(this, coordinates[0], coordinates[1]);
     } else {
       return new PointDoubleGf(this, coordinates);
     }
+  }
+
+  public Point point(final double x, final double y) {
+    return new PointDoubleXYGeometryFactory(this, x, y);
   }
 
   /**
@@ -1761,8 +2271,50 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  private boolean scalesEqual(final double[] scales) {
-    return Arrays.equals(this.scales, scales);
+  public GeometryFactory to2dFloating() {
+    return fixed(this.coordinateSystem, this.coordinateSystemId, 2, SCALES_FLOATING_2);
+  }
+
+  @Override
+  public double toDoubleX(final int x) {
+    return x / this.scaleX;
+  }
+
+  @Override
+  public double toDoubleY(final int y) {
+    return y / this.scaleY;
+  }
+
+  @Override
+  public double toDoubleZ(final int z) {
+    return z / this.scaleZ;
+  }
+
+  @Override
+  public int toIntX(final double x) {
+    if (Double.isFinite(x)) {
+      return (int)Math.round(x * this.scaleX);
+    } else {
+      return Integer.MIN_VALUE;
+    }
+  }
+
+  @Override
+  public int toIntY(final double y) {
+    if (Double.isFinite(y)) {
+      return (int)Math.round(y * this.scaleY);
+    } else {
+      return Integer.MIN_VALUE;
+    }
+  }
+
+  @Override
+  public int toIntZ(final double z) {
+    if (Double.isFinite(z)) {
+      return (int)Math.round(z * this.scaleZ);
+    } else {
+      return Integer.MIN_VALUE;
+    }
   }
 
   @Override
@@ -1772,15 +2324,15 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     map.put("srid", getCoordinateSystemId());
     map.put("axisCount", getAxisCount());
 
-    final double scaleXY = getScaleXY();
-    if (scaleXY > 0) {
-      map.put("scaleXy", scaleXY);
-    }
+    final double scaleX = getScaleX();
+    addToMap(map, "scaleX", scaleX, 0.0);
+
+    final double scaleY = getScaleY();
+    addToMap(map, "scaleY", scaleY, 0.0);
+
     if (this.axisCount > 2) {
       final double scaleZ = getScaleZ();
-      if (scaleZ > 0) {
-        map.put("scaleZ", scaleZ);
-      }
+      addToMap(map, "scaleZ", scaleZ, 0.0);
     }
     return map;
   }

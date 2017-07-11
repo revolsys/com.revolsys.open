@@ -199,10 +199,10 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
       GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       if (featureClass.isHasM()) {
         geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(), 4,
-          geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
+          geometryFactory.getScaleXY(), geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
       } else if (featureClass.isHasZ()) {
         geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(), 3,
-          geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
+          geometryFactory.getScaleXY(), geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
       }
       final FieldDefinition geometryField = recordDefinition.getGeometryField();
       geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);

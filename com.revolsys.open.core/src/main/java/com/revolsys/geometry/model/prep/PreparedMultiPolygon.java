@@ -47,9 +47,8 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
-import com.revolsys.geometry.operation.predicate.RectangleContains;
 import com.revolsys.geometry.operation.predicate.RectangleIntersects;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * A prepared version for {@link MultiPolygonal} geometries.
@@ -91,7 +90,7 @@ public class PreparedMultiPolygon implements MultiPolygon {
     try {
       return (Polygonal)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -99,7 +98,8 @@ public class PreparedMultiPolygon implements MultiPolygon {
   public boolean contains(final Geometry g) {
     if (envelopeCovers(g)) {
       if (this.isRectangle) {
-        return RectangleContains.contains(getPolygonal(), g);
+        final BoundingBox boundingBox = this.polygonal.getBoundingBox();
+        return boundingBox.containsSFS(g);
       } else {
         final PreparedPolygonContains contains = new PreparedPolygonContains(this, getPolygonal());
         return contains.contains(g);
@@ -205,6 +205,11 @@ public class PreparedMultiPolygon implements MultiPolygon {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.polygonal.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return this.polygonal.getBoundingBox();
   }
@@ -272,7 +277,7 @@ public class PreparedMultiPolygon implements MultiPolygon {
   public List<Point> getRepresentativePoints() {
     final List<Point> points = new ArrayList<>();
     for (final Vertex vertex : vertices()) {
-      points.add(vertex.newPointDouble());
+      points.add(vertex.newPoint2D());
     }
     return points;
   }

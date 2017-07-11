@@ -78,7 +78,8 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("Geometry Factory", geometryFactory, boundingBox.getGeometryFactory());
     Assert.assertEquals("Empty", empty, boundingBox.isEmpty());
     Assert.assertEquals("Axis Count", axisCount, boundingBox.getAxisCount());
-    Assert.assertEquals("Bounds", Lists.newArray(bounds), Lists.newArray(boundingBox.getBounds()));
+    Assert.assertEquals("Bounds", Lists.newArray(bounds),
+      Lists.newArray(boundingBox.getMinMaxValues()));
 
     Unit unit = SI.METRE;
     Unit lengthUnit = SI.METRE;
@@ -242,7 +243,8 @@ public class BoundingBoxTest implements TestConstants {
         assertEnvelope(new BoundingBoxDoubleGf(gfFloating, points), gfFloating, false, axisCount,
           bounds);
 
-        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount,
+          GeometryFactory.newScalesFixed(axisCount, 10.0));
 
         points = gfFixed.getPrecise(points);
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
@@ -287,7 +289,8 @@ public class BoundingBoxTest implements TestConstants {
           assertEnvelope(new BoundingBoxDoubleGf(gfFloating, axisCount, values), gfFloating, false,
             axisCount, bounds);
 
-          final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0);
+          final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount,
+            GeometryFactory.newScalesFixed(axisCount, 10.0));
           final double[] valuesPrecise = gfFixed.copyPrecise(values);
           final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
           assertEnvelope(new BoundingBoxDoubleGf(gfFixed, axisCount, valuesPrecise), gfFixed, false,
@@ -355,7 +358,8 @@ public class BoundingBoxTest implements TestConstants {
         assertEnvelope(new BoundingBoxDoubleGf(gfFloating, points), gfFloating, false, axisCount,
           bounds);
 
-        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount,
+          GeometryFactory.newScalesFixed(axisCount, 10.0));
 
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
         assertEnvelope(new BoundingBoxDoubleGf(gfFixed, points), gfFixed, false, axisCount,

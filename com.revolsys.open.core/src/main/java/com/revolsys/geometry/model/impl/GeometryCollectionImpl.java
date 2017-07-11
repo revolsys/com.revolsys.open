@@ -67,12 +67,6 @@ public class GeometryCollectionImpl implements GeometryCollection {
    */
   private final GeometryFactory geometryFactory;
 
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
-
   public GeometryCollectionImpl(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
@@ -156,13 +150,14 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
   }
@@ -211,16 +206,6 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getUserData() {
-    return this.userData;
-  }
-
-  /**
    * Gets a hash code for the Geometry.
    *
    * @return an integer value suitable for use as a hashcode
@@ -244,21 +229,6 @@ public class GeometryCollectionImpl implements GeometryCollection {
   @Override
   public Geometry prepare() {
     return this;
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserData(final Object userData) {
-    this.userData = userData;
   }
 
   @Override

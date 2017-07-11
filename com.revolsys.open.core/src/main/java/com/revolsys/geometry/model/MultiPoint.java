@@ -45,7 +45,6 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -66,16 +65,15 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     final boolean shortCircuit) {
     final Set<Point> points = new TreeSet<>();
     for (final Vertex vertex : vertices()) {
-      final Point point = new PointDouble(vertex, 2);
-      if (points.contains(point)) {
-        final DuplicateVertexError error = new DuplicateVertexError(vertex);
+      if (points.contains(vertex)) {
+        final DuplicateVertexError error = new DuplicateVertexError(vertex.clone());
         if (shortCircuit) {
           return false;
         } else {
           errors.add(error);
         }
       } else {
-        points.add(point);
+        points.add(vertex.newPoint2D());
       }
     }
     return errors.isEmpty();
@@ -102,11 +100,30 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   Punctual clone();
 
   @Override
+  default double distance(final double x, final double y, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      double minDistance = Double.MAX_VALUE;
+      for (final Point point : getPoints()) {
+        final double distance = point.distance(x, y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (distance <= terminateDistance) {
+            return distance;
+          }
+        }
+      }
+      return minDistance;
+    }
+  }
+
+  @Override
   default double distance(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       geometry = geometry.convertGeometry(geometryFactory, 2);
@@ -161,15 +178,24 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     return Dimension.FALSE;
   }
 
-  /**
-   *  Returns the <code>Coordinate</code> at the given position.
-   *
-   *@param  n  the partIndex of the <code>Coordinate</code> to retrieve, beginning
-   *      at 0
-   *@return    the <code>n</code>th <code>Coordinate</code>
-   */
-  default Point getCoordinate(final int n) {
-    return getPoint(n);
+  @Override
+  default Point getCentroid() {
+    int pointCount = 0;
+    double sumX = 0;
+    double sumY = 0;
+    for (final Point point : points()) {
+      if (!point.isEmpty()) {
+        pointCount += 1;
+        final double x = point.getX();
+        final double y = point.getY();
+        sumX += x;
+        sumY += y;
+      }
+    }
+    final double centroidX = sumX / pointCount;
+    final double centroidY = sumY / pointCount;
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.point(centroidX, centroidY);
   }
 
   @Override
@@ -233,6 +259,16 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       }
     }
     return null;
+  }
+
+  @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final Point point : points()) {
+      if (point.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -346,6 +382,26 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       final Punctual normalizedGeometry = geometryFactory.punctual(geometries);
       return normalizedGeometry;
     }
+  }
+
+  @Override
+  default List<Vertex> pointVertices() {
+    if (isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      final int vertexCount = getVertexCount();
+      final List<Vertex> vertices = new ArrayList<>(vertexCount);
+      for (int i = 0; i < vertexCount; i++) {
+        final MultiPointVertex vertex = new MultiPointVertex(this, i);
+        vertices.add(vertex);
+      }
+      return vertices;
+    }
+  }
+
+  @Override
+  default Punctual prepare() {
+    return this;
   }
 
   @Override

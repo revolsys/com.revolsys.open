@@ -147,7 +147,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
           final LinearRing ring = polygon.getRing(ringIndex);
           final int segmentIndex = segmentId[2];
           if (segmentIndex >= 0 && segmentIndex < ring.getSegmentCount()) {
-            return new MultiPolygonSegment(this, segmentId);
+            return new MultiPolygonSegment(this, partIndex, ringIndex, segmentIndex);
           }
         }
       }
@@ -214,6 +214,21 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
       }
       return null;
     }
+  }
+
+  @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final Polygon polygon : polygons()) {
+      if (polygon.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    return false;
   }
 
   @Override

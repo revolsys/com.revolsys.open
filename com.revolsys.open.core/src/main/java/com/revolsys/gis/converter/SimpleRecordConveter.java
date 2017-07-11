@@ -8,7 +8,6 @@ import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.gis.converter.process.SourceToTargetProcess;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -50,7 +49,6 @@ public class SimpleRecordConveter implements Converter<Record, Record> {
     final Geometry sourceGeometry = sourceObject.getGeometry();
     final GeometryFactory geometryFactory = sourceGeometry.getGeometryFactory();
     final Geometry targetGeometry = geometryFactory.geometry(sourceGeometry);
-    GeometryProperties.copyUserData(sourceGeometry, targetGeometry);
     targetObject.setGeometryValue(targetGeometry);
     for (final SourceToTargetProcess<Record, Record> processor : this.processors) {
       processor.process(sourceObject, targetObject);

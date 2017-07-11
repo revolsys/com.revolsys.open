@@ -41,6 +41,7 @@ import com.revolsys.geometry.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -96,7 +97,7 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   private Map<Integer, Edge<T>> edgesById = new IntHashMap<>();
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private final int id = GRAPH_IDS.incrementAndGet();
 
@@ -118,7 +119,7 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   private Map<Point, Integer> nodesIdsByCoordinates = new TreeMap<>();
 
-  private GeometryFactory precisionModel = GeometryFactory.DEFAULT;
+  private GeometryFactory precisionModel = GeometryFactory.DEFAULT_3D;
 
   public Graph() {
     this(true);
@@ -260,10 +261,6 @@ public class Graph<T> implements GeometryFactoryProxy {
     return edges;
   }
 
-  public List<Edge<T>> findEdges(final Point point, final double distance) {
-    return EdgeWithinDistance.edgesWithinDistance(this, point, distance);
-  }
-
   /**
    * Find the node by point coordinates returning the node if it exists, null
    * otherwise.
@@ -328,37 +325,6 @@ public class Graph<T> implements GeometryFactoryProxy {
     }
   }
 
-  /**
-   * Find all the nodes <= the distance of the node.
-   *
-   * @param node The node.
-   * @param distance The distance.
-   * @return The nodes.
-   */
-  public List<Node<T>> findNodes(final Node<T> node, final double distance) {
-    final Point point = node;
-    return findNodes(point, distance);
-  }
-
-  /**
-   * Find the nodes <= the distance of the specified point coordinates.
-   *
-   * @param point The point coordinates.
-   * @param distance The distance.
-   * @return The list of nodes.
-   */
-  public List<Node<T>> findNodes(final Point point, final double distance) {
-    final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
-    final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point, distance,
-      results);
-    BoundingBox envelope = new BoundingBoxDoubleGf(point);
-    envelope = envelope.expand(distance);
-    getNodeIndex().forEach(visitor, envelope);
-    final List<Node<T>> nodes = results.getList();
-    Collections.sort(nodes);
-    return nodes;
-  }
-
   public List<Node<T>> findNodesOfDegree(final int degree) {
     final List<Node<T>> nodesFound = new ArrayList<>();
     for (final Node<T> node : getNodes()) {
@@ -367,6 +333,21 @@ public class Graph<T> implements GeometryFactoryProxy {
       }
     }
     return nodesFound;
+  }
+
+  public void forEachEdge(final BoundingBoxProxy boundingBoxProxy, final Consumer<Edge<T>> action) {
+    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
+    edgeIndex.forEach(boundingBoxProxy.getBoundingBox(), action);
+  }
+
+  public void forEachEdge(final BoundingBoxProxy boundingBox,
+    final Predicate<? super Edge<T>> filter, final Consumer<Edge<T>> visitor) {
+    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
+    edgeIndex.forEach(boundingBox.getBoundingBox(), filter, visitor);
+  }
+
+  public void forEachEdge(final Comparator<Edge<T>> comparator, final Consumer<Edge<T>> action) {
+    forEachEdge(null, action, comparator);
   }
 
   @SuppressWarnings("unchecked")
@@ -420,6 +401,54 @@ public class Graph<T> implements GeometryFactoryProxy {
         }
       }
     };
+    this.edgeListeners.add(listener);
+    try {
+      while (!edges.isEmpty()) {
+        final Edge<T> edge = edges.remove(0);
+        if (!edge.isRemoved()) {
+          action.accept(edge);
+        }
+      }
+    } catch (final ExitLoopException e) {
+    } finally {
+      this.edgeListeners.remove(listener);
+    }
+  }
+
+  public void forEachEdge(final Predicate<Edge<T>> filter, final Consumer<Edge<T>> action,
+    final Comparator<Edge<T>> comparator) {
+    final LinkedList<Edge<T>> edges = new LinkedList<>(getEdges(filter));
+    final EdgeEventListener<T> listener;
+
+    if (comparator == null) {
+      listener = (edgeEvent) -> {
+        final Edge<T> edge = edgeEvent.getEdge();
+        if (edgeEvent.isAddAction()) {
+          if (filter == null || filter.test(edge)) {
+            edges.addFirst(edge);
+          }
+        }
+      };
+    } else {
+      Collections.sort(edges, comparator);
+      listener = (edgeEvent) -> {
+        final Edge<T> edge = edgeEvent.getEdge();
+        final String eventAction = edgeEvent.getAction();
+        if (eventAction.equals(EdgeEvent.EDGE_ADDED)) {
+          if (filter == null || filter.test(edge)) {
+            edges.addFirst(edge);
+          }
+          if (comparator != null) {
+            Collections.sort(edges, comparator);
+          }
+        } else if (eventAction.equals(EdgeEvent.EDGE_REMOVED)) {
+          if (comparator != null) {
+            edges.remove(edge);
+          }
+        }
+      };
+    }
+
     this.edgeListeners.add(listener);
     try {
       while (!edges.isEmpty()) {
@@ -504,11 +533,11 @@ public class Graph<T> implements GeometryFactoryProxy {
   }
 
   public double getClosestDistance(final Node<T> node, final double maxDistance) {
-    final List<Node<T>> nodes = findNodes(node, maxDistance);
+    final List<Node<T>> nodes = getNodes(node, maxDistance);
     double closestDistance = Double.MAX_VALUE;
     for (final Node<T> matchNode : nodes) {
       if (matchNode != node) {
-        final double distance = node.distance(matchNode);
+        final double distance = node.distancePoint(matchNode);
         if (distance < closestDistance) {
           closestDistance = distance;
         }
@@ -592,6 +621,21 @@ public class Graph<T> implements GeometryFactoryProxy {
     return new EdgeList<>(this, edgeIds);
   }
 
+  public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy) {
+    return BoundingBox.newArraySorted(this::forEachEdge, boundingBoxProxy);
+  }
+
+  public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy,
+    final Predicate<? super Edge<T>> filter) {
+    return BoundingBox.newArraySorted(this::forEachEdge, boundingBoxProxy, filter);
+  }
+
+  public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy,
+    final Predicate<? super Edge<T>> filter, final Comparator<Edge<T>> comparator) {
+    return BoundingBox.newArraySorted(this::forEachEdge, boundingBoxProxy, filter, comparator);
+
+  }
+
   public List<Edge<T>> getEdges(final Comparator<Edge<T>> comparator) {
     final List<Edge<T>> targetEdges = getEdges();
     if (comparator != null) {
@@ -626,6 +670,10 @@ public class Graph<T> implements GeometryFactoryProxy {
       }
     }
     return edges;
+  }
+
+  public List<Edge<T>> getEdges(final Point point, final double distance) {
+    return EdgeWithinDistance.edgesWithinDistance(this, point, distance);
   }
 
   public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter) {
@@ -761,6 +809,25 @@ public class Graph<T> implements GeometryFactoryProxy {
     }
     return nodes;
 
+  }
+
+  /**
+   * Find the nodes <= the distance of the specified point coordinates.
+   *
+   * @param point The point coordinates.
+   * @param distance The distance.
+   * @return The list of nodes.
+   */
+  public List<Node<T>> getNodes(final Point point, final double distance) {
+    final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
+    final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point, distance,
+      results);
+    BoundingBox envelope = new BoundingBoxDoubleGf(point);
+    envelope = envelope.expand(distance);
+    getNodeIndex().forEach(visitor, envelope);
+    final List<Node<T>> nodes = results.getList();
+    Collections.sort(nodes);
+    return nodes;
   }
 
   public List<Node<T>> getNodes(final Predicate<Node<T>> filter) {
@@ -939,8 +1006,8 @@ public class Graph<T> implements GeometryFactoryProxy {
     final Point point2 = node2.get3dCoordinates(typePath);
 
     final Graph<Record> graph = node1.getGraph();
-    final Point midPoint = LineSegmentUtil.midPoint(GeometryFactory.fixed(0, 1000.0, 1.0), node2,
-      node1);
+    final Point midPoint = LineSegmentUtil.midPoint(GeometryFactory.fixed(0, 1000.0, 1000.0, 1.0),
+      node2, node1);
     final double x = midPoint.getX();
     final double y = midPoint.getY();
     final double z1 = point1.getZ();
@@ -974,9 +1041,9 @@ public class Graph<T> implements GeometryFactoryProxy {
   public boolean movePointsWithinTolerance(final Map<Point, Point> movedNodes,
     final double maxDistance, final Node<T> node1) {
     final Graph<T> graph1 = node1.getGraph();
-    List<Node<T>> nodes2 = findNodes(node1, maxDistance);
+    List<Node<T>> nodes2 = getNodes(node1, maxDistance);
     if (nodes2.isEmpty()) {
-      nodes2 = findNodes(node1, maxDistance * 2);
+      nodes2 = getNodes(node1, maxDistance * 2);
       if (nodes2.size() == 1) {
         final Node<T> node2 = nodes2.get(0);
         if (graph1.findNode(node2) == null) {
@@ -984,12 +1051,12 @@ public class Graph<T> implements GeometryFactoryProxy {
           final List<Edge<T>> outEdges = node2.getOutEdges();
           if (inEdges.size() == 1 && outEdges.size() == 1) {
             final Edge<T> inEdge = inEdges.get(0);
-            if (inEdge.distance(node1) < maxDistance) {
+            if (inEdge.distancePoint(node1) < maxDistance) {
               moveToMidpoint(movedNodes, graph1, node1, node2);
               return true;
             }
             final Edge<T> outEdge = outEdges.get(0);
-            if (outEdge.distance(node1) < maxDistance) {
+            if (outEdge.distancePoint(node1) < maxDistance) {
               moveToMidpoint(movedNodes, graph1, node1, node2);
               return true;
             }
@@ -1011,15 +1078,15 @@ public class Graph<T> implements GeometryFactoryProxy {
     final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1, node2);
     if (!node1.equals(2, midPoint)) {
       if (movedNodes != null) {
-        movedNodes.put(node1.newPointDouble(), midPoint);
+        movedNodes.put(node1.newPoint2D(), midPoint);
       }
-      node1.move(midPoint);
+      node1.moveNode(midPoint);
     }
     if (!node2.equals(2, midPoint)) {
       if (movedNodes != null) {
-        movedNodes.put(node2.newPointDouble(), midPoint);
+        movedNodes.put(node2.newPoint2D(), midPoint);
       }
-      node2.move(midPoint);
+      node2.moveNode(midPoint);
     }
   }
 

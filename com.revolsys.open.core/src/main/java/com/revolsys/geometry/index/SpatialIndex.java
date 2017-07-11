@@ -33,9 +33,14 @@
 package com.revolsys.geometry.index;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.predicate.Predicates;
 
 /**
  * The basic operations supported by classes
@@ -48,7 +53,51 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
  *
  * @version 1.7
  */
-public interface SpatialIndex<V> {
+public interface SpatialIndex<V> extends GeometryFactoryProxy {
+
+  default void forEach(final BoundingBoxProxy boundingBoxProxy, final Consumer<? super V> action) {
+    final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    forEach(minX, minY, maxX, maxY, action);
+  }
+
+  default void forEach(final BoundingBoxProxy boundingBoxProxy, final Predicate<? super V> filter,
+    final Consumer<? super V> action) {
+    final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    forEach(minX, minY, maxX, maxY, filter, action);
+  }
+
+  void forEach(final Consumer<? super V> action);
+
+  void forEach(double x, double y, Consumer<? super V> action);
+
+  void forEach(double minX, double minY, double maxX, double maxY, Consumer<? super V> action);
+
+  default void forEach(final double minX, final double minY, final double maxX, final double maxY,
+    final Predicate<? super V> filter, final Consumer<? super V> action) {
+    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+    forEach(minX, minY, maxX, maxY, filteredAction);
+    ;
+  }
+
+  default void forEach(final double x, final double y, final Predicate<? super V> filter,
+    final Consumer<? super V> action) {
+    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+    forEach(x, y, filteredAction);
+  }
+
+  default void forEach(final Predicate<? super V> filter, final Consumer<? super V> action) {
+    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+    forEach(filteredAction);
+  }
+
   /**
    * Adds a spatial item with an extent specified by the given {@link BoundingBoxDoubleGf} to the index
    */

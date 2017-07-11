@@ -42,8 +42,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * Models a collection of {@link Polygon}s.
@@ -60,20 +59,11 @@ import com.revolsys.util.WrappedException;
 public class MultiPolygonImpl implements MultiPolygon {
   private static final long serialVersionUID = 8166665132445433741L;
 
-  /**
-   *  The bounding box of this <code>Geometry</code>.
-   */
   private BoundingBox boundingBox;
 
   private final GeometryFactory geometryFactory;
 
   private Polygon[] polygons;
-
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
 
   public MultiPolygonImpl(final GeometryFactory geometryFactory, final Polygon... polygons) {
     this.geometryFactory = geometryFactory;
@@ -97,7 +87,7 @@ public class MultiPolygonImpl implements MultiPolygon {
     try {
       return (Polygonal)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -141,13 +131,14 @@ public class MultiPolygonImpl implements MultiPolygon {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
   }
@@ -187,16 +178,6 @@ public class MultiPolygonImpl implements MultiPolygon {
   }
 
   /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getUserData() {
-    return this.userData;
-  }
-
-  /**
    * Gets a hash code for the Geometry.
    *
    * @return an integer value suitable for use as a hashcode
@@ -209,26 +190,6 @@ public class MultiPolygonImpl implements MultiPolygon {
   @Override
   public boolean isEmpty() {
     return this.polygons == null;
-  }
-
-  @Override
-  public Polygonal prepare() {
-    return new PreparedMultiPolygon(this);
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserData(final Object userData) {
-    this.userData = userData;
   }
 
   @Override

@@ -56,14 +56,15 @@ public final class ProjectionFactory {
     }
   }
 
-  public static CoordinatesOperation getCoordinatesOperation(final CoordinateSystem cs1,
-    final CoordinateSystem cs2) {
-    if (cs1 == null || cs2 == null || cs1 == cs2) {
+  public static CoordinatesOperation getCoordinatesOperation(
+    final CoordinateSystem fromCoordinateSystem, final CoordinateSystem toCoordinateSystem) {
+    if (fromCoordinateSystem == null || toCoordinateSystem == null
+      || fromCoordinateSystem == toCoordinateSystem) {
       return null;
     } else {
       final List<CoordinatesOperation> operations = new ArrayList<>();
-      if (cs1 instanceof ProjectedCoordinateSystem) {
-        final ProjectedCoordinateSystem pcs1 = (ProjectedCoordinateSystem)cs1;
+      if (fromCoordinateSystem instanceof ProjectedCoordinateSystem) {
+        final ProjectedCoordinateSystem pcs1 = (ProjectedCoordinateSystem)fromCoordinateSystem;
         final CoordinatesOperation inverseOperation = getInverseCoordinatesOperation(pcs1);
         if (inverseOperation == null) {
           return null;
@@ -73,11 +74,11 @@ public final class ProjectionFactory {
           operations.add(new UnitConverstionOperation(linearUnit1, SI.METRE));
         }
         operations.add(inverseOperation);
-      } else if (cs1 instanceof GeographicCoordinateSystem) {
-        final GeographicCoordinateSystem gcs1 = (GeographicCoordinateSystem)cs1;
+      } else if (fromCoordinateSystem instanceof GeographicCoordinateSystem) {
+        final GeographicCoordinateSystem gcs1 = (GeographicCoordinateSystem)fromCoordinateSystem;
         final Unit<Angle> angularUnit1 = gcs1.getUnit();
-        if (cs2 instanceof GeographicCoordinateSystem) {
-          final GeographicCoordinateSystem gcs2 = (GeographicCoordinateSystem)cs2;
+        if (toCoordinateSystem instanceof GeographicCoordinateSystem) {
+          final GeographicCoordinateSystem gcs2 = (GeographicCoordinateSystem)toCoordinateSystem;
           // TODO Datum shift
           final Unit<Angle> angularUnit2 = gcs2.getUnit();
           if (!angularUnit1.equals(angularUnit2)) {
@@ -100,8 +101,8 @@ public final class ProjectionFactory {
       } else {
         return null;
       }
-      if (cs2 instanceof ProjectedCoordinateSystem) {
-        final ProjectedCoordinateSystem pcs2 = (ProjectedCoordinateSystem)cs2;
+      if (toCoordinateSystem instanceof ProjectedCoordinateSystem) {
+        final ProjectedCoordinateSystem pcs2 = (ProjectedCoordinateSystem)toCoordinateSystem;
         final CoordinatesOperation projectOperation = getProjectCoordinatesOperation(pcs2);
         if (projectOperation != null) {
           operations.add(projectOperation);
@@ -110,8 +111,8 @@ public final class ProjectionFactory {
         if (!linearUnit2.equals(SI.METRE)) {
           operations.add(new UnitConverstionOperation(SI.METRE, linearUnit2));
         }
-      } else if (cs2 instanceof GeographicCoordinateSystem) {
-        final GeographicCoordinateSystem gcs2 = (GeographicCoordinateSystem)cs2;
+      } else if (toCoordinateSystem instanceof GeographicCoordinateSystem) {
+        final GeographicCoordinateSystem gcs2 = (GeographicCoordinateSystem)toCoordinateSystem;
         final Unit<Angle> angularUnit2 = gcs2.getUnit();
         if (!angularUnit2.equals(SI.RADIAN)) {
           operations.add(new UnitConverstionOperation(SI.RADIAN, angularUnit2, 2));
@@ -126,13 +127,6 @@ public final class ProjectionFactory {
           return new ChainedCoordinatesOperation(operations);
       }
     }
-  }
-
-  public static CoordinatesOperation getCoordinatesOperation(
-    final GeometryFactory sourceGeometryFactory, final GeometryFactory targetGeometryFactory) {
-    final CoordinateSystem sourceCoordinateSystem = sourceGeometryFactory.getCoordinateSystem();
-    final CoordinateSystem targetCoordinateSystem = targetGeometryFactory.getCoordinateSystem();
-    return getCoordinatesOperation(sourceCoordinateSystem, targetCoordinateSystem);
   }
 
   public static CoordinatesProjection getCoordinatesProjection(

@@ -55,7 +55,7 @@ public class DistanceTest extends TestCase {
     TestRunner.run(DistanceTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 2, 1.0, 1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 

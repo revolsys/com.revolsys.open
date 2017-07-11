@@ -23,7 +23,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     final double y1 = y;
     final double x2 = x1 + (double)width * cellSize;
     final double y2 = y1 + (double)height * cellSize;
-    this.boundingBox = geometryFactory.boundingBox(x1, y1, x2, y2);
+    this.boundingBox = geometryFactory.newBoundingBox(x1, y1, x2, y2);
   }
 
   @Override

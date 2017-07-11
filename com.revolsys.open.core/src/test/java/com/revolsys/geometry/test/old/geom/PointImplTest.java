@@ -56,11 +56,11 @@ public class PointImplTest extends TestCase {
     return new TestSuite(PointImplTest.class);
   }
 
-  private final GeometryFactory albers2d = GeometryFactory.fixed(3005, 1000.0);
+  private final GeometryFactory albers2d = GeometryFactory.fixed(3005, 2, 1000.0, 1000.0);
 
-  private final GeometryFactory albers3d = GeometryFactory.fixed(3005, 1000.0, 1.0);
+  private final GeometryFactory albers3d = GeometryFactory.fixed(3005, 3, 1000.0, 1000.0, 1.0);
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 2, 1000.0, 1000.0);
 
   private final GeometryFactory worldMercator = GeometryFactory.worldMercator();
 

@@ -74,7 +74,7 @@ public class LineIntersectorBenchmark implements Runnable {
     Point q2 = new PointDouble(10.0, 20, Geometry.NULL_ORDINATE);
     final Point x = new PointDouble(15.0, 15, Geometry.NULL_ORDINATE);
     lineIntersector.computeIntersection(p1, p2, q1, q2);
-    lineIntersector.getIntersectionNum();
+    lineIntersector.getIntersectionCount();
     lineIntersector.getIntersection(0);
     lineIntersector.isProper();
     lineIntersector.hasIntersection();
@@ -115,14 +115,14 @@ public class LineIntersectorBenchmark implements Runnable {
       new PointDouble(100.0, 10, Geometry.NULL_ORDINATE),
       new PointDouble(100.0, 100, Geometry.NULL_ORDINATE));
     lineIntersector.hasIntersection();
-    lineIntersector.getIntersectionNum();
+    lineIntersector.getIntersectionCount();
 
     lineIntersector.computeIntersection(new PointDouble(190.0, 50, Geometry.NULL_ORDINATE),
       new PointDouble(120.0, 100, Geometry.NULL_ORDINATE),
       new PointDouble(120.0, 100, Geometry.NULL_ORDINATE),
       new PointDouble(50.0, 150, Geometry.NULL_ORDINATE));
     lineIntersector.hasIntersection();
-    lineIntersector.getIntersectionNum();
+    lineIntersector.getIntersectionCount();
     lineIntersector.getIntersection(1);
 
     lineIntersector.computeIntersection(new PointDouble(180.0, 200, Geometry.NULL_ORDINATE),
@@ -130,14 +130,14 @@ public class LineIntersectorBenchmark implements Runnable {
       new PointDouble(220.0, 240, Geometry.NULL_ORDINATE),
       new PointDouble(140.0, 160, Geometry.NULL_ORDINATE));
     lineIntersector.hasIntersection();
-    lineIntersector.getIntersectionNum();
+    lineIntersector.getIntersectionCount();
 
     lineIntersector.computeIntersection(new PointDouble(30.0, 10, Geometry.NULL_ORDINATE),
       new PointDouble(30.0, 30, Geometry.NULL_ORDINATE),
       new PointDouble(10.0, 10, Geometry.NULL_ORDINATE),
       new PointDouble(90.0, 11, Geometry.NULL_ORDINATE));
     lineIntersector.hasIntersection();
-    lineIntersector.getIntersectionNum();
+    lineIntersector.getIntersectionCount();
     lineIntersector.isProper();
 
     lineIntersector.computeIntersection(new PointDouble(10.0, 30, Geometry.NULL_ORDINATE),
@@ -145,7 +145,7 @@ public class LineIntersectorBenchmark implements Runnable {
       new PointDouble(11.0, 90, Geometry.NULL_ORDINATE),
       new PointDouble(10.0, 10, Geometry.NULL_ORDINATE));
     lineIntersector.hasIntersection();
-    lineIntersector.getIntersectionNum();
+    lineIntersector.getIntersectionCount();
     lineIntersector.isProper();
   }
 

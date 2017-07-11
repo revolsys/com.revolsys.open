@@ -29,8 +29,8 @@ public class NodeDistanceComparator<T> implements Comparator<Node<T>> {
   @Override
   public int compare(final Node<T> node1, final Node<T> node2) {
     int compare;
-    final double distance1 = node1.distance(this.node);
-    final double distance2 = node2.distance(this.node);
+    final double distance1 = node1.distancePoint(this.node);
+    final double distance2 = node2.distancePoint(this.node);
     if (distance1 == distance2) {
       final Point point1 = node1;
       final Point point2 = node2;

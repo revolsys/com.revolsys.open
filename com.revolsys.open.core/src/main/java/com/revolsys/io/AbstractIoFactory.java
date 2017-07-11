@@ -36,15 +36,27 @@ public abstract class AbstractIoFactory implements IoFactory {
     set.add(value);
   }
 
+  protected void addFileExtension(final String fileExtension) {
+    addFileExtensionInternal(fileExtension);
+    if (isReadFromZipFileSupported()) {
+      addFileExtensionInternal(fileExtension + "z");
+      addFileExtensionInternal(fileExtension + ".zip");
+    }
+  }
+
+  protected void addFileExtensionInternal(final String fileExtension) {
+    if (!this.fileExtensions.contains(fileExtension)) {
+      this.fileExtensions.add(fileExtension);
+    }
+  }
+
   protected void addMediaType(final String mediaType) {
     this.mediaTypes.add(mediaType);
   }
 
   protected void addMediaTypeAndFileExtension(final String mediaType, final String fileExtension) {
+    addFileExtension(fileExtension);
     addMediaType(mediaType);
-    if (!this.fileExtensions.contains(fileExtension)) {
-      this.fileExtensions.add(fileExtension);
-    }
     add(this.mediaTypeToFileExtension, mediaType, fileExtension);
     add(this.mediaTypeToFileExtension, fileExtension, fileExtension);
     add(this.fileExtensionToMediaType, fileExtension, mediaType);

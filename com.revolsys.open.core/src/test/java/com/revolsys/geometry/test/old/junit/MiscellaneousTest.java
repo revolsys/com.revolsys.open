@@ -60,7 +60,7 @@ public class MiscellaneousTest extends TestCase {
     TestRunner.run(MiscellaneousTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 2, 1.0, 1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -96,9 +96,8 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(!c1.equals(c2));
     assertEquals(new PointDouble((double)3, 5, Geometry.NULL_ORDINATE),
       new PointDouble((double)3, 5, Geometry.NULL_ORDINATE));
-    assertEquals(new PointDouble((double)3, 5, Double.NaN),
-      new PointDouble((double)3, 5, Double.NaN));
-    assertTrue(new PointDouble((double)3, 5, 0).equals(new PointDouble((double)3, 5, Double.NaN)));
+    assertEquals(new PointDouble(3, 5, Double.NaN), new PointDouble(3, 5, Double.NaN));
+    assertTrue(new PointDouble(3, 5, 0).equals(new PointDouble(3, 5, Double.NaN)));
   }
 
   public void testCreateEmptyGeometry() throws Exception {
@@ -387,8 +386,8 @@ public class MiscellaneousTest extends TestCase {
   // }
 
   public void testPredicatesReturnFalseForEmptyGeometries() {
-    final Point p1 = GeometryFactory.DEFAULT.point((Point)null);
-    final Point p2 = GeometryFactory.DEFAULT
+    final Point p1 = GeometryFactory.DEFAULT_3D.point((Point)null);
+    final Point p2 = GeometryFactory.DEFAULT_3D
       .point(new PointDouble((double)5, 5, Geometry.NULL_ORDINATE));
     assertEquals(false, p1.equals(p2));
     assertEquals(true, p1.disjoint(p2));

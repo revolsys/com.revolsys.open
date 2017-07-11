@@ -25,7 +25,7 @@ import com.revolsys.geometry.wkb.WKTReader;
 public class TestPerfDistanceLinesPoints {
   static final double EXTENT = 1000;
 
-  static GeometryFactory geomFact = GeometryFactory.DEFAULT;
+  static GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
 
   static final int MAX_ITER = 1;
 

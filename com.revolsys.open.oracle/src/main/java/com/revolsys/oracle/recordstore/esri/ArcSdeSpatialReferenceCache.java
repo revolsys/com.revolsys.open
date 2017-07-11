@@ -35,7 +35,7 @@ public class ArcSdeSpatialReferenceCache {
 
   protected static ArcSdeSpatialReference getSpatialReference(final Connection connection,
     final RecordStoreSchema schema, final int esriSrid) {
-    ArcSdeSpatialReferenceCache cache = get(schema);
+    final ArcSdeSpatialReferenceCache cache = get(schema);
     return cache.getSpatialReference(connection, esriSrid);
   }
 
@@ -86,14 +86,14 @@ public class ArcSdeSpatialReferenceCache {
             srid = esriCoordinateSystem.getCoordinateSystemId();
             if (srid <= 0) {
               geometryFactory = GeometryFactory.fixed(coordinateSystem, 3, scale.doubleValue(),
-                zScale.doubleValue());
+                scale.doubleValue(), zScale.doubleValue());
             } else {
               geometryFactory = GeometryFactory.fixed(srid, 3, scale.doubleValue(),
-                zScale.doubleValue());
+                scale.doubleValue(), zScale.doubleValue());
             }
           } else {
             geometryFactory = GeometryFactory.fixed(srid, 3, scale.doubleValue(),
-              zScale.doubleValue());
+              scale.doubleValue(), zScale.doubleValue());
           }
 
           final ArcSdeSpatialReference spatialReference = new ArcSdeSpatialReference(

@@ -144,7 +144,7 @@ class OffsetSegmentString {
 
   @Override
   public String toString() {
-    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
     if (this.points.size() == 1) {
       return this.points.get(0).toString();
     } else {

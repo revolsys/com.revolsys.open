@@ -34,6 +34,8 @@ package com.revolsys.geometry.model.coordinates;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.util.MathUtil;
 
 /**
  * Computes an approximate intersection of two line segments
@@ -54,6 +56,16 @@ import com.revolsys.geometry.model.impl.PointDouble;
  * @version 1.8
  */
 public class CentralEndpointIntersector {
+  public static double average(final int axisIndex, final double... coordinates) {
+    double sum = 0;
+    final int vertexCount = coordinates.length / 2;
+    for (int coordinateIndex = axisIndex; coordinateIndex < coordinates.length; coordinateIndex = 2) {
+      final double value = coordinates[coordinateIndex];
+      sum += value;
+    }
+    return sum / vertexCount;
+  }
+
   private static Point average(final Point[] pts) {
     double averageX = 0;
     double averageY = 0;
@@ -67,6 +79,28 @@ public class CentralEndpointIntersector {
       averageX /= n;
     }
     return new PointDouble(averageX, averageY);
+  }
+
+  public static Point getIntersection(final double... coordinates) {
+    final double averageX = average(0, coordinates);
+    final double averageY = average(1, coordinates);
+    double intersectionX = Double.NaN;
+    double intersectionY = Double.NaN;
+    double minDistance = Double.POSITIVE_INFINITY;
+
+    final int vertexCount = coordinates.length / 2;
+    int coordinateIndex = 0;
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = coordinates[coordinateIndex++];
+      final double y = coordinates[coordinateIndex++];
+      final double distance = MathUtil.distance(averageX, averageY, x, y);
+      if (distance < minDistance) {
+        minDistance = distance;
+        intersectionX = x;
+        intersectionY = y;
+      }
+    }
+    return new PointDoubleXY(intersectionX, intersectionY);
   }
 
   public static Point getIntersection(final Point p00, final Point p01, final Point p10,

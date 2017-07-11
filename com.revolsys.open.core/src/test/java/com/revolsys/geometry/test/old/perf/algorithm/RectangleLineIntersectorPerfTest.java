@@ -61,7 +61,7 @@ public class RectangleLineIntersectorPerfTest {
 
   private final double baseY = 0;
 
-  private final GeometryFactory geomFact = GeometryFactory.DEFAULT;
+  private final GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
 
   private Point[] pts;
 
@@ -89,7 +89,7 @@ public class RectangleLineIntersectorPerfTest {
     final Point pt = this.geomFact
       .point(new PointDouble(this.baseX, this.baseY, Geometry.NULL_ORDINATE));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
-    return CoordinatesListUtil.getCoordinateArray(circle);
+    return CoordinatesListUtil.getPointArray(circle);
   }
 
   public void run(final boolean useSegInt, final boolean useSideInt) {

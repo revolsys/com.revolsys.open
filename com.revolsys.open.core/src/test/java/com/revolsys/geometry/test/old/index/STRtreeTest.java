@@ -60,7 +60,7 @@ public class STRtreeTest extends TestCase {
     junit.textui.TestRunner.main(testCaseName);
   }
 
-  private final GeometryFactory factory = GeometryFactory.DEFAULT;
+  private final GeometryFactory factory = GeometryFactory.DEFAULT_3D;
 
   public STRtreeTest(final String Name_) {
     super(Name_);

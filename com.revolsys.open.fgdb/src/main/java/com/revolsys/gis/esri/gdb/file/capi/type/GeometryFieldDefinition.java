@@ -41,7 +41,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
     GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon, DataTypes.MULTI_POLYGON);
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private Method readMethod;
 
@@ -77,7 +77,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
           final int srid = this.geometryFactory.getCoordinateSystemId();
           final double scaleXY = this.geometryFactory.getScaleXY();
           final double scaleZ = this.geometryFactory.getScaleZ();
-          this.geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+          this.geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleXY, scaleZ);
         }
         setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
 

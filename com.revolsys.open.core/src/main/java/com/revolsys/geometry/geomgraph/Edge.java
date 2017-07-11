@@ -125,7 +125,7 @@ public class Edge extends GraphComponent implements LineString {
    */
   public void addIntersections(final LineIntersector li, final int segmentIndex,
     final int geomIndex) {
-    for (int i = 0; i < li.getIntersectionNum(); i++) {
+    for (int i = 0; i < li.getIntersectionCount(); i++) {
       addIntersection(li, segmentIndex, geomIndex, i);
     }
   }
