@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -26,46 +25,6 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
     writer.writeGeometry(geometry, 2);
     writer.close();
-  }
-
-  public static long getLookAtRange(final BoundingBox boundingBox) {
-    if (boundingBox.isEmpty()) {
-      return 1000;
-    } else {
-      final double minX = boundingBox.getMinX();
-      final double maxX = boundingBox.getMaxX();
-      final double centreX = boundingBox.getCentreX();
-
-      final double minY = boundingBox.getMinY();
-      final double maxY = boundingBox.getMaxY();
-      final double centreY = boundingBox.getCentreY();
-
-      double maxMetres = 0;
-
-      for (final double y : new double[] {
-        minY, centreY, maxY
-      }) {
-        final double widthMetres = GeographicCoordinateSystem.distanceMetres(minX, y, maxX, y);
-        if (widthMetres > maxMetres) {
-          maxMetres = widthMetres;
-        }
-      }
-      for (final double x : new double[] {
-        minX, centreX, maxX
-      }) {
-        final double heightMetres = GeographicCoordinateSystem.distanceMetres(x, minY, x, maxY);
-        if (heightMetres > maxMetres) {
-          maxMetres = heightMetres;
-        }
-      }
-      if (maxMetres == 0) {
-        return 1000;
-      } else {
-        final double lookAtScale = 1.2;
-        final double lookAtRange = maxMetres / 2 / Math.tan(Math.toRadians(25)) * lookAtScale;
-        return (long)Math.ceil(lookAtRange);
-      }
-    }
   }
 
   public KmlXmlWriter(final OutputStream out) {

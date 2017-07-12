@@ -69,7 +69,7 @@ public class RecordStoreConnection
         Throwable savedException = null;
         do {
           try {
-            this.recordStore = MapObjectFactory.toObject(toMapInternal());
+            this.recordStore = newRecordStore();
             this.recordStore.setRecordStoreConnection(this);
             return this.recordStore;
           } catch (final Throwable e) {

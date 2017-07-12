@@ -23,8 +23,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -83,7 +81,7 @@ public class GpxIterator extends BaseObjectWithProperties
     this(StaxReader.newXmlReader(resource));
     this.recordFactory = recordFactory;
     this.typePath = path;
-    this.baseName = FileUtil.getBaseName(resource.getFilename());
+    this.baseName = resource.getBaseName();
   }
 
   public GpxIterator(final StaxReader in) {
@@ -192,14 +190,13 @@ public class GpxIterator extends BaseObjectWithProperties
       }
     }
 
-    Point coord = null;
+    Point point = null;
     if (Double.isNaN(elevation)) {
-      coord = new PointDouble(lon, lat);
+      point = this.geometryFactory.point(lon, lat);
     } else {
-      coord = new PointDouble(lon, lat, elevation);
+      point = this.geometryFactory.point(lon, lat, elevation);
     }
 
-    final Point point = this.geometryFactory.point(coord);
     record.setValue("location", point);
     return record;
   }

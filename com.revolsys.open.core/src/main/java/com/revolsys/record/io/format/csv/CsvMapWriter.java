@@ -16,7 +16,7 @@ import java.util.Map;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class CsvMapWriter extends AbstractMapWriter {
   private List<String> fieldNames;
@@ -115,7 +115,7 @@ public class CsvMapWriter extends AbstractMapWriter {
       }
       this.out.write('\n');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 }

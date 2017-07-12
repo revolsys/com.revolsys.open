@@ -20,7 +20,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.ProtocolBufferInputStream;
 import com.revolsys.record.Record;
@@ -351,7 +351,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements Re
         final long id = ids.get(i);
         final double latitude = latitudes.get(i);
         final double longitude = longitudes.get(i);
-        final PointDouble point = new PointDouble(longitude, latitude);
+        final Point point = new PointDoubleXY(longitude, latitude);
         this.nodePoints.put(id, point);
       }
     } else {

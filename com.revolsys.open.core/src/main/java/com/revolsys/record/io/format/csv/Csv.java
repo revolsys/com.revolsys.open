@@ -28,8 +28,8 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final char FIELD_SEPARATOR = ',';
@@ -223,7 +223,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
       final CsvMapIterator iterator = new CsvMapIterator(resource, FIELD_SEPARATOR);
       return new IteratorMapReader(iterator);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

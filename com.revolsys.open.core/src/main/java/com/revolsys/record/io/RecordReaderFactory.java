@@ -9,7 +9,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
@@ -20,28 +19,27 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.SupplierWithProperties;
 
-public interface RecordReaderFactory
-  extends GeometryReaderFactory, MapReaderFactory, IoFactoryWithCoordinateSystem {
+public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFactory {
   @SuppressWarnings("unchecked")
   static Supplier<RecordReader> newRecordReaderSupplier(
     final Map<String, ? extends Object> properties) {
     final String fileName = (String)properties.get("fileName");
     final String fileUrl = (String)properties.get("fileUrl");
-    String fileExtension;
+    String defaultFileExtension;
     Object source;
     if (Property.hasValue(fileName)) {
       source = Paths.get(fileName);
-      fileExtension = Maps.getString(properties, "fileExtension",
-        FileUtil.getFileNameExtension(fileName));
+      defaultFileExtension = FileUtil.getFileNameExtension(fileName);
 
     } else if (Property.hasValue(fileUrl)) {
       source = new UrlResource(fileUrl);
-      fileExtension = Maps.getString(properties, "fileExtension",
-        FileUtil.getFileNameExtension(fileUrl));
+      defaultFileExtension = FileUtil.getFileNameExtension(fileName);
     } else {
       throw new IllegalArgumentException("Config must have fileName or fileUrl:" + properties);
     }
+    final String fileExtension = Maps.getString(properties, "fileExtension", defaultFileExtension);
     final Supplier<RecordReader> factory = () -> {
       final RecordReader reader;
       if ("zip".equals(fileExtension)) {
@@ -55,12 +53,14 @@ public interface RecordReaderFactory
       } else {
         reader = RecordReader.newRecordReader(source);
       }
-      final Map<String, Object> readerProperties = (Map<String, Object>)properties
-        .get("readerProperties");
-      reader.setProperties(readerProperties);
+      if (reader != null) {
+        final Map<String, Object> readerProperties = (Map<String, Object>)properties
+          .get("readerProperties");
+        reader.setProperties(readerProperties);
+      }
       return reader;
     };
-    return factory;
+    return new SupplierWithProperties<>(factory, properties);
   }
 
   /**
@@ -104,8 +104,8 @@ public interface RecordReaderFactory
 
   @Override
   default GeometryReader newGeometryReader(final Resource resource) {
-    final Reader<Record> recordReader = newRecordReader(resource);
-    final RecordGeometryReader geometryReader = new RecordGeometryReader(recordReader);
+    final RecordReader recordReader = newRecordReader(resource);
+    final RecordReaderGeometryReader geometryReader = new RecordReaderGeometryReader(recordReader);
     return geometryReader;
   }
 

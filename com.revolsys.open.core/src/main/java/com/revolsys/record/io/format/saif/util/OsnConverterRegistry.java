@@ -17,7 +17,7 @@ public class OsnConverterRegistry {
   }
 
   public OsnConverterRegistry(final int srid) {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, 3, 1.0, 1.0, 1.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, 1.0, 1.0, 1.0);
 
     init(geometryFactory);
   }

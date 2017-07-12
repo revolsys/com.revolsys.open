@@ -1,4 +1,4 @@
-package com.revolsys.record.io.format.csv;
+package com.revolsys.record.io;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,11 +10,9 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
-import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -104,9 +102,15 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     return this.hasPointFields;
   }
 
-  protected abstract GeometryFactory loadGeometryFactory();
+  protected GeometryFactory loadGeometryFactory() {
+    return GeometryFactory.DEFAULT_3D;
+  }
 
-  protected RecordDefinition newRecordDefinition(final String filename,
+  protected Record newRecord() {
+    return this.recordFactory.newRecord(this.recordDefinition);
+  }
+
+  protected RecordDefinition newRecordDefinition(final String baseName,
     final List<String> fieldNames) throws IOException {
     this.hasPointFields = Property.hasValue(this.pointXFieldName)
       && Property.hasValue(this.pointYFieldName);
@@ -182,7 +186,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     final RecordStoreSchema schema = getProperty("schema");
     String typePath = getProperty("typePath");
     if (!Property.hasValue(typePath)) {
-      typePath = "/" + FileUtil.getBaseName(filename);
+      typePath = "/" + baseName;
       String schemaPath = getProperty("schemaPath");
       if (Property.hasValue(schemaPath)) {
         if (!schemaPath.startsWith("/")) {
@@ -207,7 +211,8 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     final Record record = this.recordFactory.newRecord(this.recordDefinition);
     final int valueCount = values.size();
     final int fieldCount = this.recordDefinition.getFieldCount();
-    for (int i = 0; i < fieldCount && i < valueCount; i++) {
+    final int count = Math.min(valueCount, fieldCount);
+    for (int i = 0; i < count; i++) {
       final String valueString = values.get(i);
       if (valueString != null) {
         final DataType dataType = this.recordDefinition.getFieldType(i);
@@ -245,6 +250,10 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
 
   public void setPointYFieldName(final String pointYFieldName) {
     this.pointYFieldName = pointYFieldName;
+  }
+
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
   }
 
 }

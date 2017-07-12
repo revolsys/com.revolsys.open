@@ -21,17 +21,17 @@ import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
-public class KmlGeometryIterator extends AbstractIterator<Geometry>
+public class KmlGeometryReader extends AbstractIterator<Geometry>
   implements GeometryReader, Kml22Constants {
   private GeometryFactory geometryFactory = GeometryFactory.floating3(COORDINATE_SYSTEM_ID);
 
   private StaxReader in;
 
-  public KmlGeometryIterator(final InputStream in) {
+  public KmlGeometryReader(final InputStream in) {
     this.in = StaxReader.newXmlReader(in);
   }
 
-  public KmlGeometryIterator(final Resource resource) {
+  public KmlGeometryReader(final Resource resource) {
     this.in = StaxReader.newXmlReader(resource);
   }
 
@@ -42,6 +42,11 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
     }
     this.geometryFactory = null;
     this.in = null;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   @Override

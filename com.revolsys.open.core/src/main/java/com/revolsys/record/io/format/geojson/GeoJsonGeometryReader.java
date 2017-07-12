@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -20,13 +21,13 @@ import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonParser.EventType;
 import com.revolsys.spring.resource.Resource;
 
-public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implements GeometryReader {
+public class GeoJsonGeometryReader extends AbstractIterator<Geometry> implements GeometryReader {
 
   private GeometryFactory geometryFactory;
 
   private JsonParser in;
 
-  public GeoJsonGeometryIterator(final Resource resource) {
+  public GeoJsonGeometryReader(final Resource resource) {
     this.in = new JsonParser(resource);
   }
 
@@ -40,6 +41,11 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
   @Override
   protected void finalize() throws Throwable {
     close();
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   @Override
@@ -60,6 +66,11 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
       }
     } while (this.in.getEvent() != EventType.endDocument);
     throw new NoSuchElementException();
+  }
+
+  @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
   }
 
   @Override

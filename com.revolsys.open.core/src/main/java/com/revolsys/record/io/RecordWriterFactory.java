@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileIoFactory;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.record.Records;
 import com.revolsys.record.schema.RecordDefinition;
@@ -34,8 +33,7 @@ public interface RecordWriterFactory
   default RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     final OutputStream out = resource.newBufferedOutputStream();
-    final String fileName = resource.getFilename();
-    final String baseName = FileUtil.getBaseName(fileName);
+    final String baseName = resource.getBaseName();
     return newRecordWriter(baseName, recordDefinition, out);
   }
 

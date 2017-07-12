@@ -29,7 +29,7 @@ import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
-import com.revolsys.record.io.format.csv.AbstractRecordReader;
+import com.revolsys.record.io.AbstractRecordReader;
 import com.revolsys.spring.resource.Resource;
 
 public class XlsxRecordReader extends AbstractRecordReader {
@@ -141,8 +141,8 @@ public class XlsxRecordReader extends AbstractRecordReader {
         final SheetData sheetData = worksheet.getSheetData();
         this.rows = sheetData.getRow();
         final List<String> line = readNextRow();
-        final String filename = this.resource.getFilename();
-        newRecordDefinition(filename, line);
+        final String baseName = this.resource.getBaseName();
+        newRecordDefinition(baseName, line);
       }
     } catch (final IOException | Docx4JException e) {
       Logs.error(this, "Unable to open " + this.resource, e);

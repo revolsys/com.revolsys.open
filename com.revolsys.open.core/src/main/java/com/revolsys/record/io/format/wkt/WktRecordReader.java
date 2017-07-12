@@ -4,43 +4,39 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.Records;
-import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.format.csv.AbstractRecordReader;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class WktRecordReader extends AbstractIterator<Record> implements RecordReader {
-
-  private RecordFactory factory;
+public class WktRecordReader extends AbstractRecordReader {
 
   private BufferedReader in;
 
-  private RecordDefinition recordDefinition;
-
   private WktParser wktParser;
 
-  public WktRecordReader(final RecordFactory factory, final Resource resource) {
-    this.factory = factory;
+  public WktRecordReader(final RecordFactory<? extends Record> recordFactory,
+    final Resource resource) {
+    super(recordFactory);
     this.in = resource.newBufferedReader();
-    this.recordDefinition = Records.newGeometryRecordDefinition();
+    final RecordDefinition recordDefinition = Records.newGeometryRecordDefinition();
+    setRecordDefinition(recordDefinition);
   }
 
   @Override
   protected void closeDo() {
+    super.closeDo();
     FileUtil.closeSilent(this.in);
-    this.factory = null;
     this.in = null;
     this.wktParser = null;
-    this.recordDefinition = null;
   }
 
   @Override
@@ -51,9 +47,9 @@ public class WktRecordReader extends AbstractIterator<Record> implements RecordR
       if (geometry == null) {
         throw new NoSuchElementException();
       } else {
-        final Record object = this.factory.newRecord(getRecordDefinition());
-        object.setGeometryValue(geometry);
-        return object;
+        final Record record = newRecord();
+        record.setGeometryValue(geometry);
+        return record;
       }
     } catch (final IOException e) {
       throw new RuntimeException("Error reading geometry ", e);
@@ -62,20 +58,20 @@ public class WktRecordReader extends AbstractIterator<Record> implements RecordR
   }
 
   @Override
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
   }
 
   @Override
   protected void initDo() {
     GeometryFactory geometryFactory;
-    final FieldDefinition geometryField = this.recordDefinition.getGeometryField();
+    final FieldDefinition geometryField = getRecordDefinition().getGeometryField();
     if (geometryField == null) {
       geometryFactory = GeometryFactory.DEFAULT_3D;
     } else {
       geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
       if (geometryFactory == null) {
-        geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+        geometryFactory = getGeometryFactory();
         if (geometryFactory == null) {
           geometryFactory = GeometryFactory.DEFAULT_3D;
         }

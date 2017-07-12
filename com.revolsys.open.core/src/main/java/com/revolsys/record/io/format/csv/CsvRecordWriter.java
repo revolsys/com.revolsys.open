@@ -10,14 +10,13 @@ import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
   private final boolean ewkt;
@@ -61,7 +60,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
       }
       this.out.write('\n');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -70,8 +69,14 @@ public class CsvRecordWriter extends AbstractRecordWriter {
    */
   @Override
   public synchronized void close() {
-    FileUtil.closeSilent(this.out);
-    this.out = null;
+    final Writer out = this.out;
+    if (out != null) {
+      try {
+        out.close();
+      } catch (final IOException e) {
+      }
+      this.out = null;
+    }
   }
 
   @Override
@@ -80,7 +85,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
       try {
         this.out.flush();
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
 
@@ -148,7 +153,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         }
         out.write('\n');
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }
