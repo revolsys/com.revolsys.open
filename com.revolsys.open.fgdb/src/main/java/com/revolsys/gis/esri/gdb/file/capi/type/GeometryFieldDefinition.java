@@ -75,9 +75,10 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         }
         if (axisCount != this.geometryFactory.getAxisCount()) {
           final int srid = this.geometryFactory.getCoordinateSystemId();
-          final double scaleXY = this.geometryFactory.getScaleXY();
+          final double scaleX = this.geometryFactory.getScaleX();
+          final double scaleY = this.geometryFactory.getScaleY();
           final double scaleZ = this.geometryFactory.getScaleZ();
-          this.geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleXY, scaleZ);
+          this.geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleX, scaleY, scaleZ);
         }
         setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
 

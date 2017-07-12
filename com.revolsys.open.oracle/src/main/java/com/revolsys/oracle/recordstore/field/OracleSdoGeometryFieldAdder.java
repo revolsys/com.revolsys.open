@@ -123,7 +123,7 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
       geometryFactory = schema.getGeometryFactory();
     }
     if (geometryFactory == null) {
-      geometryFactory = GeometryFactory.DEFAULT_3D;
+      geometryFactory = GeometryFactory.DEFAULT_2D;
     }
     DataType dataType = getColumnProperty(schema, typePath, columnName, GEOMETRY_TYPE);
     if (dataType == null) {
@@ -192,10 +192,12 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
             } else if (axisCount > 4) {
               axisCount = 4;
             }
-            final double scaleXy = getScale(dimInfo, 0);
-            final double scaleZ = getScale(dimInfo, 2);
+            final double[] scales = new double[axisCount];
+            for (int i = 0; i < scales.length; i++) {
+              scales[i] = getScale(dimInfo, i);
+            }
             final GeometryFactory geometryFactory = this.recordStore.getGeometryFactory(srid,
-              axisCount, scaleXy, scaleXy, scaleZ);
+              axisCount, scales);
             setColumnProperty(schema, typePath, columnName, GEOMETRY_FACTORY, geometryFactory);
 
             setColumnProperty(schema, typePath, columnName, ORACLE_SRID, srid);
