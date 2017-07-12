@@ -310,6 +310,11 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   @Override
+  public int getAxisCount() {
+    return this.graph.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return getLine().getBoundingBox();
   }
@@ -520,6 +525,15 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
     return false;
   }
 
+  public boolean hasNode(final Point point) {
+    final Node<T> node = this.graph.findNode(point);
+    if (node == null) {
+      return false;
+    } else {
+      return hasNode(node);
+    }
+  }
+
   public boolean isRemoved() {
     return this.graph == null;
   }
@@ -578,13 +592,15 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   public List<Edge<T>> splitEdge(final List<Point> points) {
-    final Graph<T> graph = getGraph();
-    return graph.splitEdge(this, points);
-
+    return this.graph.splitEdge(this, points);
   }
 
   public List<Edge<T>> splitEdge(final Point... points) {
     return splitEdge(Arrays.asList(points));
+  }
+
+  public List<Edge<T>> splitEdge(final Point point) {
+    return this.graph.splitEdge(this, point);
   }
 
   @Override

@@ -15,7 +15,6 @@ import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class ProjectedCoordinateSystem implements CoordinateSystem {
   private static final long serialVersionUID = 1902383026085071877L;
@@ -33,6 +32,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   private final GeographicCoordinateSystem geographicCoordinateSystem;
 
   private int id;
+
+  private BoundingBox areaBoundingBox;
 
   private final LinearUnit linearUnit;
 
@@ -97,13 +98,13 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       return true;
     } else if (object instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
-      if (!DataType.equal(this.geographicCoordinateSystem, cs.geographicCoordinateSystem)) {
+      if (!this.geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
         return false;
-      } else if (!DataType.equal(this.projection, cs.projection)) {
+      } else if (!this.projection.equals(cs.projection)) {
         return false;
-      } else if (!DataType.equal(this.normalizedParameters, cs.normalizedParameters)) {
+      } else if (!this.normalizedParameters.equals(cs.normalizedParameters)) {
         return false;
-      } else if (!DataType.equal(this.linearUnit, cs.linearUnit)) {
+      } else if (!this.linearUnit.equals(cs.linearUnit)) {
         return false;
       } else {
         return true;
@@ -153,17 +154,20 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   @Override
   public BoundingBox getAreaBoundingBox() {
-    BoundingBox boundingBox;
-    final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
-      .getGeometryFactory();
-    if (this.area == null) {
-      boundingBox = new BoundingBoxDoubleGf(geographicGeometryFactory, 2, -180, -90, 180, 90);
-    } else {
-      final BoundingBoxDoubleGf latLonBounds = this.area.getLatLonBounds();
-      boundingBox = latLonBounds.convert(geographicGeometryFactory);
+    if (this.areaBoundingBox == null) {
+      final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
+        .getGeometryFactory();
+      BoundingBox boundingBox;
+      if (this.area == null) {
+        boundingBox = geographicGeometryFactory.newBoundingBox(-180, -90, 180, 90);
+      } else {
+        final BoundingBox latLonBounds = this.area.getLatLonBounds();
+        boundingBox = latLonBounds.convert(geographicGeometryFactory);
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      this.areaBoundingBox = boundingBox.convert(geometryFactory);
     }
-    final BoundingBox projectedBoundingBox = boundingBox.convert(getGeometryFactory());
-    return projectedBoundingBox;
+    return this.areaBoundingBox;
   }
 
   @Override

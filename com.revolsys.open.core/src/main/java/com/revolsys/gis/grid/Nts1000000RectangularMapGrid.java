@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
@@ -18,7 +17,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   private static final Pattern NAME_PATTERN = Pattern
     .compile("^" + NtsConstants.REGEX_1000000 + ".*");
 
-  private final GeometryFactory geometryFactory = GeometryFactory.wgs84();
+  private final GeometryFactory geometryFactory = GeometryFactory.floating(4326, 2);
 
   private double precisionScale = 1;
 
@@ -43,7 +42,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new BoundingBoxDoubleGf(getGeometryFactory(), 2, lon, lat, lon - this.tileWidth,
+    return getGeometryFactory().newBoundingBox(lon, lat, lon - this.tileWidth,
       lat + this.tileHeight);
   }
 

@@ -25,7 +25,7 @@ public class SegmentDensifier {
 
     final LineString seq = this.inputLine;
 
-    this.newCoords.add(seq.getPoint(0).newPointDouble());
+    this.newCoords.add(seq.getPoint(0).newPoint2D());
 
     for (int i = 0; i < seq.getVertexCount() - 1; i++) {
       final Point p0 = seq.getPoint(i);
@@ -47,9 +47,9 @@ public class SegmentDensifier {
     for (int i = 0; i <= nPtsToAdd; i++) {
       final double addedPtFrac = i * segLenFrac;
       final Point pt = new PointDouble(p0.getX() + addedPtFrac * delx,
-        p0.getY() + addedPtFrac * dely, Geometry.NULL_ORDINATE);
+        p0.getY() + addedPtFrac * dely);
       this.newCoords.add(pt, false);
     }
-    this.newCoords.add(new PointDouble(p1), false);
+    this.newCoords.add(p1, false);
   }
 }

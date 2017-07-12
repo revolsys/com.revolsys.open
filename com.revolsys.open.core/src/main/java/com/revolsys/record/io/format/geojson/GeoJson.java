@@ -9,17 +9,15 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.geometry.io.GeometryReader;
-import com.revolsys.geometry.io.GeometryReaderFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.cogojson.CogoJson;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class GeoJson extends AbstractIoFactoryWithCoordinateSystem
-  implements RecordWriterFactory, GeometryReaderFactory {
+public class GeoJson extends GeometryRecordReaderFactory implements RecordWriterFactory {
 
   public static final String COORDINATES = "coordinates";
 
@@ -75,8 +73,13 @@ public class GeoJson extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
   public GeometryReader newGeometryReader(final Resource resource) {
-    final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(resource);
+    final GeoJsonGeometryReader iterator = new GeoJsonGeometryReader(resource);
     return iterator;
   }
 
@@ -85,6 +88,6 @@ public class GeoJson extends AbstractIoFactoryWithCoordinateSystem
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.newUtf8Writer(outputStream);
-    return new GeoJsonRecordWriter(writer);
+    return new GeoJsonRecordWriter(writer, recordDefinition);
   }
 }

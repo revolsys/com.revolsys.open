@@ -49,7 +49,9 @@ import com.revolsys.geometry.model.Point;
  *
  * @version 1.7
  */
-public class Node extends GraphComponent {
+public class Node extends GraphComponent implements Point {
+  private static final long serialVersionUID = 1L;
+
   /**
    * Returns all Edges that connect the two nodes (which are assumed to be different).
    */
@@ -62,10 +64,21 @@ public class Node extends GraphComponent {
   }
 
   /** The collection of DirectedEdges that leave this Node */
-  protected DirectedEdgeStar deStar;
+  protected final DirectedEdgeStar deStar;
 
   /** The location of this Node */
-  protected Point pt;
+  private double x;
+
+  private final double y;
+
+  /**
+   * Constructs a Node with the given location.
+   */
+  public Node(final double x, final double y) {
+    this.x = x;
+    this.y = y;
+    this.deStar = new DirectedEdgeStar();
+  }
 
   /**
    * Constructs a Node with the given location.
@@ -78,7 +91,8 @@ public class Node extends GraphComponent {
    * Constructs a Node with the given location and collection of outgoing DirectedEdges.
    */
   public Node(final Point pt, final DirectedEdgeStar deStar) {
-    this.pt = pt;
+    this.x = pt.getX();
+    this.y = pt.getY();
     this.deStar = deStar;
   }
 
@@ -89,11 +103,34 @@ public class Node extends GraphComponent {
     this.deStar.add(de);
   }
 
-  /**
-   * Returns the location of this Node.
-   */
-  public Point getCoordinate() {
-    return this.pt;
+  @Override
+  public Point clone() {
+    return this;
+  }
+
+  @Override
+  public void copyCoordinates(final double[] coordinates) {
+    coordinates[X] = this.x;
+    coordinates[Y] = this.y;
+    for (int i = 3; i < coordinates.length; i++) {
+      coordinates[i] = Double.NaN;
+    }
+  }
+
+  @Override
+  public int getAxisCount() {
+    return 2;
+  }
+
+  @Override
+  public double getCoordinate(final int axisIndex) {
+    if (axisIndex == X) {
+      return this.x;
+    } else if (axisIndex == Y) {
+      return this.y;
+    } else {
+      return Double.NaN;
+    }
   }
 
   /**
@@ -118,6 +155,21 @@ public class Node extends GraphComponent {
     return this.deStar;
   }
 
+  @Override
+  public double getX() {
+    return this.x;
+  }
+
+  @Override
+  public double getY() {
+    return this.y;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
+  }
+
   /**
    * Tests whether this node has been removed from its containing graph
    *
@@ -125,14 +177,14 @@ public class Node extends GraphComponent {
    */
   @Override
   public boolean isRemoved() {
-    return this.pt == null;
+    return Double.isNaN(this.x);
   }
 
   /**
    * Removes this node from its containing graph.
    */
   void remove() {
-    this.pt = null;
+    this.x = Double.NaN;
   }
 
   /**

@@ -12,12 +12,12 @@ public class OsnConverterRegistry {
   private GeometryFactory geometryFactory;
 
   public OsnConverterRegistry() {
-    final GeometryFactory geometryFactory = GeometryFactory.fixedNoSrid(1.0, 1.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixedNoSrid(1.0, 1.0, 1.0);
     init(geometryFactory);
   }
 
   public OsnConverterRegistry(final int srid) {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, 1.0, 1.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, 1.0, 1.0, 1.0);
 
     init(geometryFactory);
   }

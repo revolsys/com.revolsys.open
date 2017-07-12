@@ -3,6 +3,7 @@ package com.revolsys.record.io;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
@@ -13,7 +14,6 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function2;
 
 public class RecordStoreConnection
   extends AbstractConnection<RecordStoreConnection, RecordStoreConnectionRegistry>
@@ -64,12 +64,12 @@ public class RecordStoreConnection
     synchronized (this) {
       if (this.recordStore == null || this.recordStore.isClosed()) {
         this.recordStore = null;
-        final Function2<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
+        final BiFunction<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
           .getInvalidRecordStoreFunction();
         Throwable savedException = null;
         do {
           try {
-            this.recordStore = MapObjectFactory.toObject(toMapInternal());
+            this.recordStore = newRecordStore();
             this.recordStore.setRecordStoreConnection(this);
             return this.recordStore;
           } catch (final Throwable e) {

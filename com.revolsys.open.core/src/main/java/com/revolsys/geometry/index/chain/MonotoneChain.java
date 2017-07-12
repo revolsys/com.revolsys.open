@@ -35,7 +35,7 @@ package com.revolsys.geometry.index.chain;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.util.BoundingBoxUtil;
@@ -66,7 +66,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  *
  * MonotoneChains support the following kinds of queries:
  * <ul>
- * <li>BoundingBoxDoubleGf select: determine all the segments in the chain which
+ * <li>BoundingBox select: determine all the segments in the chain which
  * intersect a given envelope
  * <li>Overlap: determine all the pairs of segments in two chains whose
  * envelopes overlap
@@ -86,13 +86,15 @@ public class MonotoneChain {
 
   private Object context = null;// user-defined information
 
-  private BoundingBoxDoubleGf env = null;
+  private BoundingBox env = null;
 
   private int id;// useful for optimizing chain comparisons
 
   private final LineString points;
 
-  private final int start, end;
+  private final int start;
+
+  private final int end;
 
   public MonotoneChain(final LineString pts, final int start, final int end, final Object context) {
     this.points = pts;
@@ -103,17 +105,22 @@ public class MonotoneChain {
 
   private void computeOverlaps(final int start0, final int end0, final MonotoneChain mc,
     final int start1, final int end1, final MonotoneChainOverlapAction mco) {
-    final Point p00 = this.points.getPoint(start0);
-    final Point p01 = this.points.getPoint(end0);
-    final Point p10 = mc.points.getPoint(start1);
-    final Point p11 = mc.points.getPoint(end1);
+    final double x1 = this.points.getX(start0);
+    final double y1 = this.points.getY(start0);
+    final double x2 = this.points.getX(end0);
+    final double y2 = this.points.getY(end0);
+    final double x3 = mc.points.getX(start1);
+    final double y3 = mc.points.getY(start1);
+    final double x4 = mc.points.getX(end1);
+    final double y4 = mc.points.getY(end1);
+
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {
       mco.overlap(this, start0, mc, start1);
       return;
     }
     // nothing to do if the envelopes of these chains don't overlap
-    if (BoundingBoxUtil.intersects(p00, p01, p10, p11)) {
+    if (BoundingBoxUtil.intersectsMinMax(x1, y1, x2, y2, x3, y3, x4, y4)) {
 
       // the chains overlap, so split each in half and iterate (binary search)
       final int mid0 = (start0 + end0) / 2;
@@ -160,32 +167,26 @@ public class MonotoneChain {
 
   private void computeSelect(final BoundingBox searchEnv, final int start0, final int end0,
     final MonotoneChainSelectAction mcs) {
-    final Point p0 = this.points.getPoint(start0);
-    final Point p1 = this.points.getPoint(end0);
-    mcs.tempEnv1 = new BoundingBoxDoubleGf(p0, p1);
+    final double x1 = this.points.getX(start0);
+    final double y1 = this.points.getY(start0);
+    final double x2 = this.points.getX(end0);
+    final double y2 = this.points.getY(end0);
 
-    // Debug.println("trying:" + p0 + p1 + " [ " + start0 + ", " + end0 + " ]");
     // terminating condition for the recursion
     if (end0 - start0 == 1) {
-      // Debug.println("computeSelect:" + p0 + p1);
       mcs.select(this, start0);
-      return;
-    }
-    // nothing to do if the envelopes don't overlap
-    if (!searchEnv.intersects(mcs.tempEnv1)) {
-      return;
-    }
+    } else if (searchEnv.intersects(x1, y1, x2, y2)) {
+      // the chains overlap, so split each in half and iterate (binary search)
+      final int mid = (start0 + end0) / 2;
 
-    // the chains overlap, so split each in half and iterate (binary search)
-    final int mid = (start0 + end0) / 2;
-
-    // Assert: mid != start or end (since we checked above for end - start <= 1)
-    // check terminating conditions before recursing
-    if (start0 < mid) {
-      computeSelect(searchEnv, start0, mid, mcs);
-    }
-    if (mid < end0) {
-      computeSelect(searchEnv, mid, end0, mcs);
+      // Assert: mid != start or end (since we checked above for end - start <= 1)
+      // check terminating conditions before recursing
+      if (start0 < mid) {
+        computeSelect(searchEnv, start0, mid, mcs);
+      }
+      if (mid < end0) {
+        computeSelect(searchEnv, mid, end0, mcs);
+      }
     }
   }
 
@@ -210,11 +211,13 @@ public class MonotoneChain {
     return this.end;
   }
 
-  public BoundingBoxDoubleGf getEnvelope() {
+  public BoundingBox getEnvelope() {
     if (this.env == null) {
-      final Point p0 = this.points.getPoint(this.start);
-      final Point p1 = this.points.getPoint(this.end);
-      this.env = new BoundingBoxDoubleGf(p0, p1);
+      final double x1 = this.points.getX(this.start);
+      final double y1 = this.points.getY(this.start);
+      final double x2 = this.points.getX(this.end);
+      final double y2 = this.points.getY(this.end);
+      this.env = new BoundingBoxDoubleXY(x1, y1, x2, y2);
     }
     return this.env;
   }

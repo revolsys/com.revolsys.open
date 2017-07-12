@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.gis.esri.gdb.file.test.FgdbReader;
-import com.revolsys.io.EndianInput;
+import com.revolsys.io.endian.EndianInput;
 
 public class BinaryField extends FgdbField {
   public BinaryField(final String name, final int length, final boolean required) {

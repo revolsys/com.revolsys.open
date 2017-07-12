@@ -74,7 +74,7 @@ public class ConnectedInteriorTester {
   public static Point findDifferentPoint(final LineString line, final Point point) {
     for (final Vertex vertex : line.vertices()) {
       if (!vertex.equals(point)) {
-        return vertex.newPointDouble();
+        return vertex.newPoint2D();
       }
     }
     return null;
@@ -85,7 +85,7 @@ public class ConnectedInteriorTester {
   // interior
   private Point disconnectedRingcoord;
 
-  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private final GeometryGraph geomGraph;
 
@@ -198,7 +198,7 @@ public class ConnectedInteriorTester {
   }
 
   private void visitInteriorRing(final LineString ring, final PlanarGraph graph) {
-    final Point pt0 = ring.getVertex(0).newPointDouble();
+    final Point pt0 = ring.getVertex(0).newPoint2D();
     /**
      * Find first point in coord list different to initial point.
      * Need special check since the first point may be repeated.

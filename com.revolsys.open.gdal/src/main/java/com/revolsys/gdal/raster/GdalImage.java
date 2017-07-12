@@ -48,7 +48,7 @@ public class GdalImage extends AbstractGeoreferencedImage {
         if (srid > 0 && srid < 2000000) {
           setGeometryFactory(GeometryFactory.floating(srid, 2));
         } else {
-          setGeometryFactory(GeometryFactory.fixed(epsgCoordinateSystem, 2, -1));
+          setGeometryFactory(GeometryFactory.floating(epsgCoordinateSystem, 2));
         }
       }
     }

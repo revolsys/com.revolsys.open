@@ -30,13 +30,15 @@ public class UnitConverstionOperation implements CoordinatesOperation {
   public void perform(final int sourceAxisCount, final double[] sourceCoordinates,
     final int targetAxisCount, final double[] targetCoordinates) {
     final int numPoints = sourceCoordinates.length / sourceAxisCount;
+    final int axisCount = this.axisCount;
+    final UnitConverter converter = this.converter;
     for (int vertexIndex = 0; vertexIndex < numPoints; vertexIndex++) {
       for (int axisIndex = 0; axisIndex < targetAxisCount; axisIndex++) {
         double value;
         if (axisIndex < sourceAxisCount) {
           value = sourceCoordinates[vertexIndex * sourceAxisCount + axisIndex];
-          if (axisIndex < this.axisCount) {
-            value = this.converter.convert(value);
+          if (axisIndex < axisCount) {
+            value = converter.convert(value);
           }
         } else {
           value = Double.NaN;

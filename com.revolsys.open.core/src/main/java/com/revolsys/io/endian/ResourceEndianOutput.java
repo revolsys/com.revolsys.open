@@ -9,8 +9,7 @@ import java.io.OutputStream;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class ResourceEndianOutput implements EndianOutput {
   private final File file;
@@ -26,7 +25,7 @@ public class ResourceEndianOutput implements EndianOutput {
     if (!(resource instanceof FileSystemResource)) {
       this.resourceOut = resource.newBufferedOutputStream();
     }
-    this.file = SpringUtil.getFileOrCreateTempFile(resource);
+    this.file = Resource.getFileOrCreateTempFile(resource);
     final OutputStream out = new FileOutputStream(this.file);
     final BufferedOutputStream bufferedOut = new BufferedOutputStream(out);
     this.out = new EndianOutputStream(bufferedOut);
@@ -37,14 +36,14 @@ public class ResourceEndianOutput implements EndianOutput {
     try {
       this.out.close();
     } catch (final Throwable e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     } finally {
       if (!(this.resource instanceof FileSystemResource)) {
         try {
           FileUtil.copy(this.file, this.resourceOut);
           this.resourceOut.flush();
         } catch (final Throwable e) {
-          throw new WrappedException(e);
+          throw Exceptions.wrap(e);
         } finally {
           FileUtil.closeSilent(this.resourceOut);
           if (!(this.resource instanceof FileSystemResource)) {
@@ -143,6 +142,11 @@ public class ResourceEndianOutput implements EndianOutput {
   @Override
   public void writeLEShort(final short s) {
     this.out.writeLEShort(s);
+  }
+
+  @Override
+  public void writeLEUnsignedShort(final int s) {
+    this.out.writeLEUnsignedShort(s);
   }
 
   @Override

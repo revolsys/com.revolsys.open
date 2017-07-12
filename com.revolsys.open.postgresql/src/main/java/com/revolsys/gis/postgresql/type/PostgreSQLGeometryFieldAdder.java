@@ -72,7 +72,7 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
         geometryFactory = GeometryFactory.floating(srid, axisCount);
       } else {
         geometryFactory = GeometryFactory.fixed(srid, axisCount, storeGeometryFactory.getScaleXY(),
-          storeGeometryFactory.getScaleZ());
+          storeGeometryFactory.getScaleXY(), storeGeometryFactory.getScaleZ());
       }
       final FieldDefinition field = new PostgreSQLGeometryJdbcFieldDefinition(dbName, name,
         dataType, sqlType, required, description, null, srid, axisCount, geometryFactory);

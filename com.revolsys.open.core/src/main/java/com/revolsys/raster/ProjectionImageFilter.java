@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -69,8 +68,8 @@ public class ProjectionImageFilter extends WholeImageFilter {
     final GeometryFactory sourceGeometryFactory = this.sourceBoundingBox.getGeometryFactory();
     final GeometryFactory destGeometryFactory = this.destBoundingBox.getGeometryFactory();
 
-    final CoordinatesOperation operation = ProjectionFactory
-      .getCoordinatesOperation(destGeometryFactory, sourceGeometryFactory);
+    final CoordinatesOperation operation = destGeometryFactory
+      .getCoordinatesOperation(sourceGeometryFactory);
     if (operation == null) {
       return inPixels;
     }

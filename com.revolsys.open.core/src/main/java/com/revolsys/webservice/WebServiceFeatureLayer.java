@@ -16,7 +16,7 @@ import com.revolsys.spring.resource.UrlResource;
 
 public interface WebServiceFeatureLayer extends RecordDefinitionProxy, WebServiceResource {
   default BoundingBox getBoundingBox() {
-    return BoundingBox.EMPTY;
+    return BoundingBox.empty();
   }
 
   @Override

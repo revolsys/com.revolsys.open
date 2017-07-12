@@ -255,7 +255,7 @@ public class DistanceWithLocation {
     if (this.minDistance == Double.MAX_VALUE
       || line.getBoundingBox().distance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
-        final double distance = segment.distance(point);
+        final double distance = segment.distancePoint(point);
         if (distance < this.minDistance) {
           this.minDistance = distance;
           final Point closestPoint = segment.closestPoint(point);
@@ -297,7 +297,7 @@ public class DistanceWithLocation {
     final BoundingBox boundingBox = line.getBoundingBox();
     if (this.minDistance == Double.MAX_VALUE || boundingBox.distance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
-        final double distance = segment.distance(point);
+        final double distance = segment.distancePoint(point);
         if (distance < this.minDistance) {
           this.minDistance = distance;
           final Point closestPoint = segment.closestPoint(point);

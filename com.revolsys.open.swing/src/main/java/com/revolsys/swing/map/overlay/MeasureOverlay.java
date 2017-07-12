@@ -31,7 +31,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -181,7 +180,7 @@ public class MeasureOverlay extends AbstractOverlay {
     } else {
       previousPointOffset = -1;
     }
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory2d();
     if (geometry instanceof Point) {
     } else {
       final Point point = getPoint(geometryFactory, event);
@@ -255,7 +254,7 @@ public class MeasureOverlay extends AbstractOverlay {
         }
         if (clickCount == 1) {
           final Geometry measureGeometry = getMeasureGeometry();
-          final GeometryFactory geometryFactory = getGeometryFactory();
+          final GeometryFactory geometryFactory = getGeometryFactory2d();
           if (measureGeometry.isEmpty()) {
             setMeasureGeometry(point);
           } else if (measureGeometry instanceof Point) {
@@ -310,7 +309,6 @@ public class MeasureOverlay extends AbstractOverlay {
         modeMeasureUpdateXorGeometry();
       } else {
         getMap().clearToolTipText();
-        final BoundingBox boundingBox = getHotspotBoundingBox(event);
 
         Geometry xorGeometry = null;
         for (final CloseLocation location : getMouseOverLocations()) {
@@ -324,7 +322,7 @@ public class MeasureOverlay extends AbstractOverlay {
           }
         }
         setXorGeometry(xorGeometry);
-        if (!hasSnapPoint(event, boundingBox)) {
+        if (!hasSnapPoint()) {
           setMapCursor(CURSOR_NODE_ADD);
         }
         return true;
@@ -339,7 +337,7 @@ public class MeasureOverlay extends AbstractOverlay {
         if (event.getButton() == MouseEvent.BUTTON1) {
           for (final CloseLocation location : getMouseOverLocations()) {
             final Geometry geometry = location.getGeometry();
-            final GeometryFactory geometryFactory = getGeometryFactory();
+            final GeometryFactory geometryFactory = getGeometryFactory2d();
             final Point point;
             if (getSnapPoint() == null) {
               point = getPoint(geometryFactory, event);
@@ -369,9 +367,8 @@ public class MeasureOverlay extends AbstractOverlay {
 
   protected boolean modeMeasureMove(final MouseEvent event) {
     if (isOverlayAction(MEASURE)) {
-      final BoundingBox boundingBox = getHotspotBoundingBox();
-      final CloseLocation location = getMap().findCloseLocation(null, null, this.measureGeometry,
-        boundingBox);
+      final MapPanel map = getMap();
+      final CloseLocation location = map.findCloseLocation(null, null, this.measureGeometry);
       final List<CloseLocation> locations = new ArrayList<>();
       if (location != null) {
         locations.add(location);
@@ -401,9 +398,8 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   protected void modeMeasureUpdateXorGeometry() {
-    final BoundingBox boundingBox = getHotspotBoundingBox();
     final Point point = getOverlayPoint();
-    if (!hasSnapPoint(boundingBox)) {
+    if (!hasSnapPoint()) {
       setMapCursor(CURSOR);
     }
     Geometry xorGeometry = null;
@@ -429,7 +425,7 @@ public class MeasureOverlay extends AbstractOverlay {
           } else {
             final Point p1 = geometryFactory.point(toPoint);
             final Point p3 = geometryFactory.point(fromPoint);
-            final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+            final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();
             xorGeometry = viewportGeometryFactory.lineString(p1, point, p3);
           }
         }
@@ -482,12 +478,10 @@ public class MeasureOverlay extends AbstractOverlay {
   @Override
   protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
     if (!this.measureGeometry.isEmpty()) {
-      final GeometryFactory viewportGeometryFactory = viewport
-        .getRoundedGeometryFactory(getViewportGeometryFactory());
+      final GeometryFactory geometryFactory = getGeometryFactory2d();
       try (
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
-        MEASURE_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
-          this.measureGeometry);
+        MEASURE_RENDERER.paintSelected(viewport, graphics, geometryFactory, this.measureGeometry);
         if (this.measureGeometry instanceof Polygon) {
           final Polygon polygon = (Polygon)this.measureGeometry;
           GeometryStyleRenderer.renderPolygon(viewport, graphics, polygon, POLYGON_STYLE);
@@ -506,13 +500,13 @@ public class MeasureOverlay extends AbstractOverlay {
           measureTextStyle.setTextDx(Measure.valueOf(-5, NonSI.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n-1)");
           measureTextStyle.setTextVerticalAlignment("middle");
-          textPoint = this.measureGeometry.getVertex(0, -2);
+          textPoint = this.measureGeometry.getToVertex(0, 1);
         } else {
           measureTextStyle.setTextDx(Measure.valueOf(-7, NonSI.PIXEL));
           measureTextStyle.setTextDy(Measure.valueOf(-2, NonSI.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n)");
           measureTextStyle.setTextVerticalAlignment("top");
-          textPoint = this.measureGeometry.getVertex(-1);
+          textPoint = this.measureGeometry.getToVertex(0);
         }
         TextStyleRenderer.renderText(viewport, graphics, this.measureLabel, textPoint,
           measureTextStyle);

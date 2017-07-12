@@ -6,11 +6,14 @@ import com.revolsys.properties.ObjectWithProperties;
 
 public interface Writer<T> extends ObjectWithProperties, Closeable {
   @Override
-  void close();
+  default void close() {
+  }
 
-  void flush();
+  default void flush() {
+  }
 
-  void open();
+  default void open() {
+  }
 
   void write(T object);
 }

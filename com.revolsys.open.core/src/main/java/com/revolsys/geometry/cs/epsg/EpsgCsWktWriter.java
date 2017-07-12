@@ -1,7 +1,6 @@
 package com.revolsys.geometry.cs.epsg;
 
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Map.Entry;
 
 import com.revolsys.geometry.cs.AngularUnit;
@@ -17,13 +16,6 @@ import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.util.number.Numbers;
 
 public class EpsgCsWktWriter {
-
-  public static String toWkt(final CoordinateSystem coordinateSystem) {
-    final StringWriter stringWriter = new StringWriter();
-    final PrintWriter out = new PrintWriter(stringWriter);
-    write(out, coordinateSystem);
-    return stringWriter.toString();
-  }
 
   public static void write(final PrintWriter out, final AngularUnit unit) {
     if (unit != null) {

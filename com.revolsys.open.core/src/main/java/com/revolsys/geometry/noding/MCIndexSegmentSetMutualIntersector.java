@@ -89,7 +89,7 @@ public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualInter
     final List segChains = MonotoneChainBuilder.getChains(segStr.getPoints(), segStr);
     for (final Iterator i = segChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
-      this.index.insert(mc.getEnvelope(), mc);
+      this.index.insertItem(mc.getEnvelope(), mc);
     }
   }
 

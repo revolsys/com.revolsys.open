@@ -35,14 +35,14 @@ package com.revolsys.geometry.noding;
 import java.io.PrintStream;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Represents an intersection point between two {@link SegmentString}s.
  *
  * @version 1.7
  */
-public class SegmentNode extends PointDouble {
+public class SegmentNode extends PointDoubleXY {
   private static final long serialVersionUID = 1L;
 
   private final boolean isInterior;
@@ -53,7 +53,7 @@ public class SegmentNode extends PointDouble {
 
   public SegmentNode(final NodedSegmentString segString, final Point point, final int segmentIndex,
     final int segmentOctant) {
-    super(point, 2);
+    super(point.getX(), point.getY());
     this.segmentIndex = segmentIndex;
     this.segmentOctant = segmentOctant;
     this.isInterior = !point.equals(2, segString.getPoint(segmentIndex));

@@ -22,9 +22,14 @@ public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoord
   }
 
   @Override
+  protected void addFileExtensionInternal(final String fileExtension) {
+    super.addFileExtensionInternal(fileExtension);
+    this.urlPatterns.add(Pattern.compile("(.+)[\\?|&]format=" + fileExtension + "(&.+)?"));
+  }
+
+  @Override
   protected void addMediaTypeAndFileExtension(final String mediaType, final String fileExtension) {
     super.addMediaTypeAndFileExtension(mediaType, fileExtension);
-    this.urlPatterns.add(Pattern.compile("(.+)[\\?|&]format=" + fileExtension + "(&.+)?"));
   }
 
   @Override

@@ -32,7 +32,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.coordinates.PointWithOrientation;
+import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
@@ -92,7 +92,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     final String label, final Geometry geometry, final TextStyle style) {
     if (Property.hasValue(label) && geometry != null || viewport == null) {
       final String textPlacementType = style.getTextPlacementType();
-      final PointWithOrientation point = getPointWithOrientation(viewport, geometry,
+      final PointDoubleXYOrientation point = getPointWithOrientation(viewport, geometry,
         textPlacementType);
       if (point != null) {
         double orientation;

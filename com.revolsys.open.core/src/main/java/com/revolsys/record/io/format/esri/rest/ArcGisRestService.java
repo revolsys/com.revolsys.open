@@ -28,11 +28,11 @@ public class ArcGisRestService extends ArcGisResponse<CatalogElement>
 
   private String units;
 
-  private BoundingBox fullExtent = BoundingBox.EMPTY;
+  private BoundingBox fullExtent = BoundingBox.empty();
 
-  private BoundingBox initialExtent = BoundingBox.EMPTY;
+  private BoundingBox initialExtent = BoundingBox.empty();
 
-  private GeometryFactory spatialReference = GeometryFactory.DEFAULT;
+  private GeometryFactory spatialReference = GeometryFactory.DEFAULT_3D;
 
   public ArcGisRestService() {
   }

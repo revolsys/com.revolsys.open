@@ -33,30 +33,28 @@
 package com.revolsys.geometry.test.old.index;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
 
 /**
  * @version 1.7
  */
 public class EnvelopeList {
-  List envList = new ArrayList();
+  List<BoundingBox> boundingBoxes = new ArrayList<>();
 
   public EnvelopeList() {
   }
 
-  public void add(final BoundingBoxDoubleGf env) {
-    this.envList.add(env);
+  public void add(final BoundingBox env) {
+    this.boundingBoxes.add(env);
   }
 
-  public List query(final BoundingBoxDoubleGf searchEnv) {
-    final List result = new ArrayList();
-    for (final Iterator i = this.envList.iterator(); i.hasNext();) {
-      final BoundingBoxDoubleGf env = (BoundingBoxDoubleGf)i.next();
-      if (env.intersects(searchEnv)) {
-        result.add(env);
+  public List<BoundingBox> query(final BoundingBox searchEnv) {
+    final List<BoundingBox> result = new ArrayList<>();
+    for (final BoundingBox boundingBox : this.boundingBoxes) {
+      if (boundingBox.intersects(searchEnv)) {
+        result.add(boundingBox);
       }
     }
     return result;

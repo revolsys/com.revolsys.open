@@ -1,6 +1,5 @@
 package com.revolsys.geometry.test.old.perf.algorithm;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
@@ -37,15 +36,14 @@ public class AreaPrecisionPerfTest {
       for (int i = 0; i <= nrVertices; i++) {
         vertex = new PointDouble(
           originX + (1 + Math.sin((float)i / (float)nrVertices * 2 * Math.PI)),
-          originY + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)),
-          Geometry.NULL_ORDINATE);
+          originY + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)));
         coordinates[i] = vertex;
       }
       // close ring
       coordinates[nrVertices] = coordinates[0];
 
-      final LinearRing g1 = GeometryFactory.DEFAULT.linearRing(coordinates);
-      final Polygon polygon = GeometryFactory.DEFAULT.polygon(g1);
+      final LinearRing g1 = GeometryFactory.DEFAULT_3D.linearRing(coordinates);
+      final Polygon polygon = GeometryFactory.DEFAULT_3D.polygon(g1);
       // System.out.println(polygon);
 
       final double area = originalSignedArea(coordinates);

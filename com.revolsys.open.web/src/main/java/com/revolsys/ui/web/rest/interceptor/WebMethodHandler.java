@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -62,7 +63,6 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
-import com.revolsys.util.function.Function2;
 import com.revolsys.util.function.Function3;
 
 public class WebMethodHandler {
@@ -276,7 +276,7 @@ public class WebMethodHandler {
     final boolean required = cookieValue.required();
     final Object defaultValue = parseDefaultValueAttribute(dataType, cookieValue.defaultValue());
 
-    Function2<HttpServletRequest, HttpServletResponse, Object> function;
+    BiFunction<HttpServletRequest, HttpServletResponse, Object> function;
     if (Cookie.class.equals(parameterClass)) {
       function = (request, response) -> {
         final Cookie cookie = WebUtils.getCookie(request, name);
@@ -394,7 +394,7 @@ public class WebMethodHandler {
     final Class<?> parameterClass = parameter.getType();
     final DataType dataType = DataTypes.getDataType(parameterClass);
 
-    Function2<HttpServletRequest, HttpServletResponse, Object> function;
+    BiFunction<HttpServletRequest, HttpServletResponse, Object> function;
     Object defaultValue = null;
 
     if (List.class.equals(parameterClass)) {

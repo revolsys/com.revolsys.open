@@ -1,63 +1,48 @@
 package com.revolsys.geometry.index.quadtree;
 
-import java.lang.ref.Reference;
-
-import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
 
   public static final String GEOMETRY_VERTEX_INDEX = "_GeometryVertexQuadTree";
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
-  public static GeometryVertexQuadTree getGeometryVertexIndex(final Geometry geometry) {
-    if (geometry != null && !geometry.isEmpty()) {
-      final Reference<GeometryVertexQuadTree> reference = GeometryProperties
-        .getGeometryProperty(geometry, GEOMETRY_VERTEX_INDEX);
-      GeometryVertexQuadTree index;
-      if (reference == null) {
-        index = null;
-      } else {
-        index = reference.get();
-      }
+  private static final WeakKeyValueMap<Geometry, GeometryVertexQuadTree> CACHE = new WeakKeyValueMap<>();
+
+  public static GeometryVertexQuadTree get(final Geometry geometry) {
+    if (Property.hasValue(geometry)) {
+      GeometryVertexQuadTree index = CACHE.get(geometry);
       if (index == null) {
-        index = new GeometryVertexQuadTree(geometry);
-        // GeometryProperties.setGeometryProperty(geometry,
-        // GEOMETRY_VERTEX_INDEX,
-        // new SoftReference<GeometryVertexQuadTree>(index));
+        try {
+          index = new GeometryVertexQuadTree(geometry);
+          CACHE.put(geometry, index);
+        } catch (final Error e) {
+          System.out.println(geometry);
+          throw e;
+        }
       }
       return index;
+    } else {
+      return null;
     }
-    return new GeometryVertexQuadTree(null);
   }
 
   private final Geometry geometry;
 
   public GeometryVertexQuadTree(final Geometry geometry) {
+    super(geometry.getGeometryFactory());
     this.geometry = geometry;
     if (geometry != null) {
       setGeometryFactory(geometry.getGeometryFactory());
       for (final Vertex vertex : geometry.vertices()) {
-        final BoundingBox boundingBox = vertex.getBoundingBox();
-        insert(boundingBox, vertex);
+        insertItem(vertex.getBoundingBox(), vertex);
       }
-    }
-  }
-
-  @Override
-  protected double[] getBounds(final Object id) {
-    final Vertex vertex = getItem(id);
-    if (vertex == null) {
-      return null;
-    } else {
-      final BoundingBox boundingBox = vertex.getBoundingBox();
-      return boundingBox.getBounds(2);
     }
   }
 
@@ -70,5 +55,33 @@ public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
   protected Vertex getItem(final Object id) {
     final int[] vertexId = (int[])id;
     return this.geometry.getVertex(vertexId);
+  }
+
+  @Override
+  protected boolean intersectsBounds(final Object id, final double x, final double y) {
+    final Vertex vertex = getItem(id);
+    if (vertex == null) {
+      return false;
+    } else {
+      if (Doubles.equal(x, vertex.getX())) {
+        if (Doubles.equal(y, vertex.getY())) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
+  @Override
+  protected boolean intersectsBounds(final Object id, final double minX, final double minY,
+    final double maxX, final double maxY) {
+    final Vertex vertex = getItem(id);
+    if (vertex == null) {
+      return false;
+    } else {
+      final double x = vertex.getX();
+      final double y = vertex.getY();
+      return BoundingBoxUtil.intersects(minX, minY, maxX, maxY, x, y);
+    }
   }
 }

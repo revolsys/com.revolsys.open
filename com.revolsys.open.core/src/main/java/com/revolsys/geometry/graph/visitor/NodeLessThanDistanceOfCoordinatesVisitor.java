@@ -4,12 +4,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Consumer<Node<T>> {
@@ -18,10 +17,10 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Consumer<Nod
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
     final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point,
       maxDistance, results);
-    BoundingBox envelope = new BoundingBoxDoubleGf(point);
+    BoundingBox envelope = point.getBoundingBox();
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Node<T>> nodeIndex = graph.getNodeIndex();
-    nodeIndex.forEach(visitor, envelope);
+    nodeIndex.forEach(envelope, visitor);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);
     return nodes;

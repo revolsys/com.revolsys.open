@@ -37,6 +37,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
 
@@ -60,7 +61,7 @@ public class WKTReaderTest extends TestCase {
     return new TestSuite(WKTReaderTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 2, 1.0, 1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -90,11 +91,10 @@ public class WKTReaderTest extends TestCase {
   }
 
   public void testReadLargeNumbers() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1E9);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 2, 1E9, 1E9);
     final WKTReader reader = new WKTReader(geometryFactory);
     final Geometry point1 = reader.read("POINT(123456789.01234567890 10)");
-    final Point point2 = geometryFactory
-      .point(new PointDouble(123456789.01234567890, 10, Geometry.NULL_ORDINATE));
+    final Point point2 = geometryFactory.point(new PointDoubleXY(123456789.01234567890, 10));
     assertEquals(point1.getPoint().getX(), point2.getPoint().getX(), 1E-7);
     assertEquals(point1.getPoint().getY(), point2.getPoint().getY(), 1E-7);
   }
@@ -170,7 +170,7 @@ public class WKTReaderTest extends TestCase {
   }
 
   public void testReadZ() throws Exception {
-    assertEquals(new PointDouble((double)1, 2, 3), this.reader.read("POINT(1 2 3)").getPoint());
+    assertEquals(new PointDouble(1, 2, 3), this.reader.read("POINT(1 2 3)").getPoint());
   }
 
 }

@@ -14,6 +14,11 @@ public class LineStringVertex extends AbstractVertex {
     setVertexId(vertexId);
   }
 
+  public LineStringVertex(final LineString line, final int vertexIndex) {
+    super(line);
+    setVertexId(vertexIndex);
+  }
+
   @Override
   public double getCoordinate(final int axisIndex) {
     final LineString line = getGeometry();
@@ -23,7 +28,7 @@ public class LineStringVertex extends AbstractVertex {
   @Override
   public double getLineCoordinateRelative(final int vertexOffset, final int axisIndex) {
     if (isEmpty()) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       final int vertexIndex = getVertexIndex();
       final LineString line = getLineString();
@@ -62,6 +67,23 @@ public class LineStringVertex extends AbstractVertex {
     return new int[] {
       this.vertexIndex
     };
+  }
+
+  @Override
+  public int getVertexIndex() {
+    return this.vertexIndex;
+  }
+
+  @Override
+  public double getX() {
+    final LineString line = getGeometry();
+    return line.getCoordinate(this.vertexIndex, 0);
+  }
+
+  @Override
+  public double getY() {
+    final LineString line = getGeometry();
+    return line.getCoordinate(this.vertexIndex, 1);
   }
 
   @Override

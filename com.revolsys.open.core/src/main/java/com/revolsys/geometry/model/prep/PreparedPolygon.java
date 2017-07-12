@@ -48,7 +48,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
-import com.revolsys.geometry.operation.predicate.RectangleContains;
 import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 
 /**
@@ -84,9 +83,10 @@ public class PreparedPolygon extends AbstractPolygon {
   public boolean contains(final Geometry g) {
     if (envelopeCovers(g)) {
       if (this.isRectangle) {
-        return RectangleContains.contains(getPolygon(), g);
+        final BoundingBox boundingBox = this.polygon.getBoundingBox();
+        return boundingBox.containsSFS(g);
       } else {
-        final PreparedPolygonContains contains = new PreparedPolygonContains(this, getPolygon());
+        final PreparedPolygonContains contains = new PreparedPolygonContains(this, this.polygon);
         return contains.contains(g);
       }
     } else {
@@ -151,6 +151,11 @@ public class PreparedPolygon extends AbstractPolygon {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.polygon.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return this.polygon.getBoundingBox();
   }
@@ -198,7 +203,7 @@ public class PreparedPolygon extends AbstractPolygon {
   public List<Point> getRepresentativePoints() {
     final List<Point> points = new ArrayList<>();
     for (final Vertex vertex : vertices()) {
-      points.add(vertex.newPointDouble());
+      points.add(vertex.newPoint2D());
     }
     return points;
   }
@@ -278,6 +283,13 @@ public class PreparedPolygon extends AbstractPolygon {
     } else {
       return false;
     }
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public Polygon newPolygon(final LinearRing... rings) {
+    final Polygon polygon = super.newPolygon(rings);
+    return polygon.prepare();
   }
 
   @Override

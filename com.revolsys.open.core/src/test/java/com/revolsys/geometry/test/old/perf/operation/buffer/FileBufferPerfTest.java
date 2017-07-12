@@ -25,7 +25,7 @@ public class FileBufferPerfTest {
     }
   }
 
-  GeometryFactory factory = GeometryFactory.DEFAULT;
+  GeometryFactory factory = GeometryFactory.DEFAULT_3D;
 
   boolean testFailed = false;
 

@@ -26,14 +26,14 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>
       final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
       BoundingBox env = geometry.getBoundingBox();
       env = env.expand(maxDistance);
-      graph.getEdgeIndex().forEach(new EdgeWithinDistance<>(geometry, maxDistance, results), env);
+      graph.getEdgeIndex().forEach(env, new EdgeWithinDistance<>(geometry, maxDistance, results));
       return results.getList();
     }
   }
 
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Node<T> node,
     final double maxDistance) {
-    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
     final Point coordinate = node;
     final Geometry geometry = geometryFactory.point(coordinate);
     return edgesWithinDistance(graph, geometry, maxDistance);
@@ -42,7 +42,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>
 
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Point point,
     final double maxDistance) {
-    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
     final Geometry geometry = geometryFactory.point(point);
     return edgesWithinDistance(graph, geometry, maxDistance);
 

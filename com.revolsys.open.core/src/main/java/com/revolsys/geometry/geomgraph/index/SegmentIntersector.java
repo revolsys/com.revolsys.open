@@ -103,7 +103,7 @@ public class SegmentIntersector {
     final Point p10 = e1.getPoint(segIndex1);
     final Point p11 = e1.getPoint(segIndex1 + 1);
 
-    this.li.computeIntersection(p00, p01, p10, p11);
+    this.li.computeIntersectionPoints(p00, p01, p10, p11);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);
     /**
      *  Always record any non-proper intersections.
@@ -201,7 +201,7 @@ public class SegmentIntersector {
   private boolean isTrivialIntersection(final Edge e0, final int segIndex0, final Edge e1,
     final int segIndex1) {
     if (e0 == e1) {
-      if (this.li.getIntersectionNum() == 1) {
+      if (this.li.getIntersectionCount() == 1) {
         if (isAdjacentSegments(segIndex0, segIndex1)) {
           return true;
         }

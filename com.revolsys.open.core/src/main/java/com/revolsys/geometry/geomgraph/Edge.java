@@ -39,9 +39,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * @version 1.7
@@ -73,7 +72,7 @@ public class Edge extends GraphComponent implements LineString {
 
   private final EdgeIntersectionList eiList = new EdgeIntersectionList(this);
 
-  private BoundingBoxDoubleGf env;
+  private BoundingBox env;
 
   private boolean isIsolated = true;
 
@@ -105,10 +104,11 @@ public class Edge extends GraphComponent implements LineString {
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
     if (nextSegIndex < getVertexCount()) {
-      final Point nextPt = getPoint(nextSegIndex);
+      final double nextX = getX(nextSegIndex);
+      final double nextY = getY(nextSegIndex);
       // Normalize segment index if intPt falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (intPt.equals(2, nextPt)) {
+      if (intPt.equalsVertex(nextX, nextY)) {
         normalizedSegmentIndex = nextSegIndex;
         dist = 0.0;
       }
@@ -125,21 +125,21 @@ public class Edge extends GraphComponent implements LineString {
    */
   public void addIntersections(final LineIntersector li, final int segmentIndex,
     final int geomIndex) {
-    for (int i = 0; i < li.getIntersectionNum(); i++) {
+    for (int i = 0; i < li.getIntersectionCount(); i++) {
       addIntersection(li, segmentIndex, geomIndex, i);
     }
   }
-
-  // of this edge
 
   @Override
   public Edge clone() {
     try {
       return (Edge)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
+
+  // of this edge
 
   /**
    * Update the IM with the contribution for this component.
@@ -186,9 +186,14 @@ public class Edge extends GraphComponent implements LineString {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.line.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     if (this.env == null) {
-      this.env = new BoundingBoxDoubleGf(this.line);
+      this.env = this.line.getBoundingBox();
     }
     return this.env;
   }
@@ -259,6 +264,16 @@ public class Edge extends GraphComponent implements LineString {
   @Override
   public int getVertexCount() {
     return this.line.getVertexCount();
+  }
+
+  @Override
+  public double getX(final int i) {
+    return this.line.getX(i);
+  }
+
+  @Override
+  public double getY(final int i) {
+    return this.line.getY(i);
   }
 
   /**

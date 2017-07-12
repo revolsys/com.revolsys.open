@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
@@ -104,7 +104,7 @@ public class RectangleIntersectsPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double baseX = env.getMinX() + i * dx;
         final double baseY = env.getMinY() + j * dy;
-        final BoundingBox envRect = new BoundingBoxDoubleGf(2, baseX, baseY, baseX + dx,
+        final BoundingBox envRect = new BoundingBoxDoubleXY(baseX, baseY, baseX + dx,
           baseY + dy);
         final Geometry rect = envRect.toGeometry();
         rectList.add(rect);
@@ -155,11 +155,11 @@ public class RectangleIntersectsPerfTest {
 
   void test(final int nPts) {
     final double size = 100;
-    final Point origin = new PointDouble((double)0, 0, Geometry.NULL_ORDINATE);
+    final Point origin = new PointDouble((double)0, 0);
     final Geometry sinePoly = newSineStar(origin, size, nPts).getBoundary();
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
     geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(),
-      geometryFactory.getAxisCount(), size / 10, geometryFactory.getScaleZ());
+      geometryFactory.getAxisCount(), size / 10, size / 10, geometryFactory.getScaleZ());
     final Geometry newGeometry = sinePoly.convertGeometry(geometryFactory);
     /**
      * Make the geometry "crinkly" by rounding off the points.

@@ -37,7 +37,10 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.algorithm.index.LineSegmentIndex;
+import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.index.LineSegmentIndex;
+import com.revolsys.geometry.model.editor.LinealEditor;
+import com.revolsys.geometry.model.editor.MultiLineStringEditor;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -119,8 +122,7 @@ public interface Lineal extends Geometry {
                     final Vertex vertex = segment.getGeometryVertex(1);
                     error = new SelfIntersectionVertexError(vertex);
                   } else {
-                    error = new SelfIntersectionPointError(lineal,
-                      pointIntersection.newPointDouble());
+                    error = new SelfIntersectionPointError(lineal, pointIntersection);
                   }
                   errors.add(error);
                   if (shortCircuit) {
@@ -179,7 +181,7 @@ public interface Lineal extends Geometry {
         "Expecting a Lineal geometry not " + geometry.getGeometryType() + "\n" + geometry);
     } else {
       final String string = DataTypes.toString(value);
-      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      final Geometry geometry = GeometryFactory.DEFAULT_3D.geometry(string, false);
       return (G)newLineal(geometry);
     }
   }
@@ -192,11 +194,57 @@ public interface Lineal extends Geometry {
 
   Lineal applyLineal(final Function<LineString, LineString> function);
 
+  double getCoordinate(int partIndex, int vertexIndex, int axisIndex);
+
   LineString getLineString(int partIndex);
+
+  default double getM(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, M);
+  }
+
+  default double getX(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, X);
+  }
+
+  default double getY(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, Y);
+  }
+
+  default double getZ(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, Z);
+  }
 
   boolean isClosed();
 
   Iterable<LineString> lineStrings();
+
+  default Lineal mergeLines() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final LineMerger merger = new LineMerger(this);
+      return merger.getLineal();
+    }
+  }
+
+  @Override
+  Lineal newGeometry(final GeometryFactory geometryFactory);
+
+  @Override
+  default LinealEditor newGeometryEditor() {
+    return new MultiLineStringEditor(this);
+  }
+
+  @Override
+  default LinealEditor newGeometryEditor(final int axisCount) {
+    final LinealEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
+  default Lineal newLineal(final GeometryFactory geometryFactory, final LineString... lines) {
+    return geometryFactory.lineal(lines);
+  }
 
   @Override
   Lineal normalize();

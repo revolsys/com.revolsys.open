@@ -17,7 +17,6 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
-import com.revolsys.io.Writer;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
@@ -47,7 +46,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   private final Map<Resource, String> typePathByResource = new HashMap<>();
 
-  private final Map<String, Writer<Record>> writers = new HashMap<>();
+  private final Map<String, RecordWriter> writers = new HashMap<>();
 
   public DirectoryRecordStore(final File directory, final Collection<String> fileExtensions) {
     this.directory = directory;
@@ -66,7 +65,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   public void close() {
     this.directory = null;
     if (this.writers != null) {
-      for (final Writer<Record> writer : this.writers.values()) {
+      for (final RecordWriter writer : this.writers.values()) {
         if (writer != null) {
           writer.close();
         }
@@ -74,6 +73,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       this.writers.clear();
     }
     super.close();
+  }
+
+  public void closeWriters(final String typeName) {
+    final RecordWriter writer = this.writers.remove(typeName);
+    FileUtil.closeSilent(writer);
   }
 
   @Override
@@ -179,7 +183,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   public synchronized void insertRecord(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final String typePath = recordDefinition.getPath();
-    Writer<Record> writer = this.writers.get(typePath);
+    RecordWriter writer = this.writers.get(typePath);
     if (writer == null) {
       final String schemaName = PathUtil.getPath(typePath);
       final File subDirectory = FileUtil.getDirectory(getDirectory(), schemaName);
@@ -235,6 +239,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   @Override
   public RecordWriter newRecordWriter() {
     return new DirectoryRecordStoreWriter(this);
+  }
+
+  @Override
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
+    return new DirectoryRecordStoreWriter(this, recordDefinition);
   }
 
   @Override

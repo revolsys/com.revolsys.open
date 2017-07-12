@@ -49,7 +49,7 @@ public class CoordinateTest extends TestCase {
       new PointDouble(100.0, 200.0), //
       new PointDouble(100.0, 200.0, 50.0), //
       new PointDouble(100.0, 200.0, 50.0, 4.0))) {
-      final Point clone = point.newPointDouble();
+      final Point clone = point.newPoint2D();
       assertEquals3d(point, clone);
     }
   }
@@ -78,7 +78,7 @@ public class CoordinateTest extends TestCase {
 
   public void testCopyConstructor3D() {
     final Point orig = new PointDouble(350.2, 4566.8, 5266.3);
-    final Point c = new PointDouble(orig);
+    final Point c = orig;
     assertEquals(c, 350.2, 4566.8, 5266.3);
   }
 
@@ -120,7 +120,7 @@ public class CoordinateTest extends TestCase {
   public void testEquals2DWithinTolerance() {
     final Point c = new PointDouble(100.0, 200.0, 50.0);
     final Point aBitOff = new PointDouble(100.1, 200.1, 50.0);
-    assertTrue(c.equals2d(aBitOff, 0.2));
+    assertTrue(c.equalsVertex2d(aBitOff, 0.2));
   }
 
   public void testEquals3D() {

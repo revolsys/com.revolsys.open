@@ -33,7 +33,6 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.math.DD;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 
@@ -103,7 +102,7 @@ public class CGAlgorithmsDD {
       .selfAdd(DD.valueOf(q2.getY()).selfSubtract(q1.getY()).selfMultiply(fracQ))
       .doubleValue();
 
-    return new PointDouble(x, y, Geometry.NULL_ORDINATE);
+    return new PointDouble(x, y);
   }
 
   public static int orientationIndex(final double x1, final double y1, final double x2,

@@ -60,7 +60,7 @@ public class GeometryFunctions {
     }
     // TODO: ensure ring is valid
     final LinearRing ring = g.getGeometryFactory()
-      .linearRing(CoordinatesListUtil.getCoordinateArray(g));
+      .linearRing(CoordinatesListUtil.getPointArray(g));
     return g.getGeometryFactory().polygon(ring);
   }
 
@@ -69,7 +69,7 @@ public class GeometryFunctions {
   }
 
   public static Geometry getCoordinates(final Geometry g) {
-    final Point[] pts = CoordinatesListUtil.getCoordinateArray(g);
+    final Point[] pts = CoordinatesListUtil.getPointArray(g);
     return g.getGeometryFactory().punctual(pts);
   }
 

@@ -21,7 +21,7 @@ public class MultiLineStringVertex extends AbstractVertex {
   public double getCoordinate(final int axisIndex) {
     final LineString lineString = getLineString();
     if (lineString == null) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       return lineString.getCoordinate(this.vertexIndex, axisIndex);
     }
@@ -34,7 +34,7 @@ public class MultiLineStringVertex extends AbstractVertex {
   @Override
   public double getLineCoordinateRelative(final int vertexOffset, final int axisIndex) {
     if (isEmpty()) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       final int vertexIndex = getVertexIndex();
       final LineString line = getLineString();
@@ -87,6 +87,46 @@ public class MultiLineStringVertex extends AbstractVertex {
   @Override
   public int getVertexIndex() {
     return this.vertexIndex;
+  }
+
+  @Override
+  public double getX() {
+    final LineString lineString = getLineString();
+    if (lineString == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return lineString.getX(this.vertexIndex);
+    }
+  }
+
+  @Override
+  public double getX(final int axisIndex) {
+    final LineString lineString = getLineString();
+    if (lineString == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return lineString.getX(this.vertexIndex);
+    }
+  }
+
+  @Override
+  public double getY() {
+    final LineString lineString = getLineString();
+    if (lineString == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return lineString.getY(this.vertexIndex);
+    }
+  }
+
+  @Override
+  public double getY(final int axisIndex) {
+    final LineString lineString = getLineString();
+    if (lineString == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return lineString.getY(this.vertexIndex);
+    }
   }
 
   @Override

@@ -82,7 +82,6 @@ public class GeometryFunctionRegistry {
     funcRegistry.add(OverlayNoSnapFunctions.class);
     funcRegistry.add(SnappingFunctions.class);
     funcRegistry.add(SortingFunctions.class);
-    funcRegistry.add(TriangulationFunctions.class);
     funcRegistry.add(TriangleFunctions.class);
     funcRegistry.add(ValidationFunctions.class);
 

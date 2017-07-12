@@ -3,10 +3,10 @@ package com.revolsys.geometry.graph;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.index.AbstractIdObjectPointQuadTree;
+import com.revolsys.geometry.index.quadtree.AbstractIdObjectPointQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
@@ -19,20 +19,20 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   }
 
   @Override
-  public Point getCoordinates(final Node<T> node) {
-    return node;
-  }
-
-  @Override
-  public BoundingBox getEnvelope(final Node<T> node) {
+  public BoundingBox getBoundingBox(final Node<T> node) {
     if (node == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       final double x = node.getX();
       final double y = node.getY();
-      final BoundingBox envelope = new BoundingBoxDoubleGf(2, x, y, x, y);
+      final BoundingBox envelope = new BoundingBoxDoubleXY(x, y, x, y);
       return envelope;
     }
+  }
+
+  @Override
+  public Point getCoordinates(final Node<T> node) {
+    return node;
   }
 
   @Override
@@ -53,7 +53,7 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   @Override
   public List<Node<T>> query(final BoundingBox envelope) {
     final CreateListVisitor<Node<T>> visitor = new CreateListVisitor<>();
-    forEach(visitor, envelope);
+    forEach(envelope, visitor);
     return visitor.getList();
   }
 }

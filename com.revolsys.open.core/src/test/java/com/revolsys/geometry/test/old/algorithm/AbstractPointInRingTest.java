@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.test.old.algorithm;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -85,7 +84,7 @@ public abstract class AbstractPointInRingTest extends TestCase {
   }
 
   public void testComplexRing() throws Exception {
-    runPtInRing(Location.INTERIOR, new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
+    runPtInRing(Location.INTERIOR, new PointDouble(0.0, 0),
       "POLYGON ((-40 80, -40 -80, 20 0, 20 -100, 40 40, 80 -80, 100 80, 140 -20, 120 140, 40 180,     60 40, 0 120, -20 -20, -40 80))");
   }
 

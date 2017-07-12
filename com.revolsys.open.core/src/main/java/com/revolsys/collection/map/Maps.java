@@ -122,6 +122,11 @@ public interface Maps {
     return new MapBuilder<>(map);
   }
 
+  static <K, V> MapBuilder<K, V> buildHashEx() {
+    final Map<K, V> map = newHash();
+    return new MapBuilder<>(map);
+  }
+
   static <K, V> MapBuilder<K, V> buildLinkedHash() {
     final Map<K, V> map = newLinkedHash();
     return new MapBuilder<>(map);
@@ -384,7 +389,7 @@ public interface Maps {
     }
   }
 
-  static Double getDouble(final Map<String, ? extends Object> map, final String name) {
+  static <K> Double getDouble(final Map<K, ? extends Object> map, final K name) {
     final Object value = get(map, name);
     if (value == null) {
       return null;
@@ -405,7 +410,7 @@ public interface Maps {
     }
   }
 
-  static double getDouble(final Map<String, ? extends Object> object, final String name,
+  static <K> double getDouble(final Map<K, ? extends Object> object, final K name,
     final double defaultValue) {
     final Double value = getDouble(object, name);
     if (value == null) {
@@ -424,7 +429,15 @@ public interface Maps {
     }
   }
 
-  static Integer getInteger(final Map<String, ? extends Object> map, final String name) {
+  static <K> K getFirstKey(final Map<K, ?> map) {
+    return map.keySet().iterator().next();
+  }
+
+  static <V> V getFirstValue(final Map<?, V> map) {
+    return map.values().iterator().next();
+  }
+
+  static <K> Integer getInteger(final Map<K, ? extends Object> map, final K name) {
     final Object value = get(map, name);
     if (value == null) {
       return null;
@@ -445,7 +458,7 @@ public interface Maps {
     }
   }
 
-  static int getInteger(final Map<String, ? extends Object> object, final String name,
+  static <K> int getInteger(final Map<K, ? extends Object> object, final K name,
     final int defaultValue) {
     final Integer value = getInteger(object, name);
     if (value == null) {

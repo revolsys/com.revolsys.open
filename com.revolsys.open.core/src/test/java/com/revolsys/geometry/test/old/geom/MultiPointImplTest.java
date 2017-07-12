@@ -61,7 +61,7 @@ public class MultiPointImplTest extends TestCase {
     return new TestSuite(MultiPointImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 2, 1000.0, 1000.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 

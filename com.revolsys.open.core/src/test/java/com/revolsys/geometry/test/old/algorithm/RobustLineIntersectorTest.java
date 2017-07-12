@@ -33,15 +33,13 @@
 
 package com.revolsys.geometry.test.old.algorithm;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 import junit.framework.TestCase;
 
@@ -67,142 +65,125 @@ public class RobustLineIntersectorTest extends TestCase {
 
   public void test2Lines() {
     final RobustLineIntersector i = new RobustLineIntersector();
-    final Point p1 = new PointDouble((double)10, 10, Geometry.NULL_ORDINATE);
-    final Point p2 = new PointDouble((double)20, 20, Geometry.NULL_ORDINATE);
-    final Point q1 = new PointDouble((double)20, 10, Geometry.NULL_ORDINATE);
-    final Point q2 = new PointDouble((double)10, 20, Geometry.NULL_ORDINATE);
-    final Point x = new PointDouble((double)15, 15, Geometry.NULL_ORDINATE);
-    i.computeIntersection(p1, p2, q1, q2);
-    assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionNum());
-    assertEquals(1, i.getIntersectionNum());
+    final Point p1 = new PointDoubleXY(10, 10);
+    final Point p2 = new PointDoubleXY(20, 20);
+    final Point q1 = new PointDoubleXY(20, 10);
+    final Point q2 = new PointDoubleXY(10, 20);
+    final Point x = new PointDoubleXY(15, 15);
+    i.computeIntersectionPoints(p1, p2, q1, q2);
+    assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionCount());
+    assertEquals(1, i.getIntersectionCount());
     assertEquals(x, i.getIntersection(0));
     assertTrue(i.isProper());
     assertTrue(i.hasIntersection());
   }
 
   public void testA() {
-    final Point p1 = new PointDouble((double)-123456789, -40, Geometry.NULL_ORDINATE);
-    final Point p2 = new PointDouble(381039468754763d, 123456789, Geometry.NULL_ORDINATE);
-    final Point q = new PointDouble((double)0, 0, Geometry.NULL_ORDINATE);
-    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+    final Point p1 = new PointDoubleXY(-123456789, -40);
+    final Point p2 = new PointDoubleXY(381039468754763d, 123456789);
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
     final LineString l = geometryFactory.lineString(new Point[] {
       p1, p2
     });
-    final Point p = geometryFactory.point(q);
+    final Point p = geometryFactory.point(0.0, 0.0);
     assertEquals(false, l.intersects(p));
-    assertEquals(false, CGAlgorithms.isOnLine(q, geometryFactory.lineString(p1, p2)));
-    assertEquals(-1, CGAlgorithmsDD.orientationIndex(p1, p2, q));
+    assertEquals(false, geometryFactory.lineString(p1, p2).isOnLine(p));
+    assertEquals(-1, CGAlgorithmsDD.orientationIndex(p1, p2, p));
   }
 
   public void testCollinear1() {
     final RobustLineIntersector i = new RobustLineIntersector();
-    final Point p1 = new PointDouble((double)10, 10, Geometry.NULL_ORDINATE);
-    final Point p2 = new PointDouble((double)20, 10, Geometry.NULL_ORDINATE);
-    final Point q1 = new PointDouble((double)22, 10, Geometry.NULL_ORDINATE);
-    final Point q2 = new PointDouble((double)30, 10, Geometry.NULL_ORDINATE);
-    i.computeIntersection(p1, p2, q1, q2);
-    assertEquals(LineIntersector.NO_INTERSECTION, i.getIntersectionNum());
+    final Point p1 = new PointDoubleXY(10, 10);
+    final Point p2 = new PointDoubleXY(20, 10);
+    final Point q1 = new PointDoubleXY(22, 10);
+    final Point q2 = new PointDoubleXY(30, 10);
+    i.computeIntersectionPoints(p1, p2, q1, q2);
+    assertEquals(LineIntersector.NO_INTERSECTION, i.getIntersectionCount());
     assertTrue(!i.isProper());
     assertTrue(!i.hasIntersection());
   }
 
   public void testCollinear2() {
     final RobustLineIntersector i = new RobustLineIntersector();
-    final Point p1 = new PointDouble((double)10, 10, Geometry.NULL_ORDINATE);
-    final Point p2 = new PointDouble((double)20, 10, Geometry.NULL_ORDINATE);
-    final Point q1 = new PointDouble((double)20, 10, Geometry.NULL_ORDINATE);
-    final Point q2 = new PointDouble((double)30, 10, Geometry.NULL_ORDINATE);
-    i.computeIntersection(p1, p2, q1, q2);
-    assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionNum());
+    final Point p1 = new PointDoubleXY(10, 10);
+    final Point p2 = new PointDoubleXY(20, 10);
+    final Point q1 = new PointDoubleXY(20, 10);
+    final Point q2 = new PointDoubleXY(30, 10);
+    i.computeIntersectionPoints(p1, p2, q1, q2);
+    assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionCount());
     assertTrue(!i.isProper());
     assertTrue(i.hasIntersection());
   }
 
   public void testCollinear3() {
     final RobustLineIntersector i = new RobustLineIntersector();
-    final Point p1 = new PointDouble((double)10, 10, Geometry.NULL_ORDINATE);
-    final Point p2 = new PointDouble((double)20, 10, Geometry.NULL_ORDINATE);
-    final Point q1 = new PointDouble((double)15, 10, Geometry.NULL_ORDINATE);
-    final Point q2 = new PointDouble((double)30, 10, Geometry.NULL_ORDINATE);
-    i.computeIntersection(p1, p2, q1, q2);
-    assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionNum());
+    final Point p1 = new PointDoubleXY(10, 10);
+    final Point p2 = new PointDoubleXY(20, 10);
+    final Point q1 = new PointDoubleXY(15, 10);
+    final Point q2 = new PointDoubleXY(30, 10);
+    i.computeIntersectionPoints(p1, p2, q1, q2);
+    assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionCount());
     assertTrue(!i.isProper());
     assertTrue(i.hasIntersection());
   }
 
   public void testCollinear4() {
     final RobustLineIntersector i = new RobustLineIntersector();
-    final Point p1 = new PointDouble((double)30, 10, Geometry.NULL_ORDINATE);
-    final Point p2 = new PointDouble((double)20, 10, Geometry.NULL_ORDINATE);
-    final Point q1 = new PointDouble((double)10, 10, Geometry.NULL_ORDINATE);
-    final Point q2 = new PointDouble((double)30, 10, Geometry.NULL_ORDINATE);
-    i.computeIntersection(p1, p2, q1, q2);
-    assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionNum());
+    final Point p1 = new PointDoubleXY(30, 10);
+    final Point p2 = new PointDoubleXY(20, 10);
+    final Point q1 = new PointDoubleXY(10, 10);
+    final Point q2 = new PointDoubleXY(30, 10);
+    i.computeIntersectionPoints(p1, p2, q1, q2);
+    assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionCount());
     assertTrue(i.hasIntersection());
   }
 
   public void testEndpointIntersection() {
-    this.i.computeIntersection(new PointDouble((double)100, 100, Geometry.NULL_ORDINATE),
-      new PointDouble((double)10, 100, Geometry.NULL_ORDINATE),
-      new PointDouble((double)100, 10, Geometry.NULL_ORDINATE),
-      new PointDouble((double)100, 100, Geometry.NULL_ORDINATE));
+    this.i.computeIntersectionPoints(new PointDoubleXY(100, 100), new PointDoubleXY(10, 100),
+      new PointDoubleXY(100, 10), new PointDoubleXY(100, 100));
     assertTrue(this.i.hasIntersection());
-    assertEquals(1, this.i.getIntersectionNum());
+    assertEquals(1, this.i.getIntersectionCount());
   }
 
   public void testEndpointIntersection2() {
-    this.i.computeIntersection(new PointDouble((double)190, 50, Geometry.NULL_ORDINATE),
-      new PointDouble((double)120, 100, Geometry.NULL_ORDINATE),
-      new PointDouble((double)120, 100, Geometry.NULL_ORDINATE),
-      new PointDouble((double)50, 150, Geometry.NULL_ORDINATE));
+    this.i.computeIntersectionPoints(new PointDoubleXY(190, 50), new PointDoubleXY(120, 100),
+      new PointDoubleXY(120, 100), new PointDoubleXY(50, 150));
     assertTrue(this.i.hasIntersection());
-    assertEquals(1, this.i.getIntersectionNum());
-    assertEquals(new PointDouble((double)120, 100, Geometry.NULL_ORDINATE),
-      this.i.getIntersection(1));
+    assertEquals(1, this.i.getIntersectionCount());
+    assertEquals(new PointDoubleXY(120, 100), this.i.getIntersection(1));
   }
 
   public void testIsCCW() {
-    assertEquals(1,
-      CGAlgorithmsDD.orientationIndex(
-        new PointDouble((double)-123456789, -40, Geometry.NULL_ORDINATE),
-        new PointDouble((double)0, 0, Geometry.NULL_ORDINATE),
-        new PointDouble(381039468754763d, 123456789, Geometry.NULL_ORDINATE)));
+    assertEquals(1, CGAlgorithmsDD.orientationIndex(new PointDoubleXY(-123456789, -40),
+      new PointDoubleXY(0, 0), new PointDoubleXY(381039468754763d, 123456789)));
   }
 
   public void testIsCCW2() {
-    assertEquals(0,
-      CGAlgorithmsDD.orientationIndex(new PointDouble((double)10, 10, Geometry.NULL_ORDINATE),
-        new PointDouble((double)20, 20, Geometry.NULL_ORDINATE),
-        new PointDouble((double)0, 0, Geometry.NULL_ORDINATE)));
+    assertEquals(0, CGAlgorithmsDD.orientationIndex(new PointDoubleXY(10, 10),
+      new PointDoubleXY(20, 20), new PointDoubleXY(0, 0)));
   }
 
   public void testIsProper1() {
-    this.i.computeIntersection(new PointDouble((double)30, 10, Geometry.NULL_ORDINATE),
-      new PointDouble((double)30, 30, Geometry.NULL_ORDINATE),
-      new PointDouble((double)10, 10, Geometry.NULL_ORDINATE),
-      new PointDouble((double)90, 11, Geometry.NULL_ORDINATE));
+    this.i.computeIntersectionPoints(new PointDoubleXY(30, 10), new PointDoubleXY(30, 30),
+      new PointDoubleXY(10, 10), new PointDoubleXY(90, 11));
     assertTrue(this.i.hasIntersection());
-    assertEquals(1, this.i.getIntersectionNum());
+    assertEquals(1, this.i.getIntersectionCount());
     assertTrue(this.i.isProper());
   }
 
   public void testIsProper2() {
-    this.i.computeIntersection(new PointDouble((double)10, 30, Geometry.NULL_ORDINATE),
-      new PointDouble((double)10, 0, Geometry.NULL_ORDINATE),
-      new PointDouble((double)11, 90, Geometry.NULL_ORDINATE),
-      new PointDouble((double)10, 10, Geometry.NULL_ORDINATE));
+    this.i.computeIntersectionPoints(new PointDoubleXY(10, 30), new PointDoubleXY(10, 0),
+      new PointDoubleXY(11, 90), new PointDoubleXY(10, 10));
     assertTrue(this.i.hasIntersection());
-    assertEquals(1, this.i.getIntersectionNum());
+    assertEquals(1, this.i.getIntersectionCount());
     assertTrue(!this.i.isProper());
   }
 
   public void testOverlap() {
-    this.i.computeIntersection(new PointDouble((double)180, 200, Geometry.NULL_ORDINATE),
-      new PointDouble((double)160, 180, Geometry.NULL_ORDINATE),
-      new PointDouble((double)220, 240, Geometry.NULL_ORDINATE),
-      new PointDouble((double)140, 160, Geometry.NULL_ORDINATE));
+    this.i.computeIntersectionPoints(new PointDoubleXY(180, 200), new PointDoubleXY(160, 180),
+      new PointDoubleXY(220, 240), new PointDoubleXY(140, 160));
     assertTrue(this.i.hasIntersection());
-    assertEquals(2, this.i.getIntersectionNum());
+    assertEquals(2, this.i.getIntersectionCount());
   }
 
 }

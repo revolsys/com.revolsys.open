@@ -24,7 +24,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
@@ -245,7 +244,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     if (imageSelected != null) {
       GeoreferencedImageLayerRenderer.render(viewport, graphics, imageSelected, false);
     }
-    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();
     final MapPanel map = getMap();
     final List<LayerRecord> closeSelectedRecords = map.getCloseSelectedRecords();
     if (!closeSelectedRecords.isEmpty()) {
@@ -371,7 +370,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private void refreshImageSelectedAndHighlighted(final ImageViewport viewport,
     final Graphics2D graphics, final LayerGroup layerGroup) {
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();
     final List<Geometry> highlightedGeometries = new ArrayList<>();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
@@ -428,8 +427,8 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       if (clearOverlayAction(ACTION_SELECT_RECORDS)) {
         final MapPanel map = getMap();
         final GeometryFactory geometryFactory = map.getGeometryFactory();
-        BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, this.selectBoxX1,
-          this.selectBoxY1, this.selectBoxX2, this.selectBoxY2);
+        BoundingBox boundingBox = geometryFactory.newBoundingBox(this.selectBoxX1, this.selectBoxY1,
+          this.selectBoxX2, this.selectBoxY2);
         final Viewport2D viewport = getViewport();
         final double minSize = viewport.getModelUnitsPerViewUnit() * 10;
         final double width = boundingBox.getWidth();

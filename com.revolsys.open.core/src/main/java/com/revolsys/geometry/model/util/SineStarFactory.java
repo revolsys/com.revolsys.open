@@ -39,7 +39,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 
 /**
@@ -121,7 +120,7 @@ public class SineStarFactory extends GeometricShapeFactory {
       final double y = curveRadius * Math.sin(ang) + centreY;
       pts[iPt++] = coord(x, y);
     }
-    pts[iPt] = new PointDouble(pts[0]);
+    pts[iPt] = pts[0];
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);

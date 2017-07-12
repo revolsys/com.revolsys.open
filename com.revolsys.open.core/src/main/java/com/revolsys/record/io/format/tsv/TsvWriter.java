@@ -7,7 +7,7 @@ import java.util.Collection;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class TsvWriter implements BaseCloseable {
   /** The writer */
@@ -56,7 +56,7 @@ public class TsvWriter implements BaseCloseable {
       }
       this.out.write('\n');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 }

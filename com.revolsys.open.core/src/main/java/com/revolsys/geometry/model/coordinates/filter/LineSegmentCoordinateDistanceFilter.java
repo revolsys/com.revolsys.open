@@ -18,7 +18,7 @@ public class LineSegmentCoordinateDistanceFilter implements Predicate<Segment> {
 
   @Override
   public boolean test(final Segment lineSegment) {
-    final double distance = lineSegment.distance(this.point);
+    final double distance = lineSegment.distancePoint(this.point);
     if (distance < this.maxDistance) {
       return true;
     } else {

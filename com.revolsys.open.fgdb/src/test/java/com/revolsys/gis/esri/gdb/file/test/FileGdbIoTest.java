@@ -29,16 +29,16 @@ public class FileGdbIoTest {
 
   public static void doWriteReadTest(GeometryFactory geometryFactory, final DataType dataType,
     Geometry geometry) {
-    if (geometry.isEmpty() || geometryFactory.getAxisCount() == 4) {
+    final int axisCount = geometryFactory.getAxisCount();
+    if (geometry.isEmpty() || axisCount == 4) {
       return;
     }
-    geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(),
-      geometryFactory.getAxisCount(), 10000000.0, 10000000.0);
+    geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(), axisCount,
+      GeometryFactory.newScalesFixed(axisCount, 10000000.0));
 
     geometry = geometry.convertGeometry(geometryFactory);
     final String geometryTypeString = dataType.toString();
-    String name = "/tmp/revolsystest/io/gdb/" + geometryTypeString + "_"
-      + geometryFactory.getAxisCount();
+    String name = "/tmp/revolsystest/io/gdb/" + geometryTypeString + "_" + axisCount;
     if (geometry.isGeometryCollection()) {
       name += "_" + geometry.getGeometryCount();
     }
@@ -78,12 +78,12 @@ public class FileGdbIoTest {
         final Geometry actual = objects.get(0).getGeometry();
         Assert.assertEquals("Empty", geometry.isEmpty(), actual.isEmpty());
         if (!geometry.isEmpty()) {
-          final int axisCount = geometry.getAxisCount();
-          Assert.assertEquals("Axis Count", axisCount, actual.getAxisCount());
-          if (!actual.equals(axisCount, geometry)) {
+          final int geometryAxisCount = geometry.getAxisCount();
+          Assert.assertEquals("Axis Count", geometryAxisCount, actual.getAxisCount());
+          if (!actual.equals(geometryAxisCount, geometry)) {
             // Allow for conversion of multi part to single part
             if (geometry.getGeometryCount() != 1
-              || !actual.equals(axisCount, geometry.getGeometry(0))) {
+              || !actual.equals(geometryAxisCount, geometry.getGeometry(0))) {
               TestUtil.failNotEquals("Geometry Equal Exact", geometry, actual);
             }
           }

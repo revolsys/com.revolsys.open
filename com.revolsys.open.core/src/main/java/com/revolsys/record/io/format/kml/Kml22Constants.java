@@ -150,6 +150,4 @@ public interface Kml22Constants {
   QName VISIBLITY = new QName(KML_NS_URI, "visibility");
 
   QName WEST = new QName(KML_NS_URI, "west");
-
-  String WRITE_NULLS_PROPERTY = "kmlWriteNulls";
 }

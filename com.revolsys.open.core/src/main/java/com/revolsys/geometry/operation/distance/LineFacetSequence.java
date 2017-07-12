@@ -38,7 +38,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -146,8 +145,7 @@ public class LineFacetSequence implements FacetSequence {
 
   @Override
   public BoundingBox getEnvelope() {
-    final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(this.line);
-    return env;
+    return this.line.getBoundingBox();
   }
 
   @Override

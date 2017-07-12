@@ -2,7 +2,7 @@ package com.revolsys.geometry.test.old.index;
 
 import java.util.List;
 
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
 
 /**
  * Adapter for different kinds of indexes
@@ -11,7 +11,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 public interface Index {
   void finishInserting();
 
-  void insert(BoundingBoxDoubleGf itemEnv, Object item);
+  void insert(BoundingBox itemEnv, Object item);
 
-  List query(BoundingBoxDoubleGf searchEnv);
+  List query(BoundingBox searchEnv);
 }

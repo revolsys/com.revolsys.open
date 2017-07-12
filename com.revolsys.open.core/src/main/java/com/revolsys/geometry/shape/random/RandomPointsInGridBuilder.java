@@ -62,7 +62,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
 
     final double x0 = centreX + rndX;
     final double y0 = centreY + rndY;
-    return new PointDouble(x0, y0, Geometry.NULL_ORDINATE);
+    return new PointDouble(x0, y0);
   }
 
   private double gutterFraction = 0;
@@ -74,7 +74,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
    * {@link GeometryFactory}.
    */
   public RandomPointsInGridBuilder() {
-    super(GeometryFactory.DEFAULT);
+    super(GeometryFactory.DEFAULT_3D);
   }
 
   /**

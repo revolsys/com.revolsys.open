@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
@@ -13,7 +14,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class WktRecordWriter extends AbstractRecordWriter {
 
@@ -49,17 +50,22 @@ public class WktRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
+  }
+
+  @Override
   public String toString() {
     return this.recordDefinition.getPath().toString();
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     try {
       if (!this.open) {
         this.open = true;
       }
-      final Geometry geometry = object.getGeometry();
+      final Geometry geometry = record.getGeometry();
       final int srid = geometry.getCoordinateSystemId();
       if (srid > 0) {
         this.out.write("SRID=");
@@ -69,7 +75,7 @@ public class WktRecordWriter extends AbstractRecordWriter {
       EWktWriter.write(this.out, geometry);
       this.out.write('\n');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

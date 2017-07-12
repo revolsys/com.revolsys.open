@@ -8,6 +8,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.FieldValueInvalidException;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -61,7 +62,12 @@ public class MapReaderRecordReader extends AbstractReader<Record>
         final Object value = source.get(name);
         if (value != null) {
           final DataType dataType = this.recordDefinition.getFieldType(name);
-          final Object convertedValue = dataType.toObject(value);
+          final Object convertedValue;
+          try {
+            convertedValue = dataType.toObject(value);
+          } catch (final Throwable e) {
+            throw new FieldValueInvalidException(name, value, e);
+          }
           target.setValue(name, convertedValue);
         }
       }

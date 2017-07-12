@@ -12,7 +12,7 @@ import junit.textui.TestRunner;
 public class Distance3DOpTest extends TestCase {
   private static final double DIST_TOLERANCE = 0.00001;
 
-  static GeometryFactory geomFact = GeometryFactory.DEFAULT;
+  static GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
 
   static WKTReader rdr = new WKTReader();
 

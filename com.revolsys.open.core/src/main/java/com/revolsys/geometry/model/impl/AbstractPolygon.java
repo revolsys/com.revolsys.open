@@ -35,7 +35,7 @@ package com.revolsys.geometry.model.impl;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * Represents a polygon with linear edges, which may include holes.
@@ -80,7 +80,7 @@ public abstract class AbstractPolygon implements Polygon {
     try {
       return (Polygon)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

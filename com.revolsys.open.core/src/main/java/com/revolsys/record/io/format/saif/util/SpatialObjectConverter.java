@@ -26,5 +26,4 @@ public class SpatialObjectConverter implements OsnConverter {
   @Override
   public void write(final OsnSerializer serializer, final Object object) {
   }
-
 }

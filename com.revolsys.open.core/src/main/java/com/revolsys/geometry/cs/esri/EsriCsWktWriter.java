@@ -15,7 +15,7 @@ import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Projection;
 import com.revolsys.geometry.cs.Spheroid;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class EsriCsWktWriter {
 
@@ -70,7 +70,7 @@ public class EsriCsWktWriter {
         write(out, geoCs, indentLevel);
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

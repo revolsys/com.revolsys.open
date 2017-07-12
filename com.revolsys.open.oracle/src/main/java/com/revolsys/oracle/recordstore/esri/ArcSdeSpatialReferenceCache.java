@@ -86,14 +86,14 @@ public class ArcSdeSpatialReferenceCache {
             srid = esriCoordinateSystem.getCoordinateSystemId();
             if (srid <= 0) {
               geometryFactory = GeometryFactory.fixed(coordinateSystem, 3, scale.doubleValue(),
-                zScale.doubleValue());
+                scale.doubleValue(), zScale.doubleValue());
             } else {
               geometryFactory = GeometryFactory.fixed(srid, 3, scale.doubleValue(),
-                zScale.doubleValue());
+                scale.doubleValue(), zScale.doubleValue());
             }
           } else {
             geometryFactory = GeometryFactory.fixed(srid, 3, scale.doubleValue(),
-              zScale.doubleValue());
+              scale.doubleValue(), zScale.doubleValue());
           }
 
           final ArcSdeSpatialReference spatialReference = new ArcSdeSpatialReference(

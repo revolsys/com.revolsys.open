@@ -171,8 +171,16 @@ public interface MathUtil {
   static double distance(final double x1, final double y1, final double x2, final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
+    final double distanceSquared = dx * dx + dy * dy;
+    final double distance = Math.sqrt(distanceSquared);
+    return distance;
+  }
 
-    final double distance = Math.sqrt(dx * dx + dy * dy);
+  static double distanceInt(final int x1, final int y1, final int x2, final int y2) {
+    final long dx = x2 - x1;
+    final int dy = y2 - y1;
+    final long distanceSquared = dx * dx + dy * dy;
+    final double distance = Math.sqrt(distanceSquared);
     return distance;
   }
 
@@ -429,9 +437,7 @@ public interface MathUtil {
 
   static boolean isNanOrInfinite(final double... values) {
     for (final double value : values) {
-      if (Double.isNaN(value)) {
-        return true;
-      } else if (Double.isInfinite(value)) {
+      if (!Double.isFinite(value)) {
         return true;
       }
     }
@@ -785,6 +791,18 @@ public interface MathUtil {
       ints[i] = number.intValue();
     }
     return ints;
+  }
+
+  static int[] toIntArray(final String... values) {
+    final int[] ints = new int[values.length];
+    for (int i = 0; i < ints.length; i++) {
+      ints[i] = Integer.parseInt(values[i]);
+    }
+    return ints;
+  }
+
+  static int[] toIntArraySplit(final String value, final String regex) {
+    return toIntArray(value.split(regex));
   }
 
   static long toLong(final byte[] bytes, final int offset) {

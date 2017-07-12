@@ -11,7 +11,7 @@ public class CGAlgorithmFunctions {
     if (segment.getVertexCount() != 2 || ptGeom.getVertexCount() != 1) {
       throw new IllegalArgumentException("A must have two points and B must have one");
     }
-    final Point[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
+    final Point[] segPt = CoordinatesListUtil.getPointArray(segment);
 
     final Point p = ptGeom.getPoint();
     final int index = CGAlgorithmsDD.orientationIndex(segPt[0], segPt[1], p);
@@ -22,7 +22,7 @@ public class CGAlgorithmFunctions {
     if (segment.getVertexCount() != 2 || ptGeom.getVertexCount() != 1) {
       throw new IllegalArgumentException("A must have two points and B must have one");
     }
-    final Point[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
+    final Point[] segPt = CoordinatesListUtil.getPointArray(segment);
 
     final Point p = ptGeom.getPoint();
     final int index = CGAlgorithmsDD.orientationIndex(segPt[0], segPt[1], p);
@@ -30,11 +30,11 @@ public class CGAlgorithmFunctions {
   }
 
   public static Geometry segmentIntersection(final Geometry g1, final Geometry g2) {
-    final Point[] pt1 = CoordinatesListUtil.getCoordinateArray(g1);
-    final Point[] pt2 = CoordinatesListUtil.getCoordinateArray(g2);
+    final Point[] pt1 = CoordinatesListUtil.getPointArray(g1);
+    final Point[] pt2 = CoordinatesListUtil.getPointArray(g2);
     final RobustLineIntersector ri = new RobustLineIntersector();
-    ri.computeIntersection(pt1[0], pt1[1], pt2[0], pt2[1]);
-    switch (ri.getIntersectionNum()) {
+    ri.computeIntersectionPoints(pt1[0], pt1[1], pt2[0], pt2[1]);
+    switch (ri.getIntersectionCount()) {
       case 0:
         // no intersection => return empty point
         return g1.getGeometryFactory().point();
@@ -51,12 +51,12 @@ public class CGAlgorithmFunctions {
   }
 
   public static Geometry segmentIntersectionDD(final Geometry g1, final Geometry g2) {
-    final Point[] pt1 = CoordinatesListUtil.getCoordinateArray(g1);
-    final Point[] pt2 = CoordinatesListUtil.getCoordinateArray(g2);
+    final Point[] pt1 = CoordinatesListUtil.getPointArray(g1);
+    final Point[] pt2 = CoordinatesListUtil.getPointArray(g2);
 
     // first check if there actually is an intersection
     final RobustLineIntersector ri = new RobustLineIntersector();
-    ri.computeIntersection(pt1[0], pt1[1], pt2[0], pt2[1]);
+    ri.computeIntersectionPoints(pt1[0], pt1[1], pt2[0], pt2[1]);
     if (!ri.hasIntersection()) {
       // no intersection => return empty point
       return g1.getGeometryFactory().point();
@@ -67,10 +67,10 @@ public class CGAlgorithmFunctions {
   }
 
   public static boolean segmentIntersects(final Geometry g1, final Geometry g2) {
-    final Point[] pt1 = CoordinatesListUtil.getCoordinateArray(g1);
-    final Point[] pt2 = CoordinatesListUtil.getCoordinateArray(g2);
+    final Point[] pt1 = CoordinatesListUtil.getPointArray(g1);
+    final Point[] pt2 = CoordinatesListUtil.getPointArray(g2);
     final RobustLineIntersector ri = new RobustLineIntersector();
-    ri.computeIntersection(pt1[0], pt1[1], pt2[0], pt2[1]);
+    ri.computeIntersectionPoints(pt1[0], pt1[1], pt2[0], pt2[1]);
     return ri.hasIntersection();
   }
 

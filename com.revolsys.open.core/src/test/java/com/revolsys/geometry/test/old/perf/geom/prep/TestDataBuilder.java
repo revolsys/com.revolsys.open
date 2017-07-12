@@ -44,7 +44,7 @@ import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 
 public class TestDataBuilder {
-  private Point origin = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
+  private Point origin = new PointDouble((double)0, 0);
 
   private double size = 100.0;
 
@@ -97,8 +97,7 @@ public class TestDataBuilder {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new PointDouble(env.getMinX() + i * xInc, env.getMinY() + j * yInc,
-          Geometry.NULL_ORDINATE);
+        final Point base = new PointDouble(env.getMinX() + i * xInc, env.getMinY() + j * yInc);
         final Geometry line = newLine(base, size, nPts);
         geoms.add(line);
       }

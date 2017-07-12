@@ -246,7 +246,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     if (this.geometry != geometry) {
       this.geometry = geometry;
       if (geometry == null) {
-        this.geometryFactory = GeometryFactory.DEFAULT;
+        this.geometryFactory = GeometryFactory.DEFAULT_3D;
         this.vertexIndexMap = Collections.emptyMap();
         this.vertexIndices = Collections.emptyList();
       } else {

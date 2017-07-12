@@ -11,8 +11,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
@@ -202,7 +202,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
 
   @Override
   public Query newQuery(final String typePath, final String whereClause,
-    final BoundingBoxDoubleGf boundingBox) {
+    final BoundingBox boundingBox) {
     return this.recordStore.newQuery(typePath, whereClause, boundingBox);
   }
 

@@ -56,7 +56,6 @@ import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.record.schema.RecordDefinitionFactoryImpl;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 
 /**
  * <p>
@@ -148,7 +147,7 @@ public class SaifReader extends AbstractReader<Record>
   }
 
   public SaifReader(final Resource resource) {
-    setFile(SpringUtil.getFileOrCreateTempFile(resource));
+    setFile(Resource.getFileOrCreateTempFile(resource));
   }
 
   /**
@@ -584,7 +583,7 @@ public class SaifReader extends AbstractReader<Record>
         loadSchema();
         loadExportedObjects();
         loadSrid();
-        final GeometryFactory geometryFactory = GeometryFactory.fixed(this.srid, 1.0, 1.0);
+        final GeometryFactory geometryFactory = GeometryFactory.fixed(this.srid, 1.0, 1.0, 1.0);
 
         for (final RecordDefinition recordDefinition : ((RecordDefinitionFactoryImpl)this.recordDefinitionFactory)
           .getRecordDefinitions()) {

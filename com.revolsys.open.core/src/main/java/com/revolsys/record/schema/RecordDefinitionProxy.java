@@ -88,7 +88,7 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
   default GeometryFactory getGeometryFactory() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
-      return GeometryFactory.DEFAULT;
+      return GeometryFactory.DEFAULT_3D;
     } else {
       return recordDefinition.getGeometryFactory();
     }

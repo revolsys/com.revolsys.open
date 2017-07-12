@@ -29,7 +29,7 @@ public class WKBTest extends TestCase {
     TestRunner.run(WKBTest.class);
   }
 
-  private final GeometryFactory geomFactory = GeometryFactory.DEFAULT;
+  private final GeometryFactory geomFactory = GeometryFactory.DEFAULT_3D;
 
   private final WKTReader rdr = new WKTReader(this.geomFactory);
 
@@ -91,7 +91,7 @@ public class WKBTest extends TestCase {
   }
 
   private void runWKBTestCoordinateArray(final String wkt) throws IOException, ParseException {
-    final GeometryFactory geomFactory = GeometryFactory.DEFAULT;
+    final GeometryFactory geomFactory = GeometryFactory.DEFAULT_3D;
     final WKTReader rdr = new WKTReader(geomFactory);
     final Geometry g = rdr.read(wkt);
 
@@ -114,7 +114,7 @@ public class WKBTest extends TestCase {
 
   public void testBigPolygon() throws IOException, ParseException {
     final GeometricShapeFactory shapeFactory = new GeometricShapeFactory(this.geomFactory);
-    shapeFactory.setBase(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE));
+    shapeFactory.setBase(new PointDouble((double)0, 0));
     shapeFactory.setSize(1000);
     shapeFactory.setNumPoints(1000);
     final Geometry geom = shapeFactory.newRectangle();

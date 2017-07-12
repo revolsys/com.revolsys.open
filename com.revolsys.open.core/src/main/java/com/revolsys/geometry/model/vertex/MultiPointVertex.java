@@ -47,6 +47,18 @@ public class MultiPointVertex extends AbstractVertex {
   }
 
   @Override
+  public double getX() {
+    final Punctual punctual = getPunctual();
+    return punctual.getX(this.partIndex);
+  }
+
+  @Override
+  public double getY() {
+    final Punctual punctual = getPunctual();
+    return punctual.getY(this.partIndex);
+  }
+
+  @Override
   public boolean hasNext() {
     final Punctual punctual = getPunctual();
     if (punctual.isEmpty()) {

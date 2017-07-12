@@ -2,10 +2,12 @@ package com.revolsys.geometry.model.impl;
 
 import java.util.Arrays;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 
 public class LineStringDoubleBuilder extends AbstractLineString {
   private static final long serialVersionUID = 7579865828939708871L;
@@ -265,6 +267,21 @@ public class LineStringDoubleBuilder extends AbstractLineString {
     return this.vertexCount == 0;
   }
 
+  public Geometry newGeometry() {
+    final int vertexCount = getVertexCount();
+    if (vertexCount == 1) {
+      return newPoint();
+    } else if (vertexCount == 2) {
+      return newLineString();
+    } else if (vertexCount == 3) {
+      if (isClosed()) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.lineString(this.axisCount, 2, this.coordinates);
+      }
+    }
+    return newPolygon();
+  }
+
   @Override
   public LinearRing newLinearRing() {
     final int coordinateCount = this.vertexCount * this.axisCount;
@@ -272,6 +289,15 @@ public class LineStringDoubleBuilder extends AbstractLineString {
     System.arraycopy(this.coordinates, 0, coordinates, 0, coordinateCount);
     return new LinearRingDoubleGf(this.geometryFactory, this.axisCount, this.vertexCount,
       coordinates);
+  }
+
+  public Point newPoint() {
+    return this.geometryFactory.point(this.coordinates);
+  }
+
+  public Polygon newPolygon() {
+    final LinearRing ring = newLinearRing();
+    return this.geometryFactory.polygon(ring);
   }
 
   public void setCoordinate(final int index, final int axisIndex, final double coordinate) {

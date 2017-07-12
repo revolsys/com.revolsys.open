@@ -29,6 +29,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
@@ -47,7 +48,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
 
-  private BoundingBox envelope = BoundingBox.EMPTY;
+  private BoundingBox envelope = BoundingBox.empty();
 
   private DataType geometryDataType;
 
@@ -107,11 +108,16 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   }
 
   private void doubleNotNaN(final ResourceEndianOutput out, final double value) throws IOException {
-    if (MathUtil.isNanOrInfinite(value)) {
+    if (!Double.isFinite(value)) {
       out.writeLEDouble(0);
     } else {
       out.writeLEDouble(value);
     }
+  }
+
+  @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.CLOCKWISE;
   }
 
   @Override

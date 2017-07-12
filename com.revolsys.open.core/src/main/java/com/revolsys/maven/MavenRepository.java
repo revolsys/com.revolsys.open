@@ -14,7 +14,7 @@ import java.util.WeakHashMap;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.logging.Logs;
-import com.revolsys.record.io.format.xml.XmlMapIoFactory;
+import com.revolsys.record.io.format.xml.Xml;
 import com.revolsys.spring.resource.DefaultResourceLoader;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
@@ -87,7 +87,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
     final Resource mavenMetadataResource = resource.newChildResource(mavenMetadataPath);
     if (mavenMetadataResource.exists()) {
       try {
-        return XmlMapIoFactory.toMap(mavenMetadataResource);
+        return Xml.toMap(mavenMetadataResource);
       } catch (final RuntimeException e) {
         Logs.error(this, "Error loading maven resource" + mavenMetadataResource, e);
         if (mavenMetadataResource instanceof FileSystemResource) {
@@ -125,7 +125,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public MavenPom getPom(final Resource resource) {
     if (resource.exists()) {
-      final MapEx map = XmlMapIoFactory.toMap(resource);
+      final MapEx map = Xml.toMap(resource);
       final MavenPom mavenPom = new MavenPom(this, map);
       final String groupArtifactVersion = mavenPom.getGroupArtifactVersion();
       this.pomCache.put(groupArtifactVersion, mavenPom);
@@ -168,7 +168,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
     if (pom == null) {
       final Resource resource = getResource(groupId, artifactId, "pom", version);
       if (resource.exists()) {
-        final MapEx map = XmlMapIoFactory.toMap(resource);
+        final MapEx map = Xml.toMap(resource);
         pom = new MavenPom(this, map);
         this.pomCache.put(groupArtifactVersion, pom);
       } else {

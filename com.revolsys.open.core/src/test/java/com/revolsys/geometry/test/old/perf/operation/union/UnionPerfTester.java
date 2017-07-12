@@ -35,7 +35,7 @@ public class UnionPerfTester {
     test.runAll();
   }
 
-  GeometryFactory factory = GeometryFactory.DEFAULT;
+  GeometryFactory factory = GeometryFactory.DEFAULT_3D;
 
   private final List polys;
 
@@ -46,7 +46,7 @@ public class UnionPerfTester {
   }
 
   void printItemEnvelopes(final List tree) {
-    final BoundingBox itemEnv = BoundingBox.EMPTY;
+    final BoundingBox itemEnv = BoundingBox.empty();
     for (final Iterator i = tree.iterator(); i.hasNext();) {
       final Object o = i.next();
       if (o instanceof List) {

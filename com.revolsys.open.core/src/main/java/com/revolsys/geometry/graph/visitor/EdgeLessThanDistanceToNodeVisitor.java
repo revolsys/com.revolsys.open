@@ -8,7 +8,6 @@ import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
@@ -17,10 +16,10 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final Point point = node;
-    BoundingBox env = new BoundingBoxDoubleGf(point);
+    BoundingBox env = point.getBoundingBox();
     env = env.expand(maxDistance);
     graph.getEdgeIndex()
-      .forEach(new EdgeLessThanDistanceToNodeVisitor<>(node, maxDistance, results), env);
+      .forEach(env, new EdgeLessThanDistanceToNodeVisitor<>(node, maxDistance, results));
     return results.getList();
 
   }
@@ -37,7 +36,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
     this.node = node;
     this.maxDistance = maxDistance;
     final Point point = node;
-    this.envelope = new BoundingBoxDoubleGf(point);
+    this.envelope = point.getBoundingBox();
     this.envelope = this.envelope.expand(maxDistance);
   }
 

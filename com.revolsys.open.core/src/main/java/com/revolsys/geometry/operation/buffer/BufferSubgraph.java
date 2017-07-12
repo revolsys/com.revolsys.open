@@ -52,7 +52,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 
 //import debug.*;
@@ -294,7 +294,7 @@ class BufferSubgraph implements Comparable {
           }
         }
       }
-      this.env = new BoundingBoxDoubleGf(2, bounds);
+      this.env = new BoundingBoxDoubleXY(bounds);
     }
     return this.env;
   }

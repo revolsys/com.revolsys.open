@@ -101,12 +101,12 @@ public class IntersectionFinderAdder implements SegmentIntersector {
     final Point p10 = e1.getPoint(segIndex1);
     final Point p11 = e1.getPoint(segIndex1 + 1);
 
-    this.li.computeIntersection(p00, p01, p10, p11);
+    this.li.computeIntersectionPoints(p00, p01, p10, p11);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);
 
     if (this.li.hasIntersection()) {
       if (this.li.isInteriorIntersection()) {
-        for (int intIndex = 0; intIndex < this.li.getIntersectionNum(); intIndex++) {
+        for (int intIndex = 0; intIndex < this.li.getIntersectionCount(); intIndex++) {
           this.interiorIntersections.add(this.li.getIntersection(intIndex));
         }
         ((NodedSegmentString)e0).addIntersections(this.li, segIndex0, 0);

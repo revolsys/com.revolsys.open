@@ -35,6 +35,12 @@ public class MouseOverlay extends JComponent
 
   private static int y;
 
+  private static Point point = GeometryFactory.DEFAULT_3D.point();
+
+  public static Point getEventPoint() {
+    return point;
+  }
+
   public static int getEventX() {
     return x;
   }
@@ -85,7 +91,7 @@ public class MouseOverlay extends JComponent
     }
   }
 
-  public Point getEventPoint() {
+  public Point getEventPointRounded() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Point point = this.viewport.toModelPointRounded(geometryFactory, x, y);
     return point;
@@ -199,8 +205,9 @@ public class MouseOverlay extends JComponent
 
   @Override
   public void mouseExited(final MouseEvent event) {
-    x = -1;
-    y = -1;
+    MouseOverlay.x = -1;
+    MouseOverlay.y = -1;
+    MouseOverlay.point = GeometryFactory.DEFAULT_3D.point();
     this.mapPanel.mouseExitedCloseSelected(event);
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
@@ -285,8 +292,9 @@ public class MouseOverlay extends JComponent
   }
 
   private void updateEventPoint(final MouseEvent e) {
-    x = e.getX();
-    y = e.getY();
+    MouseOverlay.x = e.getX();
+    MouseOverlay.y = e.getY();
+    MouseOverlay.point = this.viewport.toModelPoint(x, y);
   }
 
 }

@@ -96,8 +96,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Point basePt = new PointDouble(env.getMinX() + xOffset, env.getMinY() + yOffset,
-      Geometry.NULL_ORDINATE);
+    final Point basePt = new PointDouble(env.getMinX() + xOffset, env.getMinY() + yOffset);
     final LineString line = newTestLine(basePt, size, nPts);
     return line;
   }
@@ -114,8 +113,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
 
   public void run(final int nPts) {
     // Geometry poly = newCircle(new PointDouble((double)0, 0), 100, nPts);
-    final Geometry poly = newSineStar(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE), 100,
-      nPts);
+    final Geometry poly = newSineStar(new PointDouble(0, 0), 100, nPts);
     // System.out.println(poly);
     //
     // System.out.println();

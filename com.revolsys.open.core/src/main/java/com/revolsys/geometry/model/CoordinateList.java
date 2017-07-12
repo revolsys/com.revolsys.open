@@ -36,8 +36,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.geometry.model.impl.PointDouble;
-
 /**
  * A list of {@link Coordinates}s, which may
  * be set to prevent repeated coordinates from occuring in the list.
@@ -259,7 +257,7 @@ public class CoordinateList extends ArrayList<Point> {
   public Object clone() {
     final CoordinateList clone = (CoordinateList)super.clone();
     for (int i = 0; i < this.size(); i++) {
-      clone.add(i, this.get(i).newPointDouble());
+      clone.add(i, this.get(i).newPoint2D());
     }
     return clone;
   }
@@ -269,7 +267,7 @@ public class CoordinateList extends ArrayList<Point> {
    */
   public void closeRing() {
     if (size() > 0) {
-      add(new PointDouble(get(0)), false);
+      add(get(0), false);
     }
   }
 

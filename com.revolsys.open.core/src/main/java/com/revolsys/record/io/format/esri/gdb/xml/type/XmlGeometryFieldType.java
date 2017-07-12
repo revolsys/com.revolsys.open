@@ -92,10 +92,17 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.startTag(POINT_ARRAY);
     out.attribute(XsiConstants.TYPE, POINT_ARRAY_TYPE);
 
-    for (final Point point : line.vertices()) {
+    final int vertexCount = line.getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = line.getX(vertexIndex);
+      final double y = line.getY(vertexIndex);
       out.startTag(POINT);
       out.attribute(XsiConstants.TYPE, POINT_N_TYPE);
-      writePoint(out, point, hasZ);
+      out.element(X, x);
+      out.element(Y, y);
+      if (hasZ) {
+        out.element(Z, line.getZ(vertexIndex));
+      }
       out.endTag(POINT);
     }
 

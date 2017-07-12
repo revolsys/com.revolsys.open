@@ -42,11 +42,11 @@ public class RobustLineIntersectionTest extends TestCase {
     // save input points
     final Point[] savePt = new Point[4];
     for (int i = 0; i < 4; i++) {
-      savePt[i] = new PointDouble(pt[i]);
+      savePt[i] = pt[i];
     }
 
     final LineIntersector li = new RobustLineIntersector(scaleFactor);
-    li.computeIntersection(pt[0], pt[1], pt[2], pt[3]);
+    li.computeIntersectionPoints(pt[0], pt[1], pt[2], pt[3]);
 
     // check that input points are unchanged
     for (int i = 0; i < 4; i++) {
@@ -76,9 +76,9 @@ public class RobustLineIntersectionTest extends TestCase {
   void checkIntersection(final Point[] pt, final int expectedIntersectionNum,
     final Point[] expectedIntPt, final double distanceTolerance) {
     final LineIntersector li = new RobustLineIntersector();
-    li.computeIntersection(pt[0], pt[1], pt[2], pt[3]);
+    li.computeIntersectionPoints(pt[0], pt[1], pt[2], pt[3]);
 
-    final int intNum = li.getIntersectionNum();
+    final int intNum = li.getIntersectionCount();
     assertEquals("Number of intersections not as expected", expectedIntersectionNum, intNum);
 
     if (expectedIntPt != null) {
@@ -122,7 +122,7 @@ public class RobustLineIntersectionTest extends TestCase {
       l1.getPoint(0), l1.getPoint(1), l2.getPoint(0), l2.getPoint(1)
     };
     final Geometry g = this.reader.read(expectedWKT);
-    final Point[] intPt = CoordinatesListUtil.getCoordinateArray(g);
+    final Point[] intPt = CoordinatesListUtil.getPointArray(g);
     checkIntersection(pt, expectedIntersectionNum, intPt, distanceTolerance);
   }
 
@@ -172,13 +172,13 @@ public class RobustLineIntersectionTest extends TestCase {
    */
   public void testCmp5CaseRaw() throws ParseException {
     checkIntersection(new Point[] {
-      new PointDouble(4348433.262114629, 5552595.478385733, Geometry.NULL_ORDINATE),
-      new PointDouble(4348440.849387404, 5552599.272022122, Geometry.NULL_ORDINATE),
+      new PointDouble(4348433.262114629, 5552595.478385733),
+      new PointDouble(4348440.849387404, 5552599.272022122),
 
-      new PointDouble(4348433.26211463, 5552595.47838573, Geometry.NULL_ORDINATE),
-      new PointDouble(4348440.8493874, 5552599.27202212, Geometry.NULL_ORDINATE)
+      new PointDouble(4348433.26211463, 5552595.47838573),
+      new PointDouble(4348440.8493874, 5552599.27202212)
     }, 1, new Point[] {
-      new PointDouble(4348440.8493874, 5552599.27202212, Geometry.NULL_ORDINATE),
+      new PointDouble(4348440.8493874, 5552599.27202212),
     }, 0);
   }
 
@@ -192,7 +192,7 @@ public class RobustLineIntersectionTest extends TestCase {
       "LINESTRING (4348433.262114629 5552595.478385733, 4348440.849387404 5552599.272022122 )",
       "LINESTRING (4348433.26211463  5552595.47838573,  4348440.8493874   5552599.27202212  )", 1,
       new Point[] {
-        new PointDouble(4348440.8493874, 5552599.27202212, Geometry.NULL_ORDINATE),
+        new PointDouble(4348440.8493874, 5552599.27202212),
       }, 0);
   }
 
@@ -207,12 +207,11 @@ public class RobustLineIntersectionTest extends TestCase {
       "LINESTRING ( 2089426.5233462777 1180182.3877339689, 2085646.6891757075 1195618.7333999649 )",
       "LINESTRING ( 1889281.8148903656 1997547.0560044837, 2259977.3672235999 483675.17050843034 )",
       1, new Point[] {
-        new PointDouble(2087536.6062609926, 1187900.560566967, Geometry.NULL_ORDINATE),
+        new PointDouble(2087536.6062609926, 1187900.560566967),
       }, 0);
   }
 
   /**
-   * Test from strk which is bad in GEOS (2009-04-14).
    *
    * @throws ParseException
    */

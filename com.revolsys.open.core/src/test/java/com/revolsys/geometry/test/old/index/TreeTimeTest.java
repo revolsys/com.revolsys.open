@@ -37,7 +37,7 @@ import java.util.List;
 
 import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.index.strtree.STRtree;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
 
 /**
  * @version 1.7
@@ -51,12 +51,12 @@ public class TreeTimeTest {
     }
 
     @Override
-    public void insert(final BoundingBoxDoubleGf itemEnv, final Object item) {
+    public void insert(final BoundingBox itemEnv, final Object item) {
       this.index.add(itemEnv);
     }
 
     @Override
-    public List query(final BoundingBoxDoubleGf searchEnv) {
+    public List query(final BoundingBox searchEnv) {
       return this.index.query(searchEnv);
     }
 
@@ -74,12 +74,12 @@ public class TreeTimeTest {
     }
 
     @Override
-    public void insert(final BoundingBoxDoubleGf itemEnv, final Object item) {
-      this.index.insert(itemEnv, item);
+    public void insert(final BoundingBox itemEnv, final Object item) {
+      this.index.insertItem(itemEnv, item);
     }
 
     @Override
-    public List query(final BoundingBoxDoubleGf searchEnv) {
+    public List query(final BoundingBox searchEnv) {
       return this.index.getItems(searchEnv);
     }
 
@@ -103,12 +103,12 @@ public class TreeTimeTest {
     }
 
     @Override
-    public void insert(final BoundingBoxDoubleGf itemEnv, final Object item) {
-      this.index.insert(itemEnv, item);
+    public void insert(final BoundingBox itemEnv, final Object item) {
+      this.index.insertItem(itemEnv, item);
     }
 
     @Override
-    public List query(final BoundingBoxDoubleGf searchEnv) {
+    public List query(final BoundingBox searchEnv) {
       return this.index.getItems(searchEnv);
     }
 

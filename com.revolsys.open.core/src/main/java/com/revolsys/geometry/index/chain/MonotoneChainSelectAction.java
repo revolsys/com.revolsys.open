@@ -43,7 +43,7 @@ import com.revolsys.geometry.model.segment.LineSegment;
  */
 public class MonotoneChainSelectAction {
   // these envelopes are used during the MonotoneChain search process
-  BoundingBox tempEnv1 = BoundingBox.EMPTY;
+  BoundingBox tempEnv1 = BoundingBox.empty();
 
   /**
    * This is a convenience method which can be overridden to obtain the actual

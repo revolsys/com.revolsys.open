@@ -58,13 +58,13 @@ public class FacetSequenceTreeBuilder {
           end = size;
         }
         final FacetSequence facetSequence = new LineFacetSequence(line, i, end);
-        tree.insert(facetSequence.getEnvelope(), facetSequence);
+        tree.insertItem(facetSequence.getEnvelope(), facetSequence);
         i = i + FACET_SEQUENCE_SIZE;
       }
     }
     for (final Point point : g.getGeometries(Point.class)) {
       final PointFacetSequence facetSequence = new PointFacetSequence(point);
-      tree.insert(facetSequence.getEnvelope(), facetSequence);
+      tree.insertItem(facetSequence.getEnvelope(), facetSequence);
     }
     tree.build();
     return tree;

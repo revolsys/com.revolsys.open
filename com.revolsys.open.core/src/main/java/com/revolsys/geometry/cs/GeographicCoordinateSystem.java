@@ -12,7 +12,6 @@ import javax.measure.unit.Unit;
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class GeographicCoordinateSystem implements CoordinateSystem {
   public static final double EARTH_RADIUS = 6378137;
@@ -186,7 +185,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     if (this.area != null) {
       return this.area.getLatLonBounds().convert(geometryFactory);
     } else {
-      return new BoundingBoxDoubleGf(geometryFactory, 2, -180, -90, 180, 90);
+      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
     }
   }
 

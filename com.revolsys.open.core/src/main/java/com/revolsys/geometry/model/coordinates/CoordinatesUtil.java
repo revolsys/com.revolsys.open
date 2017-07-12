@@ -11,9 +11,9 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
 import com.revolsys.util.number.Doubles;
 
-public class CoordinatesUtil {
+public interface CoordinatesUtil {
 
-  public static Point average(final Point c1, final Point c2) {
+  static Point average(final Point c1, final Point c2) {
     final int axisCount = Math.min(c1.getAxisCount(), c2.getAxisCount());
     final double[] coordinates = new double[axisCount];
     for (int i = 0; i < axisCount; i++) {
@@ -32,8 +32,8 @@ public class CoordinatesUtil {
     return new PointDouble(coordinates);
   }
 
-  public static Point circumcentre(final double x1, final double y1, final double x2,
-    final double y2, final double x3, final double y3) {
+  static Point circumcentre(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3) {
     // compute the perpendicular bisector of chord ab
     final HCoordinate cab = perpendicularBisector(x1, y1, x2, y2);
     // compute the perpendicular bisector of chord bc
@@ -52,7 +52,7 @@ public class CoordinatesUtil {
     return cc;
   }
 
-  public static int compare(final double x1, final double y1, final double x2, final double y2) {
+  static int compare(final double x1, final double y1, final double x2, final double y2) {
     if (x1 < x2) {
       return -1;
     } else if (x1 > x2) {
@@ -68,7 +68,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static int compareToOrigin(final Point point1, final Object other) {
+  static int compareToOrigin(final Point point1, final Object other) {
     if (other instanceof Point) {
       final Point point2 = (Point)other;
       return compareToOrigin(point1, point2);
@@ -77,7 +77,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static int compareToOrigin(final Point point1, final Point point2) {
+  static int compareToOrigin(final Point point1, final Point point2) {
     final double x = point1.getX();
     final double y = point1.getY();
     final double distance = MathUtil.distance(0, 0, x, y);
@@ -94,7 +94,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static boolean contains(final Iterable<? extends Point> points, final Point point) {
+  static boolean contains(final Iterable<? extends Point> points, final Point point) {
     for (final Point point1 : points) {
       if (point1.equals(point)) {
         return true;
@@ -109,27 +109,27 @@ public class CoordinatesUtil {
    * @param c a coordinate
    * @return the 3-dimensional Euclidean distance between the locations
    */
-  public static double distance3d(final Point point1, final Point point2) {
+  static double distance3d(final Point point1, final Point point2) {
     final double dx = point1.getX() - point2.getX();
     final double dy = point1.getY() - point2.getY();
     final double dz = point1.getZ() - point2.getZ();
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
-  public static boolean equals(final double x1, final double y1, final double x2, final double y2) {
+  static boolean equals(final double x1, final double y1, final double x2, final double y2) {
     return x1 == x2 && y1 == y2;
   }
 
-  public static Point get2d(final Geometry geometry) {
+  static Point get2d(final Geometry geometry) {
     if (geometry.isEmpty()) {
       return null;
     } else {
       final Point point = geometry.getPoint();
-      return new PointDouble(point, 2);
+      return point.newPoint2D();
     }
   }
 
-  public static int getAxisCount(final Point... points) {
+  static int getAxisCount(final Point... points) {
     int axisCount = 2;
     for (final Point point : points) {
       axisCount = Math.max(axisCount, point.getAxisCount());
@@ -137,7 +137,7 @@ public class CoordinatesUtil {
     return axisCount;
   }
 
-  public static double getElevation(final LineString line, final Point coordinate) {
+  static double getElevation(final LineString line, final Point coordinate) {
     final LineString coordinates = line;
     Point previousCoordinate = coordinates.getPoint(0);
     for (int i = 1; i < coordinates.getVertexCount(); i++) {
@@ -152,13 +152,13 @@ public class CoordinatesUtil {
     return Double.NaN;
   }
 
-  public static double getElevation(final Point coordinate, final Point c0, final Point c1) {
+  static double getElevation(final Point coordinate, final Point c0, final Point c1) {
     final double fraction = coordinate.distance(c0) / c0.distance(c1);
     final double z = c0.getZ() + (c1.getZ() - c0.getZ()) * fraction;
     return z;
   }
 
-  public static Point getPrecise(final double scale, final Point point) {
+  static Point getPrecise(final double scale, final Point point) {
     if (scale <= 0) {
       return point;
     } else {
@@ -169,7 +169,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static boolean isAcute(final Point point1, final Point point2, final Point point3) {
+  static boolean isAcute(final Point point1, final Point point2, final Point point3) {
     final double x1 = point1.getX();
     final double y1 = point1.getY();
     final double x2 = point2.getX();
@@ -198,7 +198,7 @@ public class CoordinatesUtil {
    * Returns the octant of a directed line segment (specified as x and y
    * displacements, which cannot both be 0).
    */
-  public static int octant(final double dx, final double dy) {
+  static int octant(final double dx, final double dy) {
     if (dx == 0.0 && dy == 0.0) {
       throw new IllegalArgumentException(
         "Cannot compute the octant for point ( " + dx + ", " + dy + " )");
@@ -241,7 +241,7 @@ public class CoordinatesUtil {
   /**
    * Returns the octant of a directed line segment from p0 to p1.
    */
-  public static int octant(final Point p0, final Point p1) {
+  static int octant(final Point p0, final Point p1) {
     final double dx = p1.getX() - p0.getX();
     final double dy = p1.getY() - p0.getY();
     if (dx == 0.0 && dy == 0.0) {
@@ -251,7 +251,7 @@ public class CoordinatesUtil {
     return octant(dx, dy);
   }
 
-  public static Point offset(final Point coordinate, final double angle, final double distance) {
+  static Point offset(final Point coordinate, final double angle, final double distance) {
     final double newX = coordinate.getX() + distance * Math.cos(angle);
     final double newY = coordinate.getY() + distance * Math.sin(angle);
     final Point newCoordinate = new PointDouble(newX, newY);
@@ -259,7 +259,7 @@ public class CoordinatesUtil {
 
   }
 
-  public static int orientationIndex(final Point p1, final Point p2, final Point q) {
+  static int orientationIndex(final Point p1, final Point p2, final Point q) {
     // travelling along p1->p2, turn counter clockwise to get to q return 1,
     // travelling along p1->p2, turn clockwise to get to q return -1,
     // p1, p2 and q are colinear return 0.
@@ -276,7 +276,7 @@ public class CoordinatesUtil {
     return RobustDeterminant.signOfDet2x2(dx1, dy1, dx2, dy2);
   }
 
-  public static HCoordinate perpendicularBisector(final double x1, final double y1, final double x2,
+  static HCoordinate perpendicularBisector(final double x1, final double y1, final double x2,
     final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
@@ -292,7 +292,7 @@ public class CoordinatesUtil {
    * @param points2
    * @return
    */
-  public static Point pointNotInList(final Iterable<? extends Point> points1,
+  static Point pointNotInList(final Iterable<? extends Point> points1,
     final Iterable<? extends Point> points2) {
     for (final Point point : points1) {
       if (contains(points2, point)) {
@@ -302,7 +302,7 @@ public class CoordinatesUtil {
     return null;
   }
 
-  public static Point setElevation(final Point newLocation, final Point originalLocation) {
+  static Point setElevation(final Point newLocation, final Point originalLocation) {
     if (originalLocation.getAxisCount() > 2) {
       final double z = originalLocation.getZ();
       if (Double.isNaN(z)) {
@@ -318,7 +318,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static float[] toFloatArray(final LineString points, final int axisCount) {
+  static float[] toFloatArray(final LineString points, final int axisCount) {
     final float[] coordinates = new float[axisCount * points.getVertexCount()];
     for (int i = 0; i < points.getVertexCount(); i++) {
       for (int axis = 0; axis < axisCount; axis++) {
@@ -328,7 +328,7 @@ public class CoordinatesUtil {
     return coordinates;
   }
 
-  public static Point translate(final Point point, final Double angle, final double length) {
+  static Point translate(final Point point, final Double angle, final double length) {
     final double x = point.getX();
     final double y = point.getY();
 

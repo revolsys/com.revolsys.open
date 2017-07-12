@@ -13,7 +13,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -63,7 +62,7 @@ public class TcxIterator extends BaseObjectWithProperties
     throws IOException {
     this(StaxReader.newXmlReader(resource));
     this.typePath = path;
-    this.baseName = FileUtil.getBaseName(resource.getFilename());
+    this.baseName = resource.getBaseName();
   }
 
   public TcxIterator(final StaxReader in) {

@@ -14,7 +14,8 @@ import com.revolsys.record.io.format.wkt.WktWriter;
 import com.revolsys.util.WrappedException;
 
 public class PackedGeometry {
-  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3005, 1.0, 1.0);
+  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3005, 3, 1.0, 1.0,
+    1.0);
 
   public static void checkGeometry(final Geometry geometry) {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();

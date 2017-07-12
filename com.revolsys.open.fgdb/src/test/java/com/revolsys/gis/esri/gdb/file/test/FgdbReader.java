@@ -22,7 +22,7 @@ import com.revolsys.gis.esri.gdb.file.test.field.ShortField;
 import com.revolsys.gis.esri.gdb.file.test.field.StringField;
 import com.revolsys.gis.esri.gdb.file.test.field.XmlField;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.EndianInput;
+import com.revolsys.io.endian.EndianInput;
 import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.ArrayRecord;
@@ -236,7 +236,7 @@ public class FgdbReader {
         final double maxX = this.in.readLEDouble();
         final double maxY = this.in.readLEDouble();
         final GeometryFactory geometryFactory = GeometryFactory.fixed(coordinateSystem, axisCount,
-          xyScale, zScale);
+          xyScale, xyScale, zScale);
         final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY,
           maxX, maxY);
         boolean run = true;

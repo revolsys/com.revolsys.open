@@ -66,7 +66,7 @@ public class TestPerfDistanceGeomSet {
   Point randomLocation() {
     final double x = Math.random() * MAX_X;
     final double y = Math.random() * MAX_X;
-    return new PointDouble(x, y, Geometry.NULL_ORDINATE);
+    return new PointDouble(x, y);
   }
 
   public void test() {

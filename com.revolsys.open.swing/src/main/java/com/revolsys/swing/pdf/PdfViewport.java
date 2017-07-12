@@ -42,9 +42,10 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.coordinates.PointWithOrientation;
+import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.io.format.pdf.PdfUtil;
+import com.revolsys.record.Record;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -239,13 +240,13 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
   }
 
   @Override
-  public void drawText(final LayerRecord object, final Geometry geometry, final TextStyle style) {
+  public void drawText(final Record record, final Geometry geometry, final TextStyle style) {
     try {
-      final String label = TextStyleRenderer.getLabel(object, style);
+      final String label = TextStyleRenderer.getLabel(record, style);
       if (Property.hasValue(label) && geometry != null) {
         final String textPlacementType = style.getTextPlacementType();
-        final PointWithOrientation point = AbstractRecordLayerRenderer.getPointWithOrientation(this,
-          geometry, textPlacementType);
+        final PointDoubleXYOrientation point = AbstractRecordLayerRenderer
+          .getPointWithOrientation(this, geometry, textPlacementType);
         if (point != null) {
           final double orientation = point.getOrientation();
 

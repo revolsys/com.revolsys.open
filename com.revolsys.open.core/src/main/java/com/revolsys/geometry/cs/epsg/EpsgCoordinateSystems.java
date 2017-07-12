@@ -3,6 +3,8 @@ package com.revolsys.geometry.cs.epsg;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -39,7 +41,7 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Projection;
 import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.record.io.format.csv.CsvIterator;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.UrlResource;
@@ -403,7 +405,7 @@ public final class EpsgCoordinateSystems {
             final boolean deprecated = Boolean.parseBoolean(values.get(6));
             final Authority authority = new EpsgAuthority(code);
 
-            final Area area = new Area(name, new BoundingBoxDoubleGf(2, minX, minY, maxX, maxY),
+            final Area area = new Area(name, new BoundingBoxDoubleXY(minX, minY, maxX, maxY),
               authority, deprecated);
             areas.put(code, area);
           }
@@ -662,6 +664,13 @@ public final class EpsgCoordinateSystems {
       }
       return Channels.newReader(channel, StandardCharsets.UTF_8.newDecoder(), 8196);
     }
+  }
+
+  public static String toWkt(final CoordinateSystem coordinateSystem) {
+    final StringWriter stringWriter = new StringWriter();
+    final PrintWriter out = new PrintWriter(stringWriter);
+    EpsgCsWktWriter.write(out, coordinateSystem);
+    return stringWriter.toString();
   }
 
   public static CoordinateSystem wgs84() {

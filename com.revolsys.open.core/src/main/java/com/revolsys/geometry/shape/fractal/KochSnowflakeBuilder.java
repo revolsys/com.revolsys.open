@@ -101,10 +101,9 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
       y += THIRD_HEIGHT * width;
     }
 
-    final Point p0 = new PointDouble(origin.getX(), y, Geometry.NULL_ORDINATE);
-    final Point p1 = new PointDouble(origin.getX() + width / 2, y + width * HEIGHT_FACTOR,
-      Geometry.NULL_ORDINATE);
-    final Point p2 = new PointDouble(origin.getX() + width, y, Geometry.NULL_ORDINATE);
+    final Point p0 = new PointDouble(origin.getX(), y);
+    final Point p1 = new PointDouble(origin.getX() + width / 2, y + width * HEIGHT_FACTOR);
+    final Point p2 = new PointDouble(origin.getX() + width, y);
     addSide(level, p0, p1);
     addSide(level, p1, p2);
     addSide(level, p2, p0);

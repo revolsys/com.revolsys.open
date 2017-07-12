@@ -76,5 +76,5 @@ public interface Segment
     return this;
   }
 
-  void setSegmentId(int[] segmentId);
+  void setSegmentId(int... segmentId);
 }

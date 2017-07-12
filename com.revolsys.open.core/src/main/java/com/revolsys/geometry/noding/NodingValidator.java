@@ -59,7 +59,7 @@ public class NodingValidator {
   private void checkCollapse(final Point p0, final Point p1, final Point p2) {
     if (p0.equals(p2)) {
       throw new RuntimeException(
-        "found non-noded collapse at " + GeometryFactory.DEFAULT.lineString(p0, p1, p2));
+        "found non-noded collapse at " + GeometryFactory.DEFAULT_3D.lineString(p0, p1, p2));
     }
   }
 
@@ -125,7 +125,7 @@ public class NodingValidator {
     final Point p10 = e1.getPoint(segIndex1);
     final Point p11 = e1.getPoint(segIndex1 + 1);
 
-    this.li.computeIntersection(p00, p01, p10, p11);
+    this.li.computeIntersectionPoints(p00, p01, p10, p11);
     if (this.li.hasIntersection()) {
 
       if (this.li.isProper() || hasInteriorIntersection(this.li, p00, p01)
@@ -157,7 +157,7 @@ public class NodingValidator {
    */
   private boolean hasInteriorIntersection(final LineIntersector li, final Point p0,
     final Point p1) {
-    for (int i = 0; i < li.getIntersectionNum(); i++) {
+    for (int i = 0; i < li.getIntersectionCount(); i++) {
       final Point intPt = li.getIntersection(i);
       if (!(intPt.equals(p0) || intPt.equals(p1))) {
         return true;

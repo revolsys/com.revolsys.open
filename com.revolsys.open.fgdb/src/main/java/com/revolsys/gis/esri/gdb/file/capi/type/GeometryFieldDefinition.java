@@ -13,8 +13,8 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
-import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.endian.EndianInput;
 import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
@@ -41,7 +41,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
     GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon, DataTypes.MULTI_POLYGON);
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private Method readMethod;
 
@@ -75,9 +75,10 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         }
         if (axisCount != this.geometryFactory.getAxisCount()) {
           final int srid = this.geometryFactory.getCoordinateSystemId();
-          final double scaleXY = this.geometryFactory.getScaleXY();
+          final double scaleX = this.geometryFactory.getScaleX();
+          final double scaleY = this.geometryFactory.getScaleY();
           final double scaleZ = this.geometryFactory.getScaleZ();
-          this.geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+          this.geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleX, scaleY, scaleZ);
         }
         setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
 

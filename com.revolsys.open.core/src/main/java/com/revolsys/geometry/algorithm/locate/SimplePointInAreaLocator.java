@@ -34,7 +34,6 @@ package com.revolsys.geometry.algorithm.locate;
 
 import java.util.Iterator;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollectionIterator;
 import com.revolsys.geometry.model.LinearRing;
@@ -105,7 +104,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
     if (!p.intersects(ring.getBoundingBox())) {
       return false;
     }
-    return CGAlgorithms.isPointInRing(p, ring);
+    return ring.isPointInRing(p);
   }
 
   /**

@@ -60,7 +60,7 @@ public class LambertConicConformal1SP extends AbstractCoordinatesProjection {
 
   @Override
   public void inverse(final double x, final double y, final double[] targetCoordinates,
-    final int targetOffset, final int targetAxisCount) {
+    final int targetOffset) {
     double dX = x - this.x0;
     double dY = y - this.y0;
 
@@ -89,8 +89,8 @@ public class LambertConicConformal1SP extends AbstractCoordinatesProjection {
     } while (!Double.isNaN(phi) && delta > 1.0e-011);
     final double lambda = theta / this.n + this.lambda0;
 
-    targetCoordinates[targetOffset * targetAxisCount] = lambda;
-    targetCoordinates[targetOffset * targetAxisCount + 1] = phi;
+    targetCoordinates[targetOffset] = lambda;
+    targetCoordinates[targetOffset + 1] = phi;
   }
 
   private double m(final double phi) {
@@ -100,7 +100,7 @@ public class LambertConicConformal1SP extends AbstractCoordinatesProjection {
 
   @Override
   public void project(final double lambda, final double phi, final double[] targetCoordinates,
-    final int targetOffset, final int targetAxisCount) {
+    final int targetOffset) {
 
     final double t = t(phi);
     final double rho = this.a * this.f * Math.pow(t, this.n) * this.scaleFactor;
@@ -109,8 +109,8 @@ public class LambertConicConformal1SP extends AbstractCoordinatesProjection {
     final double x = this.x0 + rho * Math.sin(theta);
     final double y = this.y0 + this.rho0 - rho * Math.cos(theta);
 
-    targetCoordinates[targetOffset * targetAxisCount] = x;
-    targetCoordinates[targetOffset * targetAxisCount + 1] = y;
+    targetCoordinates[targetOffset] = x;
+    targetCoordinates[targetOffset + 1] = y;
   }
 
   private double t(final double phi) {

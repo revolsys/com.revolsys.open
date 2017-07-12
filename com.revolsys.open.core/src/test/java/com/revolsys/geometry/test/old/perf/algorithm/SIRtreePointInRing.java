@@ -69,7 +69,7 @@ public class SIRtreePointInRing implements PointInRing {
   private void buildIndex() {
     this.sirTree = new SIRtree();
 
-    final Point[] pts = CoordinatesListUtil.getCoordinateArray(this.ring);
+    final Point[] pts = CoordinatesListUtil.getPointArray(this.ring);
     for (int i = 1; i < pts.length; i++) {
       if (pts[i - 1].equals(pts[i])) {
         continue;

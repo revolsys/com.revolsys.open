@@ -143,7 +143,7 @@ public class BufferFunctions {
 
     final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
-      final Point[] pts = CoordinatesListUtil.getCoordinateArray(line);
+      final Point[] pts = CoordinatesListUtil.getPointArray(line);
       simpLines.add(geometry.getGeometryFactory()
         .lineString(BufferInputLineSimplifier.simplify(line, distance)));
     }

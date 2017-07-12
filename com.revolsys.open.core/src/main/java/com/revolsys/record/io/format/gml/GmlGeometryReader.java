@@ -10,6 +10,7 @@ import javax.xml.stream.XMLStreamException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -107,6 +108,11 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     this.in = null;
   }
 
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
   private GeometryFactory getGeometryFactory(final GeometryFactory geometryFactory) {
     final String srsName = this.in.getAttributeValue(Gml.SRS_NAME.getNamespaceURI(),
       Gml.SRS_NAME.getLocalPart());
@@ -147,10 +153,15 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   }
 
   @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
+  }
+
+  @Override
   protected void initDo() {
     this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (this.geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.DEFAULT;
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
     }
   }
 
@@ -312,7 +323,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   }
 
   private Polygon readPolygon(final GeometryFactory geometryFactory) throws XMLStreamException {
-    int axisCount = 0;
+    int axisCount = 2;
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<LinearRing> rings = new ArrayList<>();
     final int depth = this.in.getDepth();

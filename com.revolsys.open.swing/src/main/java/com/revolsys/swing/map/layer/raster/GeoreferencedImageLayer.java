@@ -14,7 +14,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -126,7 +125,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public synchronized BoundingBox fitToViewport() {
     final Project project = getProject();
     if (project == null || this.image == null || !isInitialized()) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       final BoundingBox oldValue = this.image.getBoundingBox();
       final BoundingBox viewBoundingBox = project.getViewBoundingBox();
@@ -154,7 +153,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public BoundingBox getBoundingBox() {
     final GeoreferencedImage image = getImage();
     if (image == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       BoundingBox boundingBox = image.getBoundingBox();
       if (boundingBox.isEmpty()) {
@@ -175,7 +174,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
-      return new BoundingBoxDoubleGf(getGeometryFactory());
+      return getGeometryFactory().newBoundingBoxEmpty();
     }
   }
 

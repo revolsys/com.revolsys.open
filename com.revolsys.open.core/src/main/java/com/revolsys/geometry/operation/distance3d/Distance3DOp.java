@@ -131,10 +131,10 @@ public class Distance3DOp {
   private static Point segmentPoint(final Point p0, final Point p1, final double d0,
     final double d1) {
     if (d0 <= 0) {
-      return new PointDouble(p0);
+      return p0;
     }
     if (d1 <= 0) {
-      return new PointDouble(p1);
+      return p1;
     }
 
     final double f = Math.abs(d0) / (Math.abs(d0) + Math.abs(d1));
@@ -261,8 +261,8 @@ public class Distance3DOp {
           this.minDistance = distance;
           // TODO: compute closest pts in 3D
           final Point[] closestPt = segment1.closestPoints(segment2);
-          updateDistance(distance, new GeometryLocation(line0, i, closestPt[0].newPointDouble()),
-            new GeometryLocation(line1, j, closestPt[1].newPointDouble()), flip);
+          updateDistance(distance, new GeometryLocation(line0, i, closestPt[0].newPoint2D()),
+            new GeometryLocation(line1, j, closestPt[1].newPoint2D()), flip);
         }
         if (this.isDone) {
           return;
@@ -283,7 +283,7 @@ public class Distance3DOp {
         segment.getPoint(1));
       if (dist < this.minDistance) {
         final Point segClosestPoint = segment.closestPoint(coord);
-        updateDistance(dist, new GeometryLocation(line, i, segClosestPoint.newPointDouble()),
+        updateDistance(dist, new GeometryLocation(line, i, segClosestPoint.newPoint2D()),
           new GeometryLocation(point, 0, coord), flip);
       }
       if (this.isDone) {

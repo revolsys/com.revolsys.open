@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class JsonListMapWriter extends AbstractMapWriter {
 
@@ -20,7 +20,7 @@ public class JsonListMapWriter extends AbstractMapWriter {
     try {
       this.out.write('[');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -59,7 +59,7 @@ public class JsonListMapWriter extends AbstractMapWriter {
       this.out.write('\n');
       JsonWriterUtil.write(this.out, values, null, isWriteNulls());
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 }

@@ -267,7 +267,7 @@ public class GeometryGraph extends PlanarGraph {
     for (final Edge e : this.edges) {
       final Location eLoc = e.getLabel().getLocation(argIndex);
       for (final EdgeIntersection ei : e.getEdgeIntersectionList()) {
-        addSelfIntersectionNode(argIndex, ei.coord, eLoc);
+        addSelfIntersectionNode(argIndex, ei, eLoc);
       }
     }
   }
@@ -338,7 +338,7 @@ public class GeometryGraph extends PlanarGraph {
     final Point[] points = new Point[nodes.size()];
     int i = 0;
     for (final Node node : nodes) {
-      points[i++] = node.getPoint().newPointDouble();
+      points[i++] = node.getPoint().newPoint2D();
     }
     return points;
   }

@@ -3,6 +3,7 @@ package com.revolsys.jdbc.exception;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import javax.sql.DataSource;
 
@@ -14,10 +15,9 @@ import org.springframework.jdbc.support.SQLErrorCodesFactory;
 
 import com.revolsys.jdbc.io.DataSourceImpl;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function2;
 
 public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator {
-  private static final Map<String, Function2<String, SQLException, DataAccessException>> ERROR_CODE_TO_FUNCTION = new HashMap<>();
+  private static final Map<String, BiFunction<String, SQLException, DataAccessException>> ERROR_CODE_TO_FUNCTION = new HashMap<>();
 
   static {
     Logger.getLogger(SQLErrorCodesFactory.class).setLevel(Level.ERROR);
@@ -57,7 +57,7 @@ public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator 
         return customTranslate(task, sqlState, (SQLException)cause);
       }
     }
-    final Function2<String, SQLException, DataAccessException> function = ERROR_CODE_TO_FUNCTION
+    final BiFunction<String, SQLException, DataAccessException> function = ERROR_CODE_TO_FUNCTION
       .get(this.driverClassName + "-" + sqlState);
     if (function == null) {
       return null;

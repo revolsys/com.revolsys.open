@@ -47,13 +47,14 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 /**
  * @version 1.7
  */
 public class TestSerializable {
 
-  public static final GeometryFactory fact = GeometryFactory.DEFAULT;
+  public static final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
 
   public static final String FILENAME = "c:\\testSerial.txt";
 
@@ -89,7 +90,7 @@ public class TestSerializable {
   List newData() {
     final List objList = new ArrayList();
 
-    final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, 123, 123, 456, 456);
+    final BoundingBoxDoubleXY env = new BoundingBoxDoubleXY(123, 123, 456, 456);
     objList.add(env);
 
     objList.add(GeometryTestFactory.newBox(fact, 0.0, 100.0, 10, 10.0));

@@ -14,7 +14,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.coordinates.PointWithOrientation;
+import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
@@ -48,7 +48,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     return null;
   }
 
-  public static PointWithOrientation getMarkerLocation(final Viewport2D viewport,
+  public static PointDoubleXYOrientation getMarkerLocation(final Viewport2D viewport,
     final Geometry geometry, final MarkerStyle style) {
     final String placementType = style.getMarkerPlacementType();
     return getPointWithOrientation(viewport, geometry, placementType);
@@ -86,7 +86,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
   private static void renderMarker(final Viewport2D viewport, final Graphics2D graphics,
     final LineString line, final MarkerStyle style) {
-    final PointWithOrientation point = getMarkerLocation(viewport, line, style);
+    final PointDoubleXYOrientation point = getMarkerLocation(viewport, line, style);
     if (point != null) {
       final double orientation = point.getOrientation();
       renderMarker(viewport, graphics, point, style, orientation);

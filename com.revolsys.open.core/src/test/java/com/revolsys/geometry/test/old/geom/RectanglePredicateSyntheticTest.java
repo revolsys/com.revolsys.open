@@ -8,7 +8,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
@@ -33,10 +33,10 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   double bufSize = 10;
 
-  private final GeometryFactory fact = GeometryFactory.DEFAULT;
+  private final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
 
-  BoundingBox rectEnv = new BoundingBoxDoubleGf(2, this.baseX, this.baseY,
-    this.baseX + this.rectSize, this.baseY + this.rectSize);
+  BoundingBox rectEnv = new BoundingBoxDoubleXY(this.baseX, this.baseY, this.baseX + this.rectSize,
+    this.baseY + this.rectSize);
 
   Geometry rect = this.rectEnv.toGeometry();
 
@@ -49,7 +49,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   }
 
   private List<Geometry> getTestGeometries() {
-    final BoundingBox testEnv = new BoundingBoxDoubleGf(2, this.rectEnv.getMinX() - this.bufSize,
+    final BoundingBox testEnv = new BoundingBoxDoubleXY(this.rectEnv.getMinX() - this.bufSize,
       this.rectEnv.getMinY() - this.bufSize, this.rectEnv.getMaxX() + this.bufSize,
       this.rectEnv.getMaxY() + this.bufSize);
     final List<Geometry> testGeoms = newTestGeometries(testEnv, 5, this.testGeomSize);
@@ -72,10 +72,8 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     final int xFac = factor[quadrant][0];
     final int yFac = factor[quadrant][1];
 
-    final Point p0 = new PointDouble(base.getX() + xFac * size, base.getY() + yFac * size,
-      Geometry.NULL_ORDINATE);
-    final Point p2 = new PointDouble(base.getX() + yFac * size, base.getY() + -xFac * size,
-      Geometry.NULL_ORDINATE);
+    final Point p0 = new PointDouble(base.getX() + xFac * size, base.getY() + yFac * size);
+    final Point p2 = new PointDouble(base.getX() + yFac * size, base.getY() + -xFac * size);
 
     return this.fact.lineString(new Point[] {
       p0, base, p2
@@ -88,7 +86,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
     for (double y = env.getMinY(); y <= env.getMaxY(); y += inc) {
       for (double x = env.getMinX(); x <= env.getMaxX(); x += inc) {
-        final Point base = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+        final Point base = new PointDouble(x, y);
         testGeoms.add(newAngle(base, size, 0));
         testGeoms.add(newAngle(base, size, 1));
         testGeoms.add(newAngle(base, size, 2));

@@ -3,7 +3,6 @@ package com.revolsys.geometry.simplify;
 import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.Triangles;
 
 /**
@@ -129,7 +128,7 @@ class VWLineSimplifier {
     // ensure computed value is a valid line
     if (simp.length < 2) {
       return new Point[] {
-        simp[0], new PointDouble(simp[0])
+        simp[0], simp[0]
       };
     }
     return simp;

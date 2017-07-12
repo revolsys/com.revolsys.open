@@ -58,11 +58,10 @@ import com.revolsys.geometry.algorithm.Centroid;
 import com.revolsys.geometry.algorithm.ConvexHull;
 import com.revolsys.geometry.algorithm.InteriorPointArea;
 import com.revolsys.geometry.algorithm.InteriorPointLine;
-import com.revolsys.geometry.algorithm.InteriorPointPoint;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.buffer.Buffer;
@@ -70,7 +69,6 @@ import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.operation.distance.DistanceOp;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
-import com.revolsys.geometry.operation.predicate.RectangleContains;
 import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 import com.revolsys.geometry.operation.relate.RelateOp;
 import com.revolsys.geometry.operation.union.UnaryUnionOp;
@@ -78,6 +76,7 @@ import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.util.Emptyable;
+import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
@@ -197,16 +196,8 @@ import com.revolsys.util.number.Doubles;
  *
  *@version 1.7
  */
-public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, GeometryFactoryProxy,
-  Serializable, DataTypeProxy, Shape {
-
-  /**
-   * The value used to indicate a null or missing ordinate value.
-   * In particular, used for the value of ordinates for dimensions
-   * greater than the defined dimension of a coordinate.
-   */
-  double NULL_ORDINATE = Double.NaN;
-
+public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object>, Emptyable,
+  GeometryFactoryProxy, Serializable, DataTypeProxy, Shape {
   List<String> SORTED_GEOMETRY_TYPES = Arrays.asList("Point", "MultiPoint", "LineString",
     "LinearRing", "MultiLineString", "Polygon", "MultiPolygon", "GeometryCollection");
 
@@ -284,22 +275,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return totalGeometryCount;
   }
 
-  static GeometryFactory getNonZeroGeometryFactory(final Geometry geometry,
-    GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return GeometryFactory.DEFAULT;
-    } else {
-      final int srid = geometryFactory.getCoordinateSystemId();
-      if (srid == 0) {
-        final int geometrySrid = geometry.getCoordinateSystemId();
-        if (geometrySrid != 0) {
-          geometryFactory = geometryFactory.convertSrid(geometrySrid);
-        }
-      }
-      return geometryFactory;
-    }
-  }
-
   static int getVertexIndex(final int[] index) {
     final int length = index.length;
     final int lastIndex = length - 1;
@@ -368,7 +343,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
       return (G)value;
     } else {
       final String string = DataTypes.toString(value);
-      return GeometryFactory.DEFAULT.geometry(string, false);
+      return GeometryFactory.DEFAULT_3D.geometry(string, false);
     }
   }
 
@@ -587,6 +562,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    */
   int compareToSameClass(Geometry o);
 
+  /**
+   * In OGC terms this would be covers
+   */
   @Override
   default boolean contains(final double x, final double y) {
     return false;
@@ -618,36 +596,37 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * For a predicate with similar behaviour but avoiding
    * this subtle limitation, see {@link #covers}.
    *
-   *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@param  geometry  the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return        <code>true</code> if this <code>Geometry</code> contains <code>g</code>
    *
    * @see Geometry#within
    * @see Geometry#covers
    */
 
-  default boolean contains(final Geometry g) {
-    // short-circuit test
+  default boolean contains(final Geometry geometry) {
     final BoundingBox boundingBox = getBoundingBox();
-    final BoundingBox otherBoundingBox = g.getBoundingBox();
-    if (!boundingBox.covers(otherBoundingBox)) {
+    final BoundingBox otherBoundingBox = geometry.getBoundingBox();
+    if (boundingBox.covers(otherBoundingBox)) {
+      return relate(geometry).isContains();
+    } else {
       return false;
     }
-    // optimization for rectangle arguments
-    if (isRectangle()) {
-      return RectangleContains.contains((Polygon)this, g);
-    }
-    // general case
-    return relate(g).isContains();
   }
 
   @Override
   default boolean contains(final Point2D point) {
-    return false;
+    final double x = point.getX();
+    final double y = point.getY();
+    return contains(x, y);
   }
 
   @Override
   default boolean contains(final Rectangle2D rectangle) {
-    return false;
+    final double x = rectangle.getX();
+    final double y = rectangle.getY();
+    final double width = rectangle.getWidth();
+    final double height = rectangle.getHeight();
+    return contains(x, y, width, height);
   }
 
   default boolean containsProperly(final Geometry geometry) {
@@ -659,13 +638,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V convertAxisCount(final int axisCount) {
+  default <G extends Geometry> G convertAxisCount(final int axisCount) {
     if (getAxisCount() > axisCount) {
       GeometryFactory geometryFactory = getGeometryFactory();
       geometryFactory = geometryFactory.convertAxisCount(axisCount);
-      return (V)geometryFactory.geometry(this);
+      return (G)geometryFactory.geometry(this);
     } else {
-      return (V)this;
+      return (G)this;
     }
   }
 
@@ -713,6 +692,12 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     }
   }
 
+  default <V extends Geometry> V convertGeometry2dFloating() {
+    GeometryFactory geometryFactory = getGeometryFactory();
+    geometryFactory = geometryFactory.to2dFloating();
+    return convertGeometry(geometryFactory);
+  }
+
   default <V extends Geometry> V convertScales(final double... scales) {
     GeometryFactory geometryFactory = getGeometryFactory();
     geometryFactory = geometryFactory.convertScales(scales);
@@ -750,8 +735,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    *      s points
    */
   default Geometry convexHull() {
-    final ConvexHull convexHull = new ConvexHull(this);
-    return convexHull.getConvexHull();
+    return ConvexHull.convexHull(this);
   }
 
   /**
@@ -834,6 +818,12 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
       return true;
     }
     return relate(g).isCovers();
+  }
+
+  default boolean covers(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return contains(x, y);
   }
 
   /**
@@ -926,6 +916,31 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   /**
    *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  x the x coordinate from which to compute the distance
+   * @param  y the y coordinate from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+  default double distance(final double x, final double y) {
+    return distance(x, y, 0.0);
+  }
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  x the x coordinate from which to compute the distance
+   * @param  y the y coordinate from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+
+  double distance(double x, double y, final double terminateDistance);
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
    *  and another <code>Geometry</code>.
    *
    * @param  geometry the <code>Geometry</code> from which to compute the distance
@@ -948,15 +963,41 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   default double distance(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
+    } else if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return distance(point, terminateDistance);
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       geometry = geometry.convertGeometry(geometryFactory, 2);
       final DistanceOp distOp = new DistanceOp(this, geometry, terminateDistance);
       final double distance = distOp.distance();
       return distance;
+    }
+  }
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  point the point from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+
+  default double distance(Point point, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else if (Property.isEmpty(point)) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convertPoint2d(geometryFactory);
+      final double x = point.getX();
+      final double y = point.getY();
+      return distance(x, y, terminateDistance);
     }
   }
 
@@ -992,7 +1033,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     if (tolerance == 0) {
       return a.equals(b);
     } else {
-      return a.distance(b) <= tolerance;
+      return a.distancePoint(b) <= tolerance;
     }
   }
 
@@ -1135,6 +1176,138 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return relate(g).isEquals(getDimension(), g.getDimension());
   }
 
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(final double x,
+    final double y) {
+    if (isEmpty()) {
+      return new Pair<>();
+    } else {
+      GeometryComponent closestComponent = null;
+      double closestDistance = Double.POSITIVE_INFINITY;
+      for (final Segment segment : segments()) {
+        if (segment.isLineStart()) {
+          final Vertex from = segment.getGeometryVertex(0);
+          if (from.equalsVertex(x, y)) {
+            return new Pair<>(from, 0.0);
+          } else {
+            final double fromDistance = from.distance(x, y);
+            if (fromDistance < closestDistance || //
+              fromDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+              closestDistance = fromDistance;
+              closestComponent = from.clone();
+            }
+          }
+        }
+        {
+          final Vertex to = segment.getGeometryVertex(1);
+          if (to.equalsVertex(x, y)) {
+            return new Pair<>(to, 0.0);
+          } else {
+            final double toDistance = to.distance(x, y);
+            if (toDistance < closestDistance || //
+              toDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+              closestDistance = toDistance;
+              closestComponent = to.clone();
+            }
+          }
+        }
+        {
+          final double segmentDistance = segment.distance(x, y);
+          if (segmentDistance == 0) {
+            return new Pair<>(segment, 0.0);
+          } else if (segmentDistance < closestDistance || //
+            segmentDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+            closestDistance = segmentDistance;
+            closestComponent = segment.clone();
+          }
+        }
+      }
+      if (Double.isFinite(closestDistance)) {
+        return new Pair<>(closestComponent, closestDistance);
+      } else {
+        return new Pair<>();
+      }
+    }
+  }
+
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(final double x,
+    final double y, final double maxDistance) {
+    if (isEmpty()) {
+      return new Pair<>();
+    } else {
+      GeometryComponent closestComponent = null;
+      double closestDistance = Double.POSITIVE_INFINITY;
+      for (final Segment segment : segments()) {
+        boolean matched = false;
+        if (segment.isLineStart()) {
+          final Vertex from = segment.getGeometryVertex(0);
+          if (from.equalsVertex(x, y)) {
+            return new Pair<>(from, 0.0);
+          } else {
+            final double fromDistance = from.distance(x, y);
+            if (fromDistance <= maxDistance) {
+              if (fromDistance < closestDistance || //
+                fromDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+                closestDistance = fromDistance;
+                closestComponent = from.clone();
+                matched = true;
+              }
+            }
+          }
+        }
+        {
+          final Vertex to = segment.getGeometryVertex(1);
+          if (to.equalsVertex(x, y)) {
+            return new Pair<>(to, 0.0);
+          } else {
+            final double toDistance = to.distance(x, y);
+            if (toDistance <= maxDistance) {
+              if (toDistance < closestDistance || //
+                toDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+                closestDistance = toDistance;
+                closestComponent = to.clone();
+                matched = true;
+              }
+            }
+          }
+        }
+        if (!matched) {
+          final double segmentDistance = segment.distance(x, y);
+          if (segmentDistance == 0) {
+            return new Pair<>(segment, 0.0);
+          } else if (segmentDistance <= maxDistance) {
+            if (segmentDistance < closestDistance || //
+              segmentDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+              closestDistance = segmentDistance;
+              closestComponent = segment.clone();
+            }
+          }
+        }
+      }
+      if (Double.isFinite(closestDistance)) {
+        return new Pair<>(closestComponent, closestDistance);
+      } else {
+        return new Pair<>();
+      }
+    }
+  }
+
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(final Point point) {
+    return findClosestGeometryComponent(point, Double.POSITIVE_INFINITY);
+  }
+
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(Point point,
+    final double maxDistance) {
+    if (point.isEmpty()) {
+      return new Pair<>();
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory().to2dFloating();
+      point = point.convertGeometry(geometryFactory);
+      final double x = point.getX();
+      final double y = point.getY();
+      return findClosestGeometryComponent(x, y, maxDistance);
+    }
+  }
+
   default Iterable<Geometry> geometries() {
     return getGeometries();
   }
@@ -1156,9 +1329,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return 0.0;
   }
 
-  default int getAxisCount() {
-    return getGeometryFactory().getAxisCount();
-  }
+  int getAxisCount();
 
   /**
    * Returns the boundary, or an empty geometry of appropriate dimension
@@ -1185,9 +1356,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   int getBoundaryDimension();
 
   /**
-   * Gets an {@link BoundingBoxDoubleGf} containing
+   * Gets an {@link BoundingBox} containing
    * the minimum and maximum x and y values in this <code>Geometry</code>.
-   * If the geometry is empty, an empty <code>BoundingBoxDoubleGf</code>
+   * If the geometry is empty, an empty <code>BoundingBox</code>
    * is returned.
    * <p>
    * The returned object is a copy of the one maintained internally,
@@ -1198,6 +1369,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    *@return the boundingBox of this <code>Geometry</code>.
    *@return an empty BoundingBox if this Geometry is empty
    */
+  @Override
   default BoundingBox getBoundingBox() {
     return newBoundingBox();
   }
@@ -1242,9 +1414,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     if (isEmpty()) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       return geometryFactory.point();
+    } else {
+      return Centroid.getCentroid(this);
     }
-    final Point centPt = Centroid.getCentroid(this);
-    return getGeometryFactory().convertAxisCount(2).point(centPt);
   }
 
   default int getClassSortIndex() {
@@ -1302,7 +1474,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    *
    *@return a Geometry representing the boundingBox of this Geometry
    *
-   * @see GeometryFactory#toLineString(BoundingBoxDoubleGf)
+   * @see GeometryFactory#toLineString(BoundingBox)
    */
 
   default Geometry getEnvelope() {
@@ -1366,6 +1538,18 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     }
   }
 
+  @Override
+  default GeometryFactory getGeometryFactory() {
+    final int axisCount = getAxisCount();
+    if (axisCount == 2) {
+      return GeometryFactory.DEFAULT_2D;
+    } else if (axisCount == 2) {
+      return GeometryFactory.DEFAULT_3D;
+    } else {
+      return GeometryFactory.floating(0, axisCount);
+    }
+  }
+
   /**
    * Returns the name of this Geometry's actual class.
    *
@@ -1388,22 +1572,35 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    */
 
   default Point getInteriorPoint() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return getGeometryFactory().point();
-    }
-    Point interiorPt = null;
-    final int dim = getDimension();
-    if (dim == 0) {
-      final InteriorPointPoint intPt = new InteriorPointPoint(this);
-      interiorPt = intPt.getInteriorPoint();
-    } else if (dim == 1) {
-      final InteriorPointLine intPt = new InteriorPointLine(this);
-      interiorPt = intPt.getInteriorPoint();
+      return geometryFactory.point();
     } else {
-      final InteriorPointArea intPt = new InteriorPointArea(this);
-      interiorPt = intPt.getInteriorPoint();
+      Point interiorPt = null;
+      final int dim = getDimension();
+      if (dim == 0) {
+        final Point centroid = getCentroid();
+        final double centroidX = centroid.getX();
+        final double centroidY = centroid.getY();
+        double minDistance = Double.MAX_VALUE;
+        Point interiorPoint = null;
+        for (final Point point : getGeometries(Point.class)) {
+          final double distance = point.distance(centroidX, centroidY);
+          if (distance < minDistance) {
+            interiorPoint = point;
+            minDistance = distance;
+          }
+        }
+        return interiorPoint;
+      } else if (dim == 1) {
+        final InteriorPointLine intPt = new InteriorPointLine(this);
+        interiorPt = intPt.getInteriorPoint();
+      } else {
+        final InteriorPointArea intPt = new InteriorPointArea(this);
+        interiorPt = intPt.getInteriorPoint();
+      }
+      return geometryFactory.point(interiorPt.getX(), interiorPt.getY());
     }
-    return getGeometryFactory().point(interiorPt);
   }
 
   default List<GeometryValidationError> getIsSimpleErrors() {
@@ -1432,6 +1629,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return 0.0;
   }
 
+  @Override
   default GeometryFactory getNonZeroGeometryFactory(GeometryFactory geometryFactory) {
     final GeometryFactory geometryFactoryThis = getGeometryFactory();
     if (geometryFactory == null) {
@@ -1500,16 +1698,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   Vertex getToVertex(final int... vertexId);
 
   /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-
-  default Object getUserData() {
-    return null;
-  }
-
-  /**
    * <p>Get the {@link Vertex} at the specified vertexId (see {@link Vertex#getVertexId()}).</p>
    *
    * @author Paul Austin <paul.austin@revolsys.com>
@@ -1527,19 +1715,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    */
   int getVertexCount();
 
-  default boolean hasInvalidXyCoordinates() {
-    for (final Vertex vertex : vertices()) {
-      for (int axisIndex = 0; axisIndex < 2; axisIndex++) {
-        final double value = vertex.getCoordinate(axisIndex);
-        if (Double.isNaN(value)) {
-          return true;
-        } else if (Double.isInfinite(value)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+  boolean hasInvalidXyCoordinates();
 
   <V extends Geometry> V insertVertex(Point newPoint, int... vertexId);
 
@@ -1599,7 +1775,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   default boolean intersects(final double x, final double y, final double width,
     final double height) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox boundingBox = geometryFactory.boundingBox(x, y, x + width, y + height);
+    final BoundingBox boundingBox = geometryFactory.newBoundingBox(x, y, x + width, y + height);
     return intersects(boundingBox);
   }
 
@@ -1673,6 +1849,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     final double height = rectangle.getHeight();
     return intersects(x, y, width, height);
   }
+
+  boolean isContainedInBoundary(final BoundingBox boundingBox);
 
   /**
    *  Returns whether the two <code>Geometry</code>s are equal, from the point
@@ -1813,15 +1991,23 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   /**
    *  Returns the minimum and maximum x and y values in this <code>Geometry</code>
-   *  , or a null <code>BoundingBoxDoubleGf</code> if this <code>Geometry</code> is empty.
-   *  Unlike <code>getEnvelopeInternal</code>, this method calculates the <code>BoundingBoxDoubleGf</code>
+   *  , or a null <code>BoundingBox</code> if this <code>Geometry</code> is empty.
+   *  Unlike <code>getEnvelopeInternal</code>, this method calculates the <code>BoundingBox</code>
    *  each time it is called; <code>getEnvelopeInternal</code> caches the result
    *  of this method.
    *
    *@return    this <code>Geometry</code>s bounding box; if the <code>Geometry</code>
-   *      is empty, <code>BoundingBoxDoubleGf#isNull</code> will return <code>true</code>
+   *      is empty, <code>BoundingBox#isNull</code> will return <code>true</code>
    */
-  BoundingBox newBoundingBox();
+  default BoundingBox newBoundingBox() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (isEmpty()) {
+      return geometryFactory.newBoundingBoxEmpty();
+    } else {
+      final Iterable<Vertex> vertices = vertices();
+      return geometryFactory.newBoundingBox(vertices);
+    }
+  }
 
   /**
    * Construct a new copy of the geometry to the required geometry factory. Projecting to the required
@@ -1831,6 +2017,35 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * @return The converted geometry
    */
   Geometry newGeometry(GeometryFactory geometryFactory);
+
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newGeometry(GeometryFactory targetGeometryFactory,
+    final int axisCount) {
+    if (targetGeometryFactory == null) {
+      return newGeometry(axisCount);
+    } else {
+      targetGeometryFactory = targetGeometryFactory.convertAxisCount(2);
+      return (G)newGeometry(targetGeometryFactory);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newGeometry(final int axisCount) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory targetGeometryFactory = geometryFactory.convertAxisCount(2);
+
+    return (G)newGeometry(targetGeometryFactory);
+  }
+
+  default GeometryEditor newGeometryEditor() {
+    throw new UnsupportedOperationException();
+  }
+
+  default GeometryEditor newGeometryEditor(final int axisCount) {
+    final GeometryEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
 
   /**
    * Return a new geometry with the same coordinates but using the geometry factory. No projection will be performed.
@@ -1888,6 +2103,15 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
       return false;
     }
     return relate(g).isOverlaps(getDimension(), g.getDimension());
+  }
+
+  /**
+   * Get vertices from any point component.
+   *
+   * @return
+   */
+  default List<Vertex> pointVertices() {
+    return Collections.emptyList();
   }
 
   Geometry prepare();
@@ -1950,21 +2174,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-
-  default void setUserData(final Object userData) {
-    throw new UnsupportedOperationException("User data not supported");
-  }
-
-  /**
    * Computes a <coe>Geometry </code> representing the closure of the point-set
    * which is the union of the points in this <code>Geometry</code> which are not
    * contained in the <code>other</code> Geometry,
@@ -2005,11 +2214,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.SYMDIFFERENCE);
   }
 
+  @SuppressWarnings("unchecked")
   default <G extends Geometry> G toClockDirection(final ClockDirection clockDirection) {
     if (clockDirection.isClockwise()) {
       return toClockwise();
-    } else {
+    } else if (clockDirection.isCounterClockwise()) {
       return toCounterClockwise();
+    } else {
+      return (G)this;
     }
   }
 

@@ -1,60 +1,46 @@
 package com.revolsys.geometry.index.quadtree;
 
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 import java.util.List;
 
+import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.filter.LineSegmentCoordinateDistanceFilter;
 import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.util.Property;
 
 public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
 
-  private static final String GEOMETRY_SEGMENT_INDEX = "_GeometrySegmentQuadTree";
-
   private static final long serialVersionUID = 1L;
 
+  private static final WeakKeyValueMap<Geometry, GeometrySegmentQuadTree> CACHE = new WeakKeyValueMap<>();
+
   public static GeometrySegmentQuadTree get(final Geometry geometry) {
-    if (geometry != null && !geometry.isEmpty()) {
-      final Reference<GeometrySegmentQuadTree> reference = GeometryProperties
-        .getGeometryProperty(geometry, GEOMETRY_SEGMENT_INDEX);
-      GeometrySegmentQuadTree index;
-      if (reference == null) {
-        index = null;
-      } else {
-        index = reference.get();
-      }
+    if (Property.hasValue(geometry)) {
+      GeometrySegmentQuadTree index = CACHE.get(geometry);
       if (index == null) {
         index = new GeometrySegmentQuadTree(geometry);
-        GeometryProperties.setGeometryProperty(geometry, GEOMETRY_SEGMENT_INDEX,
-          new SoftReference<>(index));
+        CACHE.put(geometry, index);
       }
       return index;
+    } else {
+      return null;
     }
-    return new GeometrySegmentQuadTree(null);
   }
 
   private final Geometry geometry;
 
   public GeometrySegmentQuadTree(final Geometry geometry) {
+    super(geometry.getGeometryFactory());
     this.geometry = geometry;
     if (geometry != null) {
       setGeometryFactory(geometry.getGeometryFactory());
       for (final Segment segment : geometry.segments()) {
         final BoundingBox boundingBox = segment.getBoundingBox();
-        insert(boundingBox, segment);
+        insertItem(boundingBox, segment);
       }
     }
-  }
-
-  @Override
-  protected double[] getBounds(final Object id) {
-    final Segment segment = getItem(id);
-    final BoundingBox boundingBox = segment.getBoundingBox();
-    return boundingBox.getBounds(2);
   }
 
   @Override
@@ -74,6 +60,21 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
     final LineSegmentCoordinateDistanceFilter filter = new LineSegmentCoordinateDistanceFilter(
       point, maxDistance);
     return getItems(boundingBox, filter);
+  }
+
+  @Override
+  protected boolean intersectsBounds(final Object id, final double x, final double y) {
+    final Segment segment = getItem(id);
+    final BoundingBox boundingBox = segment.getBoundingBox();
+    return boundingBox.intersects(x, y, x, y);
+  }
+
+  @Override
+  protected boolean intersectsBounds(final Object id, final double minX, final double minY,
+    final double maxX, final double maxY) {
+    final Segment segment = getItem(id);
+    final BoundingBox boundingBox = segment.getBoundingBox();
+    return boundingBox.intersects(minX, minY, maxX, maxY);
   }
 
 }

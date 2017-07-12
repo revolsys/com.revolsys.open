@@ -45,7 +45,8 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.editor.PolygonEditor;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
@@ -95,7 +96,7 @@ public interface Polygon extends Polygonal {
         ((Geometry)value).getGeometryType() + " cannot be converted to a Polygon");
     } else {
       final String string = DataTypes.toString(value);
-      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+      return (G)GeometryFactory.DEFAULT_3D.geometry(string, false);
     }
   }
 
@@ -161,6 +162,23 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
+  default boolean contains(final Geometry geometry) {
+    // short-circuit test
+    final BoundingBox boundingBox = getBoundingBox();
+    final BoundingBox otherBoundingBox = geometry.getBoundingBox();
+    if (!boundingBox.covers(otherBoundingBox)) {
+      return false;
+    }
+    // optimization for rectangle arguments
+    if (isRectangle()) {
+      return boundingBox.containsSFS(geometry);
+    } else {
+      // general case
+      return relate(geometry).isContains();
+    }
+  }
+
+  @Override
   default Geometry convexHull() {
     return getShell().convexHull();
   }
@@ -195,35 +213,17 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default double distance(final Geometry geometry, final double terminateDistance) {
-    if (geometry instanceof Point) {
-      final Point point = (Point)geometry;
-      return distance(point, terminateDistance);
-    } else if (geometry instanceof LineString) {
-      return Polygonal.super.distance(geometry, terminateDistance);
-    } else if (geometry instanceof Polygon) {
-      return Polygonal.super.distance(geometry, terminateDistance);
-    } else if (Property.isEmpty(geometry)) {
-      return 0.0;
-    } else {
-      return geometry.distance(this, terminateDistance);
-    }
-  }
-
-  default double distance(Point point, final double terminateDistance) {
+  default double distance(final double x, final double y, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
-    } else if (Property.isEmpty(point)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertGeometry(geometryFactory, 2);
-      if (intersects(point)) {
+      // TODO implement intersects for x,y
+      if (intersects(new PointDoubleXY(x, y))) {
         return 0.0;
       } else {
         double minDistance = Double.MAX_VALUE;
         for (final LinearRing ring : rings()) {
-          final double distance = ring.distance(point, terminateDistance);
+          final double distance = ring.distance(x, y, terminateDistance);
           if (distance < minDistance) {
             minDistance = distance;
             if (distance <= terminateDistance) {
@@ -233,6 +233,24 @@ public interface Polygon extends Polygonal {
         }
         return minDistance;
       }
+    }
+  }
+
+  @Override
+  default double distance(final Geometry geometry, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else if (Property.isEmpty(geometry)) {
+      return Double.POSITIVE_INFINITY;
+    } else if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return distance(point, terminateDistance);
+    } else if (geometry instanceof LineString) {
+      return Polygonal.super.distance(geometry, terminateDistance);
+    } else if (geometry instanceof Polygon) {
+      return Polygonal.super.distance(geometry, terminateDistance);
+    } else {
+      return geometry.distance(this, terminateDistance);
     }
   }
 
@@ -350,6 +368,25 @@ public interface Polygon extends Polygonal {
     return 1;
   }
 
+  default double getCoordinate(final int ringIndex, final int vertexIndex, final int axisIndex) {
+    final LinearRing ring = getRing(ringIndex);
+    if (ring == null) {
+      return Double.NaN;
+    } else {
+      return ring.getCoordinate(vertexIndex, axisIndex);
+    }
+  }
+
+  @Override
+  default double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex) {
+    if (partIndex == 0) {
+      return getCoordinate(ringIndex, vertexIndex, axisIndex);
+    } else {
+      return Double.NaN;
+    }
+  }
+
   @Override
   default DataType getDataType() {
     return DataTypes.POLYGON;
@@ -411,6 +448,10 @@ public interface Polygon extends Polygonal {
       totalLength += length;
     }
     return totalLength;
+  }
+
+  default double getM(final int ringIndex, final int vertexIndex) {
+    return getCoordinate(ringIndex, vertexIndex, M);
   }
 
   @Override
@@ -494,9 +535,9 @@ public interface Polygon extends Polygonal {
       final int ringIndex = segmentId[0];
       if (ringIndex >= 0 && ringIndex < getRingCount()) {
         final LinearRing ring = getRing(ringIndex);
-        final int vertexIndex = segmentId[1];
-        if (vertexIndex >= 0 && vertexIndex < ring.getSegmentCount()) {
-          return new PolygonSegment(this, segmentId);
+        final int segmentIndex = segmentId[1];
+        if (segmentIndex >= 0 && segmentIndex < ring.getSegmentCount()) {
+          return new PolygonSegment(this, ringIndex, segmentIndex);
         }
       }
       return null;
@@ -587,6 +628,28 @@ public interface Polygon extends Polygonal {
     return vertexCount;
   }
 
+  default double getX(final int ringIndex, final int vertexIndex) {
+    return getCoordinate(ringIndex, vertexIndex, X);
+  }
+
+  default double getY(final int ringIndex, final int vertexIndex) {
+    return getCoordinate(ringIndex, vertexIndex, Y);
+  }
+
+  default double getZ(final int ringIndex, final int vertexIndex) {
+    return getCoordinate(ringIndex, vertexIndex, Z);
+  }
+
+  @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final LinearRing ring : rings()) {
+      if (ring.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   default Iterable<LinearRing> holes() {
     if (getHoleCount() == 0) {
       return Collections.emptyList();
@@ -650,6 +713,11 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    return false;
+  }
+
+  @Override
   default boolean isEmpty() {
     return getRingCount() == 0;
   }
@@ -710,16 +778,14 @@ public interface Polygon extends Polygonal {
       final GeometryFactory geometryFactory = getGeometryFactory();
       point = point.convertGeometry(geometryFactory);
       final LinearRing shell = getShell();
-      final Point point1 = point;
-      final Location shellLocation = RayCrossingCounter.locatePointInRing(point1, shell);
+      final Location shellLocation = RayCrossingCounter.locatePointInRing(point, shell);
       if (shellLocation == Location.EXTERIOR) {
         return Location.EXTERIOR;
       } else if (shellLocation == Location.BOUNDARY) {
         return Location.BOUNDARY;
       } else {
         for (final LinearRing hole : holes()) {
-          final Point point2 = point;
-          final Location holeLocation = RayCrossingCounter.locatePointInRing(point2, hole);
+          final Location holeLocation = RayCrossingCounter.locatePointInRing(point, hole);
           if (holeLocation == Location.INTERIOR) {
             return Location.EXTERIOR;
           } else if (holeLocation == Location.BOUNDARY) {
@@ -778,22 +844,33 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default BoundingBox newBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
-    for (final LinearRing ring : rings()) {
-      boundingBox = boundingBox.expandToInclude(ring);
-    }
-    return boundingBox;
-  }
-
-  @Override
   default Polygon newGeometry(final GeometryFactory geometryFactory) {
     final List<LinearRing> rings = new ArrayList<>();
     for (final LinearRing ring : rings()) {
       final LinearRing newRing = ring.newGeometry(geometryFactory);
       rings.add(newRing);
     }
+    return geometryFactory.polygon(rings);
+  }
+
+  @Override
+  default PolygonEditor newGeometryEditor() {
+    return new PolygonEditor(this);
+  }
+
+  @Override
+  default PolygonEditor newGeometryEditor(final int axisCount) {
+    final PolygonEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
+  default Polygon newPolygon(final GeometryFactory geometryFactory, final LinearRing... rings) {
+    return geometryFactory.polygon(rings);
+  }
+
+  default Polygon newPolygon(final LinearRing... rings) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.polygon(rings);
   }
 

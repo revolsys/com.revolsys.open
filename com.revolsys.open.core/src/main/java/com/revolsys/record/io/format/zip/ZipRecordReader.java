@@ -31,7 +31,7 @@ public class ZipRecordReader extends DelegatingReader<Record> implements RecordR
     try {
       String matchBaseName;
       if (baseName == null) {
-        matchBaseName = FileUtil.getBaseName(resource.getFilename());
+        matchBaseName = resource.getBaseName();
       } else {
         matchBaseName = baseName;
       }
@@ -44,14 +44,22 @@ public class ZipRecordReader extends DelegatingReader<Record> implements RecordR
         } else {
           filter = FileUtil.filterFilename(zipEntryName);
         }
-        final List<File> files = FileUtil.listFilesTree(this.directory, filter);
-        if (files.size() == 1) {
+        List<File> files = FileUtil.listFilesTree(this.directory, filter);
+        if (files.size() == 0 && baseName != null) {
+          files = FileUtil.listFilesTree(this.directory,
+            new ExtensionFilenameFilter(fileExtension));
+        }
+        if (files.size() == 0) {
+          close();
+          throw new IllegalArgumentException(
+            "No " + fileExtension + " files exist in zip file " + resource);
+        } else if (files.size() == 1) {
           final File file = files.get(0);
           openFile(resource, factory, file);
         } else {
           close();
           throw new IllegalArgumentException(
-            "Multiple" + fileExtension + " exist in zip file " + resource);
+            "Multiple " + fileExtension + " files exist in zip file " + resource);
         }
       }
       if (this.reader == null) {

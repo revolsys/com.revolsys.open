@@ -3,7 +3,7 @@ package com.revolsys.gis.esri.gdb.file.test.field;
 import java.io.IOException;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.io.EndianInput;
+import com.revolsys.io.endian.EndianInput;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 

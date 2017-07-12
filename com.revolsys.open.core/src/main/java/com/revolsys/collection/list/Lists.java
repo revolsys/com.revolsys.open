@@ -5,9 +5,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -275,6 +279,19 @@ public interface Lists {
     return list;
   }
 
+  public static <V> List<V> newArray(final BiConsumer<Consumer<V>, Predicate<V>> forEachFunction,
+    final Predicate<V> filter) {
+    final List<V> values = new ArrayList<>();
+    forEachFunction.accept(values::add, filter);
+    return values;
+  }
+
+  public static <V> ArrayList<V> newArray(final Consumer<Consumer<V>> action) {
+    final ArrayList<V> list = new ArrayList<>();
+    action.accept(list::add);
+    return list;
+  }
+
   static List<Double> newArray(final double... values) {
     if (values == null) {
       return Collections.emptyList();
@@ -305,6 +322,15 @@ public interface Lists {
     return list;
   }
 
+  public static <V> List<V> newArraySorted(
+    final BiConsumer<Consumer<V>, Predicate<V>> forEachFunction, final Predicate<V> filter,
+    final Comparator<V> comparator) {
+    final List<V> values = new ArrayList<>();
+    forEachFunction.accept(values::add, filter);
+    values.sort(comparator);
+    return values;
+  }
+
   static <T> void removeReference(final List<WeakReference<T>> list, final T object) {
     for (int i = 0; i < list.size(); i++) {
       final WeakReference<T> reference = list.get(i);
@@ -323,6 +349,13 @@ public interface Lists {
     } else {
       return Collections.emptyList();
     }
+  }
+
+  public static <V> List<V> to(final Supplier<List<V>> factory,
+    final Iterable<? extends V> values) {
+    final List<V> list = factory.get();
+    addAll(list, values);
+    return list;
   }
 
   public static <V> List<V> toArray(final Iterable<? extends V> values) {

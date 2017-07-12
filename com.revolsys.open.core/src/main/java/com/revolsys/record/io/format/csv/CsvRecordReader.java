@@ -8,11 +8,11 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.FileUtil;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.AbstractRecordReader;
 import com.revolsys.spring.resource.Resource;
 
 public class CsvRecordReader extends AbstractRecordReader {
@@ -55,8 +55,14 @@ public class CsvRecordReader extends AbstractRecordReader {
   @Override
   protected void closeDo() {
     super.closeDo();
-    FileUtil.closeSilent(this.in);
-    this.in = null;
+    final BufferedReader in = this.in;
+    if (in != null) {
+      try {
+        in.close();
+      } catch (final IOException e) {
+      }
+      this.in = null;
+    }
     this.resource = null;
   }
 
@@ -80,8 +86,8 @@ public class CsvRecordReader extends AbstractRecordReader {
     try {
       this.in = this.resource.newBufferedReader();
       final List<String> line = readNextRow();
-      final String filename = this.resource.getFilename();
-      newRecordDefinition(filename, line);
+      final String baseName = this.resource.getBaseName();
+      newRecordDefinition(baseName, line);
     } catch (final IOException e) {
       Logs.error(this, "Unable to open " + this.resource, e);
     } catch (final NoSuchElementException e) {

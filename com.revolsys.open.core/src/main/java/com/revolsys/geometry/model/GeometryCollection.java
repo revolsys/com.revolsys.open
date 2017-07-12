@@ -47,7 +47,6 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.PointLocator;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.GeometryCollectionSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.GeometryCollectionVertex;
@@ -70,7 +69,7 @@ public interface GeometryCollection extends Geometry {
       return (Geometry)value;
     } else {
       final String string = DataTypes.toString(value);
-      return GeometryFactory.DEFAULT.geometry(string, false);
+      return GeometryFactory.DEFAULT_3D.geometry(string, false);
     }
   }
 
@@ -83,6 +82,20 @@ public interface GeometryCollection extends Geometry {
       }
     }
     return errors.isEmpty();
+  }
+
+  default void addPointVertices(final List<Vertex> vertices,
+    final GeometryCollection geometryCollection, final int... parentId) {
+    for (int partIndex = 0; partIndex < getGeometryCount(); partIndex++) {
+      final Geometry part = getGeometry(partIndex);
+      if (part instanceof Point) {
+        final int[] vertexId = new int[parentId.length + 1];
+        System.arraycopy(parentId, 0, vertexId, 0, parentId.length);
+        vertexId[parentId.length] = partIndex;
+        final Vertex vertex = getVertex(vertexId);
+        vertices.add(vertex);
+      }
+    }
   }
 
   @Override
@@ -189,6 +202,25 @@ public interface GeometryCollection extends Geometry {
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for GeometryCollection must have length > 1. " + Arrays.toString(vertexId));
+    }
+  }
+
+  @Override
+  default double distance(final double x, final double y, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      double minDistance = Double.MAX_VALUE;
+      for (final Geometry geometry : geometries()) {
+        final double distance = geometry.distance(x, y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (distance <= terminateDistance) {
+            return distance;
+          }
+        }
+      }
+      return minDistance;
     }
   }
 
@@ -396,6 +428,16 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final Geometry geometry : geometries()) {
+      if (geometry.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   default <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
@@ -439,6 +481,16 @@ public interface GeometryCollection extends Geometry {
       }
       return false;
     }
+  }
+
+  @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    for (final Geometry geometry : geometries()) {
+      if (!geometry.isContainedInBoundary(boundingBox)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
@@ -519,15 +571,6 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
-  default BoundingBox newBoundingBox() {
-    BoundingBox envelope = new BoundingBoxDoubleGf(getGeometryFactory());
-    for (final Geometry geometry : geometries()) {
-      envelope = envelope.expandToInclude(geometry);
-    }
-    return envelope;
-  }
-
-  @Override
   default Geometry newGeometry(final GeometryFactory geometryFactory) {
     final List<Geometry> geometries = new ArrayList<>();
     for (final Geometry geometry : geometries()) {
@@ -587,6 +630,18 @@ public interface GeometryCollection extends Geometry {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Geometry normalizedGeometry = geometryFactory.geometryCollection(geometries);
     return normalizedGeometry;
+  }
+
+  @Override
+  default List<Vertex> pointVertices() {
+    if (isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      final int vertexCount = getVertexCount();
+      final List<Vertex> vertices = new ArrayList<>(vertexCount);
+      addPointVertices(vertices, this);
+      return vertices;
+    }
   }
 
   @Override

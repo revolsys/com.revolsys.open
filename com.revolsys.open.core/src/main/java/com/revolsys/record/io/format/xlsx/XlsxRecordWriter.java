@@ -41,7 +41,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.number.Doubles;
 
 public class XlsxRecordWriter extends AbstractRecordWriter {
@@ -120,7 +120,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       addHeaderRow(worksheet, recordDefinition);
 
     } catch (final Docx4JException | JAXBException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -225,7 +225,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
         } catch (final IOException e) {
         }
       } catch (final Docx4JException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       } finally {
         FileUtil.closeSilent(this.out);
         this.out = null;

@@ -3,7 +3,7 @@ package com.revolsys.geometry.graph;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.index.AbstractIdObjectQuadTree;
+import com.revolsys.geometry.index.quadtree.AbstractIdObjectQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 
@@ -11,19 +11,20 @@ public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
   private final Graph<T> graph;
 
   public EdgeQuadTree(final Graph<T> graph) {
+    super(graph.getGeometryFactory());
     this.graph = graph;
     final Collection<Integer> ids = graph.getEdgeIds();
     add(ids);
   }
 
   @Override
-  public BoundingBox getEnvelope(final Edge<T> edge) {
+  public BoundingBox getBoundingBox(final Edge<T> edge) {
     if (edge == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       final LineString line = edge.getLine();
       if (line == null) {
-        return BoundingBox.EMPTY;
+        return BoundingBox.empty();
       } else {
         final BoundingBox envelope = line.getBoundingBox();
         return envelope;

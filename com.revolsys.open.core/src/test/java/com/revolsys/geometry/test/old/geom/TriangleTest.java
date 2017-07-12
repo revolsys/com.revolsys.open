@@ -163,8 +163,8 @@ public class TriangleTest extends TestCase {
   }
 
   public TriangleImpl newTriangle(final LineString line) {
-    final TriangleImpl t = new TriangleImpl(line.getVertex(0).newPointDouble(),
-      line.getVertex(1).newPointDouble(), line.getVertex(2).newPointDouble());
+    final TriangleImpl t = new TriangleImpl(line.getVertex(0).newPoint2D(),
+      line.getVertex(1).newPoint2D(), line.getVertex(2).newPoint2D());
     return t;
   }
 
@@ -202,34 +202,34 @@ public class TriangleTest extends TestCase {
   public void testCentroid() throws Exception {
     // right triangle
     checkCentroid("POLYGON((10 10, 20 20, 20 10, 10 10))", new PointDouble(
-      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 20.0 + 10.0) / 3.0, Geometry.NULL_ORDINATE));
+      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 20.0 + 10.0) / 3.0));
     // CCW right tri
     checkCentroid("POLYGON((10 10, 20 10, 20 20, 10 10))", new PointDouble(
-      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0, Geometry.NULL_ORDINATE));
+      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0));
     // acute
     checkCentroid("POLYGON((10 10, 20 10, 15 20, 10 10))", new PointDouble(
-      (10.0 + 20.0 + 15.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0, Geometry.NULL_ORDINATE));
+      (10.0 + 20.0 + 15.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0));
   }
 
   public void testCircumCentre() throws Exception {
     // right triangle
     checkCircumCentre("POLYGON((10 10, 20 20, 20 10, 10 10))",
-      new PointDouble(15.0, 15.0, Geometry.NULL_ORDINATE));
+      new PointDouble(15.0, 15.0));
     // CCW right tri
     checkCircumCentre("POLYGON((10 10, 20 10, 20 20, 10 10))",
-      new PointDouble(15.0, 15.0, Geometry.NULL_ORDINATE));
+      new PointDouble(15.0, 15.0));
     // acute
     checkCircumCentre("POLYGON((10 10, 20 10, 15 20, 10 10))",
-      new PointDouble(15.0, 13.75, Geometry.NULL_ORDINATE));
+      new PointDouble(15.0, 13.75));
   }
 
   public void testInterpolateZ() throws Exception {
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDouble(1.5, 1.5, Geometry.NULL_ORDINATE), 5);
+      new PointDouble(1.5, 1.5), 5);
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDouble(1.2, 1.2, Geometry.NULL_ORDINATE), 2);
+      new PointDouble(1.2, 1.2), 2);
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE), -10);
+      new PointDouble(0.0, 0), -10);
   }
 
   public void testLongestSideLength() throws Exception {

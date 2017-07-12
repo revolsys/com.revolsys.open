@@ -12,12 +12,10 @@ import java.util.regex.Pattern;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.gis.grid.Bcgs20000RectangularMapGrid;
 import com.revolsys.gis.grid.UtmRectangularMapGrid;
 import com.revolsys.io.FileUtil;
@@ -25,7 +23,6 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
-import com.revolsys.record.io.format.saif.SaifConstants;
 
 public class MoepBinaryIterator extends BaseObjectWithProperties implements Iterator<Record> {
   private static final int COMPLEX_LINE = 3;
@@ -39,37 +36,6 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
   private static final int SIMPLE_LINE = 2;
 
   private static final int TEXT = 6;
-
-  private static double getAngle(final double angle) {
-    double orientation = (90 - angle) % 360;
-    if (orientation < 0) {
-      orientation = 360 + orientation;
-    }
-    return orientation;
-  }
-
-  public static void setGeometryProperties(final Record object) {
-    final Geometry geometry = object.getGeometry();
-    final Number angle = object.getValue(MoepConstants.ANGLE);
-    if (angle != null) {
-      final double orientation = getAngle(angle.doubleValue());
-      GeometryProperties.setGeometryProperty(geometry, "orientation", orientation);
-    }
-    GeometryProperties.setGeometryProperty(object.getGeometry(), MoepConstants.TEXT_GROUP,
-      object.getValue(MoepConstants.TEXT_GROUP));
-    GeometryProperties.setGeometryProperty(object.getGeometry(), MoepConstants.TEXT_INDEX,
-      object.getValue(MoepConstants.TEXT_INDEX));
-    GeometryProperties.setGeometryProperty(object.getGeometry(), "text",
-      object.getValue(MoepConstants.TEXT));
-    GeometryProperties.setGeometryProperty(object.getGeometry(), "textType",
-      SaifConstants.TEXT_LINE);
-    GeometryProperties.setGeometryProperty(object.getGeometry(), "fontName",
-      object.getValue(MoepConstants.FONT_NAME));
-    GeometryProperties.setGeometryProperty(object.getGeometry(), "characterHeight",
-      object.getValue(MoepConstants.FONT_SIZE));
-    GeometryProperties.setGeometryProperty(object.getGeometry(), "other",
-      object.getValue(MoepConstants.FONT_WEIGHT));
-  }
 
   private char actionName;
 
@@ -189,8 +155,8 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
 
     final double centreX = readLEInt(this.in);
     final double centreY = readLEInt(this.in);
-    this.center = new PointDouble(centreX, centreY);
-    this.factory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(), 1.0, 1.0);
+    this.center = new PointDoubleXY(centreX, centreY);
+    this.factory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(), 1.0, 1.0, 1.0);
     setProperty(IoConstants.GEOMETRY_FACTORY, this.factory);
   }
 
@@ -221,90 +187,88 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
       final int extraParams = featureKey % 100 / 10;
       final int featureType = featureKey % 10;
       final byte numBytes = (byte)read();
-      final Record object = this.recordFactory.newRecord(MoepConstants.RECORD_DEFINITION);
-      object.setValue(MoepConstants.MAPSHEET_NAME, this.mapsheet);
-      object.setValue(MoepConstants.FEATURE_CODE, this.featureCode);
-      object.setValue(MoepConstants.ORIGINAL_FILE_TYPE, this.originalFileType);
+      final Record record = this.recordFactory.newRecord(MoepConstants.RECORD_DEFINITION);
+      record.setValue(MoepConstants.MAPSHEET_NAME, this.mapsheet);
+      record.setValue(MoepConstants.FEATURE_CODE, this.featureCode);
+      record.setValue(MoepConstants.ORIGINAL_FILE_TYPE, this.originalFileType);
       String attribute = null;
       if (numBytes > 0) {
         attribute = readString(numBytes);
       }
       switch (featureType) {
         case POINT:
-          object.setValue(MoepConstants.DISPLAY_TYPE, "primary");
+          record.setValue(MoepConstants.DISPLAY_TYPE, "primary");
           final Point point = readPoint(this.in);
-          object.setGeometryValue(point);
+          record.setGeometryValue(point);
           if (extraParams == 1 || extraParams == 3) {
             final int angleInt = readLEInt(this.in);
             final int angle = angleInt / 10000;
-            object.setValue(MoepConstants.ANGLE, angle);
+            record.setValue(MoepConstants.ANGLE, angle);
           }
         break;
         case CONSTRUCTION_LINE:
         case CONSTRUCTION_COMPLEX_LINE:
-          object.setValue(MoepConstants.DISPLAY_TYPE, "constructionLine");
-          readLineString(extraParams, object);
+          record.setValue(MoepConstants.DISPLAY_TYPE, "constructionLine");
+          readLineString(extraParams, record);
         break;
         case SIMPLE_LINE:
         case COMPLEX_LINE:
-          object.setValue(MoepConstants.DISPLAY_TYPE, "primaryLine");
-          readLineString(extraParams, object);
+          record.setValue(MoepConstants.DISPLAY_TYPE, "primaryLine");
+          readLineString(extraParams, record);
         break;
         case TEXT:
-          object.setValue(MoepConstants.DISPLAY_TYPE, "primary");
+          record.setValue(MoepConstants.DISPLAY_TYPE, "primary");
           final Point textPoint = readPoint(this.in);
-          object.setGeometryValue(textPoint);
+          record.setGeometryValue(textPoint);
           if (extraParams == 1) {
             final int angleInt = readLEInt(this.in);
             final int angle = angleInt / 10000;
-            object.setValue(MoepConstants.ANGLE, angle);
+            record.setValue(MoepConstants.ANGLE, angle);
           }
           final int fontSize = readLEShort(this.in);
           final int numChars = read();
           final String text = readString(numChars);
           if (attribute == null) {
-            object.setValue(MoepConstants.FONT_NAME, "31");
-            object.setValue(MoepConstants.FONT_WEIGHT, "0");
+            record.setValue(MoepConstants.FONT_NAME, "31");
+            record.setValue(MoepConstants.FONT_WEIGHT, "0");
           } else {
             final String fontName = new String(attribute.substring(0, 3).trim());
-            object.setValue(MoepConstants.FONT_NAME, fontName);
+            record.setValue(MoepConstants.FONT_NAME, fontName);
             if (attribute.length() > 3) {
               final String other = new String(
                 attribute.substring(3, Math.min(attribute.length(), 5)).trim());
-              object.setValue(MoepConstants.FONT_WEIGHT, other);
+              record.setValue(MoepConstants.FONT_WEIGHT, other);
             } else {
-              object.setValue(MoepConstants.FONT_WEIGHT, "0");
+              record.setValue(MoepConstants.FONT_WEIGHT, "0");
             }
             if (attribute.length() > 5) {
               final String textGroup = new String(attribute.substring(4, 9).trim());
-              object.setValue(MoepConstants.TEXT_GROUP, textGroup);
+              record.setValue(MoepConstants.TEXT_GROUP, textGroup);
             }
           }
-          object.setValue(MoepConstants.FONT_SIZE, fontSize);
-          object.setValue(MoepConstants.TEXT, text);
-
-          setGeometryProperties(object);
+          record.setValue(MoepConstants.FONT_SIZE, fontSize);
+          record.setValue(MoepConstants.TEXT, text);
         break;
       }
 
       switch (this.actionName) {
         case 'W':
-          setAdmissionHistory(object, this.actionName);
+          setAdmissionHistory(record, this.actionName);
         break;
         case 'Z':
-          setAdmissionHistory(object, this.actionName);
+          setAdmissionHistory(record, this.actionName);
         break;
         case 'X':
-          setRetirementHistory(object, this.actionName);
+          setRetirementHistory(record, this.actionName);
         break;
         case 'Y':
-          setRetirementHistory(object, this.actionName);
+          setRetirementHistory(record, this.actionName);
         break;
         default:
-          setAdmissionHistory(object, 'W');
+          setAdmissionHistory(record, 'W');
         break;
       }
-      this.currentRecord = object;
+      this.currentRecord = record;
       this.loadNextObject = false;
       return this.currentRecord;
     } else {
