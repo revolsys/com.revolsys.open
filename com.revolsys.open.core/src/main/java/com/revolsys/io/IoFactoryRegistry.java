@@ -13,6 +13,8 @@ import com.revolsys.util.ServiceInitializer;
 public class IoFactoryRegistry {
   static final Map<Class<? extends IoFactory>, Set<IoFactory>> factoriesByClass = new HashMap<>();
 
+  static final Map<String, Set<IoFactory>> factoriesByFileExtension = new HashMap<>();
+
   static final Map<Class<? extends IoFactory>, Map<String, IoFactory>> factoryByClassAndFileExtension = new HashMap<>();
 
   static final Map<Class<? extends IoFactory>, Map<String, IoFactory>> factoryByClassAndMediaType = new HashMap<>();
@@ -64,6 +66,7 @@ public class IoFactoryRegistry {
         final Class<IoFactory> ioInterface = (Class<IoFactory>)factoryInterface;
         if (Maps.addToSet(factoriesByClass, ioInterface, factory)) {
           for (final String fileExtension : factory.getFileExtensions()) {
+            Maps.addToSet(factoriesByFileExtension, fileExtension, factory);
             Maps.addToTreeSet(fileExtensionsByClass, ioInterface, fileExtension);
             Maps.put(factoryByClassAndFileExtension, ioInterface, fileExtension, factory);
 
