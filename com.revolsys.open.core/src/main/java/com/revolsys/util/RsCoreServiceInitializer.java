@@ -71,7 +71,7 @@ public class RsCoreServiceInitializer implements ServiceInitializer {
 
   private void ioFactory() {
     IoFactoryRegistry.addFactory(new PointZIoFactory());
-    GriddedElevationModel.sericeInit();
+    GriddedElevationModel.serviceInit();
     TriangulatedIrregularNetwork.serviceInit();
   }
 }

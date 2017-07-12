@@ -58,7 +58,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     }
   }
 
-  public static void sericeInit() {
+  public static void serviceInit() {
     IoFactoryRegistry.addFactory(new CompactBinaryGriddedElevation());
     IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());
     IoFactoryRegistry.addFactory(new UsgsGriddedElevation());
