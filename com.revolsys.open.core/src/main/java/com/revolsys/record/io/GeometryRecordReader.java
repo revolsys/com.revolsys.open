@@ -3,55 +3,76 @@ package com.revolsys.record.io;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.io.Reader;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
+import com.revolsys.record.schema.RecordDefinition;
 
-public class GeometryRecordReader implements Iterator<Geometry>, GeometryReader {
-  private Reader<Record> reader;
+public class GeometryRecordReader extends AbstractRecordReader {
+  private GeometryReader geometryReader;
 
-  private Iterator<Record> iterator;
+  private Iterator<Geometry> geometryIterator;
 
-  public GeometryRecordReader(final Reader<Record> reader) {
-    this.reader = reader;
-    this.iterator = reader.iterator();
+  private final String baseName;
+
+  public GeometryRecordReader(final String baseName, final GeometryReader geometryReader,
+    final RecordFactory<? extends Record> recordFactory) {
+    super(recordFactory);
+    this.baseName = baseName;
+    this.geometryReader = geometryReader;
   }
 
   @Override
-  public void close() {
-    this.reader = null;
-    this.iterator = null;
+  protected void closeDo() {
+    final Iterator<Geometry> geometryIterator = this.geometryIterator;
+    this.geometryIterator = null;
+    if (geometryIterator instanceof BaseCloseable) {
+      final BaseCloseable closeable = (BaseCloseable)geometryIterator;
+      closeable.close();
+    }
+    final GeometryReader geometryReader = this.geometryReader;
+    this.geometryReader = null;
+    if (geometryReader != null) {
+      geometryReader.close();
+    }
+    super.closeDo();
   }
 
   @Override
-  public final MapEx getProperties() {
-    return this.reader.getProperties();
-  }
-
-  @Override
-  public boolean hasNext() {
-    return this.iterator.hasNext();
-  }
-
-  @Override
-  public Iterator<Geometry> iterator() {
-    return this;
-  }
-
-  @Override
-  public Geometry next() {
-    if (this.iterator.hasNext()) {
-      final Record record = this.iterator.next();
-      return record.getGeometry();
+  protected Record getNext() throws NoSuchElementException {
+    if (this.geometryIterator.hasNext()) {
+      final Geometry geometry = this.geometryIterator.next();
+      final Record record = newRecord();
+      record.setGeometryValue(geometry);
+      return record;
     } else {
       throw new NoSuchElementException();
     }
   }
 
   @Override
-  public void remove() {
-    this.iterator.remove();
+  public ClockDirection getPolygonRingDirection() {
+    if (this.geometryReader == null) {
+      return ClockDirection.NONE;
+    } else {
+      return this.geometryReader.getPolygonRingDirection();
+    }
   }
+
+  @Override
+  protected void initDo() {
+    this.geometryIterator = this.geometryReader.iterator();
+    this.geometryIterator.hasNext();
+    final GeometryFactory geometryFactory = this.geometryReader.getGeometryFactory();
+    setGeometryFactory(geometryFactory);
+
+    final RecordDefinition recordDefinition = this.geometryReader
+      .newRecordDefinition(this.baseName);
+    setRecordDefinition(recordDefinition);
+  }
+
 }
