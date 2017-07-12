@@ -184,7 +184,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   @Override
   public Form newStylePanel() {
-    return new BaseStylePanel(this);
+    return new BaseStylePanel(this, true);
   }
 
   @Override

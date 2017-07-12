@@ -20,6 +20,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.elevation.cloud.PointCloudReaderFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileConnectionManager;
@@ -27,7 +30,7 @@ import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordIo;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
@@ -48,10 +51,10 @@ import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.FunctionChildrenTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.WrappedException;
 
 public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   private static final JFileChooser CHOOSER = new JFileChooser();
@@ -173,7 +176,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
         final URL url = path.toUri().toURL();
         return url;
       } catch (final MalformedURLException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }
@@ -403,9 +406,15 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       final Path path = getPath();
       if (!this.hasFile) {
         return false;
-      } else if (IoFactory.hasFactory(GeoreferencedImageFactory.class, path)) {
+      } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, path)) {
+        return true;
+      } else if (IoFactory.hasFactory(PointCloudReaderFactory.class, path)) {
         return true;
       } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
+        return true;
+      } else if (IoFactory.hasFactory(GriddedElevationModelReadFactory.class, path)) {
+        return true;
+      } else if (IoFactory.hasFactory(TriangulatedIrregularNetworkReadFactory.class, path)) {
         return true;
       }
     }

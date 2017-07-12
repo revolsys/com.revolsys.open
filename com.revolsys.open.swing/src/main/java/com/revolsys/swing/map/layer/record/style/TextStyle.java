@@ -1,8 +1,18 @@
 package com.revolsys.swing.map.layer.record.style;
 
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +30,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -126,6 +137,94 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
   @Override
   public TextStyle clone() {
     return (TextStyle)super.clone();
+  }
+
+  public void drawTextIcon(final Graphics2D graphics, final int size) {
+    double orientation = getTextOrientation();
+
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+      RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+
+    final String textFaceName = getTextFaceName();
+    final Font font = new Font(textFaceName, 0, size);
+    graphics.setFont(font);
+    final FontMetrics fontMetrics = graphics.getFontMetrics();
+
+    int min;
+    int max;
+    int boxWidth;
+    if (size == 12) {
+      min = 0;
+      max = 15;
+      boxWidth = 16;
+    } else {
+      min = 2;
+      max = 12;
+      boxWidth = 12;
+    }
+    final String text = "A";
+    final Rectangle2D bounds = fontMetrics.getStringBounds(text, graphics);
+    final double width = bounds.getWidth();
+    final double height = fontMetrics.getAscent();
+    final String horizontalAlignment = getTextHorizontalAlignment();
+    final int x;
+    if ("right".equals(horizontalAlignment)) {
+      x = max - (int)Math.round(width);
+    } else if ("center".equals(horizontalAlignment) || "auto".equals(horizontalAlignment)) {
+      x = 8 - (int)Math.round(width / 2);
+    } else {
+      x = min;
+    }
+    final String verticalAlignment = getTextVerticalAlignment();
+    final int y;
+    if ("top".equals(verticalAlignment)) {
+      y = (int)height + min - 1;
+    } else if ("middle".equals(verticalAlignment) || "auto".equals(verticalAlignment)) {
+      y = 7 + (int)Math.round(height / 2);
+    } else {
+      y = 16 - min;
+    }
+    if (orientation != 0) {
+      if (orientation > 270) {
+        orientation -= 360;
+      }
+      graphics.rotate(-Math.toRadians(orientation), 8, 8);
+    }
+
+    final int textBoxOpacity = getTextBoxOpacity();
+    final Color textBoxColor = getTextBoxColor();
+    if (textBoxOpacity > 0 && textBoxColor != null) {
+      graphics.setPaint(textBoxColor);
+      final RoundRectangle2D.Double box = new RoundRectangle2D.Double(min, min, boxWidth, boxWidth,
+        5, 5);
+      graphics.fill(box);
+    }
+
+    final double textHaloRadius = getTextHaloRadius();
+    if (textHaloRadius > 0) {
+      final Stroke savedStroke = graphics.getStroke();
+      final Stroke outlineStroke = new BasicStroke((float)(textHaloRadius + 1),
+        BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
+      graphics.setColor(getTextHaloFill());
+      graphics.setStroke(outlineStroke);
+      final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
+      final TextLayout textLayout = new TextLayout(text, font, fontRenderContext);
+      final Shape outlineShape = textLayout.getOutline(TextStyleRenderer.NOOP_TRANSFORM);
+      graphics.draw(outlineShape);
+      graphics.setStroke(savedStroke);
+    }
+
+    graphics.setColor(getTextFill());
+    if (textBoxOpacity > 0 && textBoxOpacity < 255) {
+      graphics.setComposite(AlphaComposite.SrcOut);
+      graphics.drawString(text, x, y);
+      graphics.setComposite(AlphaComposite.DstOver);
+      graphics.drawString(text, x, y);
+    } else {
+      graphics.setComposite(AlphaComposite.SrcOver);
+      graphics.drawString(text, x, y);
+    }
   }
 
   public Font getFont(final Viewport2D viewport) {

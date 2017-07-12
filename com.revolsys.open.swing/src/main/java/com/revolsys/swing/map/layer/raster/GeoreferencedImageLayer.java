@@ -19,7 +19,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
@@ -97,7 +97,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       final Resource imageResource = Resource.getResource(this.url);
       if (imageResource.exists()) {
         try {
-          image = GeoreferencedImageFactory.loadGeoreferencedImage(imageResource);
+          image = GeoreferencedImageReadFactory.loadGeoreferencedImage(imageResource);
           if (image == null) {
             Logs.error(GeoreferencedImageLayer.class, "Cannot load image: " + this.url);
           }
@@ -249,8 +249,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
-      final GeoreferencedImageFactory factory = IoFactory
-        .factoryByFileExtension(GeoreferencedImageFactory.class, fileNameExtension);
+      final GeoreferencedImageReadFactory factory = IoFactory
+        .factoryByFileExtension(GeoreferencedImageReadFactory.class, fileNameExtension);
       if (factory != null) {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }
@@ -285,7 +285,6 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (this.image != null) {
-      System.out.println(boundingBox);
       this.image.setBoundingBox(boundingBox);
     }
   }
@@ -396,15 +395,16 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
   public Point sourcePixelToTargetPoint(final Point sourcePixel) {
     final BoundingBox boundingBox = getBoundingBox();
-    final double[] coordinates = sourcePixel.getCoordinates();
+    final double x = sourcePixel.getX();
+    final double y = sourcePixel.getY();
     final boolean useTransform = !isShowOriginalImage();
-    return sourcePixelToTargetPoint(boundingBox, useTransform, coordinates);
+    return sourcePixelToTargetPoint(boundingBox, useTransform, x, y);
   }
 
   public Point targetPointToSourcePixel(Point targetPoint) {
     final GeoreferencedImage image = getImage();
     final BoundingBox boundingBox = getBoundingBox();
-    targetPoint = targetPoint.convertGeometry(boundingBox.getGeometryFactory(), 2);
+    targetPoint = targetPoint.convertPoint2d(boundingBox.getGeometryFactory());
     final double modelX = targetPoint.getX();
     final double modelY = targetPoint.getY();
     final double modelDeltaX = modelX - boundingBox.getMinX();

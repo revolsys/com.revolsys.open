@@ -11,7 +11,6 @@ import java.util.Map;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
@@ -45,7 +44,7 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object newValue = event.getNewValue();
-    if (newValue instanceof BoundingBoxDoubleGf) {
+    if (newValue instanceof BoundingBox) {
       final BoundingBox newBoundingBox = (BoundingBox)newValue;
       synchronized (this.cachedTiles) {
         final List<MapTile> mapTiles = new ArrayList<>(this.cachedTiles.keySet());

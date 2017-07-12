@@ -17,7 +17,6 @@ com.revolsys.record.io.format.saif.Saif
 com.revolsys.record.io.format.shp.Shapefile
 com.revolsys.record.io.format.shp.ShapefileZip
 com.revolsys.record.io.format.tsv.Tsv
-com.revolsys.raster.io.format.usgsdem.UsgsDemImageFactory
 com.revolsys.record.io.format.wkt.Wkt
 com.revolsys.record.io.format.xbase.XBase
 com.revolsys.record.io.format.xlsx.Xlsx

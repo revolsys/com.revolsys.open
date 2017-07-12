@@ -12,10 +12,12 @@ import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
+import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
@@ -73,6 +75,20 @@ public class GridLayer extends AbstractLayer {
       final GeometryFactory geometryFactory = this.grid.getGeometryFactory();
       setGeometryFactory(geometryFactory);
       return true;
+    }
+  }
+
+  @Override
+  public TabbedValuePanel newPropertiesPanel() {
+    final TabbedValuePanel propertiesPanel = super.newPropertiesPanel();
+    newPropertiesPanelStyle(propertiesPanel);
+    return propertiesPanel;
+  }
+
+  protected void newPropertiesPanelStyle(final TabbedValuePanel propertiesPanel) {
+    if (getRenderer() != null) {
+      final LayerStylePanel stylePanel = new LayerStylePanel(this);
+      propertiesPanel.addTab("Style", "palette", stylePanel);
     }
   }
 

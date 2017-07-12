@@ -33,7 +33,7 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
   private JPanel previews;
 
   public GeometryStylePanel(final GeometryStyleRenderer geometryStyleRenderer) {
-    super(geometryStyleRenderer);
+    super(geometryStyleRenderer, true);
 
     this.geometryStyleRenderer = geometryStyleRenderer;
     this.geometryStyle = geometryStyleRenderer.getStyle();
@@ -52,9 +52,6 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
       } else if (DataTypes.MULTI_POLYGON.equals(this.geometryDataType)) {
         this.geometryDataType = DataTypes.POLYGON;
       }
-
-      final boolean hasLineStyle = false;
-      final boolean hasPolygonStyle = false;
 
       final JPanel panel = new JPanel(new BorderLayout());
       add(panel, 1);
@@ -85,11 +82,6 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
         addLineStylePanel(stylePanels, this.geometryStyle);
         addPolygonStylePanel(stylePanels, this.geometryStyle);
         addGeometryPreview(DataTypes.POLYGON);
-      }
-
-      if (hasLineStyle) {
-      }
-      if (hasPolygonStyle) {
       }
     }
   }

@@ -5,12 +5,16 @@ import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServer;
 import com.revolsys.swing.map.layer.bing.Bing;
+import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
+import com.revolsys.swing.map.layer.grid.GridLayerRenderer;
 import com.revolsys.swing.map.layer.mapguide.MapGuideWebServer;
 import com.revolsys.swing.map.layer.ogc.wms.OgcWms;
 import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapApiLayer;
 import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayer;
+import com.revolsys.swing.map.layer.pointcloud.PointCloudLayer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
@@ -64,6 +68,9 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("filterStyle", (config) -> {
       return new FilterMultipleRenderer(config);
     });
+    MapObjectFactoryRegistry.newFactory("gridLayerRenderer", (config) -> {
+      return new GridLayerRenderer(config);
+    });
   }
 
   private void layers() {
@@ -104,6 +111,20 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
       (config) -> {
         return GeoreferencedImageLayer.newLayer(config);
       });
+
+    MapObjectFactoryRegistry.newFactory("griddedElevationModelLayer",
+      "Gridded Elevation Model Layer", (config) -> {
+        return new GriddedElevationModelLayer(config);
+      });
+
+    MapObjectFactoryRegistry.newFactory("triangulatedIrregularNetworkLayer",
+      "Triangulated Irregular Network Layer", (config) -> {
+        return new TriangulatedIrregularNetworkLayer(config);
+      });
+
+    MapObjectFactoryRegistry.newFactory("pointCloudLayer", "Point Cloud Layer", (config) -> {
+      return new PointCloudLayer(config);
+    });
 
     ArcGisRestServer.factoryInit();
 
