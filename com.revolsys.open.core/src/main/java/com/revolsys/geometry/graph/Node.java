@@ -494,13 +494,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
               newLine = line.subLine(null, 0, vertexCount - 1, newNode);
             }
             this.graph.replaceEdge(edge, newLine);
-            if (!edge.isRemoved()) {
-              throw new RuntimeException("Not node Removed");
-            }
           }
-        }
-        if (!isRemoved()) {
-          throw new RuntimeException("Not node Removed");
         }
         return true;
       }

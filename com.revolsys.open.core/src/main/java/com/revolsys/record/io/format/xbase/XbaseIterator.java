@@ -166,17 +166,14 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
     return null;
     /*
      * String memoIndexString = new String(record, startIndex, len).trim(); if
-     * (memoIndexString.length() != 0) { int memoIndex =
-     * Integer.parseInt(memoIndexString.trim()); if (memoIn == null) { File
-     * memoFile = new File(mappedFile.getParentFile(), typePath + ".dbt"); if
-     * (memoFile.exists()) { if (log.isInfoEnabled()) { log.info("Opening memo
-     * mappedFile: " + memoFile); } memoIn = new RandomAccessFile(memoFile, "
-     * r"); } else { return null; } } memoIn.seek(memoIndex 512); StringBuilder
-     * memo = new StringBuilder(512); byte[] memoBuffer = new byte[512]; while
-     * (memoIn.read(memoBuffer) != -1) { int i = 0; while (i <
-     * memoBuffer.length) { if (memoBuffer[i] == 0x1A) { return memo.toString();
-     * } memo.append((char)memoBuffer[i]); i++; } } return memo.toString(); }
-     * return null;
+     * (memoIndexString.length() != 0) { int memoIndex = Integer.parseInt(memoIndexString.trim());
+     * if (memoIn == null) { File memoFile = new File(mappedFile.getParentFile(), typePath +
+     * ".dbt"); if (memoFile.exists()) { if (log.isInfoEnabled()) { log.info("Opening memo
+     * mappedFile: " + memoFile); } memoIn = new RandomAccessFile(memoFile, " r"); } else { return
+     * null; } } memoIn.seek(memoIndex 512); StringBuilder memo = new StringBuilder(512); byte[]
+     * memoBuffer = new byte[512]; while (memoIn.read(memoBuffer) != -1) { int i = 0; while (i <
+     * memoBuffer.length) { if (memoBuffer[i] == 0x1A) { return memo.toString(); }
+     * memo.append((char)memoBuffer[i]); i++; } } return memo.toString(); } return null;
      */
   }
 

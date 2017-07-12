@@ -20,6 +20,7 @@ import java.util.function.Predicate;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Direction;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -278,6 +279,15 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
     return 1;
   }
 
+  public boolean equalId(final Edge<T> edge) {
+    if (edge != null) {
+      if (this.graph == edge.getGraph()) {
+        return this.id == edge.getId();
+      }
+    }
+    return false;
+  }
+
   @Override
   protected void finalize() throws Throwable {
     if (this.graph != null) {
@@ -326,6 +336,16 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   public double[] getCoordinates() {
     final LineString line = getLine();
     return line.getCoordinates();
+  }
+
+  public Direction getDirection(final Point point) {
+    if (getFromPoint().equals(point)) {
+      return Direction.FORWARDS;
+    } else if (getToPoint().equals(point)) {
+      return Direction.BACKWARDS;
+    } else {
+      return Direction.NONE;
+    }
   }
 
   public List<Edge<T>> getEdgesToNextJunctionNode(final Node<T> node) {
@@ -556,6 +576,10 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
       final Graph<T> graph = getGraph();
       return graph.replaceEdge(this, lines);
     }
+  }
+
+  public void setObject(final T object) {
+    this.graph.setEdgeObject(this.id, object);
   }
 
   public <V extends Point> List<Edge<T>> splitEdge(final Collection<V> splitPoints) {

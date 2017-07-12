@@ -53,11 +53,12 @@ import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
 import com.revolsys.predicate.PredicateProxy;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.util.ExitLoopException;
 import com.revolsys.visitor.CreateListVisitor;
 
-public class Graph<T> implements GeometryFactoryProxy {
+public class Graph<T> extends BaseObjectWithProperties implements GeometryFactoryProxy {
 
   private static final AtomicInteger GRAPH_IDS = new AtomicInteger();
 
@@ -223,6 +224,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     }
   }
 
+  @Override
   @PreDestroy
   public void close() {
     this.edgePropertiesById.clear();
@@ -1162,6 +1164,10 @@ public class Graph<T> implements GeometryFactoryProxy {
     } else {
       return Collections.emptyList();
     }
+  }
+
+  public void setEdgeObject(final int edgeId, final T object) {
+    this.edgeObjectsById.put(edgeId, object);
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

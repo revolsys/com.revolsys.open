@@ -1935,6 +1935,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return lineBuilder;
   }
 
+  public LineStringDoubleBuilder newLineStringBuilder(final int vertexCapacity) {
+    return new LineStringDoubleBuilder(this, vertexCapacity);
+  }
+
   /**
    * <p>Construct a newn empty {@link Point}.</p>
    *

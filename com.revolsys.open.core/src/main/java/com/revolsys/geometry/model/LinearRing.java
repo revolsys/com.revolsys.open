@@ -235,6 +235,13 @@ public interface LinearRing extends LineString {
   }
 
   @Override
+  default LinearRing newLineString(final double... coordinates) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int axisCount = getAxisCount();
+    return geometryFactory.linearRing(axisCount, coordinates);
+  }
+
+  @Override
   default LineString newLineString(final GeometryFactory geometryFactory, final int axisCount,
     final int vertexCount, final double... coordinates) {
     final GeometryFactory geometryFactoryAxisCount = geometryFactory.convertAxisCount(axisCount);
