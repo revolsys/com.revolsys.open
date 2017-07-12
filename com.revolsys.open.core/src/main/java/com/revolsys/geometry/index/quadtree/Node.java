@@ -47,7 +47,7 @@ public class Node<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected void forEachItem(final QuadTree<T> tree, final Consumer<T> action) {
+  protected void forEachItem(final QuadTree<T> tree, final Consumer<? super T> action) {
     final List<T> items = this.items;
     synchronized (this.nodes) {
       for (final T item : items) {
@@ -58,7 +58,7 @@ public class Node<T> extends AbstractNode<T> {
 
   @Override
   protected void forEachItem(final QuadTree<T> tree, final double[] bounds,
-    final Consumer<T> action) {
+    final Consumer<? super T> action) {
     final List<T> items = this.items;
     synchronized (this.nodes) {
       int itemIndex = 0;

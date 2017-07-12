@@ -61,12 +61,10 @@ public class CGAlgorithmsDD {
    * @return
    */
   public static Point intersection(final Point p1, final Point p2, final Point q1, final Point q2) {
-    final DD denom1 = DD.valueOf(q2.getY())
-      .selfSubtract(q1.getY())
-      .selfMultiply(DD.valueOf(p2.getX()).selfSubtract(p1.getX()));
-    final DD denom2 = DD.valueOf(q2.getX())
-      .selfSubtract(q1.getX())
-      .selfMultiply(DD.valueOf(p2.getY()).selfSubtract(p1.getY()));
+    final DD denom1 = DD.valueOf(q2.getY()).selfSubtract(q1.getY()).selfMultiply(
+      DD.valueOf(p2.getX()).selfSubtract(p1.getX()));
+    final DD denom2 = DD.valueOf(q2.getX()).selfSubtract(q1.getX()).selfMultiply(
+      DD.valueOf(p2.getY()).selfSubtract(p1.getY()));
     final DD denom = denom1.subtract(denom2);
 
     /**
@@ -76,12 +74,10 @@ public class CGAlgorithmsDD {
      * - intersection point lies within line segment q if fracQ is between 0 and 1
      */
 
-    final DD numx1 = DD.valueOf(q2.getX())
-      .selfSubtract(q1.getX())
-      .selfMultiply(DD.valueOf(p1.getY()).selfSubtract(q1.getY()));
-    final DD numx2 = DD.valueOf(q2.getY())
-      .selfSubtract(q1.getY())
-      .selfMultiply(DD.valueOf(p1.getX()).selfSubtract(q1.getX()));
+    final DD numx1 = DD.valueOf(q2.getX()).selfSubtract(q1.getX()).selfMultiply(
+      DD.valueOf(p1.getY()).selfSubtract(q1.getY()));
+    final DD numx2 = DD.valueOf(q2.getY()).selfSubtract(q1.getY()).selfMultiply(
+      DD.valueOf(p1.getX()).selfSubtract(q1.getX()));
     final DD numx = numx1.subtract(numx2);
     final double fracP = numx.selfDivide(denom).doubleValue();
 
@@ -89,12 +85,10 @@ public class CGAlgorithmsDD {
       .selfAdd(DD.valueOf(p2.getX()).selfSubtract(p1.getX()).selfMultiply(fracP))
       .doubleValue();
 
-    final DD numy1 = DD.valueOf(p2.getX())
-      .selfSubtract(p1.getX())
-      .selfMultiply(DD.valueOf(p1.getY()).selfSubtract(q1.getY()));
-    final DD numy2 = DD.valueOf(p2.getY())
-      .selfSubtract(p1.getY())
-      .selfMultiply(DD.valueOf(p1.getX()).selfSubtract(q1.getX()));
+    final DD numy1 = DD.valueOf(p2.getX()).selfSubtract(p1.getX()).selfMultiply(
+      DD.valueOf(p1.getY()).selfSubtract(q1.getY()));
+    final DD numy2 = DD.valueOf(p2.getY()).selfSubtract(p1.getY()).selfMultiply(
+      DD.valueOf(p1.getX()).selfSubtract(q1.getX()));
     final DD numy = numy1.subtract(numy2);
     final double fracQ = numy.selfDivide(denom).doubleValue();
 

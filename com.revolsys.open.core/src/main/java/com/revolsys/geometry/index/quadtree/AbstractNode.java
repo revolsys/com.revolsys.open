@@ -129,7 +129,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     return this;
   }
 
-  public void forEach(final QuadTree<T> tree, final Consumer<T> action) {
+  public void forEach(final QuadTree<T> tree, final Consumer<? super T> action) {
     forEachItem(tree, action);
 
     for (final AbstractNode<T> node : this.nodes) {
@@ -139,7 +139,8 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     }
   }
 
-  public void forEach(final QuadTree<T> tree, final double[] bounds, final Consumer<T> action) {
+  public void forEach(final QuadTree<T> tree, final double[] bounds,
+    final Consumer<? super T> action) {
     if (isSearchMatch(bounds)) {
       forEachItem(tree, bounds, action);
 
@@ -151,10 +152,10 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     }
   }
 
-  protected abstract void forEachItem(QuadTree<T> tree, Consumer<T> action);
+  protected abstract void forEachItem(QuadTree<T> tree, Consumer<? super T> action);
 
   protected abstract void forEachItem(final QuadTree<T> tree, final double[] bounds,
-    final Consumer<T> action);
+    final Consumer<? super T> action);
 
   private double getCentreX() {
     if (isRoot()) {

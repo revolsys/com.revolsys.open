@@ -78,7 +78,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
     this.spatialReference = spatialReference;
     final GeometryFactory factory = spatialReference.getGeometryFactory();
 
-    if (axisCount == 3) {
+    if (axisCount >= 3) {
       this.geometryFactory = GeometryFactory.fixed(factory.getCoordinateSystemId(), axisCount,
         factory.getScaleX(), factory.getScaleY(), factory.getScaleZ());
     } else {

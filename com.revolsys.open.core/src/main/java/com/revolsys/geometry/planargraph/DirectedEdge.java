@@ -191,6 +191,16 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
   }
 
   /**
+  <<<<<<< HEAD
+  =======
+   * Returns the coordinate of the from-node.
+   */
+  public Point getCoordinate() {
+    return this.from;
+  }
+
+  /**
+  >>>>>>> refs/remotes/origin/gba-2.0.patch
    * Returns a point to which an imaginary line is drawn from the from-node to
    * specify this DirectedEdge's orientation.
    */

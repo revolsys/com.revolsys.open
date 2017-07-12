@@ -14,6 +14,7 @@ import javax.swing.JFileChooser;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -22,7 +23,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.logging.Logs;
-import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -212,8 +212,8 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
-      final GeoreferencedImageReadFactory factory = IoFactory
-        .factoryByFileExtension(GeoreferencedImageReadFactory.class, fileNameExtension);
+      final GriddedElevationModelReadFactory factory = IoFactory
+        .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileNameExtension);
       if (factory != null) {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }
