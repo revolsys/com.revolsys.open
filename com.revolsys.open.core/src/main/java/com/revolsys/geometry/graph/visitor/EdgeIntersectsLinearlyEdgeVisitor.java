@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.IntersectionMatrix;
@@ -20,7 +20,7 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Consumer<Edge<T>> {
     final LineString line = edge.getLine();
     final BoundingBox env = line.getBoundingBox();
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.forEach(new EdgeIntersectsLinearlyEdgeVisitor<>(edge, results), env);
+    index.forEach(env, new EdgeIntersectsLinearlyEdgeVisitor<>(edge, results));
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;

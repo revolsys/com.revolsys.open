@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * @version 1.7
@@ -104,10 +104,11 @@ public class Edge extends GraphComponent implements LineString {
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
     if (nextSegIndex < getVertexCount()) {
-      final Point nextPt = getPoint(nextSegIndex);
+      final double nextX = getX(nextSegIndex);
+      final double nextY = getY(nextSegIndex);
       // Normalize segment index if intPt falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (intPt.equals(2, nextPt)) {
+      if (intPt.equalsVertex(nextX, nextY)) {
         normalizedSegmentIndex = nextSegIndex;
         dist = 0.0;
       }
@@ -129,16 +130,16 @@ public class Edge extends GraphComponent implements LineString {
     }
   }
 
-  // of this edge
-
   @Override
   public Edge clone() {
     try {
       return (Edge)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
+
+  // of this edge
 
   /**
    * Update the IM with the contribution for this component.
@@ -182,6 +183,11 @@ public class Edge extends GraphComponent implements LineString {
       }
     }
     return true;
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.line.getAxisCount();
   }
 
   @Override
@@ -258,6 +264,16 @@ public class Edge extends GraphComponent implements LineString {
   @Override
   public int getVertexCount() {
     return this.line.getVertexCount();
+  }
+
+  @Override
+  public double getX(final int i) {
+    return this.line.getX(i);
+  }
+
+  @Override
+  public double getY(final int i) {
+    return this.line.getY(i);
   }
 
   /**

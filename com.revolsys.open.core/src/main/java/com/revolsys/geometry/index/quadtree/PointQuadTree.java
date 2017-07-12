@@ -1,4 +1,4 @@
-package com.revolsys.geometry.algorithm.index;
+package com.revolsys.geometry.index.quadtree;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,12 +7,13 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import com.revolsys.collection.map.WeakKeyValueMap;
+import com.revolsys.geometry.index.AbstractPointSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.util.ExitLoopException;
@@ -63,7 +64,8 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public List<Entry<Point, T>> findEntriesWithinDistance(final Point from, final Point to,
     final double maxDistance) {
-    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(this.geometryFactory, from, to);
+    final BoundingBox boundingBox = this.geometryFactory.newBoundingBox(from.getX(), from.getY(),
+      to.getX(), to.getY());
     final List<Entry<Point, T>> entries = new ArrayList<>();
     this.root.findEntriesWithin(entries, boundingBox);
     for (final Iterator<Entry<Point, T>> iterator = entries.iterator(); iterator.hasNext();) {
@@ -111,19 +113,20 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   @Override
+  public void forEach(final BoundingBoxProxy boundingBoxProxy, final Consumer<? super T> action) {
+    if (this.root != null) {
+      final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+      this.root.forEach(action, boundingBox);
+    }
+  }
+
+  @Override
   public void forEach(final Consumer<? super T> action) {
     if (this.root != null) {
       try {
         this.root.forEach(action);
       } catch (final ExitLoopException e) {
       }
-    }
-  }
-
-  @Override
-  public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
-    if (this.root != null) {
-      this.root.forEach(action, envelope);
     }
   }
 

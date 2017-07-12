@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -25,7 +25,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
     final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<>(node, boundingBox, maxDistance,
       results);
-    index.forEach(visitor, boundingBox);
+    index.forEach(boundingBox, visitor);
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;

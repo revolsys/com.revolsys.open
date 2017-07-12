@@ -268,7 +268,7 @@ public class GeometryGraph extends PlanarGraph {
     for (final Edge e : this.edges) {
       final Location eLoc = e.getLabel().getLocation(argIndex);
       for (final EdgeIntersection ei : e.getEdgeIntersectionList()) {
-        addSelfIntersectionNode(argIndex, ei.coord, eLoc);
+        addSelfIntersectionNode(argIndex, ei, eLoc);
       }
     }
   }

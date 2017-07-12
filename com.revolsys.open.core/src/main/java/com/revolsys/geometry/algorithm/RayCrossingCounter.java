@@ -32,6 +32,7 @@
  */
 package com.revolsys.geometry.algorithm;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -70,6 +71,22 @@ import com.revolsys.geometry.model.segment.Segment;
  */
 public class RayCrossingCounter implements Consumer<LineSegment> {
 
+  public static Location locatePointInRing(final Point p, final Iterable<Point> ring) {
+    final RayCrossingCounter counter = new RayCrossingCounter(p);
+    final Iterator<Point> iterator = ring.iterator();
+    if (iterator.hasNext()) {
+      final Point previousPoint = iterator.next();
+      while (iterator.hasNext()) {
+        final Point currentPoint = iterator.next();
+        counter.countSegment(currentPoint, previousPoint);
+        if (counter.isOnSegment()) {
+          return counter.getLocation();
+        }
+      }
+    }
+    return counter.getLocation();
+  }
+
   /**
    * Determines the {@link Location} of a point in a ring.
    *
@@ -89,17 +106,18 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
 
         final RayCrossingCounter counter = new RayCrossingCounter(point);
 
-        double x0 = ring.getX(0);
-        double y0 = ring.getY(0);
-        for (int i = 1; i < ring.getVertexCount(); i++) {
-          final double x1 = ring.getX(i);
-          final double y1 = ring.getY(i);
-          counter.countSegment(x1, y1, x0, y0);
+        double x1 = ring.getX(0);
+        double y1 = ring.getY(0);
+        final int vertexCount = ring.getVertexCount();
+        for (int i = 1; i < vertexCount; i++) {
+          final double x2 = ring.getX(i);
+          final double y2 = ring.getY(i);
+          counter.countSegment(x2, y2, x1, y1);
           if (counter.isOnSegment()) {
             return counter.getLocation();
           }
-          x0 = x1;
-          y0 = y1;
+          x1 = x2;
+          y1 = y2;
         }
         return counter.getLocation();
       } else {
@@ -222,6 +240,14 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
         }
       }
     }
+  }
+
+  public void countSegment(final LineSegment segment) {
+    final double x1 = segment.getX(0);
+    final double y1 = segment.getY(0);
+    final double x2 = segment.getX(1);
+    final double y2 = segment.getY(1);
+    countSegment(x1, y1, x2, y2);
   }
 
   /**

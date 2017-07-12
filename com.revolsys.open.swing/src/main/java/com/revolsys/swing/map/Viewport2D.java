@@ -31,8 +31,8 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.record.Record;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
@@ -48,6 +48,8 @@ import com.revolsys.util.Property;
 public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportProxy {
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.DEFAULT_3D.geometry();
+
+  private static final int HOTSPOT_PIXELS = 10;
 
   public static double getScale(final Measurable<Length> viewWidth,
     final Measurable<Length> modelWidth) {
@@ -147,6 +149,8 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   private int viewWidth;
 
+  private double hotspotMapUnits = 6;
+
   public Viewport2D() {
   }
 
@@ -166,7 +170,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       boundingBox = coordinateSystem.getAreaBoundingBox();
     } else {
       geometryFactory = boundingBox.getGeometryFactory();
-      if (geometryFactory == null) {
+      if (!geometryFactory.isHasCoordinateSystem()) {
         geometryFactory = GeometryFactory.worldMercator();
       }
       if (boundingBox.isEmpty()) {
@@ -192,10 +196,10 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     GeometryStyleRenderer.renderGeometryOutline(this, graphics, geometry, style);
   }
 
-  public void drawText(final LayerRecord object, final Geometry geometry, final TextStyle style) {
+  public void drawText(final Record record, final Geometry geometry, final TextStyle style) {
     final Graphics2D graphics = getGraphics();
     if (graphics != null) {
-      TextStyleRenderer.renderText(this, graphics, object, geometry, style);
+      TextStyleRenderer.renderText(this, graphics, record, geometry, style);
     }
 
   }
@@ -214,7 +218,8 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final int pixels) {
     final Point p1 = toModelPoint(geometryFactory, x - pixels, y - pixels);
     final Point p2 = toModelPoint(geometryFactory, x + pixels, y + pixels);
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, p1, p2);
+    final BoundingBox boundingBox = geometryFactory.newBoundingBox(p1.getX(), p1.getY(), p2.getX(),
+      p2.getY());
     return boundingBox;
   }
 
@@ -231,7 +236,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       if (!viewExtent.isEmpty()) {
         final BoundingBox geometryExtent = geometry.getBoundingBox();
         if (geometryExtent.intersects(viewExtent)) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
+          final GeometryFactory geometryFactory = getGeometryFactory2dFloating();
           return geometryFactory.geometry(geometry);
         }
       }
@@ -249,9 +254,17 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return this.geometryFactory;
   }
 
+  public GeometryFactory getGeometryFactory2dFloating() {
+    return this.geometryFactory2d;
+  }
+
   @Deprecated
   public Graphics2D getGraphics() {
     return null;
+  }
+
+  public double getHotspotMapUnits() {
+    return this.hotspotMapUnits;
   }
 
   public double getModelHeight() {
@@ -338,9 +351,9 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     if (geometryFactory.isProjected()) {
       final double resolution = getUnitsPerPixel();
       if (resolution > 2) {
-        geometryFactory = geometryFactory.convertScales(1.0);
+        geometryFactory = geometryFactory.convertScales(1.0, 1.0);
       } else {
-        geometryFactory = geometryFactory.convertScales(1000.0);
+        geometryFactory = geometryFactory.convertScales(1000.0, 1000.0);
       }
     }
     return geometryFactory;
@@ -457,13 +470,13 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final AffineTransform modelToScreenTransform = new AffineTransform();
     final double mapWidth = boundingBox.getWidth();
     this.pixelsPerXUnit = viewWidth / mapWidth;
+    this.hotspotMapUnits = HOTSPOT_PIXELS / this.pixelsPerXUnit;
 
     final double mapHeight = boundingBox.getHeight();
     this.pixelsPerYUnit = getPixelsPerYUnit(viewHeight, mapHeight);
 
     this.originX = boundingBox.getMinX();
     this.originY = boundingBox.getMaxY();
-
     modelToScreenTransform
       .concatenate(AffineTransform.getScaleInstance(this.pixelsPerXUnit, this.pixelsPerYUnit));
     modelToScreenTransform
@@ -483,7 +496,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   public BoundingBox setBoundingBox(BoundingBox boundingBox) {
     if (boundingBox != null && !boundingBox.isEmpty()) {
       double unitsPerPixel = 0;
-      final GeometryFactory geometryFactory = getGeometryFactory();
+      final GeometryFactory geometryFactory = getGeometryFactory2dFloating();
       boundingBox = boundingBox.convert(geometryFactory);
       if (!boundingBox.isEmpty()) {
         BoundingBox newBoundingBox = boundingBox;
@@ -595,18 +608,17 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     }
   }
 
-  private BoundingBox setCentre(Point centre, final double scale) {
+  private BoundingBox setCentre(final Point centre, final double scale) {
     final double unitsPerPixel = getUnitsPerPixel(scale);
     final GeometryFactory geometryFactory = getGeometryFactory();
-    centre = centre.newPoint2D();
     final int viewWidthPixels = getViewWidthPixels();
     final double viewWidth = viewWidthPixels * unitsPerPixel;
     final int viewHeightPixels = getViewHeightPixels();
     final double viewHeight = viewHeightPixels * unitsPerPixel;
-    final GeometryFactory precisionModel = GeometryFactory.fixedNoSrid(1 / unitsPerPixel);
-    centre = precisionModel.getPreciseCoordinates(centre);
-    final double centreX = centre.getX();
-    final double centreY = centre.getY();
+    final GeometryFactory precisionModel = GeometryFactory.fixedNoSrid(1 / unitsPerPixel,
+      1 / unitsPerPixel);
+    final double centreX = precisionModel.makeXyPrecise(centre.getX());
+    final double centreY = precisionModel.makeXyPrecise(centre.getY());
 
     double leftOffset = precisionModel.makeXyPrecise(viewWidth / 2);
     if (viewWidthPixels % 2 == 1) {
@@ -622,7 +634,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final double y1 = centreY - bottomOffset;
     final double x2 = centreX + rightOffset;
     final double y2 = centreY + topOffset;
-    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+    final BoundingBox newBoundingBox = geometryFactory.newBoundingBox(x1, y1, x2, y2);
     setBoundingBoxDo(newBoundingBox, unitsPerPixel);
     return newBoundingBox;
   }
@@ -645,12 +657,13 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     if (DataType.equal(oldGeometryFactory, geometryFactory)) {
       return false;
     } else {
-      this.geometryFactory = geometryFactory;
       if (geometryFactory == null) {
+        this.geometryFactory = GeometryFactory.DEFAULT_3D;
         this.geometryFactory2d = null;
       } else {
-        this.geometryFactory2d = geometryFactory.convertAxisCount(2);
+        this.geometryFactory = geometryFactory;
       }
+      this.geometryFactory2d = this.geometryFactory.to2dFloating();
       return true;
     }
   }
@@ -731,10 +744,10 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public Point toModelPoint(final double... viewCoordinates) {
     if (this.geometryFactory2d == null) {
-      return GeometryFactory.DEFAULT_3D.point();
+      return GeometryFactory.DEFAULT_2D.point();
     } else {
       final double[] coordinates = toModelCoordinates(viewCoordinates);
-      return this.geometryFactory2d.point(coordinates);
+      return this.geometryFactory2d.point(coordinates[0], coordinates[1]);
     }
   }
 
@@ -745,7 +758,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
       return geometryFactory.point();
     } else {
-      final Point point = this.geometryFactory2d.point(coordinates);
+      final Point point = this.geometryFactory2d.point(coordinates[0], coordinates[1]);
       return point.newGeometry(geometryFactory);
     }
   }
@@ -759,6 +772,19 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   public Point toModelPoint(final GeometryFactory geometryFactory, final MouseEvent event) {
     final java.awt.Point eventPoint = event.getPoint();
     return toModelPoint(geometryFactory, eventPoint);
+  }
+
+  public Point toModelPoint(final int x, final int y) {
+    final AffineTransform transform = getScreenToModelTransform();
+    if (transform == null) {
+      return this.geometryFactory2d.point(x, y);
+    } else {
+      final double[] coordinates = new double[] {
+        x, y
+      };
+      transform.transform(coordinates, 0, coordinates, 0, 1);
+      return this.geometryFactory2d.point(coordinates);
+    }
   }
 
   public Point toModelPoint(final java.awt.Point point) {

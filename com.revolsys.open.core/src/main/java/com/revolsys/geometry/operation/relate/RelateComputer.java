@@ -110,9 +110,8 @@ public class RelateComputer {
     im.set(Location.EXTERIOR, Location.EXTERIOR, 2);
 
     // if the Geometries don't overlap there is nothing to do
-    if (!this.arg[0].getGeometry()
-      .getBoundingBox()
-      .intersects(this.arg[1].getGeometry().getBoundingBox())) {
+    if (!this.arg[0].getGeometry().getBoundingBox().intersects(
+      this.arg[1].getGeometry().getBoundingBox())) {
       computeDisjointIM(im);
       return im;
     }
@@ -193,7 +192,7 @@ public class RelateComputer {
       final Location eLoc = e.getLabel().getLocation(argIndex);
       for (final Object element : e.getEdgeIntersectionList()) {
         final EdgeIntersection ei = (EdgeIntersection)element;
-        final RelateNode n = (RelateNode)this.nodes.addNode(ei.coord);
+        final RelateNode n = (RelateNode)this.nodes.addNode(ei);
         if (eLoc == Location.BOUNDARY) {
           n.setLabelBoundary(argIndex);
         } else {

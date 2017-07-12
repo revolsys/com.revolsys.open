@@ -32,6 +32,7 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
   private final Geometry geometry;
 
   public GeometrySegmentQuadTree(final Geometry geometry) {
+    super(geometry.getGeometryFactory());
     this.geometry = geometry;
     if (geometry != null) {
       setGeometryFactory(geometry.getGeometryFactory());
@@ -40,13 +41,6 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
         insertItem(boundingBox, segment);
       }
     }
-  }
-
-  @Override
-  protected double[] getBounds(final Object id) {
-    final Segment segment = getItem(id);
-    final BoundingBox boundingBox = segment.getBoundingBox();
-    return boundingBox.getMinMaxValues(2);
   }
 
   @Override
@@ -65,7 +59,22 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
     boundingBox = boundingBox.expand(maxDistance);
     final LineSegmentCoordinateDistanceFilter filter = new LineSegmentCoordinateDistanceFilter(
       point, maxDistance);
-    return query(boundingBox, filter);
+    return getItems(boundingBox, filter);
+  }
+
+  @Override
+  protected boolean intersectsBounds(final Object id, final double x, final double y) {
+    final Segment segment = getItem(id);
+    final BoundingBox boundingBox = segment.getBoundingBox();
+    return boundingBox.intersects(x, y, x, y);
+  }
+
+  @Override
+  protected boolean intersectsBounds(final Object id, final double minX, final double minY,
+    final double maxX, final double maxY) {
+    final Segment segment = getItem(id);
+    final BoundingBox boundingBox = segment.getBoundingBox();
+    return boundingBox.intersects(minX, minY, maxX, maxY);
   }
 
 }

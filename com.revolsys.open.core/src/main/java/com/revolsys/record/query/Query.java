@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -28,7 +29,6 @@ import com.revolsys.util.Cancellable;
 import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCountMap;
-import com.revolsys.util.function.Function2;
 
 public class Query extends BaseObjectWithProperties implements Cloneable, CancellableProxy {
   private static void addFilter(final Query query, final RecordDefinition recordDefinition,
@@ -119,7 +119,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return query;
   }
 
-  public static Query where(final Function2<FieldDefinition, Object, BinaryCondition> whereFunction,
+  public static Query where(
+    final BiFunction<FieldDefinition, Object, BinaryCondition> whereFunction,
     final FieldDefinition field, final Object value) {
     final RecordDefinition recordDefinition = field.getRecordDefinition();
     final Query query = new Query(recordDefinition);

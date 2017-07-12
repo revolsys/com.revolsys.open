@@ -19,7 +19,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
     BoundingBox env = point.getBoundingBox();
     env = env.expand(maxDistance);
     graph.getEdgeIndex()
-      .forEach(new EdgeLessThanDistanceToNodeVisitor<>(node, maxDistance, results), env);
+      .forEach(env, new EdgeLessThanDistanceToNodeVisitor<>(node, maxDistance, results));
     return results.getList();
 
   }

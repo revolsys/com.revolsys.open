@@ -168,6 +168,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
           old.setVisible(false);
         }
         Property.removeListener(old, this);
+
       }
       this.layer = layer;
       if (layer != null) {

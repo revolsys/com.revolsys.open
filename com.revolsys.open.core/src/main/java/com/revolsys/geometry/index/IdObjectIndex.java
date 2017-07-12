@@ -1,16 +1,21 @@
-package com.revolsys.geometry.algorithm.index;
+package com.revolsys.geometry.index;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 
 public interface IdObjectIndex<T> extends Iterable<T> {
   public T add(final T object);
 
-  void forEach(Consumer<? super T> action, BoundingBox envelope);
+  void forEach(BoundingBoxProxy boundingBox, Consumer<? super T> action);
 
-  BoundingBox getEnvelope(T object);
+  void forEach(BoundingBoxProxy boundingBox, Predicate<? super T> filter,
+    Consumer<? super T> action);
+
+  BoundingBox getBoundingBox(T object);
 
   int getId(T object);
 

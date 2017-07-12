@@ -1,9 +1,14 @@
-package com.revolsys.geometry.algorithm.index;
+package com.revolsys.geometry.index.quadtree;
 
 import java.util.Collection;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
+import com.revolsys.geometry.index.AbstractPointSpatialIndex;
+import com.revolsys.geometry.index.IdObjectIndex;
+import com.revolsys.geometry.index.PointSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Point;
 
 public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpatialIndex<T>
@@ -26,22 +31,37 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpat
   }
 
   @Override
+  public void forEach(final BoundingBoxProxy boundingBoxProxy, final Consumer<? super T> action) {
+    final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+    this.index.forEach(boundingBox, (id) -> {
+      final T object = getObject(id);
+      final BoundingBox e = getBoundingBox(object);
+      if (e.intersects(boundingBox)) {
+        action.accept(object);
+      }
+    });
+  }
+
+  @Override
+  public void forEach(final BoundingBoxProxy boundingBoxProxy, final Predicate<? super T> filter,
+    final Consumer<? super T> action) {
+    final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+
+    this.index.forEach(boundingBox, (id) -> {
+      final T object = getObject(id);
+      final BoundingBox e = getBoundingBox(object);
+      if (e.intersects(boundingBox) && filter.test(object)) {
+        action.accept(object);
+      }
+    });
+  }
+
+  @Override
   public void forEach(final Consumer<? super T> action) {
     this.index.forEach((id) -> {
       final T object = getObject(id);
       action.accept(object);
     });
-  }
-
-  @Override
-  public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
-    this.index.forEach((id) -> {
-      final T object = getObject(id);
-      final BoundingBox e = getEnvelope(object);
-      if (e.intersects(envelope)) {
-        action.accept(object);
-      }
-    }, envelope);
   }
 
   public abstract Point getCoordinates(T object);

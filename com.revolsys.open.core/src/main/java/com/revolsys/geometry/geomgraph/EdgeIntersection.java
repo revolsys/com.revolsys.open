@@ -35,6 +35,7 @@ package com.revolsys.geometry.geomgraph;
 import java.io.PrintStream;
 
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Represents a point on an
@@ -46,20 +47,21 @@ import com.revolsys.geometry.model.Point;
  *
  * @version 1.7
  */
-public class EdgeIntersection implements Comparable<EdgeIntersection> {
+public class EdgeIntersection extends PointDoubleXY {
 
-  public Point coord; // the point of intersection
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
   public double dist; // the edge distance of this point along the containing
-
   // parent edge
 
   public int segmentIndex; // the index of the containing line segment in the
-
   // line segment
 
   public EdgeIntersection(final Point coord, final int segmentIndex, final double dist) {
-    this.coord = coord;
+    super(coord.getX(), coord.getY());
     this.segmentIndex = segmentIndex;
     this.dist = dist;
   }
@@ -86,12 +88,17 @@ public class EdgeIntersection implements Comparable<EdgeIntersection> {
   }
 
   @Override
-  public int compareTo(final EdgeIntersection other) {
-    return compare(other.segmentIndex, other.dist);
+  public int compareTo(final Object other) {
+    if (other instanceof EdgeIntersection) {
+      final EdgeIntersection edgeIntersection = (EdgeIntersection)other;
+      return compare(edgeIntersection.segmentIndex, edgeIntersection.dist);
+    } else {
+      return super.compareTo(other);
+    }
   }
 
   public Point getCoordinate() {
-    return this.coord;
+    return this;
   }
 
   public double getDistance() {
@@ -105,21 +112,21 @@ public class EdgeIntersection implements Comparable<EdgeIntersection> {
   public boolean isEndPoint(final int maxSegmentIndex) {
     if (this.segmentIndex == 0 && this.dist == 0.0) {
       return true;
-    }
-    if (this.segmentIndex == maxSegmentIndex) {
+    } else if (this.segmentIndex == maxSegmentIndex) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
   public void print(final PrintStream out) {
-    out.print(this.coord);
+    out.print(this);
     out.print(" seg # = " + this.segmentIndex);
     out.println(" dist = " + this.dist);
   }
 
   @Override
   public String toString() {
-    return this.coord + " seg # = " + this.segmentIndex + " dist = " + this.dist;
+    return super.toString() + " seg # = " + this.segmentIndex + " dist = " + this.dist;
   }
 }

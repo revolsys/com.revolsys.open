@@ -239,7 +239,7 @@ public abstract class PlanarGraph {
 
     }
     // remove the node from the graph
-    this.nodeMap.remove(node.getCoordinate());
+    this.nodeMap.remove(node);
     node.remove();
   }
 

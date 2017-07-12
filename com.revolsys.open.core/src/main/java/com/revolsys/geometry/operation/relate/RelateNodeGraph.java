@@ -108,7 +108,7 @@ public class RelateNodeGraph {
       final Location eLoc = e.getLabel().getLocation(argIndex);
       for (final Object element : e.getEdgeIntersectionList()) {
         final EdgeIntersection ei = (EdgeIntersection)element;
-        final RelateNode n = (RelateNode)this.nodes.addNode(ei.coord);
+        final RelateNode n = (RelateNode)this.nodes.addNode(ei);
         if (eLoc == Location.BOUNDARY) {
           n.setLabelBoundary(argIndex);
         } else {

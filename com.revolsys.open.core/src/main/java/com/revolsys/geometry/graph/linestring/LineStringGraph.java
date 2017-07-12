@@ -395,12 +395,9 @@ public class LineStringGraph extends Graph<LineSegment> {
     this.points = lineString;
     int index = 0;
     for (final LineSegment lineSegment : lineString.segments()) {
-      final double fromX = lineSegment.getX(0);
-      final double fromY = lineSegment.getY(0);
-      final double toX = lineSegment.getX(1);
-      final double toY = lineSegment.getY(1);
-      final Edge<LineSegment> edge = addEdge((LineSegment)lineSegment.clone(), fromX, fromY, toX,
-        toY);
+      final Point from = lineSegment.getP0();
+      final Point to = lineSegment.getP1();
+      final Edge<LineSegment> edge = addEdge((LineSegment)lineSegment.clone(), from, to);
 
       edge.setProperty(INDEX, Arrays.asList(index++));
     }

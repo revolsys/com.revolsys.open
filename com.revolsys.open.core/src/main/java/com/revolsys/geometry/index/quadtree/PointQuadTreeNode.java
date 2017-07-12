@@ -1,4 +1,4 @@
-package com.revolsys.geometry.algorithm.index;
+package com.revolsys.geometry.index.quadtree;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;

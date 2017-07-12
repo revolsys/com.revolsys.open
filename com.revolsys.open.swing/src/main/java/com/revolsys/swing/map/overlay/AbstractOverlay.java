@@ -84,7 +84,9 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   private Point snapCentre;
 
-  private java.awt.Point snapEventPoint;
+  private int snapEventX;
+
+  private int snapEventY;
 
   private Point snapPoint;
 
@@ -161,7 +163,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
           }
           text.append(location.getIndexString());
           text.append("</td><td style=\"border-right: solid black 1px\">");
-          final Point point = location.getPoint();
+          final Point point = location.getSourcePoint();
           text.append(point.getCoordinateSystemId());
           text.append("</td><td>");
           appendPoint(text, point);
@@ -222,7 +224,6 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   protected void clearSnapLocations() {
     this.snapPointLocationMap = Collections.emptyMap();
     this.snapPoint = null;
-    this.snapEventPoint = null;
   }
 
   protected void clearUndoHistory() {
@@ -234,7 +235,6 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   public void destroy() {
     this.map = null;
-    this.snapEventPoint = null;
     this.snapPoint = null;
     this.snapPointLocationMap.clear();
     this.viewport = null;
@@ -244,7 +244,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   protected void drawXorGeometry(final Graphics2D graphics) {
     Geometry geometry = this.xorGeometry;
     if (geometry != null) {
-      geometry = geometry.newGeometry(getViewport().getGeometryFactory());
+      geometry = geometry.newGeometry(getViewport().getGeometryFactory2dFloating());
       final Paint paint = graphics.getPaint();
       try {
         graphics.setXORMode(Color.WHITE);
@@ -285,16 +285,16 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     final int x = event.getX();
     final int y = event.getY();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final Point p1 = this.viewport.toModelPoint(x, y).convertGeometry(geometryFactory, 2);
+    final Point p1 = this.viewport.toModelPoint(x, y).convertPoint2d(geometryFactory);
     final Point p2 = this.viewport.toModelPoint(x + getHotspotPixels(), y + getHotspotPixels())
-      .convertGeometry(geometryFactory, 2);
+      .convertPoint2d(geometryFactory);
 
-    return p1.distance(p2);
+    return p1.distancePoint(p2);
   }
 
   protected Point getEventPoint() {
     final MouseOverlay mouseOverlay = this.map.getMouseOverlay();
-    return mouseOverlay.getEventPoint();
+    return mouseOverlay.getEventPointRounded();
   }
 
   protected java.awt.Point getEventPosition() {
@@ -313,35 +313,33 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     return geometryFactory;
   }
 
+  protected GeometryFactory getGeometryFactory2d() {
+    GeometryFactory geometryFactory = this.geometryFactory;
+    if (geometryFactory == null) {
+      geometryFactory = getProject().getGeometryFactory();
+      if (geometryFactory == null) {
+        return getViewportGeometryFactory2d();
+      } else {
+        return geometryFactory.to2dFloating();
+      }
+    }
+    return geometryFactory;
+  }
+
   @Override
   public Graphics2D getGraphics() {
     return (Graphics2D)super.getGraphics();
   }
 
   protected BoundingBox getHotspotBoundingBox() {
-    final Viewport2D viewport = getViewport();
-    final GeometryFactory geometryFactory = getViewport().getGeometryFactory();
-    final BoundingBox boundingBox;
-    if (geometryFactory != null) {
-      final int hotspotPixels = getHotspotPixels();
-      boundingBox = viewport.getBoundingBox(geometryFactory, hotspotPixels);
-    } else {
-      boundingBox = BoundingBox.empty();
-    }
-    return boundingBox;
-  }
+    final Point point = MouseOverlay.getEventPoint();
 
-  protected BoundingBox getHotspotBoundingBox(final MouseEvent event) {
-    final Viewport2D viewport = getViewport();
-    final GeometryFactory geometryFactory = getViewport().getGeometryFactory();
-    final BoundingBox boundingBox;
-    if (geometryFactory != null) {
-      final int hotspotPixels = getHotspotPixels();
-      boundingBox = viewport.getBoundingBox(geometryFactory, event, hotspotPixels);
-    } else {
-      boundingBox = BoundingBox.empty();
-    }
-    return boundingBox;
+    final double x = point.getX();
+    final double y = point.getY();
+    final double maxDistance = this.viewport.getHotspotMapUnits();
+    final GeometryFactory geometryFactory = getViewportGeometryFactory2d();
+    return geometryFactory.newBoundingBox(x - maxDistance, y - maxDistance, x + maxDistance,
+      y + maxDistance);
   }
 
   public int getHotspotPixels() {
@@ -440,6 +438,14 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     }
   }
 
+  protected GeometryFactory getViewportGeometryFactory2d() {
+    if (this.viewport == null) {
+      return GeometryFactory.DEFAULT_3D;
+    } else {
+      return this.viewport.getGeometryFactory2dFloating();
+    }
+  }
+
   protected Point getViewportPoint(final java.awt.Point eventPoint) {
     final Point point = this.viewport.toModelPoint(eventPoint);
     return point;
@@ -457,37 +463,34 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     }
   }
 
-  protected boolean hasSnapPoint(final BoundingBox boundingBox) {
-    final java.awt.Point eventPoint = getEventPosition();
-    return hasSnapPoint(eventPoint, boundingBox);
-  }
-
-  protected boolean hasSnapPoint(final java.awt.Point eventPoint, final BoundingBox boundingBox) {
-    this.snapEventPoint = eventPoint;
-    new TreeMap<Point, List<CloseLocation>>();
-    this.snapCentre = boundingBox.getCentre();
-    final List<AbstractRecordLayer> layers = getSnapLayers();
-    final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<>();
+  protected boolean hasSnapPoint() {
     this.snapPoint = null;
+    this.snapEventX = MouseOverlay.getEventX();
+    this.snapEventY = MouseOverlay.getEventY();
+    this.snapCentre = MouseOverlay.getEventPoint();
+    final double snapCentreX = this.snapCentre.getX();
+    final double snapCentreY = this.snapCentre.getY();
+    final double maxDistance = this.viewport.getHotspotMapUnits();
+    final BoundingBox boundingBox = this.snapCentre.getBoundingBox().expand(maxDistance);
+
+    final GeometryFactory geometryFactory = getViewportGeometryFactory2d();
+    final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<>();
+    final List<AbstractRecordLayer> layers = getSnapLayers();
     for (final AbstractRecordLayer layer : layers) {
       final List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
       for (final LayerRecord record : records) {
         if (layer.isVisible(record)) {
-          final CloseLocation closeLocation = this.map.findCloseLocation(record, boundingBox);
+          final Geometry recordGeometry = record.getGeometry();
+          final CloseLocation closeLocation = this.map.findCloseLocation(geometryFactory, layer,
+            record, recordGeometry, snapCentreX, snapCentreY, maxDistance);
           if (closeLocation != null) {
-            final Point closePoint = closeLocation.getPoint();
+            final Point closePoint = closeLocation.getViewportPoint();
             Maps.addToSet(snapLocations, closePoint, closeLocation);
-
           }
         }
       }
     }
     return setSnapLocations(snapLocations);
-  }
-
-  protected boolean hasSnapPoint(final MouseEvent event, final BoundingBox boundingBox) {
-    final java.awt.Point eventPoint = event.getPoint();
-    return hasSnapPoint(eventPoint, boundingBox);
   }
 
   public boolean isMouseInMap() {
@@ -543,7 +546,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   protected LineString newXorLine(final GeometryFactory geometryFactory, final Point c0,
     final Point p1) {
     final Viewport2D viewport = getViewport();
-    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory2dFloating();
     final LineSegment line = viewportGeometryFactory.lineSegment(c0, p1);
     final double length = line.getLength();
     if (length > 0) {
@@ -628,8 +631,8 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
             } else if (hasVertex2) {
               return 0;
             }
-            final double distance1 = AbstractOverlay.this.snapCentre.distance(point1);
-            final double distance2 = AbstractOverlay.this.snapCentre.distance(point2);
+            final double distance1 = AbstractOverlay.this.snapCentre.distancePoint(point1);
+            final double distance2 = AbstractOverlay.this.snapCentre.distancePoint(point2);
             if (distance1 <= distance2) {
               return -1;
             } else {
@@ -720,7 +723,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
         i++;
       }
       text.append("</html>");
-      map.setToolTipText(this.snapEventPoint, text);
+      map.setToolTipText(this.snapEventX, this.snapEventY, text);
 
       if (Booleans.getBoolean(nodeSnap)) {
         setMapCursor(CURSOR_NODE_SNAP);

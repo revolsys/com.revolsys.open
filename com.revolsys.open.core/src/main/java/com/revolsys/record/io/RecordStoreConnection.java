@@ -3,6 +3,7 @@ package com.revolsys.record.io;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
@@ -13,11 +14,10 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function2;
 
-public class RecordStoreConnection extends
-  AbstractConnection<RecordStoreConnection, RecordStoreConnectionRegistry> implements
-  Parent<RecordStoreSchemaElement> {
+public class RecordStoreConnection
+  extends AbstractConnection<RecordStoreConnection, RecordStoreConnectionRegistry>
+  implements Parent<RecordStoreSchemaElement> {
   private RecordStore recordStore;
 
   private boolean savePassword;
@@ -64,7 +64,8 @@ public class RecordStoreConnection extends
     synchronized (this) {
       if (this.recordStore == null || this.recordStore.isClosed()) {
         this.recordStore = null;
-        final Function2<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager.getInvalidRecordStoreFunction();
+        final BiFunction<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
+          .getInvalidRecordStoreFunction();
         Throwable savedException = null;
         do {
           try {
@@ -75,7 +76,7 @@ public class RecordStoreConnection extends
             savedException = e;
           }
         } while (invalidRecordStoreFunction != null
-            && invalidRecordStoreFunction.apply(this, savedException));
+          && invalidRecordStoreFunction.apply(this, savedException));
         Exceptions.throwUncheckedException(savedException);
       }
     }

@@ -38,17 +38,14 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.index.quadtree.GeometrySegmentQuadTree;
-import com.revolsys.geometry.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryComponent;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.geometry.model.vertex.VertexIndexComparator;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
@@ -60,6 +57,7 @@ import com.revolsys.swing.listener.ConsumerSelectedItemListener;
 import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
 import com.revolsys.swing.map.border.MapRulerBorder;
+import com.revolsys.swing.map.component.MapPointerElevation;
 import com.revolsys.swing.map.component.MapPointerLocation;
 import com.revolsys.swing.map.component.SelectMapCoordinateSystem;
 import com.revolsys.swing.map.component.SelectMapScale;
@@ -91,6 +89,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 import com.revolsys.value.GlobalBooleanValue;
@@ -103,8 +102,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     50000L, 25000L, 10000L, 5000L, 2500L, 1000L, 500L, 250L, 100L, 50L, 25L, 10L, 5L);
 
   private static final long serialVersionUID = 1L;
-
-  private static final VertexIndexComparator VERTEX_INDEX_COMPARATOR = new VertexIndexComparator();
 
   public static MapPanel getMapPanel(final Layer layer) {
     if (layer == null) {
@@ -184,7 +181,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private int zoomHistoryIndex = -1;
 
-  private LayerRecordQuadTree selectedRecordsIndex = new LayerRecordQuadTree();
+  private LayerRecordQuadTree selectedRecordsIndex;
 
   private List<LayerRecord> closeSelectedRecords = Collections.emptyList();
 
@@ -457,81 +454,39 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public CloseLocation findCloseLocation(final AbstractRecordLayer layer, final LayerRecord record,
-    final Geometry geometry, final BoundingBox boundingBox) {
-    CloseLocation closeLocation = findCloseVertexLocation(layer, record, geometry, boundingBox);
-    if (closeLocation == null) {
-      closeLocation = findCloseSegmentLocation(layer, record, geometry, boundingBox);
-    }
-    return closeLocation;
+    final Geometry geometry) {
+    final Point point = MouseOverlay.getEventPoint();
+    final double x = point.getX();
+    final double y = point.getY();
+    final double maxDistance = this.viewport.getHotspotMapUnits();
+    final GeometryFactory geometryFactory = this.viewport.getGeometryFactory2dFloating();
+    return findCloseLocation(geometryFactory, layer, record, geometry, x, y, maxDistance);
   }
 
-  public CloseLocation findCloseLocation(final LayerRecord record, final BoundingBox boundingBox) {
-    if (record.isGeometryEditable()) {
-      final AbstractRecordLayer layer = record.getLayer();
-      final Geometry geometry = record.getGeometry();
-      return findCloseLocation(layer, record, geometry, boundingBox);
+  public CloseLocation findCloseLocation(final GeometryFactory viewportGeometryFactory2d,
+    final AbstractRecordLayer layer, final LayerRecord record, final Geometry geometry,
+    final double x, final double y, final double maxDistance) {
+    final Geometry convertedGeometry = geometry.convertGeometry(viewportGeometryFactory2d);
+    final Pair<GeometryComponent, Double> closestGeometryComponent = convertedGeometry
+      .findClosestGeometryComponent(x, y, maxDistance);
 
-    }
-    return null;
-  }
+    if (!closestGeometryComponent.isEmpty()) {
+      final GeometryComponent geometryComponent = closestGeometryComponent.getValue1();
+      if (geometryComponent instanceof Vertex) {
+        final Vertex convertedVertex = (Vertex)geometryComponent;
+        final int[] vertexId = convertedVertex.getVertexId();
+        // Get the vertex from the original geometry
+        final Vertex vertex = geometry.getVertex(vertexId);
+        return new CloseLocation(layer, record, vertex);
+      } else if (geometryComponent instanceof Segment) {
+        final Segment convertedSegment = (Segment)geometryComponent;
+        final int[] segmentId = convertedSegment.getSegmentId();
+        // Get the segment from the original geometry
+        final Segment segment = geometry.getSegment(segmentId);
 
-  private CloseLocation findCloseSegmentLocation(final AbstractRecordLayer layer,
-    final LayerRecord record, final Geometry geometry, final BoundingBox boundingBox) {
-
-    final GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
-    final Geometry convertedGeometry = geometry.newGeometry(viewportGeometryFactory);
-
-    final double maxDistance = getMaxDistance(boundingBox);
-    final GeometrySegmentQuadTree lineSegments = GeometrySegmentQuadTree.get(convertedGeometry);
-    final Point point = boundingBox.getCentre();
-    double closestDistance = Double.MAX_VALUE;
-    final List<Segment> segments = lineSegments.query(boundingBox, (segment) -> {
-      return segment.isWithinDistance(point, maxDistance);
-    });
-    Segment closestSegment = null;
-    for (final Segment segment : segments) {
-      final double distance = segment.distancePoint(point);
-      if (distance < closestDistance) {
-        closestSegment = segment;
-        closestDistance = distance;
-      }
-    }
-    if (closestSegment != null) {
-      final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
-      Point closePoint = pointOnLine;
-      if (layer != null) {
-        final GeometryFactory geometryFactory = layer.getGeometryFactory();
-        closePoint = pointOnLine.convertGeometry(geometryFactory);
-      }
-      final int[] segmentId = closestSegment.getSegmentId();
-      final Segment segment = geometry.getSegment(segmentId);
-      return new CloseLocation(layer, record, segment, closePoint);
-    }
-    return null;
-  }
-
-  protected CloseLocation findCloseVertexLocation(final AbstractRecordLayer layer,
-    final LayerRecord record, final Geometry geometry, final BoundingBox boundingBox) {
-    final GeometryVertexQuadTree index = GeometryVertexQuadTree.getGeometryVertexIndex(geometry);
-    if (index != null) {
-      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-      Vertex closeVertex = null;
-      final Point centre = boundingBox.getCentre();
-
-      final List<Vertex> closeVertices = index.getItems(boundingBox);
-      Collections.sort(closeVertices, VERTEX_INDEX_COMPARATOR);
-      double minDistance = Double.MAX_VALUE;
-      for (final Vertex vertex : closeVertices) {
-        if (vertex != null) {
-          final double distance = ((Point)vertex.convertGeometry(geometryFactory)).distance(centre);
-          if (distance < minDistance) {
-            minDistance = distance;
-            closeVertex = vertex;
-          }
-        }
-      }
-      if (closeVertex != null) {
-        return new CloseLocation(layer, record, closeVertex);
+        final Point closePoint = convertedSegment.project(x, y);
+        final Point sourcePoint = geometry.convertGeometry(closePoint);
+        return new CloseLocation(layer, record, segment, closePoint, sourcePoint);
       }
     }
     return null;
@@ -570,18 +525,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.viewport.getGeometryFactory();
   }
 
-  protected BoundingBox getHotspotBoundingBox(final MouseEvent event) {
-    final Viewport2D viewport = getViewport();
-    final GeometryFactory geometryFactory = getViewport().getGeometryFactory();
-    final BoundingBox boundingBox;
-    if (geometryFactory != null) {
-      boundingBox = viewport.getBoundingBox(geometryFactory, event, 8);
-    } else {
-      boundingBox = BoundingBox.empty();
-    }
-    return boundingBox;
-  }
-
   public LayerRendererOverlay getLayerOverlay() {
     return this.layerOverlay;
   }
@@ -609,10 +552,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       }
     }
     return overlays;
-  }
-
-  private double getMaxDistance(final BoundingBox boundingBox) {
-    return Math.max(boundingBox.getWidth() / 2, boundingBox.getHeight()) / 2;
   }
 
   public MouseOverlay getMouseOverlay() {
@@ -759,14 +698,21 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       return false;
     } else {
       final double scale = getViewport().getScale();
-      final BoundingBox boundingBox = getHotspotBoundingBox(event);
+      final Point point = MouseOverlay.getEventPoint();
+      final double x = point.getX();
+      final double y = point.getY();
+      final double maxDistance = this.viewport.getHotspotMapUnits();
+      final GeometryFactory geometryFactory = this.viewport.getGeometryFactory2dFloating();
+
+      final BoundingBox boundingBox = point.newBoundingBox().expand(maxDistance);
       final List<LayerRecord> closeRecords = new ArrayList<>();
       final List<CloseLocation> closeLocations = new ArrayList<>();
       for (final LayerRecord closeRecord : getSelectedRecords(boundingBox)) {
         final AbstractRecordLayer layer = closeRecord.getLayer();
         if (layer.isVisible(scale) && layer.isVisible(closeRecord)) {
-
-          final CloseLocation closeLocation = findCloseLocation(closeRecord, boundingBox);
+          final Geometry geometry = closeRecord.getGeometry();
+          final CloseLocation closeLocation = findCloseLocation(geometryFactory, layer, closeRecord,
+            geometry, x, y, maxDistance);
           if (closeLocation != null) {
             closeRecords.add(closeRecord);
             closeLocations.add(closeLocation);
@@ -793,6 +739,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
     addPointerLocation(false);
     addPointerLocation(true);
+    final MapPointerElevation elevation = new MapPointerElevation(this);
+    this.leftStatusBar.add(elevation);
 
     this.overlayActionLabel = new JLabel();
     this.overlayActionLabel.setBorder(
@@ -1169,6 +1117,12 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
   }
 
+  public void setToolTipText(final int x, final int y, final CharSequence text) {
+    Invoke.later(() -> {
+      this.toolTipOverlay.setText(x, y, text);
+    });
+  }
+
   public void setToolTipText(final Point2D location, final CharSequence text) {
     Invoke.later(() -> {
       this.toolTipOverlay.setText(location, text);
@@ -1284,8 +1238,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       final double newY1 = y - newDeltaY;
 
       final GeometryFactory newGeometryFactory = boundingBox.getGeometryFactory();
-      final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(newGeometryFactory, 2, newX1,
-        newY1, newX1 + newWidth, newY1 + newHeight);
+      final BoundingBox newBoundingBox = newGeometryFactory.newBoundingBox(newX1, newY1,
+        newX1 + newWidth, newY1 + newHeight);
       setBoundingBox(newBoundingBox);
     }
   }

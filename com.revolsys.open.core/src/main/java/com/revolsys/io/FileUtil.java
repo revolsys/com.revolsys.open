@@ -60,7 +60,6 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.WrappedException;
 
 /**
  * The FileUtil class is a utility class for performing common tasks with
@@ -99,13 +98,17 @@ public final class FileUtil {
    */
   public static void closeSilent(final AutoCloseable... closeables) {
     for (final AutoCloseable closeable : closeables) {
-      if (closeable != null) {
-        try {
-          closeable.close();
-        } catch (final IOException e) {
-        } catch (final Exception e) {
-          Logs.error(FileUtil.class, e.getMessage(), e);
-        }
+      closeSilent(closeable);
+    }
+  }
+
+  public static void closeSilent(final AutoCloseable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (final IOException e) {
+      } catch (final Exception e) {
+        Logs.error(FileUtil.class, e.getMessage(), e);
       }
     }
   }
@@ -118,14 +121,7 @@ public final class FileUtil {
    */
   public static void closeSilent(final Collection<? extends AutoCloseable> closeables) {
     for (final AutoCloseable closeable : closeables) {
-      if (closeable != null) {
-        try {
-          closeable.close();
-        } catch (final IOException e) {
-        } catch (final Exception e) {
-          Logs.error(FileUtil.class, e.getMessage(), e);
-        }
-      }
+      closeSilent(closeable);
     }
   }
 
@@ -966,6 +962,18 @@ public final class FileUtil {
     }
   }
 
+  public static String getString(final Reader reader, final boolean close) {
+    try {
+      final StringWriter out = new StringWriter();
+      copy(reader, out);
+      return out.toString();
+    } finally {
+      if (close) {
+        closeSilent(reader);
+      }
+    }
+  }
+
   public static String getString(final Reader reader, final int count) {
     try {
       final StringWriter out = new StringWriter();
@@ -1088,7 +1096,7 @@ public final class FileUtil {
     try {
       return new FileOutputStream(file);
     } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1191,7 +1199,7 @@ public final class FileUtil {
   }
 
   /**
-   * Construct a new FileUtil.
+   * Construct a new TestFileUtil.
    */
   private FileUtil() {
   }

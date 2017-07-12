@@ -62,11 +62,10 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   protected void forEachItem(final QuadTree<T> tree, final double[] bounds,
     final Consumer<? super T> action) {
     synchronized (this.nodes) {
-      final IdObjectQuadTree<T> idTree = (IdObjectQuadTree<T>)tree;
+      final IdObjectQuadTree<T> idObjectTree = (IdObjectQuadTree<T>)tree;
       for (final Object id : this.ids) {
-        final double[] itemBounds = idTree.getBounds(id);
-        if (BoundingBoxUtil.intersects(bounds, itemBounds)) {
-          final T item = idTree.getItem(id);
+        if (idObjectTree.intersectsBounds(id, bounds[0], bounds[1], bounds[2], bounds[3])) {
+          final T item = idObjectTree.getItem(id);
           action.accept(item);
         }
       }

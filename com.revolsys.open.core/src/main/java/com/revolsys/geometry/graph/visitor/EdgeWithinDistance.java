@@ -26,7 +26,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>
       final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
       BoundingBox env = geometry.getBoundingBox();
       env = env.expand(maxDistance);
-      graph.getEdgeIndex().forEach(new EdgeWithinDistance<>(geometry, maxDistance, results), env);
+      graph.getEdgeIndex().forEach(env, new EdgeWithinDistance<>(geometry, maxDistance, results));
       return results.getList();
     }
   }

@@ -63,4 +63,11 @@ public class NodeEvent<T> extends EventObject {
     return this.typePath;
   }
 
+  public boolean isAction(final String action) {
+    return this.action.equals(action);
+  }
+
+  public boolean isAddAction() {
+    return this.action.equals(NODE_ADDED);
+  }
 }

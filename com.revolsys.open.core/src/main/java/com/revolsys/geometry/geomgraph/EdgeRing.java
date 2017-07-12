@@ -35,7 +35,6 @@ package com.revolsys.geometry.geomgraph;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
@@ -184,7 +183,7 @@ public abstract class EdgeRing {
     if (!env.covers(p)) {
       return false;
     }
-    if (!CGAlgorithms.isPointInRing(p, shell)) {
+    if (!shell.isPointInRing(p)) {
       return false;
     }
 

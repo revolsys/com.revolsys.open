@@ -33,7 +33,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
     final Node<Record> toNode = edge.getToNode();
 
     final Graph<Record> graph = edge.getGraph();
-    final List<Node<Record>> nodes = graph.findNodes(edge, 2);
+    final List<Node<Record>> nodes = graph.getNodes(edge, 2);
     for (final Iterator<Node<Record>> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
       final Node<Record> node = nodeIter.next();
       final List<Edge<Record>> edges = NodeProperties.getEdgesByType(node, typePath);

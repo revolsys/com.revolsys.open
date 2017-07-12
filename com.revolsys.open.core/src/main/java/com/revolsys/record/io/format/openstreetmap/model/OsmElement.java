@@ -218,6 +218,11 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
     return this.tags != null && !this.tags.isEmpty();
   }
 
+  @Override
+  public boolean isState(final RecordState state) {
+    return state == RecordState.NEW;
+  }
+
   public boolean isTagged() {
     return this.tags != null && !this.tags.isEmpty();
   }

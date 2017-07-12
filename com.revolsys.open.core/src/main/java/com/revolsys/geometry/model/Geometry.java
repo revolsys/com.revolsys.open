@@ -58,7 +58,6 @@ import com.revolsys.geometry.algorithm.Centroid;
 import com.revolsys.geometry.algorithm.ConvexHull;
 import com.revolsys.geometry.algorithm.InteriorPointArea;
 import com.revolsys.geometry.algorithm.InteriorPointLine;
-import com.revolsys.geometry.algorithm.InteriorPointPoint;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
@@ -736,8 +735,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    *      s points
    */
   default Geometry convexHull() {
-    final ConvexHull convexHull = new ConvexHull(this);
-    return convexHull.getConvexHull();
+    return ConvexHull.convexHull(this);
   }
 
   /**
@@ -1574,22 +1572,35 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
 
   default Point getInteriorPoint() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return getGeometryFactory().point();
-    }
-    Point interiorPt = null;
-    final int dim = getDimension();
-    if (dim == 0) {
-      final InteriorPointPoint intPt = new InteriorPointPoint(this);
-      interiorPt = intPt.getInteriorPoint();
-    } else if (dim == 1) {
-      final InteriorPointLine intPt = new InteriorPointLine(this);
-      interiorPt = intPt.getInteriorPoint();
+      return geometryFactory.point();
     } else {
-      final InteriorPointArea intPt = new InteriorPointArea(this);
-      interiorPt = intPt.getInteriorPoint();
+      Point interiorPt = null;
+      final int dim = getDimension();
+      if (dim == 0) {
+        final Point centroid = getCentroid();
+        final double centroidX = centroid.getX();
+        final double centroidY = centroid.getY();
+        double minDistance = Double.MAX_VALUE;
+        Point interiorPoint = null;
+        for (final Point point : getGeometries(Point.class)) {
+          final double distance = point.distance(centroidX, centroidY);
+          if (distance < minDistance) {
+            interiorPoint = point;
+            minDistance = distance;
+          }
+        }
+        return interiorPoint;
+      } else if (dim == 1) {
+        final InteriorPointLine intPt = new InteriorPointLine(this);
+        interiorPt = intPt.getInteriorPoint();
+      } else {
+        final InteriorPointArea intPt = new InteriorPointArea(this);
+        interiorPt = intPt.getInteriorPoint();
+      }
+      return geometryFactory.point(interiorPt.getX(), interiorPt.getY());
     }
-    return getGeometryFactory().point(interiorPt);
   }
 
   default List<GeometryValidationError> getIsSimpleErrors() {

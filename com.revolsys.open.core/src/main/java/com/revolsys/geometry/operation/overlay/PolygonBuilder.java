@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.geomgraph.DirectedEdge;
 import com.revolsys.geometry.geomgraph.EdgeRing;
 import com.revolsys.geometry.geomgraph.Node;
@@ -174,7 +173,7 @@ public class PolygonBuilder {
         minEnv = minShell.getLinearRing().getBoundingBox();
       }
       boolean isContained = false;
-      if (tryEnv.covers(testEnv) && CGAlgorithms.isPointInRing(testPt, tryRing)) {
+      if (tryEnv.covers(testEnv) && tryRing.isPointInRing(testPt)) {
         isContained = true;
       }
       // check if this new containing ring is smaller than the current minimum

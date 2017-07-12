@@ -167,6 +167,16 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
     }
   }
 
+  @Override
+  public boolean isState(final RecordState state) {
+    final Record record = getRecord();
+    if (record == null) {
+      return state == RecordState.DELETED;
+    } else {
+      return record.isState(state);
+    }
+  }
+
   protected <R extends LayerRecord> R removeProxiedRecord(final R record) {
     final AbstractRecordLayer layer = getLayer();
     layer.removeProxiedRecord(record);

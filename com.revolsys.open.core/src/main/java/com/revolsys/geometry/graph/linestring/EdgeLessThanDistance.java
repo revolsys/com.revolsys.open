@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -22,7 +22,7 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
     BoundingBox envelope = lineSegment.getBoundingBox();
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Edge<LineSegment>> edgeIndex = graph.getEdgeIndex();
-    edgeIndex.forEach(new EdgeLessThanDistance(lineSegment, maxDistance, results), envelope);
+    edgeIndex.forEach(envelope, new EdgeLessThanDistance(lineSegment, maxDistance, results));
     return results.getList();
   }
 

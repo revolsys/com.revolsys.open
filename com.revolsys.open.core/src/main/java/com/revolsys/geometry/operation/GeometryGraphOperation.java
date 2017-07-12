@@ -45,12 +45,31 @@ import com.revolsys.geometry.model.GeometryFactory;
  * @version 1.7
  */
 public class GeometryGraphOperation {
+  private static double getScale(final Geometry g0, final Geometry g1) {
+    double scale;
+    final GeometryFactory geometryFactory1 = g0.getGeometryFactory();
+    final double scale0 = geometryFactory1.getScaleXY();
+
+    final GeometryFactory geometryFactory2 = g1.getGeometryFactory();
+    final double scale1 = geometryFactory2.getScaleXY();
+
+    final int sigDigits = geometryFactory1.getMaximumSignificantDigits();
+    final int otherSigDigits = geometryFactory2.getMaximumSignificantDigits();
+    // use the most precise model for the result
+    if (Integer.compare(sigDigits, otherSigDigits) >= 0) {
+      scale = scale0;
+    } else {
+      scale = scale1;
+    }
+    return scale;
+  }
+
   /**
    * The operation args into an array so they can be accessed by index
    */
   protected GeometryGraph[] arg; // the arg(s) of the operation
 
-  protected final LineIntersector li = new RobustLineIntersector();
+  protected final LineIntersector li;
 
   public GeometryGraphOperation(final Geometry g0, final Geometry g1) {
     this(g0, g1, BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE
@@ -60,21 +79,8 @@ public class GeometryGraphOperation {
 
   public GeometryGraphOperation(final Geometry g0, final Geometry g1,
     final BoundaryNodeRule boundaryNodeRule) {
-    final GeometryFactory geometryFactory1 = g0.getGeometryFactory();
-    final double scale0 = geometryFactory1.getScale(0);
-
-    final GeometryFactory geometryFactory2 = g1.getGeometryFactory();
-    final double scale1 = geometryFactory2.getScale(0);
-
-    final Integer sigDigits = geometryFactory1.getMaximumSignificantDigits();
-    final Integer otherSigDigits = geometryFactory2.getMaximumSignificantDigits();
-    // use the most precise model for the result
-    if (sigDigits.compareTo(otherSigDigits) >= 0) {
-      setComputationPrecision(scale0);
-    } else {
-      setComputationPrecision(scale1);
-    }
-
+    final double scale = getScale(g0, g1);
+    this.li = new RobustLineIntersector(scale);
     this.arg = new GeometryGraph[2];
     this.arg[0] = new GeometryGraph(0, g0, boundaryNodeRule);
     this.arg[1] = new GeometryGraph(1, g1, boundaryNodeRule);
@@ -82,9 +88,5 @@ public class GeometryGraphOperation {
 
   public Geometry getArgGeometry(final int i) {
     return this.arg[i].getGeometry();
-  }
-
-  protected void setComputationPrecision(final double scale) {
-    this.li.setScale(scale);
   }
 }

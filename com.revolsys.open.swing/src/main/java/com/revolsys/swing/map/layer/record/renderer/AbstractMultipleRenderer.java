@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.record.renderer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -20,7 +21,6 @@ import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function2;
 
 public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRenderer {
   static {
@@ -43,7 +43,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   }
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
-    final Function2<AbstractRecordLayer, AbstractMultipleRenderer, AbstractRecordLayerRenderer> rendererFactory) {
+    final BiFunction<AbstractRecordLayer, AbstractMultipleRenderer, AbstractRecordLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type + "_add").toLowerCase();
     final String name = "Add " + type + " Style";
     Menus.addMenuItem(menu, "add", name, iconName,

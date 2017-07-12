@@ -3,9 +3,9 @@ package com.revolsys.geometry.graph.visitor;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.IntersectionMatrix;
@@ -18,7 +18,7 @@ public class EdgeIntersectLineVisitor<T> implements Consumer<Edge<T>> {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final BoundingBox env = line.getBoundingBox();
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.forEach(new EdgeIntersectLineVisitor<>(line, results), env);
+    index.forEach(env, new EdgeIntersectLineVisitor<>(line, results));
     return results.getList();
 
   }

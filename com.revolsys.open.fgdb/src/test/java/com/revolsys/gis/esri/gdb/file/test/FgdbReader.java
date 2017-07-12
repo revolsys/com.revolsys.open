@@ -22,7 +22,7 @@ import com.revolsys.gis.esri.gdb.file.test.field.ShortField;
 import com.revolsys.gis.esri.gdb.file.test.field.StringField;
 import com.revolsys.gis.esri.gdb.file.test.field.XmlField;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.EndianInput;
+import com.revolsys.io.endian.EndianInput;
 import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.ArrayRecord;

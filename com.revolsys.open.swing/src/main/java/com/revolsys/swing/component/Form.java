@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.swing.JComponent;
@@ -33,7 +34,6 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Consumer2;
 import com.revolsys.value.ThreadBooleanValue;
 
 public class Form extends BasePanel {
@@ -46,7 +46,7 @@ public class Form extends BasePanel {
   private final PropertyChangeListener propertyChangeSetValue = Property
     .newListener(this::setFieldValue);
 
-  private final Map<String, List<Consumer2<String, Object>>> fieldValueListenersByFieldName = new HashMap<>();
+  private final Map<String, List<BiConsumer<String, Object>>> fieldValueListenersByFieldName = new HashMap<>();
 
   private final Map<String, Object> fieldValueByName = new HashMap<>();
 
@@ -86,8 +86,21 @@ public class Form extends BasePanel {
     }
   }
 
-  public boolean addFieldValueListener(final Consumer2<String, Object> listener) {
+  public boolean addFieldValueListener(final BiConsumer<String, Object> listener) {
     return addFieldValueListener(null, listener);
+  }
+
+  public boolean addFieldValueListener(final String fieldName,
+    final BiConsumer<String, Object> listener) {
+    synchronized (this.fieldValueListenersByFieldName) {
+      final List<BiConsumer<String, Object>> listeners = Maps
+        .getList(this.fieldValueListenersByFieldName, fieldName);
+      if (listeners.contains(listener)) {
+        return false;
+      } else {
+        return listeners.add(listener);
+      }
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -98,19 +111,6 @@ public class Form extends BasePanel {
       });
     } else {
       throw new IllegalArgumentException("A field name must be specified");
-    }
-  }
-
-  public boolean addFieldValueListener(final String fieldName,
-    final Consumer2<String, Object> listener) {
-    synchronized (this.fieldValueListenersByFieldName) {
-      final List<Consumer2<String, Object>> listeners = Maps
-        .getList(this.fieldValueListenersByFieldName, fieldName);
-      if (listeners.contains(listener)) {
-        return false;
-      } else {
-        return listeners.add(listener);
-      }
     }
   }
 
@@ -172,10 +172,10 @@ public class Form extends BasePanel {
 
   protected void fireFieldValueChanged(final String keyFieldName, final String fieldName,
     final Object fieldValue) {
-    final List<Consumer2<String, Object>> listeners = this.fieldValueListenersByFieldName
+    final List<BiConsumer<String, Object>> listeners = this.fieldValueListenersByFieldName
       .get(keyFieldName);
     if (listeners != null) {
-      for (final Consumer2<String, Object> listener : listeners) {
+      for (final BiConsumer<String, Object> listener : listeners) {
         try {
           listener.accept(fieldName, fieldValue);
         } catch (final Throwable e) {
@@ -248,12 +248,12 @@ public class Form extends BasePanel {
     }
   }
 
-  public boolean removeFieldValueListener(final Consumer2<String, Object> listener) {
+  public boolean removeFieldValueListener(final BiConsumer<String, Object> listener) {
     return removeFieldValueListener(null, listener);
   }
 
   public boolean removeFieldValueListener(final String fieldName,
-    final Consumer2<String, Object> listener) {
+    final BiConsumer<String, Object> listener) {
     synchronized (this.fieldValueListenersByFieldName) {
       return Maps.removeFromCollection(this.fieldValueListenersByFieldName, fieldName, listener);
     }
@@ -347,7 +347,7 @@ public class Form extends BasePanel {
   }
 
   public boolean showDialog() {
-    Window window = SwingUtil.getActiveWindow();
+    final Window window = SwingUtil.getActiveWindow();
     return showDialog(window);
   }
 
