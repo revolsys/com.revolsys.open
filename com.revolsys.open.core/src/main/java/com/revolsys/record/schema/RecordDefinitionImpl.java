@@ -60,7 +60,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     return new RecordDefinitionImpl(properties);
   }
 
-  private ClockDirection polygonOrientation = ClockDirection.OGC_SFS_COUNTER_CLOCKWISE;
+  private ClockDirection polygonRingDirection = ClockDirection.OGC_SFS_COUNTER_CLOCKWISE;
 
   private Map<String, CodeTable> codeTableByFieldNameMap = new HashMap<>();
 
@@ -649,7 +649,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public ClockDirection getPolygonRingDirection() {
-    return this.polygonOrientation;
+    return this.polygonRingDirection;
   }
 
   @Override
@@ -843,8 +843,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     setIdFieldNames(Arrays.asList(names));
   }
 
-  public void setPolygonRingDirection(final ClockDirection polygonOrientation) {
-    this.polygonOrientation = polygonOrientation;
+  public void setPolygonRingDirection(final ClockDirection polygonRingDirection) {
+    this.polygonRingDirection = polygonRingDirection;
   }
 
   @Override
@@ -890,8 +890,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     addTypeToMap(map, "recordDefinition");
     final String path = getPath();
     map.put("path", path);
-    final ClockDirection polygonOrientation = getPolygonRingDirection();
-    addToMap(map, "polygonOrientation", polygonOrientation, ClockDirection.NONE);
+    final ClockDirection polygonRingDirection = getPolygonRingDirection();
+    addToMap(map, "polygonRingDirection", polygonRingDirection, null);
     final GeometryFactory geometryFactory = getGeometryFactory();
     addToMap(map, "geometryFactory", geometryFactory, null);
     final List<FieldDefinition> fields = getFields();

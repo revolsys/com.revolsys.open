@@ -41,6 +41,18 @@ public interface IoFactory extends Available {
     return Lists.<C> toArray((Set<C>)IoFactoryRegistry.factoriesByClass.get(factoryClass));
   }
 
+  static List<IoFactory> factoriesByFileExtension(String fileExtension) {
+    if (fileExtension != null) {
+      fileExtension = fileExtension.toLowerCase();
+      final Set<IoFactory> factories = IoFactoryRegistry.factoriesByFileExtension
+        .get(fileExtension);
+      if (factories != null) {
+        return Lists.toArray(factories);
+      }
+    }
+    return Collections.emptyList();
+  }
+
   /**
   * Get the {@link IoFactory} for the given source. The source can be one of the following
   * classes.
