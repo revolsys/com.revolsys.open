@@ -63,7 +63,7 @@ public interface MapSerializer {
   default void addToMap(final Map<String, Object> map, final String name,
     final Supplier<Object> supplier) {
     final Object value = supplier.get();
-    addToMap(map, name, supplier);
+    addToMap(map, name, value);
   }
 
   default void addTypeToMap(final Map<String, Object> map, final String type) {

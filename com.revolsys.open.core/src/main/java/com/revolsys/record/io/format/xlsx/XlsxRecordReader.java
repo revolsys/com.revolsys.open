@@ -29,7 +29,7 @@ import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
-import com.revolsys.record.io.format.csv.AbstractRecordReader;
+import com.revolsys.record.io.AbstractRecordReader;
 import com.revolsys.spring.resource.Resource;
 
 public class XlsxRecordReader extends AbstractRecordReader {

@@ -11,7 +11,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.Records;
-import com.revolsys.record.io.format.csv.AbstractRecordReader;
+import com.revolsys.record.io.AbstractRecordReader;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;

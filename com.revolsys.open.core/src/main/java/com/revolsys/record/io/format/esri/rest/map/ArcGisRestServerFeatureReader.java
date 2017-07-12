@@ -27,7 +27,7 @@ import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
-import com.revolsys.record.io.format.csv.AbstractRecordReader;
+import com.revolsys.record.io.AbstractRecordReader;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonParser.EventType;
 import com.revolsys.record.schema.RecordDefinition;

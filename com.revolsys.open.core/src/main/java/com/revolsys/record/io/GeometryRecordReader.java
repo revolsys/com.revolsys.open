@@ -10,7 +10,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
-import com.revolsys.record.io.format.csv.AbstractRecordReader;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class GeometryRecordReader extends AbstractRecordReader {

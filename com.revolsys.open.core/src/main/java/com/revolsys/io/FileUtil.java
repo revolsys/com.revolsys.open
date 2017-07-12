@@ -62,7 +62,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
 /**
- * The TestFileUtil class is a utility class for performing common tasks with
+ * The FileUtil class is a utility class for performing common tasks with
  * classes from the java.io package.
  *
  * @author Paul Austin
