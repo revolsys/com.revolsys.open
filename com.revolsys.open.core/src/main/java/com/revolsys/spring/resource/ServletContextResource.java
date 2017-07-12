@@ -14,7 +14,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class ServletContextResource extends AbstractResource implements ContextResource {
 
@@ -81,7 +81,7 @@ public class ServletContextResource extends AbstractResource implements ContextR
         return new File(realPath);
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -122,7 +122,7 @@ public class ServletContextResource extends AbstractResource implements ContextR
       }
       return url;
     } catch (final MalformedURLException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

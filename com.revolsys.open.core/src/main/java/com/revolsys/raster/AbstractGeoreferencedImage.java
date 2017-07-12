@@ -36,14 +36,13 @@ import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.DomUtil;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeSupportProxy
@@ -310,7 +309,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
               && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
-              final Point sourcePixel = new PointDouble(imageX, imageY);
+              final Point sourcePixel = new PointDoubleXY(imageX, imageY);
 
               final double x = targetControlPoints.get(i);
               final double y = targetControlPoints.get(i + 1);
@@ -415,10 +414,6 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
           setResolution(pixelWidth);
           // TODO rotation using a warp filter
           setBoundingBox(x1, y1, pixelWidth, pixelHeight);
-          // worldWarpFilter = new WarpAffineFilter(new BoundingBoxDoubleGf(
-          // getGeometryFactory(), 0, 0, imageWidth, imageHeight), imageWidth,
-          // imageHeight, x1, y1, pixelWidth, -pixelHeight, xRotation,
-          // yRotation);
         }
       } catch (final IOException e) {
         Logs.error(this, "Error reading world file " + worldFile, e);
@@ -512,7 +507,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   protected void setImageResource(final Resource imageResource) {
     this.imageResource = imageResource;
-    this.file = SpringUtil.getOrDownloadFile(this.imageResource);
+    this.file = Resource.getOrDownloadFile(this.imageResource);
   }
 
   protected void setImageWidth(final int imageWidth) {

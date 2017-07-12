@@ -26,12 +26,16 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.channels.FileChannel;
+import java.nio.file.FileSystemException;
+import java.nio.file.Path;
 
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.util.WrappedException;
+import com.revolsys.io.FileUtil;
+import com.revolsys.util.Exceptions;
 
 /**
  * {@link Resource} implementation for {@code java.io.File} handles.
@@ -105,6 +109,12 @@ public class FileSystemResource extends AbstractResource {
     super.copyFrom(in);
   }
 
+  @Override
+  public boolean createParentDirectories() {
+    FileUtil.createParentDirectories(this.file);
+    return true;
+  }
+
   /**
    * This implementation creates a FileSystemResource, applying the given path
    * relative to the path of the underlying file of this resource descriptor.
@@ -175,7 +185,7 @@ public class FileSystemResource extends AbstractResource {
     try {
       return new FileInputStream(this.file);
     } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -191,7 +201,7 @@ public class FileSystemResource extends AbstractResource {
       }
       return new FileOutputStream(this.file);
     } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -231,7 +241,7 @@ public class FileSystemResource extends AbstractResource {
     try {
       return this.file.toURI().toURL();
     } catch (final MalformedURLException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -242,8 +252,6 @@ public class FileSystemResource extends AbstractResource {
   public int hashCode() {
     return this.path.hashCode();
   }
-
-  // implementation of WritableResource
 
   @Override
   public boolean isFile() {
@@ -274,6 +282,32 @@ public class FileSystemResource extends AbstractResource {
   @Override
   public OutputStream newOutputStream() {
     return getOutputStream();
+  }
+
+  @Override
+  public FileChannel newReadableByteChannel() {
+    try {
+      final Path path = this.file.toPath();
+      return FileChannel.open(path, com.revolsys.io.file.Paths.OPEN_OPTIONS_READ_SET,
+        com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+    } catch (final FileSystemException e) {
+      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  @Override
+  public FileChannel newWritableByteChannel() {
+    try {
+      final Path path = this.file.toPath();
+      return FileChannel.open(path, com.revolsys.io.file.Paths.OPEN_OPTIONS_WRITE_SET,
+        com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+    } catch (final FileSystemException e) {
+      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
 }
