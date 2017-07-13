@@ -475,7 +475,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     for (final String groupName : this.groupNames) {
       boolean groupHasItem = false;
       final List<ComponentFactory<?>> factories = this.groups.get(groupName);
-      if (!factories.isEmpty()) {
+      if (factories != null && !factories.isEmpty()) {
 
         for (final ComponentFactory<?> factory : factories) {
 
