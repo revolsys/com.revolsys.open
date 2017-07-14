@@ -110,9 +110,8 @@ public class RelateComputer {
     im.set(Location.EXTERIOR, Location.EXTERIOR, 2);
 
     // if the Geometries don't overlap there is nothing to do
-    if (!this.arg[0].getGeometry()
-      .getBoundingBox()
-      .intersects(this.arg[1].getGeometry().getBoundingBox())) {
+    if (!this.arg[0].getGeometry().getBoundingBox().intersects(
+      this.arg[1].getGeometry().getBoundingBox())) {
       computeDisjointIM(im);
       return im;
     }

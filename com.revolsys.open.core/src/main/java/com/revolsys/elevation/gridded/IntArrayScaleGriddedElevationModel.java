@@ -11,7 +11,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.channels.ChannelWriter;
-import com.revolsys.util.Debug;
 
 public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevationModel {
   private static final int NULL_VALUE = Integer.MIN_VALUE;
@@ -95,9 +94,6 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     for (int gridY = 0; gridY < gridHeight; gridY++) {
       for (int gridX = 0; gridX < gridWidth; gridX++) {
         final int elevation = elevations[index];
-        if (index != gridY * gridWidth + gridX) {
-          Debug.noOp();
-        }
         if (elevation == NULL_VALUE) {
           boolean hasNeighbour = false;
           if (gridX == 0) {

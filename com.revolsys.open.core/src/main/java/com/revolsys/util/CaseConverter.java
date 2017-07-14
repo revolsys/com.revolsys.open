@@ -8,6 +8,32 @@ import java.util.List;
 public final class CaseConverter {
   public static final String LOWER_CAMEL_CASE_RE = "";
 
+  private static void addWord(final String text, final List<String> list, final int tokenStart) {
+    final String lastWord = text.substring(tokenStart);
+    list.add(lastWord);
+  }
+
+  private static int addWordCharacter(final String text, final List<String> list, int tokenStart,
+    final int pos) {
+    final int newTokenStart = pos - 1;
+    if (newTokenStart != tokenStart) {
+      if (tokenStart < newTokenStart) {
+        list.add(text.substring(tokenStart, newTokenStart));
+      }
+      tokenStart = newTokenStart;
+    }
+    return tokenStart;
+  }
+
+  private static int addWordSeparator(final String text, final List<String> list, int tokenStart,
+    final int pos) {
+    if (tokenStart < pos) {
+      list.add(text.substring(tokenStart, pos));
+    }
+    tokenStart = pos + 1;
+    return tokenStart;
+  }
+
   public static String captialize(final String text) {
     final char firstChar = text.charAt(0);
     return Character.toUpperCase(firstChar) + text.substring(1).toLowerCase();
@@ -53,32 +79,6 @@ public final class CaseConverter {
         return list;
       }
     }
-  }
-
-  private static int addWordCharacter(final String text, final List<String> list, int tokenStart,
-    int pos) {
-    final int newTokenStart = pos - 1;
-    if (newTokenStart != tokenStart) {
-      if (tokenStart < newTokenStart) {
-        list.add(text.substring(tokenStart, newTokenStart));
-      }
-      tokenStart = newTokenStart;
-    }
-    return tokenStart;
-  }
-
-  private static int addWordSeparator(final String text, final List<String> list, int tokenStart,
-    int pos) {
-    if (tokenStart < pos) {
-      list.add(text.substring(tokenStart, pos));
-    }
-    tokenStart = pos + 1;
-    return tokenStart;
-  }
-
-  private static void addWord(final String text, final List<String> list, int tokenStart) {
-    final String lastWord = text.substring(tokenStart);
-    list.add(lastWord);
   }
 
   public static String toCapitalizedWords(final String text) {

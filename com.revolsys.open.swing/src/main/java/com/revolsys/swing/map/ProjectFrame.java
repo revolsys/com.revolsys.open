@@ -612,11 +612,15 @@ public class ProjectFrame extends BaseFrame {
     file.addComponentFactory("projectOpen", this.openRecentMenu);
     updateRecentMenu();
 
-    file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
-      this.project::saveAllSettings).setAcceleratorControlKey(KeyEvent.VK_S);
+    file
+      .addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
+        this.project::saveAllSettings)
+      .setAcceleratorControlKey(KeyEvent.VK_S);
 
-    file.addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
-      this::actionSaveProjectAs).setAcceleratorShiftControlKey(KeyEvent.VK_S);
+    file
+      .addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
+        this::actionSaveProjectAs)
+      .setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", SaveAsPdf::save);
 

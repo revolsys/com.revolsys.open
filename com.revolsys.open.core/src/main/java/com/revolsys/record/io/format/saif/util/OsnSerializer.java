@@ -329,9 +329,8 @@ public class OsnSerializer {
             for (final Object parent : this.scope) {
               if (parent instanceof Record) {
                 final Record parentObject = (Record)parent;
-                if (parentObject.getRecordDefinition()
-                  .getName()
-                  .equals(SaifConstants.TEXT_ON_CURVE)) {
+                if (parentObject.getRecordDefinition().getName().equals(
+                  SaifConstants.TEXT_ON_CURVE)) {
                   endLine();
                 }
               }

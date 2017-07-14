@@ -9,70 +9,72 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class VectorOfWString {
+  protected static long getCPtr(final VectorOfWString obj) {
+    return obj == null ? 0 : obj.swigCPtr;
+  }
+
   private transient long swigCPtr;
+
   protected transient boolean swigCMemOwn;
-
-  protected VectorOfWString(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-  }
-
-  protected static long getCPtr(VectorOfWString obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
-  protected void finalize() {
-    delete();
-  }
-
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        EsriFileGdbJNI.delete_VectorOfWString(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
-  }
 
   public VectorOfWString() {
     this(EsriFileGdbJNI.new_VectorOfWString__SWIG_0(), true);
   }
 
-  public VectorOfWString(long n) {
+  public VectorOfWString(final long n) {
     this(EsriFileGdbJNI.new_VectorOfWString__SWIG_1(n), true);
   }
 
-  public long size() {
-    return EsriFileGdbJNI.VectorOfWString_size(swigCPtr, this);
+  protected VectorOfWString(final long cPtr, final boolean cMemoryOwn) {
+    this.swigCMemOwn = cMemoryOwn;
+    this.swigCPtr = cPtr;
+  }
+
+  public void add(final String x) {
+    EsriFileGdbJNI.VectorOfWString_add(this.swigCPtr, this, x);
   }
 
   public long capacity() {
-    return EsriFileGdbJNI.VectorOfWString_capacity(swigCPtr, this);
-  }
-
-  public void reserve(long n) {
-    EsriFileGdbJNI.VectorOfWString_reserve(swigCPtr, this, n);
-  }
-
-  public boolean isEmpty() {
-    return EsriFileGdbJNI.VectorOfWString_isEmpty(swigCPtr, this);
+    return EsriFileGdbJNI.VectorOfWString_capacity(this.swigCPtr, this);
   }
 
   public void clear() {
-    EsriFileGdbJNI.VectorOfWString_clear(swigCPtr, this);
+    EsriFileGdbJNI.VectorOfWString_clear(this.swigCPtr, this);
   }
 
-  public void add(String x) {
-    EsriFileGdbJNI.VectorOfWString_add(swigCPtr, this, x);
+  public synchronized void delete() {
+    if (this.swigCPtr != 0) {
+      if (this.swigCMemOwn) {
+        this.swigCMemOwn = false;
+        EsriFileGdbJNI.delete_VectorOfWString(this.swigCPtr);
+      }
+      this.swigCPtr = 0;
+    }
   }
 
-  public String get(int i) {
-    return EsriFileGdbJNI.VectorOfWString_get(swigCPtr, this, i);
+  @Override
+  protected void finalize() {
+    delete();
   }
 
-  public void set(int i, String val) {
-    EsriFileGdbJNI.VectorOfWString_set(swigCPtr, this, i, val);
+  public String get(final int i) {
+    return EsriFileGdbJNI.VectorOfWString_get(this.swigCPtr, this, i);
+  }
+
+  public boolean isEmpty() {
+    return EsriFileGdbJNI.VectorOfWString_isEmpty(this.swigCPtr, this);
+  }
+
+  public void reserve(final long n) {
+    EsriFileGdbJNI.VectorOfWString_reserve(this.swigCPtr, this, n);
+  }
+
+  public void set(final int i, final String val) {
+    EsriFileGdbJNI.VectorOfWString_set(this.swigCPtr, this, i, val);
+  }
+
+  public long size() {
+    return EsriFileGdbJNI.VectorOfWString_size(this.swigCPtr, this);
   }
 
 }

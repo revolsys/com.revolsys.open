@@ -2,26 +2,37 @@ package com.revolsys.geometry.model.editor;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.util.number.Doubles;
 
-public class PointEditor extends AbstractPoint implements PunctualEditor {
+public class PointEditor extends AbstractGeometryEditor implements Point, PunctualEditor {
   private static final long serialVersionUID = 1L;
 
   private final Point point;
 
   private double[] newCoordinates;
 
-  private GeometryFactory newGeometryFactory;
+  public PointEditor(final AbstractGeometryEditor parentEditor, final Point point) {
+    super(parentEditor, point);
+    this.point = point;
+  }
 
   public PointEditor(final Point point) {
-    this.point = point;
-    this.newGeometryFactory = point.getGeometryFactory();
+    this(null, point);
   }
 
   @Override
-  public int getAxisCount() {
-    return this.newGeometryFactory.getAxisCount();
+  public Point clone() {
+    return (Point)super.clone();
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof Point) {
+      final Point point = (Point)other;
+      return equals(point);
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -36,11 +47,6 @@ public class PointEditor extends AbstractPoint implements PunctualEditor {
         return java.lang.Double.NaN;
       }
     }
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.newGeometryFactory;
   }
 
   @Override
@@ -62,6 +68,15 @@ public class PointEditor extends AbstractPoint implements PunctualEditor {
   }
 
   @Override
+  public int hashCode() {
+    final double x = getX();
+    final double y = getY();
+    long bits = java.lang.Double.doubleToLongBits(x);
+    bits ^= java.lang.Double.doubleToLongBits(y) * 31;
+    return (int)bits ^ (int)(bits >> 32);
+  }
+
+  @Override
   public boolean isEmpty() {
     return this.point.isEmpty();
   }
@@ -71,7 +86,8 @@ public class PointEditor extends AbstractPoint implements PunctualEditor {
     if (this.newCoordinates == null) {
       return this.point;
     } else {
-      return this.point.newPoint(this.newGeometryFactory, this.newCoordinates);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return this.point.newPoint(geometryFactory, this.newCoordinates);
     }
   }
 
@@ -85,7 +101,7 @@ public class PointEditor extends AbstractPoint implements PunctualEditor {
     final int oldAxisCount = getAxisCount();
     if (oldAxisCount != axisCount) {
       this.newCoordinates = getCoordinates(axisCount);
-      this.newGeometryFactory = this.newGeometryFactory.convertAxisCount(axisCount);
+      super.setAxisCount(oldAxisCount);
     }
     return oldAxisCount;
   }
@@ -142,5 +158,4 @@ public class PointEditor extends AbstractPoint implements PunctualEditor {
   public String toString() {
     return toEwkt();
   }
-
 }

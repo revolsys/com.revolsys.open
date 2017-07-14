@@ -32,9 +32,7 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.util.Exceptions;
 
@@ -70,57 +68,6 @@ public abstract class AbstractLineString implements LineString {
     }
   }
 
-  protected double[] convertCoordinates(GeometryFactory geometryFactory) {
-    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    final double[] coordinates = getCoordinates();
-    if (isEmpty()) {
-      return coordinates;
-    } else {
-      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
-      double[] targetCoordinates;
-      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
-        .getCoordinatesOperation(geometryFactory);
-      if (coordinatesOperation == null) {
-        return coordinates;
-      } else {
-        final int sourceAxisCount = getAxisCount();
-        targetCoordinates = new double[sourceAxisCount * getVertexCount()];
-        coordinatesOperation.perform(sourceAxisCount, coordinates, sourceAxisCount,
-          targetCoordinates);
-        return targetCoordinates;
-      }
-    }
-  }
-
-  /**
-   * Tests whether this geometry is structurally and numerically equal
-   * to a given <code>Object</code>.
-   * If the argument <code>Object</code> is not a <code>Geometry</code>,
-   * the result is <code>false</code>.
-   * Otherwise, the result is computed using
-   * {@link #equals(2,Geometry)}.
-   * <p>
-   * This method is provided to fulfill the Java contract
-   * for value-based object equality.
-   * In conjunction with {@link #hashCode()}
-   * it provides semantics which are most useful
-   * for using
-   * <code>Geometry</code>s as keys and values in Java collections.
-   * <p>
-   * Note that to produce the expected result the input geometries
-   * should be in normal form.  It is the caller's
-   * responsibility to perform this where required
-   * (using {@link Geometry#norm()
-   * or {@link #normalize()} as appropriate).
-   *
-   * @param other the Object to compare
-   * @return true if this geometry is exactly equal to the argument
-   *
-   * @see #equals(2,Geometry)
-   * @see #hashCode()
-   * @see #norm()
-   * @see #normalize()
-   */
   @Override
   public boolean equals(final Object other) {
     if (other instanceof Geometry) {
@@ -140,20 +87,6 @@ public abstract class AbstractLineString implements LineString {
   @Override
   public int hashCode() {
     return getBoundingBox().hashCode();
-  }
-
-  @Override
-  public LineString newGeometry(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return this.clone();
-    } else if (isEmpty()) {
-      return newLineStringEmpty(geometryFactory);
-    } else {
-      final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
-      final int vertexCount = getVertexCount();
-      return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
-    }
   }
 
   @Override

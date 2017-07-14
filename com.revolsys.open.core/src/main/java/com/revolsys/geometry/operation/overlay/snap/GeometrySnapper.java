@@ -46,7 +46,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.util.GeometryTransformer;
 import com.revolsys.geometry.model.vertex.Vertex;
 
@@ -329,7 +329,7 @@ class SnapTransformer extends GeometryTransformer {
    * @param snapPoints the target snap vertices
    */
   private LineString snapSegments(LineString line) {
-    LineStringDoubleBuilder newLine = null;
+    LineStringEditor newLine = null;
     for (final Point snapPoint : this.snapPoints) {
       final int index = findSegmentIndexToSnap(snapPoint, line);
       /**
@@ -340,10 +340,10 @@ class SnapTransformer extends GeometryTransformer {
        */
       if (index >= 0) {
         if (newLine == null) {
-          if (line instanceof LineStringDoubleBuilder) {
-            newLine = (LineStringDoubleBuilder)line;
+          if (line instanceof LineStringEditor) {
+            newLine = (LineStringEditor)line;
           } else {
-            newLine = LineStringDoubleBuilder.newLineStringDoubleBuilder(line);
+            newLine = LineStringEditor.newLineStringEditor(line);
             line = newLine;
           }
         }
@@ -364,7 +364,7 @@ class SnapTransformer extends GeometryTransformer {
    * @param snapPoints the points to snap to
    */
   private LineString snapVertices(final LineString line) {
-    LineStringDoubleBuilder newLine = null;
+    LineStringEditor newLine = null;
     final int vertexCount = line.getVertexCount();
     final boolean closed = line.isClosed();
     // if src is a ring then don't snap final vertex
@@ -375,7 +375,7 @@ class SnapTransformer extends GeometryTransformer {
       final Point snapVert = findSnapForVertex(x, y);
       if (snapVert != null) {
         if (newLine == null) {
-          newLine = LineStringDoubleBuilder.newLineStringDoubleBuilder(line);
+          newLine = LineStringEditor.newLineStringEditor(line);
           if (i == 0 && closed) {
             // keep final closing point in synch (rings only)
             newLine.setVertex(vertexCount - 1, snapVert);

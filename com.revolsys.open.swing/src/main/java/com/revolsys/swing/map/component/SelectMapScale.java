@@ -92,9 +92,8 @@ public class SelectMapScale extends JComboBox
         if (currentValue instanceof Number) {
           currentScale = ((Number)currentValue).doubleValue();
         } else if (Property.hasValue(currentValue)) {
-          final String scaleString = currentValue.toString()
-            .replaceAll("1:", "")
-            .replaceAll("[^0-9\\.]+", "");
+          final String scaleString = currentValue.toString().replaceAll("1:", "").replaceAll(
+            "[^0-9\\.]+", "");
           if (Property.hasValue(scaleString)) {
             try {
               currentScale = Double.valueOf(scaleString);

@@ -4,18 +4,23 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 
 public class LinearRingEditor extends LineStringEditor implements LinearRing {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
+
+  public LinearRingEditor(final AbstractGeometryEditor parentEditor) {
+    this(parentEditor, parentEditor.getGeometryFactory().linearRing());
+  }
+
+  public LinearRingEditor(final AbstractGeometryEditor parentEditor, final LinearRing ring) {
+    super(parentEditor, ring);
+  }
 
   public LinearRingEditor(final LinearRing ring) {
     super(ring);
   }
 
   @Override
-  public LinearRing clone() {
-    return (LinearRing)super.clone();
+  public LinearRingEditor clone() {
+    return (LinearRingEditor)super.clone();
   }
 
   @Override

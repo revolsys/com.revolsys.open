@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.record.io.format.saif.SaifConstants;
 import com.revolsys.record.io.format.saif.geometry.ArcLineString;
@@ -38,7 +38,7 @@ public class ArcConverter implements OsnConverter {
   }
 
   public LineString newLineString(final GeometryFactory geometryFactory,
-    final LineStringDoubleBuilder line) {
+    final LineStringEditor line) {
     final int axisCount = geometryFactory.getAxisCount();
     final int vertexCount = line.getVertexCount();
     final double[] coordinates = LineStringDoubleGf.getNewCoordinates(geometryFactory, line);
@@ -55,7 +55,7 @@ public class ArcConverter implements OsnConverter {
     while (field != null) {
       if (field.equals("LineString")) {
         int axisCount = 2;
-        final LineStringDoubleBuilder line = new LineStringDoubleBuilder(this.geometryFactory);
+        final LineStringEditor line = new LineStringEditor(this.geometryFactory);
         while (iterator.next() != OsnIterator.END_LIST) {
           final String pointName = iterator.nextObjectName();
           if (!pointName.equals("/Point")) {

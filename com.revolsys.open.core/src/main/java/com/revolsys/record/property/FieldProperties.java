@@ -9,7 +9,7 @@ public interface FieldProperties {
 
   String FIELD_ALLOWED_VALUES = "http://gis.revolsys.com/attributeAllowedValues";
 
-  String GEOMETRY_FACTORY = "http://gis.revolsys.com/geometryFactory";
+  String GEOMETRY_FACTORY = "geometryFactory";
 
   String VALIDATE_GEOMETRY = "http://gis.revolsys.com/validateGeometry";
 }

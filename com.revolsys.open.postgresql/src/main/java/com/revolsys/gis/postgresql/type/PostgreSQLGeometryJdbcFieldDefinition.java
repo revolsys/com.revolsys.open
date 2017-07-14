@@ -12,13 +12,12 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.util.Property;
 
 public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   private final int axisCount;
 
-  private final GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private final int srid;
 
@@ -28,8 +27,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final GeometryFactory geometryFactory) {
     super(dbName, name, dataType, sqlType, 0, 0, required, description, properties);
     this.srid = srid;
-    this.geometryFactory = geometryFactory;
-    setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+    this.geometryFactory = geometryFactory.convertAxisCount(axisCount);
     this.axisCount = axisCount;
   }
 
@@ -38,6 +36,10 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     return new PostgreSQLGeometryJdbcFieldDefinition(getDbName(), getName(), getDataType(),
       getSqlType(), isRequired(), getDescription(), getProperties(), this.srid, this.axisCount,
       this.geometryFactory);
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   public Object getInsertUpdateValue(final Object value) throws SQLException {
@@ -69,6 +71,12 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final Object value = toJava(postgresValue);
     object.setValue(getIndex(), value);
     return columnIndex + 1;
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    if (geometryFactory != null) {
+      this.geometryFactory = geometryFactory.convertAxisCount(this.axisCount);
+    }
   }
 
   @Override

@@ -61,7 +61,6 @@ import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.LineStringEditor;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
 import com.revolsys.geometry.model.prep.PreparedLineString;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
@@ -145,8 +144,7 @@ public interface LineString extends Lineal {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = geometryFactory.getAxisCount();
     final int vertexCount = getVertexCount();
-    final LineStringDoubleBuilder newLine = new LineStringDoubleBuilder(geometryFactory,
-      vertexCount);
+    final LineStringEditor newLine = new LineStringEditor(geometryFactory, vertexCount);
     double x1 = getX(0);
     double y1 = getY(0);
     newLine.appendVertex(x1, y1);
@@ -235,6 +233,28 @@ public interface LineString extends Lineal {
     final double x2 = line2.getX(vertexIndex2);
     final double y2 = line2.getY(vertexIndex2);
     return CoordinatesUtil.compare(x1, y1, x2, y2);
+  }
+
+  default double[] convertCoordinates(GeometryFactory geometryFactory) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    final double[] coordinates = getCoordinates();
+    if (isEmpty()) {
+      return coordinates;
+    } else {
+      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
+      double[] targetCoordinates;
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+        .getCoordinatesOperation(geometryFactory);
+      if (coordinatesOperation == null) {
+        return coordinates;
+      } else {
+        final int sourceAxisCount = getAxisCount();
+        targetCoordinates = new double[sourceAxisCount * getVertexCount()];
+        coordinatesOperation.perform(sourceAxisCount, coordinates, sourceAxisCount,
+          targetCoordinates);
+        return targetCoordinates;
+      }
+    }
   }
 
   default void convertVertexCoordinates2d(final int vertexIndex,
@@ -1818,7 +1838,16 @@ public interface LineString extends Lineal {
 
   @Override
   default LineString newGeometry(final GeometryFactory geometryFactory) {
-    return geometryFactory.lineString(this);
+    if (geometryFactory == null) {
+      return this.clone();
+    } else if (isEmpty()) {
+      return newLineStringEmpty(geometryFactory);
+    } else {
+      final double[] coordinates = convertCoordinates(geometryFactory);
+      final int axisCount = getAxisCount();
+      final int vertexCount = getVertexCount();
+      return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
+    }
   }
 
   @Override
@@ -2125,7 +2154,7 @@ public interface LineString extends Lineal {
   default LineString subLine(final LineStringLocation fromLocation,
     final LineStringLocation toLocation) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(geometryFactory);
+    final LineStringEditor lineBuilder = new LineStringEditor(geometryFactory);
 
     int vertexIndexFrom;
     if (fromLocation == null || fromLocation.getLine() != this) {

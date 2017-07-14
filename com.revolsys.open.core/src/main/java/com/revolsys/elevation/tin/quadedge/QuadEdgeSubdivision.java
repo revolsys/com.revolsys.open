@@ -52,7 +52,7 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.impl.TriangleDoubleXYZ;
@@ -349,7 +349,7 @@ public class QuadEdgeSubdivision {
   }
 
   public Geometry getBoundary() {
-    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(this.geometryFactory);
+    final LineStringEditor lineBuilder = new LineStringEditor(this.geometryFactory);
     for (final QuadEdge startingEdge : Arrays.asList(this.edge1, this.edge3, this.edge2)) {
       QuadEdge edge = startingEdge;
       do {
@@ -363,7 +363,7 @@ public class QuadEdgeSubdivision {
         edge = edge.getFromNextEdge();
       } while (edge != startingEdge);
     }
-    return lineBuilder.newGeometry();
+    return lineBuilder.newBestGeometry();
   }
 
   /**

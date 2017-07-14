@@ -56,12 +56,12 @@ import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxGeometryFactory;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
 import com.revolsys.geometry.model.impl.MultiLineStringImpl;
@@ -1465,7 +1465,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (points.isEmpty()) {
       return linearRing();
     } else {
-      final LineStringDoubleBuilder lineBuilder = newLineStringBuilder(points);
+      final LineStringEditor lineBuilder = newLineStringBuilder(points);
       return lineBuilder.newLinearRing();
     }
   }
@@ -1528,7 +1528,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (points == null || points.isEmpty()) {
       return lineString();
     } else {
-      final LineStringDoubleBuilder lineBuilder = newLineStringBuilder(points);
+      final LineStringEditor lineBuilder = newLineStringBuilder(points);
       return lineBuilder.newLineString();
     }
   }
@@ -1905,12 +1905,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return BoundingBoxUtil.newBounds(axisCount);
   }
 
-  public LineStringDoubleBuilder newLineStringBuilder() {
-    return new LineStringDoubleBuilder(this);
+  public LineStringEditor newLineStringBuilder() {
+    return new LineStringEditor(this);
   }
 
-  private LineStringDoubleBuilder newLineStringBuilder(final Collection<?> points) {
-    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(this, points.size());
+  private LineStringEditor newLineStringBuilder(final Collection<?> points) {
+    final LineStringEditor lineBuilder = new LineStringEditor(this, points.size());
     for (final Object object : points) {
       if (object == null) {
       } else if (object instanceof Point) {
@@ -1935,8 +1935,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return lineBuilder;
   }
 
-  public LineStringDoubleBuilder newLineStringBuilder(final int vertexCapacity) {
-    return new LineStringDoubleBuilder(this, vertexCapacity);
+  public LineStringEditor newLineStringBuilder(final int vertexCapacity) {
+    return new LineStringEditor(this, vertexCapacity);
   }
 
   /**

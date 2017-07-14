@@ -58,7 +58,7 @@ public class UuidBuilder {
 
   @Override
   public String toString() {
-    UUID uuid = newUuid();
+    final UUID uuid = newUuid();
     return uuid.toString();
   }
 }

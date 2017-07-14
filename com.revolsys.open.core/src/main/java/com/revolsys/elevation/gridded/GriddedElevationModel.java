@@ -440,8 +440,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
 
   @SuppressWarnings("unchecked")
   default <G extends Geometry> G setGeometryElevations(final G geometry) {
-    final GeometryEditor editor = geometry.newGeometryEditor();
-    editor.setAxisCount(3);
+    final GeometryEditor editor = geometry.newGeometryEditor(3);
     for (final Vertex vertex : geometry.vertices()) {
       final double x = vertex.getX();
       final double y = vertex.getY();

@@ -31,8 +31,7 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
     this.imageBuffer = new TempFileMappedIntDataBuffer(this.width, this.height);
 
     final SampleModel sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_INT,
-      this.width, this.height,
-      new int[] { //
+      this.width, this.height, new int[] { //
         0x00ff0000, // Red
         0x0000ff00, // Green
         0x000000ff, // Blue

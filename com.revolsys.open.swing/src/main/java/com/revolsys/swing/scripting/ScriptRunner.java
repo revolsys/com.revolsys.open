@@ -158,11 +158,9 @@ public class ScriptRunner {
   }
 
   private void showErrorDialog(final Class<?> scriptClass, final Throwable e) {
-    LoggingEventPanel.showDialog(SwingUtil.getActiveWindow(),
-      "Error running script file:<br /> " //
-        + "<code>" + this.scriptFile + "</code><br />"//
-        + e.getMessage(),
-      e);
+    LoggingEventPanel.showDialog(SwingUtil.getActiveWindow(), "Error running script file:<br /> " //
+      + "<code>" + this.scriptFile + "</code><br />"//
+      + e.getMessage(), e);
   }
 
   private void showErrorDialog(final String message) {

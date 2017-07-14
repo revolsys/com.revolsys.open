@@ -222,8 +222,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         setAddGeometryDataType(geometryField.getDataType());
         setMapCursor(CURSOR_NODE_ADD);
 
-        if (Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING, DataTypes.MULTI_POINT,
-          DataTypes.MULTI_LINE_STRING).contains(this.addGeometryDataType)) {
+        if (Arrays
+          .asList(DataTypes.POINT, DataTypes.LINE_STRING, DataTypes.MULTI_POINT,
+            DataTypes.MULTI_LINE_STRING)
+          .contains(this.addGeometryDataType)) {
           this.addGeometryPartIndex = new int[0];
         } else if (Arrays.asList(DataTypes.MULTI_POLYGON, DataTypes.POLYGON)
           .contains(this.addGeometryDataType)) {
@@ -1136,9 +1138,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         }
         event.consume();
       } else {
-        JOptionPane.showMessageDialog(this,
-          "There are too many " + size
-            + " selected to view. Maximum 10. Select fewer records or move mouse to middle of geometry.",
+        JOptionPane.showMessageDialog(this, "There are too many " + size
+          + " selected to view. Maximum 10. Select fewer records or move mouse to middle of geometry.",
           "Too Many Selected Records", JOptionPane.ERROR_MESSAGE);
         event.consume();
       }

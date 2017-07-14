@@ -35,7 +35,7 @@ package com.revolsys.geometry.operation.buffer;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -46,7 +46,7 @@ import com.revolsys.util.MathUtil;
  * @author Martin Davis
  *
  */
-class OffsetSegmentString extends LineStringDoubleBuilder {
+class OffsetSegmentString extends LineStringEditor {
 
   /**
    *
@@ -71,8 +71,9 @@ class OffsetSegmentString extends LineStringDoubleBuilder {
   }
 
   public void addPoint(double x, double y) {
-    x = this.geometryFactory.makeXyPrecise(x);
-    y = this.geometryFactory.makeXyPrecise(y);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    x = geometryFactory.makeXyPrecise(x);
+    y = geometryFactory.makeXyPrecise(y);
     if (!isRedundant(x, y)) {
       appendVertex(x, y);
     }

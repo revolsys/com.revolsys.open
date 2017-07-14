@@ -12,10 +12,7 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 
 public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
-  private final AbstractJdbcRecordStore recordStore;
-
   public ArcSdeStGeometryFieldAdder(final AbstractJdbcRecordStore recordStore) {
-    this.recordStore = recordStore;
 
   }
 

@@ -47,7 +47,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.vertex.Vertex;
 
@@ -67,10 +67,10 @@ public class ConvexHull {
    *@return           the coordinates with unnecessary (collinear) vertices
    *      removed
    */
-  private static LineStringDoubleBuilder cleanRing(final GeometryFactory geometryFactory,
+  private static LineStringEditor cleanRing(final GeometryFactory geometryFactory,
     final List<Point> points) {
     final int count = points.size();
-    final LineStringDoubleBuilder cleanedRing = new LineStringDoubleBuilder(geometryFactory, count);
+    final LineStringEditor cleanedRing = new LineStringEditor(geometryFactory, count);
     Point previousDistinctPoint = null;
 
     for (int i = 0; i <= count - 2; i++) {
@@ -171,7 +171,7 @@ public class ConvexHull {
 
       final Stack<Point> hullPoints = grahamScan(points);
 
-      final LineStringDoubleBuilder cleanedRing = cleanRing(geometryFactory, hullPoints);
+      final LineStringEditor cleanedRing = cleanRing(geometryFactory, hullPoints);
       if (cleanedRing.getVertexCount() == 3) {
         return geometryFactory.lineString(cleanedRing.getVertex(0), cleanedRing.getVertex(1));
       } else {

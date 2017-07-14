@@ -35,6 +35,7 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
@@ -333,9 +334,8 @@ public final class JdbcUtils {
         }
       }
       final String fromClause = query.getFromClause();
-      final boolean lockResults = query.isLockResults();
-      sql = newSelectSql(recordDefinition, "T", fromClause, lockResults, fieldNames, query,
-        orderBy);
+      final LockMode lockMode = query.getLockMode();
+      sql = newSelectSql(recordDefinition, "T", fromClause, fieldNames, query, orderBy, lockMode);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
         final StringBuilder newSql = new StringBuilder("SELECT ");
@@ -385,9 +385,9 @@ public final class JdbcUtils {
   }
 
   public static String newSelectSql(final RecordDefinition recordDefinition,
-    final String tablePrefix, final String fromClause, final boolean lockResults,
-    final List<String> fieldNames, final Query query,
-    final Map<? extends CharSequence, Boolean> orderBy) {
+    final String tablePrefix, final String fromClause, final List<String> fieldNames,
+    final Query query, final Map<? extends CharSequence, Boolean> orderBy,
+    final LockMode lockMode) {
     final String typePath = recordDefinition.getPath();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
@@ -408,9 +408,7 @@ public final class JdbcUtils {
     }
     appendWhere(sql, query);
     addOrderBy(sql, orderBy);
-    if (lockResults) {
-      sql.append(" FOR UPDATE");
-    }
+    lockMode.append(sql);
     return sql.toString();
   }
 

@@ -148,9 +148,8 @@ public class TiePointsPanel extends TablePanel implements PropertyChangeListener
     if (geometry != null) {
       final Project project = Project.get();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
-      final BoundingBox boundingBox = geometry.getBoundingBox()
-        .convert(geometryFactory)
-        .expand(200);
+      final BoundingBox boundingBox = geometry.getBoundingBox().convert(geometryFactory).expand(
+        200);
       project.setViewBoundingBox(boundingBox);
 
     }

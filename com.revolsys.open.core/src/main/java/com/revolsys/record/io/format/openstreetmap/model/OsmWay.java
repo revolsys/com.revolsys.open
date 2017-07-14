@@ -59,8 +59,10 @@ public class OsmWay extends OsmElement {
   public boolean isArea() {
     if ("yes".equals(getString("area"))) {
       return true;
-    } else if (Arrays.asList("bare_rock", "fell", "glacier, landuse=grass", "grassland", "heath",
-      "mud", "scree", "sand", "scrub", "tree", "wetland", "wood").contains(getTag("natural"))) {
+    } else if (Arrays
+      .asList("bare_rock", "fell", "glacier, landuse=grass", "grassland", "heath", "mud", "scree",
+        "sand", "scrub", "tree", "wetland", "wood")
+      .contains(getTag("natural"))) {
       return true;
     }
     return false;

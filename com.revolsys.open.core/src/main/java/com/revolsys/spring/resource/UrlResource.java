@@ -197,7 +197,8 @@ public class UrlResource extends AbstractResource {
           final URLConnection con = url.openConnection();
           customizeConnection(con);
           final HttpURLConnection httpCon = con instanceof HttpURLConnection
-            ? (HttpURLConnection)con : null;
+            ? (HttpURLConnection)con
+            : null;
           if (httpCon != null) {
             final int code = httpCon.getResponseCode();
             if (code == HttpURLConnection.HTTP_OK) {

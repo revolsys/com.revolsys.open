@@ -289,28 +289,12 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   String getLabel();
 
   default Record getRecord(final PathName typePath, final Identifier id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null || id == null) {
+    final Query query = newGetRecordQuery(typePath, id);
+    if (query == null) {
       return null;
     } else {
-      final List<Object> values = id.getValues();
-      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-      if (idFieldNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else if (values.size() != idFieldNames.size()) {
-        throw new IllegalArgumentException(
-          id + " not a valid id for " + typePath + " requires " + idFieldNames);
-      } else {
-        final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idFieldNames.size(); i++) {
-          final String name = idFieldNames.get(i);
-          final Object value = values.get(i);
-          final FieldDefinition field = recordDefinition.getField(name);
-          query.and(Q.equal(field, value));
-        }
-        final RecordReader records = getRecords(query);
-        return records.getFirst();
-      }
+      final RecordReader records = getRecords(query);
+      return records.getFirst();
     }
   }
 
@@ -358,6 +342,18 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   RecordFactory<Record> getRecordFactory();
+
+  default Record getRecordLocked(final PathName typePath, final LockMode lockMode,
+    final Identifier id) {
+    final Query query = newGetRecordQuery(typePath, id);
+    if (query == null) {
+      return null;
+    } else {
+      query.setLockMode(lockMode);
+      final RecordReader records = getRecords(query);
+      return records.getFirst();
+    }
+  }
 
   default RecordReader getRecords(final Collection<Query> queries) {
     final RecordStoreQueryReader reader = newRecordReader();
@@ -457,6 +453,31 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   boolean isLoadFullSchema();
+
+  default Query newGetRecordQuery(final PathName typePath, final Identifier id) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null || id == null) {
+      return null;
+    } else {
+      final List<Object> values = id.getValues();
+      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+      if (idFieldNames.isEmpty()) {
+        throw new IllegalArgumentException(typePath + " does not have a primary key");
+      } else if (values.size() != idFieldNames.size()) {
+        throw new IllegalArgumentException(
+          id + " not a valid id for " + typePath + " requires " + idFieldNames);
+      } else {
+        final Query query = new Query(recordDefinition);
+        for (int i = 0; i < idFieldNames.size(); i++) {
+          final String name = idFieldNames.get(i);
+          final Object value = values.get(i);
+          final FieldDefinition field = recordDefinition.getField(name);
+          query.and(Q.equal(field, value));
+        }
+        return query;
+      }
+    }
+  }
 
   default AbstractIterator<Record> newIterator(final Query query, Map<String, Object> properties) {
     if (properties == null) {

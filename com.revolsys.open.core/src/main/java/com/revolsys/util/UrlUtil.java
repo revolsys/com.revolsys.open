@@ -98,16 +98,14 @@ public final class UrlUtil {
                   } else {
                     query.append('&');
                   }
-                  query.append(name)
-                    .append('=')
-                    .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
+                  query.append(name).append('=').append(
+                    URLEncoder.encode(childValue.toString(), "US-ASCII"));
                 }
               }
 
             } else {
-              query.append(name)
-                .append('=')
-                .append(URLEncoder.encode(value.toString(), "US-ASCII"));
+              query.append(name).append('=').append(
+                URLEncoder.encode(value.toString(), "US-ASCII"));
             }
           } catch (final UnsupportedEncodingException e) {
             throw new Error(e);
@@ -143,9 +141,8 @@ public final class UrlUtil {
               } else {
                 query.append('&');
               }
-              query.append(name)
-                .append('=')
-                .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
+              query.append(name).append('=').append(
+                URLEncoder.encode(childValue.toString(), "US-ASCII"));
             }
           }
 

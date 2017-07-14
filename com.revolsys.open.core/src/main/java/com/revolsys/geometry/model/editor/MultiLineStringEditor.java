@@ -1,38 +1,35 @@
 package com.revolsys.geometry.model.editor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.util.Exceptions;
-import com.revolsys.util.number.Doubles;
 
-public class MultiLineStringEditor implements MultiLineString, LinealEditor {
+public class MultiLineStringEditor extends AbstractGeometryEditor
+  implements MultiLineString, LinealEditor {
   private static final long serialVersionUID = 1L;
 
   private final Lineal lineal;
 
-  private LineStringEditor[] newLineStrings;
+  private final List<LineStringEditor> editors = new ArrayList<>();
 
-  private GeometryFactory newGeometryFactory;
+  public MultiLineStringEditor(final AbstractGeometryEditor geometryEditor, final Lineal lineal) {
+    super(geometryEditor, lineal);
+    this.lineal = lineal;
+  }
 
   public MultiLineStringEditor(final Lineal lineal) {
-    this.lineal = lineal;
-    this.newGeometryFactory = lineal.getGeometryFactory();
+    this(null, lineal);
   }
 
   @Override
   public Lineal clone() {
-    try {
-      return (Lineal)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      throw Exceptions.wrap(e);
-    }
+    return (Lineal)super.clone();
   }
 
   @Override
@@ -45,43 +42,29 @@ public class MultiLineStringEditor implements MultiLineString, LinealEditor {
     }
   }
 
-  @Override
-  public int getAxisCount() {
-    return this.newGeometryFactory.getAxisCount();
+  public LineStringEditor getEditor(final int partIndex) {
+    if (0 <= partIndex && partIndex <= this.editors.size()) {
+      return this.editors.get(partIndex);
+    } else {
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (this.newLineStrings == null) {
-      return this.lineal.getGeometries();
-    } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(this.newLineStrings));
-    }
+    return (List<V>)Lists.toArray(this.editors);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int partIndex) {
-    if (this.newLineStrings == null) {
-      return this.lineal.getGeometry(partIndex);
-    } else {
-      return (V)this.newLineStrings[partIndex];
-    }
+    return (V)getEditor(partIndex);
   }
 
   @Override
   public int getGeometryCount() {
-    if (this.newLineStrings == null) {
-      return this.lineal.getGeometryCount();
-    } else {
-      return this.newLineStrings.length;
-    }
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.newGeometryFactory;
+    return this.editors.size();
   }
 
   @Override
@@ -96,16 +79,15 @@ public class MultiLineStringEditor implements MultiLineString, LinealEditor {
 
   @Override
   public Lineal newGeometry() {
-    if (this.newLineStrings == null) {
-      return this.lineal;
-    } else {
-      final LineString[] lines = new LineString[this.newLineStrings.length];
-      for (int i = 0; i < this.newLineStrings.length; i++) {
-        final LineStringEditor editor = this.newLineStrings[i];
-        lines[i] = editor.newGeometry();
-      }
-      return this.lineal.newLineal(this.newGeometryFactory, lines);
+    final int partCount = this.editors.size();
+    final LineString[] lines = new LineString[partCount];
+    int partIndex = 0;
+    for (final LineStringEditor editor : this.editors) {
+      final LineString lineString = editor.newGeometry();
+      lines[partIndex++] = lineString;
     }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return this.lineal.newLineal(geometryFactory, lines);
   }
 
   @Override
@@ -115,27 +97,10 @@ public class MultiLineStringEditor implements MultiLineString, LinealEditor {
 
   @Override
   public int setAxisCount(final int axisCount) {
-    final int oldAxisCount = getAxisCount();
-    if (oldAxisCount != axisCount) {
-      final int geometryCount = getGeometryCount();
-      if (this.newLineStrings == null) {
-        final LineStringEditor[] editors = new LineStringEditor[geometryCount];
-        for (int ringIndex = 0; ringIndex < geometryCount; ringIndex++) {
-          final LineString line = getGeometry(ringIndex);
-          final LineStringEditor editor = line.newGeometryEditor(axisCount);
-          editors[ringIndex] = editor;
-        }
-        this.newLineStrings = editors;
-      } else {
-        for (int ringIndex = 0; ringIndex < geometryCount; ringIndex++) {
-          final LineStringEditor editor = this.newLineStrings[ringIndex];
-          editor.setAxisCount(axisCount);
-        }
-
-      }
-      this.newGeometryFactory = this.newGeometryFactory.convertAxisCount(axisCount);
+    for (final LineStringEditor editor : this.editors) {
+      editor.setAxisCount(axisCount);
     }
-    return oldAxisCount;
+    return super.setAxisCount(axisCount);
   }
 
   @Override
@@ -152,27 +117,12 @@ public class MultiLineStringEditor implements MultiLineString, LinealEditor {
   @Override
   public double setCoordinate(final int partIndex, final int vertexIndex, final int axisIndex,
     final double coordinate) {
-    final int geometryCount = getGeometryCount();
-    if (partIndex >= 0 && partIndex < geometryCount) {
-      final int axisCount = getAxisCount();
-      if (axisIndex >= 0 && axisIndex < axisCount) {
-        final double oldValue = this.lineal.getCoordinate(partIndex, vertexIndex, axisIndex);
-        if (!Doubles.equal(coordinate, oldValue)) {
-          if (this.newLineStrings == null) {
-            final LineStringEditor[] editors = new LineStringEditor[geometryCount];
-            for (int i = 0; i < geometryCount; i++) {
-              final LineString line = getGeometry(i);
-              final LineStringEditor editor = line.newGeometryEditor(axisCount);
-              editors[i] = editor;
-            }
-            this.newLineStrings = editors;
-          }
-          final LineStringEditor editor = this.newLineStrings[partIndex];
-          editor.setCoordinate(vertexIndex, axisIndex, coordinate);
-        }
-      }
+    final LineStringEditor editor = getEditor(partIndex);
+    if (editor == null) {
+      return Double.NaN;
+    } else {
+      return editor.setCoordinate(vertexIndex, axisIndex, coordinate);
     }
-    return Double.NaN;
   }
 
   @Override

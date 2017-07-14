@@ -1,38 +1,39 @@
 package com.revolsys.geometry.model.editor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.util.Exceptions;
-import com.revolsys.util.number.Doubles;
 
-public class MultiPolygonEditor implements MultiPolygon, PolygonalEditor {
+public class MultiPolygonEditor extends AbstractGeometryEditor
+  implements MultiPolygon, PolygonalEditor {
   private static final long serialVersionUID = 1L;
 
   private final Polygonal polygonal;
 
-  private PolygonEditor[] newPolygons;
+  private final List<PolygonEditor> editors = new ArrayList<>();
 
-  private GeometryFactory newGeometryFactory;
+  public MultiPolygonEditor(final AbstractGeometryEditor parentEditor, final Polygonal polygonal) {
+    super(parentEditor, polygonal);
+    this.polygonal = polygonal;
+    for (final Polygon polygon : polygonal.getPolygons()) {
+      final PolygonEditor editor = new PolygonEditor(this, polygon);
+      this.editors.add(editor);
+    }
+  }
 
   public MultiPolygonEditor(final Polygonal polygonal) {
-    this.polygonal = polygonal;
-    this.newGeometryFactory = polygonal.getGeometryFactory();
+    this(null, polygonal);
   }
 
   @Override
   public Polygonal clone() {
-    try {
-      return (Polygonal)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      throw Exceptions.wrap(e);
-    }
+    return (Polygonal)super.clone();
   }
 
   @Override
@@ -45,43 +46,29 @@ public class MultiPolygonEditor implements MultiPolygon, PolygonalEditor {
     }
   }
 
-  @Override
-  public int getAxisCount() {
-    return this.newGeometryFactory.getAxisCount();
+  public PolygonEditor getEditor(final int partIndex) {
+    if (0 <= partIndex && partIndex < this.editors.size()) {
+      return null;
+    } else {
+      return this.editors.get(partIndex);
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (this.newPolygons == null) {
-      return this.polygonal.getGeometries();
-    } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(this.newPolygons));
-    }
+    return (List<V>)Lists.toArray(this.editors);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int partIndex) {
-    if (this.newPolygons == null) {
-      return this.polygonal.getGeometry(partIndex);
-    } else {
-      return (V)this.newPolygons[partIndex];
-    }
+    return (V)getEditor(partIndex);
   }
 
   @Override
   public int getGeometryCount() {
-    if (this.newPolygons == null) {
-      return this.polygonal.getGeometryCount();
-    } else {
-      return this.newPolygons.length;
-    }
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.newGeometryFactory;
+    return this.editors.size();
   }
 
   @Override
@@ -96,16 +83,14 @@ public class MultiPolygonEditor implements MultiPolygon, PolygonalEditor {
 
   @Override
   public Polygonal newGeometry() {
-    if (this.newPolygons == null) {
-      return this.polygonal;
-    } else {
-      final Polygon[] polygons = new Polygon[this.newPolygons.length];
-      for (int i = 0; i < this.newPolygons.length; i++) {
-        final PolygonEditor editor = this.newPolygons[i];
-        polygons[i] = editor.newGeometry();
-      }
-      return this.polygonal.newPolygonal(this.newGeometryFactory, polygons);
+    final int partCount = this.editors.size();
+    final Polygon[] polygons = new Polygon[partCount];
+    int partIndex = 0;
+    for (final PolygonEditor editor : this.editors) {
+      polygons[partIndex++] = editor.newGeometry();
     }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return this.polygonal.newPolygonal(geometryFactory, polygons);
   }
 
   @Override
@@ -115,27 +100,10 @@ public class MultiPolygonEditor implements MultiPolygon, PolygonalEditor {
 
   @Override
   public int setAxisCount(final int axisCount) {
-    final int oldAxisCount = getAxisCount();
-    if (oldAxisCount != axisCount) {
-      final int geometryCount = getGeometryCount();
-      if (this.newPolygons == null) {
-        final PolygonEditor[] editors = new PolygonEditor[geometryCount];
-        for (int ringIndex = 0; ringIndex < geometryCount; ringIndex++) {
-          final Polygon polygon = getGeometry(ringIndex);
-          final PolygonEditor editor = polygon.newGeometryEditor(axisCount);
-          editors[ringIndex] = editor;
-        }
-        this.newPolygons = editors;
-      } else {
-        for (int ringIndex = 0; ringIndex < geometryCount; ringIndex++) {
-          final PolygonEditor editor = this.newPolygons[ringIndex];
-          editor.setAxisCount(axisCount);
-        }
-
-      }
-      this.newGeometryFactory = this.newGeometryFactory.convertAxisCount(axisCount);
+    for (final PolygonalEditor editor : this.editors) {
+      editor.setAxisCount(axisCount);
     }
-    return oldAxisCount;
+    return super.setAxisCount(axisCount);
   }
 
   @Override
@@ -153,28 +121,12 @@ public class MultiPolygonEditor implements MultiPolygon, PolygonalEditor {
   @Override
   public double setCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
     final int axisIndex, final double coordinate) {
-    final int geometryCount = getGeometryCount();
-    if (partIndex >= 0 && partIndex < geometryCount) {
-      final int axisCount = getAxisCount();
-      if (axisIndex >= 0 && axisIndex < axisCount) {
-        final double oldValue = this.polygonal.getCoordinate(partIndex, ringIndex, vertexIndex,
-          axisIndex);
-        if (!Doubles.equal(coordinate, oldValue)) {
-          if (this.newPolygons == null) {
-            final PolygonEditor[] editors = new PolygonEditor[geometryCount];
-            for (int i = 0; i < geometryCount; i++) {
-              final Polygon polygon = getGeometry(i);
-              final PolygonEditor editor = polygon.newGeometryEditor(axisCount);
-              editors[i] = editor;
-            }
-            this.newPolygons = editors;
-          }
-          final PolygonEditor editor = this.newPolygons[partIndex];
-          editor.setCoordinate(ringIndex, vertexIndex, axisIndex, coordinate);
-        }
-      }
+    final PolygonEditor editor = getEditor(partIndex);
+    if (editor == null) {
+      return Double.NaN;
+    } else {
+      return editor.setCoordinate(ringIndex, vertexIndex, axisIndex, coordinate);
     }
-    return Double.NaN;
   }
 
   @Override

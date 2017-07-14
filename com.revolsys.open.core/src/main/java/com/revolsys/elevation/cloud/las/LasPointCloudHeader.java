@@ -224,6 +224,10 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     return this.geometryFactory.newBoundingBox(3, this.bounds);
   }
 
+  public Date getDate() {
+    return this.date;
+  }
+
   public int getDayOfYear() {
     return this.dayOfYear;
   }

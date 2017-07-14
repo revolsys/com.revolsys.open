@@ -229,7 +229,7 @@ public class OverlayOp extends GeometryGraphOperation {
 
   private final EdgeList edgeList = new EdgeList();
 
-  private final GeometryFactory geomFact;
+  private final GeometryFactory geomFactory;
 
   private final PlanarGraph graph;
 
@@ -258,7 +258,7 @@ public class OverlayOp extends GeometryGraphOperation {
      * Note that this does NOT handle mixed-precision arguments
      * where the second arg has greater precision than the first.
      */
-    this.geomFact = g0.getGeometryFactory();
+    this.geomFactory = g0.getGeometryFactory();
   }
 
   /**
@@ -287,10 +287,10 @@ public class OverlayOp extends GeometryGraphOperation {
 
     if (geometries.isEmpty()) {
       return newEmptyResult(opcode, this.arg[0].getGeometry(), this.arg[1].getGeometry(),
-        this.geomFact);
+        this.geomFactory);
       // */
     } else {
-      return this.geomFact.geometry(geometries);
+      return this.geomFactory.geometry(geometries);
     }
   }
 
@@ -421,14 +421,14 @@ public class OverlayOp extends GeometryGraphOperation {
     findResultAreaEdges(opCode);
     cancelDuplicateResultEdges();
 
-    final PolygonBuilder polyBuilder = new PolygonBuilder(this.geomFact);
+    final PolygonBuilder polyBuilder = new PolygonBuilder(this.geomFactory);
     polyBuilder.add(this.graph);
     this.resultPolyList = polyBuilder.getPolygons();
 
-    final LineBuilder lineBuilder = new LineBuilder(this, this.geomFact, this.ptLocator);
+    final LineBuilder lineBuilder = new LineBuilder(this, this.geomFactory, this.ptLocator);
     this.resultLineList = lineBuilder.build(opCode);
 
-    final PointBuilder pointBuilder = new PointBuilder(this, this.geomFact, this.ptLocator);
+    final PointBuilder pointBuilder = new PointBuilder(this, this.geomFactory, this.ptLocator);
     this.resultLineString = pointBuilder.build(opCode);
 
     // gather the results from all calculations into a single Geometry for the

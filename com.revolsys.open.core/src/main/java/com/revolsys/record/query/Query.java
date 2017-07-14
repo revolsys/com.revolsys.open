@@ -24,6 +24,7 @@ import com.revolsys.record.Records;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
@@ -156,7 +157,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   private int limit = Integer.MAX_VALUE;
 
-  private boolean lockResults = false;
+  private LockMode lockMode = LockMode.NONE;
 
   private int offset = 0;
 
@@ -342,6 +343,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.limit;
   }
 
+  public LockMode getLockMode() {
+    return this.lockMode;
+  }
+
   public int getOffset() {
     return this.offset;
   }
@@ -395,10 +400,6 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.whereCondition;
   }
 
-  public boolean isLockResults() {
-    return this.lockResults;
-  }
-
   public Query newQuery(final RecordDefinition recordDefinition) {
     final Query query = clone();
     query.setRecordDefinition(recordDefinition);
@@ -445,8 +446,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public void setLockResults(final boolean lockResults) {
-    this.lockResults = lockResults;
+  public Query setLockMode(final LockMode lockMode) {
+    this.lockMode = lockMode;
+    return this;
   }
 
   public Query setOffset(final int offset) {

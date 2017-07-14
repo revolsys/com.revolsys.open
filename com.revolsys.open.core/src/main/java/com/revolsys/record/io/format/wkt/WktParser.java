@@ -14,7 +14,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
@@ -253,9 +253,9 @@ public class WktParser {
     }
   }
 
-  private LineStringDoubleBuilder parseCoordinatesLineString(final GeometryFactory geometryFactory,
+  private LineStringEditor parseCoordinatesLineString(final GeometryFactory geometryFactory,
     final PushbackReader reader, final int axisCount) throws IOException {
-    final LineStringDoubleBuilder line = geometryFactory.newLineStringBuilder();
+    final LineStringEditor line = geometryFactory.newLineStringBuilder();
     skipWhitespace(reader);
     int character = reader.read();
     if (character == '(') {
@@ -524,7 +524,7 @@ public class WktParser {
     if (isEmpty(reader)) {
       return geometryFactory.lineString();
     } else {
-      final LineStringDoubleBuilder points = parseCoordinatesLineString(geometryFactory, reader,
+      final LineStringEditor points = parseCoordinatesLineString(geometryFactory, reader,
         axisCount);
       if (points.getVertexCount() == 1) {
         return geometryFactory.point(points);
@@ -604,8 +604,8 @@ public class WktParser {
     switch (character) {
       case '(':
         do {
-          final LineStringDoubleBuilder lineBuilder = parseCoordinatesLineString(geometryFactory,
-            reader, axisCount);
+          final LineStringEditor lineBuilder = parseCoordinatesLineString(geometryFactory, reader,
+            axisCount);
           parts.add(lineBuilder.newLineString());
           character = reader.read();
         } while (character == ',');
@@ -697,8 +697,8 @@ public class WktParser {
     switch (character) {
       case '(':
         do {
-          final LineStringDoubleBuilder lineBuilder = parseCoordinatesLineString(geometryFactory,
-            reader, axisCount);
+          final LineStringEditor lineBuilder = parseCoordinatesLineString(geometryFactory, reader,
+            axisCount);
           parts.add(geometryFactory.point(lineBuilder));
           skipWhitespace(reader);
           character = reader.read();

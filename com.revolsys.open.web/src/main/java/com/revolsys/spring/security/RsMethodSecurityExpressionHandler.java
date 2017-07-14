@@ -64,7 +64,8 @@ public class RsMethodSecurityExpressionHandler implements MethodSecurityExpressi
   public Object filter(final Object filterTarget, final Expression filterExpression,
     final EvaluationContext ctx) {
     final MethodSecurityExpressionRoot rootObject = (MethodSecurityExpressionRoot)ctx
-      .getRootObject().getValue();
+      .getRootObject()
+      .getValue();
     List retainList;
 
     if (this.logger.isDebugEnabled()) {

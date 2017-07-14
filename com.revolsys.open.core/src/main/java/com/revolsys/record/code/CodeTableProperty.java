@@ -416,12 +416,12 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     this.creationTimestampFieldName = creationTimestampFieldName;
   }
 
-  public void setFieldNameAliases(final List<String> fieldNameAliases) {
-    this.fieldNameAliases = new ArrayList<>(fieldNameAliases);
-  }
-
   public void setFieldAliases(final String... fieldNameAliases) {
     setFieldNameAliases(Lists.newArray(fieldNameAliases));
+  }
+
+  public void setFieldNameAliases(final List<String> fieldNameAliases) {
+    this.fieldNameAliases = new ArrayList<>(fieldNameAliases);
   }
 
   public void setIdFieldName(final String idFieldName) {

@@ -117,7 +117,7 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   @Override
-  protected double[] convertCoordinates(GeometryFactory geometryFactory) {
+  public double[] convertCoordinates(GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     if (isEmpty()) {
       return this.coordinates;

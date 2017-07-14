@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.record.io.format.saif.SaifConstants;
 import com.revolsys.record.io.format.saif.geometry.ArcDirectedLineString;
@@ -18,7 +18,7 @@ public class ArcDirectedConverter extends ArcConverter {
 
   @Override
   public LineString newLineString(final GeometryFactory geometryFactory,
-    final LineStringDoubleBuilder line) {
+    final LineStringEditor line) {
     final int axisCount = geometryFactory.getAxisCount();
     final int vertexCount = line.getVertexCount();
     final double[] coordinates = LineStringDoubleGf.getNewCoordinates(geometryFactory, line);

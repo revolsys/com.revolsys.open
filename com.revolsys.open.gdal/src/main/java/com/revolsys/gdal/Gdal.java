@@ -288,7 +288,8 @@ public class Gdal implements ServiceInitializer {
         sampleModel = new BandedSampleModel(dataBufferType, targetWidth, targetHeight, targetWidth,
           banks, offsets);
         dataType = rasterColorInterpretation == gdalconstConstants.GCI_PaletteIndex
-          ? BufferedImage.TYPE_BYTE_INDEXED : BufferedImage.TYPE_BYTE_GRAY;
+          ? BufferedImage.TYPE_BYTE_INDEXED
+          : BufferedImage.TYPE_BYTE_GRAY;
       } else if (bandDataType == gdalconstConstants.GDT_Int16) {
         final short[][] shorts = new short[bandCount][];
         for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {

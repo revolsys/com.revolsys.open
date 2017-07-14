@@ -1,65 +1,88 @@
 package com.revolsys.geometry.model.editor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.AbstractPolygon;
-import com.revolsys.util.number.Doubles;
 
-public class PolygonEditor extends AbstractPolygon implements PolygonalEditor {
+public class PolygonEditor extends AbstractGeometryEditor implements Polygon, PolygonalEditor {
   private static final long serialVersionUID = 1L;
 
   private final Polygon polygon;
 
-  private LinearRingEditor[] newRings;
+  private final List<LinearRingEditor> editors = new ArrayList<>();
 
-  private GeometryFactory newGeometryFactory;
+  public PolygonEditor(final AbstractGeometryEditor parentEditor, final Polygon polygon) {
+    super(parentEditor, polygon);
+    this.polygon = polygon;
+    for (final LinearRing ring : polygon.rings()) {
+      final LinearRingEditor editor = new LinearRingEditor(this, ring);
+      this.editors.add(editor);
+    }
+  }
 
   public PolygonEditor(final Polygon polygon) {
-    this.polygon = polygon;
-    this.newGeometryFactory = polygon.getGeometryFactory();
+    this(null, polygon);
+  }
+
+  public LinearRingEditor addRing() {
+    final LinearRingEditor editor = new LinearRingEditor(this);
+    this.editors.add(editor);
+    return editor;
+  }
+
+  public LinearRingEditor addRing(final int index) {
+    final LinearRingEditor editor = new LinearRingEditor(this);
+    this.editors.add(index, editor);
+    return editor;
+  }
+
+  public LinearRingEditor addRing(final int index, final LinearRing ring) {
+    final LinearRingEditor editor = new LinearRingEditor(this, ring);
+    this.editors.add(index, editor);
+    return editor;
+  }
+
+  public LinearRingEditor addRing(final LinearRing ring) {
+    final LinearRingEditor editor = new LinearRingEditor(this, ring);
+    this.editors.add(editor);
+    return editor;
   }
 
   @Override
-  public int getAxisCount() {
-    return this.newGeometryFactory.getAxisCount();
+  public Polygon clone() {
+    return (Polygon)super.clone();
   }
 
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.newGeometryFactory;
+  public LinearRingEditor getEditor(final int ringIndex) {
+    if (ringIndex < 0 || ringIndex >= this.editors.size()) {
+      return null;
+    } else {
+      return this.editors.get(ringIndex);
+    }
   }
 
   @Override
   public LinearRing getRing(final int ringIndex) {
-    if (this.newRings == null) {
-      return this.polygon.getRing(ringIndex);
-    } else if (ringIndex < 0 || ringIndex >= this.newRings.length) {
-      return null;
-    } else {
-      return this.newRings[ringIndex];
-    }
+    return getEditor(ringIndex);
   }
 
   @Override
   public int getRingCount() {
-    if (this.newRings == null) {
-      return this.polygon.getRingCount();
-    } else {
-      return this.newRings.length;
-    }
+    return this.editors.size();
   }
 
   @Override
   public List<LinearRing> getRings() {
-    if (this.newRings == null) {
-      return this.polygon.getRings();
-    } else {
-      return Lists.newArray(this.newRings);
-    }
+    return Lists.toArray(this.editors);
+  }
+
+  @Override
+  public int hashCode() {
+    return getBoundingBox().hashCode();
   }
 
   @Override
@@ -69,16 +92,14 @@ public class PolygonEditor extends AbstractPolygon implements PolygonalEditor {
 
   @Override
   public Polygon newGeometry() {
-    if (this.newRings == null) {
-      return this.polygon;
-    } else {
-      final LinearRing[] rings = new LinearRing[this.newRings.length];
-      for (int i = 0; i < this.newRings.length; i++) {
-        final LinearRingEditor ringEditor = this.newRings[i];
-        rings[i] = ringEditor.newGeometry();
-      }
-      return this.polygon.newPolygon(this.newGeometryFactory, rings);
+    final int ringCount = this.editors.size();
+    final LinearRing[] rings = new LinearRing[ringCount];
+    int ringIndex = 0;
+    for (final LinearRingEditor editor : this.editors) {
+      rings[ringIndex++] = editor.newGeometry();
     }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return this.polygon.newPolygon(geometryFactory, rings);
   }
 
   @Override
@@ -86,29 +107,16 @@ public class PolygonEditor extends AbstractPolygon implements PolygonalEditor {
     return this.polygon.newPolygon(geometryFactory, rings);
   }
 
+  public void removeRing(final int index) {
+    this.editors.remove(index);
+  }
+
   @Override
   public int setAxisCount(final int axisCount) {
-    final int oldAxisCount = getAxisCount();
-    if (oldAxisCount != axisCount) {
-      final int ringCount = getRingCount();
-      if (this.newRings == null) {
-        final LinearRingEditor[] ringEditors = new LinearRingEditor[ringCount];
-        for (int ringIndex = 0; ringIndex < ringCount; ringIndex++) {
-          final LinearRing ring = getRing(ringIndex);
-          final LinearRingEditor ringEditor = ring.newGeometryEditor(axisCount);
-          ringEditors[ringIndex] = ringEditor;
-        }
-        this.newRings = ringEditors;
-      } else {
-        for (int ringIndex = 0; ringIndex < ringCount; ringIndex++) {
-          final LinearRingEditor ringEditor = this.newRings[ringIndex];
-          ringEditor.setAxisCount(axisCount);
-        }
-
-      }
-      this.newGeometryFactory = this.newGeometryFactory.convertAxisCount(axisCount);
+    for (final LinearRingEditor editor : this.editors) {
+      editor.setAxisCount(axisCount);
     }
-    return oldAxisCount;
+    return super.setAxisCount(axisCount);
   }
 
   @Override
@@ -124,27 +132,12 @@ public class PolygonEditor extends AbstractPolygon implements PolygonalEditor {
 
   public double setCoordinate(final int ringIndex, final int vertexIndex, final int axisIndex,
     final double coordinate) {
-    final int ringCount = getRingCount();
-    if (ringIndex >= 0 && ringIndex < ringCount) {
-      final int axisCount = getAxisCount();
-      if (axisIndex >= 0 && axisIndex < axisCount) {
-        final double oldValue = this.polygon.getCoordinate(ringIndex, vertexIndex, axisIndex);
-        if (!Doubles.equal(coordinate, oldValue)) {
-          if (this.newRings == null) {
-            final LinearRingEditor[] ringEditors = new LinearRingEditor[ringCount];
-            for (int i = 0; i < ringCount; i++) {
-              final LinearRing ring = getRing(i);
-              final LinearRingEditor editor = ring.newGeometryEditor(axisCount);
-              ringEditors[i] = editor;
-            }
-            this.newRings = ringEditors;
-          }
-          final LinearRingEditor ring = this.newRings[ringIndex];
-          ring.setCoordinate(vertexIndex, axisIndex, coordinate);
-        }
-      }
+    final LinearRingEditor editor = getEditor(ringIndex);
+    if (editor == null) {
+      return Double.NaN;
+    } else {
+      return editor.setCoordinate(vertexIndex, axisIndex, coordinate);
     }
-    return Double.NaN;
   }
 
   @Override

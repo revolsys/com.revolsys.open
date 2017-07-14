@@ -54,10 +54,8 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
 
   @Override
   protected final B doInBackground() throws Exception {
-    this.threadName = Thread.currentThread()
-      .getName()
-      .replace("SwingWorker-pool-", "")
-      .replace("thread-", "");
+    this.threadName = Thread.currentThread().getName().replace("SwingWorker-pool-", "").replace(
+      "thread-", "");
     try {
       if (this.logTimes) {
         final long time = System.currentTimeMillis();

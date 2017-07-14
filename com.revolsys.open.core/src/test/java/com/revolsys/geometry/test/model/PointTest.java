@@ -235,15 +235,14 @@ public class PointTest implements TestConstants {
     points1.addPoint(1, 1, 2);
     points1.addPoint(5, 2, 3);
     final double[] coordinates1 = points1.getCoordinates();
-    Assert.assertArrayEquals("coordinates",
-      new double[] { //
-        1, 1, 2, //
-        7, 1, 2, //
-        10, 1, 2, //
-        11, 1, 2, //
-        5, 2, 3, //
-        5, 3, 3, //
-      }, coordinates1, 0);
+    Assert.assertArrayEquals("coordinates", new double[] { //
+      1, 1, 2, //
+      7, 1, 2, //
+      10, 1, 2, //
+      11, 1, 2, //
+      5, 2, 3, //
+      5, 3, 3, //
+    }, coordinates1, 0);
   }
 
   @Test

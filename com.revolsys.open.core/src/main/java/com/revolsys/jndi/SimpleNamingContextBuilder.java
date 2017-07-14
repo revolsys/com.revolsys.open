@@ -55,11 +55,12 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
   }
 
   public void bind(final String name, final Object obj) {
-    Logs.info(this, new StringBuilder("Static JNDI binding: [").append(name)
-      .append("] = [")
-      .append(obj)
-      .append("]")
-      .toString());
+    Logs.info(this,
+      new StringBuilder("Static JNDI binding: [").append(name)
+        .append("] = [")
+        .append(obj)
+        .append("]")
+        .toString());
     this.boundObjects.put(name, obj);
   }
 
@@ -80,12 +81,16 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
         } else {
           throw new IllegalArgumentException(new StringBuilder(
             "Invalid value type for environment key [java.naming.factory.initial]: ")
-              .append(icf.getClass().getName()).toString());
+              .append(icf.getClass().getName())
+              .toString());
         }
         if (!InitialContextFactory.class.isAssignableFrom(icfClass)) {
           throw new IllegalArgumentException(
             new StringBuilder("Specified class does not implement [")
-              .append(InitialContextFactory.class.getName()).append("]: ").append(icf).toString());
+              .append(InitialContextFactory.class.getName())
+              .append("]: ")
+              .append(icf)
+              .toString());
         }
         try {
           return (InitialContextFactory)icfClass.newInstance();
