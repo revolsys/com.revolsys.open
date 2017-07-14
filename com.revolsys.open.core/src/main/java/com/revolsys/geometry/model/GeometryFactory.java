@@ -1308,6 +1308,22 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return this.coordinateSystem instanceof ProjectedCoordinateSystem;
   }
 
+  public boolean isResolutionGreaterThan(final GeometryFactory geometryFactory) {
+    if (isFloating()) {
+      return !geometryFactory.isFloating();
+    } else if (geometryFactory.isFloating()) {
+      return false;
+    } else {
+      if (this.resolutionX > geometryFactory.getResolutionX()) {
+        return true;
+      } else if (this.resolutionY > geometryFactory.getResolutionY()) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
   public boolean isSameCoordinateSystem(final CoordinateSystem coordinateSystem) {
     final int coordinateSystemId = getCoordinateSystemId();
     if (coordinateSystem == null) {

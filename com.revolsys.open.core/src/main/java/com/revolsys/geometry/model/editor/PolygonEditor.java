@@ -1,6 +1,7 @@
 package com.revolsys.geometry.model.editor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
@@ -107,8 +108,17 @@ public class PolygonEditor extends AbstractGeometryEditor implements Polygon, Po
     return this.polygon.newPolygon(geometryFactory, rings);
   }
 
+  @Override
+  public Iterable<PolygonEditor> polygonEditors() {
+    return Collections.singleton(this);
+  }
+
   public void removeRing(final int index) {
     this.editors.remove(index);
+  }
+
+  public Iterable<LinearRingEditor> ringEditors() {
+    return Collections.unmodifiableList(this.editors);
   }
 
   @Override

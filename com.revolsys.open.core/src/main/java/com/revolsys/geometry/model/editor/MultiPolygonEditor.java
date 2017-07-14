@@ -1,6 +1,7 @@
 package com.revolsys.geometry.model.editor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
@@ -96,6 +97,11 @@ public class MultiPolygonEditor extends AbstractGeometryEditor
   @Override
   public Polygonal newPolygonal(final GeometryFactory geometryFactory, final Polygon... polygons) {
     return this.polygonal.newPolygonal(geometryFactory, polygons);
+  }
+
+  @Override
+  public Iterable<PolygonEditor> polygonEditors() {
+    return Collections.unmodifiableList(this.editors);
   }
 
   @Override

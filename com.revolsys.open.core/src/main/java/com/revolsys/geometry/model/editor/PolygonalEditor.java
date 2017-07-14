@@ -6,6 +6,8 @@ public interface PolygonalEditor extends GeometryEditor {
   @Override
   Polygonal newGeometry();
 
+  Iterable<PolygonEditor> polygonEditors();
+
   double setCoordinate(int partIndex, int ringIndex, int vertexIndex, int axisIndex,
     double coordinate);
 
