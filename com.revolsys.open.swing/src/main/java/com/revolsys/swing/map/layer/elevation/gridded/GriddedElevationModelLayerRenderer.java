@@ -49,6 +49,7 @@ public class GriddedElevationModelLayerRenderer
                 this.worker = new Thread(() -> {
                   final GriddedElevationModelImage image = new GriddedElevationModelImage(
                     elevationModel);
+                  // image.refresh(elevationModel);
                   image.refresh(new HillShadeConfiguration(elevationModel));
                   synchronized (this) {
                     if (this.worker == Thread.currentThread()) {

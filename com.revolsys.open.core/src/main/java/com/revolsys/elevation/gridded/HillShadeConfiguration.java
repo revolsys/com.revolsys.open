@@ -65,9 +65,9 @@ public class HillShadeConfiguration {
   public int getHillShade(final int index) {
     final int width = this.width;
     final int height = this.height;
-    final int x = index % width;
-    final int y = height - 1 - (index - x) / width;
-    return getHillShade(x, y);
+    final int gridX = index % width;
+    final int gridY = height - 1 - (index - gridX) / width;
+    return getHillShade(gridX, gridY);
   }
 
   private int getHillShade(final int gridX, final int gridY) {
@@ -90,28 +90,32 @@ public class HillShadeConfiguration {
       final boolean firstY = gridY == 0;
       final boolean lastX = gridX == width - 1;
       final boolean lastY = gridY == height - 1;
+      final int gridX0 = gridX - 1;
+      final int gridX2 = gridX + 1;
       if (!lastY) {
+        final int gridY2 = gridY + 1;
         if (!firstX) {
-          a = elevationModel.getElevationFast(gridX - 1, gridY + 1);
+          a = elevationModel.getElevationFast(gridX0, gridY2);
         }
-        b = elevationModel.getElevationFast(gridX, gridY + 1);
+        b = elevationModel.getElevationFast(gridX, gridY2);
         if (!lastX) {
-          c = elevationModel.getElevationFast(gridX + 1, gridY + 1);
+          c = elevationModel.getElevationFast(gridX2, gridY2);
         }
       }
       if (!firstX) {
-        d = elevationModel.getElevationFast(gridX - 1, gridY);
+        d = elevationModel.getElevationFast(gridX0, gridY);
       }
       if (!lastX) {
-        f = elevationModel.getElevationFast(gridX + 1, gridY);
+        f = elevationModel.getElevationFast(gridX2, gridY);
       }
       if (!firstY) {
+        final int gridY0 = gridY - 1;
         if (!firstX) {
-          g = elevationModel.getElevationFast(gridX - 1, gridY - 1);
+          g = elevationModel.getElevationFast(gridX0, gridY0);
         }
-        h = elevationModel.getElevationFast(gridX, gridY - 1);
+        h = elevationModel.getElevationFast(gridX, gridY0);
         if (!lastX) {
-          i = elevationModel.getElevationFast(gridX + 1, gridY - 1);
+          i = elevationModel.getElevationFast(gridX2, gridY0);
         }
       }
 
