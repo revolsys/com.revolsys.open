@@ -878,24 +878,23 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (!identifiers.isEmpty()) {
         identifiers.sort(Identifier.comparator());
         final RecordDefinition recordDefinition = recordStore.getRecordDefinition(pathName);
-        final FieldDefinition idField = recordDefinition.getIdField();
-        final int pageSize = 999;
-        final int identifierCount = identifiers.size();
-        for (int i = 0; i < identifiers.size(); i += pageSize) {
-          final List<Identifier> queryIdentifiers = identifiers.subList(i,
-            Math.min(identifierCount, i + pageSize));
-          final In in = Q.in(idField, queryIdentifiers);
-          final Query query = new Query(recordDefinition, in);
-          try (
-            Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
-            RecordReader reader = recordStore.getRecords(query)) {
-            for (final Record record : reader) {
-              final Identifier identifier = record.getIdentifier();
-              final RecordStoreLayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
-              if (cachedRecord != null) {
-                cachedRecord.refreshFromRecordStore(record);
-              }
-            }
+        final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+        final int idFieldCount = idFields.size();
+        if (idFieldCount == 1) {
+          final FieldDefinition idField = idFields.get(0);
+          final int pageSize = 999;
+          final int identifierCount = identifiers.size();
+          for (int i = 0; i < identifiers.size(); i += pageSize) {
+            final List<Identifier> queryIdentifiers = identifiers.subList(i,
+              Math.min(identifierCount, i + pageSize));
+            final In in = Q.in(idField, queryIdentifiers);
+            final Query query = new Query(recordDefinition, in);
+            updateCachedRecords(recordStore, query);
+          }
+        } else if (!idFields.isEmpty()) {
+          for (final Identifier identifier : identifiers) {
+            final Query query = new Query(recordDefinition, Q.equalId(idFields, identifier));
+            updateCachedRecords(recordStore, query);
           }
         }
       }
@@ -1073,6 +1072,20 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     final MapEx map = super.toMap();
     addToMap(map, "typePath", this.typePath);
     return map;
+  }
+
+  private void updateCachedRecords(final RecordStore recordStore, final Query query) {
+    try (
+      Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
+      RecordReader reader = recordStore.getRecords(query)) {
+      for (final Record record : reader) {
+        final Identifier identifier = record.getIdentifier();
+        final RecordStoreLayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
+        if (cachedRecord != null) {
+          cachedRecord.refreshFromRecordStore(record);
+        }
+      }
+    }
   }
 
   protected void writeDelete(final Writer<Record> writer, final LayerRecord record) {

@@ -1622,16 +1622,7 @@ public interface LineString extends Lineal {
     }
   }
 
-  /**
-   * Tests whether a point lies on the line segments defined by a list of
-   * coordinates.
-   *
-   * @return true if the point is a vertex of the line or lies in the interior
-   *         of a line segment in the linestring
-   */
-  default boolean isOnLine(final Point point) {
-    final double x = point.getX();
-    final double y = point.getY();
+  default boolean isOnLine(final double x, final double y) {
     final LineIntersector lineIntersector = new RobustLineIntersector();
     double x1 = getX(0);
     double y1 = getY(0);
@@ -1649,6 +1640,19 @@ public interface LineString extends Lineal {
     return false;
   }
 
+  /**
+   * Tests whether a point lies on the line segments defined by a list of
+   * coordinates.
+   *
+   * @return true if the point is a vertex of the line or lies in the interior
+   *         of a line segment in the linestring
+   */
+  default boolean isOnLine(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return isOnLine(x, y);
+  }
+
   default boolean isPointInRing(final Point point) {
     return RayCrossingCounter.locatePointInRing(point, this) != Location.EXTERIOR;
   }
@@ -1660,6 +1664,23 @@ public interface LineString extends Lineal {
   @Override
   default Iterable<LineString> lineStrings() {
     return Collections.singletonList(this);
+  }
+
+  @Override
+  default Location locate(final double x, final double y) {
+    // bounding-box check
+    final BoundingBox boundingBox = getBoundingBox();
+    if (boundingBox.covers(x, y)) {
+      if (!isClosed()) {
+        if (equalsVertex2d(0, x, y) || equalsVertex2d(getLastVertexIndex(), x, y)) {
+          return Location.BOUNDARY;
+        }
+      }
+      if (isOnLine(x, y)) {
+        return Location.INTERIOR;
+      }
+    }
+    return Location.EXTERIOR;
   }
 
   @Override

@@ -60,6 +60,21 @@ public class PointLocator {
   public PointLocator() {
   }
 
+  private int computeLocation(final Geometry geometry, final double x, final double y) {
+    int numBoundaries = 0;
+    if (geometry.isGeometryCollection()) {
+      for (final Geometry part : geometry.geometries()) {
+        if (part != geometry) {
+          numBoundaries += computeLocation(part, x, y);
+        }
+      }
+    } else {
+      final Location location = geometry.locate(x, y);
+      return updateLocationInfo(location);
+    }
+    return numBoundaries;
+  }
+
   private int computeLocation(final Point point, final Geometry geometry) {
     int numBoundaries = 0;
     if (geometry instanceof Point) {
@@ -84,6 +99,26 @@ public class PointLocator {
 
   public boolean intersects(final Point point, final Geometry geometry) {
     return locate(point, geometry) != Location.EXTERIOR;
+  }
+
+  public Location locate(final Geometry geometry, final double x, final double y) {
+    if (geometry.isEmpty()) {
+      return Location.EXTERIOR;
+    } else if (geometry instanceof LineString) {
+      return geometry.locate(x, y);
+    } else if (geometry instanceof Polygon) {
+      return geometry.locate(x, y);
+    }
+
+    this.isIn = false;
+    final int boundaryCount = computeLocation(geometry, x, y);
+    if (boundaryCount % 2 == 1) {
+      return Location.BOUNDARY;
+    } else if (boundaryCount > 0 || this.isIn) {
+      return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
+    }
   }
 
   /**

@@ -122,7 +122,7 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
   }
 
   public void buildTin() {
-    if (this.subdivision == null) {
+    if (this.subdivision == null && !isEmpty()) {
       this.subdivision = new QuadEdgeSubdivision(this.bounds, this.geometryFactory);
       insertVertices(this.subdivision, this.vertices);
     }
@@ -149,12 +149,18 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
   @Override
   public void forEachTriangle(final TriangleConsumer action) {
     buildTin();
-    this.subdivision.forEachTriangle(action);
+    if (this.subdivision != null) {
+      this.subdivision.forEachTriangle(action);
+    }
   }
 
   public Geometry getBoundary() {
     buildTin();
-    return this.subdivision.getBoundary();
+    if (this.subdivision == null) {
+      return this.geometryFactory.polygon();
+    } else {
+      return this.subdivision.getBoundary();
+    }
   }
 
   @Override
@@ -169,7 +175,11 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
    */
   public final Lineal getEdges() {
     buildTin();
-    return this.subdivision.getEdgesLineal(this.geometryFactory);
+    if (this.subdivision == null) {
+      return this.geometryFactory.lineString();
+    } else {
+      return this.subdivision.getEdgesLineal(this.geometryFactory);
+    }
   }
 
   @Override
@@ -189,7 +199,11 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
 
   public final int getTriangleCount() {
     buildTin();
-    return this.subdivision.getTriangleCount();
+    if (this.subdivision == null) {
+      return 0;
+    } else {
+      return this.subdivision.getTriangleCount();
+    }
   }
 
   public final List<QuadEdge> getTriangleEdges(final double x, final double y) {
@@ -216,7 +230,11 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
    */
   public final Polygonal getTrianglesPolygonal() {
     buildTin();
-    return this.subdivision.getTrianglesPolygonal(this.geometryFactory);
+    if (this.subdivision == null) {
+      return this.geometryFactory.polygon();
+    } else {
+      return this.subdivision.getTrianglesPolygonal(this.geometryFactory);
+    }
   }
 
   public int getVertexCount() {
@@ -297,6 +315,10 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
       final double z = point.getZ();
       insertVertex(x, y, z);
     }
+  }
+
+  public boolean isEmpty() {
+    return !Double.isFinite(this.bounds[0]);
   }
 
   public final boolean isSortVertices() {

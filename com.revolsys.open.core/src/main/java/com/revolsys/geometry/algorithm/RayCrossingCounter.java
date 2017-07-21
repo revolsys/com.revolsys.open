@@ -70,6 +70,31 @@ import com.revolsys.geometry.model.segment.LineSegment;
  */
 public class RayCrossingCounter implements Consumer<LineSegment> {
 
+  public static Location locatePointInRing(final LineString ring, final double x, final double y) {
+    final BoundingBox boundingBox = ring.getBoundingBox();
+    if (boundingBox.covers(x, y)) {
+
+      final RayCrossingCounter counter = new RayCrossingCounter(x, y);
+
+      double x1 = ring.getX(0);
+      double y1 = ring.getY(0);
+      final int vertexCount = ring.getVertexCount();
+      for (int i = 1; i < vertexCount; i++) {
+        final double x2 = ring.getX(i);
+        final double y2 = ring.getY(i);
+        counter.countSegment(x2, y2, x1, y1);
+        if (counter.isOnSegment()) {
+          return counter.getLocation();
+        }
+        x1 = x2;
+        y1 = y2;
+      }
+      return counter.getLocation();
+    } else {
+      return Location.EXTERIOR;
+    }
+  }
+
   public static Location locatePointInRing(final Point p, final Iterable<Point> ring) {
     final RayCrossingCounter counter = new RayCrossingCounter(p);
     final Iterator<Point> iterator = ring.iterator();
@@ -152,9 +177,9 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
   // true if the test point lies on an input segment
   private boolean pointOnSegment = false;
 
-  private final double x;
+  private double x;
 
-  private final double y;
+  private double y;
 
   public RayCrossingCounter(final double x, final double y) {
     this.x = x;
@@ -326,5 +351,10 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
 
   public void setPointOnSegment(final boolean pointOnSegment) {
     this.pointOnSegment = pointOnSegment;
+  }
+
+  public void setXY(final double x, final double y) {
+    this.x = x;
+    this.y = y;
   }
 }

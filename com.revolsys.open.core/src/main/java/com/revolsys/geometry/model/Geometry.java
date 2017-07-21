@@ -1983,6 +1983,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
+  Location locate(double x, double y);
+
   Location locate(Point point);
 
   Geometry move(final double... deltas);

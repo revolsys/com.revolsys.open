@@ -1304,24 +1304,24 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return this.coordinateSystem != null;
   }
 
-  public boolean isProjected() {
-    return this.coordinateSystem instanceof ProjectedCoordinateSystem;
-  }
-
-  public boolean isResolutionGreaterThan(final GeometryFactory geometryFactory) {
+  public boolean isMoreDetailed(final GeometryFactory geometryFactory) {
     if (isFloating()) {
       return !geometryFactory.isFloating();
     } else if (geometryFactory.isFloating()) {
       return false;
     } else {
-      if (this.resolutionX > geometryFactory.getResolutionX()) {
+      if (this.resolutionX < geometryFactory.getResolutionX()) {
         return true;
-      } else if (this.resolutionY > geometryFactory.getResolutionY()) {
+      } else if (this.resolutionY < geometryFactory.getResolutionY()) {
         return true;
       } else {
         return false;
       }
     }
+  }
+
+  public boolean isProjected() {
+    return this.coordinateSystem instanceof ProjectedCoordinateSystem;
   }
 
   public boolean isSameCoordinateSystem(final CoordinateSystem coordinateSystem) {

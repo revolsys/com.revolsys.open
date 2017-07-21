@@ -787,6 +787,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     }
   }
 
+  public void redraw() {
+    firePropertyChange("redraw", false, true);
+  }
+
   @Override
   public final void refresh() {
     Invoke.background("Refresh Layer " + getName(), () -> {

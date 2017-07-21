@@ -9,9 +9,9 @@ import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevatio
 import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
 import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.editor.GeometryEditor;
@@ -21,7 +21,7 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
-public interface GriddedElevationModel extends ObjectWithProperties, GeometryFactoryProxy {
+public interface GriddedElevationModel extends ObjectWithProperties, BoundingBoxProxy {
   String GEOMETRY_FACTORY = "geometryFactory";
 
   int NULL_COLOUR = WebColors.colorToRGB(0, 0, 0, 0);
@@ -79,6 +79,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     }
   }
 
+  @Override
   BoundingBox getBoundingBox();
 
   default int getColour(final int gridX, final int gridY) {

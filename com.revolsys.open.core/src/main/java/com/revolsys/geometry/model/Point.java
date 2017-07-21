@@ -805,6 +805,15 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
+  default Location locate(final double x, final double y) {
+    if (equalsVertex(x, y)) {
+      return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
+    }
+  }
+
+  @Override
   default Location locate(final Point point) {
     if (equals(2, point)) {
       return Location.INTERIOR;

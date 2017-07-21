@@ -58,8 +58,6 @@ public class GriddedElevationModelLayer extends AbstractLayer {
 
     Menus.<GriddedElevationModelLayer> addMenuItem(menu, "refresh", "Reload from File",
       "page:refresh", GriddedElevationModelLayer::revertDo, true);
-
-    menu.deleteMenuItem("refresh", "Refresh");
   }
 
   public static void saveAs(final String title, final Consumer<File> exportAction) {
@@ -232,6 +230,12 @@ public class GriddedElevationModelLayer extends AbstractLayer {
         image.writeGriddedElevationModel();
       }
     }
+  }
+
+  @Override
+  protected void refreshDo() {
+    final GriddedElevationModelLayerRenderer renderer = getRenderer();
+    renderer.refresh();
   }
 
   protected void revertDo() {

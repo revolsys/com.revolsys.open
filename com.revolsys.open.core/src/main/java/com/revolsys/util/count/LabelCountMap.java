@@ -53,6 +53,10 @@ public class LabelCountMap {
     }
   }
 
+  public void addCount(final Enum<?> label) {
+    addCount(label.name(), 1);
+  }
+
   public void addCount(final PathNameProxy pathNameProxy) {
     if (pathNameProxy != null) {
       final CharSequence label = pathNameProxy.getPathName();

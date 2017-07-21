@@ -97,8 +97,6 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   private boolean laszip;
 
-  private ChannelReader reader;
-
   private LasZipHeader lasZipHeader;
 
   @SuppressWarnings("unused")
@@ -174,7 +172,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
             }
           }
         }
-        this.headerSize += readVariableLengthRecords(numberOfVariableLengthRecords);
+        this.headerSize += readVariableLengthRecords(reader, numberOfVariableLengthRecords);
         this.bounds = new double[] {
           minX, minY, minZ, maxX, maxY, maxZ
         };
@@ -305,18 +303,18 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     return this.pointFormat.newLasPoint(lasPointCloud, x, y, z);
   }
 
-  private int readVariableLengthRecords(final long numberOfVariableLengthRecords)
-    throws IOException {
+  private int readVariableLengthRecords(final ChannelReader reader,
+    final long numberOfVariableLengthRecords) throws IOException {
     int byteCount = 0;
     for (int i = 0; i < numberOfVariableLengthRecords; i++) {
       @SuppressWarnings("unused")
-      final int reserved = this.reader.getUnsignedShort(); // Ignore reserved
-                                                           // value;
-      final String userId = this.reader.getUsAsciiString(16);
-      final int recordId = this.reader.getUnsignedShort();
-      final int valueLength = this.reader.getUnsignedShort();
-      final String description = this.reader.getUsAsciiString(32);
-      final byte[] bytes = this.reader.getBytes(valueLength);
+      final int reserved = reader.getUnsignedShort(); // Ignore reserved
+                                                      // value;
+      final String userId = reader.getUsAsciiString(16);
+      final int recordId = reader.getUnsignedShort();
+      final int valueLength = reader.getUnsignedShort();
+      final String description = reader.getUsAsciiString(32);
+      final byte[] bytes = reader.getBytes(valueLength);
       final LasVariableLengthRecord property = new LasVariableLengthRecord(userId, recordId,
         description, bytes);
       addProperty(property);

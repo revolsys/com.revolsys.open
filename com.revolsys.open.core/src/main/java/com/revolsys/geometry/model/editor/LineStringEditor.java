@@ -48,7 +48,7 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
   public LineStringEditor(final GeometryFactory geometryFactory) {
     super(geometryFactory);
     this.axisCount = geometryFactory.getAxisCount();
-    this.line = null;
+    this.line = newLineStringEmpty();
     this.coordinates = new double[0];
     this.vertexCount = this.coordinates.length / this.axisCount;
   }
@@ -59,7 +59,7 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
       vertexCapacity = 0;
     }
     this.axisCount = geometryFactory.getAxisCount();
-    this.line = null;
+    this.line = newLineStringEmpty();
     this.coordinates = new double[vertexCapacity * this.axisCount];
     Arrays.fill(this.coordinates, Double.NaN);
     this.vertexCount = 0;
@@ -72,7 +72,7 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
       throw new IllegalArgumentException("axisCount=" + axisCount + " must be >= 2");
     }
     this.axisCount = axisCount;
-    this.line = null;
+    this.line = newLineStringEmpty();
     if (coordinates == null || coordinates.length == 0) {
       this.coordinates = new double[0];
     } else {
@@ -83,7 +83,6 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
 
   public LineStringEditor(final int axisCount, final int vertexCount, final double... coordinates) {
     super(GeometryFactory.floating(0, axisCount));
-    this.line = null;
     if (coordinates == null || coordinates.length == 0) {
       this.axisCount = 2;
       this.coordinates = new double[0];
@@ -105,6 +104,7 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
         this.vertexCount = 0;
       }
     }
+    this.line = newLineStringEmpty();
   }
 
   public LineStringEditor(final LineString line) {
@@ -120,6 +120,15 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
   public int appendVertex(final double x, final double y) {
     final int index = getVertexCount();
     if (insertVertex(index, x, y)) {
+      return index;
+    } else {
+      return -1;
+    }
+  }
+
+  public int appendVertex(final double x, final double y, final double z) {
+    final int index = getVertexCount();
+    if (insertVertex(index, x, y, z)) {
       return index;
     } else {
       return -1;
@@ -190,6 +199,10 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
     }
   }
 
+  public LineString getOriginalGeometry() {
+    return this.line;
+  }
+
   @Override
   public int getVertexCount() {
     return this.vertexCount;
@@ -216,50 +229,22 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
   }
 
   public void insertVertex(final int index, final double... coordinates) {
-    final int axisCount = getAxisCount();
-    if (index >= this.vertexCount) {
-      ensureCapacity(index);
-      this.vertexCount = index + 1;
-    } else {
-      ensureCapacity(this.vertexCount + 1);
-      final int offset = index * axisCount;
-      final int newOffset = offset + axisCount;
-      System.arraycopy(this.coordinates, offset, this.coordinates, newOffset,
-        this.coordinates.length - newOffset);
-      this.vertexCount++;
-    }
+    insertVertexShift(index);
     setVertex(index, coordinates);
   }
 
   public boolean insertVertex(final int index, final double x, final double y) {
-    final int axisCount = getAxisCount();
-    if (index >= this.vertexCount) {
-      ensureCapacity(index + 1);
-      this.vertexCount = index + 1;
-    } else {
-      ensureCapacity(this.vertexCount + 1);
-      final int offset = index * axisCount;
-      final int newOffset = offset + axisCount;
-      System.arraycopy(this.coordinates, offset, this.coordinates, newOffset,
-        this.coordinates.length - newOffset);
-      this.vertexCount++;
-    }
+    insertVertexShift(index);
     return setVertex(index, x, y);
   }
 
+  public boolean insertVertex(final int index, final double x, final double y, final double z) {
+    insertVertexShift(index);
+    return setVertex(index, x, y, z);
+  }
+
   public boolean insertVertex(final int index, final Point point) {
-    final int axisCount = getAxisCount();
-    if (index >= this.vertexCount) {
-      ensureCapacity(index + 1);
-      this.vertexCount = index + 1;
-    } else {
-      ensureCapacity(this.vertexCount + 1);
-      final int offset = index * axisCount;
-      final int newOffset = offset + axisCount;
-      System.arraycopy(this.coordinates, offset, this.coordinates, newOffset,
-        this.vertexCount * axisCount - offset);
-      this.vertexCount++;
-    }
+    insertVertexShift(index);
     return setVertex(index, point);
   }
 
@@ -280,6 +265,21 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
       }
     }
     return insertVertex(index, point);
+  }
+
+  private void insertVertexShift(final int index) {
+    final int axisCount = getAxisCount();
+    if (index >= this.vertexCount) {
+      ensureCapacity(index + 1);
+      this.vertexCount = index + 1;
+    } else {
+      ensureCapacity(this.vertexCount + 1);
+      final int offset = index * axisCount;
+      final int newOffset = offset + axisCount;
+      System.arraycopy(this.coordinates, offset, this.coordinates, newOffset,
+        this.coordinates.length - newOffset);
+      this.vertexCount++;
+    }
   }
 
   @Override
@@ -413,8 +413,8 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
       }
       int offset = index * axisCount;
       final GeometryFactory geometryFactory = getGeometryFactory();
-      this.coordinates[offset++] = geometryFactory.makeXyPrecise(coordinates[0]);
-      this.coordinates[offset++] = geometryFactory.makeXyPrecise(coordinates[1]);
+      this.coordinates[offset++] = geometryFactory.makeXPrecise(coordinates[0]);
+      this.coordinates[offset++] = geometryFactory.makeYPrecise(coordinates[1]);
       for (int axisIndex = 2; axisIndex < coordinateAxisCount; axisIndex++) {
         this.coordinates[offset++] = geometryFactory.makePrecise(axisIndex, coordinates[axisIndex]);
       }
@@ -426,8 +426,24 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
     if (index >= 0 && index < this.vertexCount) {
       final int axisCount = getAxisCount();
       final int offset = index * axisCount;
-      this.coordinates[offset] = geometryFactory.makeXyPrecise(x);
-      this.coordinates[offset + 1] = geometryFactory.makeXyPrecise(y);
+      this.coordinates[offset] = geometryFactory.makeXPrecise(x);
+      this.coordinates[offset + 1] = geometryFactory.makeYPrecise(y);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean setVertex(final int index, final double x, final double y, final double z) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (index >= 0 && index < this.vertexCount) {
+      final int axisCount = getAxisCount();
+      final int offset = index * axisCount;
+      this.coordinates[offset] = geometryFactory.makeXPrecise(x);
+      this.coordinates[offset + 1] = geometryFactory.makeYPrecise(y);
+      if (axisCount > 2) {
+        this.coordinates[offset + 2] = geometryFactory.makeZPrecise(z);
+      }
       return true;
     } else {
       return false;
@@ -444,8 +460,8 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
       int offset = index * axisCount;
       final GeometryFactory geometryFactory = getGeometryFactory();
       final Point convertPoint2d = point.convertPoint2d(geometryFactory);
-      this.coordinates[offset++] = geometryFactory.makeXyPrecise(convertPoint2d.getX());
-      this.coordinates[offset++] = geometryFactory.makeXyPrecise(convertPoint2d.getY());
+      this.coordinates[offset++] = geometryFactory.makeXPrecise(convertPoint2d.getX());
+      this.coordinates[offset++] = geometryFactory.makeYPrecise(convertPoint2d.getY());
       for (int axisIndex = 2; axisIndex < pointAxisCount; axisIndex++) {
         this.coordinates[offset++] = geometryFactory.makePrecise(axisIndex,
           point.getCoordinate(axisIndex));

@@ -48,6 +48,27 @@ public interface Identifier {
     }
   }
 
+  static Identifier newIdentifier(final int intValue) {
+    return new IntegerIdentifier(intValue);
+  }
+
+  static Identifier newIdentifier(final long longValue) {
+    if (longValue < Integer.MIN_VALUE || longValue > Integer.MAX_VALUE) {
+      return new LongIdentifier(longValue);
+    } else {
+      final int intValue = (int)longValue;
+      return newIdentifier(intValue);
+    }
+  }
+
+  static Identifier newIdentifier(final Long longValue) {
+    if (longValue == null) {
+      return null;
+    } else {
+      return newIdentifier(longValue.longValue());
+    }
+  }
+
   static Identifier newIdentifier(final Object... values) {
     if (values == null || values.length == 0) {
       return null;
@@ -64,16 +85,11 @@ public interface Identifier {
       return null;
     } else if (value instanceof Long) {
       final long longValue = (Long)value;
-      if (longValue < Integer.MIN_VALUE || longValue > Integer.MAX_VALUE) {
-        return new LongIdentifier(longValue);
-      } else {
-        final int intValue = (int)longValue;
-        return new IntegerIdentifier(intValue);
-      }
+      return newIdentifier(longValue);
     } else if (Numbers.isPrimitiveIntegral(value)) {
       final Number number = (Number)value;
       final int intValue = number.intValue();
-      return new IntegerIdentifier(intValue);
+      return newIdentifier(intValue);
     } else if (value instanceof Identifier) {
       return (Identifier)value;
     } else if (value instanceof Collection) {

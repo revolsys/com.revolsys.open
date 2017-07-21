@@ -32,10 +32,7 @@
  */
 package com.revolsys.geometry.algorithm.locate;
 
-import java.util.Iterator;
-
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollectionIterator;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
@@ -56,55 +53,51 @@ import com.revolsys.geometry.model.Polygonal;
  */
 public class SimplePointInAreaLocator implements PointOnGeometryLocator {
 
-  private static boolean containsPoint(final Point p, final Geometry geom) {
-    if (geom instanceof Polygon) {
-      return containsPointInPolygon(p, (Polygon)geom);
-    } else if (geom.isGeometryCollection()) {
-      final Iterator<Geometry> geomi = new GeometryCollectionIterator(geom);
-      while (geomi.hasNext()) {
-        final Geometry g2 = geomi.next();
-        if (g2 != geom) {
-          if (containsPoint(p, g2)) {
-            return true;
-          }
+  private static boolean containsPoint(final Geometry geometry, final Point point) {
+    if (geometry instanceof Polygon) {
+      return containsPointInPolygon((Polygon)geometry, point);
+    } else if (geometry.isGeometryCollection()) {
+      for (final Geometry part : geometry.geometries()) {
+        if (containsPoint(part, point)) {
+          return true;
         }
       }
     }
     return false;
   }
 
-  public static boolean containsPointInPolygon(final Point p, final Polygon poly) {
-    if (poly.isEmpty()) {
+  public static boolean containsPointInPolygon(final Polygon polygon, final Point point) {
+    if (polygon.isEmpty()) {
       return false;
-    }
-    final LinearRing shell = poly.getShell();
-    if (!isPointInRing(p, shell)) {
-      return false;
-    }
-    // now test if the point lies in or on the holes
-    for (int i = 0; i < poly.getHoleCount(); i++) {
-      final LinearRing hole = poly.getHole(i);
-      if (isPointInRing(p, hole)) {
+    } else {
+      final LinearRing shell = polygon.getShell();
+      if (!isPointInRing(shell, point)) {
         return false;
+      } else {
+        for (final LinearRing hole : polygon.holes()) {
+          if (isPointInRing(hole, point)) {
+            return false;
+          }
+        }
+        return true;
       }
     }
-    return true;
   }
 
   /**
    * Determines whether a point lies in a LinearRing,
    * using the ring envelope to short-circuit if possible.
-   *
-   * @param p the point to test
    * @param ring a linear ring
+   * @param point the point to test
+   *
    * @return true if the point lies inside the ring
    */
-  private static boolean isPointInRing(final Point p, final LinearRing ring) {
-    // short-circuit if point is not in ring envelope
-    if (!p.intersects(ring.getBoundingBox())) {
+  private static boolean isPointInRing(final LinearRing ring, final Point point) {
+    if (point.intersects(ring.getBoundingBox())) {
+      return ring.isPointInRing(point);
+    } else {
       return false;
     }
-    return ring.isPointInRing(p);
   }
 
   /**
@@ -112,29 +105,28 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
    * Currently this will never return a value of BOUNDARY.
    *
    * @param p the point to test
-   * @param geom the areal geometry to test
+   * @param geometry the areal geometry to test
    * @return the Location of the point in the geometry
    */
   public static Location locate(final Point p, final Geometry geom) {
     if (geom.isEmpty()) {
       return Location.EXTERIOR;
-    }
-
-    if (containsPoint(p, geom)) {
+    } else if (containsPoint(geom, p)) {
       return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
     }
-    return Location.EXTERIOR;
   }
 
-  private final Geometry geom;
+  private final Geometry geometry;
 
   public SimplePointInAreaLocator(final Geometry geom) {
-    this.geom = geom;
+    this.geometry = geom;
   }
 
   @Override
   public Location locate(final Point p) {
-    return SimplePointInAreaLocator.locate(p, this.geom);
+    return SimplePointInAreaLocator.locate(p, this.geometry);
   }
 
 }

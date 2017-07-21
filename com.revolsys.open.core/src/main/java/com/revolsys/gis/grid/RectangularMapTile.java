@@ -13,6 +13,12 @@ public interface RectangularMapTile extends BoundingBoxProxy, Record {
 
   String getFormattedName();
 
+  @Override
+  default GeometryFactory getGeometryFactory() {
+    final RectangularMapGrid grid = getGrid();
+    return grid.getGeometryFactory();
+  }
+
   RectangularMapGrid getGrid();
 
   default double getMinX() {

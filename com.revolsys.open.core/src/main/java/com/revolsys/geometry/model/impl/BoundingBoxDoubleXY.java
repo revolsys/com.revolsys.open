@@ -205,25 +205,19 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
   public BoundingBoxDoubleXY(final GeometryFactory geometryFactory, final double x,
     final double y) {
     this(x, y);
-    final double scaleXY = geometryFactory.getScaleXY();
-    if (scaleXY > 0) {
-      this.minX = Math.floor(this.minX * scaleXY) / scaleXY;
-      this.maxX = Math.floor(this.maxX * scaleXY) / scaleXY;
-      this.minY = Math.ceil(this.minY * scaleXY) / scaleXY;
-      this.maxY = Math.ceil(this.maxY * scaleXY) / scaleXY;
-    }
+    this.minX = geometryFactory.makeXPreciseFloor(this.minX);
+    this.maxX = geometryFactory.makeXPreciseCeil(this.maxX);
+    this.minY = geometryFactory.makeYPreciseFloor(this.minY);
+    this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
   }
 
   public BoundingBoxDoubleXY(final GeometryFactory geometryFactory, final double x1,
     final double y1, final double x2, final double y2) {
     this(x1, y1, x2, y2);
-    final double scaleXY = geometryFactory.getScaleXY();
-    if (scaleXY > 0) {
-      this.minX = Math.floor(this.minX * scaleXY) / scaleXY;
-      this.maxX = Math.floor(this.maxX * scaleXY) / scaleXY;
-      this.minY = Math.ceil(this.minY * scaleXY) / scaleXY;
-      this.maxY = Math.ceil(this.maxY * scaleXY) / scaleXY;
-    }
+    this.minX = geometryFactory.makeXPreciseFloor(this.minX);
+    this.maxX = geometryFactory.makeXPreciseCeil(this.maxX);
+    this.minY = geometryFactory.makeYPreciseFloor(this.minY);
+    this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
   }
 
   public boolean covers(final double minX, final double maxX, final double minY,

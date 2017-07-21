@@ -47,12 +47,8 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       return null;
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
-      if (geometry.isEmpty()) {
-        return geometry;
-      } else {
-        final DataType dataType = getDataType();
-        return new PostgreSQLGeometryWrapper(dataType, this.geometryFactory, geometry);
-      }
+      final DataType dataType = getDataType();
+      return new PostgreSQLGeometryWrapper(dataType, this.geometryFactory, geometry);
     } else if (value instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)value;
       boundingBox = boundingBox.convert(this.geometryFactory);

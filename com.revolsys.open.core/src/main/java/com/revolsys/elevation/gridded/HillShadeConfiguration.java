@@ -75,64 +75,85 @@ public class HillShadeConfiguration {
     final int width = this.width;
     final int height = this.height;
 
-    double a;
-    double b;
-    double c;
-    double d;
+    double a = Double.NaN;
+    double b = Double.NaN;
+    double c = Double.NaN;
+    double d = Double.NaN;
     final double e = elevationModel.getElevationFast(gridX, gridY);
     if (Double.isFinite(e)) {
-      double f;
-      double g;
-      double h;
-      double i;
+      double f = Double.NaN;
+      double g = Double.NaN;
+      double h = Double.NaN;
+      double i = Double.NaN;
 
       final boolean firstX = gridX == 0;
       final boolean firstY = gridY == 0;
       final boolean lastX = gridX == width - 1;
       final boolean lastY = gridY == height - 1;
-      if (firstX) {
-        d = e;
-      } else {
-        d = elevationModel.getElevationFast(gridX - 1, gridY);
-      }
-      if (lastX) {
-        f = e;
-      } else {
-        f = elevationModel.getElevationFast(gridX + 1, gridY);
-      }
-      if (firstY) {
-        g = d;
-        h = e;
-        i = f;
-      } else {
-        if (firstX) {
-          g = e;
-        } else {
-          g = elevationModel.getElevationFast(gridX - 1, gridY - 1);
-        }
-        h = elevationModel.getElevationFast(gridX, gridY - 1);
-        if (lastX) {
-          i = e;
-        } else {
-          i = elevationModel.getElevationFast(gridX + 1, gridY - 1);
-        }
-      }
-      if (lastY) {
-        a = d;
-        b = e;
-        c = f;
-      } else {
-        if (firstX) {
-          a = e;
-        } else {
+      if (!lastY) {
+        if (!firstX) {
           a = elevationModel.getElevationFast(gridX - 1, gridY + 1);
         }
         b = elevationModel.getElevationFast(gridX, gridY + 1);
-        if (lastX) {
-          c = e;
-        } else {
+        if (!lastX) {
           c = elevationModel.getElevationFast(gridX + 1, gridY + 1);
         }
+      }
+      if (!firstX) {
+        d = elevationModel.getElevationFast(gridX - 1, gridY);
+      }
+      if (!lastX) {
+        f = elevationModel.getElevationFast(gridX + 1, gridY);
+      }
+      if (!firstY) {
+        if (!firstX) {
+          g = elevationModel.getElevationFast(gridX - 1, gridY - 1);
+        }
+        h = elevationModel.getElevationFast(gridX, gridY - 1);
+        if (!lastX) {
+          i = elevationModel.getElevationFast(gridX + 1, gridY - 1);
+        }
+      }
+
+      if (!Double.isFinite(d)) {
+        if (Double.isFinite(f)) {
+          d = e - (f - e);
+        } else {
+          d = e;
+          f = e;
+        }
+      } else if (!Double.isFinite(f)) {
+        f = e;
+      }
+      if (!Double.isFinite(a)) {
+        if (Double.isFinite(g)) {
+          a = d - (g - d);
+        } else {
+          a = d;
+        }
+      }
+      if (!Double.isFinite(b)) {
+        if (Double.isFinite(h)) {
+          b = e - (h - e);
+        } else {
+          b = e;
+        }
+      }
+      if (!Double.isFinite(c)) {
+        if (Double.isFinite(i)) {
+          c = f - (i - f);
+        } else {
+          c = f;
+        }
+      }
+      if (!Double.isFinite(g)) {
+        g = d - (a - d);
+      }
+      if (!Double.isFinite(h)) {
+        h = e - (b - e);
+      }
+      if (!Double.isFinite(i)) {
+        i = f - (c - f);
       }
       return getHillShade(a, b, c, d, f, g, h, i);
     } else {

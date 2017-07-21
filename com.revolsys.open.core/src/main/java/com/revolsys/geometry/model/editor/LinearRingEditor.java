@@ -24,6 +24,11 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
   }
 
   @Override
+  public LinearRing getOriginalGeometry() {
+    return (LinearRing)super.getOriginalGeometry();
+  }
+
+  @Override
   public LinearRing newGeometry() {
     return (LinearRing)super.newGeometry();
   }
