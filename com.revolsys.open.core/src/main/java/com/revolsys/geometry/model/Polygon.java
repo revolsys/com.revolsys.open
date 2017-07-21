@@ -477,23 +477,25 @@ public interface Polygon extends Polygonal {
         }
       } catch (final TopologyException e) {
       }
-      final BoundingBox boundingBox = getBoundingBox();
-      final double x1 = centroid.getX();
-      final double y1 = centroid.getY();
-      for (final double x2 : new double[] {
-        boundingBox.getMinX(), boundingBox.getMaxX()
-      }) {
-        for (final double y2 : new double[] {
-          boundingBox.getMinY(), boundingBox.getMaxY()
+      if (centroid != null) {
+        final BoundingBox boundingBox = getBoundingBox();
+        final double x1 = centroid.getX();
+        final double y1 = centroid.getY();
+        for (final double x2 : new double[] {
+          boundingBox.getMinX(), boundingBox.getMaxX()
         }) {
-          final LineSegment line = new LineSegmentDouble(2, x1, y1, x2, y2);
-          try {
-            final Geometry intersection = intersection(line);
-            if (!intersection.isEmpty()) {
-              return intersection.getPointWithin();
-            }
-          } catch (final TopologyException e) {
+          for (final double y2 : new double[] {
+            boundingBox.getMinY(), boundingBox.getMaxY()
+          }) {
+            final LineSegment line = new LineSegmentDouble(2, x1, y1, x2, y2);
+            try {
+              final Geometry intersection = intersection(line);
+              if (!intersection.isEmpty()) {
+                return intersection.getPointWithin();
+              }
+            } catch (final TopologyException e) {
 
+            }
           }
         }
       }

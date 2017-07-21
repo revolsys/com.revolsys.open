@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -266,6 +267,23 @@ public interface Resource extends org.springframework.core.io.Resource {
       return lastModified();
     } catch (final IOException e) {
       return Long.MAX_VALUE;
+    }
+  }
+
+  default java.sql.Date getLastModifiedDate() {
+    long lastModified = getLastModified();
+    if (lastModified == Long.MAX_VALUE) {
+      lastModified = 0;
+    }
+    return new java.sql.Date(lastModified);
+  }
+
+  default Date getLastModifiedDateTime() {
+    final long lastModified = getLastModified();
+    if (lastModified == Long.MAX_VALUE) {
+      return new Date(0);
+    } else {
+      return new Date(lastModified);
     }
   }
 

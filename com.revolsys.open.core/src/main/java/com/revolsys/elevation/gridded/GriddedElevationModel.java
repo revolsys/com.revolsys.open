@@ -1,6 +1,8 @@
 package com.revolsys.elevation.gridded;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import com.revolsys.awt.WebColors;
@@ -15,6 +17,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.editor.GeometryEditor;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
@@ -155,6 +158,97 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
   default double getMinZ() {
     final BoundingBox boundingBox = getBoundingBox();
     return boundingBox.getMinZ();
+  }
+
+  default List<Point> getNullBoundaryPoints() {
+    final List<Point> points = new ArrayList<>();
+    final double minX = getMinX();
+    final double minY = getMinY();
+
+    final int gridCellSize = getGridCellSize();
+    final int gridHeight = getGridHeight();
+    final int gridWidth = getGridWidth();
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      for (int gridX = 0; gridX < gridWidth; gridX++) {
+        if (isNull(gridX, gridY)) {
+          boolean hasNeighbour = false;
+          if (gridX == 0) {
+            if (gridY == 0) {
+              hasNeighbour = !isNull(gridX + 1, gridY) //
+                || !isNull(gridX, gridY + 1) //
+                || !isNull(gridX + 1, gridY + 1)//
+              ;
+            } else if (gridY == gridHeight - 1) {
+              hasNeighbour = !isNull(gridX - 1, gridY) //
+                || !isNull(gridX - 1, gridY - 1) //
+                || !isNull(gridX, gridY - 1) //
+              ;
+            } else {
+              hasNeighbour = !isNull(gridX + 1, gridY) //
+                || !isNull(gridX, gridY - 1) //
+                || !isNull(gridX + 1, gridY - 1) //
+                || !isNull(gridX, gridY + 1) //
+                || !isNull(gridX + 1, gridY + 1)//
+              ;
+            }
+          } else if (gridX == gridWidth - 1) {
+            if (gridY == 0) {
+              hasNeighbour = !isNull(gridX - 1, gridY) //
+                || !isNull(gridX + 1, gridY + 1) //
+                || !isNull(gridX, gridY + 1) //
+              ;
+
+            } else if (gridY == gridHeight - 1) {
+              hasNeighbour = !isNull(gridX - 1, gridY) //
+                || !isNull(gridX - 1, gridY - 1) //
+                || !isNull(gridX, gridY - 1) //
+              ;
+            } else {
+              hasNeighbour = !isNull(gridX - 1, gridY) //
+                || !isNull(gridX - 1, gridY - 1) //
+                || !isNull(gridX, gridY - 1) //
+                || !isNull(gridX + 1, gridY + 1) //
+                || !isNull(gridX, gridY + 1) //
+              ;
+            }
+          } else {
+            if (gridY == 0) {
+              hasNeighbour = !isNull(gridX - 1, gridY) //
+                || !isNull(gridX + 1, gridY) //
+                || !isNull(gridX + 1, gridY + 1) //
+                || !isNull(gridX, gridY + 1) //
+                || !isNull(gridX + 1, gridY + 1)//
+              ;
+
+            } else if (gridY == gridHeight - 1) {
+              hasNeighbour = !isNull(gridX - 1, gridY) //
+                || !isNull(gridX + 1, gridY) //
+                || !isNull(gridX - 1, gridY - 1) //
+                || !isNull(gridX, gridY - 1) //
+                || !isNull(gridX + 1, gridY - 1) //
+              ;
+            } else {
+              hasNeighbour = !isNull(gridX - 1, gridY) //
+                || !isNull(gridX + 1, gridY) //
+                || !isNull(gridX - 1, gridY - 1) //
+                || !isNull(gridX, gridY - 1) //
+                || !isNull(gridX + 1, gridY - 1) //
+                || !isNull(gridX + 1, gridY + 1) //
+                || !isNull(gridX, gridY + 1) //
+                || !isNull(gridX + 1, gridY + 1)//
+              ;
+            }
+          }
+          if (hasNeighbour) {
+            final double x = minX + gridCellSize * gridX;
+            final double y = minY + gridCellSize * gridY;
+            final PointDoubleXY point = new PointDoubleXY(x, y);
+            points.add(point);
+          }
+        }
+      }
+    }
+    return points;
   }
 
   Resource getResource();
