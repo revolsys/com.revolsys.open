@@ -15,14 +15,36 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Property;
 
 public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer {
 
   static String getTileFileName(final String filePrefix, final int coordinateSystemId,
     final String gridTileOrCellSize, final int tileMinX, final int tileMinY,
     final String fileExtension) {
-    return filePrefix + "_" + coordinateSystemId + "_" + gridTileOrCellSize + "_" + tileMinX + "_"
-      + tileMinY + "." + fileExtension;
+    return getTileFileName(filePrefix, coordinateSystemId, gridTileOrCellSize, tileMinX, tileMinY,
+      null, fileExtension);
+  }
+
+  static String getTileFileName(final String filePrefix, final int coordinateSystemId,
+    final String gridTileOrCellSize, final int tileMinX, final int tileMinY,
+    final String fileSuffix, final String fileExtension) {
+    final StringBuilder fileName = new StringBuilder(filePrefix);
+    fileName.append('_');
+    fileName.append(coordinateSystemId);
+    fileName.append('_');
+    fileName.append(gridTileOrCellSize);
+    fileName.append('_');
+    fileName.append(tileMinX);
+    fileName.append('_');
+    fileName.append(tileMinY);
+    if (Property.hasValue(fileSuffix)) {
+      fileName.append('_');
+      fileName.append(fileSuffix);
+    }
+    fileName.append('.');
+    fileName.append(fileExtension);
+    return fileName.toString();
   }
 
   static Path getTilePath(final Path basePath, final String filePrefix,
@@ -41,6 +63,13 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
   static Resource getTileResource(final Resource basePath, final String filePrefix,
     final int coordinateSystemId, final String gridTileOrCellSize, final int tileMinX,
     final int tileMinY, final String fileExtension) {
+    return getTileResource(basePath, filePrefix, coordinateSystemId, gridTileOrCellSize, tileMinX,
+      tileMinY, null, fileExtension);
+  }
+
+  static Resource getTileResource(final Resource basePath, final String filePrefix,
+    final int coordinateSystemId, final String gridTileOrCellSize, final int tileMinX,
+    final int tileMinY, final String fileSuffix, final String fileExtension) {
     final Resource fileExtensionDirectory = basePath.createRelative(fileExtension);
     final Resource coordinateSystemDirectory = fileExtensionDirectory
       .createRelative(Integer.toString(coordinateSystemId));
@@ -48,7 +77,7 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
       .createRelative(gridTileOrCellSize);
     final Resource directoryX = resolutionDirectory.createRelative(Integer.toString(tileMinX));
     final String fileName = getTileFileName(filePrefix, coordinateSystemId, gridTileOrCellSize,
-      tileMinX, tileMinY, fileExtension);
+      tileMinX, tileMinY, fileSuffix, fileExtension);
     return directoryX.createRelative(fileName);
   }
 

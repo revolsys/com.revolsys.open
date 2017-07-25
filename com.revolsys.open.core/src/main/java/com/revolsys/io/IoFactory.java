@@ -194,7 +194,11 @@ public interface IoFactory extends Available {
 
   public static ChannelReader newChannelReader(final Resource resource) {
     final ReadableByteChannel channel = newReadableByteChannel(resource);
-    return new ChannelReader(channel);
+    if (channel == null) {
+      return null;
+    } else {
+      return new ChannelReader(channel);
+    }
   }
 
   public static FileNameExtensionFilter newFileFilter(final IoFactory factory) {

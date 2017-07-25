@@ -295,7 +295,7 @@ public class PathResource extends AbstractResource implements WritableResource {
       return FileChannel.open(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_READ_SET,
         com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
     } catch (final FileSystemException e) {
-      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
+      return null;
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

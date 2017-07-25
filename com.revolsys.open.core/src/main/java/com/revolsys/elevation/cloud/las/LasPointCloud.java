@@ -60,6 +60,8 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
 
   private ZipInputStream zipIn;
 
+  private boolean exists;
+
   public LasPointCloud(final GeometryFactory geometryFactory) {
     this(LasPointFormat.Core, geometryFactory);
   }
@@ -97,7 +99,12 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
       }
     }
     this.reader = resource.newChannelReader(8096, ByteOrder.LITTLE_ENDIAN);
-    this.setHeader(new LasPointCloudHeader(this.reader, geometryFactory));
+    if (this.reader == null) {
+      this.exists = false;
+    } else {
+      this.exists = true;
+      this.setHeader(new LasPointCloudHeader(this.reader, geometryFactory));
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -249,6 +256,10 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
 
   public List<LasPoint> getPoints() {
     return this.points;
+  }
+
+  public boolean isExists() {
+    return this.exists;
   }
 
   public LazDecompress[] newLazDecompressors(final LasZipHeader lasZipHeader,

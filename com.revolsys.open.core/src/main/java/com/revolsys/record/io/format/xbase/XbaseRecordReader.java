@@ -84,6 +84,8 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
 
   private final ByteBuffer buffer1 = ByteBuffer.allocate(1);
 
+  private boolean exists = false;
+
   public XbaseRecordReader(final Resource resource, final RecordFactory recordFactory)
     throws IOException {
     this.resource = resource;
@@ -250,19 +252,24 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
 
   @Override
   protected void initDo() {
-    if (this.in == null) {
-
-      try {
-        this.in = this.resource.newReadableByteChannel();
+    try {
+      this.in = this.resource.newReadableByteChannel();
+      if (this.in == null) {
+        this.exists = false;
+        close();
+      } else {
+        this.exists = true;
         loadHeader();
-        readRecordDefinition();
-        this.recordBuffer = ByteBuffer.allocateDirect(this.recordSize);
-        if (this.initCallback != null) {
-          this.initCallback.run();
-        }
-      } catch (final IOException e) {
-        throw new RuntimeException("Error initializing mappedFile ", e);
       }
+      readRecordDefinition();
+      if (this.initCallback != null) {
+        this.initCallback.run();
+      }
+      if (this.exists) {
+        this.recordBuffer = ByteBuffer.allocateDirect(this.recordSize);
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException("Error initializing mappedFile ", e);
     }
   }
 
@@ -322,46 +329,48 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
 
   private void readRecordDefinition() throws IOException {
     this.recordDefinition = new RecordDefinitionImpl(this.typeName);
-    int readCount = Buffers.readAll(this.in, this.buffer1);
-    if (readCount == -1) {
-      throw new RuntimeException("Unexpected end of file: " + this.resource);
-    }
-    final ByteBuffer fieldHeaderBuffer = ByteBuffer.allocate(31);
-    int b = this.buffer1.get();
-    while (b != 0x0D) {
-      this.buffer1.clear();
-      readCount = Buffers.readAll(this.in, fieldHeaderBuffer);
-      if (readCount != 31) {
-        throw new RuntimeException("Unexpected end of file: " + this.resource);
-      }
-      final StringBuilder fieldName = new StringBuilder();
-      boolean endOfName = false;
-      for (int i = 0; i < 11; i++) {
-        if (!endOfName && b != 0) {
-          fieldName.append((char)b);
-        } else {
-
-          endOfName = true;
-        }
-        if (i != 10) {
-          b = fieldHeaderBuffer.get();
-        }
-      }
-      final char fieldType = (char)fieldHeaderBuffer.get();
-      fieldHeaderBuffer.getInt();
-      int length = fieldHeaderBuffer.get() & 0xFF;
-      final int decimalCount = fieldHeaderBuffer.get();
-      fieldHeaderBuffer.clear();
-      readCount = Buffers.readAll(this.in, this.buffer1);
+    if (this.exists) {
+      int readCount = Buffers.readAll(this.in, this.buffer1);
       if (readCount == -1) {
         throw new RuntimeException("Unexpected end of file: " + this.resource);
       }
-      b = this.buffer1.get();
-      final DataType dataType = DATA_TYPES.get(fieldType);
-      if (fieldType == MEMO_TYPE) {
-        length = Integer.MAX_VALUE;
+      final ByteBuffer fieldHeaderBuffer = ByteBuffer.allocate(31);
+      int b = this.buffer1.get();
+      while (b != 0x0D) {
+        this.buffer1.clear();
+        readCount = Buffers.readAll(this.in, fieldHeaderBuffer);
+        if (readCount != 31) {
+          throw new RuntimeException("Unexpected end of file: " + this.resource);
+        }
+        final StringBuilder fieldName = new StringBuilder();
+        boolean endOfName = false;
+        for (int i = 0; i < 11; i++) {
+          if (!endOfName && b != 0) {
+            fieldName.append((char)b);
+          } else {
+
+            endOfName = true;
+          }
+          if (i != 10) {
+            b = fieldHeaderBuffer.get();
+          }
+        }
+        final char fieldType = (char)fieldHeaderBuffer.get();
+        fieldHeaderBuffer.getInt();
+        int length = fieldHeaderBuffer.get() & 0xFF;
+        final int decimalCount = fieldHeaderBuffer.get();
+        fieldHeaderBuffer.clear();
+        readCount = Buffers.readAll(this.in, this.buffer1);
+        if (readCount == -1) {
+          throw new RuntimeException("Unexpected end of file: " + this.resource);
+        }
+        b = this.buffer1.get();
+        final DataType dataType = DATA_TYPES.get(fieldType);
+        if (fieldType == MEMO_TYPE) {
+          length = Integer.MAX_VALUE;
+        }
+        this.recordDefinition.addField(fieldName.toString(), dataType, length, decimalCount, false);
       }
-      this.recordDefinition.addField(fieldName.toString(), dataType, length, decimalCount, false);
     }
   }
 

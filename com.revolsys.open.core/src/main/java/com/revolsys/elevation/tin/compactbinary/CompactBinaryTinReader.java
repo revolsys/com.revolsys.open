@@ -46,21 +46,28 @@ public class CompactBinaryTinReader implements BaseCloseable {
 
   private double scaleFactorZ;
 
+  private boolean closed = false;
+
+  private boolean exists;
+
   public CompactBinaryTinReader(final Resource resource) {
     this.resource = resource;
   }
 
   @Override
   public void close() {
-    try {
-      this.in.close();
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
-    } finally {
-      this.boundingBox = null;
-      this.buffer = null;
-      this.in = null;
-      this.triangleCount = 0;
+    if (!this.closed) {
+      this.closed = true;
+      try {
+        this.in.close();
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      } finally {
+        this.boundingBox = null;
+        this.buffer = null;
+        this.in = null;
+        this.triangleCount = 0;
+      }
     }
   }
 
@@ -73,7 +80,7 @@ public class CompactBinaryTinReader implements BaseCloseable {
       int triangleToReadCount = this.triangleCount;
       while (triangleToReadCount > 0) {
         final int readCount = readBuffer(triangleToReadCount);
-        for (int readIndex = 0; readIndex < readCount; readIndex++) {
+        for (int readIndex = 0; readIndex < readCount && !this.closed; readIndex++) {
           final double x1 = getDouble(buffer, scaleFactorXY);
           final double y1 = getDouble(buffer, scaleFactorXY);
           final double z1 = getDouble(buffer, scaleFactorZ);
@@ -99,6 +106,10 @@ public class CompactBinaryTinReader implements BaseCloseable {
     } else {
       return intValue / scaleFactor;
     }
+  }
+
+  public boolean isClosed() {
+    return this.closed || !this.exists;
   }
 
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
@@ -130,24 +141,34 @@ public class CompactBinaryTinReader implements BaseCloseable {
   }
 
   public void open() {
-    if (this.in == null) {
+    if (this.in == null && !this.closed) {
       this.in = this.resource.newReadableByteChannel();
-      readHeader();
+      if (this.in == null) {
+        this.exists = false;
+        this.closed = true;
+      } else {
+        this.exists = true;
+        readHeader();
+      }
     }
   }
 
   private int readBuffer(final int triangleToReadCount) throws IOException {
-    final ByteBuffer buffer = this.buffer;
-    buffer.clear();
-    int readCount;
-    if (triangleToReadCount < BUFFER_RECORD_COUNT) {
-      readCount = triangleToReadCount;
+    if (isClosed()) {
+      return 0;
     } else {
-      readCount = BUFFER_RECORD_COUNT;
+      final ByteBuffer buffer = this.buffer;
+      buffer.clear();
+      int readCount;
+      if (triangleToReadCount < BUFFER_RECORD_COUNT) {
+        readCount = triangleToReadCount;
+      } else {
+        readCount = BUFFER_RECORD_COUNT;
+      }
+      buffer.limit(readCount * RECORD_SIZE);
+      Buffers.readAll(this.in, buffer);
+      return readCount;
     }
-    buffer.limit(readCount * RECORD_SIZE);
-    Buffers.readAll(this.in, buffer);
-    return readCount;
   }
 
   private void readHeader() {

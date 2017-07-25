@@ -26,6 +26,8 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
 
   private GeometryFactory geometryFactory;
 
+  private boolean exists = false;
+
   public PointZGeometryReader(final Resource resource) {
     this.resource = resource;
   }
@@ -33,10 +35,10 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
   @Override
   protected void closeDo() {
     super.closeDo();
-    final ChannelReader in = this.reader;
+    final ChannelReader reader = this.reader;
     this.reader = null;
-    if (in != null) {
-      in.close();
+    if (reader != null) {
+      reader.close();
     }
   }
 
@@ -47,19 +49,24 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
 
   @Override
   protected Geometry getNext() {
-    try {
-      final int xInt = this.reader.getInt();
-      final int yInt = this.reader.getInt();
-      final int zInt = this.reader.getInt();
-      final double x = xInt / this.scaleXy;
-      final double y = yInt / this.scaleXy;
-      final double z = zInt / this.scaleZ;
-      return this.geometryFactory.point(x, y, z);
-    } catch (final WrappedException e) {
-      if (e.getCause() instanceof EOFException) {
-        throw new NoSuchElementException();
-      } else {
-        throw e;
+    final ChannelReader reader = this.reader;
+    if (reader == null) {
+      return null;
+    } else {
+      try {
+        final int xInt = reader.getInt();
+        final int yInt = reader.getInt();
+        final int zInt = reader.getInt();
+        final double x = xInt / this.scaleXy;
+        final double y = yInt / this.scaleXy;
+        final double z = zInt / this.scaleZ;
+        return this.geometryFactory.point(x, y, z);
+      } catch (final WrappedException e) {
+        if (e.getCause() instanceof EOFException) {
+          throw new NoSuchElementException();
+        } else {
+          throw e;
+        }
       }
     }
   }
@@ -69,22 +76,31 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
     super.initDo();
     final ChannelReader reader = this.resource.newChannelReader();
     this.reader = reader;
-    final byte[] fileTypeBytes = new byte[6];
-    reader.getBytes(fileTypeBytes);
-    final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
-                                                                               // type
-    if (!PointZIoFactory.FILE_TYPE_POINTZ.equals(fileType)) {
-      throw new IllegalArgumentException(
-        "File must start with the text: " + PointZIoFactory.FILE_TYPE_POINTZ + " not " + fileType);
-    }
-    @SuppressWarnings("unused")
-    final short version = reader.getShort();
-    final int coordinateSystemId = reader.getInt();
-    this.scaleXy = reader.getDouble();
+    if (reader == null) {
+      this.exists = false;
+    } else {
+      this.exists = true;
+      final byte[] fileTypeBytes = new byte[6];
+      reader.getBytes(fileTypeBytes);
+      final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
+                                                                                 // type
+      if (!PointZIoFactory.FILE_TYPE_POINTZ.equals(fileType)) {
+        throw new IllegalArgumentException("File must start with the text: "
+          + PointZIoFactory.FILE_TYPE_POINTZ + " not " + fileType);
+      }
+      @SuppressWarnings("unused")
+      final short version = reader.getShort();
+      final int coordinateSystemId = reader.getInt();
+      this.scaleXy = reader.getDouble();
 
-    this.scaleZ = reader.getDouble();
-    this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, this.scaleXy, this.scaleXy,
-      this.scaleZ);
+      this.scaleZ = reader.getDouble();
+      this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, this.scaleXy,
+        this.scaleXy, this.scaleZ);
+    }
+  }
+
+  public boolean isExists() {
+    return this.exists;
   }
 
   @Override

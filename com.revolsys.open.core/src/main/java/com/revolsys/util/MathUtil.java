@@ -78,6 +78,14 @@ public interface MathUtil {
 
   double PI_TIMES_2 = 2.0 * Math.PI;
 
+  double PI_45 = Math.PI / 4;
+
+  double PI_90 = Math.PI / 2;
+
+  double PI_135 = Math.PI * 3 / 4;
+
+  double PI_180 = Math.PI;
+
   Random RANDOM = new Random();
 
   /**

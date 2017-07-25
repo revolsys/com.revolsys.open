@@ -58,6 +58,8 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
   private boolean memoryMapped = false;
 
+  private boolean exists;
+
   CompactBinaryGriddedElevationReader(final Resource resource) {
     this.resource = resource;
   }
@@ -80,40 +82,53 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
   public void open() {
     if (this.reader == null) {
       this.reader = IoFactory.newChannelReader(this.resource);
-      readHeader();
+      if (this.reader == null) {
+        this.exists = false;
+      } else {
+        this.exists = true;
+        try {
+          readHeader();
+        } catch (final Exception e) {
+          throw Exceptions.wrap("Unable to read DEM: " + this.resource, e);
+        }
+      }
     }
   }
 
   public GriddedElevationModel read() {
     open();
-    try {
-      final ChannelReader in = this.reader;
-      final int cellCount = this.gridWidth * this.gridHeight;
-      final int[] elevations = new int[cellCount];
-      final ReadableByteChannel channel = in.getChannel();
-      if (isMemoryMapped() && channel instanceof FileChannel) {
-        final FileChannel fileChannel = (FileChannel)channel;
-        final MappedByteBuffer mappedBytes = fileChannel.map(MapMode.READ_ONLY,
-          CompactBinaryGriddedElevation.HEADER_SIZE,
-          cellCount * CompactBinaryGriddedElevation.RECORD_SIZE);
-        final IntBuffer intBuffer = mappedBytes.asIntBuffer();
-        for (int index = 0; index < cellCount; index++) {
-          elevations[index] = intBuffer.get();
-        }
-      } else {
+    if (this.exists) {
+      try {
+        final ChannelReader in = this.reader;
+        final int cellCount = this.gridWidth * this.gridHeight;
+        final int[] elevations = new int[cellCount];
+        final ReadableByteChannel channel = in.getChannel();
+        if (isMemoryMapped() && channel instanceof FileChannel) {
+          final FileChannel fileChannel = (FileChannel)channel;
+          final MappedByteBuffer mappedBytes = fileChannel.map(MapMode.READ_ONLY,
+            CompactBinaryGriddedElevation.HEADER_SIZE,
+            cellCount * CompactBinaryGriddedElevation.RECORD_SIZE);
+          final IntBuffer intBuffer = mappedBytes.asIntBuffer();
+          for (int index = 0; index < cellCount; index++) {
+            elevations[index] = intBuffer.get();
+          }
+        } else {
 
-        for (int index = 0; index < cellCount; index++) {
-          final int elevation = in.getInt();
-          elevations[index] = elevation;
+          for (int index = 0; index < cellCount; index++) {
+            final int elevation = in.getInt();
+            elevations[index] = elevation;
+          }
         }
+        final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
+          this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight,
+          this.gridCellSize, elevations);
+        elevationModel.setResource(this.resource);
+        return elevationModel;
+      } catch (final IOException e) {
+        throw Exceptions.wrap("Unable to read DEM: " + this.resource, e);
       }
-      final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
-        this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight, this.gridCellSize,
-        elevations);
-      elevationModel.setResource(this.resource);
-      return elevationModel;
-    } catch (final IOException e) {
-      throw Exceptions.wrap("Unable to read DEM: " + this.resource, e);
+    } else {
+      return null;
     }
   }
 

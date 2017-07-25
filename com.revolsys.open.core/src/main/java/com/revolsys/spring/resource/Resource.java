@@ -356,7 +356,11 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   default ChannelReader newChannelReader(final int capacity, final ByteOrder byteOrder) {
     final ReadableByteChannel in = newReadableByteChannel();
-    return new ChannelReader(in, capacity, byteOrder);
+    if (in == null) {
+      return null;
+    } else {
+      return new ChannelReader(in, capacity, byteOrder);
+    }
   }
 
   default ChannelWriter newChannelWriter() {
