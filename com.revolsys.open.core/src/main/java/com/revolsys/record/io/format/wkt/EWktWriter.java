@@ -182,6 +182,17 @@ public class EWktWriter {
 
   public static void write(final Writer writer, final Geometry geometry, final boolean ewkt) {
     if (ewkt) {
+      try {
+        final int srid = geometry.getCoordinateSystemId();
+        if (srid > 0) {
+          writer.write("SRID=");
+          writer.write(Integer.toString(srid));
+          writer.write(';');
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+
       write(writer, geometry);
     } else {
       WktWriter.write(writer, geometry);
