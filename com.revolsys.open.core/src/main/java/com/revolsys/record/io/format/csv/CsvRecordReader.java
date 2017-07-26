@@ -22,6 +22,8 @@ public class CsvRecordReader extends AbstractRecordReader {
 
   private Resource resource;
 
+  final StringBuilder sb = new StringBuilder();
+
   public CsvRecordReader(final Resource resource) {
     this(resource, ArrayRecord.FACTORY, Csv.FIELD_SEPARATOR);
   }
@@ -112,22 +114,22 @@ public class CsvRecordReader extends AbstractRecordReader {
     if (in == null) {
       throw new NoSuchElementException();
     } else {
+      this.sb.setLength(0);
       final List<String> values = new ArrayList<>();
-      final StringBuilder sb = new StringBuilder();
       boolean inQuotes = false;
       boolean hadQuotes = false;
       while (true) {
         final int character = in.read();
         switch (character) {
           case -1:
-            return returnEof(values, sb, hadQuotes);
+            return returnEof(values, this.sb, hadQuotes);
           case '"':
             hadQuotes = true;
             if (inQuotes) {
               in.mark(1);
               final int nextCharacter = in.read();
               if ('"' == nextCharacter) {
-                sb.append('"');
+                this.sb.append('"');
               } else {
                 inQuotes = false;
                 in.reset();
@@ -138,17 +140,17 @@ public class CsvRecordReader extends AbstractRecordReader {
           break;
           case '\n':
             if (inQuotes) {
-              sb.append('\n');
+              this.sb.append('\n');
             } else {
               if (values.isEmpty()) {
-                if (sb.length() > 0) {
-                  values.add(sb.toString());
+                if (this.sb.length() > 0) {
+                  values.add(this.sb.toString());
                   return values;
                 } else {
                   // skip empty lines
                 }
               } else {
-                addValue(values, sb, hadQuotes);
+                addValue(values, this.sb, hadQuotes);
                 return values;
               }
             }
@@ -160,17 +162,17 @@ public class CsvRecordReader extends AbstractRecordReader {
             if (nextCharacter == '\n') {
             } else {
               if (inQuotes) {
-                sb.append('\n');
+                this.sb.append('\n');
               } else {
                 if (values.isEmpty()) {
-                  if (sb.length() > 0) {
-                    values.add(sb.toString());
+                  if (this.sb.length() > 0) {
+                    values.add(this.sb.toString());
                     return values;
                   } else {
                     // skip empty lines
                   }
                 } else {
-                  addValue(values, sb, hadQuotes);
+                  addValue(values, this.sb, hadQuotes);
                   return values;
                 }
               }
@@ -179,13 +181,13 @@ public class CsvRecordReader extends AbstractRecordReader {
           default:
             if (character == fieldSeparator) {
               if (inQuotes) {
-                sb.append(fieldSeparator);
+                this.sb.append(fieldSeparator);
               } else {
-                addValue(values, sb, hadQuotes);
+                addValue(values, this.sb, hadQuotes);
                 hadQuotes = false;
               }
             } else {
-              sb.append((char)character);
+              this.sb.append((char)character);
             }
           break;
         }

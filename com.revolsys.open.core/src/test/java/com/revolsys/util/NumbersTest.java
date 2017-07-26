@@ -1,8 +1,12 @@
 package com.revolsys.util;
 
+import java.io.IOException;
+import java.io.StringWriter;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.revolsys.util.number.Doubles;
 import com.revolsys.util.number.Integers;
 
 public class NumbersTest {
@@ -11,6 +15,78 @@ public class NumbersTest {
     final boolean actual = Integers.overlaps(min1, max1, min2, max2);
     final String message = min1 + "-" + max1 + " " + min2 + "-" + max2;
     Assert.assertEquals(message, expected, actual);
+  }
+
+  private int assertToString(final double number, final String expected) {
+    final String doubleString = Doubles.toString(number);
+    Assert.assertEquals("Doubles.toString", expected, doubleString);
+    try (
+      StringWriter writer = new StringWriter()) {
+      Doubles.write(writer, number);
+      final String writerString = writer.toString();
+      Assert.assertEquals("Doubles.write", expected, writerString);
+    } catch (final IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return 1;
+
+  }
+
+  private int assertToString(final double number, final String expected, final int decimalPlaces) {
+    final StringBuilder string = new StringBuilder();
+    DoubleFormatUtil.formatDoublePrecise(number, decimalPlaces, decimalPlaces, string);
+    final String doubleString = string.toString();
+    Assert.assertEquals("DoubleFormatUtil.formatDoublePrecise", expected, doubleString);
+    try (
+      StringWriter writer = new StringWriter()) {
+      DoubleFormatUtil.writeDoublePrecise(writer, number, decimalPlaces, decimalPlaces);
+      final String writerString = writer.toString();
+      Assert.assertEquals("DoubleFormatUtil.writeDoublePrecise", expected, writerString);
+    } catch (final IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return 1;
+  }
+
+  @Test
+  public void testDoubleToString() {
+    final long time = System.currentTimeMillis();
+    int count = 0;
+    count += assertToString(-9999648, "-9999648");
+    for (final double d : new double[] {
+      0.001, 1e7 - 0.1, 0.10
+    }) {
+      final String s = Double.toString(d);
+      count += assertToString(d, s);
+    }
+
+    count += assertToString(0.0, "0");
+    count += assertToString(1.654321, "1.654", 3);
+    count += assertToString(2.147483648E9, "2147483648");
+    count += assertToString(2.147483648E8, "214748364.8");
+    count += assertToString(2.147483648E8, "214748365", 0);
+    count += assertToString(0.0000000001, "0.0000000001");
+
+    final int increment = 1000;
+    final int maxInt = Integer.MAX_VALUE - increment;
+    for (int i = Integer.MIN_VALUE; i < maxInt; i += increment) {
+      final String s = Integer.toString(i);
+      count += assertToString(i, s);
+      final long l = i + 4 * (long)Integer.MAX_VALUE;
+      final String sl = Long.toString(l);
+      count += assertToString(l, sl);
+
+    }
+
+    count += assertToString(Integer.MAX_VALUE, Integer.toString(Integer.MAX_VALUE));
+    count += assertToString(Double.NaN, "NaN");
+    count += assertToString(Double.NEGATIVE_INFINITY, "-Infinity");
+    count += assertToString(Double.POSITIVE_INFINITY, "Infinity");
+
+    final long ellapsedTime = System.currentTimeMillis() - time;
+    System.out.println(Doubles.toString((double)ellapsedTime / count));
   }
 
   @Test

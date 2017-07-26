@@ -1,5 +1,8 @@
 package com.revolsys.util.number;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import com.revolsys.datatype.AbstractDataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.util.DoubleFormatUtil;
@@ -89,6 +92,44 @@ public class Doubles extends AbstractDataType {
     }
   }
 
+  private static int parseInt(final String string, final int fromIndex, final int toIndex) {
+    int number = 0;
+    int index = fromIndex;
+    boolean negative = false;
+    if (string.charAt(index) == '-') {
+      negative = true;
+      index++;
+    }
+    while (index < toIndex) {
+      final int digit = string.charAt(index++) - '0';
+      number = number * 10 + digit;
+    }
+    if (negative) {
+      return -number;
+    } else {
+      return number;
+    }
+  }
+
+  private static long parseLong(final String string, final int fromIndex, final int toIndex) {
+    long number = 0;
+    int index = fromIndex;
+    boolean negative = false;
+    if (string.charAt(index) == '-') {
+      negative = true;
+      index++;
+    }
+    while (index < toIndex) {
+      final int digit = string.charAt(index++) - '0';
+      number = number * 10 + digit;
+    }
+    if (negative) {
+      return -number;
+    } else {
+      return number;
+    }
+  }
+
   public static double subtract(final double left, final Number right) {
     return left - right.doubleValue();
   }
@@ -145,6 +186,86 @@ public class Doubles extends AbstractDataType {
       return Double.valueOf(string);
     } else {
       return null;
+    }
+  }
+
+  public static void write(final Writer writer, final double number) throws IOException {
+    int numberStartIndex = 0;
+
+    // The only way to format precisely the double is to use the String
+    // representation of the double, and then to do mathematical integer
+    // operation on it.
+    final String doubleString = Double.toString(number);
+    if (doubleString.charAt(0) == '-') {
+      writer.write('-');
+      numberStartIndex++;
+    }
+    final int doubleStringLength = doubleString.length();
+    int exponentIndex = -1;
+    if (doubleStringLength > 4) {
+      final int eMaxIndex = doubleStringLength - 2;
+      int eMinIndex = eMaxIndex - 3;
+      if (eMinIndex < 2) {
+        eMinIndex = 2;
+      }
+      for (int i = eMaxIndex; i >= eMinIndex; i--) {
+        final char c = doubleString.charAt(i);
+        if (c == 'E') {
+          exponentIndex = i;
+          break;
+        }
+      }
+    }
+    if (exponentIndex == -1) {
+      // Plain representation of double: "intPart.decimalPart"
+      if (doubleString.charAt(doubleStringLength - 1) == '0'
+        && doubleString.charAt(doubleStringLength - 2) == '.') {
+        // source is a mathematical integer
+        writer.write(doubleString, numberStartIndex, doubleStringLength - numberStartIndex - 2);
+      } else {
+        writer.write(doubleString, numberStartIndex, doubleStringLength - numberStartIndex);
+      }
+    } else {
+      int exposant = parseInt(doubleString, exponentIndex + 1, doubleStringLength);
+      final int decLength = exponentIndex - 2 - numberStartIndex;
+      final int decimalStartIndex = numberStartIndex + 2;
+      if (exposant >= 0) {
+        final int digits = decLength - exposant;
+        if (digits <= 0) {
+          // no decimal part,
+          writer.write(doubleString, numberStartIndex, 1);
+          writer.write(doubleString, decimalStartIndex, decLength);
+          for (int i = -digits; i > 0; i--) {
+            writer.write('0');
+          }
+        } else {
+          writer.write(doubleString, numberStartIndex, 1);
+          writer.write(doubleString, decimalStartIndex, exposant);
+          writer.write('.');
+          writer.write(doubleString, decimalStartIndex + exposant, decLength - exposant);
+        }
+      } else {
+        // Only a decimal part is supplied
+        exposant = -exposant;
+        final int digits = 19 - exposant + 1;
+        if (digits < 0) {
+          writer.write('0');
+        } else {
+          final int integerPart = doubleString.charAt(numberStartIndex) - '0';
+          if (digits == 0) {
+            DoubleFormatUtil.write(writer, 19, 0L, integerPart);
+          } else if (decLength < digits) {
+            final long decP = integerPart * DoubleFormatUtil.tenPow(decLength + 1)
+              + parseLong(doubleString, decimalStartIndex, exponentIndex) * 10;
+            DoubleFormatUtil.write(writer, exposant + decLength, 0L, decP);
+          } else {
+            final long subDecP = parseLong(doubleString, decimalStartIndex,
+              decimalStartIndex + digits);
+            final long decP = integerPart * DoubleFormatUtil.tenPow(digits) + subDecP;
+            DoubleFormatUtil.write(writer, 19, 0L, decP);
+          }
+        }
+      }
     }
   }
 

@@ -1,6 +1,5 @@
 package com.revolsys.record.io.format.csv;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
@@ -47,7 +46,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     try {
       this.recordDefinition = recordDefinition;
-      this.out = new BufferedWriter(out);
+      this.out = out;
       this.fieldSeparator = fieldSeparator;
       this.useQuotes = useQuotes;
       this.ewkt = ewkt;
@@ -139,8 +138,13 @@ public class CsvRecordWriter extends AbstractRecordWriter {
           }
           if (value instanceof Geometry) {
             final Geometry geometry = (Geometry)value;
-            final String text = EWktWriter.toString(geometry, this.ewkt);
-            string(text);
+            if (this.useQuotes) {
+              out.write('"');
+              EWktWriter.write(out, geometry, this.ewkt);
+              out.write('"');
+            } else {
+              EWktWriter.write(out, geometry, this.ewkt);
+            }
           } else if (value != null) {
             final DataType dataType = field.getDataType();
             final String stringValue = dataType.toString(value);

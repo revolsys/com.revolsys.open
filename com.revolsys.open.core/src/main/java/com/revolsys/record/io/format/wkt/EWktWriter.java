@@ -180,6 +180,14 @@ public class EWktWriter {
     }
   }
 
+  public static void write(final Writer writer, final Geometry geometry, final boolean ewkt) {
+    if (ewkt) {
+      write(writer, geometry);
+    } else {
+      WktWriter.write(writer, geometry);
+    }
+  }
+
   private static void write(final Writer out, final Geometry geometry, final int axisCount)
     throws IOException {
     if (geometry != null) {
@@ -402,7 +410,7 @@ public class EWktWriter {
       if (Double.isNaN(ordinate)) {
         out.write('0');
       } else {
-        out.write(Doubles.toString(ordinate));
+        Doubles.write(out, ordinate);
       }
     }
   }
@@ -423,17 +431,14 @@ public class EWktWriter {
   private static void writeCoordinates(final Writer out, final Point point, final int axisCount)
     throws IOException {
     final double x = point.getX();
-    final String xString = Doubles.toString(x);
-    out.write(xString);
+    Doubles.write(out, x);
     out.write(' ');
     final double y = point.getY();
-    final String yString = Doubles.toString(y);
-    out.write(yString);
+    Doubles.write(out, y);
     for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
       out.write(' ');
       final double cordinate = point.getCoordinate(axisIndex);
-      final String coordinateString = Doubles.toString(cordinate);
-      out.write(coordinateString);
+      Doubles.write(out, cordinate);
     }
   }
 
