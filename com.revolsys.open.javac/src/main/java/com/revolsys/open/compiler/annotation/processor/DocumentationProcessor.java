@@ -17,11 +17,15 @@ import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCAssign;
+import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCLiteral;
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCModifiers;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
@@ -38,6 +42,22 @@ public final class DocumentationProcessor extends AbstractProcessor {
   private TreeMaker maker;
 
   private Names names;
+
+  private JCModifiers getModifiers(final Element element) {
+    final JCTree treeElement = this.elementUtils.getTree(element);
+    if (treeElement instanceof JCVariableDecl) {
+      final JCVariableDecl modSrc = (JCVariableDecl)treeElement;
+      return modSrc.mods;
+    } else if (treeElement instanceof JCClassDecl) {
+      final JCClassDecl modSrc = (JCClassDecl)treeElement;
+      return modSrc.mods;
+    } else if (treeElement instanceof JCMethodDecl) {
+      final JCMethodDecl modSrc = (JCMethodDecl)treeElement;
+      return modSrc.mods;
+    } else {
+      throw new IllegalArgumentException("Not supported:" + treeElement.getKind());
+    }
+  }
 
   @Override
   public void init(final ProcessingEnvironment environment) {
@@ -62,8 +82,8 @@ public final class DocumentationProcessor extends AbstractProcessor {
         if (docComment != null) {
           docComment = docComment.trim();
           if (docComment.length() > 0) {
-            final JCVariableDecl elementNode = (JCVariableDecl)this.elementUtils.getTree(element);
-            for (final JCAnnotation annotation : elementNode.mods.annotations) {
+            final JCModifiers modifiers = getModifiers(element);
+            for (final JCAnnotation annotation : modifiers.annotations) {
               if (annotation.type.toString().equals(Documentation.class.getName())) {
                 boolean hasValue = false;
                 final JCLiteral commentLiteral = this.maker.Literal(docComment);
