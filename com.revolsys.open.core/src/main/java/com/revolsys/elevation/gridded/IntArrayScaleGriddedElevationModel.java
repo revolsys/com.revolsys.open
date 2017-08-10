@@ -19,13 +19,13 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
 
   public IntArrayScaleGriddedElevationModel(final GeometryFactory geometryFactory,
     final BoundingBox boundingBox, final int gridWidth, final int gridHeight,
-    final int gridCellSize, final int[] elevations) {
+    final double gridCellSize, final int[] elevations) {
     super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellSize);
     this.elevations = elevations;
   }
 
   public IntArrayScaleGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
-    final double y, final int gridWidth, final int gridHeight, final int gridCellSize) {
+    final double y, final int gridWidth, final int gridHeight, final double gridCellSize) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
     final int size = gridWidth * gridHeight;
     final int[] elevations = new int[size];
@@ -81,12 +81,13 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     }
   }
 
+  @Override
   public List<Point> getNullBoundaryPoints() {
     final List<Point> points = new ArrayList<>();
     final double minX = getMinX();
     final double minY = getMinY();
 
-    final int gridCellSize = getGridCellSize();
+    final double gridCellSize = getGridCellSize();
     final int gridHeight = getGridHeight();
     final int gridWidth = getGridWidth();
     final int[] elevations = this.elevations;
@@ -178,14 +179,14 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
 
   @Override
   public IntArrayScaleGriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
-    final double x, final double y, final int width, final int height, final int cellSize) {
+    final double x, final double y, final int width, final int height, final double cellSize) {
     return new IntArrayScaleGriddedElevationModel(geometryFactory, x, y, width, height, cellSize);
   }
 
   @Override
   public GriddedElevationModel resample(final int newGridCellSize) {
-    final int gridCellSize = getGridCellSize();
-    final double cellRatio = (double)gridCellSize / newGridCellSize;
+    final double gridCellSize = getGridCellSize();
+    final double cellRatio = gridCellSize / newGridCellSize;
     final int step = (int)Math.round(1 / cellRatio);
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();

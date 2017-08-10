@@ -28,15 +28,15 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
 
   public static CompactBinaryGriddedElevationModelFile newModel(final Path basePath,
     final GeometryFactory geometryFactory, final int minX, final int minY, final int gridWidth,
-    final int gridHeight, final int gridCellSize) {
+    final int gridHeight, final double gridCellSize) {
 
     final Path rowDirectory = basePath.resolve(Integer.toString(minX));
     final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
     final String fileName = RectangularMapGrid.getTileFileName("dem", coordinateSystemId,
-      Integer.toString(gridCellSize * gridWidth), minX, minY, "demcs");
+      Integer.toString((int)gridCellSize * gridWidth), minX, minY, "demcs");
     final Path path = rowDirectory.resolve(fileName);
     return new CompactBinaryGriddedElevationModelFile(path, geometryFactory, minX, minY, gridWidth,
-      gridHeight, gridCellSize);
+      gridHeight, (int)gridCellSize);
   }
 
   private final Path path;
@@ -68,7 +68,7 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
 
   public CompactBinaryGriddedElevationModelFile(final Path path,
     final GeometryFactory geometryFactory, final int minX, final int minY, final int gridWidth,
-    final int gridHeight, final int gridCellSize) {
+    final int gridHeight, final double gridCellSize) {
     super(geometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize,
       CompactBinaryGriddedElevation.HEADER_SIZE, 4);
     setZBoundsUpdateRequired(false);
@@ -103,11 +103,11 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
     final ChannelWriter writer = new ChannelWriter(this.channel);
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
-    final int gridCellSize = getGridCellSize();
+    final double gridCellSize = getGridCellSize();
     final BoundingBox boundingBox = getBoundingBox();
     final GeometryFactory geometryFactory = getGeometryFactory();
     CompactBinaryGriddedElevationWriter.writeHeader(writer, boundingBox, geometryFactory, gridWidth,
-      gridHeight, gridCellSize);
+      gridHeight, (int)gridCellSize);
     final int count = gridWidth * gridHeight;
     for (int i = 0; i < count; i++) {
       writer.putInt(Integer.MIN_VALUE);

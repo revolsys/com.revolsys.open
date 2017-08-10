@@ -230,9 +230,11 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public TabbedValuePanel newPropertiesPanel() {
     final TabbedValuePanel propertiesPanel = super.newPropertiesPanel();
     final TiePointsPanel tiePointsPanel = newTableViewComponent(null);
-    Borders.titled(tiePointsPanel, "Tie Points");
+    if (tiePointsPanel != null) {
+      Borders.titled(tiePointsPanel, "Tie Points");
 
-    propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
+      propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
+    }
     return propertiesPanel;
   }
 
@@ -261,7 +263,11 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
   @Override
   protected TiePointsPanel newTableViewComponent(final Map<String, Object> config) {
-    return new TiePointsPanel(this);
+    if (getImage() == null) {
+      return null;
+    } else {
+      return new TiePointsPanel(this);
+    }
   }
 
   @Override

@@ -10,7 +10,7 @@ public class DoubleArrayGriddedElevationModel extends AbstractGriddedElevationMo
   private final double[] elevations;
 
   public DoubleArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
-    final double y, final int gridWidth, final int gridHeight, final int gridCellSize) {
+    final double y, final int gridWidth, final int gridHeight, final double gridCellSize) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
     this.elevations = new double[gridWidth * gridHeight];
   }
@@ -37,7 +37,7 @@ public class DoubleArrayGriddedElevationModel extends AbstractGriddedElevationMo
 
   @Override
   public DoubleArrayGriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
-    final double x, final double y, final int width, final int height, final int cellSize) {
+    final double x, final double y, final int width, final int height, final double cellSize) {
     return new DoubleArrayGriddedElevationModel(geometryFactory, x, y, width, height, cellSize);
   }
 

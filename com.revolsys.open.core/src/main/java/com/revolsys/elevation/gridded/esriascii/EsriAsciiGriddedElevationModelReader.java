@@ -89,7 +89,7 @@ public class EsriAsciiGriddedElevationModelReader extends BaseObjectWithProperti
       double noDataValue = 0;
       int width = -1;
       int height = -1;
-      int cellSize = 0;
+      double cellSize = 0;
       double elevation = Double.NaN;
       while (Double.isNaN(elevation)) {
         String keyword = Readers.readKeyword(reader);
@@ -108,7 +108,7 @@ public class EsriAsciiGriddedElevationModelReader extends BaseObjectWithProperti
               throw new IllegalArgumentException("nrows must be > 0\n" + this.resource);
             }
           } else if ("cellsize".equals(keyword)) {
-            cellSize = Readers.readInteger(reader);
+            cellSize = Readers.readDouble(reader);
             if (cellSize <= 0) {
               throw new IllegalArgumentException("cellsize must be > 0\n" + this.resource);
             }

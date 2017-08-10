@@ -173,7 +173,7 @@ public class HillShadeConfiguration {
     this.elevationModel = elevationModel;
     this.width = elevationModel.getGridWidth();
     this.height = elevationModel.getGridHeight();
-    final int cellSize = elevationModel.getGridCellSize();
+    final double cellSize = elevationModel.getGridCellSize();
     this.oneDivCellSizeTimes8 = 1.0 / (8 * cellSize);
   }
 

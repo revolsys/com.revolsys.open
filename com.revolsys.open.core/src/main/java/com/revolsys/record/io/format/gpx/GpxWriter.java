@@ -29,6 +29,8 @@ public class GpxWriter extends AbstractRecordWriter {
 
   private String nameAttribute = "name";
 
+  private String symAttribute = "sym";
+
   private final XmlWriter out;
 
   public GpxWriter(final File file) throws IOException {
@@ -70,6 +72,10 @@ public class GpxWriter extends AbstractRecordWriter {
     return this.nameAttribute;
   }
 
+  public String getSymAttribute() {
+    return this.symAttribute;
+  }
+
   public void setCommentAttribute(final String commentAttribute) {
     this.commentAttribute = commentAttribute;
   }
@@ -82,27 +88,31 @@ public class GpxWriter extends AbstractRecordWriter {
     this.nameAttribute = nameAttribute;
   }
 
+  public void setSymAttribute(final String symAttribute) {
+    this.symAttribute = symAttribute;
+  }
+
   @Override
   public String toString() {
     return this.file.getAbsolutePath();
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     try {
-      final Geometry geometry = object.getGeometry();
+      final Geometry geometry = record.getGeometry();
       if (geometry instanceof Point) {
-        writeWaypoint(object);
+        writeWaypoint(record);
       } else if (geometry instanceof LineString) {
-        writeTrack(object);
+        writeTrack(record);
       }
     } catch (final IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
 
-  private void writeAttributes(final Record object) {
-    final Object time = object.getValue("timestamp");
+  private void writeAttributes(final Record record) {
+    final Object time = record.getValue("timestamp");
     if (time != null) {
       if (time instanceof Date) {
         final DateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -112,23 +122,24 @@ public class GpxWriter extends AbstractRecordWriter {
         this.out.element(GpxConstants.TIME_ELEMENT, time.toString());
       }
     }
-    writeElement(object, GpxConstants.NAME_ELEMENT, this.nameAttribute);
-    writeElement(object, GpxConstants.COMMENT_ELEMENT, this.commentAttribute);
-    writeElement(object, GpxConstants.DESCRIPTION_ELEMENT, this.descriptionAttribute);
+    writeElement(record, GpxConstants.NAME_ELEMENT, this.nameAttribute);
+    writeElement(record, GpxConstants.COMMENT_ELEMENT, this.commentAttribute);
+    writeElement(record, GpxConstants.DESCRIPTION_ELEMENT, this.descriptionAttribute);
+    writeElement(record, GpxConstants.SYM_ELEMENT, this.symAttribute);
   }
 
-  private void writeElement(final Record object, final QName tag, final String fieldName) {
-    final String name = object.getValue(fieldName);
+  private void writeElement(final Record record, final QName tag, final String fieldName) {
+    final String name = record.getValue(fieldName);
     if (name != null && name.length() > 0) {
       this.out.element(tag, name);
     }
   }
 
-  private void writeTrack(final Record object) throws IOException {
+  private void writeTrack(final Record record) throws IOException {
     this.out.startTag(GpxConstants.TRACK_ELEMENT);
-    LineString line = object.getGeometry();
+    LineString line = record.getGeometry();
     line = line.convertGeometry(GpxConstants.GEOMETRY_FACTORY);
-    writeAttributes(object);
+    writeAttributes(record);
     this.out.startTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
 
     final int vertexCount = line.getVertexCount();

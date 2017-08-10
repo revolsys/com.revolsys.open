@@ -51,7 +51,7 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
 
   @Override
   protected double getElevationDo(final int gridX, final int gridY, final int gridWidth) {
-    final int gridCellSize = getGridCellSize();
+    final double gridCellSize = getGridCellSize();
     final int tileMinGridX = Math.floorDiv(gridX, this.gridTileWidth) * this.gridTileWidth;
     final int tileMinGridY = Math.floorDiv(gridY, this.gridTileHeight) * this.gridTileHeight;
 
@@ -59,8 +59,8 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
     DirectFileElevationModel model = this.models.get(key);
     if (model == null) {
 
-      final int tileMinX = tileMinGridX * gridCellSize;
-      final int tileMinY = tileMinGridY * gridCellSize;
+      final int tileMinX = (int)(tileMinGridX * gridCellSize);
+      final int tileMinY = (int)(tileMinGridY * gridCellSize);
       model = new CompactBinaryGriddedElevationModelFile(this.baseResource.toPath(),
         getGeometryFactory(), tileMinX, tileMinY, this.gridTileWidth, this.gridTileHeight,
         gridCellSize);
@@ -127,7 +127,7 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
 
   @Override
   public GriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
-    final double x, final double y, final int width, final int height, final int gridCellSize) {
+    final double x, final double y, final int width, final int height, final double gridCellSize) {
     // TODO Auto-generated method stub
     return null;
   }

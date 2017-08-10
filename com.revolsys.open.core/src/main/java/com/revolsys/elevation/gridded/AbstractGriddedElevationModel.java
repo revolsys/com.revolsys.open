@@ -21,7 +21,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
 
   private double colourGreyMultiple;
 
-  private int gridCellSize;
+  private double gridCellSize;
 
   private Resource resource;
 
@@ -38,7 +38,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
 
   public AbstractGriddedElevationModel(final GeometryFactory geometryFactory,
     final BoundingBox boundingBox, final int gridWidth, final int gridHeight,
-    final int gridCellSize) {
+    final double gridCellSize) {
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
     this.gridCellSize = gridCellSize;
@@ -62,7 +62,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   public AbstractGriddedElevationModel(final GeometryFactory geometryFactory, final double minX,
-    final double minY, final int gridWidth, final int gridHeight, final int gridCellSize) {
+    final double minY, final int gridWidth, final int gridHeight, final double gridCellSize) {
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
     this.gridCellSize = gridCellSize;
@@ -171,7 +171,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
-  public int getGridCellSize() {
+  public double getGridCellSize() {
     return this.gridCellSize;
   }
 
@@ -295,7 +295,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     } else if (y3 > maxY) {
       maxY = y3;
     }
-    final int gridCellSize = this.gridCellSize;
+    final double gridCellSize = this.gridCellSize;
     final double[] bounds = this.bounds;
     final double gridMinX = bounds[0];
     final double gridMaxX = bounds[3];

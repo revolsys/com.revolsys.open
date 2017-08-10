@@ -13,7 +13,7 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   private boolean open = true;
 
   public DirectFileElevationModel(final GeometryFactory geometryFactory, final double minX,
-    final double minY, final int gridWidth, final int gridHeight, final int gridCellSize,
+    final double minY, final int gridWidth, final int gridHeight, final double gridCellSize,
     final int headerSize, final int elevationByteCount) {
     super(geometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize);
     this.headerSize = headerSize;
@@ -62,7 +62,7 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
 
   @Override
   public GriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
-    final double x, final double y, final int width, final int height, final int gridCellSize) {
+    final double x, final double y, final int width, final int height, final double gridCellSize) {
     // TODO Auto-generated method stub
     return null;
   }

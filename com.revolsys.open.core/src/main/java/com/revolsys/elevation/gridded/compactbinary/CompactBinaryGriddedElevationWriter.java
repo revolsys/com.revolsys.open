@@ -22,7 +22,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
   implements GriddedElevationModelWriter {
   public static void writeHeader(final ChannelWriter out, final BoundingBox boundingBox,
     final GeometryFactory geometryFactory, final int gridWidth, final int gridHeight,
-    final int gridCellSize) throws IOException {
+    final double gridCellSize) throws IOException {
     final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
     double scaleXY = geometryFactory.getScaleXY();
     if (scaleXY <= 0) {
@@ -50,7 +50,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
     out.putDouble(boundingBox.getMaxX()); // maxX
     out.putDouble(boundingBox.getMaxY()); // maxY
     out.putDouble(boundingBox.getMaxZ()); // maxZ
-    out.putInt(gridCellSize); // Grid Cell Size
+    out.putInt((int)gridCellSize); // Grid Cell Size
     out.putInt(gridWidth); // Grid Width
     out.putInt(gridHeight); // Grid Height
   }
@@ -153,7 +153,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
     final BoundingBox boundingBox = elevationModel.getBoundingBox();
     this.gridWidth = elevationModel.getGridWidth();
     this.gridHeight = elevationModel.getGridHeight();
-    final int gridCellSize = elevationModel.getGridCellSize();
+    final double gridCellSize = elevationModel.getGridCellSize();
 
     writeHeader(this.writer, boundingBox, geometryFactory, this.gridWidth, this.gridHeight,
       gridCellSize);
