@@ -39,7 +39,7 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
 
   public static final byte[] FILE_FORMAT_BYTES = "DEMGCB".getBytes(StandardCharsets.UTF_8);
 
-  public static final int HEADER_SIZE = 88;
+  public static final int HEADER_SIZE = 120;
 
   public static final int RECORD_SIZE = 4;
 
