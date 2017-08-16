@@ -1,8 +1,6 @@
 package com.revolsys.elevation.gridded;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import com.revolsys.awt.WebColors;
@@ -17,7 +15,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.editor.GeometryEditor;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
@@ -180,90 +178,43 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     return boundingBox.getMinZ();
   }
 
-  default List<Point> getNullBoundaryPoints() {
-    final List<Point> points = new ArrayList<>();
+  default LineStringEditor getNullBoundaryPoints() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final LineStringEditor points = new LineStringEditor(geometryFactory);
     final double minX = getMinX();
     final double minY = getMinY();
 
     final double gridCellSize = getGridCellSize();
     final int gridHeight = getGridHeight();
     final int gridWidth = getGridWidth();
+    final int[] offsets = {
+      -1, 0, 1
+    };
     for (int gridY = 0; gridY < gridHeight; gridY++) {
       for (int gridX = 0; gridX < gridWidth; gridX++) {
-        if (isNull(gridX, gridY)) {
-          boolean hasNeighbour = false;
-          if (gridX == 0) {
-            if (gridY == 0) {
-              hasNeighbour = !isNull(gridX + 1, gridY) //
-                || !isNull(gridX, gridY + 1) //
-                || !isNull(gridX + 1, gridY + 1)//
-              ;
-            } else if (gridY == gridHeight - 1) {
-              hasNeighbour = !isNull(gridX - 1, gridY) //
-                || !isNull(gridX - 1, gridY - 1) //
-                || !isNull(gridX, gridY - 1) //
-              ;
-            } else {
-              hasNeighbour = !isNull(gridX + 1, gridY) //
-                || !isNull(gridX, gridY - 1) //
-                || !isNull(gridX + 1, gridY - 1) //
-                || !isNull(gridX, gridY + 1) //
-                || !isNull(gridX + 1, gridY + 1)//
-              ;
-            }
-          } else if (gridX == gridWidth - 1) {
-            if (gridY == 0) {
-              hasNeighbour = !isNull(gridX - 1, gridY) //
-                || !isNull(gridX + 1, gridY + 1) //
-                || !isNull(gridX, gridY + 1) //
-              ;
-
-            } else if (gridY == gridHeight - 1) {
-              hasNeighbour = !isNull(gridX - 1, gridY) //
-                || !isNull(gridX - 1, gridY - 1) //
-                || !isNull(gridX, gridY - 1) //
-              ;
-            } else {
-              hasNeighbour = !isNull(gridX - 1, gridY) //
-                || !isNull(gridX - 1, gridY - 1) //
-                || !isNull(gridX, gridY - 1) //
-                || !isNull(gridX + 1, gridY + 1) //
-                || !isNull(gridX, gridY + 1) //
-              ;
-            }
-          } else {
-            if (gridY == 0) {
-              hasNeighbour = !isNull(gridX - 1, gridY) //
-                || !isNull(gridX + 1, gridY) //
-                || !isNull(gridX + 1, gridY + 1) //
-                || !isNull(gridX, gridY + 1) //
-                || !isNull(gridX + 1, gridY + 1)//
-              ;
-
-            } else if (gridY == gridHeight - 1) {
-              hasNeighbour = !isNull(gridX - 1, gridY) //
-                || !isNull(gridX + 1, gridY) //
-                || !isNull(gridX - 1, gridY - 1) //
-                || !isNull(gridX, gridY - 1) //
-                || !isNull(gridX + 1, gridY - 1) //
-              ;
-            } else {
-              hasNeighbour = !isNull(gridX - 1, gridY) //
-                || !isNull(gridX + 1, gridY) //
-                || !isNull(gridX - 1, gridY - 1) //
-                || !isNull(gridX, gridY - 1) //
-                || !isNull(gridX + 1, gridY - 1) //
-                || !isNull(gridX + 1, gridY + 1) //
-                || !isNull(gridX, gridY + 1) //
-                || !isNull(gridX + 1, gridY + 1)//
-              ;
+        final double elevation = getElevation(gridX, gridY);
+        if (Double.isFinite(elevation)) {
+          int countZ = 0;
+          long sumZ = 0;
+          for (final int offsetY : offsets) {
+            if (!(gridY == 0 && offsetY == -1) && gridY == gridHeight - 1 && offsetY == 1) {
+              for (final int offsetX : offsets) {
+                if (!(gridX == 0 && offsetX == -1) && gridX == gridWidth - 1 && offsetX == 1) {
+                  final double elevationNeighbour = getElevation(gridX + offsetX, gridY + offsetY);
+                  if (Double.isFinite(elevationNeighbour)) {
+                    sumZ += elevationNeighbour;
+                    countZ++;
+                  }
+                }
+              }
             }
           }
-          if (hasNeighbour) {
+
+          if (countZ > 0) {
             final double x = minX + gridCellSize * gridX;
             final double y = minY + gridCellSize * gridY;
-            final PointDoubleXY point = new PointDoubleXY(x, y);
-            points.add(point);
+            final double z = toDoubleZ((int)(sumZ / countZ));
+            points.appendVertex(x, y, z);
           }
         }
       }
@@ -408,6 +359,18 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   default void setElevationNull(final int gridX, final int gridY) {
     setElevation(gridX, gridY, Double.NaN);
+  }
+
+  default void setElevations(Geometry geometry) {
+    if (geometry != null) {
+      geometry = geometry.convertGeometry(getGeometryFactory());
+      for (final Vertex vertex : geometry.vertices()) {
+        final double x = vertex.getX();
+        final double y = vertex.getY();
+        final double z = vertex.getZ();
+        setElevation(x, y, z);
+      }
+    }
   }
 
   default void setElevations(final GriddedElevationModel elevationModel) {

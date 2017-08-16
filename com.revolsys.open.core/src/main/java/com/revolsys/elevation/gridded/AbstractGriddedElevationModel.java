@@ -8,6 +8,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 
 public abstract class AbstractGriddedElevationModel extends BaseObjectWithProperties
   implements GriddedElevationModel {

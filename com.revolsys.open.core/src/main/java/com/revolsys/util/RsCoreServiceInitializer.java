@@ -11,7 +11,7 @@ import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.mapguide.MapGuideWebService;
-import com.revolsys.record.io.format.pointz.PointZIoFactory;
+import com.revolsys.record.io.format.pointz.PointZ;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
@@ -70,7 +70,7 @@ public class RsCoreServiceInitializer implements ServiceInitializer {
   }
 
   private void ioFactory() {
-    IoFactoryRegistry.addFactory(new PointZIoFactory());
+    IoFactoryRegistry.addFactory(new PointZ());
     GriddedElevationModel.serviceInit();
     TriangulatedIrregularNetwork.serviceInit();
   }

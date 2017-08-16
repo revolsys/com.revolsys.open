@@ -1,15 +1,12 @@
 package com.revolsys.elevation.gridded;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevationWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.io.channels.ChannelWriter;
 
 public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevationModel {
@@ -82,8 +79,9 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   }
 
   @Override
-  public List<Point> getNullBoundaryPoints() {
-    final List<Point> points = new ArrayList<>();
+  public LineStringEditor getNullBoundaryPoints() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final LineStringEditor points = new LineStringEditor(geometryFactory);
     final double minX = getMinX();
     final double minY = getMinY();
 
@@ -92,83 +90,35 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     final int gridWidth = getGridWidth();
     final int[] elevations = this.elevations;
     int index = 0;
+    final int[] offsets = {
+      -1, 0, 1
+    };
     for (int gridY = 0; gridY < gridHeight; gridY++) {
       for (int gridX = 0; gridX < gridWidth; gridX++) {
         final int elevation = elevations[index];
         if (elevation == NULL_VALUE) {
-          boolean hasNeighbour = false;
-          if (gridX == 0) {
-            if (gridY == 0) {
-              hasNeighbour = elevations[index + 1] != NULL_VALUE //
-                || elevations[index + gridWidth] != NULL_VALUE //
-                || elevations[index + gridWidth + 1] != NULL_VALUE//
-              ;
-            } else if (gridY == gridHeight - 1) {
-              hasNeighbour = elevations[index - 1] != NULL_VALUE //
-                || elevations[index - gridWidth - 1] != NULL_VALUE //
-                || elevations[index - gridWidth] != NULL_VALUE //
-              ;
-            } else {
-              hasNeighbour = elevations[index + 1] != NULL_VALUE //
-                || elevations[index - gridWidth] != NULL_VALUE //
-                || elevations[index - gridWidth + 1] != NULL_VALUE //
-                || elevations[index + gridWidth] != NULL_VALUE //
-                || elevations[index + gridWidth + 1] != NULL_VALUE//
-              ;
-            }
-          } else if (gridX == gridWidth - 1) {
-            if (gridY == 0) {
-              hasNeighbour = elevations[index - 1] != NULL_VALUE //
-                || elevations[index + gridWidth - 1] != NULL_VALUE //
-                || elevations[index + gridWidth] != NULL_VALUE //
-              ;
-
-            } else if (gridY == gridHeight - 1) {
-              hasNeighbour = elevations[index - 1] != NULL_VALUE //
-                || elevations[index - gridWidth - 1] != NULL_VALUE //
-                || elevations[index - gridWidth] != NULL_VALUE //
-              ;
-            } else {
-              hasNeighbour = elevations[index - 1] != NULL_VALUE //
-                || elevations[index - gridWidth - 1] != NULL_VALUE //
-                || elevations[index - gridWidth] != NULL_VALUE //
-                || elevations[index + gridWidth - 1] != NULL_VALUE //
-                || elevations[index + gridWidth] != NULL_VALUE //
-              ;
-            }
-          } else {
-            if (gridY == 0) {
-              hasNeighbour = elevations[index - 1] != NULL_VALUE //
-                || elevations[index + 1] != NULL_VALUE //
-                || elevations[index + gridWidth - 1] != NULL_VALUE //
-                || elevations[index + gridWidth] != NULL_VALUE //
-                || elevations[index + gridWidth + 1] != NULL_VALUE//
-              ;
-
-            } else if (gridY == gridHeight - 1) {
-              hasNeighbour = elevations[index - 1] != NULL_VALUE //
-                || elevations[index + 1] != NULL_VALUE //
-                || elevations[index - gridWidth - 1] != NULL_VALUE //
-                || elevations[index - gridWidth] != NULL_VALUE //
-                || elevations[index - gridWidth + 1] != NULL_VALUE //
-              ;
-            } else {
-              hasNeighbour = elevations[index - 1] != NULL_VALUE //
-                || elevations[index + 1] != NULL_VALUE //
-                || elevations[index - gridWidth - 1] != NULL_VALUE //
-                || elevations[index - gridWidth] != NULL_VALUE //
-                || elevations[index - gridWidth + 1] != NULL_VALUE //
-                || elevations[index + gridWidth - 1] != NULL_VALUE //
-                || elevations[index + gridWidth] != NULL_VALUE //
-                || elevations[index + gridWidth + 1] != NULL_VALUE//
-              ;
+          int countZ = 0;
+          long sumZ = 0;
+          for (final int offsetY : offsets) {
+            if (!(gridY == 0 && offsetY == -1 || gridY == gridHeight - 1 && offsetY == 1)) {
+              final int offsetIndex = index + offsetY * gridWidth;
+              for (final int offsetX : offsets) {
+                if (!(gridX == 0 && offsetX == -1 || gridX == gridWidth - 1 && offsetX == 1)) {
+                  final int elevationNeighbour = elevations[offsetIndex + offsetX];
+                  if (elevationNeighbour != NULL_VALUE) {
+                    sumZ += elevationNeighbour;
+                    countZ++;
+                  }
+                }
+              }
             }
           }
-          if (hasNeighbour) {
+
+          if (countZ > 0) {
             final double x = minX + gridCellSize * gridX;
             final double y = minY + gridCellSize * gridY;
-            final PointDoubleXY point = new PointDoubleXY(x, y);
-            points.add(point);
+            final double z = toDoubleZ((int)(sumZ / countZ));
+            points.appendVertex(x, y, z);
           }
         }
         index++;

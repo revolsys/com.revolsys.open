@@ -9,7 +9,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -55,7 +54,6 @@ public interface Paths {
   static void createDirectories(final Path path) {
     try {
       Files.createDirectories(path, FILE_ATTRIBUTES_NONE);
-    } catch (final FileAlreadyExistsException e) {
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
@@ -63,7 +61,11 @@ public interface Paths {
 
   static void createParentDirectories(final Path path) {
     final Path parent = path.getParent();
-    createDirectories(parent);
+    try {
+      Files.createDirectories(parent, FILE_ATTRIBUTES_NONE);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   static boolean deleteDirectories(final Path path) {
@@ -230,6 +232,17 @@ public interface Paths {
     } else {
       return null;
     }
+  }
+
+  static boolean hasFileNameExtension(final Path path, final String... fileExtensions) {
+    final String fileName = getFileName(path);
+    final String fileNameExtension = FileNames.getFileNameExtension(fileName);
+    for (final String expectedFileExtension : fileExtensions) {
+      if (expectedFileExtension.equals(fileNameExtension)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   static boolean isHidden(final Path path) {

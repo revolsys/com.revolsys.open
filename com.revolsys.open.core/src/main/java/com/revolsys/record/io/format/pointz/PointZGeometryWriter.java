@@ -45,8 +45,8 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
       this.writer = this.resource.newChannelWriter();
 
       final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
-      this.writer.putBytes(PointZIoFactory.FILE_TYPE_POINTZ_BYTES); // File type
-      this.writer.putShort(PointZIoFactory.VERSION); // version
+      this.writer.putBytes(PointZ.FILE_TYPE_HEADER_BYTES); // File type
+      this.writer.putShort(PointZ.VERSION); // version
       this.writer.putInt(coordinateSystemId);
       this.writer.putDouble(this.scaleXy);
       this.writer.putDouble(this.scaleZ);

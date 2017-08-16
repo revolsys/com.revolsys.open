@@ -153,6 +153,21 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
     }
   }
 
+  public void appendVertices(final Geometry points) {
+    final Iterable<? extends Point> vertices = points.vertices();
+    appendVertices(vertices);
+  }
+
+  public void appendVertices(final Iterable<? extends Point> points) {
+    for (final Point point : points) {
+      appendVertex(point);
+    }
+  }
+
+  public void clear() {
+    this.vertexCount = 0;
+  }
+
   @Override
   public LineStringEditor clone() {
     final LineStringEditor clone = (LineStringEditor)super.clone();

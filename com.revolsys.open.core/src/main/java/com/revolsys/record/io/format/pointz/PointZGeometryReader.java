@@ -51,7 +51,7 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
   protected Geometry getNext() {
     final ChannelReader reader = this.reader;
     if (reader == null) {
-      return null;
+      throw new NoSuchElementException();
     } else {
       try {
         final int xInt = reader.getInt();
@@ -84,9 +84,9 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
       reader.getBytes(fileTypeBytes);
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
                                                                                  // type
-      if (!PointZIoFactory.FILE_TYPE_POINTZ.equals(fileType)) {
-        throw new IllegalArgumentException("File must start with the text: "
-          + PointZIoFactory.FILE_TYPE_POINTZ + " not " + fileType);
+      if (!PointZ.FILE_TYPE_HEADER.equals(fileType)) {
+        throw new IllegalArgumentException(
+          "File must start with the text: " + PointZ.FILE_TYPE_HEADER + " not " + fileType);
       }
       @SuppressWarnings("unused")
       final short version = reader.getShort();
