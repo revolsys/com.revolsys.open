@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.editor.LineStringEditor;
@@ -21,6 +22,7 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.function.DoubleConsumer3;
 
 public interface GriddedElevationModel extends ObjectWithProperties, BoundingBoxProxy {
   String GEOMETRY_FACTORY = "geometryFactory";
@@ -43,6 +45,13 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   static GriddedElevationModel newGriddedElevationModel(final Object source) {
     final Map<String, Object> properties = Collections.emptyMap();
+    return newGriddedElevationModel(source, properties);
+  }
+
+  static GriddedElevationModel newGriddedElevationModel(final Object source,
+    final GeometryFactory defaultGeometryFactory) {
+    final Map<String, Object> properties = Collections.singletonMap("geometryFactory",
+      defaultGeometryFactory);
     return newGriddedElevationModel(source, properties);
   }
 
@@ -70,6 +79,40 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   void clear();
 
+  default void forEachPoint(final DoubleConsumer3 action) {
+    final double gridCellSize = getGridCellSize();
+    final double minY = getMinY();
+    final double minX = getMinX();
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      final double y = minY + gridY * gridCellSize;
+      for (int gridX = 0; gridX < gridWidth; gridX++) {
+        final double x = minX + gridX * gridCellSize;
+        final double z = getElevationFast(gridX, gridY);
+        action.accept(x, y, z);
+      }
+    }
+  }
+
+  default void forEachPointFinite(final DoubleConsumer3 action) {
+    final double gridCellSize = getGridCellSize();
+    final double minY = getMinY();
+    final double minX = getMinX();
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      final double y = minY + gridY * gridCellSize;
+      for (int gridX = 0; gridX < gridWidth; gridX++) {
+        final double x = minX + gridX * gridCellSize;
+        final double z = getElevationFast(gridX, gridY);
+        if (Double.isFinite(z)) {
+          action.accept(x, y, z);
+        }
+      }
+    }
+  }
+
   default double getAspectRatio() {
     final int width = getGridWidth();
     final int height = getGridHeight();
@@ -78,6 +121,233 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     } else {
       return 0;
     }
+  }
+
+  default Polygon getBoundaryXY() {
+    final GeometryFactory geometryFactory = getGeometryFactory().convertAxisCount(2);
+    final LineStringEditor points = new LineStringEditor(geometryFactory);
+    final double minX = getMinX();
+    final double minY = getMinY();
+
+    final double gridCellSize = getGridCellSize();
+    final int gridHeight = getGridHeight();
+    final int gridWidth = getGridWidth();
+    final int maxGridXIndex = gridWidth - 1;
+    final int maxGridYIndex = gridHeight - 1;
+
+    int firstGridY = -1;
+    int minGridX = -1;
+    int maxGridX = 0;
+    int minGridY = Integer.MAX_VALUE;
+    int maxGridY = 0;
+    int lastGridX = 0;
+    int lastGridY = 0;
+    int gridX = 0;
+    int gridY = 0;
+    // Process South edge
+    while (gridX != gridWidth) {
+      final double z = getElevation(gridX, gridY);
+      if (Double.isFinite(z)) {
+        if (minGridX == -1) {
+          minGridX = gridX;
+        }
+        maxGridX = gridX;
+        if (firstGridY == -1) {
+          firstGridY = gridY;
+        }
+        if (gridY < minGridY) {
+          minGridY = gridY;
+        }
+        if (gridY > maxGridY) {
+          maxGridY = gridY;
+        }
+        double x = minX + gridX * gridCellSize;
+        if (gridX == maxGridXIndex) {
+          x += gridCellSize;
+        }
+        final double y = minY + gridY * gridCellSize;
+        final int vertexCount = points.getVertexCount();
+        final double lastY = points.getY(vertexCount - 1);
+        if (lastY == y) {
+          if (points.getY(vertexCount - 2) == y) {
+            points.setX(vertexCount - 1, x);
+          } else {
+            points.appendVertex(x, y);
+          }
+        } else {
+          if (vertexCount > 0) {
+            if (points.getY(vertexCount - 2) == lastY) {
+              points.setX(vertexCount - 1, x);
+            } else {
+              points.appendVertex(x, lastY);
+            }
+          }
+          points.appendVertex(x, y);
+        }
+        lastGridX = gridX;
+        lastGridY = gridY;
+        gridX++;
+        gridY = 0;
+      } else {
+        gridY++;
+        if (gridY == gridHeight) {
+          gridX++;
+          gridY = 0;
+        }
+      }
+    }
+    // Process East edge
+    gridX = maxGridX;
+    gridY = lastGridY + 1;
+    while (gridY != gridHeight) {
+      final double z = getElevation(gridX, gridY);
+      if (Double.isFinite(z)) {
+        maxGridY = gridY;
+        double x = minX + gridX * gridCellSize;
+        if (gridX == maxGridXIndex) {
+          x += gridCellSize;
+        }
+        double y = minY + gridY * gridCellSize;
+        if (gridY == maxGridYIndex) {
+          y += gridCellSize;
+        }
+
+        final int vertexCount = points.getVertexCount();
+        final double lastX = points.getX(vertexCount - 1);
+        if (lastX == x) {
+          if (points.getX(vertexCount - 2) == x) {
+            points.setY(vertexCount - 1, y);
+          } else {
+            points.appendVertex(x, y);
+          }
+        } else {
+          if (vertexCount > 0) {
+            if (points.getX(vertexCount - 2) == lastX) {
+              points.setY(vertexCount - 1, y);
+            } else {
+              points.appendVertex(lastX, y);
+            }
+          }
+          points.appendVertex(x, y);
+        }
+        lastGridX = gridX;
+        lastGridY = gridY;
+        gridX = maxGridX;
+        gridY++;
+      } else {
+        gridX--;
+        if (gridX < minGridX) {
+          gridY++;
+          gridX = maxGridX;
+        }
+      }
+    }
+    // Process North edge
+    gridX = lastGridX - 1;
+    gridY = maxGridY;
+    while (gridX >= minGridX) {
+      final double z = getElevation(gridX, gridY);
+      if (Double.isFinite(z)) {
+        double x = minX + gridX * gridCellSize;
+        if (gridX == maxGridXIndex) {
+          x += gridCellSize;
+        }
+        double y = minY + gridY * gridCellSize;
+        if (gridY == maxGridYIndex) {
+          y += gridCellSize;
+        }
+        final int vertexCount = points.getVertexCount();
+        final double lastY = points.getY(vertexCount - 1);
+        if (lastY == y) {
+          if (points.getY(vertexCount - 2) == y) {
+            points.setX(vertexCount - 1, x);
+          } else {
+            points.appendVertex(x, y);
+          }
+        } else {
+          if (vertexCount > 0) {
+            if (points.getY(vertexCount - 2) == lastY) {
+              points.setX(vertexCount - 1, x);
+            } else {
+              points.appendVertex(x, lastY);
+            }
+          }
+          points.appendVertex(x, y);
+        }
+        lastGridX = gridX;
+        lastGridY = gridY;
+        gridX--;
+        gridY = maxGridY;
+      } else {
+        gridY--;
+        if (gridY < minGridY) {
+          gridX--;
+          gridY = maxGridY;
+        }
+      }
+    }
+    // Process West edge
+    gridX = minGridX;
+    gridY = lastGridY - 1;
+    while (gridY > firstGridY) {
+      final double z = getElevation(gridX, gridY);
+      if (Double.isFinite(z)) {
+        final double x = minX + gridX * gridCellSize;
+        final double y = minY + gridY * gridCellSize;
+        final int vertexCount = points.getVertexCount();
+        final double lastX = points.getX(vertexCount - 1);
+        if (lastX == x) {
+          if (points.getX(vertexCount - 2) == x) {
+            points.setY(vertexCount - 1, y);
+          } else {
+            points.appendVertex(x, y);
+          }
+        } else {
+          if (vertexCount > 0) {
+            if (points.getX(vertexCount - 2) == lastX) {
+              points.setY(vertexCount - 1, y);
+            } else {
+              points.appendVertex(lastX, y);
+            }
+          }
+          points.appendVertex(x, y);
+        }
+        lastGridX = gridX;
+        lastGridY = gridY;
+        gridX = minGridX;
+        gridY--;
+      } else {
+        gridX++;
+        if (gridX > maxGridX) {
+          gridY--;
+          gridX = minGridX;
+        }
+      }
+    }
+    if (!points.isEmpty()) {
+      final int vertexCount = points.getVertexCount();
+      final double x = points.getX(0);
+      final double y = points.getY(0);
+
+      final double lastX = points.getX(vertexCount - 1);
+      if (lastX == x) {
+        if (points.getX(vertexCount - 2) == x) {
+          points.setY(vertexCount - 1, y);
+        } else {
+          points.appendVertex(x, y);
+        }
+      } else {
+        if (vertexCount > 0) {
+          if (points.getX(vertexCount - 2) == lastX) {
+            points.setY(vertexCount - 1, y);
+          } else {
+            points.appendVertex(lastX, y);
+          }
+        }
+        points.appendVertex(x, y);
+      }
+    }
+    return points.newPolygon();
   }
 
   @Override

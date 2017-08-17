@@ -66,7 +66,9 @@ public class EsriAsciiGriddedElevationModelReader extends BaseObjectWithProperti
       } else {
         final GeometryFactory geometryFactory = EsriCoordinateSystems
           .getGeometryFactory(this.resource);
-        setGeometryFactory(geometryFactory);
+        if (geometryFactory != null) {
+          setGeometryFactory(geometryFactory);
+        }
         return this.resource.newBufferedReader();
       }
     } catch (final IOException e) {

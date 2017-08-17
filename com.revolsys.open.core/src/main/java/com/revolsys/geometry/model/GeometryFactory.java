@@ -70,6 +70,7 @@ import com.revolsys.geometry.model.impl.MultiPolygonImpl;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.PointDoubleXYGeometryFactory;
+import com.revolsys.geometry.model.impl.PointDoubleXYZGeometryFactory;
 import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
@@ -1975,12 +1976,23 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The point.
    */
   public Point point(final double... coordinates) {
-    if (coordinates == null || coordinates.length < 2) {
+    if (coordinates == null) {
       return point();
-    } else if (this.axisCount == 2) {
-      return new PointDoubleXYGeometryFactory(this, coordinates[0], coordinates[1]);
     } else {
-      return new PointDoubleGf(this, coordinates);
+      int axisCount = this.axisCount;
+      if (coordinates.length < axisCount) {
+        axisCount = coordinates.length;
+      }
+      if (axisCount < 2) {
+        return point();
+      } else if (axisCount == 2) {
+        return new PointDoubleXYGeometryFactory(this, coordinates[0], coordinates[1]);
+      } else if (axisCount == 3) {
+        return new PointDoubleXYZGeometryFactory(this, coordinates[0], coordinates[1],
+          coordinates[2]);
+      } else {
+        return new PointDoubleGf(this, coordinates);
+      }
     }
   }
 

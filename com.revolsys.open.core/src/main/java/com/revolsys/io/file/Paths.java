@@ -21,6 +21,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -151,9 +152,30 @@ public interface Paths {
 
   static List<Path> getChildPaths(final Path path) {
     if (exists(path)) {
-      try {
-        final Stream<Path> paths = Files.list(path);
+      try (
+        final Stream<Path> paths = Files.list(path)) {
         return Lists.toArray(paths);
+      } catch (final NoSuchFileException e) {
+        return Collections.emptyList();
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  static List<Path> getChildPaths(final Path path, final String... fileExtensions) {
+    if (exists(path)) {
+      final List<Path> paths = new ArrayList<>();
+      try (
+        final Stream<Path> pathStream = Files.list(path)) {
+        pathStream.forEach((childPath) -> {
+          if (Paths.hasFileNameExtension(childPath, fileExtensions)) {
+            paths.add(childPath);
+          }
+        });
+        return paths;
       } catch (final NoSuchFileException e) {
         return Collections.emptyList();
       } catch (final IOException e) {

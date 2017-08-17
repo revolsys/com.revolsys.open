@@ -223,6 +223,48 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
     return this.vertexCount;
   }
 
+  @Override
+  public double getX(final int vertexIndex) {
+    if (this.coordinates == null) {
+      return this.line.getX(vertexIndex);
+    } else {
+      final int axisCount = this.axisCount;
+      if (vertexIndex >= 0 && vertexIndex < this.vertexCount) {
+        return this.coordinates[vertexIndex * axisCount];
+      } else {
+        return Double.NaN;
+      }
+    }
+  }
+
+  @Override
+  public double getY(final int vertexIndex) {
+    if (this.coordinates == null) {
+      return this.line.getX(vertexIndex);
+    } else {
+      if (vertexIndex >= 0 && vertexIndex < this.vertexCount) {
+        return this.coordinates[vertexIndex * this.axisCount + Y];
+      } else {
+        return Double.NaN;
+      }
+    }
+  }
+
+  @Override
+  public double getZ(final int vertexIndex) {
+    if (this.axisCount > 2) {
+      if (this.coordinates == null) {
+        return this.line.getX(vertexIndex);
+      } else {
+        final int axisCount = this.axisCount;
+        if (vertexIndex >= 0 && vertexIndex < this.vertexCount) {
+          return this.coordinates[vertexIndex * axisCount + Z];
+        }
+      }
+    }
+    return Double.NaN;
+  }
+
   private void grow(final int minCapacity) {
     // overflow-conscious code
     final int oldCapacity = this.coordinates.length;
