@@ -193,6 +193,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements Re
         parseBlock(this.blockIn);
 
       } else {
+        throw new RuntimeException("Unexpected blob: " + this.blobType);
       }
     } catch (final InvalidProtocolBufferException e) {
       e.printStackTrace();
@@ -484,6 +485,9 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements Re
         case 72:
           lon = toDegrees(input.readSInt64());
         break;
+        default:
+          input.skipField(tag);
+        break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -587,6 +591,9 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements Re
         case 82:
           input.readEnums(memberTypes);
         break;
+        default:
+          input.skipField(tag);
+        break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -672,6 +679,9 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements Re
         break;
         case 66:
           input.readLongs(nodeIds);
+        break;
+        default:
+          input.skipField(tag);
         break;
       }
     }

@@ -430,11 +430,23 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
       if (vertexIndex >= 0 && vertexIndex < vertexCount) {
         final int axisCount = getAxisCount();
         if (axisIndex >= 0 && axisIndex < axisCount) {
-          final double oldValue = this.line.getCoordinate(vertexIndex, axisIndex);
-          if (!Doubles.equal(coordinate, oldValue)) {
+          final double oldValue;
+          boolean changed;
+          if (this.line == null) {
+            changed = true;
+            oldValue = Double.NaN;
+          } else {
+            oldValue = this.line.getCoordinate(vertexIndex, axisIndex);
+            changed = !Doubles.equal(coordinate, oldValue);
+          }
+          if (changed) {
             if (this.coordinates == null) {
               setModified(true);
-              this.coordinates = this.line.getCoordinates(axisCount);
+              if (this.line == null) {
+                this.coordinates = new double[(vertexIndex + 1) * axisCount];
+              } else {
+                this.coordinates = this.line.getCoordinates(axisCount);
+              }
             }
             final GeometryFactory geometryFactory = getGeometryFactory();
             final double preciseCoordinate = geometryFactory.makePrecise(axisIndex, coordinate);
