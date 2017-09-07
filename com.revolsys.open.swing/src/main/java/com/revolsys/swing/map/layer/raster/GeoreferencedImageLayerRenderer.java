@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.raster;
 import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
@@ -23,16 +24,22 @@ public class GeoreferencedImageLayerRenderer
 
   public static void render(final Viewport2D viewport, final Graphics2D graphics,
     final GeoreferencedImage image, final boolean useTransform) {
+    render(viewport, graphics, image, useTransform, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+  }
+
+  public static void render(final Viewport2D viewport, final Graphics2D graphics,
+    final GeoreferencedImage image, final boolean useTransform, final Object interpolationMethod) {
     if (image != null) {
       final BoundingBox viewBoundingBox = viewport.getBoundingBox();
       final int viewWidth = viewport.getViewWidthPixels();
       final int viewHeight = viewport.getViewHeightPixels();
-      image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, useTransform);
+      image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, useTransform,
+        interpolationMethod);
     }
   }
 
   public static void renderAlpha(final Viewport2D viewport, final Graphics2D graphics,
-    final GeoreferencedImage image, final boolean useTransform, final double alpha) {
+    final GeoreferencedImage image, final boolean useTransform, final double alpha, Object interpolationMethod) {
     final Composite composite = graphics.getComposite();
     try (
       BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, false)) {
@@ -41,7 +48,7 @@ public class GeoreferencedImageLayerRenderer
         alphaComposite = alphaComposite.derive((float)alpha);
       }
       graphics.setComposite(alphaComposite);
-      render(viewport, graphics, image, useTransform);
+      render(viewport, graphics, image, useTransform,interpolationMethod);
     } finally {
       graphics.setComposite(composite);
     }
@@ -77,7 +84,7 @@ public class GeoreferencedImageLayerRenderer
           final Graphics2D graphics = viewport.getGraphics();
           if (graphics != null) {
             if (!cancellable.isCancelled()) {
-              renderAlpha(viewport, graphics, image, true, layer.getOpacity() / 255.0);
+              renderAlpha(viewport, graphics, image, true, layer.getOpacity() / 255.0, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             }
             if (!cancellable.isCancelled()) {
               renderDifferentCoordinateSystem(viewport, graphics, boundingBox);

@@ -39,7 +39,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
@@ -288,8 +288,7 @@ public class Gdal implements ServiceInitializer {
         sampleModel = new BandedSampleModel(dataBufferType, targetWidth, targetHeight, targetWidth,
           banks, offsets);
         dataType = rasterColorInterpretation == gdalconstConstants.GCI_PaletteIndex
-          ? BufferedImage.TYPE_BYTE_INDEXED
-          : BufferedImage.TYPE_BYTE_GRAY;
+          ? BufferedImage.TYPE_BYTE_INDEXED : BufferedImage.TYPE_BYTE_GRAY;
       } else if (bandDataType == gdalconstConstants.GDT_Int16) {
         final short[][] shorts = new short[bandCount][];
         for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {
@@ -371,7 +370,7 @@ public class Gdal implements ServiceInitializer {
         if (dataset == null) {
           throw new GdalException();
         } else {
-          final Resource resource = new FileSystemResource(file);
+          final Resource resource = new PathResource(file);
           setProjectionFromPrjFile(dataset, resource);
           final long modifiedTime = loadSettings(dataset, resource);
           // loadAuxXmlFile(modifiedTime);

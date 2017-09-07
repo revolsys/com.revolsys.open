@@ -16,7 +16,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.xml.Xml;
 import com.revolsys.spring.resource.DefaultResourceLoader;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
@@ -91,7 +91,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
         return Xml.toMap(mavenMetadataResource);
       } catch (final RuntimeException e) {
         Logs.error(this, "Error loading maven resource" + mavenMetadataResource, e);
-        if (mavenMetadataResource instanceof FileSystemResource) {
+        if (mavenMetadataResource instanceof PathResource) {
           try {
             final File file = mavenMetadataResource.getFile();
             if (file.delete()) {
@@ -338,7 +338,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public void setRoot(final Resource root) {
     if (root == null) {
-      this.root = new FileSystemResource(System.getProperty("user.home") + "/.m2/repository/");
+      this.root = new PathResource(System.getProperty("user.home") + "/.m2/repository/");
     } else {
       try {
         String url = root.getURL().toExternalForm();

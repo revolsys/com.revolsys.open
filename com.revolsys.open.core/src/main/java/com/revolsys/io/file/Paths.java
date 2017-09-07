@@ -52,18 +52,18 @@ public interface Paths {
 
   Set<OpenOption> OPEN_OPTIONS_READ_SET = Sets.newHash(StandardOpenOption.READ);
 
-  static void createDirectories(final Path path) {
+  static Path createDirectories(final Path path) {
     try {
-      Files.createDirectories(path, FILE_ATTRIBUTES_NONE);
+      return Files.createDirectories(path, FILE_ATTRIBUTES_NONE);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
   }
 
-  static void createParentDirectories(final Path path) {
+  static Path createParentDirectories(final Path path) {
     final Path parent = path.getParent();
     try {
-      Files.createDirectories(parent, FILE_ATTRIBUTES_NONE);
+      return Files.createDirectories(parent, FILE_ATTRIBUTES_NONE);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

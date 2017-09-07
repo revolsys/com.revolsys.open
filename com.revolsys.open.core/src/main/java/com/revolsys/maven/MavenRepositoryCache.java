@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.logging.Logs;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Hex;
 import com.revolsys.util.Pair;
@@ -169,7 +169,7 @@ public class MavenRepositoryCache extends MavenRepository {
         } else if (!file.isDirectory()) {
           throw new IllegalArgumentException("Maven cache is not a directory directory " + file);
         }
-        final FileSystemResource fileResource = new FileSystemResource(file);
+        final PathResource fileResource = new PathResource(file);
         super.setRoot(fileResource);
       } catch (final Throwable e) {
         throw new IllegalArgumentException("Maven cache must resolve to a local directory " + root);

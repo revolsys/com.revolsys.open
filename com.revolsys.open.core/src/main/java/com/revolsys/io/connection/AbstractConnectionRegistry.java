@@ -15,7 +15,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.format.json.Json;
-import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -320,22 +319,7 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
   }
 
   protected void setDirectory(final Resource directoryResource) {
-    if (directoryResource instanceof FileSystemResource) {
-      final FileSystemResource fileResource = (FileSystemResource)directoryResource;
-      final File directory = fileResource.getFile();
-      boolean readOnly = isReadOnly();
-      if (!readOnly) {
-        if (directoryResource.exists()) {
-          readOnly = !directory.canWrite();
-        } else if (directory.mkdirs()) {
-          readOnly = false;
-        } else {
-          readOnly = true;
-        }
-      }
-      setReadOnly(readOnly);
-      this.directory = directory;
-    } else if (directoryResource instanceof PathResource) {
+    if (directoryResource instanceof PathResource) {
       final PathResource pathResource = (PathResource)directoryResource;
       final File directory = pathResource.getFile();
       boolean readOnly = isReadOnly();

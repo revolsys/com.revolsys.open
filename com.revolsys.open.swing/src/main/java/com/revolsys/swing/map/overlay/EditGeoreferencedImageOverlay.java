@@ -360,7 +360,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         final Graphics2D graphics = (Graphics2D)image.getGraphics();
 
         this.image.drawImage(graphics, viewBoundingBox, viewport.getViewWidthPixels(),
-          viewport.getViewHeightPixels(), !this.layer.isShowOriginalImage());
+          viewport.getViewHeightPixels(), !this.layer.isShowOriginalImage(), RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         GeoreferencedImageLayerRenderer.render(imageViewport, graphics, this.image,
           !this.layer.isShowOriginalImage());
         this.cachedImage = new BufferedGeoreferencedImage(imageViewport.getBoundingBox(), image);
@@ -974,7 +974,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
         final GeoreferencedImage cachedImage = getCachedImage(boundingBox);
         GeoreferencedImageLayerRenderer.renderAlpha(viewport, graphics, cachedImage, false,
-          layer.getOpacity() / 255.0);
+          layer.getOpacity() / 255.0, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         GeoreferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, graphics,
           imageBoundingBox);

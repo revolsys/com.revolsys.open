@@ -55,7 +55,7 @@ import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
 import com.revolsys.logging.Logs;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
@@ -686,8 +686,8 @@ public final class FileUtil {
   }
 
   public static File getFile(final Resource resource) {
-    if (resource instanceof FileSystemResource) {
-      final FileSystemResource fileResource = (FileSystemResource)resource;
+    if (resource instanceof PathResource) {
+      final PathResource fileResource = (PathResource)resource;
       return fileResource.getFile();
     } else {
       final String fileName = resource.getFilename();

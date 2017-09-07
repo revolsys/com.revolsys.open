@@ -2,6 +2,7 @@ package com.revolsys.elevation.gridded.compactbinary;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -44,6 +45,8 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
   private Resource resource;
 
+  private ByteBuffer byteBuffer;
+
   private ChannelReader reader;
 
   private GeometryFactory geometryFactory;
@@ -75,13 +78,21 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
     this.resource = null;
   }
 
+  public ByteBuffer getByteBuffer() {
+    return this.byteBuffer;
+  }
+
   public boolean isMemoryMapped() {
     return this.memoryMapped;
   }
 
   public void open() {
     if (this.reader == null) {
-      this.reader = IoFactory.newChannelReader(this.resource);
+      if (this.byteBuffer == null) {
+        this.reader = IoFactory.newChannelReader(this.resource, 8192);
+      } else {
+        this.reader = IoFactory.newChannelReader(this.resource, this.byteBuffer);
+      }
       if (this.reader == null) {
         this.exists = false;
       } else {
@@ -153,6 +164,10 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
     this.boundingBox = geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY, maxZ);
 
+  }
+
+  public void setByteBuffer(final ByteBuffer byteBuffer) {
+    this.byteBuffer = byteBuffer;
   }
 
   public void setMemoryMapped(final boolean memoryMapped) {

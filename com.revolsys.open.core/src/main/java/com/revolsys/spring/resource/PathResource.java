@@ -24,9 +24,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +38,7 @@ import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 import com.revolsys.io.PathUtil;
+import com.revolsys.io.channels.Channels;
 import com.revolsys.util.Exceptions;
 
 /**
@@ -49,12 +53,11 @@ import com.revolsys.util.Exceptions;
 public class PathResource extends AbstractResource implements WritableResource {
   private final Path path;
 
+  public PathResource(final File file) {
+    this(file.toPath());
+  }
+
   /**
-   * Construct a new new PathResource from a PathUtil handle.
-   * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
-   * via {@link #createRelative}, the relative path will be built <i>underneath</i>
-   * the given root:
-   * e.g. Paths.get("C:/dir1/"), relative path "dir2" -> "C:/dir1/dir2"!
    * @param path a PathUtil handle
    */
   public PathResource(final Path path) {
@@ -64,10 +67,6 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * Construct a new new PathResource from a PathUtil handle.
-   * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
-   * via {@link #createRelative}, the relative path will be built <i>underneath</i>
-   * the given root:
-   * e.g. Paths.get("C:/dir1/"), relative path "dir2" -> "C:/dir1/dir2"!
    * @param path a path
    * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#getPath(String, String...)
    */
@@ -78,10 +77,6 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * Construct a new new PathResource from a PathUtil handle.
-   * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
-   * via {@link #createRelative}, the relative path will be built <i>underneath</i>
-   * the given root:
-   * e.g. Paths.get("C:/dir1/"), relative path "dir2" -> "C:/dir1/dir2"!
    * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#get(URI)
    * @param uri a path URI
    */
@@ -100,16 +95,59 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   @Override
   public void copyFrom(final InputStream in) {
-    final Path path = getPath();
-    final Path parent = path.getParent();
-    if (!Files.exists(parent)) {
-      try {
-        Files.createDirectories(parent);
+    final File file = getFile();
+    final File parent = file.getParentFile();
+    if (!parent.exists()) {
+      parent.mkdirs();
+    }
+    super.copyFrom(in);
+  }
+
+  @Override
+  public void copyFrom(final Resource target) {
+    if (target != null) {
+      try (
+        ReadableByteChannel in = target.newReadableByteChannel()) {
+        try (
+          FileChannel out = newWritableByteChannel();) {
+          if (in instanceof FileChannel) {
+            final FileChannel fileIn = (FileChannel)in;
+            Channels.copy(fileIn, out);
+          } else {
+            final long size = target.contentLength();
+            long count = 0;
+            while (count < size) {
+              count += out.transferFrom(in, count, count);
+            }
+          }
+        } catch (final IOException e) {
+          throw Exceptions.wrap(e);
+        }
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }
     }
-    super.copyFrom(in);
+  }
+
+  @Override
+  public void copyTo(final Resource target) {
+    if (target != null) {
+      try (
+        WritableByteChannel out = target.newWritableByteChannel()) {
+        copyTo(out);
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    }
+  }
+
+  public void copyTo(final WritableByteChannel out) {
+    try (
+      FileChannel in = newReadableByteChannel()) {
+      Channels.copy(in, out);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override
@@ -294,6 +332,8 @@ public class PathResource extends AbstractResource implements WritableResource {
     try {
       return FileChannel.open(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_READ_SET,
         com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+    } catch (final NoSuchFileException e) {
+      return null;
     } catch (final FileSystemException e) {
       return null;
     } catch (final IOException e) {
@@ -304,8 +344,17 @@ public class PathResource extends AbstractResource implements WritableResource {
   @Override
   public FileChannel newWritableByteChannel() {
     try {
-      return FileChannel.open(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_WRITE_SET,
-        com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+      try {
+        return FileChannel.open(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_WRITE_SET,
+          com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+      } catch (final NoSuchFileException e) {
+        if (com.revolsys.io.file.Paths.createParentDirectories(this.path) == null) {
+          return null;
+        } else {
+          return FileChannel.open(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_WRITE_SET,
+            com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+        }
+      }
     } catch (final FileSystemException e) {
       throw new IllegalArgumentException("Error opening file: " + getPath(), e);
     } catch (final IOException e) {

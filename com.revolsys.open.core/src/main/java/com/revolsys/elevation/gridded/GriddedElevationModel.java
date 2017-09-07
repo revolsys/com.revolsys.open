@@ -644,32 +644,45 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
   }
 
   default void setElevations(final GriddedElevationModel elevationModel) {
-    final double minX1 = elevationModel.getMinX();
-    final double minY1 = elevationModel.getMinY();
-
-    int startX = getGridCellX(minX1);
-    if (startX < 0) {
-      startX = 0;
-    }
-    int startY = getGridCellY(minY1);
-    if (startY < 0) {
-      startY = 0;
-    }
-
     final double gridCellSize = getGridCellSize();
-    final int minX = (int)(getMinX() + startX * gridCellSize);
-    final int minY = (int)(getMinY() + startY * gridCellSize);
+    if (elevationModel.getGridCellSize() == gridCellSize) {
+      final int gridWidth = getGridWidth();
+      final int gridHeight = getGridHeight();
 
-    double y = minY;
-    final int gridWidth = getGridWidth();
-    final int gridHeight = getGridHeight();
-    for (int gridY = startY; gridY < gridHeight; gridY++) {
-      double x = minX;
-      for (int gridX = startX; gridX < gridWidth; gridX++) {
-        setElevation(gridX, gridY, elevationModel, x, y);
-        x += gridCellSize;
+      final double minX1 = elevationModel.getMinX();
+      final double minY1 = elevationModel.getMinY();
+
+      int startX = getGridCellX(minX1);
+      int endX = startX + elevationModel.getGridWidth();
+      if (startX < 0) {
+        startX = 0;
       }
-      y += gridCellSize;
+      if (endX > gridWidth) {
+        endX = gridWidth;
+      }
+      int startY = getGridCellY(minY1);
+      int endY = startY + elevationModel.getGridHeight();
+      if (startY < 0) {
+        startY = 0;
+      }
+      if (endY > gridHeight) {
+        endY = gridHeight;
+      }
+      final int minX = (int)(getMinX() + startX * gridCellSize);
+      final int minY = (int)(getMinY() + startY * gridCellSize);
+
+      double y = minY;
+      for (int gridY = startY; gridY < endY; gridY++) {
+        double x = minX;
+        for (int gridX = startX; gridX < endX; gridX++) {
+          setElevation(gridX, gridY, elevationModel, x, y);
+          x += gridCellSize;
+        }
+        y += gridCellSize;
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "gridCellSize " + elevationModel.getGridCellSize() + " != " + gridCellSize);
     }
   }
 

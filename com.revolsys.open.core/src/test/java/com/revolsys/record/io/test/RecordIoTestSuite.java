@@ -34,7 +34,7 @@ import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -105,7 +105,7 @@ public class RecordIoTestSuite {
         + geometryFactory.getAxisCount() + "_" + geometry.getVertexCount() + "." + fileExtension);
       file.delete();
       file.getParentFile().mkdirs();
-      final FileSystemResource resource = new FileSystemResource(file);
+      final PathResource resource = new PathResource(file);
 
       final RecordWriterFactory recordWriterFactory = IoFactory.factory(RecordWriterFactory.class,
         resource);
@@ -178,8 +178,7 @@ public class RecordIoTestSuite {
     }
   }
 
-  private static void doGeometryReadTest(final FileSystemResource resource,
-    final ArrayRecord record) {
+  private static void doGeometryReadTest(final PathResource resource, final ArrayRecord record) {
     if (GeometryReader.isReadable(resource)) {
       try (
         GeometryReader geometryReader = GeometryReader.newGeometryReader(resource)) {
@@ -197,8 +196,7 @@ public class RecordIoTestSuite {
     }
   }
 
-  private static void doRecordReadTest(final FileSystemResource resource,
-    final ArrayRecord record) {
+  private static void doRecordReadTest(final PathResource resource, final ArrayRecord record) {
     if (RecordReader.isReadable(resource)) {
       final RecordReaderFactory recordReaderFactory = IoFactory.factory(RecordReaderFactory.class,
         resource);
@@ -233,7 +231,7 @@ public class RecordIoTestSuite {
     }
   }
 
-  private static void doRecordWriteTest(final FileSystemResource resource, final Record record) {
+  private static void doRecordWriteTest(final PathResource resource, final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
     try (

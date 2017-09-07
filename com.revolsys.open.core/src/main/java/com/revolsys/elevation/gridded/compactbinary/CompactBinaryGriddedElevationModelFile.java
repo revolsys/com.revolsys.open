@@ -183,7 +183,6 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
       @SuppressWarnings("unused")
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
                                                                                  // type
-      @SuppressWarnings("unused")
       final short version = this.reader.getShort();
       final GeometryFactory geometryFactory = CompactBinaryGriddedElevationReader
         .readGeometryFactory(this.reader, version);

@@ -15,7 +15,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.xbase.XbaseRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCountMap;
 
@@ -118,7 +118,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
       directory.mkdirs();
       final File file = new File(directory,
         getFileName(recordDefinition) + this.nameSuffix + ".shp");
-      writer = RecordWriter.newRecordWriter(recordDefinition, new FileSystemResource(file));
+      writer = RecordWriter.newRecordWriter(recordDefinition, new PathResource(file));
 
       ((XbaseRecordWriter)writer).setUseZeroForNull(this.useZeroForNull);
       final Geometry geometry = object.getGeometry();

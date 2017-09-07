@@ -66,8 +66,9 @@ public class GriddedElevationModelLayerRenderer
             final BoundingBox boundingBox = layer.getBoundingBox();
             final Graphics2D graphics = viewport.getGraphics();
             if (graphics != null) {
+              final Object interpolationMethod = null;
               GeoreferencedImageLayerRenderer.renderAlpha(viewport, graphics, this.image, true,
-                layer.getOpacity() / 255.0);
+                layer.getOpacity() / 255.0, interpolationMethod);
               GeoreferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, graphics,
                 boundingBox);
             }

@@ -14,7 +14,7 @@ import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.zip.ZipRecordReader;
 import com.revolsys.record.io.format.zip.ZipRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
 public class ShapefileZip extends AbstractRecordIoFactory implements RecordWriterFactory {
@@ -45,7 +45,7 @@ public class ShapefileZip extends AbstractRecordIoFactory implements RecordWrite
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to create temporary directory", e);
     }
-    final Resource tempResource = new FileSystemResource(new File(directory, baseName + ".shp"));
+    final Resource tempResource = new PathResource(new File(directory, baseName + ".shp"));
     final RecordWriter shapeWriter = new ShapefileRecordWriter(recordDefinition, tempResource);
     return new ZipRecordWriter(directory, shapeWriter, outputStream);
   }

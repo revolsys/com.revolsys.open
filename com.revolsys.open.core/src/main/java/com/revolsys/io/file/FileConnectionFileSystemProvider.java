@@ -23,7 +23,7 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.util.OS;
 
 public class FileConnectionFileSystemProvider extends FileSystemProvider {
@@ -34,7 +34,7 @@ public class FileConnectionFileSystemProvider extends FileSystemProvider {
   public FileConnectionFileSystemProvider() {
     this.fileSystem = new FileConnectionManager(this);
     final File directory = OS.getApplicationDataDirectory("com.revolsys.gis/Folder Connections");
-    this.fileSystem.addConnectionRegistry("User", new FileSystemResource(directory));
+    this.fileSystem.addConnectionRegistry("User", new PathResource(directory));
     FileConnectionManager.instance = this.fileSystem;
   }
 

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
@@ -23,7 +23,7 @@ public class WebServiceConnectionManager
     INSTANCE = new WebServiceConnectionManager();
     final File webServicesDirectory = OS
       .getApplicationDataDirectory("com.revolsys.gis/Web Services");
-    INSTANCE.addConnectionRegistry("User", new FileSystemResource(webServicesDirectory));
+    INSTANCE.addConnectionRegistry("User", new PathResource(webServicesDirectory));
   }
 
   private static Function<WebServiceConnection, Boolean> invalidWebServiceFunction;

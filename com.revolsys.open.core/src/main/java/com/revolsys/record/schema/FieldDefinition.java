@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -543,13 +544,19 @@ public class FieldDefinition extends BaseObjectWithProperties
 
   public FieldDefinition setAllowedValues(final Collection<?> allowedValues) {
     for (final Object allowedValue : allowedValues) {
-      this.allowedValues.put(allowedValue, allowedValue);
+      final Object fieldValue = toFieldValue(allowedValue);
+      this.allowedValues.put(fieldValue, fieldValue);
     }
     return this;
   }
 
   public FieldDefinition setAllowedValues(final Map<?, ?> allowedValues) {
-    this.allowedValues.putAll(allowedValues);
+    for (final Entry<?, ?> entry : allowedValues.entrySet()) {
+      final Object allowedValue = entry.getKey();
+      final Object description = entry.getValue();
+      final Object fieldValue = toFieldValue(allowedValue);
+      this.allowedValues.put(fieldValue, description);
+    }
     return this;
   }
 

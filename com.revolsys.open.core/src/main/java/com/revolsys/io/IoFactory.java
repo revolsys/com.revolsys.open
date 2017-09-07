@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
@@ -198,6 +199,24 @@ public interface IoFactory extends Available {
       return null;
     } else {
       return new ChannelReader(channel);
+    }
+  }
+
+  public static ChannelReader newChannelReader(final Resource resource, final ByteBuffer buffer) {
+    final ReadableByteChannel channel = newReadableByteChannel(resource);
+    if (channel == null) {
+      return null;
+    } else {
+      return new ChannelReader(channel, buffer);
+    }
+  }
+
+  public static ChannelReader newChannelReader(final Resource resource, final int bufferSize) {
+    final ReadableByteChannel channel = newReadableByteChannel(resource);
+    if (channel == null) {
+      return null;
+    } else {
+      return new ChannelReader(channel, bufferSize);
     }
   }
 

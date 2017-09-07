@@ -38,7 +38,7 @@ import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -666,8 +666,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   protected Layer loadLayer(final File file) {
-    final Resource oldResource = Resource
-      .setBaseResource(new FileSystemResource(file.getParentFile()));
+    final Resource oldResource = Resource.setBaseResource(new PathResource(file.getParentFile()));
 
     try {
       final Map<String, Object> properties = Json.toMap(file);

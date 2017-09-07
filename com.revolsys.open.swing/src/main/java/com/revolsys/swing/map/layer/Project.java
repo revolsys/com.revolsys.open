@@ -36,7 +36,6 @@ import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.format.json.Json;
-import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.SwingUtil;
@@ -183,8 +182,8 @@ public class Project extends LayerGroup {
       final Path directory = getSaveAsDirectory();
       return directory;
     }
-    if (this.resource instanceof FileSystemResource) {
-      final FileSystemResource fileResource = (FileSystemResource)this.resource;
+    if (this.resource instanceof PathResource) {
+      final PathResource fileResource = (PathResource)this.resource;
       final File directory = fileResource.getFile();
       if (!directory.exists()) {
         directory.mkdirs();
@@ -233,7 +232,7 @@ public class Project extends LayerGroup {
         FileUtil.deleteDirectory(directory);
       }
       directory.mkdirs();
-      this.resource = new FileSystemResource(directory);
+      this.resource = new PathResource(directory);
       return directory.toPath();
     } else {
       return null;

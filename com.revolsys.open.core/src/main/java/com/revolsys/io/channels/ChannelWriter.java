@@ -30,7 +30,7 @@ public class ChannelWriter implements BaseCloseable {
   private WritableByteChannel out;
 
   public ChannelWriter(final WritableByteChannel out) {
-    this(out, 8096);
+    this(out, 8192);
   }
 
   public ChannelWriter(final WritableByteChannel out, final ByteBuffer buffer) {

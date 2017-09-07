@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
@@ -22,7 +22,7 @@ public class ResourceEndianOutput implements EndianOutput {
 
   public ResourceEndianOutput(final Resource resource) throws IOException {
     this.resource = resource;
-    if (!(resource instanceof FileSystemResource)) {
+    if (!(resource instanceof PathResource)) {
       this.resourceOut = resource.newBufferedOutputStream();
     }
     this.file = Resource.getFileOrCreateTempFile(resource);
@@ -38,7 +38,7 @@ public class ResourceEndianOutput implements EndianOutput {
     } catch (final Throwable e) {
       throw Exceptions.wrap(e);
     } finally {
-      if (!(this.resource instanceof FileSystemResource)) {
+      if (!(this.resource instanceof PathResource)) {
         try {
           FileUtil.copy(this.file, this.resourceOut);
           this.resourceOut.flush();
@@ -46,7 +46,7 @@ public class ResourceEndianOutput implements EndianOutput {
           throw Exceptions.wrap(e);
         } finally {
           FileUtil.closeSilent(this.resourceOut);
-          if (!(this.resource instanceof FileSystemResource)) {
+          if (!(this.resource instanceof PathResource)) {
             this.file.delete();
           }
         }

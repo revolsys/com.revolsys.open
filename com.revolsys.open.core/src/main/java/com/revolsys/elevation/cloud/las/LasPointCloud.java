@@ -98,7 +98,7 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
         throw new IllegalArgumentException("Cannot find file: " + resource + "!" + fileName);
       }
     }
-    this.reader = resource.newChannelReader(8096, ByteOrder.LITTLE_ENDIAN);
+    this.reader = resource.newChannelReader(8192, ByteOrder.LITTLE_ENDIAN);
     if (this.reader == null) {
       this.exists = false;
     } else {

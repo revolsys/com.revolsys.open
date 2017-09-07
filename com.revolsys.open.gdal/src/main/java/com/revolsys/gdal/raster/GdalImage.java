@@ -2,6 +2,7 @@ package com.revolsys.gdal.raster;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
@@ -58,7 +59,7 @@ public class GdalImage extends AbstractGeoreferencedImage {
 
   @Override
   public void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
-    final int viewWidth, final int viewHeight, final boolean useTransform) {
+    final int viewWidth, final int viewHeight, final boolean useTransform, Object interpolationMethod) {
     try {
       final Dataset dataset = getDataset();
 
@@ -102,7 +103,7 @@ public class GdalImage extends AbstractGeoreferencedImage {
         clipYoff, clipWidth, clipHeight, targetWidth, targetHeight);
 
       super.drawRenderedImage(bufferedImage, clipBoundingBox, graphics, viewBoundingBox, viewWidth,
-        useTransform);
+        useTransform, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
     } catch (final Throwable e) {
       e.printStackTrace();

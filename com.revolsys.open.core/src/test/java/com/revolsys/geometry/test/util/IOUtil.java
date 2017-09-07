@@ -11,7 +11,7 @@ import com.revolsys.geometry.test.old.junit.GeometryUtils;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKBHexFileReader;
 import com.revolsys.geometry.wkb.WKBReader;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 
 public class IOUtil {
   public static Geometry readGeometriesFromFile(final String filename,
@@ -19,8 +19,7 @@ public class IOUtil {
     final String ext = TestFileUtil.getFileNameExtension(filename);
     if (ext.equalsIgnoreCase(".shp")) {
       try (
-        GeometryReader reader = GeometryReader
-          .newGeometryReader(new FileSystemResource(filename))) {
+        GeometryReader reader = GeometryReader.newGeometryReader(new PathResource(filename))) {
         final List<Geometry> geometries = reader.toList();
         if (geometries.isEmpty()) {
           return geomFact.geometryCollection();

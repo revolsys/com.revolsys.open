@@ -38,7 +38,7 @@ import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 
 import com.revolsys.io.filter.ExtensionFilenameFilter;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
 public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> implements Iterator<T> {
@@ -223,7 +223,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> imple
   @PostConstruct
   public void open() {
     for (final File file : getFiles()) {
-      final FileSystemResource resource = new FileSystemResource(file);
+      final PathResource resource = new PathResource(file);
       final Reader<T> reader = newReader(resource);
       reader.open();
       if (reader != null) {

@@ -32,13 +32,18 @@ public class ChannelReader implements BaseCloseable {
   private ByteBuffer tempBuffer = ByteBuffer.allocate(8);
 
   public ChannelReader(final ReadableByteChannel channel) {
-    this(channel, 8096);
+    this(channel, 8192);
   }
 
   public ChannelReader(final ReadableByteChannel channel, final ByteBuffer buffer) {
     this.channel = channel;
-    this.buffer = buffer;
-    this.tempBuffer.order(buffer.order());
+    if (buffer == null) {
+      this.buffer = ByteBuffer.allocateDirect(8192);
+    } else {
+      this.buffer = buffer;
+      this.buffer.clear();
+    }
+    this.tempBuffer.order(this.buffer.order());
   }
 
   public ChannelReader(final ReadableByteChannel channel, final int capacity) {
@@ -200,19 +205,24 @@ public class ChannelReader implements BaseCloseable {
   }
 
   private void read(final int minCount) {
+    final ReadableByteChannel channel = this.channel;
+    final ByteBuffer buffer = this.buffer;
+    int available = this.available;
     try {
-      this.buffer.clear();
-      while (this.available < minCount) {
-        final int readCount = this.channel.read(this.buffer);
+      buffer.clear();
+      while (available < minCount) {
+        final int readCount = channel.read(buffer);
         if (readCount == -1) {
           throw new EOFException();
         } else {
-          this.available += readCount;
+          available += readCount;
         }
       }
-      this.buffer.flip();
+      buffer.flip();
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
+    } finally {
+      this.available = available;
     }
   }
 

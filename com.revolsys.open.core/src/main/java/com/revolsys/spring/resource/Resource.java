@@ -54,7 +54,7 @@ public interface Resource extends org.springframework.core.io.Resource {
   static Resource getBaseResource() {
     final Resource baseResource = Resource.BASE_RESOURCE.get();
     if (baseResource == null) {
-      return new FileSystemResource(FileUtil.getCurrentDirectory());
+      return new PathResource(FileUtil.getCurrentDirectory());
     } else {
       return baseResource;
     }
@@ -67,7 +67,7 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   static File getFileOrCreateTempFile(final Resource resource) {
     try {
-      if (resource instanceof FileSystemResource) {
+      if (resource instanceof PathResource) {
         return resource.getFile();
       } else {
         final String filename = resource.getFilename();
@@ -104,7 +104,7 @@ public interface Resource extends org.springframework.core.io.Resource {
     } else if (source instanceof Path) {
       return new PathResource((Path)source);
     } else if (source instanceof File) {
-      return new FileSystemResource((File)source);
+      return new PathResource((File)source);
     } else if (source instanceof URL) {
       return new UrlResource((URL)source);
     } else if (source instanceof URI) {
@@ -119,9 +119,9 @@ public interface Resource extends org.springframework.core.io.Resource {
       if (source instanceof org.springframework.core.io.ClassPathResource) {
         final org.springframework.core.io.ClassPathResource springResource = (org.springframework.core.io.ClassPathResource)source;
         return new ClassPathResource(springResource.getPath(), springResource.getClassLoader());
-      } else if (source instanceof org.springframework.core.io.FileSystemResource) {
+      } else if (source instanceof org.springframework.core.io.PathResource) {
         final org.springframework.core.io.FileSystemResource springResource = (org.springframework.core.io.FileSystemResource)source;
-        return new FileSystemResource(springResource.getFile());
+        return new PathResource(springResource.getFile());
       } else if (source instanceof org.springframework.core.io.PathResource) {
         final org.springframework.core.io.PathResource springResource = (org.springframework.core.io.PathResource)source;
         return new PathResource(springResource.getPath());
@@ -347,7 +347,7 @@ public interface Resource extends org.springframework.core.io.Resource {
   }
 
   default ChannelReader newChannelReader() {
-    return newChannelReader(8096, ByteOrder.BIG_ENDIAN);
+    return newChannelReader(8192, ByteOrder.BIG_ENDIAN);
   }
 
   default ChannelReader newChannelReader(final int capacity) {
@@ -364,7 +364,7 @@ public interface Resource extends org.springframework.core.io.Resource {
   }
 
   default ChannelWriter newChannelWriter() {
-    return newChannelWriter(8096, ByteOrder.BIG_ENDIAN);
+    return newChannelWriter(8192, ByteOrder.BIG_ENDIAN);
   }
 
   default ChannelWriter newChannelWriter(final int capacity) {

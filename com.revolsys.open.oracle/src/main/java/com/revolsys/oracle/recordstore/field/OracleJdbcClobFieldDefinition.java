@@ -12,7 +12,7 @@ import java.util.Collections;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
 public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
@@ -53,7 +53,7 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
           in = new StringReader(string);
         } else if (value instanceof File) {
           final File file = (File)value;
-          final FileSystemResource resource = new FileSystemResource(file);
+          final PathResource resource = new PathResource(file);
           in = resource.newBufferedReader();
         } else {
           throw new IllegalArgumentException("Not valid for a clob column");

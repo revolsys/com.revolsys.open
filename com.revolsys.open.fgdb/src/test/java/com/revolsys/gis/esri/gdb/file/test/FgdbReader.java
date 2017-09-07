@@ -3,7 +3,7 @@ package com.revolsys.gis.esri.gdb.file.test;
 import java.nio.channels.ReadableByteChannel;
 
 import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 
 public class FgdbReader {
 
@@ -51,8 +51,8 @@ public class FgdbReader {
   private final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl();
 
   public FgdbReader() {
-    this.in = new FileSystemResource(
-      "/Users/paustin/Downloads/KSRD_20140306.gdb/a0000000d.gdbtable").newReadableByteChannel();
+    this.in = new PathResource("/Users/paustin/Downloads/KSRD_20140306.gdb/a0000000d.gdbtable")
+      .newReadableByteChannel();
   }
   //
   // private boolean isNull(final byte[] nullFields, final int fieldIndex) {
@@ -161,7 +161,8 @@ public class FgdbReader {
   // final int geometryFlag1 = this.in.read();
   // final int geometryFlag2 = this.in.read();
   // final String wkt = readUtf8String();
-  // final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
+  // final CoordinateSystem coordinateSystem =
+  // EsriCoordinateSystems.getCoordinateSystem(wkt);
   // final int geometryFlags = this.in.read();
   // int axisCount = 2;
   // if (geometryFlags == 5) {
@@ -199,9 +200,11 @@ public class FgdbReader {
   // final double minY = this.in.readLEDouble();
   // final double maxX = this.in.readLEDouble();
   // final double maxY = this.in.readLEDouble();
-  // final GeometryFactory geometryFactory = GeometryFactory.fixed(coordinateSystem, axisCount,
+  // final GeometryFactory geometryFactory =
+  // GeometryFactory.fixed(coordinateSystem, axisCount,
   // xyScale, zScale);
-  // final BoundingBox boundingBox = geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
+  // final BoundingBox boundingBox = geometryFactory.newBoundingBox(minX, minY,
+  // maxX, maxY);
   // boolean run = true;
   // while (run) {
   // final int v1 = this.in.read();
@@ -227,7 +230,8 @@ public class FgdbReader {
   // // Read a float64 value
   // // Goto 1
   // // End
-  // field = new GeometryField(fieldName, this.geometryType, required, geometryFactory);
+  // field = new GeometryField(fieldName, this.geometryType, required,
+  // geometryFactory);
   // break;
   // case 8:
   // this.in.read();
@@ -303,7 +307,8 @@ public class FgdbReader {
   // }
   // }
   // }
-  // this.recordDefinition.setProperty("optionalFieldCount", this.optionalFieldCount);
+  // this.recordDefinition.setProperty("optionalFieldCount",
+  // this.optionalFieldCount);
   // System.out.println(MapObjectFactory.toString(this.recordDefinition));
   // }
   //
