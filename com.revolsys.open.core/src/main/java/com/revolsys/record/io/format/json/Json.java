@@ -191,8 +191,13 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
   }
 
   public static String toString(final List<? extends Map<String, Object>> list) {
+    return toString(list, false);
+  }
+
+  public static String toString(final List<? extends Map<String, Object>> list,
+    final boolean indent) {
     final StringWriter writer = new StringWriter();
-    final JsonMapWriter mapWriter = new JsonMapWriter(writer, false);
+    final JsonMapWriter mapWriter = new JsonMapWriter(writer, indent);
     for (final Map<String, Object> map : list) {
       mapWriter.write(map);
     }
