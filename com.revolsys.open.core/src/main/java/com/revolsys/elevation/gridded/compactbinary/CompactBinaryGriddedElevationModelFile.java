@@ -100,17 +100,19 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
     Paths.createParentDirectories(this.path);
     this.channel = FileChannel.open(this.path, Paths.OPEN_OPTIONS_READ_WRITE_SET,
       this.fileAttributes);
-    final ChannelWriter writer = new ChannelWriter(this.channel);
-    final int gridWidth = getGridWidth();
-    final int gridHeight = getGridHeight();
-    final double gridCellSize = getGridCellSize();
-    final BoundingBox boundingBox = getBoundingBox();
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    CompactBinaryGriddedElevationWriter.writeHeader(writer, boundingBox, geometryFactory, gridWidth,
-      gridHeight, (int)gridCellSize);
-    final int count = gridWidth * gridHeight;
-    for (int i = 0; i < count; i++) {
-      writer.putInt(Integer.MIN_VALUE);
+    try (
+      final ChannelWriter writer = new ChannelWriter(this.channel)) {
+      final int gridWidth = getGridWidth();
+      final int gridHeight = getGridHeight();
+      final double gridCellSize = getGridCellSize();
+      final BoundingBox boundingBox = getBoundingBox();
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      CompactBinaryGriddedElevationWriter.writeHeader(writer, boundingBox, geometryFactory,
+        gridWidth, gridHeight, (int)gridCellSize);
+      final int count = gridWidth * gridHeight;
+      for (int i = 0; i < count; i++) {
+        writer.putInt(Integer.MIN_VALUE);
+      }
     }
   }
 
@@ -186,6 +188,7 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
       final short version = this.reader.getShort();
       final GeometryFactory geometryFactory = CompactBinaryGriddedElevationReader
         .readGeometryFactory(this.reader, version);
+      this.scaleZ = geometryFactory.getScaleZ();
 
       final double minX = reader.getDouble();
       final double minY = reader.getDouble();

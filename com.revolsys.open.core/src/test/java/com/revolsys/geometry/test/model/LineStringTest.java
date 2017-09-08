@@ -25,7 +25,7 @@ public class LineStringTest {
     Assert.assertEquals("Is Empty", false, point.isEmpty());
     Assert.assertEquals("Geometry Count", 1, point.getGeometryCount());
     Assert.assertNotNull("Not Null First Vertex", point.getVertex(0));
-    Assert.assertEquals("Axis Count", coordinates.length, point.getAxisCount());
+    PointTest.assertAxisCount(point, coordinates);
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
       final double value = point.getCoordinate(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {

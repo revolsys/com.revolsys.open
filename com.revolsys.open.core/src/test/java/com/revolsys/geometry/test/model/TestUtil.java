@@ -51,7 +51,7 @@ public class TestUtil {
         }
         final Geometry convertedGeometry = geometry.convertGeometry(otherGeometryFactory);
         final Geometry convertedBackGeometry = convertedGeometry.convertGeometry(geometryFactory);
-        valid &= equalsExpectedGeometry(i, geometry, convertedBackGeometry);
+        valid &= equalsExpectedGeometry(i, convertedBackGeometry, geometry);
         i++;
       }
     }

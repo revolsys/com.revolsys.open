@@ -1,13 +1,3 @@
-/*
- * Copyright 2007-2013, martin isenburg, rapidlasso - fast tools to catch reality
- *
- * This is free software; you can redistribute and/or modify it under the
- * terms of the GNU Lesser General Licence as published by the Free Software
- * Foundation. See the LICENSE.txt file for more information.
- *
- * This software is distributed WITHOUT ANY WARRANTY and without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- */
 package com.revolsys.io.channels;
 
 import java.io.EOFException;
@@ -27,41 +17,133 @@ public class ChannelWriter implements BaseCloseable {
 
   private final int capacity;
 
-  private WritableByteChannel out;
+  private WritableByteChannel channel;
 
-  public ChannelWriter(final WritableByteChannel out) {
-    this(out, 8192);
+  private final boolean closeChannel;
+
+  /**
+   * <p>Create a new ChannelWriter with buffer of 8192 bytes.<p>
+   *
+   * <p><b>NOTE: The underlying channel will not be automatically closed.</p>
+   *
+   * @param channel The channel.
+   */
+  public ChannelWriter(final WritableByteChannel channel) {
+    this(channel, 8192);
   }
 
-  public ChannelWriter(final WritableByteChannel out, final ByteBuffer buffer) {
-    this.out = out;
+  /**
+   * <p>Create a new ChannelWriter with buffer of 8192 bytes.<p>
+   *
+   * @param channel The channel.
+   * @param closeChannel Flag indicating if the channel should automatically be closed.
+   */
+  public ChannelWriter(final WritableByteChannel channel, final boolean closeChannel) {
+    this(channel, closeChannel, 8192);
+  }
+
+  /**
+   * <p>Create a new ChannelWriter.<p>
+   *
+   * @param channel The channel.
+   * @param closeChannel Flag indicating if the channel should automatically be closed.
+   * @param buffer The temporary buffer used to write to the channel.
+   */
+  public ChannelWriter(final WritableByteChannel channel, final boolean closeChannel,
+    final ByteBuffer buffer) {
+    this.channel = channel;
+    this.closeChannel = closeChannel;
     this.buffer = buffer;
     this.capacity = buffer.capacity();
   }
 
-  public ChannelWriter(final WritableByteChannel out, final int capacity) {
-    this(out, ByteBuffer.allocateDirect(capacity));
+  /**
+   * <p>Create a new ChannelWriter.<p>
+   *
+   * @param channel The channel.
+   * @param closeChannel Flag indicating if the channel should automatically be closed.
+   * @param capacity The size of the temporary buffer.
+   */
+  public ChannelWriter(final WritableByteChannel channel, final boolean closeChannel,
+    final int capacity) {
+    this(channel, closeChannel, ByteBuffer.allocateDirect(capacity));
   }
 
-  public ChannelWriter(final WritableByteChannel out, final int capacity,
-    final ByteOrder byteOrder) {
-    this(out, ByteBuffer.allocateDirect(capacity));
+  /**
+   * <p>Create a new ChannelWriter.<p>
+    *
+   * @param channel The channel.
+   * @param closeChannel Flag indicating if the channel should automatically be closed.
+   * @param capacity The size of the temporary buffer.
+   * @param byteOrder The byte order of the buffer.
+   */
+  public ChannelWriter(final WritableByteChannel channel, final boolean closeChannel,
+    final int capacity, final ByteOrder byteOrder) {
+    this(channel, closeChannel, ByteBuffer.allocateDirect(capacity));
     setByteOrder(byteOrder);
   }
 
+  /**
+   * <p>Create a new ChannelWriter.<p>
+   *
+   * <p><b>NOTE: The underlying channel will not be automatically closed.</p>
+   *
+   * @param channel The channel.
+   * @param buffer The temporary buffer used to write to the channel.
+   */
+  public ChannelWriter(final WritableByteChannel channel, final ByteBuffer buffer) {
+    this(channel, false, buffer);
+  }
+
+  /**
+  * <p>Create a new ChannelWriter.<p>
+  *
+  * <p><b>NOTE: The underlying channel will not be automatically closed.</p>
+  *
+  * @param channel The channel.
+  * @param capacity The size of the temporary buffer.
+  */
+  public ChannelWriter(final WritableByteChannel channel, final int capacity) {
+    this(channel, ByteBuffer.allocateDirect(capacity));
+  }
+
+  /**
+   * <p>Create a new ChannelWriter.<p>
+   *
+   * <p><b>NOTE: The underlying channel will not be automatically closed.</p>
+   *
+   * @param channel The channel.
+   * @param capacity The size of the temporary buffer.
+   * @param byteOrder The byte order of the buffer.
+   */
+  public ChannelWriter(final WritableByteChannel channel, final int capacity,
+    final ByteOrder byteOrder) {
+    this(channel, ByteBuffer.allocateDirect(capacity));
+    setByteOrder(byteOrder);
+  }
+
+  /**
+   * Close this writer but not the underlying channel.
+   */
   @Override
   public void close() {
-    final WritableByteChannel out = this.out;
-    if (out != null) {
-      write();
-      this.out = null;
-      try {
-        out.close();
-      } catch (final IOException e) {
-        throw Exceptions.wrap(e);
+    write();
+    final WritableByteChannel channel = this.channel;
+    if (channel != null) {
+      this.channel = null;
+      if (this.closeChannel) {
+        try {
+          channel.close();
+        } catch (final IOException e) {
+          throw Exceptions.wrap(e);
+        }
       }
     }
     this.buffer = null;
+  }
+
+  public void flush() {
+    write();
   }
 
   public ByteOrder getByteOrder() {
@@ -166,20 +248,22 @@ public class ChannelWriter implements BaseCloseable {
 
   private void write() {
     try {
-      final WritableByteChannel out = this.out;
       final ByteBuffer buffer = this.buffer;
-      buffer.flip();
-      final int size = buffer.remaining();
-      int totalWritten = 0;
-      while (totalWritten < size) {
-        final int written = out.write(buffer);
-        if (written == -1) {
-          throw new EOFException();
+      final WritableByteChannel channel = this.channel;
+      if (channel != null) {
+        buffer.flip();
+        final int size = buffer.remaining();
+        int totalWritten = 0;
+        while (totalWritten < size) {
+          final int written = channel.write(buffer);
+          if (written == -1) {
+            throw new EOFException();
+          }
+          totalWritten += written;
         }
-        totalWritten += written;
+        buffer.clear();
+        this.available = this.capacity;
       }
-      buffer.clear();
-      this.available = this.capacity;
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

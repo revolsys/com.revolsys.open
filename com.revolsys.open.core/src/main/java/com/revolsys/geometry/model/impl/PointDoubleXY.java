@@ -25,8 +25,8 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   }
 
   public PointDoubleXY(final GeometryFactory geometryFactory, final double x, final double y) {
-    this.x = geometryFactory.makeXyPrecise(x);
-    this.y = geometryFactory.makeXyPrecise(y);
+    this.x = geometryFactory.makeXPrecise(x);
+    this.y = geometryFactory.makeYPrecise(y);
   }
 
   public PointDoubleXY(final Point point) {
