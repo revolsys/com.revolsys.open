@@ -105,23 +105,13 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
       final int gridCellY = GriddedElevationModel.getGridCellY(tileY, gridCellSize, y);
       final int elevationByteSize = 4;
       final int offset = HEADER_SIZE + (gridCellY * gridSize + gridCellX) * elevationByteSize;
-      int elevation;
-      if (resource.isFile()) {
-        final Path path = resource.toPath();
-        try (
-          FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
-          final ByteBuffer bytes = ByteBuffer.allocate(4);
-          channel.read(bytes, offset);
-          elevation = bytes.getInt(0);
-        }
-      } else {
-        try (
-          DataInputStream in = resource.newBufferedInputStream(DataInputStream::new)) {
-          in.skip(offset);
-          elevation = in.readInt();
-        }
+      final Path path = resource.toPath();
+      try (
+        FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
+        final ByteBuffer bytes = ByteBuffer.allocate(4);
+        channel.read(bytes, offset);
+        return bytes.getInt(0);
       }
-      return elevation;
     } catch (final NoSuchFileException e) {
       return Double.NaN;
     } catch (final IOException e) {
