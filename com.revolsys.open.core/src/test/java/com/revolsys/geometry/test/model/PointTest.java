@@ -13,12 +13,29 @@ import com.revolsys.geometry.test.TestConstants;
 
 public class PointTest implements TestConstants {
 
+  public static void assertAxisCount(final Point point, final double... coordinates) {
+    int coordinateAxisCount = coordinates.length;
+    if (coordinateAxisCount > 3) {
+      if (Double.isNaN(coordinates[3])) {
+        if (Double.isNaN(coordinates[2])) {
+          coordinateAxisCount = 2;
+        } else {
+          coordinateAxisCount = 3;
+        }
+      }
+    } else if (coordinateAxisCount == 3) {
+      if (Double.isNaN(coordinates[2])) {
+        coordinateAxisCount = 2;
+      }
+    }
+    Assert.assertEquals("Axis Count", coordinateAxisCount, point.getAxisCount());
+  }
+
   public static void assertCoordinatesEquals(final Point point, final double... coordinates) {
     Assert.assertEquals("Is Empty", false, point.isEmpty());
     Assert.assertEquals("Geometry Count", 1, point.getGeometryCount());
     Assert.assertNotNull("Not Null First Vertex", point.getVertex(0));
-    Assert.assertEquals("Axis Count", coordinates.length, point.getAxisCount());
-    Assert.assertEquals("Vertex Count", coordinates.length, point.getAxisCount());
+    assertAxisCount(point, coordinates);
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
       final double value = point.getCoordinate(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {

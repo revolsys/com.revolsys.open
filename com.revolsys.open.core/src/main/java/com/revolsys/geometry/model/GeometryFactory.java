@@ -1983,6 +1983,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       if (coordinates.length < axisCount) {
         axisCount = coordinates.length;
       }
+      for (int axisIndex = axisCount - 1; axisIndex > 1; axisIndex--) {
+        if (!Double.isFinite(coordinates[axisIndex])) {
+          axisCount--;
+        }
+      }
       if (axisCount < 2) {
         return point();
       } else if (axisCount == 2) {

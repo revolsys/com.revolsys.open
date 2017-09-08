@@ -19,7 +19,7 @@ public class PointDoubleXYZ extends PointDoubleXY {
 
   protected PointDoubleXYZ(final GeometryFactory geometryFactory, final double x, final double y,
     final double z) {
-    super(x, y);
+    super(geometryFactory, x, y);
     this.z = geometryFactory.makeZPrecise(z);
   }
 

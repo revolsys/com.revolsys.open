@@ -88,48 +88,60 @@ public class ConvexHull {
     return cleanedRing;
   }
 
-  private static Point[] computeOctPts(final Collection<Point> points) {
-    final Point[] octetPoints = new Point[8];
-    final Point firstPoint = points.iterator().next();
-    for (int j = 0; j < octetPoints.length; j++) {
-      octetPoints[j] = firstPoint;
-    }
-    for (final Point currentPoint : points) {
+  private static PointList computeOctPts(final Collection<Point> points) {
+    final Iterator<Point> iterator = points.iterator();
+    final Point firstPoint = iterator.next();
+    Point octetPoint1 = firstPoint;
+    Point octetPoint2 = firstPoint;
+    Point octetPoint3 = firstPoint;
+    Point octetPoint4 = firstPoint;
+    Point octetPoint5 = firstPoint;
+    Point octetPoint6 = firstPoint;
+    Point octetPoint7 = firstPoint;
+    Point octetPoint8 = firstPoint;
+    while (iterator.hasNext()) {
+      final Point currentPoint = iterator.next();
       final double currentX = currentPoint.getX();
       final double currentY = currentPoint.getY();
-      if (currentX < octetPoints[0].getX()) {
-        octetPoints[0] = currentPoint;
+      if (currentX < octetPoint1.getX()) {
+        octetPoint1 = currentPoint;
       }
-      if (currentX - currentY < octetPoints[1].getX() - octetPoints[1].getY()) {
-        octetPoints[1] = currentPoint;
+      if (currentX - currentY < octetPoint2.getX() - octetPoint2.getY()) {
+        octetPoint2 = currentPoint;
       }
-      if (currentY > octetPoints[2].getY()) {
-        octetPoints[2] = currentPoint;
+      if (currentY > octetPoint3.getY()) {
+        octetPoint3 = currentPoint;
       }
-      if (currentX + currentY > octetPoints[3].getX() + octetPoints[3].getY()) {
-        octetPoints[3] = currentPoint;
+      if (currentX + currentY > octetPoint4.getX() + octetPoint4.getY()) {
+        octetPoint4 = currentPoint;
       }
-      if (currentX > octetPoints[4].getX()) {
-        octetPoints[4] = currentPoint;
+      if (currentX > octetPoint5.getX()) {
+        octetPoint5 = currentPoint;
       }
-      if (currentX - currentY > octetPoints[5].getX() - octetPoints[5].getY()) {
-        octetPoints[5] = currentPoint;
+      if (currentX - currentY > octetPoint6.getX() - octetPoint6.getY()) {
+        octetPoint6 = currentPoint;
       }
-      if (currentY < octetPoints[6].getY()) {
-        octetPoints[6] = currentPoint;
+      if (currentY < octetPoint7.getY()) {
+        octetPoint7 = currentPoint;
       }
-      if (currentX + currentY < octetPoints[7].getX() + octetPoints[7].getY()) {
-        octetPoints[7] = currentPoint;
+      if (currentX + currentY < octetPoint8.getX() + octetPoint8.getY()) {
+        octetPoint8 = currentPoint;
       }
     }
-    return octetPoints;
-
+    final PointList pointList = new PointList();
+    pointList.add(octetPoint1, false);
+    pointList.add(octetPoint2, false);
+    pointList.add(octetPoint3, false);
+    pointList.add(octetPoint4, false);
+    pointList.add(octetPoint5, false);
+    pointList.add(octetPoint6, false);
+    pointList.add(octetPoint7, false);
+    pointList.add(octetPoint8, false);
+    return pointList;
   }
 
   private static List<Point> computeOctRing(final Collection<Point> points) {
-    final Point[] octPts = computeOctPts(points);
-    final PointList pointList = new PointList();
-    pointList.add(octPts, false);
+    final PointList pointList = computeOctPts(points);
 
     // points must all lie in a line
     if (pointList.size() < 3) {
@@ -289,12 +301,12 @@ public class ConvexHull {
     for (final Point point : points) {
       final double y = point.getY();
       final double x = point.getX();
-      if (y < originX) {
+      if (y < originY) {
         originX = x;
         originY = y;
       }
       if (y == originY) {
-        if (y < originX) {
+        if (x < originX) {
           originX = x;
         }
       }
