@@ -373,7 +373,7 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   default ChannelWriter newChannelWriter(final int capacity, final ByteOrder byteOrder) {
     final WritableByteChannel in = newWritableByteChannel();
-    return new ChannelWriter(in, capacity, byteOrder);
+    return new ChannelWriter(in, true, capacity, byteOrder);
   }
 
   default Resource newChildResource(final CharSequence childPath) {

@@ -21,6 +21,9 @@ public abstract class GriddedElevationModelTest {
         final double expectedElevation = expectedModel.getElevation(gridX, gridY);
         final double actualElevation = actualModel.getElevation(gridX, gridY);
         final String message = "Elevation (" + gridX + "," + gridY + ")";
+        if (Double.isInfinite(actualElevation) && expectedElevation == 1) {
+          actualModel.getElevation(gridX, gridY);
+        }
         Assert.assertEquals(message, expectedElevation, actualElevation, 0);
       }
     }
@@ -30,7 +33,7 @@ public abstract class GriddedElevationModelTest {
   1. Write the model to the file specified by filePath.
   2. Read the model from the written file.
   3. Compare the read model with the original model
-
+  
    * @param model The model to test.
    * @param filePath The file to write to.
    */
@@ -53,7 +56,7 @@ public abstract class GriddedElevationModelTest {
   Create a new {@link IntArrayScaleGriddedElevationModel}.
   The elevation for each cell is set to gridX.gridY (e.g. 10.34).
   Except where gridX == gridY where NaN is used.
-  
+
    * @param coordinateSystemId The coordinate system id.
    * @return The model
    */
