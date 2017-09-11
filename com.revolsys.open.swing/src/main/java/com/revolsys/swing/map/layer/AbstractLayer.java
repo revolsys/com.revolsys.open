@@ -913,7 +913,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   }
 
   public void setIcon(final Icon icon) {
+    final Object oldValue = this.icon;
     this.icon = icon;
+    try (
+      final BaseCloseable eventsEnabled = eventsEnabled()) {
+      firePropertyChange("icon", oldValue, icon);
+    }
   }
 
   protected void setInitialized(final boolean initialized) {
@@ -967,7 +972,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       }
     }
     this.name = newName;
-    firePropertyChange("name", oldValue, this.name);
+    try (
+      final BaseCloseable eventsEnabled = eventsEnabled()) {
+      firePropertyChange("name", oldValue, this.name);
+    }
   }
 
   public boolean setNotExists(final String errorMessage) {

@@ -16,6 +16,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -240,19 +241,8 @@ public class ProjectFrame extends BaseFrame {
           final Component panelComponent = component;
           panel.activatePanelComponent(panelComponent, config);
           final int tabIndex = tabs.getTabCount();
-          final String name = panel.getName();
-          final Icon icon = panel.getIcon();
 
           panel.setPropertyWeak(BOTTOM_TAB, panelComponent);
-          final PropertyChangeListener listener = EventQueue.addPropertyChange(panel, "name",
-            () -> {
-              final int index = tabs.indexOfComponent(panelComponent);
-              if (index != -1) {
-                final String newName = panel.getName();
-                tabs.setTitleAt(index, newName);
-              }
-            });
-          panel.setPropertyWeak(BOTTOM_TAB_LISTENER, listener);
 
           final String layerPath = panel.getPath();
           final Runnable closeAction = () -> {
@@ -264,10 +254,29 @@ public class ProjectFrame extends BaseFrame {
           synchronized (this.bottomTabLayerPaths) {
             this.bottomTabLayerPaths.add(layerPath);
           }
+          final String name = panel.getName();
+          final Icon icon = panel.getIcon();
           final TabClosableTitle tab = tabs.addClosableTab(name, icon, panelComponent, closeAction);
           tab.setMenu(panel);
 
           tabs.setSelectedIndex(tabIndex);
+
+          panel.setPropertyWeak(BOTTOM_TAB_LISTENER, Arrays.asList(//
+            EventQueue.addPropertyChange(panel, "name", () -> {
+              final int index = tabs.indexOfComponent(panelComponent);
+              if (index != -1) {
+                final String newName = panel.getName();
+                tabs.setTitleAt(index, newName);
+              }
+            }), //
+            EventQueue.addPropertyChange(panel, "icon", () -> {
+              final int index = tabs.indexOfComponent(panelComponent);
+              if (index != -1) {
+                final Icon newName = panel.getIcon();
+                tabs.setIconAt(index, newName);
+              }
+            })//
+          ));
         }
       } else {
         panel.activatePanelComponent(component, config);
@@ -612,15 +621,11 @@ public class ProjectFrame extends BaseFrame {
     file.addComponentFactory("projectOpen", this.openRecentMenu);
     updateRecentMenu();
 
-    file
-      .addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
-        this.project::saveAllSettings)
-      .setAcceleratorControlKey(KeyEvent.VK_S);
+    file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
+      this.project::saveAllSettings).setAcceleratorControlKey(KeyEvent.VK_S);
 
-    file
-      .addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
-        this::actionSaveProjectAs)
-      .setAcceleratorShiftControlKey(KeyEvent.VK_S);
+    file.addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
+      this::actionSaveProjectAs).setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", SaveAsPdf::save);
 
@@ -722,9 +727,11 @@ public class ProjectFrame extends BaseFrame {
 
   public void removeBottomTab(final ProjectFramePanel panel) {
     final JTabbedPane tabs = getBottomTabs();
-    final PropertyChangeListener listener = panel.getProperty(BOTTOM_TAB_LISTENER);
-    if (listener != null) {
-      Property.removeListener(panel, listener);
+    final List<PropertyChangeListener> listeners = panel.getProperty(BOTTOM_TAB_LISTENER);
+    if (listeners != null) {
+      for (final PropertyChangeListener listener : listeners) {
+        Property.removeListener(panel, listener);
+      }
     }
 
     final Component component = panel.getProperty(BOTTOM_TAB);

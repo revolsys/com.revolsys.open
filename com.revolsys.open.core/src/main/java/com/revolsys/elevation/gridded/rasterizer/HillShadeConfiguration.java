@@ -1,16 +1,11 @@
-package com.revolsys.elevation.gridded;
+package com.revolsys.elevation.gridded.rasterizer;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.util.MathUtil;
 
-public class HillShadeConfiguration {
+public class HillShadeConfiguration extends AbstractGriddedElevationModelRasterizer {
   private static final double PI_TIMES_2_MINUS_PI_OVER_2 = MathUtil.PI_TIMES_2 - MathUtil.PI_OVER_2;
-
-  private GriddedElevationModel elevationModel;
-
-  private int width;
-
-  private int height;
 
   private double zenithRadians;
 
@@ -20,12 +15,18 @@ public class HillShadeConfiguration {
 
   private double sinZenithRadians;
 
-  private double oneDivCellSizeTimes8;
+  private final double oneDivCellSizeTimes8;
 
   private final double zFactor = 1;
 
+  private double zenithDegrees;
+
+  private double azimuthDegrees;
+
   public HillShadeConfiguration(final GriddedElevationModel elevationModel) {
-    setElevationModel(elevationModel);
+    super(elevationModel);
+    final double cellSize = elevationModel.getGridCellSize();
+    this.oneDivCellSizeTimes8 = 1.0 / (8 * cellSize);
 
     setZenithDegrees(45.0);
     setAzimuthDegrees(315.0);
@@ -62,15 +63,8 @@ public class HillShadeConfiguration {
     return WebColors.colorToRGB(255, hillshade, hillshade, hillshade);
   }
 
-  public int getHillShade(final int index) {
-    final int width = this.width;
-    final int height = this.height;
-    final int gridX = index % width;
-    final int gridY = height - 1 - (index - gridX) / width;
-    return getHillShade(gridX, gridY);
-  }
-
-  private int getHillShade(final int gridX, final int gridY) {
+  @Override
+  public int getValue(final int gridX, final int gridY) {
     final GriddedElevationModel elevationModel = this.elevationModel;
     final int width = this.width;
     final int height = this.height;
@@ -165,21 +159,19 @@ public class HillShadeConfiguration {
     }
   }
 
-  private void setAzimuthDegrees(final double azimuth) {
-    this.azimuthRadians = Math.toRadians(360 - azimuth + 90);
+  public void setAzimuthDegrees(final double azimuthDegrees) {
+    final double oldValue = this.azimuthDegrees;
+    this.azimuthDegrees = azimuthDegrees;
+    this.azimuthRadians = Math.toRadians(360 - azimuthDegrees + 90);
+    firePropertyChange("azimuthDegrees", oldValue, azimuthDegrees);
   }
 
-  private void setElevationModel(final GriddedElevationModel elevationModel) {
-    this.elevationModel = elevationModel;
-    this.width = elevationModel.getGridWidth();
-    this.height = elevationModel.getGridHeight();
-    final double cellSize = elevationModel.getGridCellSize();
-    this.oneDivCellSizeTimes8 = 1.0 / (8 * cellSize);
-  }
-
-  private void setZenithDegrees(final double zenith) {
-    this.zenithRadians = Math.toRadians(90 - zenith);
+  public void setZenithDegrees(final double zenithDegrees) {
+    final double oldValue = this.zenithDegrees;
+    this.zenithDegrees = zenithDegrees;
+    this.zenithRadians = Math.toRadians(90 - zenithDegrees);
     this.cosZenithRadians = Math.cos(this.zenithRadians);
     this.sinZenithRadians = Math.sin(this.zenithRadians);
+    firePropertyChange("zenithDegrees", oldValue, zenithDegrees);
   }
 }

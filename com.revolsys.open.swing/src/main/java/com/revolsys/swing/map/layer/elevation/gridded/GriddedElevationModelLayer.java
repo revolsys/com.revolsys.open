@@ -236,6 +236,7 @@ public class GriddedElevationModelLayer extends AbstractLayer {
   protected void refreshDo() {
     final GriddedElevationModelLayerRenderer renderer = getRenderer();
     renderer.refresh();
+    redraw();
   }
 
   protected void revertDo() {
@@ -263,7 +264,6 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     }
     firePropertyChange("hasChanges", true, false);
     firePropertyChange("refresh", false, true);
-    refreshDo();
   }
 
   public void saveAs() {
@@ -281,7 +281,6 @@ public class GriddedElevationModelLayer extends AbstractLayer {
   @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (this.elevationModel != null) {
-      System.out.println(boundingBox);
       this.elevationModel.setBoundingBox(boundingBox);
     }
   }

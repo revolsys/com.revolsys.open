@@ -5,7 +5,8 @@ import java.awt.Graphics2D;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelImage;
-import com.revolsys.elevation.gridded.HillShadeConfiguration;
+import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.HillShadeConfiguration;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
@@ -19,19 +20,16 @@ public class GriddedElevationModelLayerRenderer
 
   private Thread worker;
 
+  private GriddedElevationModelRasterizer rasterizer;
+
+  private boolean redraw = true;
+
   public GriddedElevationModelLayerRenderer(final GriddedElevationModelLayer layer) {
     super("raster", layer);
-    final GriddedElevationModel elevationModel = layer.getElevationModel();
-    if (elevationModel != null) {
-      this.image = new GriddedElevationModelImage(elevationModel);
-    }
   }
 
   public void refresh() {
-    synchronized (this) {
-      this.worker = null;
-      this.image = null;
-    }
+    this.redraw = true;
   }
 
   @Override
@@ -43,26 +41,20 @@ public class GriddedElevationModelLayerRenderer
       if (!layer.isEditable()) {
         final GriddedElevationModel elevationModel = layer.getElevationModel();
         if (elevationModel != null) {
-          if (this.image == null) {
-            synchronized (this) {
-              if (this.worker == null) {
-                this.worker = new Thread(() -> {
-                  final GriddedElevationModelImage image = new GriddedElevationModelImage(
-                    elevationModel);
-                  // image.refresh(elevationModel);
-                  image.refresh(new HillShadeConfiguration(elevationModel));
-                  synchronized (this) {
-                    if (this.worker == Thread.currentThread()) {
-                      this.image = image;
-                      this.worker = null;
-                    }
-                    layer.redraw();
-                  }
-                });
-                this.worker.start();
-              }
+          synchronized (this) {
+            if (this.rasterizer == null) {
+              this.rasterizer = new HillShadeConfiguration(elevationModel);
             }
-          } else {
+            if (this.image == null) {
+              this.image = new GriddedElevationModelImage(this.rasterizer);
+            }
+            if (this.image.getElevationModel() != elevationModel) {
+              this.image.setElevationModel(elevationModel);
+              this.redraw = true;
+            }
+          }
+
+          if (this.image.hasImage() && !this.redraw) {
             final BoundingBox boundingBox = layer.getBoundingBox();
             final Graphics2D graphics = viewport.getGraphics();
             if (graphics != null) {
@@ -71,6 +63,22 @@ public class GriddedElevationModelLayerRenderer
                 layer.getOpacity() / 255.0, interpolationMethod);
               GeoreferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, graphics,
                 boundingBox);
+            }
+          } else {
+            synchronized (this) {
+              if (this.redraw && this.worker == null) {
+                this.redraw = false;
+                this.worker = new Thread(() -> {
+                  synchronized (this) {
+                    if (this.worker == Thread.currentThread()) {
+                      this.image.redraw();
+                      this.worker = null;
+                    }
+                    layer.redraw();
+                  }
+                });
+                this.worker.start();
+              }
             }
           }
         }
