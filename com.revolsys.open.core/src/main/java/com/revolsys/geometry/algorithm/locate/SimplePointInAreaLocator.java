@@ -53,12 +53,12 @@ import com.revolsys.geometry.model.Polygonal;
  */
 public class SimplePointInAreaLocator implements PointOnGeometryLocator {
 
-  private static boolean containsPoint(final Geometry geometry, final Point point) {
+  private static boolean containsPoint(final Geometry geometry, final double x, final double y) {
     if (geometry instanceof Polygon) {
-      return containsPointInPolygon((Polygon)geometry, point);
+      return containsPointInPolygon((Polygon)geometry, x, y);
     } else if (geometry.isGeometryCollection()) {
       for (final Geometry part : geometry.geometries()) {
-        if (containsPoint(part, point)) {
+        if (containsPoint(part, x, y)) {
           return true;
         }
       }
@@ -66,16 +66,17 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
     return false;
   }
 
-  public static boolean containsPointInPolygon(final Polygon polygon, final Point point) {
+  public static boolean containsPointInPolygon(final Polygon polygon, final double x,
+    final double y) {
     if (polygon.isEmpty()) {
       return false;
     } else {
       final LinearRing shell = polygon.getShell();
-      if (!isPointInRing(shell, point)) {
+      if (!isPointInRing(shell, x, y)) {
         return false;
       } else {
         for (final LinearRing hole : polygon.holes()) {
-          if (isPointInRing(hole, point)) {
+          if (isPointInRing(hole, x, y)) {
             return false;
           }
         }
@@ -92,11 +93,21 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
    *
    * @return true if the point lies inside the ring
    */
-  private static boolean isPointInRing(final LinearRing ring, final Point point) {
-    if (point.intersects(ring.getBoundingBox())) {
-      return ring.isPointInRing(point);
+  private static boolean isPointInRing(final LinearRing ring, final double x, final double y) {
+    if (ring.getBoundingBox().intersects(x, y)) {
+      return ring.isPointInRing(x, y);
     } else {
       return false;
+    }
+  }
+
+  public static Location locate(final Geometry geom, final double x, final double y) {
+    if (geom.isEmpty()) {
+      return Location.EXTERIOR;
+    } else if (containsPoint(geom, x, y)) {
+      return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
     }
   }
 
@@ -109,13 +120,9 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
    * @return the Location of the point in the geometry
    */
   public static Location locate(final Point p, final Geometry geom) {
-    if (geom.isEmpty()) {
-      return Location.EXTERIOR;
-    } else if (containsPoint(geom, p)) {
-      return Location.INTERIOR;
-    } else {
-      return Location.EXTERIOR;
-    }
+    final double x = p.getX();
+    final double y = p.getY();
+    return locate(geom, x, y);
   }
 
   private final Geometry geometry;
@@ -125,8 +132,12 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
   }
 
   @Override
+  public Location locate(final double x, final double y) {
+    return SimplePointInAreaLocator.locate(this.geometry, x, y);
+  }
+
+  @Override
   public Location locate(final Point p) {
     return SimplePointInAreaLocator.locate(p, this.geometry);
   }
-
 }

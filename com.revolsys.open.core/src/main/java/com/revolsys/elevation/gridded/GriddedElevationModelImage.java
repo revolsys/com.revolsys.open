@@ -39,6 +39,10 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
     return this.elevationModel;
   }
 
+  public GriddedElevationModelRasterizer getRasterizer() {
+    return this.rasterizer;
+  }
+
   public boolean hasImage() {
     return this.imageBuffer != null;
   }

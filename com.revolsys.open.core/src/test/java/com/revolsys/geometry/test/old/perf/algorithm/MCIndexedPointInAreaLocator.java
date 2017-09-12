@@ -134,6 +134,17 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
     }
   }
 
+  @Override
+  public Location locate(final double x, final double y) {
+    final RayCrossingCounter rcc = new RayCrossingCounter(x, y);
+    final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
+    final BoundingBox rayEnv = new BoundingBoxDoubleXY(x, y, this.maxXExtent, y);
+    final List mcs = this.index.query(rayEnv);
+    countSegs(rcc, rayEnv, mcs, mcSegCounter);
+
+    return rcc.getLocation();
+  }
+
   /**
    * Determines the {@link Location} of a point in an areal {@link Geometry}.
    *
@@ -142,14 +153,9 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
    */
   @Override
   public Location locate(final Point p) {
-    final RayCrossingCounter rcc = new RayCrossingCounter(p);
-    final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
-    final BoundingBox rayEnv = new BoundingBoxDoubleXY(p.getX(), p.getY(), this.maxXExtent,
-      p.getY());
-    final List mcs = this.index.query(rayEnv);
-    countSegs(rcc, rayEnv, mcs, mcSegCounter);
-
-    return rcc.getLocation();
+    final double x = p.getX();
+    final double y = p.getY();
+    return locate(x, y);
   }
 
 }

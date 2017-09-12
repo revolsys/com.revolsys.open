@@ -54,12 +54,19 @@ public class SimpleRayCrossingStressTest extends TestCase {
     }
 
     @Override
-    public Location locate(final Point p) {
-      final RayCrossingCounter rcc = new RayCrossingCounter(p);
+    public Location locate(final double x, final double y) {
+      final RayCrossingCounter rcc = new RayCrossingCounter(x, y);
       for (final Segment segment : this.geom.segments()) {
         rcc.countSegment(segment);
       }
       return rcc.getLocation();
+    }
+
+    @Override
+    public Location locate(final Point p) {
+      final double x = p.getX();
+      final double y = p.getY();
+      return locate(x, y);
     }
   }
 

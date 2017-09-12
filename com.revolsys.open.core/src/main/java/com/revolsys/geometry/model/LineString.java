@@ -1555,7 +1555,8 @@ public interface LineString extends Lineal {
         if (!(x == previousX && y == previousY)) {
           hadSegment = true;
 
-          // we already know that the segment is contained in the rectangle envelope
+          // we already know that the segment is contained in the rectangle
+          // envelope
           if (previousX == x) {
             if (previousX == minX || previousX == maxX) {
               return true;
@@ -1651,6 +1652,10 @@ public interface LineString extends Lineal {
     final double x = point.getX();
     final double y = point.getY();
     return isOnLine(x, y);
+  }
+
+  default boolean isPointInRing(final double x, final double y) {
+    return RayCrossingCounter.locatePointInRing(this, x, y) != Location.EXTERIOR;
   }
 
   default boolean isPointInRing(final Point point) {

@@ -40,7 +40,7 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
   }
 
   private void writeObject(final ObjectOutputStream oos) throws IOException {
-    oos.writeInt(this.recordDefinition.getInstanceId());
+    // oos.writeInt(this.recordDefinition.getInstanceId());
     oos.defaultWriteObject();
   }
 }

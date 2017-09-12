@@ -169,7 +169,8 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
       }
       // check rect point in poly (rect is known not to touch polygon at this
       // point)
-      if (SimplePointInAreaLocator.containsPointInPolygon((Polygon)geom, rectPt)) {
+      if (SimplePointInAreaLocator.containsPointInPolygon((Polygon)geom, rectPt.getX(),
+        rectPt.getY())) {
         this.containsPoint = true;
         return;
       }

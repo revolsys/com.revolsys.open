@@ -43,6 +43,12 @@ public class GreyscaleRasterizer extends AbstractGriddedElevationModelRasterizer
     return colour;
   }
 
+  @Override
+  public void setElevationModel(final GriddedElevationModel elevationModel) {
+    super.setElevationModel(elevationModel);
+    updateCachedFields();
+  }
+
   public void setMaxZ(final double maxZ) {
     this.maxZ = maxZ;
   }

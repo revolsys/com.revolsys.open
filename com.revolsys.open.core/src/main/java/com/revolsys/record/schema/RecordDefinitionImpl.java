@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PreDestroy;
 
@@ -20,7 +19,6 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -41,18 +39,11 @@ import com.revolsys.record.property.ValueRecordDefinitionProperty;
 
 public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   implements RecordDefinition {
-  private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
-
-  private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakKeyValueMap<>();
 
   public static void destroy(final RecordDefinitionImpl... recordDefinitionList) {
     for (final RecordDefinitionImpl recordDefinition : recordDefinitionList) {
       recordDefinition.destroy();
     }
-  }
-
-  public static RecordDefinition getRecordDefinition(final int instanceId) {
-    return RECORD_DEFINITION_CACHE.get(instanceId);
   }
 
   public static RecordDefinitionImpl newRecordDefinition(
@@ -93,8 +84,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   private final List<String> idFieldDefinitionNames = new ArrayList<>();
 
   private final List<FieldDefinition> idFieldDefinitions = new ArrayList<>();
-
-  private final Integer instanceId = INSTANCE_IDS.getAndIncrement();
 
   private final List<String> internalFieldNames = new ArrayList<>();
 
@@ -146,7 +135,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   public RecordDefinitionImpl(final PathName path) {
     super(path);
-    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl(final PathName path, final FieldDefinition... fields) {
@@ -169,7 +157,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       addField(field.clone());
     }
     cloneProperties(properties);
-    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl(final RecordDefinition recordDefinition) {
@@ -177,7 +164,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       recordDefinition.getFields());
     setPolygonRingDirection(recordDefinition.getPolygonRingDirection());
     setIdFieldIndex(recordDefinition.getIdFieldIndex());
-    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl(final RecordStoreSchema schema, final PathName pathName) {
@@ -186,7 +172,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     if (recordStore != null) {
       this.recordFactory = recordStore.getRecordFactory();
     }
-    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl(final RecordStoreSchema schema, final PathName path,
@@ -358,7 +343,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   @PreDestroy
   public void destroy() {
     super.close();
-    RECORD_DEFINITION_CACHE.remove(this.instanceId);
     this.fieldIdMap.clear();
     this.fieldMap.clear();
     this.internalFieldNames.clear();
@@ -643,11 +627,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
-  public int getInstanceId() {
-    return this.instanceId;
-  }
-
-  @Override
   public ClockDirection getPolygonRingDirection() {
     return this.polygonRingDirection;
   }
@@ -736,7 +715,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   private void readObject(final ObjectInputStream ois) throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
-    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl rename(final String path) {

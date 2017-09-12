@@ -93,12 +93,16 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     if (coordinates.length == 2) {
       final double x1 = coordinates[0];
       final double y1 = coordinates[1];
-      final double x2 = x1 + this.tileWidth;
-      final double y2 = y1 + this.tileHeight;
-      return this.geometryFactory.newBoundingBox(x1, y1, x2, y2);
+      return getBoundingBox(x1, y1);
     } else {
       return null;
     }
+  }
+
+  public BoundingBox getBoundingBox(final double x1, final double y1) {
+    final double x2 = x1 + this.tileWidth;
+    final double y2 = y1 + this.tileHeight;
+    return this.geometryFactory.newBoundingBox(x1, y1, x2, y2);
   }
 
   @Override

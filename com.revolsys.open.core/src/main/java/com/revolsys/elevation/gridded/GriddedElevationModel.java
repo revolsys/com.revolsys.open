@@ -22,6 +22,7 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 import com.revolsys.util.function.DoubleConsumer3;
 
 public interface GriddedElevationModel extends ObjectWithProperties, BoundingBoxProxy {
@@ -584,6 +585,9 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
         for (int gridY = gridYMin; gridY < gridYMax; gridY++) {
           for (int gridX = gridXMin; gridX < gridXMax; gridX++) {
             final double elevation = getElevation(gridX, gridY);
+            if (elevation < -1000) {
+              Debug.noOp();
+            }
             if (Double.isFinite(elevation)) {
               count++;
               sum += elevation;

@@ -5,8 +5,8 @@ import java.awt.Graphics2D;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelImage;
+import com.revolsys.elevation.gridded.rasterizer.GreyscaleRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
-import com.revolsys.elevation.gridded.rasterizer.HillShadeConfiguration;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
@@ -43,13 +43,18 @@ public class GriddedElevationModelLayerRenderer
         if (elevationModel != null) {
           synchronized (this) {
             if (this.rasterizer == null) {
-              this.rasterizer = new HillShadeConfiguration(elevationModel);
+              // this.rasterizer = new HillShadeConfiguration(elevationModel);
+              this.rasterizer = new GreyscaleRasterizer(elevationModel);
             }
             if (this.image == null) {
               this.image = new GriddedElevationModelImage(this.rasterizer);
             }
             if (this.image.getElevationModel() != elevationModel) {
               this.image.setElevationModel(elevationModel);
+              this.redraw = true;
+            }
+            if (this.rasterizer != this.image.getRasterizer()) {
+              this.image.setRasterizer(this.rasterizer);
               this.redraw = true;
             }
           }

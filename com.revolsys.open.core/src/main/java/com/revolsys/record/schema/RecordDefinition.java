@@ -177,8 +177,6 @@ public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchem
 
   List<FieldDefinition> getIdFields();
 
-  int getInstanceId();
-
   ClockDirection getPolygonRingDirection();
 
   @Override

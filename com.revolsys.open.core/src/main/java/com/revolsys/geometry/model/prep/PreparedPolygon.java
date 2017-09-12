@@ -40,6 +40,7 @@ import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -283,6 +284,24 @@ public class PreparedPolygon extends AbstractPolygon {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public boolean intersects(final Point point) {
+    // TODO Auto-generated method stub
+    return super.intersects(point);
+  }
+
+  @Override
+  public Location locate(final double x, final double y) {
+    final PointOnGeometryLocator pointLocator = getPointLocator();
+    return pointLocator.locate(x, y);
+  }
+
+  @Override
+  public Location locate(final Point point) {
+    final PointOnGeometryLocator pointLocator = getPointLocator();
+    return pointLocator.locate(point);
   }
 
   @SuppressWarnings("deprecation")
