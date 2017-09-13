@@ -27,8 +27,11 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -65,12 +68,11 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.ProjectFramePanel;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
-import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.preferences.PreferenceFields;
-import com.revolsys.util.Booleans;
+import com.revolsys.swing.table.NumberTableCellRenderer;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
@@ -216,18 +218,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       }
     }
     return false;
-  }
-
-  protected boolean checkShowProperties() {
-    boolean show = true;
-    synchronized (this) {
-      if (Booleans.getBoolean(getProperty("INTERNAL_PROPERTIES_VISIBLE"))) {
-        show = false;
-      } else {
-        setProperty("INTERNAL_PROPERTIES_VISIBLE", true);
-      }
-    }
-    return show;
   }
 
   public void clearPluginConfig(final String pluginName) {
@@ -673,9 +663,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       tabPanel.addTab("Spatial", "world", panel);
 
       final JPanel extentPanel = Panels.titledTransparent("Extent");
+      extentPanel.setLayout(new BorderLayout());
       final BoundingBox boundingBox = getBoundingBox();
       if (boundingBox == null || boundingBox.isEmpty()) {
-        extentPanel.add(new JLabel("Unknown"));
+        extentPanel.add(new JLabel("Unknown"), BorderLayout.CENTER);
 
       } else {
         final JLabel extentLabel = new JLabel("<html><table cellspacing=\"3\" style=\"margin:0px\">"
@@ -688,10 +679,32 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
           + DataTypes.toString(boundingBox.getMinimum(1)) + "</td><td>&nbsp;</td></tr><tr>"
           + "</tr></table></html>");
         extentLabel.setFont(SwingUtil.FONT);
-        extentPanel.add(extentLabel);
+        extentPanel.add(extentLabel, BorderLayout.CENTER);
 
+        final int boundingBoxAxisCount = boundingBox.getAxisCount();
+        final DefaultTableModel boundingBoxTableModel = new DefaultTableModel(new Object[] {
+          "AXIS", "MIN", "MAX"
+        }, 0);
+        boundingBoxTableModel.addRow(new Object[] {
+          "X", boundingBox.getMinX(), boundingBox.getMaxY()
+        });
+        boundingBoxTableModel.addRow(new Object[] {
+          "Y", boundingBox.getMinY(), boundingBox.getMaxY()
+        });
+        if (boundingBoxAxisCount > 2) {
+          boundingBoxTableModel.addRow(new Object[] {
+            "Z", boundingBox.getMinZ(), boundingBox.getMaxZ()
+          });
+        }
+        final JXTable boundingBoxTable = new JXTable(boundingBoxTableModel);
+        boundingBoxTable.setVisibleRowCount(3);
+        boundingBoxTable.setDefaultEditor(Object.class, null);
+        boundingBoxTable.setDefaultRenderer(Object.class, new NumberTableCellRenderer());
+        final JScrollPane boundingBoxScroll = new JScrollPane(boundingBoxTable);
+        extentPanel.add(boundingBoxScroll, BorderLayout.EAST);
+        boundingBoxTable.getColumnExt(0).setMaxWidth(31);
       }
-      GroupLayouts.makeColumns(extentPanel, 1, true);
+
       panel.add(extentPanel);
 
       final JPanel coordinateSystemPanel = Panels.titledTransparent("Coordinate System");
@@ -1109,28 +1122,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
             final Window window = SwingUtilities.getWindowAncestor(map);
             final TabbedValuePanel panel = newPropertiesPanel();
             panel.setSelectdTab(tabName);
-            panel.showDialog(window);
-            refresh();
-          } finally {
-            removeProperty("INTERNAL_PROPERTIES_VISIBLE");
-          }
-        }
-      }
-    }
-  }
-
-  @Override
-  public void showRendererProperties(final LayerRenderer<?> renderer) {
-    final MapPanel map = getMapPanel();
-    if (map != null) {
-      if (this.exists) {
-        if (checkShowProperties()) {
-          try {
-            final Window window = SwingUtilities.getWindowAncestor(map);
-            final TabbedValuePanel panel = newPropertiesPanel();
-            panel.setSelectdTab("Style");
-            final LayerStylePanel stylePanel = panel.getTab("Style");
-            stylePanel.setSelectedRenderer(renderer);
             panel.showDialog(window);
             refresh();
           } finally {

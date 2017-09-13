@@ -5,13 +5,16 @@ import java.awt.image.DataBuffer;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.properties.ObjectWithProperties;
 
 public interface GriddedElevationModelRasterizer
-  extends BoundingBoxProxy, PropertyChangeSupportProxy {
+  extends BoundingBoxProxy, PropertyChangeSupportProxy, ObjectWithProperties {
 
   GriddedElevationModel getElevationModel();
 
   int getHeight();
+
+  String getName();
 
   default int getValue(final int index) {
     final int width = getWidth();

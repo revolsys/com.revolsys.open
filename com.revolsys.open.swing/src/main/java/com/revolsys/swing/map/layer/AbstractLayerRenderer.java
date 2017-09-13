@@ -130,17 +130,6 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     return renderers;
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public <V extends LayerRenderer<?>> V getRenderer(final List<String> path) {
-    if (path.isEmpty()) {
-      return null;
-    } else if (path.get(0).equals(getName())) {
-      return (V)this;
-    }
-    return null;
-  }
-
   public String getType() {
     return this.type;
   }
@@ -158,6 +147,10 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     } else {
       return this.parent.isEditing();
     }
+  }
+
+  public boolean isHasParent() {
+    return getParent() != null;
   }
 
   @Override

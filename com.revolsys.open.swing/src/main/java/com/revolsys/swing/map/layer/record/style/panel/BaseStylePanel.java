@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -161,10 +162,15 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
   }
 
   protected void addFields(final JPanel container, final Object object,
-    final String... fieldNames) {
+    final List<String> fieldNames) {
     for (final String fieldName : fieldNames) {
       addField(container, object, fieldName);
     }
+  }
+
+  protected void addFields(final JPanel container, final Object object,
+    final String... fieldNames) {
+    addFields(container, object, Arrays.asList(fieldNames));
   }
 
   protected void addLengthMeasureField(final JPanel container, final Object object,
@@ -206,13 +212,18 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
   }
 
   protected JPanel addPanel(final Container container, final String title, final Object object,
-    final String... fieldNames) {
+    final List<String> fieldNames) {
     final JPanel panel = Panels.titledTransparent(title);
 
     addFields(panel, object, fieldNames);
     GroupLayouts.makeColumns(panel, 2, true);
     container.add(panel);
     return panel;
+  }
+
+  protected JPanel addPanel(final Container container, final String title, final Object object,
+    final String... fieldNames) {
+    return addPanel(container, title, object, Arrays.asList(fieldNames));
   }
 
   protected void addPolygonStylePanel(final JPanel stylePanels, final GeometryStyle geometryStyle) {

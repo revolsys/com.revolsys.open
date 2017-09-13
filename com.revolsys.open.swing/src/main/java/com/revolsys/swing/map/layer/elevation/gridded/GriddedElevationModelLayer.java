@@ -12,7 +12,6 @@ import java.util.function.Predicate;
 import javax.swing.JFileChooser;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
@@ -22,6 +21,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileNameExtensionFilter;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
@@ -32,6 +32,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
@@ -111,8 +112,6 @@ public class GriddedElevationModelLayer extends AbstractLayer {
 
   private GriddedElevationModel elevationModel;
 
-  private int opacity = 255;
-
   private Resource resource;
 
   private String url;
@@ -123,12 +122,12 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     setSelectSupported(false);
     setQuerySupported(false);
     setReadOnly(true);
-    final GriddedElevationModelLayerRenderer renderer = new GriddedElevationModelLayerRenderer(
-      this);
-    setRenderer(renderer);
-    final int opacity = Maps.getInteger(properties, "opacity", 255);
-    setOpacity(opacity);
-    setIcon(Icons.getIcon("picture"));
+    if (getRenderer() == null) {
+      final MultipleGriddedElevationModelLayerRenderer renderer = new MultipleGriddedElevationModelLayerRenderer(
+        this);
+      setRenderer(renderer);
+    }
+    setIcon(Icons.getIcon("gridded_dem"));
   }
 
   @Override
@@ -167,10 +166,6 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     }
   }
 
-  public int getOpacity() {
-    return this.opacity;
-  }
-
   @Override
   protected boolean initializeDo() {
     final String url = getProperty("url");
@@ -193,8 +188,15 @@ public class GriddedElevationModelLayer extends AbstractLayer {
   @Override
   public TabbedValuePanel newPropertiesPanel() {
     final TabbedValuePanel propertiesPanel = super.newPropertiesPanel();
-
+    newPropertiesPanelStyle(propertiesPanel);
     return propertiesPanel;
+  }
+
+  protected void newPropertiesPanelStyle(final TabbedValuePanel propertiesPanel) {
+    if (getRenderer() != null) {
+      final LayerStylePanel stylePanel = new LayerStylePanel(this);
+      propertiesPanel.addTab("Style", "palette", stylePanel);
+    }
   }
 
   @Override
@@ -234,7 +236,7 @@ public class GriddedElevationModelLayer extends AbstractLayer {
 
   @Override
   protected void refreshDo() {
-    final GriddedElevationModelLayerRenderer renderer = getRenderer();
+    final AbstractGriddedElevationModelLayerRenderer renderer = getRenderer();
     renderer.refresh();
     redraw();
   }
@@ -295,18 +297,29 @@ public class GriddedElevationModelLayer extends AbstractLayer {
       setExists(true);
       Property.addListener(elevationModel, this);
     }
+    final AbstractGriddedElevationModelLayerRenderer renderer = getRenderer();
+    if (renderer != null) {
+      renderer.setElevationModel(elevationModel);
+    }
     firePropertyChange("elevationModel", old, this.elevationModel);
   }
 
-  public void setOpacity(int opacity) {
-    final int oldValue = this.opacity;
-    if (opacity < 0) {
-      opacity = 0;
-    } else if (opacity > 255) {
-      opacity = 255;
+  @SuppressWarnings("unchecked")
+  public void setStyle(Object style) {
+    if (style instanceof Map) {
+      final Map<String, Object> map = (Map<String, Object>)style;
+      style = MapObjectFactory.toObject(map);
     }
-    this.opacity = opacity;
-    firePropertyChange("opacity", oldValue, opacity);
+    if (style instanceof MultipleGriddedElevationModelLayerRenderer) {
+      final MultipleGriddedElevationModelLayerRenderer renderer = (MultipleGriddedElevationModelLayerRenderer)style;
+      setRenderer(renderer);
+    } else if (style instanceof RasterizerGriddedElevationModelLayerRenderer) {
+      final MultipleGriddedElevationModelLayerRenderer renderer = new MultipleGriddedElevationModelLayerRenderer(
+        this, (RasterizerGriddedElevationModelLayerRenderer)style);
+      setRenderer(renderer);
+    } else {
+      Logs.error(this, "Cannot create renderer for: " + style);
+    }
   }
 
   @Override
@@ -316,10 +329,7 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     map.remove("selectSupported");
     map.remove("editable");
     map.remove("readOnly");
-    map.remove("showOriginalImage");
-    map.remove("imageSettings");
     addToMap(map, "url", this.url);
-    addToMap(map, "opacity", this.opacity, 1);
     return map;
   }
 
@@ -334,4 +344,5 @@ public class GriddedElevationModelLayer extends AbstractLayer {
 
     project.setViewBoundingBox(boundingBox);
   }
+
 }

@@ -1,10 +1,14 @@
 package com.revolsys.elevation.gridded.rasterizer;
 
+import java.util.Map;
+
 import com.revolsys.awt.WebColors;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.util.MathUtil;
 
-public class HillShadeConfiguration extends AbstractGriddedElevationModelRasterizer {
+public class HillShadeGriddedElevationModelRasterizer
+  extends AbstractGriddedElevationModelRasterizer {
   private static final double PI_TIMES_2_MINUS_PI_OVER_2 = MathUtil.PI_TIMES_2 - MathUtil.PI_OVER_2;
 
   private double zenithRadians;
@@ -15,21 +19,32 @@ public class HillShadeConfiguration extends AbstractGriddedElevationModelRasteri
 
   private double sinZenithRadians;
 
-  private final double oneDivCellSizeTimes8;
+  private double oneDivCellSizeTimes8;
 
-  private final double zFactor = 1;
+  private double zFactor = 1;
 
   private double zenithDegrees;
 
   private double azimuthDegrees;
 
-  public HillShadeConfiguration(final GriddedElevationModel elevationModel) {
-    super(elevationModel);
-    final double cellSize = elevationModel.getGridCellSize();
-    this.oneDivCellSizeTimes8 = 1.0 / (8 * cellSize);
-
+  public HillShadeGriddedElevationModelRasterizer() {
+    super("hillShadeGriddedElevationModelRasterizer");
     setZenithDegrees(45.0);
     setAzimuthDegrees(315.0);
+  }
+
+  public HillShadeGriddedElevationModelRasterizer(final GriddedElevationModel elevationModel) {
+    this();
+    setElevationModel(elevationModel);
+  }
+
+  public HillShadeGriddedElevationModelRasterizer(final Map<String, ? extends Object> config) {
+    this();
+    setProperties(config);
+  }
+
+  public double getAzimuthDegrees() {
+    return this.azimuthDegrees;
   }
 
   private int getHillShade(final double a, final double b, final double c, final double d,
@@ -61,6 +76,11 @@ public class HillShadeConfiguration extends AbstractGriddedElevationModelRasteri
         * Math.sin(slopeRadians) * Math.cos(this.azimuthRadians - aspectRadians)));
 
     return WebColors.colorToRGB(255, hillshade, hillshade, hillshade);
+  }
+
+  @Override
+  public String getName() {
+    return "Hillshade";
   }
 
   @Override
@@ -159,11 +179,28 @@ public class HillShadeConfiguration extends AbstractGriddedElevationModelRasteri
     }
   }
 
+  public double getZenithDegrees() {
+    return this.zenithDegrees;
+  }
+
+  public double getzFactor() {
+    return this.zFactor;
+  }
+
   public void setAzimuthDegrees(final double azimuthDegrees) {
     final double oldValue = this.azimuthDegrees;
     this.azimuthDegrees = azimuthDegrees;
     this.azimuthRadians = Math.toRadians(360 - azimuthDegrees + 90);
     firePropertyChange("azimuthDegrees", oldValue, azimuthDegrees);
+  }
+
+  @Override
+  public void setElevationModel(final GriddedElevationModel elevationModel) {
+    super.setElevationModel(elevationModel);
+    if (elevationModel != null) {
+      final double cellSize = elevationModel.getGridCellSize();
+      this.oneDivCellSizeTimes8 = 1.0 / (8 * cellSize);
+    }
   }
 
   public void setZenithDegrees(final double zenithDegrees) {
@@ -173,5 +210,20 @@ public class HillShadeConfiguration extends AbstractGriddedElevationModelRasteri
     this.cosZenithRadians = Math.cos(this.zenithRadians);
     this.sinZenithRadians = Math.sin(this.zenithRadians);
     firePropertyChange("zenithDegrees", oldValue, zenithDegrees);
+  }
+
+  public void setzFactor(final double zFactor) {
+    final double oldValue = this.zFactor;
+    this.zFactor = zFactor;
+    firePropertyChange("zFactor", oldValue, zFactor);
+  }
+
+  @Override
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
+    map.put("azimuthDegrees", this.azimuthDegrees);
+    map.put("zenithDegrees", this.zenithDegrees);
+    map.put("zFactor", this.zFactor);
+    return map;
   }
 }

@@ -1,11 +1,15 @@
 package com.revolsys.swing;
 
+import com.revolsys.elevation.gridded.rasterizer.ColourGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServer;
 import com.revolsys.swing.map.layer.bing.Bing;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.gridded.MultipleGriddedElevationModelLayerRenderer;
+import com.revolsys.swing.map.layer.elevation.gridded.RasterizerGriddedElevationModelLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
@@ -33,12 +37,8 @@ import com.revolsys.util.ServiceInitializer;
 
 public class RsSwingServiceInitializer implements ServiceInitializer {
   private static void markers() {
-    MapObjectFactoryRegistry.newFactory("markerText", "Marker Font and Text", (config) -> {
-      return new TextMarker(config);
-    });
-    MapObjectFactoryRegistry.newFactory("markerSvg", "Marker SVG", (config) -> {
-      return new SvgMarker(config);
-    });
+    MapObjectFactoryRegistry.newFactory("markerText", "Marker Font and Text", TextMarker::new);
+    MapObjectFactoryRegistry.newFactory("markerSvg", "Marker SVG", SvgMarker::new);
   }
 
   @Override
@@ -50,81 +50,58 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
   }
 
   private void layerRenderers() {
-    MapObjectFactoryRegistry.newFactory("geometryStyle", (config) -> {
-      return new GeometryStyleRenderer(config);
-    });
-    MapObjectFactoryRegistry.newFactory("textStyle", (config) -> {
-      return new TextStyleRenderer(config);
-    });
-    MapObjectFactoryRegistry.newFactory("markerStyle", (config) -> {
-      return new MarkerStyleRenderer(config);
-    });
-    MapObjectFactoryRegistry.newFactory("multipleStyle", (config) -> {
-      return new MultipleRenderer(config);
-    });
-    MapObjectFactoryRegistry.newFactory("scaleStyle", (config) -> {
-      return new ScaleMultipleRenderer(config);
-    });
-    MapObjectFactoryRegistry.newFactory("filterStyle", (config) -> {
-      return new FilterMultipleRenderer(config);
-    });
-    MapObjectFactoryRegistry.newFactory("gridLayerRenderer", (config) -> {
-      return new GridLayerRenderer(config);
-    });
+    MapObjectFactoryRegistry.newFactory("geometryStyle", GeometryStyleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("textStyle", TextStyleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("markerStyle", MarkerStyleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("multipleStyle", MultipleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("scaleStyle", ScaleMultipleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("filterStyle", FilterMultipleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("gridLayerRenderer", GridLayerRenderer::new);
+
+    MapObjectFactoryRegistry.newFactory("hillShadeGriddedElevationModelRasterizer",
+      HillShadeGriddedElevationModelRasterizer::new);
+    MapObjectFactoryRegistry.newFactory("colourGriddedElevationModelRasterizer",
+      ColourGriddedElevationModelRasterizer::new);
+    MapObjectFactoryRegistry.newFactory("rasterizerGriddedElevationModelLayerRenderer",
+      RasterizerGriddedElevationModelLayerRenderer::new);
+
+    MapObjectFactoryRegistry.newFactory("multipleGriddedElevationModelLayerRenderer",
+      MultipleGriddedElevationModelLayerRenderer::new);
   }
 
   private void layers() {
-    MapObjectFactoryRegistry.newFactory("layerGroup", "Layer Group", (config) -> {
-      return LayerGroup.newLayer(config);
-    });
+    MapObjectFactoryRegistry.newFactory("layerGroup", "Layer Group", LayerGroup::newLayer);
 
-    MapObjectFactoryRegistry.newFactory("baseMapLayerGroup", "Base Map Layer Group", (config) -> {
-      return BaseMapLayerGroup.newLayer(config);
-    });
+    MapObjectFactoryRegistry.newFactory("baseMapLayerGroup", "Base Map Layer Group",
+      BaseMapLayerGroup::newLayer);
 
-    MapObjectFactoryRegistry.newFactory("recordFileLayer", "File", (config) -> {
-      return FileRecordLayer.newLayer(config);
-    });
+    MapObjectFactoryRegistry.newFactory("recordFileLayer", "File", FileRecordLayer::newLayer);
 
-    MapObjectFactoryRegistry.newFactory("recordStoreLayer", "Record Store Layer", (config) -> {
-      return new RecordStoreLayer(config);
-    });
+    MapObjectFactoryRegistry.newFactory("recordStoreLayer", "Record Store Layer",
+      RecordStoreLayer::new);
 
     MapObjectFactoryRegistry.newFactory("openStreetMapVectorApi", "Open Street Map (Vector API)",
-      (config) -> {
-        return OpenStreetMapApiLayer.newLayer(config);
-      });
+      OpenStreetMapApiLayer::newLayer);
 
-    MapObjectFactoryRegistry.newFactory("gridLayer", "Grid Layer", (config) -> {
-      return GridLayer.newLayer(config);
-    });
+    MapObjectFactoryRegistry.newFactory("gridLayer", "Grid Layer", GridLayer::newLayer);
 
-    MapObjectFactoryRegistry.newFactory("wikipedia", "Wikipedia Articles", (config) -> {
-      return WikipediaBoundingBoxLayerWorker.newLayer(config);
-    });
+    MapObjectFactoryRegistry.newFactory("wikipedia", "Wikipedia Articles",
+      WikipediaBoundingBoxLayerWorker::newLayer);
 
-    MapObjectFactoryRegistry.newFactory("geoname", "Geoname.org", (config) -> {
-      return GeoNamesBoundingBoxLayerWorker.newLayer(config);
-    });
+    MapObjectFactoryRegistry.newFactory("geoname", "Geoname.org",
+      GeoNamesBoundingBoxLayerWorker::newLayer);
 
     MapObjectFactoryRegistry.newFactory("geoReferencedImageLayer", "Geo-referenced Image Layer",
-      (config) -> {
-        return GeoreferencedImageLayer.newLayer(config);
-      });
+      GeoreferencedImageLayer::newLayer);
 
     MapObjectFactoryRegistry.newFactory("griddedElevationModelLayer",
-      "Gridded Elevation Model Layer", (config) -> {
-        return new GriddedElevationModelLayer(config);
-      });
+      "Gridded Elevation Model Layer", GriddedElevationModelLayer::new);
 
     MapObjectFactoryRegistry.newFactory("triangulatedIrregularNetworkLayer",
-      "Triangulated Irregular Network Layer", (config) -> {
-        return new TriangulatedIrregularNetworkLayer(config);
-      });
+      "Triangulated Irregular Network Layer", TriangulatedIrregularNetworkLayer::new);
 
-    MapObjectFactoryRegistry.newFactory("pointCloudLayer", "Point Cloud Layer", (config) -> {
-      return new PointCloudLayer(config);
-    });
+    MapObjectFactoryRegistry.newFactory("pointCloudLayer", "Point Cloud Layer",
+      PointCloudLayer::new);
 
     ArcGisRestServer.factoryInit();
 
@@ -134,9 +111,8 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
 
     OgcWms.factoryInit();
 
-    MapObjectFactoryRegistry.newFactory("openStreetMap", "Open Street Map Tiles", (config) -> {
-      return new OpenStreetMapLayer(config);
-    });
+    MapObjectFactoryRegistry.newFactory("openStreetMap", "Open Street Map Tiles",
+      OpenStreetMapLayer::new);
 
     WebMercatorTileCache.factoryInit();
   }

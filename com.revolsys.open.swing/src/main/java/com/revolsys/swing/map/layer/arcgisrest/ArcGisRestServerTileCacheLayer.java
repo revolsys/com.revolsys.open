@@ -220,8 +220,14 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);
 
     final String url = getUrl();
-    SwingUtil.addLabelledReadOnlyTextField(panel, "URL", url);
-    GroupLayouts.makeColumns(panel, 2, true);
+    if (Property.hasValue(url)) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "URL", url);
+    }
+    if (this.mapService != null) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Service URL", this.mapService.getServiceUrl());
+    }
+    SwingUtil.addLabelledReadOnlyTextField(panel, "Service Path", this.servicePath);
+    GroupLayouts.makeColumns(panel, panel.getComponentCount() / 2, true);
     return panel;
   }
 

@@ -9,22 +9,20 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
-import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRenderer {
+public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRenderer
+  implements MultipleLayerRenderer<AbstractRecordLayer, AbstractRecordLayerRenderer> {
   static {
-    MenuFactory.addMenuInitializer(AbstractMultipleRenderer.class, (menu) -> {
+    MenuFactory.addMenuInitializer(AbstractMultipleRenderer.class, menu -> {
 
       addAddMenuItem(menu, "Geometry", GeometryStyleRenderer::new);
       addAddMenuItem(menu, "Text", TextStyleRenderer::new);
@@ -78,10 +76,12 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     super(type, name);
   }
 
+  @Override
   public int addRenderer(final AbstractRecordLayerRenderer renderer) {
     return addRenderer(-1, renderer);
   }
 
+  @Override
   public int addRenderer(int index, final AbstractRecordLayerRenderer renderer) {
     if (renderer == null) {
       return -1;
@@ -106,17 +106,9 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     }
   }
 
-  public void addRendererEdit(final AbstractRecordLayerRenderer renderer) {
-    addRenderer(-1, renderer);
-    final Object item = MenuFactory.getMenuSource();
-    if (item instanceof BaseTreeNode) {
-      final BaseTreeNode node = (BaseTreeNode)item;
-      final BaseTree tree = node.getTree();
-      if (tree.isPropertyEqual("treeType", Project.class.getName())) {
-        final AbstractRecordLayer layer = renderer.getLayer();
-        layer.showRendererProperties(renderer);
-      }
-    }
+  @Override
+  public boolean canAddChild(final Object object) {
+    return object instanceof AbstractRecordLayerRenderer;
   }
 
   @Override
@@ -188,57 +180,10 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public <V extends LayerRenderer<?>> V getRenderer(final List<String> path) {
-    LayerRenderer<?> renderer = this;
-    final int pathSize = path.size();
-    for (int i = 0; i < pathSize; i++) {
-      final String name = path.get(i);
-      final String rendererName = renderer.getName();
-      if (DataType.equal(name, rendererName)) {
-        if (i < pathSize - 1) {
-          final String childName = path.get(i + 1);
-          if (renderer instanceof AbstractMultipleRenderer) {
-            final AbstractMultipleRenderer multipleRenderer = (AbstractMultipleRenderer)renderer;
-            renderer = multipleRenderer.getRenderer(childName);
-          }
-        }
-      } else {
-        return null;
-      }
-    }
-    return (V)renderer;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V extends LayerRenderer<?>> V getRenderer(final String name) {
-    if (Property.hasValue(name)) {
-      for (final LayerRenderer<?> renderer : this.renderers) {
-        final String rendererName = renderer.getName();
-        if (DataType.equal(name, rendererName)) {
-          return (V)renderer;
-        }
-      }
-    }
-    return null;
-  }
-
   public List<AbstractRecordLayerRenderer> getRenderers() {
     synchronized (this.renderers) {
       return new ArrayList<>(this.renderers);
     }
-  }
-
-  public boolean hasRendererWithSameName(final LayerRenderer<?> renderer, final String name) {
-    for (final AbstractRecordLayerRenderer otherRenderer : this.renderers) {
-      if (renderer != otherRenderer) {
-        final String layerName = otherRenderer.getName();
-        if (name.equals(layerName)) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   public boolean isEmpty() {
@@ -266,6 +211,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     }
   }
 
+  @Override
   public int removeRenderer(final AbstractRecordLayerRenderer renderer) {
     boolean removed = false;
     synchronized (this.renderers) {

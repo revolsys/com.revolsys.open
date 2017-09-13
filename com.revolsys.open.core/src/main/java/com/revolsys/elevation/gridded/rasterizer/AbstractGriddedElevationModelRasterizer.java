@@ -1,11 +1,13 @@
 package com.revolsys.elevation.gridded.rasterizer;
 
-import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.io.map.MapSerializer;
+import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 
-public abstract class AbstractGriddedElevationModelRasterizer
-  extends AbstractPropertyChangeSupportProxy implements GriddedElevationModelRasterizer {
+public abstract class AbstractGriddedElevationModelRasterizer extends
+  BaseObjectWithPropertiesAndChange implements GriddedElevationModelRasterizer, MapSerializer {
 
   protected GriddedElevationModel elevationModel;
 
@@ -13,8 +15,10 @@ public abstract class AbstractGriddedElevationModelRasterizer
 
   protected int height;
 
-  public AbstractGriddedElevationModelRasterizer(final GriddedElevationModel elevationModel) {
-    setElevationModel(elevationModel);
+  private final String type;
+
+  public AbstractGriddedElevationModelRasterizer(final String type) {
+    this.type = type;
   }
 
   @Override
@@ -40,8 +44,16 @@ public abstract class AbstractGriddedElevationModelRasterizer
   @Override
   public void setElevationModel(final GriddedElevationModel elevationModel) {
     this.elevationModel = elevationModel;
-    this.width = elevationModel.getGridWidth();
-    this.height = elevationModel.getGridHeight();
+    if (elevationModel != null) {
+      this.width = elevationModel.getGridWidth();
+      this.height = elevationModel.getGridHeight();
+    }
+  }
+
+  @Override
+  public MapEx toMap() {
+    final MapEx map = newTypeMap(this.type);
+    return map;
   }
 
 }

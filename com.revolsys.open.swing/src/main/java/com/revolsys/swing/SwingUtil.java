@@ -127,9 +127,11 @@ public interface SwingUtil {
 
   static void addLabelledReadOnlyTextField(final JPanel container, final String fieldName,
     final Object value) {
-    final String string = DataTypes.toString(value);
-    final int length = Math.max(1, string.length());
-    addLabelledReadOnlyTextField(container, fieldName, value, length);
+    if (value != null) {
+      final String string = DataTypes.toString(value);
+      final int length = Math.max(1, string.length());
+      addLabelledReadOnlyTextField(container, fieldName, value, length);
+    }
   }
 
   static void addLabelledReadOnlyTextField(final JPanel container, final String fieldName,

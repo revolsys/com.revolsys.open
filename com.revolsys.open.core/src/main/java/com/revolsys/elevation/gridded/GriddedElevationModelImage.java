@@ -8,6 +8,7 @@ import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
 
 import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizerDataBuffer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.AbstractGeoreferencedImage;
 
@@ -17,6 +18,8 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
   private GriddedElevationModelRasterizer rasterizer;
 
   private GriddedElevationModel elevationModel;
+
+  private boolean cached;
 
   public GriddedElevationModelImage(final GriddedElevationModelRasterizer rasterizer) {
     this.rasterizer = rasterizer;
@@ -47,17 +50,24 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
     return this.imageBuffer != null;
   }
 
+  public boolean isCached() {
+    return this.cached;
+  }
+
   public void redraw() {
     synchronized (this) {
       if (this.imageBuffer == null) {
         final int width = this.elevationModel.getGridWidth();
         final int height = this.elevationModel.getGridHeight();
         final ColorModel colorModel = ColorModel.getRGBdefault();
-        final DataBuffer imageBuffer = new TempFileMappedIntDataBuffer(width, height);
-
+        final DataBuffer imageBuffer;
+        if (this.cached) {
+          imageBuffer = new TempFileMappedIntDataBuffer(width, height);
+        } else {
+          imageBuffer = new GriddedElevationModelRasterizerDataBuffer(this.rasterizer);
+        }
         final SampleModel sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_INT, width,
-          height,
-          new int[] { //
+          height, new int[] { //
             0x00ff0000, // Red
             0x0000ff00, // Green
             0x000000ff, // Blue
@@ -67,11 +77,25 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
         final WritableRaster raster = new IntegerRaster(sampleModel, imageBuffer);
         final BufferedImage image = new BufferedImage(colorModel, raster, false, null);
 
+        if (this.cached) {
+          this.rasterizer.rasterize(imageBuffer);
+        }
         setRenderedImage(image);
-        this.rasterizer.rasterize(imageBuffer);
         this.imageBuffer = imageBuffer;
       } else {
-        this.rasterizer.rasterize(this.imageBuffer);
+        if (this.cached) {
+          this.rasterizer.rasterize(this.imageBuffer);
+        }
+      }
+    }
+  }
+
+  public void setCached(final boolean cached) {
+    synchronized (this) {
+      final boolean oldValue = this.cached;
+      if (oldValue != cached) {
+        this.cached = cached;
+        this.imageBuffer = null;
       }
     }
   }
@@ -79,14 +103,16 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
   public void setElevationModel(final GriddedElevationModel elevationModel) {
     this.elevationModel = elevationModel;
     this.rasterizer.setElevationModel(elevationModel);
-    final BoundingBox boundingBox = elevationModel.getBoundingBox();
-    setBoundingBox(boundingBox);
+    if (elevationModel != null) {
+      final BoundingBox boundingBox = elevationModel.getBoundingBox();
+      setBoundingBox(boundingBox);
 
-    final int width = elevationModel.getGridWidth();
-    setImageWidth(width);
+      final int width = elevationModel.getGridWidth();
+      setImageWidth(width);
 
-    final int height = elevationModel.getGridHeight();
-    setImageHeight(height);
+      final int height = elevationModel.getGridHeight();
+      setImageHeight(height);
+    }
   }
 
   public void setRasterizer(final GriddedElevationModelRasterizer rasterizer) {

@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer;
 
+import java.awt.Window;
 import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.SwingUtilities;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.Child;
@@ -17,10 +19,24 @@ import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
+import com.revolsys.util.Booleans;
 
 public interface Layer
   extends GeometryFactoryProxy, PropertyChangeSupportProxy, ObjectWithProperties,
   PropertyChangeListener, Comparable<Layer>, MapSerializer, Child<LayerGroup>, Cloneable {
+
+  default boolean checkShowProperties() {
+    boolean show = true;
+    synchronized (this) {
+      if (Booleans.getBoolean(getProperty("INTERNAL_PROPERTIES_VISIBLE"))) {
+        show = false;
+      } else {
+        setProperty("INTERNAL_PROPERTIES_VISIBLE", true);
+      }
+    }
+    return show;
+  }
 
   void delete();
 
@@ -166,7 +182,22 @@ public interface Layer
 
   void showProperties(String tabName);
 
-  void showRendererProperties(final LayerRenderer<?> renderer);
+  default void showRendererProperties(final LayerRenderer<?> renderer) {
+    final MapPanel map = getMapPanel();
+    if (map != null && isExists() && checkShowProperties()) {
+      try {
+        final Window window = SwingUtilities.getWindowAncestor(map);
+        final TabbedValuePanel panel = newPropertiesPanel();
+        panel.setSelectdTab("Style");
+        final LayerStylePanel stylePanel = panel.getTab("Style");
+        stylePanel.setSelectedRenderer(renderer);
+        panel.showDialog(window);
+        refresh();
+      } finally {
+        removeProperty("INTERNAL_PROPERTIES_VISIBLE");
+      }
+    }
+  }
 
   void showTableView();
 

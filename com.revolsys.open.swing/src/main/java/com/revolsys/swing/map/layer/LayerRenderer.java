@@ -29,7 +29,15 @@ public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
 
   List<LayerRenderer<?>> getPathRenderers();
 
-  <V extends LayerRenderer<?>> V getRenderer(final List<String> path);
+  @SuppressWarnings("unchecked")
+  default <V extends LayerRenderer<?>> V getRenderer(final List<String> path) {
+    if (path.isEmpty()) {
+      return null;
+    } else if (path.get(0).equals(getName())) {
+      return (V)this;
+    }
+    return null;
+  }
 
   boolean isEditing();
 
