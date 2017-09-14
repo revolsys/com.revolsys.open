@@ -2,9 +2,9 @@ package com.revolsys.swing.map.layer.bing;
 
 import java.awt.image.BufferedImage;
 
-import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.map.layer.raster.GeoreferencedImageMapTile;
 
-public class BingMapTile extends MapTile {
+public class BingMapTile extends GeoreferencedImageMapTile {
 
   private final BingLayer layer;
 

@@ -7,12 +7,13 @@ import javax.swing.Icon;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
+import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 
 public abstract class AbstractGriddedElevationModelLayerRenderer
-  extends AbstractLayerRenderer<GriddedElevationModelLayer> {
+  extends AbstractLayerRenderer<IGriddedElevationModelLayer> {
 
   static {
     MenuFactory.addMenuInitializer(AbstractGriddedElevationModelLayerRenderer.class, menu -> {
@@ -65,7 +66,7 @@ public abstract class AbstractGriddedElevationModelLayerRenderer
 
   @Override
   public void setName(final String name) {
-    final MultipleGriddedElevationModelLayerRenderer parent = (MultipleGriddedElevationModelLayerRenderer)getParent();
+    final MultipleLayerRenderer<?, ?> parent = (MultipleLayerRenderer<?, ?>)getParent();
     String newName = name;
     if (parent != null) {
       int i = 1;

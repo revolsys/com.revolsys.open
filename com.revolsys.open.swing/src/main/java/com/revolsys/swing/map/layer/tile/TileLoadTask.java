@@ -1,21 +1,20 @@
-package com.revolsys.swing.map.layer.raster;
+package com.revolsys.swing.map.layer.tile;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
-import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.util.Cancellable;
 
-public class TileLoadTask implements Runnable {
+public class TileLoadTask<D, T extends AbstractMapTile<D>> implements Runnable {
   private final GeometryFactory geometryFactory;
 
-  private final MapTile mapTile;
+  private final T mapTile;
 
-  private final TiledImageLayerRenderer renderer;
+  private final AbstractTiledLayerRenderer<D, T> renderer;
 
   private final Cancellable cancellable;
 
-  public TileLoadTask(final TiledImageLayerRenderer renderer, final Cancellable cancellable,
-    final GeometryFactory geometryFactory, final MapTile mapTile) {
+  public TileLoadTask(final AbstractTiledLayerRenderer<D, T> renderer,
+    final Cancellable cancellable, final GeometryFactory geometryFactory, final T mapTile) {
     this.renderer = renderer;
     this.cancellable = cancellable;
     this.geometryFactory = geometryFactory;
@@ -26,11 +25,11 @@ public class TileLoadTask implements Runnable {
     return this.geometryFactory;
   }
 
-  public MapTile getMapTile() {
+  public T getMapTile() {
     return this.mapTile;
   }
 
-  public TiledImageLayerRenderer getRenderer() {
+  public AbstractTiledLayerRenderer<D, T> getRenderer() {
     return this.renderer;
   }
 
@@ -38,12 +37,12 @@ public class TileLoadTask implements Runnable {
   public void run() {
     try {
       if (!this.cancellable.isCancelled()) {
-        this.mapTile.loadImage(this.geometryFactory);
+        this.mapTile.loadData(this.geometryFactory);
       }
       if (!this.cancellable.isCancelled()) {
         this.renderer.setLoaded(this);
       }
-    } catch (final Throwable e) {
+    } catch (final RuntimeException e) {
       if (!this.cancellable.isCancelled()) {
         Logs.error(this, "Unable to load " + this.mapTile, e);
       }

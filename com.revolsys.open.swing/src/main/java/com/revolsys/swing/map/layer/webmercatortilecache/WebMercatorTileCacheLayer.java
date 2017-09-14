@@ -14,12 +14,12 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
-public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
+public class WebMercatorTileCacheLayer
+  extends AbstractTiledImageLayer<WebMercatorTileCacheMapTile> {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
   private static final BoundingBox MAX_BOUNDING_BOX = GEOMETRY_FACTORY.newBoundingBox(-180, -85,
@@ -59,8 +59,8 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
-    final List<MapTile> tiles = new ArrayList<>();
+  public List<WebMercatorTileCacheMapTile> getOverlappingMapTiles(final Viewport2D viewport) {
+    final List<WebMercatorTileCacheMapTile> tiles = new ArrayList<>();
     try {
       final double metresPerPixel = viewport.getUnitsPerPixel();
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);

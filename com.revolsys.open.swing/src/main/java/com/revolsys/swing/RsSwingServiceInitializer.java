@@ -10,6 +10,8 @@ import com.revolsys.swing.map.layer.bing.Bing;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.gridded.MultipleGriddedElevationModelLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.gridded.RasterizerGriddedElevationModelLayerRenderer;
+import com.revolsys.swing.map.layer.elevation.gridded.TiledGriddedElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.gridded.TiledMultipleGriddedElevationModelLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
@@ -67,6 +69,9 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
 
     MapObjectFactoryRegistry.newFactory("multipleGriddedElevationModelLayerRenderer",
       MultipleGriddedElevationModelLayerRenderer::new);
+
+    MapObjectFactoryRegistry.newFactory("tiledMultipleGriddedElevationModelLayerRenderer",
+      TiledMultipleGriddedElevationModelLayerRenderer::new);
   }
 
   private void layers() {
@@ -96,6 +101,9 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
 
     MapObjectFactoryRegistry.newFactory("griddedElevationModelLayer",
       "Gridded Elevation Model Layer", GriddedElevationModelLayer::new);
+
+    MapObjectFactoryRegistry.newFactory("tiledGriddedElevationModelLayer",
+      "Tiled Gridded Elevation Model Layer", TiledGriddedElevationModelLayer::new);
 
     MapObjectFactoryRegistry.newFactory("triangulatedIrregularNetworkLayer",
       "Triangulated Irregular Network Layer", TriangulatedIrregularNetworkLayer::new);

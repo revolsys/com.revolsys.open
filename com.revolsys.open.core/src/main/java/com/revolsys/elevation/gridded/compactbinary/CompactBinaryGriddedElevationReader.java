@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.MappedByteBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.channels.ReadableByteChannel;
@@ -135,8 +136,14 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
           this.gridCellSize, elevations);
         elevationModel.setResource(this.resource);
         return elevationModel;
-      } catch (final IOException e) {
-        throw Exceptions.wrap("Unable to read DEM: " + this.resource, e);
+      } catch (final ClosedByInterruptException e) {
+        return null;
+      } catch (final IOException | RuntimeException e) {
+        if (Exceptions.isException(e, ClosedByInterruptException.class)) {
+          return null;
+        } else {
+          throw Exceptions.wrap("Unable to read DEM: " + this.resource, e);
+        }
       }
     } else {
       return null;

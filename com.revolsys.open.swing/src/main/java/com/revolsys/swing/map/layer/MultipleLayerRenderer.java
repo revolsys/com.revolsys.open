@@ -13,8 +13,7 @@ import com.revolsys.util.Property;
  *
  * @param <C> The type of child
  */
-public interface MultipleLayerRenderer<L extends Layer, C extends LayerRenderer<L>>
-  extends LayerRenderer<L> {
+public interface MultipleLayerRenderer<L extends Layer, C extends LayerRenderer<L>> {
 
   default int addRenderer(final C renderer) {
     return addRenderer(-1, renderer);
@@ -36,29 +35,6 @@ public interface MultipleLayerRenderer<L extends Layer, C extends LayerRenderer<
   }
 
   boolean canAddChild(Object object);
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends LayerRenderer<?>> V getRenderer(final List<String> path) {
-    LayerRenderer<?> renderer = this;
-    final int pathSize = path.size();
-    for (int i = 0; i < pathSize; i++) {
-      final String name = path.get(i);
-      final String rendererName = renderer.getName();
-      if (DataType.equal(name, rendererName)) {
-        if (i < pathSize - 1) {
-          final String childName = path.get(i + 1);
-          if (renderer instanceof MultipleLayerRenderer) {
-            final MultipleLayerRenderer<?, ?> multipleRenderer = (MultipleLayerRenderer<?, ?>)renderer;
-            renderer = multipleRenderer.getRenderer(childName);
-          }
-        }
-      } else {
-        return null;
-      }
-    }
-    return (V)renderer;
-  }
 
   @SuppressWarnings("unchecked")
   default <V extends LayerRenderer<?>> V getRenderer(final String name) {
@@ -85,6 +61,13 @@ public interface MultipleLayerRenderer<L extends Layer, C extends LayerRenderer<
       }
     }
     return false;
+  }
+
+  boolean isSameLayer(Layer layer);
+
+  default boolean isSameLayer(final LayerRenderer<?> renderer) {
+    final Layer layer = renderer.getLayer();
+    return isSameLayer(layer);
   }
 
   int removeRenderer(final C renderer);

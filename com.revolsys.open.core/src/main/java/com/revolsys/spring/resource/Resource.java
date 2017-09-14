@@ -29,6 +29,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.channels.ChannelReader;
@@ -203,6 +204,11 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   default boolean createParentDirectories() {
     return false;
+  }
+
+  default Resource createRelative(final Object relativePath) {
+    final String path = DataTypes.toString(relativePath);
+    return createRelative(path);
   }
 
   @Override

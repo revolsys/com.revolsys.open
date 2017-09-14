@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.logging.Logs;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -188,6 +189,11 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
 
   public boolean isEmpty() {
     return this.renderers.isEmpty();
+  }
+
+  @Override
+  public boolean isSameLayer(final Layer layer) {
+    return getLayer() == layer;
   }
 
   @Override

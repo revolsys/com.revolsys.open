@@ -190,8 +190,10 @@ public interface Layer
         final TabbedValuePanel panel = newPropertiesPanel();
         panel.setSelectdTab("Style");
         final LayerStylePanel stylePanel = panel.getTab("Style");
-        stylePanel.setSelectedRenderer(renderer);
-        panel.showDialog(window);
+        if (stylePanel != null) {
+          stylePanel.setSelectedRenderer(renderer);
+          panel.showDialog(window);
+        }
         refresh();
       } finally {
         removeProperty("INTERNAL_PROPERTIES_VISIBLE");

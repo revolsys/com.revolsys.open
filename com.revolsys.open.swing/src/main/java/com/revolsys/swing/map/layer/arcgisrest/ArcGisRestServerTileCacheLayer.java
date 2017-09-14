@@ -20,8 +20,7 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.PasswordUtil;
@@ -31,7 +30,8 @@ import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceConnectionManager;
 import com.revolsys.webservice.WebServiceResource;
 
-public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
+public class ArcGisRestServerTileCacheLayer
+  extends AbstractTiledImageLayer<ArcGisRestServerTileCacheMapTile> {
 
   private String username;
 
@@ -96,8 +96,8 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
-    final List<MapTile> tiles = new ArrayList<>();
+  public List<ArcGisRestServerTileCacheMapTile> getOverlappingMapTiles(final Viewport2D viewport) {
+    final List<ArcGisRestServerTileCacheMapTile> tiles = new ArrayList<>();
     final MapService mapService = getMapService();
     if (mapService != null) {
       if (!isHasError()) {

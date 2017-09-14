@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.layer;
+package com.revolsys.swing.map.layer.tile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,26 +6,30 @@ import java.util.List;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.raster.TiledImageLayerRenderer;
+import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.BaseMapLayer;
 
-public abstract class AbstractTiledImageLayer extends AbstractLayer implements BaseMapLayer {
+public abstract class AbstractTiledLayer<D, T extends AbstractMapTile<D>> extends AbstractLayer
+  implements BaseMapLayer {
   private boolean hasError = false;
 
-  public AbstractTiledImageLayer(final String type) {
+  public AbstractTiledLayer(final String type) {
     super(type);
     setReadOnly(true);
     setSelectSupported(false);
     setQuerySupported(false);
-    setRenderer(new TiledImageLayerRenderer(this));
+    setRenderer(newRenderer());
   }
 
-  public abstract List<MapTile> getOverlappingMapTiles(final Viewport2D viewport);
+  public abstract List<T> getOverlappingMapTiles(final Viewport2D viewport);
 
   public abstract double getResolution(final Viewport2D viewport);
 
   public boolean isHasError() {
     return this.hasError;
   }
+
+  protected abstract AbstractTiledLayerRenderer<D, T> newRenderer();
 
   @Override
   protected void refreshDo() {

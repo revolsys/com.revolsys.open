@@ -39,7 +39,8 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
-public class GriddedElevationModelLayer extends AbstractLayer {
+public class GriddedElevationModelLayer extends AbstractLayer
+  implements IGriddedElevationModelLayer {
   public static final String J_TYPE = "griddedElevationModelLayer";
 
   static {

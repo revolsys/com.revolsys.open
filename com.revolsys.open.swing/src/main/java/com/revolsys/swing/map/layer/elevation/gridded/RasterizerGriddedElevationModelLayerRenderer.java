@@ -12,6 +12,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
+import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
@@ -41,19 +42,19 @@ public class RasterizerGriddedElevationModelLayerRenderer
     super("rasterizerGriddedElevationModelLayerRenderer", "DEM Style");
   }
 
-  public RasterizerGriddedElevationModelLayerRenderer(final GriddedElevationModelLayer layer,
-    final MultipleGriddedElevationModelLayerRenderer parent) {
+  public RasterizerGriddedElevationModelLayerRenderer(final IGriddedElevationModelLayer layer,
+    final MultipleLayerRenderer<IGriddedElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> parent) {
     this();
     setLayer(layer);
-    setParent(parent);
+    setParent((LayerRenderer<?>)parent);
   }
 
-  public RasterizerGriddedElevationModelLayerRenderer(final GriddedElevationModelLayer layer,
-    final MultipleGriddedElevationModelLayerRenderer parent,
+  public RasterizerGriddedElevationModelLayerRenderer(final IGriddedElevationModelLayer layer,
+    final MultipleLayerRenderer<IGriddedElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> parent,
     final GriddedElevationModelRasterizer rasterizer) {
     this();
     setLayer(layer);
-    setParent(parent);
+    setParent((LayerRenderer<?>)parent);
     this.rasterizer = rasterizer;
     if (rasterizer != null) {
       final String name = rasterizer.getName();
@@ -66,10 +67,11 @@ public class RasterizerGriddedElevationModelLayerRenderer
     setProperties(config);
   }
 
+  @SuppressWarnings("unchecked")
   public void delete() {
     final LayerRenderer<?> parent = getParent();
-    if (parent instanceof MultipleGriddedElevationModelLayerRenderer) {
-      final MultipleGriddedElevationModelLayerRenderer multiple = (MultipleGriddedElevationModelLayerRenderer)parent;
+    if (parent instanceof MultipleLayerRenderer) {
+      final MultipleLayerRenderer<IGriddedElevationModelLayer, LayerRenderer<IGriddedElevationModelLayer>> multiple = (MultipleLayerRenderer<IGriddedElevationModelLayer, LayerRenderer<IGriddedElevationModelLayer>>)parent;
       multiple.removeRenderer(this);
     }
   }
@@ -94,12 +96,12 @@ public class RasterizerGriddedElevationModelLayerRenderer
 
   @Override
   public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final GriddedElevationModelLayer layer) {
+    final IGriddedElevationModelLayer layer) {
     // TODO cancel
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
-        final GriddedElevationModel elevationModel = layer.getElevationModel();
+        final GriddedElevationModel elevationModel = getElevationModel();
         if (elevationModel != null) {
           synchronized (this) {
             if (this.rasterizer == null) {
@@ -152,6 +154,14 @@ public class RasterizerGriddedElevationModelLayerRenderer
     }
   }
 
+  @Override
+  public void setElevationModel(final GriddedElevationModel elevationModel) {
+    super.setElevationModel(elevationModel);
+    if (this.rasterizer != null) {
+      this.rasterizer.setElevationModel(elevationModel);
+    }
+  }
+
   public void setOpacity(final float opacity) {
     final float oldValue = this.opacity;
     if (opacity < 0) {
@@ -166,6 +176,10 @@ public class RasterizerGriddedElevationModelLayerRenderer
 
   public void setRasterizer(final GriddedElevationModelRasterizer rasterizer) {
     this.rasterizer = rasterizer;
+    final GriddedElevationModel elevationModel = getElevationModel();
+    if (elevationModel != null) {
+      rasterizer.setElevationModel(elevationModel);
+    }
     this.redraw = true;
   }
 

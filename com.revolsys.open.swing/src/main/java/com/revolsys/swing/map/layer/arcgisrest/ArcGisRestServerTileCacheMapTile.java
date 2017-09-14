@@ -3,9 +3,9 @@ package com.revolsys.swing.map.layer.arcgisrest;
 import java.awt.image.BufferedImage;
 
 import com.revolsys.record.io.format.esri.rest.map.MapService;
-import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.map.layer.raster.GeoreferencedImageMapTile;
 
-public class ArcGisRestServerTileCacheMapTile extends MapTile {
+public class ArcGisRestServerTileCacheMapTile extends GeoreferencedImageMapTile {
   private final ArcGisRestServerTileCacheLayer layer;
 
   private final MapService mapService;

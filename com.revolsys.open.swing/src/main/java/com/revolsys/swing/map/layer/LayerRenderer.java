@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.Icon;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.component.Form;
@@ -31,12 +32,24 @@ public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
 
   @SuppressWarnings("unchecked")
   default <V extends LayerRenderer<?>> V getRenderer(final List<String> path) {
-    if (path.isEmpty()) {
-      return null;
-    } else if (path.get(0).equals(getName())) {
-      return (V)this;
+    LayerRenderer<?> renderer = this;
+    final int pathSize = path.size();
+    for (int i = 0; i < pathSize; i++) {
+      final String name = path.get(i);
+      final String rendererName = renderer.getName();
+      if (DataType.equal(name, rendererName)) {
+        if (i < pathSize - 1) {
+          final String childName = path.get(i + 1);
+          if (renderer instanceof MultipleLayerRenderer) {
+            final MultipleLayerRenderer<?, ?> multipleRenderer = (MultipleLayerRenderer<?, ?>)renderer;
+            renderer = multipleRenderer.getRenderer(childName);
+          }
+        }
+      } else {
+        return null;
+      }
     }
-    return null;
+    return (V)renderer;
   }
 
   boolean isEditing();

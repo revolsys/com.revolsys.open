@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.layer;
+package com.revolsys.swing.map.layer.raster;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -7,49 +7,25 @@ import java.util.Map;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.swing.map.layer.tile.AbstractMapTile;
 
-public abstract class MapTile implements GeometryFactoryProxy {
-  private final BoundingBox boundingBox;
-
-  private final int height;
+public abstract class GeoreferencedImageMapTile extends AbstractMapTile<GeoreferencedImage> {
 
   private final Map<CoordinateSystem, GeoreferencedImage> projectedImages = new HashMap<>();
 
-  private final double resolution;
-
-  private final int width;
-
-  public MapTile(final BoundingBox boundingBox, final int width, final int height,
+  public GeoreferencedImageMapTile(final BoundingBox boundingBox, final int width, final int height,
     final double resolution) {
-    this.boundingBox = boundingBox;
-    this.width = width;
-    this.height = height;
-    this.resolution = resolution;
+    super(boundingBox, width, height, resolution);
   }
 
   @Override
   public boolean equals(final Object obj) {
-    if (obj instanceof MapTile) {
-      final MapTile tile = (MapTile)obj;
-      return tile.getBoundingBox().equals(this.boundingBox);
+    if (obj instanceof GeoreferencedImageMapTile) {
+      return super.equals(obj);
     }
     return false;
-  }
-
-  public BoundingBox getBoundingBox() {
-    return this.boundingBox;
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.boundingBox.getGeometryFactory();
-  }
-
-  public int getHeight() {
-    return this.height;
   }
 
   public GeoreferencedImage getImage() {
@@ -68,17 +44,10 @@ public abstract class MapTile implements GeometryFactoryProxy {
     return getImage(coordinateSystem);
   }
 
-  public double getResolution() {
-    return this.resolution;
-  }
-
-  public int getWidth() {
-    return this.width;
-  }
-
   protected abstract BufferedImage loadBuffferedImage();
 
-  protected GeoreferencedImage loadImage() {
+  @Override
+  protected GeoreferencedImage loadData() {
     final BufferedImage bufferedImage = loadBuffferedImage();
     if (bufferedImage == null) {
       return null;
@@ -88,18 +57,18 @@ public abstract class MapTile implements GeometryFactoryProxy {
     }
   }
 
-  public GeoreferencedImage loadImage(final CoordinateSystem coordinateSystem) {
+  protected GeoreferencedImage loadData(final CoordinateSystem coordinateSystem) {
     synchronized (this.projectedImages) {
       GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
       if (projectedImage == null) {
         final GeometryFactory geometryFactory = getGeometryFactory();
-        GeoreferencedImage image = getImage();
+        GeoreferencedImage image = getData();
         if (image == null) {
-          image = loadImage();
+          image = loadData();
           this.projectedImages.put(geometryFactory.getCoordinateSystem(), image);
         }
         if (image != null) {
-          projectedImage = image.getImage(coordinateSystem, this.resolution);
+          projectedImage = image.getImage(coordinateSystem, getResolution());
           this.projectedImages.put(coordinateSystem, projectedImage);
         }
       }
@@ -107,9 +76,10 @@ public abstract class MapTile implements GeometryFactoryProxy {
     }
   }
 
-  public GeoreferencedImage loadImage(final GeometryFactory geometryFactory) {
+  @Override
+  public GeoreferencedImage loadData(final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    return loadImage(coordinateSystem);
+    return loadData(coordinateSystem);
   }
 
 }

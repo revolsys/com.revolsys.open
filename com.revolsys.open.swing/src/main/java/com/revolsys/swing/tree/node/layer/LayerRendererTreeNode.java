@@ -112,9 +112,7 @@ public class LayerRendererTreeNode extends ListTreeNode
     if (mutipleRenderer != null && mutipleRenderer.canAddChild(child)) {
       if (super.isDndDropSupported(support, dropPath, childPath, child)) {
         final LayerRenderer<Layer> childRenderer = (LayerRenderer<Layer>)child;
-        final Layer nodeLayer = mutipleRenderer.getLayer();
-        final Layer childLayer = childRenderer.getLayer();
-        if (childLayer != nodeLayer) {
+        if (!mutipleRenderer.isSameLayer(childRenderer)) {
           if (isCopySupported(childRenderer)) {
             support.setDropAction(DnDConstants.ACTION_COPY);
           } else {

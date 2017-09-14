@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.elevation.gridded;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,17 +16,18 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
+import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class MultipleGriddedElevationModelLayerRenderer
-  extends AbstractGriddedElevationModelLayerRenderer implements
+public class TiledMultipleGriddedElevationModelLayerRenderer extends
+  AbstractTiledLayerRenderer<GriddedElevationModel, TiledGriddedElevationModelLayerTile> implements
   MultipleLayerRenderer<IGriddedElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> {
   static {
-    MenuFactory.addMenuInitializer(MultipleGriddedElevationModelLayerRenderer.class, menu -> {
+    MenuFactory.addMenuInitializer(TiledMultipleGriddedElevationModelLayerRenderer.class, menu -> {
 
       addAddMenuItem(menu, "Colour", (layer, parent) -> {
         final ColourGriddedElevationModelRasterizer rasterizer = new ColourGriddedElevationModelRasterizer();
@@ -39,12 +41,12 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
-    final BiFunction<IGriddedElevationModelLayer, MultipleGriddedElevationModelLayerRenderer, RasterizerGriddedElevationModelLayerRenderer> rendererFactory) {
+    final BiFunction<TiledGriddedElevationModelLayer, TiledMultipleGriddedElevationModelLayerRenderer, RasterizerGriddedElevationModelLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type + "_add").toLowerCase();
     final String name = "Add " + type + " Style";
     Menus.addMenuItem(menu, "add", name, iconName,
-      (final MultipleGriddedElevationModelLayerRenderer parentRenderer) -> {
-        final IGriddedElevationModelLayer layer = parentRenderer.getLayer();
+      (final TiledMultipleGriddedElevationModelLayerRenderer parentRenderer) -> {
+        final TiledGriddedElevationModelLayer layer = parentRenderer.getLayer();
         final RasterizerGriddedElevationModelLayerRenderer newRenderer = rendererFactory
           .apply(layer, parentRenderer);
         parentRenderer.addRendererEdit(newRenderer);
@@ -53,26 +55,29 @@ public class MultipleGriddedElevationModelLayerRenderer
 
   private List<RasterizerGriddedElevationModelLayerRenderer> renderers = new ArrayList<>();
 
-  private MultipleGriddedElevationModelLayerRenderer() {
-    super("multipleGriddedElevationModelLayerRenderer", "Styles");
+  private TiledMultipleGriddedElevationModelLayerRenderer() {
+    super("tiledMultipleGriddedElevationModelLayerRenderer", "Styles");
   }
 
-  public MultipleGriddedElevationModelLayerRenderer(final GriddedElevationModelLayer layer) {
+  public TiledMultipleGriddedElevationModelLayerRenderer(
+    final Map<String, ? extends Object> config) {
+    this();
+    setProperties(config);
+  }
+
+  public TiledMultipleGriddedElevationModelLayerRenderer(
+    final TiledGriddedElevationModelLayer layer) {
     this();
     setLayer(layer);
     addRenderer(new RasterizerGriddedElevationModelLayerRenderer(layer, this));
   }
 
-  public MultipleGriddedElevationModelLayerRenderer(final GriddedElevationModelLayer layer,
+  public TiledMultipleGriddedElevationModelLayerRenderer(
+    final TiledGriddedElevationModelLayer layer,
     final RasterizerGriddedElevationModelLayerRenderer renderer) {
     this();
     setLayer(layer);
     addRenderer(renderer);
-  }
-
-  public MultipleGriddedElevationModelLayerRenderer(final Map<String, ? extends Object> config) {
-    this();
-    setProperties(config);
   }
 
   @Override
@@ -93,8 +98,6 @@ public class MultipleGriddedElevationModelLayerRenderer
         if (index < 0) {
           index = this.renderers.size();
         }
-        final GriddedElevationModel elevationModel = getElevationModel();
-        renderer.setElevationModel(elevationModel);
         this.renderers.add(index, renderer);
       }
       firePropertyChange("renderers", index, null, renderer);
@@ -113,13 +116,18 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public MultipleGriddedElevationModelLayerRenderer clone() {
-    final MultipleGriddedElevationModelLayerRenderer clone = (MultipleGriddedElevationModelLayerRenderer)super.clone();
+  public TiledMultipleGriddedElevationModelLayerRenderer clone() {
+    final TiledMultipleGriddedElevationModelLayerRenderer clone = (TiledMultipleGriddedElevationModelLayerRenderer)super.clone();
     clone.renderers = JavaBeanUtil.clone(this.renderers);
     for (final RasterizerGriddedElevationModelLayerRenderer renderer : clone.renderers) {
       renderer.setParent(clone);
     }
     return clone;
+  }
+
+  @Override
+  public TiledGriddedElevationModelLayer getLayer() {
+    return (TiledGriddedElevationModelLayer)super.getLayer();
   }
 
   @Override
@@ -152,15 +160,6 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void refreshIcon() {
-    if (this.renderers != null) {
-      for (final RasterizerGriddedElevationModelLayerRenderer renderer : this.renderers) {
-        renderer.refreshIcon();
-      }
-    }
-  }
-
-  @Override
   public int removeRenderer(final RasterizerGriddedElevationModelLayerRenderer renderer) {
     boolean removed = false;
     synchronized (this.renderers) {
@@ -179,30 +178,23 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final IGriddedElevationModelLayer layer) {
-    final List<RasterizerGriddedElevationModelLayerRenderer> renderers = getRenderers();
-    for (final RasterizerGriddedElevationModelLayerRenderer renderer : cancellable
-      .cancellable(renderers)) {
-      final long scaleForVisible = (long)viewport.getScaleForVisible();
-      if (renderer.isVisible(scaleForVisible)) {
-        renderer.render(viewport, cancellable, layer);
+  protected void renderTile(final Viewport2D viewport, final Cancellable cancellable,
+    final TiledGriddedElevationModelLayerTile tile) {
+    final Graphics2D graphics = viewport.getGraphics();
+    if (graphics != null) {
+      final GriddedElevationModel elevationModel = tile.getElevationModel();
+
+      final TiledGriddedElevationModelLayer layer = getLayer();
+      final List<RasterizerGriddedElevationModelLayerRenderer> renderers = getRenderers();
+      for (final RasterizerGriddedElevationModelLayerRenderer renderer : cancellable
+        .cancellable(renderers)) {
+        final long scaleForVisible = (long)viewport.getScaleForVisible();
+        if (renderer.isVisible(scaleForVisible)) {
+          renderer.setElevationModel(elevationModel);
+          renderer.render(viewport, cancellable, layer);
+        }
       }
     }
-  }
-
-  @Override
-  public void setElevationModel(final GriddedElevationModel elevationModel) {
-    super.setElevationModel(elevationModel);
-    for (final RasterizerGriddedElevationModelLayerRenderer renderer : this.renderers) {
-      renderer.setElevationModel(elevationModel);
-    }
-  }
-
-  @Override
-  public void setLayer(final IGriddedElevationModelLayer layer) {
-    super.setLayer(layer);
-    refreshIcon();
   }
 
   public void setRenderers(

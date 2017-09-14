@@ -91,7 +91,7 @@ public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevat
   public void setElevationModel(final GriddedElevationModel elevationModel) {
     super.setElevationModel(elevationModel);
     if (elevationModel != null) {
-      if (Double.isInfinite(this.minZ)) {
+      if (Double.isNaN(this.minZ)) {
         this.minZ = this.elevationModel.getMinZ();
         this.maxZ = this.elevationModel.getMaxZ();
         updateRangeZ();
