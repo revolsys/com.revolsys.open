@@ -70,6 +70,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
         this.cachedTiles.clear();
       }
     }
+    firePropertyChange(event);
   }
 
   @Override
