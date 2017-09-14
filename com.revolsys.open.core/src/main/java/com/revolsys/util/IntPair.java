@@ -1,6 +1,6 @@
 package com.revolsys.util;
 
-public class IntPair {
+public class IntPair implements Comparable<IntPair> {
 
   private int value1;
 
@@ -9,6 +9,15 @@ public class IntPair {
   public IntPair(final int value1, final int value2) {
     this.value1 = value1;
     this.value2 = value2;
+  }
+
+  @Override
+  public int compareTo(final IntPair other) {
+    int compare = Integer.compare(this.value1, other.getValue1());
+    if (compare == 0) {
+      compare = Integer.compare(this.value2, other.getValue2());
+    }
+    return compare;
   }
 
   @Override
