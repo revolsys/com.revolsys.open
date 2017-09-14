@@ -376,6 +376,10 @@ public class UrlResource extends AbstractResource {
     return this.password;
   }
 
+  public String getProtocol() {
+    return this.url.getProtocol();
+  }
+
   /**
    * This implementation returns the underlying URI directly,
    * if possible.

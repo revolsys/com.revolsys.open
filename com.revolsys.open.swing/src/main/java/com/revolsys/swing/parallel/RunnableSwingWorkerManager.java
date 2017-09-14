@@ -6,7 +6,7 @@ import java.util.Queue;
 
 public class RunnableSwingWorkerManager {
 
-  private final String description;
+  private String description;
 
   private RunnableSwingWorkerProcess process;
 
@@ -19,20 +19,21 @@ public class RunnableSwingWorkerManager {
   public void addTask(final Runnable task) {
     synchronized (this.tasks) {
       this.tasks.add(task);
-      if (this.process == null) {
-        this.process = new RunnableSwingWorkerProcess(this);
-        this.process.execute();
-      }
+      executeTasks();
     }
   }
 
   public void addTasks(final Collection<Runnable> tasks) {
     synchronized (this.tasks) {
       this.tasks.addAll(tasks);
-      if (this.process == null) {
-        this.process = new RunnableSwingWorkerProcess(this);
-        this.process.execute();
-      }
+      executeTasks();
+    }
+  }
+
+  private void executeTasks() {
+    if (this.process == null) {
+      this.process = new RunnableSwingWorkerProcess(this);
+      Invoke.worker(this.process);
     }
   }
 
@@ -56,6 +57,10 @@ public class RunnableSwingWorkerManager {
     synchronized (this.tasks) {
       this.tasks.removeAll(tasks);
     }
+  }
+
+  public void setDescription(final String description) {
+    this.description = description;
   }
 
   @Override

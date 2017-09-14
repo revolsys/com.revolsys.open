@@ -57,9 +57,11 @@ public class GriddedElevationModelStylePanel extends BaseStylePanel
     final Object source = event.getSource();
     if (source instanceof Field) {
       final Field field = (Field)source;
-      final String fieldName = field.getFieldName();
-      final Object fieldValue = field.getFieldValue();
-      this.rasterizer.setProperty(fieldName, fieldValue);
+      if (this.rasterizer != null) {
+        final String fieldName = field.getFieldName();
+        final Object fieldValue = field.getFieldValue();
+        this.rasterizer.setProperty(fieldName, fieldValue);
+      }
     } else if (source == this.rasterizer) {
       final String name = event.getPropertyName();
       final Object value = event.getNewValue();

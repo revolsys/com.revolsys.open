@@ -22,7 +22,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
-import com.revolsys.swing.map.layer.raster.TiledImageLayerRenderer;
+import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -106,12 +106,19 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
 
   @Override
   public void propertyChange(final PropertyChangeEvent e) {
-    if (!(e.getSource() instanceof MapPanel)) {
+    final Object source = e.getSource();
+    if (!(source instanceof MapPanel)) {
       final String propertyName = e.getPropertyName();
       if (!IGNORE_PROPERTY_NAMES.contains(propertyName)) {
         if (this.layer instanceof Project) {
-          if (TiledImageLayerRenderer.TILES_LOADED.equals(propertyName)) {
-            return;
+          final Project project = (Project)this.layer;
+          if (AbstractTiledLayerRenderer.TILES_LOADED.equals(propertyName)) {
+            if (source instanceof Layer) {
+              final Layer eventLayer = (Layer)source;
+              if (project.isBaseMapLayer(eventLayer)) {
+                return;
+              }
+            }
           }
         }
         redraw();

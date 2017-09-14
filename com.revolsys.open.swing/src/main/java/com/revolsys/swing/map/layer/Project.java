@@ -261,6 +261,10 @@ public class Project extends LayerGroup {
     baseMaps.addLayers(importBaseMaps);
   }
 
+  public boolean isBaseMapLayer(final Layer layer) {
+    return this.baseMapLayers.isDescendant(layer);
+  }
+
   @Override
   protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);

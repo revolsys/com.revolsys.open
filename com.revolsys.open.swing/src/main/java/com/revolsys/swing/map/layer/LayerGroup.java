@@ -615,6 +615,19 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return this.deleted;
   }
 
+  public boolean isDescendant(final Layer layer) {
+    if (layer == this) {
+      return true;
+    } else {
+      for (final Layer childLayer : this.layers) {
+        if (childLayer.isDescendant(layer)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
   public boolean isEmpty() {
     return this.layers.isEmpty();
   }

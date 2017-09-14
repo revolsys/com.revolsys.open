@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
@@ -41,6 +40,14 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     super(type, name);
   }
 
+  public T getCachedTile(final T mapTile) {
+    return this.cachedTiles.get(mapTile);
+  }
+
+  public double getResolution() {
+    return this.resolution;
+  }
+
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object newValue = event.getNewValue();
@@ -61,9 +68,6 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     } else if (!TILES_LOADED.equals(event.getPropertyName())) {
       synchronized (this.cachedTiles) {
         this.cachedTiles.clear();
-        // if (this.tileLoaderProcess != null) {
-        // this.tileLoaderProcess.cancel(true);
-        // }
       }
     }
   }
@@ -72,10 +76,10 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
   public void render(final Viewport2D viewport, final Cancellable cancellable,
     final AbstractTiledLayer<D, T> layer) {
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    final double resolution = layer.getResolution(viewport);
+    final double layerResolution = layer.getResolution(viewport);
     synchronized (this.cachedTiles) {
-      if (resolution != this.resolution || viewportGeometryFactory != this.geometryFactory) {
-        this.resolution = resolution;
+      if (layerResolution != this.resolution || viewportGeometryFactory != this.geometryFactory) {
+        this.resolution = layerResolution;
         this.geometryFactory = viewportGeometryFactory;
         this.cachedTiles.clear();
         tileLoaderManager.removeTasks(this.loadingTasks);
@@ -88,7 +92,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
       if (mapTile != null) {
         T cachedTile = null;
         synchronized (this.cachedTiles) {
-          cachedTile = this.cachedTiles.get(mapTile);
+          cachedTile = getCachedTile(mapTile);
           if (cachedTile == null) {
             cachedTile = mapTile;
             this.cachedTiles.put(cachedTile, cachedTile);
@@ -104,6 +108,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     }
     synchronized (this.loadingTasks) {
       this.loadingTasks.addAll(tasks);
+      tileLoaderManager.setDescription("Load tiles: " + layer.getPath());
       tileLoaderManager.addTasks(tasks);
     }
   }
@@ -111,7 +116,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
   protected abstract void renderTile(final Viewport2D viewport, final Cancellable cancellable,
     final T tile);
 
-  public void setLoaded(final TileLoadTask tileLoadTask) {
+  public void setLoaded(final TileLoadTask<D, T> tileLoadTask) {
     this.loadingTasks.remove(tileLoadTask);
     final AbstractTiledLayer<D, T> layer = getLayer();
     if (layer != null) {
@@ -119,8 +124,4 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     }
   }
 
-  @Override
-  public MapEx toMap() {
-    return MapEx.EMPTY;
-  }
 }

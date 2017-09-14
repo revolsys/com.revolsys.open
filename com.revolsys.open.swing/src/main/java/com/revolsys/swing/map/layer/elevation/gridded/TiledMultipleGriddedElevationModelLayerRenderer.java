@@ -5,17 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.ColourGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.logging.Logs;
+import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
+import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
+import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
@@ -25,9 +30,23 @@ import com.revolsys.util.Property;
 
 public class TiledMultipleGriddedElevationModelLayerRenderer extends
   AbstractTiledLayerRenderer<GriddedElevationModel, TiledGriddedElevationModelLayerTile> implements
-  MultipleLayerRenderer<IGriddedElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> {
+  MultipleLayerRenderer<IGriddedElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer>,
+  GriddedElevationModelZRange {
   static {
     MenuFactory.addMenuInitializer(TiledMultipleGriddedElevationModelLayerRenderer.class, menu -> {
+      Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
+        ((Predicate<TiledMultipleGriddedElevationModelLayerRenderer>)TiledMultipleGriddedElevationModelLayerRenderer::isEditing)
+          .negate(),
+        TiledMultipleGriddedElevationModelLayerRenderer::showProperties, false);
+
+      menu.addComponentFactory("scale",
+        new TreeItemScaleMenu<>(true, null,
+          TiledMultipleGriddedElevationModelLayerRenderer::getMinimumScale,
+          TiledMultipleGriddedElevationModelLayerRenderer::setMinimumScale));
+      menu.addComponentFactory("scale",
+        new TreeItemScaleMenu<>(false, null,
+          TiledMultipleGriddedElevationModelLayerRenderer::getMaximumScale,
+          TiledMultipleGriddedElevationModelLayerRenderer::setMaximumScale));
 
       addAddMenuItem(menu, "Colour", (layer, parent) -> {
         final ColourGriddedElevationModelRasterizer rasterizer = new ColourGriddedElevationModelRasterizer();
@@ -54,6 +73,10 @@ public class TiledMultipleGriddedElevationModelLayerRenderer extends
   }
 
   private List<RasterizerGriddedElevationModelLayerRenderer> renderers = new ArrayList<>();
+
+  private double minZ = Double.NaN;
+
+  private double maxZ = Double.NaN;
 
   private TiledMultipleGriddedElevationModelLayerRenderer() {
     super("tiledMultipleGriddedElevationModelLayerRenderer", "Styles");
@@ -131,6 +154,16 @@ public class TiledMultipleGriddedElevationModelLayerRenderer extends
   }
 
   @Override
+  public double getMaxZ() {
+    return this.maxZ;
+  }
+
+  @Override
+  public double getMinZ() {
+    return this.minZ;
+  }
+
+  @Override
   public List<RasterizerGriddedElevationModelLayerRenderer> getRenderers() {
     synchronized (this.renderers) {
       return new ArrayList<>(this.renderers);
@@ -160,6 +193,11 @@ public class TiledMultipleGriddedElevationModelLayerRenderer extends
   }
 
   @Override
+  public Form newStylePanel() {
+    return new TiledMultipleGriddedElevationModelStylePanel(this);
+  }
+
+  @Override
   public int removeRenderer(final RasterizerGriddedElevationModelLayerRenderer renderer) {
     boolean removed = false;
     synchronized (this.renderers) {
@@ -183,18 +221,36 @@ public class TiledMultipleGriddedElevationModelLayerRenderer extends
     final Graphics2D graphics = viewport.getGraphics();
     if (graphics != null) {
       final GriddedElevationModel elevationModel = tile.getElevationModel();
-
-      final TiledGriddedElevationModelLayer layer = getLayer();
-      final List<RasterizerGriddedElevationModelLayerRenderer> renderers = getRenderers();
-      for (final RasterizerGriddedElevationModelLayerRenderer renderer : cancellable
-        .cancellable(renderers)) {
-        final long scaleForVisible = (long)viewport.getScaleForVisible();
-        if (renderer.isVisible(scaleForVisible)) {
-          renderer.setElevationModel(elevationModel);
-          renderer.render(viewport, cancellable, layer);
+      if (elevationModel != null) {
+        final TiledGriddedElevationModelLayer layer = getLayer();
+        final List<RasterizerGriddedElevationModelLayerRenderer> renderers = getRenderers();
+        for (final RasterizerGriddedElevationModelLayerRenderer renderer : cancellable
+          .cancellable(renderers)) {
+          final long scaleForVisible = (long)viewport.getScaleForVisible();
+          if (renderer.isVisible(scaleForVisible)) {
+            renderer.setElevationModel(elevationModel);
+            renderer.render(viewport, cancellable, layer);
+          }
         }
       }
     }
+  }
+
+  @Override
+  public void setLayer(
+    final AbstractTiledLayer<GriddedElevationModel, TiledGriddedElevationModelLayerTile> layer) {
+    super.setLayer(layer);
+    updateBoundingBox();
+  }
+
+  public void setMaxZ(final double maxZ) {
+    this.maxZ = maxZ;
+    updateBoundingBox();
+  }
+
+  public void setMinZ(final double minZ) {
+    this.minZ = minZ;
+    updateBoundingBox();
   }
 
   public void setRenderers(
@@ -242,6 +298,22 @@ public class TiledMultipleGriddedElevationModelLayerRenderer extends
       }
       addToMap(map, "styles", rendererMaps);
     }
+    addToMap(map, "minZ", this.minZ);
+    addToMap(map, "maxZ", this.maxZ);
     return map;
+  }
+
+  private void updateBoundingBox() {
+    final TiledGriddedElevationModelLayer layer = getLayer();
+    if (layer != null) {
+      final BoundingBox boundingBox = layer.getBoundingBox();
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
+      final BoundingBox newBoundingBox = boundingBox.newBoundingBox(minX, minY, this.minZ, maxX,
+        maxY, this.maxZ);
+      layer.setBoundingBox(newBoundingBox);
+    }
   }
 }

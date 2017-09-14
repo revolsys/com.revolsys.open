@@ -28,7 +28,9 @@ public class TiledImageLayerRenderer<T extends GeoreferencedImageMapTile>
     if (graphics != null) {
       final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
       final GeoreferencedImage image = tile.getImage(viewportGeometryFactory);
-      GeoreferencedImageLayerRenderer.render(viewport, graphics, image, false);
+      if (image != null) {
+        GeoreferencedImageLayerRenderer.render(viewport, graphics, image, false);
+      }
     }
   }
 

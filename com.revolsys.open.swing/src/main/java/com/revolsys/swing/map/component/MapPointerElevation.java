@@ -12,7 +12,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.gridded.IGriddedElevationModelLayer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.number.Doubles;
 
@@ -46,12 +46,13 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
     final int x = e.getX();
     final int y = e.getY();
     final Point mapLocation = this.viewport.toModelPoint(x, y);
-    for (final GriddedElevationModelLayer layer : this.map.getProject()
-      .getVisibleDescendants(GriddedElevationModelLayer.class, this.viewport.getScale())) {
+    for (final IGriddedElevationModelLayer layer : this.map.getProject()
+      .getVisibleDescendants(IGriddedElevationModelLayer.class, this.viewport.getScale())) {
       final double layerElevation = layer.getElevation(mapLocation);
       if (!Double.isNaN(layerElevation)) {
         final double elevation = layerElevation;
-        setMapElevation(layer.getGeometryFactory(), elevation);
+        GeometryFactory geometryFactory = layer.getGeometryFactory();
+        setMapElevation(geometryFactory, elevation);
         return;
       }
     }

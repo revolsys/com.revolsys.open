@@ -11,6 +11,10 @@ public abstract class AbstractGriddedElevationModelRasterizer extends
 
   protected GriddedElevationModel elevationModel;
 
+  protected double maxZ = Double.NaN;
+
+  protected double minZ = Double.NaN;
+
   protected int width;
 
   protected int height;
@@ -37,6 +41,16 @@ public abstract class AbstractGriddedElevationModelRasterizer extends
   }
 
   @Override
+  public double getMaxZ() {
+    return this.maxZ;
+  }
+
+  @Override
+  public double getMinZ() {
+    return this.minZ;
+  }
+
+  @Override
   public int getWidth() {
     return this.width;
   }
@@ -47,13 +61,33 @@ public abstract class AbstractGriddedElevationModelRasterizer extends
     if (elevationModel != null) {
       this.width = elevationModel.getGridWidth();
       this.height = elevationModel.getGridHeight();
+      if (Double.isNaN(this.minZ)) {
+        this.minZ = this.elevationModel.getMinZ();
+        this.maxZ = this.elevationModel.getMaxZ();
+        updateRangeZ();
+      }
     }
+  }
+
+  @Override
+  public void setMaxZ(final double maxZ) {
+    this.maxZ = maxZ;
+    updateRangeZ();
+  }
+
+  @Override
+  public void setMinZ(final double minZ) {
+    this.minZ = minZ;
+    updateRangeZ();
   }
 
   @Override
   public MapEx toMap() {
     final MapEx map = newTypeMap(this.type);
     return map;
+  }
+
+  protected void updateRangeZ() {
   }
 
 }

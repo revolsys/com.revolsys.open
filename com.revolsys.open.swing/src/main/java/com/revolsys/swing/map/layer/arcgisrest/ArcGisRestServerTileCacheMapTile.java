@@ -70,7 +70,7 @@ public class ArcGisRestServerTileCacheMapTile extends GeoreferencedImageMapTile 
   protected BufferedImage loadBuffferedImage() {
     try {
       return this.mapService.getTileImage(this.zoomLevel, this.tileX, this.tileY);
-    } catch (final Throwable t) {
+    } catch (final RuntimeException t) {
       this.layer.setError(t);
       return null;
     }

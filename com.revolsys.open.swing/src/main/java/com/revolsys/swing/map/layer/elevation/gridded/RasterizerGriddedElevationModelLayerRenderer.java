@@ -55,7 +55,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
     this();
     setLayer(layer);
     setParent((LayerRenderer<?>)parent);
-    this.rasterizer = rasterizer;
+    setRasterizer(rasterizer);
     if (rasterizer != null) {
       final String name = rasterizer.getName();
       setName(name);
@@ -105,7 +105,9 @@ public class RasterizerGriddedElevationModelLayerRenderer
         if (elevationModel != null) {
           synchronized (this) {
             if (this.rasterizer == null) {
-              this.rasterizer = new ColourGriddedElevationModelRasterizer(elevationModel);
+              final ColourGriddedElevationModelRasterizer rasterizer = new ColourGriddedElevationModelRasterizer();
+              setRasterizer(rasterizer);
+
               final String name = this.rasterizer.getName();
               setName(name);
             }
@@ -176,6 +178,18 @@ public class RasterizerGriddedElevationModelLayerRenderer
 
   public void setRasterizer(final GriddedElevationModelRasterizer rasterizer) {
     this.rasterizer = rasterizer;
+    final LayerRenderer<?> parent = getParent();
+    if (parent instanceof GriddedElevationModelZRange) {
+      final GriddedElevationModelZRange zRange = (GriddedElevationModelZRange)parent;
+      if (!Double.isFinite(rasterizer.getMinZ())) {
+        final double minZ = zRange.getMinZ();
+        rasterizer.setMinZ(minZ);
+      }
+      if (!Double.isFinite(rasterizer.getMaxZ())) {
+        final double maxZ = zRange.getMaxZ();
+        rasterizer.setMaxZ(maxZ);
+      }
+    }
     final GriddedElevationModel elevationModel = getElevationModel();
     if (elevationModel != null) {
       rasterizer.setElevationModel(elevationModel);

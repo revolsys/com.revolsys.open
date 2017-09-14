@@ -32,6 +32,7 @@ import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.util.WrappedException;
 
@@ -154,7 +155,7 @@ public abstract class AbstractUpdateField extends JDialog {
         progressMonitor.setNote("Updated " + progress + " of " + this.recordCountString);
       }
     });
-    task.execute();
+    Invoke.worker(task);
   }
 
   protected FieldDefinition getFieldDefinition() {

@@ -9,6 +9,8 @@ import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -40,6 +42,32 @@ public class TiledGriddedElevationModelLayer
   public TiledGriddedElevationModelLayer(final Map<String, ? extends Object> config) {
     this();
     setProperties(config);
+  }
+
+  @Override
+  public double getElevation(final double x, final double y) {
+    final GriddedElevationModel elevationModel = getElevationModel(x, y);
+    if (elevationModel == null) {
+      return Double.NaN;
+    } else {
+      return elevationModel.getElevation(x, y);
+    }
+  }
+
+  protected GriddedElevationModel getElevationModel(final double x, final double y) {
+    final TiledMultipleGriddedElevationModelLayerRenderer renderer = getRenderer();
+    final int resolution = (int)renderer.getResolution();
+    if (resolution > 0) {
+      final int tileSize = resolution * this.tileSizePixels;
+      final int tileX = (int)Math.floor(x / tileSize) * tileSize;
+      final int tileY = (int)Math.floor(y / tileSize) * tileSize;
+      final TiledGriddedElevationModelLayerTile tile = newTile(resolution, tileSize, tileX, tileY);
+      final TiledGriddedElevationModelLayerTile cachedTile = renderer.getCachedTile(tile);
+      if (cachedTile != null) {
+        return cachedTile.getElevationModel();
+      }
+    }
+    return null;
   }
 
   public String getFileExtension() {
@@ -74,13 +102,10 @@ public class TiledGriddedElevationModelLayer
         final int maxTileX = (int)Math.floor(maxX / tileSize) * tileSize;
         final int maxTileY = (int)Math.floor(maxY / tileSize) * tileSize;
 
-        final int coordinateSystemId = getCoordinateSystemId();
         for (int tileY = minTileY; tileY <= maxTileY; tileY += tileSize) {
           for (int tileX = minTileX; tileX <= maxTileX; tileX += tileSize) {
-            final BoundingBox tileBoundingBox = geometryFactory.newBoundingBox(2, tileX, tileY,
-              tileX + tileSize, tileY + tileSize);
-            final TiledGriddedElevationModelLayerTile tile = new TiledGriddedElevationModelLayerTile(
-              this, tileBoundingBox, coordinateSystemId, tileSize, resolution, tileX, tileY);
+            final TiledGriddedElevationModelLayerTile tile = newTile(resolution, tileSize, tileX,
+              tileY);
             tiles.add(tile);
           }
         }
@@ -89,7 +114,6 @@ public class TiledGriddedElevationModelLayer
       setError(e);
     }
     return tiles;
-
   }
 
   @Override
@@ -100,9 +124,8 @@ public class TiledGriddedElevationModelLayer
       final double resolution1 = this.resolutions.get(i);
       final double resolution2 = this.resolutions.get(i + 1);
 
-      if (metresPerPixel >= resolution1) {
-        return resolution1;
-      } else if (resolution1 - metresPerPixel < (resolution1 - resolution2) * 0.7) {
+      if (metresPerPixel >= resolution1
+        || resolution1 - metresPerPixel < (resolution1 - resolution2) * 0.7) {
         // Within 70% of more detailed
         return resolution1;
       }
@@ -146,12 +169,41 @@ public class TiledGriddedElevationModelLayer
     return new TiledMultipleGriddedElevationModelLayerRenderer(this);
   }
 
+  protected TiledGriddedElevationModelLayerTile newTile(final int resolution, final int tileSize,
+    final int tileX, final int tileY) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int coordinateSystemId = getCoordinateSystemId();
+    final BoundingBox tileBoundingBox = geometryFactory.newBoundingBox(2, tileX, tileY,
+      tileX + tileSize, tileY + tileSize);
+    return new TiledGriddedElevationModelLayerTile(this, tileBoundingBox, coordinateSystemId,
+      tileSize, resolution, tileX, tileY);
+  }
+
+  @Override
+  protected void setBoundingBox(final BoundingBox boundingBox) {
+    super.setBoundingBox(boundingBox);
+  }
+
   public void setFileExtension(final String fileExtension) {
     this.fileExtension = fileExtension;
   }
 
   public void setFilePrefix(final String filePrefix) {
     this.filePrefix = filePrefix;
+  }
+
+  @SuppressWarnings("unchecked")
+  public void setStyle(Object style) {
+    if (style instanceof Map) {
+      final Map<String, Object> map = (Map<String, Object>)style;
+      style = MapObjectFactory.toObject(map);
+    }
+    if (style instanceof TiledMultipleGriddedElevationModelLayerRenderer) {
+      final TiledMultipleGriddedElevationModelLayerRenderer renderer = (TiledMultipleGriddedElevationModelLayerRenderer)style;
+      setRenderer(renderer);
+    } else {
+      Logs.error(this, "Cannot create renderer for: " + style);
+    }
   }
 
   public void setTileSizePixels(final int tileSizePixels) {

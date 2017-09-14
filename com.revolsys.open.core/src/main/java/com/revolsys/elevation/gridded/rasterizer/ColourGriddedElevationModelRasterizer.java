@@ -13,15 +13,11 @@ public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevat
 
   private int minBlue;
 
-  private Color minColour = WebColors.White;
+  private Color minColour = WebColors.Black;
 
   private int minGreen;
 
   private int minRed;
-
-  private double maxZ = Double.NaN;
-
-  private double minZ = Double.NaN;
 
   private int rangeBlue;
 
@@ -31,7 +27,7 @@ public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevat
 
   private double rangeZ;
 
-  private Color maxColour = WebColors.Black;
+  private Color maxColour = WebColors.White;
 
   private double multipleZ;
 
@@ -54,16 +50,8 @@ public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevat
     return this.maxColour;
   }
 
-  public double getMaxZ() {
-    return this.maxZ;
-  }
-
   public Color getMinColour() {
     return this.minColour;
-  }
-
-  public double getMinZ() {
-    return this.minZ;
   }
 
   @Override
@@ -87,36 +75,14 @@ public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevat
     return colour;
   }
 
-  @Override
-  public void setElevationModel(final GriddedElevationModel elevationModel) {
-    super.setElevationModel(elevationModel);
-    if (elevationModel != null) {
-      if (Double.isNaN(this.minZ)) {
-        this.minZ = this.elevationModel.getMinZ();
-        this.maxZ = this.elevationModel.getMaxZ();
-        updateRangeZ();
-      }
-    }
-  }
-
   public void setMaxColour(final Color maxColour) {
     this.maxColour = maxColour;
     updateColours();
   }
 
-  public void setMaxZ(final double maxZ) {
-    this.maxZ = maxZ;
-    updateRangeZ();
-  }
-
   public void setMinColour(final Color minColour) {
     this.minColour = minColour;
     updateColours();
-  }
-
-  public void setMinZ(final double minZ) {
-    this.minZ = minZ;
-    updateRangeZ();
   }
 
   @Override
@@ -147,7 +113,8 @@ public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevat
     this.rangeBlue = this.maxColour.getBlue() - this.minBlue;
   }
 
-  private void updateRangeZ() {
+  @Override
+  protected void updateRangeZ() {
     if (Double.isFinite(this.minZ)) {
       this.rangeZ = this.maxZ - this.minZ;
     } else {

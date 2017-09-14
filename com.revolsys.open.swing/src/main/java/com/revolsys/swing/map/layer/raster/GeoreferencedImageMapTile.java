@@ -46,17 +46,6 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
 
   protected abstract BufferedImage loadBuffferedImage();
 
-  @Override
-  protected GeoreferencedImage loadData() {
-    final BufferedImage bufferedImage = loadBuffferedImage();
-    if (bufferedImage == null) {
-      return null;
-    } else {
-      final BoundingBox boundingBox = getBoundingBox();
-      return new BufferedGeoreferencedImage(boundingBox, bufferedImage);
-    }
-  }
-
   protected GeoreferencedImage loadData(final CoordinateSystem coordinateSystem) {
     synchronized (this.projectedImages) {
       GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
@@ -80,6 +69,17 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
   public GeoreferencedImage loadData(final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     return loadData(coordinateSystem);
+  }
+
+  @Override
+  protected GeoreferencedImage loadDataDo() {
+    final BufferedImage bufferedImage = loadBuffferedImage();
+    if (bufferedImage == null) {
+      return null;
+    } else {
+      final BoundingBox boundingBox = getBoundingBox();
+      return new BufferedGeoreferencedImage(boundingBox, bufferedImage);
+    }
   }
 
 }

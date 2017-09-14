@@ -37,9 +37,6 @@ public abstract class AbstractMapTile<D> implements GeometryFactoryProxy {
   }
 
   public D getData() {
-    if (this.data == null) {
-      this.data = loadData();
-    }
     return this.data;
   }
 
@@ -60,10 +57,19 @@ public abstract class AbstractMapTile<D> implements GeometryFactoryProxy {
     return this.width;
   }
 
-  protected abstract D loadData();
+  protected final D loadData() {
+    final D data = loadDataDo();
+    this.data = data;
+    return data;
+  }
 
   protected D loadData(final GeometryFactory geometryFactory) {
     return loadData();
   }
 
+  protected abstract D loadDataDo();
+
+  protected void setData(final D data) {
+    this.data = data;
+  }
 }

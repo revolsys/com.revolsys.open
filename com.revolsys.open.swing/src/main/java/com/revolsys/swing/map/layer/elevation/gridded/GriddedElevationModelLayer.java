@@ -17,7 +17,6 @@ import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileNameExtensionFilter;
@@ -146,12 +145,14 @@ public class GriddedElevationModelLayer extends AbstractLayer
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
-      return getGeometryFactory().newBoundingBoxEmpty();
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.newBoundingBoxEmpty();
     }
   }
 
-  public double getElevation(final Point point) {
-    return getElevationModel().getElevation(point);
+  @Override
+  public double getElevation(final double x, final double y) {
+    return this.elevationModel.getElevation(x, y);
   }
 
   public GriddedElevationModel getElevationModel() {
@@ -161,7 +162,8 @@ public class GriddedElevationModelLayer extends AbstractLayer
   @Override
   public GeometryFactory getGeometryFactory() {
     if (this.elevationModel == null) {
-      return getBoundingBox().getGeometryFactory();
+      final BoundingBox boundingBox = getBoundingBox();
+      return boundingBox.getGeometryFactory();
     } else {
       return this.elevationModel.getGeometryFactory();
     }
@@ -245,10 +247,9 @@ public class GriddedElevationModelLayer extends AbstractLayer
   protected void revertDo() {
     if (this.resource != null) {
       GriddedElevationModel elevationModel = null;
-      final Resource resource = Resource.getResource(this.url);
-      if (resource.exists()) {
+      if (this.resource.exists()) {
         try {
-          elevationModel = GriddedElevationModel.newGriddedElevationModel(resource);
+          elevationModel = GriddedElevationModel.newGriddedElevationModel(this.resource);
           if (elevationModel == null) {
             Logs.error(GriddedElevationModelLayer.class,
               "Cannot load elevation model: " + this.url);
@@ -270,9 +271,8 @@ public class GriddedElevationModelLayer extends AbstractLayer
   }
 
   public void saveAs() {
-    saveAs(this.resource.getBaseName(), (file) -> {
-      this.elevationModel.writeGriddedElevationModel(file);
-    });
+    saveAs(this.resource.getBaseName(),
+      file -> this.elevationModel.writeGriddedElevationModel(file));
   }
 
   protected void saveImageChanges() {

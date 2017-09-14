@@ -148,7 +148,12 @@ public interface Resource extends org.springframework.core.io.Resource {
         final String path = location.substring(CLASSPATH_URL_PREFIX.length());
         return new ClassPathResource(path, classLoader);
       } else {
-        return new UrlResource(location);
+        final UrlResource urlResource = new UrlResource(location);
+        if ("file".equals(urlResource.getProtocol())) {
+          final URI uri = urlResource.getUri();
+          return new PathResource(uri);
+        }
+        return urlResource;
       }
     }
     return null;

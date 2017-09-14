@@ -14,6 +14,10 @@ public interface GriddedElevationModelRasterizer
 
   int getHeight();
 
+  double getMaxZ();
+
+  double getMinZ();
+
   String getName();
 
   default int getValue(final int index) {
@@ -42,4 +46,8 @@ public interface GriddedElevationModelRasterizer
   }
 
   void setElevationModel(GriddedElevationModel elevationModel);
+
+  void setMaxZ(double maxZ);
+
+  void setMinZ(double minZ);
 }

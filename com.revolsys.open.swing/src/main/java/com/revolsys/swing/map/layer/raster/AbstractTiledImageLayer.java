@@ -9,10 +9,6 @@ public abstract class AbstractTiledImageLayer<T extends GeoreferencedImageMapTil
 
   public AbstractTiledImageLayer(final String type) {
     super(type);
-    setReadOnly(true);
-    setSelectSupported(false);
-    setQuerySupported(false);
-    setRenderer(newRenderer());
   }
 
   @Override

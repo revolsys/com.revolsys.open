@@ -98,6 +98,10 @@ public interface Layer
 
   boolean isDeleted();
 
+  default boolean isDescendant(final Layer layer) {
+    return layer == this;
+  }
+
   boolean isEditable();
 
   boolean isEditable(double scale);

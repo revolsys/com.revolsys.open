@@ -71,7 +71,7 @@ public class TiledGriddedElevationModelLayerTile extends AbstractMapTile<Gridded
   }
 
   @Override
-  protected GriddedElevationModel loadData() {
+  protected GriddedElevationModel loadDataDo() {
     try {
       return this.layer.newGriddedElevationModel(this.tileSize, this.tileX, this.tileY);
     } catch (final RuntimeException t) {
