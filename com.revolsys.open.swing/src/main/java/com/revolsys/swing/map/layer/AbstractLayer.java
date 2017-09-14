@@ -136,7 +136,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   private boolean exists = true;
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_2D;
 
   private Icon icon = Icons.getIcon("map");
 
@@ -500,7 +500,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       if (exists && Property.getBoolean(this, "showTableView")) {
         Invoke.later(this::showTableView);
       }
-    } catch (final Throwable e) {
+    } catch (final RuntimeException e) {
       Logs.error(this, getPath() + ": Unable to initialize layer", e);
       setExists(false);
     } finally {
@@ -717,11 +717,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
           coordinateSystem.getCoordinateSystemId(), 10);
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount", axisCount, 10);
 
-        final double scaleXY = geometryFactory.getScaleXY();
-        if (scaleXY > 0) {
-          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", scaleXY, 10);
+        final double scaleX = geometryFactory.getScaleX();
+        if (scaleX > 0) {
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleX", scaleX, 10);
         } else {
-          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", "Floating", 10);
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleX", "Floating", 10);
+        }
+        final double scaleY = geometryFactory.getScaleXY();
+        if (scaleY > 0) {
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleY", scaleY, 10);
+        } else {
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleY", "Floating", 10);
         }
 
         if (axisCount > 2) {

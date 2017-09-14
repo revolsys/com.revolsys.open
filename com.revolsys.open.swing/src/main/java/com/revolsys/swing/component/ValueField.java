@@ -257,7 +257,7 @@ public class ValueField extends JPanel implements Field {
     actionMap.put("save", new RunnableAction(saveRunnable));
 
     dialog.pack();
-    SwingUtil.autoAdjustPosition(dialog);
+    SwingUtil.autoAdjustPosition(window, dialog);
     this.saved = false;
     dialog.setVisible(true);
     final V value = (V)getFieldValue();

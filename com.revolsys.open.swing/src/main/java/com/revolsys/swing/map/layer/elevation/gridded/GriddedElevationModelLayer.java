@@ -212,11 +212,11 @@ public class GriddedElevationModelLayer extends AbstractLayer
     } else {
       SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.url);
     }
-    final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
-    if (Property.hasValue(fileNameExtension)) {
-      SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
+    final String fileExtension = FileUtil.getFileNameExtension(this.url);
+    if (Property.hasValue(fileExtension)) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileExtension);
       final GriddedElevationModelReadFactory factory = IoFactory
-        .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileNameExtension);
+        .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);
       if (factory != null) {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }

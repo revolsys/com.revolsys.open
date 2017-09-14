@@ -182,6 +182,17 @@ public interface SwingUtil {
     setLocationCentre(bounds, window);
   }
 
+  static void autoAdjustPosition(final Window parentWindow, final Window window) {
+    window.pack();
+
+    final Rectangle bounds = getScreenBounds(parentWindow);
+    final int width = Math.min(window.getWidth(), bounds.width - 100);
+    final int height = Math.min(window.getHeight(), bounds.height - 100);
+    window.setSize(width, height);
+
+    setLocationCentre(bounds, window);
+  }
+
   static void autoAdjustSize(final Window window) {
     window.pack();
 
@@ -267,12 +278,14 @@ public interface SwingUtil {
     if (component == null) {
       component = SwingUtil.getActiveWindow();
     }
-    final Point mousePosition;
+    Point mousePosition;
     if (component == null) {
       mousePosition = null;
     } else {
       mousePosition = component.getMousePosition();
-      if (mousePosition != null) {
+      if (mousePosition == null) {
+        mousePosition = component.getLocation();
+      } else {
         SwingUtilities.convertPointToScreen(mousePosition, component);
       }
     }

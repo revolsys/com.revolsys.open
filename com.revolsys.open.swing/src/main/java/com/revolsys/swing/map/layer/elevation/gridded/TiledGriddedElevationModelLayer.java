@@ -5,38 +5,46 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
-import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
+import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
+import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public class TiledGriddedElevationModelLayer
   extends AbstractTiledLayer<GriddedElevationModel, TiledGriddedElevationModelLayerTile>
   implements IGriddedElevationModelLayer {
+  private Resource baseResource;
+
+  private String fileExtension = CompactBinaryGriddedElevation.FILE_EXTENSION;
+
+  private String filePrefix = null;
+
   private final List<Double> resolutions = Lists.newArray(2000.0, 1000.0, 500.0, 200.0, 100.0, 50.0,
     20.0, 10.0, 5.0, 2.0, 1.0);
 
   private int tileSizePixels = 1000;
 
-  private final Resource basePath = new PathResource("/Data/elevation/griddedDem");
-
-  private String filePrefix = "bc_gridded_dem";
-
-  private String fileExtension = CompactBinaryGriddedElevation.FILE_EXTENSION;
+  private String url;
 
   public TiledGriddedElevationModelLayer() {
     super("tiledGriddedElevationModelLayer");
-    setGeometryFactory(GeometryFactory.fixed(3005, 1.0, 1.0, 1000.0));
   }
 
   public TiledGriddedElevationModelLayer(final Map<String, ? extends Object> config) {
@@ -137,11 +145,24 @@ public class TiledGriddedElevationModelLayer
     return this.tileSizePixels;
   }
 
+  public String getUrl() {
+    return this.url;
+  }
+
+  @Override
+  protected boolean initializeDo() {
+    final boolean initialized = super.initializeDo();
+    if (initialized) {
+      this.baseResource = Resource.getResource(this.url);
+    }
+    return initialized;
+  }
+
   public GriddedElevationModel newGriddedElevationModel(final int tileSize, final int tileX,
     final int tileY) {
     final String fileName = Strings.toString("_", this.filePrefix, getCoordinateSystemId(),
       tileSize, tileX, tileY) + "." + this.fileExtension;
-    final Resource path = this.basePath //
+    final Resource path = this.baseResource //
       .createRelative(this.fileExtension) //
       .createRelative(getCoordinateSystemId()) //
       .createRelative(tileSize) //
@@ -162,6 +183,30 @@ public class TiledGriddedElevationModelLayer
       final LayerStylePanel stylePanel = new LayerStylePanel(this);
       propertiesPanel.addTab("Style", "palette", stylePanel);
     }
+  }
+
+  @Override
+  protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);
+
+    if (this.url.startsWith("file:")) {
+      final String fileName = this.url.replaceFirst("file:(//)?", "");
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Base Directory", fileName);
+    } else {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Base URL", this.url);
+    }
+    SwingUtil.addLabelledReadOnlyTextField(panel, "File Prefix", this.filePrefix);
+    if (Property.hasValue(this.fileExtension)) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", this.fileExtension);
+      final GriddedElevationModelReadFactory factory = IoFactory
+        .factoryByFileExtension(GriddedElevationModelReadFactory.class, this.fileExtension);
+      if (factory != null) {
+        SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
+      }
+    }
+    SwingUtil.addLabelledReadOnlyTextField(panel, "Tile Size Pixels", this.tileSizePixels);
+    GroupLayouts.makeColumns(panel, 2, true);
+    return panel;
   }
 
   @Override
@@ -192,6 +237,28 @@ public class TiledGriddedElevationModelLayer
     this.filePrefix = filePrefix;
   }
 
+  @Override
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    if (geometryFactory != null) {
+      GeometryFactory geometryFactory3d;
+      if (geometryFactory.getAxisCount() == 2) {
+        final double scaleX = geometryFactory.getScaleX();
+        final double scaleY = geometryFactory.getScaleY();
+        final double[] scales = {
+          scaleX, scaleY, 1000.0
+        };
+        geometryFactory3d = geometryFactory.convertAxisCountAndScales(3, scales);
+      } else {
+        geometryFactory3d = geometryFactory.convertAxisCount(3);
+      }
+      super.setGeometryFactory(geometryFactory3d);
+      final TiledMultipleGriddedElevationModelLayerRenderer renderer = getRenderer();
+      if (renderer != null) {
+        renderer.updateBoundingBox();
+      }
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public void setStyle(Object style) {
     if (style instanceof Map) {
@@ -210,4 +277,18 @@ public class TiledGriddedElevationModelLayer
     this.tileSizePixels = tileSizePixels;
   }
 
+  public void setUrl(final String url) {
+    this.url = url;
+  }
+
+  @Override
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
+    addToMap(map, "geometryFactory", getGeometryFactory());
+    addToMap(map, "url", this.url);
+    addToMap(map, "fileExtension", this.fileExtension);
+    addToMap(map, "filePrefix", this.filePrefix);
+    addToMap(map, "tileSizePixels", this.tileSizePixels);
+    return map;
+  }
 }

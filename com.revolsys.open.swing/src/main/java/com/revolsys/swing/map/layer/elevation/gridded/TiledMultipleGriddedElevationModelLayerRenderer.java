@@ -303,7 +303,7 @@ public class TiledMultipleGriddedElevationModelLayerRenderer extends
     return map;
   }
 
-  private void updateBoundingBox() {
+  public void updateBoundingBox() {
     final TiledGriddedElevationModelLayer layer = getLayer();
     if (layer != null) {
       final BoundingBox boundingBox = layer.getBoundingBox();
