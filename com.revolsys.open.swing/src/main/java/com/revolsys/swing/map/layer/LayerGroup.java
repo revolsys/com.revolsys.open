@@ -55,6 +55,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.LayerGroupTreeNode;
 import com.revolsys.util.OS;
+import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
@@ -156,11 +157,15 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     final int returnVal = fileChooser.showOpenDialog(window);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
       final File projectDirectory = fileChooser.getSelectedFile();
+      if (projectDirectory != null) {
+        PreferencesUtil.setUserString("com.revolsys.swing.map.project", "directory",
+          projectDirectory.getParent());
 
-      if (projectDirectory != null && projectDirectory.exists()) {
-        final Project importProject = new Project();
-        importProject.readProject(projectDirectory);
-        importProject(importProject);
+        if (projectDirectory.exists()) {
+          final Project importProject = new Project();
+          importProject.readProject(projectDirectory);
+          importProject(importProject);
+        }
       }
     }
   }
@@ -590,8 +595,17 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   protected void importProject(final Project importProject) {
+    importProjectLayers(importProject);
+  }
+
+  protected void importProjectLayers(final Project importProject) {
     final List<Layer> importLayers = importProject.getLayers();
-    addLayers(importLayers);
+    if (!importLayers.isEmpty()) {
+      final String projectName = importProject.getName();
+      final LayerGroup newGroup = new LayerGroup(projectName);
+      addLayer(newGroup);
+      newGroup.addLayers(importLayers);
+    }
   }
 
   public int indexOf(final Layer layer) {
@@ -615,6 +629,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return this.deleted;
   }
 
+  @Override
   public boolean isDescendant(final Layer layer) {
     if (layer == this) {
       return true;

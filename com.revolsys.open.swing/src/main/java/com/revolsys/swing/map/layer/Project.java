@@ -253,12 +253,10 @@ public class Project extends LayerGroup {
 
   @Override
   protected void importProject(final Project importProject) {
-    final List<Layer> importLayers = importProject.getLayers();
-    addLayers(importLayers);
+    super.importProject(importProject);
 
-    final BaseMapLayerGroup importBaseMaps = importProject.getBaseMapLayers();
     final BaseMapLayerGroup baseMaps = getBaseMapLayers();
-    baseMaps.addLayers(importBaseMaps);
+    baseMaps.importProjectBaseMaps(importProject);
   }
 
   public boolean isBaseMapLayer(final Layer layer) {

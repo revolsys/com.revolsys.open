@@ -11,6 +11,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.parallel.RunnableSwingWorkerManager;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
@@ -70,7 +71,9 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
         this.cachedTiles.clear();
       }
     }
-    firePropertyChange(event);
+    if (!(event.getSource() instanceof Layer)) {
+      firePropertyChange(event);
+    }
   }
 
   @Override

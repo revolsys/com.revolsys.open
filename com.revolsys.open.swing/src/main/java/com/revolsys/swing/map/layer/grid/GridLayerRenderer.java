@@ -69,9 +69,16 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
     setLayer(layer);
   }
 
+  @SuppressWarnings("unchecked")
   public GridLayerRenderer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
+    final Map<String, ? extends Object> geometryStyleProperties = (Map<String, ? extends Object>)properties
+      .get("geometryStyle");
+    this.geometryStyle.setProperties(geometryStyleProperties);
+    final Map<String, ? extends Object> textStyleProperties = (Map<String, ? extends Object>)properties
+      .get("textStyle");
+    this.geometryStyle.setProperties(textStyleProperties);
   }
 
   @Override

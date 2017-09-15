@@ -45,6 +45,10 @@ public class BaseMapLayerGroup extends LayerGroup {
 
   @Override
   protected void importProject(final Project importProject) {
+    importProjectBaseMaps(importProject);
+  }
+
+  protected void importProjectBaseMaps(final Project importProject) {
     final BaseMapLayerGroup importBaseMaps = importProject.getBaseMapLayers();
     addLayers(importBaseMaps);
   }

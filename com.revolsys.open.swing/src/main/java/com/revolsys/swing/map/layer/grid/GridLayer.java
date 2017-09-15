@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -47,7 +48,9 @@ public class GridLayer extends AbstractLayer {
     setProperties(config);
     setReadOnly(true);
     setSelectSupported(false);
-    setRenderer(new GridLayerRenderer(this));
+    if (getRenderer() == null) {
+      setRenderer(new GridLayerRenderer(this));
+    }
     setIcon(Icons.getIcon("grid"));
   }
 
@@ -98,6 +101,20 @@ public class GridLayer extends AbstractLayer {
 
   public void setGridName(final String gridName) {
     this.gridName = gridName;
+  }
+
+  @SuppressWarnings("unchecked")
+  public void setStyle(Object style) {
+    if (style instanceof Map) {
+      final Map<String, Object> map = (Map<String, Object>)style;
+      style = MapObjectFactory.toObject(map);
+    }
+    if (style instanceof GridLayerRenderer) {
+      final GridLayerRenderer renderer = (GridLayerRenderer)style;
+      setRenderer(renderer);
+    } else {
+      Logs.error(this, "Cannot create renderer for: " + style);
+    }
   }
 
   @Override

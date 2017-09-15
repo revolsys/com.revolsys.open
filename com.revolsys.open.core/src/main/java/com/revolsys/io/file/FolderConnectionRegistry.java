@@ -1,6 +1,7 @@
 package com.revolsys.io.file;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
@@ -62,6 +63,13 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
   }
 
   public FolderConnection addConnection(String name, final File file) {
+    name = getUniqueName(name);
+    final FolderConnection connection = new FolderConnection(this, name, file);
+    addConnection(connection);
+    return connection;
+  }
+
+  public FolderConnection addConnection(String name, final Path file) {
     name = getUniqueName(name);
     final FolderConnection connection = new FolderConnection(this, name, file);
     addConnection(connection);
