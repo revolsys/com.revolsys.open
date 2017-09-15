@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.grid;
 
 import java.util.Map;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import com.revolsys.collection.map.MapEx;
@@ -139,8 +140,11 @@ public class GridLayer extends AbstractLayer {
       final String gridName = grid.getName();
       final String preferenceName = CaseConverter.toCapitalizedWords(gridName) + "Mapsheet";
       String mapsheet = PreferencesUtil.getString(getClass(), preferenceName);
-      mapsheet = JOptionPane.showInputDialog(map,
-        "Enter name of the" + gridName + " mapsheet to zoom to", mapsheet);
+
+      final String title = "Zoom to Mapsheet: " + getName();
+      mapsheet = (String)JOptionPane.showInputDialog(map,
+        new JLabel("<html><p>" + gridName + "</p><p>Enter mapsheet to zoom to.</p></html>"), title,
+        JOptionPane.QUESTION_MESSAGE, null, null, mapsheet);
       zoomToSheet(mapsheet);
     }
   }

@@ -11,6 +11,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   private static final double DEFAULT_TILE_SIZE = 1000;
@@ -88,6 +89,12 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return tiles;
   }
 
+  public BoundingBox getBoundingBox(final double x1, final double y1) {
+    final double x2 = x1 + this.tileWidth;
+    final double y2 = y1 + this.tileHeight;
+    return this.geometryFactory.newBoundingBox(x1, y1, x2, y2);
+  }
+
   public BoundingBox getBoundingBox(final String name) {
     final double[] coordinates = MathUtil.toDoubleArraySplit(name, "_");
     if (coordinates.length == 2) {
@@ -97,12 +104,6 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     } else {
       return null;
     }
-  }
-
-  public BoundingBox getBoundingBox(final double x1, final double y1) {
-    final double x2 = x1 + this.tileWidth;
-    final double y2 = y1 + this.tileHeight;
-    return this.geometryFactory.newBoundingBox(x1, y1, x2, y2);
   }
 
   @Override
@@ -132,6 +133,26 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     final double x = coordinates.getX();
     final double y = coordinates.getY();
     return getMapTileName(x, y);
+  }
+
+  @Override
+  public String getName() {
+    final StringBuilder string = new StringBuilder();
+    if (this.geometryFactory != null) {
+      string.append(this.geometryFactory.getCoordinateSystem().getCoordinateSystemName());
+      string.append(" ");
+    }
+    if (this.originX != 0 && this.originY != 0) {
+      string.append(Doubles.toString(this.originX));
+      string.append(',');
+      string.append(Doubles.toString(this.originY));
+    }
+
+    string.append(Doubles.toString(this.tileWidth));
+    string.append('x');
+    string.append(Doubles.toString(this.tileHeight));
+
+    return string.toString();
   }
 
   public double getOriginX() {
@@ -249,21 +270,6 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public String toString() {
-    final StringBuilder string = new StringBuilder();
-    if (this.geometryFactory != null) {
-      string.append(this.geometryFactory.getCoordinateSystem().getCoordinateSystemName());
-      string.append(" ");
-    }
-    if (this.originX != 0 && this.originY != 0) {
-      string.append(this.originX);
-      string.append(',');
-      string.append(this.originY);
-    }
-
-    string.append(this.tileWidth);
-    string.append('x');
-    string.append(this.tileHeight);
-
-    return string.toString();
+    return getName();
   }
 }
