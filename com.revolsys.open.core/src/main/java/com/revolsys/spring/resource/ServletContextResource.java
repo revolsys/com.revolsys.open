@@ -64,6 +64,10 @@ public class ServletContextResource extends AbstractResource implements ContextR
     }
   }
 
+  public final String getContextPath() {
+    return this.path;
+  }
+
   @Override
   public String getDescription() {
     return this.path;
@@ -97,10 +101,6 @@ public class ServletContextResource extends AbstractResource implements ContextR
       throw new IllegalArgumentException("Could not open " + getDescription());
     }
     return is;
-  }
-
-  public final String getPath() {
-    return this.path;
   }
 
   @Override

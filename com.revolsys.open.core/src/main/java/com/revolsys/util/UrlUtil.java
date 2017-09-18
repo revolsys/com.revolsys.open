@@ -409,8 +409,7 @@ public final class UrlUtil {
     if (parent == null) {
       return null;
     } else {
-      final URL parentUrl = parent.getUrl();
-      return getUrl(parentUrl, child);
+      return parent.getUrl(child);
     }
   }
 

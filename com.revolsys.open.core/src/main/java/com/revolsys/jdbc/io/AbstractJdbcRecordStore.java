@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -588,12 +589,12 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             final PathName pathName = schemaPath.newChild(tableName);
 
             JdbcRecordDefinition recordDefinition = recordDefinitionMap.get(pathName);
-            List<String> tablePermissions;
+            Set<String> tablePermissions;
             if (recordDefinition == null) {
               recordDefinition = newRecordDefinition(schema, pathName, dbTableName);
               recordDefinitionMap.put(pathName, recordDefinition);
 
-              tablePermissions = new ArrayList<>();
+              tablePermissions = new LinkedHashSet<>();
               recordDefinition.setProperty("permissions", tablePermissions);
 
               final String description = resultSet.getString("REMARKS");

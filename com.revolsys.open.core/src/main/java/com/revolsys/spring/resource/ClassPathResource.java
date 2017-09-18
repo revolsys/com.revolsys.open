@@ -78,6 +78,10 @@ public class ClassPathResource extends AbstractResource {
     return this.clazz != null ? this.clazz.getClassLoader() : this.classLoader;
   }
 
+  public final String getClassPath() {
+    return this.path;
+  }
+
   @Override
   public String getDescription() {
     final StringBuilder builder = new StringBuilder();
@@ -113,10 +117,6 @@ public class ClassPathResource extends AbstractResource {
         getDescription() + " cannot be opened because it does not exist");
     }
     return is;
-  }
-
-  public final String getPath() {
-    return this.path;
   }
 
   @Override

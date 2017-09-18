@@ -3,7 +3,8 @@ package com.revolsys.io.connection;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.file.Paths;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
@@ -28,7 +30,7 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
 
   private Map<String, C> connections;
 
-  private File directory;
+  private Path directory;
 
   private final String fileExtension;
 
@@ -82,8 +84,8 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
     }
   }
 
-  protected File getConnectionFile(final Connection connection, final boolean useOriginalFile) {
-    File connectionFile = null;
+  protected Path getConnectionFile(final Connection connection, final boolean useOriginalFile) {
+    Path connectionFile = null;
     if (useOriginalFile) {
       connectionFile = connection.getConnectionFile();
     }
@@ -94,17 +96,21 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
     return connectionFile;
   }
 
-  protected File getConnectionFile(final String name) {
+  protected Path getConnectionFile(final String name) {
     if (Property.hasValue(name)) {
-      if (!this.directory.exists()) {
+      if (!Paths.exists(this.directory)) {
         if (isReadOnly()) {
           return null;
-        } else if (!this.directory.mkdirs()) {
-          return null;
+        } else {
+          try {
+            Paths.createDirectories(this.directory);
+          } catch (final Throwable e) {
+            return null;
+          }
         }
       }
       final String fileName = FileUtil.toSafeName(name) + "." + this.fileExtension;
-      final File file = new File(this.directory, fileName);
+      final Path file = this.directory.resolve(fileName);
       return file;
     } else {
       return null;
@@ -132,11 +138,11 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
     return null;
   }
 
-  protected String getConnectionName(final MapEx config, final File connectionFile,
+  protected String getConnectionName(final MapEx config, final Path connectionFile,
     final boolean requireUniqueNames) {
     String name = config.getString("name");
     if (connectionFile != null && !Property.hasValue(name)) {
-      name = FileUtil.getBaseName(connectionFile);
+      name = Paths.getBaseName(connectionFile);
     }
     if (requireUniqueNames) {
       name = getUniqueName(name);
@@ -156,7 +162,7 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
     return new ArrayList<>(this.connections.values());
   }
 
-  public File getDirectory() {
+  public Path getDirectory() {
     return this.directory;
   }
 
@@ -187,8 +193,8 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
   }
 
   @Override
-  public void importConnection(final File file) {
-    if (file != null && file.isFile()) {
+  public void importConnection(final Path file) {
+    if (file != null && Files.isRegularFile(file)) {
       loadConnection(file, true);
     }
   }
@@ -199,9 +205,9 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
   }
 
   protected void initDo() {
-    if (this.directory != null && this.directory.isDirectory()) {
-      for (final File connectionFile : FileUtil.getFilesByExtension(this.directory,
-        this.fileExtension, "rgobject")) {
+    if (this.directory != null && Files.isDirectory(this.directory)) {
+      for (final Path connectionFile : Paths.getChildPaths(this.directory, this.fileExtension,
+        "rgobject")) {
         loadConnection(connectionFile, false);
       }
     }
@@ -217,13 +223,13 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
     return this.visible;
   }
 
-  protected abstract C loadConnection(final File connectionFile, boolean importConnection);
+  protected abstract C loadConnection(final Path connectionFile, boolean importConnection);
 
   @Override
   public C newConnection(final Map<String, ? extends Object> connectionParameters) {
     final String name = Maps.getString(connectionParameters, "name");
-    final File file = getConnectionFile(name);
-    if (file != null && (!file.exists() || file.canRead())) {
+    final Path file = getConnectionFile(name);
+    if (file != null && (!Paths.exists(file) || Files.isReadable(file))) {
       Json.writeMap(connectionParameters, file, true);
       return loadConnection(file, false);
     }
@@ -269,8 +275,8 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
           null);
         this.propertyChangeSupport.fireIndexedPropertyChange("children", index, connection, null);
         if (this.directory != null && !this.readOnly) {
-          final File file = existingConnection.getConnectionFile();
-          FileUtil.deleteDirectory(file);
+          final Path file = existingConnection.getConnectionFile();
+          Paths.deleteDirectories(file);
         }
         return true;
       }
@@ -294,7 +300,7 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
 
   private void saveDo(final boolean useOriginalFile) {
     for (final Connection connection : this.connections.values()) {
-      final File connectionFile = getConnectionFile(connection, useOriginalFile);
+      final Path connectionFile = getConnectionFile(connection, useOriginalFile);
       final String name = connection.getName();
       if (Property.hasValue(name)) {
         connection.writeToFile(connectionFile);
@@ -321,12 +327,12 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
   protected void setDirectory(final Resource directoryResource) {
     if (directoryResource instanceof PathResource) {
       final PathResource pathResource = (PathResource)directoryResource;
-      final File directory = pathResource.getFile();
+      final Path directory = pathResource.getPath();
       boolean readOnly = isReadOnly();
       if (!readOnly) {
         if (directoryResource.exists()) {
-          readOnly = !directory.canWrite();
-        } else if (directory.mkdirs()) {
+          readOnly = !Files.isWritable(directory);
+        } else if (Paths.deleteDirectories(directory)) {
           readOnly = false;
         } else {
           readOnly = true;

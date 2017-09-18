@@ -257,6 +257,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   /**
    * Return the file path for this resource.
    */
+  @Override
   public final Path getPath() {
     return this.path;
   }

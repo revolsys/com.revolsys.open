@@ -54,7 +54,6 @@ import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
-import com.revolsys.util.UrlUtil;
 
 public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   private static final JFileChooser CHOOSER = new JFileChooser();
@@ -165,12 +164,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public static URL getUrl(final BaseTreeNode parent, final Path path) {
     if (parent instanceof UrlProxy) {
       final UrlProxy parentProxy = (UrlProxy)parent;
-      String childPath = Paths.getFileName(path);
-
-      if (Files.isDirectory(path)) {
-        childPath += "/";
-      }
-      return UrlUtil.getUrl(parentProxy, childPath);
+      return parentProxy.getUrl(path);
     } else {
       try {
         final URL url = path.toUri().toURL();
@@ -241,7 +235,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       Borders.titled(panel, "Folder Connection");
 
       SwingUtil.addLabel(panel, "Folder");
-      final JLabel fileLabel = new JLabel(getIconFile(path).getAbsolutePath());
+      final JLabel fileLabel = new JLabel(path.toString());
       panel.add(fileLabel);
 
       SwingUtil.addLabel(panel, "Name");
@@ -271,7 +265,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
           connectionName = fileName;
         }
 
-        registry.addConnection(connectionName, getIconFile(path));
+        registry.addConnection(connectionName, path);
       }
     }
   }

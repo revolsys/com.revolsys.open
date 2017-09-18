@@ -26,10 +26,9 @@ import com.revolsys.util.Property;
 public class FileRecordLayer extends ListRecordLayer {
 
   static {
-    MenuFactory.addMenuInitializer(FileRecordLayer.class, (menu) -> {
-      Menus.<FileRecordLayer> addMenuItem(menu, "refresh", "Reload from File",
-        Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revertDo, true);
-    });
+    MenuFactory.addMenuInitializer(FileRecordLayer.class,
+      menu -> Menus.<FileRecordLayer> addMenuItem(menu, "refresh", "Reload from File",
+        Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revertDo, true));
   }
 
   public static FileRecordLayer newLayer(final Map<String, ? extends Object> config) {
@@ -131,7 +130,7 @@ public class FileRecordLayer extends ListRecordLayer {
             setExists(true);
             return true;
           }
-        } catch (final Throwable e) {
+        } catch (final RuntimeException e) {
           Logs.error(this, "Error reading: " + this.resource, e);
         } finally {
           refresh();

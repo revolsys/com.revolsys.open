@@ -302,6 +302,15 @@ public interface Resource extends org.springframework.core.io.Resource {
     return null;
   }
 
+  default Path getPath() {
+    final File file = getFile();
+    if (file == null) {
+      return null;
+    } else {
+      return file.toPath();
+    }
+  }
+
   default URI getUri() {
     try {
       return getURI();

@@ -27,7 +27,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.util.Booleans;
-import com.revolsys.util.OS;
+import com.revolsys.util.Preferences;
 
 public class ZoomOverlay extends AbstractOverlay {
   private static final String PREFERENCE_WHEEL_FORWARDS_ZOOM_IN = "wheelForwardsZoomIn";
@@ -96,7 +96,8 @@ public class ZoomOverlay extends AbstractOverlay {
   }
 
   public boolean isWheelForwardsZoomIn() {
-    final Object wheelForwardsZoomIn = OS.getPreference("com.revolsys.gis", PREFERENCE_PATH,
+    Preferences preferences = getMap().getPreferences();
+    final Object wheelForwardsZoomIn = preferences.getValue(PREFERENCE_PATH,
       PREFERENCE_WHEEL_FORWARDS_ZOOM_IN);
     return !Booleans.isFalse(wheelForwardsZoomIn);
   }

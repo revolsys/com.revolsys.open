@@ -1,10 +1,9 @@
 package com.revolsys.io.file;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.io.connection.ConnectionRegistryManager;
@@ -55,18 +54,11 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
     final String name = connection.getName();
     addConnection(name, connection);
     if (!isReadOnly()) {
-      final File file = getConnectionFile(connection, true);
-      if (file != null && (!file.exists() || file.canWrite())) {
+      final Path file = getConnectionFile(connection, true);
+      if (file != null && (!Paths.exists(file) || Files.isWritable(file))) {
         connection.writeToFile(file);
       }
     }
-  }
-
-  public FolderConnection addConnection(String name, final File file) {
-    name = getUniqueName(name);
-    final FolderConnection connection = new FolderConnection(this, name, file);
-    addConnection(connection);
-    return connection;
   }
 
   public FolderConnection addConnection(String name, final Path file) {
@@ -82,13 +74,13 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
   }
 
   @Override
-  protected FolderConnection loadConnection(final File connectionFile,
+  protected FolderConnection loadConnection(final Path connectionFile,
     final boolean importConnection) {
     try {
       final MapEx config = Json.toMap(connectionFile);
       final String name = getConnectionName(config, connectionFile, importConnection);
       final String fileName = (String)config.get("file");
-      final File file = FileUtil.getFile(fileName);
+      final Path file = Paths.getPath(fileName);
       final FolderConnection connection = new FolderConnection(this, name, file);
       if (!importConnection) {
         connection.setConnectionFile(connectionFile);

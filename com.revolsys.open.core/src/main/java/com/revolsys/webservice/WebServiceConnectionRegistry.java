@@ -1,6 +1,6 @@
 package com.revolsys.webservice;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
@@ -73,7 +73,7 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
   }
 
   @Override
-  protected WebServiceConnection loadConnection(final File connectionFile,
+  protected WebServiceConnection loadConnection(final Path connectionFile,
     final boolean importConnection) {
     final MapEx config = Json.toMap(connectionFile);
     final String name = getConnectionName(config, connectionFile, importConnection);

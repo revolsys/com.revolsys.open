@@ -250,39 +250,45 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
   }
 
-  public void addLayer(int index, final Layer layer) {
+  public boolean addLayer(final int index, final Layer layer) {
+    final int addIndex;
     synchronized (this.layers) {
-      if (layer != null && !this.layers.contains(layer)) {
-        final String name = layer.getName();
-        String newName = name;
-        int i = 1;
-        while (hasLayerWithSameName(layer, newName)) {
-          newName = name + i;
-          i++;
-        }
-        layer.setName(newName);
-        if (index < this.layers.size()) {
-          this.layers.add(index, layer);
-        } else {
-          index = this.layers.size();
-          this.layers.add(layer);
-        }
-        layer.setLayerGroup(this);
-        initialize(layer);
-        fireIndexedPropertyChange("layers", index, null, layer);
-      }
+      addIndex = addLayerDo(index, layer);
+    }
+    if (addIndex > -1) {
+      fireIndexedPropertyChange("layers", addIndex, null, layer);
+      return true;
+    } else {
+      return false;
     }
   }
 
   public boolean addLayer(final Layer layer) {
-    synchronized (this.layers) {
-      if (layer == null || this.layers.contains(layer)) {
-        return false;
-      } else {
-        final int index = this.layers.size();
-        addLayer(index, layer);
-        return true;
+    return addLayer(-1, layer);
+  }
+
+  protected int addLayerDo(final int index, final Layer layer) {
+    if (layer != null && !this.layers.contains(layer)) {
+      final String name = layer.getName();
+      String newName = name;
+      int i = 1;
+      while (hasLayerWithSameName(layer, newName)) {
+        newName = name + i;
+        i++;
       }
+      layer.setName(newName);
+      int addIndex = index;
+      if (index >= 0 && index < this.layers.size()) {
+        this.layers.add(index, layer);
+      } else {
+        addIndex = this.layers.size();
+        this.layers.add(layer);
+      }
+      layer.setLayerGroup(this);
+      initialize(layer);
+      return addIndex;
+    } else {
+      return -1;
     }
   }
 
@@ -899,6 +905,21 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   protected boolean saveSettingsDo(final java.nio.file.Path directory) {
     final java.nio.file.Path groupDirectory = getGroupSettingsDirectory(directory);
     return super.saveSettingsDo(groupDirectory);
+  }
+
+  public void setLayers(final List<Layer> layers) {
+    final Object oldValue;
+    synchronized (this.layers) {
+      oldValue = new ArrayList<>(this.layers);
+      this.layers.clear();
+      int index = 0;
+      for (final Object layer : layers) {
+        if (layer instanceof Layer) {
+          addLayerDo(index++, (Layer)layer);
+        }
+      }
+    }
+    firePropertyChange("layer", oldValue, layers);
   }
 
   public void setSingleLayerVisible(final boolean singleLayerVisible) {

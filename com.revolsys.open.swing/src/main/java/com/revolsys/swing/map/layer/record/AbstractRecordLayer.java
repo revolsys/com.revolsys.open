@@ -1656,8 +1656,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (permissions == null) {
         return true;
       } else {
-        final boolean hasPermission = permissions.contains(permission);
-        return hasPermission;
+        return permissions.contains(permission);
       }
     }
   }

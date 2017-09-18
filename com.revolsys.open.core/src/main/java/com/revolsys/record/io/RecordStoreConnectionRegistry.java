@@ -1,6 +1,6 @@
 package com.revolsys.record.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 
@@ -72,7 +72,7 @@ public class RecordStoreConnectionRegistry
   }
 
   @Override
-  protected RecordStoreConnection loadConnection(final File connectionFile,
+  protected RecordStoreConnection loadConnection(final Path connectionFile,
     final boolean importConnection) {
     final MapEx config = Json.toMap(connectionFile);
     final String name = getConnectionName(config, connectionFile, importConnection);

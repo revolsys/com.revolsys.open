@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.springframework.util.Assert;
@@ -18,6 +19,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.file.Paths;
 import com.revolsys.util.Base64;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
@@ -264,10 +266,10 @@ public class UrlResource extends AbstractResource {
   @Override
   public File getFile() {
     try {
-      final URL url = getURL();
       if (isFolderConnection()) {
-        return FileUtil.getFile(url);
+        return FileUtil.getFile(this.url);
       } else {
+        final URL url = getURL();
         if (!"file".equals(url.getProtocol())) {
           throw new FileNotFoundException(getDescription() + " is not a file URL: " + url);
         }
@@ -374,6 +376,11 @@ public class UrlResource extends AbstractResource {
 
   public String getPassword() {
     return this.password;
+  }
+
+  @Override
+  public Path getPath() {
+    return Paths.getPath(this.uri);
   }
 
   public String getProtocol() {

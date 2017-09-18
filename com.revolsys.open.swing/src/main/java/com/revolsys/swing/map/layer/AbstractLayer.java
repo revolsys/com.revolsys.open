@@ -1024,7 +1024,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
-    if (properties == null || !this.getProperties().equals(properties)) {
+    if (properties == null || !getProperties().equals(properties)) {
       super.setProperties(properties);
       firePropertyChange("properties", null, properties);
     }

@@ -1,6 +1,6 @@
 package com.revolsys.io.connection;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import com.revolsys.collection.NameProxy;
 import com.revolsys.io.map.MapSerializer;
@@ -9,7 +9,7 @@ import com.revolsys.util.IconNameProxy;
 public interface Connection extends MapSerializer, NameProxy, IconNameProxy {
   void deleteConnection();
 
-  File getConnectionFile();
+  Path getConnectionFile();
 
   ConnectionRegistry<?> getRegistry();
 

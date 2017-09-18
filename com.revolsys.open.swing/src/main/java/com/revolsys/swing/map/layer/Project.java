@@ -263,6 +263,10 @@ public class Project extends LayerGroup {
     return this.baseMapLayers.isDescendant(layer);
   }
 
+  public boolean isSaved() {
+    return this.resource != null;
+  }
+
   @Override
   protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);
@@ -316,7 +320,7 @@ public class Project extends LayerGroup {
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
         loadLayers(properties);
-      } catch (final Throwable e) {
+      } catch (final RuntimeException e) {
         Logs.error(this, "Unable to read: " + layerGroupResource, e);
       } finally {
         Resource.setBaseResource(oldResource);
@@ -586,7 +590,7 @@ public class Project extends LayerGroup {
         if (srid != null) {
           setGeometryFactory(GeometryFactory.floating3(srid));
         }
-      } catch (final Throwable t) {
+      } catch (final RuntimeException t) {
       }
     } else if ("viewBoundingBox".equals(name)) {
       if (value != null) {

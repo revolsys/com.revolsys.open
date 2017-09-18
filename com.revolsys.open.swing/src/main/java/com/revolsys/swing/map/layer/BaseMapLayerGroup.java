@@ -28,10 +28,11 @@ public class BaseMapLayerGroup extends LayerGroup {
   }
 
   @Override
-  public void addLayer(final int index, final Layer layer) {
+  public boolean addLayer(final int index, final Layer layer) {
     if (layer == null) {
+      return false;
     } else if (layer instanceof BaseMapLayer) {
-      super.addLayer(index, layer);
+      return super.addLayer(index, layer);
     } else {
       throw new IllegalArgumentException("Layer " + layer.getName() + " must be a subclass of "
         + BaseMapLayer.class + " not " + layer.getClass());

@@ -1,6 +1,6 @@
 package com.revolsys.io.connection;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -19,7 +19,7 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
 
   private R registry;
 
-  private File connectionFile;
+  private Path connectionFile;
 
   public AbstractConnection(final R registry, final String name) {
     this.registry = registry;
@@ -66,7 +66,7 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
   }
 
   @Override
-  public File getConnectionFile() {
+  public Path getConnectionFile() {
     return this.connectionFile;
   }
 
@@ -98,7 +98,7 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
     }
   }
 
-  public void setConnectionFile(final File connectionFile) {
+  public void setConnectionFile(final Path connectionFile) {
     this.connectionFile = connectionFile;
   }
 
@@ -120,7 +120,7 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
   public void writeToFile(final Object target) {
     final Resource resource = Resource.getResource(target);
     try {
-      this.connectionFile = resource.getFile();
+      this.connectionFile = resource.getPath();
     } catch (final Throwable e) {
 
     }

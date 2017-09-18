@@ -7,26 +7,25 @@ import java.util.List;
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnection;
 import com.revolsys.util.Property;
 
 public class FolderConnection extends AbstractConnection<FolderConnection, FolderConnectionRegistry>
   implements Parent<Path> {
-  private File file;
 
-  private Path path;
-
-  public FolderConnection(final FolderConnectionRegistry registry, final String name,
-    final File file) {
-    super(registry, name);
-    setFile(file);
-  }
+  private final Path path;
 
   public FolderConnection(final FolderConnectionRegistry registry, final String name,
     final Path path) {
     super(registry, name);
-    setFile(path.toFile());
+    if (path == null) {
+      throw new IllegalArgumentException("File must not be null");
+    }
+    if (!Property.hasValue(getName())) {
+      final String fileName = Paths.getFileName(path);
+      setName(fileName);
+    }
+    this.path = path.toAbsolutePath();
   }
 
   @Override
@@ -45,7 +44,7 @@ public class FolderConnection extends AbstractConnection<FolderConnection, Folde
   }
 
   public File getFile() {
-    return this.file;
+    return this.path.toFile();
   }
 
   @Override
@@ -57,24 +56,12 @@ public class FolderConnection extends AbstractConnection<FolderConnection, Folde
     return this.path;
   }
 
-  public void setFile(final File file) {
-    if (file == null) {
-      throw new IllegalArgumentException("File must not be null");
-    }
-    if (!Property.hasValue(getName())) {
-      final String fileName = FileUtil.getFileName(file);
-      setName(fileName);
-    }
-    this.file = file;
-    this.path = file.toPath();
-  }
-
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
     addTypeToMap(map, "folderConnection");
     map.put("name", getName());
-    map.put("file", FileUtil.getCanonicalPath(this.file));
+    map.put("file", this.path.toAbsolutePath().toString());
     return map;
   }
 }

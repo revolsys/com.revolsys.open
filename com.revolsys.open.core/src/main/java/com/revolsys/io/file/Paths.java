@@ -34,6 +34,7 @@ import com.revolsys.io.FileNames;
 import com.revolsys.logging.Logs;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
+import com.revolsys.util.UrlUtil;
 
 public interface Paths {
   LinkOption[] LINK_OPTIONS_NONE = new LinkOption[0];
@@ -248,11 +249,33 @@ public interface Paths {
   }
 
   static Path getPath(final URI uri) {
-    if (uri != null) {
-      final Path path = java.nio.file.Paths.get(uri);
-      return getPath(path);
-    } else {
+    if (uri == null) {
       return null;
+    } else {
+      final String scheme = uri.getScheme();
+      if ("folderconnection".equalsIgnoreCase(scheme)) {
+        final String authority = uri.getAuthority();
+        final String connectionName = UrlUtil.percentDecode(authority);
+
+        final String uriPath = uri.getPath();
+
+        Path path = null;
+        for (final FolderConnectionRegistry registry : FileConnectionManager.get()
+          .getConnectionRegistries()) {
+          final FolderConnection connection = registry.getConnection(connectionName);
+          if (connection != null) {
+            final Path directory = connection.getPath();
+            path = directory.resolve(uriPath);
+            if (Paths.exists(path)) {
+              return Paths.getPath(path);
+            }
+          }
+        }
+        return path;
+      } else {
+        final Path path = java.nio.file.Paths.get(uri);
+        return getPath(path);
+      }
     }
   }
 

@@ -2,6 +2,7 @@ package com.revolsys.swing.tree.node;
 
 import java.awt.Window;
 import java.io.File;
+import java.nio.file.Path;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -113,7 +114,8 @@ public class ConnectionManagerTrees {
     if (status == JFileChooser.APPROVE_OPTION) {
       Invoke.background("Import " + name, () -> {
         for (final File file : fileChooser.getSelectedFiles()) {
-          connectionRegistry.importConnection(file);
+          final Path path = file.toPath();
+          connectionRegistry.importConnection(path);
         }
       });
     }
