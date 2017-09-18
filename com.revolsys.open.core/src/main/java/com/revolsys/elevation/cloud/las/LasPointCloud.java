@@ -234,6 +234,11 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
   }
 
   @Override
+  public Predicate<Point> getDefaultFilter() {
+    return point -> LasClassification.GROUND.equals(((LasPoint)point).getClassification());
+  }
+
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }

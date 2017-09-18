@@ -14,8 +14,6 @@ public class MenuSourceAction extends AbstractActionMainMenuItemFactory {
   @SuppressWarnings("rawtypes")
   private final Consumer action;
 
-  private String iconName;
-
   private final boolean runInBackground;
 
   MenuSourceAction(final CharSequence name, final String toolTip, final Icon icon,
@@ -46,12 +44,4 @@ public class MenuSourceAction extends AbstractActionMainMenuItemFactory {
     }
   }
 
-  @Override
-  public String getIconName() {
-    return this.iconName;
-  }
-
-  public void setIconName(final String iconName) {
-    this.iconName = iconName;
-  }
 }

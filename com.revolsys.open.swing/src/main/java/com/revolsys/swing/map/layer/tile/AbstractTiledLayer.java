@@ -35,6 +35,8 @@ public abstract class AbstractTiledLayer<D, T extends AbstractMapTile<D>> extend
   protected void refreshDo() {
     this.hasError = false;
     super.refreshDo();
+    final AbstractTiledLayerRenderer<D, T> renderer = getRenderer();
+    renderer.clearCachedTiles();
   }
 
   public void setError(final Throwable e) {

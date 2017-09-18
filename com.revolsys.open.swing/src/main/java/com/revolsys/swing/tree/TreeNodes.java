@@ -12,19 +12,25 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
 
 public interface TreeNodes {
-  static <V extends BaseTreeNode> void addMenuItem(final MenuFactory menu, final String groupName,
-    final CharSequence name, final String iconName, final Consumer<V> consumer) {
-    addMenuItem(menu, groupName, name, iconName, null, consumer);
+  static <V extends BaseTreeNode> RunnableAction addMenuItem(final MenuFactory menu,
+    final String groupName, final CharSequence name, final Consumer<V> consumer) {
+    return addMenuItem(menu, groupName, name, null, null, consumer);
   }
 
-  static <V extends BaseTreeNode> void addMenuItem(final MenuFactory menu, final String groupName,
-    final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
+  static <V extends BaseTreeNode> RunnableAction addMenuItem(final MenuFactory menu,
+    final String groupName, final CharSequence name, final String iconName,
     final Consumer<V> consumer) {
-    addMenuItem(menu, groupName, -1, name, iconName, enabledFilter, consumer);
+    return addMenuItem(menu, groupName, name, iconName, null, consumer);
   }
 
-  static <V extends BaseTreeNode> void addMenuItem(final MenuFactory menu, final String groupName,
-    final int index, final CharSequence name, final String iconName,
+  static <V extends BaseTreeNode> RunnableAction addMenuItem(final MenuFactory menu,
+    final String groupName, final CharSequence name, final String iconName,
+    final Predicate<V> enabledFilter, final Consumer<V> consumer) {
+    return addMenuItem(menu, groupName, -1, name, iconName, enabledFilter, consumer);
+  }
+
+  static <V extends BaseTreeNode> RunnableAction addMenuItem(final MenuFactory menu,
+    final String groupName, final int index, final CharSequence name, final String iconName,
     final Predicate<V> enabledFilter, final Consumer<V> consumer) {
     final Icon icon = Icons.getIcon(iconName);
     final EnableCheck enableCheck = enableCheck(enabledFilter);
@@ -34,6 +40,7 @@ public interface TreeNodes {
     });
     action.setEnableCheck(enableCheck);
     menu.addMenuItem(groupName, action);
+    return action;
   }
 
   static <V> void addMenuItemNodeValue(final MenuFactory menu, final String groupName,

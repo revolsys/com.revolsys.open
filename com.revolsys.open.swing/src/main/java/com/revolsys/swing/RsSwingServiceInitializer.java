@@ -1,10 +1,20 @@
 package com.revolsys.swing;
 
+import java.net.URL;
+
+import com.revolsys.elevation.cloud.PointCloudReaderFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.rasterizer.ColourGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.raster.GeoreferencedImageReadFactory;
+import com.revolsys.record.io.RecordReaderFactory;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServer;
 import com.revolsys.swing.map.layer.bing.Bing;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
@@ -35,9 +45,29 @@ import com.revolsys.swing.map.layer.record.style.marker.TextMarker;
 import com.revolsys.swing.map.layer.webmercatortilecache.WebMercatorTileCache;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.symbol.SymbolLibrary;
+import com.revolsys.swing.tree.TreeNodes;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.ServiceInitializer;
 
 public class RsSwingServiceInitializer implements ServiceInitializer {
+  private static void actionAddLayer(final PathTreeNode node,
+    final Class<? extends IoFactory> factoryClass) {
+    final URL url = node.getUrl();
+    final Project project = Project.get();
+    project.openFile(url);
+  }
+
+  private static void addIoFactoryMenuItem(final String menuGroup, final String menuName,
+    final String iconName, final Class<? extends IoFactory> factoryClass) {
+    final EnableCheck enableCheck = TreeNodes
+      .enableCheck((final PathTreeNode node) -> node.isReadable(factoryClass));
+    TreeNodes
+      .addMenuItem(PathTreeNode.MENU, menuGroup, menuName,
+        (final PathTreeNode node) -> actionAddLayer(node, factoryClass)) //
+      .setVisibleCheck(enableCheck) //
+      .setIconName(iconName, "add");
+  }
+
   private static void markers() {
     MapObjectFactoryRegistry.newFactory("markerText", "Marker Font and Text", TextMarker::new);
     MapObjectFactoryRegistry.newFactory("markerSvg", "Marker SVG", SvgMarker::new);
@@ -80,6 +110,8 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("baseMapLayerGroup", "Base Map Layer Group",
       BaseMapLayerGroup::newLayer);
 
+    addIoFactoryMenuItem("record", "Add Record Layer", "map", RecordReaderFactory.class);
+
     MapObjectFactoryRegistry.newFactory("recordFileLayer", "File", FileRecordLayer::newLayer);
 
     MapObjectFactoryRegistry.newFactory("recordStoreLayer", "Record Store Layer",
@@ -99,17 +131,29 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("geoReferencedImageLayer", "Geo-referenced Image Layer",
       GeoreferencedImageLayer::newLayer);
 
+    addIoFactoryMenuItem("image", "Add Image Layer", "picture",
+      GeoreferencedImageReadFactory.class);
+
     MapObjectFactoryRegistry.newFactory("griddedElevationModelLayer",
       "Gridded Elevation Model Layer", GriddedElevationModelLayer::new);
 
     MapObjectFactoryRegistry.newFactory("tiledGriddedElevationModelLayer",
       "Tiled Gridded Elevation Model Layer", TiledGriddedElevationModelLayer::new);
 
+    addIoFactoryMenuItem("griddedElevationModel", "Add Gridded DEM Layer", "gridded_dem",
+      GriddedElevationModelReadFactory.class);
+
     MapObjectFactoryRegistry.newFactory("triangulatedIrregularNetworkLayer",
       "Triangulated Irregular Network Layer", TriangulatedIrregularNetworkLayer::new);
 
+    addIoFactoryMenuItem("tin", "Add TIN Layer", "tin",
+      TriangulatedIrregularNetworkReadFactory.class);
+
     MapObjectFactoryRegistry.newFactory("pointCloudLayer", "Point Cloud Layer",
       PointCloudLayer::new);
+
+    addIoFactoryMenuItem("pointCloud", "Add Point Cloud Layer", "point_cloud",
+      PointCloudReaderFactory.class);
 
     ArcGisRestServer.factoryInit();
 

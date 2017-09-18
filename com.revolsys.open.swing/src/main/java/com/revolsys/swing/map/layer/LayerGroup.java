@@ -743,6 +743,46 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
   }
 
+  public int openFile(final Class<? extends IoFactory> factoryClass, int index, final URL url) {
+    final String urlString = url.toString();
+    final Map<String, Object> properties = new HashMap<>();
+    properties.put("url", urlString);
+    String name = UrlUtil.getFileBaseName(url);
+    name = FileUtil.fromSafeName(name);
+    properties.put("name", name);
+    Layer layer;
+    if (factoryClass == TriangulatedIrregularNetworkReadFactory.class) {
+      layer = new TriangulatedIrregularNetworkLayer(properties);
+    } else if (factoryClass == GriddedElevationModelReadFactory.class) {
+      layer = new GriddedElevationModelLayer(properties);
+    } else if (factoryClass == GeoreferencedImageReadFactory.class) {
+      layer = new GeoreferencedImageLayer(properties);
+    } else if (factoryClass == PointCloudReaderFactory.class) {
+      layer = new PointCloudLayer(properties);
+    } else if (factoryClass == RecordReaderFactory.class) {
+      final FileRecordLayer recordLayer = new FileRecordLayer(properties);
+      final GeometryStyleRenderer renderer = recordLayer.getRenderer();
+      renderer.setStyle(GeometryStyle.newStyle());
+      layer = recordLayer;
+    } else {
+      layer = null;
+    }
+    if (layer != null) {
+      layer.setProperty("showTableView", OS.getPreferenceBoolean("com.revolsys.gis",
+        PREFERENCE_PATH, PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false));
+      if (index == -1) {
+        addLayer(layer);
+      } else {
+        addLayer(index++, layer);
+      }
+    }
+    return index;
+  }
+
+  public int openFile(final Class<? extends IoFactory> factoryClass, final URL url) {
+    return openFile(factoryClass, -1, url);
+  }
+
   public void openFile(final File file) {
     final String extension = FileUtil.getFileNameExtension(file);
     if ("rgobject".equals(extension)) {
@@ -843,6 +883,13 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @Override
   protected void refreshDo() {
+  }
+
+  public void refreshLayer(final String path) {
+    final Layer layer = getLayerByPath(path);
+    if (layer != null) {
+      layer.refresh();
+    }
   }
 
   public Layer removeLayer(final int index) {

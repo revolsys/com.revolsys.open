@@ -26,6 +26,16 @@ import com.revolsys.swing.parallel.Invoke;
 public class ProgressMonitor extends JDialog implements WindowListener {
   private static final long serialVersionUID = -5843323756390303783L;
 
+  public static void background(final Component component, final String title, final String note,
+    final boolean canCancel, final Consumer<ProgressMonitor> task) {
+    final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, canCancel);
+    Invoke.background(title, () -> {
+      task.accept(progressMonitor);
+      return null;
+    }, result -> progressMonitor.setVisible(false));
+    progressMonitor.setVisible(true);
+  }
+
   public static void ui(final Component component, final String title, final String note,
     final boolean canCancel, final Consumer<ProgressMonitor> task) {
     final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, canCancel);

@@ -67,7 +67,6 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
         TablePanel.eventColumn = table.convertColumnIndexToModel(eventColumn);
 
         if (e.getButton() == MouseEvent.BUTTON3) {
-          // table.getSelectionModel().setSelectionInterval(eventRow, eventRow);
           if (table.isEditing()) {
             table.getCellEditor().stopCellEditing();
           }

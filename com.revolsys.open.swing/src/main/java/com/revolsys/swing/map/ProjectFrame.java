@@ -70,12 +70,12 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.print.SinglePage;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.BackgroundTaskTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.pdf.SaveAsPdf;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.scripting.ScriptRunner;
-import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.node.ListTreeNode;
@@ -677,7 +677,7 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected void newTabBottomTasksPanel() {
-    final int tabIndex = SwingWorkerTableModel.addNewTabPanel(this.bottomTabs);
+    final int tabIndex = BackgroundTaskTableModel.addNewTabPanel(this.bottomTabs);
 
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = RunnableAction.newButton(null, "View Running Tasks",

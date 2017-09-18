@@ -24,7 +24,7 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class Invoke {
-  private static PropertyChangeListener PROPERTY_CHANGE_LISTENER = new PropertyChangeListener() {
+  private static final PropertyChangeListener PROPERTY_CHANGE_LISTENER = new PropertyChangeListener() {
     @Override
     public synchronized void propertyChange(final PropertyChangeEvent event) {
       final SwingWorker<?, ?> worker = (SwingWorker<?, ?>)event.getSource();
@@ -84,7 +84,7 @@ public class Invoke {
         SwingUtilities.invokeAndWait(runnable);
         return runnable.getResult();
       }
-    } catch (final Throwable e) {
+    } catch (final Exception e) {
       return Exceptions.throwUncheckedException(e);
     }
   }
@@ -114,9 +114,7 @@ public class Invoke {
       } else {
         try {
           final V result = backgroundTask.get();
-          later(() -> {
-            doneTask.accept(result);
-          });
+          later(() -> doneTask.accept(result));
         } catch (final Exception e) {
           Exceptions.throwUncheckedException(e);
         }
@@ -167,9 +165,7 @@ public class Invoke {
         return worker;
       } else {
         final V result = backgroundTask.get();
-        later(() -> {
-          doneTask.accept(result);
-        });
+        later(() -> doneTask.accept(result));
       }
     }
     return null;
@@ -239,7 +235,7 @@ public class Invoke {
   public static void workerDone(final String description, final Runnable doneTask) {
     if (doneTask != null) {
       final SwingWorker<Void, Void> worker = new SupplierConsumerSwingWorker<>(description, null,
-        (result) -> doneTask.run());
+        result -> doneTask.run());
       worker(worker);
     }
   }

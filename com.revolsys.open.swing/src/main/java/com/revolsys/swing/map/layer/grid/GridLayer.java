@@ -28,7 +28,7 @@ import com.revolsys.util.Property;
 
 public class GridLayer extends AbstractLayer {
   static {
-    MenuFactory.addMenuInitializer(GridLayer.class, (menu) -> {
+    MenuFactory.addMenuInitializer(GridLayer.class, menu -> {
       menu.deleteMenuItem("zoom", "Zoom to Layer");
       menu.deleteMenuItem("refresh", "Refresh");
       Menus.<GridLayer> addMenuItem(menu, "zoom", "Zoom to Mapsheet", "magnifier_zoom_grid",

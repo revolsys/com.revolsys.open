@@ -43,7 +43,6 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
@@ -76,19 +75,20 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public static final Icon ICON_FOLDER_MISSING = Icons.getIconWithBadge(ICON_FOLDER, "error");
 
-  private static final MenuFactory MENU = new MenuFactory("File");
+  public static final MenuFactory MENU = new MenuFactory("File");
 
   static {
     addRefreshMenuItem(MENU);
 
-    TreeNodes.addMenuItem(MENU, "default", "Add Layer", "map_add", PathTreeNode::isFileLayer,
-      PathTreeNode::actionAddLayer);
+    TreeNodes
+      .addMenuItem(MENU, "record", "Export Records", "table_save",
+        PathTreeNode::actionExportRecords) //
+      .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isRecordFileLayer));
 
-    TreeNodes.addMenuItem(MENU, "default", "Export Records", "table_save",
-      PathTreeNode::isRecordFileLayer, PathTreeNode::actionExportRecords);
-
-    TreeNodes.addMenuItem(MENU, "default", "Add Folder Connection", "link_add",
-      PathTreeNode::isDirectory, PathTreeNode::actionAddFolderConnection);
+    TreeNodes
+      .addMenuItem(MENU, "folder", "Add Folder Connection", "link_add",
+        PathTreeNode::actionAddFolderConnection)//
+      .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isDirectory));
   }
 
   public static void addPathNode(final List<BaseTreeNode> children, final Path path,
@@ -270,12 +270,6 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     }
   }
 
-  private void actionAddLayer() {
-    final URL url = getUrl();
-    final Project project = Project.get();
-    project.openFile(url);
-  }
-
   private void actionExportRecords() {
     final Path path = getPath();
     boolean hasGeometryField;
@@ -419,16 +413,22 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     return this.hasFile;
   }
 
-  public boolean isRecordFileLayer() {
+  public boolean isReadable(final Class<? extends IoFactory> factoryClass) {
     if (isExists()) {
       final Path path = getPath();
       if (!this.hasFile) {
         return false;
-      } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
-        return true;
+      } else {
+        if (IoFactory.hasFactory(factoryClass, path)) {
+          return true;
+        }
       }
     }
     return false;
+  }
+
+  public boolean isRecordFileLayer() {
+    return isReadable(RecordReaderFactory.class);
   }
 
   @Override

@@ -41,6 +41,14 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     super(type, name);
   }
 
+  protected void clearCachedTiles() {
+    synchronized (this.cachedTiles) {
+      this.cachedTiles.clear();
+      tileLoaderManager.removeTasks(this.loadingTasks);
+      this.loadingTasks.clear();
+    }
+  }
+
   public T getCachedTile(final T mapTile) {
     return this.cachedTiles.get(mapTile);
   }
@@ -67,9 +75,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
         }
       }
     } else if (!TILES_LOADED.equals(event.getPropertyName())) {
-      synchronized (this.cachedTiles) {
-        this.cachedTiles.clear();
-      }
+      clearCachedTiles();
     }
     if (!(event.getSource() instanceof Layer)) {
       firePropertyChange(event);
@@ -85,9 +91,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
       if (layerResolution != this.resolution || viewportGeometryFactory != this.geometryFactory) {
         this.resolution = layerResolution;
         this.geometryFactory = viewportGeometryFactory;
-        this.cachedTiles.clear();
-        tileLoaderManager.removeTasks(this.loadingTasks);
-        this.loadingTasks.clear();
+        clearCachedTiles();
       }
     }
     final List<Runnable> tasks = new ArrayList<>();
