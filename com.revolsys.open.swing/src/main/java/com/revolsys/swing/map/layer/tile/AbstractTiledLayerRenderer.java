@@ -13,6 +13,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.parallel.RunnableSwingWorkerManager;
+import com.revolsys.util.BooleanCancellable;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
@@ -25,6 +26,8 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     "Load Map Tiles");
 
   private final Map<T, T> cachedTiles = new HashMap<>();
+
+  private BooleanCancellable cancellable = new BooleanCancellable();
 
   private GeometryFactory geometryFactory;
 
@@ -46,6 +49,8 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
       this.cachedTiles.clear();
       tileLoaderManager.removeTasks(this.loadingTasks);
       this.loadingTasks.clear();
+      this.cancellable.cancel();
+      this.cancellable = new BooleanCancellable();
     }
   }
 
@@ -104,8 +109,8 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
           if (cachedTile == null) {
             cachedTile = mapTile;
             this.cachedTiles.put(cachedTile, cachedTile);
-            final Runnable task = new TileLoadTask<D, T>(this, cancellable, viewportGeometryFactory,
-              cachedTile);
+            final Runnable task = new TileLoadTask<D, T>(this, this.cancellable,
+              viewportGeometryFactory, cachedTile);
             tasks.add(task);
           }
         }
