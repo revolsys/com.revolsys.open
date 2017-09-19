@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
+import javax.swing.Timer;
 
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -26,6 +27,8 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.TabbedPane;
+import com.revolsys.swing.menu.BaseJPopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
@@ -34,7 +37,7 @@ import com.revolsys.swing.table.highlighter.ColorHighlighter;
 public class BackgroundTaskTableModel extends AbstractTableModel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private static final List<String> COLUMN_TITLES = Arrays.asList("Thread", "Description",
+  private static final List<String> COLUMN_TITLES = Arrays.asList("Thread", "Title", "Message",
     "Time (s)", "Status");
 
   private static void addCountLabel(final JToolBar toolBar, final BackgroundTaskTableModel model,
@@ -98,9 +101,9 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
 
     for (int i = 0; i < model.getColumnCount(); i++) {
       final TableColumnExt column = table.getColumnExt(i);
-      if (i == 1) {
+      if (i == 1 || i == 2) {
         column.setMinWidth(200);
-        column.setPreferredWidth(400);
+        column.setPreferredWidth(300);
       } else {
         column.setMinWidth(70);
         column.setPreferredWidth(70);
@@ -114,11 +117,22 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
     return table;
   }
 
+  private final Timer timer = new Timer(500, e -> {
+    if (this.runningCount > 0) {
+      final BaseJTable table = getTable();
+      if (table != null) {
+        table.repaint();
+      }
+    }
+  });
+
   private transient List<BackgroundTask> tasks = new ArrayList<>();
 
   private final transient Map<SwingWorker<?, ?>, BackgroundTask> taskBySwingWorker = new LinkedHashMap<>();
 
   private final transient PropertyChangeListener taskListener;
+
+  private final transient PropertyChangeListener taskStatusChangeListener;
 
   private int pendingCount;
 
@@ -129,12 +143,17 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
   public BackgroundTaskTableModel() {
     final PropertyChangeSupport propertyChangeSupport = Invoke.getPropertyChangeSupport();
     propertyChangeSupport.addPropertyChangeListener(this);
-    this.taskListener = BackgroundTaskManager.addListener(task -> Invoke.later(() -> {
+    this.taskListener = BackgroundTaskManager.addTaskListener(task -> Invoke.later(() -> {
       if (!this.tasks.contains(task)) {
         this.tasks.add(task);
+        updateCounts();
         fireTableDataChanged();
       }
     }));
+    this.taskStatusChangeListener = BackgroundTaskManager
+      .addTaskStatusChangedListener(() -> Invoke.later(() -> {
+        updateCounts();
+      }));
   }
 
   private void addNewWorkers(final List<SwingWorker<?, ?>> workers) {
@@ -168,13 +187,14 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
     super.dispose();
     Invoke.getPropertyChangeSupport().removePropertyChangeListener(this);
     BackgroundTaskManager.removeListener(this.taskListener);
+    BackgroundTaskManager.removeListener(this.taskStatusChangeListener);
   }
 
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
-    if (columnIndex == 3) {
+    if (columnIndex == 4) {
       return StateValue.class;
-    } else if (columnIndex == 2) {
+    } else if (columnIndex == 3) {
       return Long.class;
     } else {
       return String.class;
@@ -183,7 +203,7 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
 
   @Override
   public int getColumnCount() {
-    return 4;
+    return COLUMN_TITLES.size();
   }
 
   @Override
@@ -193,6 +213,20 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
 
   public int getDoneCount() {
     return this.doneCount;
+  }
+
+  @Override
+  public BaseJPopupMenu getMenu(final int rowIndex, final int columnIndex) {
+    if (rowIndex >= 0 && rowIndex < this.tasks.size()) {
+      final BackgroundTask backgroundTask = this.tasks.get(rowIndex);
+      if (backgroundTask != null) {
+        final MenuFactory menu = backgroundTask.getMenu();
+        if (menu != null) {
+          return menu.newJPopupMenu();
+        }
+      }
+    }
+    return null;
   }
 
   public int getPendingCount() {
@@ -224,6 +258,8 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
         } else if (columnIndex == 1) {
           return task.getTaskTitle();
         } else if (columnIndex == 2) {
+          return task.getTaskMessage();
+        } else if (columnIndex == 3) {
           final long taskTime = task.getTaskTime();
           if (taskTime == -1) {
             return null;
@@ -294,6 +330,11 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
       } else if (!task.isTaskClosed()) {
         this.doneCount++;
       }
+    }
+    if (this.runningCount == 0) {
+      this.timer.stop();
+    } else {
+      this.timer.start();
     }
     firePropertyChange("pendingCount", -1, this.pendingCount);
     firePropertyChange("runningCount", -1, this.runningCount);

@@ -2178,6 +2178,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return proxyRecords;
   }
 
+  public Query newQuery() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return new Query(recordDefinition);
+  }
+
   public JComponent newSearchField(final FieldDefinition fieldDefinition,
     final CodeTable codeTable) {
     if (fieldDefinition == null) {

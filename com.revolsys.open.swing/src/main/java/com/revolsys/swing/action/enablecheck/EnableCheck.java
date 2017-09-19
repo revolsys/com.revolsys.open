@@ -2,16 +2,20 @@ package com.revolsys.swing.action.enablecheck;
 
 @FunctionalInterface
 public interface EnableCheck {
-  EnableCheck ENABLED = () -> {
-    return true;
-  };
+  EnableCheck ENABLED = () -> true;
 
-  EnableCheck DISABLED = () -> {
-    return false;
-  };
+  EnableCheck DISABLED = () -> false;
 
   static EnableCheck property(final Object object, final String propertyName) {
     return new ObjectPropertyEnableCheck(object, propertyName);
+  }
+
+  static EnableCheck propertyNotNull(final Object object, final String propertyName) {
+    return new ObjectPropertyEnableCheck(object, propertyName, null, true);
+  }
+
+  static EnableCheck propertyNull(final Object object, final String propertyName) {
+    return new ObjectPropertyEnableCheck(object, propertyName, null);
   }
 
   default EnableCheck and(final EnableCheck enableCheck) {

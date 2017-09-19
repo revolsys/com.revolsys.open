@@ -257,11 +257,12 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     addComponentFactory(groupName, menuItem);
   }
 
-  public void addMenuItem(final String groupName, final String title, final String iconName,
-    final Runnable runnable) {
+  public RunnableAction addMenuItem(final String groupName, final String title,
+    final String iconName, final Runnable runnable) {
     final Icon icon = Icons.getIcon(iconName);
     final RunnableAction menuItem = newMenuItem(title, title, icon, null, runnable);
     addComponentFactory(groupName, menuItem);
+    return menuItem;
   }
 
   public void addMenuItem(final String groupName, final String title, final String toolTip,

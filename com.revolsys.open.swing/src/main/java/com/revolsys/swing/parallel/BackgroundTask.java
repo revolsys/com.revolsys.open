@@ -2,13 +2,22 @@ package com.revolsys.swing.parallel;
 
 import javax.swing.SwingWorker.StateValue;
 
+import com.revolsys.swing.menu.MenuFactory;
+
 public interface BackgroundTask {
 
-  static void runnable(final String taskTitle, final Runnable runnable) {
+  static BackgroundTask runnable(final String taskTitle, final Runnable runnable) {
     final RunnableBackgroundTask task = new RunnableBackgroundTask(taskTitle, runnable);
-    BackgroundTaskManager.addTask(task);
-    final Thread thread = new Thread(task);
-    thread.start();
+    task.start();
+    return task;
+  }
+
+  default MenuFactory getMenu() {
+    return null;
+  }
+
+  default String getTaskMessage() {
+    return null;
   }
 
   StateValue getTaskStatus();
