@@ -137,6 +137,17 @@ public class Project extends LayerGroup {
   }
 
   @Override
+  public BoundingBox getBoundingBox() {
+    final BoundingBox boundingBox = super.getBoundingBox();
+    if (boundingBox.isEmpty()) {
+      final CoordinateSystem coordinateSystem = getCoordinateSystem();
+      return coordinateSystem.getAreaBoundingBox();
+    } else {
+      return boundingBox;
+    }
+  }
+
+  @Override
   public Path getDirectory() {
     final Path directory = getProjectDirectory();
     if (directory != null) {

@@ -409,14 +409,14 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boudingBox = geometryFactory.newBoundingBoxEmpty();
+    BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
     for (final Layer layer : this) {
       final BoundingBox layerBoundingBox = layer.getBoundingBox();
       if (!layerBoundingBox.isEmpty()) {
-        boudingBox = boudingBox.expandToInclude(layerBoundingBox);
+        boundingBox = boundingBox.expandToInclude(layerBoundingBox);
       }
     }
-    return boudingBox;
+    return boundingBox;
   }
 
   @Override
