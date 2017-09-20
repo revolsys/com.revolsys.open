@@ -56,7 +56,8 @@ public class RecordStoreConnectionRegistry
     this(null, name, true, readOnly, resource);
   }
 
-  public RecordStoreConnection addConnection(final Map<String, Object> config) {
+  @Override
+  public RecordStoreConnection addConnection(final MapEx config) {
     final RecordStoreConnection connection = new RecordStoreConnection(this, null, config);
     addConnection(connection);
     return connection;

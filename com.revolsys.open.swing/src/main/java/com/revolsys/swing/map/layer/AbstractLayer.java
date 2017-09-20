@@ -74,7 +74,8 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.swing.table.NumberTableCellRenderer;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.OS;
+import com.revolsys.util.PreferenceKey;
+import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
 import com.revolsys.util.ToolTipProxy;
 import com.revolsys.value.ThreadBooleanValue;
@@ -85,14 +86,16 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   public static final String PLUGIN_TABLE_VIEW = "tableView";
 
-  public static final String PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW = "newLayersShowTableView";
-
-  public static final String PREFERENCE_NEW_LAYERS_VISIBLE = "newLayersVisible";
-
   public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer";
 
+  public static final PreferenceKey PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW = new PreferenceKey(
+    PREFERENCE_PATH, "newLayersShowTableView");
+
+  public static final PreferenceKey PREFERENCE_NEW_LAYERS_VISIBLE = new PreferenceKey(
+    PREFERENCE_PATH, "newLayersVisible");
+
   static {
-    MenuFactory.addMenuInitializer(AbstractLayer.class, (menu) -> {
+    MenuFactory.addMenuInitializer(AbstractLayer.class, menu -> {
       Menus.addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",
         AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer, true);
 
@@ -113,11 +116,16 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       Menus.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information", exists,
         AbstractLayer::showProperties, false);
 
-      PreferenceFields.addField("Layers", "com.revolsys.gis", PREFERENCE_PATH,
-        PREFERENCE_NEW_LAYERS_VISIBLE, DataTypes.BOOLEAN, false);
-      PreferenceFields.addField("Layers", "com.revolsys.gis", PREFERENCE_PATH,
-        PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, DataTypes.BOOLEAN, false);
+      PreferenceFields.addField("Layers", "com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE,
+        DataTypes.BOOLEAN, false);
+      PreferenceFields.addField("Layers", "com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW,
+        DataTypes.BOOLEAN, false);
     });
+  }
+
+  public static boolean isShowNewLayerTableView() {
+    return new Preferences("com.revolsys.gis").getBoolean(PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW,
+      false);
   }
 
   private String errorMessage;
@@ -172,8 +180,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   private String type;
 
-  private boolean visible = OS.getPreferenceBoolean("com.revolsys.gis", PREFERENCE_PATH,
-    PREFERENCE_NEW_LAYERS_VISIBLE, false);
+  private boolean visible = new Preferences("com.revolsys.gis")
+    .getBoolean(PREFERENCE_NEW_LAYERS_VISIBLE, false);
 
   protected AbstractLayer(final String type) {
     this.type = type;

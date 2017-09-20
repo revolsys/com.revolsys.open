@@ -27,12 +27,16 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.util.Booleans;
+import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 
 public class ZoomOverlay extends AbstractOverlay {
-  private static final String PREFERENCE_WHEEL_FORWARDS_ZOOM_IN = "wheelForwardsZoomIn";
+  private static final String PREFERENCE_WHEEL_FORWARDS_ZOOM_IN2 = "wheelForwardsZoomIn";
 
   private static final String PREFERENCE_PATH = "/com/revolsys/gis/zoom";
+
+  private static final PreferenceKey PREFERENCE_WHEEL_FORWARDS_ZOOM_IN = new PreferenceKey(
+    PREFERENCE_PATH, PREFERENCE_WHEEL_FORWARDS_ZOOM_IN2);
 
   public static final String ACTION_PAN = "pan";
 
@@ -54,8 +58,8 @@ public class ZoomOverlay extends AbstractOverlay {
     }, 0f);
 
   static {
-    PreferenceFields.addField("Zoom", "com.revolsys.gis", PREFERENCE_PATH,
-      PREFERENCE_WHEEL_FORWARDS_ZOOM_IN, DataTypes.BOOLEAN, true);
+    PreferenceFields.addField("Zoom", "com.revolsys.gis", PREFERENCE_WHEEL_FORWARDS_ZOOM_IN,
+      DataTypes.BOOLEAN, true);
   }
 
   private int panButton;
@@ -96,9 +100,8 @@ public class ZoomOverlay extends AbstractOverlay {
   }
 
   public boolean isWheelForwardsZoomIn() {
-    Preferences preferences = getMap().getPreferences();
-    final Object wheelForwardsZoomIn = preferences.getValue(PREFERENCE_PATH,
-      PREFERENCE_WHEEL_FORWARDS_ZOOM_IN);
+    final Preferences preferences = getMap().getPreferences();
+    final Object wheelForwardsZoomIn = preferences.getValue(PREFERENCE_WHEEL_FORWARDS_ZOOM_IN);
     return !Booleans.isFalse(wheelForwardsZoomIn);
   }
 

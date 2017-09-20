@@ -15,16 +15,13 @@ public class Preferences {
     this.applicationId = applicationId;
   }
 
-  public boolean getBoolean(final String path, final String propertyName) {
-    final Map<String, Object> preferences = getPreferences(path);
-    final Object value = preferences.get(propertyName);
+  public boolean getBoolean(final PreferenceKey preference) {
+    final Object value = getValue(preference);
     return !Booleans.isFalse(value);
   }
 
-  public boolean getBoolean(final String path, final String propertyName,
-    final boolean defaultValue) {
-    final Map<String, Object> preferences = getPreferences(path);
-    final Object value = preferences.get(propertyName);
+  public boolean getBoolean(final PreferenceKey preference, final boolean defaultValue) {
+    final Object value = getValue(preference);
     if (value == null) {
       return defaultValue;
     } else {
@@ -32,9 +29,8 @@ public class Preferences {
     }
   }
 
-  public Integer getInt(final String path, final String propertyName) {
-    final Map<String, Object> preferences = getPreferences(path);
-    final Object value = preferences.get(propertyName);
+  public Integer getInt(final PreferenceKey preference) {
+    final Object value = getValue(preference);
     if (value == null) {
       return null;
     } else {
@@ -42,9 +38,8 @@ public class Preferences {
     }
   }
 
-  public int getInt(final String path, final String propertyName, final int defaultValue) {
-    final Map<String, Object> preferences = getPreferences(path);
-    final Object value = preferences.get(propertyName);
+  public int getInt(final PreferenceKey preference, final int defaultValue) {
+    final Object value = getValue(preference);
     if (value == null) {
       return defaultValue;
     } else {
@@ -52,19 +47,20 @@ public class Preferences {
     }
   }
 
-  public File getPreferenceFile(final String path) {
+  public File getPreferenceFile(final PreferenceKey preference) {
+    final String path = preference.getPath();
     if (path.contains("..")) {
       throw new IllegalArgumentException(
         "Path cannot contain the '..' character sequernce: " + path);
     }
-    final File preferencesDirectory = getsDirectory();
+    final File preferencesDirectory = getPreferencesDirectory();
     final File file = FileUtil.getFile(preferencesDirectory, path + ".rgobject");
     file.getParentFile().mkdirs();
     return file;
   }
 
-  public Map<String, Object> getPreferences(final String path) {
-    final File file = getPreferenceFile(path);
+  public Map<String, Object> getPreferences(final PreferenceKey preference) {
+    final File file = getPreferenceFile(preference);
     if (file.exists()) {
       return Json.toMap(file);
     } else {
@@ -72,7 +68,7 @@ public class Preferences {
     }
   }
 
-  public File getsDirectory() {
+  public File getPreferencesDirectory() {
     String path;
     if (OS.isWindows()) {
       path = System.getenv("APPDATA") + "/" + this.applicationId + "/Preferences";
@@ -86,18 +82,18 @@ public class Preferences {
     return directory;
   }
 
-  @SuppressWarnings("unchecked")
-  public <T> T getValue(final String path, final String propertyName) {
-    final Map<String, Object> preferences = getPreferences(path);
-    return (T)Property.get(preferences, propertyName);
+  public <T> T getValue(final PreferenceKey preference) {
+    return getValue(preference, null);
   }
 
-  public <T> T getValue(final String path, final String propertyName, final T defaultValue) {
-    final T value = getValue(path, propertyName);
-    if (value == null) {
+  @SuppressWarnings("unchecked")
+  public <T> T getValue(final PreferenceKey preference, final T defaultValue) {
+    final Map<String, Object> preferences = getPreferences(preference);
+    if (preferences == null) {
       return defaultValue;
     } else {
-      return value;
+      final String name = preference.getName();
+      return (T)preferences.getOrDefault(name, defaultValue);
     }
   }
 
@@ -105,10 +101,11 @@ public class Preferences {
     this.applicationId = applicationId;
   }
 
-  public void setValue(final String path, final String propertyName, final Object value) {
-    final Map<String, Object> preferences = getPreferences(path);
-    preferences.put(propertyName, value);
-    final File file = getPreferenceFile(path);
+  public void setValue(final PreferenceKey preference, final Object value) {
+    final Map<String, Object> preferences = getPreferences(preference);
+    final String name = preference.getName();
+    preferences.put(name, value);
+    final File file = getPreferenceFile(preference);
     Json.writeMap(preferences, file, true);
   }
 

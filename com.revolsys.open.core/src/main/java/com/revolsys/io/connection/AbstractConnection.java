@@ -59,6 +59,16 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
     return false;
   }
 
+  @Override
+  public boolean equalsConfig(final Connection connection) {
+    if (connection != null && getClass().isAssignableFrom(connection.getClass())) {
+      final MapEx config = connection.getConfig();
+      return DataType.equal(this.config, config);
+    }
+    return false;
+  }
+
+  @Override
   public MapEx getConfig() {
     final MapEx config = new LinkedHashMapEx(this.config);
     config.putAll(getProperties());

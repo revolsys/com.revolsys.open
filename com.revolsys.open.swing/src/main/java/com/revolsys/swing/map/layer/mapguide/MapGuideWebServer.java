@@ -8,7 +8,6 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
-import com.revolsys.util.OS;
 
 public class MapGuideWebServer {
   private static final String J_TYPE = "mapGuideWebServerRecordLayer";
@@ -24,8 +23,7 @@ public class MapGuideWebServer {
       }
       final MapGuideWebServerRecordLayer layer = new MapGuideWebServerRecordLayer(layerDescription);
       layerGroup.addLayer(layer);
-      if (OS.getPreferenceBoolean("com.revolsys.gis", AbstractLayer.PREFERENCE_PATH,
-        AbstractLayer.PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false)) {
+      if (AbstractLayer.isShowNewLayerTableView()) {
         layer.showTableView();
       }
     }

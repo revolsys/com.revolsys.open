@@ -7,9 +7,12 @@ import java.util.Map;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.NameProxy;
 import com.revolsys.collection.Parent;
+import com.revolsys.collection.map.MapEx;
 
 public interface ConnectionRegistry<C extends Connection>
   extends PropertyChangeSupportProxy, Parent<C>, NameProxy {
+  C addConnection(final MapEx config);
+
   @Override
   default List<C> getChildren() {
     return getConnections();

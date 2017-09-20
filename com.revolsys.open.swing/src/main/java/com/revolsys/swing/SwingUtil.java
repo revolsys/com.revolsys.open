@@ -81,6 +81,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.OS;
+import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -760,10 +761,10 @@ public interface SwingUtil {
   }
 
   static JFileChooser newFileChooser(final String title, final Preferences preferences,
-    final String preferencePath, final String propertyName) {
+    final PreferenceKey preference) {
     final JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle(title);
-    final String currentDirectoryName = preferences.getValue(preferencePath, propertyName);
+    final String currentDirectoryName = preferences.getValue(preference);
     if (Property.hasValue(currentDirectoryName)) {
       final File directory = new File(currentDirectoryName);
       if (directory.exists() && directory.canRead()) {

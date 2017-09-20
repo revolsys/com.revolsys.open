@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.swing.field.Field;
+import com.revolsys.util.PreferenceKey;
 
 public class SimplePreferencesPanel extends AbstractPreferencesPanel {
   private static final long serialVersionUID = 1L;
@@ -16,9 +17,9 @@ public class SimplePreferencesPanel extends AbstractPreferencesPanel {
     super(title, null);
   }
 
-  public void addPreference(final String applicationName, final String path,
-    final String propertyName, final DataType valueClass, final Object defaultValue) {
-    final Preference preference = new Preference(applicationName, path, propertyName, valueClass,
+  public void addPreference(final String applicationName, final PreferenceKey preferenceKey,
+    final DataType valueClass, final Object defaultValue) {
+    final Preference preference = new Preference(applicationName, preferenceKey, valueClass,
       defaultValue);
     if (!this.preferences.contains(preference)) {
       this.preferences.add(preference);
@@ -26,10 +27,10 @@ public class SimplePreferencesPanel extends AbstractPreferencesPanel {
     }
   }
 
-  public Preference addPreference(final String applicationName, final String path,
-    final String propertyName, final DataType valueClass, final Object defaultValue,
+  public Preference addPreference(final String applicationName, final PreferenceKey preferenceKey,
+    final DataType valueClass, final Object defaultValue,
     final Function<Preference, Field> fieldFactory) {
-    final Preference preference = new Preference(applicationName, path, propertyName, valueClass,
+    final Preference preference = new Preference(applicationName, preferenceKey, valueClass,
       defaultValue, fieldFactory);
     if (this.preferences.contains(preference)) {
       for (final Preference preference2 : this.preferences) {

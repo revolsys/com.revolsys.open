@@ -9,17 +9,18 @@ import java.util.function.Function;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.swing.field.Field;
+import com.revolsys.util.PreferenceKey;
 
 public class PreferenceFields {
   private static final Map<String, List<Consumer<PreferencesDialog>>> fieldFactories = new LinkedHashMap<>();
 
-  public static void addField(final String title, final String applicationName, final String path,
-    final String propertyName, final DataType valueClass, final Object defaultValue) {
-    addField(title, applicationName, path, propertyName, valueClass, defaultValue, null);
+  public static void addField(final String title, final String applicationName,
+    final PreferenceKey preference, final DataType valueClass, final Object defaultValue) {
+    addField(title, applicationName, preference, valueClass, defaultValue, null);
   }
 
-  public static void addField(final String title, final String applicationName, final String path,
-    final String propertyName, final DataType valueClass, final Object defaultValue,
+  public static void addField(final String title, final String applicationName,
+    final PreferenceKey preference, final DataType valueClass, final Object defaultValue,
     final Function<Preference, Field> fieldFactory) {
 
     final Consumer<PreferencesDialog> factory = (Consumer<PreferencesDialog>)(dialog) -> {
@@ -30,7 +31,7 @@ public class PreferenceFields {
       }
       if (panel instanceof SimplePreferencesPanel) {
         final SimplePreferencesPanel simplePanel = (SimplePreferencesPanel)panel;
-        simplePanel.addPreference(applicationName, path, propertyName, valueClass, defaultValue,
+        simplePanel.addPreference(applicationName, preference, valueClass, defaultValue,
           fieldFactory);
       }
     };

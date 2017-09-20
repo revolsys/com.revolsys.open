@@ -15,7 +15,6 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.tree.node.WebServiceConnectionTrees;
-import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
 public interface ArcGisRestServer {
@@ -27,8 +26,7 @@ public interface ArcGisRestServer {
     if (layerGroup != null) {
       final ArcGisRestServerRecordLayer layer = new ArcGisRestServerRecordLayer(layerDescription);
       layerGroup.addLayer(layer);
-      if (OS.getPreferenceBoolean("com.revolsys.gis", AbstractLayer.PREFERENCE_PATH,
-        AbstractLayer.PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false)) {
+      if (AbstractLayer.isShowNewLayerTableView()) {
         layer.showTableView();
       }
     }

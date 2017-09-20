@@ -61,6 +61,21 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
     }
   }
 
+  @Override
+  public FolderConnection addConnection(final MapEx config) {
+    try {
+      final String name = getConnectionName(config, null, true);
+      final String fileName = (String)config.get("file");
+      final Path file = Paths.getPath(fileName);
+      final FolderConnection connection = new FolderConnection(this, name, file);
+      addConnection(connection);
+      return connection;
+    } catch (final Exception e) {
+      Logs.error(this, "Error creating folder connection from: " + config, e);
+      return null;
+    }
+  }
+
   public FolderConnection addConnection(String name, final Path file) {
     name = getUniqueName(name);
     final FolderConnection connection = new FolderConnection(this, name, file);

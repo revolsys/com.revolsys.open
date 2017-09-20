@@ -85,6 +85,7 @@ import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.ProjectTreeNode;
 import com.revolsys.swing.tree.node.record.RecordStoreConnectionTrees;
 import com.revolsys.util.OS;
+import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -93,6 +94,15 @@ import com.revolsys.webservice.WebServiceConnectionRegistry;
 
 public class ProjectFrame extends BaseFrame {
   private static final String PREFERENCE_PROJECT = "/com/revolsys/gis/project";
+
+  private static final PreferenceKey PREFERENCE_PROJECT_DIRECTORY = new PreferenceKey(
+    PREFERENCE_PROJECT, "directory");
+
+  private static final PreferenceKey PREFERENCE_RECENT_PROJECT = new PreferenceKey(
+    PREFERENCE_PROJECT, "recentProject");
+
+  private static final PreferenceKey PREFERENCE_RECENT_PROJECTS = new PreferenceKey(
+    PREFERENCE_PROJECT, "recentProjects");
 
   private static final String BOTTOM_TAB = "INTERNAL_bottomTab";
 
@@ -161,10 +171,6 @@ public class ProjectFrame extends BaseFrame {
 
   private Project project = newEmptyProject();
 
-  protected Project newEmptyProject() {
-    return new Project();
-  }
-
   private BaseTree tocTree;
 
   private JSplitPane topBottomSplit;
@@ -196,7 +202,7 @@ public class ProjectFrame extends BaseFrame {
     this.applicationId = applicationId;
     this.preferences.setApplicationId(applicationId);
 
-    final String recentProjectPath = this.preferences.getValue(PREFERENCE_PROJECT, "recentProject");
+    final String recentProjectPath = this.preferences.getValue(PREFERENCE_RECENT_PROJECT);
     this.projectPath = Paths.getPath(recentProjectPath);
     initUi();
     loadProject();
@@ -213,7 +219,7 @@ public class ProjectFrame extends BaseFrame {
     if (this.project != null && this.project.saveWithPrompt()) {
 
       final JFileChooser fileChooser = SwingUtil.newFileChooser("Open Project", this.preferences,
-        PREFERENCE_PROJECT, "directory");
+        PREFERENCE_PROJECT_DIRECTORY);
 
       final FileNameExtensionFilter filter = new FileNameExtensionFilter("Project (*.rgmap)",
         "rgmap");
@@ -226,6 +232,8 @@ public class ProjectFrame extends BaseFrame {
       final int returnVal = fileChooser.showOpenDialog(this);
       if (returnVal == JFileChooser.APPROVE_OPTION) {
         final File projectDirectory = fileChooser.getSelectedFile();
+        final File parentDirectory = projectDirectory.getParentFile();
+        this.preferences.setValue(PREFERENCE_PROJECT_DIRECTORY, parentDirectory);
         openProject(projectDirectory.toPath());
       }
     }
@@ -321,8 +329,8 @@ public class ProjectFrame extends BaseFrame {
     while (recentProjects.size() > 10) {
       recentProjects.remove(recentProjects.size() - 1);
     }
-    this.preferences.setValue(PREFERENCE_PROJECT, "recentProjects", recentProjects);
-    this.preferences.setValue(PREFERENCE_PROJECT, "recentProject", filePath);
+    this.preferences.setValue(PREFERENCE_RECENT_PROJECTS, recentProjects);
+    this.preferences.setValue(PREFERENCE_RECENT_PROJECT, filePath);
     updateRecentMenu();
   }
 
@@ -444,8 +452,8 @@ public class ProjectFrame extends BaseFrame {
   }
 
   private List<String> getRecentProjectPaths() {
-    final List<String> recentProjects = this.preferences.getValue(PREFERENCE_PROJECT,
-      "recentProjects", new ArrayList<String>());
+    final List<String> recentProjects = this.preferences.getValue(PREFERENCE_RECENT_PROJECTS,
+      new ArrayList<String>());
     for (int i = 0; i < recentProjects.size();) {
       final String filePath = recentProjects.get(i);
       final File file = FileUtil.getFile(filePath);
@@ -455,7 +463,7 @@ public class ProjectFrame extends BaseFrame {
         recentProjects.remove(i);
       }
     }
-    this.preferences.setValue(PREFERENCE_PROJECT, "recentProjects", recentProjects);
+    this.preferences.setValue(PREFERENCE_RECENT_PROJECTS, recentProjects);
     return recentProjects;
   }
 
@@ -590,6 +598,10 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
+  protected Project newEmptyProject() {
+    return new Project();
+  }
+
   public JavaProcess newJavaProcess() {
     return new JavaProcess();
   }
@@ -624,6 +636,12 @@ public class ProjectFrame extends BaseFrame {
 
     file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", this::actionNewProject)
       .setAcceleratorControlKey(KeyEvent.VK_N);
+
+    file.addMenuItemTitleIcon("projectOpen", "New Project...", "layout_add", () -> {
+      if (this.project != null) {
+        this.project.actionImportProject("New Project from Template", true);
+      }
+    }).setAcceleratorShiftControlKey(KeyEvent.VK_N);
 
     file
       .addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add", this::actionOpenProject)

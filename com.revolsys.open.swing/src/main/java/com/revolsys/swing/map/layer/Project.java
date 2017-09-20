@@ -223,6 +223,10 @@ public class Project extends LayerGroup {
     return this.recordStores;
   }
 
+  public Resource getResource() {
+    return this.resource;
+  }
+
   public Path getSaveAsDirectory() {
     File directory = null;
     final JFileChooser fileChooser = SwingUtil.newFileChooser("Save Project",
@@ -339,14 +343,17 @@ public class Project extends LayerGroup {
     }
   }
 
-  public void readProject(final Object source) {
-    this.resource = Resource.getResource(source);
+  public void readProject(final Resource resource) {
+    this.resource = resource;
     if (this.resource.exists()) {
       String name;
       try (
         final BaseCloseable booleanValueCloseable = eventsDisabled()) {
         final Resource layersDir = this.resource.newChildResource("Layers");
-        readProperties(layersDir);
+        final boolean hasLayers = layersDir.exists();
+        if (hasLayers) {
+          readProperties(layersDir);
+        }
 
         final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry
           .getForThread();
@@ -375,7 +382,9 @@ public class Project extends LayerGroup {
           this.webServices = new WebServiceConnectionRegistry("Project", webServicesDirectory,
             readOnly);
 
-          readLayers(layersDir);
+          if (hasLayers) {
+            readLayers(layersDir);
+          }
 
           readBaseMapsLayers(this.resource);
         } finally {
@@ -411,8 +420,9 @@ public class Project extends LayerGroup {
     }
   }
 
+  @Override
   public void reset() {
-    clear();
+    super.reset();
     setName("Project");
     this.baseMapLayers.clear();
     this.recordStores = new RecordStoreConnectionRegistry("Project");

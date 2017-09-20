@@ -26,7 +26,6 @@ import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.ConnectionManagerTrees;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
-import com.revolsys.util.OS;
 
 public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
 
@@ -74,8 +73,7 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
     layerConfig.put("name", recordDefinition.getName());
     layerConfig.put("connection", connection);
     layerConfig.put("typePath", typePath);
-    layerConfig.put("showTableView", OS.getPreferenceBoolean("com.revolsys.gis",
-      AbstractLayer.PREFERENCE_PATH, AbstractLayer.PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false));
+    layerConfig.put("showTableView", AbstractLayer.isShowNewLayerTableView());
 
     final LinkedList<String> path = new LinkedList<>();
     {
