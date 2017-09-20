@@ -2793,7 +2793,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   @Override
-  protected boolean setGeometryFactoryDo(final GeometryFactory geometryFactory) {
+  protected GeometryFactory setGeometryFactoryDo(final GeometryFactory geometryFactory) {
     this.index.setGeometryFactory(geometryFactory);
     return super.setGeometryFactoryDo(geometryFactory);
   }

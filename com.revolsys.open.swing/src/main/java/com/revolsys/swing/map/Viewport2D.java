@@ -116,9 +116,9 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   /** The current bounding box of the project. */
   private BoundingBox boundingBox = BoundingBox.empty();
 
-  private GeometryFactory geometryFactory = GeometryFactory.floating3(3857);
+  private GeometryFactory geometryFactory = GeometryFactory.floating3d(3857);
 
-  private GeometryFactory geometryFactory2d = GeometryFactory.floating(3857, 2);
+  private GeometryFactory geometryFactory2d = GeometryFactory.floating2d(3857);
 
   private boolean initialized = false;
 
@@ -615,7 +615,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final double viewWidth = viewWidthPixels * unitsPerPixel;
     final int viewHeightPixels = getViewHeightPixels();
     final double viewHeight = viewHeightPixels * unitsPerPixel;
-    final GeometryFactory precisionModel = GeometryFactory.fixedNoSrid(1 / unitsPerPixel,
+    final GeometryFactory precisionModel = GeometryFactory.fixed2d(1 / unitsPerPixel,
       1 / unitsPerPixel);
     final double centreX = precisionModel.makeXyPrecise(centre.getX());
     final double centreY = precisionModel.makeXyPrecise(centre.getY());

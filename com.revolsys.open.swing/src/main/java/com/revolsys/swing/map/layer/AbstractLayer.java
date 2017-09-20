@@ -903,18 +903,19 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     firePropertyChange("exists", old, this.exists);
   }
 
-  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+  public final void setGeometryFactory(final GeometryFactory geometryFactory) {
     final GeometryFactory oldGeometryFactory = this.geometryFactory;
-    if (setGeometryFactoryDo(geometryFactory)) {
-      fireGeometryFactoryChanged(oldGeometryFactory, geometryFactory);
+    final GeometryFactory newGeometryFactory = setGeometryFactoryDo(geometryFactory);
+    if (newGeometryFactory != null) {
+      fireGeometryFactoryChanged(oldGeometryFactory, newGeometryFactory);
     }
   }
 
-  protected boolean setGeometryFactoryDo(final GeometryFactory geometryFactory) {
+  protected GeometryFactory setGeometryFactoryDo(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
-      return false;
+      return null;
     } else if (geometryFactory.equals(this.geometryFactory)) {
-      return false;
+      return null;
     } else {
       this.geometryFactory = geometryFactory;
       if (Property.isEmpty(this.boundingBox)) {
@@ -927,7 +928,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
         && geometryFactory.isHasCoordinateSystem()) {
         this.boundingBox = this.boundingBox.convert(geometryFactory);
       }
-      return true;
+      return geometryFactory;
     }
   }
 

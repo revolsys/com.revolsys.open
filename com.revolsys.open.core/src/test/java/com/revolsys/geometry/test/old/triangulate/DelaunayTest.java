@@ -50,7 +50,8 @@ public class DelaunayTest {
 
   static final double COMPARISON_TOLERANCE = 1.0e-7;
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0, 1000.0, 1000.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed3d(0, 1000.0, 1000.0,
+    1000.0);
 
   void runDelaunay(final String sitesWKT, final boolean computeTriangles, final String expectedWKT)
     throws ParseException {

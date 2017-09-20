@@ -56,7 +56,7 @@ import junit.textui.TestRunner;
  */
 public class ConvexHullTest extends TestCase {
 
-  private static final GeometryFactory GEOMETRY_FACTORY_1M = GeometryFactory.fixed(0, 1.0, 1.0);
+  private static final GeometryFactory GEOMETRY_FACTORY_1M = GeometryFactory.fixed2d(0, 1.0, 1.0);
 
   public static void main(final String args[]) {
     TestRunner.run(suite());
@@ -66,7 +66,7 @@ public class ConvexHullTest extends TestCase {
     return new TestSuite(ConvexHullTest.class);
   }
 
-  GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0, 1000.0);
+  GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1000.0, 1000.0);
 
   public ConvexHullTest(final String name) {
     super(name);

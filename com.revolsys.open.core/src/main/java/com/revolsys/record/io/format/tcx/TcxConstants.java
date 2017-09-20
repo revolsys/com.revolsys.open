@@ -24,7 +24,7 @@ public interface TcxConstants {
 
   QName EXTENSIONS = new QName(_NS_URI, "Extensions");
 
-  GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
+  GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(4326);
 
   QName HEART_RATE_BPM = new QName(_NS_URI, "HeartRateBpm");
 

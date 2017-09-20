@@ -51,7 +51,7 @@ public class GeometryFactoryTest extends TestCase {
     TestRunner.run(GeometryFactoryTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  private final GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   public GeometryFactoryTest(final String name) {
     super(name);

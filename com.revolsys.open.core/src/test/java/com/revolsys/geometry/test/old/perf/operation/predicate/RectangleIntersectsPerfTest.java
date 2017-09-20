@@ -47,7 +47,7 @@ import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.geometry.util.Stopwatch;
 
 public class RectangleIntersectsPerfTest {
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   static final int MAX_ITER = 10;
 

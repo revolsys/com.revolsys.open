@@ -240,7 +240,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   public void setSrid(final int srid) {
-    setGeometryFactory(GeometryFactory.fixed(srid, 1.0, 1.0));
+    setGeometryFactory(GeometryFactory.fixed2d(srid, 1.0, 1.0));
   }
 
   public void setTileHeight(final double tileHeight) {

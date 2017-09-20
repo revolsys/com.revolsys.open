@@ -47,9 +47,9 @@ public class GdalImage extends AbstractGeoreferencedImage {
         }
         final int srid = epsgCoordinateSystem.getCoordinateSystemId();
         if (srid > 0 && srid < 2000000) {
-          setGeometryFactory(GeometryFactory.floating(srid, 2));
+          setGeometryFactory(GeometryFactory.floating2d(srid));
         } else {
-          setGeometryFactory(GeometryFactory.floating(epsgCoordinateSystem, 2));
+          setGeometryFactory(GeometryFactory.floating2d(epsgCoordinateSystem));
         }
       }
     }
@@ -59,7 +59,8 @@ public class GdalImage extends AbstractGeoreferencedImage {
 
   @Override
   public void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
-    final int viewWidth, final int viewHeight, final boolean useTransform, Object interpolationMethod) {
+    final int viewWidth, final int viewHeight, final boolean useTransform,
+    final Object interpolationMethod) {
     try {
       final Dataset dataset = getDataset();
 

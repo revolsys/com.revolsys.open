@@ -22,7 +22,7 @@ public class KdTreeTest extends TestCase {
   }
 
   public void testSinglePoint() {
-    final KdTree index = new KdTree(GeometryFactory.fixed(0, 2, 1000, 1000));
+    final KdTree index = new KdTree(GeometryFactory.fixed2d(0, 1000, 1000));
 
     final KdNode node1 = index.insertPoint(new PointDouble(1, 1));
 

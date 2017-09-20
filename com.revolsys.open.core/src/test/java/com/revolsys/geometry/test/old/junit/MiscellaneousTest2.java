@@ -60,7 +60,7 @@ public class MiscellaneousTest2 extends TestCase {
     junit.textui.TestRunner.main(testCaseName);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0, 1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1.0, 1.0);
 
   public MiscellaneousTest2(final String Name_) {
     super(Name_);
@@ -155,7 +155,7 @@ public class MiscellaneousTest2 extends TestCase {
     final Geometry a = this.geometryFactory.geometry("POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))");
     final Geometry b = this.geometryFactory
       .geometry("POLYGON((50 50, 150 50, 150 150, 50 150, 50 50))");
-    final Geometry polygonCollection = GeometryFactory.floating(0, 2).geometry(a, b);
+    final Geometry polygonCollection = GeometryFactory.floating2d(0).geometry(a, b);
     final Geometry union = polygonCollection.buffer(0);
     // System.out.println(union);
     assertEquals("POLYGON((0 0,100 0,100 50,150 50,150 150,50 150,50 100,0 100,0 0))",

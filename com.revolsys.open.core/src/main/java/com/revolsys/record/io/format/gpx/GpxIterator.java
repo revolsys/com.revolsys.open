@@ -44,7 +44,7 @@ public class GpxIterator extends BaseObjectWithProperties
 
   private File file;
 
-  private final GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
+  private final GeometryFactory geometryFactory = GeometryFactory.floating3d(4326);
 
   private boolean hasNext = true;
 

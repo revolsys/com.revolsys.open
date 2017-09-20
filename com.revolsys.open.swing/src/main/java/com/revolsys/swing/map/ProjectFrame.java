@@ -159,7 +159,11 @@ public class ProjectFrame extends BaseFrame {
 
   private final JMenu openRecentMenu = new JMenu("Open Recent Project");
 
-  private Project project = new Project();
+  private Project project = newEmptyProject();
+
+  protected Project newEmptyProject() {
+    return new Project();
+  }
 
   private BaseTree tocTree;
 

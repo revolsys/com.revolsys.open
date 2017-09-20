@@ -41,7 +41,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.util.Stopwatch;
 
 public class PreparedLineIntersectsPerfTest {
-  static GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  static GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   static final int MAX_ITER = 1;
 

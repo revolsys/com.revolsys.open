@@ -16,7 +16,7 @@ import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
 import com.revolsys.util.CaseConverter;
 
 public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
-  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
+  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(4326);
 
   private static final BoundingBox MAX_BOUNDING_BOX = GEOMETRY_FACTORY.newBoundingBox(-180, -85,
     180, 85);

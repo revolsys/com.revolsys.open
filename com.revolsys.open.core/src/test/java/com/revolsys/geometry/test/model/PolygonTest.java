@@ -19,7 +19,7 @@ public class PolygonTest {
     new PointDoubleXY(10.0, 0.0), new PointDoubleXY(10.0, 10.0), new PointDoubleXY(0.0, 10.0),
     new PointDoubleXY(0.0, 0));
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating(4326, 2);
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating2d(4326);
 
   private static final List<Point> INTERIOR_2 = Arrays.<Point> asList(new PointDoubleXY(2.0, 2.0),
     new PointDoubleXY(8.0, 2.0), new PointDoubleXY(8.0, 8.0), new PointDoubleXY(2.0, 8.0),

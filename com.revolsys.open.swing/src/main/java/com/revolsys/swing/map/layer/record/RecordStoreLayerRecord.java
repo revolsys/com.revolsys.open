@@ -46,7 +46,7 @@ public class RecordStoreLayerRecord extends ArrayLayerRecord {
   }
 
   public void refreshFromRecordStore(final Record record) {
-    synchronized (this) {
+    synchronized (getSync()) {
       if (!isHasOriginalValues()) {
         final RecordState oldState = super.setState(RecordState.INITIALIZING);
         try {

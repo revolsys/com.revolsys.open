@@ -65,8 +65,8 @@ public class GeoPackageGeometryFieldAdder extends JdbcFieldAdder {
       if (storeGeometryFactory == null) {
         geometryFactory = GeometryFactory.floating(srid, axisCount);
       } else {
-        geometryFactory = GeometryFactory.fixed(srid, axisCount, storeGeometryFactory.getScaleX(),
-          storeGeometryFactory.getScaleY(), storeGeometryFactory.getScaleZ());
+        final double[] scales = storeGeometryFactory.newScales(axisCount);
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
       }
       final FieldDefinition field = new GeoPackageGeometryJdbcFieldDefinition(dbName, name,
         dataType, required, description, null, srid, axisCount, geometryFactory);

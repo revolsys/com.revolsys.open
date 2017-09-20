@@ -134,7 +134,7 @@ public interface BoundingBox
         if (WktParser.hasText(reader, "SRID=")) {
           final Integer srid = WktParser.parseInteger(reader);
           if (srid != null) {
-            geometryFactory = GeometryFactory.floating(srid, 2);
+            geometryFactory = GeometryFactory.floating2d(srid);
           }
           WktParser.hasText(reader, ";");
         }
@@ -1219,7 +1219,7 @@ public interface BoundingBox
   default Geometry toGeometry() {
     GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
-      geometryFactory = GeometryFactory.floating(0, 2);
+      geometryFactory = GeometryFactory.floating2d(0);
     }
     if (isEmpty()) {
       return geometryFactory.point();
@@ -1261,7 +1261,7 @@ public interface BoundingBox
       final GeometryFactory factory = getGeometryFactory();
       if (geometryFactory == null) {
         if (factory == null) {
-          geometryFactory = GeometryFactory.floating(0, 2);
+          geometryFactory = GeometryFactory.floating2d(0);
         } else {
           geometryFactory = factory;
         }

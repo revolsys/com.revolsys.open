@@ -69,7 +69,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
     return targetCoordinates;
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  private GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   private Point sourcePixel;
 

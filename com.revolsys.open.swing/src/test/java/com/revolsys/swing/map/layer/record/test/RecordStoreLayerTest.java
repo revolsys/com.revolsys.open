@@ -35,8 +35,7 @@ public class RecordStoreLayerTest {
 
   private static final String DEFAULT_NAME = "A Record";
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3587, 2, 1000.0,
-    1000.0);
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed2d(3587, 1000.0, 1000.0);
 
   private static final PathName TEST = PathName.newPathName("TEST");
 

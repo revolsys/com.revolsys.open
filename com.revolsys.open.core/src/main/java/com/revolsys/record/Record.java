@@ -1039,6 +1039,15 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     }
   }
 
+  default void setGeometryValue(final Record record) {
+    if (record != null) {
+      final Geometry geometry = record.getGeometry();
+      if (geometry != null) {
+        setGeometryValue(geometry);
+      }
+    }
+  }
+
   default void setIdentifier(final Identifier identifier) {
     final RecordDefinition recordDefinition = getRecordDefinition();
 

@@ -23,7 +23,7 @@ public final class GpxConstants {
 
   public static final QName EXTENSION_ELEMENT = new QName(GPX_NS_URI, "extensions");
 
-  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
+  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(4326);
 
   public static final QName GPX_ELEMENT = new QName(GPX_NS_URI, "gpx");
 

@@ -197,13 +197,16 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
       recordDefinition.setGeometryFieldName(shapeFieldName);
       final SpatialReference spatialReference = featureClass.getSpatialReference();
       GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+      int axisCount = 2;
       if (featureClass.isHasM()) {
-        geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(), 4,
-          geometryFactory.getScaleX(), geometryFactory.getScaleY(), geometryFactory.getScaleZ());
+        axisCount = 4;
       } else if (featureClass.isHasZ()) {
-        geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(), 3,
-          geometryFactory.getScaleX(), geometryFactory.getScaleY(), geometryFactory.getScaleZ());
+        axisCount = 3;
       }
+      final double[] scales = geometryFactory.newScales(axisCount);
+      geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(), axisCount,
+        scales);
+
       final FieldDefinition geometryField = recordDefinition.getGeometryField();
       geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
     }

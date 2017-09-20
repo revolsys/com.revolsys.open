@@ -6,7 +6,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
 
 public class FileUnionPerfTest {
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   static final int MAX_ITER = 1;
 

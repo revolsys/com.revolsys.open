@@ -85,7 +85,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
       if (geometrySrid == null) {
         this.geometryFactory = loadGeometryFactory();
       } else {
-        this.geometryFactory = GeometryFactory.floating3(geometrySrid);
+        this.geometryFactory = GeometryFactory.floating3d(geometrySrid);
       }
     }
     if (this.geometryFactory == null) {

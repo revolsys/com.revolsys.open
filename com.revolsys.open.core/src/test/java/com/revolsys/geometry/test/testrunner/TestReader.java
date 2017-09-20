@@ -328,7 +328,7 @@ public class TestReader {
 
     // ----------- <precisionModel> (optional) ----------------
     final double scale = parsePrecisionModel(runElement);
-    this.geometryFactory = GeometryFactory.fixed(0, scale, scale);
+    this.geometryFactory = GeometryFactory.fixed2d(0, scale, scale);
 
     // --------------- build TestRun ---------------------
     final String description = descElement != null ? descElement.getTextTrim() : "";
@@ -464,7 +464,7 @@ public class TestReader {
 
   private GeometryResult toGeometryResult(final String value, final TestFile testRun)
     throws com.revolsys.geometry.wkb.ParseException {
-    final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+    final GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
     final WKTOrWKBReader wktorbReader = new WKTOrWKBReader(geometryFactory);
     return new GeometryResult(wktorbReader.read(value));
   }

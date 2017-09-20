@@ -20,7 +20,7 @@ import com.revolsys.util.Property;
 
 public class WebMercatorTileCacheLayer
   extends AbstractTiledImageLayer<WebMercatorTileCacheMapTile> {
-  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
+  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(4326);
 
   private static final BoundingBox MAX_BOUNDING_BOX = GEOMETRY_FACTORY.newBoundingBox(-180, -85,
     180, 85);

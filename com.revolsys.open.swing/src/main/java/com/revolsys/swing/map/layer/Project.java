@@ -589,17 +589,12 @@ public class Project extends LayerGroup {
   }
 
   @Override
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    super.setGeometryFactory(geometryFactory);
-  }
-
-  @Override
   public void setProperty(final String name, final Object value) {
     if ("srid".equals(name)) {
       try {
         final Integer srid = Integers.toValid(value);
         if (srid != null) {
-          setGeometryFactory(GeometryFactory.floating3(srid));
+          setGeometryFactory(GeometryFactory.floating3d(srid));
         }
       } catch (final RuntimeException t) {
       }
@@ -622,7 +617,7 @@ public class Project extends LayerGroup {
 
   public void setSrid(final Number srid) {
     if (srid != null) {
-      final GeometryFactory geometryFactory = GeometryFactory.floating3(srid.intValue());
+      final GeometryFactory geometryFactory = GeometryFactory.floating3d(srid.intValue());
       setGeometryFactory(geometryFactory);
     }
   }
@@ -640,13 +635,9 @@ public class Project extends LayerGroup {
       final BoundingBox oldBoundingBox = this.viewBoundingBox;
       final boolean bboxUpdated = setViewBoundingBoxDo(viewBoundingBox);
 
-      final GeometryFactory oldGeometryFactory = getGeometryFactory();
       final GeometryFactory geometryFactory = viewBoundingBox.getGeometryFactory();
-      final boolean geometryFactoryUpdated = setGeometryFactoryDo(geometryFactory);
+      setGeometryFactory(geometryFactory);
 
-      if (geometryFactoryUpdated) {
-        fireGeometryFactoryChanged(oldGeometryFactory, geometryFactory);
-      }
       if (bboxUpdated) {
         firePropertyChange("viewBoundingBox", oldBoundingBox, this.viewBoundingBox);
       }

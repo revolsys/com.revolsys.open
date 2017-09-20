@@ -14,7 +14,7 @@ public class UnionPerfTester {
 
   public static final int CASCADED = 1;
 
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   public static final int ITERATED = 2;
 

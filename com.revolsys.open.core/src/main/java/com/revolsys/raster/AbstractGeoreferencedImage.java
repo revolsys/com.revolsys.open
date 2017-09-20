@@ -298,7 +298,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
               }
             }
           }
-          final GeometryFactory geometryFactory = GeometryFactory.floating(srid, 2);
+          final GeometryFactory geometryFactory = GeometryFactory.floating2d(srid);
           setGeometryFactory(geometryFactory);
 
           final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc, "SourceGCPs");

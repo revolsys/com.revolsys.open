@@ -42,7 +42,7 @@ import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 
 public abstract class StressTestHarness {
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   static final int MAX_ITER = 10000;
 

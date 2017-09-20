@@ -157,12 +157,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public static final double[] SCALES_FLOATING_3 = new double[3];
 
-  public static final GeometryFactory DEFAULT_2D = fixed(0, SCALES_FLOATING_2);
+  public static final GeometryFactory DEFAULT_2D = fixed2d(0, 0, 0);
 
   /**
    * The default GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a floating precision model.
    */
-  public static final GeometryFactory DEFAULT_3D = fixed(0, SCALES_FLOATING_3);
+  public static final GeometryFactory DEFAULT_3D = fixed(0, 3, SCALES_FLOATING_3);
 
   private static final long serialVersionUID = 4328651897279304108L;
 
@@ -246,24 +246,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   /**
    * <p>
-   * Get a GeometryFactory with the coordinate system, 2D axis (x &amp; y) and a
-   * fixed x, y precision model.
-   * </p>
-   *
-   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
-   *          coordinate system id</a>.
-   * @param scaleXY The scale factor used to round the x, y coordinates. The
-   *          precision is 1 / scaleXy. A scale factor of 1000 will give a
-   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
-   *          metres.
-   * @return The geometry factory.
-   */
-  public static GeometryFactory fixed(final int coordinateSystemId, final double... scales) {
-    return fixed(coordinateSystemId, scales.length, scales);
-  }
-
-  /**
-   * <p>
    * Get a GeometryFactory with the coordinate system, number of axis and a
    * fixed x, y &amp; fixed z precision models.
    * </p>
@@ -313,20 +295,23 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  /**
-   * <p>
-   * Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and
-   * a fixed x, y & floating z precision models.
-   * </p>
-   *
-   * @param scaleXY The scale factor used to round the x, y coordinates. The
-   *          precision is 1 / scaleXy. A scale factor of 1000 will give a
-   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
-   *          metres.
-   * @return The geometry factory.
-   */
-  public static GeometryFactory fixedNoSrid(final double... scales) {
-    return fixed(0, scales);
+  public static GeometryFactory fixed2d(final double scaleX, final double scaleY) {
+    return fixed(0, 2, scaleX, scaleY);
+  }
+
+  public static GeometryFactory fixed2d(final int coordinateSystemId, final double scaleX,
+    final double scaleY) {
+    return fixed(coordinateSystemId, 2, scaleX, scaleY);
+  }
+
+  public static GeometryFactory fixed3d(final double scaleX, final double scaleY,
+    final double scaleZ) {
+    return fixed(0, 3, scaleX, scaleY, scaleZ);
+  }
+
+  public static GeometryFactory fixed3d(final int coordinateSystemId, final double scaleX,
+    final double scaleY, final double scaleZ) {
+    return fixed(coordinateSystemId, 3, scaleX, scaleY, scaleZ);
   }
 
   /**
@@ -364,10 +349,28 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return fixed(coordinateSystemId, axisCount, scales);
   }
 
+  public static GeometryFactory floating2d(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem == null) {
+      return floating2d(0);
+    } else {
+      final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+      if (coordinateSystemId <= 0) {
+        final double[] scales = newScalesFloating(2);
+        return new GeometryFactory(coordinateSystem, 2, scales);
+      } else {
+        return floating2d(coordinateSystemId);
+      }
+    }
+  }
+
+  public static GeometryFactory floating2d(final int coordinateSystemId) {
+    return fixed(coordinateSystemId, 2, SCALES_FLOATING_2);
+  }
+
   /**
    * get a 3d geometry factory with a floating scale.
    */
-  public static GeometryFactory floating3(final CoordinateSystem coordinateSystem) {
+  public static GeometryFactory floating3d(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
       return DEFAULT_3D;
     } else {
@@ -375,7 +378,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       if (coordinateSystemId == 0) {
         return new GeometryFactory(coordinateSystem, 3, SCALES_FLOATING_3);
       } else {
-        return floating3(coordinateSystemId);
+        return floating3d(coordinateSystemId);
       }
     }
   }
@@ -390,8 +393,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    *          coordinate system id</a>.
    * @return The geometry factory.
    */
-  public static GeometryFactory floating3(final int coordinateSystemId) {
-    return fixed(coordinateSystemId, SCALES_FLOATING_3);
+  public static GeometryFactory floating3d(final int coordinateSystemId) {
+    return fixed(coordinateSystemId, 3, SCALES_FLOATING_3);
   }
 
   public static GeometryFactory get(final Object factory) {
@@ -439,7 +442,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
         .getCoordinateSystem(esriCoordinateSystem);
       final int coordinateSystemId = epsgCoordinateSystem.getCoordinateSystemId();
-      return floating(coordinateSystemId, 3);
+      return floating3d(coordinateSystemId);
     }
   }
 
@@ -504,7 +507,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
     final double scaleZ) {
     if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
-      return fixed(coordinateSystemId, 3, scaleX, scaleY, scaleZ);
+      return fixed3d(coordinateSystemId, scaleX, scaleY, scaleZ);
     } else {
       return new GeometryFactoryWithOffsets(coordinateSystemId, offsetX, scaleX, offsetY, scaleY,
         offsetZ, scaleZ);
@@ -520,11 +523,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public static GeometryFactory wgs84() {
-    return floating3(4326);
+    return floating3d(4326);
   }
 
   public static GeometryFactory worldMercator() {
-    return floating3(3857);
+    return floating3d(3857);
   }
 
   private int axisCount = 2;
@@ -856,7 +859,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       final int geometrySrid = geometry.getCoordinateSystemId();
       if (coordinateSystemId == 0 && geometrySrid != 0) {
         final GeometryFactory geometryFactory = GeometryFactory.fixed(geometrySrid, this.axisCount,
-          getScaleX(), getScaleY(), getScaleZ());
+          this.scales);
         return geometryFactory.geometry(geometry);
       } else if (coordinateSystemId != 0 && geometrySrid != 0
         && geometrySrid != coordinateSystemId) {
@@ -1954,6 +1957,20 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public LineStringEditor newLineStringBuilder(final int vertexCapacity) {
     return new LineStringEditor(this, vertexCapacity);
+  }
+
+  public double[] newScales(final int axisCount) {
+    final double[] scales = new double[axisCount];
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      double scale;
+      if (axisIndex < this.scales.length) {
+        scale = this.scales[axisIndex];
+      } else {
+        scale = this.scales[this.scales.length - 1];
+      }
+      scales[axisIndex] = scale;
+    }
+    return scales;
   }
 
   /**

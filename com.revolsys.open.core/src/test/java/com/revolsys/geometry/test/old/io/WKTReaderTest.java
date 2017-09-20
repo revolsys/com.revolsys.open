@@ -61,7 +61,7 @@ public class WKTReaderTest extends TestCase {
     return new TestSuite(WKTReaderTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 2, 1.0, 1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1.0, 1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -91,7 +91,7 @@ public class WKTReaderTest extends TestCase {
   }
 
   public void testReadLargeNumbers() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 2, 1E9, 1E9);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1E9, 1E9);
     final WKTReader reader = new WKTReader(geometryFactory);
     final Geometry point1 = reader.read("POINT(123456789.01234567890 10)");
     final Point point2 = geometryFactory.point(new PointDoubleXY(123456789.01234567890, 10));

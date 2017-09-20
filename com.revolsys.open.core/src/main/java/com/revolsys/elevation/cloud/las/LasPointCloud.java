@@ -27,6 +27,7 @@ import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -48,7 +49,7 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
     }
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.fixedNoSrid(1000.0, 1000.0, 1000.0);
+  private GeometryFactory geometryFactory = GeometryFactory.fixed3d(1000.0, 1000.0, 1000.0);
 
   private LasPointCloudHeader header;
 
@@ -74,7 +75,7 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
     this(resource, null);
   }
 
-  public LasPointCloud(Resource resource, final GeometryFactory geometryFactory) {
+  public LasPointCloud(Resource resource, GeometryFactory geometryFactory) {
     this.resource = resource;
     if (resource.getFileNameExtension().equals("zip")) {
       boolean found = false;
@@ -103,7 +104,11 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
       this.exists = false;
     } else {
       this.exists = true;
-      this.setHeader(new LasPointCloudHeader(this.reader, geometryFactory));
+      if (geometryFactory == null || !geometryFactory.isHasCoordinateSystem()) {
+        geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+      }
+      final LasPointCloudHeader header = new LasPointCloudHeader(this.reader, geometryFactory);
+      this.setHeader(header);
     }
   }
 

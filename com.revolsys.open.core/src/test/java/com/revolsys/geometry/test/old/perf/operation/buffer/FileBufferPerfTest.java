@@ -9,7 +9,7 @@ import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
 import com.revolsys.geometry.util.Stopwatch;
 
 public class FileBufferPerfTest {
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   static final int MAX_ITER = 1;
 

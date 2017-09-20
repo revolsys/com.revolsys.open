@@ -29,7 +29,7 @@ import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<Geometry> {
-  private GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
+  private GeometryFactory geometryFactory = GeometryFactory.floating3d(4326);
 
   public GeometryHttpMessageConverter() {
     super(Geometry.class, IoFactory.mediaTypes(GeometryReaderFactory.class),
@@ -64,7 +64,7 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
           .getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
-          factory = GeometryFactory.floating3(Integer.parseInt(srid));
+          factory = GeometryFactory.floating3d(Integer.parseInt(srid));
         }
         reader.setProperty(IoConstants.GEOMETRY_FACTORY, factory);
         for (final Geometry geometry : reader) {

@@ -60,7 +60,7 @@ public class LineStringImplTest extends TestCase {
     return new TestSuite(LineStringImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0, 1000.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1000.0, 1000.0);
 
   public LineStringImplTest(final String name) {
     super(name);
@@ -75,7 +75,7 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals10() throws Exception {
-    final GeometryFactory geometryFactotyr = GeometryFactory.fixed(0, 1.0, 1.0);
+    final GeometryFactory geometryFactotyr = GeometryFactory.fixed2d(0, 1.0, 1.0);
     Geometry l1 = geometryFactotyr.geometry(
       "POLYGON((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     Geometry l2 = geometryFactotyr.geometry(
@@ -134,7 +134,7 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals8() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0, 1000.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1000.0, 1000.0);
     final Lineal l1 = (Lineal)geometryFactory.geometry(
       "MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     final Lineal l2 = (Lineal)geometryFactory.geometry(
@@ -143,7 +143,7 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals9() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0, 1.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1.0, 1.0);
     final Lineal l1 = (Lineal)geometryFactory.geometry(
       "MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     final Lineal l2 = (Lineal)geometryFactory.geometry(
@@ -152,7 +152,7 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testFiveZeros() {
-    final GeometryFactory factory = GeometryFactory.floating(0, 2);
+    final GeometryFactory factory = GeometryFactory.floating2d(0);
     final LineString line = factory.lineString(2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     final boolean closed = line.isClosed();
     assertTrue(closed);

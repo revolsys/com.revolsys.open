@@ -57,7 +57,7 @@ public class GeometryReaderHttpMessageConverter
           .getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
-          factory = GeometryFactory.floating3(Integer.parseInt(srid));
+          factory = GeometryFactory.floating3d(Integer.parseInt(srid));
         }
         reader.setProperty(IoConstants.GEOMETRY_FACTORY, factory);
         return reader;

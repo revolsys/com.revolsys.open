@@ -238,7 +238,7 @@ public class TiledGriddedElevationModelLayer
   }
 
   @Override
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+  public GeometryFactory setGeometryFactoryDo(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       GeometryFactory geometryFactory3d;
       if (geometryFactory.getAxisCount() == 2) {
@@ -251,12 +251,14 @@ public class TiledGriddedElevationModelLayer
       } else {
         geometryFactory3d = geometryFactory.convertAxisCount(3);
       }
-      super.setGeometryFactory(geometryFactory3d);
+      final GeometryFactory newGeometryFactory = super.setGeometryFactoryDo(geometryFactory3d);
       final TiledMultipleGriddedElevationModelLayerRenderer renderer = getRenderer();
       if (renderer != null) {
         renderer.updateBoundingBox();
       }
+      return newGeometryFactory;
     }
+    return super.getGeometryFactory();
   }
 
   @SuppressWarnings("unchecked")

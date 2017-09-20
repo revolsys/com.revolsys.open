@@ -165,7 +165,7 @@ public class TriangulationVisualization {
   }
 
   public static void tinVisual() {
-    final GeometryFactory geometryFactory = GeometryFactory.floating(3005, 3);
+    final GeometryFactory geometryFactory = GeometryFactory.floating3d(3005);
 
     final List<Point> points = new ArrayList<>();
     for (int x = 1; x < 10; x++) {

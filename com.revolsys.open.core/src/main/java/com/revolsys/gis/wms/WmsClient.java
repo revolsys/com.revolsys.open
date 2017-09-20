@@ -46,7 +46,7 @@ public class WmsClient extends AbstractWebService<WmsLayerDefinition>
 
   public static GeometryFactory getGeometryFactory(final String srs) {
     final int coordinateSystemId = getCoordinateSystemId(srs);
-    final GeometryFactory geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
+    final GeometryFactory geometryFactory = GeometryFactory.floating2d(coordinateSystemId);
     return geometryFactory;
   }
 

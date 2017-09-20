@@ -85,13 +85,13 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
 
   @Override
   public Polygon getPolygon(final int numPoints) {
-    final GeometryFactory factory = GeometryFactory.floating3(4326);
+    final GeometryFactory factory = GeometryFactory.floating3d(4326);
     return getPolygon(factory, numPoints);
   }
 
   @Override
   public Polygon getPolygon(final int numXPoints, final int numYPoints) {
-    final GeometryFactory factory = GeometryFactory.floating3(4326);
+    final GeometryFactory factory = GeometryFactory.floating3d(4326);
     return getPolygon(factory, numXPoints, numYPoints);
   }
 

@@ -30,7 +30,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
     if (version == 1) {
       final double scaleX = reader.getDouble();
       final double scaleZ = reader.getDouble();
-      geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scaleX, scaleX, scaleZ);
+      geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, scaleX, scaleX, scaleZ);
     } else {
       final double offsetX = reader.getDouble();
       final double scaleX = reader.getDouble();

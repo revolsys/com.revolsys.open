@@ -22,7 +22,7 @@ import com.revolsys.swing.parallel.AbstractSwingWorker;
 public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<LayerRecord>, Void> {
 
   public static BoundingBoxRecordLayer newLayer(final Map<String, ? extends Object> config) {
-    final GeometryFactory wgs84 = GeometryFactory.floating3(4326);
+    final GeometryFactory wgs84 = GeometryFactory.floating3d(4326);
     final BoundingBoxRecordLayer layer = new BoundingBoxRecordLayer("geoname", "Geo Names",
       GeoNamesBoundingBoxLayerWorker.class, wgs84);
 

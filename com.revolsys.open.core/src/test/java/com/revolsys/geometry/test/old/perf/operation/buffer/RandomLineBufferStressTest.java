@@ -55,7 +55,7 @@ public class RandomLineBufferStressTest {
 
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  private final GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   public RandomLineBufferStressTest() {
   }

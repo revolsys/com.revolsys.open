@@ -35,8 +35,10 @@ public class TestUtil {
         final int axisCount = object.getInteger("axisCount");
         final double scaleXy = object.getInteger("scaleXy");
         final double scaleZ = object.getInteger("scaleZ");
-        final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
-          scaleXy, scaleZ);
+        final double[] scales = {
+          scaleXy, scaleXy, scaleZ
+        };
+        final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
         final String wkt = object.getValue("wkt");
         final Geometry geometry = geometryFactory.geometry(wkt);
         valid &= equalsExpectedWkt(i, object, geometry);
@@ -44,10 +46,10 @@ public class TestUtil {
         GeometryFactory otherGeometryFactory;
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-          otherGeometryFactory = GeometryFactory.fixed(
-            projectedCoordinateSystem.getCoordinateSystemId(), axisCount, scaleXy, scaleXy, scaleZ);
+          otherGeometryFactory = GeometryFactory
+            .fixed(projectedCoordinateSystem.getCoordinateSystemId(), axisCount, scales);
         } else {
-          otherGeometryFactory = GeometryFactory.fixed(3005, axisCount, scaleXy, scaleXy, scaleZ);
+          otherGeometryFactory = GeometryFactory.fixed(3005, axisCount, scales);
         }
         final Geometry convertedGeometry = geometry.convertGeometry(otherGeometryFactory);
         final Geometry convertedBackGeometry = convertedGeometry.convertGeometry(geometryFactory);

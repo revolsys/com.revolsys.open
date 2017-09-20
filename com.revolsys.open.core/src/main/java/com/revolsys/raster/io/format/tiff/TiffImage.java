@@ -231,7 +231,7 @@ public class TiffImage extends JaiGeoreferencedImage {
     if (coordinateSystemId == 0) {
       coordinateSystemId = Maps.getInteger(geoKeys, GEOGRAPHIC_COORDINATE_SYSTEM_ID, 0);
       if (coordinateSystemId != 0) {
-        geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
+        geometryFactory = GeometryFactory.floating2d(coordinateSystemId);
       }
     } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
       final int geoSrid = Maps.getInteger(geoKeys, GEOGRAPHIC_COORDINATE_SYSTEM_ID, 0);
@@ -265,12 +265,12 @@ public class TiffImage extends JaiGeoreferencedImage {
             linearUnit, axis, authority, false);
           final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
             .getCoordinateSystem(coordinateSystem);
-          geometryFactory = GeometryFactory.floating(epsgCoordinateSystem.getCoordinateSystemId(),
-            2);
+          geometryFactory = GeometryFactory
+            .floating2d(epsgCoordinateSystem.getCoordinateSystemId());
         }
       }
     } else {
-      geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
+      geometryFactory = GeometryFactory.floating2d(coordinateSystemId);
     }
     if (geometryFactory != null) {
       setGeometryFactory(geometryFactory);

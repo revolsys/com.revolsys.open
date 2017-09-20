@@ -22,7 +22,7 @@ import com.revolsys.swing.parallel.AbstractSwingWorker;
 public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<LayerRecord>, Void> {
 
   public static BoundingBoxRecordLayer newLayer(final Map<String, ? extends Object> config) {
-    final GeometryFactory wgs84 = GeometryFactory.floating3(4326);
+    final GeometryFactory wgs84 = GeometryFactory.floating3d(4326);
     final BoundingBoxRecordLayer layer1 = new BoundingBoxRecordLayer("wikipedia",
       "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class, wgs84);
 

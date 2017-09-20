@@ -53,7 +53,7 @@ import junit.textui.TestRunner;
  *
  */
 public class PreparedPolygonIntersectsStressTest extends TestCase {
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   static final int MAX_ITER = 10000;
 

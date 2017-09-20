@@ -60,7 +60,7 @@ public class GeometryImplTest extends TestCase {
     return new TestSuite(GeometryImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0, 1.0, 1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed3d(0, 1.0, 1.0, 1.0);
 
   private final GeometryFactory geometryFactoryFloat = GeometryFactory.DEFAULT_3D;
 

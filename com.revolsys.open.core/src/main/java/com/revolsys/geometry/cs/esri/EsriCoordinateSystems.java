@@ -125,9 +125,9 @@ public class EsriCoordinateSystems {
     if (coordinateSystem != null) {
       final int srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
       if (srid > 0 && srid < 2000000) {
-        return GeometryFactory.floating(srid, 2);
+        return GeometryFactory.floating2d(srid);
       } else {
-        return GeometryFactory.floating(coordinateSystem, 2);
+        return GeometryFactory.floating2d(coordinateSystem);
       }
     }
     return null;

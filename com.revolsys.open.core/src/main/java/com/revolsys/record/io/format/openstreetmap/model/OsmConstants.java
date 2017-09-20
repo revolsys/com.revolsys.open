@@ -22,7 +22,7 @@ public interface OsmConstants {
 
   QName WAY = new QName("way");
 
-  GeometryFactory WGS84_2D = GeometryFactory.floating(4326, 2);
+  GeometryFactory WGS84_2D = GeometryFactory.floating2d(4326);
 
   List<QName> NODE_XML_ELEMENTS = Arrays.asList(TAG);
 

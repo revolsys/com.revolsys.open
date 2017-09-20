@@ -162,7 +162,7 @@ public class PdfUtil {
                 geometryFactory = GeometryFactory.getFactory(wkt);
               }
             } else {
-              geometryFactory = GeometryFactory.floating3(srid);
+              geometryFactory = GeometryFactory.floating3d(srid);
             }
             final GeometryFactory geoGeometryFactory = geometryFactory
               .getGeographicGeometryFactory();

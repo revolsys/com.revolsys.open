@@ -1870,7 +1870,7 @@ public interface LineString extends Lineal {
       return newLineStringEmpty(geometryFactory);
     } else {
       final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
+      final int axisCount = geometryFactory.getAxisCount();
       final int vertexCount = getVertexCount();
       return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
     }

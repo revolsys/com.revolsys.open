@@ -26,7 +26,7 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
 
   public PointZGeometryWriter(final Resource resource) {
     this.resource = resource;
-    setGeometryFactory(GeometryFactory.fixed(0, 1000.0, 1000.0, 1000.0));
+    setGeometryFactory(GeometryFactory.fixed3d(0, 1000.0, 1000.0, 1000.0));
 
   }
 

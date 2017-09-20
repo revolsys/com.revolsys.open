@@ -99,7 +99,7 @@ public class WKBTest extends TestCase {
   }
 
   private void runWKBTestPackedCoordinate(final String wkt) throws IOException, ParseException {
-    final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+    final GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
     final Geometry g = geometryFactory.geometry(wkt);
 
     // Since we are using a PCS of dim=2, only check 2-dimensional storage

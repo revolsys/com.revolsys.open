@@ -17,7 +17,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   private static final Pattern NAME_PATTERN = Pattern
     .compile("^" + NtsConstants.REGEX_1000000 + ".*");
 
-  private final GeometryFactory geometryFactory = GeometryFactory.floating(4326, 2);
+  private final GeometryFactory geometryFactory = GeometryFactory.floating2d(4326);
 
   private double precisionScale = 1;
 

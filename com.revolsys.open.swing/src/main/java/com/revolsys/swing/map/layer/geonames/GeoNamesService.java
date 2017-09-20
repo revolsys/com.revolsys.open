@@ -85,7 +85,7 @@ public class GeoNamesService {
   }
 
   public List<Record> getNames(final BoundingBox boundingBox) {
-    final GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
+    final GeometryFactory geometryFactory = GeometryFactory.floating3d(4326);
     final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)geometryFactory
       .getCoordinateSystem();
     final BoundingBox geographicBoundingBox = boundingBox.convert(geometryFactory);
@@ -113,7 +113,7 @@ public class GeoNamesService {
   }
 
   public List<Record> getWikipediaArticles(final BoundingBox boundingBox) {
-    final BoundingBox geographicBoundingBox = boundingBox.convert(GeometryFactory.floating3(4326));
+    final BoundingBox geographicBoundingBox = boundingBox.convert(GeometryFactory.floating3d(4326));
     final Map<String, Object> params = new HashMap<>();
 
     params.put("north", geographicBoundingBox.getMaxY());

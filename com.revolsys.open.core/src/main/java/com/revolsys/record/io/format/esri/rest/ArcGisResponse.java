@@ -64,7 +64,7 @@ public abstract class ArcGisResponse<V> extends AbstractWebService<V> implements
           srid = 3005;
         }
       }
-      return GeometryFactory.floating3(srid);
+      return GeometryFactory.floating3d(srid);
     }
   }
 

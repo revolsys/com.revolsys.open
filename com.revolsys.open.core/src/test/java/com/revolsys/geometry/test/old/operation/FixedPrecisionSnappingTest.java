@@ -7,7 +7,7 @@ import com.revolsys.geometry.wkb.ParseException;
 import junit.framework.TestCase;
 
 public class FixedPrecisionSnappingTest extends TestCase {
-  private final GeometryFactory factory = GeometryFactory.fixed(0, 2, 1.0, 1.0);
+  private final GeometryFactory factory = GeometryFactory.fixed2d(0, 1.0, 1.0);
 
   public FixedPrecisionSnappingTest(final String name) {
     super(name);

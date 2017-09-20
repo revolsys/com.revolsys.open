@@ -61,7 +61,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   private String generatingSoftware = "RevolutionGIS";
 
-  private GeometryFactory geometryFactory = GeometryFactory.fixedNoSrid(1000.0, 1000.0, 1000.0);
+  private GeometryFactory geometryFactory = GeometryFactory.fixed3d(1000.0, 1000.0, 1000.0);
 
   private int globalEncoding = 0;
 

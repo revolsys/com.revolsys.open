@@ -32,7 +32,7 @@ public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
 
   @Override
   default GeometryFactory getGeometryFactory() {
-    return GeometryFactory.floating3(this);
+    return GeometryFactory.floating3d(this);
   }
 
   Unit<Length> getLengthUnit();

@@ -60,7 +60,7 @@ public class MultiPointImplTest extends TestCase {
     return new TestSuite(MultiPointImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0, 1000.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1000.0, 1000.0);
 
   public MultiPointImplTest(final String name) {
     super(name);

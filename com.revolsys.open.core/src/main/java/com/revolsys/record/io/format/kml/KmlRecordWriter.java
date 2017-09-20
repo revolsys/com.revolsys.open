@@ -25,10 +25,10 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
   private static final Map<Class<?>, String> TYPE_MAP = new HashMap<>();
 
   public static final GeometryFactory GEOMETRY_FACTORY_3D = GeometryFactory
-    .floating(Kml22Constants.COORDINATE_SYSTEM_ID, 2);
+    .floating3d(Kml22Constants.COORDINATE_SYSTEM_ID);
 
   public static final GeometryFactory GEOMETRY_FACTORY_2D = GeometryFactory
-    .floating(Kml22Constants.COORDINATE_SYSTEM_ID, 2);
+    .floating2d(Kml22Constants.COORDINATE_SYSTEM_ID);
 
   static {
     TYPE_MAP.put(Double.class, "decimal");

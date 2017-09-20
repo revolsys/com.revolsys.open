@@ -288,9 +288,9 @@ public class NodedSegmentString implements NodableSegmentString {
     if (this.line == null || this.line.getVertexCount() == 0) {
       return "LINESTRING EMPTY\t" + this.data;
     } else if (this.line.getVertexCount() < 2) {
-      return GeometryFactory.floating(0, 2).point(this.line) + "\t" + this.data;
+      return GeometryFactory.floating2d(0).point(this.line) + "\t" + this.data;
     } else {
-      return GeometryFactory.floating(0, 2).lineString(this.line) + "\t" + this.data;
+      return GeometryFactory.floating2d(0).lineString(this.line) + "\t" + this.data;
     }
   }
 }

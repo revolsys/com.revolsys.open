@@ -207,7 +207,7 @@ public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
         }
         if (1 == planimetricReferenceSystem) {
           final int coordinateSystemId = 26900 + zone;
-          geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
+          geometryFactory = GeometryFactory.floating2d(coordinateSystemId);
         } else if (2 == planimetricReferenceSystem) {
 
         } else if (3 == planimetricReferenceSystem) {
@@ -231,10 +231,10 @@ public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
             .getCoordinateSystem(projectedCoordinateSystem);
           if (projectedCoordinateSystem2 == projectedCoordinateSystem
             || projectedCoordinateSystem2 == null) {
-            geometryFactory = GeometryFactory.floating(projectedCoordinateSystem2, 2);
+            geometryFactory = GeometryFactory.floating2d(projectedCoordinateSystem2);
           } else {
             final int coordinateSystemId = projectedCoordinateSystem2.getCoordinateSystemId();
-            geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
+            geometryFactory = GeometryFactory.floating2d(coordinateSystemId);
           }
         }
 

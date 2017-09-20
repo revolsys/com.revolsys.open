@@ -103,7 +103,7 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, WebServic
       final double maxX = XmlUtil.getAttributeDouble(boundingBoxElement, "maxx", 180);
       final double minY = XmlUtil.getAttributeDouble(boundingBoxElement, "miny", -90);
       final double maxY = XmlUtil.getAttributeDouble(boundingBoxElement, "maxy", 90);
-      final GeometryFactory geometryFactory = GeometryFactory.floating(4326, 2);
+      final GeometryFactory geometryFactory = GeometryFactory.floating2d(4326);
       this.latLonBoundingBox = geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
     });
     XmlUtil.forFirstElement(layerElement, "EX_GeographicBoundingBox", (boundingBoxElement) -> {
@@ -115,7 +115,7 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, WebServic
         -90);
       final double maxY = XmlUtil.getFirstElementDouble(boundingBoxElement, "northBoundLatitude",
         90);
-      final GeometryFactory geometryFactory = GeometryFactory.floating(4326, 2);
+      final GeometryFactory geometryFactory = GeometryFactory.floating2d(4326);
       this.latLonBoundingBox = geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
     });
 
@@ -208,7 +208,7 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, WebServic
         final WmsLayerDefinition parentLayer = (WmsLayerDefinition)this.parent;
         return parentLayer.getDefaultGeometryFactory();
       } else {
-        return GeometryFactory.floating(4326, 2);
+        return GeometryFactory.floating2d(4326);
       }
     } else {
       return WmsClient.getGeometryFactory(this.srs.get(0));
