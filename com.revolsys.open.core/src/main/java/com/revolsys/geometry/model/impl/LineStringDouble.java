@@ -138,8 +138,12 @@ public class LineStringDouble extends AbstractLineString {
           int i = 0;
           for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
             for (int axisIndex = 0; axisIndex < targetAxisCount; axisIndex++) {
-              final double coordinate = sourceCoordinates[vertexIndex * sourceAxisCount
-                + axisIndex];
+              final double coordinate;
+              if (axisIndex < sourceAxisCount) {
+                coordinate = sourceCoordinates[vertexIndex * sourceAxisCount + axisIndex];
+              } else {
+                coordinate = Double.NaN;
+              }
               coordinates[i++] = coordinate;
             }
           }
