@@ -1,12 +1,14 @@
 package com.revolsys.io.connection;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.beans.PropertyChangeSupport;
+import com.revolsys.beans.PropertyChangeSupportProxy;
+
 public class AbstractConnectionRegistryManager<R extends ConnectionRegistry<C>, C extends Connection>
-  implements ConnectionRegistryManager<R> {
+  implements ConnectionRegistryManager<R>, PropertyChangeSupportProxy {
 
   private final String name;
 

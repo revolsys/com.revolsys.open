@@ -2,7 +2,6 @@ package com.revolsys.beans;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
 import com.revolsys.util.Property;
 
@@ -19,16 +18,41 @@ public interface PropertyChangeSupportProxy {
   }
 
   default void firePropertyChange(final Object source, final String propertyName,
+    final boolean oldValue, final boolean newValue) {
+    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
+  }
+
+  default void firePropertyChange(final Object source, final String propertyName,
+    final int oldValue, final int newValue) {
+    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
+  }
+
+  default void firePropertyChange(final Object source, final String propertyName,
     final Object oldValue, final Object newValue) {
-    final PropertyChangeEvent event = new PropertyChangeEvent(source, propertyName, oldValue,
-      newValue);
-    firePropertyChange(event);
+    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
   }
 
   default void firePropertyChange(final PropertyChangeEvent event) {
     final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
     if (propertyChangeSupport != null) {
       propertyChangeSupport.firePropertyChange(event);
+    }
+  }
+
+  default void firePropertyChange(final String propertyName, final int index,
+    final boolean oldValue, final boolean newValue) {
+    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
   }
 

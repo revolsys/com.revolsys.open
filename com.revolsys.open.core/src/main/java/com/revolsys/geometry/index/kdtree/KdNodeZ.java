@@ -82,8 +82,10 @@ public class KdNodeZ extends KdNode {
     }
   }
 
-  public void setZ(final double z) {
+  @Override
+  public Point setZ(final double z) {
     this.z = z;
+    return this;
   }
 
   /**

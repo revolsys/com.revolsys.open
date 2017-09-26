@@ -134,24 +134,29 @@ public class PointEditor extends AbstractGeometryEditor implements Point, Punctu
     if (partIndex == 0) {
       return setCoordinate(axisIndex, coordinate);
     } else {
-      return java.lang.Double.NaN;
+      return Double.NaN;
     }
   }
 
-  public double setM(final double m) {
-    return setCoordinate(M, m);
+  public PointEditor setM(final double m) {
+    setCoordinate(M, m);
+    return this;
   }
 
-  public double setX(final double x) {
-    return setCoordinate(X, x);
+  public PointEditor setX(final double x) {
+    setCoordinate(X, x);
+    return this;
   }
 
-  public double setY(final double y) {
-    return setCoordinate(Y, y);
+  public PointEditor setY(final double y) {
+    setCoordinate(Y, y);
+    return this;
   }
 
-  public double setZ(final double z) {
-    return setCoordinate(Z, z);
+  @Override
+  public PointEditor setZ(final double z) {
+    setCoordinate(Z, z);
+    return this;
   }
 
   @Override

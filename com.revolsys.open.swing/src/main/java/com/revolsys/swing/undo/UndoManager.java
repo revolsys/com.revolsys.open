@@ -3,7 +3,6 @@ package com.revolsys.swing.undo;
 import java.awt.Component;
 import java.awt.Event;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeSupport;
 
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -14,6 +13,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoableEdit;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.action.RunnableAction;

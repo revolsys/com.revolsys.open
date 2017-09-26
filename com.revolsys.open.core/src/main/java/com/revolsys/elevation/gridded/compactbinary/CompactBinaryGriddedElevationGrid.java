@@ -54,6 +54,7 @@ public class CompactBinaryGriddedElevationGrid {
     }
 
     public synchronized int getInt(final long offset) throws IOException {
+      this.bytes.rewind();
       this.fileChannel.read(this.bytes, offset);
       return this.bytes.getInt(0);
     }
@@ -77,7 +78,7 @@ public class CompactBinaryGriddedElevationGrid {
 
   private final IntHashMap<IntHashMap<FileChannelHolder>> channelsByXandY = new IntHashMap<>();
 
-  private int gridSize;
+  private final int gridSizePixels;
 
   private final int gridCellSize;
 
@@ -101,6 +102,7 @@ public class CompactBinaryGriddedElevationGrid {
     this.gridCellSize = gridCellSize;
     this.filePrefix = filePrefix;
     this.scaleZ = scaleZ;
+    this.gridSizePixels = gridTileSize / gridCellSize;
     this.tileBasePath = basePath//
       .resolve(CompactBinaryGriddedElevation.FILE_EXTENSION)//
       .resolve(Integer.toString(coordinateSystemId))//
@@ -117,7 +119,7 @@ public class CompactBinaryGriddedElevationGrid {
       final int gridCellY = GriddedElevationModel.getGridCellY(tileY, this.gridCellSize, y);
       final int elevationByteSize = 4;
       final int offset = CompactBinaryGriddedElevation.HEADER_SIZE
-        + (gridCellY * this.gridSize + gridCellX) * elevationByteSize;
+        + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
       try (
         FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
         final int elevationInt = channelHolder.getInt(offset);

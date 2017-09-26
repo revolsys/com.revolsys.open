@@ -1,10 +1,10 @@
 package com.revolsys.swing.preferences;
 
-import java.beans.PropertyChangeSupport;
 import java.util.function.Function;
 
 import javax.swing.JComponent;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.swing.SwingUtil;

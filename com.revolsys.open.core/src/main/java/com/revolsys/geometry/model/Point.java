@@ -1033,6 +1033,17 @@ public interface Point extends Punctual, Serializable {
     return this;
   }
 
+  default Point setZ(final double elevation) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int axisCount = geometryFactory.getAxisCount();
+    if (axisCount > 2) {
+      final double[] coordinates = getCoordinates(axisCount);
+      coordinates[2] = elevation;
+      return newPoint(geometryFactory, coordinates);
+    }
+    return this;
+  }
+
   default Point subtract(final Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Point convertedPoint = point.convertPoint2d(geometryFactory);

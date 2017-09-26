@@ -6,7 +6,6 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.beans.PropertyChangeSupport;
 import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
@@ -19,6 +18,7 @@ import javax.swing.UIManager;
 
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.parallel.Invoke;

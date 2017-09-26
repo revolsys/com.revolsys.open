@@ -2,7 +2,6 @@ package com.revolsys.io.connection;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -11,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
@@ -22,7 +22,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public abstract class AbstractConnectionRegistry<C extends Connection>
-  implements ConnectionRegistry<C>, PropertyChangeListener {
+  implements ConnectionRegistry<C>, PropertyChangeListener, PropertyChangeSupportProxy {
 
   private ConnectionRegistryManager<ConnectionRegistry<C>> connectionManager;
 
