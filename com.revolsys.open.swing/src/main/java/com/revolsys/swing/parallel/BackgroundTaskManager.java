@@ -1,9 +1,9 @@
 package com.revolsys.swing.parallel;
 
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.function.Consumer;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.util.Property;
 
 class BackgroundTaskManager {

@@ -2,7 +2,6 @@ package com.revolsys.swing.parallel;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +16,7 @@ import java.util.function.Supplier;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.parallel.ThreadInterruptedException;

@@ -137,11 +137,8 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
 
   public int appendVertex(final Point point) {
     final int index = getVertexCount();
-    if (insertVertex(index, point)) {
-      return index;
-    } else {
-      return -1;
-    }
+    insertVertex(index, point);
+    return index;
   }
 
   public int appendVertex(final Point point, final boolean allowRepeated) {
@@ -171,15 +168,21 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
   @Override
   public LineStringEditor clone() {
     final LineStringEditor clone = (LineStringEditor)super.clone();
-    clone.coordinates = this.coordinates.clone();
+    if (clone.coordinates != null) {
+      clone.coordinates = this.coordinates.clone();
+    }
     return clone;
   }
 
   private void ensureCapacity(final int vertexCount) {
     if (vertexCount >= this.vertexCount) {
-      final int coordinateCount = vertexCount * this.axisCount;
-      if (coordinateCount - this.coordinates.length > 0) {
-        grow(coordinateCount);
+      if (this.coordinates == null) {
+        getCoordinatesModified(vertexCount, this.axisCount);
+      } else {
+        final int coordinateCount = vertexCount * this.axisCount;
+        if (coordinateCount - this.coordinates.length > 0) {
+          grow(coordinateCount);
+        }
       }
     }
   }
@@ -211,6 +214,20 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
       final double[] coordinates = new double[this.vertexCount * this.axisCount];
       System.arraycopy(this.coordinates, 0, coordinates, 0, coordinates.length);
       return coordinates;
+    }
+  }
+
+  private void getCoordinatesModified(final int vertexIndex, final int axisCount) {
+    if (this.coordinates == null) {
+      setModified(true);
+      int vertexCount = this.vertexCount;
+      if (vertexIndex >= vertexCount) {
+        vertexCount = vertexIndex + 1;
+      }
+      this.coordinates = new double[vertexCount * axisCount];
+      if (this.line != null) {
+        this.line.copyCoordinates(axisCount, Double.NaN, this.coordinates, 0);
+      }
     }
   }
 
@@ -300,9 +317,12 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
     return setVertex(index, x, y, z);
   }
 
-  public boolean insertVertex(final int index, final Point point) {
+  @SuppressWarnings("unchecked")
+  @Override
+  public <G extends Geometry> G insertVertex(final int index, final Point point) {
     insertVertexShift(index);
-    return setVertex(index, point);
+    setVertex(index, point);
+    return (G)this;
   }
 
   public boolean insertVertex(final int index, final Point point, final boolean allowRepeated) {
@@ -321,7 +341,8 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
         }
       }
     }
-    return insertVertex(index, point);
+    insertVertex(index, point);
+    return true;
   }
 
   private void insertVertexShift(final int index) {
@@ -417,6 +438,7 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
     }
   }
 
+  @Override
   public double setCoordinate(final int vertexIndex, final int axisIndex, final double coordinate) {
     if (vertexIndex < 0) {
       throw new IllegalArgumentException("vertexIndex=" + vertexIndex + " must be >=0");
@@ -440,14 +462,7 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
             changed = !Doubles.equal(coordinate, oldValue);
           }
           if (changed) {
-            if (this.coordinates == null) {
-              setModified(true);
-              if (this.line == null) {
-                this.coordinates = new double[(vertexIndex + 1) * axisCount];
-              } else {
-                this.coordinates = this.line.getCoordinates(axisCount);
-              }
-            }
+            getCoordinatesModified(vertexIndex + 1, axisCount);
             final GeometryFactory geometryFactory = getGeometryFactory();
             final double preciseCoordinate = geometryFactory.makePrecise(axisIndex, coordinate);
             this.coordinates[vertexIndex * axisCount + axisIndex] = preciseCoordinate;
@@ -467,10 +482,6 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
     } else {
       return Double.NaN;
     }
-  }
-
-  public double setM(final int vertexIndex, final double m) {
-    return setCoordinate(vertexIndex, M, m);
   }
 
   public void setVertex(final int index, final double... coordinates) {
@@ -539,18 +550,6 @@ public class LineStringEditor extends AbstractGeometryEditor implements LineStri
     } else {
       return false;
     }
-  }
-
-  public double setX(final int vertexIndex, final double x) {
-    return setCoordinate(vertexIndex, X, x);
-  }
-
-  public double setY(final int vertexIndex, final double y) {
-    return setCoordinate(vertexIndex, Y, y);
-  }
-
-  public double setZ(final int vertexIndex, final double z) {
-    return setCoordinate(vertexIndex, Z, z);
   }
 
   @Override

@@ -6,7 +6,6 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeSupport;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -22,6 +21,7 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.awt.CloseableAffineTransform;
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;

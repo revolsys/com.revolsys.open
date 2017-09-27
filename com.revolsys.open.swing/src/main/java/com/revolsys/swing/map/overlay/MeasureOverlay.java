@@ -38,6 +38,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Icons;
@@ -345,16 +346,17 @@ public class MeasureOverlay extends AbstractOverlay {
               point = getSnapPoint().newGeometry(geometryFactory);
             }
             final int[] vertexIndex = location.getVertexId();
-            Geometry newGeometry;
+            final GeometryEditor geometryEditor = geometry.newGeometryEditor();
             final Point newPoint = point;
             if (vertexIndex == null) {
               final int[] segmentIndex = location.getSegmentId();
               final int[] newIndex = segmentIndex.clone();
               newIndex[newIndex.length - 1] = newIndex[newIndex.length - 1] + 1;
-              newGeometry = geometry.insertVertex(newPoint, newIndex);
+              geometryEditor.insertVertex(newPoint, newIndex);
             } else {
-              newGeometry = geometry.moveVertex(newPoint, vertexIndex);
+              geometryEditor.moveVertex(newPoint, vertexIndex);
             }
+            final Geometry newGeometry = geometryEditor.newGeometry();
             setMeasureGeometry(newGeometry);
           }
           return true;

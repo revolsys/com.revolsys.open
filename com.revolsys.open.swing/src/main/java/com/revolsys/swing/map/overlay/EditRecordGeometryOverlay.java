@@ -41,6 +41,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
@@ -54,6 +55,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.elevation.gridded.IGriddedElevationModelLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
@@ -201,6 +203,16 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     }
   }
 
+  private Point addElevation(final GeometryFactory geometryFactory, final Point newPoint) {
+    if (geometryFactory.getAxisCount() > 2) {
+      final double elevation = getElevation(newPoint);
+      if (Double.isFinite(elevation)) {
+        return newPoint.newPointZ(elevation);
+      }
+    }
+    return newPoint;
+  }
+
   /**
    * Set the addLayer that a new feature is to be added to.
    *
@@ -243,7 +255,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private void addRecords(final List<LayerRecord> results, final LayerGroup group,
     final Geometry boundingBox) {
-    final double scale = getViewport().getScale();
+    final double scale = getViewportScale();
     final List<Layer> layers = group.getLayers();
     Collections.reverse(layers);
     for (final Layer layer : layers) {
@@ -387,6 +399,34 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     }
   }
 
+  private GeometryEditor geometryEdit(final MouseEvent event, final CloseLocation location) {
+    final Geometry geometry = location.getGeometry();
+    final Point newPoint = getSnapOrEventPointWithElevation(event, location);
+    int[] vertexId = location.getVertexId();
+    final GeometryEditor geometryEditor = geometry.newGeometryEditor();
+    if (vertexId == null) {
+      vertexId = location.getSegmentIdNext();
+      geometryEditor.insertVertex(newPoint, vertexId);
+    } else {
+      geometryEditor.setVertex(newPoint, vertexId);
+    }
+    if (geometryEditor.isModified()) {
+      if (geometry.getGeometryFactory().getAxisCount() > 2) {
+
+        for (final Vertex vertex : geometryEditor.vertices()) {
+          double z = vertex.getZ();
+          if (z == 0 || !Double.isFinite(z)) {
+            z = getElevation(vertex);
+            if (Double.isFinite(z)) {
+              vertex.setZ(z);
+            }
+          }
+        }
+      }
+    }
+    return geometryEditor;
+  }
+
   public DataType getAddGeometryPartDataType() {
     return this.addGeometryPartDataType;
   }
@@ -414,6 +454,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       final Point pointOnLine = segment.project(point);
       return geometryFactory.point(pointOnLine);
     }
+  }
+
+  private double getElevation(final Point point) {
+    final Project project = getProject();
+    final double scale = getViewportScale();
+    return IGriddedElevationModelLayer.getElevation(project, scale, point);
   }
 
   public DataType getGeometryPartDataType(final DataType dataType) {
@@ -481,6 +527,20 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       return visibleDescendants;
     }
     return new ArrayList<>(layers);
+  }
+
+  private Point getSnapOrEventPointWithElevation(final MouseEvent event,
+    final CloseLocation location) {
+    final GeometryFactory geometryFactory = location.getGeometryFactory();
+    final Point snapPoint = getSnapPoint();
+    Point newPoint;
+    if (snapPoint == null) {
+      newPoint = getPoint(geometryFactory, event);
+    } else {
+      newPoint = snapPoint.newGeometry(geometryFactory);
+    }
+    newPoint = addElevation(geometryFactory, newPoint);
+    return newPoint;
   }
 
   protected Geometry getVertexGeometry(final MouseEvent event, final CloseLocation location) {
@@ -819,25 +879,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         if (event.getButton() == MouseEvent.BUTTON1) {
           this.addGeometryEditVerticesStart = false;
           for (final CloseLocation location : getMouseOverLocations()) {
-            final Geometry geometry = location.getGeometry();
-            final GeometryFactory geometryFactory = location.getGeometryFactory();
-            final Point point;
-            if (getSnapPoint() == null) {
-              point = getPoint(geometryFactory, event);
-            } else {
-              point = getSnapPoint().newGeometry(geometryFactory);
-            }
-            final int[] vertexIndex = location.getVertexId();
-            Geometry newGeometry;
-            final Point newPoint = point;
-            if (vertexIndex == null) {
-              final int[] segmentIndex = location.getSegmentId();
-              final int[] newIndex = segmentIndex.clone();
-              newIndex[newIndex.length - 1] = newIndex[newIndex.length - 1] + 1;
-              newGeometry = geometry.insertVertex(newPoint, newIndex);
-            } else {
-              newGeometry = geometry.moveVertex(newPoint, vertexIndex);
-            }
+            final GeometryEditor geometryEditor = geometryEdit(event, location);
+            final Geometry newGeometry = geometryEditor.newGeometry();
             setAddGeometry(newGeometry);
           }
           setMouseOverLocationsDo(Collections.emptyList());
@@ -977,28 +1020,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           final MultipleUndo edit = new MultipleUndo();
           final List<CloseLocation> locations = getMouseOverLocations();
           for (final CloseLocation location : locations) {
-            final Geometry geometry = location.getGeometry();
-            final GeometryFactory geometryFactory = location.getGeometryFactory();
-            final Point point;
-            final Point snapPoint = getSnapPoint();
-            if (snapPoint == null) {
-              point = getPoint(geometryFactory, event);
-            } else {
-              point = snapPoint.newGeometry(geometryFactory);
+            final GeometryEditor geometryEditor = geometryEdit(event, location);
+            if (geometryEditor.isModified()) {
+              Geometry newGeometry = geometryEditor.newGeometry();
+              final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
+              edit.addEdit(geometryEdit);
             }
-            final int[] vertexIndex = location.getVertexId();
-            Geometry newGeometry;
-            final Point newPoint = point;
-            if (vertexIndex == null) {
-              final int[] segmentIndex = location.getSegmentId();
-              final int[] newIndex = segmentIndex.clone();
-              newIndex[newIndex.length - 1] = newIndex[newIndex.length - 1] + 1;
-              newGeometry = geometry.insertVertex(newPoint, newIndex);
-            } else {
-              newGeometry = geometry.moveVertex(newPoint, vertexIndex);
-            }
-            final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
-            edit.addEdit(geometryEdit);
           }
           if (!edit.isEmpty()) {
             addUndo(edit);
@@ -1015,7 +1042,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected boolean modeEditGeometryVerticesMove(final MouseEvent event) {
     if (canOverrideOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)
       || isOverlayAction(ACTION_MOVE_GEOMETRY)) {
-      final double scale = getViewport().getScale();
+      final double scale = getViewportScale();
       final List<CloseLocation> closeLocations = new ArrayList<>();
       final MapPanel map = getMap();
       for (final CloseLocation location : map.getCloseSelectedLocations()) {
@@ -1325,7 +1352,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       final LayerRecord record = location.getRecord();
       final String geometryFieldName = record.getGeometryFieldName();
       final Geometry oldValue = record.getGeometry();
-      if (DataTypes.GEOMETRY.equals(newGeometry, oldValue)) {
+      if (newGeometry == oldValue || newGeometry != null && newGeometry.equalsExact(oldValue)) {
         return null;
       } else {
         final AbstractRecordLayer layer = location.getLayer();

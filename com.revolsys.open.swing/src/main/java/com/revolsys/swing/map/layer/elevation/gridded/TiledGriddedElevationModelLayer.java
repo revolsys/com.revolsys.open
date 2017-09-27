@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.elevation.gridded;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevation;
+import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevationGrid;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
@@ -44,6 +46,12 @@ public class TiledGriddedElevationModelLayer
 
   private String url;
 
+  private CompactBinaryGriddedElevationGrid elevationModel;
+
+  private double scaleZ;
+
+  private final int minResolution = 1;
+
   public TiledGriddedElevationModelLayer() {
     super("tiledGriddedElevationModelLayer");
   }
@@ -55,11 +63,15 @@ public class TiledGriddedElevationModelLayer
 
   @Override
   public double getElevation(final double x, final double y) {
-    final GriddedElevationModel elevationModel = getElevationModel(x, y);
-    if (elevationModel == null) {
-      return Double.NaN;
+    if (this.elevationModel == null) {
+      final GriddedElevationModel elevationModel = getElevationModel(x, y);
+      if (elevationModel == null) {
+        return Double.NaN;
+      } else {
+        return elevationModel.getElevation(x, y);
+      }
     } else {
-      return elevationModel.getElevation(x, y);
+      return this.elevationModel.getElevation(x, y);
     }
   }
 
@@ -155,8 +167,23 @@ public class TiledGriddedElevationModelLayer
     final boolean initialized = super.initializeDo();
     if (initialized) {
       this.baseResource = Resource.getResource(this.url);
+      if (this.baseResource.isFile()) {
+        final Path basePath = this.baseResource.getPath();
+        final int coordinateSystemId = getCoordinateSystemId();
+        this.elevationModel = new CompactBinaryGriddedElevationGrid(basePath, this.filePrefix,
+          coordinateSystemId, this.tileSizePixels, this.minResolution, this.scaleZ);
+      }
     }
     return initialized;
+  }
+
+  @Override
+  public boolean isUseElevationAtScale(final double scale) {
+    if (this.elevationModel == null) {
+      return IGriddedElevationModelLayer.super.isUseElevationAtScale(scale);
+    } else {
+      return true;
+    }
   }
 
   public GriddedElevationModel newGriddedElevationModel(final int tileSize, final int tileX,
@@ -252,6 +279,8 @@ public class TiledGriddedElevationModelLayer
       } else {
         geometryFactory3d = geometryFactory.convertAxisCount(3);
       }
+      this.scaleZ = geometryFactory3d.getScaleZ();
+
       final GeometryFactory newGeometryFactory = super.setGeometryFactoryDo(geometryFactory3d);
       final TiledMultipleGriddedElevationModelLayerRenderer renderer = getRenderer();
       if (renderer != null) {

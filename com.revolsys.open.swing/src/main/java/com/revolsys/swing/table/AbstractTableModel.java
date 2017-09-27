@@ -1,6 +1,5 @@
 package com.revolsys.swing.table;
 
-import java.beans.PropertyChangeSupport;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +12,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumnModel;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.logging.Logs;

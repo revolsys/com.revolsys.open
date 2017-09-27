@@ -1,9 +1,9 @@
 package com.revolsys.properties;
 
-import java.beans.PropertyChangeSupport;
 import java.util.Map;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.util.Property;

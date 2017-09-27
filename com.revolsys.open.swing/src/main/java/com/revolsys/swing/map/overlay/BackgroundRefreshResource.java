@@ -1,11 +1,11 @@
 package com.revolsys.swing.map.overlay;
 
-import java.beans.PropertyChangeSupport;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 import javax.swing.SwingWorker;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SupplierConsumerMaxThreadsSwingWorker;

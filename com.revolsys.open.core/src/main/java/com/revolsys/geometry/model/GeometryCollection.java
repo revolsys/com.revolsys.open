@@ -690,6 +690,26 @@ public interface GeometryCollection extends Geometry {
     return new GeometryCollectionSegment(this, -1);
   }
 
+  default double setCoordinate(final int[] vertexId, final int axisIndex, final double coordinate) {
+    throw new UnsupportedOperationException();
+  }
+
+  default double setM(final int[] vertexId, final double coordinate) {
+    return setCoordinate(vertexId, M, coordinate);
+  }
+
+  default double setX(final int[] vertexId, final double coordinate) {
+    return setCoordinate(vertexId, X, coordinate);
+  }
+
+  default double setY(final int[] vertexId, final double coordinate) {
+    return setCoordinate(vertexId, Y, coordinate);
+  }
+
+  default double setZ(final int[] vertexId, final double coordinate) {
+    return setCoordinate(vertexId, Z, coordinate);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toClockwise() {

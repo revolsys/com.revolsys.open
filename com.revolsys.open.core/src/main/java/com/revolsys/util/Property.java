@@ -7,7 +7,6 @@ import java.beans.Introspector;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
-import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -27,6 +26,7 @@ import org.apache.commons.beanutils.MethodUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import com.revolsys.beans.NonWeakListener;
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.beans.ProxyPropertyChangeListener;
 import com.revolsys.beans.WeakPropertyChangeListener;

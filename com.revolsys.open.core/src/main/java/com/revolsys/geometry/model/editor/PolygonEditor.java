@@ -140,6 +140,7 @@ public class PolygonEditor extends AbstractGeometryEditor implements Polygon, Po
     }
   }
 
+  @Override
   public double setCoordinate(final int ringIndex, final int vertexIndex, final int axisIndex,
     final double coordinate) {
     final LinearRingEditor editor = getEditor(ringIndex);
@@ -158,21 +159,5 @@ public class PolygonEditor extends AbstractGeometryEditor implements Polygon, Po
     } else {
       return Double.NaN;
     }
-  }
-
-  public double setM(final int ringIndex, final int vertexIndex, final double m) {
-    return setCoordinate(ringIndex, vertexIndex, M, m);
-  }
-
-  public double setX(final int ringIndex, final int vertexIndex, final double x) {
-    return setCoordinate(ringIndex, vertexIndex, X, x);
-  }
-
-  public double setY(final int ringIndex, final int vertexIndex, final double y) {
-    return setCoordinate(ringIndex, vertexIndex, Y, y);
-  }
-
-  public double setZ(final int ringIndex, final int vertexIndex, final double z) {
-    return setCoordinate(ringIndex, vertexIndex, Z, z);
   }
 }

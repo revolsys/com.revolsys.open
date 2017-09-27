@@ -6,9 +6,7 @@ import com.revolsys.collection.map.LruMap;
 import com.revolsys.elevation.gridded.AbstractGriddedElevationModel;
 import com.revolsys.elevation.gridded.DirectFileElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.IoFactory;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.IntPair;
 
@@ -24,8 +22,6 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
 
   private final Map<IntPair, DirectFileElevationModel> models = new LruMap<>(5000);
 
-  private CompactBinaryGriddedElevation factory;
-
   public TiledCompactBinaryGriddedElevationModel() {
   }
 
@@ -33,7 +29,6 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
     final String fileExtension, final GeometryFactory geometryFactory, final double minX,
     final double minY, final int gridTileWidth, final int gridTileHeight, final int gridCellSize) {
     super(geometryFactory, minX, minY, Integer.MAX_VALUE, Integer.MAX_VALUE, gridCellSize);
-    setFileExtension(fileExtension);
     this.gridTileWidth = gridTileWidth;
     this.gridTileHeight = gridTileHeight;
     this.coordinateSystemId = geometryFactory.getCoordinateSystemId();
@@ -128,17 +123,11 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
   @Override
   public GriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
     final double x, final double y, final int width, final int height, final double gridCellSize) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public void setElevation(final int x, final int y, final double elevation) {
-  }
-
-  public void setFileExtension(final String fileExtension) {
-    this.factory = (CompactBinaryGriddedElevation)IoFactory
-      .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);
   }
 
   public void setGridTileHeight(final int gridTileHeight) {

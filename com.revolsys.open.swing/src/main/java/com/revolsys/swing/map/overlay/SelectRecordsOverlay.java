@@ -126,7 +126,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private void addSelectedRecords(final LayerGroup group, final BoundingBox boundingBox) {
 
-    final double scale = getViewport().getScale();
+    final double scale = getViewportScale();
     final List<Layer> layers = group.getLayers();
     Collections.reverse(layers);
     for (final Layer layer : layers) {
@@ -480,7 +480,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   private void selectRecords(final LayerGroup group, final BoundingBox boundingBox) {
-    final double scale = getViewport().getScale();
+    final double scale = getViewportScale();
     final List<Layer> layers = group.getLayers();
     Collections.reverse(layers);
     for (final Layer layer : layers) {
@@ -545,7 +545,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private void unSelectRecords(final LayerGroup group, final BoundingBox boundingBox) {
 
-    final double scale = getViewport().getScale();
+    final double scale = getViewportScale();
     final List<Layer> layers = group.getLayers();
     Collections.reverse(layers);
     for (final Layer layer : layers) {

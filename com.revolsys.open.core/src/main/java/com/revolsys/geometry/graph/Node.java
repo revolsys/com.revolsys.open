@@ -508,8 +508,8 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     this.id = in.readInt();
     this.inEdgeIds = (int[])in.readObject();
     this.outEdgeIds = (int[])in.readObject();
-    setX(in.readDouble());
-    setY(in.readDouble());
+    setXDo(in.readDouble());
+    setYDo(in.readDouble());
   }
 
   void remove() {

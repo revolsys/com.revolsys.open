@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -25,6 +24,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.menu.BaseJPopupMenu;

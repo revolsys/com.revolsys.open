@@ -6,10 +6,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.Exceptions;
 
 public abstract class AbstractGeometryEditor implements GeometryEditor {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private AbstractGeometryEditor parentEditor;
@@ -111,6 +107,7 @@ public abstract class AbstractGeometryEditor implements GeometryEditor {
     return getBoundingBox().hashCode();
   }
 
+  @Override
   public boolean isModified() {
     return this.modified;
   }

@@ -186,6 +186,12 @@ public class MultiLineStringVertex extends AbstractVertex {
     throw new UnsupportedOperationException("Removing vertices not supported");
   }
 
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    final Lineal line = getLineal();
+    return line.setCoordinate(this.partIndex, this.vertexIndex, axisIndex, coordinate);
+  }
+
   public void setVertexId(final int... vertexId) {
     this.partIndex = vertexId[0];
     this.vertexIndex = vertexId[1];

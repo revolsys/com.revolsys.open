@@ -129,6 +129,12 @@ public class LineStringVertex extends AbstractVertex {
     throw new UnsupportedOperationException("Removing vertices not supported");
   }
 
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    final LineString line = getLineString();
+    return line.setCoordinate(this.vertexIndex, axisIndex, coordinate);
+  }
+
   public void setVertexId(final int... vertexId) {
     this.vertexIndex = vertexId[0];
   }

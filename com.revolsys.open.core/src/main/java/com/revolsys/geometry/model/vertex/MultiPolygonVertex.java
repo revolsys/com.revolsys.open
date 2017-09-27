@@ -203,9 +203,17 @@ public class MultiPolygonVertex extends AbstractVertex {
     throw new UnsupportedOperationException("Removing vertices not supported");
   }
 
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    final Polygonal Polygonal = getPolygonal();
+    return Polygonal.setCoordinate(this.partIndex, this.ringIndex, this.vertexIndex, axisIndex,
+      coordinate);
+  }
+
   public void setVertexId(final int... vertexId) {
     this.partIndex = vertexId[0];
     this.ringIndex = vertexId[1];
     this.vertexIndex = vertexId[2];
   }
+
 }

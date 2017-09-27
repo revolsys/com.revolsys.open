@@ -7,7 +7,6 @@ import java.awt.TextArea;
 import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.nio.file.Files;
@@ -36,6 +35,7 @@ import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.collection.map.LinkedHashMapEx;

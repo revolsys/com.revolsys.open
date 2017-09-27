@@ -1,7 +1,5 @@
 package com.revolsys.beans;
 
-import java.beans.PropertyChangeSupport;
-
 import com.revolsys.util.Exceptions;
 
 public abstract class AbstractPropertyChangeSupportProxy

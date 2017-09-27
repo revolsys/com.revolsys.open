@@ -671,7 +671,7 @@ public interface Polygon extends Polygonal {
           final GeometryFactory geometryFactory = getGeometryFactory();
 
           final LinearRing ring = getRing(ringIndex);
-          final LinearRing newRing = ring.insertVertex(newPoint, vertexIndex);
+          final LinearRing newRing = ring.insertVertex(vertexIndex, newPoint);
           final List<LinearRing> rings = new ArrayList<>(getRings());
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
@@ -1005,6 +1005,37 @@ public interface Polygon extends Polygonal {
   @Override
   default Iterable<Segment> segments() {
     return new PolygonSegment(this, 0, -1);
+  }
+
+  default double setCoordinate(final int ringIndex, final int vertexIndex, final int axisIndex,
+    final double coordinate) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  default double setCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex, final double coordinate) {
+    if (partIndex == 0) {
+      return setCoordinate(ringIndex, vertexIndex, axisIndex, coordinate);
+    } else {
+      throw new ArrayIndexOutOfBoundsException(partIndex);
+    }
+  }
+
+  default double setM(final int ringIndex, final int vertexIndex, final double m) {
+    return setCoordinate(ringIndex, vertexIndex, M, m);
+  }
+
+  default double setX(final int ringIndex, final int vertexIndex, final double x) {
+    return setCoordinate(ringIndex, vertexIndex, X, x);
+  }
+
+  default double setY(final int ringIndex, final int vertexIndex, final double y) {
+    return setCoordinate(ringIndex, vertexIndex, Y, y);
+  }
+
+  default double setZ(final int ringIndex, final int vertexIndex, final double z) {
+    return setCoordinate(ringIndex, vertexIndex, Z, z);
   }
 
   @Override
