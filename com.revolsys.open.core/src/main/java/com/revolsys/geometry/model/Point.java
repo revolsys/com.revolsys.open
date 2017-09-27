@@ -971,6 +971,21 @@ public interface Point extends Punctual, Serializable {
     return newPoint(x, y);
   }
 
+  default Point newPointCoordinate(final int axisIndex, final double coordinate) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int axisCount = geometryFactory.getAxisCount();
+    if (axisIndex < axisCount) {
+      final double[] coordinates = getCoordinates(axisCount);
+      coordinates[axisIndex] = coordinate;
+      return newPoint(geometryFactory, coordinates);
+    }
+    return this;
+  }
+
+  default Point newPointZ(final double z) {
+    return newPointCoordinate(2, z);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
@@ -1033,15 +1048,33 @@ public interface Point extends Punctual, Serializable {
     return this;
   }
 
-  default Point setZ(final double elevation) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final int axisCount = geometryFactory.getAxisCount();
-    if (axisCount > 2) {
-      final double[] coordinates = getCoordinates(axisCount);
-      coordinates[2] = elevation;
-      return newPoint(geometryFactory, coordinates);
+  default double setCoordinate(final int axisIndex, final double coordinate) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  default double setCoordinate(final int partIndex, final int axisIndex, final double coordinate) {
+    if (partIndex == 0) {
+      return setCoordinate(axisIndex, coordinate);
+    } else {
+      throw new ArrayIndexOutOfBoundsException(partIndex);
     }
-    return this;
+  }
+
+  default double setM(final double m) {
+    return setCoordinate(M, m);
+  }
+
+  default double setX(final double x) {
+    return setCoordinate(X, x);
+  }
+
+  default double setY(final double y) {
+    return setCoordinate(Y, y);
+  }
+
+  default double setZ(final double z) {
+    return setCoordinate(Z, z);
   }
 
   default Point subtract(final Point point) {

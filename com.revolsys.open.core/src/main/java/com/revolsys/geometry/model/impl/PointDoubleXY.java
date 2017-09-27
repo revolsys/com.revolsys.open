@@ -151,11 +151,11 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
     throw new UnsupportedOperationException();
   }
 
-  protected void setX(final double x) {
+  protected void setXDo(final double x) {
     this.x = x;
   }
 
-  protected void setY(final double y) {
+  protected void setYDo(final double y) {
     this.y = y;
   }
 

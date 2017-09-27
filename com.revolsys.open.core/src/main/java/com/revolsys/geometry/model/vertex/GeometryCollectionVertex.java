@@ -191,6 +191,15 @@ public class GeometryCollectionVertex extends AbstractVertex {
     throw new UnsupportedOperationException("Removing vertices not supported");
   }
 
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    if (this.vertex == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return this.vertex.setCoordinate(axisIndex, coordinate);
+    }
+  }
+
   public void setVertexId(final int[] vertexId) {
     this.vertex = null;
     if (vertexId.length > 0) {
@@ -208,4 +217,5 @@ public class GeometryCollectionVertex extends AbstractVertex {
       this.partIndex = -2;
     }
   }
+
 }

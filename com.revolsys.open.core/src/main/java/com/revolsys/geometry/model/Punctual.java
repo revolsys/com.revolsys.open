@@ -135,6 +135,26 @@ public interface Punctual extends Geometry {
     return getGeometries();
   }
 
+  default double setCoordinate(final int partIndex, final int axisIndex, final double coordinate) {
+    throw new UnsupportedOperationException();
+  }
+
+  default double setM(final int partIndex, final double m) {
+    return setCoordinate(partIndex, M, m);
+  }
+
+  default double setX(final int partIndex, final double x) {
+    return setCoordinate(partIndex, X, x);
+  }
+
+  default double setY(final int partIndex, final double y) {
+    return setCoordinate(partIndex, Y, y);
+  }
+
+  default double setZ(final int partIndex, final double z) {
+    return setCoordinate(partIndex, Z, z);
+  }
+
   @Override
   default Punctual union() {
     if (isEmpty()) {

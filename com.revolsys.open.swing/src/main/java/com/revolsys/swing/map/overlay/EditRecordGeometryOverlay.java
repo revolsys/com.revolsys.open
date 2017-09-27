@@ -41,6 +41,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
@@ -204,11 +205,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private Point addElevation(final GeometryFactory geometryFactory, final Point newPoint) {
     if (geometryFactory.getAxisCount() > 2) {
-      final Project project = getProject();
-      final double scale = getViewportScale();
-      final double elevation = IGriddedElevationModelLayer.getElevation(project, scale, newPoint);
+      final double elevation = getElevation(newPoint);
       if (Double.isFinite(elevation)) {
-        return newPoint.setZ(elevation);
+        return newPoint.newPointZ(elevation);
       }
     }
     return newPoint;
@@ -400,6 +399,34 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     }
   }
 
+  private GeometryEditor geometryEdit(final MouseEvent event, final CloseLocation location) {
+    final Geometry geometry = location.getGeometry();
+    final Point newPoint = getSnapOrEventPointWithElevation(event, location);
+    int[] vertexId = location.getVertexId();
+    final GeometryEditor geometryEditor = geometry.newGeometryEditor();
+    if (vertexId == null) {
+      vertexId = location.getSegmentIdNext();
+      geometryEditor.insertVertex(newPoint, vertexId);
+    } else {
+      geometryEditor.setVertex(newPoint, vertexId);
+    }
+    if (geometryEditor.isModified()) {
+      if (geometry.getGeometryFactory().getAxisCount() > 2) {
+
+        for (final Vertex vertex : geometryEditor.vertices()) {
+          double z = vertex.getZ();
+          if (z == 0 || !Double.isFinite(z)) {
+            z = getElevation(vertex);
+            if (Double.isFinite(z)) {
+              vertex.setZ(z);
+            }
+          }
+        }
+      }
+    }
+    return geometryEditor;
+  }
+
   public DataType getAddGeometryPartDataType() {
     return this.addGeometryPartDataType;
   }
@@ -427,6 +454,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       final Point pointOnLine = segment.project(point);
       return geometryFactory.point(pointOnLine);
     }
+  }
+
+  private double getElevation(final Point point) {
+    final Project project = getProject();
+    final double scale = getViewportScale();
+    return IGriddedElevationModelLayer.getElevation(project, scale, point);
   }
 
   public DataType getGeometryPartDataType(final DataType dataType) {
@@ -846,18 +879,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         if (event.getButton() == MouseEvent.BUTTON1) {
           this.addGeometryEditVerticesStart = false;
           for (final CloseLocation location : getMouseOverLocations()) {
-            final Geometry geometry = location.getGeometry();
-            final Point newPoint = getSnapOrEventPointWithElevation(event, location);
-            final int[] vertexIndex = location.getVertexId();
-            Geometry newGeometry;
-            if (vertexIndex == null) {
-              final int[] segmentIndex = location.getSegmentId();
-              final int[] newIndex = segmentIndex.clone();
-              newIndex[newIndex.length - 1] = newIndex[newIndex.length - 1] + 1;
-              newGeometry = geometry.insertVertex(newPoint, newIndex);
-            } else {
-              newGeometry = geometry.moveVertex(newPoint, vertexIndex);
-            }
+            final GeometryEditor geometryEditor = geometryEdit(event, location);
+            final Geometry newGeometry = geometryEditor.newGeometry();
             setAddGeometry(newGeometry);
           }
           setMouseOverLocationsDo(Collections.emptyList());
@@ -997,20 +1020,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           final MultipleUndo edit = new MultipleUndo();
           final List<CloseLocation> locations = getMouseOverLocations();
           for (final CloseLocation location : locations) {
-            final Geometry geometry = location.getGeometry();
-            final Point newPoint = getSnapOrEventPointWithElevation(event, location);
-            final int[] vertexIndex = location.getVertexId();
-            Geometry newGeometry;
-            if (vertexIndex == null) {
-              final int[] segmentIndex = location.getSegmentId();
-              final int[] newIndex = segmentIndex.clone();
-              newIndex[newIndex.length - 1] = newIndex[newIndex.length - 1] + 1;
-              newGeometry = geometry.insertVertex(newPoint, newIndex);
-            } else {
-              newGeometry = geometry.moveVertex(newPoint, vertexIndex);
+            final GeometryEditor geometryEditor = geometryEdit(event, location);
+            if (geometryEditor.isModified()) {
+              Geometry newGeometry = geometryEditor.newGeometry();
+              final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
+              edit.addEdit(geometryEdit);
             }
-            final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
-            edit.addEdit(geometryEdit);
           }
           if (!edit.isEmpty()) {
             addUndo(edit);

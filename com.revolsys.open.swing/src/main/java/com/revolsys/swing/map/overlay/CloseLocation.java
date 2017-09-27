@@ -153,6 +153,13 @@ public class CloseLocation implements Comparable<CloseLocation> {
     return this.segment.getSegmentId();
   }
 
+  public int[] getSegmentIdNext() {
+    final int[] segmentId = getSegmentId();
+    final int[] newId = segmentId.clone();
+    newId[newId.length - 1] = newId[newId.length - 1] + 1;
+    return newId;
+  }
+
   public Point getSourcePoint() {
     return this.sourcePoint;
   }

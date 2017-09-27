@@ -3,10 +3,6 @@ package com.revolsys.geometry.model.impl;
 import com.revolsys.geometry.model.Point;
 
 public class PointDoubleXYBuilder extends PointDoubleXY {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public PointDoubleXYBuilder() {
@@ -21,12 +17,16 @@ public class PointDoubleXYBuilder extends PointDoubleXY {
   }
 
   @Override
-  public void setX(final double x) {
-    super.setX(x);
+  public double setX(final double x) {
+    final double oldValue = getX();
+    super.setXDo(x);
+    return oldValue;
   }
 
   @Override
-  public void setY(final double y) {
-    super.setY(y);
+  public double setY(final double y) {
+    final double oldValue = getY();
+    super.setYDo(y);
+    return oldValue;
   }
 }

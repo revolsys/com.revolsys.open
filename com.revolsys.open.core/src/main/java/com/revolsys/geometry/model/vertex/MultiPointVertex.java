@@ -93,6 +93,12 @@ public class MultiPointVertex extends AbstractVertex {
     throw new UnsupportedOperationException("Removing vertices not supported");
   }
 
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    final Punctual punctual = getPunctual();
+    return punctual.setCoordinate(this.partIndex, axisIndex, coordinate);
+  }
+
   public void setPartIndex(final int partIndex) {
     this.partIndex = partIndex;
   }

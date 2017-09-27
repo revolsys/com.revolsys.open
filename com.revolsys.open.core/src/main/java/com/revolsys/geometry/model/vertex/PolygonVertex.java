@@ -175,6 +175,12 @@ public class PolygonVertex extends AbstractVertex {
     throw new UnsupportedOperationException("Removing vertices not supported");
   }
 
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    final Polygon polygon = getPolygon();
+    return polygon.setCoordinate(this.ringIndex, this.vertexIndex, axisIndex, coordinate);
+  }
+
   public void setVertexId(final int... vertexId) {
     this.ringIndex = vertexId[0];
     this.vertexIndex = vertexId[1];

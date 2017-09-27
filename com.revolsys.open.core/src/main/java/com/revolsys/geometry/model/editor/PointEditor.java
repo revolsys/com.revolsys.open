@@ -106,6 +106,7 @@ public class PointEditor extends AbstractGeometryEditor implements Point, Punctu
     return oldAxisCount;
   }
 
+  @Override
   public double setCoordinate(final int axisIndex, final double coordinate) {
     final double oldValue = this.point.getCoordinate(axisIndex);
     if (!Doubles.equal(coordinate, oldValue)) {
@@ -138,25 +139,13 @@ public class PointEditor extends AbstractGeometryEditor implements Point, Punctu
     }
   }
 
-  public PointEditor setM(final double m) {
-    setCoordinate(M, m);
-    return this;
-  }
-
-  public PointEditor setX(final double x) {
-    setCoordinate(X, x);
-    return this;
-  }
-
-  public PointEditor setY(final double y) {
-    setCoordinate(Y, y);
-    return this;
-  }
-
   @Override
-  public PointEditor setZ(final double z) {
-    setCoordinate(Z, z);
-    return this;
+  public void setVertex(final Point newPoint, final int... vertexId) {
+    final int axisCount = getAxisCount();
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double coordinate = newPoint.getCoordinate(axisIndex);
+      setCoordinate(axisIndex, coordinate, vertexId);
+    }
   }
 
   @Override

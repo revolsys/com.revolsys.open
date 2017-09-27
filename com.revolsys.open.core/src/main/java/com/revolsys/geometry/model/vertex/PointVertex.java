@@ -86,6 +86,12 @@ public class PointVertex extends AbstractVertex {
     throw new UnsupportedOperationException("Removing vertices not supported");
   }
 
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    final Point point = getPoint();
+    return point.setCoordinate(axisIndex, coordinate);
+  }
+
   public void setVertexId(final int... vertexId) {
     if (vertexId.length == 1) {
       this.vertexIndex = vertexId[0];
@@ -93,4 +99,5 @@ public class PointVertex extends AbstractVertex {
       this.vertexIndex = 1;
     }
   }
+
 }

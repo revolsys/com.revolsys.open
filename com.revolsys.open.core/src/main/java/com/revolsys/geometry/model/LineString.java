@@ -1421,7 +1421,7 @@ public interface LineString extends Lineal {
   default <G extends Geometry> G insertVertex(final Point newPoint, final int... vertexId) {
     if (vertexId.length == 1) {
       final int vertexIndex = vertexId[0];
-      return insertVertex(newPoint, vertexIndex);
+      return insertVertex(vertexIndex, newPoint);
     } else {
       throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
         + " must have length 1. " + Arrays.toString(vertexId));
@@ -1429,7 +1429,7 @@ public interface LineString extends Lineal {
   }
 
   @SuppressWarnings("unchecked")
-  default <G extends Geometry> G insertVertex(Point newPoint, final int vertexIndex) {
+  default <G extends Geometry> G insertVertex(final int vertexIndex, Point newPoint) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (newPoint == null || newPoint.isEmpty()) {
       return (G)this;
@@ -2071,6 +2071,37 @@ public interface LineString extends Lineal {
   @Override
   default Iterable<Segment> segments() {
     return new LineStringSegment(this, -1);
+  }
+
+  default double setCoordinate(final int vertexIndex, final int axisIndex,
+    final double coordinate) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  default double setCoordinate(final int partIndex, final int vertexIndex, final int axisIndex,
+    final double coordinate) {
+    if (partIndex == 0) {
+      return setCoordinate(vertexIndex, axisIndex, coordinate);
+    } else {
+      throw new ArrayIndexOutOfBoundsException(partIndex);
+    }
+  }
+
+  default double setM(final int vertexIndex, final double m) {
+    return setCoordinate(vertexIndex, M, m);
+  }
+
+  default double setX(final int vertexIndex, final double x) {
+    return setCoordinate(vertexIndex, X, x);
+  }
+
+  default double setY(final int vertexIndex, final double y) {
+    return setCoordinate(vertexIndex, Y, y);
+  }
+
+  default double setZ(final int vertexIndex, final double z) {
+    return setCoordinate(vertexIndex, Z, z);
   }
 
   default List<LineString> split(final Iterable<LineStringLocation> splitLocations) {

@@ -248,4 +248,26 @@ public interface Lineal extends Geometry {
 
   @Override
   Lineal normalize();
+
+  default double setCoordinate(final int partIndex, final int vertexIndex, final int axisIndex,
+    final double coordinate) {
+    throw new UnsupportedOperationException();
+  }
+
+  default double setM(final int partIndex, final int vertexIndex, final double m) {
+    return setCoordinate(partIndex, vertexIndex, M, m);
+  }
+
+  default double setX(final int partIndex, final int vertexIndex, final double x) {
+    return setCoordinate(partIndex, vertexIndex, X, x);
+  }
+
+  default double setY(final int partIndex, final int vertexIndex, final double y) {
+    return setCoordinate(partIndex, vertexIndex, Y, y);
+  }
+
+  default double setZ(final int partIndex, final int vertexIndex, final double z) {
+    return setCoordinate(partIndex, vertexIndex, Z, z);
+  }
+
 }
