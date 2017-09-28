@@ -40,6 +40,9 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
+import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
+import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.util.Exceptions;
 
 /**
@@ -224,6 +227,16 @@ public class GeometryCollectionImpl implements GeometryCollection {
   @Override
   public boolean isHomogeneousGeometryCollection() {
     return false;
+  }
+
+  @Override
+  public GeometryEditor<?> newGeometryEditor() {
+    return new GeometryCollectionImplEditor(this);
+  }
+
+  @Override
+  public GeometryEditor<?> newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new GeometryCollectionImplEditor((GeometryCollectionImplEditor)parentEditor, this);
   }
 
   @Override

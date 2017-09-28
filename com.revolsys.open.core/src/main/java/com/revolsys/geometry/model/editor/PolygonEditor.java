@@ -1,22 +1,26 @@
 package com.revolsys.geometry.model.editor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 
-public class PolygonEditor extends AbstractGeometryEditor implements Polygon, PolygonalEditor {
+public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
+  implements Polygon, PolygonalEditor {
   private static final long serialVersionUID = 1L;
 
   private final Polygon polygon;
 
   private final List<LinearRingEditor> editors = new ArrayList<>();
 
-  public PolygonEditor(final AbstractGeometryEditor parentEditor, final Polygon polygon) {
+  public PolygonEditor(final AbstractGeometryCollectionEditor<?, ?, ?> parentEditor,
+    final Polygon polygon) {
     super(parentEditor, polygon);
     this.polygon = polygon;
     for (final LinearRing ring : polygon.rings()) {
@@ -53,9 +57,46 @@ public class PolygonEditor extends AbstractGeometryEditor implements Polygon, Po
     return editor;
   }
 
+  public PolygonalEditor appendVertex(final int ringIndex, final Point point) {
+    final LinearRingEditor editor = getEditor(ringIndex);
+    if (editor != null) {
+      editor.appendVertex(point);
+    }
+    return this;
+  }
+
+  @Override
+  public PolygonalEditor appendVertex(final int[] geometryId, final Point point) {
+    if (geometryId == null || geometryId.length != 1) {
+    } else {
+      final int ringIndex = geometryId[0];
+      appendVertex(ringIndex, point);
+    }
+    return this;
+  }
+
   @Override
   public Polygon clone() {
     return (Polygon)super.clone();
+  }
+
+  @Override
+  public PolygonalEditor deleteVertex(final int[] vertexId) {
+    if (vertexId == null || vertexId.length < 2) {
+    } else {
+      final int partIndex = vertexId[0];
+      final LinearRingEditor editor = getEditor(partIndex);
+      if (editor != null) {
+        final int[] childVertexId = Arrays.copyOfRange(vertexId, 1, vertexId.length);
+        editor.deleteVertex(childVertexId);
+      }
+    }
+    return this;
+  }
+
+  @Override
+  public Iterable<PolygonEditor> editors() {
+    return Collections.singleton(this);
   }
 
   public LinearRingEditor getEditor(final int ringIndex) {
@@ -87,6 +128,20 @@ public class PolygonEditor extends AbstractGeometryEditor implements Polygon, Po
   }
 
   @Override
+  public GeometryEditor<?> insertVertex(final int[] vertexId, final Point point) {
+    if (vertexId == null || vertexId.length < 1) {
+    } else {
+      final int ringIndex = vertexId[0];
+      final LinearRingEditor editor = getEditor(ringIndex);
+      if (editor != null) {
+        final int[] childVertexId = Arrays.copyOfRange(vertexId, 1, vertexId.length);
+        editor.insertVertex(childVertexId, point);
+      }
+    }
+    return this;
+  }
+
+  @Override
   public boolean isEmpty() {
     return this.polygon.isEmpty();
   }
@@ -108,11 +163,6 @@ public class PolygonEditor extends AbstractGeometryEditor implements Polygon, Po
     return this.polygon.newPolygon(geometryFactory, rings);
   }
 
-  @Override
-  public Iterable<PolygonEditor> polygonEditors() {
-    return Collections.singleton(this);
-  }
-
   public void removeRing(final int index) {
     this.editors.remove(index);
   }
@@ -122,22 +172,15 @@ public class PolygonEditor extends AbstractGeometryEditor implements Polygon, Po
   }
 
   @Override
-  public int setAxisCount(final int axisCount) {
-    for (final LinearRingEditor editor : this.editors) {
-      editor.setAxisCount(axisCount);
+  public PolygonEditor setAxisCount(final int axisCount) {
+    final int oldAxisCount = getAxisCount();
+    if (oldAxisCount != axisCount) {
+      super.setAxisCount(axisCount);
+      for (final LinearRingEditor editor : this.editors) {
+        editor.setAxisCount(axisCount);
+      }
     }
-    return super.setAxisCount(axisCount);
-  }
-
-  @Override
-  public double setCoordinate(final int axisIndex, final double coordinate, final int... vertexId) {
-    if (vertexId.length == 2) {
-      final int ringIndex = vertexId[0];
-      final int vertexIndex = vertexId[1];
-      return setCoordinate(ringIndex, vertexIndex, axisIndex, coordinate);
-    } else {
-      return Double.NaN;
-    }
+    return this;
   }
 
   @Override
@@ -159,5 +202,18 @@ public class PolygonEditor extends AbstractGeometryEditor implements Polygon, Po
     } else {
       return Double.NaN;
     }
+  }
+
+  @Override
+  public PolygonEditor setCoordinate(final int[] vertexId, final int axisIndex,
+    final double coordinate) {
+    if (vertexId == null || vertexId.length != 2) {
+      throw new IllegalArgumentException("Invalid vertex Id");
+    } else {
+      final int ringIndex = vertexId[0];
+      final int vertexIndex = vertexId[1];
+      setCoordinate(ringIndex, vertexIndex, axisIndex, coordinate);
+    }
+    return this;
   }
 }

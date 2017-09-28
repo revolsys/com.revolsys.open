@@ -77,27 +77,6 @@ public class PointDoubleXYZ extends PointDoubleXY {
     return false;
   }
 
-  @Override
-  public Point move(final double... deltas) {
-    if (deltas == null) {
-      return this;
-    } else {
-      double x = this.x;
-      if (deltas.length > 0) {
-        x += deltas[0];
-      }
-      double y = this.y;
-      if (deltas.length > 1) {
-        y += deltas[1];
-      }
-      double z = this.z;
-      if (deltas.length > 1) {
-        z += deltas[1];
-      }
-      return newPoint(x, y, z);
-    }
-  }
-
   public Point newPoint(final double x, final double y, final double z) {
     return new PointDoubleXYZ(x, y, z);
   }

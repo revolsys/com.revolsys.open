@@ -33,7 +33,6 @@
 package com.revolsys.geometry.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +46,7 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.PointLocator;
+import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.segment.GeometryCollectionSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.GeometryCollectionVertex;
@@ -100,38 +100,6 @@ public interface GeometryCollection extends Geometry {
 
   @Override
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (geometryId.length > 0) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (isEmpty()) {
-        return (V)newPoint.newGeometry(geometryFactory);
-      } else {
-        final int partIndex = geometryId[0];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final int[] subId = new int[geometryId.length - 1];
-          System.arraycopy(geometryId, 1, subId, 0, subId.length);
-          final Geometry geometry = getGeometry(partIndex);
-          final Geometry newGeometry = geometry.appendVertex(newPoint, subId);
-
-          final List<Geometry> geometries = new ArrayList<>(getGeometries());
-          geometries.set(partIndex, newGeometry);
-          return (V)geometryFactory.geometryCollection(geometries);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for GeometryCollection must have length > 1. " + Arrays.toString(geometryId));
-    }
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
   default <GIN extends Geometry, GRET extends Geometry> GRET applyGeometry(
     final Function<? super GIN, ? super Geometry> function) {
     if (!isEmpty()) {
@@ -172,37 +140,6 @@ public interface GeometryCollection extends Geometry {
     final Set<Geometry> theseElements = new TreeSet<>(getGeometries());
     final Set<Geometry> otherElements = new TreeSet<>(geometry.getGeometries());
     return Geometry.compare(theseElements, otherElements);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V deleteVertex(final int... vertexId) {
-    if (vertexId.length > 1) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot delete vertex for empty MultiPoint");
-      } else {
-        final int partIndex = vertexId[0];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          final int[] subId = new int[vertexId.length - 1];
-          System.arraycopy(vertexId, 1, subId, 0, subId.length);
-          final Geometry geometry = getGeometry(partIndex);
-          final Geometry newGeometry = geometry.deleteVertex(subId);
-
-          final List<Geometry> geometries = new ArrayList<>(getGeometries());
-          geometries.set(partIndex, newGeometry);
-          return (V)geometryFactory.geometryCollection(geometries);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for GeometryCollection must have length > 1. " + Arrays.toString(vertexId));
-    }
   }
 
   @Override
@@ -438,38 +375,6 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (vertexId.length > 1) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (isEmpty()) {
-        return newPoint.convertGeometry(geometryFactory);
-      } else {
-        final int partIndex = vertexId[0];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final int[] subId = new int[vertexId.length - 1];
-          System.arraycopy(vertexId, 1, subId, 0, subId.length);
-          final Geometry geometry = getGeometry(partIndex);
-          final Geometry newGeometry = geometry.insertVertex(newPoint, subId);
-
-          final List<Geometry> geometries = new ArrayList<>(getGeometries());
-          geometries.set(partIndex, newGeometry);
-          return (V)geometryFactory.geometryCollection(geometries);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
-        + " must have length > 1. " + Arrays.toString(vertexId));
-    }
-  }
-
-  @Override
   default boolean intersects(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
@@ -525,54 +430,6 @@ public interface GeometryCollection extends Geometry {
   @Override
   default Location locate(final Point point) {
     return new PointLocator().locate(point, this);
-  }
-
-  @Override
-  default Geometry move(final double... deltas) {
-    if (deltas == null || isEmpty()) {
-      return this;
-    } else {
-      final List<Geometry> parts = new ArrayList<>();
-      for (final Geometry part : geometries()) {
-        final Geometry movedPart = part.move(deltas);
-        parts.add(movedPart);
-      }
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.geometryCollection(parts);
-    }
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (vertexId.length > 1) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty " + getGeometryType());
-      } else {
-        final int partIndex = vertexId[0];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          final int[] subId = new int[vertexId.length - 1];
-          System.arraycopy(vertexId, 1, subId, 0, subId.length);
-          final Geometry geometry = getGeometry(partIndex);
-          final Geometry newGeometry = geometry.moveVertex(newPoint, subId);
-
-          final List<Geometry> geometries = new ArrayList<>(getGeometries());
-          geometries.set(partIndex, newGeometry);
-          return (V)geometryFactory.geometryCollection(geometries);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
-        + " must have length > 1. " + Arrays.toString(vertexId));
-    }
   }
 
   @Override
@@ -690,24 +547,9 @@ public interface GeometryCollection extends Geometry {
     return new GeometryCollectionSegment(this, -1);
   }
 
-  default double setCoordinate(final int[] vertexId, final int axisIndex, final double coordinate) {
+  default GeometryEditor<?> setCoordinate(final int[] vertexId, final int axisIndex,
+    final double coordinate) {
     throw new UnsupportedOperationException();
-  }
-
-  default double setM(final int[] vertexId, final double coordinate) {
-    return setCoordinate(vertexId, M, coordinate);
-  }
-
-  default double setX(final int[] vertexId, final double coordinate) {
-    return setCoordinate(vertexId, X, coordinate);
-  }
-
-  default double setY(final int[] vertexId, final double coordinate) {
-    return setCoordinate(vertexId, Y, coordinate);
-  }
-
-  default double setZ(final int[] vertexId, final double coordinate) {
-    return setCoordinate(vertexId, Z, coordinate);
   }
 
   @SuppressWarnings("unchecked")

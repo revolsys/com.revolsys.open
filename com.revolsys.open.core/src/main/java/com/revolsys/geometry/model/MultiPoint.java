@@ -33,7 +33,6 @@
 package com.revolsys.geometry.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -77,23 +76,6 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       }
     }
     return errors.isEmpty();
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (isEmpty()) {
-        return (V)newPoint.newGeometry(geometryFactory);
-      } else {
-        final List<Point> points = getPoints();
-        points.add(newPoint);
-        return (V)geometryFactory.punctual(points);
-      }
-    }
   }
 
   @Override
@@ -294,36 +276,6 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   @Override
   default boolean isValid() {
     return true;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-
-  default <V extends Geometry> V moveVertex(Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (vertexId.length <= 2) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty MultiPoint");
-      } else {
-        final int partIndex = vertexId[0];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          newPoint = newPoint.newGeometry(geometryFactory);
-          final List<Point> points = new ArrayList<>(getPoints());
-          points.set(partIndex, newPoint);
-          return (V)geometryFactory.punctual(points);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for MultiPoint must have length 1. " + Arrays.toString(vertexId));
-    }
   }
 
   @Override

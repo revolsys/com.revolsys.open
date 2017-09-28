@@ -291,7 +291,10 @@ public class WktParser {
           }
         } else if (character == ' ' || Character.isWhitespace(character)) {
           skipWhitespace(reader);
-          if (axisIndex < axisCount) {
+          if (axisIndex == 0) {
+            line.appendVertex(number, Double.NaN);
+            axisIndex++;
+          } else if (axisIndex < axisCount) {
             line.setCoordinate(vertexIndex, axisIndex, number);
             axisIndex++;
           }

@@ -130,23 +130,6 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   }
 
   @Override
-  public Point move(final double... deltas) {
-    if (deltas == null) {
-      return this;
-    } else {
-      double x = this.x;
-      if (deltas.length > 0) {
-        x += deltas[0];
-      }
-      double y = this.y;
-      if (deltas.length > 1) {
-        y += deltas[1];
-      }
-      return new PointDoubleXY(x, y);
-    }
-  }
-
-  @Override
   public void setLocation(final double x, final double y) {
     throw new UnsupportedOperationException();
   }

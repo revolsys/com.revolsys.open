@@ -185,7 +185,7 @@ public class CompactBinaryGriddedElevationGrid {
 
   @SuppressWarnings("unchecked")
   public <G extends Geometry> G setElevations(final G geometry) {
-    final GeometryEditor editor = geometry.newGeometryEditor();
+    final GeometryEditor<?> editor = geometry.newGeometryEditor();
     editor.setAxisCount(3);
     for (final Vertex vertex : geometry.vertices()) {
       final double x = vertex.getX();
@@ -193,7 +193,7 @@ public class CompactBinaryGriddedElevationGrid {
       final double elevation = getElevation(x, y);
       if (Double.isFinite(elevation)) {
         final int[] vertexId = vertex.getVertexId();
-        editor.setZ(elevation, vertexId);
+        editor.setZ(vertexId, elevation);
       }
     }
     return (G)editor.newGeometry();

@@ -3,7 +3,6 @@ package com.revolsys.geometry.model.impl;
 import java.io.Serializable;
 
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
 
 public class PointDouble extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -105,17 +104,4 @@ public class PointDouble extends AbstractPoint implements Serializable {
     return this.coordinates == null;
   }
 
-  @Override
-  public Point move(final double... deltas) {
-    if (deltas == null || isEmpty()) {
-      return this;
-    } else {
-      final double[] coordinates = this.coordinates.clone();
-      final int axisCount = Math.min(deltas.length, getAxisCount());
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[axisIndex] += deltas[axisIndex];
-      }
-      return new PointDouble(coordinates);
-    }
-  }
 }

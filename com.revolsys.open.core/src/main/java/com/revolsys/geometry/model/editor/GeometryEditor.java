@@ -2,37 +2,45 @@ package com.revolsys.geometry.model.editor;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.vertex.Vertex;
 
-public interface GeometryEditor extends Geometry {
+public interface GeometryEditor<GE extends GeometryEditor<?>> extends Geometry {
+  GeometryEditor<?> appendVertex(int[] geometryId, Point point);
+
+  GeometryEditor<?> deleteVertex(int[] vertexId);
+
+  Iterable<GE> editors();
+
+  GeometryEditor<?> insertVertex(int[] vertexId, Point newPoint);
+
   boolean isModified();
+
+  default GeometryEditor<?> move(final double deltaX, final double deltaY) {
+    for (final Vertex vertex : vertices()) {
+      double x = vertex.getX();
+      x += deltaX;
+      vertex.setX(x);
+
+      double y = vertex.getY();
+      y += deltaY;
+      vertex.setY(y);
+    }
+    return this;
+  }
 
   Geometry newGeometry();
 
-  int setAxisCount(int axisCount);
+  GeometryEditor<?> setAxisCount(int axisCount);
 
-  double setCoordinate(final int axisIndex, final double coordinate, final int... vertexId);
+  GeometryEditor<?> setCoordinate(int[] vertexId, int axisIndex, double coordinate);
 
-  default double setM(final double m, final int... vertexId) {
-    return setCoordinate(M, m, vertexId);
-  }
+  GeometryEditor<?> setM(int[] vertexId, double m);
 
-  default void setVertex(final Point newPoint, final int... vertexId) {
-    final int axisCount = getAxisCount();
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double coordinate = newPoint.getCoordinate(axisIndex);
-      setCoordinate(axisIndex, coordinate, vertexId);
-    }
-  }
+  GeometryEditor<?> setVertex(int[] vertexId, Point newPoint);
 
-  default double setX(final double x, final int... vertexId) {
-    return setCoordinate(X, x, vertexId);
-  }
+  GeometryEditor<?> setX(int[] vertexId, double x);
 
-  default double setY(final double y, final int... vertexId) {
-    return setCoordinate(Y, y, vertexId);
-  }
+  GeometryEditor<?> setY(int[] vertexId, double y);
 
-  default double setZ(final double z, final int... vertexId) {
-    return setCoordinate(Z, z, vertexId);
-  }
+  GeometryEditor<?> setZ(int[] vertexId, double z);
 }

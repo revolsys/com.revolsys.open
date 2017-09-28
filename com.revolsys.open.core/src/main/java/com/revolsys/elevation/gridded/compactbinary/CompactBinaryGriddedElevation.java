@@ -125,7 +125,7 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
   public static <G extends Geometry> G setElevationNearest(final PathResource baseResource,
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
     final String fileExtension, final G geometry) {
-    final GeometryEditor editor = geometry.newGeometryEditor();
+    final GeometryEditor<?> editor = geometry.newGeometryEditor();
     editor.setAxisCount(3);
     for (final Vertex vertex : geometry.vertices()) {
       final double x = vertex.getX();
@@ -134,7 +134,7 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
         gridSize, fileExtension, x, y);
       if (!Double.isNaN(elevation)) {
         final int[] vertexId = vertex.getVertexId();
-        editor.setZ(elevation, vertexId);
+        editor.setZ(vertexId, elevation);
       }
     }
     return (G)editor.newGeometry();

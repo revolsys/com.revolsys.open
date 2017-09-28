@@ -1,8 +1,5 @@
 package com.revolsys.geometry.index.kdtree;
 
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDoubleXYZ;
-
 public class KdNodeZ extends KdNode {
   private static final long serialVersionUID = 1L;
 
@@ -59,27 +56,6 @@ public class KdNodeZ extends KdNode {
   @Override
   public boolean isEmpty() {
     return false;
-  }
-
-  @Override
-  public Point move(final double... deltas) {
-    if (deltas == null) {
-      return this;
-    } else {
-      double x = this.x;
-      if (deltas.length > 0) {
-        x += deltas[0];
-      }
-      double y = this.y;
-      if (deltas.length > 1) {
-        y += deltas[1];
-      }
-      double z = this.z;
-      if (deltas.length > 1) {
-        z += deltas[1];
-      }
-      return new PointDoubleXYZ(x, y, z);
-    }
   }
 
   @Override

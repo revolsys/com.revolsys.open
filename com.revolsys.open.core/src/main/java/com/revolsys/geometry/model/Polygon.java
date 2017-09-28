@@ -33,7 +33,6 @@
 package com.revolsys.geometry.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -45,6 +44,8 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PolygonEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
@@ -112,36 +113,6 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (geometryId.length == 1) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
-      } else {
-        final int ringIndex = geometryId[0];
-        final int ringCount = getRingCount();
-        if (ringIndex >= 0 && ringIndex < ringCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          final LinearRing ring = getRing(ringIndex);
-          final LinearRing newRing = ring.appendVertex(newPoint);
-          final List<LinearRing> rings = new ArrayList<>(getRings());
-          rings.set(ringIndex, newRing);
-          return (V)geometryFactory.polygon(rings);
-        } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not " + ringIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Geometry id's for Polygons must have length 1. " + Arrays.toString(geometryId));
-    }
-  }
-
-  @Override
   default Polygon applyPolygonal(final Function<Polygon, Polygon> function) {
     if (!isEmpty()) {
       final Polygon newPolygon = function.apply(this);
@@ -181,35 +152,6 @@ public interface Polygon extends Polygonal {
   @Override
   default Geometry convexHull() {
     return getShell().convexHull();
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V deleteVertex(final int... vertexId) {
-    if (vertexId.length == 2) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
-      } else {
-        final int ringIndex = vertexId[0];
-        final int vertexIndex = vertexId[1];
-        final int ringCount = getRingCount();
-        if (ringIndex >= 0 && ringIndex < ringCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          final LinearRing ring = getRing(ringIndex);
-          final LinearRing newRing = ring.deleteVertex(vertexIndex);
-          final List<LinearRing> rings = new ArrayList<>(getRings());
-          rings.set(ringIndex, newRing);
-          return (V)geometryFactory.polygon(rings);
-        } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not " + ringIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
-    }
   }
 
   @Override
@@ -656,37 +598,6 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (vertexId.length == 2) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
-      } else {
-        final int ringIndex = vertexId[0];
-        final int vertexIndex = vertexId[1];
-        final int ringCount = getRingCount();
-        if (ringIndex >= 0 && ringIndex < ringCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          final LinearRing ring = getRing(ringIndex);
-          final LinearRing newRing = ring.insertVertex(vertexIndex, newPoint);
-          final List<LinearRing> rings = new ArrayList<>(getRings());
-          rings.set(ringIndex, newRing);
-          return (V)geometryFactory.polygon(rings);
-        } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not " + ringIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
-    }
-  }
-
-  @Override
   default boolean intersects(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
@@ -815,52 +726,6 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default Polygon move(final double... deltas) {
-    if (deltas == null || isEmpty()) {
-      return this;
-    } else {
-      final List<LinearRing> rings = new ArrayList<>();
-      for (final LinearRing part : rings()) {
-        final LinearRing movedPart = part.move(deltas);
-        rings.add(movedPart);
-      }
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.polygon(rings);
-    }
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (vertexId.length == 2) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
-      } else {
-        final int ringIndex = vertexId[0];
-        final int vertexIndex = vertexId[1];
-        final int ringCount = getRingCount();
-        if (ringIndex >= 0 && ringIndex < ringCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          final LinearRing ring = getRing(ringIndex);
-          final LinearRing newRing = ring.moveVertex(newPoint, vertexIndex);
-          final List<LinearRing> rings = new ArrayList<>(getRings());
-          rings.set(ringIndex, newRing);
-          return (V)geometryFactory.polygon(rings);
-        } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not " + ringIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
-    }
-  }
-
-  @Override
   default Polygon newGeometry(final GeometryFactory geometryFactory) {
     final List<LinearRing> rings = new ArrayList<>();
     for (final LinearRing ring : rings()) {
@@ -873,6 +738,11 @@ public interface Polygon extends Polygonal {
   @Override
   default PolygonEditor newGeometryEditor() {
     return new PolygonEditor(this);
+  }
+
+  @Override
+  default PolygonEditor newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new PolygonEditor((AbstractGeometryCollectionEditor<?, ?, ?>)parentEditor, this);
   }
 
   @Override

@@ -151,23 +151,6 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
   }
 
   @Override
-  public Point move(final double... deltas) {
-    if (deltas == null) {
-      return this;
-    } else {
-      double x = getX();
-      if (deltas.length > 0) {
-        x += deltas[0];
-      }
-      double y = getY();
-      if (deltas.length > 1) {
-        y += deltas[1];
-      }
-      return newPoint(x, y);
-    }
-  }
-
-  @Override
   public void setLocation(final double x, final double y) {
     throw new UnsupportedOperationException();
   }

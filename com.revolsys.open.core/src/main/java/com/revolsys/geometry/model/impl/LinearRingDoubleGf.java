@@ -33,16 +33,11 @@
 package com.revolsys.geometry.model.impl;
 
 import java.io.StringWriter;
-import java.util.Arrays;
 
 import com.revolsys.geometry.model.Dimension;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
@@ -83,73 +78,9 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
     validate();
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> V appendVertex(Point newPoint, final int... geometryId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (geometryId.length == 0) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (isEmpty()) {
-        return newPoint.convertGeometry(geometryFactory);
-      } else {
-        newPoint = newPoint.convertGeometry(geometryFactory);
-        final int vertexCount = getVertexCount();
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
-        final Vertex fromPoint = getVertex(0);
-        final int length = (vertexCount - 1) * axisCount;
-        System.arraycopy(coordinates, 0, newCoordinates, 0, length);
-        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexCount - 1, newPoint);
-        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexCount, fromPoint);
-
-        return (V)geometryFactory.linearRing(axisCount, newCoordinates);
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Geometry id's for LinearRings must have length 0. " + Arrays.toString(geometryId));
-    }
-  }
-
   @Override
   public LinearRingDoubleGf clone() {
     return (LinearRingDoubleGf)super.clone();
-  }
-
-  @Override
-  public LinearRing deleteVertex(final int vertexIndex) {
-    if (isEmpty()) {
-      throw new IllegalArgumentException("Cannot delete vertex for empty LinearRing");
-    } else {
-      final int vertexCount = getVertexCount();
-      if (vertexCount <= 4) {
-        throw new IllegalArgumentException("LineString must have a minimum of 4 vertices");
-      } else if (vertexIndex >= 0 && vertexIndex < vertexCount) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        final double[] newCoordinates = new double[axisCount * (vertexCount - 1)];
-        if (vertexIndex == 0 || vertexIndex == vertexCount - 1) {
-          System.arraycopy(coordinates, axisCount, newCoordinates, 0,
-            (vertexCount - 2) * axisCount);
-          System.arraycopy(coordinates, axisCount, newCoordinates, (vertexCount - 2) * axisCount,
-            axisCount);
-        } else {
-          final int beforeLength = vertexIndex * axisCount;
-          System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
-
-          final int sourceIndex = (vertexIndex + 1) * axisCount;
-          final int afterLength = (vertexCount - vertexIndex - 1) * axisCount;
-          System.arraycopy(coordinates, sourceIndex, newCoordinates, vertexIndex * axisCount,
-            afterLength);
-        }
-        return geometryFactory.linearRing(axisCount, newCoordinates);
-      } else {
-        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
-      }
-    }
   }
 
   /**
@@ -161,46 +92,6 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
   @Override
   public int getBoundaryDimension() {
     return Dimension.FALSE;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> V insertVertex(Point newPoint, final int... vertexId) {
-    if (vertexId.length == 1) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (newPoint == null || newPoint.isEmpty()) {
-        return (V)this;
-      } else if (isEmpty()) {
-        return newPoint.convertGeometry(geometryFactory);
-      } else {
-        final int vertexIndex = vertexId[0];
-        final int vertexCount = getVertexCount();
-        if (vertexIndex == 0 || vertexIndex == vertexCount - 1) {
-          return appendVertex(newPoint);
-        } else {
-          newPoint = newPoint.convertGeometry(geometryFactory);
-          final double[] coordinates = getCoordinates();
-          final int axisCount = getAxisCount();
-          final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
-
-          final int beforeLength = vertexIndex * axisCount;
-          System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
-
-          CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexIndex, newPoint);
-
-          final int afterSourceIndex = vertexIndex * axisCount;
-          final int afterNewIndex = (vertexIndex + 1) * axisCount;
-          final int afterLength = (vertexCount - vertexIndex) * axisCount;
-          System.arraycopy(coordinates, afterSourceIndex, newCoordinates, afterNewIndex,
-            afterLength);
-
-          return (V)geometryFactory.linearRing(axisCount, newCoordinates);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
-        + " must have length 1. " + Arrays.toString(vertexId));
-    }
   }
 
   /**
@@ -216,45 +107,6 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
       return true;
     } else {
       return super.isClosed();
-    }
-  }
-
-  @Override
-  public LinearRing move(final double... deltas) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (deltas == null || isEmpty()) {
-      return this;
-    } else {
-      final double[] coordinates = moveCoordinates(deltas);
-      final int axisCount = getAxisCount();
-      return geometryFactory.linearRing(axisCount, coordinates);
-    }
-  }
-
-  @Override
-  public LinearRing moveVertex(Point newPoint, final int vertexIndex) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return this;
-    } else if (isEmpty()) {
-      throw new IllegalArgumentException("Cannot move vertex for empty LinearRing");
-    } else {
-      final int vertexCount = getVertexCount();
-
-      if (vertexIndex >= 0 && vertexIndex < vertexCount) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        newPoint = newPoint.convertGeometry(geometryFactory);
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        if (vertexIndex == 0 || vertexIndex == vertexCount - 1) {
-          CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, newPoint);
-          CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, newPoint);
-        } else {
-          CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, newPoint);
-        }
-        return geometryFactory.linearRing(axisCount, coordinates);
-      } else {
-        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
-      }
     }
   }
 

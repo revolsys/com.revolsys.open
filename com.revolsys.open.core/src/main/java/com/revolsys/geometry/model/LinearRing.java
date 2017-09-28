@@ -134,11 +134,6 @@ public interface LinearRing extends LineString {
   @Override
   LinearRing clone();
 
-  @Override
-  default LinearRing deleteVertex(final int vertexIndex) {
-    return (LinearRing)LineString.super.deleteVertex(vertexIndex);
-  }
-
   /**
    * Get the area of the polygon using the http://en.wikipedia.org/wiki/Shoelace_formula
    *
@@ -199,16 +194,6 @@ public interface LinearRing extends LineString {
   @Override
   default boolean isValid() {
     return LineString.super.isValid();
-  }
-
-  @Override
-  default LinearRing move(final double... deltas) {
-    return (LinearRing)LineString.super.move(deltas);
-  }
-
-  @Override
-  default LinearRing moveVertex(final Point newPoint, final int vertexIndex) {
-    return (LinearRing)LineString.super.moveVertex(newPoint, vertexIndex);
   }
 
   @Override

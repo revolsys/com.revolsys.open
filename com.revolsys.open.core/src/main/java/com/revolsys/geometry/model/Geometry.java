@@ -61,6 +61,7 @@ import com.revolsys.geometry.algorithm.InteriorPointLine;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -367,8 +368,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     final boolean shortCircuit) {
     return true;
   }
-
-  <V extends Geometry> V appendVertex(Point newPoint, int... geometryId);
 
   @SuppressWarnings("unchecked")
   default <GIN extends Geometry, GRET extends Geometry> GRET applyGeometry(
@@ -859,8 +858,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return relate(g).isCrosses(getDimension(), g.getDimension());
   }
 
-  <V extends Geometry> V deleteVertex(int... vertexId);
-
   /**
    * Computes a <code>Geometry</code> representing the closure of the point-set
    * of the points contained in this <code>Geometry</code> that are not contained in
@@ -1011,6 +1008,18 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
   default double distancePoint(final Point point) {
     return distance(point, 0.0);
+  }
+
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry, GEIN extends GeometryEditor<?>, GEOUT extends GeometryEditor<?>> G edit(
+    final Function<GEIN, GEOUT> edit) {
+    final GEIN editor = (GEIN)newGeometryEditor();
+    final GEOUT newEditor = edit.apply(editor);
+    if (newEditor.isModified()) {
+      return (G)newEditor.newGeometry();
+    } else {
+      return (G)this;
+    }
   }
 
   default boolean envelopeCovers(final Geometry geometry) {
@@ -1717,8 +1726,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   boolean hasInvalidXyCoordinates();
 
-  <V extends Geometry> V insertVertex(Point newPoint, int... vertexId);
-
   /**
    * Computes a <code>Geometry</code> representing the point-set which is
    * common to both this <code>Geometry</code> and the <code>other</code> Geometry.
@@ -1991,10 +1998,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   Location locate(Point point);
 
-  Geometry move(final double... deltas);
-
-  <V extends Geometry> V moveVertex(Point newPoint, int... vertexId);
-
   /**
    *  Returns the minimum and maximum x and y values in this <code>Geometry</code>
    *  , or a null <code>BoundingBox</code> if this <code>Geometry</code> is empty.
@@ -2043,12 +2046,16 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return (G)newGeometry(targetGeometryFactory);
   }
 
-  default GeometryEditor newGeometryEditor() {
+  default GeometryEditor<?> newGeometryEditor() {
+    return newGeometryEditor(null);
+  }
+
+  default GeometryEditor<?> newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
     throw new UnsupportedOperationException();
   }
 
-  default GeometryEditor newGeometryEditor(final int axisCount) {
-    final GeometryEditor geometryEditor = newGeometryEditor();
+  default GeometryEditor<?> newGeometryEditor(final int axisCount) {
+    final GeometryEditor<?> geometryEditor = newGeometryEditor();
     geometryEditor.setAxisCount(axisCount);
     return geometryEditor;
   }

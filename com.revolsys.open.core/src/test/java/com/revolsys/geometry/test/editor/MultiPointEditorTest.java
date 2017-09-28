@@ -15,7 +15,7 @@ public class MultiPointEditorTest {
   @Test
   public void testNotModified() {
     final PunctualEditor editor = PUNCTUAL.newGeometryEditor();
-    editor.setZ(13);
+    editor.setZ(new int[0], 13);
     final Punctual newMultiPoint = editor.newGeometry();
     Assert.assertSame(PUNCTUAL, newMultiPoint);
 

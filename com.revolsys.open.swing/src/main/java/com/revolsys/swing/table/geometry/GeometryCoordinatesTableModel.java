@@ -289,14 +289,11 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
           final int axisIndex = columnIndex - this.numIndexItems;
           final Vertex vertex = getVertex(rowIndex);
           if (vertex != null) {
-            final double[] coordinates = vertex.getCoordinates();
-            coordinates[axisIndex] = MathUtil.toDouble(value.toString());
-            final Point newPoint = this.geometryFactory.point(coordinates);
-            if (!newPoint.equalsExact(vertex)) {
-              final int[] vertexId = vertex.getVertexId();
-              final Geometry newGeometry = this.geometry.moveVertex(newPoint, vertexId);
-              setGeometry(newGeometry);
-            }
+            final double coordinate = MathUtil.toDouble(value.toString());
+            final int[] vertexId = vertex.getVertexId();
+            final Geometry newGeometry = this.geometry
+              .edit(editor -> editor.setCoordinate(vertexId, axisIndex, coordinate));
+            setGeometry(newGeometry);
           }
         }
       }

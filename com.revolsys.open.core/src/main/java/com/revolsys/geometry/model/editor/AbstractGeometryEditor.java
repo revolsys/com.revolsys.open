@@ -2,22 +2,39 @@ package com.revolsys.geometry.model.editor;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.Exceptions;
 
-public abstract class AbstractGeometryEditor implements GeometryEditor {
+public abstract class AbstractGeometryEditor<GE extends GeometryEditor<?>>
+  implements GeometryEditor<GE> {
   private static final long serialVersionUID = 1L;
 
-  private AbstractGeometryEditor parentEditor;
+  private AbstractGeometryEditor<?> parentEditor;
 
   private GeometryFactory geometryFactory;
 
   private boolean modified;
 
-  public AbstractGeometryEditor(final AbstractGeometryEditor parentEditor,
+  public AbstractGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    this(parentEditor.getGeometryFactory());
+    this.parentEditor = parentEditor;
+  }
+
+  public AbstractGeometryEditor(final AbstractGeometryEditor<?> parentEditor,
     final Geometry geometry) {
     this(geometry.getGeometryFactory());
     this.parentEditor = parentEditor;
+  }
+
+  public AbstractGeometryEditor(final AbstractGeometryEditor<?> parentEditor,
+    final GeometryFactory geometryFactory) {
+    this.parentEditor = parentEditor;
+    if (parentEditor == null) {
+      this.geometryFactory = geometryFactory;
+    } else {
+      this.geometryFactory = parentEditor.getGeometryFactory();
+    }
   }
 
   public AbstractGeometryEditor(final Geometry geometry) {
@@ -92,7 +109,7 @@ public abstract class AbstractGeometryEditor implements GeometryEditor {
     return this.geometryFactory;
   }
 
-  public GeometryEditor getParentEditor() {
+  public AbstractGeometryEditor<?> getParentEditor() {
     return this.parentEditor;
   }
 
@@ -113,12 +130,18 @@ public abstract class AbstractGeometryEditor implements GeometryEditor {
   }
 
   @Override
-  public int setAxisCount(final int axisCount) {
+  public GeometryEditor<?> setAxisCount(final int axisCount) {
     final int oldAxisCount = this.geometryFactory.getAxisCount();
     if (oldAxisCount != axisCount) {
+      this.modified = true;
       this.geometryFactory = this.geometryFactory.convertAxisCount(axisCount);
     }
-    return oldAxisCount;
+    return this;
+  }
+
+  @Override
+  public GeometryEditor<?> setM(final int[] vertexId, final double m) {
+    return setCoordinate(vertexId, M, m);
   }
 
   protected void setModified(final boolean modified) {
@@ -126,6 +149,31 @@ public abstract class AbstractGeometryEditor implements GeometryEditor {
     if (this.parentEditor != null) {
       this.parentEditor.setModified(modified);
     }
+  }
+
+  @Override
+  public GeometryEditor<?> setVertex(final int[] vertexId, final Point newPoint) {
+    final int axisCount = getAxisCount();
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double coordinate = newPoint.getCoordinate(axisIndex);
+      setCoordinate(vertexId, axisIndex, coordinate);
+    }
+    return this;
+  }
+
+  @Override
+  public GeometryEditor<?> setX(final int[] vertexId, final double x) {
+    return setCoordinate(vertexId, X, x);
+  }
+
+  @Override
+  public GeometryEditor<?> setY(final int[] vertexId, final double y) {
+    return setCoordinate(vertexId, Y, y);
+  }
+
+  @Override
+  public GeometryEditor<?> setZ(final int[] vertexId, final double z) {
+    return setCoordinate(vertexId, Z, z);
   }
 
   @Override

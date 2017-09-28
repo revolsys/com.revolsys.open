@@ -109,7 +109,7 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   private Geometry deleteVertex() {
-    Geometry geometry = getMeasureGeometry();
+    final Geometry geometry = getMeasureGeometry();
 
     for (final CloseLocation location : getMouseOverLocations()) {
       final int[] vertexId = location.getVertexId();
@@ -148,7 +148,11 @@ public class MeasureOverlay extends AbstractOverlay {
           }
         }
         try {
-          geometry = geometry.deleteVertex(vertexId);
+          final GeometryEditor geometryEditor = geometry.newGeometryEditor();
+          geometryEditor.deleteVertex(vertexId);
+          if (geometryEditor.isModified()) {
+            return geometryEditor.newGeometry();
+          }
         } catch (final Exception e) {
           Toolkit.getDefaultToolkit().beep();
           return geometry;
@@ -269,7 +273,8 @@ public class MeasureOverlay extends AbstractOverlay {
               LineString line = (LineString)measureGeometry;
               final Point to = line.getToPoint();
               if (!to.equals(point)) {
-                line = line.appendVertex(point);
+                final Point newPoint = point;
+                line = line.editLine(editor -> editor.appendVertex(newPoint));
                 setMeasureGeometry(line);
               }
             }
@@ -278,19 +283,23 @@ public class MeasureOverlay extends AbstractOverlay {
               LineString line = (LineString)measureGeometry;
               final Point from = line.getToVertex(0);
               if (!from.equals(point)) {
-                line = line.appendVertex(point);
+                final Point newPoint = point;
+                line = line.editLine(editor -> editor.appendVertex(newPoint));
                 setMeasureGeometry(line);
               }
               if (line.getVertexCount() > 2) {
                 if (!line.isClosed()) {
                   final Vertex firstPoint = line.getVertex(0);
-                  line = line.appendVertex(firstPoint);
+                  line = line.editLine(editor -> editor.appendVertex(firstPoint));
                 }
                 setMeasureGeometry(geometryFactory.polygon(line));
               }
             } else if (measureGeometry instanceof Polygon) {
               final Polygon polygon = (Polygon)measureGeometry;
-              setMeasureGeometry(polygon.appendVertex(point, 0));
+              final Point newPoint = point;
+              setMeasureGeometry(polygon.edit(editor -> editor.appendVertex(new int[] {
+                0
+              }, newPoint)));
             }
           }
           event.consume();
@@ -345,16 +354,16 @@ public class MeasureOverlay extends AbstractOverlay {
             } else {
               point = getSnapPoint().newGeometry(geometryFactory);
             }
-            final int[] vertexIndex = location.getVertexId();
-            final GeometryEditor geometryEditor = geometry.newGeometryEditor();
+            final int[] vertexId = location.getVertexId();
+            final GeometryEditor<?> geometryEditor = geometry.newGeometryEditor();
             final Point newPoint = point;
-            if (vertexIndex == null) {
+            if (vertexId == null) {
               final int[] segmentIndex = location.getSegmentId();
-              final int[] newIndex = segmentIndex.clone();
-              newIndex[newIndex.length - 1] = newIndex[newIndex.length - 1] + 1;
-              geometryEditor.insertVertex(newPoint, newIndex);
+              final int[] newVertexId = segmentIndex.clone();
+              newVertexId[newVertexId.length - 1] = newVertexId[newVertexId.length - 1] + 1;
+              geometryEditor.insertVertex(newVertexId, newPoint);
             } else {
-              geometryEditor.moveVertex(newPoint, vertexIndex);
+              geometryEditor.setVertex(vertexId, newPoint);
             }
             final Geometry newGeometry = geometryEditor.newGeometry();
             setMeasureGeometry(newGeometry);

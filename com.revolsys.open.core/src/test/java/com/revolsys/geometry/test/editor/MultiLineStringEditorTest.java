@@ -18,7 +18,7 @@ public class MultiLineStringEditorTest {
   @Test
   public void testNotModified() {
     final LinealEditor editor = LINEAL.newGeometryEditor();
-    editor.setZ(13);
+    editor.setZ(new int[0], 13);
     final Lineal newGeometry = editor.newGeometry();
     Assert.assertSame(LINEAL, newGeometry);
 

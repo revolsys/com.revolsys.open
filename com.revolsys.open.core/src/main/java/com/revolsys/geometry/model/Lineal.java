@@ -39,6 +39,8 @@ import java.util.function.Function;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.index.LineSegmentIndex;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
+import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
 import com.revolsys.geometry.model.editor.LinealEditor;
 import com.revolsys.geometry.model.editor.MultiLineStringEditor;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -233,6 +235,11 @@ public interface Lineal extends Geometry {
   @Override
   default LinealEditor newGeometryEditor() {
     return new MultiLineStringEditor(this);
+  }
+
+  @Override
+  default LinealEditor newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new MultiLineStringEditor((GeometryCollectionImplEditor)parentEditor, this);
   }
 
   @Override

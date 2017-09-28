@@ -18,10 +18,11 @@ public class PolygonEditorTest {
   public void testNotModified() {
     final Polygon polygon = POLYGON;
     final PolygonEditor polygonEditor = polygon.newGeometryEditor();
-    polygonEditor.setZ(13);
-    final Polygon newPolygon = polygonEditor.newGeometry();
-    Assert.assertSame(polygon, newPolygon);
-
+    try {
+      polygonEditor.setZ(new int[0], 13);
+      Assert.fail("Invalid index should cause exception");
+    } catch (final Exception e) {
+    }
   }
 
   @Test

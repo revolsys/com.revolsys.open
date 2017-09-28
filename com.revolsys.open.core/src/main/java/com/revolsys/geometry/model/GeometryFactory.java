@@ -2001,7 +2001,9 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         axisCount = coordinates.length;
       }
       for (int axisIndex = axisCount - 1; axisIndex > 1; axisIndex--) {
-        if (!Double.isFinite(coordinates[axisIndex])) {
+        if (Double.isFinite(coordinates[axisIndex])) {
+          break;
+        } else {
           axisCount--;
         }
       }

@@ -805,14 +805,14 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   @SuppressWarnings("unchecked")
   default <G extends Geometry> G setGeometryElevations(final G geometry) {
-    final GeometryEditor editor = geometry.newGeometryEditor(3);
+    final GeometryEditor<?> editor = geometry.newGeometryEditor(3);
     for (final Vertex vertex : geometry.vertices()) {
       final double x = vertex.getX();
       final double y = vertex.getY();
       final double elevation = getElevation(x, y);
       if (Double.isFinite(elevation)) {
         final int[] vertexId = vertex.getVertexId();
-        editor.setZ(elevation, vertexId);
+        editor.setZ(vertexId, elevation);
       }
     }
     return (G)editor.newGeometry();

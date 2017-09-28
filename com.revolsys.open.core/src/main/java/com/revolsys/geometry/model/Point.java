@@ -40,6 +40,8 @@ import java.util.List;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PointEditor;
 import com.revolsys.geometry.model.impl.BaseBoundingBox;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
@@ -117,21 +119,6 @@ public interface Point extends Punctual, Serializable {
     final double x2 = other.getX();
     final double y2 = other.getY();
     return Angle.angle2d(x1, y1, x2, y2);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (isEmpty()) {
-      return newPoint.convertGeometry(geometryFactory);
-    } else if (newPoint.isEmpty()) {
-      return (V)this;
-    } else {
-      return (V)geometryFactory.lineString(this, newPoint);
-    }
   }
 
   @Override
@@ -314,13 +301,6 @@ public interface Point extends Punctual, Serializable {
     final double x2 = convertedPoint.getX();
     final double y2 = convertedPoint.getY();
     return getX() * y2 - getY() * x2;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V deleteVertex(final int... vertexId) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return (V)geometryFactory.point();
   }
 
   @Override
@@ -698,30 +678,6 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
-    if (vertexId.length == 1) {
-      final int vertexIndex = vertexId[0];
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (newPoint == null || newPoint.isEmpty()) {
-        return (V)this;
-      } else if (isEmpty()) {
-        return newPoint.convertGeometry(geometryFactory);
-      } else if (newPoint.isEmpty()) {
-        return (V)this;
-      } else if (vertexIndex == 0) {
-        return (V)geometryFactory.lineString(newPoint, this);
-      } else {
-        return (V)geometryFactory.lineString(this, newPoint);
-      }
-    } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
-        + " must have length 1. " + Arrays.toString(vertexId));
-    }
-
-  }
-
-  @Override
   default boolean intersects(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
@@ -822,32 +778,6 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
-  @Override
-  default Point move(final double... deltas) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (deltas == null || isEmpty()) {
-      return this;
-    } else {
-      final double[] coordinates = getCoordinates();
-      final int axisCount = Math.min(deltas.length, getAxisCount());
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[axisIndex] += deltas[axisIndex];
-      }
-      return geometryFactory.point(coordinates);
-    }
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return (V)newPoint.newGeometry(geometryFactory);
-    }
-  }
-
   default Point multiply(final double s) {
     final double x = getX();
     final double y = getY();
@@ -940,6 +870,11 @@ public interface Point extends Punctual, Serializable {
   @Override
   default PointEditor newGeometryEditor() {
     return new PointEditor(this);
+  }
+
+  @Override
+  default PointEditor newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new PointEditor((AbstractGeometryCollectionEditor<?, ?, ?>)parentEditor, this);
   }
 
   @Override

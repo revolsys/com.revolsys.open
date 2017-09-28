@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.measure.Measure;
@@ -60,6 +61,7 @@ import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
 import com.revolsys.geometry.model.prep.PreparedLineString;
@@ -103,34 +105,6 @@ public interface LineString extends Lineal {
     } else {
       final String string = DataTypes.toString(value);
       return (G)GeometryFactory.DEFAULT_3D.geometry(string, false);
-    }
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V appendVertex(Point newPoint, final int... geometryId) {
-    if (geometryId.length == 0) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (newPoint == null || newPoint.isEmpty()) {
-        return (V)this;
-      } else if (isEmpty()) {
-        return newPoint.convertGeometry(geometryFactory);
-      } else {
-        newPoint = newPoint.convertGeometry(geometryFactory);
-        final int vertexCount = getVertexCount();
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
-
-        final int length = vertexCount * axisCount;
-        System.arraycopy(coordinates, 0, newCoordinates, 0, length);
-        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexCount, newPoint);
-
-        return (V)newLineString(newCoordinates);
-      }
-    } else {
-      throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
-        + " must have length 0. " + Arrays.toString(geometryId));
     }
   }
 
@@ -307,44 +281,6 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V deleteVertex(final int... vertexId) {
-    if (vertexId.length == 1) {
-      final int vertexIndex = vertexId[0];
-      return (V)deleteVertex(vertexIndex);
-    } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
-        + " must have length 1. " + Arrays.toString(vertexId));
-    }
-  }
-
-  default LineString deleteVertex(final int vertexIndex) {
-    if (isEmpty()) {
-      throw new IllegalArgumentException("Cannot delete vertex for empty LineString");
-    } else {
-      final int vertexCount = getVertexCount();
-      if (vertexCount <= 2) {
-        throw new IllegalArgumentException("LineString must have a minimum of 2 vertices");
-      } else if (vertexIndex >= 0 && vertexIndex < vertexCount) {
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        final double[] newCoordinates = new double[axisCount * (vertexCount - 1)];
-        final int beforeLength = vertexIndex * axisCount;
-        if (vertexIndex > 0) {
-          System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
-        }
-        final int sourceIndex = (vertexIndex + 1) * axisCount;
-        final int length = (vertexCount - vertexIndex - 1) * axisCount;
-        System.arraycopy(coordinates, sourceIndex, newCoordinates, beforeLength, length);
-
-        return newLineString(newCoordinates);
-      } else {
-        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
-      }
-    }
-  }
-
-  @Override
   default double distance(final double x, final double y) {
     return distance(x, y, 0);
   }
@@ -514,6 +450,16 @@ public interface LineString extends Lineal {
     final double x = convertedPoint.getX();
     final double y = convertedPoint.getY();
     return distanceVertex(index, x, y);
+  }
+
+  default LineString editLine(final Consumer<LineStringEditor> edit) {
+    final LineStringEditor editor = newGeometryEditor();
+    edit.accept(editor);
+    if (editor.isModified()) {
+      return editor.newGeometry();
+    } else {
+      return this;
+    }
   }
 
   @Override
@@ -1418,45 +1364,6 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default <G extends Geometry> G insertVertex(final Point newPoint, final int... vertexId) {
-    if (vertexId.length == 1) {
-      final int vertexIndex = vertexId[0];
-      return insertVertex(vertexIndex, newPoint);
-    } else {
-      throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
-        + " must have length 1. " + Arrays.toString(vertexId));
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  default <G extends Geometry> G insertVertex(final int vertexIndex, Point newPoint) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (G)this;
-    } else if (isEmpty()) {
-      return newPoint.convertGeometry(geometryFactory);
-    } else {
-      newPoint = newPoint.convertGeometry(geometryFactory);
-      final int vertexCount = getVertexCount();
-      final double[] coordinates = getCoordinates();
-      final int axisCount = getAxisCount();
-      final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
-
-      final int beforeLength = vertexIndex * axisCount;
-      System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
-
-      CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexIndex, newPoint);
-
-      final int afterSourceIndex = vertexIndex * axisCount;
-      final int afterNewIndex = (vertexIndex + 1) * axisCount;
-      final int afterLength = (vertexCount - vertexIndex) * axisCount;
-      System.arraycopy(coordinates, afterSourceIndex, newCoordinates, afterNewIndex, afterLength);
-
-      return (G)newLineString(newCoordinates);
-    }
-  }
-
-  @Override
   default boolean intersects(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
@@ -1807,62 +1714,6 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default LineString move(final double... deltas) {
-    if (deltas == null || isEmpty()) {
-      return this;
-    } else {
-      final double[] coordinates = moveCoordinates(deltas);
-      return newLineString(coordinates);
-    }
-  }
-
-  default double[] moveCoordinates(final double... deltas) {
-    final double[] coordinates = getCoordinates();
-    final int vertexCount = getVertexCount();
-    final int axisCount = getAxisCount();
-    final int deltaCount = Math.min(deltas.length, getAxisCount());
-    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-      for (int axisIndex = 0; axisIndex < deltaCount; axisIndex++) {
-        coordinates[vertexIndex * axisCount + axisIndex] += deltas[axisIndex];
-      }
-    }
-    return coordinates;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
-    if (vertexId.length == 1) {
-      final int vertexIndex = vertexId[0];
-      return (V)moveVertex(newPoint, vertexIndex);
-    } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
-        + " must have length 1. " + Arrays.toString(vertexId));
-    }
-  }
-
-  default LineString moveVertex(Point newPoint, final int vertexIndex) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return this;
-    } else if (isEmpty()) {
-      throw new IllegalArgumentException("Cannot move vertex for empty LineString");
-    } else {
-      final int vertexCount = getVertexCount();
-      if (vertexIndex >= 0 && vertexIndex < vertexCount) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        newPoint = newPoint.convertGeometry(geometryFactory);
-
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, newPoint);
-        return newLineString(coordinates);
-      } else {
-        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
-      }
-    }
-  }
-
-  @Override
   default LineString newGeometry(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       return this.clone();
@@ -1879,6 +1730,11 @@ public interface LineString extends Lineal {
   @Override
   default LineStringEditor newGeometryEditor() {
     return new LineStringEditor(this);
+  }
+
+  @Override
+  default LineStringEditor newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new LineStringEditor(parentEditor, this);
   }
 
   @Override

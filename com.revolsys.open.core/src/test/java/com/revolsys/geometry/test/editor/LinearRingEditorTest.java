@@ -7,19 +7,20 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 
-public class LineStringEditorTest {
+public class LinearRingEditorTest {
   private static final GeometryFactory WGS84_2D = GeometryFactory.wgs84().convertAxisCount(2);
 
   private static final LineString LINE_STRING = WGS84_2D.lineString(2, 100.0, 200.0, 110.0, 210.0);
 
   @Test
-  public void testInvalidIndex() {
+  public void testNotModified() {
     final LineStringEditor lineEditor = LINE_STRING.newGeometryEditor();
     try {
       lineEditor.setZ(new int[0], 13);
       Assert.fail("Invalid index should cause exception");
     } catch (final Exception e) {
     }
+
   }
 
   @Test

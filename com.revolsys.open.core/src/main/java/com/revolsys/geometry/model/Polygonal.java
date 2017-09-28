@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
+import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
 import com.revolsys.geometry.model.editor.MultiPolygonEditor;
 import com.revolsys.geometry.model.editor.PolygonalEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
@@ -115,6 +117,11 @@ public interface Polygonal extends Geometry {
   @Override
   default PolygonalEditor newGeometryEditor() {
     return new MultiPolygonEditor(this);
+  }
+
+  @Override
+  default PolygonalEditor newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new MultiPolygonEditor((GeometryCollectionImplEditor)parentEditor, this);
   }
 
   @Override

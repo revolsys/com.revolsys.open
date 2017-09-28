@@ -313,7 +313,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           final Point point = (Point)geometry;
           geometry = geometryFactory.punctual(point, newPoint);
         } else {
-          geometry = geometry.appendVertex(newPoint, this.addGeometryPartIndex);
+          geometry = geometry
+            .edit(editor -> editor.appendVertex(this.addGeometryPartIndex, newPoint));
         }
       } else if (DataTypes.LINE_STRING.equals(geometryDataType)) {
         if (geometry instanceof Point) {
@@ -321,7 +322,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           geometry = geometryFactory.lineString(point, newPoint);
         } else if (geometry instanceof LineString) {
           final LineString line = (LineString)geometry;
-          geometry = line.appendVertex(newPoint, geometryPartIndex);
+          geometry = line.edit(editor -> editor.appendVertex(geometryPartIndex, newPoint));
         }
       } else if (DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
         if (geometry instanceof Point) {
@@ -329,10 +330,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           geometry = geometryFactory.lineString(point, newPoint);
         } else if (geometry instanceof LineString) {
           final LineString line = (LineString)geometry;
-          geometry = line.appendVertex(newPoint);
+          geometry = line.editLine(editor -> editor.appendVertex(newPoint));
         } else if (geometry instanceof Lineal) {
           final Lineal line = (Lineal)geometry;
-          geometry = line.appendVertex(newPoint, geometryPartIndex);
+          geometry = line.edit(editor -> editor.appendVertex(geometryPartIndex, newPoint));
         }
       } else if (DataTypes.POLYGON.equals(geometryDataType)
         || DataTypes.MULTI_POLYGON.equals(geometryDataType)
@@ -348,7 +349,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           geometry = geometryFactory.polygon(ring);
         } else if (geometry instanceof Polygon) {
           final Polygon polygon = (Polygon)geometry;
-          geometry = polygon.appendVertex(newPoint, geometryPartIndex[0]);
+          geometry = polygon.edit(editor -> editor.appendVertex(geometryPartIndex, newPoint));
         }
         // TODO MultiPolygon
         // TODO Rings
@@ -399,16 +400,16 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     }
   }
 
-  private GeometryEditor geometryEdit(final MouseEvent event, final CloseLocation location) {
+  private GeometryEditor<?> geometryEdit(final MouseEvent event, final CloseLocation location) {
     final Geometry geometry = location.getGeometry();
     final Point newPoint = getSnapOrEventPointWithElevation(event, location);
     int[] vertexId = location.getVertexId();
-    final GeometryEditor geometryEditor = geometry.newGeometryEditor();
+    final GeometryEditor<?> geometryEditor = geometry.newGeometryEditor();
     if (vertexId == null) {
       vertexId = location.getSegmentIdNext();
-      geometryEditor.insertVertex(newPoint, vertexId);
+      geometryEditor.insertVertex(vertexId, newPoint);
     } else {
-      geometryEditor.setVertex(newPoint, vertexId);
+      geometryEditor.setVertex(vertexId, newPoint);
     }
     if (geometryEditor.isModified()) {
       if (geometry.getGeometryFactory().getAxisCount() > 2) {
@@ -701,17 +702,21 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         final MultipleUndo edit = new MultipleUndo();
         for (final CloseLocation location : getMouseOverLocations()) {
           final Geometry geometry = location.getGeometry();
-          final int[] vertexIndex = location.getVertexId();
-          if (vertexIndex != null) {
+          final int[] vertexId = location.getVertexId();
+          if (vertexId != null) {
             try {
-              final Geometry newGeometry = geometry.deleteVertex(vertexIndex);
-              if (newGeometry.isEmpty()) {
-                Toolkit.getDefaultToolkit().beep();
-              } else {
-                final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
-                edit.addEdit(geometryEdit);
+              final GeometryEditor<?> geometryEditor = geometry.newGeometryEditor();
+              geometryEditor.deleteVertex(vertexId);
+              if (geometryEditor.isModified()) {
+                final Geometry newGeometry = geometryEditor.newGeometry();
+                if (newGeometry.isEmpty()) {
+                  Toolkit.getDefaultToolkit().beep();
+                } else {
+                  final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
+                  edit.addEdit(geometryEdit);
+                }
               }
-            } catch (final Throwable t) {
+            } catch (final Exception t) {
               Toolkit.getDefaultToolkit().beep();
             }
           }
@@ -1022,7 +1027,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           for (final CloseLocation location : locations) {
             final GeometryEditor geometryEditor = geometryEdit(event, location);
             if (geometryEditor.isModified()) {
-              Geometry newGeometry = geometryEditor.newGeometry();
+              final Geometry newGeometry = geometryEditor.newGeometry();
               final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
               edit.addEdit(geometryEdit);
             }
@@ -1108,7 +1113,16 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           final double deltaY = to.getY() - from.getY();
           if (deltaX != 0 || deltaY != 0) {
             final Geometry geometry = location.getGeometry();
-            final Geometry newGeometry = geometry.move(deltaX, deltaY);
+            final Geometry newGeometry = geometry.edit(editor -> {
+              editor.move(deltaX, deltaY);
+              for (final Vertex vertex : editor.vertices()) {
+                final double z = getElevation(vertex);
+                if (Double.isFinite(z)) {
+                  vertex.setZ(z);
+                }
+              }
+              return editor;
+            });
             final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
             addUndo(geometryEdit);
           }
@@ -1240,7 +1254,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           final Point to = this.moveGeometryEnd.convertGeometry(geometryFactory);
           final double deltaX = to.getX() - from.getX();
           final double deltaY = to.getY() - from.getY();
-          geometry = geometry.move(deltaX, deltaY);
+          geometry = geometry.edit(editor -> editor.move(deltaX, deltaY));
           GEOMETRY_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating, geometry);
           GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating,
             geometry);

@@ -92,21 +92,6 @@ public class PointDoubleGf extends PointDouble {
   }
 
   @Override
-  public Point move(final double... deltas) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (deltas == null || isEmpty()) {
-      return this;
-    } else {
-      final double[] coordinates = getCoordinates();
-      final int axisCount = Math.min(deltas.length, getAxisCount());
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[axisIndex] += deltas[axisIndex];
-      }
-      return geometryFactory.point(coordinates);
-    }
-  }
-
-  @Override
   public Point newPoint(final double x, final double y) {
     final GeometryFactory geometryFactory2 = getGeometryFactory();
     return geometryFactory2.point(x, y);

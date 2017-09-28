@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.MultiPointEditor;
 import com.revolsys.geometry.model.editor.PunctualEditor;
 
@@ -118,6 +119,11 @@ public interface Punctual extends Geometry {
   @Override
   default PunctualEditor newGeometryEditor() {
     return new MultiPointEditor(this);
+  }
+
+  @Override
+  default PunctualEditor newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new MultiPointEditor(parentEditor, this);
   }
 
   @Override

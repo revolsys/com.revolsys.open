@@ -435,8 +435,8 @@ public class LineStringTest {
       START_X + 100, START_Y + 100, 1);
     final LineString lineVertexMiddle2 = geometryFactory.lineString(3, START_X + 100, START_Y + 100,
       1, START_X + 200, START_Y + 100, 2, START_X + 100, START_Y, 3);
-    assertSplit(true, line, geometryFactory.point(START_X + 100, START_Y + 100), lineVertexMiddle1,
-      lineVertexMiddle2);
+    final Point pointVertexMiddle2 = geometryFactory.point(START_X + 100, START_Y + 100);
+    assertSplit(true, line, pointVertexMiddle2, lineVertexMiddle1, lineVertexMiddle2);
 
     // Middle vertex
     final LineString lineVertexClose1 = geometryFactory.lineString(3, START_X, START_Y, 0,

@@ -24,7 +24,7 @@ public class MultiPolygonEditorTest {
   @Test
   public void testNotModified() {
     final PolygonalEditor editor = POLYGONAL.newGeometryEditor();
-    editor.setZ(13);
+    editor.setZ(new int[0], 13);
     final Polygonal newGeometry = editor.newGeometry();
     Assert.assertSame(POLYGONAL, newGeometry);
 

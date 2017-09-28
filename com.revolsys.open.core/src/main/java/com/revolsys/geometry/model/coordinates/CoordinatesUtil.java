@@ -163,6 +163,19 @@ public interface CoordinatesUtil {
     return Double.NaN;
   }
 
+  static double getElevation(final Point newLocation, final Point originalLocation) {
+    if (originalLocation.getAxisCount() > 2) {
+      final double z = originalLocation.getZ();
+      if (Double.isNaN(z)) {
+        return newLocation.getZ();
+      } else {
+        return z;
+      }
+    } else {
+      return newLocation.getZ();
+    }
+  }
+
   static double getElevation(final Point point, final Point point1, final Point point2) {
 
     final double x1 = point1.getX();

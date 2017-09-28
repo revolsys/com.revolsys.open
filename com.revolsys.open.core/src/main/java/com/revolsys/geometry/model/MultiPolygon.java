@@ -33,7 +33,6 @@
 package com.revolsys.geometry.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -239,39 +238,6 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   @Override
   default boolean isHomogeneousGeometryCollection() {
     return true;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-
-  default <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (vertexId.length == 3) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty MultiPolygon");
-      } else {
-        final int partIndex = vertexId[0];
-        final int ringIndex = vertexId[1];
-        final int vertexIndex = vertexId[2];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          final Polygon polygon = getPolygon(partIndex);
-          final Polygon newPolygon = polygon.moveVertex(newPoint, ringIndex, vertexIndex);
-          final List<Polygon> polygons = new ArrayList<>(getPolygons());
-          polygons.set(partIndex, newPolygon);
-          return (V)geometryFactory.polygonal(polygons);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for MultiPolygons must have length 3. " + Arrays.toString(vertexId));
-    }
   }
 
   @Override
