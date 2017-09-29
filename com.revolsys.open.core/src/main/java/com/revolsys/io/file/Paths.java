@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -56,6 +57,12 @@ public interface Paths {
   static Path createDirectories(final Path path) {
     try {
       return Files.createDirectories(path, FILE_ATTRIBUTES_NONE);
+    } catch (final FileAlreadyExistsException e) {
+      if (Files.isSymbolicLink(path)) {
+        return path;
+      } else {
+        throw Exceptions.wrap(e);
+      }
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

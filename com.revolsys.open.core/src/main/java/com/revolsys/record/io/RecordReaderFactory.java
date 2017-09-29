@@ -17,7 +17,6 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.SupplierWithProperties;
 
@@ -34,8 +33,9 @@ public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFac
       defaultFileExtension = FileUtil.getFileNameExtension(fileName);
 
     } else if (Property.hasValue(fileUrl)) {
-      source = new UrlResource(fileUrl);
-      defaultFileExtension = FileUtil.getFileNameExtension(fileName);
+      final Resource resource = Resource.getResource(fileUrl);
+      source = resource;
+      defaultFileExtension = resource.getFileNameExtension();
     } else {
       throw new IllegalArgumentException("Config must have fileName or fileUrl:" + properties);
     }

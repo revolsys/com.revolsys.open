@@ -166,8 +166,9 @@ public class CategoryLabelCountMap implements Emptyable {
     }
   }
 
-  public void setLabelTitle(final String labelTitle) {
+  public CategoryLabelCountMap setLabelTitle(final String labelTitle) {
     this.labelTitle = labelTitle;
+    return this;
   }
 
   public synchronized void setLogCounts(final boolean logCounts) {

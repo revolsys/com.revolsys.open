@@ -1,10 +1,8 @@
 package com.revolsys.io;
 
-import java.io.Closeable;
-
 import com.revolsys.properties.ObjectWithProperties;
 
-public interface Writer<T> extends ObjectWithProperties, Closeable {
+public interface Writer<T> extends ObjectWithProperties, BaseCloseable {
   @Override
   default void close() {
   }

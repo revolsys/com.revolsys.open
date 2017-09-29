@@ -40,7 +40,7 @@ public class RsCoreServiceInitializer implements ServiceInitializer {
     });
 
     MapObjectFactoryRegistry.newFactory("recordReaderFactoryFile",
-      "Factory to create a RecordReader from a file", (config) -> {
+      "Factory to create a RecordReader from a file", config -> {
         return RecordReaderFactory.newRecordReaderSupplier(config);
       });
 

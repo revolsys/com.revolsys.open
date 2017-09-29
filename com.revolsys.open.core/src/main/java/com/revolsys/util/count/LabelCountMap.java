@@ -8,10 +8,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.PathNameProxy;
 import com.revolsys.logging.Logs;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.util.Counter;
 import com.revolsys.util.LongCounter;
 
@@ -202,6 +206,20 @@ public class LabelCountMap {
         tsv.write(label, count);
       }
       tsv.write("Total", total);
+    }
+  }
+
+  public void writeCounts(final Object target, final String labelTitle) {
+    final RecordDefinitionBuilder recordDefinitionBuilder = new RecordDefinitionBuilder("Counts");
+    recordDefinitionBuilder.addField(labelTitle, DataTypes.STRING, 50);
+    recordDefinitionBuilder.addField("Count", DataTypes.LONG, 10);
+    final RecordDefinition recordDefinition = recordDefinitionBuilder.getRecordDefinition();
+    try (
+      RecordWriter recordWriter = RecordWriter.newRecordWriter(recordDefinition, target)) {
+      for (final String label : getLabels()) {
+        final Long count = getCount(label);
+        recordWriter.write(label, count);
+      }
     }
   }
 }

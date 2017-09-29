@@ -804,11 +804,15 @@ public final class FileUtil {
   }
 
   public static String getFileNameExtension(final String fileName) {
-    final int dotIndex = fileName.lastIndexOf('.');
-    if (dotIndex != -1) {
-      return fileName.substring(dotIndex + 1);
-    } else {
+    if (fileName == null) {
       return "";
+    } else {
+      final int dotIndex = fileName.lastIndexOf('.');
+      if (dotIndex != -1) {
+        return fileName.substring(dotIndex + 1);
+      } else {
+        return "";
+      }
     }
   }
 
