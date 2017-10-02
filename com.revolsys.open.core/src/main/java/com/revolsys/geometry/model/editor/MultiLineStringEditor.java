@@ -10,12 +10,16 @@ public class MultiLineStringEditor
   implements MultiLineString, LinealEditor {
   private static final long serialVersionUID = 1L;
 
-  private final Lineal lineal;
+  private Lineal lineal;
 
   public MultiLineStringEditor(final GeometryCollectionImplEditor geometryEditor,
     final Lineal lineal) {
     super(geometryEditor, lineal);
     this.lineal = lineal;
+  }
+
+  public MultiLineStringEditor(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
   }
 
   public MultiLineStringEditor(final Lineal lineal) {

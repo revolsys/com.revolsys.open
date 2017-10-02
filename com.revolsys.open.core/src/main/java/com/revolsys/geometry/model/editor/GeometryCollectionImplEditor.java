@@ -20,6 +20,10 @@ public class GeometryCollectionImplEditor
     this(null, geometryCollection);
   }
 
+  public GeometryCollectionImplEditor(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
+  }
+
   public GeometryCollectionImplEditor(final GeometryFactory geometryFactory,
     final List<GeometryEditor<?>> editors) {
     super(geometryFactory, editors);

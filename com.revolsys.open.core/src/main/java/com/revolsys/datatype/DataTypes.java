@@ -27,6 +27,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
+import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
@@ -37,6 +38,14 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
+import com.revolsys.geometry.model.editor.LineStringEditor;
+import com.revolsys.geometry.model.editor.LinearRingEditor;
+import com.revolsys.geometry.model.editor.MultiLineStringEditor;
+import com.revolsys.geometry.model.editor.MultiPointEditor;
+import com.revolsys.geometry.model.editor.MultiPolygonEditor;
+import com.revolsys.geometry.model.editor.PointEditor;
+import com.revolsys.geometry.model.editor.PolygonEditor;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
@@ -96,12 +105,12 @@ public final class DataTypes {
 
   public static final DataType FLOAT = new Floats();
 
-  public static final DataType GEOMETRY = FunctionDataType.newToObjectEquals("Geometry",
-    Geometry.class, Geometry::newGeometry, Geometry::equalsExact);
+  public static final GeometryDataType<Geometry, GeometryCollectionImplEditor> GEOMETRY = new GeometryDataType<>(
+    Geometry.class, Geometry::newGeometry, GeometryCollectionImplEditor::new);
 
-  public static final DataType GEOMETRY_COLLECTION = FunctionDataType.newToObjectEquals(
-    "GeometryCollection", GeometryCollection.class, GeometryCollection::newGeometryCollection,
-    Geometry::equalsExact);
+  public static final GeometryDataType<Geometry, GeometryCollectionImplEditor> GEOMETRY_COLLECTION = new GeometryDataType<>(
+    GeometryCollection.class, GeometryCollection::newGeometryCollection,
+    GeometryCollectionImplEditor::new);
 
   public static final DataType IDENTIFIER = new FunctionDataType("identifier", Identifier.class,
     Identifier::newIdentifier);
@@ -110,11 +119,11 @@ public final class DataTypes {
 
   public static final DataType INTEGER = new BigIntegers();
 
-  public static final DataType LINE_STRING = FunctionDataType.newToObjectEquals("LineString",
-    LineString.class, LineString::newLineString, Geometry::equalsExact);
+  public static final GeometryDataType<LineString, LineStringEditor> LINE_STRING = new GeometryDataType<>(
+    LineString.class, LineString::newLineString, LineStringEditor::new);
 
-  public static final DataType LINEAR_RING = FunctionDataType.newToObjectEquals("LinearRing",
-    LinearRing.class, LinearRing::newLinearRing, Geometry::equalsExact);
+  public static final GeometryDataType<LinearRing, LinearRingEditor> LINEAR_RING = new GeometryDataType<>(
+    LinearRing.class, LinearRing::newLinearRing, LinearRingEditor::new);
 
   private static final Logger LOG = Logger.getLogger(DataTypes.class);
 
@@ -123,22 +132,22 @@ public final class DataTypes {
   public static final DataType MEASURE = new FunctionDataType("measure", Measure.class,
     Measures::newMeasure, Measures::toString);
 
-  public static final DataType MULTI_LINE_STRING = FunctionDataType.newToObjectEquals(
-    "MultiLineString", MultiLineString.class, Lineal::newLineal, Geometry::equalsExact);
+  public static final GeometryDataType<MultiLineString, MultiLineStringEditor> MULTI_LINE_STRING = new GeometryDataType<>(
+    MultiLineString.class, Lineal::newLineal, MultiLineStringEditor::new);
 
-  public static final DataType MULTI_POINT = FunctionDataType.newToObjectEquals("MultiPoint",
-    MultiPoint.class, Punctual::newPunctual, Geometry::equalsExact);
+  public static final GeometryDataType<MultiPoint, MultiPointEditor> MULTI_POINT = new GeometryDataType<>(
+    MultiPoint.class, Punctual::newPunctual, MultiPointEditor::new);
 
-  public static final DataType MULTI_POLYGON = FunctionDataType.newToObjectEquals("MultiPolygon",
-    MultiPolygon.class, Polygonal::newPolygonal, Geometry::equalsExact);
+  public static final GeometryDataType<MultiPolygon, MultiPolygonEditor> MULTI_POLYGON = new GeometryDataType<>(
+    MultiPolygon.class, Polygonal::newPolygonal, MultiPolygonEditor::new);
 
   public static final DataType OBJECT = new ObjectDataType();
 
-  public static final DataType POINT = FunctionDataType.newToObjectEquals("Point", Point.class,
-    Point::newPoint, Geometry::equalsExact);
+  public static final GeometryDataType<Point, PointEditor> POINT = new GeometryDataType<>(
+    Point.class, Point::newPoint, PointEditor::new);
 
-  public static final DataType POLYGON = FunctionDataType.newToObjectEquals("Polygon",
-    Polygon.class, Polygon::newPolygon, Geometry::equalsExact);
+  public static final GeometryDataType<Polygon, PolygonEditor> POLYGON = new GeometryDataType<>(
+    Polygon.class, Polygon::newPolygon, PolygonEditor::new);
 
   public static final DataType QNAME = new SimpleDataType("QName", QName.class);
 

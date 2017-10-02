@@ -22,6 +22,10 @@ public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual,
     super(parentEditor, geometryFactory, editors);
   }
 
+  public MultiPointEditor(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
+  }
+
   public MultiPointEditor(final Punctual punctual) {
     this(null, punctual);
   }

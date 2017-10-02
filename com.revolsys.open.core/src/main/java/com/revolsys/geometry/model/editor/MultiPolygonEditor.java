@@ -10,12 +10,16 @@ public class MultiPolygonEditor
   implements MultiPolygon, PolygonalEditor {
   private static final long serialVersionUID = 1L;
 
-  private final Polygonal polygonal;
+  private Polygonal polygonal;
 
   public MultiPolygonEditor(final GeometryCollectionImplEditor parentEditor,
     final Polygonal polygonal) {
     super(parentEditor, polygonal);
     this.polygonal = polygonal;
+  }
+
+  public MultiPolygonEditor(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
   }
 
   public MultiPolygonEditor(final Polygonal polygonal) {

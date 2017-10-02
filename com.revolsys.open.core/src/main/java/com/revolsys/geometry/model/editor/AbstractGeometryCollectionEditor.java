@@ -44,6 +44,10 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
     this(null, geometry);
   }
 
+  public AbstractGeometryCollectionEditor(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
+  }
+
   public AbstractGeometryCollectionEditor(final GeometryFactory geometryFactory,
     final List<GE> editors) {
     super(geometryFactory);

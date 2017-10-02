@@ -15,7 +15,7 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   implements Polygon, PolygonalEditor {
   private static final long serialVersionUID = 1L;
 
-  private final Polygon polygon;
+  private Polygon polygon;
 
   private final List<LinearRingEditor> editors = new ArrayList<>();
 
@@ -27,6 +27,10 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
       final LinearRingEditor editor = new LinearRingEditor(this, ring);
       this.editors.add(editor);
     }
+  }
+
+  public PolygonEditor(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
   }
 
   public PolygonEditor(final Polygon polygon) {

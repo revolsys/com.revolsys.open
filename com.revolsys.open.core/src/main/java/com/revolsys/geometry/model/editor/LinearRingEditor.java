@@ -14,6 +14,10 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
     super(parentEditor, ring);
   }
 
+  public LinearRingEditor(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
+  }
+
   public LinearRingEditor(final LinearRing ring) {
     super(ring);
   }

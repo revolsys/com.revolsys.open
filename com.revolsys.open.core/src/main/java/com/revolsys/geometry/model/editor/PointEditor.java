@@ -11,7 +11,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
   implements Point, PunctualEditor {
   private static final long serialVersionUID = 1L;
 
-  private final Point point;
+  private Point point;
 
   private double[] newCoordinates;
 
@@ -19,6 +19,10 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
     final Point point) {
     super(parentEditor, point);
     this.point = point;
+  }
+
+  public PointEditor(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
   }
 
   public PointEditor(final Point point) {
