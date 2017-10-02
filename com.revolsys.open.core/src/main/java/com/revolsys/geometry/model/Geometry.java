@@ -51,7 +51,6 @@ import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypeProxy;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.Centroid;
@@ -1446,7 +1445,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   }
 
   @Override
-  default DataType getDataType() {
+  default GeometryDataType<?, ?> getDataType() {
     return DataTypes.GEOMETRY;
   }
 

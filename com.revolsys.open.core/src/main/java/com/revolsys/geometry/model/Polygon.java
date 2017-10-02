@@ -41,7 +41,6 @@ import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
@@ -330,7 +329,7 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default DataType getDataType() {
+  default GeometryDataType<Polygon, PolygonEditor> getDataType() {
     return DataTypes.POLYGON;
   }
 
@@ -463,19 +462,18 @@ public interface Polygon extends Polygonal {
 
   @Override
   default Segment getSegment(final int... segmentId) {
-    if (segmentId == null || segmentId.length != 2) {
-      return null;
-    } else {
-      final int ringIndex = segmentId[0];
-      if (ringIndex >= 0 && ringIndex < getRingCount()) {
-        final LinearRing ring = getRing(ringIndex);
-        final int segmentIndex = segmentId[1];
-        if (segmentIndex >= 0 && segmentIndex < ring.getSegmentCount()) {
-          return new PolygonSegment(this, ringIndex, segmentIndex);
-        }
+    final int[] newSegmentId = GeometryCollection.cleanPartId(2, segmentId);
+    final int ringIndex = newSegmentId[0];
+    final int ringCount = getRingCount();
+    if (ringIndex >= 0 && ringIndex < ringCount) {
+      final LinearRing ring = getRing(ringIndex);
+      final int segmentIndex = newSegmentId[1];
+      final int segmentCount = ring.getSegmentCount();
+      if (segmentIndex >= 0 && segmentIndex < segmentCount) {
+        return new PolygonSegment(this, ringIndex, segmentIndex);
       }
-      return null;
     }
+    return null;
   }
 
   @Override
@@ -496,61 +494,37 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default Vertex getToVertex(int... vertexId) {
-    if (vertexId == null || vertexId.length != 2) {
-      return null;
-    } else {
-      final int ringIndex = vertexId[0];
-      if (ringIndex >= 0 && ringIndex < getRingCount()) {
-        final LinearRing ring = getRing(ringIndex);
-        int vertexIndex = vertexId[1];
-        final int vertexCount = ring.getVertexCount();
-        vertexIndex = vertexCount - 2 - vertexIndex;
-        vertexId = Geometry.setVertexIndex(vertexId, vertexIndex);
-        if (vertexIndex >= 0 && vertexIndex < vertexCount) {
-          return new PolygonVertex(this, vertexId);
-        }
+  default Vertex getToVertex(final int... vertexId) {
+    final int[] newVertexId = GeometryCollection.cleanPartId(2, vertexId);
+    final int ringIndex = newVertexId[0];
+    final int ringCount = getRingCount();
+    if (ringIndex >= 0 && ringIndex < ringCount) {
+      final LinearRing ring = getRing(ringIndex);
+      int vertexIndex = newVertexId[1];
+      final int vertexCount = ring.getVertexCount();
+      vertexIndex = vertexCount - 2 - vertexIndex;
+      newVertexId[1] = vertexIndex;
+      if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+        return new PolygonVertex(this, newVertexId);
       }
-      return null;
     }
+    return null;
   }
 
   @Override
   default Vertex getVertex(final int... vertexId) {
-    if (vertexId == null || vertexId.length > 2) {
-      return null;
-    } else if (vertexId.length == 1) {
-      int vertexIndex = vertexId[0];
-      while (vertexIndex < 0) {
-        vertexIndex += getVertexCount() - 1;
+    final int[] newVertexId = GeometryCollection.cleanPartId(2, vertexId);
+    final int ringIndex = newVertexId[0];
+    final int ringCount = getRingCount();
+    if (ringIndex >= 0 && ringIndex < ringCount) {
+      final LinearRing ring = getRing(ringIndex);
+      final int vertexIndex = newVertexId[1];
+      final int vertexCount = ring.getVertexCount();
+      if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+        return new PolygonVertex(this, newVertexId);
       }
-      int totalVertexCount = 0;
-      final int ringIndex = 0;
-      for (final LinearRing ring : rings()) {
-        final int ringVertexCount = ring.getVertexCount();
-        final int ringVertexIndex = vertexIndex - totalVertexCount;
-        if (ringVertexIndex <= ringVertexCount) {
-          return new PolygonVertex(this, ringIndex, ringVertexIndex);
-        } else {
-          totalVertexCount += ringVertexCount;
-        }
-      }
-      return null;
-    } else {
-      final int ringIndex = vertexId[0];
-      if (ringIndex >= 0 && ringIndex < getRingCount()) {
-        final LinearRing ring = getRing(ringIndex);
-        int vertexIndex = vertexId[1];
-        final int vertexCount = ring.getVertexCount();
-        if (vertexIndex <= vertexCount) {
-          while (vertexIndex < 0) {
-            vertexIndex += vertexCount - 1;
-          }
-          return new PolygonVertex(this, vertexId);
-        }
-      }
-      return null;
     }
+    return null;
   }
 
   @Override

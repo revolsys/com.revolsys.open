@@ -292,7 +292,7 @@ class PolygonizeGraph extends PlanarGraph {
     }
 
     final Point startPt = cleanLine.getVertex(0).newPoint2D();
-    final Point endPt = cleanLine.getVertex(-1).newPoint2D();
+    final Point endPt = cleanLine.getToVertex(0).newPoint2D();
 
     final Node nStart = getNode(startPt);
     final Node nEnd = getNode(endPt);

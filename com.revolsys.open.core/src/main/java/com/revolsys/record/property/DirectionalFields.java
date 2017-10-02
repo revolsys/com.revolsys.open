@@ -511,8 +511,8 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
       toRecord = record1;
       newLine = line1.merge(point, line2);
     } else {
-      final Vertex line1To = line1.getVertex(-1);
-      final Vertex line2To = line2.getVertex(-1);
+      final Vertex line1To = line1.getToVertex(0);
+      final Vertex line2To = line2.getToVertex(0);
       if (line1To.equals(2, line2To) && line1To.equals(2, point)) {
         record2 = getReverse(record2);
         line2 = record2.getGeometry();

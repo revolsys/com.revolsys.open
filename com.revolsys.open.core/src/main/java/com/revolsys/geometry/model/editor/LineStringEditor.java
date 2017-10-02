@@ -134,7 +134,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
 
   @Override
   public LineStringEditor appendVertex(final int[] geometryId, final Point point) {
-    if (geometryId == null || geometryId.length != 0) {
+    if (geometryId == null || geometryId.length == 0) {
       appendVertex(point);
     }
     return this;
@@ -200,19 +200,18 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
         final double[] oldCoordinates;
         if (this.coordinates == null) {
           oldCoordinates = this.line.getCoordinates(axisCount);
+          setModified(true);
+          this.coordinates = new double[axisCount * (vertexCount - 1)];
         } else {
           oldCoordinates = this.coordinates;
         }
-        final double[] newCoordinates = new double[axisCount * (vertexCount - 1)];
         final int beforeLength = vertexIndex * axisCount;
-        if (vertexIndex > 0) {
-          System.arraycopy(oldCoordinates, 0, newCoordinates, 0, beforeLength);
-        }
         final int sourceIndex = (vertexIndex + 1) * axisCount;
         final int length = (vertexCount - vertexIndex - 1) * axisCount;
-        System.arraycopy(oldCoordinates, sourceIndex, newCoordinates, beforeLength, length);
-
-        setCoordinates(newCoordinates);
+        System.arraycopy(oldCoordinates, sourceIndex, this.coordinates, beforeLength, length);
+        Arrays.fill(this.coordinates, this.coordinates.length - axisCount, this.coordinates.length,
+          Double.NaN);
+        this.vertexCount--;
       } else {
         throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
       }
@@ -249,6 +248,21 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       }
     }
     return this.coordinates;
+  }
+
+  @Override
+  public boolean equalsVertex(final int axisCount, final int vertexIndex, final Point point) {
+    return LineString.super.equalsVertex(axisCount, vertexIndex, point);
+  }
+
+  @Override
+  public boolean equalsVertex(final int axisCount, final int[] geometryId, final int vertexIndex,
+    final Point point) {
+    if (geometryId == null || geometryId.length == 0) {
+      return equalsVertex(axisCount, vertexIndex, point);
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -293,21 +307,6 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     return this.coordinates;
   }
 
-  private double[] getCoordinatesModified(final int vertexIndex, final int axisCount) {
-    if (this.coordinates == null) {
-      setModified(true);
-      int vertexCount = this.vertexCount;
-      if (vertexIndex >= vertexCount) {
-        vertexCount = vertexIndex + 1;
-      }
-      this.coordinates = new double[vertexCount * axisCount];
-      if (this.line != null) {
-        this.line.copyCoordinates(axisCount, Double.NaN, this.coordinates, 0);
-      }
-    }
-    return this.coordinates;
-  }
-
   public LineString getOriginalGeometry() {
     return this.line;
   }
@@ -315,6 +314,15 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   @Override
   public int getVertexCount() {
     return this.vertexCount;
+  }
+
+  @Override
+  public int getVertexCount(final int[] geometryId, final int idLength) {
+    if (geometryId == null || idLength == 0) {
+      return this.vertexCount;
+    } else {
+      return 0;
+    }
   }
 
   private int getVertexId(final int[] vertexId) {

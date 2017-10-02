@@ -47,7 +47,6 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.LineStringLocation;
@@ -820,7 +819,7 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default DataType getDataType() {
+  default GeometryDataType<LineString, LineStringEditor> getDataType() {
     return DataTypes.LINE_STRING;
   }
 
@@ -1279,15 +1278,17 @@ public interface LineString extends Lineal {
   @Override
   default AbstractVertex getToVertex(final int... vertexId) {
     if (vertexId.length == 1) {
-      int vertexIndex = vertexId[0];
-      final int vertexCount = getVertexCount();
-      vertexIndex = vertexCount - vertexIndex - 1;
-      if (vertexIndex < vertexCount) {
-        while (vertexIndex < 0) {
-          vertexIndex += vertexCount;
-        }
-        return new LineStringVertex(this, vertexIndex);
-      }
+      final int vertexIndex = vertexId[0];
+      return getToVertex(vertexIndex);
+    }
+    return null;
+  }
+
+  default AbstractVertex getToVertex(int vertexIndex) {
+    final int vertexCount = getVertexCount();
+    vertexIndex = vertexCount - vertexIndex - 1;
+    if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+      return new LineStringVertex(this, vertexIndex);
     }
     return null;
   }

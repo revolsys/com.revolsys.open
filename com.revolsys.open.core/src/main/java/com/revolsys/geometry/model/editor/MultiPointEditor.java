@@ -1,6 +1,8 @@
 package com.revolsys.geometry.model.editor;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
@@ -32,8 +34,7 @@ public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual,
 
   @Override
   public GeometryEditor<?> appendVertex(final int[] geometryId, final Point point) {
-    if (geometryId == null || geometryId.length != 0) {
-    } else {
+    if (geometryId == null || geometryId.length == 0) {
       appendVertex(point);
     }
     return this;
@@ -60,6 +61,30 @@ public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual,
       return equals(2, geometry);
     } else {
       return false;
+    }
+  }
+
+  @Override
+  public boolean equalsVertex(final int axisCount, final int vertexIndex, final Point point) {
+    return getEditor(vertexIndex).equals(2, point);
+  }
+
+  @Override
+  public int[] getFirstGeometryId() {
+    return new int[0];
+  }
+
+  @Override
+  public GeometryDataType<Point, PointEditor> getPartDataType() {
+    return DataTypes.POINT;
+  }
+
+  @Override
+  public int getVertexCount(final int[] geometryId) {
+    if (geometryId == null || geometryId.length == 0) {
+      return getGeometryCount();
+    } else {
+      return 0;
     }
   }
 

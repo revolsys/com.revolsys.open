@@ -37,8 +37,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.editor.MultiPolygonEditor;
 import com.revolsys.geometry.model.segment.MultiPolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPolygonVertex;
@@ -119,7 +119,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
-  default DataType getDataType() {
+  default GeometryDataType<MultiPolygon, MultiPolygonEditor> getDataType() {
     return DataTypes.MULTI_POLYGON;
   }
 
@@ -135,23 +135,24 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
 
   @Override
   default Segment getSegment(final int... segmentId) {
-    if (segmentId == null || segmentId.length != 3) {
-      return null;
-    } else {
-      final int partIndex = segmentId[0];
-      if (partIndex >= 0 && partIndex < getGeometryCount()) {
-        final Polygon polygon = getPolygon(partIndex);
-        final int ringIndex = segmentId[1];
-        if (ringIndex >= 0 && ringIndex < polygon.getRingCount()) {
-          final LinearRing ring = polygon.getRing(ringIndex);
-          final int segmentIndex = segmentId[2];
-          if (segmentIndex >= 0 && segmentIndex < ring.getSegmentCount()) {
-            return new MultiPolygonSegment(this, partIndex, ringIndex, segmentIndex);
-          }
+    final int[] newSegmentId = GeometryCollection.cleanPartId(3, segmentId);
+
+    final int partIndex = newSegmentId[0];
+    final int geometryCount = getGeometryCount();
+    if (partIndex >= 0 && partIndex < geometryCount) {
+      final Polygon polygon = getPolygon(partIndex);
+      final int ringIndex = newSegmentId[1];
+      final int ringCount = polygon.getRingCount();
+      if (ringIndex >= 0 && ringIndex < ringCount) {
+        final LinearRing ring = polygon.getRing(ringIndex);
+        final int segmentIndex = newSegmentId[2];
+        final int segmentCount = ring.getSegmentCount();
+        if (segmentIndex >= 0 && segmentIndex < segmentCount) {
+          return new MultiPolygonSegment(this, partIndex, ringIndex, segmentIndex);
         }
       }
-      return null;
     }
+    return null;
   }
 
   @Override
@@ -164,55 +165,47 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
-  default Vertex getToVertex(int... vertexId) {
-    if (vertexId == null || vertexId.length != 3) {
-      return null;
-    } else {
-      final int partIndex = vertexId[0];
-      if (partIndex >= 0 && partIndex < getGeometryCount()) {
-        final Polygon polygon = getPolygon(partIndex);
-        final int ringIndex = vertexId[1];
-        if (ringIndex >= 0 && ringIndex < polygon.getRingCount()) {
-          final LinearRing ring = polygon.getRing(ringIndex);
-          int vertexIndex = vertexId[2];
-          final int vertexCount = ring.getVertexCount();
-          vertexIndex = vertexCount - 2 - vertexIndex;
-          if (vertexIndex <= vertexCount) {
-            while (vertexIndex < 0) {
-              vertexIndex += vertexCount - 1;
-            }
-            vertexId = Geometry.setVertexIndex(vertexId, vertexIndex);
-            return new MultiPolygonVertex(this, vertexId);
-          }
+  default Vertex getToVertex(final int... vertexId) {
+    final int[] newVertexId = GeometryCollection.cleanPartId(3, vertexId);
+    final int partIndex = newVertexId[0];
+    final int geometryCount = getGeometryCount();
+    if (partIndex >= 0 && partIndex < geometryCount) {
+      final Polygon polygon = getPolygon(partIndex);
+      final int ringIndex = newVertexId[1];
+      final int ringCount = polygon.getRingCount();
+      if (ringIndex >= 0 && ringIndex < ringCount) {
+        final LinearRing ring = polygon.getRing(ringIndex);
+        int vertexIndex = newVertexId[2];
+        final int vertexCount = ring.getVertexCount();
+        vertexIndex = vertexCount - 2 - vertexIndex;
+        if (vertexIndex >= 0 && vertexIndex <= vertexCount) {
+          newVertexId[2] = vertexIndex;
+          return new MultiPolygonVertex(this, newVertexId);
         }
       }
-      return null;
     }
+    return null;
   }
 
   @Override
   default Vertex getVertex(final int... vertexId) {
-    if (vertexId == null || vertexId.length != 3) {
-      return null;
-    } else {
-      final int partIndex = vertexId[0];
-      if (partIndex >= 0 && partIndex < getGeometryCount()) {
-        final Polygon polygon = getPolygon(partIndex);
-        final int ringIndex = vertexId[1];
-        if (ringIndex >= 0 && ringIndex < polygon.getRingCount()) {
-          final LinearRing ring = polygon.getRing(ringIndex);
-          int vertexIndex = vertexId[2];
-          final int vertexCount = ring.getVertexCount();
-          if (vertexIndex <= vertexCount) {
-            while (vertexIndex < 0) {
-              vertexIndex += vertexCount - 1;
-            }
-            return new MultiPolygonVertex(this, vertexId);
-          }
+    final int[] newVertexId = GeometryCollection.cleanPartId(3, vertexId);
+    final int partIndex = newVertexId[0];
+    final int geometryCount = getGeometryCount();
+    if (partIndex >= 0 && partIndex < geometryCount) {
+      final Polygon polygon = getPolygon(partIndex);
+      final int ringIndex = newVertexId[1];
+      final int ringCount = polygon.getRingCount();
+      if (ringIndex >= 0 && ringIndex < ringCount) {
+        final LinearRing ring = polygon.getRing(ringIndex);
+        final int vertexIndex = newVertexId[2];
+        final int vertexCount = ring.getVertexCount();
+        if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+          return new MultiPolygonVertex(this, newVertexId);
         }
       }
-      return null;
     }
+    return null;
   }
 
   @Override

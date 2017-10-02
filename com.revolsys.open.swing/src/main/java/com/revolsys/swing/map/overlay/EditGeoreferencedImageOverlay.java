@@ -360,7 +360,8 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         final Graphics2D graphics = (Graphics2D)image.getGraphics();
 
         this.image.drawImage(graphics, viewBoundingBox, viewport.getViewWidthPixels(),
-          viewport.getViewHeightPixels(), !this.layer.isShowOriginalImage(), RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+          viewport.getViewHeightPixels(), !this.layer.isShowOriginalImage(),
+          RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         GeoreferencedImageLayerRenderer.render(imageViewport, graphics, this.image,
           !this.layer.isShowOriginalImage());
         this.cachedImage = new BufferedGeoreferencedImage(imageViewport.getBoundingBox(), image);
@@ -1034,7 +1035,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
           if (this.moveTiePointSource) {
             vertex = line.getVertex(0);
           } else {
-            vertex = line.getVertex(-1);
+            vertex = line.getToVertex(0);
           }
           TIE_POINT_CLOSE_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
             vertex);

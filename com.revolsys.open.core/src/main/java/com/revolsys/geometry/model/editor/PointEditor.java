@@ -18,7 +18,9 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
   public PointEditor(final AbstractGeometryCollectionEditor<?, ?, ?> parentEditor,
     final Point point) {
     super(parentEditor, point);
-    this.point = point;
+    if (point != null && !point.isEmpty()) {
+      this.point = point;
+    }
   }
 
   public PointEditor(final GeometryFactory geometryFactory) {
@@ -53,7 +55,10 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
 
   @Override
   public PointEditor deleteVertex(final int[] vertexId) {
-    // TODO deal with empty points
+    if (vertexId == null || vertexId.length == 0) {
+      this.newCoordinates = null;
+      this.point = null;
+    }
     return this;
   }
 
@@ -73,9 +78,32 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
   }
 
   @Override
+  public boolean equalsVertex(final int axisCount, final int vertexIndex, final Point point) {
+    if (vertexIndex == 0) {
+      return equals(axisCount, point);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean equalsVertex(final int axisCount, final int[] geometryId, final int vertexIndex,
+    final Point point) {
+    if (geometryId == null || geometryId.length == 0) {
+      return equalsVertex(axisCount, vertexIndex, point);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   public double getCoordinate(final int axisIndex) {
     if (this.newCoordinates == null) {
-      return this.point.getCoordinate(axisIndex);
+      if (this.point == null) {
+        return Double.NaN;
+      } else {
+        return this.point.getCoordinate(axisIndex);
+      }
     } else {
       final int axisCount = getAxisCount();
       if (axisIndex >= 0 && axisIndex < axisCount) {
@@ -87,9 +115,24 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
   }
 
   @Override
+  public int getVertexCount(final int[] geometryId, final int idLength) {
+    if (geometryId == null || idLength == 0) {
+      return 0;
+    } else if (isEmpty()) {
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+
+  @Override
   public double getX() {
     if (this.newCoordinates == null) {
-      return this.point.getX();
+      if (this.point == null) {
+        return Double.NaN;
+      } else {
+        return this.point.getX();
+      }
     } else {
       return this.newCoordinates[X];
     }
@@ -98,7 +141,11 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
   @Override
   public double getY() {
     if (this.newCoordinates == null) {
-      return this.point.getY();
+      if (this.point == null) {
+        return Double.NaN;
+      } else {
+        return this.point.getY();
+      }
     } else {
       return this.newCoordinates[Y];
     }
@@ -125,7 +172,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
         if (point == null || point.isEmpty()) {
           return this;
         } else if (isEmpty()) {
-          return setVertex(this.point);
+          return setVertex(point);
         } else if (point.isEmpty()) {
           return this;
         } else {
@@ -149,22 +196,25 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
 
   @Override
   public boolean isEmpty() {
-    return this.point.isEmpty();
+    return this.point == null && this.newCoordinates == null;
   }
 
   @Override
   public Point newGeometry() {
     if (this.newCoordinates == null) {
+      if (this.point == null) {
+        return getGeometryFactory().point();
+      }
       return this.point;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return this.point.newPoint(geometryFactory, this.newCoordinates);
+      return geometryFactory.point(this.newCoordinates);
     }
   }
 
   @Override
   public Point newPoint(final GeometryFactory geometryFactory, final double... coordinates) {
-    return this.point.newPoint(geometryFactory, coordinates);
+    return geometryFactory.point(coordinates);
   }
 
   @Override
@@ -179,17 +229,30 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
 
   @Override
   public double setCoordinate(final int axisIndex, final double coordinate) {
-    final double oldValue = this.point.getCoordinate(axisIndex);
-    if (!Doubles.equal(coordinate, oldValue)) {
-      final int axisCount = getAxisCount();
-      if (axisIndex >= 0 && axisIndex < axisCount) {
+    final int axisCount = getAxisCount();
+    if (axisIndex >= 0 && axisIndex < axisCount) {
+      final double oldValue;
+      if (this.newCoordinates != null) {
+        oldValue = this.newCoordinates[axisIndex];
+      } else if (this.point == null) {
+        oldValue = Double.NaN;
+      } else {
+        oldValue = this.point.getCoordinate(axisIndex);
+      }
+      if (!Doubles.equal(coordinate, oldValue)) {
         if (this.newCoordinates == null) {
-          this.newCoordinates = this.point.getCoordinates(axisCount);
+          if (this.point == null) {
+            this.newCoordinates = new double[axisCount];
+          } else {
+            this.newCoordinates = this.point.getCoordinates(axisCount);
+          }
         }
         this.newCoordinates[axisIndex] = coordinate;
       }
+      return oldValue;
+    } else {
+      return Double.NaN;
     }
-    return oldValue;
   }
 
   @Override

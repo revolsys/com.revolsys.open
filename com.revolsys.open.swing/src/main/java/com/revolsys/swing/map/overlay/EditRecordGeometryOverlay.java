@@ -36,12 +36,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Lineal;
-import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -68,59 +63,17 @@ import com.revolsys.swing.undo.MultipleUndo;
 public class EditRecordGeometryOverlay extends AbstractOverlay
   implements PropertyChangeListener, MouseListener, MouseMotionListener {
 
-  private class AddGeometryUndoEdit extends AbstractUndoableEdit {
-
+  private class ClearXorUndoEdit extends AbstractUndoableEdit {
     private static final long serialVersionUID = 1L;
-
-    private final DataType geometryPartDataType = EditRecordGeometryOverlay.this.addGeometryPartDataType;
-
-    private final int[] geometryPartIndex = EditRecordGeometryOverlay.this.addGeometryPartIndex;
-
-    private final Geometry newGeometry;
-
-    private final Geometry oldGeometry = EditRecordGeometryOverlay.this.getAddGeometry();
-
-    private AddGeometryUndoEdit(final Geometry geometry) {
-      this.newGeometry = geometry;
-    }
-
-    @Override
-    public boolean canRedo() {
-      if (super.canRedo()) {
-        if (DataTypes.GEOMETRY.equals(this.oldGeometry,
-          EditRecordGeometryOverlay.this.getAddGeometry())) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    @Override
-    public boolean canUndo() {
-      if (super.canUndo()) {
-        if (DataTypes.GEOMETRY.equals(this.newGeometry,
-          EditRecordGeometryOverlay.this.getAddGeometry())) {
-          return true;
-        }
-      }
-      return false;
-    }
 
     @Override
     protected void redoDo() {
-      setAddGeometry(this.newGeometry);
-      setXorGeometry(null);
-      repaint();
+      clearXor();
     }
 
     @Override
     protected void undoDo() {
-      EditRecordGeometryOverlay.this.addGeometry = this.oldGeometry;
-      EditRecordGeometryOverlay.this.addGeometryEditor = this.oldGeometry.newGeometryEditor();
-      EditRecordGeometryOverlay.this.addGeometryPartDataType = this.geometryPartDataType;
-      EditRecordGeometryOverlay.this.addGeometryPartIndex = this.geometryPartIndex;
-      setXorGeometry(null);
-      repaint();
+      clearXor();
     }
   }
 
@@ -149,16 +102,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private AddGeometryCompleteAction addCompleteAction;
 
-  private Geometry addGeometry;
-
-  private DataType addGeometryDataType;
-
-  private DataType addGeometryPartDataType;
+  private GeometryDataType<?, ?> addGeometryPartDataType;
 
   /** Index to the part of the addGeometry that new points should be added too. */
   private int[] addGeometryPartIndex = {};
-
-  private int addGeometryVertexIndex;
 
   private AbstractRecordLayer addLayer;
 
@@ -241,22 +188,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           .getDataType();
         setAddGeometryDataType(geometryDataType, geometryFactory);
         setMapCursor(CURSOR_NODE_ADD);
-
-        if (Arrays
-          .asList(DataTypes.POINT, DataTypes.LINE_STRING, DataTypes.MULTI_POINT,
-            DataTypes.MULTI_LINE_STRING)
-          .contains(this.addGeometryDataType)) {
-          this.addGeometryPartIndex = new int[0];
-        } else if (Arrays.asList(DataTypes.MULTI_POLYGON, DataTypes.POLYGON)
-          .contains(this.addGeometryDataType)) {
-          this.addGeometryPartIndex = new int[] {
-            0
-          };
-        } else {
-          this.addGeometryPartIndex = new int[] {
-            0, 0
-          };
-        }
       }
     }
   }
@@ -308,66 +239,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     return false;
   }
 
-  protected Geometry appendVertex(final Point newPoint) {
-    final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
-    Geometry geometry = this.getAddGeometry();
-    if (geometry.isEmpty()) {
-      geometry = newPoint.convertGeometry(geometryFactory);
-    } else {
-      final DataType geometryDataType = this.addGeometryDataType;
-      final int[] geometryPartIndex = this.addGeometryPartIndex;
-      if (DataTypes.MULTI_POINT.equals(geometryDataType)) {
-        if (geometry instanceof Point) {
-          final Point point = (Point)geometry;
-          geometry = geometryFactory.punctual(point, newPoint);
-        } else {
-          geometry = geometry
-            .edit(editor -> editor.appendVertex(this.addGeometryPartIndex, newPoint));
-        }
-      } else if (DataTypes.LINE_STRING.equals(geometryDataType)) {
-        if (geometry instanceof Point) {
-          final Point point = (Point)geometry;
-          geometry = geometryFactory.lineString(point, newPoint);
-        } else if (geometry instanceof LineString) {
-          final LineString line = (LineString)geometry;
-          geometry = line.edit(editor -> editor.appendVertex(geometryPartIndex, newPoint));
-        }
-      } else if (DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
-        if (geometry instanceof Point) {
-          final Point point = (Point)geometry;
-          geometry = geometryFactory.lineString(point, newPoint);
-        } else if (geometry instanceof LineString) {
-          final LineString line = (LineString)geometry;
-          geometry = line.editLine(editor -> editor.appendVertex(newPoint));
-        } else if (geometry instanceof Lineal) {
-          final Lineal line = (Lineal)geometry;
-          geometry = line.edit(editor -> editor.appendVertex(geometryPartIndex, newPoint));
-        }
-      } else if (DataTypes.POLYGON.equals(geometryDataType)
-        || DataTypes.MULTI_POLYGON.equals(geometryDataType)
-        || DataTypes.GEOMETRY.equals(geometryDataType)) {
-        if (geometry instanceof Point) {
-          final Point point = (Point)geometry;
-          geometry = geometryFactory.lineString(point, newPoint);
-        } else if (geometry instanceof LineString) {
-          final LineString line = (LineString)geometry;
-          final Point p0 = line.getPoint(0);
-          final Point p1 = line.getPoint(1);
-          final LinearRing ring = geometryFactory.linearRing(Arrays.asList(p0, p1, newPoint, p0));
-          geometry = geometryFactory.polygon(ring);
-        } else if (geometry instanceof Polygon) {
-          final Polygon polygon = (Polygon)geometry;
-          geometry = polygon.edit(editor -> editor.appendVertex(geometryPartIndex, newPoint));
-        }
-        // TODO MultiPolygon
-        // TODO Rings
-      } else {
-        // TODO multi point, oldGeometry collection
-      }
-    }
-    return geometry;
-  }
-
   protected void cancel() {
     clearMouseOverLocations();
     if (this.addCompleteAction != null) {
@@ -392,6 +263,11 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     final MapPanel map = getMap();
     map.clearCloseSelected();
     map.clearToolTipText();
+    repaint();
+  }
+
+  private void clearXor() {
+    setXorGeometry(null);
     repaint();
   }
 
@@ -436,10 +312,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     return geometryEditor;
   }
 
-  private Geometry getAddGeometry() {
-    return this.addGeometry;
-  }
-
   public DataType getAddGeometryPartDataType() {
     return this.addGeometryPartDataType;
   }
@@ -475,7 +347,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     return IGriddedElevationModelLayer.getElevation(project, scale, point);
   }
 
-  public DataType getGeometryPartDataType(final DataType dataType) {
+  public GeometryDataType<?, ?> getGeometryPartDataType(final DataType dataType) {
     if (Arrays.asList(DataTypes.POINT, DataTypes.MULTI_POINT).contains(dataType)) {
       return DataTypes.POINT;
     } else if (Arrays.asList(DataTypes.LINE_STRING, DataTypes.MULTI_LINE_STRING)
@@ -611,50 +483,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     return recordLayer.isExists() && recordLayer.isVisible() && recordLayer.isCanEditRecords();
   }
 
-  protected boolean isGeometryValid(final Geometry geometry) {
-    if (DataTypes.POINT.equals(this.addGeometryDataType)) {
-      if (geometry instanceof Point) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if (DataTypes.MULTI_POINT.equals(this.addGeometryDataType)) {
-      if (geometry instanceof Punctual) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if (DataTypes.LINE_STRING.equals(this.addGeometryDataType)) {
-      if (geometry instanceof LineString) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if (DataTypes.MULTI_LINE_STRING.equals(this.addGeometryDataType)) {
-      if (geometry instanceof Lineal) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if (DataTypes.POLYGON.equals(this.addGeometryDataType)) {
-      if (geometry instanceof Polygon) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if (DataTypes.MULTI_POLYGON.equals(this.addGeometryDataType)) {
-      if (geometry instanceof Polygonal) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if (DataTypes.GEOMETRY.equals(this.addGeometryDataType)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   @Override
   public void keyPressed(final KeyEvent e) {
     final int keyCode = e.getKeyCode();
@@ -742,7 +570,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       clearMouseOverLocations();
       modeMoveGeometryClear();
       if (this.addCompleteAction != null) {
-        this.addCompleteAction.addComplete(this, this.getAddGeometry());
+        final Geometry addGeometry = this.addGeometryEditor.newGeometry();
+        this.addCompleteAction.addComplete(this, addGeometry);
       }
       modeAddGeometryClear();
     } else if (splitLineKeyPress(e)) {
@@ -760,9 +589,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
     if (cleared || !hasOverlayAction()) {
       this.addCompleteAction = null;
-      this.addGeometry = null;
       this.addGeometryEditor = null;
-      this.addGeometryDataType = null;
       this.addGeometryEditVerticesStart = false;
       this.addGeometryPartDataType = null;
       this.addGeometryPartIndex = null;
@@ -786,28 +613,22 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           }
           final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
           point = point.newGeometry(geometryFactory);
-          if (this.getAddGeometry().isEmpty()) {
-            setAddGeometry(point);
-          } else {
-            final int[] toVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
-            final Point previousPoint = this.getAddGeometry().getToVertex(toVertexId);
-            if (!point.equals(previousPoint)) {
-              final Geometry newGeometry = appendVertex(point);
-              setAddGeometry(newGeometry);
-            }
-          }
+          addUndo(new MultipleUndo( //
+            new AppendVertexUndoEdit(this.addGeometryEditor, this.addGeometryPartIndex,
+              this.addGeometryPartDataType, point), //
+            new ClearXorUndoEdit() //
+          ));
 
           setXorGeometry(null);
           event.consume();
-          if (DataTypes.POINT.equals(this.addGeometryDataType)) {
+          if (DataTypes.POINT.equals(this.addGeometryEditor.getDataType())) {
             if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-              if (isGeometryValid(this.getAddGeometry())) {
+              if (this.addGeometryEditor.isValid()) {
                 try {
                   setXorGeometry(null);
                   if (this.addCompleteAction != null) {
-                    final Geometry geometry = this.getAddGeometry()
-                      .newGeometry(this.addLayer.getGeometryFactory());
-                    this.addCompleteAction.addComplete(this, geometry);
+                    final Geometry addGeometry = this.addGeometryEditor.newGeometry();
+                    this.addCompleteAction.addComplete(this, addGeometry);
                     modeAddGeometryClear();
                   }
                 } finally {
@@ -828,20 +649,13 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           if (point == null) {
             point = getPoint(event);
           }
-          final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
-          point = point.newGeometry(geometryFactory);
-          final int[] toVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
-          final Point previousPoint = this.getAddGeometry().getToVertex(toVertexId);
-          if (!point.equals(previousPoint)) {
-            final Geometry newGeometry = appendVertex(point);
-            setAddGeometry(newGeometry);
-          }
-          if (isGeometryValid(this.getAddGeometry())) {
+          addUndo(new AppendVertexUndoEdit(this.addGeometryEditor, this.addGeometryPartIndex,
+            this.addGeometryPartDataType, point));
+          if (this.addGeometryEditor.isValid()) {
             try {
               setXorGeometry(null);
               if (this.addCompleteAction != null) {
-                final Geometry geometry = this.getAddGeometry()
-                  .newGeometry(this.addLayer.getGeometryFactory());
+                final Geometry geometry = this.addGeometryEditor.newGeometry();
                 this.addCompleteAction.addComplete(this, geometry);
                 modeAddGeometryClear();
               }
@@ -896,10 +710,22 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (this.addGeometryEditVerticesStart && hasMouseOverLocation()) {
         if (event.getButton() == MouseEvent.BUTTON1) {
           this.addGeometryEditVerticesStart = false;
+          final MultipleUndo edit = new MultipleUndo();
           for (final CloseLocation location : getMouseOverLocations()) {
-            final GeometryEditor geometryEditor = geometryEdit(event, location);
-            final Geometry newGeometry = geometryEditor.newGeometry();
-            setAddGeometry(newGeometry);
+            final Point newPoint = getSnapOrEventPointWithElevation(event, location);
+            int[] vertexId = location.getVertexId();
+            AbstractUndoableEdit locationEdit;
+            if (vertexId == null) {
+              vertexId = location.getSegmentIdNext();
+              locationEdit = new InsertVertexUndoEdit(this.addGeometryEditor, vertexId, newPoint);
+            } else {
+              locationEdit = new SetVertexUndoEdit(this.addGeometryEditor, vertexId, newPoint);
+            }
+            edit.addEdit(locationEdit);
+          }
+          if (!edit.isEmpty()) {
+            edit.addEdit(new ClearXorUndoEdit());
+            addUndo(edit);
           }
           setMouseOverLocationsDo(Collections.emptyList());
           clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
@@ -911,13 +737,13 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   protected boolean modeAddGeometryMove(final MouseEvent event) {
-    if (this.getAddGeometry() != null) {
+    if (this.addGeometryEditor != null) {
       if (isOverlayAction(ACTION_ADD_GEOMETRY) || isOverlayAction(ACTION_MOVE_GEOMETRY)
         || isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
 
         final MapPanel map = getMap();
         final CloseLocation location = map.findCloseLocation(this.addLayer, null,
-          this.getAddGeometry());
+          this.addGeometryEditor);
         final List<CloseLocation> locations = new ArrayList<>();
         if (location != null) {
           locations.add(location);
@@ -974,15 +800,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
     if (DataTypes.POINT.equals(this.addGeometryPartDataType)) {
     } else {
-      Vertex firstVertex;
-      final Vertex toVertex;
-      if (this.getAddGeometry() instanceof LineString) {
-        firstVertex = this.getAddGeometry().getVertex(0);
-        toVertex = this.getAddGeometry().getToVertex(0);
-      } else {
-        firstVertex = this.getAddGeometry().getVertex(firstVertexId);
-        toVertex = this.getAddGeometry().getToVertex(firstVertexId);
-      }
+      final Vertex firstVertex = this.addGeometryEditor.getVertex(firstVertexId);
+      final Vertex toVertex = this.addGeometryEditor.getToVertex(firstVertexId);
+
       final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
       if (toVertex != null && !toVertex.isEmpty()) {
         if (DataTypes.LINE_STRING.equals(this.addGeometryPartDataType)) {
@@ -1039,7 +859,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           final MultipleUndo edit = new MultipleUndo();
           final List<CloseLocation> locations = getMouseOverLocations();
           for (final CloseLocation location : locations) {
-            final GeometryEditor geometryEditor = geometryEdit(event, location);
+            final GeometryEditor<?> geometryEditor = geometryEdit(event, location);
             if (geometryEditor.isModified()) {
               final Geometry newGeometry = geometryEditor.newGeometry();
               final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
@@ -1274,16 +1094,16 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             geometry);
         }
       }
-    } else if (this.getAddGeometry() != null) {
+    } else if (this.addGeometryEditor != null) {
       try (
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_ON);
 
         GEOMETRY_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating,
-          this.getAddGeometry());
+          this.addGeometryEditor);
         GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating,
-          this.getAddGeometry());
+          this.addGeometryEditor);
       }
     }
     if (this.moveGeometryStart == null) {
@@ -1326,12 +1146,11 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
     if ("preEditable".equals(propertyName)) {
       if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-        if (isGeometryValid(this.getAddGeometry())) {
+        if (this.addGeometryEditor.isValid()) {
           try {
             setXorGeometry(null);
             if (this.addCompleteAction != null) {
-              final Geometry geometry = this.getAddGeometry()
-                .newGeometry(this.addLayer.getGeometryFactory());
+              final Geometry geometry = this.addGeometryEditor.newGeometry();
               this.addCompleteAction.addComplete(this, geometry);
               modeAddGeometryClear();
             }
@@ -1355,30 +1174,22 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     }
   }
 
-  private void setAddGeometry(final Geometry geometry) {
-    if (!DataTypes.GEOMETRY.equals(geometry, this.addGeometry)) {
-      final AddGeometryUndoEdit undo = new AddGeometryUndoEdit(geometry);
-      addUndo(undo);
-      repaint();
-    }
-  }
-
   protected void setAddGeometryDataType(
     final GeometryDataType<Geometry, GeometryEditor<?>> dataType,
     final GeometryFactory geometryFactory) {
-    this.addGeometryDataType = dataType;
     this.addGeometryPartDataType = getGeometryPartDataType(dataType);
     this.addGeometryEditor = dataType.newGeometryEditor(geometryFactory);
-    this.addGeometry = this.addGeometryEditor.newGeometry();
+    this.addGeometryPartIndex = this.addGeometryEditor.getFirstGeometryId();
   }
 
   protected UndoableEdit setGeometry(final CloseLocation location, final Geometry newGeometry) {
     if (isOverlayAction(ACTION_ADD_GEOMETRY)
       || isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
-      if (DataTypes.GEOMETRY.equals(newGeometry, this.getAddGeometry())) {
+      if (DataTypes.GEOMETRY.equals(newGeometry, this.addGeometryEditor)) {
         return null;
       } else {
-        return new AddGeometryUndoEdit(newGeometry);
+        // TODO
+        return null;
       }
     } else {
       final LayerRecord record = location.getRecord();

@@ -36,9 +36,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
+import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
@@ -163,6 +165,11 @@ public class GeometryCollectionImpl implements GeometryCollection {
       this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
+  }
+
+  @Override
+  public GeometryDataType<?, ?> getDataType() {
+    return DataTypes.GEOMETRY_COLLECTION;
   }
 
   @SuppressWarnings("unchecked")

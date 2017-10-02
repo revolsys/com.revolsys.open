@@ -42,8 +42,8 @@ import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.editor.MultiPointEditor;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -187,7 +187,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   }
 
   @Override
-  default DataType getDataType() {
+  default GeometryDataType<MultiPoint, MultiPointEditor> getDataType() {
     return DataTypes.MULTI_POINT;
   }
 
@@ -218,27 +218,21 @@ public interface MultiPoint extends GeometryCollection, Punctual {
 
   @Override
   default Vertex getToVertex(final int... vertexId) {
-    if (vertexId.length <= 2) {
-      if (vertexId.length == 1 || vertexId[1] == 0) {
-        final int vertexIndex = vertexId[0];
-        final int geometryCount = getGeometryCount();
-        if (vertexIndex >= 0 || vertexIndex < geometryCount) {
-          return new MultiPointVertex(this, geometryCount - vertexIndex - 1);
-        }
-      }
+    final int[] newVertexId = GeometryCollection.cleanPartId(1, vertexId);
+    final int vertexIndex = newVertexId[0];
+    final int geometryCount = getGeometryCount();
+    if (vertexIndex >= 0 || vertexIndex < geometryCount) {
+      return new MultiPointVertex(this, geometryCount - vertexIndex - 1);
     }
     return null;
   }
 
   @Override
   default Vertex getVertex(final int... vertexId) {
-    if (vertexId.length <= 2) {
-      if (vertexId.length == 1 || vertexId[1] == 0) {
-        final int vertexIndex = vertexId[0];
-        if (vertexIndex >= 0 || vertexIndex < getGeometryCount()) {
-          return new MultiPointVertex(this, vertexId);
-        }
-      }
+    final int[] newVertexId = GeometryCollection.cleanPartId(1, vertexId);
+    final int vertexIndex = newVertexId[0];
+    if (vertexIndex >= 0 || vertexIndex < getGeometryCount()) {
+      return new MultiPointVertex(this, newVertexId);
     }
     return null;
   }

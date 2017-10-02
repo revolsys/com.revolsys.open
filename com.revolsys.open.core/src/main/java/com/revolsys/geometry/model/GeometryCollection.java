@@ -43,7 +43,6 @@ import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.editor.GeometryEditor;
@@ -62,6 +61,23 @@ import com.revolsys.geometry.operation.valid.GeometryValidationError;
  *@version 1.7
  */
 public interface GeometryCollection extends Geometry {
+  static int[] cleanPartId(final int count, final int[] id) {
+    if (id == null) {
+      throw new IllegalArgumentException("geometry/vertex id must not be null");
+    } else {
+      final int length = id.length;
+      if (length == count) {
+        return id;
+      } else if (length == count - 1) {
+        final int[] newId = new int[count];
+        System.arraycopy(id, 0, newId, 1, length);
+        return newId;
+      } else {
+        throw new IllegalArgumentException("geometry/vertex id must have " + count + " parts");
+      }
+    }
+  }
+
   static Geometry newGeometryCollection(final Object value) {
     if (value == null) {
       return null;
@@ -252,11 +268,6 @@ public interface GeometryCollection extends Geometry {
       dimension = Math.max(dimension, geometry.getBoundaryDimension());
     }
     return dimension;
-  }
-
-  @Override
-  default DataType getDataType() {
-    return DataTypes.GEOMETRY_COLLECTION;
   }
 
   @Override

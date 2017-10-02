@@ -41,9 +41,9 @@ import java.util.function.Function;
 import javax.measure.quantity.Area;
 import javax.measure.unit.Unit;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.editor.MultiLineStringEditor;
 import com.revolsys.geometry.model.prep.PreparedMultiLineString;
 import com.revolsys.geometry.model.segment.MultiLineStringSegment;
 import com.revolsys.geometry.model.segment.Segment;
@@ -161,7 +161,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
-  default DataType getDataType() {
+  default GeometryDataType<MultiLineString, MultiLineStringEditor> getDataType() {
     return DataTypes.MULTI_LINE_STRING;
   }
 
@@ -184,19 +184,16 @@ public interface MultiLineString extends GeometryCollection, Lineal {
 
   @Override
   default Segment getSegment(final int... segmentId) {
-    if (segmentId == null || segmentId.length != 2) {
-      return null;
-    } else {
-      final int partIndex = segmentId[0];
-      if (partIndex >= 0 && partIndex < getGeometryCount()) {
-        final LineString line = getLineString(partIndex);
-        final int segmentIndex = segmentId[1];
-        if (segmentIndex >= 0 && segmentIndex < line.getSegmentCount()) {
-          return new MultiLineStringSegment(this, partIndex, segmentIndex);
-        }
+    final int[] newId = GeometryCollection.cleanPartId(2, segmentId);
+    final int partIndex = newId[0];
+    if (partIndex >= 0 && partIndex < getGeometryCount()) {
+      final LineString line = getLineString(partIndex);
+      final int segmentIndex = newId[1];
+      if (segmentIndex >= 0 && segmentIndex < line.getSegmentCount()) {
+        return new MultiLineStringSegment(this, partIndex, segmentIndex);
       }
-      return null;
     }
+    return null;
   }
 
   @Override
@@ -209,47 +206,39 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
-  default Vertex getToVertex(int... vertexId) {
-    if (vertexId == null || vertexId.length != 2) {
-      return null;
-    } else {
-      final int partIndex = vertexId[0];
-      if (partIndex >= 0 && partIndex < getGeometryCount()) {
-        final LineString line = getLineString(partIndex);
-        int vertexIndex = vertexId[1];
-        final int vertexCount = line.getVertexCount();
-        vertexIndex = vertexCount - 1 - vertexIndex;
-        if (vertexIndex <= vertexCount) {
-          while (vertexIndex < 0) {
-            vertexIndex += vertexCount - 1;
-          }
-          vertexId = Geometry.setVertexIndex(vertexId, vertexIndex);
-          return new MultiLineStringVertex(this, vertexId);
-        }
+  default Vertex getToVertex(final int... vertexId) {
+    final int[] newId = GeometryCollection.cleanPartId(2, vertexId);
+    final int partIndex = newId[0];
+    final int geometryCount = getGeometryCount();
+    if (partIndex >= 0 && partIndex < geometryCount) {
+      final LineString line = getLineString(partIndex);
+      int vertexIndex = newId[1];
+      final int vertexCount = line.getVertexCount();
+      vertexIndex = vertexCount - 1 - vertexIndex;
+      if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+        newId[1] = vertexIndex;
+        return new MultiLineStringVertex(this, newId);
       }
-      return null;
     }
+    return null;
   }
 
   @Override
   default Vertex getVertex(final int... vertexId) {
-    if (vertexId == null || vertexId.length != 2) {
-      return null;
-    } else {
-      final int partIndex = vertexId[0];
+    final int[] newId = GeometryCollection.cleanPartId(2, vertexId);
+    final int partIndex = newId[0];
+    final int geometryCount = getGeometryCount();
+    if (partIndex >= 0 && partIndex < geometryCount) {
       if (partIndex >= 0 && partIndex < getGeometryCount()) {
+        final int vertexIndex = newId[1];
         final LineString line = getLineString(partIndex);
-        int vertexIndex = vertexId[1];
         final int vertexCount = line.getVertexCount();
-        if (vertexIndex <= vertexCount) {
-          while (vertexIndex < 0) {
-            vertexIndex += vertexCount - 1;
-          }
-          return new MultiLineStringVertex(this, vertexId);
+        if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+          return new MultiLineStringVertex(this, newId);
         }
       }
-      return null;
     }
+    return null;
   }
 
   @Override

@@ -1,5 +1,7 @@
 package com.revolsys.geometry.model.editor;
 
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -29,6 +31,11 @@ public class MultiLineStringEditor
   @Override
   public MultiLineStringEditor clone() {
     return (MultiLineStringEditor)super.clone();
+  }
+
+  @Override
+  public GeometryDataType<LineString, LineStringEditor> getPartDataType() {
+    return DataTypes.LINE_STRING;
   }
 
   @Override

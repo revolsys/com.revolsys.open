@@ -103,12 +103,43 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
     return Collections.singleton(this);
   }
 
+  @Override
+  public boolean equalsVertex(final int axisCount, final int[] geometryId, final int vertexIndex,
+    final Point point) {
+    final GeometryEditor<?> geometryEditor = getGeometryEditor(geometryId, 0);
+    if (geometryEditor == null) {
+      return false;
+    } else {
+      return geometryEditor.equalsVertex(axisCount, vertexIndex, point);
+    }
+  }
+
   public LinearRingEditor getEditor(final int ringIndex) {
     if (ringIndex < 0 || ringIndex >= this.editors.size()) {
       return null;
     } else {
       return this.editors.get(ringIndex);
     }
+  }
+
+  @Override
+  public int[] getFirstGeometryId() {
+    return new int[] {
+      0
+    };
+  }
+
+  @Override
+  public GeometryEditor<?> getGeometryEditor(final int[] geometryId, final int idOffset,
+    final int idLength) {
+    if (geometryId != null && idOffset == idLength - 1) {
+      final int partIndex = geometryId[idOffset];
+      final LineStringEditor geometryEditor = getEditor(partIndex);
+      if (geometryEditor != null) {
+        return geometryEditor;
+      }
+    }
+    return null;
   }
 
   @Override
@@ -124,6 +155,21 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   @Override
   public List<LinearRing> getRings() {
     return Lists.toArray(this.editors);
+  }
+
+  @Override
+  public int getVertexCount(final int[] geometryId, final int idLength) {
+    if (geometryId == null || idLength < 1) {
+      return 0;
+    } else {
+      final int partIndex = geometryId[0];
+      final LinearRingEditor editor = getEditor(partIndex);
+      if (editor != null) {
+        final int[] childGeometryId = Arrays.copyOfRange(geometryId, 1, idLength);
+        return editor.getVertexCount(childGeometryId);
+      }
+    }
+    return 0;
   }
 
   @Override
@@ -147,7 +193,7 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
 
   @Override
   public boolean isEmpty() {
-    return this.polygon.isEmpty();
+    return this.editors.isEmpty();
   }
 
   @Override

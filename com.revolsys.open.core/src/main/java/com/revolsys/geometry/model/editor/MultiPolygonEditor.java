@@ -1,5 +1,7 @@
 package com.revolsys.geometry.model.editor;
 
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
@@ -29,6 +31,11 @@ public class MultiPolygonEditor
   @Override
   public MultiPolygonEditor clone() {
     return (MultiPolygonEditor)super.clone();
+  }
+
+  @Override
+  public GeometryDataType<Polygon, PolygonEditor> getPartDataType() {
+    return DataTypes.POLYGON;
   }
 
   @Override

@@ -8,6 +8,7 @@ import java.util.List;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
+import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 
@@ -46,6 +47,7 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
 
   public AbstractGeometryCollectionEditor(final GeometryFactory geometryFactory) {
     super(geometryFactory);
+    setModified(true);
   }
 
   public AbstractGeometryCollectionEditor(final GeometryFactory geometryFactory,
@@ -58,12 +60,21 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
     this.editors.add(editor);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public GeometryEditor<?> appendVertex(final int[] geometryId, final Point point) {
+  public GeometryEditor<?> appendVertex(final int[] geometryId,
+    final GeometryDataType<?, ?> partDataType, final Point point) {
     if (geometryId == null || geometryId.length < 1) {
     } else {
       final int partIndex = geometryId[0];
-      final GE editor = getEditor(partIndex);
+      GE editor = getEditor(partIndex);
+      if (editor == null && partIndex == this.editors.size()) {
+        final GeometryDataType<?, ?> thisPartDataType = getPartDataType();
+        if (thisPartDataType == null || thisPartDataType.equals(partDataType)) {
+          editor = (GE)partDataType.newGeometryEditor(getGeometryFactory());
+          addEditor(editor);
+        }
+      }
       if (editor != null) {
         final int[] childGeometryId = Arrays.copyOfRange(geometryId, 1, geometryId.length);
         final GeometryEditor<?> newEditor = editor.appendVertex(childGeometryId, point);
@@ -76,6 +87,11 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
       }
     }
     return this;
+  }
+
+  @Override
+  public GeometryEditor<?> appendVertex(final int[] geometryId, final Point point) {
+    return appendVertex(geometryId, null, point);
   }
 
   @Override
@@ -112,12 +128,30 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
     }
   }
 
+  @Override
+  public boolean equalsVertex(final int axisCount, final int[] geometryId, final int vertexIndex,
+    final Point point) {
+    final GeometryEditor<?> geometryEditor = getGeometryEditor(geometryId, 0);
+    if (geometryEditor == null) {
+      return false;
+    } else {
+      return geometryEditor.equalsVertex(axisCount, vertexIndex, point);
+    }
+  }
+
   public GE getEditor(final int partIndex) {
     if (0 <= partIndex && partIndex < this.editors.size()) {
       return this.editors.get(partIndex);
     } else {
       return null;
     }
+  }
+
+  @Override
+  public int[] getFirstGeometryId() {
+    return new int[] {
+      0
+    };
   }
 
   @SuppressWarnings("unchecked")
@@ -135,6 +169,39 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
   @Override
   public int getGeometryCount() {
     return this.editors.size();
+  }
+
+  @Override
+  public GeometryEditor<?> getGeometryEditor(final int[] geometryId, final int idOffset,
+    final int idLength) {
+    if (geometryId != null && idOffset < idLength) {
+      final int partIndex = geometryId[idOffset];
+      final GeometryEditor<?> geometryEditor = getEditor(partIndex);
+      if (geometryEditor != null) {
+        final int nextIdOffset = idOffset + 1;
+        if (nextIdOffset < idLength) {
+          return geometryEditor.getGeometryEditor(geometryId, nextIdOffset);
+        } else {
+          return geometryEditor;
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public int getVertexCount(final int[] geometryId, final int idLength) {
+    if (geometryId == null || idLength < 1) {
+      return 0;
+    } else {
+      final int partIndex = geometryId[0];
+      final GE editor = getEditor(partIndex);
+      if (editor != null) {
+        final int[] childGeometryId = Arrays.copyOfRange(geometryId, 1, idLength);
+        return editor.getVertexCount(childGeometryId);
+      }
+    }
+    return 0;
   }
 
   @Override
@@ -181,7 +248,7 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
   @Override
   @SuppressWarnings("unchecked")
   public GC newGeometry() {
-    if (isModified()) {
+    if (isModified() || this.geometry == null) {
       final List<G> geometries = new ArrayList<>();
       for (final GE editor : this.editors) {
         final G newGeometry = (G)editor.newGeometry();

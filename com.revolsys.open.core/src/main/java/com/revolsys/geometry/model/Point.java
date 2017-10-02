@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
@@ -575,7 +574,7 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
-  default DataType getDataType() {
+  default GeometryDataType<Point, PointEditor> getDataType() {
     return DataTypes.POINT;
   }
 

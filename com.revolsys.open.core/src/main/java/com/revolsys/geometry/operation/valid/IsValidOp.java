@@ -127,7 +127,9 @@ public class IsValidOp {
   }
 
   private boolean checkClosedRing(final LinearRing ring) {
-    if (ring.isClosed()) {
+    if (ring == null) {
+      return false;
+    } else if (ring.isClosed()) {
       return true;
     } else {
       Point point = null;
