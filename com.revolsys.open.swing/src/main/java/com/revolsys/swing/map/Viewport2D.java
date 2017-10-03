@@ -236,8 +236,13 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       if (!viewExtent.isEmpty()) {
         final BoundingBox geometryExtent = geometry.getBoundingBox();
         if (geometryExtent.intersects(viewExtent)) {
+
           final GeometryFactory geometryFactory = getGeometryFactory2dFloating();
-          return geometryFactory.geometry(geometry);
+          if (geometryFactory.isSameCoordinateSystem(geometry)) {
+            return geometry;
+          } else {
+            return geometryFactory.geometry(geometry);
+          }
         }
       }
     }

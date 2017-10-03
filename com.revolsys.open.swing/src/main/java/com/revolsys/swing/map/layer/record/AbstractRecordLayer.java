@@ -125,7 +125,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordValidationDialog;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
-import com.revolsys.swing.map.overlay.EditRecordGeometryOverlay;
+import com.revolsys.swing.map.overlay.record.EditRecordGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.menu.WrappedMenuFactory;

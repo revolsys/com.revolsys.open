@@ -208,9 +208,9 @@ public interface LineString extends Lineal {
     return CoordinatesUtil.compare(x1, y1, x2, y2);
   }
 
-  default double[] convertCoordinates(GeometryFactory geometryFactory) {
+  default double[] convertCoordinates(GeometryFactory geometryFactory, final int axisCount) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    final double[] coordinates = getCoordinates();
+    final double[] coordinates = getCoordinates(axisCount);
     if (isEmpty()) {
       return coordinates;
     } else {
@@ -1721,8 +1721,8 @@ public interface LineString extends Lineal {
     } else if (isEmpty()) {
       return newLineStringEmpty(geometryFactory);
     } else {
-      final double[] coordinates = convertCoordinates(geometryFactory);
       final int axisCount = geometryFactory.getAxisCount();
+      final double[] coordinates = convertCoordinates(geometryFactory, axisCount);
       final int vertexCount = getVertexCount();
       return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
     }

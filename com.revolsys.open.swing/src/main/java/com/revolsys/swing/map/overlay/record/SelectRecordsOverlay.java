@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.overlay;
+package com.revolsys.swing.map.overlay.record;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -42,6 +42,12 @@ import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
+import com.revolsys.swing.map.overlay.AbstractOverlay;
+import com.revolsys.swing.map.overlay.BackgroundRefreshResource;
+import com.revolsys.swing.map.overlay.CloseLocation;
+import com.revolsys.swing.map.overlay.LayerRendererOverlay;
+import com.revolsys.swing.map.overlay.VertexStyleRenderer;
+import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 import com.revolsys.value.ThreadBooleanValue;

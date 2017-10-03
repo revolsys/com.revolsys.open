@@ -9,6 +9,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
 import com.revolsys.util.Property;
 
 public class VertexStyleRenderer {

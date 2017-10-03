@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.overlay;
+package com.revolsys.swing.map.overlay.record;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

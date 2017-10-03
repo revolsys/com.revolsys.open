@@ -117,7 +117,7 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   @Override
-  public double[] convertCoordinates(GeometryFactory geometryFactory) {
+  public double[] convertCoordinates(GeometryFactory geometryFactory, final int axisCount) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     final double[] sourceCoordinates = this.coordinates;
     if (isEmpty()) {
@@ -126,7 +126,7 @@ public class LineStringDouble extends AbstractLineString {
       final int sourceAxisCount = this.axisCount;
       final int vertexCount = this.vertexCount;
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
-      final int targetAxisCount = geometryFactory.getAxisCount();
+      final int targetAxisCount = axisCount;
       double[] targetCoordinates;
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
         .getCoordinatesOperation(geometryFactory);

@@ -3,6 +3,7 @@ package com.revolsys.geometry.model.editor;
 import java.util.Arrays;
 import java.util.Collections;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -36,9 +37,11 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
 
   private double[] coordinates;
 
-  private final LineString line;
+  private LineString line;
 
   private int vertexCount;
+
+  private BoundingBox boundingBox;
 
   public LineStringEditor(final AbstractGeometryEditor<?> parentEditor, final LineString line) {
     super(parentEditor, line);
@@ -50,7 +53,6 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   public LineStringEditor(final GeometryFactory geometryFactory) {
     super(geometryFactory);
     this.axisCount = geometryFactory.getAxisCount();
-    this.line = newLineStringEmpty();
     this.coordinates = new double[0];
     this.vertexCount = this.coordinates.length / this.axisCount;
   }
@@ -61,7 +63,6 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       vertexCapacity = 0;
     }
     this.axisCount = geometryFactory.getAxisCount();
-    this.line = newLineStringEmpty();
     this.coordinates = new double[vertexCapacity * this.axisCount];
     Arrays.fill(this.coordinates, Double.NaN);
     this.vertexCount = 0;
@@ -74,7 +75,6 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       throw new IllegalArgumentException("axisCount=" + axisCount + " must be >= 2");
     }
     this.axisCount = axisCount;
-    this.line = newLineStringEmpty();
     if (coordinates == null || coordinates.length == 0) {
       this.coordinates = new double[0];
     } else {
@@ -106,7 +106,6 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
         this.vertexCount = 0;
       }
     }
-    this.line = newLineStringEmpty();
   }
 
   public LineStringEditor(final LineString line) {
@@ -188,30 +187,32 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   }
 
   public void deleteVertex(final int vertexIndex) {
-    if (isEmpty()) {
-      throw new IllegalArgumentException("Cannot delete vertex for empty LineString");
-    } else {
+    if (!isEmpty()) {
       final int vertexCount = getVertexCount();
-      if (vertexCount <= 2) {
-        throw new IllegalArgumentException("LineString must have a minimum of 2 vertices");
-      } else if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+      if (vertexIndex >= 0 && vertexIndex < vertexCount) {
         final int axisCount = getAxisCount();
 
-        final double[] oldCoordinates;
-        if (this.coordinates == null) {
-          oldCoordinates = this.line.getCoordinates(axisCount);
-          setModified(true);
-          this.coordinates = new double[axisCount * (vertexCount - 1)];
-        } else {
-          oldCoordinates = this.coordinates;
-        }
         final int beforeLength = vertexIndex * axisCount;
         final int sourceIndex = (vertexIndex + 1) * axisCount;
         final int length = (vertexCount - vertexIndex - 1) * axisCount;
-        System.arraycopy(oldCoordinates, sourceIndex, this.coordinates, beforeLength, length);
-        Arrays.fill(this.coordinates, this.coordinates.length - axisCount, this.coordinates.length,
-          Double.NaN);
-        this.vertexCount--;
+        final double[] oldCoordinates;
+        if (this.coordinates == null) {
+          if (this.line == null) {
+            return;
+          }
+          oldCoordinates = this.line.getCoordinates(axisCount);
+          setModified(true);
+          this.coordinates = new double[axisCount * (vertexCount - 1)];
+          System.arraycopy(oldCoordinates, 0, this.coordinates, 0, beforeLength);
+          System.arraycopy(oldCoordinates, sourceIndex, this.coordinates, beforeLength, length);
+          this.vertexCount--;
+        } else {
+          oldCoordinates = this.coordinates;
+          System.arraycopy(oldCoordinates, sourceIndex, this.coordinates, beforeLength, length);
+          Arrays.fill(this.coordinates, this.coordinates.length - axisCount,
+            this.coordinates.length, Double.NaN);
+          this.vertexCount--;
+        }
       } else {
         throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
       }
@@ -266,28 +267,48 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   }
 
   @Override
+  public boolean equalsVertex(final int axisCount, final int[] vertexId, final Point point) {
+    final int vertexIndex = getVertexId(vertexId);
+    return equalsVertex(axisCount, vertexIndex, point);
+  }
+
+  @Override
   public int getAxisCount() {
     return this.axisCount;
   }
 
   @Override
+  public BoundingBox getBoundingBox() {
+    BoundingBox boundingBox = this.boundingBox;
+    if (boundingBox == null) {
+      this.boundingBox = boundingBox = newBoundingBox();
+    }
+    return boundingBox;
+  }
+
+  @Override
   public double getCoordinate(final int vertexIndex, final int axisIndex) {
     if (this.coordinates == null) {
-      return this.line.getCoordinate(vertexIndex, axisIndex);
+      if (this.line != null) {
+        return this.line.getCoordinate(vertexIndex, axisIndex);
+      }
     } else {
       final int axisCount = this.axisCount;
       if (isInVertexRange(vertexIndex) && axisIndex < axisCount) {
         return this.coordinates[vertexIndex * axisCount + axisIndex];
-      } else {
-        return Double.NaN;
       }
     }
+    return Double.NaN;
   }
 
   @Override
   public double[] getCoordinates() {
     if (this.coordinates == null) {
-      return this.line.getCoordinates();
+      if (this.line == null) {
+        return null;
+      } else {
+        return this.line.getCoordinates();
+      }
     } else {
       final double[] coordinates = new double[this.vertexCount * this.axisCount];
       System.arraycopy(this.coordinates, 0, coordinates, 0, coordinates.length);
@@ -337,35 +358,39 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   @Override
   public double getX(final int vertexIndex) {
     if (this.coordinates == null) {
-      return this.line.getX(vertexIndex);
+      if (this.line != null) {
+        return this.line.getX(vertexIndex);
+      }
     } else {
       final int axisCount = this.axisCount;
       if (isInVertexRange(vertexIndex)) {
         return this.coordinates[vertexIndex * axisCount];
-      } else {
-        return Double.NaN;
       }
     }
+    return Double.NaN;
   }
 
   @Override
   public double getY(final int vertexIndex) {
     if (this.coordinates == null) {
-      return this.line.getX(vertexIndex);
+      if (this.line != null) {
+        return this.line.getX(vertexIndex);
+      }
     } else {
       if (isInVertexRange(vertexIndex)) {
         return this.coordinates[vertexIndex * this.axisCount + Y];
-      } else {
-        return Double.NaN;
       }
     }
+    return Double.NaN;
   }
 
   @Override
   public double getZ(final int vertexIndex) {
     if (this.axisCount > 2) {
       if (this.coordinates == null) {
-        return this.line.getX(vertexIndex);
+        if (this.line != null) {
+          return this.line.getX(vertexIndex);
+        }
       } else {
         final int axisCount = this.axisCount;
         if (isInVertexRange(vertexIndex)) {
@@ -518,12 +543,16 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   @Override
   public LineString newGeometry() {
     if (this.coordinates == null) {
-      return this.line.newLineString();
+      if (this.line == null) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.lineString();
+      } else {
+        return this.line.newLineString();
+      }
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final int axisCount = geometryFactory.getAxisCount();
-      return this.line.newLineString(geometryFactory, axisCount, this.vertexCount,
-        this.coordinates);
+      return newLineString(geometryFactory, axisCount, this.vertexCount, this.coordinates);
     }
   }
 
@@ -539,7 +568,8 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   @Override
   public LineString newLineString(final GeometryFactory geometryFactory, final int axisCount,
     final int vertexCount, final double... coordinates) {
-    return this.line.newLineString(geometryFactory, axisCount, vertexCount, coordinates);
+    final GeometryFactory geometryFactoryAxisCount = geometryFactory.convertAxisCount(axisCount);
+    return geometryFactoryAxisCount.lineString(axisCount, vertexCount, coordinates);
   }
 
   public Point newPoint() {
@@ -557,6 +587,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   public LineStringEditor setAxisCount(final int axisCount) {
     final int oldAxisCount = getAxisCount();
     if (oldAxisCount != axisCount) {
+      this.boundingBox = null;
       this.coordinates = getCoordinates(axisCount);
       this.axisCount = axisCount;
       super.setAxisCount(axisCount);
@@ -572,6 +603,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       final double oldValue = getCoordinate(vertexIndex, axisIndex);
       final boolean changed = !Doubles.equal(preciseCoordinate, oldValue);
       if (changed) {
+        this.boundingBox = null;
         final double[] lineCoordinates = getCoordinatesModified();
         lineCoordinates[vertexIndex * this.axisCount + axisIndex] = preciseCoordinate;
         return oldValue;
@@ -600,10 +632,11 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
 
   private void setCoordinates(final double[] coordinates) {
     setModified(true);
+    this.boundingBox = null;
     this.coordinates = coordinates;
   }
 
-  public void setCoordinatesNaN(int offset, final int startAxisCount) {
+  private void setCoordinatesNaN(int offset, final int startAxisCount) {
     for (int axisIndex = startAxisCount; axisIndex < this.axisCount; axisIndex++) {
       this.coordinates[offset++] = Double.NaN;
     }
@@ -611,6 +644,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
 
   public LineStringEditor setVertex(final int vertexIndex, final double... coordinates) {
     if (isInVertexRange(vertexIndex)) {
+      this.boundingBox = null;
       final double[] lineCoordinates = getCoordinatesModified();
       int offset = vertexIndex * this.axisCount;
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -629,6 +663,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   public LineStringEditor setVertex(final int vertexIndex, final double x, final double y) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isInVertexRange(vertexIndex)) {
+      this.boundingBox = null;
       final double[] lineCoordinates = getCoordinatesModified();
       final int axisCount = getAxisCount();
       int offset = vertexIndex * axisCount;
@@ -643,6 +678,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     final double z) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isInVertexRange(vertexIndex)) {
+      this.boundingBox = null;
       final double[] lineCoordinates = getCoordinatesModified();
       final int axisCount = getAxisCount();
       int offset = vertexIndex * axisCount;
@@ -658,6 +694,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
 
   public LineStringEditor setVertex(final int index, final Point point) {
     if (isInVertexRange(index) && point != null && !point.isEmpty()) {
+      this.boundingBox = null;
       final double[] lineCoordinates = getCoordinatesModified();
       final int axisCount = getAxisCount();
       final int pointAxisCount = point.getAxisCount();
@@ -676,6 +713,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   }
 
   private void setVertexCount(final int vertexCount) {
+    this.boundingBox = null;
     this.vertexCount = vertexCount;
     ensureCapacity(vertexCount);
   }

@@ -86,9 +86,13 @@ public interface Point extends Punctual, Serializable {
     final double x2 = convertedPoint.getX();
     final double y2 = convertedPoint.getY();
 
+    return add(x2, y2);
+  }
+
+  default Point add(final double deltaX, final double deltaY) {
     final double x1 = getX();
     final double y1 = getY();
-    return newPoint(x1 + x2, y1 + y2);
+    return newPoint(x1 + deltaX, y1 + deltaY);
   }
 
   /**

@@ -1,6 +1,7 @@
 package com.revolsys.geometry.model.editor;
 
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 
 public class LinearRingEditor extends LineStringEditor implements LinearRing {
@@ -40,6 +41,13 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
   @Override
   public LinearRing newGeometry(final GeometryFactory geometryFactory) {
     return LinearRing.super.newGeometry(geometryFactory);
+  }
+
+  @Override
+  public LineString newLineString(final GeometryFactory geometryFactory, final int axisCount,
+    final int vertexCount, final double... coordinates) {
+    final GeometryFactory geometryFactoryAxisCount = geometryFactory.convertAxisCount(axisCount);
+    return geometryFactoryAxisCount.linearRing(axisCount, vertexCount, coordinates);
   }
 
   @Override

@@ -1,10 +1,10 @@
-package com.revolsys.swing.map.overlay;
+package com.revolsys.swing.map.overlay.record.geometryeditor;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 
-class InsertVertexUndoEdit extends AbstractUndoableEdit {
+public class InsertVertexUndoEdit extends AbstractUndoableEdit {
   private static final long serialVersionUID = 1L;
 
   private final GeometryEditor<?> geometryEditor;
@@ -17,7 +17,7 @@ class InsertVertexUndoEdit extends AbstractUndoableEdit {
 
   private final int vertexCount;
 
-  InsertVertexUndoEdit(final GeometryEditor<?> geometryEditor, final int[] vertexId,
+  public InsertVertexUndoEdit(final GeometryEditor<?> geometryEditor, final int[] vertexId,
     final Point newPoint) {
     this.geometryEditor = geometryEditor;
     this.vertexId = vertexId;
