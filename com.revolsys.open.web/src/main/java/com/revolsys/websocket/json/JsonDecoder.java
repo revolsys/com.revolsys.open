@@ -1,16 +1,15 @@
 package com.revolsys.websocket.json;
 
-import java.util.Map;
-
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.Json;
 
-public class JsonDecoder implements Decoder.Text<Map<String, Object>> {
+public class JsonDecoder implements Decoder.Text<MapEx> {
 
   @Override
-  public Map<String, Object> decode(final String string) {
+  public MapEx decode(final String string) {
     return Json.toObjectMap(string);
   }
 

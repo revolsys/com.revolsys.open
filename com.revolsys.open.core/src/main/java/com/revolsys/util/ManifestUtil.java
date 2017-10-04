@@ -38,10 +38,11 @@ public class ManifestUtil {
 
   public static Manifest getManifestByImplementationTitle(final String implementationTitle) {
     try {
-      final Enumeration resources = Thread.currentThread().getContextClassLoader().getResources(
-        "META-INF/MANIFEST.MF");
+      final Enumeration<URL> resources = Thread.currentThread()
+        .getContextClassLoader()
+        .getResources("META-INF/MANIFEST.MF");
       while (resources.hasMoreElements()) {
-        final URL url = (URL)resources.nextElement();
+        final URL url = resources.nextElement();
 
         final InputStream in = url.openStream();
         try {

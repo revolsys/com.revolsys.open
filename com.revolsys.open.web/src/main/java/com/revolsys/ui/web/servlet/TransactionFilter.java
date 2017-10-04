@@ -42,10 +42,10 @@ public class TransactionFilter extends GenericFilterBean {
         throw e;
       }
     } catch (IOException | ServletException | Error | RuntimeException e) {
-      HttpServletLogUtil.logRequestException(this, e);
+      HttpServletLogUtil.logRequestException(this, servletRequest, e);
       throw e;
     } catch (final Throwable e) {
-      HttpServletLogUtil.logRequestException(this, e);
+      HttpServletLogUtil.logRequestException(this, servletRequest, e);
       throw Exceptions.wrap(e);
     }
   }

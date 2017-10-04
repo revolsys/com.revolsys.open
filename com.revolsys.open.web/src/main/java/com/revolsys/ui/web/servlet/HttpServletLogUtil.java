@@ -2,21 +2,20 @@ package com.revolsys.ui.web.servlet;
 
 import java.io.IOException;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.logging.Logs;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public final class HttpServletLogUtil {
-  public static void logRequestException(final Object logCategory, final HttpServletRequest request,
-    final Throwable exception) {
-    logRequestException(logCategory, request, exception, null);
-  }
 
   public static void logRequestException(final Object logCategory, final HttpServletRequest request,
     final Throwable exception, final String[] headerNames) {
-    if (!(exception instanceof IOException) && !exception.getMessage().contains("Broken pipe")) {
-      if (request.getAttribute("LogException") != exception) {
+    if (!(exception instanceof IOException) || !exception.getMessage().contains("Broken pipe")) {
+      if (request == null) {
+        Logs.error(logCategory, exception);
+      } else if (request.getAttribute("LogException") != exception) {
         final StringBuilder text = new StringBuilder();
         final String message = exception.getMessage();
         if (message != null) {
@@ -54,6 +53,15 @@ public final class HttpServletLogUtil {
         request.setAttribute("LogException", exception);
       }
     }
+  }
+
+  public static void logRequestException(final Object logCategory, final ServletRequest request,
+    final Throwable exception) {
+    HttpServletRequest httpRequest = null;
+    if (request instanceof HttpServletRequest) {
+      httpRequest = (HttpServletRequest)request;
+    }
+    logRequestException(logCategory, httpRequest, exception, null);
   }
 
   public static void logRequestException(final Object logCategory, final Throwable exception) {

@@ -194,7 +194,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   }
 
   public Query(final RecordDefinitionProxy recordDefinition, final Condition whereCondition) {
-    this(recordDefinition.getPathName());
+    this(recordDefinition == null ? null : recordDefinition.getPathName());
     this.recordDefinition = recordDefinition.getRecordDefinition();
     setWhereCondition(whereCondition);
   }

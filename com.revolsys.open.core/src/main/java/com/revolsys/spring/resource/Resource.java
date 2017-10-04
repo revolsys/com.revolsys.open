@@ -141,7 +141,8 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   static Resource getResource(final String location) {
     if (Property.hasValue(location)) {
-      if (location.charAt(0) == '/' || location.length() > 1 && location.charAt(1) == ':') {
+      if (location.charAt(0) == '/' || location.length() > 1 && location.charAt(1) == ':'
+        || location.indexOf(':') == -1) {
         return new PathResource(location);
       } else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();

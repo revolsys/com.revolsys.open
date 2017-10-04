@@ -8,7 +8,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 
 public class Slf4jLogServletFilter implements Filter {
   @Override
@@ -25,10 +24,10 @@ public class Slf4jLogServletFilter implements Filter {
     } catch (final ServletException e) {
       throw e;
     } catch (final RuntimeException e) {
-      HttpServletLogUtil.logRequestException(this, (HttpServletRequest)request, e);
+      HttpServletLogUtil.logRequestException(this, request, e);
       throw e;
     } catch (final Error e) {
-      HttpServletLogUtil.logRequestException(this, (HttpServletRequest)request, e);
+      HttpServletLogUtil.logRequestException(this, request, e);
       throw e;
     }
   }
