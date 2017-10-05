@@ -108,7 +108,7 @@ public final class DataTypes {
   public static final GeometryDataType<Geometry, GeometryCollectionImplEditor> GEOMETRY = new GeometryDataType<>(
     Geometry.class, Geometry::newGeometry, GeometryCollectionImplEditor::new);
 
-  public static final GeometryDataType<Geometry, GeometryCollectionImplEditor> GEOMETRY_COLLECTION = new GeometryDataType<>(
+  public static final GeometryDataType<GeometryCollection, GeometryCollectionImplEditor> GEOMETRY_COLLECTION = new GeometryDataType<>(
     GeometryCollection.class, GeometryCollection::newGeometryCollection,
     GeometryCollectionImplEditor::new);
 
