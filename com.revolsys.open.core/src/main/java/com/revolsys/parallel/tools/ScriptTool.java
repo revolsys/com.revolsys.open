@@ -116,7 +116,7 @@ public class ScriptTool {
     final String implementationTitle = System.getProperty("script.implementationTitle");
     if (implementationTitle != null) {
       final String build = ManifestUtil.getMainAttributeByImplementationTitle(implementationTitle,
-        "SCM-Revision");
+        "SCM-Revision", null);
       if (build != null) {
         System.out.println(implementationTitle + " (build " + build + ")");
       } else {
