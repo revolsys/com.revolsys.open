@@ -199,8 +199,7 @@ public class UrlResource extends AbstractResource {
           final URLConnection con = url.openConnection();
           customizeConnection(con);
           final HttpURLConnection httpCon = con instanceof HttpURLConnection
-            ? (HttpURLConnection)con
-            : null;
+            ? (HttpURLConnection)con : null;
           if (httpCon != null) {
             final int code = httpCon.getResponseCode();
             if (code == HttpURLConnection.HTTP_OK) {
@@ -352,7 +351,7 @@ public class UrlResource extends AbstractResource {
         try {
           return con.getInputStream();
         } catch (final FileNotFoundException e) {
-          throw new IllegalArgumentException("Error opening file: " + toString(), e);
+          throw Exceptions.wrap("Error opening file: " + toString(), e);
         } catch (final IOException e) {
           // Close the HTTP connection (if applicable).
           if (con instanceof HttpURLConnection) {

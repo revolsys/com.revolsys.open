@@ -226,7 +226,7 @@ public class PathResource extends AbstractResource implements WritableResource {
     try {
       return Files.newInputStream(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_NONE);
     } catch (final FileSystemException e) {
-      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
+      throw Exceptions.wrap("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
@@ -238,7 +238,7 @@ public class PathResource extends AbstractResource implements WritableResource {
       final Path path = this.path;
       return Files.newOutputStream(path, com.revolsys.io.file.Paths.OPEN_OPTIONS_NONE);
     } catch (final FileSystemException e) {
-      throw new IllegalArgumentException("Error opening file: " + this.path, e);
+      throw Exceptions.wrap("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
@@ -357,7 +357,7 @@ public class PathResource extends AbstractResource implements WritableResource {
         }
       }
     } catch (final FileSystemException e) {
-      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
+      throw Exceptions.wrap("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

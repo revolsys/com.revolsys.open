@@ -25,6 +25,7 @@ import com.revolsys.io.StringWriter;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.WrappedException;
 
 public class EsriCoordinateSystems {
   private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new HashMap<>();
@@ -153,7 +154,7 @@ public class EsriCoordinateSystems {
     try {
       final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);
       return getGeometryFactory(coordinateSystem);
-    } catch (final IllegalArgumentException e) {
+    } catch (final WrappedException e) {
       final Throwable cause = e.getCause();
       if (cause instanceof FileNotFoundException) {
       } else if (cause instanceof FileSystemException) {

@@ -10,6 +10,7 @@ import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 import javax.websocket.Session;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
@@ -18,11 +19,11 @@ import com.revolsys.websocket.AsyncResult;
 public class JsonAsyncSender implements SendHandler {
   private final Async async;
 
-  private final Map<String, AsyncResult<Map<String, Object>>> messageCallbackById = new HashMap<>();
+  private final Map<String, AsyncResult<MapEx>> messageCallbackById = new HashMap<>();
 
-  private final Map<String, Map<String, Object>> messageResultById = new HashMap<>();
+  private final Map<String, MapEx> messageResultById = new HashMap<>();
 
-  private final LinkedList<Map<String, Object>> messages = new LinkedList<>();
+  private final LinkedList<MapEx> messages = new LinkedList<>();
 
   private final Session session;
 
@@ -33,8 +34,7 @@ public class JsonAsyncSender implements SendHandler {
 
   public void close() {
     synchronized (this.messageCallbackById) {
-      for (final AsyncResult<Map<String, Object>> messageProcessor : this.messageCallbackById
-        .values()) {
+      for (final AsyncResult<MapEx> messageProcessor : this.messageCallbackById.values()) {
         synchronized (messageProcessor) {
           messageProcessor.notify();
         }
@@ -43,7 +43,7 @@ public class JsonAsyncSender implements SendHandler {
     }
   }
 
-  private void doSendMessage(final Map<String, Object> message) {
+  private void doSendMessage(final MapEx message) {
     this.async.sendObject(message, this);
   }
 
@@ -56,7 +56,7 @@ public class JsonAsyncSender implements SendHandler {
         }
         this.messages.removeFirst();
         if (!this.messages.isEmpty()) {
-          final Map<String, Object> message = this.messages.getFirst();
+          final MapEx message = this.messages.getFirst();
           doSendMessage(message);
         } else {
           this.messages.clear();
@@ -65,8 +65,7 @@ public class JsonAsyncSender implements SendHandler {
     }
   }
 
-  public <V> V sendAndWait(final Map<String, Object> message,
-    final AsyncResult<Map<String, Object>> messageProcessor) {
+  public <V> V sendAndWait(final MapEx message, final AsyncResult<MapEx> messageProcessor) {
     final String messageId = UUID.randomUUID().toString();
     message.put("messageId", messageId);
     synchronized (this.messageCallbackById) {
@@ -76,7 +75,7 @@ public class JsonAsyncSender implements SendHandler {
       try {
         sendMessage(message);
         messageProcessor.wait();
-        final Map<String, Object> result = this.messageResultById.remove(messageId);
+        final MapEx result = this.messageResultById.remove(messageId);
         if (result == null) {
           throw new RuntimeException("No result returned: " + message);
         } else {
@@ -91,7 +90,7 @@ public class JsonAsyncSender implements SendHandler {
     }
   }
 
-  public synchronized void sendMessage(final Map<String, Object> message) {
+  public synchronized void sendMessage(final MapEx message) {
     final boolean hasMessage = !this.messages.isEmpty();
     if (this.session.isOpen()) {
       this.messages.addLast(message);
@@ -101,13 +100,12 @@ public class JsonAsyncSender implements SendHandler {
     }
   }
 
-  public boolean setResult(final Map<String, Object> message) {
+  public boolean setResult(final MapEx message) {
     if (this.session.isOpen()) {
       final String messageId = Maps.getString(message, "messageId");
       if (Property.hasValue(messageId)) {
         synchronized (this.messageCallbackById) {
-          final AsyncResult<Map<String, Object>> resultCallback = this.messageCallbackById
-            .get(messageId);
+          final AsyncResult<MapEx> resultCallback = this.messageCallbackById.get(messageId);
           if (resultCallback != null) {
             synchronized (resultCallback) {
               this.messageResultById.put(messageId, message);

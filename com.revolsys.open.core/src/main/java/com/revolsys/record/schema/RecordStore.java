@@ -92,6 +92,10 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
+  static <T extends RecordStore> T newRecordStore(final Path file) {
+    return newRecordStore(file.toUri().toString());
+  }
+
   @SuppressWarnings("unchecked")
   static <T extends RecordStore> T newRecordStore(final String url) {
     final RecordStoreFactory factory = recordStoreFactory(url);

@@ -21,6 +21,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.WrappedException;
 
 public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   public enum EventType {
@@ -77,7 +78,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
       try {
         final Resource resource = Resource.getResource(source);
         reader = resource.newBufferedReader();
-      } catch (final IllegalArgumentException e) {
+      } catch (final WrappedException e) {
         reader = new StringReader(source.toString());
       }
     }
