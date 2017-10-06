@@ -13,6 +13,15 @@ public class LineStringEditorTest {
   private static final LineString LINE_STRING = WGS84_2D.lineString(2, 100.0, 200.0, 110.0, 210.0);
 
   @Test
+  public void testInsertVertices() {
+    final LineStringEditor lineEditor = LINE_STRING.newGeometryEditor(3);
+    lineEditor.setZ(0, 10);
+    final LineString newLineString = lineEditor.newGeometry();
+    Assert.assertNotSame(LINE_STRING, newLineString);
+    Assert.assertEquals(10.0, newLineString.getZ(0), 0.0);
+  }
+
+  @Test
   public void testInvalidIndex() {
     final LineStringEditor lineEditor = LINE_STRING.newGeometryEditor();
     try {
