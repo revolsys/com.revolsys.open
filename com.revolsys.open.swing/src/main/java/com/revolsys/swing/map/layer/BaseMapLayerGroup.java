@@ -18,7 +18,8 @@ public class BaseMapLayerGroup extends LayerGroup {
 
   public static LayerGroup newLayer(final Map<String, ? extends Object> properties) {
     final BaseMapLayerGroup layerGroup = new BaseMapLayerGroup();
-    layerGroup.loadLayers(properties);
+    final Project project = layerGroup.getProject();
+    layerGroup.loadLayers(project, properties);
     return layerGroup;
   }
 

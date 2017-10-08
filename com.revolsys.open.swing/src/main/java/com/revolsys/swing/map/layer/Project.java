@@ -81,29 +81,36 @@ public class Project extends LayerGroup {
 
   private BaseMapLayerGroup baseMapLayers = new BaseMapLayerGroup();
 
-  private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry("Project");
-
-  private WebServiceConnectionRegistry webServices = new WebServiceConnectionRegistry("Project");
+  private FolderConnectionRegistry folderConnections;
 
   private BoundingBox initialBoundingBox;
 
-  private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry("Project");
+  private RecordStoreConnectionRegistry recordStores;
 
   private Resource resource;
 
   private BoundingBox viewBoundingBox = BoundingBox.empty();
 
+  private WebServiceConnectionRegistry webServices;
+
   private Map<String, BoundingBox> zoomBookmarks = new LinkedHashMap<>();
+
+  private final String connectionRegistryName;
 
   public Project() {
     this("Project");
   }
 
-  public Project(final String name) {
-    super(name);
+  public Project(final String connectionRegistryName) {
+    super("Project");
     setType("Project");
+    this.connectionRegistryName = connectionRegistryName;
     this.baseMapLayers.setLayerGroup(this);
     setGeometryFactory(GeometryFactory.worldMercator());
+
+    this.folderConnections = new FolderConnectionRegistry(connectionRegistryName);
+    this.recordStores = new RecordStoreConnectionRegistry(connectionRegistryName);
+    this.webServices = new WebServiceConnectionRegistry(connectionRegistryName);
   }
 
   private void addChangedLayers(final LayerGroup group, final List<Layer> layersWithChanges) {
@@ -145,6 +152,10 @@ public class Project extends LayerGroup {
     } else {
       return boundingBox;
     }
+  }
+
+  public String getConnectionRegistryName() {
+    return this.connectionRegistryName;
   }
 
   @Override
@@ -301,14 +312,14 @@ public class Project extends LayerGroup {
     }
   }
 
-  public BaseMapLayerGroup readBaseMapsLayers(final Resource resource) {
+  public BaseMapLayerGroup readBaseMapsLayers(final Project rootProject, final Resource resource) {
     final Resource baseMapsResource = resource.newChildResource("Base Maps");
     final Resource layerGroupResource = baseMapsResource.newChildResource("rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
       final Resource oldResource = Resource.setBaseResource(baseMapsResource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
-        this.baseMapLayers.loadLayers(properties);
+        this.baseMapLayers.loadLayers(rootProject, properties);
         boolean hasVisible = false;
         if (this.baseMapLayers != null) {
           for (final Layer layer : this.baseMapLayers) {
@@ -326,7 +337,7 @@ public class Project extends LayerGroup {
     return this.baseMapLayers;
   }
 
-  protected void readLayers(final Resource resource) {
+  protected void readLayers(final Project rootProject, final Resource resource) {
     final Resource layerGroupResource = resource.newChildResource("rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       Logs.error(this, "File not found: " + layerGroupResource);
@@ -334,7 +345,7 @@ public class Project extends LayerGroup {
       final Resource oldResource = Resource.setBaseResource(resource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
-        loadLayers(properties);
+        loadLayers(rootProject, properties);
       } catch (final RuntimeException e) {
         Logs.error(this, "Unable to read: " + layerGroupResource, e);
       } finally {
@@ -343,7 +354,7 @@ public class Project extends LayerGroup {
     }
   }
 
-  public void readProject(final Resource resource) {
+  public void readProject(final Project rootProject, final Resource resource) {
     this.resource = resource;
     if (this.resource.exists()) {
       String name;
@@ -359,34 +370,26 @@ public class Project extends LayerGroup {
           .getForThread();
         try {
           final Resource recordStoresDirectory = this.resource.newChildResource("Record Stores");
-          if (!recordStoresDirectory.exists()) {
-            final Resource dataStoresDirectory = this.resource.newChildResource("Data Stores");
-            if (dataStoresDirectory.exists()) {
-              final File file = dataStoresDirectory.getFile();
-              file.renameTo(new File(file.getParentFile(), "Record Stores"));
-            }
-          }
-
           final boolean readOnly = isReadOnly();
           final RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
-            "Project", recordStoresDirectory, readOnly);
+            this.connectionRegistryName, recordStoresDirectory, readOnly);
           setRecordStores(recordStores);
           RecordStoreConnectionRegistry.setForThread(recordStores);
 
           final Resource folderConnectionsDirectory = this.resource
             .newChildResource("Folder Connections");
-          this.folderConnections = new FolderConnectionRegistry("Project",
+          this.folderConnections = new FolderConnectionRegistry(this.connectionRegistryName,
             folderConnectionsDirectory, readOnly);
 
           final Resource webServicesDirectory = this.resource.newChildResource("Web Services");
-          this.webServices = new WebServiceConnectionRegistry("Project", webServicesDirectory,
-            readOnly);
+          this.webServices = new WebServiceConnectionRegistry(this.connectionRegistryName,
+            webServicesDirectory, readOnly);
 
           if (hasLayers) {
-            readLayers(layersDir);
+            readLayers(rootProject, layersDir);
           }
 
-          readBaseMapsLayers(this.resource);
+          readBaseMapsLayers(rootProject, this.resource);
         } finally {
           RecordStoreConnectionRegistry.setForThread(oldRecordStoreConnections);
         }
@@ -425,9 +428,9 @@ public class Project extends LayerGroup {
     super.reset();
     setName("Project");
     this.baseMapLayers.clear();
-    this.recordStores = new RecordStoreConnectionRegistry("Project");
-    this.folderConnections = new FolderConnectionRegistry("Project");
-    this.webServices = new WebServiceConnectionRegistry("Project");
+    this.recordStores = new RecordStoreConnectionRegistry(this.connectionRegistryName);
+    this.folderConnections = new FolderConnectionRegistry(this.connectionRegistryName);
+    this.webServices = new WebServiceConnectionRegistry(this.connectionRegistryName);
     this.initialBoundingBox = null;
     this.resource = null;
     this.viewBoundingBox = BoundingBox.empty();

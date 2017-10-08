@@ -547,27 +547,28 @@ public class ProjectFrame extends BaseFrame {
 
   protected void loadProject(final Path projectPath) {
     final PathResource resource = new PathResource(projectPath);
-    this.project.readProject(resource);
+    this.project.readProject(this.project, resource);
     Invoke.later(() -> setTitle(this.project.getName() + " - " + this.frameTitle));
 
     final Object frameBoundsObject = this.project.getProperty("frameBounds");
     setBounds(frameBoundsObject, true);
     setVisible(true);
 
+    final String connectionRegistryName = this.project.getConnectionRegistryName();
     final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
       .get();
-    recordStoreConnectionManager.removeConnectionRegistry("Project");
+    recordStoreConnectionManager.removeConnectionRegistry(connectionRegistryName);
     final RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
     recordStoreConnectionManager.addConnectionRegistry(recordStores);
 
     final FileConnectionManager fileConnectionManager = FileConnectionManager.get();
-    fileConnectionManager.removeConnectionRegistry("Project");
+    fileConnectionManager.removeConnectionRegistry(connectionRegistryName);
     final FolderConnectionRegistry folderConnections = this.project.getFolderConnections();
     fileConnectionManager.addConnectionRegistry(folderConnections);
 
     final WebServiceConnectionManager webServiceConnectionManager = WebServiceConnectionManager
       .get();
-    webServiceConnectionManager.removeConnectionRegistry("Project");
+    webServiceConnectionManager.removeConnectionRegistry(connectionRegistryName);
     final WebServiceConnectionRegistry webServices = this.project.getWebServices();
     webServiceConnectionManager.addConnectionRegistry(webServices);
 

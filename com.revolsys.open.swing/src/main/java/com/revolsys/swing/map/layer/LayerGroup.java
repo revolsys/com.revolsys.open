@@ -111,7 +111,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   public static LayerGroup newLayer(final Map<String, ? extends Object> config) {
     final LayerGroup layerGroup = new LayerGroup();
-    layerGroup.loadLayers(config);
+    final Project project = layerGroup.getProject();
+    layerGroup.loadLayers(project, config);
     return layerGroup;
   }
 
@@ -151,8 +152,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public void actionImportProject(final String title, final boolean resetProject) {
+    final Project project = getProject();
     if (resetProject) {
-      if (!getProject().saveWithPrompt()) {
+      if (!project.saveWithPrompt()) {
         return;
       }
     }
@@ -176,7 +178,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
           projectDirectory.getParent());
         final PathResource resource = new PathResource(projectDirectory);
 
-        importProject(resource, resetProject);
+        importProject(project, resource, resetProject);
       }
     }
   }
@@ -627,29 +629,29 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   protected void importProject(final Project importProject) {
-    final WebServiceConnectionRegistry importWebServices = importProject.getWebServices();
-    final WebServiceConnectionRegistry webServices = getProject().getWebServices();
-    importConnections("Web Service", importProject, importWebServices, webServices);
-
-    final RecordStoreConnectionRegistry importRecordStores = importProject.getRecordStores();
-    final RecordStoreConnectionRegistry recordStores = getProject().getRecordStores();
-    importConnections("Record Store", importProject, importRecordStores, recordStores);
-
-    final FolderConnectionRegistry importFolderConnections = importProject.getFolderConnections();
-    final FolderConnectionRegistry folderConnections = getProject().getFolderConnections();
-    importConnections("Folder Connection", importProject, importFolderConnections,
-      folderConnections);
-
     importProjectLayers(importProject, false);
   }
 
-  protected boolean importProject(final Resource resource, final boolean resetProject) {
+  protected boolean importProject(final Project rootProject, final Resource resource,
+    final boolean resetProject) {
     if (resetProject) {
       reset();
     }
     if (resource.exists()) {
-      final Project importProject = new Project();
-      importProject.readProject(resource);
+      final Project importProject = new Project("ImportProject_" + resource.getBaseName());
+      importProject.readProject(rootProject, resource);
+      final WebServiceConnectionRegistry importWebServices = importProject.getWebServices();
+      final WebServiceConnectionRegistry webServices = rootProject.getWebServices();
+      importConnections("Web Service", importProject, importWebServices, webServices);
+
+      final RecordStoreConnectionRegistry importRecordStores = importProject.getRecordStores();
+      final RecordStoreConnectionRegistry recordStores = rootProject.getRecordStores();
+      importConnections("Record Store", importProject, importRecordStores, recordStores);
+
+      final FolderConnectionRegistry importFolderConnections = importProject.getFolderConnections();
+      final FolderConnectionRegistry folderConnections = rootProject.getFolderConnections();
+      importConnections("Folder Connection", importProject, importFolderConnections,
+        folderConnections);
       importProject(importProject);
       if (resetProject) {
         setName(importProject.getName());
@@ -661,6 +663,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   protected void importProjectLayers(final Project importProject, final boolean createGroup) {
+
     final List<Layer> importLayers = importProject.getLayers();
     if (!importLayers.isEmpty()) {
       LayerGroup targetGroup;
@@ -779,14 +782,14 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   @SuppressWarnings("unchecked")
-  protected void loadLayers(final Map<String, ? extends Object> config) {
+  protected void loadLayers(final Project rootProject, final Map<String, ? extends Object> config) {
     final List<String> layerFiles = (List<String>)config.remove("layers");
     setProperties(config);
     if (layerFiles != null) {
       for (String fileName : layerFiles) {
         if (fileName.endsWith(".rgmap")) {
           final Resource childResource = Resource.getBaseResource(fileName);
-          if (!importProject(childResource, false)) {
+          if (!importProject(rootProject, childResource, false)) {
             Logs.error(LayerGroup.class, "Project not found: " + childResource);
           }
         } else {
