@@ -22,7 +22,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.gis.grid.CustomRectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
-import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
@@ -90,24 +89,23 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     return Double.NaN;
   }
 
-  public static double getElevationNearest(final Resource baseResource,
-    final int coordinateSystemId, final int gridCellSize, final int gridSize,
-    final String fileExtension, final double x, final double y) {
+  public static double getElevationNearest(final Path baseDirectory, final int coordinateSystemId,
+    final int gridCellSize, final int gridSize, final String fileExtension, final double x,
+    final double y) {
 
     final int gridTileSize = gridSize * gridCellSize;
     final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, gridTileSize, x);
     final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, gridTileSize, y);
 
-    final Resource resource = RectangularMapGrid.getTileResource(baseResource, "dem",
-      coordinateSystemId, Integer.toString(gridTileSize), tileX, tileY, fileExtension);
+    final Path file = RectangularMapGrid.getTilePath(baseDirectory, "dem", coordinateSystemId,
+      Integer.toString(gridTileSize), tileX, tileY, fileExtension);
     try {
       final int gridCellX = GriddedElevationModel.getGridCellX(tileX, gridCellSize, x);
       final int gridCellY = GriddedElevationModel.getGridCellY(tileY, gridCellSize, y);
       final int elevationByteSize = 4;
       final int offset = HEADER_SIZE + (gridCellY * gridSize + gridCellX) * elevationByteSize;
-      final Path path = resource.toPath();
       try (
-        FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
+        FileChannel channel = FileChannel.open(file, StandardOpenOption.READ)) {
         final ByteBuffer bytes = ByteBuffer.allocate(4);
         channel.read(bytes, offset);
         return bytes.getInt(0);
@@ -115,14 +113,14 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     } catch (final NoSuchFileException e) {
       return Double.NaN;
     } catch (final IOException e) {
-      throw Exceptions.wrap("Unable to read: " + resource, e);
+      throw Exceptions.wrap("Unable to read: " + file, e);
     } catch (final ClassCastException e) {
       throw new IllegalArgumentException(fileExtension + " not supported");
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static <G extends Geometry> G setElevationNearest(final PathResource baseResource,
+  public static <G extends Geometry> G setElevationNearest(final Path baseDirectory,
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
     final String fileExtension, final G geometry) {
     final GeometryEditor<?> editor = geometry.newGeometryEditor();
@@ -130,7 +128,7 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     for (final Vertex vertex : geometry.vertices()) {
       final double x = vertex.getX();
       final double y = vertex.getY();
-      final double elevation = getElevationNearest(baseResource, coordinateSystemId, gridCellSize,
+      final double elevation = getElevationNearest(baseDirectory, coordinateSystemId, gridCellSize,
         gridSize, fileExtension, x, y);
       if (!Double.isNaN(elevation)) {
         final int[] vertexId = vertex.getVertexId();
