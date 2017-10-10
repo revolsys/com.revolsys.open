@@ -358,8 +358,9 @@ public class ProjectFrame extends BaseFrame {
       this.mapPanel.destroy();
     }
     if (this.project != null) {
-      final RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
-      RecordStoreConnectionManager.get().removeConnectionRegistry(recordStores);
+      this.project.getRecordStores().remove();
+      this.project.getFolderConnections().remove();
+      this.project.getWebServices().remove();
       if (Project.get() == this.project) {
         Project.set(null);
       }
@@ -489,6 +490,7 @@ public class ProjectFrame extends BaseFrame {
     this.project.setViewBoundingBoxAndGeometryFactory(defaultBoundingBox);
     Project.set(this.project);
     this.project.setPropertyWeak(PROJECT_FRAME, this);
+    setConnectionRegistries();
 
     newMapPanel();
 
@@ -553,24 +555,6 @@ public class ProjectFrame extends BaseFrame {
     final Object frameBoundsObject = this.project.getProperty("frameBounds");
     setBounds(frameBoundsObject, true);
     setVisible(true);
-
-    final String connectionRegistryName = this.project.getConnectionRegistryName();
-    final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
-      .get();
-    recordStoreConnectionManager.removeConnectionRegistry(connectionRegistryName);
-    final RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
-    recordStoreConnectionManager.addConnectionRegistry(recordStores);
-
-    final FileConnectionManager fileConnectionManager = FileConnectionManager.get();
-    fileConnectionManager.removeConnectionRegistry(connectionRegistryName);
-    final FolderConnectionRegistry folderConnections = this.project.getFolderConnections();
-    fileConnectionManager.addConnectionRegistry(folderConnections);
-
-    final WebServiceConnectionManager webServiceConnectionManager = WebServiceConnectionManager
-      .get();
-    webServiceConnectionManager.removeConnectionRegistry(connectionRegistryName);
-    final WebServiceConnectionRegistry webServices = this.project.getWebServices();
-    webServiceConnectionManager.addConnectionRegistry(webServices);
 
     final MapPanel mapPanel = getMapPanel();
     final BoundingBox initialBoundingBox = this.project.getInitialBoundingBox();
@@ -659,10 +643,8 @@ public class ProjectFrame extends BaseFrame {
       }
     }).setAcceleratorControlKey(KeyEvent.VK_S);
 
-    file
-      .addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
-        this::actionSaveProjectAs)
-      .setAcceleratorShiftControlKey(KeyEvent.VK_S);
+    file.addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
+      this::actionSaveProjectAs).setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", SaveAsPdf::save);
 
@@ -835,6 +817,26 @@ public class ProjectFrame extends BaseFrame {
         setVisible(true);
       }
     });
+  }
+
+  private void setConnectionRegistries() {
+    final String connectionRegistryName = this.project.getConnectionRegistryName();
+    final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
+      .get();
+    recordStoreConnectionManager.removeConnectionRegistry(connectionRegistryName);
+    final RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
+    recordStoreConnectionManager.addConnectionRegistry(recordStores);
+
+    final FileConnectionManager fileConnectionManager = FileConnectionManager.get();
+    fileConnectionManager.removeConnectionRegistry(connectionRegistryName);
+    final FolderConnectionRegistry folderConnections = this.project.getFolderConnections();
+    fileConnectionManager.addConnectionRegistry(folderConnections);
+
+    final WebServiceConnectionManager webServiceConnectionManager = WebServiceConnectionManager
+      .get();
+    webServiceConnectionManager.removeConnectionRegistry(connectionRegistryName);
+    final WebServiceConnectionRegistry webServices = this.project.getWebServices();
+    webServiceConnectionManager.addConnectionRegistry(webServices);
   }
 
   public void setExitOnClose(final boolean exitOnClose) {

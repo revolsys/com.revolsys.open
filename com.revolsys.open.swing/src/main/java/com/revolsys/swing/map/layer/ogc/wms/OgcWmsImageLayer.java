@@ -73,11 +73,15 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
         if (Property.hasValue(this.connectionName)) {
           final WebService<?> webService = WebServiceConnectionManager
             .getWebService(this.connectionName);
-          if (webService instanceof WmsClient) {
+          if (webService == null) {
+            Logs.error(this,
+              getPath() + ": Web service " + this.connectionName + ": no connection configured");
+            return false;
+          } else if (webService instanceof WmsClient) {
             wmsClient = (WmsClient)webService;
           } else {
             Logs.error(this,
-              getPath() + ": Web service " + this.connectionName + " is not a OGS WMS service");
+              getPath() + ": Web service " + this.connectionName + ": is not a OGS WMS service");
             return false;
           }
         } else if (Property.hasValue(this.serviceUrl)) {

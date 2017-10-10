@@ -28,12 +28,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.logging.Logs;
-import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.PathResource;
@@ -81,17 +79,17 @@ public class Project extends LayerGroup {
 
   private BaseMapLayerGroup baseMapLayers = new BaseMapLayerGroup();
 
-  private FolderConnectionRegistry folderConnections;
+  private final FolderConnectionRegistry folderConnections;
 
   private BoundingBox initialBoundingBox;
 
-  private RecordStoreConnectionRegistry recordStores;
+  private final RecordStoreConnectionRegistry recordStores;
 
   private Resource resource;
 
   private BoundingBox viewBoundingBox = BoundingBox.empty();
 
-  private WebServiceConnectionRegistry webServices;
+  private final WebServiceConnectionRegistry webServices;
 
   private Map<String, BoundingBox> zoomBookmarks = new LinkedHashMap<>();
 
@@ -360,31 +358,42 @@ public class Project extends LayerGroup {
       String name;
       try (
         final BaseCloseable booleanValueCloseable = eventsDisabled()) {
-        final Resource layersDir = this.resource.newChildResource("Layers");
-        final boolean hasLayers = layersDir.exists();
-        if (hasLayers) {
-          readProperties(layersDir);
-        }
 
         final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry
           .getForThread();
         try {
-          final Resource recordStoresDirectory = this.resource.newChildResource("Record Stores");
           final boolean readOnly = isReadOnly();
-          final RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
-            this.connectionRegistryName, recordStoresDirectory, readOnly);
-          setRecordStores(recordStores);
-          RecordStoreConnectionRegistry.setForThread(recordStores);
 
           final Resource folderConnectionsDirectory = this.resource
             .newChildResource("Folder Connections");
-          this.folderConnections = new FolderConnectionRegistry(this.connectionRegistryName,
-            folderConnectionsDirectory, readOnly);
+          this.folderConnections.clear(folderConnectionsDirectory, readOnly);
+
+          final Resource recordStoresDirectory = this.resource.newChildResource("Record Stores");
+          this.recordStores.clear(recordStoresDirectory, readOnly);
 
           final Resource webServicesDirectory = this.resource.newChildResource("Web Services");
-          this.webServices = new WebServiceConnectionRegistry(this.connectionRegistryName,
-            webServicesDirectory, readOnly);
+          this.webServices.clear(webServicesDirectory, readOnly);
 
+          if (rootProject == null) {
+            RecordStoreConnectionRegistry.setForThread(this.recordStores);
+          } else {
+            final WebServiceConnectionRegistry rootWebServices = rootProject.getWebServices();
+            importConnections("Web Service", this, this.webServices, rootWebServices);
+
+            final RecordStoreConnectionRegistry rootRecordStores = rootProject.getRecordStores();
+            rootProject.importConnections("Record Store", this, this.recordStores,
+              rootRecordStores);
+
+            final FolderConnectionRegistry rootFolderConnections = rootProject
+              .getFolderConnections();
+            rootProject.importConnections("Folder Connection", this, this.folderConnections,
+              rootFolderConnections);
+          }
+          final Resource layersDir = this.resource.newChildResource("Layers");
+          final boolean hasLayers = layersDir.exists();
+          if (hasLayers) {
+            readProperties(layersDir);
+          }
           if (hasLayers) {
             readLayers(rootProject, layersDir);
           }
@@ -428,9 +437,11 @@ public class Project extends LayerGroup {
     super.reset();
     setName("Project");
     this.baseMapLayers.clear();
-    this.recordStores = new RecordStoreConnectionRegistry(this.connectionRegistryName);
-    this.folderConnections = new FolderConnectionRegistry(this.connectionRegistryName);
-    this.webServices = new WebServiceConnectionRegistry(this.connectionRegistryName);
+
+    this.recordStores.clear();
+    this.folderConnections.clear();
+    this.webServices.clear();
+
     this.initialBoundingBox = null;
     this.resource = null;
     this.viewBoundingBox = BoundingBox.empty();
@@ -448,16 +459,9 @@ public class Project extends LayerGroup {
       final Path directory = getDirectory();
       final boolean saveAllSettings = super.saveAllSettings(directory);
       if (saveAllSettings) {
-        final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
-          .get();
-        final RecordStoreConnectionRegistry recordStoreConnections = recordStoreConnectionManager
-          .getConnectionRegistry("Project");
-        recordStoreConnections.saveAs(this.resource, "Record Stores");
-
-        final FileConnectionManager fileConnectionManager = FileConnectionManager.get();
-        final FolderConnectionRegistry folderConnections = fileConnectionManager
-          .getConnectionRegistry("Project");
-        folderConnections.saveAs(this.resource, "Folder Connections");
+        this.recordStores.saveAs(this.resource, "Record Stores");
+        this.folderConnections.saveAs(this.resource, "Folder Connections");
+        this.webServices.saveAs(this.resource, "Web Services");
       }
       return saveAllSettings;
     }
@@ -597,10 +601,6 @@ public class Project extends LayerGroup {
     return result;
   }
 
-  public void setFolderConnections(final FolderConnectionRegistry folderConnections) {
-    this.folderConnections = folderConnections;
-  }
-
   @Override
   public void setProperty(final String name, final Object value) {
     if ("srid".equals(name)) {
@@ -622,10 +622,6 @@ public class Project extends LayerGroup {
     } else {
       super.setProperty(name, value);
     }
-  }
-
-  public void setRecordStores(final RecordStoreConnectionRegistry recordStores) {
-    this.recordStores = recordStores;
   }
 
   public void setSrid(final Number srid) {
@@ -680,10 +676,6 @@ public class Project extends LayerGroup {
       this.viewBoundingBox = viewBoundingBox;
       return !viewBoundingBox.equals(oldBoundingBox);
     }
-  }
-
-  public void setWebServices(final WebServiceConnectionRegistry webServices) {
-    this.webServices = webServices;
   }
 
   public void setZoomBookmarks(final Map<String, ?> zoomBookmarks) {

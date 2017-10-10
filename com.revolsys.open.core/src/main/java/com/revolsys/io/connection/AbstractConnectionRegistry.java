@@ -28,7 +28,7 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
 
   private final Map<String, String> connectionNames = new TreeMap<>();
 
-  private Map<String, C> connections;
+  private final Map<String, C> connections = new TreeMap<>();
 
   private Path directory;
 
@@ -73,6 +73,17 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
       this.propertyChangeSupport.fireIndexedPropertyChange("connections", index, null, connection);
       this.propertyChangeSupport.fireIndexedPropertyChange("children", index, null, connection);
     }
+  }
+
+  public void clear() {
+    this.directory = null;
+    init();
+  }
+
+  public void clear(final Resource directory, final boolean readOnly) {
+    this.readOnly = readOnly;
+    setDirectory(directory);
+    init();
   }
 
   @Override
@@ -199,9 +210,13 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
     }
   }
 
-  protected synchronized void init() {
-    this.connections = new TreeMap<>();
+  private synchronized void init() {
+    this.connectionNames.clear();
+    this.connections.clear();
     initDo();
+    final List<C> connections = getConnections();
+    this.propertyChangeSupport.firePropertyChange("connections", null, connections);
+    this.propertyChangeSupport.firePropertyChange("children", null, connections);
   }
 
   protected void initDo() {
@@ -239,6 +254,13 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     this.propertyChangeSupport.firePropertyChange(event);
+  }
+
+  public void remove() {
+    if (this.connectionManager != null) {
+      this.connectionManager.removeConnectionRegistry(this);
+      this.connectionManager = null;
+    }
   }
 
   @Override

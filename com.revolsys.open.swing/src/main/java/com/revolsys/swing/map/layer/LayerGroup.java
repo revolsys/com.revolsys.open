@@ -34,13 +34,11 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.connection.Connection;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.io.file.FileNameExtensionFilter;
-import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordReaderFactory;
-import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
@@ -62,7 +60,6 @@ import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.webservice.WebServiceConnectionRegistry;
 
 public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable<Layer> {
 
@@ -640,18 +637,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     if (resource.exists()) {
       final Project importProject = new Project("ImportProject_" + resource.getBaseName());
       importProject.readProject(rootProject, resource);
-      final WebServiceConnectionRegistry importWebServices = importProject.getWebServices();
-      final WebServiceConnectionRegistry webServices = rootProject.getWebServices();
-      importConnections("Web Service", importProject, importWebServices, webServices);
 
-      final RecordStoreConnectionRegistry importRecordStores = importProject.getRecordStores();
-      final RecordStoreConnectionRegistry recordStores = rootProject.getRecordStores();
-      importConnections("Record Store", importProject, importRecordStores, recordStores);
-
-      final FolderConnectionRegistry importFolderConnections = importProject.getFolderConnections();
-      final FolderConnectionRegistry folderConnections = rootProject.getFolderConnections();
-      importConnections("Folder Connection", importProject, importFolderConnections,
-        folderConnections);
       importProject(importProject);
       if (resetProject) {
         setName(importProject.getName());

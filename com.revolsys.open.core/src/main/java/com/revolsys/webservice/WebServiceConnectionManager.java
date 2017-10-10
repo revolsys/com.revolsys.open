@@ -1,6 +1,7 @@
 package com.revolsys.webservice;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -110,9 +111,14 @@ public class WebServiceConnectionManager
   }
 
   public WebServiceConnectionRegistry addConnectionRegistry(final String name,
-    final Resource recordStoresDirectory) {
+    final Path directory) {
+    return addConnectionRegistry(name, new PathResource(directory));
+  }
+
+  public WebServiceConnectionRegistry addConnectionRegistry(final String name,
+    final Resource directory) {
     final WebServiceConnectionRegistry registry = new WebServiceConnectionRegistry(this, name,
-      recordStoresDirectory);
+      directory);
     addConnectionRegistry(registry);
     return registry;
   }
