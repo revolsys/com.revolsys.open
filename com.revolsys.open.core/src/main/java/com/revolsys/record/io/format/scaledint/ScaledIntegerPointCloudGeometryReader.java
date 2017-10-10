@@ -1,4 +1,4 @@
-package com.revolsys.record.io.format.pointz;
+package com.revolsys.record.io.format.scaledint;
 
 import java.io.EOFException;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +15,7 @@ import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.WrappedException;
 
-public class PointZGeometryReader extends AbstractIterator<Geometry> implements GeometryReader {
+public class ScaledIntegerPointCloudGeometryReader extends AbstractIterator<Geometry> implements GeometryReader {
   private final Resource resource;
 
   private ChannelReader reader;
@@ -28,7 +28,7 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
 
   private boolean exists = false;
 
-  public PointZGeometryReader(final Resource resource) {
+  public ScaledIntegerPointCloudGeometryReader(final Resource resource) {
     this.resource = resource;
   }
 
@@ -84,9 +84,9 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
       reader.getBytes(fileTypeBytes);
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
                                                                                  // type
-      if (!PointZ.FILE_TYPE_HEADER.equals(fileType)) {
+      if (!ScaledIntegerPointCloud.FILE_TYPE_HEADER.equals(fileType)) {
         throw new IllegalArgumentException(
-          "File must start with the text: " + PointZ.FILE_TYPE_HEADER + " not " + fileType);
+          "File must start with the text: " + ScaledIntegerPointCloud.FILE_TYPE_HEADER + " not " + fileType);
       }
       @SuppressWarnings("unused")
       final short version = reader.getShort();

@@ -28,7 +28,7 @@ import com.revolsys.util.Exceptions;
 public class ScaledIntegerGriddedDigitalElevationModel extends AbstractIoFactoryWithCoordinateSystem
   implements GriddedElevationModelReadFactory, GriddedElevationModelWriterFactory {
 
-  public static final String MEDIA_TYPE = "image/x-rs-sigdem";
+  public static final String MEDIA_TYPE = "image/x-revolsys-sigdem";
 
   public static final String FILE_EXTENSION = "sigdem";
 

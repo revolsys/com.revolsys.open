@@ -1,4 +1,4 @@
-package com.revolsys.record.io.format.pointz;
+package com.revolsys.record.io.format.scaledint;
 
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class PointZGeometryWriter extends AbstractWriter<Geometry> implements GeometryWriter {
+public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geometry> implements GeometryWriter {
   private boolean initialized;
 
   private final Resource resource;
@@ -24,7 +24,7 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
 
   private GeometryFactory geometryFactory;
 
-  public PointZGeometryWriter(final Resource resource) {
+  public ScaledIntegerPointCloudGeometryWriter(final Resource resource) {
     this.resource = resource;
     setGeometryFactory(GeometryFactory.fixed3d(0, 1000.0, 1000.0, 1000.0));
 
@@ -45,8 +45,8 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
       this.writer = this.resource.newChannelWriter();
 
       final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
-      this.writer.putBytes(PointZ.FILE_TYPE_HEADER_BYTES); // File type
-      this.writer.putShort(PointZ.VERSION); // version
+      this.writer.putBytes(ScaledIntegerPointCloud.FILE_TYPE_HEADER_BYTES); // File type
+      this.writer.putShort(ScaledIntegerPointCloud.VERSION); // version
       this.writer.putInt(coordinateSystemId);
       this.writer.putDouble(this.scaleXy);
       this.writer.putDouble(this.scaleZ);
