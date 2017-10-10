@@ -272,7 +272,7 @@ public interface Paths {
           final FolderConnection connection = registry.getConnection(connectionName);
           if (connection != null) {
             final Path directory = connection.getPath();
-            path = directory.resolve(uriPath);
+            path = directory.resolve(uriPath.substring(1));
             if (Paths.exists(path)) {
               return Paths.getPath(path);
             }

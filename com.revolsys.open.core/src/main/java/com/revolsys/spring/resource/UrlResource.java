@@ -379,7 +379,12 @@ public class UrlResource extends AbstractResource {
 
   @Override
   public Path getPath() {
-    return Paths.getPath(this.uri);
+    final URI uri = getUri();
+    if (isFolderConnection()) {
+      return Paths.getPath(uri);
+    } else {
+      return Paths.getPath(uri);
+    }
   }
 
   public String getProtocol() {
