@@ -202,7 +202,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   public void setEditing(final boolean editing) {
     final boolean oldValue = this.editing;
     this.editing = editing;
-    firePropertyChange("editing", oldValue, this.layer);
+    firePropertyChange("editing", oldValue, this.editing);
   }
 
   public void setIcon(final Icon icon) {

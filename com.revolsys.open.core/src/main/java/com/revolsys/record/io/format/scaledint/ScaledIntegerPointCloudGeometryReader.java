@@ -15,7 +15,8 @@ import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.WrappedException;
 
-public class ScaledIntegerPointCloudGeometryReader extends AbstractIterator<Geometry> implements GeometryReader {
+public class ScaledIntegerPointCloudGeometryReader extends AbstractIterator<Geometry>
+  implements GeometryReader {
   private final Resource resource;
 
   private ChannelReader reader;
@@ -84,9 +85,10 @@ public class ScaledIntegerPointCloudGeometryReader extends AbstractIterator<Geom
       reader.getBytes(fileTypeBytes);
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
                                                                                  // type
-      if (!ScaledIntegerPointCloud.FILE_TYPE_HEADER.equals(fileType)) {
-        throw new IllegalArgumentException(
-          "File must start with the text: " + ScaledIntegerPointCloud.FILE_TYPE_HEADER + " not " + fileType);
+      if (!ScaledIntegerPointCloud.FILE_TYPE_HEADER.equals(fileType)
+        && !"POINTZ".equals(fileType)) {
+        throw new IllegalArgumentException("File must start with the text: "
+          + ScaledIntegerPointCloud.FILE_TYPE_HEADER + " not " + fileType);
       }
       @SuppressWarnings("unused")
       final short version = reader.getShort();
