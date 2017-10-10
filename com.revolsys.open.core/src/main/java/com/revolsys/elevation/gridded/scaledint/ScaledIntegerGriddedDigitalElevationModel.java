@@ -1,4 +1,4 @@
-package com.revolsys.elevation.gridded.compactbinary;
+package com.revolsys.elevation.gridded.scaledint;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -25,24 +25,26 @@ import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
+public class ScaledIntegerGriddedDigitalElevationModel extends AbstractIoFactoryWithCoordinateSystem
   implements GriddedElevationModelReadFactory, GriddedElevationModelWriterFactory {
 
-  public static final String FILE_EXTENSION = "demcb";
+  public static final String MEDIA_TYPE = "image/x-rs-sigdem";
 
-  public static final String FILE_EXTENSION_GZ = "demcb.gz";
+  public static final String FILE_EXTENSION = "sigdem";
 
-  public static final String FILE_EXTENSION_ZIP = "demcb.zip";
+  public static final String FILE_EXTENSION_GZ = FILE_EXTENSION + ".gz";
 
-  public static final String FILE_FORMAT = "DEMGCB";
+  public static final String FILE_EXTENSION_ZIP = FILE_EXTENSION + ".zip";
 
-  public static final byte[] FILE_FORMAT_BYTES = "DEMGCB".getBytes(StandardCharsets.UTF_8);
+  public static final String FILE_FORMAT = "SIGDEM";
+
+  public static final byte[] FILE_FORMAT_BYTES = "SIGDEM".getBytes(StandardCharsets.UTF_8);
 
   public static final int HEADER_SIZE = 120;
 
   public static final int RECORD_SIZE = 4;
 
-  public static final short VERSION = 2;
+  public static final short VERSION = 1;
 
   public static double getElevationInterpolated(final Resource baseResource,
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
@@ -138,10 +140,10 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     return (G)editor.newGeometry();
   }
 
-  public CompactBinaryGriddedElevation() {
-    super("DEM Compact Binary");
+  public ScaledIntegerGriddedDigitalElevationModel() {
+    super("Scaled Integer Gridded Digital Elevation Model");
 
-    addMediaTypeAndFileExtension("image/x-rs-compact-binary-dem", FILE_EXTENSION);
+    addMediaTypeAndFileExtension(MEDIA_TYPE, FILE_EXTENSION);
     addFileExtension(FILE_EXTENSION_ZIP);
     addFileExtension(FILE_EXTENSION_GZ);
   }
@@ -150,7 +152,7 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
   public GriddedElevationModel newGriddedElevationModel(final Resource resource,
     final Map<String, ? extends Object> properties) {
     try (
-      CompactBinaryGriddedElevationReader reader = new CompactBinaryGriddedElevationReader(
+      ScaledIntegerGriddedDigitalElevationModelReader reader = new ScaledIntegerGriddedDigitalElevationModelReader(
         resource)) {
       reader.setProperties(properties);
       return reader.read();
@@ -159,6 +161,6 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
 
   @Override
   public GriddedElevationModelWriter newGriddedElevationModelWriter(final Resource resource) {
-    return new CompactBinaryGriddedElevationWriter(resource);
+    return new ScaledIntegerGriddedDigitalElevationModelWriter(resource);
   }
 }

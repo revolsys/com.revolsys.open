@@ -9,8 +9,8 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
-import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevation;
-import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevationGrid;
+import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModel;
+import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModelGrid;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
@@ -34,7 +34,7 @@ public class TiledGriddedElevationModelLayer
   implements IGriddedElevationModelLayer {
   private Resource baseResource;
 
-  private String fileExtension = CompactBinaryGriddedElevation.FILE_EXTENSION;
+  private String fileExtension = ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION;
 
   private String filePrefix = null;
 
@@ -46,7 +46,7 @@ public class TiledGriddedElevationModelLayer
 
   private String url;
 
-  private CompactBinaryGriddedElevationGrid elevationModel;
+  private ScaledIntegerGriddedDigitalElevationModelGrid elevationModel;
 
   private double scaleZ;
 
@@ -170,7 +170,7 @@ public class TiledGriddedElevationModelLayer
       if (this.baseResource.isFile()) {
         final Path basePath = this.baseResource.getPath();
         final int coordinateSystemId = getCoordinateSystemId();
-        this.elevationModel = new CompactBinaryGriddedElevationGrid(basePath, this.filePrefix,
+        this.elevationModel = new ScaledIntegerGriddedDigitalElevationModelGrid(basePath, this.filePrefix,
           coordinateSystemId, this.tileSizePixels, this.minResolution, this.scaleZ);
       }
     }

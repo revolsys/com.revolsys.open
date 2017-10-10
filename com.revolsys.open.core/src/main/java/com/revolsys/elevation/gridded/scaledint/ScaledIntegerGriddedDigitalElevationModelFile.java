@@ -1,4 +1,4 @@
-package com.revolsys.elevation.gridded.compactbinary;
+package com.revolsys.elevation.gridded.scaledint;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -23,10 +23,10 @@ import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.util.Exceptions;
 
-public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationModel {
+public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileElevationModel {
   private static final int ELEVATION_BYTE_COUNT = 4;
 
-  public static CompactBinaryGriddedElevationModelFile newModel(final Path basePath,
+  public static ScaledIntegerGriddedDigitalElevationModelFile newModel(final Path basePath,
     final GeometryFactory geometryFactory, final int minX, final int minY, final int gridWidth,
     final int gridHeight, final double gridCellSize) {
 
@@ -35,7 +35,7 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
     final String fileName = RectangularMapGrid.getTileFileName("dem", coordinateSystemId,
       Integer.toString((int)gridCellSize * gridWidth), minX, minY, "demcs");
     final Path path = rowDirectory.resolve(fileName);
-    return new CompactBinaryGriddedElevationModelFile(path, geometryFactory, minX, minY, gridWidth,
+    return new ScaledIntegerGriddedDigitalElevationModelFile(path, geometryFactory, minX, minY, gridWidth,
       gridHeight, (int)gridCellSize);
   }
 
@@ -59,18 +59,18 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
 
   private boolean useLocks = false;
 
-  public CompactBinaryGriddedElevationModelFile(final Path path) {
-    super(CompactBinaryGriddedElevation.HEADER_SIZE, CompactBinaryGriddedElevation.RECORD_SIZE);
+  public ScaledIntegerGriddedDigitalElevationModelFile(final Path path) {
+    super(ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE, ScaledIntegerGriddedDigitalElevationModel.RECORD_SIZE);
     this.path = path;
     this.openOptions = Paths.OPEN_OPTIONS_READ_SET;
     readHeader();
   }
 
-  public CompactBinaryGriddedElevationModelFile(final Path path,
+  public ScaledIntegerGriddedDigitalElevationModelFile(final Path path,
     final GeometryFactory geometryFactory, final int minX, final int minY, final int gridWidth,
     final int gridHeight, final double gridCellSize) {
     super(geometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize,
-      CompactBinaryGriddedElevation.HEADER_SIZE, 4);
+      ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE, 4);
     setZBoundsUpdateRequired(false);
     this.openOptions = Sets.newHash(StandardOpenOption.READ, StandardOpenOption.WRITE,
       StandardOpenOption.SYNC);
@@ -107,7 +107,7 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
       final double gridCellSize = getGridCellSize();
       final BoundingBox boundingBox = getBoundingBox();
       final GeometryFactory geometryFactory = getGeometryFactory();
-      CompactBinaryGriddedElevationWriter.writeHeader(writer, boundingBox, geometryFactory,
+      ScaledIntegerGriddedDigitalElevationModelWriter.writeHeader(writer, boundingBox, geometryFactory,
         gridWidth, gridHeight, (int)gridCellSize);
       final int count = gridWidth * gridHeight;
       for (int i = 0; i < count; i++) {
@@ -186,8 +186,8 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
                                                                                  // type
       final short version = this.reader.getShort();
-      final GeometryFactory geometryFactory = CompactBinaryGriddedElevationReader
-        .readGeometryFactory(this.reader, version);
+      final GeometryFactory geometryFactory = ScaledIntegerGriddedDigitalElevationModelReader
+        .readGeometryFactory(this.reader);
       this.scaleZ = geometryFactory.getScaleZ();
 
       final double minX = reader.getDouble();

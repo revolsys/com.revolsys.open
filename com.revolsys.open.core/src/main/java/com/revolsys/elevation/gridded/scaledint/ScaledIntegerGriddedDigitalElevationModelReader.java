@@ -1,4 +1,4 @@
-package com.revolsys.elevation.gridded.compactbinary;
+package com.revolsys.elevation.gridded.scaledint;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -21,27 +21,18 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class CompactBinaryGriddedElevationReader extends BaseObjectWithProperties
+public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectWithProperties
   implements Closeable {
-  protected static GeometryFactory readGeometryFactory(final ChannelReader reader,
-    final short version) {
-    GeometryFactory geometryFactory;
-    final int coordinateSystemId = reader.getInt(); // Coordinate System ID
-    if (version == 1) {
-      final double scaleX = reader.getDouble();
-      final double scaleZ = reader.getDouble();
-      geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, scaleX, scaleX, scaleZ);
-    } else {
-      final double offsetX = reader.getDouble();
-      final double scaleX = reader.getDouble();
-      final double offsetY = reader.getDouble();
-      final double scaleY = reader.getDouble();
-      final double offsetZ = reader.getDouble();
-      final double scaleZ = reader.getDouble();
-      geometryFactory = GeometryFactory.newWithOffsets(coordinateSystemId, offsetX, scaleX, offsetY,
-        scaleY, offsetZ, scaleZ);
-    }
-    return geometryFactory;
+  protected static GeometryFactory readGeometryFactory(final ChannelReader reader) {
+    final int coordinateSystemId = reader.getInt();
+    final double offsetX = reader.getDouble();
+    final double scaleX = reader.getDouble();
+    final double offsetY = reader.getDouble();
+    final double scaleY = reader.getDouble();
+    final double offsetZ = reader.getDouble();
+    final double scaleZ = reader.getDouble();
+    return GeometryFactory.newWithOffsets(coordinateSystemId, offsetX, scaleX, offsetY, scaleY,
+      offsetZ, scaleZ);
   }
 
   private Resource resource;
@@ -64,7 +55,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
   private boolean exists;
 
-  CompactBinaryGriddedElevationReader(final Resource resource) {
+  ScaledIntegerGriddedDigitalElevationModelReader(final Resource resource) {
     this.resource = resource;
   }
 
@@ -118,8 +109,8 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
         if (isMemoryMapped() && channel instanceof FileChannel) {
           final FileChannel fileChannel = (FileChannel)channel;
           final MappedByteBuffer mappedBytes = fileChannel.map(MapMode.READ_ONLY,
-            CompactBinaryGriddedElevation.HEADER_SIZE,
-            cellCount * CompactBinaryGriddedElevation.RECORD_SIZE);
+            ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE,
+            cellCount * ScaledIntegerGriddedDigitalElevationModel.RECORD_SIZE);
           final IntBuffer intBuffer = mappedBytes.asIntBuffer();
           for (int index = 0; index < cellCount; index++) {
             elevations[index] = intBuffer.get();
@@ -154,10 +145,9 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
     final byte[] fileTypeBytes = new byte[6];
     this.reader.getBytes(fileTypeBytes);
     @SuppressWarnings("unused")
-    final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
-                                                                               // type
+    final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8);
     final short version = this.reader.getShort();
-    final GeometryFactory geometryFactory = readGeometryFactory(this.reader, version);
+    final GeometryFactory geometryFactory = readGeometryFactory(this.reader);
     this.geometryFactory = geometryFactory;
     final double minX = this.reader.getDouble();
     final double minY = this.reader.getDouble();
@@ -165,9 +155,9 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
     final double maxX = this.reader.getDouble();
     final double maxY = this.reader.getDouble();
     final double maxZ = this.reader.getDouble();
-    this.gridCellSize = this.reader.getInt(); // Grid Cell Size
-    this.gridWidth = this.reader.getInt(); // Grid Width
-    this.gridHeight = this.reader.getInt(); // Grid Height
+    this.gridCellSize = this.reader.getInt();
+    this.gridWidth = this.reader.getInt();
+    this.gridHeight = this.reader.getInt();
 
     this.boundingBox = geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY, maxZ);
 

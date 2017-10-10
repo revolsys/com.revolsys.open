@@ -15,6 +15,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
+import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
@@ -66,7 +67,8 @@ public class GriddedElevationModelLayer extends AbstractLayer
       final JFileChooser fileChooser = SwingUtil.newFileChooser("Save As",
         "com.revolsys.swing.map.layer.elevation.gridded.save", "directory");
       final String defaultFileExtension = PreferencesUtil.getUserString(
-        "com.revolsys.swing.map.layer.elevation.gridded.save", "fileExtension", "demcb");
+        "com.revolsys.swing.map.layer.elevation.gridded.save", "fileExtension",
+        ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION);
 
       final List<FileNameExtensionFilter> fileFilters = new ArrayList<>();
       for (final GriddedElevationModelWriterFactory factory : IoFactory

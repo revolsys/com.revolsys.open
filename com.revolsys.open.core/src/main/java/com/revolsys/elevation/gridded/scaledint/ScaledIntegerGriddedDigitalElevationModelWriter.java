@@ -1,4 +1,4 @@
-package com.revolsys.elevation.gridded.compactbinary;
+package com.revolsys.elevation.gridded.scaledint;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,7 +18,7 @@ import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedElevationModel>
+public class ScaledIntegerGriddedDigitalElevationModelWriter extends AbstractWriter<GriddedElevationModel>
   implements GriddedElevationModelWriter {
   public static void writeHeader(final ChannelWriter writer, final BoundingBox boundingBox,
     final GeometryFactory geometryFactory, final int gridWidth, final int gridHeight,
@@ -32,9 +32,9 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
     if (scaleZ <= 0) {
       scaleZ = 1000;
     }
-    writer.putBytes(CompactBinaryGriddedElevation.FILE_FORMAT_BYTES); // File //
+    writer.putBytes(ScaledIntegerGriddedDigitalElevationModel.FILE_FORMAT_BYTES); // File //
     // type
-    writer.putShort(CompactBinaryGriddedElevation.VERSION); // version
+    writer.putShort(ScaledIntegerGriddedDigitalElevationModel.VERSION); // version
     writer.putInt(coordinateSystemId); // Coordinate System ID
 
     for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
@@ -63,7 +63,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
 
   private int gridHeight;
 
-  CompactBinaryGriddedElevationWriter(final Resource resource) {
+  ScaledIntegerGriddedDigitalElevationModelWriter(final Resource resource) {
     this.resource = resource;
   }
 
@@ -86,7 +86,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
     if (this.writer == null) {
       final String fileNameExtension = this.resource.getFileNameExtension();
       if ("zip".equals(fileNameExtension)
-        || CompactBinaryGriddedElevation.FILE_EXTENSION_ZIP.equals(fileNameExtension)) {
+        || ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION_ZIP.equals(fileNameExtension)) {
         try {
           final OutputStream bufferedOut = this.resource.newBufferedOutputStream();
           final String fileName = this.resource.getBaseName();
@@ -101,8 +101,8 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
       } else if ("gz".equals(fileNameExtension)) {
         try {
           String fileName = this.resource.getBaseName();
-          if (!fileName.endsWith("." + CompactBinaryGriddedElevation.FILE_EXTENSION)) {
-            fileName += "." + CompactBinaryGriddedElevation.FILE_EXTENSION;
+          if (!fileName.endsWith("." + ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION)) {
+            fileName += "." + ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION;
           }
           final OutputStream bufferedOut = this.resource.newBufferedOutputStream();
           final GZIPOutputStream zipOut = new GZIPOutputStream(bufferedOut);

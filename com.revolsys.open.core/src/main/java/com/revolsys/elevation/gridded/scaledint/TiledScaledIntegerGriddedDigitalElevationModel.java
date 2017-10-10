@@ -1,4 +1,4 @@
-package com.revolsys.elevation.gridded.compactbinary;
+package com.revolsys.elevation.gridded.scaledint;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.IntPair;
 
-public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElevationModel {
+public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGriddedElevationModel {
 
   private int gridTileWidth;
 
@@ -22,10 +22,10 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
 
   private final Map<IntPair, DirectFileElevationModel> models = new LruMap<>(5000);
 
-  public TiledCompactBinaryGriddedElevationModel() {
+  public TiledScaledIntegerGriddedDigitalElevationModel() {
   }
 
-  public TiledCompactBinaryGriddedElevationModel(final Resource baseResource,
+  public TiledScaledIntegerGriddedDigitalElevationModel(final Resource baseResource,
     final String fileExtension, final GeometryFactory geometryFactory, final double minX,
     final double minY, final int gridTileWidth, final int gridTileHeight, final int gridCellSize) {
     super(geometryFactory, minX, minY, Integer.MAX_VALUE, Integer.MAX_VALUE, gridCellSize);
@@ -56,7 +56,7 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
 
       final int tileMinX = (int)(tileMinGridX * gridCellSize);
       final int tileMinY = (int)(tileMinGridY * gridCellSize);
-      model = new CompactBinaryGriddedElevationModelFile(this.baseResource.toPath(),
+      model = new ScaledIntegerGriddedDigitalElevationModelFile(this.baseResource.toPath(),
         getGeometryFactory(), tileMinX, tileMinY, this.gridTileWidth, this.gridTileHeight,
         gridCellSize);
       this.models.put(key, model);
@@ -66,7 +66,7 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
     final int gridCellY = gridY - tileMinGridY;
 
     return model.getElevation(gridCellX, gridCellY);
-    // final int offset = CompactBinaryGriddedElevation.HEADER_SIZE
+    // final int offset = ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE
     // + (gridCellY * this.gridSize + gridCellX) * this.elevationByteCount;
     // double elevation;
     // if (this.isPath) {

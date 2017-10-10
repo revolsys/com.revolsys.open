@@ -4,12 +4,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.revolsys.elevation.gridded.test.CompactBinaryGriddedElevationModelTest;
+import com.revolsys.elevation.gridded.test.ScaledIntegerGriddedDigitalElevationModelTest;
 import com.revolsys.elevation.gridded.test.EsriAsciiGriddedElevationModelTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  CompactBinaryGriddedElevationModelTest.class, //
+  ScaledIntegerGriddedDigitalElevationModelTest.class, //
   EsriAsciiGriddedElevationModelTest.class //
 })
 public class ElevationTestSuite {

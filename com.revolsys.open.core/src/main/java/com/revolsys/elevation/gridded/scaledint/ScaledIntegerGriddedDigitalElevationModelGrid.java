@@ -1,4 +1,4 @@
-package com.revolsys.elevation.gridded.compactbinary;
+package com.revolsys.elevation.gridded.scaledint;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -17,7 +17,7 @@ import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 
-public class CompactBinaryGriddedElevationGrid {
+public class ScaledIntegerGriddedDigitalElevationModelGrid {
 
   private class FileChannelHolder implements BaseCloseable {
     private final int tileX;
@@ -63,7 +63,7 @@ public class CompactBinaryGriddedElevationGrid {
       if (this.openCount.get() == this.closeCount.get()) {
         try {
           this.fileChannel.close();
-          CompactBinaryGriddedElevationGrid.this.channelsByXandY.get(this.tileX).remove(this.tileY);
+          ScaledIntegerGriddedDigitalElevationModelGrid.this.channelsByXandY.get(this.tileX).remove(this.tileY);
           this.fileChannel = null;
         } catch (final Exception e) {
         }
@@ -94,7 +94,7 @@ public class CompactBinaryGriddedElevationGrid {
 
   private final LinkedList<FileChannelHolder> channels = new LinkedList<>();
 
-  public CompactBinaryGriddedElevationGrid(final Path basePath, final String filePrefix,
+  public ScaledIntegerGriddedDigitalElevationModelGrid(final Path basePath, final String filePrefix,
     final int coordinateSystemId, final int gridTileSize, final int gridCellSize,
     final double scaleZ) {
     this.coordinateSystemId = coordinateSystemId;
@@ -104,7 +104,7 @@ public class CompactBinaryGriddedElevationGrid {
     this.scaleZ = scaleZ;
     this.gridSizePixels = gridTileSize / gridCellSize;
     this.tileBasePath = basePath//
-      .resolve(CompactBinaryGriddedElevation.FILE_EXTENSION)//
+      .resolve(ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION)//
       .resolve(Integer.toString(coordinateSystemId))//
       .resolve(Integer.toString(gridTileSize))//
     ;
@@ -118,7 +118,7 @@ public class CompactBinaryGriddedElevationGrid {
       final int gridCellX = GriddedElevationModel.getGridCellX(tileX, this.gridCellSize, x);
       final int gridCellY = GriddedElevationModel.getGridCellY(tileY, this.gridCellSize, y);
       final int elevationByteSize = 4;
-      final int offset = CompactBinaryGriddedElevation.HEADER_SIZE
+      final int offset = ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE
         + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
       try (
         FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
@@ -160,7 +160,7 @@ public class CompactBinaryGriddedElevationGrid {
       fileNameBuilder.append('_');
       fileNameBuilder.append(tileY);
       fileNameBuilder.append('.');
-      fileNameBuilder.append(CompactBinaryGriddedElevation.FILE_EXTENSION);
+      fileNameBuilder.append(ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION);
       final String fileName = fileNameBuilder.toString();
       final Path path = this.tileBasePath//
         .resolve(Integer.toString(tileX))//

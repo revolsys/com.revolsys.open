@@ -3,7 +3,7 @@ package com.revolsys.elevation.gridded;
 import java.io.IOException;
 import java.util.Arrays;
 
-import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevationWriter;
+import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModelWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.editor.LineStringEditor;
@@ -200,7 +200,7 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     super.setGeometryFactory(geometryFactory);
   }
 
-  public void writeIntArray(final CompactBinaryGriddedElevationWriter writer,
+  public void writeIntArray(final ScaledIntegerGriddedDigitalElevationModelWriter writer,
     final ChannelWriter out) throws IOException {
     final int[] elevations = this.elevations;
     for (final int elevation : elevations) {
