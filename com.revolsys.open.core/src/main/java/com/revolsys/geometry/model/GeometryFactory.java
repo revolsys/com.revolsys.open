@@ -1802,6 +1802,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public BoundingBox newBoundingBox(final BoundingBox boundingBox) {
+    final int axisCount = getAxisCount();
+    final double[] bounds = boundingBox.getMinMaxValues(axisCount);
+    return newBoundingBox(axisCount, bounds);
+  }
+
   public BoundingBox newBoundingBox(final double x, final double y) {
     return new BoundingBoxDoubleXYGeometryFactory(this, x, y);
   }

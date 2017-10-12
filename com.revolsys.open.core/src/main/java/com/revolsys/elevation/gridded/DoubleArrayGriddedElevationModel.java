@@ -1,6 +1,7 @@
 package com.revolsys.elevation.gridded;
 
 import java.util.Arrays;
+import java.util.function.DoubleConsumer;
 
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -13,6 +14,7 @@ public class DoubleArrayGriddedElevationModel extends AbstractGriddedElevationMo
     final double y, final int gridWidth, final int gridHeight, final double gridCellSize) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
     this.elevations = new double[gridWidth * gridHeight];
+    Arrays.fill(this.elevations, NULL_VALUE);
   }
 
   @Override
@@ -25,6 +27,15 @@ public class DoubleArrayGriddedElevationModel extends AbstractGriddedElevationMo
   protected void expandZ() {
     for (final double elevation : this.elevations) {
       expandZ(elevation);
+    }
+  }
+
+  @Override
+  public void forEachElevationFinite(final DoubleConsumer action) {
+    for (final double z : this.elevations) {
+      if (Double.isFinite(z)) {
+        action.accept(z);
+      }
     }
   }
 

@@ -6,35 +6,71 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.gridded.DoubleArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
+import com.revolsys.geometry.io.PointReader;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Readers;
-import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.number.BigDecimals;
 import com.revolsys.util.number.Doubles;
 
-public class EsriAsciiGriddedElevationModelReader extends BaseObjectWithProperties
-  implements BaseCloseable {
+public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point>
+  implements BaseCloseable, PointReader {
 
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private final Resource resource;
 
+  private double noDataValue = 0;
+
+  private double x;
+
+  private double y;
+
+  private int width = -1;
+
+  private int height = -1;
+
+  private double elevation = Double.NaN;
+
+  private double cellSize = 0;
+
+  private BufferedReader reader;
+
+  private int gridX = 0;
+
+  private int gridY = 0;
+
   public EsriAsciiGriddedElevationModelReader(final Resource resource,
     final Map<String, ? extends Object> properties) {
     this.resource = resource;
     setProperties(properties);
+  }
+
+  @Override
+  protected void closeDo() {
+    final BufferedReader reader = this.reader;
+    if (reader != null) {
+      try {
+        reader.close();
+      } catch (final IOException e) {
+      } finally {
+        this.reader = null;
+      }
+    }
   }
 
   protected BufferedReader getBufferedReader() {
@@ -69,49 +105,97 @@ public class EsriAsciiGriddedElevationModelReader extends BaseObjectWithProperti
         if (geometryFactory != null) {
           setGeometryFactory(geometryFactory);
         }
-        return this.resource.newBufferedReader();
+        this.reader = this.resource.newBufferedReader();
+        return this.reader;
       }
     } catch (final IOException e) {
       throw Exceptions.wrap("Unable to open: " + this.resource, e);
     }
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
 
-  public GriddedElevationModel read() {
+  @Override
+  protected Point getNext() throws NoSuchElementException {
+    try {
+      while (this.gridY >= 0) {
+        while (this.gridX < this.width) {
+          if (this.elevation != this.noDataValue) {
+            final Point point = this.geometryFactory.point(this.x + this.gridX * this.cellSize,
+              this.y + this.gridY * this.cellSize, this.elevation);
+            this.elevation = Readers.readDouble(this.reader);
+            this.gridX++;
+            return point;
+          } else {
+            this.elevation = Readers.readDouble(this.reader);
+            this.gridX++;
+          }
+        }
+        this.gridX = 0;
+        this.gridY--;
+      }
+    } catch (final Exception e) {
+      throw Exceptions.wrap("Error reading: " + this.resource, e);
+    }
+    throw new NoSuchElementException();
+  }
 
-    try (
-      BufferedReader reader = getBufferedReader()) {
+  @Override
+  protected void initDo() {
+    readHeader();
+  }
+
+  public GriddedElevationModel read() {
+    try {
+      readHeader();
+      final DoubleArrayGriddedElevationModel elevationModel = new DoubleArrayGriddedElevationModel(
+        this.geometryFactory, this.x, this.y, this.width, this.height, this.cellSize);
+      elevationModel.setResource(this.resource);
+      if (Maps.getBool(getProperties(), EsriAsciiGriddedElevation.PROPERTY_READ_DATA, true)) {
+        for (int gridY = this.height - 1; gridY >= 0; gridY--) {
+          for (int gridX = 0; gridX < this.width; gridX++) {
+            if (this.elevation != this.noDataValue) {
+              elevationModel.setElevation(gridX, gridY, this.elevation);
+            }
+            this.elevation = Readers.readDouble(this.reader);
+          }
+        }
+      }
+      return elevationModel;
+    } catch (final Exception e) {
+      throw Exceptions.wrap("Error reading: " + this.resource, e);
+    }
+  }
+
+  private BufferedReader readHeader() {
+    try {
+      final BufferedReader reader = getBufferedReader();
       double xCentre = Double.NaN;
       double yCentre = Double.NaN;
       double xCorner = Double.NaN;
       double yCorner = Double.NaN;
-      double noDataValue = 0;
-      int width = -1;
-      int height = -1;
-      double cellSize = 0;
-      double elevation = Double.NaN;
-      while (Double.isNaN(elevation)) {
+      while (Double.isNaN(this.elevation)) {
         String keyword = Readers.readKeyword(reader);
         if (BigDecimals.isNumber(keyword)) {
-          elevation = Doubles.toValid(keyword);
+          this.elevation = Doubles.toValid(keyword);
         } else {
           keyword = keyword.toLowerCase();
           if ("ncols".equals(keyword)) {
-            width = Readers.readInteger(reader);
-            if (width <= 0) {
+            this.width = Readers.readInteger(reader);
+            if (this.width <= 0) {
               throw new IllegalArgumentException("ncols must be > 0\n" + this.resource);
             }
           } else if ("nrows".equals(keyword)) {
-            height = Readers.readInteger(reader);
-            if (height <= 0) {
+            this.height = Readers.readInteger(reader);
+            if (this.height <= 0) {
               throw new IllegalArgumentException("nrows must be > 0\n" + this.resource);
             }
           } else if ("cellsize".equals(keyword)) {
-            cellSize = Readers.readDouble(reader);
-            if (cellSize <= 0) {
+            this.cellSize = Readers.readDouble(reader);
+            if (this.cellSize <= 0) {
               throw new IllegalArgumentException("cellsize must be > 0\n" + this.resource);
             }
           } else if ("xllcenter".equals(keyword)) {
@@ -123,20 +207,18 @@ public class EsriAsciiGriddedElevationModelReader extends BaseObjectWithProperti
           } else if ("yllcorner".equals(keyword)) {
             yCorner = Readers.readDouble(reader);
           } else if ("nodata_value".equals(keyword)) {
-            noDataValue = Readers.readDouble(reader);
+            this.noDataValue = Readers.readDouble(reader);
           } else {
             // Skip unknown value
             Readers.readKeyword(reader);
           }
         }
       }
-      double x;
-      double y;
-      if (width == 0) {
+      if (this.width == 0) {
         throw new IllegalArgumentException("ncols not specified\n" + this.resource);
-      } else if (height == 0) {
+      } else if (this.height == 0) {
         throw new IllegalArgumentException("nrows not specified\n" + this.resource);
-      } else if (cellSize == 0) {
+      } else if (this.cellSize == 0) {
         throw new IllegalArgumentException("cellsize not specified\n" + this.resource);
       } else if (Double.isNaN(xCentre)) {
         if (Double.isNaN(xCorner)) {
@@ -147,8 +229,8 @@ public class EsriAsciiGriddedElevationModelReader extends BaseObjectWithProperti
             throw new IllegalArgumentException(
               "xllcorner set must missing yllcorner\n" + this.resource);
           } else {
-            x = xCorner;
-            y = yCorner;
+            this.x = xCorner;
+            this.y = yCorner;
           }
         }
       } else {
@@ -156,27 +238,13 @@ public class EsriAsciiGriddedElevationModelReader extends BaseObjectWithProperti
           throw new IllegalArgumentException(
             "xllcenter set must missing yllcenter\n" + this.resource);
         } else {
-          x = xCentre - cellSize / 2.0;
-          y = yCentre - cellSize / 2.0;
+          this.x = xCentre - this.cellSize / 2.0;
+          this.y = yCentre - this.cellSize / 2.0;
         }
       }
-      final DoubleArrayGriddedElevationModel elevationModel = new DoubleArrayGriddedElevationModel(
-        this.geometryFactory, x, y, width, height, cellSize);
-      elevationModel.setResource(this.resource);
-      if (Maps.getBool(getProperties(), EsriAsciiGriddedElevation.PROPERTY_READ_DATA, true)) {
-        for (int gridY = height - 1; gridY >= 0; gridY--) {
-          for (int gridX = 0; gridX < width; gridX++) {
-            if (elevation == noDataValue) {
-              elevationModel.setElevationNull(gridX, gridY);
-            } else {
-              elevationModel.setElevation(gridX, gridY, elevation);
-            }
-            elevation = Readers.readDouble(reader);
-          }
-        }
-      }
-      return elevationModel;
-    } catch (final Throwable e) {
+      this.gridY = this.height - 1;
+      return reader;
+    } catch (final Exception e) {
       throw Exceptions.wrap("Error reading: " + this.resource, e);
     }
   }

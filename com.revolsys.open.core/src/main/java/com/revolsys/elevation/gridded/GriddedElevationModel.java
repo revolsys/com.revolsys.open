@@ -2,12 +2,15 @@ package com.revolsys.elevation.gridded;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModel;
 import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
@@ -80,6 +83,19 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   void clear();
 
+  default void forEachElevationFinite(final DoubleConsumer action) {
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      for (int gridX = 0; gridX < gridWidth; gridX++) {
+        final double z = getElevationFast(gridX, gridY);
+        if (Double.isFinite(z)) {
+          action.accept(z);
+        }
+      }
+    }
+  }
+
   default void forEachPoint(final DoubleConsumer3 action) {
     final double gridCellSize = getGridCellSize();
     final double minY = getMinY();
@@ -92,6 +108,75 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
         final double x = minX + gridX * gridCellSize;
         final double z = getElevationFast(gridX, gridY);
         action.accept(x, y, z);
+      }
+    }
+  }
+
+  default void forEachPointFinite(final BoundingBox boundingBox, final Consumer<Point> action) {
+    final GeometryFactory targetGeometryFactory = boundingBox.getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+
+    final CoordinatesOperation projection = geometryFactory
+      .getCoordinatesOperation(targetGeometryFactory);
+
+    final BoundingBox convertexBoundingBox = boundingBox.convert(geometryFactory);
+    final double gridCellSize = getGridCellSize();
+    final double minY = getMinY();
+    final double minX = getMinX();
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+
+    int startGridX = (int)Math.floor((convertexBoundingBox.getMinX() - minX) / gridCellSize);
+    if (startGridX < 0) {
+      startGridX = 0;
+    }
+    int endGridX = (int)Math.ceil((convertexBoundingBox.getMaxX() - minX) / gridCellSize);
+    if (endGridX > gridWidth) {
+      endGridX = gridWidth;
+    }
+
+    int startGridY = (int)Math.floor((convertexBoundingBox.getMinY() - minY) / gridCellSize);
+    if (startGridY < 0) {
+      startGridY = 0;
+    }
+    int endGridY = (int)Math.ceil((convertexBoundingBox.getMaxY() - minY) / gridCellSize);
+    if (endGridY > gridHeight) {
+      endGridY = gridHeight;
+    }
+
+    if (projection == null) {
+      for (int gridY = startGridY; gridY < endGridY; gridY++) {
+        final double y = minY + gridY * gridCellSize;
+        for (int gridX = startGridX; gridX < endGridX; gridX++) {
+          final double x = minX + gridX * gridCellSize;
+          final double z = getElevationFast(gridX, gridY);
+          if (Double.isFinite(z)) {
+            if (boundingBox.covers(x, y)) {
+              final Point point = targetGeometryFactory.point(x, y, z);
+              action.accept(point);
+            }
+          }
+        }
+      }
+    } else {
+      final double[] coordinates = new double[2];
+      for (int gridY = startGridY; gridY < endGridY; gridY++) {
+        final double y = minY + gridY * gridCellSize;
+        for (int gridX = startGridX; gridX < endGridX; gridX++) {
+          final double x = minX + gridX * gridCellSize;
+          final double z = getElevationFast(gridX, gridY);
+          if (Double.isFinite(z)) {
+            coordinates[0] = x;
+            coordinates[1] = y;
+            projection.perform(2, coordinates, 2, coordinates);
+            final double targetX = coordinates[0];
+            final double targetY = coordinates[1];
+            if (boundingBox.covers(targetX, targetY)) {
+              final Point point = targetGeometryFactory.point(targetX, targetY, z);
+              action.accept(point);
+            }
+          }
+        }
       }
     }
   }
@@ -356,7 +441,11 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
         points.appendVertex(x, y);
       }
     }
-    return points.newPolygon();
+    if (points.isEmpty()) {
+      return getBoundingBox().toPolygon();
+    } else {
+      return points.newPolygon();
+    }
   }
 
   @Override

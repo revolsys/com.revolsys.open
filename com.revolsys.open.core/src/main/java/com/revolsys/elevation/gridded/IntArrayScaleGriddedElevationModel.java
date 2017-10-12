@@ -2,6 +2,7 @@ package com.revolsys.elevation.gridded;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.DoubleConsumer;
 
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModelWriter;
 import com.revolsys.geometry.model.BoundingBox;
@@ -54,6 +55,16 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     final double maxZ = toDoubleZ(max);
     setZRange(minZ, maxZ);
 
+  }
+
+  @Override
+  public void forEachElevationFinite(final DoubleConsumer action) {
+    for (final int elevation : this.elevations) {
+      if (elevation != NULL_VALUE) {
+        final double z = toDoubleZ(elevation);
+        action.accept(z);
+      }
+    }
   }
 
   @Override
