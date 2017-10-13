@@ -37,9 +37,9 @@ import java.util.List;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
  * Validates that a collection of {@link SegmentString}s is correctly noded.
@@ -131,9 +131,9 @@ public class FastNodingValidator {
       return "no intersections found";
     }
 
-    final Point[] intSegs = this.segInt.getIntersectionSegments();
-    return "found non-noded intersection between " + EWktWriter.lineString(intSegs[0], intSegs[1])
-      + " and " + EWktWriter.lineString(intSegs[2], intSegs[3]);
+    final double[] intSegs = this.segInt.getIntersectionSegments();
+    return "found non-noded intersection between "
+      + GeometryFactory.DEFAULT_2D.lineString(2, intSegs);
   }
 
   public List getIntersections() {

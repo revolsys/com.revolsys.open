@@ -37,6 +37,7 @@ import java.io.PrintStream;
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Assert;
 
 /**
@@ -50,7 +51,9 @@ import com.revolsys.geometry.util.Assert;
  * @version 1.7
  */
 public class EdgeEnd implements Comparable<Object> {
-  private double dx, dy; // the direction vector for this edge from its starting
+  private double dx;
+
+  private double dy; // the direction vector for this edge from its starting
 
   protected Edge edge; // the parent edge of this edge end
 
@@ -58,23 +61,31 @@ public class EdgeEnd implements Comparable<Object> {
 
   private Node node; // the node this edge end originates at
 
-  private Point p0, p1; // points of initial line segment
-
   // point
 
   private int quadrant;
+
+  private double x1;
+
+  private double y1;
+
+  private double x2;
+
+  private double y2;
 
   protected EdgeEnd(final Edge edge) {
     this.edge = edge;
   }
 
-  public EdgeEnd(final Edge edge, final Point p0, final Point p1) {
-    this(edge, p0, p1, null);
+  public EdgeEnd(final Edge edge, final double x1, final double y1, final double x2,
+    final double y2) {
+    this(edge, x1, y1, x2, y2, null);
   }
 
-  public EdgeEnd(final Edge edge, final Point p0, final Point p1, final Label label) {
+  public EdgeEnd(final Edge edge, final double x1, final double y1, final double x2,
+    final double y2, final Label label) {
     this(edge);
-    init(p0, p1);
+    init(x1, y1, x2, y2);
     this.setLabel(label);
   }
 
@@ -130,7 +141,7 @@ public class EdgeEnd implements Comparable<Object> {
      * clear this is an appropriate patch.
      *
      */
-    return CGAlgorithmsDD.orientationIndex(e.p0, e.p1, this.p1);
+    return CGAlgorithmsDD.orientationIndex(e.x1, e.y1, e.x2, e.y2, this.x2, this.y2);
     // testing only
     // return ShewchuksDeterminant.orientationIndex(p1, p2, q);
     // previous implementation - not quite fully robust
@@ -148,11 +159,11 @@ public class EdgeEnd implements Comparable<Object> {
   }
 
   public Point getCoordinate() {
-    return this.p0;
+    return new PointDoubleXY(this.x1, this.y1);
   }
 
   public Point getDirectedCoordinate() {
-    return this.p1;
+    return new PointDoubleXY(this.x2, this.y2);
   }
 
   public double getDx() {
@@ -179,11 +190,29 @@ public class EdgeEnd implements Comparable<Object> {
     return this.quadrant;
   }
 
-  protected void init(final Point p0, final Point p1) {
-    this.p0 = p0;
-    this.p1 = p1;
-    this.dx = p1.getX() - p0.getX();
-    this.dy = p1.getY() - p0.getY();
+  public double getX1() {
+    return this.x1;
+  }
+
+  public double getX2() {
+    return this.x2;
+  }
+
+  public double getY1() {
+    return this.y1;
+  }
+
+  public double getY2() {
+    return this.y2;
+  }
+
+  protected void init(final double x1, final double y1, final double x2, final double y2) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.dx = x2 - x1;
+    this.dy = y2 - y1;
     this.quadrant = Quadrant.quadrant(this.dx, this.dy);
     Assert.isTrue(!(this.dx == 0 && this.dy == 0), "EdgeEnd with identical endpoints found");
   }
@@ -193,8 +222,8 @@ public class EdgeEnd implements Comparable<Object> {
     final String className = getClass().getName();
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
-    out.print("  " + name + ": " + this.p0 + " - " + this.p1 + " " + this.quadrant + ":" + angle
-      + "   " + getLabel());
+    out.print("  " + name + ": " + this.x1 + "," + this.y1 + " - " + this.x2 + "," + this.y2 + " "
+      + this.quadrant + ":" + angle + "   " + getLabel());
   }
 
   protected void setLabel(final Label label) {
@@ -211,7 +240,7 @@ public class EdgeEnd implements Comparable<Object> {
     final String className = getClass().getName();
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
-    return "  " + name + ": " + this.p0 + " - " + this.p1 + " " + this.quadrant + ":" + angle
-      + "   " + getLabel();
+    return "  " + name + ": " + this.x1 + "," + this.y1 + " - " + this.x2 + "," + this.y2 + " "
+      + this.quadrant + ":" + angle + "   " + getLabel();
   }
 }

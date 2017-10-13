@@ -144,13 +144,13 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     // Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
     int pointCount = ei1.segmentIndex - ei0.segmentIndex + 2;
 
-    final Point lastSegStartPt = this.edge.getPoint(ei1.segmentIndex);
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
     // (This check is needed because the distance metric is not totally
     // reliable!)
     // The check for point equality is 2D only - Z values are ignored
-    final boolean useIntPt1 = ei1.dist > 0.0 || !ei1.equals(2, lastSegStartPt);
+    final boolean useIntPt1 = ei1.dist > 0.0
+      || !this.edge.equalsVertex(ei1.segmentIndex, ei1.getX(), ei1.getY());
     if (!useIntPt1) {
       pointCount--;
     }

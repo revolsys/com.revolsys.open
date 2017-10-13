@@ -33,9 +33,7 @@
 package com.revolsys.geometry.geomgraph.index;
 
 import com.revolsys.geometry.geomgraph.Edge;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 
 /**
  * MonotoneChains are a way of partitioning the segments of an edge to
@@ -78,20 +76,33 @@ public class MonotoneChainEdge {
 
   private void computeIntersectsForChain(final int start0, final int end0,
     final MonotoneChainEdge mce, final int start1, final int end1, final SegmentIntersector ei) {
-    final Point p00 = this.edge.getPoint(start0);
-    final Point p01 = this.edge.getPoint(end0);
-    final Point p10 = mce.edge.getPoint(start1);
-    final Point p11 = mce.edge.getPoint(end1);
-    // Debug.println("computeIntersectsForChain:" + p00 + p01 + p10 + p11);
+
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {
       ei.addIntersections(this.edge, start0, mce.edge, start1);
       return;
     }
+    double p0x0 = this.edge.getX(start0);
+    double p0y0 = this.edge.getY(start0);
+    double p0x1 = this.edge.getX(end0);
+    double p0y1 = this.edge.getY(end0);
+    if (p0x0 > p0x1) {
+      final double t = p0x0;
+      p0x0 = p0x1;
+      p0x1 = t;
+    }
+    if (p0y0 > p0y1) {
+      final double t = p0y0;
+      p0y0 = p0y1;
+      p0y1 = t;
+    }
+
+    final double p1x0 = mce.edge.getX(start1);
+    final double p1y0 = mce.edge.getY(start1);
+    final double p1x1 = mce.edge.getX(end1);
+    final double p1y1 = mce.edge.getY(end1);
     // nothing to do if the envelopes of these chains don't overlap
-    final BoundingBox env1 = BoundingBoxDoubleXY.newBoundingBox(p00, p01);
-    final BoundingBox env2 = BoundingBoxDoubleXY.newBoundingBox(p10, p11);
-    if (!env1.intersects(env2)) {
+    if (!BoundingBoxUtil.intersects(p0x0, p0y0, p0x1, p0y1, p1x0, p1y0, p1x1, p1y1)) {
       return;
     }
 
@@ -126,14 +137,14 @@ public class MonotoneChainEdge {
   }
 
   public double getMaxX(final int chainIndex) {
-    final double x1 = this.edge.getPoint(this.startIndex[chainIndex]).getX();
-    final double x2 = this.edge.getPoint(this.startIndex[chainIndex + 1]).getX();
+    final double x1 = this.edge.getX(this.startIndex[chainIndex]);
+    final double x2 = this.edge.getX(this.startIndex[chainIndex + 1]);
     return x1 > x2 ? x1 : x2;
   }
 
   public double getMinX(final int chainIndex) {
-    final double x1 = this.edge.getPoint(this.startIndex[chainIndex]).getX();
-    final double x2 = this.edge.getPoint(this.startIndex[chainIndex + 1]).getX();
+    final double x1 = this.edge.getX(this.startIndex[chainIndex]);
+    final double x2 = this.edge.getX(this.startIndex[chainIndex + 1]);
     return x1 < x2 ? x1 : x2;
   }
 

@@ -178,7 +178,7 @@ public class LineBuilder {
       final DirectedEdge de = (DirectedEdge)element;
       final Edge e = de.getEdge();
       if (de.isLineEdge() && !e.isCoveredSet()) {
-        final boolean isCovered = this.op.isCoveredByA(de.getCoordinate());
+        final boolean isCovered = this.op.isCoveredByA(de.getX1(), de.getY1());
         e.setCovered(isCovered);
       }
     }

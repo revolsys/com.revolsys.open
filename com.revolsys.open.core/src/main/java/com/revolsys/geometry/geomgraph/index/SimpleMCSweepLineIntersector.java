@@ -36,7 +36,6 @@ package com.revolsys.geometry.geomgraph.index;
  * @version 1.7
  */
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.geometry.geomgraph.Edge;
@@ -111,12 +110,12 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
   private void computeIntersections(final SegmentIntersector si) {
     this.nOverlaps = 0;
     prepareEvents();
-
-    for (int i = 0; i < this.events.size(); i++) {
-      final SweepLineEvent ev = this.events.get(i);
-      if (ev.isInsert()) {
-        processOverlaps(i, ev.getDeleteEventIndex(), ev, si);
+    int i = 0;
+    for (final SweepLineEvent event : this.events) {
+      if (event.isInsert()) {
+        processOverlaps(i, event.getDeleteEventIndex(), event, si);
       }
+      i++;
     }
   }
 
@@ -126,13 +125,14 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
    * compared to a given Insert event object.
    */
   private void prepareEvents() {
-    Collections.sort(this.events);
+    this.events.sort(null);
     // set DELETE event indexes
-    for (int i = 0; i < this.events.size(); i++) {
-      final SweepLineEvent ev = this.events.get(i);
-      if (ev.isDelete()) {
-        ev.getInsertEvent().setDeleteEventIndex(i);
+    int i = 0;
+    for (final SweepLineEvent event : this.events) {
+      if (event.isDelete()) {
+        event.getInsertEvent().setDeleteEventIndex(i);
       }
+      i++;
     }
   }
 
@@ -145,11 +145,11 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
      * Last index can be skipped, because it must be a Delete event.
      */
     for (int i = start; i < end; i++) {
-      final SweepLineEvent ev1 = this.events.get(i);
-      if (ev1.isInsert()) {
-        final MonotoneChain mc1 = (MonotoneChain)ev1.getObject();
+      final SweepLineEvent event = this.events.get(i);
+      if (event.isInsert()) {
+        final MonotoneChain mc1 = (MonotoneChain)event.getObject();
         // don't compare edges in same group, if labels are present
-        if (!ev0.isSameLabel(ev1)) {
+        if (!ev0.isSameLabel(event)) {
           mc0.computeIntersections(mc1, si);
           this.nOverlaps++;
         }

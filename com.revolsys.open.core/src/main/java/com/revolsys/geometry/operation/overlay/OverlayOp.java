@@ -547,6 +547,17 @@ public class OverlayOp extends GeometryGraphOperation {
     }
   }
 
+  private boolean isCovered(final double x, final double y,
+    final List<? extends Geometry> geometries) {
+    for (final Geometry geometry : geometries) {
+      final Location loc = this.ptLocator.locate( geometry,x,y);
+      if (loc != Location.EXTERIOR) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * @return true if the coord is located in the interior or boundary of
    * a geometry in the list.
@@ -569,6 +580,19 @@ public class OverlayOp extends GeometryGraphOperation {
    */
   public boolean isCoveredByA(final Point coord) {
     if (isCovered(coord, this.resultPolyList)) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Tests if an L edge should be included in the result or not.
+   *
+   * @param coord the point coordinate
+   * @return true if the coordinate point is covered by a result Area geometry
+   */
+  public boolean isCoveredByA(final double x, double y) {
+    if (isCovered(x,y, this.resultPolyList)) {
       return true;
     }
     return false;

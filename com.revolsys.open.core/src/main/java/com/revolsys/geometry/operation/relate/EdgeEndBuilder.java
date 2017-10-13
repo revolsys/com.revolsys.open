@@ -128,7 +128,8 @@ public class EdgeEndBuilder {
       pNext = eiNext.newPoint2D();
     }
 
-    final EdgeEnd e = new EdgeEnd(edge, eiCurr.newPoint2D(), pNext, new Label(edge.getLabel()));
+    final EdgeEnd e = new EdgeEnd(edge, eiCurr.getX(), eiCurr.getY(), pNext.getX(), pNext.getY(),
+      new Label(edge.getLabel()));
     // Debug.println(e);
     l.add(e);
   }
@@ -152,6 +153,7 @@ public class EdgeEndBuilder {
       }
       iPrev--;
     }
+
     Point pPrev = edge.getPoint(iPrev);
     // if prev intersection is past the previous vertex, use it instead
     if (eiPrev != null && eiPrev.segmentIndex >= iPrev) {
@@ -162,7 +164,8 @@ public class EdgeEndBuilder {
     // since edgeStub is oriented opposite to it's parent edge, have to flip
     // sides for edge label
     label.flip();
-    final EdgeEnd e = new EdgeEnd(edge, eiCurr.newPoint2D(), pPrev, label);
+    final EdgeEnd e = new EdgeEnd(edge, eiCurr.getX(), eiCurr.getY(), pPrev.getX(), pPrev.getY(),
+      label);
     // e.print(System.out); System.out.println();
     l.add(e);
   }

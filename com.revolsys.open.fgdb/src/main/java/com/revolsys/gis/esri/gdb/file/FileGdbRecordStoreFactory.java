@@ -142,9 +142,11 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 
-    final FileGdbRecordStore recordStore = newRecordStore(file);
-    RecordStore.setConnectionProperties(recordStore, properties);
-    return recordStore;
+    synchronized (COUNTS) {
+      final FileGdbRecordStore recordStore = newRecordStore(file);
+      RecordStore.setConnectionProperties(recordStore, properties);
+      return recordStore;
+    }
   }
 
   @Override
