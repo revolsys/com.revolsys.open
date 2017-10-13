@@ -385,7 +385,9 @@ public class DirectedEdgeStar extends EdgeEndStar<DirectedEdge> {
       }
       // Assert.isTrue(firstOut != null, "no outgoing dirEdge found (at " +
       // getCoordinate() );
-      Assert.isTrue(firstOut.isInResult(), "unable to link last incoming dirEdge");
+      if (!firstOut.isInResult()) {
+        throw new IllegalStateException("unable to link last incoming dirEdge");
+      }
       incoming.setNext(firstOut);
     }
   }

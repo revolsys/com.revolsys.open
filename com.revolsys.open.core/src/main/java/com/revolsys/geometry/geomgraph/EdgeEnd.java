@@ -38,7 +38,6 @@ import com.revolsys.geometry.algorithm.BoundaryNodeRule;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.util.Assert;
 
 /**
  * Models the end of an edge incident on a node.
@@ -214,7 +213,9 @@ public class EdgeEnd implements Comparable<Object> {
     this.dx = x2 - x1;
     this.dy = y2 - y1;
     this.quadrant = Quadrant.quadrant(this.dx, this.dy);
-    Assert.isTrue(!(this.dx == 0 && this.dy == 0), "EdgeEnd with identical endpoints found");
+    if (this.dx == 0 && this.dy == 0) {
+      throw new IllegalArgumentException("EdgeEnd with identical endpoints found");
+    }
   }
 
   public void print(final PrintStream out) {

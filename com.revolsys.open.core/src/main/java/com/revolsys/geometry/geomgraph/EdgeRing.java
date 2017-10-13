@@ -42,7 +42,6 @@ import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.geometry.util.Assert;
 
 /**
  * @version 1.7
@@ -152,7 +151,9 @@ public abstract class EdgeRing {
 
       this.edges.add(de);
       final Label label = de.getLabel();
-      Assert.isTrue(label.isArea());
+      if (!label.isArea()) {
+        throw new IllegalStateException("Label is not an area");
+      }
       mergeLabel(label);
       addPoints(de.getEdge(), de.isForward(), isFirstEdge);
       isFirstEdge = false;

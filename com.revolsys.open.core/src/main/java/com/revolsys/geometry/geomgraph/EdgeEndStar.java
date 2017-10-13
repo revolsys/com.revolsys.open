@@ -334,8 +334,9 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
            *  the other geometry (which is determined by the current location).
            *  Assign both sides to be the current location.
            */
-          Assert.isTrue(label.getLocation(geomIndex, Position.LEFT) == Location.NONE,
-            "found single null side");
+          if (label.getLocation(geomIndex, Position.LEFT) != Location.NONE) {
+            throw new IllegalStateException("found single null side");
+          }
           label.setLocation(geomIndex, Position.RIGHT, currLoc);
           label.setLocation(geomIndex, Position.LEFT, currLoc);
         }

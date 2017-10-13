@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.util.Strings;
 
 /**
@@ -155,17 +155,16 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
       pointCount--;
     }
 
-    final Point[] pts = new Point[pointCount];
-    int ipt = 0;
-    pts[ipt++] = ei0;
+    final LineStringEditor lineEditor = new LineStringEditor(2, pointCount);
+    lineEditor.appendVertex(ei0.getX(), ei0.getY());
     for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
-      pts[ipt++] = this.edge.getPoint(i);
+      lineEditor.appendVertex(this.edge.getX(i), this.edge.getY(i));
     }
     if (useIntPt1) {
-      pts[ipt] = ei1;
+      lineEditor.appendVertex(ei1.getX(), ei1.getY());
     }
-    final LineStringDouble points = new LineStringDouble(pts);
-    return new Edge(points, new Label(this.edge.label));
+    final LineString line = lineEditor.newLineString();
+    return new Edge(line, new Label(this.edge.label));
   }
 
   @Override

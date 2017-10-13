@@ -83,6 +83,13 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     this.vertexCount = this.coordinates.length / axisCount;
   }
 
+  public LineStringEditor(final int axisCount, final int vertexCount) {
+    super(GeometryFactory.floating(0, axisCount));
+    this.axisCount = axisCount;
+    this.coordinates = new double[axisCount * vertexCount];
+    this.vertexCount = 0;
+  }
+
   public LineStringEditor(final int axisCount, final int vertexCount, final double... coordinates) {
     super(GeometryFactory.floating(0, axisCount));
     if (coordinates == null || coordinates.length == 0) {
@@ -669,7 +676,9 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       int offset = vertexIndex * axisCount;
       lineCoordinates[offset++] = geometryFactory.makeXPrecise(x);
       lineCoordinates[offset++] = geometryFactory.makeYPrecise(y);
-      setCoordinatesNaN(offset, axisCount);
+      if (axisCount > 2) {
+        setCoordinatesNaN(offset, axisCount);
+      }
     }
     return this;
   }
@@ -686,7 +695,9 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       lineCoordinates[offset++] = geometryFactory.makeYPrecise(y);
       if (this.axisCount > 2) {
         lineCoordinates[offset++] = geometryFactory.makeZPrecise(z);
-        setCoordinatesNaN(offset, 3);
+        if (axisCount > 3) {
+          setCoordinatesNaN(offset, 3);
+        }
       }
     }
     return this;

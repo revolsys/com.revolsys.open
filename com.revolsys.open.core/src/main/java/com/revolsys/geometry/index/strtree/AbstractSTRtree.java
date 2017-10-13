@@ -39,7 +39,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.util.Assert;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.ExitLoopException;
 
@@ -97,7 +96,9 @@ public abstract class AbstractSTRtree<B, I, N extends AbstractNode<B, I>>
    * @param nodeCapacity the maximum number of child nodes in a node
    */
   public AbstractSTRtree(final int nodeCapacity) {
-    Assert.isTrue(nodeCapacity > 1, "Node capacity must be greater than 1");
+    if (nodeCapacity < 2) {
+      throw new IllegalArgumentException("Node capacity must be greater than 1");
+    }
     this.nodeCapacity = nodeCapacity;
   }
 
@@ -148,8 +149,10 @@ public abstract class AbstractSTRtree<B, I, N extends AbstractNode<B, I>>
   }
 
   protected void insert(final B bounds, final I item) {
-    Assert.isTrue(!this.built,
-      "Cannot insert items into an STR packed R-tree after it has been built.");
+    if (this.built) {
+      throw new IllegalStateException(
+        "Cannot insert items into an STR packed R-tree after it has been built.");
+    }
     final ItemBoundable<B, I> itemBoundable = new ItemBoundable<>(bounds, item);
     this.itemBoundables.add(itemBoundable);
   }
@@ -215,7 +218,7 @@ public abstract class AbstractSTRtree<B, I, N extends AbstractNode<B, I>>
       } else if (childBoundable instanceof ItemBoundable) {
         valuesTreeForNode.add(((ItemBoundable)childBoundable).getItem());
       } else {
-        Assert.shouldNeverReachHere();
+        throw new IllegalStateException("Shouldn't reach this code");
       }
     }
     if (valuesTreeForNode.size() <= 0) {
@@ -242,7 +245,9 @@ public abstract class AbstractSTRtree<B, I, N extends AbstractNode<B, I>>
    */
   private N newNodeHigherLevels(final List<? extends Boundable<B, I>> boundablesOfALevel,
     final int level) {
-    Assert.isTrue(!boundablesOfALevel.isEmpty());
+    if (boundablesOfALevel.isEmpty()) {
+      throw new IllegalArgumentException("Must not be empty");
+    }
     final List<N> parentBoundables = newParentBoundables(boundablesOfALevel, level + 1);
     if (parentBoundables.size() == 1) {
       return parentBoundables.get(0);
@@ -256,7 +261,9 @@ public abstract class AbstractSTRtree<B, I, N extends AbstractNode<B, I>>
    */
   protected List<N> newParentBoundables(final List<? extends Boundable<B, I>> childBoundables,
     final int newLevel) {
-    Assert.isTrue(!childBoundables.isEmpty());
+    if (childBoundables.isEmpty()) {
+      throw new IllegalArgumentException("Must not be empty");
+    }
     final List<N> parentBoundables = new ArrayList<>();
     parentBoundables.add(newNode(newLevel));
     final List<Boundable<B, I>> sortedChildBoundables = new ArrayList<>(childBoundables);
@@ -301,9 +308,6 @@ public abstract class AbstractSTRtree<B, I, N extends AbstractNode<B, I>>
    */
   protected boolean remove(final B searchBounds, final I item) {
     build();
-    if (this.itemBoundables.isEmpty()) {
-      Assert.isTrue(this.root.getBounds() == null);
-    }
     if (intersects(this.root.getBounds(), searchBounds)) {
       return this.root.remove(this, searchBounds, item);
     }

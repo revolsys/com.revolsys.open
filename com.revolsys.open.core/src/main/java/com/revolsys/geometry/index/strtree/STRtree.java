@@ -43,7 +43,6 @@ import java.util.function.Consumer;
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
-import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.util.PriorityQueue;
 import com.revolsys.util.Pair;
 
@@ -306,7 +305,9 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
   @Override
   protected List<BoundingBoxNode<I>> newParentBoundables(
     final List<? extends Boundable<BoundingBox, I>> childBoundables, final int newLevel) {
-    Assert.isTrue(!childBoundables.isEmpty());
+    if (childBoundables.isEmpty()) {
+      throw new IllegalArgumentException("Must not be empty");
+    }
     final int minLeafCount = (int)Math.ceil(childBoundables.size() / (double)getNodeCapacity());
     final List<Boundable<BoundingBox, I>> sortedChildBoundables = new ArrayList<>(childBoundables);
     Collections.sort(sortedChildBoundables, this::compareX);
@@ -322,7 +323,6 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
 
   private List<BoundingBoxNode<I>> newParentBoundablesFromVerticalSlices(
     final List<List<Boundable<BoundingBox, I>>> verticalSlices, final int newLevel) {
-    Assert.isTrue(verticalSlices.size() > 0);
     final List<BoundingBoxNode<I>> parentBoundables = new ArrayList<>();
     for (final List<? extends Boundable<BoundingBox, I>> verticalSlice : verticalSlices) {
       parentBoundables.addAll(newParentBoundablesFromVerticalSlice(verticalSlice, newLevel));
