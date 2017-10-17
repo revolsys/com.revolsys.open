@@ -32,7 +32,12 @@ public class LineStringVertex extends AbstractVertex {
     } else {
       final int vertexIndex = getVertexIndex();
       final LineString line = getLineString();
-      return line.getCoordinate(vertexIndex + vertexOffset, axisIndex);
+      final int newVertexIndex = vertexIndex + vertexOffset;
+      if (newVertexIndex < 0) {
+        return java.lang.Double.NaN;
+      } else {
+        return line.getCoordinate(newVertexIndex, axisIndex);
+      }
     }
   }
 

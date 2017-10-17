@@ -23,6 +23,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
+import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
@@ -522,7 +523,7 @@ public interface Records {
   }
 
   static <V extends Record> Predicate<V> newFilter(final BoundingBox boundingBox) {
-    return (record) -> {
+    return record -> {
       if (record != null) {
         try {
           final Geometry geometry = record.getGeometry();
@@ -530,6 +531,7 @@ public interface Records {
             return geometry.intersects(boundingBox);
           }
         } catch (final Throwable t) {
+          Logs.debug(Records.class, "Invalid Geometry", t);
         }
       }
       return false;
@@ -538,7 +540,7 @@ public interface Records {
 
   static <V extends Record> Predicate<V> newFilter(final Geometry geometry,
     final double maxDistance) {
-    return (record) -> {
+    return record -> {
       if (record != null) {
         final Geometry recordGeometry = record.getGeometry();
         if (recordGeometry != null) {
@@ -553,7 +555,7 @@ public interface Records {
   }
 
   static <V extends Record> Predicate<V> newFilter(final String fieldName, final Object value) {
-    return (record) -> {
+    return record -> {
       if (record != null) {
         final Object fieldValue = record.getValue(fieldName);
         return DataType.equal(fieldValue, value);
@@ -565,7 +567,7 @@ public interface Records {
   static <R extends Record> Predicate<R> newFilterGeometryIntersects(final Geometry geometry) {
     if (Property.hasValue(geometry)) {
       final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-      return (record) -> {
+      return record -> {
         if (record != null) {
           try {
             final Geometry geometry2 = record.getGeometry();

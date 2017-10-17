@@ -48,10 +48,13 @@ public class PolygonVertex extends AbstractVertex {
     final LineString ring = getRing();
     if (ring != null) {
       int newVertexIndex = this.vertexIndex + 1;
-      if (newVertexIndex >= ring.getVertexCount() - 1) {
-        newVertexIndex -= ring.getVertexCount();
+      final int vertexCount = ring.getVertexCount();
+      if (newVertexIndex == vertexCount - 1) {
+        newVertexIndex = 1;
+      } else {
+        newVertexIndex -= vertexCount;
       }
-      if (newVertexIndex < ring.getVertexCount() - 1) {
+      if (newVertexIndex < vertexCount - 1) {
         return new PolygonVertex(getPolygon(), this.ringIndex, newVertexIndex);
       }
     }

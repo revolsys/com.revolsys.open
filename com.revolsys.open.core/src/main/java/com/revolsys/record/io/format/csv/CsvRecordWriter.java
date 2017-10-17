@@ -71,6 +71,10 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     final Writer out = this.out;
     if (out != null) {
       try {
+        out.flush();
+      } catch (final IOException e) {
+      }
+      try {
         out.close();
       } catch (final IOException e) {
       }

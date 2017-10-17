@@ -201,12 +201,14 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
   }
 
   public void countSegment(final double x1, final double y1, final double x2, final double y2) {
-    if (x1 < this.x && x2 < this.x) {
+    final double x = this.x;
+    final double y = this.y;
+    if (x1 < x && x2 < x) {
       // check if the segment is strictly to the left of the test point
-    } else if (this.x == x2 && this.y == y2) {
+    } else if (x == x2 && y == y2) {
       // check if the point is equal to the current ring vertex
       this.pointOnSegment = true;
-    } else if (y1 == this.y && y2 == this.y) {
+    } else if (y1 == y && y2 == y) {
       /**
        * For horizontal segments, check if the point is on the segment. Otherwise,
        * horizontal segments are not counted.
@@ -217,10 +219,10 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
         minX = x2;
         maxX = x1;
       }
-      if (this.x >= minX && this.x <= maxX) {
+      if (x >= minX && x <= maxX) {
         this.pointOnSegment = true;
       }
-    } else if (y1 > this.y && y2 <= this.y || y2 > this.y && y1 <= this.y) {
+    } else if (y1 > y && y2 <= y || y2 > y && y1 <= y) {
       /**
        * Evaluate all non-horizontal segments which cross a horizontal ray to the
        * right of the test pt. To avoid double-counting shared vertices, we use
@@ -233,10 +235,10 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
        * </ul>
        */
       // translate the segment so that the test point lies on the origin
-      final double deltaX1 = x1 - this.x;
-      final double deltaY1 = y1 - this.y;
-      final double deltaX2 = x2 - this.x;
-      final double deltaY2 = y2 - this.y;
+      final double deltaX1 = x1 - x;
+      final double deltaY1 = y1 - y;
+      final double deltaX2 = x2 - x;
+      final double deltaY2 = y2 - y;
 
       /**
        * The translated segment straddles the x-axis. Compute the sign of the
