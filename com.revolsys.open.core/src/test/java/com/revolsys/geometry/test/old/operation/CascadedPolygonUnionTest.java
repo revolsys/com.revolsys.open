@@ -54,11 +54,12 @@ public class CascadedPolygonUnionTest extends TestCase {
     "unchecked", "rawtypes"
   })
   public void testBoxes() throws Exception {
-    runTest((List)GeometryUtils.readWKT(new String[] {
+    List polygons = (List)GeometryUtils.readWKT(new String[] {
       "POLYGON ((80 260, 200 260, 200 30, 80 30, 80 260))",
       "POLYGON ((30 180, 300 180, 300 110, 30 110, 30 180))",
       "POLYGON ((30 280, 30 150, 140 150, 140 280, 30 280))"
-    }), CascadedPolygonUnionTester.MIN_SIMILARITY_MEAURE);
+    });
+    runTest(polygons, CascadedPolygonUnionTester.MIN_SIMILARITY_MEAURE);
   }
 
   public void testDiscs1() throws Exception {

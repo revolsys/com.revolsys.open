@@ -140,22 +140,6 @@ public class MonotoneChainEdge {
       mce.startIndex[chainIndex1], mce.startIndex[chainIndex1 + 1], si);
   }
 
-  public double getMaxX(final int chainIndex) {
-    final Edge edge = this.edge;
-    final int[] startIndex = this.startIndex;
-    final double x1 = edge.getX(startIndex[chainIndex]);
-    final double x2 = edge.getX(startIndex[chainIndex + 1]);
-    return x1 > x2 ? x1 : x2;
-  }
-
-  public double getMinX(final int chainIndex) {
-    final Edge edge = this.edge;
-    final int[] startIndex = this.startIndex;
-    final double x1 = edge.getX(startIndex[chainIndex]);
-    final double x2 = edge.getX(startIndex[chainIndex + 1]);
-    return x1 < x2 ? x1 : x2;
-  }
-
   public int getStartIndexCount() {
     return this.startIndex.length;
   }

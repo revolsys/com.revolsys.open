@@ -728,8 +728,8 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     if (modified) {
       setModified(true);
       this.boundingBox = null;
-      this.vertexCount = vertexCount;
       ensureCapacity(vertexCount);
+      this.vertexCount = vertexCount;
     }
   }
 

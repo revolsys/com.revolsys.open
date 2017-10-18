@@ -453,7 +453,7 @@ public interface Polygon extends Polygonal {
 
   @Override
   default Polygon getPolygon(final int partIndex) {
-    if (partIndex == 1) {
+    if (partIndex == 0) {
       return this;
     } else {
       return null;

@@ -244,11 +244,17 @@ public interface LineString extends Lineal {
   }
 
   default int copyCoordinates(final int axisCount, final double nanValue,
+    final double[] destCoordinates, final int destOffset) {
+    final int vertexCount = getVertexCount();
+    return copyCoordinates(axisCount, vertexCount, nanValue, destCoordinates, destOffset);
+  }
+
+  default int copyCoordinates(final int axisCount, final int vertexCount, final double nanValue,
     final double[] destCoordinates, int destOffset) {
     if (isEmpty()) {
       return destOffset;
     } else {
-      for (int vertexIndex = 0; vertexIndex < getVertexCount(); vertexIndex++) {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
         for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
           double coordinate = getCoordinate(vertexIndex, axisIndex);
           if (Double.isNaN(coordinate)) {

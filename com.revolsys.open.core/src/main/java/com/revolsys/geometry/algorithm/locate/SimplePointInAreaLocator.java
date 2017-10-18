@@ -101,10 +101,10 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
     }
   }
 
-  public static Location locate(final Geometry geom, final double x, final double y) {
-    if (geom.isEmpty()) {
+  public static Location locate(final Geometry geometry, final double x, final double y) {
+    if (geometry.isEmpty()) {
       return Location.EXTERIOR;
-    } else if (containsPoint(geom, x, y)) {
+    } else if (containsPoint(geometry, x, y)) {
       return Location.INTERIOR;
     } else {
       return Location.EXTERIOR;

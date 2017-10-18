@@ -299,6 +299,7 @@ public interface LinearRing extends LineString {
       int newVertexIndex = 1;
 
       final int vertexCount = getVertexCount();
+
       for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
         final double x = getX(vertexIndex);
         final double y = getY(vertexIndex);

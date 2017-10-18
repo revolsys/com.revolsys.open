@@ -114,7 +114,7 @@ public class STRtreeTest extends TestCase {
     try {
       t.insertItem(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
       assertTrue(false);
-    } catch (final AssertionError e) {
+    } catch (final IllegalStateException e) {
       assertTrue(true);
     }
   }

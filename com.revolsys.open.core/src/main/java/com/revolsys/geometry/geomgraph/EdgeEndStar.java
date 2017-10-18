@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
+import com.revolsys.geometry.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
@@ -186,6 +187,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
           } else {
             final double x = e.getX1();
             final double y = e.getY1();
+            final Point c = e.getCoordinate();
             loc = getLocation(geomi, x, y, geomGraph);
           }
           label.setAllLocationsIfNull(geomi, loc);
@@ -237,7 +239,8 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
     Location location = this.ptInAreaLocation[geomIndex];
     if (location == Location.NONE) {
       final Geometry geometry = geom[geomIndex].getGeometry();
-      location = this.ptInAreaLocation[geomIndex] = geometry.locate(x, y);
+      location = SimplePointInAreaLocator.locate(geometry, x, y);
+      this.ptInAreaLocation[geomIndex] = location;
     }
     return location;
   }
