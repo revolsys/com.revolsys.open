@@ -71,9 +71,10 @@ public class GeometryGraph extends PlanarGraph {
    *    isInBoundary = (componentCount == 1)
    */
   /*
-   * public static boolean isInBoundary(int boundaryCount) { // the "Mod-2 Rule" return
-   * boundaryCount % 2 == 1; } public static int determineBoundary(int boundaryCount) { return
-   * isInBoundary(boundaryCount) ? Location.BOUNDARY : Location.INTERIOR; }
+   * public static boolean isInBoundary(int boundaryCount) { // the "Mod-2 Rule"
+   * return boundaryCount % 2 == 1; } public static int determineBoundary(int
+   * boundaryCount) { return isInBoundary(boundaryCount) ? Location.BOUNDARY :
+   * Location.INTERIOR; }
    */
 
   public static Location determineBoundary(final BoundaryNodeRule boundaryNodeRule,
@@ -167,7 +168,8 @@ public class GeometryGraph extends PlanarGraph {
   private void addLineString(final LineString line) {
     final LineString cleanLine = line.removeDuplicatePoints();
 
-    if (cleanLine.getVertexCount() < 2 || cleanLine.isEmpty()) {
+    final int cleanVertexCount = cleanLine.getVertexCount();
+    if (cleanVertexCount < 2 || cleanLine.isEmpty()) {
       this.hasTooFewPoints = true;
       this.invalidPoint = cleanLine.getPoint(0);
       return;
@@ -183,7 +185,7 @@ public class GeometryGraph extends PlanarGraph {
        * This allows for the case that the node already exists and is a boundary point.
        */
       insertBoundaryPoint(this.argIndex, cleanLine.getPoint(0));
-      insertBoundaryPoint(this.argIndex, cleanLine.getPoint(cleanLine.getVertexCount() - 1));
+      insertBoundaryPoint(this.argIndex, cleanLine.getPoint(cleanVertexCount - 1));
     }
   }
 
@@ -289,8 +291,8 @@ public class GeometryGraph extends PlanarGraph {
     final EdgeSetIntersector esi = newEdgeSetIntersector();
     esi.computeIntersections(this.edges, g.edges, si);
     /*
-     * for (Iterator i = g.edges.iterator(); i.hasNext();) { Edge e = (Edge) i.next();
-     * Debug.print(e.getEdgeIntersectionList()); }
+     * for (Iterator i = g.edges.iterator(); i.hasNext();) { Edge e = (Edge)
+     * i.next(); Debug.print(e.getEdgeIntersectionList()); }
      */
     return si;
   }
@@ -410,15 +412,6 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   private EdgeSetIntersector newEdgeSetIntersector() {
-    // various options for computing intersections, from slowest to fastest
-
-    // private EdgeSetIntersector esi = new SimpleEdgeSetIntersector();
-    // private EdgeSetIntersector esi = new MonotoneChainIntersector();
-    // private EdgeSetIntersector esi = new NonReversingChainIntersector();
-    // private EdgeSetIntersector esi = new SimpleSweepLineIntersector();
-    // private EdgeSetIntersector esi = new MCSweepLineIntersector();
-
-    // return new SimpleEdgeSetIntersector();
     return new SimpleMCSweepLineIntersector();
   }
 }

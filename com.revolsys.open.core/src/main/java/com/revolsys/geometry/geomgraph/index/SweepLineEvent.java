@@ -35,7 +35,7 @@ package com.revolsys.geometry.geomgraph.index;
 /**
  * @version 1.7
  */
-public class SweepLineEvent implements Comparable {
+public class SweepLineEvent<O> implements Comparable<SweepLineEvent<O>> {
   private static final int DELETE = 2;
 
   private static final int INSERT = 1;
@@ -44,11 +44,12 @@ public class SweepLineEvent implements Comparable {
 
   private final int eventType;
 
-  private SweepLineEvent insertEvent = null; // null if this is an INSERT event
+  private SweepLineEvent<O> insertEvent = null; // null if this is an INSERT
+                                                // event
 
-  private Object label; // used for red-blue intersection detection
+  private final Object label; // used for red-blue intersection detection
 
-  private Object obj;
+  private final O object;
 
   private final double xValue;
 
@@ -58,10 +59,12 @@ public class SweepLineEvent implements Comparable {
    * @param x the event location
    * @param insertEvent the corresponding INSERT event
    */
-  public SweepLineEvent(final double x, final SweepLineEvent insertEvent) {
+  public SweepLineEvent(final double x, final SweepLineEvent<O> insertEvent) {
     this.eventType = DELETE;
+    this.label = null;
     this.xValue = x;
     this.insertEvent = insertEvent;
+    this.object = null;
   }
 
   /**
@@ -71,11 +74,11 @@ public class SweepLineEvent implements Comparable {
    * @param x the event location
    * @param obj the object being inserted
    */
-  public SweepLineEvent(final Object label, final double x, final Object obj) {
+  public SweepLineEvent(final Object label, final double x, final O obj) {
     this.eventType = INSERT;
     this.label = label;
     this.xValue = x;
-    this.obj = obj;
+    this.object = obj;
   }
 
   /**
@@ -85,33 +88,24 @@ public class SweepLineEvent implements Comparable {
    * correctly handled.
    */
   @Override
-  public int compareTo(final Object o) {
-    final SweepLineEvent pe = (SweepLineEvent)o;
-    if (this.xValue < pe.xValue) {
-      return -1;
+  public int compareTo(final SweepLineEvent<O> event) {
+    final int compare = Double.compare(this.xValue, event.xValue);
+    if (compare == 0) {
+      return Integer.compare(this.eventType, event.eventType);
     }
-    if (this.xValue > pe.xValue) {
-      return 1;
-    }
-    if (this.eventType < pe.eventType) {
-      return -1;
-    }
-    if (this.eventType > pe.eventType) {
-      return 1;
-    }
-    return 0;
+    return compare;
   }
 
   public int getDeleteEventIndex() {
     return this.deleteEventIndex;
   }
 
-  public SweepLineEvent getInsertEvent() {
+  public SweepLineEvent<O> getInsertEvent() {
     return this.insertEvent;
   }
 
-  public Object getObject() {
-    return this.obj;
+  public O getObject() {
+    return this.object;
   }
 
   public boolean isDelete() {
@@ -122,7 +116,7 @@ public class SweepLineEvent implements Comparable {
     return this.eventType == INSERT;
   }
 
-  public boolean isSameLabel(final SweepLineEvent ev) {
+  public boolean isSameLabel(final SweepLineEvent<O> ev) {
     // no label set indicates single group
     if (this.label == null) {
       return false;

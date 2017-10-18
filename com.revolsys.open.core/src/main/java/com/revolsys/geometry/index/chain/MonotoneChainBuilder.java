@@ -60,26 +60,42 @@ public class MonotoneChainBuilder {
     // skip any zero-length segments at the start of the sequence
     // (since they cannot be used to establish a quadrant)
     final int size = points.getVertexCount();
-    while (safeStart < size - 1 && points.equalsVertex2d(safeStart, safeStart + 1)) {
+    double startX1 = points.getX(safeStart);
+    double startY1 = points.getY(safeStart);
+    double startX2 = points.getX(safeStart + 1);
+    double startY2 = points.getY(safeStart + 1);
+    while (safeStart < size - 1 && startX1 == startX2 && startY1 == startY2) {
+      startX1 = startX2;
+      startY1 = startY2;
       safeStart++;
+      startX2 = points.getX(safeStart + 1);
+      startY2 = points.getY(safeStart + 1);
     }
     // check if there are NO non-zero-length segments
     if (safeStart >= size - 1) {
       return size - 1;
     }
     // determine overall quadrant for chain (which is the starting quadrant)
-    final int chainQuad = Quadrant.quadrant(points, safeStart, safeStart + 1);
+    final int chainQuad = Quadrant.quadrant(startX1, startY1, startX2, startY2);
     int last = start + 1;
-    while (last < size) {
-      // skip zero-length segments, but include them in the chain
-      if (!points.equalsVertex2d(last - 1, last)) {
-        // compute quadrant for next possible segment in chain
-        final int quad = Quadrant.quadrant(points, last - 1, last);
-        if (quad != chainQuad) {
-          break;
+    if (last < size) {
+      double lastX1 = points.getX(last - 1);
+      double lastY1 = points.getY(last - 1);
+      while (last < size) {
+        final double lastX2 = points.getX(last);
+        final double lastY2 = points.getY(last);
+        // skip zero-length segments, but include them in the chain
+        if (!(lastX1 == lastX2 && lastY1 == lastY2)) {
+          // compute quadrant for next possible segment in chain
+          final int quad = Quadrant.quadrant(lastX1, lastY1, lastX2, lastY2);
+          if (quad != chainQuad) {
+            break;
+          }
         }
+        last++;
+        lastX1 = lastX2;
+        lastY1 = lastY2;
       }
-      last++;
     }
     return last - 1;
   }

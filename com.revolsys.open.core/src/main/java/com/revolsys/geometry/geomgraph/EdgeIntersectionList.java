@@ -78,12 +78,13 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    * Adds entries for the first and last points of the edge to the list
    */
   public void addEndpoints() {
-    final int maxSegIndex = this.edge.getVertexCount() - 1;
-    final double x1 = this.edge.getX(0);
-    final double y1 = this.edge.getY(0);
+    final Edge edge = this.edge;
+    final int maxSegIndex = edge.getVertexCount() - 1;
+    final double x1 = edge.getX(0);
+    final double y1 = edge.getY(0);
     add(x1, y1, 0, 0.0);
-    final double x2 = this.edge.getX(maxSegIndex);
-    final double y2 = this.edge.getY(maxSegIndex);
+    final double x2 = edge.getX(maxSegIndex);
+    final double y2 = edge.getY(maxSegIndex);
     add(x2, y2, maxSegIndex, 0.0);
   }
 

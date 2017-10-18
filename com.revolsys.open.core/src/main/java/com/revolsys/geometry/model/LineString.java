@@ -738,18 +738,26 @@ public interface LineString extends Lineal {
 
     // find distinct point before highest point
     int iPrev = hiIndex;
+    double xPrev;
+    double yPrev;
     do {
       iPrev = iPrev - 1;
       if (iPrev < 0) {
         iPrev = pointCount;
       }
-    } while (equalsVertex(iPrev, hiPtX, hiPtY) && iPrev != hiIndex);
+      xPrev = getX(iPrev);
+      yPrev = getY(iPrev);
+    } while (xPrev == hiPtX && yPrev == hiPtY && iPrev != hiIndex);
 
     // find distinct point after highest point
     int iNext = hiIndex;
+    double xNext;
+    double yNext;
     do {
       iNext = (iNext + 1) % pointCount;
-    } while (equalsVertex(iNext, hiPtX, hiPtY) && iNext != hiIndex);
+      xNext = getX(iNext);
+      yNext = getY(iNext);
+    } while (xNext == hiPtX && yNext == hiPtY && iNext != hiIndex);
 
     /**
      * This check catches cases where the ring contains an A-B-A configuration
@@ -757,11 +765,13 @@ public interface LineString extends Lineal {
      * (including the case where the input array has fewer than 4 elements), or
      * it contains coincident line segments.
      */
-    if (equalsVertex(iPrev, hiPtX, hiPtY) || equalsVertex(iNext, hiPtX, hiPtY)
-      || equalsVertex2d(iPrev, iNext)) {
+    if (xPrev == hiPtX && yPrev == hiPtY) {
+      return ClockDirection.CLOCKWISE;
+    } else if (xNext == hiPtX && yNext == hiPtY) {
+      return ClockDirection.CLOCKWISE;
+    } else if (xNext == xPrev && yNext == yPrev) {
       return ClockDirection.CLOCKWISE;
     }
-
     final int disc = orientationIndex(iPrev, hiIndex, iNext);
 
     /**

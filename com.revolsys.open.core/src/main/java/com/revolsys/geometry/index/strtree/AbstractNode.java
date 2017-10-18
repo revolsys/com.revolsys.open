@@ -195,8 +195,9 @@ public abstract class AbstractNode<B extends Bounds<B>, I>
   @Override
   public void query(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds,
     final Consumer<? super I> action) {
-    if (getBounds().intersectsBounds(searchBounds)) {
-      for (final Boundable<B, I> child : this) {
+    final B bounds = getBounds();
+    if (bounds.intersectsBounds(searchBounds)) {
+      for (final Boundable<B, I> child : this.children) {
         child.query(tree, searchBounds, action);
       }
     }

@@ -164,14 +164,15 @@ public class Edge extends GraphComponent implements LineString {
     }
     final Edge e = (Edge)o;
 
-    if (getVertexCount() != e.getVertexCount()) {
+    final int vertexCount = getVertexCount();
+    if (vertexCount != e.getVertexCount()) {
       return false;
     }
 
     boolean isEqualForward = true;
     boolean isEqualReverse = true;
-    int iRev = getVertexCount();
-    for (int i = 0; i < getVertexCount(); i++) {
+    int iRev = vertexCount;
+    for (int i = 0; i < vertexCount; i++) {
       if (!getPoint(i).equals(2, e.getPoint(i))) {
         isEqualForward = false;
       }
@@ -302,11 +303,12 @@ public class Edge extends GraphComponent implements LineString {
    * @return true if the coordinate sequences of the Edges are identical
    */
   public boolean isPointwiseEqual(final Edge e) {
-    if (getVertexCount() != e.getVertexCount()) {
+    final int vertexCount = getVertexCount();
+    if (vertexCount != e.getVertexCount()) {
       return false;
     }
 
-    for (int i = 0; i < getVertexCount(); i++) {
+    for (int i = 0; i < vertexCount; i++) {
       if (!getPoint(i).equals(2, e.getPoint(i))) {
         return false;
       }
