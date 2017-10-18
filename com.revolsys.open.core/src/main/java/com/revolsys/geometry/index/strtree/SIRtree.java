@@ -96,11 +96,6 @@ public class SIRtree<I> extends AbstractSTRtree<Interval, I, IntervalNode<I>>
   }
 
   @Override
-  public boolean intersects(final Interval aBounds, final Interval bBounds) {
-    return aBounds.intersects(bBounds);
-  }
-
-  @Override
   protected IntervalNode<I> newNode(final int level) {
     return new IntervalNode<>(level);
   }

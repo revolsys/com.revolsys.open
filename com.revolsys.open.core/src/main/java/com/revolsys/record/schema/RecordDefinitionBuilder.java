@@ -8,6 +8,10 @@ public class RecordDefinitionBuilder {
 
   private final RecordDefinitionImpl recordDefinition;
 
+  public RecordDefinitionBuilder() {
+    this("");
+  }
+
   public RecordDefinitionBuilder(final PathName pathName) {
     this.recordDefinition = new RecordDefinitionImpl(pathName);
   }
@@ -16,8 +20,15 @@ public class RecordDefinitionBuilder {
     this(PathName.newPathName(pathName));
   }
 
-  public void addField(final FieldDefinition field) {
+  public RecordDefinitionBuilder addField(final DataType type) {
+    final String fieldName = type.getName();
+    this.recordDefinition.addField(fieldName, type);
+    return this;
+  }
+
+  public RecordDefinitionBuilder addField(final FieldDefinition field) {
     this.recordDefinition.addField(field.clone());
+    return this;
   }
 
   public RecordDefinitionBuilder addField(final String fieldName, final DataType type) {
@@ -66,6 +77,11 @@ public class RecordDefinitionBuilder {
 
   public RecordDefinitionBuilder setGeometryFactory(final GeometryFactory geometryFactory) {
     this.recordDefinition.setGeometryFactory(geometryFactory);
+    return this;
+  }
+
+  public RecordDefinitionBuilder setGeometryFieldName(final String fieldName) {
+    this.recordDefinition.setGeometryFieldName(fieldName);
     return this;
   }
 }

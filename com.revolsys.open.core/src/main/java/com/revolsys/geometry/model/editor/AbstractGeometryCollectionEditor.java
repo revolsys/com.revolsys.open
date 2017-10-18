@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.Geometry;
@@ -136,6 +137,13 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
       return false;
     } else {
       return geometryEditor.equalsVertex(axisCount, vertexIndex, point);
+    }
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    for (final Geometry geometry : this.editors) {
+      action.accept(geometry);
     }
   }
 

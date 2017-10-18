@@ -32,21 +32,19 @@
  */
 package com.revolsys.geometry.geomgraph.index;
 
-/**
- * @version 1.7
- */
 public class MonotoneChain {
 
-  int chainIndex;
+  private final int chainIndex;
 
-  MonotoneChainEdge mce;
+  private final MonotoneChainEdge edge;
 
-  public MonotoneChain(final MonotoneChainEdge mce, final int chainIndex) {
-    this.mce = mce;
+  public MonotoneChain(final MonotoneChainEdge edge, final int chainIndex) {
+    this.edge = edge;
     this.chainIndex = chainIndex;
   }
 
-  public void computeIntersections(final MonotoneChain mc, final SegmentIntersector si) {
-    this.mce.computeIntersectsForChain(this.chainIndex, mc.mce, mc.chainIndex, si);
+  public void computeIntersections(final MonotoneChain chain,
+    final SegmentIntersector intersector) {
+    this.edge.computeIntersectsForChain(this.chainIndex, chain.edge, chain.chainIndex, intersector);
   }
 }

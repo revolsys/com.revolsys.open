@@ -40,7 +40,7 @@ import com.revolsys.geometry.util.Assert;
  *
  * @version 1.7
  */
-public class Interval {
+public class Interval implements Bounds<Interval> {
 
   private double max;
 
@@ -78,7 +78,8 @@ public class Interval {
     return (this.min + this.max) / 2;
   }
 
-  public boolean intersects(final Interval other) {
+  @Override
+  public boolean intersectsBounds(final Interval other) {
     return !(other.min > this.max || other.max < this.min);
   }
 }

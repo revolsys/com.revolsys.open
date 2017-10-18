@@ -1,5 +1,7 @@
 package com.revolsys.geometry.model.editor;
 
+import java.util.function.Consumer;
+
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -31,6 +33,14 @@ public class MultiPolygonEditor
   @Override
   public MultiPolygonEditor clone() {
     return (MultiPolygonEditor)super.clone();
+  }
+
+  @Override
+  public void forEachPolygon(final Consumer<Polygon> action) {
+    for (int i = 0; i < getGeometryCount(); i++) {
+      final Polygon polygon = getEditor(i);
+      action.accept(polygon);
+    }
   }
 
   @Override

@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.measure.quantity.Area;
@@ -1316,6 +1317,10 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
+  default void forEachGeometry(final Consumer<Geometry> action) {
+    action.accept(this);
+  }
+
   default Iterable<Geometry> geometries() {
     return getGeometries();
   }
@@ -1755,7 +1760,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (this.isEmpty() || geometry.isEmpty()) {
       // special case: if one input is empty ==> empty
       return OverlayOp.newEmptyResult(OverlayOp.INTERSECTION, this, geometry, geometryFactory);
-    } else if (this.isHeterogeneousGeometryCollection()) {
+    } else if (isHeterogeneousGeometryCollection()) {
       final List<Geometry> geometries = new ArrayList<>();
       for (final Geometry part : geometries()) {
         final Geometry partIntersection = part.intersection(geometry);
@@ -1769,7 +1774,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       }
       return geometryFactory.geometry(geometries);
     } else {
-      checkNotGeometryCollection(this);
       checkNotGeometryCollection(geometry);
       return SnapIfNeededOverlayOp.overlayOp(this, geometry, OverlayOp.INTERSECTION);
     }
@@ -1838,10 +1842,10 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
     // optimization for rectangle arguments
     if (isRectangle()) {
-      return RectangleIntersects.intersects((Polygon)this, g);
+      return RectangleIntersects.rectangleIntersects((Polygon)this, g);
     }
     if (g.isRectangle()) {
-      return RectangleIntersects.intersects((Polygon)g, this);
+      return RectangleIntersects.rectangleIntersects((Polygon)g, this);
     }
     // general case
     return relate(g).isIntersects();
@@ -1882,6 +1886,11 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return false;
   }
 
+  /**
+   * Does it contain different types of geometry
+   *
+   * @return
+   */
   default boolean isHeterogeneousGeometryCollection() {
     if (isGeometryCollection()) {
       return !isHomogeneousGeometryCollection();

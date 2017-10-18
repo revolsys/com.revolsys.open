@@ -723,10 +723,44 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     return this;
   }
 
-  private void setVertexCount(final int vertexCount) {
+  public void setVertexCount(final int vertexCount) {
     this.boundingBox = null;
     this.vertexCount = vertexCount;
     ensureCapacity(vertexCount);
+  }
+
+  @Override
+  public double setX(final int vertexIndex, final double x) {
+    if (isInVertexRange(vertexIndex)) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final double preciseX = geometryFactory.makeXPrecise(x);
+      final double oldValue = getX(vertexIndex);
+      final boolean changed = !Doubles.equal(preciseX, oldValue);
+      if (changed) {
+        this.boundingBox = null;
+        final double[] lineCoordinates = getCoordinatesModified();
+        lineCoordinates[vertexIndex * this.axisCount] = preciseX;
+        return oldValue;
+      }
+    }
+    return Double.NaN;
+  }
+
+  @Override
+  public double setY(final int vertexIndex, final double y) {
+    if (isInVertexRange(vertexIndex)) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final double preciseY = geometryFactory.makeYPrecise(y);
+      final double oldValue = getX(vertexIndex);
+      final boolean changed = !Doubles.equal(preciseY, oldValue);
+      if (changed) {
+        this.boundingBox = null;
+        final double[] lineCoordinates = getCoordinatesModified();
+        lineCoordinates[vertexIndex * this.axisCount + 1] = preciseY;
+        return oldValue;
+      }
+    }
+    return Double.NaN;
   }
 
   @Override

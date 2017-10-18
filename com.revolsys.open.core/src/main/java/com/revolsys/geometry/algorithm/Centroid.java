@@ -135,9 +135,7 @@ public class Centroid {
       final Polygon poly = (Polygon)geometry;
       add(poly);
     } else if (geometry.isGeometryCollection()) {
-      for (final Geometry part : geometry.geometries()) {
-        add(part);
-      }
+      geometry.forEachGeometry(this::add);
     }
   }
 

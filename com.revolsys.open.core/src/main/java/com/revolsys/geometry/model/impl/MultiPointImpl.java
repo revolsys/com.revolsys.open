@@ -35,6 +35,7 @@ package com.revolsys.geometry.model.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -125,6 +126,15 @@ public class MultiPointImpl implements MultiPoint {
       return equals(2, geometry);
     } else {
       return false;
+    }
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    if (this.points != null) {
+      for (final Geometry geometry : this.points) {
+        action.accept(geometry);
+      }
     }
   }
 

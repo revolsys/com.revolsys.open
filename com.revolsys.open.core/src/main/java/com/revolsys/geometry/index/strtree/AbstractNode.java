@@ -52,7 +52,8 @@ import com.revolsys.util.Emptyable;
  *
  * @version 1.7
  */
-public abstract class AbstractNode<B, I> implements Emptyable, Boundable<B, I>, Serializable {
+public abstract class AbstractNode<B extends Bounds<B>, I>
+  implements Emptyable, Boundable<B, I>, Serializable {
   private static final long serialVersionUID = 6493722185909573708L;
 
   private B bounds = null;
@@ -194,7 +195,7 @@ public abstract class AbstractNode<B, I> implements Emptyable, Boundable<B, I>, 
   @Override
   public void query(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds,
     final Consumer<? super I> action) {
-    if (tree.intersects(getBounds(), searchBounds)) {
+    if (getBounds().intersectsBounds(searchBounds)) {
       for (final Boundable<B, I> child : this) {
         child.query(tree, searchBounds, action);
       }
@@ -211,7 +212,7 @@ public abstract class AbstractNode<B, I> implements Emptyable, Boundable<B, I>, 
         .hasNext();) {
         final Boundable<B, I> child = iterator.next();
         if (child.isNode()) {
-          if (tree.intersects(child.getBounds(), searchBounds)) {
+          if (child.getBounds().intersectsBounds(searchBounds)) {
             if (child.remove(tree, searchBounds, item)) {
               if (child.isEmpty()) {
                 iterator.remove();

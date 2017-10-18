@@ -33,7 +33,9 @@
 
 package com.revolsys.geometry.model;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
@@ -42,7 +44,6 @@ import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
 import com.revolsys.geometry.model.editor.MultiPolygonEditor;
 import com.revolsys.geometry.model.editor.PolygonalEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 
 public interface Polygonal extends Geometry {
   @SuppressWarnings("unchecked")
@@ -74,6 +75,8 @@ public interface Polygonal extends Geometry {
     return false;
   }
 
+  void forEachPolygon(Consumer<Polygon> action);
+
   default double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
     final int axisIndex) {
     final Polygon polygon = getGeometry(partIndex);
@@ -90,11 +93,33 @@ public interface Polygonal extends Geometry {
 
   Polygon getPolygon(int partIndex);
 
+  default int getPolygonCount() {
+    return getGeometryCount();
+  }
+
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
   default <V extends Polygon> List<V> getPolygons() {
     return (List)getGeometries();
+  }
+
+  default List<LinearRing> getRings() {
+    final List<LinearRing> rings = new ArrayList<>();
+    forEachPolygon(polygon -> {
+      for (final LinearRing ring : polygon.rings()) {
+        if (!ring.isEmpty()) {
+          rings.add(ring);
+        }
+      }
+    });
+    return rings;
+  }
+
+  default Lineal getRingsLineal() {
+    final List<LinearRing> rings = getRings();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.lineal(rings);
   }
 
   default double getX(final int partIndex, final int ringIndex, final int vertexIndex) {
@@ -140,11 +165,6 @@ public interface Polygonal extends Geometry {
 
   default Iterable<Polygon> polygons() {
     return getGeometries();
-  }
-
-  @Override
-  default Polygonal prepare() {
-    return new PreparedMultiPolygon(this);
   }
 
   default double setCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,

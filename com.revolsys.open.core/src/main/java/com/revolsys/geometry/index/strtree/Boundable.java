@@ -43,7 +43,7 @@ import java.util.function.Consumer;
  *
  * @version 1.7
  */
-public interface Boundable<B, I> extends Iterable<Boundable<B, I>> {
+public interface Boundable<B extends Bounds<B>, I> extends Iterable<Boundable<B, I>> {
   void boundablesAtLevel(int level, Collection<Boundable<B, I>> boundables);
 
   /**

@@ -172,9 +172,7 @@ public class InteriorPointArea {
     if (geometry instanceof Polygon) {
       addPolygon(geometry);
     } else if (geometry.isGeometryCollection()) {
-      for (final Geometry part : geometry.geometries()) {
-        add(part);
-      }
+      geometry.forEachGeometry(this::add);
     }
   }
 

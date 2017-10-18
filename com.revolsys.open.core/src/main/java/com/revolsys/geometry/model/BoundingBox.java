@@ -22,7 +22,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.index.strtree.Bounds;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
@@ -39,8 +39,8 @@ import com.revolsys.util.Property;
 import com.revolsys.util.function.Consumer3;
 import com.revolsys.util.number.Doubles;
 
-public interface BoundingBox
-  extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
+public interface BoundingBox extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable,
+  Serializable, Bounds<BoundingBox> {
   public static final int OUT_LEFT = 1;
 
   public static final int OUT_TOP = 2;
@@ -1096,6 +1096,15 @@ public interface BoundingBox
     return !(x1 > maxX1 || x2 < minX1 || y1 > maxY1 || y2 < minY1);
   }
 
+  @Override
+  default boolean intersectsBounds(final BoundingBox boundingBox) {
+    final double minX2 = boundingBox.getMinX();
+    final double minY2 = boundingBox.getMinY();
+    final double maxX2 = boundingBox.getMaxX();
+    final double maxY2 = boundingBox.getMaxY();
+    return intersects(minX2, minY2, maxX2, maxY2);
+  }
+
   /**
    * Fast version of intersects that assumes it's in the same coordinate system.
    *
@@ -1304,39 +1313,44 @@ public interface BoundingBox
         final double maxX = getMaxX();
         final double minY = getMinY();
         final double maxY = getMaxY();
-        final int numCoordinates = 1 + 2 * (numX + numY);
-        final double[] coordinates = new double[numCoordinates * 2];
+        final int coordinateCount = 1 + 2 * (numX + numY);
+        final double[] coordinates = new double[coordinateCount * 2];
         int i = 0;
 
-        CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY);
-        i++;
+        coordinates[i++] = maxX;
+        coordinates[i++] = minY;
         for (int j = 0; j < numX - 1; j++) {
-          CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX - j * xStep, minY);
-          i++;
+          final double x = maxX - j * xStep;
+          coordinates[i++] = x;
+          coordinates[i++] = minY;
         }
-        CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX, minY);
-        i++;
+        coordinates[i++] = minX;
+        coordinates[i++] = minY;
 
         for (int j = 0; j < numY - 1; j++) {
-          CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX, minY + j * yStep);
-          i++;
+          final double y = minY + j * yStep;
+          coordinates[i++] = minX;
+          coordinates[i++] = y;
         }
-        CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX, maxY);
-        i++;
+        coordinates[i++] = minX;
+        coordinates[i++] = maxY;
 
         for (int j = 0; j < numX - 1; j++) {
-          CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX + j * xStep, maxY);
-          i++;
+          final double x = minX + j * xStep;
+          coordinates[i++] = x;
+          coordinates[i++] = maxY;
         }
 
-        CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, maxY);
-        i++;
+        coordinates[i++] = maxX;
+        coordinates[i++] = maxY;
 
         for (int j = 0; j < numY - 1; j++) {
-          CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY + (numY - j) * yStep);
-          i++;
+          final double y = minY + (numY - j) * yStep;
+          coordinates[i++] = maxX;
+          coordinates[i++] = y;
         }
-        CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY);
+        coordinates[i++] = maxX;
+        coordinates[i++] = minY;
 
         final LinearRing ring = factory.linearRing(2, coordinates);
         final Polygon polygon = factory.polygon(ring);

@@ -43,7 +43,9 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.editor.LinearRingEditor;
+import com.revolsys.geometry.model.prep.PreparedLinearRing;
 
 /**
  * Models an OGC SFS <code>LinearRing</code>.
@@ -281,36 +283,47 @@ public interface LinearRing extends LineString {
   }
 
   @Override
+  default LinearRing prepare() {
+    return new PreparedLinearRing(this);
+  }
+
+  @Override
   default LinearRing removeDuplicatePoints() {
     if (isEmpty()) {
       return this;
     } else {
+      final LineStringEditor editor = newGeometryEditor();
+      final int axisCount = getAxisCount();
+      double previousX = getX(0);
+      double previousY = getY(0);
+      int newVertexIndex = 1;
       final int vertexCount = getVertexCount();
-      if (vertexCount < 3) {
-        return this;
-      } else {
-        final int axisCount = getAxisCount();
-        final double[] coordinates = new double[vertexCount * axisCount];
-        double previousX = getX(0);
-        double previousY = getY(0);
-        CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, this, 0);
-        int j = 1 + 0;
-        for (int i = 1; i < vertexCount; i++) {
-          final double x = getX(i);
-          final double y = getY(i);
-          if (x != previousX || y != previousY) {
-            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, this, i);
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x = getX(vertexIndex);
+        final double y = getY(vertexIndex);
+        if (x != previousX || y != previousY) {
+          if (newVertexIndex != vertexIndex) {
+            editor.setX(newVertexIndex, x);
+            editor.setY(newVertexIndex, y);
+            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+              final double coordinate = getCoordinate(newVertexIndex, axisIndex);
+              editor.setCoordinate(newVertexIndex, axisIndex, coordinate);
+            }
           }
+          newVertexIndex++;
+        }
 
-          previousX = x;
-          previousY = y;
-        }
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        if (j < 3) {
-          return newLineStringEmpty(geometryFactory);
-        } else {
-          return geometryFactory.linearRing(axisCount, j, coordinates);
-        }
+        previousX = x;
+        previousY = y;
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (newVertexIndex < 3) {
+        return geometryFactory.linearRing();
+      } else if (editor.isModified()) {
+        editor.setVertexCount(newVertexIndex);
+        return editor.newLinearRing();
+      } else {
+        return this;
       }
     }
   }

@@ -33,6 +33,7 @@
 package com.revolsys.geometry.model.prep;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -116,6 +117,11 @@ public class PreparedMultiLineString implements MultiLineString {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    this.lineal.forEachGeometry(action);
   }
 
   @Override

@@ -35,6 +35,7 @@ package com.revolsys.geometry.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.measure.quantity.Area;
@@ -249,6 +250,11 @@ public interface Polygon extends Polygonal {
     }
   }
 
+  @Override
+  default void forEachPolygon(final Consumer<Polygon> action) {
+    action.accept(this);
+  }
+
   /**
    *  Returns the area of this <code>Polygon</code>
    *
@@ -454,10 +460,20 @@ public interface Polygon extends Polygonal {
     }
   }
 
+  @Override
+  default int getPolygonCount() {
+    if (isEmpty()) {
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+
   LinearRing getRing(int ringIndex);
 
   int getRingCount();
 
+  @Override
   List<LinearRing> getRings();
 
   @Override
@@ -809,7 +825,7 @@ public interface Polygon extends Polygonal {
 
   @Override
   @Deprecated
-  default Polygon prepare() {
+  default PreparedPolygon prepare() {
     return new PreparedPolygon(this);
   }
 

@@ -44,7 +44,7 @@ import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.impl.AbstractPolygon;
+import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
@@ -63,20 +63,27 @@ import com.revolsys.geometry.operation.predicate.RectangleIntersects;
  * @author mbdavis
  *
  */
-public class PreparedPolygon extends AbstractPolygon {
+public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
   private static final long serialVersionUID = 1L;
+
+  private static LinearRing[] prepareRings(final Polygon polygon) {
+    final LinearRing[] rings = new LinearRing[polygon.getRingCount()];
+    for (int i = 0; i < rings.length; i++) {
+      final LinearRing ring = polygon.getRing(i);
+      rings[i] = ring.prepare();
+    }
+    return rings;
+  }
 
   private final boolean isRectangle;
 
   private PointOnGeometryLocator pia = null;
 
-  private final Polygon polygon;
-
   // create these lazily, since they are expensive
   private FastSegmentSetIntersectionFinder segIntFinder = null;
 
   public PreparedPolygon(final Polygon polygon) {
-    this.polygon = polygon;
+    super(polygon.getGeometryFactory(), prepareRings(polygon));
     this.isRectangle = polygon.isRectangle();
   }
 
@@ -84,10 +91,10 @@ public class PreparedPolygon extends AbstractPolygon {
   public boolean contains(final Geometry g) {
     if (envelopeCovers(g)) {
       if (this.isRectangle) {
-        final BoundingBox boundingBox = this.polygon.getBoundingBox();
+        final BoundingBox boundingBox = getBoundingBox();
         return boundingBox.containsSFS(g);
       } else {
-        final PreparedPolygonContains contains = new PreparedPolygonContains(this, this.polygon);
+        final PreparedPolygonContains contains = new PreparedPolygonContains(this);
         return contains.contains(g);
       }
     } else {
@@ -147,18 +154,8 @@ public class PreparedPolygon extends AbstractPolygon {
     } else if (this.isRectangle) {
       return true;
     } else {
-      return new PreparedPolygonCovers(this, this.polygon).covers(geometry);
+      return new PreparedPolygonCovers(this).covers(geometry);
     }
-  }
-
-  @Override
-  public int getAxisCount() {
-    return this.polygon.getAxisCount();
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    return this.polygon.getBoundingBox();
   }
 
   /**
@@ -175,21 +172,17 @@ public class PreparedPolygon extends AbstractPolygon {
      */
     if (this.segIntFinder == null) {
       this.segIntFinder = new FastSegmentSetIntersectionFinder(
-        SegmentStringUtil.extractSegmentStrings(getPolygon()));
+        SegmentStringUtil.extractSegmentStrings(this));
     }
     return this.segIntFinder;
   }
 
   public synchronized PointOnGeometryLocator getPointLocator() {
     if (this.pia == null) {
-      this.pia = new IndexedPointInAreaLocator(getPolygon());
+      this.pia = new IndexedPointInAreaLocator(this);
     }
 
     return this.pia;
-  }
-
-  public Polygon getPolygon() {
-    return this.polygon;
   }
 
   /**
@@ -210,25 +203,10 @@ public class PreparedPolygon extends AbstractPolygon {
   }
 
   @Override
-  public LinearRing getRing(final int ringIndex) {
-    return this.polygon.getRing(ringIndex);
-  }
-
-  @Override
-  public int getRingCount() {
-    return this.polygon.getRingCount();
-  }
-
-  @Override
-  public List<LinearRing> getRings() {
-    return this.polygon.getRings();
-  }
-
-  @Override
   public boolean intersects(final Geometry geometry) {
     if (envelopesIntersect(geometry)) {
       if (this.isRectangle) {
-        return RectangleIntersects.intersects(getPolygon(), geometry);
+        return RectangleIntersects.rectangleIntersects(this, geometry);
       } else {
         final PointOnGeometryLocator pointLocator = getPointLocator();
         /**
@@ -287,9 +265,8 @@ public class PreparedPolygon extends AbstractPolygon {
   }
 
   @Override
-  public boolean intersects(final Point point) {
-    // TODO Auto-generated method stub
-    return super.intersects(point);
+  public boolean isRectangle() {
+    return this.isRectangle;
   }
 
   @Override
@@ -312,7 +289,7 @@ public class PreparedPolygon extends AbstractPolygon {
   }
 
   @Override
-  public Polygon prepare() {
+  public PreparedPolygon prepare() {
     return this;
   }
 }

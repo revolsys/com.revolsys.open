@@ -65,13 +65,16 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
   }
 
   private void add(final Edge edge, final Object edgeSet) {
-    final MonotoneChainEdge mce = edge.getMonotoneChainEdge();
-    final int[] startIndex = mce.getStartIndexes();
-    for (int i = 0; i < startIndex.length - 1; i++) {
-      final MonotoneChain mc = new MonotoneChain(mce, i);
-      final SweepLineEvent insertEvent = new SweepLineEvent(edgeSet, mce.getMinX(i), mc);
-      this.events.add(insertEvent);
-      this.events.add(new SweepLineEvent(mce.getMaxX(i), insertEvent));
+    final MonotoneChainEdge chainEdge = edge.getMonotoneChainEdge();
+    final int startIndexCount = chainEdge.getStartIndexCount();
+    for (int i = 0; i < startIndexCount - 1; i++) {
+      final MonotoneChain chain = new MonotoneChain(chainEdge, i);
+      final double minX = chainEdge.getMinX(i);
+      final double maxX = chainEdge.getMaxX(i);
+      final SweepLineEvent minEvent = new SweepLineEvent(edgeSet, minX, chain);
+      this.events.add(minEvent);
+      final SweepLineEvent maxEvent = new SweepLineEvent(maxX, minEvent);
+      this.events.add(maxEvent);
     }
   }
 

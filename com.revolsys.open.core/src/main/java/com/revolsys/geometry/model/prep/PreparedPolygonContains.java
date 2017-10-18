@@ -48,8 +48,8 @@ import com.revolsys.geometry.model.Geometry;
  */
 class PreparedPolygonContains extends AbstractPreparedPolygonContains {
 
-  public PreparedPolygonContains(final Geometry preparedPolygon, final Geometry originalGeometry) {
-    super(preparedPolygon, originalGeometry);
+  public PreparedPolygonContains(final PreparedPolygonal preparedPolygonal) {
+    super(preparedPolygonal);
   }
 
   /**
@@ -71,7 +71,7 @@ class PreparedPolygonContains extends AbstractPreparedPolygonContains {
    */
   @Override
   protected boolean fullTopologicalPredicate(final Geometry geometry) {
-    final boolean isContained = getOriginalGeometry().contains(geometry);
+    final boolean isContained = this.preparedPolygonal.containsTopo(geometry);
     return isContained;
   }
 

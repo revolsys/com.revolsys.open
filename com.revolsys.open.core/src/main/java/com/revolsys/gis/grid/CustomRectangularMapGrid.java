@@ -3,14 +3,17 @@ package com.revolsys.gis.grid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
@@ -67,14 +70,14 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     setProperties(properties);
   }
 
-  public List<RectangularMapTile> getAllTiles(final BoundingBox boundingBox) {
-    final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
+  public void forEachTile(final BoundingBox boundingBox,
+    final Consumer<RectangularMapTile> action) {
+    final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
 
-    final List<RectangularMapTile> tiles = new ArrayList<>();
-    final int minX = getGridFloor(this.originX, this.tileWidth, envelope.getMinX());
-    final int minY = getGridFloor(this.originY, this.tileHeight, envelope.getMinY());
-    final int maxX = getGridCeil(this.originX, this.tileWidth, envelope.getMaxX());
-    final int maxY = getGridCeil(this.originY, this.tileHeight, envelope.getMaxY());
+    final int minX = getGridFloor(this.originX, this.tileWidth, convertedBoundingBox.getMinX());
+    final int minY = getGridFloor(this.originY, this.tileHeight, convertedBoundingBox.getMinY());
+    final int maxX = getGridCeil(this.originX, this.tileWidth, convertedBoundingBox.getMaxX());
+    final int maxY = getGridCeil(this.originY, this.tileHeight, convertedBoundingBox.getMaxY());
 
     final int numX = (int)Math.ceil((maxX - minX) / this.tileWidth);
     final int numY = (int)Math.ceil((maxY - minY) / this.tileWidth);
@@ -83,9 +86,28 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
       for (int j = 0; j < numX; j++) {
         final double x = minX + j * this.tileWidth;
         final RectangularMapTile tile = getTileByLocation(x, y);
-        tiles.add(tile);
+        action.accept(tile);
       }
     }
+  }
+
+  public void forEachTile(final Geometry geometry, final Consumer<RectangularMapTile> action) {
+    final Geometry convertedGeometry = toCoordinateSystem(geometry);
+    if (!Property.isEmpty(convertedGeometry)) {
+      final BoundingBox boundingBox = convertedGeometry.getBoundingBox();
+      forEachTile(boundingBox, tile -> {
+        final BoundingBox tileBoundingBox = tile.getBoundingBox();
+        if (convertedGeometry.intersects(tileBoundingBox)) {
+          action.accept(tile);
+        }
+      });
+    }
+  }
+
+  public List<RectangularMapTile> getAllTiles(final BoundingBox boundingBox) {
+    final List<RectangularMapTile> tiles = new ArrayList<>();
+    final Consumer<RectangularMapTile> action = tiles::add;
+    forEachTile(boundingBox, action);
     return tiles;
   }
 

@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
-import com.revolsys.geometry.algorithm.locate.SimplePointInAreaLocator;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.TopologyException;
@@ -184,8 +184,9 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
           if (hasDimensionalCollapseEdge[geomi]) {
             loc = Location.EXTERIOR;
           } else {
-            final Point p = e.getCoordinate();
-            loc = getLocation(geomi, p, geomGraph);
+            final double x = e.getX1();
+            final double y = e.getY1();
+            loc = getLocation(geomi, x, y, geomGraph);
           }
           label.setAllLocationsIfNull(geomi, loc);
         }
@@ -230,13 +231,15 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
     return this.edgeList;
   }
 
-  private Location getLocation(final int geomIndex, final Point p, final GeometryGraph[] geom) {
+  private Location getLocation(final int geomIndex, final double x, final double y,
+    final GeometryGraph[] geom) {
     // compute location only on demand
-    if (this.ptInAreaLocation[geomIndex] == Location.NONE) {
-      this.ptInAreaLocation[geomIndex] = SimplePointInAreaLocator.locate(p,
-        geom[geomIndex].getGeometry());
+    Location location = this.ptInAreaLocation[geomIndex];
+    if (location == Location.NONE) {
+      final Geometry geometry = geom[geomIndex].getGeometry();
+      location = this.ptInAreaLocation[geomIndex] = geometry.locate(x, y);
     }
-    return this.ptInAreaLocation[geomIndex];
+    return location;
   }
 
   public EdgeEnd getNextCW(final EdgeEnd ee) {

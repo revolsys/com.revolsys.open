@@ -56,7 +56,7 @@ import com.revolsys.util.ExitLoopException;
  *
  * @version 1.7
  */
-public abstract class AbstractSTRtree<B, I, N extends AbstractNode<B, I>>
+public abstract class AbstractSTRtree<B extends Bounds<B>, I, N extends AbstractNode<B, I>>
   implements Emptyable, Serializable {
 
   private static final int DEFAULT_NODE_CAPACITY = 10;
@@ -156,15 +156,6 @@ public abstract class AbstractSTRtree<B, I, N extends AbstractNode<B, I>>
     final ItemBoundable<B, I> itemBoundable = new ItemBoundable<>(bounds, item);
     this.itemBoundables.add(itemBoundable);
   }
-
-  /**
-   * For STRtrees, the bounds will be Envelopes; for SIRtrees, Intervals;
-   * for other subclasses of AbstractSTRtree, some other class.
-   * @param aBounds the bounds of one spatial object
-   * @param bBounds the bounds of another spatial object
-   * @return whether the two bounds intersect
-   */
-  protected abstract boolean intersects(B bounds1, B bounds2);
 
   /**
    * Tests whether the index contains any items.
@@ -308,7 +299,7 @@ public abstract class AbstractSTRtree<B, I, N extends AbstractNode<B, I>>
    */
   protected boolean remove(final B searchBounds, final I item) {
     build();
-    if (intersects(this.root.getBounds(), searchBounds)) {
+    if (this.root.getBounds().intersectsBounds(searchBounds)) {
       return this.root.remove(this, searchBounds, item);
     }
     return false;

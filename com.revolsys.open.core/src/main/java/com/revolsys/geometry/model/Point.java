@@ -80,6 +80,12 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
+  default Point add(final double deltaX, final double deltaY) {
+    final double x1 = getX();
+    final double y1 = getY();
+    return newPoint(x1 + deltaX, y1 + deltaY);
+  }
+
   default Point add(final Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Point convertedPoint = point.convertPoint2d(geometryFactory);
@@ -87,12 +93,6 @@ public interface Point extends Punctual, Serializable {
     final double y2 = convertedPoint.getY();
 
     return add(x2, y2);
-  }
-
-  default Point add(final double deltaX, final double deltaY) {
-    final double x1 = getX();
-    final double y1 = getY();
-    return newPoint(x1 + deltaX, y1 + deltaY);
   }
 
   /**
@@ -170,16 +170,21 @@ public interface Point extends Punctual, Serializable {
     } else if (otherEmpty) {
       return 1;
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point convertedPoint = point.convertPoint2d(geometryFactory);
-      final double x1 = this.getX();
+      final Point convertedPoint;
+      if (isSameCoordinateSystem(point)) {
+        convertedPoint = point;
+      } else {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        convertedPoint = point.convertPoint2d(geometryFactory);
+      }
+      final double x1 = getX();
       final double x2 = convertedPoint.getX();
       if (x1 < x2) {
         return -1;
       } else if (x1 > x2) {
         return 1;
       } else {
-        final double y1 = this.getY();
+        final double y1 = getY();
         final double y2 = convertedPoint.getY();
         if (y1 < y2) {
           return -1;

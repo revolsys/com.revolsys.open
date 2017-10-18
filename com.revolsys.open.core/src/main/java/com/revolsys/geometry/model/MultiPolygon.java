@@ -39,6 +39,7 @@ import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.MultiPolygonEditor;
+import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 import com.revolsys.geometry.model.segment.MultiPolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPolygonVertex;
@@ -224,6 +225,11 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
+  default boolean isEmpty() {
+    return getPolygonCount() == 0;
+  }
+
+  @Override
   default boolean isEquivalentClass(final Geometry other) {
     return other instanceof MultiPolygon;
   }
@@ -236,10 +242,10 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   @Override
   default Polygonal newGeometry(final GeometryFactory geometryFactory) {
     final List<Polygon> polygons = new ArrayList<>();
-    for (final Polygon polygon : polygons()) {
+    forEachPolygon(polygon -> {
       final Polygon newPolygon = polygon.newGeometry(geometryFactory);
       polygons.add(newPolygon);
-    }
+    });
     return geometryFactory.polygonal(polygons);
   }
 
@@ -297,6 +303,11 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
       final Polygonal normalizedGeometry = geometryFactory.polygonal(geometries);
       return normalizedGeometry;
     }
+  }
+
+  @Override
+  default PreparedMultiPolygon prepare() {
+    return new PreparedMultiPolygon(this);
   }
 
   @Override

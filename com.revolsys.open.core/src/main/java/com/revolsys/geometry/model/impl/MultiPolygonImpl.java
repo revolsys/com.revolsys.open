@@ -35,6 +35,7 @@ package com.revolsys.geometry.model.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -131,6 +132,24 @@ public class MultiPolygonImpl implements MultiPolygon {
   }
 
   @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    if (this.polygons != null) {
+      for (final Polygon polygon : this.polygons) {
+        action.accept(polygon);
+      }
+    }
+  }
+
+  @Override
+  public void forEachPolygon(final Consumer<Polygon> action) {
+    if (this.polygons != null) {
+      for (final Polygon polygon : this.polygons) {
+        action.accept(polygon);
+      }
+    }
+  }
+
+  @Override
   public int getAxisCount() {
     return this.geometryFactory.getAxisCount();
   }
@@ -175,6 +194,15 @@ public class MultiPolygonImpl implements MultiPolygon {
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
+  }
+
+  @Override
+  public int getPolygonCount() {
+    if (this.polygons == null) {
+      return 0;
+    } else {
+      return this.polygons.length;
+    }
   }
 
   /**

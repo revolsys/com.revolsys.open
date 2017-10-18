@@ -131,6 +131,18 @@ public interface GeometryFactoryProxy {
     }
   }
 
+  default <G extends Geometry> G toCoordinateSystem(final G geometry) {
+    if (geometry != null) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (geometryFactory != null) {
+        if (!geometry.isSameCoordinateSystem(geometryFactory)) {
+          return geometry.convertGeometry(geometryFactory);
+        }
+      }
+    }
+    return geometry;
+  }
+
   default double toDoubleX(final int x) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.toDoubleX(x);

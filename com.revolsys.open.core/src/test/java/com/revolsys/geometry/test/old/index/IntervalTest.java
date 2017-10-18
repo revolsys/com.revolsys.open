@@ -68,21 +68,21 @@ public class IntervalTest extends TestCase {
   }
 
   public void testIntersectsBasic() {
-    assertTrue(new Interval(5, 10).intersects(new Interval(7, 12)));
-    assertTrue(new Interval(7, 12).intersects(new Interval(5, 10)));
-    assertTrue(!new Interval(5, 10).intersects(new Interval(11, 12)));
-    assertTrue(!new Interval(11, 12).intersects(new Interval(5, 10)));
-    assertTrue(new Interval(5, 10).intersects(new Interval(10, 12)));
-    assertTrue(new Interval(10, 12).intersects(new Interval(5, 10)));
+    assertTrue(new Interval(5, 10).intersectsBounds(new Interval(7, 12)));
+    assertTrue(new Interval(7, 12).intersectsBounds(new Interval(5, 10)));
+    assertTrue(!new Interval(5, 10).intersectsBounds(new Interval(11, 12)));
+    assertTrue(!new Interval(11, 12).intersectsBounds(new Interval(5, 10)));
+    assertTrue(new Interval(5, 10).intersectsBounds(new Interval(10, 12)));
+    assertTrue(new Interval(10, 12).intersectsBounds(new Interval(5, 10)));
   }
 
   public void testIntersectsZeroWidthInterval() {
-    assertTrue(new Interval(10, 10).intersects(new Interval(7, 12)));
-    assertTrue(new Interval(7, 12).intersects(new Interval(10, 10)));
-    assertTrue(!new Interval(10, 10).intersects(new Interval(11, 12)));
-    assertTrue(!new Interval(11, 12).intersects(new Interval(10, 10)));
-    assertTrue(new Interval(10, 10).intersects(new Interval(10, 12)));
-    assertTrue(new Interval(10, 12).intersects(new Interval(10, 10)));
+    assertTrue(new Interval(10, 10).intersectsBounds(new Interval(7, 12)));
+    assertTrue(new Interval(7, 12).intersectsBounds(new Interval(10, 10)));
+    assertTrue(!new Interval(10, 10).intersectsBounds(new Interval(11, 12)));
+    assertTrue(!new Interval(11, 12).intersectsBounds(new Interval(10, 10)));
+    assertTrue(new Interval(10, 10).intersectsBounds(new Interval(10, 12)));
+    assertTrue(new Interval(10, 12).intersectsBounds(new Interval(10, 10)));
   }
 
 }

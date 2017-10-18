@@ -67,8 +67,10 @@ public class MonotoneChainEdge {
   }
 
   public void computeIntersects(final MonotoneChainEdge mce, final SegmentIntersector si) {
-    for (int i = 0; i < this.startIndex.length - 1; i++) {
-      for (int j = 0; j < mce.startIndex.length - 1; j++) {
+    final int length1 = this.startIndex.length;
+    final int length2 = mce.startIndex.length;
+    for (int i = 0; i < length1 - 1; i++) {
+      for (int j = 0; j < length2 - 1; j++) {
         computeIntersectsForChain(i, mce, j, si);
       }
     }
@@ -78,14 +80,16 @@ public class MonotoneChainEdge {
     final MonotoneChainEdge mce, final int start1, final int end1, final SegmentIntersector ei) {
 
     // terminating condition for the recursion
+    final Edge edge1 = this.edge;
+    final Edge edge2 = mce.edge;
     if (end0 - start0 == 1 && end1 - start1 == 1) {
-      ei.addIntersections(this.edge, start0, mce.edge, start1);
+      ei.addIntersections(edge1, start0, edge2, start1);
       return;
     }
-    double p0x0 = this.edge.getX(start0);
-    double p0y0 = this.edge.getY(start0);
-    double p0x1 = this.edge.getX(end0);
-    double p0y1 = this.edge.getY(end0);
+    double p0x0 = edge1.getX(start0);
+    double p0y0 = edge1.getY(start0);
+    double p0x1 = edge1.getX(end0);
+    double p0y1 = edge1.getY(end0);
     if (p0x0 > p0x1) {
       final double t = p0x0;
       p0x0 = p0x1;
@@ -97,10 +101,10 @@ public class MonotoneChainEdge {
       p0y1 = t;
     }
 
-    final double p1x0 = mce.edge.getX(start1);
-    final double p1y0 = mce.edge.getY(start1);
-    final double p1x1 = mce.edge.getX(end1);
-    final double p1y1 = mce.edge.getY(end1);
+    final double p1x0 = edge2.getX(start1);
+    final double p1y0 = edge2.getY(start1);
+    final double p1x1 = edge2.getX(end1);
+    final double p1y1 = edge2.getY(end1);
     // nothing to do if the envelopes of these chains don't overlap
     if (!BoundingBoxUtil.intersects(p0x0, p0y0, p0x1, p0y1, p1x0, p1y0, p1x1, p1y1)) {
       return;
@@ -137,15 +141,23 @@ public class MonotoneChainEdge {
   }
 
   public double getMaxX(final int chainIndex) {
-    final double x1 = this.edge.getX(this.startIndex[chainIndex]);
-    final double x2 = this.edge.getX(this.startIndex[chainIndex + 1]);
+    final Edge edge = this.edge;
+    final int[] startIndex = this.startIndex;
+    final double x1 = edge.getX(startIndex[chainIndex]);
+    final double x2 = edge.getX(startIndex[chainIndex + 1]);
     return x1 > x2 ? x1 : x2;
   }
 
   public double getMinX(final int chainIndex) {
-    final double x1 = this.edge.getX(this.startIndex[chainIndex]);
-    final double x2 = this.edge.getX(this.startIndex[chainIndex + 1]);
+    final Edge edge = this.edge;
+    final int[] startIndex = this.startIndex;
+    final double x1 = edge.getX(startIndex[chainIndex]);
+    final double x2 = edge.getX(startIndex[chainIndex + 1]);
     return x1 < x2 ? x1 : x2;
+  }
+
+  public int getStartIndexCount() {
+    return this.startIndex.length;
   }
 
   public int[] getStartIndexes() {

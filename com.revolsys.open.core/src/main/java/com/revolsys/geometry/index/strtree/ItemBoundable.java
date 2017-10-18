@@ -42,7 +42,7 @@ import java.util.function.Consumer;
  *
  * @version 1.7
  */
-public class ItemBoundable<B, I> implements Boundable<B, I>, Serializable {
+public class ItemBoundable<B extends Bounds<B>, I> implements Boundable<B, I>, Serializable {
   private static final long serialVersionUID = 1L;
 
   private final B bounds;
@@ -74,7 +74,7 @@ public class ItemBoundable<B, I> implements Boundable<B, I>, Serializable {
   @Override
   public void query(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds,
     final Consumer<? super I> action) {
-    if (tree.intersects(getBounds(), searchBounds)) {
+    if (getBounds().intersectsBounds(searchBounds)) {
       action.accept(this.item);
     }
   }
