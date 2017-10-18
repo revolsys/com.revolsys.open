@@ -297,6 +297,7 @@ public interface LinearRing extends LineString {
       double previousX = getX(0);
       double previousY = getY(0);
       int newVertexIndex = 1;
+
       final int vertexCount = getVertexCount();
       for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
         final double x = getX(vertexIndex);
@@ -316,11 +317,11 @@ public interface LinearRing extends LineString {
         previousX = x;
         previousY = y;
       }
+      editor.setVertexCount(newVertexIndex);
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (newVertexIndex < 3) {
         return geometryFactory.linearRing();
       } else if (editor.isModified()) {
-        editor.setVertexCount(newVertexIndex);
         return editor.newLinearRing();
       } else {
         return this;

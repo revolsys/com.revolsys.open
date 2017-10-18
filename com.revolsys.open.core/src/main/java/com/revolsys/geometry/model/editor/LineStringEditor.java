@@ -724,9 +724,13 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   }
 
   public void setVertexCount(final int vertexCount) {
-    this.boundingBox = null;
-    this.vertexCount = vertexCount;
-    ensureCapacity(vertexCount);
+    final boolean modified = vertexCount != this.vertexCount;
+    if (modified) {
+      setModified(true);
+      this.boundingBox = null;
+      this.vertexCount = vertexCount;
+      ensureCapacity(vertexCount);
+    }
   }
 
   @Override
@@ -751,7 +755,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     if (isInVertexRange(vertexIndex)) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final double preciseY = geometryFactory.makeYPrecise(y);
-      final double oldValue = getX(vertexIndex);
+      final double oldValue = getY(vertexIndex);
       final boolean changed = !Doubles.equal(preciseY, oldValue);
       if (changed) {
         this.boundingBox = null;
