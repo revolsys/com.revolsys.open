@@ -591,7 +591,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
       BoundingBox boundingBox = geometry.getBoundingBox();
       boundingBox = boundingBox.expand(maxDistance);
       final Predicate<Edge<T>> filter = (edge) -> {
-        final LineString line = edge.getLine();
+        final LineString line = edge.getLineString();
         final double distance = line.distance(geometry);
         if (distance <= maxDistance) {
           return true;
@@ -635,7 +635,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
       final double x = point.getX();
       final double y = point.getY();
       final Predicate<Edge<T>> filter = (edge) -> {
-        final LineString line = edge.getLine();
+        final LineString line = edge.getLineString();
         final double distance = line.distance(x, y);
         if (distance <= maxDistance) {
           return true;
@@ -899,8 +899,8 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
       final Map<String, Object> attributes1 = edge1.getProperties();
       final Map<String, Object> attributes2 = edge2.getProperties();
       final T object1 = edge1.getObject();
-      final LineString line1 = edge1.getLine();
-      final LineString line2 = edge2.getLine();
+      final LineString line1 = edge1.getLineString();
+      final LineString line2 = edge2.getLineString();
 
       final LineString newLine = line1.merge(node, line2);
 
@@ -928,8 +928,8 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
    * @return The new edge.
    */
   public Edge<T> mergeEdges(final Edge<T> edge1, final Edge<T> edge2) {
-    final LineString line1 = edge1.getLine();
-    final LineString line2 = edge2.getLine();
+    final LineString line1 = edge1.getLineString();
+    final LineString line2 = edge2.getLineString();
 
     final LineString newLine = line1.merge(line2);
     final Edge<T> newEdge = replaceEdge(edge1, newLine);
@@ -945,7 +945,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
         for (final Edge<Record> edge : edges) {
           if (!edge.isRemoved()) {
-            final LineString line = edge.getLine();
+            final LineString line = edge.getLineString();
             LineString newLine;
             if (line.getPoint().equals(fromNode)) {
               newLine = line.subLine(newPoint, 1, line.getVertexCount() - 1, null);
@@ -1193,7 +1193,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     if (edge.isRemoved()) {
       return Collections.emptyList();
     } else {
-      final LineString line = edge.getLine();
+      final LineString line = edge.getLineString();
       final LineString points = line;
       final Set<Integer> splitVertices = new TreeSet<>();
       final Set<Integer> splitIndexes = new TreeSet<>();
@@ -1338,7 +1338,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   public List<Edge<T>> splitEdge(final Edge<T> edge, final Point point) {
     if (!edge.isRemoved()) {
-      final LineString line = edge.getLine();
+      final LineString line = edge.getLineString();
       final List<LineString> lines = line.split(point);
       if (lines.size() == 1) {
         return Collections.singletonList(edge);

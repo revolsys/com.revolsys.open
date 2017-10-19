@@ -47,6 +47,7 @@ import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -77,6 +78,7 @@ public class GeometryCollectionImpl implements GeometryCollection {
 
   public GeometryCollectionImpl(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+    this.geometries = EMPTY_GEOMETRIES;
   }
 
   /**
@@ -155,6 +157,17 @@ public class GeometryCollectionImpl implements GeometryCollection {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final Geometry geometry : this.geometries) {
+      final R result = geometry.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

@@ -62,7 +62,7 @@ class MCIndexedGeometry {
 
   private void addLine(final LineString points) {
     final SegmentString segStr = new BasicSegmentString(points, null);
-    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getPoints(),
+    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getLineString(),
       segStr);
     for (final MonotoneChain mc : segChains) {
       this.index.insertItem(mc.getEnvelope(), mc);

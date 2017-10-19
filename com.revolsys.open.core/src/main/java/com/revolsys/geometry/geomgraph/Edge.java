@@ -34,19 +34,17 @@ package com.revolsys.geometry.geomgraph;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.geomgraph.index.MonotoneChainEdge;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * @version 1.7
  */
-public class Edge extends GraphComponent implements LineString {
+public class Edge extends GraphComponent implements DelegatingLineString {
 
   private static final long serialVersionUID = 1L;
 
@@ -69,8 +67,6 @@ public class Edge extends GraphComponent implements LineString {
   private int depthDelta = 0; // the change in area depth from the R to L side
 
   private final EdgeIntersectionList eiList = new EdgeIntersectionList(this);
-
-  private BoundingBox env;
 
   private boolean isIsolated = true;
 
@@ -146,8 +142,6 @@ public class Edge extends GraphComponent implements LineString {
     updateIM(this.label, im);
   }
 
-  // of this edge
-
   /**
    * equals is defined to be:
    * <p>
@@ -184,39 +178,13 @@ public class Edge extends GraphComponent implements LineString {
     return true;
   }
 
-  @Override
-  public void forEachVertex(final BiConsumerDouble action) {
-    this.line.forEachVertex(action);
-  }
-
-  @Override
-  public int getAxisCount() {
-    return this.line.getAxisCount();
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    if (this.env == null) {
-      this.env = this.line.getBoundingBox();
-    }
-    return this.env;
-  }
+  // of this edge
 
   public Edge getCollapsedEdge() {
     final LineString points = new LineStringDouble(getPoint(0), getPoint(1));
     final Label lineLabel = Label.toLineLabel(this.label);
     final Edge edge = new Edge(points, lineLabel);
     return edge;
-  }
-
-  @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    return this.line.getCoordinate(vertexIndex, axisIndex);
-  }
-
-  @Override
-  public double[] getCoordinates() {
-    return this.line.getCoordinates();
   }
 
   public Depth getDepth() {
@@ -236,11 +204,7 @@ public class Edge extends GraphComponent implements LineString {
   }
 
   @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.line.getGeometryFactory();
-  }
-
-  public LineString getLine() {
+  public LineString getLineString() {
     return this.line;
   }
 
@@ -257,27 +221,8 @@ public class Edge extends GraphComponent implements LineString {
 
   @Override
   public Point getPoint() {
-    return this.line.getPoint();
-  }
-
-  @Override
-  public Point getPoint(final int i) {
-    return this.line.getPoint(i);
-  }
-
-  @Override
-  public int getVertexCount() {
-    return this.line.getVertexCount();
-  }
-
-  @Override
-  public double getX(final int i) {
-    return this.line.getX(i);
-  }
-
-  @Override
-  public double getY(final int i) {
-    return this.line.getY(i);
+    final LineString line = getLineString();
+    return line.getPoint();
   }
 
   /**
@@ -335,7 +280,7 @@ public class Edge extends GraphComponent implements LineString {
   public String toString() {
     final StringBuilder buf = new StringBuilder();
     buf.append("edge " + this.name + ": ");
-    buf.append(this.line.toString());
+    buf.append(toWkt());
     buf.append("  " + this.label + " " + this.depthDelta);
     return buf.toString();
   }

@@ -44,6 +44,7 @@ import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 /**
  * Models a collection of (@link LineString}s.
@@ -133,6 +134,17 @@ public class MultiLineStringImpl implements MultiLineString {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final Geometry geometry : this.lines) {
+      final R result = geometry.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

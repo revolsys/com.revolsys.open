@@ -80,6 +80,7 @@ import com.revolsys.util.Emptyable;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.number.Doubles;
 
 /**
@@ -1317,6 +1318,15 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return findClosestGeometryComponent(x, y, maxDistance);
     }
   }
+
+  /**
+   * Iterate through all the vertices of the geometry and call the supplied action.
+   * If the action returns a value other than null the iteration will stop and that value returned.
+  *
+    * @param action
+   * @return The first non-null result
+   */
+  <R> R findVertex(BiFunctionDouble<R> action);
 
   default void forEachGeometry(final Consumer<Geometry> action) {
     action.accept(this);

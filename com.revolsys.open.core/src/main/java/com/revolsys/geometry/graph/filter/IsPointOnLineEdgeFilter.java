@@ -29,7 +29,7 @@ public class IsPointOnLineEdgeFilter<T> implements Predicate<Node<T>> {
 
   @Override
   public boolean test(final Node<T> node) {
-    final LineString line = this.edge.getLine();
+    final LineString line = this.edge.getLineString();
     if (!this.edge.hasNode(node)) {
       if (node.intersects(this.boundingBox)) {
         if (LineStringUtil.isPointOnLine(line, node, this.maxDistance)) {

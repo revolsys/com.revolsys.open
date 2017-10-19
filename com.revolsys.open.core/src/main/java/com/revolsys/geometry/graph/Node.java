@@ -191,7 +191,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
       if (!edges.isEmpty()) {
         Point coordinates = null;
         for (final Edge<T> edge : edges) {
-          final LineString line = edge.getLine();
+          final LineString line = edge.getLineString();
           final LineString points = line;
           Point point = null;
           if (edge.getFromNode() == this) {
@@ -480,7 +480,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
         edges.addAll(getOutEdges());
         for (final Edge<T> edge : edges) {
           if (!edge.isRemoved()) {
-            final LineString line = edge.getLine();
+            final LineString line = edge.getLineString();
             LineString newLine;
             final int vertexCount = line.getVertexCount();
             if (edge.getEnd(this).isFrom()) {

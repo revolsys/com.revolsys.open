@@ -12,6 +12,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.number.Doubles;
 
 public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
@@ -278,6 +279,28 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   public boolean equalsVertex(final int axisCount, final int[] vertexId, final Point point) {
     final int vertexIndex = getVertexId(vertexId);
     return equalsVertex(axisCount, vertexIndex, point);
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    if (this.coordinates == null) {
+      return this.line.findVertex(action);
+    } else {
+      final int vertexCount = this.vertexCount;
+      final int axisIgnoreCount = this.axisCount - 2;
+      final double[] coordinates = this.coordinates;
+      int coordinateIndex = 0;
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+        final double x = coordinates[coordinateIndex++];
+        final double y = coordinates[coordinateIndex++];
+        final R result = action.accept(x, y);
+        if (result != null) {
+          return result;
+        }
+        coordinateIndex += axisIgnoreCount;
+      }
+      return null;
+    }
   }
 
   @Override

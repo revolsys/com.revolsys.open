@@ -17,7 +17,7 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Consumer<Edge<T>> {
 
   public static <T> List<Edge<T>> getEdges(final Graph<T> graph, final Edge<T> edge) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
     final BoundingBox env = line.getBoundingBox();
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
     index.forEach(env, new EdgeIntersectsLinearlyEdgeVisitor<>(edge, results));
@@ -40,8 +40,8 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Consumer<Edge<T>> {
   @Override
   public void accept(final Edge<T> edge2) {
     if (edge2 != this.edge) {
-      final LineString line1 = this.edge.getLine();
-      final LineString line2 = edge2.getLine();
+      final LineString line1 = this.edge.getLineString();
+      final LineString line2 = edge2.getLineString();
       final BoundingBox envelope1 = line1.getBoundingBox();
       final BoundingBox envelope2 = line2.getBoundingBox();
       if (envelope1.intersects(envelope2)) {

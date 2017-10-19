@@ -7,6 +7,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 public class PointDoubleXY extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -82,8 +83,19 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   }
 
   @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    if (isEmpty()) {
+      return null;
+    } else {
+      return action.accept(this.x, this.y);
+    }
+  }
+
+  @Override
   public void forEachVertex(final BiConsumerDouble action) {
-    action.accept(this.x, this.y);
+    if (!isEmpty()) {
+      action.accept(this.x, this.y);
+    }
   }
 
   @Override

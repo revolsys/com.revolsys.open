@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 public class MultiPolygonEditor
   extends AbstractGeometryCollectionEditor<Polygonal, Polygon, PolygonEditor>
@@ -35,6 +36,17 @@ public class MultiPolygonEditor
   @Override
   public MultiPolygonEditor clone() {
     return (MultiPolygonEditor)super.clone();
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      final R result = editor.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

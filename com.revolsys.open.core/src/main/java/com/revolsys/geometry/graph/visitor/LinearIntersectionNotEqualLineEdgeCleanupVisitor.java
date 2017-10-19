@@ -47,7 +47,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
     final String typePath = edge.getTypeName();
 
     final Graph<Record> graph = edge.getGraph();
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
 
     Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<>(typePath);
 
@@ -71,7 +71,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
       if (intersectingEdges.size() == 1 && line.getLength() > 10) {
         if (line.getVertexCount() > 2) {
           final Edge<Record> edge2 = intersectingEdges.get(0);
-          final LineString line2 = edge2.getLine();
+          final LineString line2 = edge2.getLineString();
 
           if (middleCoordinatesEqual(line, line2)) {
             final boolean firstEqual = line.equalsVertex(2, 0, line2, 0);

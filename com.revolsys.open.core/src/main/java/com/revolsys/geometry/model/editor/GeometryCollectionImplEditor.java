@@ -7,6 +7,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 public class GeometryCollectionImplEditor
   extends AbstractGeometryCollectionEditor<GeometryCollectionImpl, Geometry, GeometryEditor<?>> {
@@ -34,6 +35,17 @@ public class GeometryCollectionImplEditor
   @Override
   public GeometryCollectionImplEditor clone() {
     return (GeometryCollectionImplEditor)super.clone();
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      final R result = editor.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   implements Polygon, PolygonalEditor {
@@ -115,6 +116,17 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
     } else {
       return geometryEditor.equalsVertex(axisCount, vertexIndex, point);
     }
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      final R result = editor.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

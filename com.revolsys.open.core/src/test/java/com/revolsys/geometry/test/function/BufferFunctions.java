@@ -159,7 +159,7 @@ public class BufferFunctions {
     final List<LineString> lines = new ArrayList<>();
     for (final Iterator i = curves.iterator(); i.hasNext();) {
       final SegmentString ss = (SegmentString)i.next();
-      final LineString points = ss.getPoints();
+      final LineString points = ss.getLineString();
       lines.add(geometry.getGeometryFactory().lineString(points));
     }
     final Geometry curve = geometry.getGeometryFactory().geometry(lines);

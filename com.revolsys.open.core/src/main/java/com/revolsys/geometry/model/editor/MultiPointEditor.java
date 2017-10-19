@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual, Point, PointEditor>
   implements MultiPoint, PunctualEditor {
@@ -70,6 +71,17 @@ public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual,
   @Override
   public boolean equalsVertex(final int axisCount, final int vertexIndex, final Point point) {
     return getEditor(vertexIndex).equals(2, point);
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      final R result = editor.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

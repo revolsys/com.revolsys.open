@@ -147,7 +147,7 @@ public class LineMerger {
             Node<LineString> currentNode = node;
             Edge<LineString> currentEdge = edge;
             do {
-              final LineString line = currentEdge.getLine();
+              final LineString line = currentEdge.getLineString();
               final double length = line.getLength();
               final boolean forwards = currentEdge.getEnd(currentNode).isFrom();
               if (forwards) {
@@ -193,8 +193,8 @@ public class LineMerger {
             final Edge<LineString> edge1 = edges.get(0);
             final Edge<LineString> edge2 = edges.get(1);
             if (edge1 != edge2) {
-              final LineString line1 = edge1.getLine();
-              final LineString line2 = edge2.getLine();
+              final LineString line1 = edge1.getLineString();
+              final LineString line2 = edge2.getLineString();
               final LineString mergedLine = line1.merge(line2);
               this.graph.addEdge(mergedLine);
               this.graph.remove(edge1);

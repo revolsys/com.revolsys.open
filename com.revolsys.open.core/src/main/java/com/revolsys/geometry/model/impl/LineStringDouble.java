@@ -11,6 +11,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 public class LineStringDouble extends AbstractLineString {
   private static final long serialVersionUID = 7579865828939708871L;
@@ -157,6 +158,24 @@ public class LineStringDouble extends AbstractLineString {
         return targetCoordinates;
       }
     }
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    final int vertexCount = this.vertexCount;
+    final int axisIgnoreCount = this.axisCount - 2;
+    final double[] coordinates = this.coordinates;
+    int coordinateIndex = 0;
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = coordinates[coordinateIndex++];
+      final double y = coordinates[coordinateIndex++];
+      final R result = action.accept(x, y);
+      if (result != null) {
+        return result;
+      }
+      coordinateIndex += axisIgnoreCount;
+    }
+    return null;
   }
 
   @Override

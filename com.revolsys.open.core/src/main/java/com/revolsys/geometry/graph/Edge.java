@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.Direction;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.LineString;
@@ -28,13 +28,12 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.BiConsumerDouble;
 
-public class Edge<T> implements LineString, ObjectWithProperties, Externalizable {
+public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Externalizable {
 
   public static <T> void addEdgeToEdgesByLine(final Map<LineString, Set<Edge<T>>> lineEdgeMap,
     final Edge<T> edge) {
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
     for (final Entry<LineString, Set<Edge<T>>> entry : lineEdgeMap.entrySet()) {
       final LineString keyLine = entry.getKey();
       if (LineStringUtil.equalsIgnoreDirection2d(line, keyLine)) {
@@ -50,7 +49,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
 
   public static <T> void addEdgeToEdgesByLine(final Node<T> node,
     final Map<LineString, Set<Edge<T>>> lineEdgeMap, final Edge<T> edge) {
-    LineString line = edge.getLine();
+    LineString line = edge.getLineString();
     for (final Entry<LineString, Set<Edge<T>>> entry : lineEdgeMap.entrySet()) {
       final LineString keyLine = entry.getKey();
       if (LineStringUtil.equalsIgnoreDirection2d(line, keyLine)) {
@@ -70,7 +69,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   public static <T> Set<Edge<T>> getEdges(final Collection<Edge<T>> edges, final LineString line) {
     final Set<Edge<T>> newEdges = new LinkedHashSet<>();
     for (final Edge<T> edge : edges) {
-      if (LineStringUtil.equalsIgnoreDirection2d(line, edge.getLine())) {
+      if (LineStringUtil.equalsIgnoreDirection2d(line, edge.getLineString())) {
         newEdges.add(edge);
       }
     }
@@ -274,7 +273,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
       }
     } else if (other instanceof LineString) {
       final LineString otherLine = (LineString)other;
-      final LineString line = getLine();
+      final LineString line = getLineString();
       return line.compareTo(otherLine);
     }
     return 1;
@@ -297,12 +296,6 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
     super.finalize();
   }
 
-  @Override
-  public void forEachVertex(final BiConsumerDouble action) {
-    final LineString line = getLine();
-    line.forEachVertex(action);
-  }
-
   public double getAngle(final Node<T> node) {
     if (node.getGraph() == this.graph) {
       final int nodeId = node.getId();
@@ -321,28 +314,11 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
     return this.graph.getAxisCount();
   }
 
-  @Override
-  public BoundingBox getBoundingBox() {
-    return getLine().getBoundingBox();
-  }
-
   public Collection<Node<T>> getCommonNodes(final Edge<T> edge) {
     final Collection<Node<T>> nodes1 = getNodes();
     final Collection<Node<T>> nodes2 = edge.getNodes();
     nodes1.retainAll(nodes2);
     return nodes1;
-  }
-
-  @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    final LineString line = getLine();
-    return line.getCoordinate(vertexIndex, axisIndex);
-  }
-
-  @Override
-  public double[] getCoordinates() {
-    final LineString line = getLine();
-    return line.getCoordinates();
   }
 
   public Direction getDirection(final Point point) {
@@ -393,7 +369,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   public double getFromAngle() {
-    final LineString line = getLine();
+    final LineString line = getLineString();
     final LineString points = line;
     return CoordinatesListUtil.angleToNext(points, 0);
   }
@@ -411,12 +387,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   @Override
-  public double getLength() {
-    final LineString line = getLine();
-    return line.getLength();
-  }
-
-  public LineString getLine() {
+  public LineString getLineString() {
     return this.graph.getEdgeLine(this.id);
   }
 
@@ -492,7 +463,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   public double getToAngle() {
-    final LineString line = getLine();
+    final LineString line = getLineString();
     if (line == null) {
       return Double.NaN;
     } else {
@@ -507,12 +478,6 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
 
   public String getTypeName() {
     return this.graph.getTypeName(this);
-  }
-
-  @Override
-  public int getVertexCount() {
-    final LineString line = getLine();
-    return line.getVertexCount();
   }
 
   @Override

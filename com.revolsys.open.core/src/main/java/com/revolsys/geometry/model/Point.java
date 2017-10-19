@@ -52,6 +52,7 @@ import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.number.Doubles;
 
 /**
@@ -525,6 +526,16 @@ public interface Point extends Punctual, Serializable {
       }
       return false;
     }
+  }
+
+  @Override
+  default <R> R findVertex(final BiFunctionDouble<R> action) {
+    if (!isEmpty()) {
+      final double x = getX();
+      final double y = getY();
+      return action.accept(x, y);
+    }
+    return null;
   }
 
   @Override

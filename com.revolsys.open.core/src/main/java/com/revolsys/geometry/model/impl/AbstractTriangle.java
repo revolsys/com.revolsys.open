@@ -2,6 +2,7 @@ package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 public abstract class AbstractTriangle extends AbstractPolygon implements Triangle {
   /**
@@ -22,6 +23,21 @@ public abstract class AbstractTriangle extends AbstractPolygon implements Triang
     } else {
       return super.equals(other);
     }
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    if (!isEmpty()) {
+      for (int i = 0; i < 3; i++) {
+        final double x = getX(i);
+        final double y = getY(i);
+        final R result = action.accept(x, y);
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+    return null;
   }
 
   @Override

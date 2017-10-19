@@ -127,7 +127,7 @@ public class GeometryNoder {
     final List<LineString> lines = new ArrayList<>();
     for (final NodedSegmentString ss : segStrings) {
       if (ss.size() > 1) {
-        lines.add(this.geomFact.lineString(ss.getPoints()));
+        lines.add(this.geomFact.lineString(ss.getLineString()));
       }
     }
     return lines;

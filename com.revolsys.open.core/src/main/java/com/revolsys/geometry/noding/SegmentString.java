@@ -32,8 +32,8 @@
  */
 package com.revolsys.geometry.noding;
 
+import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
 
 /**
  * An interface for classes which represent a sequence of contiguous line segments.
@@ -42,13 +42,7 @@ import com.revolsys.geometry.model.Point;
  *
  * @version 1.7
  */
-public interface SegmentString extends LineString {
-  @Override
-  boolean equalsVertex2d(final int vertexIndex, final double x, final double y);
-
-  @Override
-  boolean equalsVertex2d(int vertexIndex1, int vertexIndex2);
-
+public interface SegmentString extends DelegatingLineString {
   /**
   * Gets the user-defined data for this segment string.
   *
@@ -56,19 +50,7 @@ public interface SegmentString extends LineString {
   */
   Object getData();
 
-  @Override
-  Point getPoint(int vertexIndex);
-
-  LineString getPoints();
-
-  @Override
-  double getX(int vertexIndex);
-
-  @Override
-  double getY(int vertexIndex);
-
-  @Override
-  boolean isClosed();
+  LineString getLineString();
 
   /**
    * Sets the user-defined data for this segment string.

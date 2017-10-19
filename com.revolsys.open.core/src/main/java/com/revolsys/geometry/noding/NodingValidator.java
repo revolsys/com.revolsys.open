@@ -74,7 +74,7 @@ public class NodingValidator {
   }
 
   private void checkCollapses(final NodedSegmentString ss) {
-    final LineString points = ss.getPoints();
+    final LineString points = ss.getLineString();
     for (int i = 0; i < points.getVertexCount() - 2; i++) {
       final double x1 = points.getX(i);
       final double y1 = points.getY(i);
@@ -105,7 +105,7 @@ public class NodingValidator {
   private void checkEndPtVertexIntersections(final double x, final double y,
     final Collection<NodedSegmentString> segStrings) {
     for (final NodedSegmentString ss : segStrings) {
-      final LineString pts = ss.getPoints();
+      final LineString pts = ss.getLineString();
       for (int j = 1; j < pts.getVertexCount() - 1; j++) {
         if (pts.equalsVertex2d(j, x, y)) {
           throw new RuntimeException(

@@ -22,6 +22,7 @@ import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.number.Doubles;
 
 public interface LineSegment extends LineString {
@@ -375,14 +376,28 @@ public interface LineSegment extends LineString {
   }
 
   @Override
+  default <R> R findVertex(final BiFunctionDouble<R> action) {
+    if (!isEmpty()) {
+      for (int i = 0; i < 2; i++) {
+        final double x1 = getX(i);
+        final double y1 = getY(i);
+        final R result = action.accept(x1, y1);
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
   default void forEachVertex(final BiConsumerDouble action) {
     if (!isEmpty()) {
-      final double x1 = getX(0);
-      final double y1 = getY(0);
-      action.accept(x1, y1);
-      final double x2 = getX(1);
-      final double y2 = getY(1);
-      action.accept(x2, y2);
+      for (int i = 0; i < 2; i++) {
+        final double x1 = getX(i);
+        final double y1 = getY(i);
+        action.accept(x1, y1);
+      }
     }
   }
 

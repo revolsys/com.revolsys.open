@@ -11,6 +11,7 @@ import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Serializable {
   private static final long serialVersionUID = 1L;
@@ -72,6 +73,11 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
     } else {
       return false;
     }
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    return action.accept(this.x, this.y);
   }
 
   @Override

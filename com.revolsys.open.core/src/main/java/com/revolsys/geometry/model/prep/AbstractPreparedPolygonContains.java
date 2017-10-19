@@ -105,15 +105,23 @@ abstract class AbstractPreparedPolygonContains {
    */
   public static boolean isAnyTargetComponentInAreaTest(final Geometry testGeom,
     final Geometry targetGeom) {
-    for (final Vertex vertex : targetGeom.vertices()) {
-      final double x = vertex.getX();
-      final double y = vertex.getY();
+    return Boolean.TRUE == targetGeom.findVertex((x, y) -> {
       final Location loc = testGeom.locate(x, y);
-      if (loc != Location.EXTERIOR) {
+      if (loc == Location.EXTERIOR) {
+        return null;
+      } else {
         return true;
       }
-    }
-    return false;
+    });
+    // for (final Vertex vertex : targetGeom.vertices()) {
+    // final double x = vertex.getX();
+    // final double y = vertex.getY();
+    // final Location loc = testGeom.locate(x, y);
+    // if (loc != Location.EXTERIOR) {
+    // return true;
+    // }
+    // }
+    // return false;
   }
 
   /**

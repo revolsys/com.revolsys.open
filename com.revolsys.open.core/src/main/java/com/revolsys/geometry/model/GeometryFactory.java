@@ -80,6 +80,7 @@ import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 /**
  * Supplies a set of utility methods for building Geometry objects from lists
@@ -104,6 +105,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     @Override
     public void copyCoordinates(final double[] coordinates) {
       Arrays.fill(coordinates, java.lang.Double.NaN);
+    }
+
+    @Override
+    public <R> R findVertex(final BiFunctionDouble<R> action) {
+      return null;
     }
 
     @Override

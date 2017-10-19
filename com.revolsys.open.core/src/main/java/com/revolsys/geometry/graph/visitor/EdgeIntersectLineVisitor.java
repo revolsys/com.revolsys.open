@@ -34,7 +34,7 @@ public class EdgeIntersectLineVisitor<T> implements Consumer<Edge<T>> {
 
   @Override
   public void accept(final Edge<T> edge) {
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
     final IntersectionMatrix relate = this.line.relate(line);
     if (relate.get(0, 0) == Dimension.L) {
       this.matchVisitor.accept(edge);

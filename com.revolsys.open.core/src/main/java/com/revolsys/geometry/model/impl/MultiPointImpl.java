@@ -44,6 +44,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 /**
  * Models a collection of {@link Point}s.
@@ -129,6 +130,17 @@ public class MultiPointImpl implements MultiPoint {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final Geometry geometry : this.points) {
+      final R result = geometry.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

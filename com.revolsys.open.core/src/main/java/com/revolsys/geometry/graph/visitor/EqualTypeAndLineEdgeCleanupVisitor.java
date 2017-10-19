@@ -43,7 +43,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
     if (edge.getProperty(EDGE_PROCESSED) == null) {
       final String typePath = edge.getTypeName();
       final Graph<Record> graph = edge.getGraph();
-      final LineString line = edge.getLine();
+      final LineString line = edge.getLineString();
 
       Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<>(typePath);
 
@@ -165,7 +165,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
     final boolean equalAttributes = record1.equalValuesExclude(record2,
       this.equalExcludeFieldNames);
 
-    final LineString line1 = edge1.getLine();
+    final LineString line1 = edge1.getLineString();
     int compare = 0;
     final Comparator<Edge<Record>> comparator = getComparator();
     if (comparator != null) {
@@ -179,7 +179,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
             equalExcludedAttributes = false;
           }
         }
-        final LineString line2 = edge2.getLine();
+        final LineString line2 = edge2.getLineString();
 
         final boolean equalZ = fixMissingZValues(line1, line2);
         if (equalExcludedAttributes) {

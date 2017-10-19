@@ -4,6 +4,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 public class TriangleLinearRing extends AbstractLineString implements LinearRing {
   private static final long serialVersionUID = 1L;
@@ -17,6 +18,21 @@ public class TriangleLinearRing extends AbstractLineString implements LinearRing
   @Override
   public TriangleLinearRing clone() {
     return (TriangleLinearRing)super.clone();
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    if (!isEmpty()) {
+      for (int i = 0; i < 3; i++) {
+        final double x = getX(i);
+        final double y = getY(i);
+        final R result = action.accept(x, y);
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+    return null;
   }
 
   @Override

@@ -42,6 +42,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 /**
  * Represents a polygon with linear edges, which may include holes.
@@ -134,6 +135,17 @@ public class PolygonImpl extends AbstractPolygon {
       poly.rings[i] = this.rings[i].clone();
     }
     return poly;
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final Geometry geometry : this.rings) {
+      final R result = geometry.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

@@ -33,8 +33,6 @@
 package com.revolsys.geometry.noding;
 
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Represents a list of contiguous line segments,
@@ -71,43 +69,6 @@ public class BasicSegmentString implements SegmentString {
     return this;
   }
 
-  @Override
-  public boolean equalsVertex2d(final int vertexIndex, final double x, final double y) {
-    final double x1 = this.line.getX(vertexIndex);
-    if (x1 == x) {
-      final double y1 = this.line.getY(vertexIndex);
-      if (y1 == y) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
-  public boolean equalsVertex2d(final int vertexIndex1, final int vertexIndex2) {
-    return this.line.equalsVertex2d(vertexIndex1, vertexIndex2);
-  }
-
-  @Override
-  public void forEachVertex(final BiConsumerDouble action) {
-    this.line.forEachVertex(action);
-  }
-
-  @Override
-  public int getAxisCount() {
-    return this.line.getAxisCount();
-  }
-
-  @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    return this.line.getCoordinate(vertexIndex, axisIndex);
-  }
-
-  @Override
-  public double[] getCoordinates() {
-    return this.line.getCoordinates();
-  }
-
   /**
    * Gets the user-defined data for this segment string.
    *
@@ -119,12 +80,7 @@ public class BasicSegmentString implements SegmentString {
   }
 
   @Override
-  public Point getPoint(final int i) {
-    return this.line.getPoint(i);
-  }
-
-  @Override
-  public LineString getPoints() {
+  public LineString getLineString() {
     return this.line;
   }
 
@@ -136,7 +92,7 @@ public class BasicSegmentString implements SegmentString {
    * @return the octant of the segment at the vertex
    */
   public int getSegmentOctant(final int index) {
-    if (index == this.line.getVertexCount() - 1) {
+    if (index == getVertexCount() - 1) {
       return -1;
     }
     final double x1 = getX(index);
@@ -144,26 +100,6 @@ public class BasicSegmentString implements SegmentString {
     final double x2 = getX(index + 1);
     final double y2 = getY(index + 1);
     return Octant.octant(x1, y1, x2, y2);
-  }
-
-  @Override
-  public int getVertexCount() {
-    return this.line.getVertexCount();
-  }
-
-  @Override
-  public double getX(final int i) {
-    return this.line.getX(i);
-  }
-
-  @Override
-  public double getY(final int i) {
-    return this.line.getY(i);
-  }
-
-  @Override
-  public boolean isClosed() {
-    return this.line.equalsVertex2d(0, this.line.getVertexCount() - 1);
   }
 
   /**
@@ -178,11 +114,11 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public int size() {
-    return this.line.getVertexCount();
+    return getVertexCount();
   }
 
   @Override
   public String toString() {
-    return this.line.toString();
+    return toWkt();
   }
 }

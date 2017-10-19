@@ -233,7 +233,7 @@ public class Buffer {
       if (vertexCount > 2 || vertexCount == 2 && !segment.equalsVertex2d(0, 1)) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
-        final LineString points = segment.getPoints();
+        final LineString points = segment.getLineString();
         final Edge edge = new Edge(points, label);
         insertUniqueEdge(edges, edge);
       }

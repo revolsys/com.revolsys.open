@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 public class MultiLineStringEditor
   extends AbstractGeometryCollectionEditor<Lineal, LineString, LineStringEditor>
@@ -35,6 +36,17 @@ public class MultiLineStringEditor
   @Override
   public MultiLineStringEditor clone() {
     return (MultiLineStringEditor)super.clone();
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      final R result = editor.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

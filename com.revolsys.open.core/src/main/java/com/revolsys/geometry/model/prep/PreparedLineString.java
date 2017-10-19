@@ -46,6 +46,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.SegmentStringUtil;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.BiFunctionDouble;
 
 /**
  * A prepared version for {@link Lineal} geometries.
@@ -64,6 +65,11 @@ public class PreparedLineString extends AbstractLineString {
 
   public PreparedLineString(final LineString line) {
     this.line = line;
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    return this.line.findVertex(action);
   }
 
   @Override
