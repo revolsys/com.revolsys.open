@@ -6,6 +6,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.BiConsumerDouble;
 
 public class PointDoubleXY extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -78,6 +79,11 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    action.accept(this.x, this.y);
   }
 
   @Override

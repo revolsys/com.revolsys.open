@@ -33,6 +33,7 @@
 package com.revolsys.geometry.model.impl;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
@@ -40,6 +41,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Represents a polygon with linear edges, which may include holes.
@@ -70,6 +72,8 @@ import com.revolsys.geometry.model.Polygon;
 public class PolygonImpl extends AbstractPolygon {
   private static final long serialVersionUID = 1L;
 
+  private static final LinearRing[] EMPTY_RINGS = new LinearRing[0];
+
   private BoundingBox boundingBox;
 
   /**
@@ -81,6 +85,7 @@ public class PolygonImpl extends AbstractPolygon {
 
   public PolygonImpl(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+    this.rings = EMPTY_RINGS;
   }
 
   /**
@@ -97,7 +102,7 @@ public class PolygonImpl extends AbstractPolygon {
   public PolygonImpl(final GeometryFactory factory, final LinearRing... rings) {
     this.geometryFactory = factory;
     if (rings == null || rings.length == 0) {
-
+      this.rings = EMPTY_RINGS;
     } else if (Geometry.hasNullElements(rings)) {
       throw new IllegalArgumentException("rings must not contain null elements");
     } else {
@@ -108,6 +113,7 @@ public class PolygonImpl extends AbstractPolygon {
             throw new IllegalArgumentException("shell is empty but hole " + (i - 1) + " is not");
           }
         }
+        this.rings = EMPTY_RINGS;
       } else {
         this.rings = rings;
       }
@@ -123,13 +129,25 @@ public class PolygonImpl extends AbstractPolygon {
   @Override
   public PolygonImpl clone() {
     final PolygonImpl poly = (PolygonImpl)super.clone();
-    if (this.rings != null) {
-      poly.rings = this.rings.clone();
-      for (int i = 0; i < this.rings.length; i++) {
-        poly.rings[i] = this.rings[i].clone();
-      }
+    poly.rings = this.rings.clone();
+    for (int i = 0; i < this.rings.length; i++) {
+      poly.rings[i] = this.rings[i].clone();
     }
     return poly;
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    for (final LinearRing ring : this.rings) {
+      ring.forEachGeometry(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final LinearRing ring : this.rings) {
+      ring.forEachVertex(action);
+    }
   }
 
   @Override
@@ -162,7 +180,7 @@ public class PolygonImpl extends AbstractPolygon {
 
   @Override
   public LinearRing getRing(final int ringIndex) {
-    if (this.rings == null || ringIndex < 0 || ringIndex >= this.rings.length) {
+    if (ringIndex < 0 || ringIndex >= this.rings.length) {
       return null;
     } else {
       return this.rings[ringIndex];
@@ -171,11 +189,7 @@ public class PolygonImpl extends AbstractPolygon {
 
   @Override
   public int getRingCount() {
-    if (this.rings == null) {
-      return 0;
-    } else {
-      return this.rings.length;
-    }
+    return this.rings.length;
   }
 
   @Override
@@ -185,6 +199,6 @@ public class PolygonImpl extends AbstractPolygon {
 
   @Override
   public boolean isEmpty() {
-    return this.rings == null;
+    return this.rings.length == 0;
   }
 }

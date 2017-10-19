@@ -41,15 +41,13 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * @version 1.7
  */
 public class Edge extends GraphComponent implements LineString {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   /**
@@ -139,8 +137,6 @@ public class Edge extends GraphComponent implements LineString {
     }
   }
 
-  // of this edge
-
   /**
    * Update the IM with the contribution for this component.
    * A component only contributes if it has a labelling for both parent geometries
@@ -149,6 +145,8 @@ public class Edge extends GraphComponent implements LineString {
   public void computeIM(final IntersectionMatrix im) {
     updateIM(this.label, im);
   }
+
+  // of this edge
 
   /**
    * equals is defined to be:
@@ -184,6 +182,11 @@ public class Edge extends GraphComponent implements LineString {
       }
     }
     return true;
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    this.line.forEachVertex(action);
   }
 
   @Override

@@ -32,11 +32,10 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.google.common.collect.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -44,6 +43,7 @@ import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Models a collection of {@link Point}s.
@@ -54,6 +54,8 @@ import com.revolsys.util.Exceptions;
  */
 public class MultiPointImpl implements MultiPoint {
   private static final long serialVersionUID = -8048474874175355449L;
+
+  private static final Point[] EMPTY_POINTS = new Point[0];
 
   /**
    *  The bounding box of this <code>Geometry</code>.
@@ -67,7 +69,7 @@ public class MultiPointImpl implements MultiPoint {
   public MultiPointImpl(final GeometryFactory geometryFactory, final Point... points) {
     this.geometryFactory = geometryFactory;
     if (points == null || points.length == 0) {
-      this.points = null;
+      this.points = EMPTY_POINTS;
     } else if (Geometry.hasNullElements(points)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -139,6 +141,13 @@ public class MultiPointImpl implements MultiPoint {
   }
 
   @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final Point point : this.points) {
+      point.forEachVertex(action);
+    }
+  }
+
+  @Override
   public int getAxisCount() {
     return this.geometryFactory.getAxisCount();
   }
@@ -154,30 +163,18 @@ public class MultiPointImpl implements MultiPoint {
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (this.points == null) {
-      return new ArrayList<>();
-    } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(this.points));
-    }
+    return (List<V>)Lists.newArrayList(this.points);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (this.points == null) {
-      return null;
-    } else {
-      return (V)this.points[n];
-    }
+    return (V)this.points[n];
   }
 
   @Override
   public int getGeometryCount() {
-    if (this.points == null) {
-      return 0;
-    } else {
-      return this.points.length;
-    }
+    return this.points.length;
   }
 
   @Override
@@ -198,7 +195,7 @@ public class MultiPointImpl implements MultiPoint {
 
   @Override
   public boolean isEmpty() {
-    return this.points == null;
+    return this.points.length == 0;
   }
 
   @Override

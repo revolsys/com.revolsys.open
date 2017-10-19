@@ -1,5 +1,7 @@
 package com.revolsys.geometry.model.impl;
 
+import com.revolsys.util.function.BiConsumerDouble;
+
 public class TriangleDoubleXYZ extends AbstractTriangle {
   private static final long serialVersionUID = 1l;
 
@@ -49,6 +51,15 @@ public class TriangleDoubleXYZ extends AbstractTriangle {
   @Override
   public TriangleDoubleXYZ clone() {
     return (TriangleDoubleXYZ)super.clone();
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    if (!isEmpty()) {
+      action.accept(this.x1, this.y1);
+      action.accept(this.x2, this.y2);
+      action.accept(this.x3, this.y3);
+    }
   }
 
   @Override

@@ -79,6 +79,7 @@ import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.number.Doubles;
 
 /**
@@ -1320,6 +1321,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   default void forEachGeometry(final Consumer<Geometry> action) {
     action.accept(this);
   }
+
+  void forEachVertex(BiConsumerDouble action);
 
   default Iterable<Geometry> geometries() {
     return getGeometries();

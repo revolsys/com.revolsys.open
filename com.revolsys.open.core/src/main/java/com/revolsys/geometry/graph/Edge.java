@@ -28,6 +28,7 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.BiConsumerDouble;
 
 public class Edge<T> implements LineString, ObjectWithProperties, Externalizable {
 
@@ -294,6 +295,12 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
       this.graph.evict(this);
     }
     super.finalize();
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    final LineString line = getLine();
+    line.forEachVertex(action);
   }
 
   public double getAngle(final Node<T> node) {

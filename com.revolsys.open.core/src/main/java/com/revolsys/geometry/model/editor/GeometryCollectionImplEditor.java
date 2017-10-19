@@ -1,10 +1,12 @@
 package com.revolsys.geometry.model.editor;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
+import com.revolsys.util.function.BiConsumerDouble;
 
 public class GeometryCollectionImplEditor
   extends AbstractGeometryCollectionEditor<GeometryCollectionImpl, Geometry, GeometryEditor<?>> {
@@ -32,6 +34,20 @@ public class GeometryCollectionImplEditor
   @Override
   public GeometryCollectionImplEditor clone() {
     return (GeometryCollectionImplEditor)super.clone();
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      action.accept(editor);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      editor.forEachVertex(action);
+    }
   }
 
   @Override

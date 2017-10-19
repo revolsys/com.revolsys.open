@@ -34,6 +34,7 @@ package com.revolsys.geometry.noding;
 
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Represents a list of contiguous line segments,
@@ -48,9 +49,6 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class BasicSegmentString implements SegmentString {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private Object data;
@@ -88,6 +86,11 @@ public class BasicSegmentString implements SegmentString {
   @Override
   public boolean equalsVertex2d(final int vertexIndex1, final int vertexIndex2) {
     return this.line.equalsVertex2d(vertexIndex1, vertexIndex2);
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    this.line.forEachVertex(action);
   }
 
   @Override

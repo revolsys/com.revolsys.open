@@ -1,5 +1,7 @@
 package com.revolsys.geometry.model.editor;
 
+import java.util.function.Consumer;
+
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
@@ -7,6 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.util.function.BiConsumerDouble;
 
 public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual, Point, PointEditor>
   implements MultiPoint, PunctualEditor {
@@ -67,6 +70,20 @@ public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual,
   @Override
   public boolean equalsVertex(final int axisCount, final int vertexIndex, final Point point) {
     return getEditor(vertexIndex).equals(2, point);
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      action.accept(editor);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      editor.forEachVertex(action);
+    }
   }
 
   @Override

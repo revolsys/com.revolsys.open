@@ -33,5 +33,4 @@ public abstract class AbstractLineSegment extends AbstractLineString implements 
     }
     return false;
   }
-
 }

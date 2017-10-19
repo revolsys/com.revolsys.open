@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.function.BiConsumerDouble;
 
 public class LineStringDouble extends AbstractLineString {
   private static final long serialVersionUID = 7579865828939708871L;
@@ -155,6 +156,20 @@ public class LineStringDouble extends AbstractLineString {
           targetCoordinates);
         return targetCoordinates;
       }
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    final int vertexCount = this.vertexCount;
+    final int axisIgnoreCount = this.axisCount - 2;
+    final double[] coordinates = this.coordinates;
+    int coordinateIndex = 0;
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = coordinates[coordinateIndex++];
+      final double y = coordinates[coordinateIndex++];
+      action.accept(x, y);
+      coordinateIndex += axisIgnoreCount;
     }
   }
 

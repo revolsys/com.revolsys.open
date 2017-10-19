@@ -33,6 +33,7 @@
 package com.revolsys.geometry.model.prep;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.BoundingBox;
@@ -44,6 +45,7 @@ import com.revolsys.geometry.model.impl.AbstractLineString;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.SegmentStringUtil;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * A prepared version for {@link Lineal} geometries.
@@ -62,6 +64,16 @@ public class PreparedLineString extends AbstractLineString {
 
   public PreparedLineString(final LineString line) {
     this.line = line;
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    this.line.forEachGeometry(action);
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    this.line.forEachVertex(action);
   }
 
   @Override

@@ -175,6 +175,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     return (LineString)getGeometry(partIndex);
   }
 
+  int getLineStringCount();
+
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })

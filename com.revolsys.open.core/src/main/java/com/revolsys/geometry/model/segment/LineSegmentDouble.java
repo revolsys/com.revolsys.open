@@ -37,6 +37,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Represents a line segment defined by two {@link Coordinates}s.
@@ -123,6 +124,19 @@ public class LineSegmentDouble extends AbstractLineSegment {
       clone.coordinates = clone.coordinates.clone();
     }
     return clone;
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    if (!isEmpty()) {
+      final int axisCount = getAxisCount();
+      final double x1 = this.coordinates[0];
+      final double y1 = this.coordinates[1];
+      action.accept(x1, y1);
+      final double x2 = this.coordinates[axisCount];
+      final double y2 = this.coordinates[axisCount + 1];
+      action.accept(x2, y2);
+    }
   }
 
   @Override

@@ -13,7 +13,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
 
   private Point point;
 
-  private double[] newCoordinates;
+  private double[] coordinates;
 
   public PointEditor(final AbstractGeometryCollectionEditor<?, ?, ?> parentEditor,
     final Point point) {
@@ -56,7 +56,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
   @Override
   public PointEditor deleteVertex(final int[] vertexId) {
     if (vertexId == null || vertexId.length == 0) {
-      this.newCoordinates = null;
+      this.coordinates = null;
       this.point = null;
     }
     return this;
@@ -98,7 +98,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
 
   @Override
   public double getCoordinate(final int axisIndex) {
-    if (this.newCoordinates == null) {
+    if (this.coordinates == null) {
       if (this.point == null) {
         return Double.NaN;
       } else {
@@ -107,7 +107,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
     } else {
       final int axisCount = getAxisCount();
       if (axisIndex >= 0 && axisIndex < axisCount) {
-        return this.newCoordinates[axisIndex];
+        return this.coordinates[axisIndex];
       } else {
         return java.lang.Double.NaN;
       }
@@ -127,27 +127,27 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
 
   @Override
   public double getX() {
-    if (this.newCoordinates == null) {
+    if (this.coordinates == null) {
       if (this.point == null) {
         return Double.NaN;
       } else {
         return this.point.getX();
       }
     } else {
-      return this.newCoordinates[X];
+      return this.coordinates[X];
     }
   }
 
   @Override
   public double getY() {
-    if (this.newCoordinates == null) {
+    if (this.coordinates == null) {
       if (this.point == null) {
         return Double.NaN;
       } else {
         return this.point.getY();
       }
     } else {
-      return this.newCoordinates[Y];
+      return this.coordinates[Y];
     }
   }
 
@@ -196,19 +196,19 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
 
   @Override
   public boolean isEmpty() {
-    return this.point == null && this.newCoordinates == null;
+    return this.point == null && this.coordinates == null;
   }
 
   @Override
   public Point newGeometry() {
-    if (this.newCoordinates == null) {
+    if (this.coordinates == null) {
       if (this.point == null) {
         return getGeometryFactory().point();
       }
       return this.point;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.point(this.newCoordinates);
+      return geometryFactory.point(this.coordinates);
     }
   }
 
@@ -221,7 +221,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
   public GeometryEditor<?> setAxisCount(final int axisCount) {
     final int oldAxisCount = getAxisCount();
     if (oldAxisCount != axisCount) {
-      this.newCoordinates = getCoordinates(axisCount);
+      this.coordinates = getCoordinates(axisCount);
       super.setAxisCount(axisCount);
     }
     return this;
@@ -232,22 +232,22 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
     final int axisCount = getAxisCount();
     if (axisIndex >= 0 && axisIndex < axisCount) {
       final double oldValue;
-      if (this.newCoordinates != null) {
-        oldValue = this.newCoordinates[axisIndex];
+      if (this.coordinates != null) {
+        oldValue = this.coordinates[axisIndex];
       } else if (this.point == null) {
         oldValue = Double.NaN;
       } else {
         oldValue = this.point.getCoordinate(axisIndex);
       }
       if (!Doubles.equal(coordinate, oldValue)) {
-        if (this.newCoordinates == null) {
+        if (this.coordinates == null) {
           if (this.point == null) {
-            this.newCoordinates = new double[axisCount];
+            this.coordinates = new double[axisCount];
           } else {
-            this.newCoordinates = this.point.getCoordinates(axisCount);
+            this.coordinates = this.point.getCoordinates(axisCount);
           }
         }
-        this.newCoordinates[axisIndex] = coordinate;
+        this.coordinates[axisIndex] = coordinate;
       }
       return oldValue;
     } else {
@@ -287,12 +287,12 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Point newPoint = point.convertGeometry(geometryFactory);
     final int axisCount = getAxisCount();
-    if (this.newCoordinates == null) {
-      this.newCoordinates = newPoint.getCoordinates(axisCount);
+    if (this.coordinates == null) {
+      this.coordinates = newPoint.getCoordinates(axisCount);
     } else {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         final double coordinate = newPoint.getCoordinate(axisIndex);
-        this.newCoordinates[axisIndex] = coordinate;
+        this.coordinates[axisIndex] = coordinate;
       }
     }
     return this;

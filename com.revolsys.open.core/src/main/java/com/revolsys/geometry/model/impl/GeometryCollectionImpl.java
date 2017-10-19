@@ -32,11 +32,10 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -47,6 +46,7 @@ import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -57,6 +57,8 @@ import com.revolsys.util.Exceptions;
  */
 public class GeometryCollectionImpl implements GeometryCollection {
   private static final long serialVersionUID = -5694727726395021467L;
+
+  private static final Geometry[] EMPTY_GEOMETRIES = new Geometry[0];
 
   /**
    *  The bounding box of this <code>Geometry</code>.
@@ -88,7 +90,7 @@ public class GeometryCollectionImpl implements GeometryCollection {
     final Geometry[] geometries) {
     this.geometryFactory = geometryFactory;
     if (geometries == null || geometries.length == 0) {
-      this.geometries = null;
+      this.geometries = EMPTY_GEOMETRIES;
     } else if (Geometry.hasNullElements(geometries)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -165,6 +167,13 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final Geometry geometry : this.geometries) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
   public int getAxisCount() {
     return this.geometryFactory.getAxisCount();
   }
@@ -185,30 +194,18 @@ public class GeometryCollectionImpl implements GeometryCollection {
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (this.geometries == null) {
-      return new ArrayList<>();
-    } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(this.geometries));
-    }
+    return (List<V>)Lists.newArray(this.geometries);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (this.geometries == null) {
-      return null;
-    } else {
-      return (V)this.geometries[n];
-    }
+    return (V)this.geometries[n];
   }
 
   @Override
   public int getGeometryCount() {
-    if (this.geometries == null) {
-      return 0;
-    } else {
-      return this.geometries.length;
-    }
+    return this.geometries.length;
   }
 
   @Override
@@ -238,7 +235,7 @@ public class GeometryCollectionImpl implements GeometryCollection {
 
   @Override
   public boolean isEmpty() {
-    return this.geometries == null;
+    return this.geometries.length == 0;
   }
 
   @Override

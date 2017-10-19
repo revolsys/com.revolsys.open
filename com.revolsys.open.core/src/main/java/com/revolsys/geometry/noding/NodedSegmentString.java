@@ -40,6 +40,7 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Represents a list of contiguous line segments,
@@ -175,6 +176,11 @@ public class NodedSegmentString implements NodableSegmentString {
   @Override
   public boolean equalsVertex2d(final int vertexIndex1, final int vertexIndex2) {
     return this.line.equalsVertex2d(vertexIndex1, vertexIndex2);
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    this.line.forEachVertex(action);
   }
 
   @Override

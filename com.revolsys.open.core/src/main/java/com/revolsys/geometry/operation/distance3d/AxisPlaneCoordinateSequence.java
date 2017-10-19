@@ -36,6 +36,7 @@ package com.revolsys.geometry.operation.distance3d;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.impl.AbstractLineString;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * A LineString wrapper which
@@ -50,9 +51,6 @@ import com.revolsys.geometry.model.impl.AbstractLineString;
  */
 public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private static final int[] XY_INDEX = new int[] {
@@ -103,16 +101,26 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
   private final int[] indexMap;
 
-  private final LineString seq;
+  private final LineString line;
 
   private AxisPlaneCoordinateSequence(final LineString seq, final int[] indexMap) {
-    this.seq = seq;
+    this.line = seq;
     this.indexMap = indexMap;
   }
 
   @Override
   public AxisPlaneCoordinateSequence clone() {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    final int vertexCount = getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = getX(vertexIndex);
+      final double y = getY(vertexIndex);
+      action.accept(x, y);
+    }
   }
 
   @Override
@@ -126,17 +134,17 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
     if (ordinateIndex > 1) {
       return 0;
     }
-    return this.seq.getCoordinate(index, this.indexMap[ordinateIndex]);
+    return this.line.getCoordinate(index, this.indexMap[ordinateIndex]);
   }
 
   @Override
   public double[] getCoordinates() {
-    return this.seq.getCoordinates();
+    return this.line.getCoordinates();
   }
 
   @Override
   public int getVertexCount() {
-    return this.seq.getVertexCount();
+    return this.line.getVertexCount();
   }
 
   @Override
@@ -156,7 +164,7 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
   @Override
   public boolean isEmpty() {
-    return this.seq.isEmpty();
+    return this.line.isEmpty();
   }
 
 }

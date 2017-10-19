@@ -3,11 +3,13 @@ package com.revolsys.geometry.model.editor;
 import java.util.function.Consumer;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.util.function.BiConsumerDouble;
 
 public class MultiPolygonEditor
   extends AbstractGeometryCollectionEditor<Polygonal, Polygon, PolygonEditor>
@@ -36,10 +38,24 @@ public class MultiPolygonEditor
   }
 
   @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      action.accept(editor);
+    }
+  }
+
+  @Override
   public void forEachPolygon(final Consumer<Polygon> action) {
     for (int i = 0; i < getGeometryCount(); i++) {
       final Polygon polygon = getEditor(i);
       action.accept(polygon);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      editor.forEachVertex(action);
     }
   }
 

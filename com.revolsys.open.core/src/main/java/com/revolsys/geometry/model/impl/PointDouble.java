@@ -3,6 +3,7 @@ package com.revolsys.geometry.model.impl;
 import java.io.Serializable;
 
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.util.function.BiConsumerDouble;
 
 public class PointDouble extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -55,6 +56,13 @@ public class PointDouble extends AbstractPoint implements Serializable {
       axisCount = coordinates.length;
     }
     System.arraycopy(this.coordinates, 0, coordinates, 0, axisCount);
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    final double x = this.coordinates[0];
+    final double y = this.coordinates[1];
+    action.accept(x, y);
   }
 
   @Override

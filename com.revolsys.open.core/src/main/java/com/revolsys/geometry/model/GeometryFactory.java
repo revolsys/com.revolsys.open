@@ -79,6 +79,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Supplies a set of utility methods for building Geometry objects from lists
@@ -103,6 +104,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     @Override
     public void copyCoordinates(final double[] coordinates) {
       Arrays.fill(coordinates, java.lang.Double.NaN);
+    }
+
+    @Override
+    public void forEachVertex(final BiConsumerDouble action) {
     }
 
     @Override

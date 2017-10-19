@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.BiConsumerDouble;
 
 public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Serializable {
   private static final long serialVersionUID = 1L;
@@ -71,6 +72,11 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
     } else {
       return false;
     }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    action.accept(this.x, this.y);
   }
 
   @Override

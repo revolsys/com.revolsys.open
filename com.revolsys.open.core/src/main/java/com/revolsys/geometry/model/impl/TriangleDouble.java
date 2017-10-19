@@ -4,6 +4,7 @@ import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.util.function.BiConsumerDouble;
 
 public class TriangleDouble extends AbstractTriangle {
   private static final long serialVersionUID = 7579865828939708871L;
@@ -49,6 +50,22 @@ public class TriangleDouble extends AbstractTriangle {
     final TriangleDouble clone = (TriangleDouble)super.clone();
     clone.coordinates = this.coordinates.clone();
     return clone;
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    if (!isEmpty()) {
+      final int axisCount = getAxisCount();
+      final double x1 = this.coordinates[0];
+      final double y1 = this.coordinates[1];
+      action.accept(x1, y1);
+      final double x2 = this.coordinates[axisCount];
+      final double y2 = this.coordinates[axisCount + 1];
+      action.accept(x2, y2);
+      final double x3 = this.coordinates[axisCount * 2];
+      final double y3 = this.coordinates[axisCount * 2 + 1];
+      action.accept(x3, y3);
+    }
   }
 
   @Override

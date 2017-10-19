@@ -38,6 +38,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.AbstractPoint;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Represents a sequence of facets (points or line segments)
@@ -89,6 +90,11 @@ public class PointFacetSequence extends AbstractPoint implements FacetSequence {
     } else {
       return computePointLineDistance(x, y, other);
     }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    this.point.forEachVertex(action);
   }
 
   @Override

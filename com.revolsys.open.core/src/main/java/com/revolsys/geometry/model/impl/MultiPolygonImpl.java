@@ -32,11 +32,10 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -44,6 +43,7 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Models a collection of {@link Polygon}s.
@@ -60,6 +60,8 @@ import com.revolsys.util.Exceptions;
 public class MultiPolygonImpl implements MultiPolygon {
   private static final long serialVersionUID = 8166665132445433741L;
 
+  private static final Polygon[] EMPTY_POLYGONS = new Polygon[0];
+
   private BoundingBox boundingBox;
 
   private final GeometryFactory geometryFactory;
@@ -69,7 +71,7 @@ public class MultiPolygonImpl implements MultiPolygon {
   public MultiPolygonImpl(final GeometryFactory geometryFactory, final Polygon... polygons) {
     this.geometryFactory = geometryFactory;
     if (polygons == null || polygons.length == 0) {
-      this.polygons = null;
+      this.polygons = EMPTY_POLYGONS;
     } else if (Geometry.hasNullElements(polygons)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -150,6 +152,13 @@ public class MultiPolygonImpl implements MultiPolygon {
   }
 
   @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final Polygon polygon : this.polygons) {
+      polygon.forEachVertex(action);
+    }
+  }
+
+  @Override
   public int getAxisCount() {
     return this.geometryFactory.getAxisCount();
   }
@@ -165,30 +174,18 @@ public class MultiPolygonImpl implements MultiPolygon {
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (this.polygons == null) {
-      return new ArrayList<>();
-    } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(this.polygons));
-    }
+    return (List<V>)Lists.newArray(this.polygons);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (this.polygons == null) {
-      return null;
-    } else {
-      return (V)this.polygons[n];
-    }
+    return (V)this.polygons[n];
   }
 
   @Override
   public int getGeometryCount() {
-    if (this.polygons == null) {
-      return 0;
-    } else {
-      return this.polygons.length;
-    }
+    return this.polygons.length;
   }
 
   @Override
@@ -198,11 +195,7 @@ public class MultiPolygonImpl implements MultiPolygon {
 
   @Override
   public int getPolygonCount() {
-    if (this.polygons == null) {
-      return 0;
-    } else {
-      return this.polygons.length;
-    }
+    return this.polygons.length;
   }
 
   /**
@@ -217,7 +210,7 @@ public class MultiPolygonImpl implements MultiPolygon {
 
   @Override
   public boolean isEmpty() {
-    return this.polygons == null;
+    return this.polygons.length == 0;
   }
 
   @Override

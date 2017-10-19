@@ -19,7 +19,7 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
 
   private GC geometry;
 
-  private final List<GE> editors = new ArrayList<>();
+  protected final List<GE> editors = new ArrayList<>();
 
   public AbstractGeometryCollectionEditor(final AbstractGeometryEditor<?> parentEditor,
     final GC geometry) {

@@ -32,11 +32,10 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -44,6 +43,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * Models a collection of (@link LineString}s.
@@ -54,6 +54,8 @@ import com.revolsys.util.Exceptions;
  */
 public class MultiLineStringImpl implements MultiLineString {
   private static final long serialVersionUID = 8166665132445433741L;
+
+  private static final LineString[] EMPTY_LINES = new LineString[0];
 
   /**
    *  The bounding box of this <code>Geometry</code>.
@@ -67,7 +69,7 @@ public class MultiLineStringImpl implements MultiLineString {
   public MultiLineStringImpl(final GeometryFactory geometryFactory, final LineString... lines) {
     this.geometryFactory = geometryFactory;
     if (lines == null || lines.length == 0) {
-      this.lines = null;
+      this.lines = EMPTY_LINES;
     } else if (Geometry.hasNullElements(lines)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -143,6 +145,13 @@ public class MultiLineStringImpl implements MultiLineString {
   }
 
   @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final LineString line : this.lines) {
+      line.forEachVertex(action);
+    }
+  }
+
+  @Override
   public int getAxisCount() {
     return this.geometryFactory.getAxisCount();
   }
@@ -158,35 +167,28 @@ public class MultiLineStringImpl implements MultiLineString {
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (this.lines == null) {
-      return new ArrayList<>();
-    } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(this.lines));
-    }
+    return (List<V>)Lists.newArray(this.lines);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (this.lines == null) {
-      return null;
-    } else {
-      return (V)this.lines[n];
-    }
+    return (V)this.lines[n];
   }
 
   @Override
   public int getGeometryCount() {
-    if (this.lines == null) {
-      return 0;
-    } else {
-      return this.lines.length;
-    }
+    return this.lines.length;
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
+  }
+
+  @Override
+  public int getLineStringCount() {
+    return this.lines.length;
   }
 
   /**
@@ -202,7 +204,7 @@ public class MultiLineStringImpl implements MultiLineString {
 
   @Override
   public boolean isEmpty() {
-    return this.lines == null;
+    return this.lines.length == 0;
   }
 
   @Override

@@ -21,6 +21,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.number.Doubles;
 
 public interface LineSegment extends LineString {
@@ -371,6 +372,18 @@ public interface LineSegment extends LineString {
     final Point c2 = CoordinatesUtil.offset(getPoint(1), angle, endDistance);
     return new LineSegmentDoubleGF(getGeometryFactory(), c1, c2);
 
+  }
+
+  @Override
+  default void forEachVertex(final BiConsumerDouble action) {
+    if (!isEmpty()) {
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      action.accept(x1, y1);
+      final double x2 = getX(1);
+      final double y2 = getY(1);
+      action.accept(x2, y2);
+    }
   }
 
   @Override
