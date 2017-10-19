@@ -77,7 +77,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
 
   private final boolean isRectangle;
 
-  private PointOnGeometryLocator pia = null;
+  private PointOnGeometryLocator pointLocator = null;
 
   // create these lazily, since they are expensive
   private FastSegmentSetIntersectionFinder segIntFinder = null;
@@ -178,11 +178,11 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
   }
 
   public synchronized PointOnGeometryLocator getPointLocator() {
-    if (this.pia == null) {
-      this.pia = new IndexedPointInAreaLocator(this);
+    if (this.pointLocator == null) {
+      this.pointLocator = new IndexedPointInAreaLocator(this);
     }
 
-    return this.pia;
+    return this.pointLocator;
   }
 
   /**

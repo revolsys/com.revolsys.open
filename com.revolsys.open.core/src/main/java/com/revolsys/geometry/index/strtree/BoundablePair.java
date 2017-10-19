@@ -32,8 +32,6 @@
  */
 package com.revolsys.geometry.index.strtree;
 
-import java.util.List;
-
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.util.PriorityQueue;
 
@@ -121,9 +119,9 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
     final Boundable<BoundingBox, I> bndOther, final PriorityQueue<BoundablePair<I>> priQ,
     final ItemDistance<I> itemDistance, final double minDistance) {
     final int childCount = bndComposite.getChildCount();
-    final List<Boundable<BoundingBox, I>> children = bndComposite.getChildren();
+    final Boundable<BoundingBox, I>[] children = bndComposite.getChildren();
     for (int i = 0; i < childCount; i++) {
-      final Boundable<BoundingBox, I> child = children.get(i);
+      final Boundable<BoundingBox, I> child = children[i];
       final double distance = BoundablePair.distance(itemDistance, child, bndOther);
       // only add to queue if this pair might contain the closest points
       if (distance < minDistance) {

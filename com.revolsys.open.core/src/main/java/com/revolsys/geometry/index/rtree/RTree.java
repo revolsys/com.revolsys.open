@@ -27,44 +27,54 @@ public class RTree<T> implements SpatialIndex<T> {
   }
 
   @Override
-  public void forEach(final Consumer<? super T> action) {
+  public boolean forEach(final Consumer<? super T> action) {
     try {
       this.root.forEachValue(action);
+      return true;
     } catch (final ExitLoopException e) {
+      return false;
     }
   }
 
   @Override
-  public void forEach(final double x, final double y, final Consumer<? super T> action) {
+  public boolean forEach(final double x, final double y, final Consumer<? super T> action) {
     try {
       this.root.forEach(x, y, action);
+      return true;
     } catch (final ExitLoopException e) {
+      return false;
     }
   }
 
   @Override
-  public void forEach(final double minX, final double minY, final double maxX, final double maxY,
+  public boolean forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super T> action) {
     try {
       this.root.forEach(minX, minY, maxX, maxY, action);
+      return true;
     } catch (final ExitLoopException e) {
+      return false;
     }
   }
 
   @Override
-  public void forEach(final double minX, final double minY, final double maxX, final double maxY,
+  public boolean forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Predicate<? super T> filter, final Consumer<? super T> action) {
     try {
       this.root.forEach(minX, minY, maxX, maxY, filter, action);
+      return true;
     } catch (final ExitLoopException e) {
+      return false;
     }
   }
 
   @Override
-  public void forEach(final Predicate<? super T> filter, final Consumer<? super T> action) {
+  public boolean forEach(final Predicate<? super T> filter, final Consumer<? super T> action) {
     try {
       this.root.forEachValue(filter, action);
+      return true;
     } catch (final ExitLoopException e) {
+      return false;
     }
   }
 

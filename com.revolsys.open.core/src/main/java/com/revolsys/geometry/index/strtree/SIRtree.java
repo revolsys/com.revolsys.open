@@ -73,11 +73,6 @@ public class SIRtree<I> extends AbstractSTRtree<Interval, I, IntervalNode<I>>
     return compareDoubles(centre1, centre2);
   }
 
-  @Override
-  protected Comparator<Boundable<Interval, I>> getComparator() {
-    return this;
-  }
-
   /**
    * Inserts an item having the given bounds into the tree.
    */
@@ -97,7 +92,7 @@ public class SIRtree<I> extends AbstractSTRtree<Interval, I, IntervalNode<I>>
 
   @Override
   protected IntervalNode<I> newNode(final int level) {
-    return new IntervalNode<>(level);
+    return new IntervalNode<>(this.nodeCapacity, level);
   }
 
   /**

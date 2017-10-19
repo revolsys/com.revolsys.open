@@ -56,47 +56,47 @@ import com.revolsys.visitor.CreateListVisitor;
  */
 public interface SpatialIndex<V> extends GeometryFactoryProxy {
 
-  default void forEach(final BoundingBoxProxy boundingBoxProxy, final Consumer<? super V> action) {
-    final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
-    final double minX = boundingBox.getMinX();
-    final double minY = boundingBox.getMinY();
-    final double maxX = boundingBox.getMaxX();
-    final double maxY = boundingBox.getMaxY();
-    forEach(minX, minY, maxX, maxY, action);
-  }
-
-  default void forEach(final BoundingBoxProxy boundingBoxProxy, final Predicate<? super V> filter,
+  default boolean forEach(final BoundingBoxProxy boundingBoxProxy,
     final Consumer<? super V> action) {
     final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();
     final double maxX = boundingBox.getMaxX();
     final double maxY = boundingBox.getMaxY();
-    forEach(minX, minY, maxX, maxY, filter, action);
+    return forEach(minX, minY, maxX, maxY, action);
   }
 
-  void forEach(final Consumer<? super V> action);
-
-  void forEach(double x, double y, Consumer<? super V> action);
-
-  void forEach(double minX, double minY, double maxX, double maxY, Consumer<? super V> action);
-
-  default void forEach(final double minX, final double minY, final double maxX, final double maxY,
+  default boolean forEach(final BoundingBoxProxy boundingBoxProxy,
     final Predicate<? super V> filter, final Consumer<? super V> action) {
-    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
-    forEach(minX, minY, maxX, maxY, filteredAction);
-    ;
+    final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    return forEach(minX, minY, maxX, maxY, filter, action);
   }
 
-  default void forEach(final double x, final double y, final Predicate<? super V> filter,
+  boolean forEach(final Consumer<? super V> action);
+
+  boolean forEach(double x, double y, Consumer<? super V> action);
+
+  boolean forEach(double minX, double minY, double maxX, double maxY, Consumer<? super V> action);
+
+  default boolean forEach(final double minX, final double minY, final double maxX,
+    final double maxY, final Predicate<? super V> filter, final Consumer<? super V> action) {
+    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+    return forEach(minX, minY, maxX, maxY, filteredAction);
+  }
+
+  default boolean forEach(final double x, final double y, final Predicate<? super V> filter,
     final Consumer<? super V> action) {
     final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
-    forEach(x, y, filteredAction);
+    return forEach(x, y, filteredAction);
   }
 
-  default void forEach(final Predicate<? super V> filter, final Consumer<? super V> action) {
+  default boolean forEach(final Predicate<? super V> filter, final Consumer<? super V> action) {
     final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
-    forEach(filteredAction);
+    return forEach(filteredAction);
   }
 
   default List<V> getItems() {

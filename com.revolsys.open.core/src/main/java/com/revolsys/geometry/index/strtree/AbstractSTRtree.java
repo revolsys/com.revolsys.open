@@ -57,7 +57,7 @@ import com.revolsys.util.ExitLoopException;
  * @version 1.7
  */
 public abstract class AbstractSTRtree<B extends Bounds<B>, I, N extends AbstractNode<B, I>>
-  implements Emptyable, Serializable {
+  implements Emptyable, Serializable, Comparator<Boundable<B, I>> {
 
   private static final int DEFAULT_NODE_CAPACITY = 10;
 
@@ -77,7 +77,7 @@ public abstract class AbstractSTRtree<B extends Bounds<B>, I, N extends Abstract
    */
   private List<ItemBoundable<B, I>> itemBoundables = new ArrayList<>();
 
-  private final int nodeCapacity;
+  protected final int nodeCapacity;
 
   protected N root;
 
@@ -133,8 +133,6 @@ public abstract class AbstractSTRtree<B extends Bounds<B>, I, N extends Abstract
       return this.root.getDepth();
     }
   }
-
-  protected abstract Comparator<Boundable<B, I>> getComparator();
 
   /**
    * Returns the maximum number of child nodes that a node may have
@@ -199,15 +197,18 @@ public abstract class AbstractSTRtree<B extends Bounds<B>, I, N extends Abstract
   })
   private List itemsTree(final N node) {
     final List valuesTreeForNode = new ArrayList();
-    for (final Boundable<B, I> childBoundable : node.getChildren()) {
-      if (childBoundable instanceof AbstractNode) {
-        final List valuesTreeForChild = itemsTree((N)childBoundable);
+    final int childCount = node.childCount;
+    final Boundable<B, I>[] children = node.children;
+    for (int i = 0; i < childCount; i++) {
+      final Boundable<B, I> child = children[i];
+      if (child instanceof AbstractNode) {
+        final List valuesTreeForChild = itemsTree((N)child);
         // only add if not null (which indicates an item somewhere in this tree
         if (valuesTreeForChild != null) {
           valuesTreeForNode.add(valuesTreeForChild);
         }
-      } else if (childBoundable instanceof ItemBoundable) {
-        valuesTreeForNode.add(((ItemBoundable)childBoundable).getItem());
+      } else if (child instanceof ItemBoundable) {
+        valuesTreeForNode.add(((ItemBoundable)child).getItem());
       } else {
         throw new IllegalStateException("Shouldn't reach this code");
       }
@@ -255,15 +256,23 @@ public abstract class AbstractSTRtree<B extends Bounds<B>, I, N extends Abstract
     if (childBoundables.isEmpty()) {
       throw new IllegalArgumentException("Must not be empty");
     }
-    final List<N> parentBoundables = new ArrayList<>();
-    parentBoundables.add(newNode(newLevel));
     final List<Boundable<B, I>> sortedChildBoundables = new ArrayList<>(childBoundables);
-    Collections.sort(sortedChildBoundables, getComparator());
+    Collections.sort(sortedChildBoundables, this);
+
+    final List<N> parentBoundables = new ArrayList<>();
+    final int nodeCapacity = getNodeCapacity();
+    N childNode = newNode(newLevel);
+    parentBoundables.add(childNode);
+
+    int count = 0;
     for (final Boundable<B, I> childBoundable : sortedChildBoundables) {
-      if (lastNode(parentBoundables).getChildCount() == getNodeCapacity()) {
-        parentBoundables.add(newNode(newLevel));
+      if (count == nodeCapacity) {
+        count = 0;
+        childNode = newNode(newLevel);
+        parentBoundables.add(childNode);
       }
-      lastNode(parentBoundables).addChild(childBoundable);
+      childNode.addChild(childBoundable);
+      count++;
     }
     return parentBoundables;
   }
@@ -291,18 +300,6 @@ public abstract class AbstractSTRtree<B extends Bounds<B>, I, N extends Abstract
       } catch (final ExitLoopException e) {
       }
     }
-  }
-
-  /**
-   * Removes an item from the tree.
-   * (Builds the tree, if necessary.)
-   */
-  protected boolean remove(final B searchBounds, final I item) {
-    build();
-    if (this.root.getBounds().intersectsBounds(searchBounds)) {
-      return this.root.remove(this, searchBounds, item);
-    }
-    return false;
   }
 
   public int size() {

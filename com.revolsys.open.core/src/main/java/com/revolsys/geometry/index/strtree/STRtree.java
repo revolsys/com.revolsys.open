@@ -44,6 +44,7 @@ import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.util.PriorityQueue;
+import com.revolsys.util.ExitLoopException;
 import com.revolsys.util.Pair;
 
 /**
@@ -116,33 +117,38 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
   @Override
   public int depth() {
     return super.depth();
-  };
-
-  @Override
-  public void forEach(final BoundingBoxProxy boundingBox, final Consumer<? super I> action) {
-    query(boundingBox.getBoundingBox(), action);
   }
 
   @Override
-  public void forEach(final Consumer<? super I> action) {
+  public boolean forEach(final BoundingBoxProxy boundingBox, final Consumer<? super I> action) {
+    try {
+      query(boundingBox.getBoundingBox(), action);
+      return true;
+    } catch (final ExitLoopException e) {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean forEach(final Consumer<? super I> action) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void forEach(final double x, final double y, final Consumer<? super I> action) {
+  public boolean forEach(final double x, final double y, final Consumer<? super I> action) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void forEach(final double minX, final double minY, final double maxX, final double maxY,
+  public boolean forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super I> action) {
-    final BoundingBox boundingBox = getGeometryFactory().newBoundingBox(minX, minY, maxX, maxY);
-    query(boundingBox, action);
-  }
-
-  @Override
-  protected Comparator<Boundable<BoundingBox, I>> getComparator() {
-    return this;
+    try {
+      final BoundingBox boundingBox = getGeometryFactory().newBoundingBox(minX, minY, maxX, maxY);
+      query(boundingBox, action);
+      return true;
+    } catch (final ExitLoopException e) {
+      return false;
+    }
   }
 
   @Override
@@ -207,8 +213,8 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
         // testing - does allowing a tolerance improve speed?
         // Ans: by only about 10% - not enough to matter
         /*
-         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 <
-         * lastComputedDistance) return; //
+         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 < lastComputedDistance)
+         * return; //
          */
 
         /**
@@ -287,7 +293,7 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
 
   @Override
   protected BoundingBoxNode<I> newNode(final int level) {
-    return new BoundingBoxNode<>(level);
+    return new BoundingBoxNode<>(this.nodeCapacity, level);
   }
 
   /**
@@ -325,16 +331,9 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
     return parentBoundables;
   }
 
-  /**
-   * Removes a single item from the tree.
-   *
-   * @param itemEnv the BoundingBox of the item to remove
-   * @param item the item to remove
-   * @return <code>true</code> if the item was found
-   */
   @Override
-  public boolean removeItem(final BoundingBox itemEnv, final I item) {
-    return super.remove(itemEnv, item);
+  public boolean removeItem(final BoundingBox getItems, final I item) {
+    throw new UnsupportedOperationException();
   }
 
   /**

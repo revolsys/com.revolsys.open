@@ -1582,8 +1582,11 @@ public interface LineString extends Lineal {
     return RayCrossingCounter.locatePointInRing(this, x, y) != Location.EXTERIOR;
   }
 
-  default boolean isPointInRing(final Point point) {
-    return RayCrossingCounter.locatePointInRing(point, this) != Location.EXTERIOR;
+  default boolean isPointInRing(Point point) {
+    point = toCoordinateSystem(point);
+    final double x = point.getX();
+    final double y = point.getY();
+    return isPointInRing(x, y);
   }
 
   default boolean isRing() {

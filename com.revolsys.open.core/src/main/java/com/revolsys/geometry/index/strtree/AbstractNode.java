@@ -33,10 +33,7 @@
 package com.revolsys.geometry.index.strtree;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.util.Emptyable;
@@ -58,22 +55,20 @@ public abstract class AbstractNode<B extends Bounds<B>, I>
 
   private B bounds = null;
 
-  private final List<Boundable<B, I>> children = new ArrayList<>();
+  protected final Boundable<B, I>[] children;
 
-  private int level;
+  protected int childCount;
 
-  /**
-   * Default constructor required for serialization.
-   */
-  public AbstractNode() {
-  }
+  private final int level;
 
   /**
    * Constructs an AbstractNode at the given level in the tree
    * @param level 0 if this node is a leaf, 1 if a parent of a leaf, and so on; the
    * root node will have the highest level
    */
-  public AbstractNode(final int level) {
+  @SuppressWarnings("unchecked")
+  public AbstractNode(final int nodeCapacity, final int level) {
+    this.children = new Boundable[nodeCapacity];
     this.level = level;
   }
 
@@ -82,7 +77,7 @@ public abstract class AbstractNode<B extends Bounds<B>, I>
    * (wrapped in an ItemBoundable)
    */
   public void addChild(final Boundable<B, I> child) {
-    this.children.add(child);
+    this.children[this.childCount++] = child;
   }
 
   /**
@@ -93,8 +88,11 @@ public abstract class AbstractNode<B extends Bounds<B>, I>
     if (getLevel() == level) {
       boundables.add(this);
     } else {
-      for (final Boundable<B, I> boundable : this) {
-        boundable.boundablesAtLevel(level, boundables);
+      final int childCount = this.childCount;
+      final Boundable<B, I>[] children = this.children;
+      for (int i = 0; i < childCount; i++) {
+        final Boundable<B, I> child = children[i];
+        child.boundablesAtLevel(level, boundables);
       }
     }
   }
@@ -131,23 +129,22 @@ public abstract class AbstractNode<B extends Bounds<B>, I>
    */
   @Override
   public int getChildCount() {
-    return this.children.size();
+    return this.childCount;
   }
 
-  /**
-   * Returns either child {@link AbstractNode}s, or if this is a leaf node, real data (wrapped
-   * in {@link ItemBoundable}s).
-   */
   @Override
-  public List<Boundable<B, I>> getChildren() {
+  public Boundable<B, I>[] getChildren() {
     return this.children;
   }
 
   @Override
   public int getDepth() {
     int maxChildDepth = 0;
-    for (final Boundable<B, I> childBoundable : this) {
-      final int childDepth = childBoundable.getDepth();
+    final int childCount = this.childCount;
+    final Boundable<B, I>[] children = this.children;
+    for (int i = 0; i < childCount; i++) {
+      final Boundable<B, I> child = children[i];
+      final int childDepth = child.getDepth();
       if (childDepth > maxChildDepth) {
         maxChildDepth = childDepth;
       }
@@ -158,8 +155,11 @@ public abstract class AbstractNode<B extends Bounds<B>, I>
   @Override
   public int getItemCount() {
     int itemCount = 0;
-    for (final Boundable<B, I> childBoundable : this) {
-      itemCount += childBoundable.getItemCount();
+    final int childCount = this.childCount;
+    final Boundable<B, I>[] children = this.children;
+    for (int i = 0; i < childCount; i++) {
+      final Boundable<B, I> child = children[i];
+      itemCount += child.getItemCount();
     }
     return itemCount;
   }
@@ -179,7 +179,7 @@ public abstract class AbstractNode<B extends Bounds<B>, I>
    */
   @Override
   public boolean isEmpty() {
-    return this.children.isEmpty();
+    return this.childCount == 0;
   }
 
   @Override
@@ -188,53 +188,16 @@ public abstract class AbstractNode<B extends Bounds<B>, I>
   }
 
   @Override
-  public Iterator<Boundable<B, I>> iterator() {
-    return this.children.iterator();
-  }
-
-  @Override
   public void query(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds,
     final Consumer<? super I> action) {
     final B bounds = getBounds();
     if (bounds.intersectsBounds(searchBounds)) {
-      for (final Boundable<B, I> child : this.children) {
+      final int childCount = this.childCount;
+      final Boundable<B, I>[] children = this.children;
+      for (int i = 0; i < childCount; i++) {
+        final Boundable<B, I> child = children[i];
         child.query(tree, searchBounds, action);
       }
     }
-  }
-
-  @Override
-  public boolean remove(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds, final I item) {
-    // first try removing item from this node
-    if (removeItem(item)) {
-      return true;
-    } else {
-      for (final Iterator<Boundable<B, I>> iterator = this.children.iterator(); iterator
-        .hasNext();) {
-        final Boundable<B, I> child = iterator.next();
-        if (child.isNode()) {
-          if (child.getBounds().intersectsBounds(searchBounds)) {
-            if (child.remove(tree, searchBounds, item)) {
-              if (child.isEmpty()) {
-                iterator.remove();
-              }
-              return true;
-            }
-          }
-        }
-      }
-      return false;
-    }
-  }
-
-  private boolean removeItem(final I item) {
-    for (final Iterator<Boundable<B, I>> iterator = this.children.iterator(); iterator.hasNext();) {
-      final Boundable<B, I> child = iterator.next();
-      if (child.getItem() == item) {
-        iterator.remove();
-        return true;
-      }
-    }
-    return false;
   }
 }

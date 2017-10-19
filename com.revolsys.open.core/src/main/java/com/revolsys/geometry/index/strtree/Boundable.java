@@ -33,9 +33,6 @@
 package com.revolsys.geometry.index.strtree;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -43,7 +40,7 @@ import java.util.function.Consumer;
  *
  * @version 1.7
  */
-public interface Boundable<B extends Bounds<B>, I> extends Iterable<Boundable<B, I>> {
+public interface Boundable<B extends Bounds<B>, I> {
   void boundablesAtLevel(int level, Collection<Boundable<B, I>> boundables);
 
   /**
@@ -60,8 +57,8 @@ public interface Boundable<B extends Bounds<B>, I> extends Iterable<Boundable<B,
     return 0;
   }
 
-  default List<Boundable<B, I>> getChildren() {
-    return Collections.emptyList();
+  default Boundable<B, I>[] getChildren() {
+    return null;
   }
 
   default int getDepth() {
@@ -84,14 +81,5 @@ public interface Boundable<B extends Bounds<B>, I> extends Iterable<Boundable<B,
     return false;
   }
 
-  @Override
-  default Iterator<Boundable<B, I>> iterator() {
-    return Collections.emptyIterator();
-  }
-
   void query(AbstractSTRtree<B, ?, ?> tree, final B searchBounds, final Consumer<? super I> action);
-
-  default boolean remove(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds, final I item) {
-    return false;
-  }
 }

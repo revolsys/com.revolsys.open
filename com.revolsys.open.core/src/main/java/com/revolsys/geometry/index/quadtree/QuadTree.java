@@ -98,22 +98,34 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   // TODO forEach and remove in one call
 
   @Override
-  public void forEach(final Consumer<? super T> action) {
+  public boolean forEach(final Consumer<? super T> action) {
     try {
       this.root.forEach(this, action);
+      return true;
     } catch (final ExitLoopException e) {
+      return false;
     }
   }
 
   @Override
-  public void forEach(final double x, final double y, final Consumer<? super T> action) {
-    this.root.forEach(this, x, y, action);
+  public boolean forEach(final double x, final double y, final Consumer<? super T> action) {
+    try {
+      this.root.forEach(this, x, y, action);
+      return true;
+    } catch (final ExitLoopException e) {
+      return false;
+    }
   }
 
   @Override
-  public void forEach(final double minX, final double minY, final double maxX, final double maxY,
+  public boolean forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super T> action) {
-    this.root.forEach(this, minX, minY, maxX, maxY, action);
+    try {
+      this.root.forEach(this, minX, minY, maxX, maxY, action);
+      return true;
+    } catch (final ExitLoopException e) {
+      return false;
+    }
   }
 
   public List<T> getAll() {

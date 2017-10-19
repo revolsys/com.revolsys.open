@@ -136,6 +136,7 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
    */
   private void prepareEvents() {
     if (this.changed) {
+      this.changed = false;
       final List<SweepLineEvent<MonotoneChain>> events = this.events;
       events.sort(null);
       // set DELETE event indexes
@@ -151,8 +152,10 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
   }
 
   private void processOverlaps(final int start, final int end,
-    final SweepLineEvent<MonotoneChain> ev0, final SegmentIntersector si) {
-    final MonotoneChain mc0 = ev0.getObject();
+    final SweepLineEvent<MonotoneChain> event1, final SegmentIntersector intersector) {
+    final MonotoneChain chain1 = event1.getObject();
+    final int chain1Index = chain1.getChainIndex();
+    final MonotoneChainEdge chain1Edge = chain1.getEdge();
     final List<SweepLineEvent<MonotoneChain>> events = this.events;
     /**
     * Since we might need to test for self-intersections,
@@ -162,10 +165,12 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
     for (int i = start; i < end; i++) {
       final SweepLineEvent<MonotoneChain> event = events.get(i);
       if (event.isInsert()) {
-        final MonotoneChain mc1 = event.getObject();
+        final MonotoneChain chain2 = event.getObject();
         // don't compare edges in same group, if labels are present
-        if (!ev0.isSameLabel(event)) {
-          mc0.computeIntersections(mc1, si);
+        if (!event1.isSameLabel(event)) {
+          final MonotoneChainEdge chain2Edge = chain2.getEdge();
+          final int chain2Index = chain2.getChainIndex();
+          chain1Edge.computeIntersectsForChain(chain1Index, chain2Edge, chain2Index, intersector);
         }
       }
     }

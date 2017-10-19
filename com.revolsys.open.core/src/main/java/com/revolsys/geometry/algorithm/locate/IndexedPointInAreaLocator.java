@@ -41,6 +41,7 @@ import com.revolsys.geometry.index.intervalrtree.SortedPackedIntervalRTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
@@ -105,8 +106,8 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
    * @param geometry the Geometry to locate in
    */
   public IndexedPointInAreaLocator(final Geometry geometry) {
-    if (!(geometry instanceof Polygonal)) {
-      throw new IllegalArgumentException("Argument must be Polygonal");
+    if (!(geometry instanceof Polygonal || geometry instanceof LinearRing)) {
+      throw new IllegalArgumentException("Argument must be Polygonal or LinearRing");
     }
     this.geometry = geometry;
     this.index = new IntervalIndexedGeometry(geometry);
@@ -129,6 +130,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     return !location.equals(Location.EXTERIOR);
   }
 
+  @Override
   public Location locate(final double x, final double y) {
     final RayCrossingCounter visitor = new RayCrossingCounter(x, y);
     this.index.query(y, y, visitor);
