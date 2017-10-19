@@ -550,7 +550,7 @@ public class OverlayOp extends GeometryGraphOperation {
   private boolean isCovered(final double x, final double y,
     final List<? extends Geometry> geometries) {
     for (final Geometry geometry : geometries) {
-      final Location loc = this.ptLocator.locate( geometry,x,y);
+      final Location loc = this.ptLocator.locate(geometry, x, y);
       if (loc != Location.EXTERIOR) {
         return true;
       }
@@ -578,8 +578,8 @@ public class OverlayOp extends GeometryGraphOperation {
    * @param coord the point coordinate
    * @return true if the coordinate point is covered by a result Area geometry
    */
-  public boolean isCoveredByA(final Point coord) {
-    if (isCovered(coord, this.resultPolyList)) {
+  public boolean isCoveredByA(final double x, final double y) {
+    if (isCovered(x, y, this.resultPolyList)) {
       return true;
     }
     return false;
@@ -591,8 +591,8 @@ public class OverlayOp extends GeometryGraphOperation {
    * @param coord the point coordinate
    * @return true if the coordinate point is covered by a result Area geometry
    */
-  public boolean isCoveredByA(final double x, double y) {
-    if (isCovered(x,y, this.resultPolyList)) {
+  public boolean isCoveredByA(final Point coord) {
+    if (isCovered(coord, this.resultPolyList)) {
       return true;
     }
     return false;
@@ -617,12 +617,13 @@ public class OverlayOp extends GeometryGraphOperation {
   /**
    * Label an isolated node with its relationship to the target geometry.
    */
-  private void labelIncompleteNode(final Node n, final int targetIndex) {
-    final Location loc = this.ptLocator.locate(n.getPoint(), this.arg[targetIndex].getGeometry());
-
-    // MD - 2008-10-24 - experimental for now
-    // int loc = arg[targetIndex].locate(n.getCoordinate());
-    n.getLabel().setLocation(targetIndex, loc);
+  private void labelIncompleteNode(final Node node, final int targetIndex) {
+    final Geometry geometry = this.arg[targetIndex].getGeometry();
+    final double x = node.getX();
+    final double y = node.getY();
+    final Location location = this.ptLocator.locate(geometry, x, y);
+    final Label label = node.getLabel();
+    label.setLocation(targetIndex, location);
   }
 
   /**

@@ -33,6 +33,7 @@
 package com.revolsys.geometry.noding;
 
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.impl.AbstractDelegatingLineString;
 
 /**
  * Represents a list of contiguous line segments,
@@ -46,12 +47,10 @@ import com.revolsys.geometry.model.LineString;
  *
  * @version 1.7
  */
-public class BasicSegmentString implements SegmentString {
+public class BasicSegmentString extends AbstractDelegatingLineString implements SegmentString {
   private static final long serialVersionUID = 1L;
 
   private Object data;
-
-  private final LineString line;
 
   /**
    * Creates a new segment string from a list of vertices.
@@ -60,7 +59,7 @@ public class BasicSegmentString implements SegmentString {
    * @param data the user-defined data of this segment string (may be null)
    */
   public BasicSegmentString(final LineString line, final Object data) {
-    this.line = line;
+    super(line);
     this.data = data;
   }
 
@@ -77,11 +76,6 @@ public class BasicSegmentString implements SegmentString {
   @Override
   public Object getData() {
     return this.data;
-  }
-
-  @Override
-  public LineString getLineString() {
-    return this.line;
   }
 
   /**

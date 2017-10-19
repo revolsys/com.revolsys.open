@@ -690,28 +690,17 @@ public interface Polygon extends Polygonal {
 
   @Override
   default Location locate(Point point) {
-    if (isEmpty() || point.isEmpty()) {
+    if (isEmpty()) {
       return Location.EXTERIOR;
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertGeometry(geometryFactory);
-      final LinearRing shell = getShell();
-      final Location shellLocation = RayCrossingCounter.locatePointInRing(point, shell);
-      if (shellLocation == Location.EXTERIOR) {
+      point = toCoordinateSystem(point);
+      if (point.isEmpty()) {
         return Location.EXTERIOR;
-      } else if (shellLocation == Location.BOUNDARY) {
-        return Location.BOUNDARY;
       } else {
-        for (final LinearRing hole : holes()) {
-          final Location holeLocation = RayCrossingCounter.locatePointInRing(point, hole);
-          if (holeLocation == Location.INTERIOR) {
-            return Location.EXTERIOR;
-          } else if (holeLocation == Location.BOUNDARY) {
-            return Location.BOUNDARY;
-          }
-        }
+        final double x = point.getX();
+        final double y = point.getY();
+        return locate(x, y);
       }
-      return Location.INTERIOR;
     }
   }
 

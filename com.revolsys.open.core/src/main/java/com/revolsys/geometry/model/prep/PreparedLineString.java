@@ -34,11 +34,10 @@ package com.revolsys.geometry.model.prep;
 
 import java.util.List;
 
-import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
-import com.revolsys.geometry.model.impl.AbstractLineString;
+import com.revolsys.geometry.model.impl.AbstractDelegatingLineString;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.SegmentStringUtil;
 
@@ -50,15 +49,13 @@ import com.revolsys.geometry.noding.SegmentStringUtil;
  * @author mbdavis
  *
  */
-public class PreparedLineString extends AbstractLineString implements DelegatingLineString {
+public class PreparedLineString extends AbstractDelegatingLineString {
   private static final long serialVersionUID = 1L;
-
-  private final LineString line;
 
   private FastSegmentSetIntersectionFinder segIntFinder = null;
 
   public PreparedLineString(final LineString line) {
-    this.line = line;
+    super(line);
   }
 
   public synchronized FastSegmentSetIntersectionFinder getIntersectionFinder() {
@@ -73,11 +70,6 @@ public class PreparedLineString extends AbstractLineString implements Delegating
         SegmentStringUtil.extractSegmentStrings(getLineString()));
     }
     return this.segIntFinder;
-  }
-
-  @Override
-  public LineString getLineString() {
-    return this.line;
   }
 
   @Override

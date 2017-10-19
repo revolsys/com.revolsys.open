@@ -97,6 +97,14 @@ public class Node extends GraphComponent {
     return this.coord;
   }
 
+  public double getX() {
+    return this.coord.getX();
+  }
+
+  public double getY() {
+    return this.coord.getY();
+  }
+
   /**
    * Tests whether any incident edge is flagged as
    * being in the result.

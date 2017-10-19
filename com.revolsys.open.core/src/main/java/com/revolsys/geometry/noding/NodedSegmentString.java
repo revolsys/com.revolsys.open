@@ -40,6 +40,7 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.AbstractDelegatingLineString;
 
 /**
  * Represents a list of contiguous line segments,
@@ -53,7 +54,8 @@ import com.revolsys.geometry.model.Point;
  *
  * @version 1.7
  */
-public class NodedSegmentString implements NodableSegmentString {
+public class NodedSegmentString extends AbstractDelegatingLineString
+  implements NodableSegmentString {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -76,8 +78,6 @@ public class NodedSegmentString implements NodableSegmentString {
 
   private final SegmentNodeList nodeList = new SegmentNodeList(this);
 
-  private final LineString line;
-
   /**
    * Creates a new segment string from a list of vertices.
    *
@@ -85,7 +85,7 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param data the user-defined data of this segment string (may be null)
    */
   public NodedSegmentString(final LineString line, final Object data) {
-    this.line = line;
+    super(line);
     this.data = data;
   }
 
@@ -130,7 +130,7 @@ public class NodedSegmentString implements NodableSegmentString {
     if (nextSegIndex < size()) {
       // Normalize segment index if point falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (this.line.equalsVertex(nextSegIndex, x, y)) {
+      if (equalsVertex(nextSegIndex, x, y)) {
         normalizedSegmentIndex = nextSegIndex;
       }
     }
@@ -165,11 +165,6 @@ public class NodedSegmentString implements NodableSegmentString {
   @Override
   public Object getData() {
     return this.data;
-  }
-
-  @Override
-  public LineString getLineString() {
-    return this.line;
   }
 
   public SegmentNodeList getNodeList() {

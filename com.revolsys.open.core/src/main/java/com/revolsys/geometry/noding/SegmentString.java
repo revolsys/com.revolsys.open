@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.noding;
 
-import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.LineString;
 
 /**
@@ -42,7 +41,7 @@ import com.revolsys.geometry.model.LineString;
  *
  * @version 1.7
  */
-public interface SegmentString extends DelegatingLineString {
+public interface SegmentString extends LineString {
   /**
   * Gets the user-defined data for this segment string.
   *
