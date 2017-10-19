@@ -41,6 +41,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.MultiPointEditor;
 import com.revolsys.geometry.model.editor.PunctualEditor;
+import com.revolsys.util.function.Function4Double;
 
 /**
  * Identifies {@link Geometry} subclasses which
@@ -65,6 +66,11 @@ public interface Punctual extends Geometry {
       final Geometry geometry = GeometryFactory.DEFAULT_3D.geometry(string, false);
       return (G)newPunctual(geometry);
     }
+  }
+
+  @Override
+  default <R> R findSegment(final Function4Double<R> action) {
+    return null;
   }
 
   double getCoordinate(int partIndex, int axisIndex);

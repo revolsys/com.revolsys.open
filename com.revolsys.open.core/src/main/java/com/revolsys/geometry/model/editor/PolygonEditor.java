@@ -14,6 +14,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 
 public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   implements Polygon, PolygonalEditor {
@@ -116,6 +117,17 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
     } else {
       return geometryEditor.equalsVertex(axisCount, vertexIndex, point);
     }
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    for (final Geometry geometry : this.editors) {
+      final R result = geometry.findSegment(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

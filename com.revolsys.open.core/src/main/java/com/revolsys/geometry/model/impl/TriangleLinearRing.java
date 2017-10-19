@@ -5,6 +5,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 
 public class TriangleLinearRing extends AbstractLineString implements LinearRing {
   private static final long serialVersionUID = 1L;
@@ -18,6 +19,27 @@ public class TriangleLinearRing extends AbstractLineString implements LinearRing
   @Override
   public TriangleLinearRing clone() {
     return (TriangleLinearRing)super.clone();
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    if (!isEmpty()) {
+      final Triangle triangle = this.triangle;
+      final double x1 = triangle.getX(0);
+      final double y1 = triangle.getY(0);
+      final double x2 = triangle.getX(1);
+      final double y2 = triangle.getY(1);
+      final double x3 = triangle.getX(2);
+      final double y3 = triangle.getY(2);
+      R result = action.accept(x1, y1, x2, y2);
+      if (result == null) {
+        result = action.accept(x2, y2, x3, y3);
+        if (result == null) {
+          result = action.accept(x3, y3, x1, y1);
+        }
+      }
+    }
+    return null;
   }
 
   @Override
@@ -38,14 +60,15 @@ public class TriangleLinearRing extends AbstractLineString implements LinearRing
   @Override
   public void forEachVertex(final BiConsumerDouble action) {
     if (!isEmpty()) {
-      final double x1 = this.triangle.getX(0);
-      final double y1 = this.triangle.getY(0);
+      final Triangle triangle = this.triangle;
+      final double x1 = triangle.getX(0);
+      final double y1 = triangle.getY(0);
       action.accept(x1, y1);
-      final double x2 = this.triangle.getX(1);
-      final double y2 = this.triangle.getY(1);
+      final double x2 = triangle.getX(1);
+      final double y2 = triangle.getY(1);
       action.accept(x2, y2);
-      final double x3 = this.triangle.getX(2);
-      final double y3 = this.triangle.getY(2);
+      final double x3 = triangle.getX(2);
+      final double y3 = triangle.getY(2);
       action.accept(x3, y3);
     }
   }

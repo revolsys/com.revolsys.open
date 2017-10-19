@@ -36,7 +36,7 @@ public class PreparedLinearRing extends PreparedLineString implements LinearRing
   }
 
   @Override
-  public LinearRing prepare() {
+  public PreparedLinearRing prepare() {
     return this;
   }
 }

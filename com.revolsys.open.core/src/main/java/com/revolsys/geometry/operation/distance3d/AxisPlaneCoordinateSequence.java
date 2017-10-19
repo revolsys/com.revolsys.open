@@ -38,6 +38,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.impl.AbstractLineString;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 
 /**
  * A LineString wrapper which
@@ -112,6 +113,24 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
   @Override
   public AxisPlaneCoordinateSequence clone() {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    final int vertexCount = getVertexCount();
+    double x1 = getX(0);
+    double y1 = getY(0);
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = getX(vertexIndex);
+      final double y2 = getY(vertexIndex);
+      final R result = action.accept(x1, y1, x2, y2);
+      if (result != null) {
+        return result;
+      }
+      x1 = x2;
+      y1 = y2;
+    }
+    return null;
   }
 
   @Override

@@ -2,6 +2,7 @@ package com.revolsys.geometry.model;
 
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 
 public interface DelegatingLineString extends LineString {
 
@@ -15,6 +16,12 @@ public interface DelegatingLineString extends LineString {
   default boolean equalsVertex2d(final int vertexIndex1, final int vertexIndex2) {
     final LineString line = getLineString();
     return line.equalsVertex2d(vertexIndex1, vertexIndex2);
+  }
+
+  @Override
+  default <R> R findSegment(final Function4Double<R> action) {
+    final LineString line = getLineString();
+    return line.findSegment(action);
   }
 
   @Override

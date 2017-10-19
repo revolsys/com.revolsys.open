@@ -12,6 +12,7 @@ import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.util.function.Function4Double;
 
 public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G extends Geometry, GE extends GeometryEditor<?>>
   extends AbstractGeometryEditor<GE> implements GeometryCollection {
@@ -138,6 +139,17 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
     } else {
       return geometryEditor.equalsVertex(axisCount, vertexIndex, point);
     }
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    for (final Geometry geometry : this.editors) {
+      final R result = geometry.findSegment(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

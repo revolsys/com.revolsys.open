@@ -12,6 +12,7 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 
 public class LineStringDouble extends AbstractLineString {
   private static final long serialVersionUID = 7579865828939708871L;
@@ -158,6 +159,30 @@ public class LineStringDouble extends AbstractLineString {
         return targetCoordinates;
       }
     }
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    final int vertexCount = this.vertexCount;
+    final int axisCount = this.axisCount;
+    final int axisIgnoreCount = axisCount - 2;
+    final double[] coordinates = this.coordinates;
+    int coordinateIndex = 0;
+    double x1 = coordinates[coordinateIndex++];
+    double y1 = coordinates[coordinateIndex++];
+    coordinateIndex += axisIgnoreCount;
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = coordinates[coordinateIndex++];
+      final double y2 = coordinates[coordinateIndex++];
+      final R result = action.accept(x1, y1, x2, y2);
+      if (result != null) {
+        return result;
+      }
+      coordinateIndex += axisIgnoreCount;
+      x1 = x2;
+      y1 = y2;
+    }
+    return null;
   }
 
   @Override

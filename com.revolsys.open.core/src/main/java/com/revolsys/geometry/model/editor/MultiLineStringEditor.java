@@ -11,6 +11,7 @@ import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 
 public class MultiLineStringEditor
   extends AbstractGeometryCollectionEditor<Lineal, LineString, LineStringEditor>
@@ -36,6 +37,17 @@ public class MultiLineStringEditor
   @Override
   public MultiLineStringEditor clone() {
     return (MultiLineStringEditor)super.clone();
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    for (final Geometry geometry : this.editors) {
+      final R result = geometry.findSegment(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

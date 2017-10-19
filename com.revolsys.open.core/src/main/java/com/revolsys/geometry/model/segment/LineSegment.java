@@ -23,6 +23,7 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 import com.revolsys.util.number.Doubles;
 
 public interface LineSegment extends LineString {
@@ -373,6 +374,19 @@ public interface LineSegment extends LineString {
     final Point c2 = CoordinatesUtil.offset(getPoint(1), angle, endDistance);
     return new LineSegmentDoubleGF(getGeometryFactory(), c1, c2);
 
+  }
+
+  @Override
+  default <R> R findSegment(final Function4Double<R> action) {
+    if (!isEmpty()) {
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      final double x2 = getX(1);
+      final double y2 = getY(1);
+      final R result = action.accept(x1, y1, x2, y2);
+      return result;
+    }
+    return null;
   }
 
   @Override

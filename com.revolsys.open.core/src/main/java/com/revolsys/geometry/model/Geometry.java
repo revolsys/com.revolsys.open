@@ -81,6 +81,7 @@ import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 import com.revolsys.util.number.Doubles;
 
 /**
@@ -1318,6 +1319,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return findClosestGeometryComponent(x, y, maxDistance);
     }
   }
+
+  <R> R findSegment(Function4Double<R> action);
 
   /**
    * Iterate through all the vertices of the geometry and call the supplied action.

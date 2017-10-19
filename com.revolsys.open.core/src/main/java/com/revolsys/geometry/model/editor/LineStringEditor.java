@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 import com.revolsys.util.number.Doubles;
 
 public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
@@ -279,6 +280,34 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   public boolean equalsVertex(final int axisCount, final int[] vertexId, final Point point) {
     final int vertexIndex = getVertexId(vertexId);
     return equalsVertex(axisCount, vertexIndex, point);
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    if (this.coordinates == null) {
+      return this.line.findSegment(action);
+    } else {
+      final int vertexCount = this.vertexCount;
+      final int axisCount = this.axisCount;
+      final int axisIgnoreCount = axisCount - 2;
+      final double[] coordinates = this.coordinates;
+      int coordinateIndex = 0;
+      double x1 = coordinates[coordinateIndex++];
+      double y1 = coordinates[coordinateIndex++];
+      coordinateIndex += axisIgnoreCount;
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = coordinates[coordinateIndex++];
+        final double y2 = coordinates[coordinateIndex++];
+        final R result = action.accept(x1, y1, x2, y2);
+        if (result != null) {
+          return result;
+        }
+        coordinateIndex += axisIgnoreCount;
+        x1 = x2;
+        y1 = y2;
+      }
+      return null;
+    }
   }
 
   @Override

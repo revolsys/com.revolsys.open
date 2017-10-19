@@ -11,6 +11,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 
 public class MultiPolygonEditor
   extends AbstractGeometryCollectionEditor<Polygonal, Polygon, PolygonEditor>
@@ -36,6 +37,17 @@ public class MultiPolygonEditor
   @Override
   public MultiPolygonEditor clone() {
     return (MultiPolygonEditor)super.clone();
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    for (final Geometry geometry : this.editors) {
+      final R result = geometry.findSegment(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

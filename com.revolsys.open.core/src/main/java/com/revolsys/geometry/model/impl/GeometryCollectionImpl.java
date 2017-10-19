@@ -48,6 +48,7 @@ import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -157,6 +158,17 @@ public class GeometryCollectionImpl implements GeometryCollection {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    for (final Geometry geometry : this.geometries) {
+      final R result = geometry.findSegment(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

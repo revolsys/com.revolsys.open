@@ -45,6 +45,7 @@ import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Function4Double;
 
 /**
  * Models a collection of (@link LineString}s.
@@ -134,6 +135,17 @@ public class MultiLineStringImpl implements MultiLineString {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    for (final Geometry geometry : this.lines) {
+      final R result = geometry.findSegment(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override

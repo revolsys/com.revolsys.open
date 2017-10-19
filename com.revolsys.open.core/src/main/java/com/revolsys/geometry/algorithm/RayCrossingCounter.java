@@ -75,20 +75,27 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     if (boundingBox.covers(x, y)) {
 
       final RayCrossingCounter counter = new RayCrossingCounter(x, y);
-
-      double x1 = ring.getX(0);
-      double y1 = ring.getY(0);
-      final int vertexCount = ring.getVertexCount();
-      for (int i = 1; i < vertexCount; i++) {
-        final double x2 = ring.getX(i);
-        final double y2 = ring.getY(i);
+      ring.findSegment((x1, y1, x2, y2) -> {
         counter.countSegment(x2, y2, x1, y1);
         if (counter.isOnSegment()) {
           return counter.getLocation();
         }
-        x1 = x2;
-        y1 = y2;
-      }
+        return null;
+      });
+
+      // double x1 = ring.getX(0);
+      // double y1 = ring.getY(0);
+      // final int vertexCount = ring.getVertexCount();
+      // for (int i = 1; i < vertexCount; i++) {
+      // final double x2 = ring.getX(i);
+      // final double y2 = ring.getY(i);
+      // counter.countSegment(x2, y2, x1, y1);
+      // if (counter.isOnSegment()) {
+      // return counter.getLocation();
+      // }
+      // x1 = x2;
+      // y1 = y2;
+      // }
       return counter.getLocation();
     } else {
       return Location.EXTERIOR;

@@ -33,20 +33,14 @@
 package com.revolsys.geometry.model.prep;
 
 import java.util.List;
-import java.util.function.Consumer;
 
-import com.revolsys.geometry.algorithm.PointLocator;
-import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.impl.AbstractLineString;
-import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.SegmentStringUtil;
-import com.revolsys.util.function.BiConsumerDouble;
-import com.revolsys.util.function.BiFunctionDouble;
 
 /**
  * A prepared version for {@link Lineal} geometries.
@@ -56,7 +50,7 @@ import com.revolsys.util.function.BiFunctionDouble;
  * @author mbdavis
  *
  */
-public class PreparedLineString extends AbstractLineString {
+public class PreparedLineString extends AbstractLineString implements DelegatingLineString {
   private static final long serialVersionUID = 1L;
 
   private final LineString line;
@@ -65,49 +59,6 @@ public class PreparedLineString extends AbstractLineString {
 
   public PreparedLineString(final LineString line) {
     this.line = line;
-  }
-
-  @Override
-  public <R> R findVertex(final BiFunctionDouble<R> action) {
-    return this.line.findVertex(action);
-  }
-
-  @Override
-  public void forEachGeometry(final Consumer<Geometry> action) {
-    this.line.forEachGeometry(action);
-  }
-
-  @Override
-  public void forEachVertex(final BiConsumerDouble action) {
-    this.line.forEachVertex(action);
-  }
-
-  @Override
-  public int getAxisCount() {
-    return this.line.getAxisCount();
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    return this.line.getBoundingBox();
-  }
-
-  @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    final LineString line = getLine();
-    return line.getCoordinate(vertexIndex, axisIndex);
-  }
-
-  @Override
-  public double[] getCoordinates() {
-    final LineString line = getLine();
-    return line.getCoordinates();
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    final LineString line = getLine();
-    return line.getGeometryFactory();
   }
 
   public synchronized FastSegmentSetIntersectionFinder getIntersectionFinder() {
@@ -119,19 +70,14 @@ public class PreparedLineString extends AbstractLineString {
      */
     if (this.segIntFinder == null) {
       this.segIntFinder = new FastSegmentSetIntersectionFinder(
-        SegmentStringUtil.extractSegmentStrings(getLine()));
+        SegmentStringUtil.extractSegmentStrings(getLineString()));
     }
     return this.segIntFinder;
   }
 
-  public LineString getLine() {
-    return this.line;
-  }
-
   @Override
-  public int getVertexCount() {
-    final LineString line = getLine();
-    return line.getVertexCount();
+  public LineString getLineString() {
+    return this.line;
   }
 
   @Override
@@ -189,24 +135,17 @@ public class PreparedLineString extends AbstractLineString {
      * This could be optimized by using the segment index on the lineal target.
      * However, it seems like the L/P case would be pretty rare in practice.
      */
-    final PointLocator locator = new PointLocator();
-    final Geometry realGeometry = getLine();
-    for (final Vertex vertex : geometry.vertices()) {
-      if (realGeometry.intersects(vertex)) {
+    return Boolean.TRUE == geometry.findVertex((x, y) -> {
+      if (intersects(x, y)) {
         return true;
+      } else {
+        return null;
       }
-    }
-    return false;
+    });
   }
 
   @Override
-  public boolean isEmpty() {
-    final LineString line = getLine();
-    return line.isEmpty();
-  }
-
-  @Override
-  public LineString prepare() {
+  public PreparedLineString prepare() {
     return this;
   }
 }
