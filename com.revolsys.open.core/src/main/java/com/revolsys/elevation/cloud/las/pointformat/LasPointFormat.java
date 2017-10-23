@@ -146,7 +146,10 @@ public enum LasPointFormat implements Code {
   public LasPoint newLasPoint(final LasPointCloud pointCloud, final double x, final double y,
     final double z) {
     final BaseLasPoint point = (BaseLasPoint)newLasPoint(pointCloud);
-    point.setXYZ(pointCloud.toIntX(x), pointCloud.toIntY(y), pointCloud.toIntZ(z));
+    final int xInt = pointCloud.toIntX(x);
+    final int yInt = pointCloud.toIntY(y);
+    final int zInt = pointCloud.toIntZ(z);
+    point.setXYZ(xInt, yInt, zInt);
     return point;
   }
 

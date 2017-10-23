@@ -113,6 +113,15 @@ public interface GeometryFactoryProxy {
     }
   }
 
+  default boolean isConversionRequired(final GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactoryThis = getGeometryFactory();
+    if (geometryFactoryThis == null) {
+      return false;
+    } else {
+      return geometryFactoryThis.isConversionRequired(geometryFactory);
+    }
+  }
+
   default boolean isSameCoordinateSystem(final GeometryFactory geometryFactory) {
     final GeometryFactory geometryFactory2 = getGeometryFactory();
     if (geometryFactory == null || geometryFactory2 == null) {

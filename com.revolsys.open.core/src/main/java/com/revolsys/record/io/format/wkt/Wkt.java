@@ -3,6 +3,7 @@ package com.revolsys.record.io.format.wkt;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
@@ -27,7 +28,7 @@ public class Wkt extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> factory) {
+    final RecordFactory<? extends Record> factory, Map<String, ? extends Object> properties) {
     return new WktRecordReader(factory, resource);
   }
 

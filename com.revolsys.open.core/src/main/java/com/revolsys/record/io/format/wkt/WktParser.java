@@ -406,7 +406,11 @@ public class WktParser {
         final int srid = geometry.getCoordinateSystemId();
         if (useAxisCountFromGeometryFactory) {
           geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
-          return (T)geometryFactory.geometry(geometry);
+          if (geometry.getGeometryFactory() == geometryFactory) {
+            return (T)geometry;
+          } else {
+            return (T)geometryFactory.geometry(geometry);
+          }
         } else {
           return (T)geometry;
         }
@@ -458,7 +462,9 @@ public class WktParser {
           do {
             final Geometry geometry = parseGeometry(geometryFactory,
               useAxisCountFromGeometryFactory, reader);
-            geometries.add(geometry);
+            if (!geometry.isEmpty()) {
+              geometries.add(geometry);
+            }
             skipWhitespace(reader);
             character = reader.read();
           } while (character == ',');

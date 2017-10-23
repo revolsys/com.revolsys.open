@@ -1052,8 +1052,8 @@ public interface BoundingBox extends BoundingBoxProxy, Emptyable, GeometryFactor
     if (isEmpty() || other.isEmpty()) {
       return false;
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final BoundingBox convertedBoundingBox = other.convert(geometryFactory, 2);
+      final CoordinateSystem coordinateSystem = getCoordinateSystem();
+      final BoundingBox convertedBoundingBox = other.toCoordinateSystem(coordinateSystem, 2);
       return intersectsFast(convertedBoundingBox);
     }
   }
@@ -1117,19 +1117,6 @@ public interface BoundingBox extends BoundingBoxProxy, Emptyable, GeometryFactor
     final double maxX2 = boundingBox.getMaxX();
     final double maxY2 = boundingBox.getMaxY();
     return intersects(minX2, minY2, maxX2, maxY2);
-  }
-
-  @Override
-  default boolean isEmpty() {
-    final double minX = getMinX();
-    final double maxX = getMaxX();
-    if (Double.isNaN(minX)) {
-      return true;
-    } else if (Double.isNaN(maxX)) {
-      return true;
-    } else {
-      return maxX < minX;
-    }
   }
 
   default boolean isWithinDistance(final BoundingBox boundingBox, final double maxDistance) {
@@ -1203,6 +1190,34 @@ public interface BoundingBox extends BoundingBoxProxy, Emptyable, GeometryFactor
 
   default BoundingBox newBoundingBoxEmpty() {
     return BoundingBoxDoubleXY.EMPTY;
+  }
+
+  default BoundingBox toCoordinateSystem(final CoordinateSystem coordinateSystem,
+    final int minAxisCount) {
+    if (coordinateSystem == null) {
+      return this;
+    } else {
+      final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
+      if (coordinateSystemThis == coordinateSystem || coordinateSystemThis
+        .getCoordinateSystemId() == coordinateSystem.getCoordinateSystemId()) {
+        return this;
+      } else {
+        final GeometryFactory geometryFactory = getGeometryFactory()
+          .convertCoordinateSystem(coordinateSystem)
+          .convertAxisCount(minAxisCount);
+        return convert(geometryFactory);
+      }
+    }
+  }
+
+  default BoundingBox toCoordinateSystem(final GeometryFactory geometryFactory,
+    final int minAxisCount) {
+    if (geometryFactory == null) {
+      return this;
+    } else {
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      return toCoordinateSystem(coordinateSystem, minAxisCount);
+    }
   }
 
   /**

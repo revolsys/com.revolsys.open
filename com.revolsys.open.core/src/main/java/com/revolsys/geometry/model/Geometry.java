@@ -60,10 +60,12 @@ import com.revolsys.geometry.algorithm.InteriorPointArea;
 import com.revolsys.geometry.algorithm.InteriorPointLine;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.model.util.BoundingBoxXyContructor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
@@ -379,6 +381,24 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return (GRET)function.apply((GIN)this);
     }
     return (GRET)this;
+  }
+
+  /**
+   * If this geometry factory's coordinate system requires conversion ({@link GeometryFactory#isConversionRequired(GeometryFactory)})
+   * then return a new 2d geometry converted to the target geometry factory.
+   *
+   * @param geometryFactory The target geometry factory
+   * @return This geometry or converted geometry.
+   * @see GeometryFactory#isConversionRequired(GeometryFactory)
+   */
+  @SuppressWarnings("unchecked")
+  default <V extends Geometry> V as2d(final GeometryFactory geometryFactory) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {
+      return (V)this;
+    } else {
+      return (V)newGeometry(geometryFactory);
+    }
   }
 
   /**
@@ -1337,6 +1357,29 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   void forEachVertex(BiConsumerDouble action);
 
+  void forEachVertex(Consumer<double[]> action);
+
+  void forEachVertex(CoordinatesOperation coordinatesOperation, double[] coordinates,
+    Consumer<double[]> action);
+
+  default void forEachVertex(final GeometryFactory geometryFactory,
+    final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      if (isConversionRequired(geometryFactory)) {
+        final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
+        int axisCount = getAxisCount();
+        final int axisCount2 = geometryFactory.getAxisCount();
+        if (axisCount2 < axisCount) {
+          axisCount = axisCount2;
+        }
+        final double[] coordinates = new double[axisCount];
+        forEachVertex(coordinatesOperation, coordinates, action);
+      } else {
+        forEachVertex(geometryFactory, action);
+      }
+    }
+  }
+
   default Iterable<Geometry> geometries() {
     return getGeometries();
   }
@@ -2037,8 +2080,9 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (isEmpty()) {
       return geometryFactory.newBoundingBoxEmpty();
     } else {
-      final Iterable<Vertex> vertices = vertices();
-      return geometryFactory.newBoundingBox(vertices);
+      final BoundingBoxXyContructor boundingBox = new BoundingBoxXyContructor(geometryFactory);
+      forEachVertex(boundingBox);
+      return boundingBox.newBoundingBox();
     }
   }
 

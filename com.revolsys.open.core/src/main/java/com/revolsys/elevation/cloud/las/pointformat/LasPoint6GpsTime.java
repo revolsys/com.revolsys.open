@@ -166,8 +166,9 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
     this.scannerChannel = (byte)(classificationByte >> 4 & 0b11);
     this.scanDirectionFlag = (classificationByte >> 6 & 0b1) == 1;
     this.edgeOfFlightLine = (classificationByte >> 7 & 0b1) == 1;
-    this.userData = reader.getByte();
+    this.classification = reader.getByte();
     this.scanAngle = reader.getShort();
+    this.userData = reader.getByte();
     this.pointSourceID = reader.getUnsignedShort();
     this.gpsTime = reader.getDouble();
   }

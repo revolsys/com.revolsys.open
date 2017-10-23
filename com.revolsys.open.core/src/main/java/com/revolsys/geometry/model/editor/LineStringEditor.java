@@ -2,7 +2,9 @@ package com.revolsys.geometry.model.editor;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.function.Consumer;
 
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -346,6 +348,37 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
         final double y = coordinates[coordinateIndex++];
         action.accept(x, y);
         coordinateIndex += axisIgnoreCount;
+      }
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<double[]> action) {
+    if (this.coordinates == null) {
+      this.line.forEachVertex(action);
+    } else {
+      final int axisCount = getAxisCount();
+      final double[] coordinates = new double[axisCount];
+      final int coordinatesLength = this.vertexCount * axisCount;
+      for (int coordinateIndex = 0; coordinateIndex < coordinatesLength; coordinateIndex += axisCount) {
+        System.arraycopy(this.coordinates, coordinateIndex, coordinates, 0, axisCount);
+        action.accept(coordinates);
+      }
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    if (coordinates == null) {
+      this.line.forEachVertex(coordinatesOperation, coordinates, action);
+    } else {
+      final int coordinatesLength = coordinates.length;
+      final int axisCount = getAxisCount();
+      final int coordinateCount = this.vertexCount * axisCount;
+      for (int coordinateIndex = 0; coordinateIndex < coordinateCount; coordinateIndex += axisCount) {
+        System.arraycopy(this.coordinates, coordinateIndex, coordinates, 0, coordinatesLength);
+        action.accept(coordinates);
       }
     }
   }

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -171,6 +172,21 @@ public class PolygonImpl extends AbstractPolygon {
   public void forEachVertex(final BiConsumerDouble action) {
     for (final LinearRing ring : this.rings) {
       ring.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<double[]> action) {
+    for (final Geometry geometry : this.rings) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    for (final Geometry geometry : this.rings) {
+      geometry.forEachVertex(coordinatesOperation, coordinates, action);
     }
   }
 

@@ -2,6 +2,7 @@ package com.revolsys.record.io;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -110,6 +111,14 @@ public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFac
   }
 
   @Override
+  default GeometryReader newGeometryReader(final Resource resource,
+    final Map<String, ? extends Object> properties) {
+    final RecordReader recordReader = newRecordReader(resource, ArrayRecord.FACTORY, properties);
+    final RecordReaderGeometryReader geometryReader = new RecordReaderGeometryReader(recordReader);
+    return geometryReader;
+  }
+
+  @Override
   default MapReader newMapReader(final Resource resource) {
     final RecordReader reader = newRecordReader(resource);
     return new RecordMapReader(reader);
@@ -144,8 +153,9 @@ public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFac
   default RecordReader newRecordReader(final Object source,
     final RecordFactory<? extends Record> factory) {
     final Resource resource = Resource.getResource(source);
-    return newRecordReader(resource, factory);
+    return newRecordReader(resource, factory, Collections.emptyMap());
   }
 
-  RecordReader newRecordReader(Resource resource, RecordFactory<? extends Record> factory);
+  RecordReader newRecordReader(Resource resource, RecordFactory<? extends Record> factory,
+    Map<String, ? extends Object> properties);
 }

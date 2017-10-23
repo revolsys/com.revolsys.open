@@ -1,11 +1,13 @@
 package com.revolsys.geometry.model;
 
+import java.util.function.Consumer;
+
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Function4Double;
 
 public interface DelegatingLineString extends LineString {
-
   @Override
   default boolean equalsVertex2d(final int vertexIndex, final double x, final double y) {
     final LineString line = getLineString();
@@ -34,6 +36,26 @@ public interface DelegatingLineString extends LineString {
   default void forEachVertex(final BiConsumerDouble action) {
     final LineString line = getLineString();
     line.forEachVertex(action);
+  }
+
+  @Override
+  default void forEachVertex(final Consumer<double[]> action) {
+    final LineString line = getLineString();
+    line.forEachVertex(action);
+  }
+
+  @Override
+  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    final LineString line = getLineString();
+    line.forEachVertex(coordinatesOperation, coordinates, action);
+  }
+
+  @Override
+  default void forEachVertex(final GeometryFactory geometryFactory,
+    final Consumer<double[]> action) {
+    final LineString line = getLineString();
+    line.forEachVertex(geometryFactory, action);
   }
 
   @Override

@@ -1,5 +1,8 @@
 package com.revolsys.geometry.model.impl;
 
+import java.util.function.Consumer;
+
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 
@@ -36,6 +39,26 @@ public class PointDoubleXYZ extends PointDoubleXY {
     for (int i = 3; i < coordinates.length; i++) {
       coordinates[i] = java.lang.Double.NaN;
     }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      final double[] coordinates = new double[] {
+        this.x, this.y, this.z
+      };
+      action.accept(coordinates);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    coordinates[X] = this.x;
+    coordinates[Y] = this.y;
+    coordinates[Z] = this.z;
+    coordinatesOperation.perform(3, coordinates, 3, coordinates);
+    action.accept(coordinates);
   }
 
   @Override

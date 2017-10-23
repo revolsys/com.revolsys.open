@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
@@ -152,6 +153,21 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   public void forEachVertex(final BiConsumerDouble action) {
     for (final LinearRingEditor editor : this.editors) {
       editor.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<double[]> action) {
+    for (final Geometry geometry : this.editors) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    for (final Geometry geometry : this.editors) {
+      geometry.forEachVertex(coordinatesOperation, coordinates, action);
     }
   }
 

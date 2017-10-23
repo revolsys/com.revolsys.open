@@ -2,6 +2,7 @@ package com.revolsys.elevation.cloud.las.pointformat;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.cloud.las.LasClassification;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.channels.ChannelReader;
@@ -61,6 +62,10 @@ public interface LasPoint extends Point, MapSerializer {
 
   boolean isKeyPoint();
 
+  default boolean isPointFormat(final LasPointFormat pointFormat) {
+    return pointFormat.equals(getPointFormat());
+  }
+
   boolean isScanDirectionFlag();
 
   boolean isSynthetic();
@@ -73,6 +78,11 @@ public interface LasPoint extends Point, MapSerializer {
   }
 
   void setClassification(byte classification);
+
+  default void setClassification(final LasClassification classification) {
+    final byte code = classification.getCode();
+    setClassification(code);
+  }
 
   void setClassificationByte(byte classificationByte);
 

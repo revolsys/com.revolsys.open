@@ -37,6 +37,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
@@ -195,6 +196,21 @@ public class GeometryCollectionImpl implements GeometryCollection {
   public void forEachVertex(final BiConsumerDouble action) {
     for (final Geometry geometry : this.geometries) {
       geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<double[]> action) {
+    for (final Geometry geometry : this.geometries) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    for (final Geometry geometry : this.geometries) {
+      geometry.forEachVertex(coordinatesOperation, coordinates, action);
     }
   }
 

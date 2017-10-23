@@ -133,7 +133,10 @@ public class LasPoint0Core extends BaseLasPoint {
 
   @Override
   public void setClassification(final byte classification) {
-    this.classificationByte &= classification | 0b11100000;
+    byte newClassificationByte = this.classificationByte;
+    newClassificationByte &= 0b11100000;
+    newClassificationByte |= classification & 0b11111;
+    this.classificationByte = newClassificationByte;
   }
 
   @Override

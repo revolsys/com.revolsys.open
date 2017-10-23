@@ -1,7 +1,9 @@
 package com.revolsys.geometry.model.impl;
 
 import java.io.Serializable;
+import java.util.function.Consumer;
 
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.MathUtil;
@@ -96,6 +98,25 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
     if (!isEmpty()) {
       action.accept(this.x, this.y);
     }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      final double[] coordinates = new double[] {
+        this.x, this.y
+      };
+      action.accept(coordinates);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    coordinates[0] = this.x;
+    coordinates[1] = this.y;
+    coordinatesOperation.perform(2, coordinates, 2, coordinates);
+    action.accept(coordinates);
   }
 
   @Override

@@ -104,6 +104,12 @@ public class Debug {
     println(new Timestamp(System.currentTimeMillis()));
   }
 
+  public static void time(final String message, final Runnable runnable) {
+    final long startTime = System.currentTimeMillis();
+    runnable.run();
+    Dates.printEllapsedTime(message, startTime);
+  }
+
   public static void typePath(final Edge<?> edge, final String typePath) {
     final String typePath2 = edge.getTypeName();
     equals(typePath2, typePath);

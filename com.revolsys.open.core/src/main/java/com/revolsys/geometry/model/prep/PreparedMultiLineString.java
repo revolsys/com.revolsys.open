@@ -39,7 +39,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.impl.MultiLineStringImpl;
-import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
@@ -150,12 +149,13 @@ public class PreparedMultiLineString extends MultiLineStringImpl {
      * This could be optimized by using the segment index on the lineal target.
      * However, it seems like the L/P case would be pretty rare in practice.
      */
-    for (final Vertex vertex : geometry.vertices()) {
-      if (intersects(vertex)) {
-        return true;
+    return Boolean.TRUE == geometry.findVertex((x, y) -> {
+      if (intersects(x, y)) {
+        return Boolean.TRUE;
+      } else {
+        return null;
       }
-    }
-    return false;
+    });
   }
 
   @Override

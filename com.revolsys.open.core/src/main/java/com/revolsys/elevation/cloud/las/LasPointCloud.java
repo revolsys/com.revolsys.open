@@ -37,6 +37,7 @@ import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 
 public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSerializer {
@@ -105,7 +106,11 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
     } else {
       this.exists = true;
       if (geometryFactory == null || !geometryFactory.isHasCoordinateSystem()) {
-        geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+        final GeometryFactory geometryFactoryFromPrj = EsriCoordinateSystems
+          .getGeometryFactory(resource);
+        if (geometryFactoryFromPrj != null) {
+          geometryFactory = geometryFactoryFromPrj;
+        }
       }
       final LasPointCloudHeader header = new LasPointCloudHeader(this.reader, geometryFactory);
       this.setHeader(header);
