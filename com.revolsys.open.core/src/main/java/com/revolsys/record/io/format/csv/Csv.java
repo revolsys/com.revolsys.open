@@ -234,7 +234,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory) {
+    final RecordFactory<? extends Record> recordFactory, Map<String, ? extends Object> properties) {
     return new CsvRecordReader(resource, recordFactory);
   }
 

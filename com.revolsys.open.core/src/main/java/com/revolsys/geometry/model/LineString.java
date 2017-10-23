@@ -699,6 +699,35 @@ public interface LineString extends Lineal {
     return findClosestGeometryComponent(point.getX(), point.getY());
   }
 
+  @Override
+  default void forEachVertex(final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      final int axisCount = getAxisCount();
+      final double[] coordinates = new double[axisCount];
+      final int vertexCount = getVertexCount();
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += axisCount) {
+        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+          coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
+        }
+        action.accept(coordinates);
+      }
+    }
+  }
+
+  @Override
+  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    final int axisCount = coordinates.length;
+    final int vertexCount = getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += axisCount) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
+      }
+
+      action.accept(coordinates);
+    }
+  }
+
   /**
    * Gets the boundary of this geometry. The boundary of a lineal geometry is
    * always a zero-dimensional geometry (which may be empty).

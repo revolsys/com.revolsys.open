@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
@@ -33,14 +34,14 @@ public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory 
 
   /**
    * Construct a new reader for the file using the specified data object factory.
-   *
-   * @param inputStream The file to read.
    * @param factory The factory used to create data objects.
+   * @param inputStream The file to read.
+   *
    * @return The reader for the file.
    */
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory) {
+    final RecordFactory<? extends Record> recordFactory, Map<String, ? extends Object> properties) {
     try {
       return new GpxIterator(resource, recordFactory, null);
     } catch (final IOException e) {

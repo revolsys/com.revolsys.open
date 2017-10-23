@@ -732,15 +732,14 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     setElevation(gridX, gridY, Double.NaN);
   }
 
-  default void setElevations(Geometry geometry) {
+  default void setElevations(final Geometry geometry) {
     if (geometry != null) {
-      geometry = geometry.convertGeometry(getGeometryFactory());
-      for (final Vertex vertex : geometry.vertices()) {
-        final double x = vertex.getX();
-        final double y = vertex.getY();
-        final double z = vertex.getZ();
+      geometry.forEachVertex(getGeometryFactory(), coordinates -> {
+        final double x = coordinates[0];
+        final double y = coordinates[1];
+        final double z = coordinates[2];
         setElevation(x, y, z);
-      }
+      });
     }
   }
 

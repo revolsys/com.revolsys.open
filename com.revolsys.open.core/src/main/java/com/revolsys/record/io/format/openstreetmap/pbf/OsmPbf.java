@@ -1,6 +1,7 @@
 package com.revolsys.record.io.format.openstreetmap.pbf;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -35,7 +36,7 @@ public class OsmPbf extends AbstractRecordIoFactory {
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory) {
+    final RecordFactory<? extends Record> recordFactory, Map<String, ? extends Object> properties) {
     return new OsmPbfRecordIterator(resource);
   }
 }

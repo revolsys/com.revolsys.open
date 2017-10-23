@@ -1,5 +1,8 @@
 package com.revolsys.geometry.model.impl;
 
+import java.util.function.Consumer;
+
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -41,6 +44,17 @@ public class AbstractDelegatingLineString extends AbstractLineString
   @Override
   public void forEachVertex(final BiConsumerDouble action) {
     this.line.forEachVertex(action);
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<double[]> action) {
+    this.line.forEachVertex(action);
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    this.line.forEachVertex(coordinatesOperation, coordinates, action);
   }
 
   @Override

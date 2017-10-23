@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryDataType;
@@ -156,6 +157,21 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
   public void forEachGeometry(final Consumer<Geometry> action) {
     for (final Geometry geometry : this.editors) {
       action.accept(geometry);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<double[]> action) {
+    for (final Geometry geometry : this.editors) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    for (final Geometry geometry : this.editors) {
+      geometry.forEachVertex(coordinatesOperation, coordinates, action);
     }
   }
 

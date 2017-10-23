@@ -1,5 +1,7 @@
 package com.revolsys.record.io.format.saif;
 
+import java.util.Map;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
@@ -20,7 +22,7 @@ public class Saif extends AbstractRecordIoFactory {
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory) {
+    final RecordFactory<? extends Record> recordFactory, Map<String, ? extends Object> properties) {
     final SaifReader reader = new SaifReader(resource);
     return reader;
   }

@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;
@@ -86,7 +87,7 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory) {
+    final RecordFactory<? extends Record> recordFactory, Map<String, ? extends Object> properties) {
     return new CsvRecordReader(resource, recordFactory, Tsv.FIELD_SEPARATOR);
   }
 

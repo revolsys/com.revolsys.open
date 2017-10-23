@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
@@ -545,6 +546,30 @@ public interface Point extends Punctual, Serializable {
       final double y = getY();
       action.accept(x, y);
     }
+  }
+
+  @Override
+  default void forEachVertex(final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      final int axisCount = getAxisCount();
+      final double[] coordinates = new double[axisCount];
+      copyCoordinates(coordinates);
+      action.accept(coordinates);
+    }
+  }
+
+  @Override
+  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    final int coordinatesLength = coordinates.length;
+    coordinates[0] = getX();
+    coordinates[1] = getY();
+    for (int i = 2; i < coordinatesLength; i++) {
+      final double value = getCoordinate(i);
+      coordinates[i] = value;
+    }
+    coordinatesOperation.perform(coordinatesLength, coordinates, coordinatesLength, coordinates);
+    action.accept(coordinates);
   }
 
   /**

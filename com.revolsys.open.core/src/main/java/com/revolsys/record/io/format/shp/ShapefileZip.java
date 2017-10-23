@@ -3,6 +3,7 @@ package com.revolsys.record.io.format.shp;
 import java.io.File;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
@@ -31,7 +32,7 @@ public class ShapefileZip extends AbstractRecordIoFactory implements RecordWrite
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> factory) {
+    final RecordFactory<? extends Record> factory, Map<String, ? extends Object> properties) {
     return new ZipRecordReader(resource, ShapefileConstants.FILE_EXTENSION, factory);
   }
 

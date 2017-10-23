@@ -40,6 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.IntHashMap;
@@ -113,7 +114,15 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
 
     @Override
+    public void forEachGeometry(final Consumer<Geometry> action) {
+    }
+
+    @Override
     public void forEachVertex(final BiConsumerDouble action) {
+    }
+
+    @Override
+    public void forEachVertex(final Consumer<double[]> action) {
     }
 
     @Override
@@ -1312,23 +1321,28 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  private boolean isConversionRequired(final CoordinateSystem coordinateSystem) {
+    final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
+    if (coordinateSystemThis == coordinateSystem //
+      || coordinateSystemThis == null //
+      || coordinateSystem == null //
+      || coordinateSystemThis.getCoordinateSystemId() == coordinateSystem.getCoordinateSystemId() //
+      || coordinateSystemThis.equals(coordinateSystem)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  @Override
   public boolean isConversionRequired(final GeometryFactory geometryFactory) {
     if (this == geometryFactory) {
       return false;
     } else if (geometryFactory == null) {
       return false;
     } else {
-      final CoordinateSystem coordinateSystem = getCoordinateSystem();
-      final CoordinateSystem coordinateSystem2 = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem == null || coordinateSystem2 == null) {
-        return false;
-      } else if (coordinateSystem == coordinateSystem2
-        || coordinateSystem.getCoordinateSystemId() == coordinateSystem2.getCoordinateSystemId()
-        || coordinateSystem.equals(coordinateSystem2)) {
-        return false;
-      } else {
-        return true;
-      }
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      return isConversionRequired(coordinateSystem);
     }
   }
 

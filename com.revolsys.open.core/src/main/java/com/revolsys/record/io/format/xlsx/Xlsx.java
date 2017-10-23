@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.xlsx;
 
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -35,7 +36,7 @@ public class Xlsx extends AbstractRecordIoFactory implements RecordWriterFactory
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory) {
+    final RecordFactory<? extends Record> recordFactory, Map<String, ? extends Object> properties) {
     return new XlsxRecordReader(resource, recordFactory);
   }
 
