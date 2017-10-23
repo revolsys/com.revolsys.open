@@ -239,9 +239,9 @@ public class PolygonBuilder {
         final EdgeRing shell = findEdgeRingContaining(hole, shellList);
         if (shell == null) {
           throw new TopologyException("unable to assign hole to a shell", hole.getCoordinate(0));
+        } else {
+          hole.setShell(shell);
         }
-        // Assert.isTrue(shell != null, "unable to assign hole to a shell");
-        hole.setShell(shell);
       }
     }
   }
