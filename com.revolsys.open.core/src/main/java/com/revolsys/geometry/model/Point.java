@@ -821,9 +821,6 @@ public interface Point extends Punctual, Serializable {
     } else {
       return new BaseBoundingBox() {
 
-        /**
-         *
-         */
         private static final long serialVersionUID = 1L;
 
         @Override
@@ -838,32 +835,37 @@ public interface Point extends Punctual, Serializable {
 
         @Override
         public double getMax(final int axisIndes) {
-          return Point.this.getCoordinate(axisIndes);
+          return getCoordinate(axisIndes);
         }
 
         @Override
         public double getMaxX() {
-          return Point.this.getX();
+          return getX();
         }
 
         @Override
         public double getMaxY() {
-          return Point.this.getY();
+          return getY();
         }
 
         @Override
         public double getMin(final int axisIndes) {
-          return Point.this.getCoordinate(axisIndes);
+          return getCoordinate(axisIndes);
         }
 
         @Override
         public double getMinX() {
-          return Point.this.getX();
+          return getX();
         }
 
         @Override
         public double getMinY() {
-          return Point.this.getY();
+          return getY();
+        }
+
+        @Override
+        public boolean isEmpty() {
+          return Point.this.isEmpty();
         }
       };
     }

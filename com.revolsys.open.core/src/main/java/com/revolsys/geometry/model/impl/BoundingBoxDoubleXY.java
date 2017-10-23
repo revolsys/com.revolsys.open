@@ -40,9 +40,6 @@ import com.revolsys.util.MathUtil;
 
 public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public static BoundingBox EMPTY = new BoundingBoxDoubleXY(Double.NaN, Double.NaN);
@@ -309,6 +306,41 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
       result = 37 * result + MathUtil.hashCode(minY);
       result = 37 * result + MathUtil.hashCode(maxY);
       return result;
+    }
+  }
+
+  @Override
+  public boolean intersects(final double x, final double y) {
+    return !(x > this.maxX || x < this.minX || y > this.maxY || y < this.minY);
+  }
+
+  @Override
+  public boolean intersects(double x1, double y1, double x2, double y2) {
+    if (x1 > x2) {
+      final double t = x1;
+      x1 = x2;
+      x2 = t;
+    }
+    if (y1 > y2) {
+      final double t = y1;
+      y1 = y2;
+      y2 = t;
+    }
+    return !(x1 > this.maxX || x2 < this.minX || y1 > this.maxY || y2 < this.minY);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    if (Double.isFinite(this.minX)) {
+      return false;
+    } else if (Double.isFinite(this.maxX)) {
+      return false;
+    } else if (Double.isFinite(this.minY)) {
+      return false;
+    } else if (Double.isFinite(this.maxY)) {
+      return false;
+    } else {
+      return true;
     }
   }
 

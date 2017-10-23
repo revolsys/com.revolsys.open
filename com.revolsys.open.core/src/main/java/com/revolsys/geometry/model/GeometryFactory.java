@@ -60,7 +60,7 @@ import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxGeometryFactory;
+import com.revolsys.geometry.model.impl.BoundingBoxEmpty;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
@@ -543,7 +543,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   private int axisCount = 2;
 
-  private final BoundingBox boundingBoxEmpty = new BoundingBoxGeometryFactory(this);
+  private final BoundingBox boundingBoxEmpty = new BoundingBoxEmpty(this);
 
   private final CoordinateSystem coordinateSystem;
 
@@ -686,7 +686,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public GeometryFactory convertAxisCount(final int axisCount) {
-    if (axisCount == getAxisCount()) {
+    if (axisCount == this.axisCount) {
       return this;
     } else {
       return fixed(this.coordinateSystem, this.coordinateSystemId, axisCount, this.scales);
@@ -1003,7 +1003,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  public int getAxisCount() {
+  public final int getAxisCount() {
     return this.axisCount;
   }
 
@@ -1057,9 +1057,9 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)this.coordinateSystem;
       final GeographicCoordinateSystem geographicCs = projectedCs.getGeographicCoordinateSystem();
       final int coordinateSystemId = geographicCs.getCoordinateSystemId();
-      return floating(coordinateSystemId, getAxisCount());
+      return floating(coordinateSystemId, this.axisCount);
     } else {
-      return floating(4326, getAxisCount());
+      return floating(4326, this.axisCount);
     }
   }
 
@@ -1089,7 +1089,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       return linearRing(points);
     } else if (ring instanceof double[]) {
       final double[] coordinates = (double[])ring;
-      return linearRing(getAxisCount(), coordinates);
+      return linearRing(this.axisCount, coordinates);
     } else {
       return null;
     }
@@ -1453,7 +1453,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
           }
         } else if (value instanceof double[]) {
           final double[] points = (double[])value;
-          final int axisCount = getAxisCount();
+          final int axisCount = this.axisCount;
           final LineString line = lineString(axisCount, points);
           lineStrings.add(line);
         }
@@ -1814,7 +1814,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public BoundingBox newBoundingBox(final BoundingBox boundingBox) {
-    final int axisCount = getAxisCount();
+    final int axisCount = this.axisCount;
     final double[] bounds = boundingBox.getMinMaxValues(axisCount);
     return newBoundingBox(axisCount, bounds);
   }
@@ -1845,7 +1845,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public BoundingBox newBoundingBox(int axisCount, final Iterable<? extends Point> points) {
-    axisCount = Math.min(axisCount, getAxisCount());
+    axisCount = Math.min(axisCount, this.axisCount);
     double[] bounds = null;
     if (points != null) {
       for (final Point point : points) {
@@ -1866,7 +1866,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public BoundingBox newBoundingBox(int axisCount, final Point... points) {
-    axisCount = Math.min(axisCount, getAxisCount());
+    axisCount = Math.min(axisCount, this.axisCount);
     double[] bounds = null;
     if (points != null) {
       for (final Point point : points) {
@@ -2056,7 +2056,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       if (size == 0) {
         return point();
       } else if (size == 1) {
-        final int axisCount = Math.min(points.getAxisCount(), getAxisCount());
+        final int axisCount = Math.min(points.getAxisCount(), this.axisCount);
         final double[] coordinates = new double[axisCount];
         for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
           final double coordinate = points.getCoordinate(0, axisIndex);
@@ -2395,7 +2395,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     final MapEx map = new LinkedHashMapEx();
     addTypeToMap(map, "geometryFactory");
     map.put("srid", getCoordinateSystemId());
-    map.put("axisCount", getAxisCount());
+    map.put("axisCount", this.axisCount);
 
     final double scaleX = getScaleX();
     addToMap(map, "scaleX", scaleX, 0.0);

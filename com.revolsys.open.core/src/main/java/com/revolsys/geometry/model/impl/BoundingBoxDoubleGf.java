@@ -56,9 +56,6 @@ import com.revolsys.util.MathUtil;
  *@version 1.7
  */
 public class BoundingBoxDoubleGf extends BaseBoundingBox {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   static {
@@ -179,6 +176,16 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
       result = 37 * result + MathUtil.hashCode(maxY);
       return result;
     }
+  }
+
+  @Override
+  public boolean isEmpty() {
+    for (final double value : this.bounds) {
+      if (Double.isFinite(value)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
