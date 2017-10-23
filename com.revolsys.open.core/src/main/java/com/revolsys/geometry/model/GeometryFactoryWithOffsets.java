@@ -53,11 +53,16 @@ public class GeometryFactoryWithOffsets extends GeometryFactory {
   @Override
   public GeometryFactoryWithOffsets convertCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
-    if (isSameCoordinateSystem(coordinateSystem)) {
+    if (coordinateSystem == null) {
       return this;
     } else {
-      return new GeometryFactoryWithOffsets(coordinateSystem, this.offsetX, this.offsetY,
-        this.offsetZ, this.scales);
+      final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
+      if (coordinateSystem == coordinateSystemThis) {
+        return this;
+      } else {
+        return new GeometryFactoryWithOffsets(coordinateSystem, this.offsetX, this.offsetY,
+          this.offsetZ, this.scales);
+      }
     }
   }
 

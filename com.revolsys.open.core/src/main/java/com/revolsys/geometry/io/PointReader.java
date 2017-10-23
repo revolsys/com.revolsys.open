@@ -19,7 +19,7 @@ public interface PointReader extends Reader<Point> {
     }
   }
 
-  static PointReader newGeometryReader(final Object source) {
+  static PointReader newPointReader(final Object source) {
     final PointReaderFactory readerFactory = IoFactory.factory(PointReaderFactory.class, source);
     if (readerFactory == null) {
       return null;

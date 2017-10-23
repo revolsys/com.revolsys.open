@@ -350,29 +350,25 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem == null) {
-        throw new IllegalArgumentException("A valid  coordinate system must be specified");
-      } else {
-        double scaleX = geometryFactory.getScaleX();
-        if (scaleX == 0) {
-          scaleX = 1000;
-        }
-        double scaleY = geometryFactory.getScaleY();
-        if (scaleY == 0) {
-          scaleY = 1000;
-        }
-        double scaleZ = geometryFactory.getScaleZ();
-        if (scaleZ == 0) {
-          scaleZ = 1000;
-        }
-        final double offsetX = geometryFactory.getOffsetX();
-        final double offsetY = geometryFactory.getOffsetY();
-        final double offsetZ = geometryFactory.getOffsetZ();
-        this.geometryFactory = GeometryFactory.newWithOffsets(coordinateSystem, offsetX, scaleX,
-          offsetY, scaleY, offsetZ, scaleZ);
-
-        LasProjection.setCoordinateSystem(this, coordinateSystem);
+      double scaleX = geometryFactory.getScaleX();
+      if (scaleX == 0) {
+        scaleX = 1000;
       }
+      double scaleY = geometryFactory.getScaleY();
+      if (scaleY == 0) {
+        scaleY = 1000;
+      }
+      double scaleZ = geometryFactory.getScaleZ();
+      if (scaleZ == 0) {
+        scaleZ = 1000;
+      }
+      final double offsetX = geometryFactory.getOffsetX();
+      final double offsetY = geometryFactory.getOffsetY();
+      final double offsetZ = geometryFactory.getOffsetZ();
+      this.geometryFactory = GeometryFactory.newWithOffsets(coordinateSystem, offsetX, scaleX,
+        offsetY, scaleY, offsetZ, scaleZ);
+
+      LasProjection.setCoordinateSystem(this, coordinateSystem);
     }
   }
 

@@ -698,10 +698,15 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public GeometryFactory convertCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    if (isSameCoordinateSystem(coordinateSystem)) {
+    if (coordinateSystem == null) {
       return this;
     } else {
-      return GeometryFactory.fixed(coordinateSystem, this.axisCount, this.scales);
+      final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
+      if (coordinateSystem == coordinateSystemThis) {
+        return this;
+      } else {
+        return GeometryFactory.fixed(coordinateSystem, this.axisCount, this.scales);
+      }
     }
   }
 
@@ -1304,6 +1309,26 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (axisCount > 2) {
       this.scaleZ = this.scales[2];
       this.resolutionZ = toResolution(this.scaleZ);
+    }
+  }
+
+  public boolean isConversionRequired(final GeometryFactory geometryFactory) {
+    if (this == geometryFactory) {
+      return false;
+    } else if (geometryFactory == null) {
+      return false;
+    } else {
+      final CoordinateSystem coordinateSystem = getCoordinateSystem();
+      final CoordinateSystem coordinateSystem2 = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem == null || coordinateSystem2 == null) {
+        return false;
+      } else if (coordinateSystem == coordinateSystem2
+        || coordinateSystem.getCoordinateSystemId() == coordinateSystem2.getCoordinateSystemId()
+        || coordinateSystem.equals(coordinateSystem2)) {
+        return false;
+      } else {
+        return true;
+      }
     }
   }
 
