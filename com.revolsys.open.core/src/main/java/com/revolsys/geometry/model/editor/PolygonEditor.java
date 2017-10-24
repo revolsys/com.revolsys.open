@@ -157,17 +157,17 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   }
 
   @Override
-  public void forEachVertex(final Consumer<double[]> action) {
-    for (final Geometry geometry : this.editors) {
-      geometry.forEachVertex(action);
-    }
-  }
-
-  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final double[] coordinates, final Consumer<double[]> action) {
     for (final Geometry geometry : this.editors) {
       geometry.forEachVertex(coordinatesOperation, coordinates, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+    for (final Geometry geometry : this.editors) {
+      geometry.forEachVertex(coordinates, action);
     }
   }
 

@@ -661,7 +661,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   @SuppressWarnings("unchecked")
   default <G extends Geometry> G convertAxisCount(final int axisCount) {
-    if (getAxisCount() > axisCount) {
+    final int axisCountThis = getAxisCount();
+    if (axisCountThis > axisCount) {
       GeometryFactory geometryFactory = getGeometryFactory();
       geometryFactory = geometryFactory.convertAxisCount(axisCount);
       return (G)geometryFactory.geometry(this);
@@ -712,12 +713,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     } else {
       return (V)this;
     }
-  }
-
-  default <V extends Geometry> V convertGeometry2dFloating() {
-    GeometryFactory geometryFactory = getGeometryFactory();
-    geometryFactory = geometryFactory.to2dFloating();
-    return convertGeometry(geometryFactory);
   }
 
   default <V extends Geometry> V convertScales(final double... scales) {
@@ -1357,26 +1352,57 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   void forEachVertex(BiConsumerDouble action);
 
-  void forEachVertex(Consumer<double[]> action);
+  default void forEachVertex(final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      final int axisCount = getAxisCount();
+      final double[] coordinates = new double[axisCount];
+      forEachVertex(coordinates, action);
+    }
+  }
 
   void forEachVertex(CoordinatesOperation coordinatesOperation, double[] coordinates,
     Consumer<double[]> action);
 
+  void forEachVertex(double[] coordinates, Consumer<double[]> action);
+
   default void forEachVertex(final GeometryFactory geometryFactory,
     final Consumer<double[]> action) {
     if (!isEmpty()) {
+      int axisCount = getAxisCount();
+      final int axisCount2 = geometryFactory.getAxisCount();
+      if (axisCount2 < axisCount) {
+        axisCount = axisCount2;
+      }
+      final double[] coordinates = new double[axisCount];
       if (isConversionRequired(geometryFactory)) {
         final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
-        int axisCount = getAxisCount();
-        final int axisCount2 = geometryFactory.getAxisCount();
-        if (axisCount2 < axisCount) {
-          axisCount = axisCount2;
-        }
-        final double[] coordinates = new double[axisCount];
         forEachVertex(coordinatesOperation, coordinates, action);
       } else {
-        forEachVertex(geometryFactory, action);
+        forEachVertex(coordinates, action);
       }
+    }
+  }
+
+  default void forEachVertex(final GeometryFactory geometryFactory, final int axisCount,
+    final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      final double[] coordinates = new double[axisCount];
+      Arrays.fill(coordinates, Double.NaN);
+      if (isConversionRequired(geometryFactory)) {
+        final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
+
+        forEachVertex(coordinatesOperation, coordinates, action);
+      } else {
+        forEachVertex(coordinates, action);
+      }
+    }
+  }
+
+  default void forEachVertex(final int axisCount, final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      final double[] coordinates = new double[axisCount];
+      Arrays.fill(coordinates, Double.NaN);
+      forEachVertex(coordinates, action);
     }
   }
 

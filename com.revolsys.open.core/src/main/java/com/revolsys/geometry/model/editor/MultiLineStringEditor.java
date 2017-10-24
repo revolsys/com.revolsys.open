@@ -9,7 +9,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Function4Double;
 
@@ -65,13 +64,6 @@ public class MultiLineStringEditor
   public void forEachGeometry(final Consumer<Geometry> action) {
     for (final GeometryEditor<?> editor : this.editors) {
       action.accept(editor);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final BiConsumerDouble action) {
-    for (final GeometryEditor<?> editor : this.editors) {
-      editor.forEachVertex(action);
     }
   }
 

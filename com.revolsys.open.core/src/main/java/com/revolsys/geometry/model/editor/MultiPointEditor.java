@@ -9,7 +9,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 
 public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual, Point, PointEditor>
@@ -88,13 +87,6 @@ public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual,
   public void forEachGeometry(final Consumer<Geometry> action) {
     for (final GeometryEditor<?> editor : this.editors) {
       action.accept(editor);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final BiConsumerDouble action) {
-    for (final GeometryEditor<?> editor : this.editors) {
-      editor.forEachVertex(action);
     }
   }
 

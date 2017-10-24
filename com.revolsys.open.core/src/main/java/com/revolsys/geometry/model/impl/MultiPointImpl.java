@@ -161,17 +161,17 @@ public class MultiPointImpl implements MultiPoint {
   }
 
   @Override
-  public void forEachVertex(final Consumer<double[]> action) {
-    for (final Geometry geometry : this.points) {
-      geometry.forEachVertex(action);
-    }
-  }
-
-  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final double[] coordinates, final Consumer<double[]> action) {
     for (final Geometry geometry : this.points) {
       geometry.forEachVertex(coordinatesOperation, coordinates, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+    for (final Geometry geometry : this.points) {
+      geometry.forEachVertex(coordinates, action);
     }
   }
 

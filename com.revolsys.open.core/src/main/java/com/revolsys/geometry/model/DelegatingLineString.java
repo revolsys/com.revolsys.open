@@ -39,12 +39,6 @@ public interface DelegatingLineString extends LineString {
   }
 
   @Override
-  default void forEachVertex(final Consumer<double[]> action) {
-    final LineString line = getLineString();
-    line.forEachVertex(action);
-  }
-
-  @Override
   default void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final double[] coordinates, final Consumer<double[]> action) {
     final LineString line = getLineString();
@@ -52,10 +46,9 @@ public interface DelegatingLineString extends LineString {
   }
 
   @Override
-  default void forEachVertex(final GeometryFactory geometryFactory,
-    final Consumer<double[]> action) {
+  default void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
     final LineString line = getLineString();
-    line.forEachVertex(geometryFactory, action);
+    line.forEachVertex(coordinates, action);
   }
 
   @Override

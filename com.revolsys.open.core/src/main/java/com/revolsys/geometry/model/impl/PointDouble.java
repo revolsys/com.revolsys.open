@@ -80,20 +80,30 @@ public class PointDouble extends AbstractPoint implements Serializable {
   }
 
   @Override
-  public void forEachVertex(final Consumer<double[]> action) {
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
     if (!isEmpty()) {
-      final double[] coordinates = this.coordinates.clone();
+      int coordinatesLength = coordinates.length;
+      final int axisCount = getAxisCount();
+      if (coordinatesLength > axisCount) {
+        coordinatesLength = axisCount;
+      }
+      coordinatesOperation.perform(axisCount, this.coordinates, coordinatesLength, coordinates);
       action.accept(coordinates);
     }
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    final int coordinatesLength = coordinates.length;
-    coordinatesOperation.perform(coordinatesLength, this.coordinates, coordinatesLength,
-      coordinates);
-    action.accept(coordinates);
+  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      int coordinatesLength = coordinates.length;
+      final int axisCount = getAxisCount();
+      if (coordinatesLength > axisCount) {
+        coordinatesLength = axisCount;
+      }
+      System.arraycopy(this.coordinates, 0, coordinates, 0, coordinatesLength);
+      action.accept(coordinates);
+    }
   }
 
   @Override

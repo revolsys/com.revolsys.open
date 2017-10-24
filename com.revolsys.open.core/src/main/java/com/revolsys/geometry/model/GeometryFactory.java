@@ -122,10 +122,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
 
     @Override
-    public void forEachVertex(final Consumer<double[]> action) {
-    }
-
-    @Override
     public int getAxisCount() {
       return GeometryFactory.this.axisCount;
     }

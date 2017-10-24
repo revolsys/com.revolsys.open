@@ -177,17 +177,17 @@ public class MultiLineStringImpl implements MultiLineString {
   }
 
   @Override
-  public void forEachVertex(final Consumer<double[]> action) {
-    for (final Geometry geometry : this.lines) {
-      geometry.forEachVertex(action);
-    }
-  }
-
-  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final double[] coordinates, final Consumer<double[]> action) {
     for (final Geometry geometry : this.lines) {
       geometry.forEachVertex(coordinatesOperation, coordinates, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+    for (final Geometry geometry : this.lines) {
+      geometry.forEachVertex(coordinates, action);
     }
   }
 
