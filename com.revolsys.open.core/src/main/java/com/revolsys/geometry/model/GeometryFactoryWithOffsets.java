@@ -3,11 +3,8 @@ package com.revolsys.geometry.model;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.CoordinateSystem;
 
-public class GeometryFactoryWithOffsets extends GeometryFactory {
+public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final double offsetX;

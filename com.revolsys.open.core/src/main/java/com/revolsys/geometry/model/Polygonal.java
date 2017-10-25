@@ -43,7 +43,6 @@ import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
 import com.revolsys.geometry.model.editor.MultiPolygonEditor;
 import com.revolsys.geometry.model.editor.PolygonalEditor;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 public interface Polygonal extends Geometry {
   @SuppressWarnings("unchecked")
@@ -67,7 +66,7 @@ public interface Polygonal extends Geometry {
 
   @Override
   default boolean contains(final double x, final double y) {
-    return locate(new PointDoubleXY(x, y)) != Location.EXTERIOR;
+    return locate(x, y) != Location.EXTERIOR;
   }
 
   @Override

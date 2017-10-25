@@ -80,7 +80,7 @@ public interface LineSegment extends LineString {
     } else {
       final double distance = segment2.distance(x, y);
       final double maxDistance = segment1.getGeometryFactory().getResolution(0);
-      if (distance < maxDistance) {
+      if (distance == 0 || distance < maxDistance) {
         final double x1 = segment2.getX(0);
         final double y1 = segment2.getY(0);
         final double x2 = segment2.getX(1);
