@@ -336,22 +336,21 @@ public interface Triangle extends Polygon {
   }
 
   @Override
-  default void forEachVertex(final Consumer<double[]> action) {
-    if (!isEmpty()) {
-      final double[] coordinates = new double[3];
-      final int vertexCount = getVertexCount();
-      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += 3) {
-        for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
-          coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
-        }
-        action.accept(coordinates);
+  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    final int axisCount = coordinates.length;
+    final int vertexCount = getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += axisCount) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
       }
+      coordinatesOperation.perform(axisCount, coordinates, axisCount, coordinates);
+      action.accept(coordinates);
     }
   }
 
   @Override
-  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
+  default void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
     final int axisCount = coordinates.length;
     final int vertexCount = getVertexCount();
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += axisCount) {

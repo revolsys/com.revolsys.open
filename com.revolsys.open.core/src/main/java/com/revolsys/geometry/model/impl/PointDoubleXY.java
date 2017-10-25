@@ -101,22 +101,23 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   }
 
   @Override
-  public void forEachVertex(final Consumer<double[]> action) {
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
     if (!isEmpty()) {
-      final double[] coordinates = new double[] {
-        this.x, this.y
-      };
+      coordinates[0] = this.x;
+      coordinates[1] = this.y;
+      coordinatesOperation.perform(2, coordinates, 2, coordinates);
       action.accept(coordinates);
     }
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    coordinates[0] = this.x;
-    coordinates[1] = this.y;
-    coordinatesOperation.perform(2, coordinates, 2, coordinates);
-    action.accept(coordinates);
+  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      coordinates[0] = this.x;
+      coordinates[1] = this.y;
+      action.accept(coordinates);
+    }
   }
 
   @Override

@@ -184,17 +184,17 @@ public class MultiPolygonImpl implements MultiPolygon {
   }
 
   @Override
-  public void forEachVertex(final Consumer<double[]> action) {
-    for (final Geometry geometry : this.polygons) {
-      geometry.forEachVertex(action);
-    }
-  }
-
-  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final double[] coordinates, final Consumer<double[]> action) {
     for (final Geometry geometry : this.polygons) {
       geometry.forEachVertex(coordinatesOperation, coordinates, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+    for (final Geometry geometry : this.polygons) {
+      geometry.forEachVertex(coordinates, action);
     }
   }
 

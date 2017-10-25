@@ -42,23 +42,31 @@ public class PointDoubleXYZ extends PointDoubleXY {
   }
 
   @Override
-  public void forEachVertex(final Consumer<double[]> action) {
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
     if (!isEmpty()) {
-      final double[] coordinates = new double[] {
-        this.x, this.y, this.z
-      };
+      coordinates[X] = this.x;
+      coordinates[Y] = this.y;
+      if (coordinates.length > 2) {
+        coordinates[Z] = this.z;
+        coordinatesOperation.perform(3, coordinates, 3, coordinates);
+      } else {
+        coordinatesOperation.perform(2, coordinates, 2, coordinates);
+      }
       action.accept(coordinates);
     }
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    coordinates[X] = this.x;
-    coordinates[Y] = this.y;
-    coordinates[Z] = this.z;
-    coordinatesOperation.perform(3, coordinates, 3, coordinates);
-    action.accept(coordinates);
+  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      coordinates[X] = this.x;
+      coordinates[Y] = this.y;
+      if (coordinates.length > 2) {
+        coordinates[Z] = this.z;
+      }
+      action.accept(coordinates);
+    }
   }
 
   @Override

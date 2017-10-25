@@ -47,14 +47,14 @@ public class AbstractDelegatingLineString extends AbstractLineString
   }
 
   @Override
-  public void forEachVertex(final Consumer<double[]> action) {
-    this.line.forEachVertex(action);
-  }
-
-  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final double[] coordinates, final Consumer<double[]> action) {
     this.line.forEachVertex(coordinatesOperation, coordinates, action);
+  }
+
+  @Override
+  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+    this.line.forEachVertex(coordinates, action);
   }
 
   @Override

@@ -353,28 +353,34 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   }
 
   @Override
-  public void forEachVertex(final Consumer<double[]> action) {
-    if (this.coordinates == null) {
-      this.line.forEachVertex(action);
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
+    if (coordinates == null) {
+      this.line.forEachVertex(coordinatesOperation, coordinates, action);
     } else {
       final int axisCount = getAxisCount();
-      final double[] coordinates = new double[axisCount];
-      final int coordinatesLength = this.vertexCount * axisCount;
-      for (int coordinateIndex = 0; coordinateIndex < coordinatesLength; coordinateIndex += axisCount) {
-        System.arraycopy(this.coordinates, coordinateIndex, coordinates, 0, axisCount);
+      int coordinatesLength = coordinates.length;
+      if (coordinatesLength > axisCount) {
+        coordinatesLength = axisCount;
+      }
+      final int coordinateCount = this.vertexCount * axisCount;
+      for (int coordinateIndex = 0; coordinateIndex < coordinateCount; coordinateIndex += axisCount) {
+        System.arraycopy(this.coordinates, coordinateIndex, coordinates, 0, coordinatesLength);
         action.accept(coordinates);
       }
     }
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
+  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
     if (coordinates == null) {
-      this.line.forEachVertex(coordinatesOperation, coordinates, action);
+      this.line.forEachVertex(coordinates, action);
     } else {
-      final int coordinatesLength = coordinates.length;
       final int axisCount = getAxisCount();
+      int coordinatesLength = coordinates.length;
+      if (coordinatesLength > axisCount) {
+        coordinatesLength = axisCount;
+      }
       final int coordinateCount = this.vertexCount * axisCount;
       for (int coordinateIndex = 0; coordinateIndex < coordinateCount; coordinateIndex += axisCount) {
         System.arraycopy(this.coordinates, coordinateIndex, coordinates, 0, coordinatesLength);

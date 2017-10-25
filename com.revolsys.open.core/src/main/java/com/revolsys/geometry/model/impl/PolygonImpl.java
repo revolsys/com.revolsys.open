@@ -176,17 +176,17 @@ public class PolygonImpl extends AbstractPolygon {
   }
 
   @Override
-  public void forEachVertex(final Consumer<double[]> action) {
-    for (final Geometry geometry : this.rings) {
-      geometry.forEachVertex(action);
-    }
-  }
-
-  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final double[] coordinates, final Consumer<double[]> action) {
     for (final Geometry geometry : this.rings) {
       geometry.forEachVertex(coordinatesOperation, coordinates, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+    for (final Geometry geometry : this.rings) {
+      geometry.forEachVertex(coordinates, action);
     }
   }
 

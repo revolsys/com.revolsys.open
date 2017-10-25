@@ -113,12 +113,21 @@ public interface GeometryFactoryProxy {
     }
   }
 
-  default boolean isConversionRequired(final GeometryFactory geometryFactory) {
+  default boolean isProjectionRequired(final GeometryFactory geometryFactory) {
     final GeometryFactory geometryFactoryThis = getGeometryFactory();
     if (geometryFactoryThis == null) {
       return false;
     } else {
-      return geometryFactoryThis.isConversionRequired(geometryFactory);
+      return geometryFactoryThis.isProjectionRequired(geometryFactory);
+    }
+  }
+
+  default boolean isProjectionRequired(final GeometryFactoryProxy geometryFactoryProxy) {
+    if (geometryFactoryProxy == null) {
+      return false;
+    } else {
+      final GeometryFactory geometryFactory = geometryFactoryProxy.getGeometryFactory();
+      return isProjectionRequired(geometryFactory);
     }
   }
 

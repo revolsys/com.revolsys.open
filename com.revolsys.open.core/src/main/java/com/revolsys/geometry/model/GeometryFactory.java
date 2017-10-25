@@ -122,10 +122,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
 
     @Override
-    public void forEachVertex(final Consumer<double[]> action) {
-    }
-
-    @Override
     public int getAxisCount() {
       return GeometryFactory.this.axisCount;
     }
@@ -1321,7 +1317,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  private boolean isConversionRequired(final CoordinateSystem coordinateSystem) {
+  private boolean isProjectionRequired(final CoordinateSystem coordinateSystem) {
     final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
     if (coordinateSystemThis == coordinateSystem //
       || coordinateSystemThis == null //
@@ -1335,14 +1331,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   @Override
-  public boolean isConversionRequired(final GeometryFactory geometryFactory) {
+  public boolean isProjectionRequired(final GeometryFactory geometryFactory) {
     if (this == geometryFactory) {
       return false;
     } else if (geometryFactory == null) {
       return false;
     } else {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      return isConversionRequired(coordinateSystem);
+      return isProjectionRequired(coordinateSystem);
     }
   }
 

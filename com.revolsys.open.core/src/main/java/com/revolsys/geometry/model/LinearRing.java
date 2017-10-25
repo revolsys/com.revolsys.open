@@ -177,7 +177,7 @@ public interface LinearRing extends LineString {
     if (coordinateSystem instanceof GeographicCoordinateSystem) {
       // TODO better algorithm than converting to world mercator
       final GeometryFactory geometryFactory = GeometryFactory.worldMercator();
-      final LinearRing ring = convertGeometry(geometryFactory, 2);
+      final LinearRing ring = as2d(geometryFactory);
       return ring.getPolygonArea(unit);
     } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;

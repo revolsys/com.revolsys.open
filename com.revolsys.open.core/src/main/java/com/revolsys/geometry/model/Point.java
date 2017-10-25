@@ -549,27 +549,33 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
-  default void forEachVertex(final Consumer<double[]> action) {
+  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final double[] coordinates, final Consumer<double[]> action) {
     if (!isEmpty()) {
-      final int axisCount = getAxisCount();
-      final double[] coordinates = new double[axisCount];
-      copyCoordinates(coordinates);
+      final int coordinatesLength = coordinates.length;
+      coordinates[0] = getX();
+      coordinates[1] = getY();
+      for (int i = 2; i < coordinatesLength; i++) {
+        final double value = getCoordinate(i);
+        coordinates[i] = value;
+      }
+      coordinatesOperation.perform(coordinatesLength, coordinates, coordinatesLength, coordinates);
       action.accept(coordinates);
     }
   }
 
   @Override
-  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    final int coordinatesLength = coordinates.length;
-    coordinates[0] = getX();
-    coordinates[1] = getY();
-    for (int i = 2; i < coordinatesLength; i++) {
-      final double value = getCoordinate(i);
-      coordinates[i] = value;
+  default void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+    if (!isEmpty()) {
+      final int coordinatesLength = coordinates.length;
+      coordinates[0] = getX();
+      coordinates[1] = getY();
+      for (int i = 2; i < coordinatesLength; i++) {
+        final double value = getCoordinate(i);
+        coordinates[i] = value;
+      }
+      action.accept(coordinates);
     }
-    coordinatesOperation.perform(coordinatesLength, coordinates, coordinatesLength, coordinates);
-    action.accept(coordinates);
   }
 
   /**
