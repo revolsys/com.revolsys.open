@@ -283,6 +283,7 @@ public class TiledGriddedElevationModelLayer
       this.scaleZ = geometryFactory3d.getScaleZ();
 
       final GeometryFactory newGeometryFactory = super.setGeometryFactoryDo(geometryFactory3d);
+      setBoundingBox(newGeometryFactory.getCoordinateSystem().getAreaBoundingBox());
       final TiledMultipleGriddedElevationModelLayerRenderer renderer = getRenderer();
       if (renderer != null) {
         renderer.updateBoundingBox();

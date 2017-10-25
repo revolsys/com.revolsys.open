@@ -13,16 +13,20 @@ import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
 
 import com.revolsys.geometry.model.Point;
+import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.channel.store.Overwrite;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.elevation.gridded.IGriddedElevationModelLayer;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.parallel.MaxThreadsSwingWorker;
 import com.revolsys.util.number.Doubles;
 
 public class MapPointerElevation extends JLabel implements MouseMotionListener {
-  public class ElevationWorker extends AbstractSwingWorker<Double, Void> {
+  public class ElevationWorker extends AbstractSwingWorker<Double, Void>
+    implements MaxThreadsSwingWorker {
 
     private final Point mapLocation;
 
@@ -31,22 +35,30 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
     }
 
     @Override
+    public int getMaxThreads() {
+      return 1;
+    }
+
+    @Override
     protected Double handleBackground() {
       if (isCancelled()) {
         return Double.NaN;
       } else {
-        return IGriddedElevationModelLayer.getElevation(getLayers(), this.mapLocation);
+        final int refreshIndex = MapPointerElevation.this.refreshIndex;
+
+        final List<IGriddedElevationModelLayer> layers = getLayers();
+        return IGriddedElevationModelLayer.getElevation(layers, this.mapLocation);
       }
     }
 
     @Override
     protected void handleDone(final Double elevation) {
-      if (Double.isNaN(elevation) || getLayers().isEmpty()) {
-        setVisible(false);
-      } else {
+      if (Double.isFinite(elevation) && !getLayers().isEmpty()) {
         setVisible(true);
         final String text = Doubles.toString(Doubles.makePrecise(1000, elevation));
         setText(text);
+      } else {
+        setVisible(false);
       }
     }
 
@@ -57,6 +69,10 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
   }
 
   private static final long serialVersionUID = 1L;
+
+  private final Channel<Point> refreshChannel = new Channel<>(new Overwrite<>());
+
+  private final int refreshIndex = 0;
 
   private Viewport2D viewport;
 
@@ -87,6 +103,31 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
     };
     this.project.addPropertyChangeListener("layers", listener);
     this.project.addPropertyChangeListener("visible", listener);
+    new Thread(() -> {
+      while (true) {
+        final Point point = this.refreshChannel.read();
+        if (point == null) {
+          return;
+        } else {
+          final List<IGriddedElevationModelLayer> layers = getLayers();
+          if (!layers.isEmpty()) {
+
+            final double elevation = IGriddedElevationModelLayer.getElevation(layers, point);
+            Invoke.later(() -> {
+              synchronized (this.layerSync) {
+                if (Double.isFinite(elevation) && !getLayers().isEmpty()) {
+                  setVisible(true);
+                  final String text = Doubles.toString(Doubles.makePrecise(1000, elevation));
+                  setText(text);
+                } else {
+                  setVisible(false);
+                }
+              }
+            });
+          }
+        }
+      }
+    }, "map-get-elevation").start();
   }
 
   private List<IGriddedElevationModelLayer> getLayers() {
@@ -95,9 +136,8 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
         if (this.layers == null) {
           final double scale = this.viewport.getScale();
           this.layers = IGriddedElevationModelLayer.getVisibleLayers(this.project, scale);
-          if (this.layers.isEmpty()) {
-            Invoke.later(() -> this.setVisible(false));
-          }
+          final boolean hasLayers = !this.layers.isEmpty();
+          Invoke.later(() -> this.setVisible(hasLayers));
         }
       }
     }
@@ -116,13 +156,7 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
     final Point mapLocation = this.viewport.toModelPoint(x, y);
 
     if (!getLayers().isEmpty()) {
-      final SwingWorker<Double, Void> oldWorker = this.worker;
-      if (oldWorker != null) {
-        oldWorker.isCancelled();
-      }
-      final SwingWorker<Double, Void> worker = new ElevationWorker(mapLocation);
-      this.worker = worker;
-      Invoke.worker(worker);
+      this.refreshChannel.write(mapLocation);
     }
   }
 

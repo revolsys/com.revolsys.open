@@ -153,6 +153,7 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
     this.taskStatusChangeListener = BackgroundTaskManager
       .addTaskStatusChangedListener(() -> Invoke.later(() -> {
         updateCounts();
+        fireTableDataChanged();
       }));
   }
 
@@ -300,8 +301,7 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
 
   private void removeDoneWorkers(final List<SwingWorker<?, ?>> workers) {
     for (final Iterator<Entry<SwingWorker<?, ?>, BackgroundTask>> iterator = this.taskBySwingWorker
-      .entrySet()
-      .iterator(); iterator.hasNext();) {
+      .entrySet().iterator(); iterator.hasNext();) {
       final Entry<SwingWorker<?, ?>, BackgroundTask> entry = iterator.next();
       final SwingWorker<?, ?> worker = entry.getKey();
       if (worker.isDone() || !workers.contains(worker)) {
