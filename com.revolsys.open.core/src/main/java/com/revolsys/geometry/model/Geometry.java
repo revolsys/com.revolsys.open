@@ -384,21 +384,33 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   }
 
   /**
-   * If this geometry factory's coordinate system requires conversion ({@link GeometryFactory#isConversionRequired(GeometryFactory)})
+   * If this geometry factory's coordinate system requires conversion ({@link GeometryFactory#isProjectionRequired(GeometryFactory)})
    * then return a new 2d geometry converted to the target geometry factory.
    *
    * @param geometryFactory The target geometry factory
    * @return This geometry or converted geometry.
-   * @see GeometryFactory#isConversionRequired(GeometryFactory)
+   * @see GeometryFactory#isProjectionRequired(GeometryFactory)
    */
   @SuppressWarnings("unchecked")
   default <V extends Geometry> V as2d(final GeometryFactory geometryFactory) {
-    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {
-      return (V)this;
-    } else {
+    if (isProjectionRequired(geometryFactory)) {
       return (V)newGeometry(geometryFactory);
+    } else {
+      return (V)this;
     }
+  }
+
+  /**
+   * If this geometry factory's coordinate system requires conversion ({@link GeometryFactory#isProjectionRequired(GeometryFactory)})
+   * then return a new 2d geometry converted to the target geometry factory.
+   *
+   * @param geometryFactory The target geometry factory
+   * @return This geometry or converted geometry.
+   * @see GeometryFactory#isProjectionRequired(GeometryFactory)
+   */
+  default <V extends Geometry> V as2d(final GeometryFactoryProxy geometryFactoryProxy) {
+    final GeometryFactory geometryFactory = geometryFactoryProxy.getGeometryFactory();
+    return as2d(geometryFactory);
   }
 
   /**
@@ -985,8 +997,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       final Point point = (Point)geometry;
       return distance(point, terminateDistance);
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      geometry = geometry.convertGeometry(geometryFactory, 2);
+      geometry = geometry.as2d(this);
       final DistanceOp distOp = new DistanceOp(this, geometry, terminateDistance);
       final double distance = distOp.distance();
       return distance;
@@ -1374,7 +1385,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
         axisCount = axisCount2;
       }
       final double[] coordinates = new double[axisCount];
-      if (isConversionRequired(geometryFactory)) {
+      if (isProjectionRequired(geometryFactory)) {
         final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
         forEachVertex(coordinatesOperation, coordinates, action);
       } else {
@@ -1388,7 +1399,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (!isEmpty()) {
       final double[] coordinates = new double[axisCount];
       Arrays.fill(coordinates, Double.NaN);
-      if (isConversionRequired(geometryFactory)) {
+      if (isProjectionRequired(geometryFactory)) {
         final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
 
         forEachVertex(coordinatesOperation, coordinates, action);
@@ -2002,8 +2013,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * @return <code>true</code> if the geometries are less than <code>distance</code> apart.
    */
   default boolean isLessThanDistance(Geometry geometry, final double distance) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    geometry = geometry.convertGeometry(geometryFactory, 2);
+    geometry = geometry.as2d(this);
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox boundingBox2 = geometry.getBoundingBox();
     final double bboxDistance = boundingBox.distance(boundingBox2);
@@ -2073,8 +2083,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * @return <code>true</code> if the geometries are less than <code>distance</code> apart.
    */
   default boolean isWithinDistance(Geometry geometry, final double distance) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    geometry = geometry.convertGeometry(geometryFactory, 2);
+    geometry = geometry.as2d(this);
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox boundingBox2 = geometry.getBoundingBox();
     final double bboxDistance = boundingBox.distance(boundingBox2);

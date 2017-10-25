@@ -583,20 +583,24 @@ public interface LineString extends Lineal {
     }
   }
 
-  default boolean equalsVertex(final int axisCount, final int vertexIndex, Point point) {
+  default boolean equalsVertex(final int axisCount, final int vertexIndex, final Point point) {
     if (isEmpty() || Property.isEmpty(point)) {
       return false;
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertGeometry(geometryFactory, axisCount);
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        final double coordinate = point.getCoordinate(axisIndex);
-        final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
-        if (!Doubles.equal(coordinate, matchCoordinate)) {
-          return false;
+      final Point projectedPoint = point.as2d(this);
+      if (getX(vertexIndex) == projectedPoint.getX()) {
+        if (getY(vertexIndex) == projectedPoint.getY()) {
+          for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+            final double coordinate = point.getCoordinate(axisIndex);
+            final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
+            if (!Doubles.equal(coordinate, matchCoordinate)) {
+              return false;
+            }
+          }
+          return true;
         }
       }
-      return true;
+      return false;
     }
   }
 
@@ -1076,7 +1080,7 @@ public interface LineString extends Lineal {
 
   default PointLineStringMetrics getMetrics(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convertGeometry(geometryFactory, 2);
+    point = point.as2d(geometryFactory);
     if (isEmpty() && point.isEmpty()) {
       return PointLineStringMetrics.EMPTY;
     } else {
