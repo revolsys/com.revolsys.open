@@ -10,12 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateSystemParser;
-import com.revolsys.geometry.cs.CoordinateSystems;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
@@ -202,8 +199,7 @@ public class EsriCoordinateSystems {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
         final int srid = coordinateSystem.getCoordinateSystemId();
-        final CoordinateSystem esriCoordinateSystem = CoordinateSystems
-          .getCoordinateSystem(new QName("ESRI", String.valueOf(srid)));
+        final CoordinateSystem esriCoordinateSystem = coordinateSystemsById.get(srid);
         if (esriCoordinateSystem == null) {
           EsriCsWktWriter.write(writer, coordinateSystem, -1);
         } else {

@@ -94,7 +94,7 @@ import com.revolsys.util.function.BiFunctionDouble;
  *
  * @version 1.7
  */
-public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapSerializer {
+public abstract class GeometryFactory implements GeometryFactoryProxy, Serializable, MapSerializer {
   private class EmptyPoint extends AbstractPoint {
     private static final long serialVersionUID = 1L;
 
@@ -169,16 +169,18 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   private static final IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
 
+  private static final IntHashMap<IntHashMap<GeometryFactory>> factoryFloatingBySridAndAxisCount = new IntHashMap<>();
+
   private static final double[] SCALES_FLOATING_2 = new double[2];
 
   public static final double[] SCALES_FLOATING_3 = new double[3];
 
-  public static final GeometryFactory DEFAULT_2D = fixed2d(0, 0, 0);
+  public static final GeometryFactory DEFAULT_2D = floating(0, 2);
 
   /**
    * The default GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a floating precision model.
    */
-  public static final GeometryFactory DEFAULT_3D = fixed(0, 3, SCALES_FLOATING_3);
+  public static final GeometryFactory DEFAULT_3D = floating(0, 3);
 
   private static final long serialVersionUID = 4328651897279304108L;
 
@@ -231,6 +233,19 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    */
   protected static GeometryFactory fixed(final CoordinateSystem coordinateSystem,
     final int coordinateSystemId, final int axisCount, final double... scales) {
+    if (scales == null) {
+      return floating(coordinateSystem, coordinateSystemId, axisCount);
+    } else {
+      boolean allZero = true;
+      for (final double scale : scales) {
+        if (scale > 0) {
+          allZero = false;
+        }
+      }
+      if (allZero) {
+        return floating(coordinateSystem, coordinateSystemId, axisCount);
+      }
+    }
     synchronized (factoriesBySrid) {
       GeometryFactory factory = null;
       IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid
@@ -282,6 +297,19 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    */
   public static GeometryFactory fixed(final int coordinateSystemId, final int axisCount,
     final double... scales) {
+    if (scales == null) {
+      return floating(coordinateSystemId, axisCount);
+    } else {
+      boolean allZero = true;
+      for (final double scale : scales) {
+        if (scale > 0) {
+          allZero = false;
+        }
+      }
+      if (allZero) {
+        return floating(coordinateSystemId, axisCount);
+      }
+    }
     synchronized (factoriesBySrid) {
       GeometryFactory factory = null;
       IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid
@@ -340,7 +368,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else {
       final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId <= 0) {
-        return new GeometryFactory(coordinateSystem, axisCount);
+        return new GeometryFactoryFloating(coordinateSystem, axisCount);
       } else {
         return floating(coordinateSystemId, axisCount);
       }
@@ -349,30 +377,18 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   protected static GeometryFactory floating(final CoordinateSystem coordinateSystem,
     final int coordinateSystemId, final int axisCount) {
-    synchronized (factoriesBySrid) {
+    synchronized (factoryFloatingBySridAndAxisCount) {
       GeometryFactory factory = null;
-      IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid
+      IntHashMap<GeometryFactory> factoriesByAxisCount = factoryFloatingBySridAndAxisCount
         .get(coordinateSystemId);
       if (factoriesByAxisCount == null) {
         factoriesByAxisCount = new IntHashMap<>();
-        factoriesBySrid.put(coordinateSystemId, factoriesByAxisCount);
+        factoryFloatingBySridAndAxisCount.put(coordinateSystemId, factoriesByAxisCount);
       }
-      List<GeometryFactory> factories = factoriesByAxisCount.get(axisCount);
-      if (factories == null) {
-        factories = new ArrayList<>();
-        factoriesByAxisCount.put(axisCount, factories);
-      } else {
-        final int size = factories.size();
-        for (int i = 0; i < size; i++) {
-          final GeometryFactory matchFactory = factories.get(i);
-          if (matchFactory.isFloating()) {
-            return matchFactory;
-          }
-        }
-      }
+      factory = factoriesByAxisCount.get(axisCount);
       if (factory == null) {
-        factory = new GeometryFactory(coordinateSystem, coordinateSystemId, axisCount);
-        factories.add(factory);
+        factory = new GeometryFactoryFloating(coordinateSystem, coordinateSystemId, axisCount);
+        factoriesByAxisCount.put(axisCount, factory);
       }
       return factory;
     }
@@ -391,8 +407,21 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The geometry factory.
    */
   public static GeometryFactory floating(final int coordinateSystemId, final int axisCount) {
-    final double[] scales = newScalesFloating(axisCount);
-    return fixed(coordinateSystemId, axisCount, scales);
+    synchronized (factoryFloatingBySridAndAxisCount) {
+      GeometryFactory factory = null;
+      IntHashMap<GeometryFactory> factoriesByAxisCount = factoryFloatingBySridAndAxisCount
+        .get(coordinateSystemId);
+      if (factoriesByAxisCount == null) {
+        factoriesByAxisCount = new IntHashMap<>();
+        factoryFloatingBySridAndAxisCount.put(coordinateSystemId, factoriesByAxisCount);
+      }
+      factory = factoriesByAxisCount.get(axisCount);
+      if (factory == null) {
+        factory = new GeometryFactoryFloating(coordinateSystemId, axisCount);
+        factoriesByAxisCount.put(axisCount, factory);
+      }
+      return factory;
+    }
   }
 
   public static GeometryFactory floating2d(final CoordinateSystem coordinateSystem) {
@@ -401,7 +430,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else {
       final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId <= 0) {
-        return new GeometryFactory(coordinateSystem, 2);
+        return new GeometryFactoryFloating(coordinateSystem, 2);
       } else {
         return floating2d(coordinateSystemId);
       }
@@ -409,7 +438,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public static GeometryFactory floating2d(final int coordinateSystemId) {
-    return fixed(coordinateSystemId, 2, SCALES_FLOATING_2);
+    return floating(coordinateSystemId, 2);
   }
 
   /**
@@ -421,7 +450,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else {
       final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId == 0) {
-        return new GeometryFactory(coordinateSystem, 3);
+        return new GeometryFactoryFloating(coordinateSystem, 3);
       } else {
         return floating3d(coordinateSystemId);
       }
@@ -439,7 +468,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The geometry factory.
    */
   public static GeometryFactory floating3d(final int coordinateSystemId) {
-    return fixed(coordinateSystemId, 3, SCALES_FLOATING_3);
+    return floating(coordinateSystemId, 3);
   }
 
   public static GeometryFactory get(final Object factory) {
@@ -2205,7 +2234,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public GeometryFactory to2dFloating() {
-    return fixed(this.coordinateSystem, this.coordinateSystemId, 2, SCALES_FLOATING_2);
+    return floating(this.coordinateSystem, this.coordinateSystemId, 2);
   }
 
   @Override
