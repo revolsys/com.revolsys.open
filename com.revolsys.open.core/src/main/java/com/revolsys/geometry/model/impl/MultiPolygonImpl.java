@@ -46,6 +46,7 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 /**
@@ -173,6 +174,13 @@ public class MultiPolygonImpl implements MultiPolygon {
       for (final Polygon polygon : this.polygons) {
         action.accept(polygon);
       }
+    }
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    for (final Geometry geometry : this.polygons) {
+      geometry.forEachSegment(action);
     }
   }
 

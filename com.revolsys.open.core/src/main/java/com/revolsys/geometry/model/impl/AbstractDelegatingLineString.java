@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 public class AbstractDelegatingLineString extends AbstractLineString
@@ -39,6 +40,11 @@ public class AbstractDelegatingLineString extends AbstractLineString
   @Override
   public <R> R findVertex(final BiFunctionDouble<R> action) {
     return this.line.findVertex(action);
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    this.line.forEachSegment(action);
   }
 
   @Override

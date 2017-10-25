@@ -17,6 +17,8 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.geometry.util.Triangles;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.function.Consumer4Double;
+import com.revolsys.util.function.Function4Double;
 
 public interface Triangle extends Polygon {
   static void addIntersection(final GeometryFactory geometryFactory, final Set<Point> coordinates,
@@ -333,6 +335,41 @@ public interface Triangle extends Polygon {
       }
     }
     return false;
+  }
+
+  @Override
+  default <R> R findSegment(final Function4Double<R> action) {
+    if (!isEmpty()) {
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      final double x2 = getX(1);
+      final double y2 = getY(1);
+      final double x3 = getX(2);
+      final double y3 = getY(2);
+      R result = action.accept(x1, y1, x2, y2);
+      if (result == null) {
+        result = action.accept(x2, y2, x3, y3);
+        if (result == null) {
+          result = action.accept(x3, y3, x1, y1);
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
+  default void forEachSegment(final Consumer4Double action) {
+    if (!isEmpty()) {
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      final double x2 = getX(1);
+      final double y2 = getY(1);
+      final double x3 = getX(2);
+      final double y3 = getY(2);
+      action.accept(x1, y1, x2, y2);
+      action.accept(x2, y2, x3, y3);
+      action.accept(x3, y3, x1, y1);
+    }
   }
 
   @Override

@@ -15,6 +15,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
@@ -146,6 +147,13 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   public void forEachGeometry(final Consumer<Geometry> action) {
     for (final LinearRingEditor editor : this.editors) {
       action.accept(editor);
+    }
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    for (final Geometry geometry : this.editors) {
+      geometry.forEachSegment(action);
     }
   }
 

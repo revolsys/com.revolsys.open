@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 public class LineStringDouble extends AbstractLineString {
@@ -202,6 +203,26 @@ public class LineStringDouble extends AbstractLineString {
       coordinateIndex += axisIgnoreCount;
     }
     return null;
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    final int vertexCount = this.vertexCount;
+    final int axisCount = this.axisCount;
+    final int axisIgnoreCount = axisCount - 2;
+    final double[] coordinates = this.coordinates;
+    int coordinateIndex = 0;
+    double x1 = coordinates[coordinateIndex++];
+    double y1 = coordinates[coordinateIndex++];
+    coordinateIndex += axisIgnoreCount;
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = coordinates[coordinateIndex++];
+      final double y2 = coordinates[coordinateIndex++];
+      action.accept(x1, y1, x2, y2);
+      coordinateIndex += axisIgnoreCount;
+      x1 = x2;
+      y1 = y2;
+    }
   }
 
   @Override

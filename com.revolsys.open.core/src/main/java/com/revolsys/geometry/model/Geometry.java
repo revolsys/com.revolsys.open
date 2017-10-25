@@ -83,6 +83,7 @@ import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 import com.revolsys.util.number.Doubles;
 
@@ -1360,6 +1361,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   default void forEachGeometry(final Consumer<Geometry> action) {
     action.accept(this);
   }
+
+  void forEachSegment(Consumer4Double action);
 
   void forEachVertex(BiConsumerDouble action);
 

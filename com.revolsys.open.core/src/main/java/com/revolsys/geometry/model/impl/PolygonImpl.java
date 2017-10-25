@@ -44,6 +44,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 /**
@@ -165,6 +166,13 @@ public class PolygonImpl extends AbstractPolygon {
   public void forEachGeometry(final Consumer<Geometry> action) {
     for (final LinearRing ring : this.rings) {
       ring.forEachGeometry(action);
+    }
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    for (final Geometry geometry : this.rings) {
+      geometry.forEachSegment(action);
     }
   }
 

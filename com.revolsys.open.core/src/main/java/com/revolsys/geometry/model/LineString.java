@@ -75,6 +75,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.number.Doubles;
 
 /**
@@ -701,6 +702,20 @@ public interface LineString extends Lineal {
     final GeometryFactory geometryFactory = getGeometryFactory();
     point = point.convertPoint2d(geometryFactory);
     return findClosestGeometryComponent(point.getX(), point.getY());
+  }
+
+  @Override
+  default void forEachSegment(final Consumer4Double action) {
+    final int vertexCount = getVertexCount();
+    double x1 = getX(0);
+    double y1 = getY(0);
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = getX(vertexIndex);
+      final double y2 = getY(vertexIndex);
+      action.accept(x1, y1, x2, y2);
+      x1 = x2;
+      y1 = y2;
+    }
   }
 
   @Override

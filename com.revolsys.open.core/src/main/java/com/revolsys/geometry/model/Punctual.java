@@ -41,6 +41,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.MultiPointEditor;
 import com.revolsys.geometry.model.editor.PunctualEditor;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 /**
@@ -71,6 +72,10 @@ public interface Punctual extends Geometry {
   @Override
   default <R> R findSegment(final Function4Double<R> action) {
     return null;
+  }
+
+  @Override
+  default void forEachSegment(final Consumer4Double action) {
   }
 
   double getCoordinate(int partIndex, int axisIndex);

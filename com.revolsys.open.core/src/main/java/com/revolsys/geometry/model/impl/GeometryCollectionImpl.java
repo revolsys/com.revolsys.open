@@ -49,6 +49,7 @@ import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 /**
@@ -189,6 +190,13 @@ public class GeometryCollectionImpl implements GeometryCollection {
       for (final Geometry geometry : this.geometries) {
         action.accept(geometry);
       }
+    }
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    for (final Geometry geometry : this.geometries) {
+      geometry.forEachSegment(action);
     }
   }
 

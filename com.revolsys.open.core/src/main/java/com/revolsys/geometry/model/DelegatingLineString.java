@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 public interface DelegatingLineString extends LineString {
@@ -30,6 +31,12 @@ public interface DelegatingLineString extends LineString {
   default <R> R findVertex(final BiFunctionDouble<R> action) {
     final LineString line = getLineString();
     return line.findVertex(action);
+  }
+
+  @Override
+  default void forEachSegment(final Consumer4Double action) {
+    final LineString line = getLineString();
+    line.forEachSegment(action);
   }
 
   @Override
