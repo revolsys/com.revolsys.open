@@ -91,14 +91,16 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
             final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(wkt);
             setGeometryFactory(geometryFactory);
           } else if (name.equals(fileName)) {
-            return new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+            this.reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+            return this.reader;
           }
         }
         throw new IllegalArgumentException("Cannot find " + fileName + " in " + this.resource);
       } else if (fileExtension.equals("gz")) {
         final InputStream in = this.resource.newBufferedInputStream();
         final GZIPInputStream gzIn = new GZIPInputStream(in);
-        return new BufferedReader(new InputStreamReader(gzIn, StandardCharsets.UTF_8));
+        this.reader = new BufferedReader(new InputStreamReader(gzIn, StandardCharsets.UTF_8));
+        return this.reader;
       } else {
         final GeometryFactory geometryFactory = EsriCoordinateSystems
           .getGeometryFactory(this.resource);
