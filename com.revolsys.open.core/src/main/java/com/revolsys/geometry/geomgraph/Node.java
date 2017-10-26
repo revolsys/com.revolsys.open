@@ -42,13 +42,16 @@ import com.revolsys.geometry.model.Point;
 /**
  * @version 1.7
  */
-public class Node extends GraphComponent {
-  protected Point coord; // only non-null if this node is precise
+public class Node extends GraphComponent implements Point {
+  private final double x;
+
+  private final double y;
 
   protected EdgeEndStar edges;
 
-  public Node(final Point coord, final EdgeEndStar edges) {
-    this.coord = coord;
+  public Node(final double x, final double y, final EdgeEndStar edges) {
+    this.x = x;
+    this.y = y;
     this.edges = edges;
     this.label = new Label(0, Location.NONE);
   }
@@ -60,6 +63,11 @@ public class Node extends GraphComponent {
     // Assert: start pt of e is equal to node point
     this.edges.insert(e);
     e.setNode(this);
+  }
+
+  @Override
+  public Point clone() {
+    return this;
   }
 
   /**
@@ -88,21 +96,41 @@ public class Node extends GraphComponent {
     return loc;
   }
 
+  @Override
+  public int getAxisCount() {
+    return 2;
+  }
+
+  @Override
+  public double getCoordinate(final int axisIndex) {
+    if (axisIndex == 0) {
+
+    }
+    return 0;
+  }
+
   public EdgeEndStar getEdges() {
     return this.edges;
   }
 
   @Override
   public Point getPoint() {
-    return this.coord;
+    return this;
   }
 
+  @Override
   public double getX() {
-    return this.coord.getX();
+    return this.x;
   }
 
+  @Override
   public double getY() {
-    return this.coord.getY();
+    return this.y;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
   }
 
   /**
@@ -150,7 +178,7 @@ public class Node extends GraphComponent {
   }
 
   public void print(final PrintStream out) {
-    out.println("node " + this.coord + " lbl: " + this.label);
+    out.println("node " + toString() + " lbl: " + this.label);
   }
 
   public void setLabel(final int argIndex, final Location onLocation) {
@@ -193,6 +221,6 @@ public class Node extends GraphComponent {
 
   @Override
   public String toString() {
-    return this.coord.toString();
+    return toWkt();
   }
 }

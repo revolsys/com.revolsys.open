@@ -33,7 +33,6 @@
 package com.revolsys.geometry.geomgraph.index;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.geomgraph.Edge;
@@ -173,17 +172,6 @@ public class SegmentIntersector {
     return this.hasProper;
   }
 
-  private boolean isBoundaryPoint(final LineIntersector li, final Collection bdyNodes) {
-    for (final Iterator i = bdyNodes.iterator(); i.hasNext();) {
-      final Node node = (Node)i.next();
-      final Point pt = node.getPoint();
-      if (li.isIntersection(pt)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private boolean isBoundaryPoint(final LineIntersector li, final Collection[] bdyNodes) {
     if (bdyNodes == null) {
       return false;
@@ -193,6 +181,17 @@ public class SegmentIntersector {
     }
     if (isBoundaryPoint(li, bdyNodes[1])) {
       return true;
+    }
+    return false;
+  }
+
+  private boolean isBoundaryPoint(final LineIntersector li, final Collection<Node> bdyNodes) {
+    for (final Node node : bdyNodes) {
+      final double x = node.getX();
+      final double y = node.getY();
+      if (li.isIntersection(x, y)) {
+        return true;
+      }
     }
     return false;
   }

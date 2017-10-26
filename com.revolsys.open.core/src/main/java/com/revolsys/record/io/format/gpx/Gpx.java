@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -41,7 +41,7 @@ public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory 
    */
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory, Map<String, ? extends Object> properties) {
+    final RecordFactory<? extends Record> recordFactory, MapEx properties) {
     try {
       return new GpxIterator(resource, recordFactory, null);
     } catch (final IOException e) {

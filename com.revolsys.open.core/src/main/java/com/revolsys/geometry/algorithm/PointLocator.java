@@ -75,30 +75,8 @@ public class PointLocator {
     return numBoundaries;
   }
 
-  private int computeLocation(final Point point, final Geometry geometry) {
-    int numBoundaries = 0;
-    if (geometry instanceof Point) {
-      final Location location = point.locate((Point)geometry);
-      return updateLocationInfo(location);
-    } else if (geometry instanceof LineString) {
-      final Location location = ((LineString)geometry).locate(point);
-      return updateLocationInfo(location);
-    } else if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
-      final Location location = polygon.locate(point);
-      return updateLocationInfo(location);
-    } else {
-      for (final Geometry part : geometry.geometries()) {
-        if (part != geometry) {
-          numBoundaries += computeLocation(point, part);
-        }
-      }
-    }
-    return numBoundaries;
-  }
-
   public boolean intersects(final Point point, final Geometry geometry) {
-    return locate(point, geometry) != Location.EXTERIOR;
+    return locate(geometry, point) != Location.EXTERIOR;
   }
 
   public Location locate(final Geometry geometry, final double x, final double y) {
@@ -131,24 +109,10 @@ public class PointLocator {
    *
    * @return the {@link Location} of the point relative to the input Geometry
    */
-  public Location locate(final Point point, final Geometry geometry) {
-    if (geometry.isEmpty()) {
-      return Location.EXTERIOR;
-    } else if (geometry instanceof LineString) {
-      return geometry.locate(point);
-    } else if (geometry instanceof Polygon) {
-      return geometry.locate(point);
-    }
-
-    this.isIn = false;
-    final int boundaryCount = computeLocation(point, geometry);
-    if (boundaryCount % 2 == 1) {
-      return Location.BOUNDARY;
-    } else if (boundaryCount > 0 || this.isIn) {
-      return Location.INTERIOR;
-    } else {
-      return Location.EXTERIOR;
-    }
+  public Location locate(final Geometry geometry, final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return locate(geometry, x, y);
   }
 
   private int updateLocationInfo(final Location loc) {

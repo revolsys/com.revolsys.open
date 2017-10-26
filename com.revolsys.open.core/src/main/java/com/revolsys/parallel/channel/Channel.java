@@ -3,7 +3,6 @@ package com.revolsys.parallel.channel;
 import java.util.Iterator;
 
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.store.ZeroBuffer;
 
 public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
@@ -137,7 +136,11 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
         }
         if (this.data.getState() == ChannelValueStore.EMPTY) {
           try {
-            ThreadUtil.pause(this.monitor, timeout);
+            try {
+              this.monitor.wait(timeout);
+            } catch (final InterruptedException e) {
+              throw new ThreadInterruptedException(e);
+            }
             if (isClosed()) {
               throw new ClosedException();
             }
@@ -216,7 +219,11 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
         }
         if (this.data.getState() == ChannelValueStore.FULL) {
           try {
-            ThreadUtil.pause(this.monitor);
+            try {
+              this.monitor.wait();
+            } catch (final InterruptedException e) {
+              throw new ThreadInterruptedException(e);
+            }
             if (this.closed) {
               throw new ClosedException();
             }

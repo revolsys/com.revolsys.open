@@ -36,7 +36,6 @@ import com.revolsys.geometry.geomgraph.DirectedEdgeStar;
 import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.geomgraph.NodeFactory;
 import com.revolsys.geometry.geomgraph.PlanarGraph;
-import com.revolsys.geometry.model.Point;
 
 /**
  * Creates nodes for use in the {@link PlanarGraph}s constructed during
@@ -46,7 +45,7 @@ import com.revolsys.geometry.model.Point;
  */
 public class OverlayNodeFactory extends NodeFactory {
   @Override
-  public Node newNode(final Point point) {
-    return new Node(point, new DirectedEdgeStar());
+  public Node newNode(final double x, final double y) {
+    return new Node(x, y, new DirectedEdgeStar());
   }
 }

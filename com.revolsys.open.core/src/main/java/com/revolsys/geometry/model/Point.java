@@ -757,12 +757,7 @@ public interface Point extends Punctual, Serializable {
       final Point point = (Point)geometry;
       return intersects(point);
     } else {
-      final BoundingBox boundingBox = geometry.getBoundingBox();
-      if (intersects(boundingBox)) {
-        return geometry.locate(this) != Location.EXTERIOR;
-      } else {
-        return false;
-      }
+      return geometry.intersects(this);
     }
   }
 

@@ -110,8 +110,9 @@ public class RelateComputer {
     im.set(Location.EXTERIOR, Location.EXTERIOR, 2);
 
     // if the Geometries don't overlap there is nothing to do
-    if (!this.arg[0].getGeometry().getBoundingBox().intersects(
-      this.arg[1].getGeometry().getBoundingBox())) {
+    if (!this.arg[0].getGeometry()
+      .getBoundingBox()
+      .intersects(this.arg[1].getGeometry().getBoundingBox())) {
       computeDisjointIM(im);
       return im;
     }
@@ -247,12 +248,14 @@ public class RelateComputer {
       }
     }
     /*
-     * If edges of LineStrings properly intersect *in an interior point*, all we can deduce is that
-     * the interiors intersect. (We can NOT deduce that the exteriors intersect, since some other
-     * segments in the geometries might cover the points in the neighbourhood of the intersection.)
-     * It is important that the point be known to be an interior point of both Geometries, since it
-     * is possible in a self-intersecting geometry to have a proper intersection on one segment that
-     * is also a boundary point of another segment.
+     * If edges of LineStrings properly intersect *in an interior point*, all we
+     * can deduce is that the interiors intersect. (We can NOT deduce that the
+     * exteriors intersect, since some other segments in the geometries might
+     * cover the points in the neighbourhood of the intersection.) It is
+     * important that the point be known to be an interior point of both
+     * Geometries, since it is possible in a self-intersecting geometry to have
+     * a proper intersection on one segment that is also a boundary point of
+     * another segment.
      */
     else if (dimA == 1 && dimB == 1) {
       if (hasProperInterior) {
@@ -273,7 +276,7 @@ public class RelateComputer {
   private void copyNodesAndLabels(final int argIndex) {
     for (final Iterator i = this.arg[argIndex].getNodeIterator(); i.hasNext();) {
       final Node graphNode = (Node)i.next();
-      final Node newNode = this.nodes.addNode(graphNode.getPoint());
+      final Node newNode = this.nodes.addNode(graphNode);
       newNode.setLabel(argIndex, graphNode.getLabel().getLocation(argIndex));
       // node.print(System.out);
     }
@@ -291,17 +294,19 @@ public class RelateComputer {
    * If the target has dim 2 or 1, the edge can either be in the interior or the exterior.
    * If the target has dim 0, the edge must be in the exterior
    */
-  private void labelIsolatedEdge(final Edge e, final int targetIndex, final Geometry target) {
+  private void labelIsolatedEdge(final Edge edge, final int targetIndex, final Geometry target) {
     // this won't work for GeometryCollections with both dim 2 and 1 geoms
     if (target.getDimension() > 0) {
       // since edge is not in boundary, may not need the full generality of
       // PointLocator?
       // Possibly should use ptInArea locator instead? We probably know here
       // that the edge does not touch the bdy of the target Geometry
-      final Location loc = this.ptLocator.locate(e.getPoint(), target);
-      e.getLabel().setAllLocations(targetIndex, loc);
+      final double x = edge.getX(0);
+      final double y = edge.getY(0);
+      final Location loc = this.ptLocator.locate(target, x, y);
+      edge.getLabel().setAllLocations(targetIndex, loc);
     } else {
-      e.getLabel().setAllLocations(targetIndex, Location.EXTERIOR);
+      edge.getLabel().setAllLocations(targetIndex, Location.EXTERIOR);
     }
     // System.out.println(e.getLabel());
   }
@@ -327,7 +332,10 @@ public class RelateComputer {
    * Label an isolated node with its relationship to the target geometry.
    */
   private void labelIsolatedNode(final Node n, final int targetIndex) {
-    final Location loc = this.ptLocator.locate(n.getPoint(), this.arg[targetIndex].getGeometry());
+    final Geometry geometry = this.arg[targetIndex].getGeometry();
+    final double x = n.getX();
+    final double y = n.getY();
+    final Location loc = this.ptLocator.locate(geometry, x, y);
     n.getLabel().setAllLocations(targetIndex, loc);
     // debugPrintln(n.getLabel());
   }

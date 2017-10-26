@@ -63,7 +63,9 @@ public class PointLocatorTest extends TestCase {
     throws Exception {
     final Geometry geom = this.geometryFactory.geometry(wkt);
     final PointLocator pointLocator = new PointLocator();
-    final Location loc = pointLocator.locate(pt, geom);
+    final double x = pt.getX();
+    final double y = pt.getY();
+    final Location loc = pointLocator.locate(geom, x, y);
     assertEquals(expected, loc);
   }
 

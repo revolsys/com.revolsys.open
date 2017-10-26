@@ -444,7 +444,7 @@ public interface GeometryCollection extends Geometry {
 
   @Override
   default Location locate(final Point point) {
-    return new PointLocator().locate(point, this);
+    return new PointLocator().locate(this, point);
   }
 
   @Override

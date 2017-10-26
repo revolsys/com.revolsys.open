@@ -1,8 +1,6 @@
 package com.revolsys.geometry.io;
 
-import java.util.Collections;
-import java.util.Map;
-
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.ReadIoFactory;
@@ -16,9 +14,8 @@ public interface GeometryReaderFactory
   }
 
   default GeometryReader newGeometryReader(final Resource resource) {
-    return newGeometryReader(resource, Collections.emptyMap());
+    return newGeometryReader(resource, MapEx.EMPTY);
   }
 
-  GeometryReader newGeometryReader(final Resource resource,
-    Map<String, ? extends Object> properties);
+  GeometryReader newGeometryReader(final Resource resource, MapEx properties);
 }

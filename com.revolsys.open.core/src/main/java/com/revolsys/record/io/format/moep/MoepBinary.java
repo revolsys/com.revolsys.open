@@ -1,7 +1,6 @@
 package com.revolsys.record.io.format.moep;
 
-import java.util.Map;
-
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
@@ -32,7 +31,7 @@ public class MoepBinary extends AbstractRecordIoFactory {
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory, Map<String, ? extends Object> properties) {
+    final RecordFactory<? extends Record> recordFactory, MapEx properties) {
     return new MoepBinaryReader(null, resource, recordFactory);
   }
 }

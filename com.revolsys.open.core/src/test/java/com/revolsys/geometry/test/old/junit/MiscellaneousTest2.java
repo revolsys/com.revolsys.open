@@ -138,17 +138,17 @@ public class MiscellaneousTest2 extends TestCase {
     final PointLocator pointLocator = new PointLocator();
     final Geometry polygon = this.geometryFactory
       .geometry("POLYGON ((70 340, 430 50, 70 50, 70 340))");
-    assertEquals(Location.EXTERIOR, pointLocator.locate(new PointDoubleXY(420, 340), polygon));
-    assertEquals(Location.BOUNDARY, pointLocator.locate(new PointDoubleXY(350, 50), polygon));
-    assertEquals(Location.BOUNDARY, pointLocator.locate(new PointDoubleXY(410, 50), polygon));
-    assertEquals(Location.INTERIOR, pointLocator.locate(new PointDoubleXY(190, 150), polygon));
+    assertEquals(Location.EXTERIOR, pointLocator.locate(polygon, 420, 340));
+    assertEquals(Location.BOUNDARY, pointLocator.locate(polygon, 350, 50));
+    assertEquals(Location.BOUNDARY, pointLocator.locate(polygon, 410, 50));
+    assertEquals(Location.INTERIOR, pointLocator.locate(polygon, 190, 150));
   }
 
   public void testPointLocatorLinearRingLineString() throws Exception {
     final PointLocator pointLocator = new PointLocator();
     final Geometry gc = this.geometryFactory.geometry(
       "GEOMETRYCOLLECTION( LINESTRING(0 0, 10 10), LINEARRING(10 10, 10 20, 20 10, 10 10))");
-    assertEquals(Location.BOUNDARY, pointLocator.locate(new PointDoubleXY(10, 10), gc));
+    assertEquals(Location.BOUNDARY, pointLocator.locate(gc, 10.0, 10.0));
   }
 
   public void testQuickPolygonUnion() throws Exception {

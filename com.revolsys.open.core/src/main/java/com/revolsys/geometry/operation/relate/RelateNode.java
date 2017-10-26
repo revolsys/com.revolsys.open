@@ -34,7 +34,6 @@ package com.revolsys.geometry.operation.relate;
 
 import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.model.IntersectionMatrix;
-import com.revolsys.geometry.model.Point;
 
 /**
  * Represents a node in the topological graph used to compute spatial relationships.
@@ -43,8 +42,8 @@ import com.revolsys.geometry.model.Point;
  */
 public class RelateNode extends Node {
 
-  public RelateNode(final Point coord, final EdgeEndBundleStar edges) {
-    super(coord, edges);
+  public RelateNode(final double x, final double y, final EdgeEndBundleStar edges) {
+    super(x, y, edges);
   }
 
   /**

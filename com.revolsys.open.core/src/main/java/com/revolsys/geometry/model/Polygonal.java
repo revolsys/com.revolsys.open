@@ -166,6 +166,9 @@ public interface Polygonal extends Geometry {
     return getGeometries();
   }
 
+  @Override
+  Polygonal prepare();
+
   default double setCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
     final int axisIndex, final double coordinate) {
     throw new UnsupportedOperationException();

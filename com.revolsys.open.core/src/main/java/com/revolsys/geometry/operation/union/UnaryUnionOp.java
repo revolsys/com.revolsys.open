@@ -212,7 +212,7 @@ public class UnaryUnionOp {
     Set<Geometry> exteriorGeometries = null;
 
     for (final Point point : punctual.points()) {
-      final Location loc = locater.locate(point, otherGeom);
+      final Location loc = locater.locate(otherGeom, point);
       if (loc == Location.EXTERIOR) {
         if (exteriorGeometries == null) {
           exteriorGeometries = new TreeSet<>();

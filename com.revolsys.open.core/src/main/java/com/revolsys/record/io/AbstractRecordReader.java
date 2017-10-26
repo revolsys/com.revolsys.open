@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.format.csv.GeometryFieldDefinition;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -167,9 +168,12 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
           type = DataTypes.STRING;
           length = 4000;
         }
-        final FieldDefinition field = new FieldDefinition(fieldName, type, length, false);
+        final FieldDefinition field;
         if (isGeometryField) {
+          field = new GeometryFieldDefinition(this.geometryFactory, fieldName, type, false);
           geometryField = field;
+        } else {
+          field = new FieldDefinition(fieldName, type, length, false);
         }
         fields.add(field);
       }
@@ -215,9 +219,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     for (int i = 0; i < count; i++) {
       final String valueString = values.get(i);
       if (valueString != null) {
-        final DataType dataType = this.recordDefinition.getFieldType(i);
-        final Object convertedValue = dataType.toObject(valueString);
-        record.setValue(i, convertedValue);
+        record.setValue(i, valueString);
       }
     }
     if (this.hasPointFields) {

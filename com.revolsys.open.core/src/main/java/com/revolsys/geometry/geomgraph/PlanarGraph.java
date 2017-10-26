@@ -114,10 +114,6 @@ public class PlanarGraph {
     }
   }
 
-  public Node addNode(final Node node) {
-    return this.nodes.addNode(node);
-  }
-
   public Node addNode(final Point coord) {
     return this.nodes.addNode(coord);
   }

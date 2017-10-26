@@ -1,7 +1,6 @@
 package com.revolsys.record.io;
 
-import java.util.Map;
-
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.record.Record;
@@ -17,7 +16,7 @@ public abstract class GeometryRecordReaderFactory extends AbstractRecordIoFactor
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory, Map<String, ? extends Object> properties) {
+    final RecordFactory<? extends Record> recordFactory, MapEx properties) {
     final GeometryReader geometryReader = newGeometryReader(resource);
     if (geometryReader == null) {
       return null;

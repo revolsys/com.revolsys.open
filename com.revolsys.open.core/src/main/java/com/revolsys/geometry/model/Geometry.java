@@ -1950,8 +1950,11 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return relate(g).isIntersects();
   }
 
-  default boolean intersects(final Point point) {
-    return locate(point) != Location.EXTERIOR;
+  default boolean intersects(Point point) {
+    point = point.as2d(this);
+    final double x = point.getX();
+    final double y = point.getY();
+    return intersects(x, y);
   }
 
   @Override

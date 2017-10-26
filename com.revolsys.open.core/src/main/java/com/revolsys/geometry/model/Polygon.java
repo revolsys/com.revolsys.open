@@ -594,7 +594,13 @@ public interface Polygon extends Polygonal {
     } else {
       final BoundingBox thisBoundingBox = getBoundingBox();
       if (thisBoundingBox.intersects(boundingBox)) {
-        return intersects(boundingBox.toPolygon(getGeometryFactory(), 10));
+
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        if (boundingBox.isProjectionRequired(this)) {
+          return intersects(boundingBox.toPolygon(geometryFactory, 10));
+        } else {
+          return intersects(boundingBox.toPolygon(0));
+        }
       }
       // for (final LinearRing ring : rings()) {
       // if (ring.intersects(boundingBox)) {
@@ -693,7 +699,7 @@ public interface Polygon extends Polygonal {
     if (isEmpty()) {
       return Location.EXTERIOR;
     } else {
-      point = toCoordinateSystem(point);
+      point = point.as2d(this);
       if (point.isEmpty()) {
         return Location.EXTERIOR;
       } else {

@@ -130,7 +130,7 @@ public class RelateNodeGraph implements Iterable<RelateNode> {
    */
   public void copyNodesAndLabels(final GeometryGraph geomGraph, final int argIndex) {
     for (final Node graphNode : geomGraph.getNodeMap()) {
-      final Node newNode = this.nodes.addNode(graphNode.getPoint());
+      final Node newNode = this.nodes.addNode(graphNode);
       newNode.setLabel(argIndex, graphNode.getLabel().getLocation(argIndex));
     }
   }

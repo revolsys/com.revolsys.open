@@ -43,6 +43,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
 
 /**
@@ -169,9 +170,11 @@ public class DistanceWithPoints {
 
   private boolean computeContainmentDistance(final List<Point> locations,
     final List<Polygon> polygons) {
-    for (final Point insidePoint : locations) {
+    for (final Point point : locations) {
+      final double x = point.getX();
+      final double y = point.getY();
       for (final Polygon polygon : polygons) {
-        if (computeContainmentDistance(insidePoint, polygon)) {
+        if (computeContainmentDistance(polygon, x, y)) {
           return true;
         }
       }
@@ -179,12 +182,12 @@ public class DistanceWithPoints {
     return false;
   }
 
-  private boolean computeContainmentDistance(final Point point, final Polygon poly) {
+  private boolean computeContainmentDistance(final Polygon poly, final double x, final double y) {
     // if point is not in exterior, distance to geom is 0
-    if (Location.EXTERIOR != poly.locate(point)) {
+    if (Location.EXTERIOR != poly.locate(x, y)) {
       this.minDistance = 0.0;
-      this.minDistancePoint1 = point;
-      this.minDistancePoint2 = point;
+      this.minDistancePoint1 = new PointDoubleXY(x, y);
+      this.minDistancePoint2 = new PointDoubleXY(x, y);
       return true;
     } else {
       return false;

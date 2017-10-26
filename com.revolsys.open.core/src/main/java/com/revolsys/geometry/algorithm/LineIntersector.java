@@ -421,6 +421,10 @@ public abstract class LineIntersector {
   public boolean isIntersection(final Point point) {
     final double x = point.getX();
     final double y = point.getY();
+    return isIntersection(x, y);
+  }
+
+  public boolean isIntersection(final double x, final double y) {
     if (this.intersectionCount == NO_INTERSECTION) {
       return false;
     } else {

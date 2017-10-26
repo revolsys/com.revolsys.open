@@ -1,5 +1,7 @@
 package com.revolsys.geometry.io;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
@@ -22,13 +24,23 @@ public interface GeometryReader extends Reader<Geometry> {
   }
 
   static GeometryReader newGeometryReader(final Object source) {
+    return newGeometryReader(source, MapEx.EMPTY);
+  }
+
+  static GeometryReader newGeometryReader(final Object source,
+    final GeometryFactory geometryFactory) {
+    final MapEx properties = new LinkedHashMapEx("geometryFactory", geometryFactory);
+    return newGeometryReader(source, properties);
+  }
+
+  static GeometryReader newGeometryReader(final Object source, final MapEx properties) {
     final GeometryReaderFactory readerFactory = IoFactory.factory(GeometryReaderFactory.class,
       source);
     if (readerFactory == null || !readerFactory.isGeometrySupported()) {
       return null;
     } else {
       final Resource resource = readerFactory.getZipResource(source);
-      return readerFactory.newGeometryReader(resource);
+      return readerFactory.newGeometryReader(resource, properties);
     }
   }
 

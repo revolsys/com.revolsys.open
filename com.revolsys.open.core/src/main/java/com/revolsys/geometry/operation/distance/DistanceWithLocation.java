@@ -158,8 +158,10 @@ public class DistanceWithLocation {
   private void computeContainmentDistance(final GeometryLocation ptLoc, final Polygon poly,
     final GeometryLocation[] locPtPoly) {
     final Point pt = ptLoc.getPoint();
+    final double x = pt.getX();
+    final double y = pt.getY();
     // if pt is not in exterior, distance to geom is 0
-    if (Location.EXTERIOR != poly.locate(pt)) {
+    if (Location.EXTERIOR != poly.locate(x, y)) {
       this.minDistance = 0.0;
       locPtPoly[0] = ptLoc;
       locPtPoly[1] = new GeometryLocation(poly, pt);

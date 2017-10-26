@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.IteratorMapReader;
@@ -234,7 +235,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory, Map<String, ? extends Object> properties) {
+    final RecordFactory<? extends Record> recordFactory, MapEx properties) {
     return new CsvRecordReader(resource, recordFactory);
   }
 

@@ -40,7 +40,6 @@ import java.util.Map;
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.PointLocator;
-import com.revolsys.geometry.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.geometry.geomgraph.index.EdgeSetIntersector;
 import com.revolsys.geometry.geomgraph.index.SegmentIntersector;
@@ -82,7 +81,7 @@ public class GeometryGraph extends PlanarGraph {
     return boundaryNodeRule.isInBoundary(boundaryCount) ? Location.BOUNDARY : Location.INTERIOR;
   }
 
-  private PointOnGeometryLocator areaPtLocator = null;
+  private final PointOnGeometryLocator areaPtLocator = null;
 
   private final int argIndex; // the index of this geometry as an argument to a
 
@@ -361,9 +360,9 @@ public class GeometryGraph extends PlanarGraph {
    * This is used to add the boundary
    * points of dim-1 geometries (Curves/MultiCurves).
    */
-  private void insertBoundaryPoint(final int argIndex, final Point coord) {
+  private void insertBoundaryPoint(final int argIndex, final Point point) {
     final NodeMap nodes = getNodeMap();
-    final Node n = nodes.addNode(coord);
+    final Node n = nodes.addNode(point);
     // nodes always have labels
     final Label lbl = n.getLabel();
     // the new point to insert is on a boundary
@@ -381,34 +380,15 @@ public class GeometryGraph extends PlanarGraph {
     lbl.setLocation(argIndex, newLoc);
   }
 
-  private void insertPoint(final int argIndex, final Point coord, final Location onLocation) {
+  private void insertPoint(final int argIndex, final Point point, final Location onLocation) {
     final NodeMap nodes = getNodeMap();
-    final Node n = nodes.addNode(coord);
+    final Node n = nodes.addNode(point);
     final Label lbl = n.getLabel();
     if (lbl == null) {
       n.label = new Label(argIndex, onLocation);
     } else {
       lbl.setLocation(argIndex, onLocation);
     }
-  }
-
-  // MD - experimental for now
-  /**
-   * Determines the {@link Location} of the given {@link Coordinates}
-   * in this geometry.
-   *
-   * @param p the point to test
-   * @return the location of the point in the geometry
-   */
-  public Location locate(final Point pt) {
-    if (this.geometry instanceof Polygonal && this.geometry.getGeometryCount() > 50) {
-      // lazily init point locator
-      if (this.areaPtLocator == null) {
-        this.areaPtLocator = new IndexedPointInAreaLocator(this.geometry);
-      }
-      return this.areaPtLocator.locate(pt);
-    }
-    return this.ptLocator.locate(pt, this.geometry);
   }
 
   private EdgeSetIntersector newEdgeSetIntersector() {

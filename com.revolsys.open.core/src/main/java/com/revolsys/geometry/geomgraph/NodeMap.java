@@ -47,13 +47,13 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class NodeMap implements Iterable<Node> {
-  NodeFactory nodeFact;
+  NodeFactory nodeFactory;
 
   // Map nodeMap = new HashMap();
   Map<Point, Node> nodeMap = new TreeMap<>();
 
   public NodeMap(final NodeFactory nodeFact) {
-    this.nodeFact = nodeFact;
+    this.nodeFactory = nodeFact;
   }
 
   /**
@@ -67,16 +67,6 @@ public class NodeMap implements Iterable<Node> {
     n.add(e);
   }
 
-  public Node addNode(final Node n) {
-    final Node node = this.nodeMap.get(n.getPoint());
-    if (node == null) {
-      this.nodeMap.put(n.getPoint(), n);
-      return n;
-    }
-    node.mergeLabel(n);
-    return node;
-  }
-
   /**
    * Factory function - subclasses can override to create their own types of nodes
    */
@@ -86,11 +76,13 @@ public class NodeMap implements Iterable<Node> {
   /**
    * This method expects that a node has a coordinate value.
    */
-  public Node addNode(final Point coord) {
-    Node node = this.nodeMap.get(coord);
+  public Node addNode(final Point point) {
+    Node node = this.nodeMap.get(point);
     if (node == null) {
-      node = this.nodeFact.newNode(coord);
-      this.nodeMap.put(coord, node);
+      final double x = point.getX();
+      final double y = point.getY();
+      node = this.nodeFactory.newNode(x, y);
+      this.nodeMap.put(node, node);
     }
     return node;
   }

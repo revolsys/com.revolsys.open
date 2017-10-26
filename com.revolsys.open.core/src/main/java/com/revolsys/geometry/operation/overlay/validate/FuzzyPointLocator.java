@@ -90,14 +90,16 @@ public class FuzzyPointLocator {
     if (isWithinToleranceOfBoundary(pt)) {
       return Location.BOUNDARY;
       /*
-       * double dist = linework.distance(point); // if point is close to boundary, it is considered
-       * to be on the boundary if (dist < tolerance) return Location.BOUNDARY;
+       * double dist = linework.distance(point); // if point is close to
+       * boundary, it is considered to be on the boundary if (dist < tolerance)
+       * return Location.BOUNDARY;
        */
     }
 
     // now we know point must be clearly inside or outside geometry, so return
     // actual location value
-    return this.ptLocator.locate(pt, this.g);
+
+    return this.ptLocator.locate(this.g, pt);
   }
 
   private boolean isWithinToleranceOfBoundary(final Point pt) {
