@@ -728,6 +728,12 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     }
   }
 
+  default void setElevationNull(final double x, final double y) {
+    final int gridX = getGridCellX(x);
+    final int gridY = getGridCellY(y);
+    setElevationNull(gridX, gridY);
+  }
+
   default void setElevationNull(final int gridX, final int gridY) {
     setElevation(gridX, gridY, Double.NaN);
   }
