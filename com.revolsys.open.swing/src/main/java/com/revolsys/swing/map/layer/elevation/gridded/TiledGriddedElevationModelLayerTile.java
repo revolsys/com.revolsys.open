@@ -1,8 +1,11 @@
 package com.revolsys.swing.map.layer.elevation.gridded;
 
+import java.io.FileNotFoundException;
+
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.layer.tile.AbstractMapTile;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Strings;
 
 public class TiledGriddedElevationModelLayerTile extends AbstractMapTile<GriddedElevationModel> {
@@ -75,7 +78,9 @@ public class TiledGriddedElevationModelLayerTile extends AbstractMapTile<Gridded
     try {
       return this.layer.newGriddedElevationModel(this.tileSize, this.tileX, this.tileY);
     } catch (final RuntimeException t) {
-      this.layer.setError(t);
+      if (!Exceptions.isException(t, FileNotFoundException.class)) {
+        this.layer.setError(t);
+      }
       return null;
     }
   }
