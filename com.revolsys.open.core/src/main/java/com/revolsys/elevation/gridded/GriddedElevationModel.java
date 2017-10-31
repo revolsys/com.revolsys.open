@@ -723,9 +723,9 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
   default void setElevation(final int gridX, final int gridY,
     final GriddedElevationModel elevationModel, final double x, final double y) {
     final double elevation = elevationModel.getElevation(x, y);
-    if (Double.isFinite(elevation)) {
-      setElevation(gridX, gridY, elevation);
-    }
+    // if (Double.isFinite(elevation)) {
+    setElevation(gridX, gridY, elevation);
+    // }
   }
 
   default void setElevationNull(final double x, final double y) {

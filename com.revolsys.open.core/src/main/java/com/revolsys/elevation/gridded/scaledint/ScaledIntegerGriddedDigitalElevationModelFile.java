@@ -35,8 +35,8 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
     final String fileName = RectangularMapGrid.getTileFileName("dem", coordinateSystemId,
       Integer.toString((int)gridCellSize * gridWidth), minX, minY, "demcs");
     final Path path = rowDirectory.resolve(fileName);
-    return new ScaledIntegerGriddedDigitalElevationModelFile(path, geometryFactory, minX, minY, gridWidth,
-      gridHeight, (int)gridCellSize);
+    return new ScaledIntegerGriddedDigitalElevationModelFile(path, geometryFactory, minX, minY,
+      gridWidth, gridHeight, (int)gridCellSize);
   }
 
   private final Path path;
@@ -60,7 +60,8 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
   private boolean useLocks = false;
 
   public ScaledIntegerGriddedDigitalElevationModelFile(final Path path) {
-    super(ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE, ScaledIntegerGriddedDigitalElevationModel.RECORD_SIZE);
+    super(ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE,
+      ScaledIntegerGriddedDigitalElevationModel.RECORD_SIZE);
     this.path = path;
     this.openOptions = Paths.OPEN_OPTIONS_READ_SET;
     readHeader();
@@ -107,8 +108,8 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
       final double gridCellSize = getGridCellSize();
       final BoundingBox boundingBox = getBoundingBox();
       final GeometryFactory geometryFactory = getGeometryFactory();
-      ScaledIntegerGriddedDigitalElevationModelWriter.writeHeader(writer, boundingBox, geometryFactory,
-        gridWidth, gridHeight, (int)gridCellSize);
+      ScaledIntegerGriddedDigitalElevationModelWriter.writeHeader(writer, boundingBox,
+        geometryFactory, gridWidth, gridHeight, (int)gridCellSize);
       final int count = gridWidth * gridHeight;
       for (int i = 0; i < count; i++) {
         writer.putInt(Integer.MIN_VALUE);
@@ -212,6 +213,13 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
     }
   }
 
+  @Override
+  public void setElevationNull(final int gridX, final int gridY) {
+    final int gridWidth = getGridWidth();
+    final int offset = this.headerSize + (gridY * gridWidth + gridX) * this.elevationByteCount;
+    writeElevation(offset, Integer.MIN_VALUE);
+  }
+
   public void setElevations(final double x, final double y, final double[] elevations) {
     final int gridX = getGridCellX(x);
     final int gridY = getGridCellY(y);
@@ -260,17 +268,23 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
   }
 
   @Override
-  protected synchronized void writeElevation(int offset, final double elevation) {
+  protected synchronized void writeElevation(final int offset, final double elevation) {
+    int elevationInt;
+    if (Double.isFinite(elevation)) {
+      final double scale = this.scaleZ;
+      elevationInt = (int)Math.round(elevation * scale);
+    } else {
+      elevationInt = Integer.MIN_VALUE;
+    }
+    writeElevation(offset, elevationInt);
+  }
+
+  protected void writeElevation(int offset, final int elevationInt) {
     try {
       final FileChannel fileChannel = getFileChannel();
       if (fileChannel != null) {
-        final double scale = this.scaleZ;
-        if (Double.isFinite(elevation)) {
-          final int elevationInt = (int)Math.round(elevation * scale);
-          this.buffer.putInt(elevationInt);
-        } else {
-          this.buffer.putInt(Integer.MIN_VALUE);
-        }
+
+        this.buffer.putInt(elevationInt);
         this.buffer.flip();
         while (this.buffer.hasRemaining()) {
           offset += fileChannel.write(this.buffer, offset);

@@ -453,13 +453,17 @@ public interface Resource extends org.springframework.core.io.Resource {
   }
 
   default Resource newResourceChangeExtension(final String extension) {
-    final String baseName = getBaseName();
-    final String newFileName = baseName + "." + extension;
-    final Resource parent = getParent();
-    if (parent == null) {
-      return null;
+    if (extension.equals(getFileNameExtension())) {
+      return this;
     } else {
-      return parent.newChildResource(newFileName);
+      final String baseName = getBaseName();
+      final String newFileName = baseName + "." + extension;
+      final Resource parent = getParent();
+      if (parent == null) {
+        return null;
+      } else {
+        return parent.newChildResource(newFileName);
+      }
     }
   }
 

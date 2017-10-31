@@ -204,6 +204,17 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   }
 
   @Override
+  public void setElevationNull(final int gridX, final int gridY) {
+    final int width = getGridWidth();
+    final int height = getGridHeight();
+    if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
+      final int index = gridY * width + gridX;
+      this.elevations[index] = NULL_VALUE;
+      clearCachedObjects();
+    }
+  }
+
+  @Override
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory.getScaleZ() <= 0) {
       throw new IllegalArgumentException("Geometry factory must have a z scale factor");

@@ -69,6 +69,13 @@ public class DoubleArrayGriddedElevationModel extends AbstractGriddedElevationMo
 
   @Override
   public void setElevationNull(final int gridX, final int gridY) {
-    setElevation(gridX, gridY, NULL_VALUE);
+    final int width = getGridWidth();
+    final int height = getGridHeight();
+    if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
+      final int index = gridY * width + gridX;
+      this.elevations[index] = NULL_VALUE;
+      clearCachedObjects();
+    }
   }
+
 }

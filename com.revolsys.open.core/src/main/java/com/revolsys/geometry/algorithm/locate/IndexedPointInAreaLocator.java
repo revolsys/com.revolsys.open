@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.algorithm.locate;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.collection.map.WeakKeyValueMap;
@@ -40,13 +39,12 @@ import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.index.intervalrtree.SortedPackedIntervalRTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.util.Property;
 
 /**
@@ -65,16 +63,30 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     private final SortedPackedIntervalRTree<LineSegment> index = new SortedPackedIntervalRTree<>();
 
     public IntervalIndexedGeometry(final Geometry geometry) {
-      final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
-      for (final LineString line : lines) {
-        for (final Segment segment : line.segments()) {
-          final double y1 = segment.getY(0);
-          final double y2 = segment.getY(1);
-          final double min = Math.min(y1, y2);
-          final double max = Math.max(y1, y2);
-          this.index.insert(min, max, segment.clone());
+      geometry.forEachSegment((x1, y1, x2, y2) -> {
+        double minY;
+        double maxY;
+        if (y1 < y2) {
+          minY = y1;
+          maxY = y2;
+        } else {
+          minY = y2;
+          maxY = y1;
         }
-      }
+        final LineSegmentDouble segment = new LineSegmentDouble(2, x1, y1, x2, y2);
+        this.index.insert(minY, maxY, segment);
+      });
+      // final List<LineString> lines =
+      // geometry.getGeometryComponents(LineString.class);
+      // for (final LineString line : lines) {
+      // for (final Segment segment : line.segments()) {
+      // final double y1 = segment.getY(0);
+      // final double y2 = segment.getY(1);
+      // final double min = Math.min(y1, y2);
+      // final double max = Math.max(y1, y2);
+      // this.index.insert(min, max, segment.clone());
+      // }
+      // }
     }
 
     public void query(final double min, final double max, final Consumer<LineSegment> visitor) {

@@ -12,6 +12,8 @@ public class LasPointCloudFactory extends AbstractIoFactory implements PointClou
     super("LASer Point Cloud");
     addMediaTypeAndFileExtension("application/vnd.las", "las");
     addMediaTypeAndFileExtension("application/vnd.laz", "laz");
+    addFileExtension("las.zip");
+    addFileExtension("las.gz");
   }
 
   @SuppressWarnings("unchecked")

@@ -1,6 +1,8 @@
 package com.revolsys.elevation.cloud.las;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +39,7 @@ import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Exceptions;
 
 public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSerializer {
@@ -76,19 +78,24 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
     this(resource, null);
   }
 
-  public LasPointCloud(Resource resource, GeometryFactory geometryFactory) {
+  public LasPointCloud(final Resource resource, GeometryFactory geometryFactory) {
     this.resource = resource;
+    Resource fileResource = resource;
     if (resource.getFileNameExtension().equals("zip")) {
       boolean found = false;
-      final String baseName = resource.getBaseName();
+      String baseName = resource.getBaseName();
+      if (baseName.endsWith("las")) {
+        baseName = baseName.replace(".las", "");
+      }
       final String fileName = baseName + ".las";
+
       this.zipIn = this.resource.newBufferedInputStream(ZipInputStream::new);
       try {
         for (ZipEntry zipEntry = this.zipIn.getNextEntry(); zipEntry != null; zipEntry = this.zipIn
           .getNextEntry()) {
           final String name = zipEntry.getName();
           if (name.equalsIgnoreCase(fileName)) {
-            resource = new InputStreamResource(this.zipIn);
+            fileResource = new InputStreamResource(this.zipIn);
             found = true;
             break;
           }
@@ -96,11 +103,24 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
       } catch (final IOException e) {
         throw Exceptions.wrap("Error reading: " + resource, e);
       }
-      if (!found) {
+      if (found) {
+        try {
+          final URI prjUrl = new URI("jar", resource.getUri() + "!/" + baseName + ".prj", null);
+          final Resource prjResource = new UrlResource(prjUrl);
+          final GeometryFactory geometryFactoryFromPrj = EsriCoordinateSystems
+            .getGeometryFactory(prjResource);
+          if (geometryFactoryFromPrj != null) {
+            geometryFactory = geometryFactoryFromPrj;
+          }
+        } catch (URISyntaxException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      } else {
         throw new IllegalArgumentException("Cannot find file: " + resource + "!" + fileName);
       }
     }
-    this.reader = resource.newChannelReader(8192, ByteOrder.LITTLE_ENDIAN);
+    this.reader = fileResource.newChannelReader(8192, ByteOrder.LITTLE_ENDIAN);
     if (this.reader == null) {
       this.exists = false;
     } else {
