@@ -7,6 +7,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.DoubleConsumer3;
 
 public class PointDouble extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -103,6 +104,22 @@ public class PointDouble extends AbstractPoint implements Serializable {
       }
       System.arraycopy(this.coordinates, 0, coordinates, 0, coordinatesLength);
       action.accept(coordinates);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final DoubleConsumer3 action) {
+    if (!isEmpty()) {
+      final double x = this.coordinates[0];
+      final double y = this.coordinates[1];
+      double z;
+      if (this.coordinates.length < 3) {
+        z = java.lang.Double.NaN;
+      } else {
+        z = this.coordinates[2];
+      }
+
+      action.accept(x, y, z);
     }
   }
 

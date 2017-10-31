@@ -1,6 +1,7 @@
 package com.revolsys.geometry.model.impl;
 
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.DoubleConsumer3;
 
 public class TriangleDoubleXYZ extends AbstractTriangle {
   private static final long serialVersionUID = 1l;
@@ -59,6 +60,15 @@ public class TriangleDoubleXYZ extends AbstractTriangle {
       action.accept(this.x1, this.y1);
       action.accept(this.x2, this.y2);
       action.accept(this.x3, this.y3);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final DoubleConsumer3 action) {
+    if (!isEmpty()) {
+      action.accept(this.x1, this.y1, this.z1);
+      action.accept(this.x2, this.y2, this.z2);
+      action.accept(this.x3, this.y3, this.z3);
     }
   }
 

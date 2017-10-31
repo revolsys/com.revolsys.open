@@ -21,7 +21,6 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Function4Double;
 import com.revolsys.util.number.Doubles;
@@ -402,17 +401,6 @@ public interface LineSegment extends LineString {
       }
     }
     return null;
-  }
-
-  @Override
-  default void forEachVertex(final BiConsumerDouble action) {
-    if (!isEmpty()) {
-      for (int i = 0; i < 2; i++) {
-        final double x1 = getX(i);
-        final double y1 = getY(i);
-        action.accept(x1, y1);
-      }
-    }
   }
 
   @Override

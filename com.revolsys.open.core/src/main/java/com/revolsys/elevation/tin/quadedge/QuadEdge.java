@@ -273,21 +273,24 @@ public class QuadEdge {
     final double toX = toPoint.getX();
     final double toY = toPoint.getY();
 
-    final Side side = Side.getSide(fromX, fromY, toX, toY, previousToX, previousToY);
-    if (side == Side.RIGHT) {
-      final double deltaX1 = fromX - x;
-      final double deltaY1 = fromY - y;
-      final double deltaX2 = previousToX - x;
-      final double deltaY2 = previousToY - y;
-      final double deltaX3 = toX - x;
-      final double deltaY3 = toY - y;
+    final double orientationIndex = (fromX - previousToX) * (toY - previousToY)
+      - (fromY - previousToY) * (toX - previousToX);
 
-      final double abdet = deltaX1 * deltaY2 - deltaX2 * deltaY1;
-      final double bcdet = deltaX2 * deltaY3 - deltaX3 * deltaY2;
-      final double cadet = deltaX3 * deltaY1 - deltaX1 * deltaY3;
-      final double alift = deltaX1 * deltaX1 + deltaY1 * deltaY1;
-      final double blift = deltaX2 * deltaX2 + deltaY2 * deltaY2;
-      final double clift = deltaX3 * deltaX3 + deltaY3 * deltaY3;
+    if (orientationIndex < 0) {
+      // On right side
+      final double fromDeltaX = fromX - x;
+      final double fromDeltaY = fromY - y;
+      final double toDeltaX = toX - x;
+      final double toDeltaY = toY - y;
+      final double previousToDeltaX = previousToX - x;
+      final double previousToDeltaY = previousToY - y;
+      final double abdet = fromDeltaX * previousToDeltaY - previousToDeltaX * fromDeltaY;
+      final double bcdet = previousToDeltaX * toDeltaY - toDeltaX * previousToDeltaY;
+      final double cadet = toDeltaX * fromDeltaY - fromDeltaX * toDeltaY;
+      final double alift = fromDeltaX * fromDeltaX + fromDeltaY * fromDeltaY;
+      final double blift = previousToDeltaX * previousToDeltaX
+        + previousToDeltaY * previousToDeltaY;
+      final double clift = toDeltaX * toDeltaX + toDeltaY * toDeltaY;
 
       final double disc = alift * bcdet + blift * cadet + clift * abdet;
       final boolean inCircle = disc > 0;
@@ -338,14 +341,6 @@ public class QuadEdge {
   /***********************************************************************************************
    * Data Access
    **********************************************************************************************/
-  /**
-   * Sets the Point for this edge's origin
-   *
-   * @param fromPoint the origin Point
-   */
-  void setFromPoint(final Point fromPoint) {
-    this.fromPoint = fromPoint;
-  }
 
   public void setVisited(final short visitIndex) {
     this.visitIndex = visitIndex;
@@ -392,8 +387,8 @@ public class QuadEdge {
     sym.splice(b);
     splice(edgePrevious.getLeftNext());
     sym.splice(b.getLeftNext());
-    setFromPoint(edgePrevious.getToPoint());
-    sym.setFromPoint(b.getToPoint());
+    this.fromPoint = edgePrevious.getToPoint();
+    sym.fromPoint = b.getToPoint();
   }
 
   /**

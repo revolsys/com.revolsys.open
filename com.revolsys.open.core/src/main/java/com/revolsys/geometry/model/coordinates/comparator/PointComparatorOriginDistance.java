@@ -1,6 +1,7 @@
 package com.revolsys.geometry.model.coordinates.comparator;
 
 import java.util.Comparator;
+import java.util.List;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.MathUtil;
@@ -11,6 +12,13 @@ import com.revolsys.util.MathUtil;
  *
  */
 public class PointComparatorOriginDistance implements Comparator<Point> {
+
+  public static void sort(final double originX, final double originY,
+    final List<? extends Point> points) {
+    final PointComparatorOriginDistance comparator = new PointComparatorOriginDistance(originX,
+      originY);
+    points.sort(comparator);
+  }
 
   private final double originX;
 

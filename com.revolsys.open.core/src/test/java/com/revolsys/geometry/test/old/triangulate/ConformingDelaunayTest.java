@@ -35,6 +35,7 @@ package com.revolsys.geometry.test.old.triangulate;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeConformingDelaunayTinBuilder;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.wkb.ParseException;
 
 import junit.framework.TestCase;
@@ -79,7 +80,8 @@ public class ConformingDelaunayTest extends TestCase {
     Geometry expectedEdges = this.geometryFactory.geometry(expectedWKT);
     result = result.normalize();
     expectedEdges = expectedEdges.normalize();
-    assertTrue(expectedEdges.equalsExact(result, COMPARISON_TOLERANCE));
+    Assert.equals("Triangulation", expectedEdges.equalsExact(result, COMPARISON_TOLERANCE),
+      expectedEdges, result);
   }
 
   public void testRandom() throws ParseException {

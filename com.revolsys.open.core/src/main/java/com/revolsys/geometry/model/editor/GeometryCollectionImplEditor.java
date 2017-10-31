@@ -8,6 +8,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.DoubleConsumer3;
 
 public class GeometryCollectionImplEditor
   extends AbstractGeometryCollectionEditor<GeometryCollectionImpl, Geometry, GeometryEditor<?>> {
@@ -57,6 +58,13 @@ public class GeometryCollectionImplEditor
 
   @Override
   public void forEachVertex(final BiConsumerDouble action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      editor.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final DoubleConsumer3 action) {
     for (final GeometryEditor<?> editor : this.editors) {
       editor.forEachVertex(action);
     }

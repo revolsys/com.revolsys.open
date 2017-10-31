@@ -39,6 +39,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.DoubleConsumer3;
 
 /**
  * Represents a sequence of facets (points or line segments)
@@ -94,6 +95,11 @@ public class PointFacetSequence extends AbstractPoint implements FacetSequence {
 
   @Override
   public void forEachVertex(final BiConsumerDouble action) {
+    this.point.forEachVertex(action);
+  }
+
+  @Override
+  public void forEachVertex(final DoubleConsumer3 action) {
     this.point.forEachVertex(action);
   }
 

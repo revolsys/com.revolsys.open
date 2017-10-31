@@ -75,7 +75,9 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.Consumer4Double;
+import com.revolsys.util.function.DoubleConsumer3;
 import com.revolsys.util.number.Doubles;
 
 /**
@@ -719,6 +721,17 @@ public interface LineString extends Lineal {
   }
 
   @Override
+  default void forEachVertex(final BiConsumerDouble action) {
+    if (!isEmpty()) {
+      for (int i = 0; i < 2; i++) {
+        final double x1 = getX(i);
+        final double y1 = getY(i);
+        action.accept(x1, y1);
+      }
+    }
+  }
+
+  @Override
   default void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final double[] coordinates, final Consumer<double[]> action) {
     final int axisCount = coordinates.length;
@@ -741,6 +754,19 @@ public interface LineString extends Lineal {
         coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
       }
       action.accept(coordinates);
+    }
+  }
+
+  @Override
+  default void forEachVertex(final DoubleConsumer3 action) {
+    if (!isEmpty()) {
+      final int vertexCount = getVertexCount();
+      for (int i = 0; i < vertexCount; i++) {
+        final double x = getX(i);
+        final double y = getY(i);
+        final double z = getZ(i);
+        action.accept(x, y, z);
+      }
     }
   }
 

@@ -6,6 +6,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer4Double;
+import com.revolsys.util.function.DoubleConsumer3;
 import com.revolsys.util.function.Function4Double;
 
 public interface DelegatingLineString extends LineString {
@@ -56,6 +57,12 @@ public interface DelegatingLineString extends LineString {
   default void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
     final LineString line = getLineString();
     line.forEachVertex(coordinates, action);
+  }
+
+  @Override
+  default void forEachVertex(final DoubleConsumer3 action) {
+    final LineString line = getLineString();
+    line.forEachVertex(action);
   }
 
   @Override

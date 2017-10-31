@@ -14,6 +14,7 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer4Double;
+import com.revolsys.util.function.DoubleConsumer3;
 import com.revolsys.util.function.Function4Double;
 
 public class LineStringDouble extends AbstractLineString {
@@ -265,6 +266,30 @@ public class LineStringDouble extends AbstractLineString {
     for (int coordinateIndex = 0; coordinateIndex < coordinateCount; coordinateIndex += axisCount) {
       System.arraycopy(this.coordinates, coordinateIndex, coordinates, 0, coordinatesLength);
       action.accept(coordinates);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final DoubleConsumer3 action) {
+    final int vertexCount = this.vertexCount;
+    final double[] coordinates = this.coordinates;
+    final int axisCount = this.axisCount;
+    int coordinateIndex = 0;
+    if (axisCount < 3) {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+        final double x = coordinates[coordinateIndex++];
+        final double y = coordinates[coordinateIndex++];
+        action.accept(x, y, Double.NaN);
+      }
+    } else {
+      final int axisIgnoreCount = axisCount - 3;
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+        final double x = coordinates[coordinateIndex++];
+        final double y = coordinates[coordinateIndex++];
+        final double z = coordinates[coordinateIndex++];
+        action.accept(x, y, z);
+        coordinateIndex += axisIgnoreCount;
+      }
     }
   }
 

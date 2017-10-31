@@ -10,6 +10,7 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.DoubleConsumer3;
 
 public class PointDoubleXY extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -117,6 +118,13 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
       coordinates[0] = this.x;
       coordinates[1] = this.y;
       action.accept(coordinates);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final DoubleConsumer3 action) {
+    if (!isEmpty()) {
+      action.accept(this.x, this.y, java.lang.Double.NaN);
     }
   }
 

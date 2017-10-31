@@ -47,6 +47,7 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer4Double;
+import com.revolsys.util.function.DoubleConsumer3;
 import com.revolsys.util.function.Function4Double;
 
 /**
@@ -203,6 +204,13 @@ public class MultiPolygonImpl implements MultiPolygon {
   public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
     for (final Geometry geometry : this.polygons) {
       geometry.forEachVertex(coordinates, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final DoubleConsumer3 action) {
+    for (final Geometry geometry : this.polygons) {
+      geometry.forEachVertex(action);
     }
   }
 

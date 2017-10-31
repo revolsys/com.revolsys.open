@@ -54,6 +54,7 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.DoubleConsumer3;
 import com.revolsys.util.number.Doubles;
 
 /**
@@ -575,6 +576,16 @@ public interface Point extends Punctual, Serializable {
         coordinates[i] = value;
       }
       action.accept(coordinates);
+    }
+  }
+
+  @Override
+  default void forEachVertex(final DoubleConsumer3 action) {
+    if (!isEmpty()) {
+      final double x = getX();
+      final double y = getY();
+      final double z = getZ();
+      action.accept(x, y, z);
     }
   }
 

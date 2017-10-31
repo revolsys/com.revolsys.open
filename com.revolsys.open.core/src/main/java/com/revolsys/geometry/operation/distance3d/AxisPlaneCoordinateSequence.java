@@ -36,7 +36,6 @@ package com.revolsys.geometry.operation.distance3d;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.impl.AbstractLineString;
-import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Function4Double;
 
@@ -145,16 +144,6 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
       }
     }
     return null;
-  }
-
-  @Override
-  public void forEachVertex(final BiConsumerDouble action) {
-    final int vertexCount = getVertexCount();
-    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-      final double x = getX(vertexIndex);
-      final double y = getY(vertexIndex);
-      action.accept(x, y);
-    }
   }
 
   @Override

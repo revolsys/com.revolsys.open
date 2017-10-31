@@ -35,6 +35,7 @@ package com.revolsys.geometry.planargraph;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.function.DoubleConsumer3;
 
 /**
  * A node in a {@link PlanarGraph}is a location where 0 or more {@link Edge}s
@@ -89,6 +90,11 @@ public class Node extends GraphComponent implements Point {
   @Override
   public void forEachVertex(final BiConsumerDouble action) {
     action.accept(this.x, this.y);
+  }
+
+  @Override
+  public void forEachVertex(final DoubleConsumer3 action) {
+    action.accept(this.x, this.y, Double.NaN);
   }
 
   @Override

@@ -46,6 +46,7 @@ import com.revolsys.geometry.model.Punctual;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
+import com.revolsys.util.function.DoubleConsumer3;
 
 /**
  * Models a collection of {@link Point}s.
@@ -172,6 +173,13 @@ public class MultiPointImpl implements MultiPoint {
   public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
     for (final Geometry geometry : this.points) {
       geometry.forEachVertex(coordinates, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final DoubleConsumer3 action) {
+    for (final Geometry geometry : this.points) {
+      geometry.forEachVertex(action);
     }
   }
 

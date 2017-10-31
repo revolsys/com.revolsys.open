@@ -117,6 +117,12 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     this.bounds[3] = maxY;
   }
 
+  public QuadEdgeDelaunayTinBuilder(final GeometryFactory geometryFactory,
+    final List<Point> filteredPoints) {
+    this(geometryFactory);
+    this.vertices.addAll(filteredPoints);
+  }
+
   public void addVertex(final Point vertex) {
     this.vertices.add(vertex);
   }
