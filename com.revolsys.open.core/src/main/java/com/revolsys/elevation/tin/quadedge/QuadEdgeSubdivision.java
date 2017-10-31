@@ -35,9 +35,7 @@ package com.revolsys.elevation.tin.quadedge;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -222,7 +220,7 @@ public class QuadEdgeSubdivision {
    * or null if the triangle should not be visited (for instance, if it is
    *         outer)
    */
-  private boolean fetchTriangleToVisit(final QuadEdge edge, final Deque<QuadEdge> edgeStack,
+  private boolean fetchTriangleToVisit(final QuadEdge edge, final List<QuadEdge> edgeStack,
     final short visitIndex, final double[] coordinates) {
     QuadEdge currentEdge = edge;
     boolean isFrame = false;
@@ -241,7 +239,7 @@ public class QuadEdgeSubdivision {
       // push sym edges to visit next
       final QuadEdge sym = currentEdge.sym();
       if (!sym.isVisited(visitIndex)) {
-        edgeStack.push(sym);
+        edgeStack.add(sym);
       }
       currentEdge.setVisited(visitIndex);
 
@@ -322,11 +320,11 @@ public class QuadEdgeSubdivision {
     }
     final short visitIndex = ++this.visitIndex;
     final double[] coordinates = new double[9];
-    final Deque<QuadEdge> edgeStack = new LinkedList<>();
-    edgeStack.push(this.edge1);
-
+    final List<QuadEdge> edgeStack = new ArrayList<>(64);
+    edgeStack.add(this.edge1);
     while (!edgeStack.isEmpty()) {
-      final QuadEdge edge = edgeStack.pop();
+      final int size = edgeStack.size();
+      final QuadEdge edge = edgeStack.remove(size - 1);
       if (!edge.isVisited(visitIndex)) {
         if (fetchTriangleToVisit(edge, edgeStack, visitIndex, coordinates)) {
           final double x1 = coordinates[0];
@@ -453,10 +451,11 @@ public class QuadEdgeSubdivision {
     final double x = vertex.getX();
     final double y = vertex.getY();
     /*
-     * This code is based on Guibas and Stolfi (1985), with minor modifications and a bug fix from
-     * Dani Lischinski (Graphic Gems 1993). (The modification I believe is the test for the inserted
-     * site falling exactly on an existing edge. Without this test zero-width triangles have been
-     * observed to be created)
+     * This code is based on Guibas and Stolfi (1985), with minor modifications
+     * and a bug fix from Dani Lischinski (Graphic Gems 1993). (The modification
+     * I believe is the test for the inserted site falling exactly on an
+     * existing edge. Without this test zero-width triangles have been observed
+     * to be created)
      */
     QuadEdge edge = findQuadEdge(x, y);
     if (edge != null) {
@@ -489,8 +488,8 @@ public class QuadEdgeSubdivision {
         }
       }
       /*
-       * Connect the new point to the vertices of the containing triangle (or quadrilateral, if the
-       * new point fell on an existing edge.)
+       * Connect the new point to the vertices of the containing triangle (or
+       * quadrilateral, if the new point fell on an existing edge.)
        */
       final QuadEdge base = makeEdge(edgeFromPoint, vertex);
       base.splice(edge);

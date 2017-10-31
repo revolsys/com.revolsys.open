@@ -78,14 +78,16 @@ public class LineSegmentUtil {
     } else {
       // AB and CD are line segments
       /*
-       * from comp.graphics.algo Solving the above for r and s yields (Ay-Cy)(Dx-Cx)-(Ax-Cx)(Dy-Cy)
-       * r = ----------------------------- (eqn 1) (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx)
-       * (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) s = ----------------------------- (eqn 2)
-       * (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) Let P be the position vector of the intersection point, then
-       * P=A+r(B-A) or Px=Ax+r(Bx-Ax) Py=Ay+r(By-Ay) By examining the values of r & s, you can also
-       * determine some other limiting conditions: If 0<=r<=1 & 0<=s<=1, intersection exists r<0 or
-       * r>1 or s<0 or s>1 line segments do not intersect If the denominator in eqn 1 is zero, AB &
-       * CD are parallel If the numerator in eqn 1 is also zero, AB & CD are collinear.
+       * from comp.graphics.algo Solving the above for r and s yields
+       * (Ay-Cy)(Dx-Cx)-(Ax-Cx)(Dy-Cy) r = ----------------------------- (eqn 1)
+       * (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) s =
+       * ----------------------------- (eqn 2) (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) Let
+       * P be the position vector of the intersection point, then P=A+r(B-A) or
+       * Px=Ax+r(Bx-Ax) Py=Ay+r(By-Ay) By examining the values of r & s, you can
+       * also determine some other limiting conditions: If 0<=r<=1 & 0<=s<=1,
+       * intersection exists r<0 or r>1 or s<0 or s>1 line segments do not
+       * intersect If the denominator in eqn 1 is zero, AB & CD are parallel If
+       * the numerator in eqn 1 is also zero, AB & CD are collinear.
        */
 
       boolean noIntersection = false;
@@ -159,27 +161,31 @@ public class LineSegmentUtil {
    */
   public static double distanceLinePoint(final double x1, final double y1, final double x2,
     final double y2, final double x, final double y) {
+    final double deltaX1X = x1 - x;
+    final double deltaY1Y = y1 - y;
     if (x1 == x2 && y1 == y2) {
-      return MathUtil.distance(x, y, x1, y1);
+      return Math.sqrt(deltaX1X * deltaX1X + deltaY1Y * deltaY1Y);
     } else {
-      final double dxx1 = x - x1;
-      final double dx2x1 = x2 - x1;
-      final double dyy1 = y - y1;
-      final double dy2y1 = y2 - y1;
-      final double d2x1sq = dx2x1 * dx2x1;
-      final double dy2y1sq = dy2y1 * dy2y1;
-      final double r = (dxx1 * dx2x1 + dyy1 * dy2y1) / (d2x1sq + dy2y1sq);
+      final double deltaXX1 = -deltaX1X;
+      final double deltaYY1 = -deltaY1Y;
+      final double deltaX2X1 = x2 - x1;
+      final double deltaY2Y1 = y2 - y1;
+      final double deltaX2X1Sq = deltaX2X1 * deltaX2X1;
+      final double deltaY2Y1Sq = deltaY2Y1 * deltaY2Y1;
+      final double deltaX2X1SqPlusDeltaY2Y1Sq = deltaX2X1Sq + deltaY2Y1Sq;
+      final double r = (deltaXX1 * deltaX2X1 + deltaYY1 * deltaY2Y1) / deltaX2X1SqPlusDeltaY2Y1Sq;
 
       if (r <= 0.0) {
-        return MathUtil.distance(x, y, x1, y1);
+        return Math.sqrt(deltaX1X * deltaX1X + deltaY1Y * deltaY1Y);
       } else if (r >= 1.0) {
-        return MathUtil.distance(x, y, x2, y2);
+        final double deltaX2X = x2 - x;
+        final double deltaY2Y = y2 - y;
+        return Math.sqrt(deltaX2X * deltaX2X + deltaY2Y * deltaY2Y);
       } else {
-        final double dy1y = y1 - y;
-        final double dx1x = x1 - x;
-        final double s = (dy1y * dx2x1 - dx1x * dy2y1) / (d2x1sq + dy2y1sq);
+        final double s = (deltaY1Y * deltaX2X1 - deltaX1X * deltaY2Y1)
+          / deltaX2X1SqPlusDeltaY2Y1Sq;
 
-        return Math.abs(s) * Math.sqrt(d2x1sq + dy2y1sq);
+        return Math.abs(s) * Math.sqrt(deltaX2X1SqPlusDeltaY2Y1Sq);
       }
     }
   }
@@ -248,8 +254,8 @@ public class LineSegmentUtil {
     final double x1, final double y1, final double x2, final double y2) {
     // use comp.graphics.algorithms Frequently Asked Questions method
     /*
-     * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) ----------------------------- L^2 Then the distance
-     * from C to P = |s|*L.
+     * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) ----------------------------- L^2
+     * Then the distance from C to P = |s|*L.
      */
     final double len2 = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
     final double s = ((y1 - y) * (x2 - x1) - (x1 - x) * (y2 - y1)) / len2;
