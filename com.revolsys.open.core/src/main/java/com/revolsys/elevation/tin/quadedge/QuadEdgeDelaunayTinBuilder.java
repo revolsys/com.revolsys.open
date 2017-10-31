@@ -118,9 +118,10 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
   }
 
   public QuadEdgeDelaunayTinBuilder(final GeometryFactory geometryFactory,
-    final List<Point> filteredPoints) {
+    final List<Point> points) {
     this(geometryFactory);
-    this.vertices.addAll(filteredPoints);
+    this.vertices.addAll(points);
+    expandBoundingBox(points);
   }
 
   public void addVertex(final Point vertex) {
