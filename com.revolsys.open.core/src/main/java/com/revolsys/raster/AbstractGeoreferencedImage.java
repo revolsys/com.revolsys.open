@@ -334,10 +334,11 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     loadMetaDataFromImage();
     final long modifiedTime = loadSettings();
     loadAuxXmlFile(modifiedTime);
+    final boolean hasBoundingBox = hasBoundingBox();
     if (!hasGeometryFactory()) {
       loadProjectionFile();
     }
-    if (!hasBoundingBox()) {
+    if (!hasBoundingBox) {
       loadWorldFile();
     }
   }
@@ -356,7 +357,12 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     final Resource settingsFile = resource.newResourceAddExtension("rgobject");
     if (settingsFile.exists()) {
       try {
-        final Map<String, Object> settings = Json.toMap(settingsFile);
+        Map<String, Object> settings;
+        try {
+          settings = Json.toMap(settingsFile);
+        } catch (final Throwable e) {
+          settings = new LinkedHashMapEx();
+        }
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {
           final BoundingBox boundingBox = BoundingBox.newBoundingBox(boundingBoxWkt);
