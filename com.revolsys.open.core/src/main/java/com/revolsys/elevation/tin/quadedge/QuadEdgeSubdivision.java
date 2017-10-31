@@ -314,8 +314,6 @@ public class QuadEdgeSubdivision {
       }
     }
     return null;
-    // throw new
-    // LocateFailureException(currentEdge.newLineString(this.geometryFactory));
   }
 
   public void forEachTriangle(final TriangleConsumer action) {
