@@ -878,7 +878,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
   public void setSplitFieldValues(final LineString oldLine, final Point splitPoint,
     final Map<String, Object> newRecord, final LineString newLine) {
     final boolean firstPoint = newLine.equalsVertex(2, 0, splitPoint);
-    final boolean toPoint = newLine.equalsVertex(2, -1, splitPoint);
+    final boolean toPoint = newLine.equalsVertex(2, newLine.getLastVertexIndex(), splitPoint);
     if (firstPoint) {
       if (!toPoint) {
         clearFromFields(newRecord);

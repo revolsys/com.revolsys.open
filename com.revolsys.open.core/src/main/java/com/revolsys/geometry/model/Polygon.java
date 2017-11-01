@@ -518,7 +518,11 @@ public interface Polygon extends Polygonal {
       final LinearRing ring = getRing(ringIndex);
       int vertexIndex = newVertexId[1];
       final int vertexCount = ring.getVertexCount();
-      vertexIndex = vertexCount - 2 - vertexIndex;
+      if (vertexCount == 2) {
+        vertexIndex = vertexCount - 1 - vertexIndex;
+      } else {
+        vertexIndex = vertexCount - 2 - vertexIndex;
+      }
       newVertexId[1] = vertexIndex;
       if (vertexIndex >= 0 && vertexIndex < vertexCount) {
         return new PolygonVertex(this, newVertexId);

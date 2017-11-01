@@ -35,7 +35,6 @@ package com.revolsys.geometry.precision;
 import com.revolsys.geometry.index.strtree.ItemBoundable;
 import com.revolsys.geometry.index.strtree.ItemDistance;
 import com.revolsys.geometry.index.strtree.STRtree;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -171,8 +170,8 @@ public class MinimumClearance {
     }
 
     @Override
-    public double distance(final ItemBoundable<BoundingBox, FacetSequence> b1,
-      final ItemBoundable<BoundingBox, FacetSequence> b2) {
+    public double distance(final ItemBoundable<FacetSequence> b1,
+      final ItemBoundable<FacetSequence> b2) {
       final FacetSequence fs1 = b1.getItem();
       final FacetSequence fs2 = b2.getItem();
       this.minDist = Double.MAX_VALUE;

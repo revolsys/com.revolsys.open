@@ -40,13 +40,13 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     return new LineStringEditor(geometryFactory, axisCount, coordinates);
   }
 
-  private int axisCount;
+  protected int axisCount;
 
-  private double[] coordinates;
+  protected double[] coordinates;
 
   private LineString line;
 
-  private int vertexCount;
+  protected int vertexCount;
 
   private BoundingBox boundingBox;
 
@@ -499,6 +499,18 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       }
     }
     return this.coordinates;
+  }
+
+  @Override
+  public Geometry getCurrentGeometry() {
+    final int vertexCount = getVertexCount();
+    if (vertexCount == 0) {
+      return newLineStringEmpty();
+    } else if (vertexCount == 1) {
+      return newPoint();
+    } else {
+      return this;
+    }
   }
 
   public LineString getOriginalGeometry() {

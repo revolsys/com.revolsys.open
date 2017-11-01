@@ -1,5 +1,6 @@
 package com.revolsys.geometry.model.editor;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -29,6 +30,21 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
   }
 
   @Override
+  public Geometry getCurrentGeometry() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int vertexCount = getVertexCount();
+    if (vertexCount == 0) {
+      return newLineStringEmpty();
+    } else if (vertexCount == 1) {
+      return newPoint();
+    } else if (vertexCount == 2 || !isClosed()) {
+      return newLineString(geometryFactory, this.axisCount, vertexCount, this.coordinates);
+    } else {
+      return this;
+    }
+  }
+
+  @Override
   public LinearRing getOriginalGeometry() {
     return (LinearRing)super.getOriginalGeometry();
   }
@@ -47,7 +63,11 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
   public LineString newLineString(final GeometryFactory geometryFactory, final int axisCount,
     final int vertexCount, final double... coordinates) {
     final GeometryFactory geometryFactoryAxisCount = geometryFactory.convertAxisCount(axisCount);
-    return geometryFactoryAxisCount.linearRing(axisCount, vertexCount, coordinates);
+    if (isClosed()) {
+      return geometryFactoryAxisCount.linearRing(axisCount, vertexCount, coordinates);
+    } else {
+      return geometryFactoryAxisCount.lineString(axisCount, vertexCount, coordinates);
+    }
   }
 
   @Override

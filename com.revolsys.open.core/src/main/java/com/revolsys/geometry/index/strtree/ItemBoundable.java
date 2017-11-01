@@ -36,33 +36,35 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.model.BoundingBox;
+
 /**
  * Boundable wrapper for a non-Boundable spatial object. Used internally by
  * AbstractSTRtree.
  *
  * @version 1.7
  */
-public class ItemBoundable<B extends Bounds<B>, I> implements Boundable<B, I>, Serializable {
+public class ItemBoundable<I> implements Boundable<I>, Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final B bounds;
+  private final BoundingBox bounds;
 
   private final I item;
 
-  public ItemBoundable(final B bounds, final I item) {
+  public ItemBoundable(final BoundingBox bounds, final I item) {
     this.bounds = bounds;
     this.item = item;
   }
 
   @Override
-  public void boundablesAtLevel(final int level, final Collection<Boundable<B, I>> boundables) {
+  public void boundablesAtLevel(final int level, final Collection<Boundable<I>> boundables) {
     if (level == -1) {
       boundables.add(this);
     }
   }
 
   @Override
-  public B getBounds() {
+  public BoundingBox getBounds() {
     return this.bounds;
   }
 
@@ -72,8 +74,7 @@ public class ItemBoundable<B extends Bounds<B>, I> implements Boundable<B, I>, S
   }
 
   @Override
-  public void query(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds,
-    final Consumer<? super I> action) {
+  public void query(final BoundingBox searchBounds, final Consumer<? super I> action) {
     if (getBounds().intersectsBounds(searchBounds)) {
       action.accept(this.item);
     }

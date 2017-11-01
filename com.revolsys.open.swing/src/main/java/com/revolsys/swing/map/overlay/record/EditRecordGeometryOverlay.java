@@ -136,6 +136,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private GeometryEditor<?> addGeometryEditor;
 
+  private Geometry addGeometry;
+
   public EditRecordGeometryOverlay(final MapPanel map) {
     super(map);
     addOverlayAction( //
@@ -1122,10 +1124,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_ON);
 
-        GEOMETRY_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating,
-          this.addGeometryEditor);
+        final Geometry addGeometry = this.addGeometryEditor.getCurrentGeometry();
+        GEOMETRY_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating, addGeometry);
         GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating,
-          this.addGeometryEditor);
+          addGeometry);
       }
     }
     if (this.moveGeometryStart == null) {

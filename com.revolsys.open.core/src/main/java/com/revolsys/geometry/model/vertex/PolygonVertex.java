@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.util.Debug;
 
 public class PolygonVertex extends AbstractVertex {
   /**
@@ -51,10 +52,7 @@ public class PolygonVertex extends AbstractVertex {
       final int vertexCount = ring.getVertexCount();
       if (newVertexIndex == vertexCount - 1) {
         newVertexIndex = 1;
-      } else {
-        newVertexIndex -= vertexCount;
-      }
-      if (newVertexIndex < vertexCount - 1) {
+      } else if (newVertexIndex < vertexCount - 1) {
         return new PolygonVertex(getPolygon(), this.ringIndex, newVertexIndex);
       }
     }
@@ -187,5 +185,8 @@ public class PolygonVertex extends AbstractVertex {
   public void setVertexId(final int... vertexId) {
     this.ringIndex = vertexId[0];
     this.vertexIndex = vertexId[1];
+    if (this.vertexIndex < -1) {
+      Debug.noOp();
+    }
   }
 }

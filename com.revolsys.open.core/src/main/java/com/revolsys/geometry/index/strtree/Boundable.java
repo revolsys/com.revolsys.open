@@ -35,13 +35,15 @@ package com.revolsys.geometry.index.strtree;
 import java.util.Collection;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.model.BoundingBox;
+
 /**
  * A spatial object in an AbstractSTRtree.
  *
  * @version 1.7
  */
-public interface Boundable<B extends Bounds<B>, I> {
-  void boundablesAtLevel(int level, Collection<Boundable<B, I>> boundables);
+public interface Boundable<I> {
+  void boundablesAtLevel(int level, Collection<Boundable<I>> boundables);
 
   /**
    * Returns a representation of space that encloses this Boundable, preferably
@@ -51,13 +53,13 @@ public interface Boundable<B extends Bounds<B>, I> {
    * @return an BoundingBox (for STRtrees), an Interval (for SIRtrees), or other object
    * (for other subclasses of AbstractSTRtree)
    */
-  B getBounds();
+  BoundingBox getBounds();
 
   default int getChildCount() {
     return 0;
   }
 
-  default Boundable<B, I>[] getChildren() {
+  default Boundable<I>[] getChildren() {
     return null;
   }
 
@@ -81,5 +83,5 @@ public interface Boundable<B extends Bounds<B>, I> {
     return false;
   }
 
-  void query(AbstractSTRtree<B, ?, ?> tree, final B searchBounds, final Consumer<? super I> action);
+  void query(final BoundingBox searchBounds, final Consumer<? super I> action);
 }

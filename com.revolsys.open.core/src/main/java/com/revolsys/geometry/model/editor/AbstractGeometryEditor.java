@@ -42,7 +42,11 @@ public abstract class AbstractGeometryEditor<GE extends GeometryEditor<?>>
   }
 
   public AbstractGeometryEditor(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
+    if (geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.DEFAULT_2D;
+    } else {
+      this.geometryFactory = geometryFactory;
+    }
   }
 
   /**
@@ -101,7 +105,11 @@ public abstract class AbstractGeometryEditor<GE extends GeometryEditor<?>>
 
   @Override
   public int getAxisCount() {
-    return this.geometryFactory.getAxisCount();
+    if (this.geometryFactory == null) {
+      return 2;
+    } else {
+      return this.geometryFactory.getAxisCount();
+    }
   }
 
   @Override

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.number.Doubles;
@@ -149,6 +150,11 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
         return java.lang.Double.NaN;
       }
     }
+  }
+
+  @Override
+  public Geometry getCurrentGeometry() {
+    return this;
   }
 
   @Override

@@ -49,7 +49,7 @@ import com.revolsys.geometry.util.PriorityQueue;
  *
  */
 class BoundablePair<I> implements Comparable<BoundablePair<I>> {
-  private static double area(final Boundable<BoundingBox, ?> b) {
+  private static double area(final Boundable<?> b) {
     return b.getBounds().getArea();
   }
 
@@ -64,38 +64,37 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
    * @return
    */
   public static <ITEM> double distance(final ItemDistance<ITEM> itemDistance,
-    final Boundable<BoundingBox, ITEM> boundable1, final Boundable<BoundingBox, ITEM> boundable2) {
+    final Boundable<ITEM> boundable1, final Boundable<ITEM> boundable2) {
     if (boundable1.isNode() || boundable2.isNode()) {
       final BoundingBox bounds1 = boundable1.getBounds();
       final BoundingBox bounds2 = boundable2.getBounds();
       return bounds1.distance(bounds2);
     } else {
-      final ItemBoundable<BoundingBox, ITEM> item1 = (ItemBoundable<BoundingBox, ITEM>)boundable1;
-      final ItemBoundable<BoundingBox, ITEM> item2 = (ItemBoundable<BoundingBox, ITEM>)boundable2;
+      final ItemBoundable<ITEM> item1 = (ItemBoundable<ITEM>)boundable1;
+      final ItemBoundable<ITEM> item2 = (ItemBoundable<ITEM>)boundable2;
       return itemDistance.distance(item1, item2);
     }
   }
 
-  public static boolean isLeaves(final Boundable<?, ?> boundable1,
-    final Boundable<?, ?> boundable2) {
+  public static boolean isLeaves(final Boundable<?> boundable1, final Boundable<?> boundable2) {
     return !(boundable1.isNode() || boundable2.isNode());
   }
 
-  private final Boundable<BoundingBox, I> boundable1;
+  private final Boundable<I> boundable1;
 
-  private final Boundable<BoundingBox, I> boundable2;
+  private final Boundable<I> boundable2;
 
   private final double distance;
 
-  public BoundablePair(final Boundable<BoundingBox, I> boundable1,
-    final Boundable<BoundingBox, I> boundable2, final double distance) {
+  public BoundablePair(final Boundable<I> boundable1, final Boundable<I> boundable2,
+    final double distance) {
     this.boundable1 = boundable1;
     this.boundable2 = boundable2;
     this.distance = distance;
   }
 
-  public BoundablePair(final Boundable<BoundingBox, I> boundable1,
-    final Boundable<BoundingBox, I> boundable2, final ItemDistance<I> itemDistance) {
+  public BoundablePair(final Boundable<I> boundable1, final Boundable<I> boundable2,
+    final ItemDistance<I> itemDistance) {
     this.boundable1 = boundable1;
     this.boundable2 = boundable2;
     this.distance = distance(itemDistance, this.boundable1, this.boundable2);
@@ -115,13 +114,13 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
     }
   }
 
-  private void expand(final Boundable<BoundingBox, I> bndComposite,
-    final Boundable<BoundingBox, I> bndOther, final PriorityQueue<BoundablePair<I>> priQ,
-    final ItemDistance<I> itemDistance, final double minDistance) {
+  private void expand(final Boundable<I> bndComposite, final Boundable<I> bndOther,
+    final PriorityQueue<BoundablePair<I>> priQ, final ItemDistance<I> itemDistance,
+    final double minDistance) {
     final int childCount = bndComposite.getChildCount();
-    final Boundable<BoundingBox, I>[] children = bndComposite.getChildren();
+    final Boundable<I>[] children = bndComposite.getChildren();
     for (int i = 0; i < childCount; i++) {
-      final Boundable<BoundingBox, I> child = children[i];
+      final Boundable<I> child = children[i];
       final double distance = BoundablePair.distance(itemDistance, child, bndOther);
       // only add to queue if this pair might contain the closest points
       if (distance < minDistance) {
@@ -171,7 +170,7 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
    * @param i the index of the member to return (0 or 1)
    * @return the chosen member
    */
-  public Boundable<BoundingBox, I> getBoundable(final int i) {
+  public Boundable<I> getBoundable(final int i) {
     if (i == 0) {
       return this.boundable1;
     }

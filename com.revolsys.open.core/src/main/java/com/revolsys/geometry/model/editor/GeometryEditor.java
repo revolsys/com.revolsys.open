@@ -2,6 +2,7 @@ package com.revolsys.geometry.model.editor;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.vertex.Vertex;
 
@@ -12,6 +13,16 @@ public interface GeometryEditor<GE extends GeometryEditor<?>> extends Geometry {
   }
 
   GeometryEditor<?> appendVertex(int[] geometryId, Point point);
+
+  @Override
+  default <V extends Geometry> V convertGeometry(final GeometryFactory geometryFactory) {
+    final Geometry geometry = getCurrentGeometry();
+    if (geometry == this) {
+      return Geometry.super.convertGeometry(geometryFactory);
+    } else {
+      return geometry.convertGeometry(geometryFactory);
+    }
+  }
 
   GeometryEditor<?> deleteVertex(int[] vertexId);
 
@@ -38,6 +49,8 @@ public interface GeometryEditor<GE extends GeometryEditor<?>> extends Geometry {
     final int axisCount = getAxisCount();
     return equalsVertex(axisCount, vertexId, point);
   }
+
+  Geometry getCurrentGeometry();
 
   default int[] getFirstGeometryId() {
     return new int[0];

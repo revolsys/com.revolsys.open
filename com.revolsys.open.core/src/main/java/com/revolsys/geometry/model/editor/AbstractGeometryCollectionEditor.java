@@ -199,6 +199,17 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
     }
   }
 
+  @Override
+  public Geometry getCurrentGeometry() {
+    final List<Geometry> geometries = new ArrayList<>();
+    for (final GE editor : this.editors) {
+      final Geometry currentGeometry = editor.getCurrentGeometry();
+      geometries.add(currentGeometry);
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.geometry(geometries);
+  }
+
   public GE getEditor(final int partIndex) {
     if (0 <= partIndex && partIndex < this.editors.size()) {
       return this.editors.get(partIndex);

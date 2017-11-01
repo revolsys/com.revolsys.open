@@ -81,7 +81,7 @@ public class STRtreeDemo {
     }
 
     @Override
-    public List<List<Boundable<BoundingBox, Object>>> verticalSlices(final List childBoundables,
+    public List<List<Boundable<Object>>> verticalSlices(final List childBoundables,
       final int size) {
       return super.verticalSlices(childBoundables, size);
     }
@@ -100,7 +100,7 @@ public class STRtreeDemo {
   private static final int NODE_CAPACITY = 4;
 
   private static BoundingBox envelope(final Boundable b) {
-    return (BoundingBox)b.getBounds();
+    return b.getBounds();
   }
 
   private static void initTree(final TestTree t, final List sourceEnvelopes) {

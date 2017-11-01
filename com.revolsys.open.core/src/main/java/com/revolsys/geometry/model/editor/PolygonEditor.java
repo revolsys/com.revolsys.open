@@ -70,9 +70,24 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   }
 
   public PolygonalEditor appendVertex(final int ringIndex, final Point point) {
-    final LinearRingEditor editor = getEditor(ringIndex);
-    if (editor != null) {
+    LinearRingEditor editor = getEditor(ringIndex);
+    if (editor == null) {
+      if (ringIndex == 0) {
+        editor = new LinearRingEditor(this);
+        this.editors.add(editor);
+      } else {
+        return this;
+      }
+    }
+    final int vertexCount = editor.getVertexCount();
+    if (vertexCount < 2) {
       editor.appendVertex(point);
+    } else if (vertexCount == 2) {
+      editor.appendVertex(point);
+      final Point firstPoint = editor.getPoint(0);
+      editor.appendVertex(firstPoint);
+    } else {
+      editor.insertVertex(vertexCount - 1, point);
     }
     return this;
   }
@@ -185,6 +200,40 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
     for (final GeometryEditor<?> editor : this.editors) {
       editor.forEachVertex(action);
     }
+  }
+
+  @Override
+  public Geometry getCurrentGeometry() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (isEmpty()) {
+      return geometryFactory.polygon();
+    }
+    final List<LinearRing> rings = new ArrayList<>();
+    final List<Geometry> geometries = new ArrayList<>();
+    boolean shell = true;
+    for (final LinearRingEditor editor : this.editors) {
+      final Geometry ringGeometry = editor.getCurrentGeometry();
+      if (ringGeometry instanceof LinearRing) {
+        final LinearRing ring = (LinearRing)ringGeometry;
+        if (shell || !rings.isEmpty()) {
+          rings.add(ring);
+        } else {
+          geometries.add(ringGeometry);
+        }
+      } else {
+        geometries.add(ringGeometry);
+      }
+      shell = false;
+    }
+    if (!rings.isEmpty()) {
+      final Polygon polygon = geometryFactory.polygon(rings);
+      if (geometries.isEmpty()) {
+        return polygon;
+      } else {
+        geometries.add(polygon);
+      }
+    }
+    return geometryFactory.geometry(geometries);
   }
 
   public LinearRingEditor getEditor(final int ringIndex) {

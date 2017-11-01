@@ -1194,10 +1194,10 @@ public interface BoundingBox extends BoundingBoxProxy, Emptyable, GeometryFactor
 
   default BoundingBox toCoordinateSystem(final CoordinateSystem coordinateSystem,
     final int minAxisCount) {
-    if (coordinateSystem == null) {
+    final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
+    if (coordinateSystem == null || coordinateSystemThis == null) {
       return this;
     } else {
-      final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
       if (coordinateSystemThis == coordinateSystem || coordinateSystemThis
         .getCoordinateSystemId() == coordinateSystem.getCoordinateSystemId()) {
         return this;

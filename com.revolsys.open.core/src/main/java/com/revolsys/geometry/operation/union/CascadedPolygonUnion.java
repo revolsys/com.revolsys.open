@@ -33,6 +33,7 @@
 package com.revolsys.geometry.operation.union;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
@@ -135,6 +136,10 @@ public class CascadedPolygonUnion {
   public static Polygonal union(final Iterable<? extends Polygonal> polygons) {
     final CascadedPolygonUnion op = new CascadedPolygonUnion(polygons);
     return op.union();
+  }
+
+  public static Polygonal union(final Polygonal... polygons) {
+    return union(Arrays.asList(polygons));
   }
 
   private GeometryFactory geometryFactory;
