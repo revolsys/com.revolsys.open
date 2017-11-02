@@ -32,9 +32,9 @@
  */
 package com.revolsys.geometry.precision;
 
-import com.revolsys.geometry.index.strtree.ItemBoundable;
+import com.revolsys.geometry.index.strtree.StrTreeLeaf;
 import com.revolsys.geometry.index.strtree.ItemDistance;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -99,7 +99,7 @@ import com.revolsys.util.Pair;
  * {@link #getDistance()} and {@link #getLine()}.
  * <p>
  * The computation of Minimum Clearance utilizes
- * the {@link STRtree#nearestNeighbour(ItemDistance)}
+ * the {@link StrTree#nearestNeighbour(ItemDistance)}
  * method to provide good performance even for
  * large inputs.
  * <p>
@@ -170,8 +170,8 @@ public class MinimumClearance {
     }
 
     @Override
-    public double distance(final ItemBoundable<FacetSequence> b1,
-      final ItemBoundable<FacetSequence> b2) {
+    public double distance(final StrTreeLeaf<FacetSequence> b1,
+      final StrTreeLeaf<FacetSequence> b2) {
       final FacetSequence fs1 = b1.getItem();
       final FacetSequence fs2 = b2.getItem();
       this.minDist = Double.MAX_VALUE;
@@ -321,7 +321,7 @@ public class MinimumClearance {
       this.minClearance = Double.MAX_VALUE;
 
       if (!this.geometry.isEmpty()) {
-        final STRtree<FacetSequence> geomTree = FacetSequenceTreeBuilder.build(this.geometry);
+        final StrTree<FacetSequence> geomTree = FacetSequenceTreeBuilder.build(this.geometry);
 
         final Pair<FacetSequence, FacetSequence> nearest = geomTree
           .nearestNeighbour(new MinClearanceDistance(this.calculateLine));

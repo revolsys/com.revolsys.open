@@ -37,7 +37,7 @@ import java.util.List;
 
 import com.revolsys.geometry.geomgraph.GeometryGraph;
 import com.revolsys.geometry.index.SpatialIndex;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
@@ -70,7 +70,7 @@ public class IndexedNestedRingTester {
   }
 
   private void buildIndex() {
-    this.index = new STRtree();
+    this.index = new StrTree();
 
     for (int i = 0; i < this.rings.size(); i++) {
       final LinearRing ring = (LinearRing)this.rings.get(i);

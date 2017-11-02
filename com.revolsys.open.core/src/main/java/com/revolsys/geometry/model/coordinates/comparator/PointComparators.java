@@ -8,6 +8,28 @@ import com.revolsys.util.MathUtil;
 
 public interface PointComparators {
 
+  static <P extends Point> Comparator<P> leftLowest() {
+    return (point1, point2) -> {
+      final double x1 = point1.getX();
+      final double x2 = point2.getX();
+      if (x1 < x2) {
+        return -1;
+      } else if (x1 > x2) {
+        return 1;
+      } else {
+        final double y1 = point1.getY();
+        final double y2 = point2.getY();
+        if (y1 < y2) {
+          return -1;
+        } else if (y1 > y2) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
+    };
+  }
+
   static <P extends Point> Comparator<P> lowestLeft() {
     return (point1, point2) -> {
       final double y1 = point1.getY();

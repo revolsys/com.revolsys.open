@@ -36,7 +36,7 @@ package com.revolsys.geometry.noding.snapround;
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.chain.MonotoneChain;
 import com.revolsys.geometry.index.chain.MonotoneChainSelectAction;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentString;
@@ -94,10 +94,10 @@ public class MCIndexPointSnapper {
 
   }
 
-  private final STRtree index;
+  private final StrTree index;
 
   public MCIndexPointSnapper(final SpatialIndex index) {
-    this.index = (STRtree)index;
+    this.index = (StrTree)index;
   }
 
   public boolean snap(final HotPixel hotPixel) {

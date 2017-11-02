@@ -37,11 +37,9 @@ import java.util.List;
 
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.chain.MonotoneChain;
 import com.revolsys.geometry.index.chain.MonotoneChainBuilder;
 import com.revolsys.geometry.index.chain.MonotoneChainSelectAction;
-import com.revolsys.geometry.index.strtree.STRtree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
@@ -51,10 +49,11 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.noding.BasicSegmentString;
+import com.revolsys.geometry.noding.MonotoneChainIndex;
 import com.revolsys.geometry.noding.SegmentString;
 
 class MCIndexedGeometry {
-  private final SpatialIndex index = new STRtree();
+  private final MonotoneChainIndex index = new MonotoneChainIndex();
 
   public MCIndexedGeometry(final Geometry geom) {
     init(geom);
@@ -62,10 +61,10 @@ class MCIndexedGeometry {
 
   private void addLine(final LineString points) {
     final SegmentString segStr = new BasicSegmentString(points, null);
-    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getLineString(),
+    final List<MonotoneChain> chains = MonotoneChainBuilder.getChains(segStr.getLineString(),
       segStr);
-    for (final MonotoneChain mc : segChains) {
-      this.index.insertItem(mc.getEnvelope(), mc);
+    for (final MonotoneChain chain : chains) {
+      this.index.insertItem(chain);
     }
   }
 

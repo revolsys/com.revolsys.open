@@ -22,7 +22,6 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.index.strtree.Bounds;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
@@ -39,8 +38,8 @@ import com.revolsys.util.Property;
 import com.revolsys.util.function.Consumer3;
 import com.revolsys.util.number.Doubles;
 
-public interface BoundingBox extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable,
-  Serializable, Bounds<BoundingBox> {
+public interface BoundingBox
+  extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
   public static final int OUT_LEFT = 1;
 
   public static final int OUT_TOP = 2;
@@ -753,11 +752,11 @@ public interface BoundingBox extends BoundingBoxProxy, Emptyable, GeometryFactor
   }
 
   default double getCentreX() {
-    return getMinX() + getWidth() / 2;
+    return (getMinX() + getMaxX()) / 2;
   }
 
   default double getCentreY() {
-    return getMinY() + getHeight() / 2;
+    return (getMinY() + getMaxY()) / 2;
   }
 
   /**
@@ -1096,15 +1095,6 @@ public interface BoundingBox extends BoundingBoxProxy, Emptyable, GeometryFactor
     return !(x1 > maxX1 || x2 < minX1 || y1 > maxY1 || y2 < minY1);
   }
 
-  @Override
-  default boolean intersectsBounds(final BoundingBox boundingBox) {
-    final double minX2 = boundingBox.getMinX();
-    final double minY2 = boundingBox.getMinY();
-    final double maxX2 = boundingBox.getMaxX();
-    final double maxY2 = boundingBox.getMaxY();
-    return intersects(minX2, minY2, maxX2, maxY2);
-  }
-
   /**
    * Fast version of intersects that assumes it's in the same coordinate system.
    *
@@ -1112,11 +1102,11 @@ public interface BoundingBox extends BoundingBoxProxy, Emptyable, GeometryFactor
    * @return
    */
   default boolean intersectsFast(final BoundingBox boundingBox) {
-    final double minX2 = boundingBox.getMinX();
-    final double minY2 = boundingBox.getMinY();
-    final double maxX2 = boundingBox.getMaxX();
-    final double maxY2 = boundingBox.getMaxY();
-    return intersects(minX2, minY2, maxX2, maxY2);
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    return intersects(minX, minY, maxX, maxY);
   }
 
   default boolean isWithinDistance(final BoundingBox boundingBox, final double maxDistance) {

@@ -33,7 +33,6 @@
 package com.revolsys.geometry.geomgraph.index;
 
 import com.revolsys.geometry.geomgraph.Edge;
-import com.revolsys.geometry.util.BoundingBoxUtil;
 
 /**
  * MonotoneChains are a way of partitioning the segments of an edge to
@@ -76,37 +75,46 @@ public class MonotoneChainEdge {
     }
   }
 
-  private void computeIntersectsForChain(final int start0, final int end0,
-    final MonotoneChainEdge mce, final int start1, final int end1, final SegmentIntersector ei) {
+  private void computeIntersectsForChain(final Edge edge1, final int start0, final int end0,
+    final Edge edge2, final int start1, final int end1, final SegmentIntersector ei) {
 
     // terminating condition for the recursion
-    final Edge edge1 = this.edge;
-    final Edge edge2 = mce.edge;
     if (end0 - start0 == 1 && end1 - start1 == 1) {
       ei.addIntersections(edge1, start0, edge2, start1);
       return;
     }
-    double p0x0 = edge1.getX(start0);
-    double p0y0 = edge1.getY(start0);
-    double p0x1 = edge1.getX(end0);
-    double p0y1 = edge1.getY(end0);
-    if (p0x0 > p0x1) {
-      final double t = p0x0;
-      p0x0 = p0x1;
-      p0x1 = t;
+    double minX1 = edge1.getX(start0);
+    double minY1 = edge1.getY(start0);
+    double maxX1 = edge1.getX(end0);
+    double maxY1 = edge1.getY(end0);
+    if (minX1 > maxX1) {
+      final double t = minX1;
+      minX1 = maxX1;
+      maxX1 = t;
     }
-    if (p0y0 > p0y1) {
-      final double t = p0y0;
-      p0y0 = p0y1;
-      p0y1 = t;
+    if (minY1 > maxY1) {
+      final double t = minY1;
+      minY1 = maxY1;
+      maxY1 = t;
     }
 
-    final double p1x0 = edge2.getX(start1);
-    final double p1y0 = edge2.getY(start1);
-    final double p1x1 = edge2.getX(end1);
-    final double p1y1 = edge2.getY(end1);
+    double minX2 = edge2.getX(start1);
+    double minY2 = edge2.getY(start1);
+    double maxX2 = edge2.getX(end1);
+    double maxY2 = edge2.getY(end1);
+    if (minX2 > maxX2) {
+      final double t = minX2;
+      minX2 = maxX2;
+      maxX2 = t;
+    }
+    if (minY2 > maxY2) {
+      final double t = minY2;
+      minY2 = maxY2;
+      maxY2 = t;
+    }
+
     // nothing to do if the envelopes of these chains don't overlap
-    if (!BoundingBoxUtil.intersects(p0x0, p0y0, p0x1, p0y1, p1x0, p1y0, p1x1, p1y1)) {
+    if (minX2 > maxX1 || maxX2 < minX1 || minY2 > maxY1 || maxY2 < minY1) {
       return;
     }
 
@@ -118,26 +126,27 @@ public class MonotoneChainEdge {
     // check terminating conditions before recursing
     if (start0 < mid0) {
       if (start1 < mid1) {
-        computeIntersectsForChain(start0, mid0, mce, start1, mid1, ei);
+        computeIntersectsForChain(edge1, start0, mid0, edge2, start1, mid1, ei);
       }
       if (mid1 < end1) {
-        computeIntersectsForChain(start0, mid0, mce, mid1, end1, ei);
+        computeIntersectsForChain(edge1, start0, mid0, edge2, mid1, end1, ei);
       }
     }
     if (mid0 < end0) {
       if (start1 < mid1) {
-        computeIntersectsForChain(mid0, end0, mce, start1, mid1, ei);
+        computeIntersectsForChain(edge1, mid0, end0, edge2, start1, mid1, ei);
       }
       if (mid1 < end1) {
-        computeIntersectsForChain(mid0, end0, mce, mid1, end1, ei);
+        computeIntersectsForChain(edge1, mid0, end0, edge2, mid1, end1, ei);
       }
     }
   }
 
   public void computeIntersectsForChain(final int chainIndex0, final MonotoneChainEdge mce,
     final int chainIndex1, final SegmentIntersector si) {
-    computeIntersectsForChain(this.startIndex[chainIndex0], this.startIndex[chainIndex0 + 1], mce,
-      mce.startIndex[chainIndex1], mce.startIndex[chainIndex1 + 1], si);
+    computeIntersectsForChain(this.edge, this.startIndex[chainIndex0],
+      this.startIndex[chainIndex0 + 1], mce.edge, mce.startIndex[chainIndex1],
+      mce.startIndex[chainIndex1 + 1], si);
   }
 
   public int getStartIndexCount() {

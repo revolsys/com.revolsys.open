@@ -10,9 +10,6 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.Emptyable;
 
 public abstract class AbstractNode<T> implements Emptyable, Serializable {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private static int computeQuadLevel(final double... bounds) {

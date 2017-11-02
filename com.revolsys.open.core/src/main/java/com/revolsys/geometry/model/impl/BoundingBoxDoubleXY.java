@@ -144,13 +144,20 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     }
   }
 
-  private double maxX;
+  protected double maxX;
 
-  private double maxY;
+  protected double maxY;
 
-  private double minX;
+  protected double minX;
 
-  private double minY;
+  protected double minY;
+
+  protected BoundingBoxDoubleXY() {
+    this.minX = Double.POSITIVE_INFINITY;
+    this.maxX = Double.NEGATIVE_INFINITY;
+    this.minY = Double.POSITIVE_INFINITY;
+    this.maxY = Double.NEGATIVE_INFINITY;
+  }
 
   public BoundingBoxDoubleXY(final BoundingBox boundingBox) {
     this.minX = boundingBox.getMinX();
@@ -217,6 +224,13 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
   }
 
+  protected void clear() {
+    this.minX = Double.POSITIVE_INFINITY;
+    this.maxX = Double.NEGATIVE_INFINITY;
+    this.maxY = Double.NEGATIVE_INFINITY;
+    this.minY = Double.POSITIVE_INFINITY;
+  }
+
   public boolean covers(final double minX, final double maxX, final double minY,
     final double maxY) {
     return BoundingBoxUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX,
@@ -233,9 +247,55 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     }
   }
 
+  /**
+   * minX must be <= maxX, minY must be <= maxY
+   *
+   * @param minX
+   * @param minY
+   * @param maxX
+   * @param maxY
+   */
+  protected void expand(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    if (minX < this.minX) {
+      this.minX = minX;
+    }
+    if (minY < this.minY) {
+      this.minY = minY;
+    }
+    if (maxX > this.maxX) {
+      this.maxX = maxX;
+    }
+    if (maxY > this.maxY) {
+      this.maxY = maxY;
+    }
+  }
+
+  @Override
+  public double getArea() {
+    final double width = this.maxX - this.minX;
+    final double height = this.maxY - this.minY;
+    final double area = width * height;
+    if (Double.isFinite(area)) {
+      return area;
+    } else {
+      return 0;
+    }
+  }
+
   @Override
   public int getAxisCount() {
     return 2;
+  }
+
+  @Override
+  public double getCentreX() {
+    return (this.minX + this.maxX) / 2;
+  }
+
+  @Override
+  public double getCentreY() {
+    return (this.minY + this.maxY) / 2;
   }
 
   @Override

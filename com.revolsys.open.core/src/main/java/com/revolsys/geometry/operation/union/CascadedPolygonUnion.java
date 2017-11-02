@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -79,7 +79,7 @@ public class CascadedPolygonUnion {
    * The effectiveness of the index is somewhat sensitive
    * to the node capacity.
    * Testing indicates that a smaller capacity is better.
-   * For an STRtree, 4 is probably a good number (since
+   * For an StrTree, 4 is probably a good number (since
    * this produces 2x2 "squares").
    */
   private static final int STRTREE_NODE_CAPACITY = 4;
@@ -272,7 +272,7 @@ public class CascadedPolygonUnion {
        * This makes unioning more efficient, since vertices are more likely
        * to be eliminated on each round.
        */
-      final STRtree<Polygon> index = new STRtree<>(STRTREE_NODE_CAPACITY);
+      final StrTree<Polygon> index = new StrTree<>(STRTREE_NODE_CAPACITY);
       for (final Polygon polygon : this.polygons) {
         final BoundingBox boundingBox = polygon.getBoundingBox();
         index.insertItem(boundingBox, polygon);
