@@ -232,14 +232,19 @@ public class Edge extends GraphComponent implements DelegatingLineString {
   public boolean isCollapsed() {
     if (!this.label.isArea()) {
       return false;
-    }
-    if (getVertexCount() != 3) {
+    } else if (getVertexCount() != 3) {
       return false;
+    } else {
+      final double x1 = getX(0);
+      final double x2 = getX(2);
+      if (x1 == x2) {
+        final double y1 = getY(0);
+        final double y2 = getY(2);
+        return y1 == y2;
+      } else {
+        return false;
+      }
     }
-    if (getPoint(0).equals(getPoint(2))) {
-      return true;
-    }
-    return false;
   }
 
   @Override

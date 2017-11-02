@@ -122,8 +122,7 @@ public class NonRobustLineIntersector extends LineIntersector {
     }
   }
 
-  @Override
-  protected int computeIntersect(final double line1x1, final double line1y1, final double line1x2,
+  private int computeIntersect(final double line1x1, final double line1y1, final double line1x2,
     final double line1y2, final double line2x1, final double line2y1, final double line2x2,
     final double line2y2) {
     this.isProper = false;
@@ -240,6 +239,23 @@ public class NonRobustLineIntersector extends LineIntersector {
     }
     this.intersectionCount = POINT_INTERSECTION;
     return true;
+  }
+
+  @Override
+  public boolean computeIntersection(final double line1x1, final double line1y1,
+    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
+    final double line2x2, final double line2y2) {
+    this.line1x1 = line1x1;
+    this.line1y1 = line1y1;
+    this.line1x2 = line1x2;
+    this.line1y2 = line1y2;
+    this.line2x1 = line2x1;
+    this.line2y1 = line2y1;
+    this.line2x2 = line2x2;
+    this.line2y2 = line2y2;
+    this.intersectionCount = computeIntersect(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+      line2x2, line2y2);
+    return hasIntersection();
   }
 
   /**

@@ -238,21 +238,14 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
        * ordinate of intersection with the x-axis. (y2 != y1, so denominator
        * will never be 0.0)
        */
-      // double xIntSign = RobustDeterminant.signOfDet2x2(x1, y1, x2, y2) / (y2
-      // - y1);
-      // MD - faster & more robust computation?
       double xIntSign = RobustDeterminant.signOfDet2x2(deltaX1, deltaY1, deltaX2, deltaY2);
       if (xIntSign == 0.0) {
         this.pointOnSegment = true;
       } else {
         if (deltaY2 < deltaY1) {
           xIntSign = -xIntSign;
-          // xsave = xInt;
         }
 
-        // System.out.println("xIntSign(" + x1 + ", " + y1 + ", " + x2 + ", " +
-        // y2
-        // + " = " + xIntSign);
         // The segment crosses the ray if the sign is strictly positive.
         if (xIntSign > 0.0) {
           this.crossingCount++;

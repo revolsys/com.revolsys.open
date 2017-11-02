@@ -162,7 +162,8 @@ public class PolygonBuilder {
   private EdgeRing findEdgeRingContaining(final EdgeRing testEr, final List<EdgeRing> shellList) {
     final LinearRing testRing = testEr.getLinearRing();
     final BoundingBox testEnv = testRing.getBoundingBox();
-    final Point testPt = testRing.getPoint(0);
+    final double testX = testRing.getX(0);
+    final double testY = testRing.getY(0);
 
     EdgeRing minShell = null;
     BoundingBox minEnv = null;
@@ -173,7 +174,7 @@ public class PolygonBuilder {
         minEnv = minShell.getLinearRing().getBoundingBox();
       }
       boolean isContained = false;
-      if (tryEnv.covers(testEnv) && tryRing.isPointInRing(testPt)) {
+      if (tryEnv.covers(testEnv) && tryRing.isPointInRing(testX, testY)) {
         isContained = true;
       }
       // check if this new containing ring is smaller than the current minimum
@@ -238,7 +239,7 @@ public class PolygonBuilder {
       if (hole.getShell() == null) {
         final EdgeRing shell = findEdgeRingContaining(hole, shellList);
         if (shell == null) {
-          throw new TopologyException("unable to assign hole to a shell", hole.getCoordinate(0));
+          throw new TopologyException("unable to assign hole to a shell", hole.getFirstPoint());
         } else {
           hole.setShell(shell);
         }

@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.model.util;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.Triangles;
 
@@ -208,14 +207,10 @@ public class TriangleImpl {
    * the triangle is oriented CW, and negative if it is oriented CCW.
    * <p>
    * The signed area value can be used to determine point orientation, but the
-   * implementation in this method is susceptible to round-off errors. Use
-   * {@link CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)}
-   * for robust orientation calculation.
+   * implementation in this method is susceptible to round-off errors.
    *
    * @return the signed 2D area of this triangle
-   *
-   * @see CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)
-   */
+    */
   public double signedArea() {
     return Triangles.signedArea(this.p0, this.p1, this.p2);
   }

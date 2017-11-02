@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.editor.LineStringEditor;
+import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.util.Strings;
 
 /**
@@ -142,30 +142,39 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    * The label for the new edge is the same as the label for the parent edge.
    */
   Edge newSplitEdge(final EdgeIntersection ei0, final EdgeIntersection ei1) {
-    // Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
-    int pointCount = ei1.segmentIndex - ei0.segmentIndex + 2;
+    final int fromIndex = ei0.segmentIndex;
+    final int toIndex = ei1.segmentIndex;
+    int pointCount = toIndex - fromIndex + 2;
 
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
     // (This check is needed because the distance metric is not totally
     // reliable!)
     // The check for point equality is 2D only - Z values are ignored
-    final boolean useIntPt1 = ei1.dist > 0.0
-      || !this.edge.equalsVertex(ei1.segmentIndex, ei1.getX(), ei1.getY());
+    final double xEnd = ei1.getX();
+    final double yEnd = ei1.getY();
+    final Edge edge = this.edge;
+    final boolean useIntPt1 = ei1.dist > 0.0 || !edge.equalsVertex(toIndex, xEnd, yEnd);
     if (!useIntPt1) {
       pointCount--;
     }
 
-    final LineStringEditor lineEditor = new LineStringEditor(2, pointCount);
-    lineEditor.appendVertex(ei0.getX(), ei0.getY());
-    for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
-      lineEditor.appendVertex(this.edge.getX(i), this.edge.getY(i));
+    final double[] coordinates = new double[pointCount * 2];
+    int coordinateIndex = 0;
+    coordinates[coordinateIndex++] = ei0.getX();
+    coordinates[coordinateIndex++] = ei0.getY();
+    for (int i = fromIndex + 1; i <= toIndex; i++) {
+      final double x = edge.getX(i);
+      final double y = edge.getY(i);
+      coordinates[coordinateIndex++] = x;
+      coordinates[coordinateIndex++] = y;
     }
     if (useIntPt1) {
-      lineEditor.appendVertex(ei1.getX(), ei1.getY());
+      coordinates[coordinateIndex++] = xEnd;
+      coordinates[coordinateIndex++] = yEnd;
     }
-    final LineString line = lineEditor.newLineString();
-    return new Edge(line, new Label(this.edge.label));
+    final LineString line = new LineStringDouble(2, coordinates);
+    return new Edge(line, new Label(edge.label));
   }
 
   @Override

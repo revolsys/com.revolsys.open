@@ -42,7 +42,6 @@ import com.revolsys.geometry.test.old.algorithm.ConvexHullTest;
 import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
 import com.revolsys.geometry.test.old.algorithm.IsCounterClockWiseTest;
 import com.revolsys.geometry.test.old.algorithm.NonRobustLineIntersectorTest;
-import com.revolsys.geometry.test.old.algorithm.OrientationIndexTest;
 import com.revolsys.geometry.test.old.algorithm.RobustLineIntersectionTest;
 import com.revolsys.geometry.test.old.geom.AreaLengthTest;
 import com.revolsys.geometry.test.old.geom.GeometryCollectionImplTest;
@@ -81,7 +80,7 @@ import junit.framework.TestCase;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  AngleTest.class, AreaLengthTest.class, CascadedPolygonUnionTest.class, OrientationIndexTest.class,
+  AngleTest.class, AreaLengthTest.class, CascadedPolygonUnionTest.class,
   ConformingDelaunayTest.class, ConvexHullTest.class, DelaunayTest.class, DistanceTest.class,
   GeometryCollectionImplTest.class, GeometryImplTest.class, IntersectionMatrixTest.class,
   IsCounterClockWiseTest.class, IsRectangleTest.class, IsValidTest.class,

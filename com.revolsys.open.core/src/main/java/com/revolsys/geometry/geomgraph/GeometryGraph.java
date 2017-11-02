@@ -39,12 +39,11 @@ import java.util.Map;
 
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
 import com.revolsys.geometry.algorithm.LineIntersector;
-import com.revolsys.geometry.algorithm.PointLocator;
-import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.geometry.geomgraph.index.EdgeSetIntersector;
 import com.revolsys.geometry.geomgraph.index.SegmentIntersector;
 import com.revolsys.geometry.geomgraph.index.SimpleMCSweepLineIntersector;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
@@ -69,29 +68,18 @@ public class GeometryGraph extends PlanarGraph {
    * the "At Most One Rule":
    *    isInBoundary = (componentCount == 1)
    */
-  /*
-   * public static boolean isInBoundary(int boundaryCount) { // the "Mod-2 Rule"
-   * return boundaryCount % 2 == 1; } public static int determineBoundary(int
-   * boundaryCount) { return isInBoundary(boundaryCount) ? Location.BOUNDARY :
-   * Location.INTERIOR; }
-   */
-
   public static Location determineBoundary(final BoundaryNodeRule boundaryNodeRule,
     final int boundaryCount) {
     return boundaryNodeRule.isInBoundary(boundaryCount) ? Location.BOUNDARY : Location.INTERIOR;
   }
 
-  private final PointOnGeometryLocator areaPtLocator = null;
-
-  private final int argIndex; // the index of this geometry as an argument to a
+  private final int argIndex;
 
   private BoundaryNodeRule boundaryNodeRule = null;
 
   private Collection<Node> boundaryNodes;
 
   private final Geometry geometry;
-
-  // spatial function (used for labelling)
 
   private boolean hasTooFewPoints = false;
 
@@ -103,9 +91,6 @@ public class GeometryGraph extends PlanarGraph {
    * This is used to efficiently perform findEdge queries
    */
   private final Map<LineString, Edge> lineEdgeMap = new HashMap<>();
-
-  // for use if geometry is not Polygonal
-  private final PointLocator ptLocator = new PointLocator();
 
   /**
    * If this flag is true, the Boundary Determination Rule will used when deciding
@@ -223,34 +208,35 @@ public class GeometryGraph extends PlanarGraph {
       final LineString simplifiedRing;
       try {
         simplifiedRing = ring.removeDuplicatePoints();
+        final int vertexCount = simplifiedRing.getVertexCount();
+        if (vertexCount > 3) {
+          Location left;
+          Location right;
+          if (ring.isCounterClockwise()) {
+            left = cwRight;
+            right = cwLeft;
+          } else {
+            left = cwLeft;
+            right = cwRight;
+          }
+          final Label label = new Label(this.argIndex, Location.BOUNDARY, left, right);
+          final Edge e = new Edge(simplifiedRing, label);
+          this.lineEdgeMap.put(ring, e);
+
+          insertEdge(e);
+          // insert the endpoint as a node, to mark that it is on the boundary
+          insertPoint(this.argIndex, simplifiedRing.getPoint2D(0), Location.BOUNDARY);
+
+        } else if (vertexCount == 0) {
+          this.hasTooFewPoints = true;
+          this.invalidPoint = GeometryFactory.DEFAULT_2D.point();
+        } else {
+          this.hasTooFewPoints = true;
+          this.invalidPoint = simplifiedRing.getPoint2D(0);
+        }
       } catch (final IllegalArgumentException e) {
         this.hasTooFewPoints = true;
-        this.invalidPoint = ring.getPoint(0);
-        return;
-      }
-
-      if (simplifiedRing.getVertexCount() < 4) {
-        this.hasTooFewPoints = true;
-        this.invalidPoint = simplifiedRing.getPoint(0);
-        return;
-      } else {
-
-        Location left;
-        Location right;
-        if (ring.isCounterClockwise()) {
-          left = cwRight;
-          right = cwLeft;
-        } else {
-          left = cwLeft;
-          right = cwRight;
-        }
-        final Label label = new Label(this.argIndex, Location.BOUNDARY, left, right);
-        final Edge e = new Edge(simplifiedRing, label);
-        this.lineEdgeMap.put(ring, e);
-
-        insertEdge(e);
-        // insert the endpoint as a node, to mark that it is on the boundary
-        insertPoint(this.argIndex, simplifiedRing.getPoint(0), Location.BOUNDARY);
+        this.invalidPoint = ring.getPoint2D(0);
       }
     }
   }
@@ -290,8 +276,8 @@ public class GeometryGraph extends PlanarGraph {
     final EdgeSetIntersector esi = newEdgeSetIntersector();
     esi.computeIntersections(this.edges, g.edges, si);
     /*
-     * for (Iterator i = g.edges.iterator(); i.hasNext();) { Edge e = (Edge)
-     * i.next(); Debug.print(e.getEdgeIntersectionList()); }
+     * for (Iterator i = g.edges.iterator(); i.hasNext();) { Edge e = (Edge) i.next();
+     * Debug.print(e.getEdgeIntersectionList()); }
      */
     return si;
   }

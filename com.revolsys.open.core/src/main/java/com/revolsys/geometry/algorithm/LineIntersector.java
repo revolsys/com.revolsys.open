@@ -148,10 +148,6 @@ public abstract class LineIntersector {
     this.scale = scale;
   }
 
-  protected abstract int computeIntersect(final double line1x1, final double line1y1,
-    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
-    final double line2x2, final double line2y2);
-
   /**
    * Compute the intersection of a point p and the line p1-p2.
    * This function computes the boolean value of the hasIntersection test.
@@ -161,21 +157,9 @@ public abstract class LineIntersector {
   public abstract boolean computeIntersection(double x, double y, double x1, double y1, double x2,
     double y2);
 
-  public final boolean computeIntersection(final double line1x1, final double line1y1,
+  public abstract boolean computeIntersection(final double line1x1, final double line1y1,
     final double line1x2, final double line1y2, final double line2x1, final double line2y1,
-    final double line2x2, final double line2y2) {
-    this.line1x1 = line1x1;
-    this.line1y1 = line1y1;
-    this.line1x2 = line1x2;
-    this.line1y2 = line1y2;
-    this.line2x1 = line2x1;
-    this.line2y1 = line2y1;
-    this.line2x2 = line2x2;
-    this.line2y2 = line2y2;
-    this.intersectionCount = computeIntersect(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
-      line2x2, line2y2);
-    return hasIntersection();
-  }
+    final double line2x2, final double line2y2);
 
   /**
    * Computes the intersection of the lines p1-p2 and p3-p4.
@@ -409,21 +393,6 @@ public abstract class LineIntersector {
     return false;
   }
 
-  /**
-   * Test whether a point is a intersection point of two line segments.
-   * Note that if the intersection is a line segment, this method only tests for
-   * equality with the endpoints of the intersection segment.
-   * It does <b>not</b> return true if
-   * the input point is internal to the intersection segment.
-   *
-   * @return true if the input point is one of the intersection points.
-   */
-  public boolean isIntersection(final Point point) {
-    final double x = point.getX();
-    final double y = point.getY();
-    return isIntersection(x, y);
-  }
-
   public boolean isIntersection(final double x, final double y) {
     if (this.intersectionCount == NO_INTERSECTION) {
       return false;
@@ -438,6 +407,21 @@ public abstract class LineIntersector {
       }
       return false;
     }
+  }
+
+  /**
+   * Test whether a point is a intersection point of two line segments.
+   * Note that if the intersection is a line segment, this method only tests for
+   * equality with the endpoints of the intersection segment.
+   * It does <b>not</b> return true if
+   * the input point is internal to the intersection segment.
+   *
+   * @return true if the input point is one of the intersection points.
+   */
+  public boolean isIntersection(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return isIntersection(x, y);
   }
 
   /**

@@ -1,6 +1,5 @@
 package com.revolsys.geometry.util;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
@@ -380,9 +379,7 @@ public interface Triangles {
    * the triangle is oriented CW, and negative if it is oriented CCW.
    * <p>
    * The signed area value can be used to determine point orientation, but the
-   * implementation in this method is susceptible to round-off errors. Use
-   * {@link CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)}
-   * for robust orientation calculation.
+   * implementation in this method is susceptible to round-off errors.
    *
    * @param a
    *          a vertex of the triangle
@@ -391,8 +388,6 @@ public interface Triangles {
    * @param c
    *          a vertex of the triangle
    * @return the signed 2D area of the triangle
-   *
-   * @see CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)
    */
   static double signedArea(final Point a, final Point b, final Point c) {
     /**
