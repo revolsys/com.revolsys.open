@@ -34,12 +34,11 @@ package com.revolsys.geometry.test.old.index;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.index.strtree.Boundable;
-import com.revolsys.geometry.index.strtree.BoundingBoxNode;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
+import com.revolsys.geometry.index.strtree.StrTreeNode;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -52,7 +51,7 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
  */
 public class STRtreeDemo {
 
-  public static class TestTree extends STRtree<Object> {
+  public static class TestTree extends StrTree<Object> {
     private static final long serialVersionUID = 1L;
 
     public TestTree(final int nodeCapacity) {
@@ -60,29 +59,30 @@ public class STRtreeDemo {
     }
 
     @Override
-    public List boundablesAtLevel(final int level) {
+    public List<Boundable<Object>> boundablesAtLevel(final int level) {
       return super.boundablesAtLevel(level);
     }
 
     @Override
-    public BoundingBoxNode<Object> getRoot() {
+    public StrTreeNode<Object> getRoot() {
       return this.root;
     }
 
     @Override
-    public List newParentBoundables(final List verticalSlice, final int newLevel) {
+    public List<StrTreeNode<Object>> newParentBoundables(
+      final List<? extends Boundable<Object>> verticalSlice, final int newLevel) {
       return super.newParentBoundables(verticalSlice, newLevel);
     }
 
     @Override
-    public List newParentBoundablesFromVerticalSlice(final List childBoundables,
-      final int newLevel) {
+    public List<StrTreeNode<Object>> newParentBoundablesFromVerticalSlice(
+      final List<? extends Boundable<Object>> childBoundables, final int newLevel) {
       return super.newParentBoundablesFromVerticalSlice(childBoundables, newLevel);
     }
 
     @Override
-    public List<List<Boundable<Object>>> verticalSlices(final List childBoundables,
-      final int size) {
+    public List<List<Boundable<Object>>> verticalSlices(
+      final List<Boundable<Object>> childBoundables, final int size) {
       return super.verticalSlices(childBoundables, size);
     }
   }
@@ -99,20 +99,15 @@ public class STRtreeDemo {
 
   private static final int NODE_CAPACITY = 4;
 
-  private static BoundingBox envelope(final Boundable b) {
-    return b.getBounds();
-  }
-
-  private static void initTree(final TestTree t, final List sourceEnvelopes) {
-    for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
-      final BoundingBox sourceEnvelope = (BoundingBox)i.next();
+  private static void initTree(final TestTree t, final List<BoundingBox> sourceEnvelopes) {
+    for (final BoundingBox sourceEnvelope : sourceEnvelopes) {
       t.insertItem(sourceEnvelope, sourceEnvelope);
     }
     t.build();
   }
 
   public static void main(final String[] args) throws Exception {
-    final List envelopes = sourceData();
+    final List<BoundingBox> envelopes = sourceData();
     final TestTree t = new TestTree(NODE_CAPACITY);
     initTree(t, envelopes);
     final PrintStream printStream = System.out;
@@ -120,13 +115,12 @@ public class STRtreeDemo {
     printLevels(t, printStream);
   }
 
-  public static void printBoundables(final List boundables, final String title,
+  public static void printBoundables(final List<Boundable<Object>> boundables, final String title,
     final PrintStream out) {
     out.println("============ " + title + " ============\n");
     out.print("GEOMETRYCOLLECTION(");
     boolean first = true;
-    for (final Iterator i = boundables.iterator(); i.hasNext();) {
-      final Boundable boundable = (Boundable)i.next();
+    for (final Boundable<Object> boundable : boundables) {
       if (first) {
         first = false;
       } else {
@@ -143,12 +137,12 @@ public class STRtreeDemo {
     }
   }
 
-  public static void printSourceData(final List sourceEnvelopes, final PrintStream out) {
+  public static void printSourceData(final List<BoundingBox> sourceEnvelopes,
+    final PrintStream out) {
     out.println("============ Source Data ============\n");
     out.print("GEOMETRYCOLLECTION(");
     boolean first = true;
-    for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
-      final BoundingBox e = (BoundingBox)i.next();
+    for (final BoundingBox e : sourceEnvelopes) {
       final Geometry g = factory.polygon(factory.linearRing(new Point[] {
         new PointDoubleXY(e.getMinX(), e.getMinY()), new PointDoubleXY(e.getMinX(), e.getMaxY()),
         new PointDoubleXY(e.getMaxX(), e.getMaxY()), new PointDoubleXY(e.getMaxX(), e.getMinY()),
@@ -177,19 +171,18 @@ public class STRtreeDemo {
     }));
   }
 
-  private static List sourceData() {
-    final ArrayList envelopes = new ArrayList();
+  private static List<BoundingBox> sourceData() {
+    final List<BoundingBox> envelopes = new ArrayList<>();
     for (int i = 0; i < ITEM_COUNT; i++) {
       envelopes.add(randomRectangle().getBoundingBox());
     }
     return envelopes;
   }
 
-  private static String toString(final Boundable b) {
-    return "POLYGON((" + envelope(b).getMinX() + " " + envelope(b).getMinY() + ", "
-      + envelope(b).getMinX() + " " + envelope(b).getMaxY() + ", " + envelope(b).getMaxX() + " "
-      + envelope(b).getMaxY() + ", " + envelope(b).getMaxX() + " " + envelope(b).getMinY() + ","
-      + envelope(b).getMinX() + " " + envelope(b).getMinY() + "))";
+  private static String toString(final Boundable<?> b) {
+    return "POLYGON((" + b.getMinX() + " " + b.getMinY() + ", " + b.getMinX() + " " + b.getMaxY()
+      + ", " + b.getMaxX() + " " + b.getMaxY() + ", " + b.getMaxX() + " " + b.getMinY() + ","
+      + b.getMinX() + " " + b.getMinY() + "))";
   }
 
   public STRtreeDemo() {

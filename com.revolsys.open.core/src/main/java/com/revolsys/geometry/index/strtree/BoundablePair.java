@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.index.strtree;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.util.PriorityQueue;
 
 /**
@@ -49,16 +48,12 @@ import com.revolsys.geometry.util.PriorityQueue;
  *
  */
 class BoundablePair<I> implements Comparable<BoundablePair<I>> {
-  private static double area(final Boundable<?> b) {
-    return b.getBounds().getArea();
-  }
-
   /**
    * Computes the distance between the {@link Boundable}s in this pair.
    * The boundables are either composites or leaves.
    * If either is composite, the distance is computed as the minimum distance
    * between the bounds.
-   * If both are leaves, the distance is computed by {@link #itemDistance(ItemBoundable, ItemBoundable)}.
+   * If both are leaves, the distance is computed by {@link #itemDistance(StrTreeLeaf, StrTreeLeaf)}.
    * @param itemDistance
    *
    * @return
@@ -66,12 +61,10 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
   public static <ITEM> double distance(final ItemDistance<ITEM> itemDistance,
     final Boundable<ITEM> boundable1, final Boundable<ITEM> boundable2) {
     if (boundable1.isNode() || boundable2.isNode()) {
-      final BoundingBox bounds1 = boundable1.getBounds();
-      final BoundingBox bounds2 = boundable2.getBounds();
-      return bounds1.distance(bounds2);
+      return boundable1.distance(boundable2);
     } else {
-      final ItemBoundable<ITEM> item1 = (ItemBoundable<ITEM>)boundable1;
-      final ItemBoundable<ITEM> item2 = (ItemBoundable<ITEM>)boundable2;
+      final StrTreeLeaf<ITEM> item1 = (StrTreeLeaf<ITEM>)boundable1;
+      final StrTreeLeaf<ITEM> item2 = (StrTreeLeaf<ITEM>)boundable2;
       return itemDistance.distance(item1, item2);
     }
   }
@@ -145,7 +138,7 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
      */
     if (this.boundable1.isNode()) {
       if (this.boundable2.isNode()) {
-        if (area(this.boundable1) > area(this.boundable2)) {
+        if (this.boundable1.getArea() > this.boundable2.getArea()) {
           expand(this.boundable1, this.boundable2, priQ, itemDistance, minDistance);
         } else {
           expand(this.boundable2, this.boundable1, priQ, itemDistance, minDistance);

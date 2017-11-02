@@ -37,9 +37,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.index.strtree.Boundable;
-import com.revolsys.geometry.index.strtree.BoundingBoxNode;
-import com.revolsys.geometry.index.strtree.ItemBoundable;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTreeNode;
+import com.revolsys.geometry.index.strtree.StrTreeLeaf;
+import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -73,10 +73,10 @@ public class STRtreeTest extends TestCase {
     final List parentBoundables = t.newParentBoundablesFromVerticalSlice(itemWrappers(childCount),
       0);
     for (int i = 0; i < parentBoundables.size() - 1; i++) {// -1
-      final BoundingBoxNode<?> parentBoundable = (BoundingBoxNode<?>)parentBoundables.get(i);
+      final StrTreeNode<?> parentBoundable = (StrTreeNode<?>)parentBoundables.get(i);
       assertEquals(expectedChildrenPerParentBoundable, parentBoundable.getChildCount());
     }
-    final BoundingBoxNode<?> lastParent = (BoundingBoxNode<?>)parentBoundables
+    final StrTreeNode<?> lastParent = (StrTreeNode<?>)parentBoundables
       .get(parentBoundables.size() - 1);
     assertEquals(expectedChildrenOfLastParent, lastParent.getChildCount());
   }
@@ -96,7 +96,7 @@ public class STRtreeTest extends TestCase {
   private List itemWrappers(final int size) {
     final ArrayList itemWrappers = new ArrayList();
     for (int i = 0; i < size; i++) {
-      itemWrappers.add(new ItemBoundable(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object()));
+      itemWrappers.add(new StrTreeLeaf(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object()));
     }
     return itemWrappers;
   }
@@ -108,7 +108,7 @@ public class STRtreeTest extends TestCase {
   }
 
   public void testDisallowedInserts() {
-    final STRtree t = new STRtree(5);
+    final StrTree t = new StrTree(5);
     t.insertItem(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
     t.insertItem(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
     t.getItems(BoundingBox.empty());
@@ -121,14 +121,14 @@ public class STRtreeTest extends TestCase {
   }
 
   public void testEmptyTreeUsingItemVisitorQuery() {
-    final STRtree tree = new STRtree();
+    final StrTree tree = new StrTree();
     tree.query(new BoundingBoxDoubleXY(0, 1, 0, 1), (item) -> {
       assertTrue("Should never reach here", true);
     });
   }
 
   public void testEmptyTreeUsingListQuery() {
-    final STRtree tree = new STRtree();
+    final StrTree tree = new StrTree();
     final List list = tree.getItems(new BoundingBoxDoubleXY(0, 1, 0, 1));
     assertTrue(list.isEmpty());
   }
@@ -164,15 +164,15 @@ public class STRtreeTest extends TestCase {
 
   public void testSerialization() throws Exception {
     final SpatialIndexTester tester = new SpatialIndexTester();
-    tester.setSpatialIndex(new STRtree(4));
+    tester.setSpatialIndex(new StrTree(4));
     tester.init();
 
-    STRtree tree = (STRtree)tester.getSpatialIndex();
+    StrTree tree = (StrTree)tester.getSpatialIndex();
     // create the index before serialization
     tree.getItems(BoundingBox.empty());
 
     final byte[] data = SerializationUtil.serialize(tree);
-    tree = (STRtree)SerializationUtil.deserialize(data);
+    tree = (StrTree)SerializationUtil.deserialize(data);
 
     tester.setSpatialIndex(tree);
     tester.run();
@@ -181,7 +181,7 @@ public class STRtreeTest extends TestCase {
 
   public void testSpatialIndex() throws Exception {
     final SpatialIndexTester tester = new SpatialIndexTester();
-    tester.setSpatialIndex(new STRtree(4));
+    tester.setSpatialIndex(new StrTree(4));
     tester.init();
     tester.run();
     assertTrue(tester.isSuccess());

@@ -42,18 +42,8 @@ import com.revolsys.geometry.model.BoundingBox;
  *
  * @version 1.7
  */
-public interface Boundable<I> {
+public interface Boundable<I> extends BoundingBox {
   void boundablesAtLevel(int level, Collection<Boundable<I>> boundables);
-
-  /**
-   * Returns a representation of space that encloses this Boundable, preferably
-   * not much bigger than this Boundable's boundary yet fast to test for intersection
-   * with the bounds of other Boundables. The class of object returned depends
-   * on the subclass of AbstractSTRtree.
-   * @return an BoundingBox (for STRtrees), an Interval (for SIRtrees), or other object
-   * (for other subclasses of AbstractSTRtree)
-   */
-  BoundingBox getBounds();
 
   default int getChildCount() {
     return 0;
@@ -75,13 +65,9 @@ public interface Boundable<I> {
     return 1;
   }
 
-  default boolean isEmpty() {
-    return false;
-  }
-
   default boolean isNode() {
     return false;
   }
 
-  void query(final BoundingBox searchBounds, final Consumer<? super I> action);
+  void query(double minX, double minY, double maxX, double maxY, Consumer<? super I> action);
 }

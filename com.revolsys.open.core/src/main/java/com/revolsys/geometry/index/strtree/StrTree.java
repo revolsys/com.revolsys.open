@@ -64,55 +64,39 @@ import com.revolsys.util.Pair;
  *
  * @version 1.7
  */
-public class STRtree<I>
+public class StrTree<I>
   implements Emptyable, Serializable, Comparator<Boundable<I>>, SpatialIndex<I> {
 
   private static final int DEFAULT_NODE_CAPACITY = 10;
 
   private static final long serialVersionUID = 259274702368956900L;
 
-  private static double avg(final double a, final double b) {
-    return (a + b) / 2d;
-  }
-
-  private static double centreX(final BoundingBox e) {
-    return avg(e.getMinX(), e.getMaxX());
-  }
-
-  private static double centreY(final BoundingBox e) {
-    return avg(e.getMinY(), e.getMaxY());
-  }
-
-  protected static int compareDoubles(final double a, final double b) {
-    return a > b ? 1 : a < b ? -1 : 0;
-  }
-
   private boolean built = false;
 
   /**
    * Set to <tt>null</tt> when index is built, to avoid retaining memory.
    */
-  private List<ItemBoundable<I>> itemBoundables = new ArrayList<>();
+  private List<StrTreeLeaf<I>> strTreeLeafs = new ArrayList<>();
 
   protected final int nodeCapacity;
 
-  protected BoundingBoxNode<I> root;
+  protected StrTreeNode<I> root;
 
   /**
-   * Constructs an STRtree with the default node capacity.
+   * Constructs an StrTree with the default node capacity.
    */
-  public STRtree() {
+  public StrTree() {
     this(DEFAULT_NODE_CAPACITY);
   }
 
   /**
-   * Constructs an STRtree with the given maximum number of child nodes that
+   * Constructs an StrTree with the given maximum number of child nodes that
    * a node may have.
    * <p>
    * The minimum recommended capacity setting is 4.
    *
    */
-  public STRtree(final int nodeCapacity) {
+  public StrTree(final int nodeCapacity) {
     if (nodeCapacity < 2) {
       throw new IllegalArgumentException("Node capacity must be greater than 1");
     }
@@ -135,20 +119,21 @@ public class STRtree<I>
     if (this.built) {
       return;
     }
-    this.root = this.itemBoundables.isEmpty() ? newNode(0)
-      : newNodeHigherLevels(this.itemBoundables, -1);
+    this.root = this.strTreeLeafs.isEmpty() ? newNode(0)
+      : newNodeHigherLevels(this.strTreeLeafs, -1);
     // the item list is no longer needed
-    this.itemBoundables = null;
+    this.strTreeLeafs = null;
     this.built = true;
+    this.root.computeBounds();
   }
 
   @Override
   public int compare(final Boundable<I> o1, final Boundable<I> o2) {
-    return compareDoubles(centreY(o1.getBounds()), centreY(o2.getBounds()));
+    return Double.compare(o1.getCentreY(), o2.getCentreY());
   }
 
   public int compareX(final Boundable<I> o1, final Boundable<I> o2) {
-    return compareDoubles(centreX(o1.getBounds()), centreX(o2.getBounds()));
+    return Double.compare(o1.getCentreX(), o2.getCentreX());
   }
 
   protected int depth() {
@@ -199,7 +184,7 @@ public class STRtree<I>
     return this.nodeCapacity;
   }
 
-  public BoundingBoxNode<I> getRoot() {
+  public StrTreeNode<I> getRoot() {
     build();
     return this.root;
   }
@@ -214,8 +199,8 @@ public class STRtree<I>
       throw new IllegalStateException(
         "Cannot insert items into an STR packed R-tree after it has been built.");
     }
-    final ItemBoundable<I> itemBoundable = new ItemBoundable<>(bounds, item);
-    this.itemBoundables.add(itemBoundable);
+    final StrTreeLeaf<I> itemBoundable = new StrTreeLeaf<>(bounds, item);
+    this.strTreeLeafs.add(itemBoundable);
   };
 
   /**
@@ -240,7 +225,7 @@ public class STRtree<I>
   @Override
   public boolean isEmpty() {
     if (!this.built) {
-      return this.itemBoundables.isEmpty();
+      return this.strTreeLeafs.isEmpty();
     }
     return this.root.isEmpty();
   }
@@ -270,20 +255,20 @@ public class STRtree<I>
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  private List itemsTree(final BoundingBoxNode<I> node) {
+  private List itemsTree(final StrTreeNode<I> node) {
     final List valuesTreeForNode = new ArrayList();
     final int childCount = node.childCount;
     final Boundable<I>[] children = node.children;
     for (int i = 0; i < childCount; i++) {
       final Boundable<I> child = children[i];
-      if (child instanceof BoundingBoxNode) {
-        final List valuesTreeForChild = itemsTree((BoundingBoxNode<I>)child);
+      if (child instanceof StrTreeNode) {
+        final List valuesTreeForChild = itemsTree((StrTreeNode<I>)child);
         // only add if not null (which indicates an item somewhere in this tree
         if (valuesTreeForChild != null) {
           valuesTreeForNode.add(valuesTreeForChild);
         }
-      } else if (child instanceof ItemBoundable) {
-        valuesTreeForNode.add(((ItemBoundable)child).getItem());
+      } else if (child instanceof StrTreeLeaf) {
+        valuesTreeForNode.add(((StrTreeLeaf)child).getItem());
       } else {
         throw new IllegalStateException("Shouldn't reach this code");
       }
@@ -294,7 +279,7 @@ public class STRtree<I>
     return valuesTreeForNode;
   }
 
-  protected BoundingBoxNode<I> lastNode(final List<BoundingBoxNode<I>> nodes) {
+  protected StrTreeNode<I> lastNode(final List<StrTreeNode<I>> nodes) {
     return nodes.get(nodes.size() - 1);
   }
 
@@ -383,8 +368,8 @@ public class STRtree<I>
    */
   public I nearestNeighbour(final BoundingBox env, final I item,
     final ItemDistance<I> itemDistance) {
-    final Boundable<I> bnd = new ItemBoundable<>(env, item);
-    final BoundingBoxNode<I> root = getRoot();
+    final Boundable<I> bnd = new StrTreeLeaf<>(env, item);
+    final StrTreeNode<I> root = getRoot();
     final BoundablePair<I> bp = new BoundablePair<>(root, bnd, itemDistance);
     return nearestNeighbour(bp, itemDistance).getValue1();
   }
@@ -399,7 +384,7 @@ public class STRtree<I>
    * @return the pair of the nearest items
    */
   public Pair<I, I> nearestNeighbour(final ItemDistance<I> itemDistance) {
-    final BoundingBoxNode<I> root = getRoot();
+    final StrTreeNode<I> root = getRoot();
     final BoundablePair<I> bp = new BoundablePair<>(root, root, itemDistance);
     return nearestNeighbour(bp, itemDistance);
   }
@@ -418,13 +403,13 @@ public class STRtree<I>
    * @param itemDistance a distance metric applicable to the items in the trees
    * @return the pair of the nearest items, one from each tree
    */
-  public Pair<I, I> nearestNeighbour(final STRtree<I> tree, final ItemDistance<I> itemDistance) {
+  public Pair<I, I> nearestNeighbour(final StrTree<I> tree, final ItemDistance<I> itemDistance) {
     final BoundablePair<I> bp = new BoundablePair<>(getRoot(), tree.getRoot(), itemDistance);
     return nearestNeighbour(bp, itemDistance);
   }
 
-  protected BoundingBoxNode<I> newNode(final int level) {
-    return new BoundingBoxNode<>(this.nodeCapacity, level);
+  protected StrTreeNode<I> newNode(final int level) {
+    return new StrTreeNode<>(this.nodeCapacity, level);
   }
 
   /**
@@ -437,12 +422,12 @@ public class STRtree<I>
    *            boundables (that is, below level 0)
    * @return the root, which may be a ParentNode or a LeafNode
    */
-  private BoundingBoxNode<I> newNodeHigherLevels(
-    final List<? extends Boundable<I>> boundablesOfALevel, final int level) {
+  private StrTreeNode<I> newNodeHigherLevels(final List<? extends Boundable<I>> boundablesOfALevel,
+    final int level) {
     if (boundablesOfALevel.isEmpty()) {
       throw new IllegalArgumentException("Must not be empty");
     }
-    final List<BoundingBoxNode<I>> parentBoundables = newParentBoundables(boundablesOfALevel,
+    final List<StrTreeNode<I>> parentBoundables = newParentBoundables(boundablesOfALevel,
       level + 1);
     if (parentBoundables.size() == 1) {
       return parentBoundables.get(0);
@@ -458,7 +443,7 @@ public class STRtree<I>
    * a new (parent) node.
    */
 
-  protected List<BoundingBoxNode<I>> newParentBoundables(
+  protected List<StrTreeNode<I>> newParentBoundables(
     final List<? extends Boundable<I>> childBoundables, final int newLevel) {
     if (childBoundables.isEmpty()) {
       throw new IllegalArgumentException("Must not be empty");
@@ -475,7 +460,7 @@ public class STRtree<I>
    * Sorts the childBoundables then divides them into groups of size M, where
    * M is the node capacity.
    */
-  protected List<BoundingBoxNode<I>> newParentBoundablesFromVerticalSlice(
+  protected List<StrTreeNode<I>> newParentBoundablesFromVerticalSlice(
     final List<? extends Boundable<I>> childBoundables, final int newLevel) {
     if (childBoundables.isEmpty()) {
       throw new IllegalArgumentException("Must not be empty");
@@ -483,9 +468,9 @@ public class STRtree<I>
     final List<Boundable<I>> sortedChildBoundables = new ArrayList<>(childBoundables);
     Collections.sort(sortedChildBoundables, this);
 
-    final List<BoundingBoxNode<I>> parentBoundables = new ArrayList<>();
+    final List<StrTreeNode<I>> parentBoundables = new ArrayList<>();
     final int nodeCapacity = getNodeCapacity();
-    BoundingBoxNode<I> childNode = newNode(newLevel);
+    StrTreeNode<I> childNode = newNode(newLevel);
     parentBoundables.add(childNode);
 
     int count = 0;
@@ -501,9 +486,9 @@ public class STRtree<I>
     return parentBoundables;
   }
 
-  private List<BoundingBoxNode<I>> newParentBoundablesFromVerticalSlices(
+  private List<StrTreeNode<I>> newParentBoundablesFromVerticalSlices(
     final List<List<Boundable<I>>> verticalSlices, final int newLevel) {
-    final List<BoundingBoxNode<I>> parentBoundables = new ArrayList<>();
+    final List<StrTreeNode<I>> parentBoundables = new ArrayList<>();
     for (final List<? extends Boundable<I>> verticalSlice : verticalSlices) {
       parentBoundables.addAll(newParentBoundablesFromVerticalSlice(verticalSlice, newLevel));
     }
@@ -525,18 +510,18 @@ public class STRtree<I>
   /**
    *  Also builds the tree, if necessary.
    */
-  public void query(final BoundingBox searchBounds, final Consumer<? super I> visitor) {
+  public void query(final BoundingBox boundingBox, final Consumer<? super I> visitor) {
     build();
     if (!isEmpty()) {
       try {
-        queryDo(searchBounds, visitor);
+        final double minX = boundingBox.getMinX();
+        final double minY = boundingBox.getMinY();
+        final double maxX = boundingBox.getMaxX();
+        final double maxY = boundingBox.getMaxY();
+        this.root.query(minX, minY, maxX, maxY, visitor);
       } catch (final ExitLoopException e) {
       }
     }
-  }
-
-  public void queryDo(final BoundingBox searchBounds, final Consumer<? super I> visitor) {
-    this.root.query(searchBounds, visitor);
   }
 
   @Override

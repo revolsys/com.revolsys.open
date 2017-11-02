@@ -4,14 +4,12 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.util.Emptyable;
 
-public class BoundingBoxNode<I> implements Emptyable, Boundable<I>, Serializable {
+public class StrTreeNode<I> extends BoundingBoxDoubleXY
+  implements Emptyable, Boundable<I>, Serializable {
   private static final long serialVersionUID = 1L;
-
-  private BoundingBox bounds = null;
 
   protected Boundable<I>[] children;
 
@@ -20,19 +18,19 @@ public class BoundingBoxNode<I> implements Emptyable, Boundable<I>, Serializable
   private final int level;
 
   /**
-   * Constructs an BoundingBoxNode at the given level in the tree
+   * Constructs an StrTreeNode at the given level in the tree
    * @param level 0 if this node is a leaf, 1 if a parent of a leaf, and so on; the
    * root node will have the highest level
    */
   @SuppressWarnings("unchecked")
-  public BoundingBoxNode(final int nodeCapacity, final int level) {
+  public StrTreeNode(final int nodeCapacity, final int level) {
     this.children = new Boundable[nodeCapacity];
     this.level = level;
   }
 
   /**
    * Adds either an AbstractNode, or if this is a leaf node, a data object
-   * (wrapped in an ItemBoundable)
+   * (wrapped in an StrTreeLeaf)
    */
   public void addChild(final Boundable<I> child) {
     this.children[this.childCount++] = child;
@@ -55,48 +53,22 @@ public class BoundingBoxNode<I> implements Emptyable, Boundable<I>, Serializable
     }
   }
 
-  protected BoundingBox computeBounds() {
-    double x1 = Double.POSITIVE_INFINITY;
-    double y1 = Double.POSITIVE_INFINITY;
-    double x2 = Double.NEGATIVE_INFINITY;
-    double y2 = Double.NEGATIVE_INFINITY;
+  protected void computeBounds() {
+    clear();
     final int childCount = this.childCount;
     final Boundable<I>[] children = this.children;
     for (int i = 0; i < childCount; i++) {
       final Boundable<I> child = children[i];
-      final BoundingBox childBounds = child.getBounds();
-      final double minX = childBounds.getMinX();
-      if (minX < x1) {
-        x1 = minX;
+      if (child instanceof StrTreeNode) {
+        final StrTreeNode<I> childNode = (StrTreeNode<I>)child;
+        childNode.computeBounds();
       }
-      final double minY = childBounds.getMinY();
-      if (minY < y1) {
-        y1 = minY;
-      }
-      final double maxX = childBounds.getMaxX();
-      if (maxX > x2) {
-        x2 = maxX;
-      }
-      final double maxY = childBounds.getMaxY();
-      if (maxY > y2) {
-        y2 = maxY;
-      }
-
+      final double minX = child.getMinX();
+      final double minY = child.getMinY();
+      final double maxX = child.getMaxX();
+      final double maxY = child.getMaxY();
+      expand(minX, minY, maxX, maxY);
     }
-    return new BoundingBoxDoubleXY(x1, y1, x2, y2);
-  }
-
-  /**
-   * Gets the bounds of this node
-   *
-   * @return the object representing bounds in this index
-   */
-  @Override
-  public BoundingBox getBounds() {
-    if (this.bounds == null) {
-      this.bounds = computeBounds();
-    }
-    return this.bounds;
   }
 
   /**
@@ -165,15 +137,14 @@ public class BoundingBoxNode<I> implements Emptyable, Boundable<I>, Serializable
   }
 
   @Override
-  public void query(final BoundingBox searchBounds, final Consumer<? super I> action) {
-    final BoundingBox bounds = getBounds();
-    final boolean intersectsBounds = bounds.intersectsBounds(searchBounds);
-    if (intersectsBounds) {
+  public void query(final double minX, final double minY, final double maxX, final double maxY,
+    final Consumer<? super I> action) {
+    if (intersects(minX, minY, maxX, maxY)) {
       final int childCount = this.childCount;
       final Boundable<I>[] children = this.children;
       for (int i = 0; i < childCount; i++) {
         final Boundable<I> child = children[i];
-        child.query(searchBounds, action);
+        child.query(minX, minY, maxX, maxY, action);
       }
     }
   }

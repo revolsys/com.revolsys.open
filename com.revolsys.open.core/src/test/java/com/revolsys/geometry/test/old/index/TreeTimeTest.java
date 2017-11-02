@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.index.quadtree.QuadTree;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -91,11 +91,11 @@ public class TreeTimeTest {
   }
 
   class STRtreeIndex implements Index {
-    STRtree index;
+    StrTree index;
 
     // public String toString() { return "" + index.getNodeCapacity() + ""; }
     public STRtreeIndex(final int nodeCapacity) {
-      this.index = new STRtree(nodeCapacity);
+      this.index = new StrTree(nodeCapacity);
     }
 
     @Override

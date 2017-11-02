@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 /**
  * Boundable wrapper for a non-Boundable spatial object. Used internally by
@@ -44,15 +45,13 @@ import com.revolsys.geometry.model.BoundingBox;
  *
  * @version 1.7
  */
-public class ItemBoundable<I> implements Boundable<I>, Serializable {
+public class StrTreeLeaf<I> extends BoundingBoxDoubleXY implements Boundable<I>, Serializable {
   private static final long serialVersionUID = 1L;
-
-  private final BoundingBox bounds;
 
   private final I item;
 
-  public ItemBoundable(final BoundingBox bounds, final I item) {
-    this.bounds = bounds;
+  public StrTreeLeaf(final BoundingBox bounds, final I item) {
+    super(bounds);
     this.item = item;
   }
 
@@ -64,18 +63,14 @@ public class ItemBoundable<I> implements Boundable<I>, Serializable {
   }
 
   @Override
-  public BoundingBox getBounds() {
-    return this.bounds;
-  }
-
-  @Override
   public I getItem() {
     return this.item;
   }
 
   @Override
-  public void query(final BoundingBox searchBounds, final Consumer<? super I> action) {
-    if (getBounds().intersectsBounds(searchBounds)) {
+  public void query(final double minX, final double minY, final double maxX, final double maxY,
+    final Consumer<? super I> action) {
+    if (intersects(minX, minY, maxX, maxY)) {
       action.accept(this.item);
     }
   }
