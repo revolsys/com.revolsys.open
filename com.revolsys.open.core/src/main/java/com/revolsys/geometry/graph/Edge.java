@@ -244,11 +244,11 @@ public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Exte
       } else {
         final Node<?> otherFromNode = edge.getFromNode();
         final Node<?> fromNode = getFromNode();
-        final int fromCompare = fromNode.compareTo(otherFromNode);
+        final int fromCompare = fromNode.compareTo(otherFromNode.getX(), otherFromNode.getY());
         if (fromCompare == 0) {
           final Node<?> otherToNode = edge.getToNode();
           final Node<T> toNode = getToNode();
-          final int toCompare = toNode.compareTo(otherToNode);
+          final int toCompare = toNode.compareTo(otherToNode.getX(), otherToNode.getY());
           if (toCompare == 0) {
             final double otherLength = edge.getLength();
             final double length = getLength();

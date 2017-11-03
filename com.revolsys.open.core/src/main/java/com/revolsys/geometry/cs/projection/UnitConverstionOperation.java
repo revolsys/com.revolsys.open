@@ -13,9 +13,7 @@ public class UnitConverstionOperation implements CoordinatesOperation {
   private final Unit targetUnit;
 
   public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit) {
-    this.sourceUnit = sourceUnit;
-    this.targetUnit = targetUnit;
-    this.converter = sourceUnit.getConverterTo(targetUnit);
+    this(sourceUnit, targetUnit, 2);
   }
 
   public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit,

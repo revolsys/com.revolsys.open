@@ -327,7 +327,11 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
       rings[ringIndex++] = editor.newGeometry();
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return this.polygon.newPolygon(geometryFactory, rings);
+    if (this.polygon == null) {
+      return geometryFactory.polygon(rings);
+    } else {
+      return this.polygon.newPolygon(geometryFactory, rings);
+    }
   }
 
   @Override
@@ -337,6 +341,7 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
 
   public void removeRing(final int index) {
     this.editors.remove(index);
+    setModified(true);
   }
 
   public Iterable<LinearRingEditor> ringEditors() {

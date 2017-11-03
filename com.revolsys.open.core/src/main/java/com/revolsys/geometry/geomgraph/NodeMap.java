@@ -41,6 +41,7 @@ import java.util.TreeMap;
 
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.comparator.PointComparators;
 
 /**
  * A map of nodes, indexed by the coordinate of the node
@@ -49,7 +50,7 @@ import com.revolsys.geometry.model.Point;
 public class NodeMap implements Iterable<Node> {
   private final NodeFactory nodeFactory;
 
-  private final Map<Point, Node> nodeMap = new TreeMap<>();// PointComparators.leftLowest());
+  private final Map<Point, Node> nodeMap = new TreeMap<>(PointComparators.leftLowest());
 
   public NodeMap(final NodeFactory nodeFact) {
     this.nodeFactory = nodeFact;

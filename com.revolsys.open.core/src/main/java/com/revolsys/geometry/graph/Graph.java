@@ -46,6 +46,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
+import com.revolsys.geometry.model.coordinates.comparator.PointComparators;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
@@ -114,7 +115,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   private Map<Integer, Node<T>> nodesById = new IntHashMap<>();
 
-  private Map<Point, Integer> nodesIdsByPoint = new TreeMap<>();
+  private Map<Point, Integer> nodesIdsByPoint = new TreeMap<>(PointComparators.leftLowest());
 
   private GeometryFactory precisionModel = GeometryFactory.DEFAULT_3D;
 

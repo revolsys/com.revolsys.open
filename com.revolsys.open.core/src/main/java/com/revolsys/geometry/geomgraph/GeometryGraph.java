@@ -271,7 +271,7 @@ public class GeometryGraph extends PlanarGraph {
   public SegmentIntersector computeEdgeIntersections(final GeometryGraph g,
     final LineIntersector li, final boolean includeProper) {
     final SegmentIntersector si = new SegmentIntersector(li, includeProper, true);
-    si.setBoundaryNodes(this.getBoundaryNodes(), g.getBoundaryNodes());
+    si.setBoundaryNodes(getBoundaryNodes(), g.getBoundaryNodes());
 
     final EdgeSetIntersector esi = newEdgeSetIntersector();
     esi.computeIntersections(this.edges, g.edges, si);

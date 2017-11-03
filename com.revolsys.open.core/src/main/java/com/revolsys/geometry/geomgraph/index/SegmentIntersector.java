@@ -33,10 +33,12 @@
 package com.revolsys.geometry.geomgraph.index;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.geomgraph.Edge;
 import com.revolsys.geometry.geomgraph.Node;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 
 /**
@@ -46,13 +48,6 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class SegmentIntersector {
-
-  public static boolean isAdjacentSegments(final int i1, final int i2) {
-    return Math.abs(i1 - i2) == 1;
-  }
-
-  private Collection[] bdyNodes;
-
   /**
    * These variables keep track of what types of intersections were
    * found during ALL edges that have been intersected.
@@ -65,7 +60,7 @@ public class SegmentIntersector {
 
   private final boolean includeProper;
 
-  private final LineIntersector li;
+  private final LineIntersector lineIntersector;
 
   // testing only
   public int numTests = 0;
@@ -75,12 +70,16 @@ public class SegmentIntersector {
 
   private final boolean recordIsolated;
 
+  private Collection<Node> boundaryNodes1 = Collections.emptySet();
+
+  private Collection<Node> boundaryNodes2 = Collections.emptySet();
+
   /*
    * public SegmentIntersector() { }
    */
   public SegmentIntersector(final LineIntersector li, final boolean includeProper,
     final boolean recordIsolated) {
-    this.li = li;
+    this.lineIntersector = li;
     this.includeProper = includeProper;
     this.recordIsolated = recordIsolated;
   }
@@ -91,53 +90,67 @@ public class SegmentIntersector {
    * Note that clients (such as MonotoneChainEdges) may choose not to intersect
    * certain pairs of segments for efficiency reasons.
    */
-  public void addIntersections(final Edge e0, final int segIndex0, final Edge e1,
-    final int segIndex1) {
-    if (e0 == e1 && segIndex0 == segIndex1) {
+  public void addIntersections(final Edge edge1, final LineString line1, final int segIndex0,
+    final Edge edge2, final LineString line2, final int segIndex1) {
+    if (edge1 == edge2 && segIndex0 == segIndex1) {
       return;
-    }
-    this.numTests++;
-    final double line1x1 = e0.getX(segIndex0);
-    final double line1y1 = e0.getY(segIndex0);
-    final double line1x2 = e0.getX(segIndex0 + 1);
-    final double line1y2 = e0.getY(segIndex0 + 1);
-    final double line2x1 = e1.getX(segIndex1);
-    final double line2y1 = e1.getY(segIndex1);
-    final double line2x2 = e1.getX(segIndex1 + 1);
-    final double line2y2 = e1.getY(segIndex1 + 1);
+    } else {
+      this.numTests++;
+      final double line1x1 = line1.getX(segIndex0);
+      final double line1y1 = line1.getY(segIndex0);
+      final double line1x2 = line1.getX(segIndex0 + 1);
+      final double line1y2 = line1.getY(segIndex0 + 1);
 
-    this.li.computeIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2,
-      line2y2);
-    // if (li.hasIntersection() && li.isProper()) Debug.println(li);
-    /**
-     *  Always record any non-proper intersections.
-     *  If includeProper is true, record any proper intersections as well.
-     */
-    if (this.li.hasIntersection()) {
-      if (this.recordIsolated) {
-        e0.setIsolated(false);
-        e1.setIsolated(false);
-      }
-      // if the segments are adjacent they have at least one trivial
-      // intersection,
-      // the shared endpoint. Don't bother adding it if it is the
-      // only intersection.
-      if (!isTrivialIntersection(e0, segIndex0, e1, segIndex1)) {
-        this.hasIntersection = true;
-        if (this.includeProper || !this.li.isProper()) {
-          // Debug.println(li);
-          e0.addIntersections(this.li, segIndex0, 0);
-          e1.addIntersections(this.li, segIndex1, 1);
+      final double line2x1 = line2.getX(segIndex1);
+      final double line2y1 = line2.getY(segIndex1);
+      final double line2x2 = line2.getX(segIndex1 + 1);
+      final double line2y2 = line2.getY(segIndex1 + 1);
+
+      final LineIntersector lineIntersector = this.lineIntersector;
+      lineIntersector.computeIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+        line2x2, line2y2);
+      /**
+       *  Always record any non-proper intersections.
+       *  If includeProper is true, record any proper intersections as well.
+       */
+      if (lineIntersector.hasIntersection()) {
+        if (this.recordIsolated) {
+          edge1.setIsolated(false);
+          edge2.setIsolated(false);
         }
-        if (this.li.isProper()) {
-          this.properIntersectionPoint = this.li.getIntersection(0).newPoint();
-          this.hasProper = true;
-          if (!isBoundaryPoint(this.li, this.bdyNodes)) {
-            this.hasProperInterior = true;
+        // if the segments are adjacent they have at least one trivial
+        // intersection,
+        // the shared endpoint. Don't bother adding it if it is the
+        // only intersection.
+        boolean trivialIntersection = false;
+        if (edge1 == edge2) {
+          if (lineIntersector.getIntersectionCount() == 1) {
+            if (Math.abs(segIndex0 - segIndex1) == 1) {
+              trivialIntersection = true;
+            } else if (line1.isClosed()) {
+              final int maxSegIndex = line1.getVertexCount() - 1;
+              if (segIndex0 == 0 && segIndex1 == maxSegIndex
+                || segIndex1 == 0 && segIndex0 == maxSegIndex) {
+                trivialIntersection = true;
+              }
+            }
           }
         }
-        // if (li.isCollinear())
-        // hasCollinear = true;
+
+        if (!trivialIntersection) {
+          this.hasIntersection = true;
+          if (this.includeProper || !lineIntersector.isProper()) {
+            edge1.addIntersections(lineIntersector, segIndex0, 0);
+            edge2.addIntersections(lineIntersector, segIndex1, 1);
+          }
+          if (lineIntersector.isProper()) {
+            this.properIntersectionPoint = lineIntersector.getIntersection(0);
+            this.hasProper = true;
+            if (!isBoundaryPoint()) {
+              this.hasProperInterior = true;
+            }
+          }
+        }
       }
     }
   }
@@ -172,24 +185,22 @@ public class SegmentIntersector {
     return this.hasProper;
   }
 
-  private boolean isBoundaryPoint(final LineIntersector li, final Collection[] bdyNodes) {
-    if (bdyNodes == null) {
+  private boolean isBoundaryPoint() {
+    if (isBoundaryPoint(this.boundaryNodes1)) {
+      return true;
+    } else if (isBoundaryPoint(this.boundaryNodes2)) {
+      return true;
+    } else {
       return false;
     }
-    if (isBoundaryPoint(li, bdyNodes[0])) {
-      return true;
-    }
-    if (isBoundaryPoint(li, bdyNodes[1])) {
-      return true;
-    }
-    return false;
   }
 
-  private boolean isBoundaryPoint(final LineIntersector li, final Collection<Node> bdyNodes) {
-    for (final Node node : bdyNodes) {
+  private boolean isBoundaryPoint(final Collection<Node> boundaryNodes) {
+    final LineIntersector lineIntersector = this.lineIntersector;
+    for (final Node node : boundaryNodes) {
       final double x = node.getX();
       final double y = node.getY();
-      if (li.isIntersection(x, y)) {
+      if (lineIntersector.isIntersection(x, y)) {
         return true;
       }
     }
@@ -204,27 +215,13 @@ public class SegmentIntersector {
    */
   private boolean isTrivialIntersection(final Edge e0, final int segIndex0, final Edge e1,
     final int segIndex1) {
-    if (e0 == e1) {
-      if (this.li.getIntersectionCount() == 1) {
-        if (isAdjacentSegments(segIndex0, segIndex1)) {
-          return true;
-        }
-        if (e0.isClosed()) {
-          final int maxSegIndex = e0.getVertexCount() - 1;
-          if (segIndex0 == 0 && segIndex1 == maxSegIndex
-            || segIndex1 == 0 && segIndex0 == maxSegIndex) {
-            return true;
-          }
-        }
-      }
-    }
     return false;
   }
 
-  public void setBoundaryNodes(final Collection bdyNodes0, final Collection bdyNodes1) {
-    this.bdyNodes = new Collection[2];
-    this.bdyNodes[0] = bdyNodes0;
-    this.bdyNodes[1] = bdyNodes1;
+  public void setBoundaryNodes(final Collection<Node> boundaryNodes1,
+    final Collection<Node> boundaryNodes2) {
+    this.boundaryNodes1 = boundaryNodes1;
+    this.boundaryNodes2 = boundaryNodes2;
   }
 
 }

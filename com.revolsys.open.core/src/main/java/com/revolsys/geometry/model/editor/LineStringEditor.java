@@ -563,7 +563,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   public double getY(final int vertexIndex) {
     if (this.coordinates == null) {
       if (this.line != null) {
-        return this.line.getX(vertexIndex);
+        return this.line.getY(vertexIndex);
       }
     } else {
       if (vertexIndex < 0) {
@@ -580,7 +580,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     if (this.axisCount > 2) {
       if (this.coordinates == null) {
         if (this.line != null) {
-          return this.line.getX(vertexIndex);
+          return this.line.getZ(vertexIndex);
         }
       } else {
         final int axisCount = this.axisCount;

@@ -621,6 +621,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
 
   private transient final WktParser parser = new WktParser(this);
 
+  private final IntHashMap<CoordinatesOperation> coordinatesOperationById = new IntHashMap<>();
+
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount) {
     if (axisCount < 2) {
       this.axisCount = 2;
@@ -1101,8 +1103,21 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
         return null;
       } else {
         final CoordinateSystem coordinateSystem = getCoordinateSystem();
-        final CoordinateSystem otherCoordinateSystem = geometryFactory.getCoordinateSystem();
-        return ProjectionFactory.getCoordinatesOperation(coordinateSystem, otherCoordinateSystem);
+        final int otherCoordinateSystemId = geometryFactory.getCoordinateSystemId();
+        if (otherCoordinateSystemId > 0) {
+          CoordinatesOperation coordinatesOperation = this.coordinatesOperationById
+            .get(otherCoordinateSystemId);
+          if (coordinatesOperation == null) {
+            final CoordinateSystem otherCoordinateSystem = geometryFactory.getCoordinateSystem();
+            coordinatesOperation = ProjectionFactory.getCoordinatesOperation(coordinateSystem,
+              otherCoordinateSystem);
+            this.coordinatesOperationById.put(otherCoordinateSystemId, coordinatesOperation);
+          }
+          return coordinatesOperation;
+        } else {
+          final CoordinateSystem otherCoordinateSystem = geometryFactory.getCoordinateSystem();
+          return ProjectionFactory.getCoordinatesOperation(coordinateSystem, otherCoordinateSystem);
+        }
       }
     }
   }

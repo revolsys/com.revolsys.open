@@ -2479,25 +2479,26 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * @see LineMerger
    */
 
-  default Geometry union(final Geometry other) {
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G union(final Geometry other) {
     // handle empty geometry cases
     if (other == null) {
-      return this;
+      return (G)this;
     } else if (isEmpty()) {
       if (other.isEmpty()) {
-        return OverlayOp.newEmptyResult(OverlayOp.UNION, this, other, getGeometryFactory());
+        return (G)OverlayOp.newEmptyResult(OverlayOp.UNION, this, other, getGeometryFactory());
       } else {
-        return other;
+        return (G)other;
       }
     } else if (other.isEmpty()) {
-      return this;
+      return (G)this;
     }
 
     // TODO: optimize if envelopes of geometries do not intersect
 
     checkNotGeometryCollection(this);
     checkNotGeometryCollection(other);
-    return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.UNION);
+    return (G)SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.UNION);
   }
 
   /**

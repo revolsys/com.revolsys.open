@@ -131,6 +131,24 @@ public interface Point extends Punctual, Serializable {
   @Override
   Point clone();
 
+  default int compareTo(final double x, final double y) {
+    final double x1 = getX();
+    if (x1 < x) {
+      return -1;
+    } else if (x1 > x) {
+      return 1;
+    } else {
+      final double y1 = getY();
+      if (y1 < y) {
+        return -1;
+      } else if (y1 > y) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+  }
+
   @Override
   default int compareTo(final Object other) {
     if (other instanceof Point) {
