@@ -34,7 +34,6 @@ package com.revolsys.geometry.model.impl;
 
 import java.io.StringWriter;
 
-import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -81,17 +80,6 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
   @Override
   public LinearRingDoubleGf clone() {
     return (LinearRingDoubleGf)super.clone();
-  }
-
-  /**
-   * Returns <code>Dimension.FALSE</code>, since by definition LinearRings do
-   * not have a boundary.
-   *
-   * @return Dimension.FALSE
-   */
-  @Override
-  public int getBoundaryDimension() {
-    return Dimension.FALSE;
   }
 
   /**

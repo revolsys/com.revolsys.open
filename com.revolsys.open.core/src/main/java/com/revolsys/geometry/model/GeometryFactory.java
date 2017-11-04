@@ -73,6 +73,7 @@ import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.PointDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.PointDoubleXYZGeometryFactory;
 import com.revolsys.geometry.model.impl.PolygonImpl;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.geometry.util.BoundingBoxUtil;
@@ -1893,6 +1894,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
 
   public LineStringEditor newLineStringBuilder(final int vertexCapacity) {
     return new LineStringEditor(this, vertexCapacity);
+  }
+
+  public RectangleXY newRectangle(final double x, final double y, final double width,
+    final double height) {
+    return new RectangleXY(this, x, y, width, height);
   }
 
   public double[] newScales(final int axisCount) {

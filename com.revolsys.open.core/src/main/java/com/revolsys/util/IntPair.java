@@ -13,11 +13,21 @@ public class IntPair implements Comparable<IntPair> {
 
   @Override
   public int compareTo(final IntPair other) {
-    int compare = Integer.compare(this.value1, other.getValue1());
-    if (compare == 0) {
-      compare = Integer.compare(this.value2, other.getValue2());
+    final int otherValue1 = other.getValue1();
+    if (this.value1 == otherValue1) {
+      final int otherValue2 = other.getValue2();
+      if (this.value2 == otherValue2) {
+        return 0;
+      } else if (this.value2 < otherValue2) {
+        return -1;
+      } else {
+        return 1;
+      }
+    } else if (this.value1 < otherValue1) {
+      return -1;
+    } else {
+      return 1;
     }
-    return compare;
   }
 
   @Override

@@ -437,39 +437,45 @@ public interface BoundingBox
   default double distance(BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     boundingBox = boundingBox.convert(geometryFactory);
-    final double minX = getMinX();
-    final double minY = getMinY();
-    final double maxX = getMaxX();
-    final double maxY = getMaxY();
 
-    final double minX2 = boundingBox.getMinX();
-    final double minY2 = boundingBox.getMinY();
-    final double maxX2 = boundingBox.getMaxX();
-    final double maxY2 = boundingBox.getMaxY();
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
 
-    if (isEmpty(minX, maxX) || isEmpty(minX2, maxX2)) {
+    return distance(minX, minY, maxX, maxY);
+  }
+
+  default double distance(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double minXThis = getMinX();
+    final double minYThis = getMinY();
+    final double maxXThis = getMaxX();
+    final double maxYThis = getMaxY();
+
+    if (isEmpty(minXThis, maxXThis) || isEmpty(minX, maxX)) {
       // Empty
       return Double.MAX_VALUE;
-    } else if (!(minX2 > maxX || maxX2 < minX || minY2 > maxY || maxY2 < minY)) {
+    } else if (!(minX > maxXThis || maxX < minXThis || minY > maxYThis || maxY < minYThis)) {
       // Intersects
       return 0;
     } else {
       double dx;
-      if (maxX < minX2) {
-        dx = minX2 - maxX;
+      if (maxXThis < minX) {
+        dx = minX - maxXThis;
       } else {
-        if (minX > maxX2) {
-          dx = minX - maxX2;
+        if (minXThis > maxX) {
+          dx = minXThis - maxX;
         } else {
           dx = 0;
         }
       }
 
       double dy;
-      if (maxY < minY2) {
-        dy = minY2 - maxY;
-      } else if (minY > maxY2) {
-        dy = minY - maxY2;
+      if (maxYThis < minY) {
+        dy = minY - maxYThis;
+      } else if (minYThis > maxY) {
+        dy = minYThis - maxY;
       } else {
         dy = 0;
       }

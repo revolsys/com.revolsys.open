@@ -316,13 +316,11 @@ public class OverlayOp extends GeometryGraphOperation {
    * In this case, convert the label for that Geometry to a Line label
    */
   /*
-   * NOT NEEDED? private void checkDimensionalCollapse(Label labelToMerge, Label
-   * existingLabel) { if (existingLabel.isArea() && labelToMerge.isArea()) { for
-   * (int i = 0; i < 2; i++) { if (! labelToMerge.isNull(i) &&
-   * labelToMerge.getLocation(i, Position.LEFT) == existingLabel.getLocation(i,
-   * Position.RIGHT) && labelToMerge.getLocation(i, Position.RIGHT) ==
-   * existingLabel.getLocation(i, Position.LEFT) ) { existingLabel.toLine(i); }
-   * } } }
+   * NOT NEEDED? private void checkDimensionalCollapse(Label labelToMerge, Label existingLabel) { if
+   * (existingLabel.isArea() && labelToMerge.isArea()) { for (int i = 0; i < 2; i++) { if (!
+   * labelToMerge.isNull(i) && labelToMerge.getLocation(i, Position.LEFT) ==
+   * existingLabel.getLocation(i, Position.RIGHT) && labelToMerge.getLocation(i, Position.RIGHT) ==
+   * existingLabel.getLocation(i, Position.LEFT) ) { existingLabel.toLine(i); } } } }
    */
   /**
    * Update the labels for edges according to their depths.

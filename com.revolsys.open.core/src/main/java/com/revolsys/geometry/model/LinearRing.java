@@ -137,6 +137,17 @@ public interface LinearRing extends LineString {
   LinearRing clone();
 
   /**
+   * Returns <code>Dimension.FALSE</code>, since by definition LinearRings do
+   * not have a boundary.
+   *
+   * @return Dimension.FALSE
+   */
+  @Override
+  default int getBoundaryDimension() {
+    return Dimension.FALSE;
+  }
+
+  /**
    * Get the area of the polygon using the http://en.wikipedia.org/wiki/Shoelace_formula
    *
    * @return The area of the polygon.

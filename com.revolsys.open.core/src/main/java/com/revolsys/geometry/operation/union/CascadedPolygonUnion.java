@@ -194,6 +194,7 @@ public class CascadedPolygonUnion {
       final Polygonal polygon2 = getPolygon(polygons, start + 1);
       return unionSafe(polygon1, polygon2);
     } else {
+
       // recurse on both halves of the list
       final int mid = (end + start) / 2;
       final Polygonal polygon1 = binaryUnion(polygons, start, mid);
