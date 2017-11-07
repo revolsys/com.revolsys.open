@@ -200,6 +200,11 @@ public class RangeSet extends AbstractSet<Object>
     return addRange(addRange);
   }
 
+  public boolean addRange(final double from, final double to) {
+    final DoubleRange addRange = new DoubleRange(from, to);
+    return addRange(addRange);
+  }
+
   public boolean addRange(final int from, final int to) {
     final IntRange addRange = new IntRange(from, to);
     return addRange(addRange);

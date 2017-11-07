@@ -32,19 +32,14 @@
  */
 package com.revolsys.geometry.algorithm.locate;
 
-import java.util.function.Consumer;
-
 import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
-import com.revolsys.geometry.index.intervalrtree.SortedPackedIntervalRTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.util.Property;
 
 /**
@@ -59,40 +54,6 @@ import com.revolsys.util.Property;
  *
  */
 public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
-  public static class IntervalIndexedGeometry {
-    private final SortedPackedIntervalRTree<LineSegment> index = new SortedPackedIntervalRTree<>();
-
-    public IntervalIndexedGeometry(final Geometry geometry) {
-      geometry.forEachSegment((x1, y1, x2, y2) -> {
-        double minY;
-        double maxY;
-        if (y1 < y2) {
-          minY = y1;
-          maxY = y2;
-        } else {
-          minY = y2;
-          maxY = y1;
-        }
-        final LineSegmentDouble segment = new LineSegmentDouble(2, x1, y1, x2, y2);
-        this.index.insert(minY, maxY, segment);
-      });
-      // final List<LineString> lines =
-      // geometry.getGeometryComponents(LineString.class);
-      // for (final LineString line : lines) {
-      // for (final Segment segment : line.segments()) {
-      // final double y1 = segment.getY(0);
-      // final double y2 = segment.getY(1);
-      // final double min = Math.min(y1, y2);
-      // final double max = Math.max(y1, y2);
-      // this.index.insert(min, max, segment.clone());
-      // }
-      // }
-    }
-
-    public void query(final double min, final double max, final Consumer<LineSegment> visitor) {
-      this.index.query(min, max, visitor);
-    }
-  }
 
   private static final WeakKeyValueMap<Geometry, IndexedPointInAreaLocator> CACHE = new WeakKeyValueMap<>();
 
@@ -110,7 +71,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 
   private final Geometry geometry;
 
-  private final IntervalIndexedGeometry index;
+  private final GeometrySegmentYIntervalIndex index;
 
   /**
    * Creates a new locator for a given {@link Geometry}
@@ -122,7 +83,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
       throw new IllegalArgumentException("Argument must be Polygonal or LinearRing");
     }
     this.geometry = geometry;
-    this.index = new IntervalIndexedGeometry(geometry);
+    this.index = new GeometrySegmentYIntervalIndex(geometry);
   }
 
   public Geometry getGeometry() {
@@ -133,7 +94,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     return this.geometry.getGeometryFactory();
   }
 
-  public IntervalIndexedGeometry getIndex() {
+  public GeometrySegmentYIntervalIndex getIndex() {
     return this.index;
   }
 
@@ -145,7 +106,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
   @Override
   public Location locate(final double x, final double y) {
     final RayCrossingCounter visitor = new RayCrossingCounter(x, y);
-    this.index.query(y, y, visitor);
+    this.index.query(y, visitor);
 
     return visitor.getLocation();
   }
