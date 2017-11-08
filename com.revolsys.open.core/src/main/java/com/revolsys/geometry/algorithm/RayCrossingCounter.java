@@ -174,6 +174,9 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
 
   private double y;
 
+  public RayCrossingCounter() {
+  }
+
   public RayCrossingCounter(final double x, final double y) {
     this.x = x;
     this.y = y;
@@ -335,6 +338,30 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
    */
   public boolean isPointInPolygon() {
     return getLocation() != Location.EXTERIOR;
+  }
+
+  public void reset() {
+    this.crossingCount = 0;
+    this.pointOnSegment = false;
+  }
+
+  public void reset(final double x, final double y) {
+    this.crossingCount = 0;
+    this.pointOnSegment = false;
+    this.x = x;
+    this.y = y;
+  }
+
+  public void resetX(final double x) {
+    this.crossingCount = 0;
+    this.pointOnSegment = false;
+    this.x = x;
+  }
+
+  public void resetY(final double y) {
+    this.crossingCount = 0;
+    this.pointOnSegment = false;
+    this.y = y;
   }
 
   public void setPointOnSegment(final boolean pointOnSegment) {

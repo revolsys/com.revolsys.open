@@ -1,5 +1,7 @@
 package com.revolsys.geometry.algorithm.locate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.intervalrtree.SortedPackedIntervalRTree;
@@ -9,42 +11,29 @@ import com.revolsys.geometry.model.segment.LineSegmentDoubleXY;
 import com.revolsys.util.function.Consumer4Double;
 
 public class GeometrySegmentYIntervalIndex {
-  public static GeometrySegmentYIntervalIndex sortY(final Geometry geometry) {
-    final SortedPackedIntervalRTree<LineSegmentDoubleXY> index = new SortedPackedIntervalRTree<>();
-
-    geometry.forEachSegment((x1, y1, x2, y2) -> {
-      if (y1 <= y2) {
-        final LineSegmentDoubleXY segment = new LineSegmentDoubleXY(x1, y1, x2, y2);
-        index.insert(y1, y2, segment);
-      } else {
-        final LineSegmentDoubleXY segment = new LineSegmentDoubleXY(x2, y2, x1, y1);
-        index.insert(y2, y1, segment);
-      }
-    });
-    return new GeometrySegmentYIntervalIndex(index);
-  }
 
   private final SortedPackedIntervalRTree<LineSegmentDoubleXY> index;
 
   public GeometrySegmentYIntervalIndex(final Geometry geometry) {
     this(new SortedPackedIntervalRTree<>());
     geometry.forEachSegment((x1, y1, x2, y2) -> {
-      double minY;
-      double maxY;
-      if (y1 < y2) {
-        minY = y1;
-        maxY = y2;
-      } else {
-        minY = y2;
-        maxY = y1;
-      }
       final LineSegmentDoubleXY segment = new LineSegmentDoubleXY(x1, y1, x2, y2);
-      this.index.insert(minY, maxY, segment);
+      if (y1 <= y2) {
+        this.index.insert(y1, y2, segment);
+      } else {
+        this.index.insert(y2, y1, segment);
+      }
     });
   }
 
   public GeometrySegmentYIntervalIndex(final SortedPackedIntervalRTree<LineSegmentDoubleXY> index) {
     this.index = index;
+  }
+
+  public List<LineSegment> getSegments(final double y) {
+    final List<LineSegment> segments = new ArrayList<>();
+    this.index.query(y, y, segments::add);
+    return segments;
   }
 
   public void query(final double y, final Consumer<LineSegment> visitor) {
