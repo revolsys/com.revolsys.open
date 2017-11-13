@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
@@ -26,9 +27,13 @@ import com.revolsys.io.PathName;
 import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -147,6 +152,40 @@ public interface Records {
     final T newObject = (T)record.clone();
     newObject.setGeometryValue(geometry);
     return newObject;
+  }
+
+  static void copyRecords(final RecordStore sourceRecordStore, final String sourceTableName,
+    final RecordStore targetRecordStore, final String targetTableName) {
+    final Query query = new Query(sourceTableName);
+    try (
+      RecordReader reader = sourceRecordStore.getRecords(query);
+      RecordWriter writer = targetRecordStore.newRecordWriter();) {
+      final RecordDefinition recordDefinition = targetRecordStore
+        .getRecordDefinition(targetTableName);
+      for (final Record record : reader) {
+        final Record newRecord = recordDefinition.newRecord();
+        newRecord.setValuesAll(record);
+        writer.write(newRecord);
+      }
+    }
+  }
+
+  static void copyRecords(final RecordStore sourceRecordStore, final String sourceTableName,
+    final RecordStore targetRecordStore, final String targetTableName,
+    final BiConsumer<Record, Record> recordEditor) {
+    final Query query = new Query(sourceTableName);
+    try (
+      RecordReader reader = sourceRecordStore.getRecords(query);
+      RecordWriter writer = targetRecordStore.newRecordWriter();) {
+      final RecordDefinition recordDefinition = targetRecordStore
+        .getRecordDefinition(targetTableName);
+      for (final Record record : reader) {
+        final Record newRecord = recordDefinition.newRecord();
+        newRecord.setValuesAll(record);
+        recordEditor.accept(record, newRecord);
+        writer.write(newRecord);
+      }
+    }
   }
 
   static double distance(final Record record1, final Record record2) {

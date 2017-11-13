@@ -148,6 +148,11 @@ public interface SpatialIndex<V> extends GeometryFactoryProxy {
    */
   void insertItem(BoundingBox boundingBox, V item);
 
+  default void insertItem(final BoundingBoxProxy boundingBoxProxy, final V item) {
+    final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+    insertItem(boundingBox, item);
+  }
+
   /**
    * Removes a single item from the tree.
    *

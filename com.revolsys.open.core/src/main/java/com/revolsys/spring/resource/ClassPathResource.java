@@ -113,8 +113,7 @@ public class ClassPathResource extends AbstractResource {
       is = ClassLoader.getSystemResourceAsStream(this.path);
     }
     if (is == null) {
-      throw new IllegalArgumentException(
-        getDescription() + " cannot be opened because it does not exist");
+      throw new NoSuchResourceException(this);
     }
     return is;
   }
@@ -130,8 +129,7 @@ public class ClassPathResource extends AbstractResource {
       url = ClassLoader.getSystemResource(this.path);
     }
     if (url == null) {
-      throw new IllegalArgumentException(
-        getDescription() + " cannot be resolved to URL because it does not exist");
+      throw new NoSuchResourceException(this);
     }
     return url;
   }

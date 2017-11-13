@@ -156,6 +156,10 @@ public class RecordGraph extends Graph<Record> {
     return mergedEdge;
   }
 
+  public List<Edge<Record>> splitEdges(final Point point) {
+    return splitEdges(point, 0);
+  }
+
   public List<Edge<Record>> splitEdges(final Point point, final double distance) {
     final List<Edge<Record>> edges = new ArrayList<>();
     for (final Edge<Record> edge : getEdges(point, distance)) {
@@ -166,5 +170,4 @@ public class RecordGraph extends Graph<Record> {
     }
     return edges;
   }
-
 }

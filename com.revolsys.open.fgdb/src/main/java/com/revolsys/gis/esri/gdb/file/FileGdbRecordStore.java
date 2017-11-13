@@ -1092,12 +1092,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return this.exists && !isClosed();
   }
 
-  public boolean isNull(final Row row, final String name) {
-    synchronized (this.apiSync) {
-      return row.isNull(name);
-    }
-  }
-
   public boolean isOpen(final Table table) {
     synchronized (this.apiSync) {
       if (table == null) {

@@ -12,7 +12,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
@@ -105,39 +104,38 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    final FileGdbRecordStore recordStore = getRecordStore();
-    if (recordStore.isNull(row, name)) {
-      return null;
-    } else {
-      final byte[] bytes;
-      synchronized (getSync()) {
+    final byte[] bytes;
+    synchronized (getSync()) {
+      if (row.isNull(name)) {
+        return null;
+      } else {
         bytes = row.getGeometry();
       }
-      final ByteBuffer buffer = ByteBuffer.wrap(bytes);
-      buffer.order(ByteOrder.LITTLE_ENDIAN);
+    }
+    final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-      final int geometryType = buffer.getInt();
-      if (geometryType == 0) {
-        final DataType dataType = getDataType();
-        if (DataTypes.POINT.equals(dataType)) {
-          return this.geometryFactory.point();
-        } else if (DataTypes.MULTI_POINT.equals(dataType)) {
-          return this.geometryFactory.point();
-        } else if (DataTypes.LINE_STRING.equals(dataType)) {
-          return this.geometryFactory.lineString();
-        } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
-          return this.geometryFactory.lineString();
-        } else if (DataTypes.POLYGON.equals(dataType)) {
-          return this.geometryFactory.polygon();
-        } else if (DataTypes.MULTI_POLYGON.equals(dataType)) {
-          return this.geometryFactory.polygon();
-        } else {
-          return null;
-        }
+    final int geometryType = buffer.getInt();
+    if (geometryType == 0) {
+      final DataType dataType = getDataType();
+      if (DataTypes.POINT.equals(dataType)) {
+        return this.geometryFactory.point();
+      } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+        return this.geometryFactory.point();
+      } else if (DataTypes.LINE_STRING.equals(dataType)) {
+        return this.geometryFactory.lineString();
+      } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
+        return this.geometryFactory.lineString();
+      } else if (DataTypes.POLYGON.equals(dataType)) {
+        return this.geometryFactory.polygon();
+      } else if (DataTypes.MULTI_POLYGON.equals(dataType)) {
+        return this.geometryFactory.polygon();
       } else {
-        final Geometry geometry = this.readFunction.apply(this.geometryFactory, buffer, MINUS1);
-        return geometry;
+        return null;
       }
+    } else {
+      final Geometry geometry = this.readFunction.apply(this.geometryFactory, buffer, MINUS1);
+      return geometry;
     }
   }
 

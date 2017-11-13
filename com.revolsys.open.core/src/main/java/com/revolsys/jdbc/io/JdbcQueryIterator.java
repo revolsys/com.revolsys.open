@@ -181,7 +181,11 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     String dbTableName;
     if (this.recordDefinition == null) {
       final PathName pathName = PathName.newPathName(tableName);
-      dbTableName = pathName.getName();
+      if (pathName == null) {
+        dbTableName = null;
+      } else {
+        dbTableName = pathName.getName();
+      }
     } else {
       dbTableName = this.recordDefinition.getDbTableName();
     }

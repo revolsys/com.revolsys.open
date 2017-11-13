@@ -1225,6 +1225,21 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     }
   }
 
+  default void setValuesAll(final Record record) {
+    if (record != null) {
+      final List<FieldDefinition> fields = getFieldDefinitions();
+      for (final FieldDefinition fieldDefintion : fields) {
+        final String name = fieldDefintion.getName();
+        final Object value = record.getValue(name);
+        fieldDefintion.setValue(this, value);
+      }
+      final Geometry geometry = record.getGeometry();
+      if (geometry != null) {
+        setGeometryValue(geometry);
+      }
+    }
+  }
+
   default void setValuesByPath(final Map<? extends CharSequence, ? extends Object> values) {
     if (values != null) {
       for (final Entry<? extends CharSequence, ? extends Object> defaultValue : new ArrayList<>(

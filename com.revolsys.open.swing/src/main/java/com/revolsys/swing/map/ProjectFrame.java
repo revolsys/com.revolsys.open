@@ -314,6 +314,22 @@ public class ProjectFrame extends BaseFrame {
     });
   }
 
+  protected void addBottomTabs(final DnDTabbedPane bottomTabs) {
+    addBottomTabsTasks();
+    Log4jTableModel.addNewTabPane(bottomTabs);
+  }
+
+  protected void addBottomTabsTasks() {
+    final int tabIndex = BackgroundTaskTableModel.addNewTabPanel(this.bottomTabs);
+
+    final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
+    final JButton viewTasksAction = RunnableAction.newButton(null, "View Running Tasks",
+      Icons.getIcon("time_go"), () -> this.bottomTabs.setSelectedIndex(tabIndex));
+    viewTasksAction.setBorderPainted(false);
+    viewTasksAction.setBorder(null);
+    progressBar.add(viewTasksAction, BorderLayout.EAST);
+  }
+
   protected void addMenu(final JMenuBar menuBar, final MenuFactory menuFactory) {
     if (menuFactory != null) {
       final JMenu menu = menuFactory.newComponent();
@@ -527,8 +543,7 @@ public class ProjectFrame extends BaseFrame {
     newTabLeftTableOfContents();
     newTabLeftCatalogPanel();
 
-    newTabBottomTasksPanel();
-    Log4jTableModel.addNewTabPane(this.bottomTabs);
+    addBottomTabs(this.bottomTabs);
     setBounds((Object)null, false);
 
     super.initUi();
@@ -643,8 +658,10 @@ public class ProjectFrame extends BaseFrame {
       }
     }).setAcceleratorControlKey(KeyEvent.VK_S);
 
-    file.addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
-      this::actionSaveProjectAs).setAcceleratorShiftControlKey(KeyEvent.VK_S);
+    file
+      .addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
+        this::actionSaveProjectAs)
+      .setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", SaveAsPdf::save);
 
@@ -679,17 +696,6 @@ public class ProjectFrame extends BaseFrame {
 
     tools.addMenuItem("script", "Run Script...", "script_go", this::actionRunScript);
     return tools;
-  }
-
-  protected void newTabBottomTasksPanel() {
-    final int tabIndex = BackgroundTaskTableModel.addNewTabPanel(this.bottomTabs);
-
-    final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
-    final JButton viewTasksAction = RunnableAction.newButton(null, "View Running Tasks",
-      Icons.getIcon("time_go"), () -> this.bottomTabs.setSelectedIndex(tabIndex));
-    viewTasksAction.setBorderPainted(false);
-    viewTasksAction.setBorder(null);
-    progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
 
   protected void newTabLeftCatalogPanel() {

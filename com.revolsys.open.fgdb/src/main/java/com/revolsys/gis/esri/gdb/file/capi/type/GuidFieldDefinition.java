@@ -45,10 +45,10 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (getRecordStore().isNull(row, name)) {
-      return null;
-    } else {
-      synchronized (getSync()) {
+    synchronized (getSync()) {
+      if (row.isNull(name)) {
+        return null;
+      } else {
         final Guid guid = row.getGuid(name);
         addGuid(guid);
         return guid.toString();

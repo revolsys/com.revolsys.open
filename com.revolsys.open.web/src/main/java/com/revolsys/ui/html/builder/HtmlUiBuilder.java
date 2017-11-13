@@ -1203,41 +1203,43 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final RecordStore recordStore, Query query, final String pageName) {
     final Map<String, Object> response = new LinkedHashMap<>();
     try {
-      final int numRecords = recordStore.getRecordCount(query);
-      int recordCount = 50;
-      final String lengthString = request.getParameter("length");
-      if (Property.hasValue(lengthString)) {
-        if (!"NAN".equalsIgnoreCase(lengthString)) {
-          try {
-            recordCount = Integer.valueOf(lengthString);
-          } catch (final Throwable e) {
+      final int recordCount = recordStore.getRecordCount(query);
+      final List<List<String>> rows = new ArrayList<>();
+      if (recordCount > 0) {
+        int recordCountMax = 50;
+        final String lengthString = request.getParameter("length");
+        if (Property.hasValue(lengthString)) {
+          if (!"NAN".equalsIgnoreCase(lengthString)) {
+            try {
+              recordCountMax = Integer.valueOf(lengthString);
+            } catch (final Throwable e) {
+            }
           }
         }
-      }
 
-      final int offset = HttpServletUtils.getIntegerParameter(request, "start");
-      query = query.clone();
-      query.setOffset(offset);
-      query.setLimit(recordCount);
+        final int offset = HttpServletUtils.getIntegerParameter(request, "start");
+        query = query.clone();
+        query.setOffset(offset);
+        query.setLimit(recordCountMax);
 
-      final List<KeySerializer> serializers = getSerializers(pageName, "list");
+        final List<KeySerializer> serializers = getSerializers(pageName, "list");
 
-      final List<List<String>> rows = new ArrayList<>();
-      try (
-        Reader<Record> reader = recordStore.getRecords(query)) {
-        for (Record record : reader) {
-          record = convertRecord(record);
-          final List<String> row = new ArrayList<>();
-          for (final KeySerializer serializer : serializers) {
-            final String html = serializer.toString(record);
-            row.add(html);
+        try (
+          Reader<Record> reader = recordStore.getRecords(query)) {
+          for (Record record : reader) {
+            record = convertRecord(record);
+            final List<String> row = new ArrayList<>();
+            for (final KeySerializer serializer : serializers) {
+              final String html = serializer.toString(record);
+              row.add(html);
+            }
+            rows.add(row);
           }
-          rows.add(row);
         }
       }
       response.put("draw", HttpServletUtils.getIntegerParameter(request, "draw"));
-      response.put("recordsTotal", numRecords);
-      response.put("recordsFiltered", numRecords);
+      response.put("recordsTotal", recordCount);
+      response.put("recordsFiltered", recordCount);
       response.put("data", rows);
     } catch (final Throwable e) {
       Logs.error(this, "Error executing query: " + query, e);
