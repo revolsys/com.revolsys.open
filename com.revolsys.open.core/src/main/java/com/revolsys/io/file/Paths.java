@@ -24,6 +24,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -324,6 +325,22 @@ public interface Paths {
       return Files.getLastModifiedTime(path);
     } catch (final IOException e) {
       return FileTime.fromMillis(0);
+    }
+  }
+
+  static Date lastModifiedDate(final Path path) {
+    try {
+      return new Date(Files.getLastModifiedTime(path).toMillis());
+    } catch (final IOException e) {
+      return new Date(0);
+    }
+  }
+
+  static java.sql.Date lastModifiedDateSql(final Path path) {
+    try {
+      return new java.sql.Date(Files.getLastModifiedTime(path).toMillis());
+    } catch (final IOException e) {
+      return new java.sql.Date(0);
     }
   }
 

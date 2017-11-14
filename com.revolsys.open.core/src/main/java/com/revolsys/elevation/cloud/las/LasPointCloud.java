@@ -52,6 +52,12 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
     }
   }
 
+  public static LasPointCloud newLasPointCloud(final Object source,
+    final GeometryFactory geometryFactory) {
+    final Resource resource = Resource.getResource(source);
+    return new LasPointCloud(resource, geometryFactory);
+  }
+
   private GeometryFactory geometryFactory = GeometryFactory.fixed3d(1000.0, 1000.0, 1000.0);
 
   private LasPointCloudHeader header;
@@ -112,7 +118,7 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
           if (geometryFactoryFromPrj != null) {
             geometryFactory = geometryFactoryFromPrj;
           }
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
         }
