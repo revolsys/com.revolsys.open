@@ -34,6 +34,10 @@ public class TabbedPane extends JTabbedPane {
     return tabTitle;
   }
 
+  public int addTab(final Icon icon, final String toolTipText, final Component component) {
+    return addTab(icon, toolTipText, component, false);
+  }
+
   public int addTab(final Icon icon, final String toolTipText, Component component,
     final boolean useScrollPane) {
     if (useScrollPane) {

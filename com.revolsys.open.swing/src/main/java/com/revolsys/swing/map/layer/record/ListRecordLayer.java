@@ -203,7 +203,9 @@ public class ListRecordLayer extends AbstractRecordLayer {
   @Override
   public LayerRecord newLayerRecord(final Map<String, ? extends Object> values) {
     final LayerRecord record = super.newLayerRecord(values);
-    addRecord(record);
+    if (record != null) {
+      addRecord(record);
+    }
     return record;
   }
 
@@ -256,5 +258,4 @@ public class ListRecordLayer extends AbstractRecordLayer {
       return super.saveChangesDo(errors, record);
     }
   }
-
 }
