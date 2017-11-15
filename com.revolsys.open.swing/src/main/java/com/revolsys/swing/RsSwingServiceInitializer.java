@@ -2,7 +2,6 @@ package com.revolsys.swing;
 
 import java.net.URL;
 
-import com.revolsys.elevation.cloud.PointCloudReaderFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.rasterizer.ColourGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
@@ -152,8 +151,9 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("pointCloudLayer", "Point Cloud Layer",
       PointCloudLayer::new);
 
-    addIoFactoryMenuItem("pointCloud", "Add Point Cloud Layer", "point_cloud",
-      PointCloudReaderFactory.class);
+    // TODO Need to handle memory and rendering better
+    // addIoFactoryMenuItem("pointCloud", "Add Point Cloud Layer", "point_cloud",
+    // PointCloudReaderFactory.class);
 
     ArcGisRestServer.factoryInit();
 

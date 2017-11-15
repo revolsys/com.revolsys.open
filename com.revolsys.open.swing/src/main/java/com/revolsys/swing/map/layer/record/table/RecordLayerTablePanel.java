@@ -274,7 +274,7 @@ public class RecordLayerTablePanel extends TablePanel
     final TableRowCount tableRowCount = new TableRowCount(table);
     toolBar.addComponent("count", tableRowCount);
 
-    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this.tableModel::refresh);
+    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this.layer::refresh);
 
     toolBar.addButtonTitleIcon("table", "Export Records", "table_save",
       new ObjectPropertyEnableCheck(tableRowCount, "rowCount", 0, true),
