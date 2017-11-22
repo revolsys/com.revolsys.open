@@ -101,8 +101,15 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
         }
       }
       String name = recordDefinition.getName();
-      if (name.length() > 30) {
-        name = name.substring(0, 30);
+      if (name == null) {
+        name = "Sheet1";
+      } else {
+        name = name.trim();
+        if (name.length() == 0) {
+          name = "Sheet1";
+        } else if (name.length() > 30) {
+          name = name.substring(0, 30);
+        }
       }
       final PartName spreadsheetPartName = new PartName("/xl/worksheets/sheet1.xml");
       this.sheet = this.spreadsheetPackage.createWorksheetPart(spreadsheetPartName, name, 1);

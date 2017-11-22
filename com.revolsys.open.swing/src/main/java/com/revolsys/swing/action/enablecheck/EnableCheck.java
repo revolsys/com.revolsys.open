@@ -10,6 +10,15 @@ public interface EnableCheck {
     return new ObjectPropertyEnableCheck(object, propertyName);
   }
 
+  static EnableCheck property(final Object object, final String propertyName, final Object value) {
+    return new ObjectPropertyEnableCheck(object, propertyName, value);
+  }
+
+  static EnableCheck property(final Object object, final String propertyName, final Object value,
+    final boolean inverse) {
+    return new ObjectPropertyEnableCheck(object, propertyName, value, inverse);
+  }
+
   static EnableCheck propertyNotNull(final Object object, final String propertyName) {
     return new ObjectPropertyEnableCheck(object, propertyName, null, true);
   }

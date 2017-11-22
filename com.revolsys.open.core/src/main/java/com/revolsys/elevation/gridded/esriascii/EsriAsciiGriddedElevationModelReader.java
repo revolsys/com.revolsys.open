@@ -17,6 +17,7 @@ import com.revolsys.elevation.gridded.DoubleArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.io.PointReader;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.BaseCloseable;
@@ -73,6 +74,12 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
     }
   }
 
+  public BoundingBox getBoundingBox() {
+    GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.newBoundingBox(this.x, this.y, this.x + this.width * this.cellSize,
+      this.y + this.height * this.cellSize);
+  }
+
   protected BufferedReader getBufferedReader() {
 
     final String fileExtension = this.resource.getFileNameExtension();
@@ -115,9 +122,25 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
     }
   }
 
+  public double getCellSize() {
+    return this.cellSize;
+  }
+
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
+  }
+
+  public int getHeight() {
+    return this.height;
+  }
+
+  public double getMinX() {
+    return this.x;
+  }
+
+  public double getMinY() {
+    return this.y;
   }
 
   @Override
@@ -143,6 +166,14 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
       throw Exceptions.wrap("Error reading: " + this.resource, e);
     }
     throw new NoSuchElementException();
+  }
+
+  public double getNoDataValue() {
+    return this.noDataValue;
+  }
+
+  public int getWidth() {
+    return this.width;
   }
 
   @Override
