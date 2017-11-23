@@ -52,7 +52,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.elevation.gridded.IGriddedElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
@@ -357,7 +357,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   private double getElevation(final Point point) {
     final Project project = getProject();
     final double scale = getViewportScale();
-    return IGriddedElevationModelLayer.getElevation(project, scale, point);
+    return ElevationModelLayer.getElevation(project, scale, point);
   }
 
   public GeometryDataType<?, ?> getGeometryPartDataType(final DataType dataType) {

@@ -17,7 +17,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -790,74 +789,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     }
   }
 
-  default void setElevationsForTriangle(final double x1, final double y1, final double z1,
-    final double x2, final double y2, final double z2, final double x3, final double y3,
-    final double z3) {
-    final double scaleXy = getScaleXY();
-    double minX = x1;
-    double maxX = x1;
-    if (x2 < minX) {
-      minX = x2;
-    } else if (x2 > maxX) {
-      maxX = x2;
-    }
-    if (x2 < minX) {
-      minX = x2;
-    } else if (x2 > maxX) {
-      maxX = x2;
-    }
-    if (x3 < minX) {
-      minX = x3;
-    } else if (x3 > maxX) {
-      maxX = x3;
-    }
-
-    double minY = y1;
-    double maxY = y1;
-    if (y2 < minY) {
-      minY = y2;
-    } else if (y2 > maxY) {
-      maxY = y2;
-    }
-    if (y3 < minY) {
-      minY = y3;
-    } else if (y3 > maxY) {
-      maxY = y3;
-    }
-    final double gridCellSize = getGridCellSize();
-    final double gridMinX = getMinX();
-    final double gridMaxX = getMaxX();
-    final double startX;
-    if (minX < gridMinX) {
-      startX = gridMinX;
-    } else {
-      startX = Math.ceil(minX / gridCellSize) * gridCellSize;
-    }
-    if (maxX > gridMaxX) {
-      maxX = gridMaxX;
-    }
-    final double gridMinY = getMinY();
-    final double gridMaxY = getMaxY();
-    final double startY;
-    if (minY < gridMinY) {
-      startY = gridMinY;
-    } else {
-      startY = Math.ceil(minY / gridCellSize) * gridCellSize;
-    }
-    if (maxY > gridMaxY) {
-      maxY = gridMaxY;
-    }
-    for (double y = startY; y < maxY; y += gridCellSize) {
-      for (double x = startX; x < maxX; x += gridCellSize) {
-        if (Triangle.containsPoint(scaleXy, x1, y1, x2, y2, x3, y3, x, y)) {
-          final double elevation = Triangle.getElevation(x1, y1, z1, x2, y2, z2, x3, y3, z3, x, y);
-          if (Double.isFinite(elevation)) {
-            setElevation(x, y, elevation);
-          }
-        }
-      }
-    }
-  }
+  void setElevationsForTriangle(final double x1, final double y1, final double z1, final double x2,
+    final double y2, final double z2, final double x3, final double y3, final double z3);
 
   default void setElevationsNull(final GriddedElevationModel elevationModel) {
     final double minX1 = elevationModel.getMinX();

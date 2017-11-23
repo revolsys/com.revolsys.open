@@ -32,6 +32,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
@@ -40,7 +41,7 @@ import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class GriddedElevationModelLayer extends AbstractLayer
-  implements IGriddedElevationModelLayer {
+  implements ElevationModelLayer {
   public static final String J_TYPE = "griddedElevationModelLayer";
 
   static {

@@ -45,30 +45,7 @@ public interface Triangle extends Polygon {
       final double b = (y3y1 * xx3 + x1x3 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
       if (0 <= b && b <= 1) {
         final double c = 1 - a - b;
-        if (0 <= c && c <= 1) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  static boolean containsPoint(final double scale, final double x1, final double y1,
-    final double x2, final double y2, final double x3, final double y3, final double x,
-    final double y) {
-    final double y2y3 = y2 - y3;
-    final double xx3 = x - x3;
-    final double x3x2 = x3 - x2;
-    final double yy3 = y - y3;
-    final double x1x3 = x1 - x3;
-    final double y1y3 = y1 - y3;
-    final double a = (y2y3 * xx3 + x3x2 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
-    if (0 <= a && a <= 1) {
-      final double y3y1 = y3 - y1;
-      final double b = (y3y1 * xx3 + x1x3 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
-      if (0 <= b && b <= 1) {
-        final double c = Math.round((1 - a - b) * scale) / scale;
-        if (0 <= c && c <= 1) {
+        if (-0.001 < c && c < 1.001) {
           return true;
         }
       }
@@ -195,12 +172,19 @@ public interface Triangle extends Polygon {
     // https://en.wikipedia.org/wiki/Barycentric_coordinate_system
     // http://www.alecjacobson.com/weblog/?p=1596
 
-    final double invDET = 1. / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+    final double xx3 = x - x3;
+    final double x1x3 = x1 - x3;
+    final double x3x2 = x3 - x2;
+    final double yy3 = y - y3;
+    final double y1y3 = y1 - y3;
+    final double y2y3 = y2 - y3;
+    final double y3y1 = y3 - y1;
+    final double det = y2y3 * x1x3 + x3x2 * y1y3;
 
-    final double l1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) * invDET;
-    final double l2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) * invDET;
-    final double l3 = 1. - l1 - l2;
-    final double z = l1 * z1 + l2 * z2 + l3 * z3;
+    final double lambda1 = (y2y3 * xx3 + x3x2 * yy3) / det;
+    final double lambda2 = (y3y1 * xx3 + x1x3 * yy3) / det;
+    final double lambda3 = 1.0 - lambda1 - lambda2;
+    final double z = lambda1 * z1 + lambda2 * z2 + lambda3 * z3;
     return z;
   }
 

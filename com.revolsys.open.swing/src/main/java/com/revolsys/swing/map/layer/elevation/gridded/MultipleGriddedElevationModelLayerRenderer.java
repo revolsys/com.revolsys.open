@@ -15,6 +15,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
+import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Cancellable;
@@ -23,7 +24,7 @@ import com.revolsys.util.Property;
 
 public class MultipleGriddedElevationModelLayerRenderer
   extends AbstractGriddedElevationModelLayerRenderer implements
-  MultipleLayerRenderer<IGriddedElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> {
+  MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> {
   static {
     MenuFactory.addMenuInitializer(MultipleGriddedElevationModelLayerRenderer.class, menu -> {
 
@@ -39,12 +40,12 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
-    final BiFunction<IGriddedElevationModelLayer, MultipleGriddedElevationModelLayerRenderer, RasterizerGriddedElevationModelLayerRenderer> rendererFactory) {
+    final BiFunction<ElevationModelLayer, MultipleGriddedElevationModelLayerRenderer, RasterizerGriddedElevationModelLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type + "_add").toLowerCase();
     final String name = "Add " + type + " Style";
     Menus.addMenuItem(menu, "add", name, iconName,
       (final MultipleGriddedElevationModelLayerRenderer parentRenderer) -> {
-        final IGriddedElevationModelLayer layer = parentRenderer.getLayer();
+        final ElevationModelLayer layer = parentRenderer.getLayer();
         final RasterizerGriddedElevationModelLayerRenderer newRenderer = rendererFactory
           .apply(layer, parentRenderer);
         parentRenderer.addRendererEdit(newRenderer);
@@ -180,7 +181,7 @@ public class MultipleGriddedElevationModelLayerRenderer
 
   @Override
   public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final IGriddedElevationModelLayer layer) {
+    final ElevationModelLayer layer) {
     final List<RasterizerGriddedElevationModelLayerRenderer> renderers = getRenderers();
     for (final RasterizerGriddedElevationModelLayerRenderer renderer : cancellable
       .cancellable(renderers)) {
@@ -200,7 +201,7 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void setLayer(final IGriddedElevationModelLayer layer) {
+  public void setLayer(final ElevationModelLayer layer) {
     super.setLayer(layer);
     refreshIcon();
   }

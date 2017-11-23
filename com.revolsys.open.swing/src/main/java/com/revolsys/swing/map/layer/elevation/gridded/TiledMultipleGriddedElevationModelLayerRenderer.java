@@ -19,6 +19,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
+import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
@@ -30,7 +31,7 @@ import com.revolsys.util.Property;
 
 public class TiledMultipleGriddedElevationModelLayerRenderer extends
   AbstractTiledLayerRenderer<GriddedElevationModel, TiledGriddedElevationModelLayerTile> implements
-  MultipleLayerRenderer<IGriddedElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer>,
+  MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer>,
   GriddedElevationModelZRange {
   static {
     MenuFactory.addMenuInitializer(TiledMultipleGriddedElevationModelLayerRenderer.class, menu -> {

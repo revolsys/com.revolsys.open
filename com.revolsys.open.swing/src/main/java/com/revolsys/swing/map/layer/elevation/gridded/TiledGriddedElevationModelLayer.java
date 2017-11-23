@@ -23,6 +23,7 @@ import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
@@ -31,7 +32,7 @@ import com.revolsys.util.Strings;
 
 public class TiledGriddedElevationModelLayer
   extends AbstractTiledLayer<GriddedElevationModel, TiledGriddedElevationModelLayerTile>
-  implements IGriddedElevationModelLayer {
+  implements ElevationModelLayer {
   private Resource baseResource;
 
   private String fileExtension = ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION;
@@ -181,7 +182,7 @@ public class TiledGriddedElevationModelLayer
   @Override
   public boolean isUseElevationAtScale(final double scale) {
     if (this.elevationModel == null) {
-      return IGriddedElevationModelLayer.super.isUseElevationAtScale(scale);
+      return ElevationModelLayer.super.isUseElevationAtScale(scale);
     } else {
       return true;
     }

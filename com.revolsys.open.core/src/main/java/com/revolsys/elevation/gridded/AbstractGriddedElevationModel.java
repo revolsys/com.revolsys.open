@@ -3,7 +3,6 @@ package com.revolsys.elevation.gridded;
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -265,70 +264,92 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   public void setElevationsForTriangle(final double x1, final double y1, final double z1,
     final double x2, final double y2, final double z2, final double x3, final double y3,
     final double z3) {
-    final double scaleXy = this.scaleXY;
-    double minX = x1;
-    double maxX = x1;
-    if (x2 < minX) {
-      minX = x2;
-    } else if (x2 > maxX) {
-      maxX = x2;
-    }
-    if (x2 < minX) {
-      minX = x2;
-    } else if (x2 > maxX) {
-      maxX = x2;
-    }
-    if (x3 < minX) {
-      minX = x3;
-    } else if (x3 > maxX) {
-      maxX = x3;
-    }
+    if (Double.isFinite(z1) && Double.isFinite(z2) && Double.isFinite(z3)) {
+      final double scaleXy = this.scaleXY;
+      double minX = x1;
+      double maxX = x1;
+      if (x2 < minX) {
+        minX = x2;
+      } else if (x2 > maxX) {
+        maxX = x2;
+      }
+      if (x2 < minX) {
+        minX = x2;
+      } else if (x2 > maxX) {
+        maxX = x2;
+      }
+      if (x3 < minX) {
+        minX = x3;
+      } else if (x3 > maxX) {
+        maxX = x3;
+      }
 
-    double minY = y1;
-    double maxY = y1;
-    if (y2 < minY) {
-      minY = y2;
-    } else if (y2 > maxY) {
-      maxY = y2;
-    }
-    if (y3 < minY) {
-      minY = y3;
-    } else if (y3 > maxY) {
-      maxY = y3;
-    }
-    final double gridCellSize = this.gridCellSize;
-    final double[] bounds = this.bounds;
-    final double gridMinX = bounds[0];
-    final double gridMaxX = bounds[3];
-    final double startX;
-    if (minX < gridMinX) {
-      startX = gridMinX;
-    } else {
-      startX = Math.ceil(minX / gridCellSize) * gridCellSize;
-    }
-    if (maxX > gridMaxX) {
-      maxX = gridMaxX;
-    }
-    final double gridMinY = bounds[1];
-    final double gridMaxY = bounds[4];
-    final double startY;
-    if (minY < gridMinY) {
-      startY = gridMinY;
-    } else {
-      startY = Math.ceil(minY / gridCellSize) * gridCellSize;
-    }
-    if (maxY > gridMaxY) {
-      maxY = gridMaxY;
-    }
-    for (double y = startY; y < maxY; y += gridCellSize) {
-      for (double x = startX; x < maxX; x += gridCellSize) {
-        if (Triangle.containsPoint(scaleXy, x1, y1, x2, y2, x3, y3, x, y)) {
-          final double elevation = Triangle.getElevation(x1, y1, z1, x2, y2, z2, x3, y3, z3, x, y);
-          if (Double.isFinite(elevation)) {
-            setElevation(x, y, elevation);
+      double minY = y1;
+      double maxY = y1;
+      if (y2 < minY) {
+        minY = y2;
+      } else if (y2 > maxY) {
+        maxY = y2;
+      }
+      if (y3 < minY) {
+        minY = y3;
+      } else if (y3 > maxY) {
+        maxY = y3;
+      }
+      final double gridCellSize = this.gridCellSize;
+      final double[] bounds = this.bounds;
+      final double gridMinX = bounds[0];
+      final double gridMaxX = bounds[3];
+      final double startX;
+      if (minX < gridMinX) {
+        startX = gridMinX;
+      } else {
+        startX = Math.ceil(minX / gridCellSize) * gridCellSize;
+      }
+      if (maxX > gridMaxX) {
+        maxX = gridMaxX;
+      }
+      final double gridMinY = bounds[1];
+      final double gridMaxY = bounds[4];
+      final double startY;
+      if (minY < gridMinY) {
+        startY = gridMinY;
+      } else {
+        startY = Math.ceil(minY / gridCellSize) * gridCellSize;
+      }
+      if (maxY > gridMaxY) {
+        maxY = gridMaxY;
+      }
+      final double x1x3 = x1 - x3;
+      final double x3x2 = x3 - x2;
+      final double y1y3 = y1 - y3;
+      final double y2y3 = y2 - y3;
+      final double y3y1 = y3 - y1;
+      final double det = y2y3 * x1x3 + x3x2 * y1y3;
+
+      for (double y = startY; y < maxY; y += gridCellSize) {
+        final double yy3 = y - y3;
+        for (double x = startX; x < maxX; x += gridCellSize) {
+          final double xx3 = x - x3;
+          final double lambda1 = (y2y3 * xx3 + x3x2 * yy3) / det;
+          if (0 <= lambda1 && lambda1 <= 1) {
+            final double lambda2 = (y3y1 * xx3 + x1x3 * yy3) / det;
+            if (0 <= lambda2 && lambda2 <= 1) {
+              final double lambda3 = 1.0 - lambda1 - lambda2;
+              if (-0.001 <= lambda3 && lambda3 <= 1.001) {
+                final double elevation = lambda1 * z1 + lambda2 * z2 + lambda3 * z3;
+                if (Double.isFinite(elevation)) {
+                  setElevation(x, y, elevation);
+                } else {
+                  Debug.noOp();
+                }
+              }
+            }
           }
         }
       }
+    } else {
+      Debug.noOp();
     }
   }
 

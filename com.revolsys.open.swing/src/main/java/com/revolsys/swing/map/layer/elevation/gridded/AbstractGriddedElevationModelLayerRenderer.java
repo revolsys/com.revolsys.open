@@ -8,12 +8,13 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
+import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 
 public abstract class AbstractGriddedElevationModelLayerRenderer
-  extends AbstractLayerRenderer<IGriddedElevationModelLayer> {
+  extends AbstractLayerRenderer<ElevationModelLayer> {
 
   static {
     MenuFactory.addMenuInitializer(AbstractGriddedElevationModelLayerRenderer.class, menu -> {

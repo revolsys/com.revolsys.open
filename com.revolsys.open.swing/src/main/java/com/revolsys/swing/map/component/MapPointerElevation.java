@@ -18,7 +18,7 @@ import com.revolsys.parallel.channel.store.Overwrite;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.elevation.gridded.IGriddedElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.MaxThreadsSwingWorker;
@@ -46,8 +46,8 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
       } else {
         final int refreshIndex = MapPointerElevation.this.refreshIndex;
 
-        final List<IGriddedElevationModelLayer> layers = getLayers();
-        return IGriddedElevationModelLayer.getElevation(layers, this.mapLocation);
+        final List<ElevationModelLayer> layers = getLayers();
+        return ElevationModelLayer.getElevation(layers, this.mapLocation);
       }
     }
 
@@ -80,7 +80,7 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
 
   private final Project project;
 
-  private List<IGriddedElevationModelLayer> layers = Collections.emptyList();
+  private List<ElevationModelLayer> layers = Collections.emptyList();
 
   private final Object layerSync = new Object();
 
@@ -109,10 +109,10 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
         if (point == null) {
           return;
         } else {
-          final List<IGriddedElevationModelLayer> layers = getLayers();
+          final List<ElevationModelLayer> layers = getLayers();
           if (!layers.isEmpty()) {
 
-            final double elevation = IGriddedElevationModelLayer.getElevation(layers, point);
+            final double elevation = ElevationModelLayer.getElevation(layers, point);
             Invoke.later(() -> {
               synchronized (this.layerSync) {
                 if (Double.isFinite(elevation) && !getLayers().isEmpty()) {
@@ -130,12 +130,12 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
     }, "map-get-elevation").start();
   }
 
-  private List<IGriddedElevationModelLayer> getLayers() {
+  private List<ElevationModelLayer> getLayers() {
     if (this.layers == null) {
       synchronized (this.layerSync) {
         if (this.layers == null) {
           final double scale = this.viewport.getScale();
-          this.layers = IGriddedElevationModelLayer.getVisibleLayers(this.project, scale);
+          this.layers = ElevationModelLayer.getVisibleLayers(this.project, scale);
           final boolean hasLayers = !this.layers.isEmpty();
           Invoke.later(() -> this.setVisible(hasLayers));
         }

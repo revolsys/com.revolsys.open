@@ -13,6 +13,7 @@ import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
+import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
@@ -42,15 +43,15 @@ public class RasterizerGriddedElevationModelLayerRenderer
     super("rasterizerGriddedElevationModelLayerRenderer", "DEM Style");
   }
 
-  public RasterizerGriddedElevationModelLayerRenderer(final IGriddedElevationModelLayer layer,
-    final MultipleLayerRenderer<IGriddedElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> parent) {
+  public RasterizerGriddedElevationModelLayerRenderer(final ElevationModelLayer layer,
+    final MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> parent) {
     this();
     setLayer(layer);
     setParent((LayerRenderer<?>)parent);
   }
 
-  public RasterizerGriddedElevationModelLayerRenderer(final IGriddedElevationModelLayer layer,
-    final MultipleLayerRenderer<IGriddedElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> parent,
+  public RasterizerGriddedElevationModelLayerRenderer(final ElevationModelLayer layer,
+    final MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> parent,
     final GriddedElevationModelRasterizer rasterizer) {
     this();
     setLayer(layer);
@@ -71,7 +72,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
   public void delete() {
     final LayerRenderer<?> parent = getParent();
     if (parent instanceof MultipleLayerRenderer) {
-      final MultipleLayerRenderer<IGriddedElevationModelLayer, LayerRenderer<IGriddedElevationModelLayer>> multiple = (MultipleLayerRenderer<IGriddedElevationModelLayer, LayerRenderer<IGriddedElevationModelLayer>>)parent;
+      final MultipleLayerRenderer<ElevationModelLayer, LayerRenderer<ElevationModelLayer>> multiple = (MultipleLayerRenderer<ElevationModelLayer, LayerRenderer<ElevationModelLayer>>)parent;
       multiple.removeRenderer(this);
     }
   }
@@ -96,7 +97,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
 
   @Override
   public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final IGriddedElevationModelLayer layer) {
+    final ElevationModelLayer layer) {
     // TODO cancel
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {

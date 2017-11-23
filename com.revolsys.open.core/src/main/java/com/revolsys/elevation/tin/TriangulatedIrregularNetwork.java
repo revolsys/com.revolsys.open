@@ -235,9 +235,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
 
   default List<Triangle> getTriangles(final double x, final double y) {
     final List<Triangle> triangles = new ArrayList<>();
-    final Predicate<Triangle> filter = (triangle) -> {
-      return triangle.containsPoint(x, y);
-    };
+    final Predicate<Triangle> filter = triangle -> triangle.containsPoint(x, y);
     final BoundingBox boundingBox = new BoundingBoxDoubleXY(x, y);
     forEachTriangle(boundingBox, filter, triangles::add);
     return triangles;

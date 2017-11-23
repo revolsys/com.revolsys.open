@@ -20,11 +20,13 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Property;
 
-public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
+public class TriangulatedIrregularNetworkLayer extends AbstractLayer
+  implements ElevationModelLayer {
   public static final String J_TYPE = "triangulatedIrregularNetworkLayer";
   static {
     final MenuFactory menu = MenuFactory.getMenu(TriangulatedIrregularNetworkLayer.class);
@@ -71,6 +73,11 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
     } else {
       return getGeometryFactory().newBoundingBoxEmpty();
     }
+  }
+
+  @Override
+  public double getElevation(final double x, final double y) {
+    return this.tin.getElevation(x, y);
   }
 
   @Override
