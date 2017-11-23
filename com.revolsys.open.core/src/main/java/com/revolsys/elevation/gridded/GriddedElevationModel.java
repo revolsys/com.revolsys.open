@@ -252,8 +252,10 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
           x += gridCellSize;
         }
         final double y = minY + gridY * gridCellSize;
-        if (!points.isEmpty()) {
-          final int vertexCount = points.getVertexCount();
+        final int vertexCount = points.getVertexCount();
+        if (vertexCount < 2) {
+          points.appendVertex(x, y);
+        } else {
           final double lastY = points.getY(vertexCount - 1);
           if (lastY == y) {
             if (points.getY(vertexCount - 2) == y) {
@@ -262,12 +264,10 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
               points.appendVertex(x, y);
             }
           } else {
-            if (vertexCount > 0) {
-              if (points.getY(vertexCount - 2) == lastY) {
-                points.setX(vertexCount - 1, x);
-              } else {
-                points.appendVertex(x, lastY);
-              }
+            if (points.getY(vertexCount - 2) == lastY) {
+              points.setX(vertexCount - 1, x);
+            } else {
+              points.appendVertex(x, lastY);
             }
             points.appendVertex(x, y);
           }
@@ -300,8 +300,10 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
           y += gridCellSize;
         }
 
-        if (!points.isEmpty()) {
-          final int vertexCount = points.getVertexCount();
+        final int vertexCount = points.getVertexCount();
+        if (vertexCount < 2) {
+          points.appendVertex(x, y);
+        } else {
           final double lastX = points.getX(vertexCount - 1);
           if (lastX == x) {
             if (points.getX(vertexCount - 2) == x) {
@@ -310,12 +312,10 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
               points.appendVertex(x, y);
             }
           } else {
-            if (vertexCount > 0) {
-              if (points.getX(vertexCount - 2) == lastX) {
-                points.setY(vertexCount - 1, y);
-              } else {
-                points.appendVertex(lastX, y);
-              }
+            if (points.getX(vertexCount - 2) == lastX) {
+              points.setY(vertexCount - 1, y);
+            } else {
+              points.appendVertex(lastX, y);
             }
             points.appendVertex(x, y);
           }
@@ -346,8 +346,10 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
         if (gridY == maxGridYIndex) {
           y += gridCellSize;
         }
-        if (!points.isEmpty()) {
-          final int vertexCount = points.getVertexCount();
+        final int vertexCount = points.getVertexCount();
+        if (vertexCount < 2) {
+          points.appendVertex(x, y);
+        } else {
           final double lastY = points.getY(vertexCount - 1);
           if (lastY == y) {
             if (points.getY(vertexCount - 2) == y) {
@@ -356,12 +358,10 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
               points.appendVertex(x, y);
             }
           } else {
-            if (vertexCount > 0) {
-              if (points.getY(vertexCount - 2) == lastY) {
-                points.setX(vertexCount - 1, x);
-              } else {
-                points.appendVertex(x, lastY);
-              }
+            if (points.getY(vertexCount - 2) == lastY) {
+              points.setX(vertexCount - 1, x);
+            } else {
+              points.appendVertex(x, lastY);
             }
             points.appendVertex(x, y);
           }
@@ -387,7 +387,9 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
         final double x = minX + gridX * gridCellSize;
         final double y = minY + gridY * gridCellSize;
         final int vertexCount = points.getVertexCount();
-        if (!points.isEmpty()) {
+        if (vertexCount < 2) {
+          points.appendVertex(x, y);
+        } else {
           final double lastX = points.getX(vertexCount - 1);
           if (lastX == x) {
             if (points.getX(vertexCount - 2) == x) {
@@ -396,12 +398,10 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
               points.appendVertex(x, y);
             }
           } else {
-            if (vertexCount > 0) {
-              if (points.getX(vertexCount - 2) == lastX) {
-                points.setY(vertexCount - 1, y);
-              } else {
-                points.appendVertex(lastX, y);
-              }
+            if (points.getX(vertexCount - 2) == lastX) {
+              points.setY(vertexCount - 1, y);
+            } else {
+              points.appendVertex(lastX, y);
             }
             points.appendVertex(x, y);
           }
@@ -418,8 +418,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
         }
       }
     }
-    if (!points.isEmpty()) {
-      final int vertexCount = points.getVertexCount();
+    final int vertexCount = points.getVertexCount();
+    if (vertexCount > 2) {
       final double x = points.getX(0);
       final double y = points.getY(0);
 
@@ -431,15 +431,13 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
           points.appendVertex(x, y);
         }
       } else {
-        if (vertexCount > 0) {
-          if (points.getX(vertexCount - 2) == lastX) {
-            points.setY(vertexCount - 1, y);
-          } else {
-            points.appendVertex(lastX, y);
-          }
+        if (points.getX(vertexCount - 2) == lastX) {
+          points.setY(vertexCount - 1, y);
+        } else {
+          points.appendVertex(lastX, y);
         }
-        points.appendVertex(x, y);
       }
+      points.appendVertex(x, y);
     }
     if (points.isEmpty()) {
       return getBoundingBox().toPolygon();
