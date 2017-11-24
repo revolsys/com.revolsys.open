@@ -1,6 +1,5 @@
 package com.revolsys.elevation.gridded.scaledint;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -10,8 +9,10 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -22,7 +23,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
 public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectWithProperties
-  implements Closeable {
+  implements GriddedElevationModelReader {
   protected static GeometryFactory readGeometryFactory(final ChannelReader reader) {
     final int coordinateSystemId = reader.getInt();
     final double offsetX = reader.getDouble();
@@ -34,6 +35,8 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
     return GeometryFactory.newWithOffsets(coordinateSystemId, offsetX, scaleX, offsetY, scaleY,
       offsetZ, scaleZ);
   }
+
+  private boolean initialized;
 
   private Resource resource;
 
@@ -55,8 +58,10 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
 
   private boolean exists;
 
-  ScaledIntegerGriddedDigitalElevationModelReader(final Resource resource) {
+  ScaledIntegerGriddedDigitalElevationModelReader(final Resource resource,
+    final Map<String, ? extends Object> properties) {
     this.resource = resource;
+    setProperties(properties);
   }
 
   @Override
@@ -70,16 +75,25 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
     this.resource = null;
   }
 
+  @Override
+  public BoundingBox getBoundingBox() {
+    init();
+    return this.boundingBox;
+  }
+
   public ByteBuffer getByteBuffer() {
     return this.byteBuffer;
   }
 
-  public boolean isMemoryMapped() {
-    return this.memoryMapped;
+  @Override
+  public double getGridCellSize() {
+    init();
+    return this.gridCellSize;
   }
 
-  public void open() {
-    if (this.reader == null) {
+  private void init() {
+    if (!this.initialized) {
+      this.initialized = true;
       if (this.byteBuffer == null) {
         this.reader = IoFactory.newChannelReader(this.resource, 8192);
       } else {
@@ -98,8 +112,13 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
     }
   }
 
+  public boolean isMemoryMapped() {
+    return this.memoryMapped;
+  }
+
+  @Override
   public GriddedElevationModel read() {
-    open();
+    init();
     if (this.exists) {
       try {
         final ChannelReader in = this.reader;
@@ -160,7 +179,6 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
     this.gridHeight = this.reader.getInt();
 
     this.boundingBox = geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY, maxZ);
-
   }
 
   public void setByteBuffer(final ByteBuffer byteBuffer) {

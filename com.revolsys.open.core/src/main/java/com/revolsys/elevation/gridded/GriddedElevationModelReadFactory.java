@@ -6,6 +6,14 @@ import com.revolsys.io.ReadIoFactory;
 import com.revolsys.spring.resource.Resource;
 
 public interface GriddedElevationModelReadFactory extends ReadIoFactory {
-  GriddedElevationModel newGriddedElevationModel(Resource resource,
+  default GriddedElevationModel newGriddedElevationModel(final Resource resource,
+    final Map<String, ? extends Object> properties) {
+    try (
+      GriddedElevationModelReader reader = newGriddedElevationModelReader(resource, properties)) {
+      return reader.read();
+    }
+  }
+
+  GriddedElevationModelReader newGriddedElevationModelReader(Resource resource,
     Map<String, ? extends Object> properties);
 }

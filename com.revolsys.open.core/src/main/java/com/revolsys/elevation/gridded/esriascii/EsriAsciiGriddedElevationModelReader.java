@@ -15,12 +15,12 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.gridded.DoubleArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.io.PointReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Readers;
 import com.revolsys.spring.resource.Resource;
@@ -29,7 +29,7 @@ import com.revolsys.util.number.BigDecimals;
 import com.revolsys.util.number.Doubles;
 
 public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point>
-  implements BaseCloseable, PointReader {
+  implements GriddedElevationModelReader, PointReader {
 
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
@@ -47,7 +47,7 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
 
   private double elevation = Double.NaN;
 
-  private double cellSize = 0;
+  private double gridCellSize = 0;
 
   private BufferedReader reader;
 
@@ -74,10 +74,12 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
     }
   }
 
+  @Override
   public BoundingBox getBoundingBox() {
-    GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.newBoundingBox(this.x, this.y, this.x + this.width * this.cellSize,
-      this.y + this.height * this.cellSize);
+    init();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.newBoundingBox(this.x, this.y, this.x + this.width * this.gridCellSize,
+      this.y + this.height * this.gridCellSize);
   }
 
   protected BufferedReader getBufferedReader() {
@@ -104,16 +106,14 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
         }
         throw new IllegalArgumentException("Cannot find " + fileName + " in " + this.resource);
       } else if (fileExtension.equals("gz")) {
+        final String baseName = this.resource.getBaseName();
+        setGeometryFactory(this.resource.getParent().newChildResource(baseName));
         final InputStream in = this.resource.newBufferedInputStream();
         final GZIPInputStream gzIn = new GZIPInputStream(in);
         this.reader = new BufferedReader(new InputStreamReader(gzIn, StandardCharsets.UTF_8));
         return this.reader;
       } else {
-        final GeometryFactory geometryFactory = EsriCoordinateSystems
-          .getGeometryFactory(this.resource);
-        if (geometryFactory != null) {
-          setGeometryFactory(geometryFactory);
-        }
+        setGeometryFactory(this.resource);
         this.reader = this.resource.newBufferedReader();
         return this.reader;
       }
@@ -122,13 +122,15 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
     }
   }
 
-  public double getCellSize() {
-    return this.cellSize;
-  }
-
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
+  }
+
+  @Override
+  public double getGridCellSize() {
+    init();
+    return this.gridCellSize;
   }
 
   public int getHeight() {
@@ -149,8 +151,8 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
       while (this.gridY >= 0) {
         while (this.gridX < this.width) {
           if (this.elevation != this.noDataValue) {
-            final Point point = this.geometryFactory.point(this.x + this.gridX * this.cellSize,
-              this.y + this.gridY * this.cellSize, this.elevation);
+            final Point point = this.geometryFactory.point(this.x + this.gridX * this.gridCellSize,
+              this.y + this.gridY * this.gridCellSize, this.elevation);
             this.elevation = Readers.readDouble(this.reader);
             this.gridX++;
             return point;
@@ -181,11 +183,12 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
     readHeader();
   }
 
+  @Override
   public GriddedElevationModel read() {
     try {
-      readHeader();
+      init();
       final DoubleArrayGriddedElevationModel elevationModel = new DoubleArrayGriddedElevationModel(
-        this.geometryFactory, this.x, this.y, this.width, this.height, this.cellSize);
+        this.geometryFactory, this.x, this.y, this.width, this.height, this.gridCellSize);
       elevationModel.setResource(this.resource);
       if (Maps.getBool(getProperties(), EsriAsciiGriddedElevation.PROPERTY_READ_DATA, true)) {
         for (int gridY = this.height - 1; gridY >= 0; gridY--) {
@@ -227,8 +230,8 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
               throw new IllegalArgumentException("nrows must be > 0\n" + this.resource);
             }
           } else if ("cellsize".equals(keyword)) {
-            this.cellSize = Readers.readDouble(reader);
-            if (this.cellSize <= 0) {
+            this.gridCellSize = Readers.readDouble(reader);
+            if (this.gridCellSize <= 0) {
               throw new IllegalArgumentException("cellsize must be > 0\n" + this.resource);
             }
           } else if ("xllcenter".equals(keyword)) {
@@ -251,7 +254,7 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
         throw new IllegalArgumentException("ncols not specified\n" + this.resource);
       } else if (this.height == 0) {
         throw new IllegalArgumentException("nrows not specified\n" + this.resource);
-      } else if (this.cellSize == 0) {
+      } else if (this.gridCellSize == 0) {
         throw new IllegalArgumentException("cellsize not specified\n" + this.resource);
       } else if (Double.isNaN(xCentre)) {
         if (Double.isNaN(xCorner)) {
@@ -271,8 +274,8 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
           throw new IllegalArgumentException(
             "xllcenter set must missing yllcenter\n" + this.resource);
         } else {
-          this.x = xCentre - this.cellSize / 2.0;
-          this.y = yCentre - this.cellSize / 2.0;
+          this.x = xCentre - this.gridCellSize / 2.0;
+          this.y = yCentre - this.gridCellSize / 2.0;
         }
       }
       this.gridY = this.height - 1;
@@ -287,6 +290,13 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
       this.geometryFactory = GeometryFactory.DEFAULT_3D;
     } else {
       this.geometryFactory = geometryFactory;
+    }
+  }
+
+  private void setGeometryFactory(final Resource resource) {
+    final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+    if (geometryFactory != null) {
+      setGeometryFactory(geometryFactory);
     }
   }
 

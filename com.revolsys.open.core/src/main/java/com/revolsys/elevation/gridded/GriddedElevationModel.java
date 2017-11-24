@@ -71,6 +71,25 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     }
   }
 
+  public static <R extends GriddedElevationModelReader> R newGriddedElevationModelReader(
+    final Object source) {
+    final MapEx properties = MapEx.EMPTY;
+    return newGriddedElevationModelReader(source, properties);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <R extends GriddedElevationModelReader> R newGriddedElevationModelReader(
+    final Object source, final MapEx properties) {
+    final GriddedElevationModelReadFactory factory = IoFactory
+      .factory(GriddedElevationModelReadFactory.class, source);
+    if (factory == null) {
+      return null;
+    } else {
+      final Resource resource = Resource.getResource(source);
+      return (R)factory.newGriddedElevationModelReader(resource, properties);
+    }
+  }
+
   public static void serviceInit() {
     IoFactoryRegistry.addFactory(new ScaledIntegerGriddedDigitalElevationModel());
     IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());

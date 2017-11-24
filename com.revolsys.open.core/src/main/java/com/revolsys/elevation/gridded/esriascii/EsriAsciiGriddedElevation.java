@@ -2,9 +2,9 @@ package com.revolsys.elevation.gridded.esriascii;
 
 import java.util.Map;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.io.PointReader;
@@ -22,19 +22,6 @@ public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSy
 
   public static final String PROPERTY_READ_DATA = "readData";
 
-  public static EsriAsciiGriddedElevationModelReader newReader(final Object resource) {
-    return newReader(resource, MapEx.EMPTY);
-  }
-
-  public static EsriAsciiGriddedElevationModelReader newReader(final Object source,
-    final Map<String, ? extends Object> properties) {
-    final Resource resource = Resource.getResource(source);
-    final EsriAsciiGriddedElevationModelReader reader = new EsriAsciiGriddedElevationModelReader(
-      resource, properties);
-    reader.init();
-    return reader;
-  }
-
   public EsriAsciiGriddedElevation() {
     super("ESRI ASCII Grid");
     addMediaTypeAndFileExtension("image/x-esri-ascii-grid", FILE_EXTENSION);
@@ -50,6 +37,12 @@ public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSy
         resource, properties)) {
       return reader.read();
     }
+  }
+
+  @Override
+  public GriddedElevationModelReader newGriddedElevationModelReader(final Resource resource,
+    final Map<String, ? extends Object> properties) {
+    return new EsriAsciiGriddedElevationModelReader(resource, properties);
   }
 
   @Override

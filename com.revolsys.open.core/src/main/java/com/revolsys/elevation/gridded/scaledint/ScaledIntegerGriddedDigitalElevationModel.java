@@ -149,14 +149,9 @@ public class ScaledIntegerGriddedDigitalElevationModel extends AbstractIoFactory
   }
 
   @Override
-  public GriddedElevationModel newGriddedElevationModel(final Resource resource,
-    final Map<String, ? extends Object> properties) {
-    try (
-      ScaledIntegerGriddedDigitalElevationModelReader reader = new ScaledIntegerGriddedDigitalElevationModelReader(
-        resource)) {
-      reader.setProperties(properties);
-      return reader.read();
-    }
+  public ScaledIntegerGriddedDigitalElevationModelReader newGriddedElevationModelReader(
+    final Resource resource, final Map<String, ? extends Object> properties) {
+    return new ScaledIntegerGriddedDigitalElevationModelReader(resource, properties);
   }
 
   @Override
