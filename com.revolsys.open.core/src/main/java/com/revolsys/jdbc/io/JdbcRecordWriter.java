@@ -27,12 +27,13 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.property.GlobalIdProperty;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.count.CategoryLabelCountMap;
 
-public class JdbcWriterImpl extends AbstractRecordWriter {
-  private static final Logger LOG = Logger.getLogger(JdbcWriterImpl.class);
+public class JdbcRecordWriter extends AbstractRecordWriter {
+  private static final Logger LOG = Logger.getLogger(JdbcRecordWriter.class);
 
   private int batchSize = 1;
 
@@ -98,11 +99,14 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
 
   private final Map<JdbcRecordDefinition, List<Record>> typeDeleteRecords = new HashMap<>();
 
-  public JdbcWriterImpl(final JdbcRecordStore recordStore) {
+  private RecordDefinition recordDefinition;
+
+  public JdbcRecordWriter(final JdbcRecordStore recordStore) {
     this(recordStore, recordStore.getStatistics());
   }
 
-  public JdbcWriterImpl(final JdbcRecordStore recordStore, final CategoryLabelCountMap statistics) {
+  public JdbcRecordWriter(final JdbcRecordStore recordStore,
+    final CategoryLabelCountMap statistics) {
     this.recordStore = recordStore;
     this.statistics = statistics;
     this.connection = recordStore.getJdbcConnection();
@@ -115,6 +119,12 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
       }
     }
     statistics.connect();
+  }
+
+  public JdbcRecordWriter(final JdbcRecordStore recordStore,
+    final RecordDefinition recordDefinition) {
+    this(recordStore);
+    this.recordDefinition = recordDefinition;
   }
 
   public void appendIdEquals(final StringBuilder sqlBuffer, final List<FieldDefinition> idFields) {
@@ -376,6 +386,11 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
 
   public String getLabel() {
     return this.label;
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   private JdbcRecordDefinition getRecordDefinition(final PathName typePath) {

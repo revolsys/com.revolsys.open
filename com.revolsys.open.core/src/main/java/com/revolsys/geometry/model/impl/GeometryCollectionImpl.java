@@ -43,6 +43,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
@@ -190,6 +191,20 @@ public class GeometryCollectionImpl implements GeometryCollection {
     if (this.geometries != null) {
       for (final Geometry geometry : this.geometries) {
         action.accept(geometry);
+      }
+    }
+  }
+
+  @Override
+  public void forEachPolygon(final Consumer<Polygon> action) {
+    if (this.geometries != null) {
+      for (final Geometry geometry : this.geometries) {
+        if (geometry instanceof Polygon) {
+          final Polygon polygon = (Polygon)geometry;
+          action.accept(polygon);
+        } else if (geometry instanceof GeometryCollection) {
+          geometry.forEachPolygon(action);
+        }
       }
     }
   }

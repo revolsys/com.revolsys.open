@@ -45,6 +45,7 @@ import com.revolsys.geometry.model.editor.MultiPolygonEditor;
 import com.revolsys.geometry.model.editor.PolygonalEditor;
 
 public interface Polygonal extends Geometry {
+
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G newPolygonal(final Object value) {
     if (value == null) {
@@ -74,6 +75,7 @@ public interface Polygonal extends Geometry {
     return false;
   }
 
+  @Override
   void forEachPolygon(Consumer<Polygon> action);
 
   default double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,

@@ -1363,6 +1363,9 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     action.accept(this);
   }
 
+  default void forEachPolygon(final Consumer<Polygon> action) {
+  }
+
   void forEachSegment(Consumer4Double action);
 
   void forEachVertex(BiConsumerDouble action);

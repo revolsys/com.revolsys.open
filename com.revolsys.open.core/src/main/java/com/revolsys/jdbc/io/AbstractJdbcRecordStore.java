@@ -693,8 +693,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     }
   }
 
-  protected JdbcWriterImpl newRecordWriter(final int batchSize) {
-    final JdbcWriterImpl writer = new JdbcWriterImpl(this);
+  protected JdbcRecordWriter newRecordWriter(final int batchSize) {
+    final JdbcRecordWriter writer = new JdbcRecordWriter(this);
     writer.setSqlPrefix(this.sqlPrefix);
     writer.setSqlSuffix(this.sqlSuffix);
     writer.setBatchSize(batchSize);
@@ -702,6 +702,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     writer.setFlushBetweenTypes(this.flushBetweenTypes);
     writer.setQuoteColumnNames(false);
     return writer;
+  }
+
+  @Override
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
+    return new JdbcRecordWriter(this, recordDefinition);
   }
 
   @Override

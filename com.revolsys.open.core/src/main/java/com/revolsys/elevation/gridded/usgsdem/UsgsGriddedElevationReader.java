@@ -134,25 +134,25 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     }
   }
 
-  private double getDouble() {
-    final String string = getString(24);
-    return Double.valueOf(string);
-  }
-
   private Double getDouble(final int length) {
     final String string = getString(length);
     return Double.parseDouble(string);
+  }
+
+  private double getDouble12() {
+    final String string = getString(12);
+    return Double.parseDouble(string);
+  }
+
+  private double getDouble24() {
+    final String string = getString(24);
+    return Double.valueOf(string);
   }
 
   private Double getDoubleSci() {
     String string = getString(24);
     string = string.replace("D", "E");
     return Double.valueOf(string);
-  }
-
-  private float getFloat() {
-    final String string = getString(12);
-    return Float.parseFloat(string);
   }
 
   @Override
@@ -181,7 +181,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     final double[] bounds = new double[polygonSides * 2 + 2];
     int i = 0;
     for (; i < bounds.length - 2; i++) {
-      bounds[i] = getDouble();
+      bounds[i] = getDouble24();
     }
     bounds[i++] = bounds[0];
     bounds[i++] = bounds[1];
@@ -237,11 +237,11 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           Arrays.fill(yElevations, 0, rowIndex, Double.NaN);
         }
 
-        final double x1 = getDouble();
-        final double y1 = getDouble();
-        final double z1 = getDouble();
-        final double minZ = getDouble();
-        final double maxZ = getDouble();
+        final double x1 = getDouble24();
+        final double y1 = getDouble24();
+        final double z1 = getDouble24();
+        final double minZ = getDouble24();
+        final double maxZ = getDouble24();
 
         this.rasterRowCount = Math.max(this.rasterRowCount, rowIndex + rowCount);
         for (int i = 0; i < rowCount; i++) {
@@ -330,13 +330,26 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         final int verticalUom = getInteger();
         this.polygonBounds = getPolygonCoordinates();
 
-        final double min = getDouble();
-        final double max = getDouble();
-        final double angle = getDouble();
+        final double min = getDouble24();
+        final double max = getDouble24();
+        final double angle = getDouble24();
+        if (angle != 0) {
+          throw new IllegalArgumentException(
+            "Angle=" + angle + " not currently supported for USGS DEM: " + this.resource);
+        }
         final int verticalAccuracy = getInteger();
-        this.resolutionX = (int)getFloat();
-        final float resolutionY = getFloat();
-        this.resolutionZ = getFloat();
+        final double resolutionX = getDouble12();
+        final double resolutionY = getDouble12();
+        if (resolutionX != resolutionY) {
+          throw new IllegalArgumentException("resolutionX " + resolutionX + " != " + resolutionY
+            + " resolutionY for USGS DEM: " + this.resource);
+        }
+        this.resolutionX = (int)resolutionX;
+        if (resolutionX != this.resolutionX) {
+          throw new IllegalArgumentException("resolutionX " + resolutionX
+            + " must currently be an integer for USGS DEM: " + this.resource);
+        }
+        this.resolutionZ = getDouble12();
         this.rasterRowCount = getInteger();
         this.rasterColCount = getInteger();
         final Short largestContourInterval = getShort();
@@ -364,8 +377,11 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         } else if (planimetricUom == 2) {
           linearUnit = EpsgCoordinateSystems.getLinearUnit("metre");
         }
-        GeographicCoordinateSystem geographicCoordinateSystem = null;
+        GeographicCoordinateSystem geographicCoordinateSystem;
         switch (horizontalDatum) {
+          case 0:
+            geographicCoordinateSystem = null;
+          break;
           case 1:
             geographicCoordinateSystem = (GeographicCoordinateSystem)EpsgCoordinateSystems
               .getCoordinateSystem("NAD27");
@@ -384,13 +400,16 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           break;
 
           default:
-          break;
+            throw new IllegalArgumentException("horizontalDatum=" + horizontalDatum
+              + " not currently supported for USGS DEM: " + this.resource);
         }
         if (1 == planimetricReferenceSystem) {
           final int coordinateSystemId = 26900 + zone;
           this.geometryFactory = GeometryFactory.floating2d(coordinateSystemId);
         } else if (2 == planimetricReferenceSystem) {
-
+          throw new IllegalArgumentException(
+            "planimetricReferenceSystem=" + planimetricReferenceSystem
+              + " not currently supported for USGS DEM: " + this.resource);
         } else if (3 == planimetricReferenceSystem) {
           final MapEx parameters = new LinkedHashMapEx();
           parameters.put(ProjectionParameterNames.LONGITUDE_OF_CENTER,
@@ -417,6 +436,10 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
             final int coordinateSystemId = projectedCoordinateSystem2.getCoordinateSystemId();
             this.geometryFactory = GeometryFactory.floating2d(coordinateSystemId);
           }
+        } else {
+          throw new IllegalArgumentException(
+            "planimetricReferenceSystem=" + planimetricReferenceSystem
+              + " not currently supported for USGS DEM: " + this.resource);
         }
         final Polygon polygon = this.geometryFactory
           .polygon(this.geometryFactory.linearRing(2, this.polygonBounds));
