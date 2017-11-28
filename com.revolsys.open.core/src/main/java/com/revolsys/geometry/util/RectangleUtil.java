@@ -4,35 +4,186 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.util.function.Consumer4Double;
+import com.revolsys.util.function.Consumer6Double;
 
-public class BoundingBoxUtil {
+public class RectangleUtil {
   /**
    * The bitmask that indicates that a point lies below
    * this <code>Rectangle2D</code>.
    * @since 1.2
    */
-  public static final int OUT_BOTTOM = 8;
+  public static final int OUT_BOTTOM = 4; // 0100 Wikipedia value, others have different bit orders
 
   /**
    * The bitmask that indicates that a point lies to the left of
    * this <code>Rectangle2D</code>.
    * @since 1.2
    */
-  public static final int OUT_LEFT = 1;
+  public static final int OUT_LEFT = 1; // 0001 Wikipedia value, others have different bit orders
 
   /**
    * The bitmask that indicates that a point lies to the right of
    * this <code>Rectangle2D</code>.
    * @since 1.2
    */
-  public static final int OUT_RIGHT = 4;
+  public static final int OUT_RIGHT = 2; // 0010 Wikipedia value, others have different bit orders
 
   /**
    * The bitmask that indicates that a point lies above
    * this <code>Rectangle2D</code>.
    * @since 1.2
    */
-  public static final int OUT_TOP = 2;
+  public static final int OUT_TOP = 8; // 1000 Wikipedia value, others have different bit orders
+
+  // https://en.wikipedia.org/wiki/Cohen–Sutherland_algorithm
+  public static void clipLine(final double minX, final double minY, final double maxX,
+    final double maxY, double lineX1, double lineY1, double lineX2, double lineY2,
+    final Consumer4Double action) {
+    // compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
+    int outcode1 = getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
+    int outcode2 = getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
+    boolean accept = false;
+
+    while (!accept) {
+      if ((outcode1 | outcode2) == 0) {
+        // Bitwise OR is 0. Trivially accept and get out of loop
+        accept = true;
+      } else if ((outcode1 & outcode2) == 0) {
+        // Bitwise AND is not 0. (implies both end points are in the same region outside the
+        // window). Reject and get out of loop
+        return;
+      } else {
+        // failed both tests, so calculate the line segment to clip
+        // from an outside point to an intersection with clip edge
+        double x;
+        double y;
+
+        // At least one endpoint is outside the clip rectangle; pick it.
+        final int outcodeOut = outcode1 == 0 ? outcode1 : outcode2;
+
+        // Now find the intersection point;
+        // use formulas:
+        // slope = (y1 - y0) / (x1 - x0)
+        // x = x0 + (1 / slope) * (ym - y0), where ym is ymin or maxY
+        // y = y0 + slope * (xm - x0), where xm is xmin or xmax
+        final double deltaY = lineY2 - lineY1;
+        final double deltaX = lineX2 - lineX1;
+        if ((outcodeOut & OUT_TOP) != 0) { // point is above the clip rectangle
+          final double ratio = (maxY - lineY1) / deltaY;
+          x = lineX1 + deltaX * ratio;
+          y = maxY;
+        } else if ((outcodeOut & OUT_BOTTOM) != 0) { // point is below the clip rectangle
+          final double ratio = (minY - lineY1) / deltaY;
+          x = lineX2 + deltaX * ratio;
+          y = minY;
+        } else if ((outcodeOut & OUT_RIGHT) != 0) { // point is to the right of clip rectangle
+          final double ratio = (maxX - lineX1) / deltaX;
+          y = lineY1 + deltaY * ratio;
+          x = maxX;
+        } else if ((outcodeOut & OUT_LEFT) != 0) { // point is to the left of clip rectangle
+          final double ratio = (minX - lineX1) / deltaX;
+          y = lineY1 + deltaY * ratio;
+          x = minX;
+        } else {
+          throw new IllegalStateException("Cannot clip as both points are inside the rectangle");
+        }
+
+        // Now we move outside point to intersection point to clip
+        // and get ready for next pass.
+        if (outcodeOut == outcode1) {
+          lineX1 = x;
+          lineY1 = y;
+          outcode1 = getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
+        } else {
+          lineX2 = x;
+          lineY2 = y;
+          outcode2 = getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
+        }
+      }
+    }
+    if (accept) {
+      action.accept(lineX2, lineY2, lineX2, lineY2);
+    }
+  }
+
+  // https://en.wikipedia.org/wiki/Cohen–Sutherland_algorithm
+  public static void clipLine(final double minX, final double minY, final double maxX,
+    final double maxY, double lineX1, double lineY1, double lineZ1, double lineX2, double lineY2,
+    double lineZ2, final Consumer6Double action) {
+    // compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
+    int outcode1 = getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
+    int outcode2 = getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
+    boolean accept = false;
+
+    while (!accept) {
+      if ((outcode1 | outcode2) == 0) {
+        // Bitwise OR is 0. Trivially accept and get out of loop
+        accept = true;
+      } else if ((outcode1 & outcode2) != 0) {
+        // Bitwise AND is not 0. (implies both end points are in the same region outside the
+        // window). Reject and get out of loop
+        return;
+      } else {
+        // failed both tests, so calculate the line segment to clip
+        // from an outside point to an intersection with clip edge
+        double x;
+        double y;
+        double z;
+
+        // At least one endpoint is outside the clip rectangle; pick it.
+        final int outcodeOut = outcode1 != 0 ? outcode1 : outcode2;
+
+        // Now find the intersection point;
+        // use formulas:
+        // slope = (y1 - y0) / (x1 - x0)
+        // x = x0 + (1 / slope) * (ym - y0), where ym is ymin or maxY
+        // y = y0 + slope * (xm - x0), where xm is xmin or xmax
+        final double deltaY = lineY2 - lineY1;
+        final double deltaX = lineX2 - lineX1;
+        if ((outcodeOut & OUT_TOP) != 0) { // point is above the clip rectangle
+          final double ratio = (maxY - lineY1) / deltaY;
+          x = lineX1 + deltaX * ratio;
+          y = maxY;
+          z = lineZ1 + deltaX * ratio;
+        } else if ((outcodeOut & OUT_BOTTOM) != 0) { // point is below the clip rectangle
+          final double ratio = (minY - lineY1) / deltaY;
+          x = lineX2 + deltaX * ratio;
+          y = minY;
+          z = lineZ1 + deltaX * ratio;
+        } else if ((outcodeOut & OUT_RIGHT) != 0) { // point is to the right of clip rectangle
+          final double ratio = (maxX - lineX1) / deltaX;
+          y = lineY1 + deltaY * ratio;
+          x = maxX;
+          z = lineZ1 + deltaY * ratio;
+        } else if ((outcodeOut & OUT_LEFT) != 0) { // point is to the left of clip rectangle
+          final double ratio = (minX - lineX1) / deltaX;
+          y = lineY1 + deltaY * ratio;
+          x = minX;
+          z = lineZ1 + deltaY * ratio;
+        } else {
+          throw new IllegalStateException("Cannot clip as both points are inside the rectangle");
+        }
+
+        // Now we move outside point to intersection point to clip
+        // and get ready for next pass.
+        if (outcodeOut == outcode1) {
+          lineX1 = x;
+          lineY1 = y;
+          lineZ1 = z;
+          outcode1 = getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
+        } else {
+          lineX2 = x;
+          lineY2 = y;
+          lineZ2 = z;
+          outcode2 = getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
+        }
+      }
+    }
+    if (accept) {
+      action.accept(lineX2, lineY2, lineZ1, lineX2, lineY2, lineZ2);
+    }
+  }
 
   public static boolean covers(final double minX1, final double minY1, final double maxX1,
     final double maxY1, final double minX2, final double minY2, final double maxX2,
@@ -194,8 +345,6 @@ public class BoundingBoxUtil {
       out = OUT_LEFT;
     } else if (x > maxX) {
       out = OUT_RIGHT;
-    } else {
-      out = 0;
     }
     if (y < minY) {
       out |= OUT_BOTTOM;

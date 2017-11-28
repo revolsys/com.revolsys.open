@@ -38,7 +38,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 
 /**
  * Monotone Chains are a way of partitioning the segments of a linestring to
@@ -110,7 +110,7 @@ public class MonotoneChain {
     // terminating condition for the recursion
     if (end - start == 1 && cEnd - cStart == 1) {
       action.overlap(this, start, chain, cStart);
-    } else if (BoundingBoxUtil.intersectsMinMax(startX, startY, endX, endY, cStartX, cStartY, cEndX,
+    } else if (RectangleUtil.intersectsMinMax(startX, startY, endX, endY, cStartX, cStartY, cEndX,
       cEndY)) {
 
       // the chains overlap, so split each in half and iterate (binary search)

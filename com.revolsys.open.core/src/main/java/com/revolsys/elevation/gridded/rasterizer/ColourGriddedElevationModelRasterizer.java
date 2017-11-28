@@ -33,7 +33,7 @@ public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevat
 
   public ColourGriddedElevationModelRasterizer() {
     super("colourGriddedElevationModelRasterizer");
-    updateColours();
+    updateValues();
   }
 
   public ColourGriddedElevationModelRasterizer(final GriddedElevationModel elevationModel) {
@@ -77,12 +77,12 @@ public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevat
 
   public void setMaxColour(final Color maxColour) {
     this.maxColour = maxColour;
-    updateColours();
+    updateValues();
   }
 
   public void setMinColour(final Color minColour) {
     this.minColour = minColour;
-    updateColours();
+    updateValues();
   }
 
   @Override
@@ -104,17 +104,14 @@ public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevat
     return map;
   }
 
-  private void updateColours() {
+  @Override
+  protected void updateValues() {
     this.minRed = this.minColour.getRed();
     this.rangeRed = this.maxColour.getRed() - this.minRed;
     this.minGreen = this.minColour.getGreen();
     this.rangeGreen = this.maxColour.getGreen() - this.minGreen;
     this.minBlue = this.minColour.getBlue();
     this.rangeBlue = this.maxColour.getBlue() - this.minBlue;
-  }
-
-  @Override
-  protected void updateRangeZ() {
     if (Double.isFinite(this.minZ)) {
       this.rangeZ = this.maxZ - this.minZ;
     } else {

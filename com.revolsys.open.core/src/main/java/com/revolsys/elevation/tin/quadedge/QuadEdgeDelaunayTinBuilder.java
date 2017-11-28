@@ -51,7 +51,7 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 
 /**
  * A utility class which creates Delaunay Trianglulations
@@ -62,7 +62,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  *
  */
 public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
-  private final double[] bounds = BoundingBoxUtil.newBounds(2);
+  private final double[] bounds = RectangleUtil.newBounds(2);
 
   private final List<Point> vertices = new ArrayList<>();
 
@@ -137,7 +137,7 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
 
   protected void expandBoundingBox(final Iterable<? extends Point> points) {
     for (final Point point : points) {
-      BoundingBoxUtil.expand(this.bounds, 2, point);
+      RectangleUtil.expand(this.bounds, 2, point);
     }
   }
 
@@ -261,8 +261,8 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     y = Math.round(y * scaleY) / scaleY;
     z = Math.round(z * scaleZ) / scaleZ;
     final double[] bounds = this.bounds;
-    BoundingBoxUtil.expand(bounds, 2, 0, x);
-    BoundingBoxUtil.expand(bounds, 2, 1, y);
+    RectangleUtil.expand(bounds, 2, 0, x);
+    RectangleUtil.expand(bounds, 2, 1, y);
     final Point vertex = newVertex(x, y, z);
     this.vertices.add(vertex);
     if (this.subdivision != null) {

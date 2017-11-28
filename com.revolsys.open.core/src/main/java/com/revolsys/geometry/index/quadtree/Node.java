@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 
 public class Node<T> extends AbstractNode<T> {
   private static final long serialVersionUID = 1L;
@@ -64,7 +64,7 @@ public class Node<T> extends AbstractNode<T> {
       int itemIndex = 0;
       for (final T item : items) {
         final double[] itemBounds = this.boundingBoxes.get(itemIndex);
-        if (BoundingBoxUtil.intersects(bounds, itemBounds)) {
+        if (RectangleUtil.intersects(bounds, itemBounds)) {
           action.accept(item);
         }
         itemIndex++;

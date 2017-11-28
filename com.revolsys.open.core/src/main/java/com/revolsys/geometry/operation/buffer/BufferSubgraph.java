@@ -53,7 +53,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 
 //import debug.*;
 
@@ -289,9 +289,9 @@ class BufferSubgraph implements Comparable {
         for (int i = 0; i < points.getVertexCount(); i++) {
           final Point point = points.getPoint(i);
           if (bounds == null) {
-            bounds = BoundingBoxUtil.newBounds(2, point);
+            bounds = RectangleUtil.newBounds(2, point);
           } else {
-            BoundingBoxUtil.expand(bounds, 2, point);
+            RectangleUtil.expand(bounds, 2, point);
           }
         }
       }

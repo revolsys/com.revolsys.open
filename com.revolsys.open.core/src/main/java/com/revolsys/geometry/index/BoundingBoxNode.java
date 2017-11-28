@@ -1,7 +1,7 @@
 package com.revolsys.geometry.index;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Property;
 
 public class BoundingBoxNode {
@@ -36,7 +36,7 @@ public class BoundingBoxNode {
   }
 
   public boolean covers(final BoundingBox boundingBox) {
-    return BoundingBoxUtil.covers(this.minX, this.minY, this.maxX, this.maxY, boundingBox.getMinX(),
+    return RectangleUtil.covers(this.minX, this.minY, this.maxX, this.maxY, boundingBox.getMinX(),
       boundingBox.getMinY(), boundingBox.getMaxX(), boundingBox.getMaxY());
   }
 

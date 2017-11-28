@@ -25,7 +25,7 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileNameExtensionFilter;
@@ -614,7 +614,7 @@ public class Project extends LayerGroup {
     } else if ("viewBoundingBox".equals(name)) {
       if (value != null) {
         final BoundingBox viewBoundingBox = BoundingBox.newBoundingBox(value.toString());
-        if (!BoundingBoxUtil.isEmpty(viewBoundingBox)) {
+        if (!RectangleUtil.isEmpty(viewBoundingBox)) {
           this.initialBoundingBox = viewBoundingBox;
           setViewBoundingBoxAndGeometryFactory(viewBoundingBox);
         }
@@ -713,7 +713,7 @@ public class Project extends LayerGroup {
     final MapEx map = super.toMap();
 
     BoundingBox boundingBox = getViewBoundingBox();
-    if (!BoundingBoxUtil.isEmpty(boundingBox)) {
+    if (!RectangleUtil.isEmpty(boundingBox)) {
       BoundingBox defaultBoundingBox = null;
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (geometryFactory != null) {

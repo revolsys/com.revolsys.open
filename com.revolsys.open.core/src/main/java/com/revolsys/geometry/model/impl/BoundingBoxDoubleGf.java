@@ -39,7 +39,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -88,8 +88,8 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
     if (bounds == null || bounds.length == 0 || axisCount < 1) {
       this.bounds = null;
     } else if (bounds.length % axisCount == 0) {
-      this.bounds = BoundingBoxUtil.newBounds(axisCount);
-      BoundingBoxUtil.expand(geometryFactory, this.bounds, bounds);
+      this.bounds = RectangleUtil.newBounds(axisCount);
+      RectangleUtil.expand(geometryFactory, this.bounds, bounds);
     } else {
       throw new IllegalArgumentException(
         "Expecting a multiple of " + axisCount + " not " + bounds.length);
@@ -138,7 +138,7 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
     if (this.bounds == null || axisIndex >= getAxisCount()) {
       return Double.NaN;
     } else {
-      return BoundingBoxUtil.getMax(this.bounds, axisIndex);
+      return RectangleUtil.getMax(this.bounds, axisIndex);
     }
   }
 
@@ -147,7 +147,7 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
     if (this.bounds == null) {
       return Double.NaN;
     } else {
-      return BoundingBoxUtil.getMin(this.bounds, axisIndex);
+      return RectangleUtil.getMin(this.bounds, axisIndex);
     }
   }
 

@@ -23,7 +23,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.io.map.MapSerializer;
@@ -201,7 +201,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     }
     this.recordLength = pointFormat.getRecordLength();
     setGeometryFactory(geometryFactory);
-    this.bounds = BoundingBoxUtil.newBounds(3);
+    this.bounds = RectangleUtil.newBounds(3);
   }
 
   protected void addProperty(final LasVariableLengthRecord property) {
@@ -299,7 +299,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     final double z) {
     this.pointCount++;
     this.pointCountByReturn[0]++;
-    BoundingBoxUtil.expand(this.bounds, 3, x, y, z);
+    RectangleUtil.expand(this.bounds, 3, x, y, z);
     return this.pointFormat.newLasPoint(lasPointCloud, x, y, z);
   }
 

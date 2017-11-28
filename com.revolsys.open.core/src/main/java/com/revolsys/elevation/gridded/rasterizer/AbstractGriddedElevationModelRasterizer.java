@@ -64,21 +64,21 @@ public abstract class AbstractGriddedElevationModelRasterizer extends
       if (Double.isNaN(this.minZ)) {
         this.minZ = this.elevationModel.getMinZ();
         this.maxZ = this.elevationModel.getMaxZ();
-        updateRangeZ();
       }
     }
+    updateValues();
   }
 
   @Override
   public void setMaxZ(final double maxZ) {
     this.maxZ = maxZ;
-    updateRangeZ();
+    updateValues();
   }
 
   @Override
   public void setMinZ(final double minZ) {
     this.minZ = minZ;
-    updateRangeZ();
+    updateValues();
   }
 
   @Override
@@ -87,7 +87,7 @@ public abstract class AbstractGriddedElevationModelRasterizer extends
     return map;
   }
 
-  protected void updateRangeZ() {
+  protected void updateValues() {
   }
 
 }

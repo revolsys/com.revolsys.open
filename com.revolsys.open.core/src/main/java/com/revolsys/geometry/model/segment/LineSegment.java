@@ -17,7 +17,7 @@ import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -483,7 +483,7 @@ public interface LineSegment extends LineString {
     final double line2y1 = lineSegment2.getY(0);
     final double line2x2 = lineSegment2.getX(1);
     final double line2y2 = lineSegment2.getY(1);
-    if (BoundingBoxUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+    if (RectangleUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
       line2x2, line2y2)) {
       int intersectionCount = 0;
       final int axisCount = geometryFactory.getAxisCount();

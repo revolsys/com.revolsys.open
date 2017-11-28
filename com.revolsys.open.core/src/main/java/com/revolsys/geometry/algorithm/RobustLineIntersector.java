@@ -39,7 +39,7 @@ import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 
 /**
  * A robust version of {@link LineIntersector}.
@@ -59,13 +59,13 @@ public class RobustLineIntersector extends LineIntersector {
   private int computeCollinearIntersection(final double line1x1, final double line1y1,
     final double line1x2, final double line1y2, final double line2x1, final double line2y1,
     final double line2x2, final double line2y2) {
-    final boolean p1q1p2 = BoundingBoxUtil.intersects(line1x1, line1y1, line1x2, line1y2, line2x1,
+    final boolean p1q1p2 = RectangleUtil.intersects(line1x1, line1y1, line1x2, line1y2, line2x1,
       line2y1);
-    final boolean p1q2p2 = BoundingBoxUtil.intersects(line1x1, line1y1, line1x2, line1y2, line2x2,
+    final boolean p1q2p2 = RectangleUtil.intersects(line1x1, line1y1, line1x2, line1y2, line2x2,
       line2y2);
-    final boolean q1p1q2 = BoundingBoxUtil.intersects(line2x1, line2y1, line2x2, line2y2, line1x1,
+    final boolean q1p1q2 = RectangleUtil.intersects(line2x1, line2y1, line2x2, line2y2, line1x1,
       line1y1);
-    final boolean q1p2q2 = BoundingBoxUtil.intersects(line2x1, line2y1, line2x2, line2y2, line1x2,
+    final boolean q1p2q2 = RectangleUtil.intersects(line2x1, line2y1, line2x2, line2y2, line1x2,
       line1y2);
 
     if (p1q1p2 && p1q2p2) {
@@ -131,7 +131,7 @@ public class RobustLineIntersector extends LineIntersector {
     this.isProper = false;
 
     // first try a fast test to see if the envelopes of the lines intersect
-    if (!BoundingBoxUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+    if (!RectangleUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
       line2x2, line2y2)) {
       return NO_INTERSECTION;
     }
@@ -233,7 +233,7 @@ public class RobustLineIntersector extends LineIntersector {
     final double y1, final double x2, final double y2) {
     this.isProper = false;
     // do between check first, since it is faster than the orientation test
-    if (BoundingBoxUtil.intersects(x1, y1, x2, y2, x, y)) {
+    if (RectangleUtil.intersects(x1, y1, x2, y2, x, y)) {
       if (CGAlgorithmsDD.orientationIndex(x1, y1, x2, y2, x, y) == 0
         && CGAlgorithmsDD.orientationIndex(x2, y2, x1, y1, x, y) == 0) {
         this.isProper = true;

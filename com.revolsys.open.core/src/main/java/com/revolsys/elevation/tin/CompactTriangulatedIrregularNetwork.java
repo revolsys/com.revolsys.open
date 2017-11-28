@@ -7,7 +7,7 @@ import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Triangle;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.spring.resource.Resource;
 
 public class CompactTriangulatedIrregularNetwork extends BaseCompactTriangulatedIrregularNetwork {
@@ -40,11 +40,11 @@ public class CompactTriangulatedIrregularNetwork extends BaseCompactTriangulated
     };
     this.triangleSpatialIndex.setUseEquals(true);
 
-    final double[] bounds = BoundingBoxUtil.newBounds(2);
+    final double[] bounds = RectangleUtil.newBounds(2);
     for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++) {
       final BoundingBox triangleBoundingBox = newTriangleBoundingBox(triangleIndex);
       this.triangleSpatialIndex.insertItem(triangleBoundingBox, triangleIndex);
-      BoundingBoxUtil.expand(bounds, 2, triangleBoundingBox);
+      RectangleUtil.expand(bounds, 2, triangleBoundingBox);
     }
     this.boundingBox = geometryFactory.newBoundingBox(2, bounds);
   }

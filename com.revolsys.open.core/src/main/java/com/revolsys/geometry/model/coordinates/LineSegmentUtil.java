@@ -15,7 +15,7 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.number.Doubles;
@@ -91,7 +91,7 @@ public class LineSegmentUtil {
        */
 
       boolean noIntersection = false;
-      if (!BoundingBoxUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+      if (!RectangleUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
         line2x2, line2y2)) {
         noIntersection = true;
       } else {
@@ -436,7 +436,7 @@ public class LineSegmentUtil {
     line1End = line1End.convertGeometry(geometryFactory);
     line2Start = line2Start.convertGeometry(geometryFactory);
     line2End = line2End.convertGeometry(geometryFactory);
-    if (BoundingBoxUtil.intersects(line1Start, line1End, line2Start, line2End)) {
+    if (RectangleUtil.intersects(line1Start, line1End, line2Start, line2End)) {
       final Set<Point> intersections = new TreeSet<>(
         new CoordinatesDistanceComparator(line1Start.getX(), line1Start.getY()));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End, line1Start)) {

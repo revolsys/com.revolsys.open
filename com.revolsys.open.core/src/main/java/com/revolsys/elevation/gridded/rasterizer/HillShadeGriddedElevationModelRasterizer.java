@@ -197,10 +197,6 @@ public class HillShadeGriddedElevationModelRasterizer
   @Override
   public void setElevationModel(final GriddedElevationModel elevationModel) {
     super.setElevationModel(elevationModel);
-    if (elevationModel != null) {
-      final double cellSize = elevationModel.getGridCellSize();
-      this.oneDivCellSizeTimes8 = 1.0 / (8 * cellSize);
-    }
   }
 
   public void setZenithDegrees(final double zenithDegrees) {
@@ -225,5 +221,13 @@ public class HillShadeGriddedElevationModelRasterizer
     map.put("zenithDegrees", this.zenithDegrees);
     map.put("zFactor", this.zFactor);
     return map;
+  }
+
+  @Override
+  protected void updateValues() {
+    if (this.elevationModel != null) {
+      final double cellSize = this.elevationModel.getGridCellSize();
+      this.oneDivCellSizeTimes8 = 1.0 / (8 * cellSize);
+    }
   }
 }

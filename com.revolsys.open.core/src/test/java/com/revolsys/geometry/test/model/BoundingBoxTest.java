@@ -24,7 +24,7 @@ import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.test.TestConstants;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.number.Doubles;
 
 // TODO
@@ -268,7 +268,7 @@ public class BoundingBoxTest implements TestConstants {
     for (int axisCount = 2; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
         Point[] points = new Point[valueCount];
-        final double[] bounds = BoundingBoxUtil.newBounds(axisCount);
+        final double[] bounds = RectangleUtil.newBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           final double[] values = new double[axisCount];
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
@@ -342,7 +342,7 @@ public class BoundingBoxTest implements TestConstants {
     for (int axisCount = 2; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
         final List<Point> points = new ArrayList<>();
-        final double[] bounds = BoundingBoxUtil.newBounds(axisCount);
+        final double[] bounds = RectangleUtil.newBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           final double[] values = new double[axisCount];
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {

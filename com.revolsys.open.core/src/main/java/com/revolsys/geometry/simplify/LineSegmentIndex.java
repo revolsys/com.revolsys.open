@@ -42,7 +42,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 
 /**
  * An spatial index on a set of {@link LineSegmentDouble}s.
@@ -105,7 +105,7 @@ class LineSegmentVisitor implements Consumer<LineSegment> {
 
   @Override
   public void accept(final LineSegment seg) {
-    if (BoundingBoxUtil.intersects(seg.getP0(), seg.getP1(), this.querySeg.getP0(),
+    if (RectangleUtil.intersects(seg.getP0(), seg.getP1(), this.querySeg.getP0(),
       this.querySeg.getP1())) {
       this.items.add(seg);
     }

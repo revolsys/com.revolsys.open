@@ -54,7 +54,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
@@ -3282,7 +3282,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void zoomToBoundingBox(BoundingBox boundingBox) {
-    if (!BoundingBoxUtil.isEmpty(boundingBox)) {
+    if (!RectangleUtil.isEmpty(boundingBox)) {
       final Project project = getProject();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);

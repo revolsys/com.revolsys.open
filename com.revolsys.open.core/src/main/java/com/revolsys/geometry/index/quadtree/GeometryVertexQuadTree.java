@@ -3,7 +3,7 @@ package com.revolsys.geometry.index.quadtree;
 import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
@@ -83,7 +83,7 @@ public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
     } else {
       final double x = vertex.getX();
       final double y = vertex.getY();
-      return BoundingBoxUtil.intersects(minX, minY, maxX, maxY, x, y);
+      return RectangleUtil.intersects(minX, minY, maxX, maxY, x, y);
     }
   }
 }

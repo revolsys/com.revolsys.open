@@ -76,7 +76,7 @@ import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.MathUtil;
@@ -1771,9 +1771,9 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       for (final Point point : points) {
         if (point != null) {
           if (bounds == null) {
-            bounds = BoundingBoxUtil.newBounds(this, axisCount, point);
+            bounds = RectangleUtil.newBounds(this, axisCount, point);
           } else {
-            BoundingBoxUtil.expand(this, bounds, point);
+            RectangleUtil.expand(this, bounds, point);
           }
         }
       }
@@ -1792,9 +1792,9 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       for (final Point point : points) {
         if (point != null) {
           if (bounds == null) {
-            bounds = BoundingBoxUtil.newBounds(this, axisCount, point);
+            bounds = RectangleUtil.newBounds(this, axisCount, point);
           } else {
-            BoundingBoxUtil.expand(this, bounds, point);
+            RectangleUtil.expand(this, bounds, point);
           }
         }
       }
@@ -1859,7 +1859,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public double[] newBounds(final int axisCount) {
-    return BoundingBoxUtil.newBounds(axisCount);
+    return RectangleUtil.newBounds(axisCount);
   }
 
   public LineStringEditor newLineStringBuilder() {

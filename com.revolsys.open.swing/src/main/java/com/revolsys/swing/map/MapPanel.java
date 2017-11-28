@@ -46,7 +46,7 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -838,7 +838,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     final GeometryFactory geometryFactory = getGeometryFactory();
     boundingBox = boundingBox.convert(geometryFactory);
     final Viewport2D viewport = getViewport();
-    if (!BoundingBoxUtil.isEmpty(boundingBox)) {
+    if (!RectangleUtil.isEmpty(boundingBox)) {
       final Point centre = boundingBox.getCentre();
       viewport.setCentre(centre);
     }

@@ -101,6 +101,21 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   void clear();
 
+  // t is a value that goes from 0 to 1 to interpolate in a C1 continuous way across uniformly
+  // sampled data points.
+  // when t is 0, this will return B. When t is 1, this will return C. Inbetween values will return
+  // an interpolation
+  // between B and C. A and B are used to calculate slopes at the edges.
+  default double CubicHermite(final double A, final double B, final double C, final double D,
+    final double t) {
+    final double a = -A / 2.0f + 3.0f * B / 2.0f - 3.0f * C / 2.0f + D / 2.0f;
+    final double b = A - 5.0f * B / 2.0f + 2.0f * C - D / 2.0f;
+    final double c = -A / 2.0f + C / 2.0f;
+    final double d = B;
+
+    return a * t * t * t + b * t * t + c * t + d;
+  }
+
   default void forEachElevationFinite(final DoubleConsumer action) {
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
@@ -624,6 +639,16 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     final double maxY = getMinY();
     final double gridCellSize = getGridCellSize();
     return maxY + i * gridCellSize;
+  }
+
+  default boolean hasElevation(final int gridX, final int gridY) {
+    final double elevation = getElevation(gridX, gridY);
+    return Double.isFinite(elevation);
+  }
+
+  default boolean hasElevationFast(final int gridX, final int gridY) {
+    final double elevation = getElevation(gridX, gridY);
+    return Double.isFinite(elevation);
   }
 
   boolean isEmpty();

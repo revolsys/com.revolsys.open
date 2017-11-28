@@ -10,7 +10,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.AbstractTriangle;
 import com.revolsys.geometry.model.impl.BaseBoundingBox;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.spring.resource.Resource;
 
 public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIrregularNetwork {
@@ -228,7 +228,7 @@ public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIr
       };
       triangleSpatialIndex.setUseEquals(true);
 
-      final double[] bounds = BoundingBoxUtil.newBounds(2);
+      final double[] bounds = RectangleUtil.newBounds(2);
       for (int triangleIndex = 0; triangleIndex < this.triangleCount; triangleIndex++) {
         final BoundingBox triangleBoundingBox = newTriangleBoundingBox(triangleIndex);
         final double minX = triangleBoundingBox.getMinX();
@@ -237,7 +237,7 @@ public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIr
         final double maxY = triangleBoundingBox.getMaxY();
 
         triangleSpatialIndex.insertItem(minX, minY, maxX, maxY, triangleIndex);
-        BoundingBoxUtil.expand(bounds, 2, triangleBoundingBox);
+        RectangleUtil.expand(bounds, 2, triangleBoundingBox);
       }
       this.triangleSpatialIndex = triangleSpatialIndex;
     }

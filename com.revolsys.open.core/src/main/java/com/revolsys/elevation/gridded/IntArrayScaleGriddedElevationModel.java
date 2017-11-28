@@ -78,6 +78,18 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     }
   }
 
+  @Override
+  public double getElevationFast(final int gridX, final int gridY) {
+    final int gridWidth1 = this.gridWidth;
+    final int index = gridY * gridWidth1 + gridX;
+    final int elevationInt = this.elevations[index];
+    if (elevationInt == NULL_VALUE) {
+      return Double.NaN;
+    } else {
+      return toDoubleZ(elevationInt);
+    }
+  }
+
   public int getElevationInt(final int gridX, final int gridY) {
     final int width = getGridWidth();
     final int height = getGridHeight();
@@ -136,6 +148,17 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
       }
     }
     return points;
+  }
+
+  public boolean hasElevationFast(final int gridX, final int gridY) {
+    final int gridWidth1 = this.gridWidth;
+    final int index = gridY * gridWidth1 + gridX;
+    final int elevationInt = this.elevations[index];
+    if (elevationInt == NULL_VALUE) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   @Override

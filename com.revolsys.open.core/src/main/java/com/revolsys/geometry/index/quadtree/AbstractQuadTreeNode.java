@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import com.revolsys.geometry.index.DoubleBits;
 import com.revolsys.geometry.index.IntervalSize;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Emptyable;
 
 public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable {
@@ -48,7 +48,7 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
 
   private boolean coversBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
-    return BoundingBoxUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX,
+    return RectangleUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX,
       maxY);
   }
 
@@ -318,7 +318,7 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
       newMinY = Math.floor(minY / quadSize) * quadSize;
       newMaxX = newMinX + quadSize;
       newMaxY = newMinY + quadSize;
-    } while (!BoundingBoxUtil.covers(newMinX, newMinY, newMaxX, newMaxY, minX, minY, maxX, maxY));
+    } while (!RectangleUtil.covers(newMinX, newMinY, newMaxX, newMaxY, minX, minY, maxX, maxY));
 
     return newNode(level, newMinX, newMinY, newMaxX, newMaxY);
   }

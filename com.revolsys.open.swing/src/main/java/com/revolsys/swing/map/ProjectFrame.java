@@ -43,7 +43,7 @@ import javax.swing.tree.TreePath;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FileNameExtensionFilter;
@@ -574,7 +574,7 @@ public class ProjectFrame extends BaseFrame {
     final MapPanel mapPanel = getMapPanel();
     final BoundingBox initialBoundingBox = this.project.getInitialBoundingBox();
     final Viewport2D viewport = mapPanel.getViewport();
-    if (!BoundingBoxUtil.isEmpty(initialBoundingBox)) {
+    if (!RectangleUtil.isEmpty(initialBoundingBox)) {
       this.project.setViewBoundingBoxAndGeometryFactory(initialBoundingBox);
       viewport.setBoundingBoxAndGeometryFactory(initialBoundingBox);
     }

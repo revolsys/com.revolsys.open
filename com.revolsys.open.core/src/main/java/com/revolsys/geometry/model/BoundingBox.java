@@ -27,7 +27,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
@@ -352,7 +352,7 @@ public interface BoundingBox
     final double minY2 = getMinY();
     final double maxX2 = getMaxX();
     final double maxY2 = getMaxY();
-    return BoundingBoxUtil.covers(minX1, minY1, maxX1, maxY1, minX2, minY2, maxX2, maxY2);
+    return RectangleUtil.covers(minX1, minY1, maxX1, maxY1, minX2, minY2, maxX2, maxY2);
   }
 
   /**
@@ -395,7 +395,7 @@ public interface BoundingBox
       final double maxX = getMaxX();
       final double maxY = getMaxY();
 
-      return BoundingBoxUtil.covers(minX, minY, maxX, maxY, x, y, x, y);
+      return RectangleUtil.covers(minX, minY, maxX, maxY, x, y, x, y);
     }
   }
 
@@ -597,7 +597,7 @@ public interface BoundingBox
     final CoordinatesOperation operation, final double[] to, final double... from) {
 
     operation.perform(2, from, 2, to);
-    BoundingBoxUtil.expand(geometryFactory, bounds, to);
+    RectangleUtil.expand(geometryFactory, bounds, to);
   }
 
   default BoundingBox expand(final Point point) {
@@ -669,11 +669,11 @@ public interface BoundingBox
       final double[] bounds;
       final int axisCount = getAxisCount();
       if (isEmpty()) {
-        bounds = BoundingBoxUtil.newBounds(axisCount);
+        bounds = RectangleUtil.newBounds(axisCount);
       } else {
         bounds = getMinMaxValues();
       }
-      BoundingBoxUtil.expand(bounds, axisCount, coordinates);
+      RectangleUtil.expand(bounds, axisCount, coordinates);
       return newBoundingBox(axisCount, bounds);
     }
   }

@@ -4,18 +4,17 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 
 public abstract class AbstractGriddedElevationModel extends BaseObjectWithProperties
   implements GriddedElevationModel {
-  protected double[] bounds = BoundingBoxUtil.newBounds(3);
+  protected double[] bounds = RectangleUtil.newBounds(3);
 
   private int gridHeight;
 
-  private int gridWidth;
+  protected int gridWidth;
 
   private double minColourMultiple;
 
@@ -265,7 +264,6 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     final double x2, final double y2, final double z2, final double x3, final double y3,
     final double z3) {
     if (Double.isFinite(z1) && Double.isFinite(z2) && Double.isFinite(z3)) {
-      final double scaleXy = this.scaleXY;
       double minX = x1;
       double maxX = x1;
       if (x2 < minX) {
@@ -301,7 +299,11 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
       final double gridMinX = bounds[0];
       final double gridMaxX = bounds[3];
       final double startX;
-      if (minX < gridMinX) {
+      if (maxX <= gridMinX) {
+        return;
+      } else if (minX >= gridMaxX) {
+        return;
+      } else if (minX < gridMinX) {
         startX = gridMinX;
       } else {
         startX = Math.ceil(minX / gridCellSize) * gridCellSize;
@@ -312,7 +314,11 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
       final double gridMinY = bounds[1];
       final double gridMaxY = bounds[4];
       final double startY;
-      if (minY < gridMinY) {
+      if (maxX <= gridMinY) {
+        return;
+      } else if (minY >= gridMaxY) {
+        return;
+      } else if (minY < gridMinY) {
         startY = gridMinY;
       } else {
         startY = Math.ceil(minY / gridCellSize) * gridCellSize;
@@ -340,16 +346,12 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
                 final double elevation = lambda1 * z1 + lambda2 * z2 + lambda3 * z3;
                 if (Double.isFinite(elevation)) {
                   setElevation(x, y, elevation);
-                } else {
-                  Debug.noOp();
                 }
               }
             }
           }
         }
       }
-    } else {
-      Debug.noOp();
     }
   }
 
