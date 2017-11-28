@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.index.intervalrtree.SortedPackedIntervalRTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -34,6 +35,12 @@ public class GeometrySegmentYIntervalIndex {
     final List<LineSegment> segments = new ArrayList<>();
     this.index.query(y, y, segments::add);
     return segments;
+  }
+
+  public boolean isIntersects(final RayCrossingCounter counter, final double x, final double y) {
+    counter.reset(x, y);
+    query(y, counter);
+    return counter.isIntersects();
   }
 
   public void query(final double y, final Consumer<LineSegment> visitor) {

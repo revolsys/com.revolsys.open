@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -481,10 +482,19 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public void setOrderBy(final Map<? extends CharSequence, Boolean> orderBy) {
+    if (orderBy != null) {
+      for (final Iterator<? extends CharSequence> iterator = orderBy.keySet().iterator(); iterator
+        .hasNext();) {
+        final CharSequence fieldName = iterator.next();
+        if (!this.layer.hasField(fieldName)) {
+          iterator.remove();
+        }
+      }
+    }
     setOrderByInternal(orderBy);
     final Map<Integer, SortOrder> sortedColumns = new LinkedHashMap<>();
-    for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
-      if (orderBy != null) {
+    if (orderBy != null) {
+      for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
         final CharSequence fieldName = entry.getKey();
         final Boolean order = entry.getValue();
         final int index = getColumnFieldIndex(fieldName.toString());

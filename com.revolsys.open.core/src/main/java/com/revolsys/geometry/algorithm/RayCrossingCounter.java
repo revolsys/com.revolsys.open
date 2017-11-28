@@ -295,14 +295,14 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
   public Location getLocation() {
     if (this.pointOnSegment) {
       return Location.BOUNDARY;
-    }
-
-    // The point is in the interior of the ring if the number of X-crossings is
-    // odd.
-    if (this.crossingCount % 2 == 1) {
+    } else if (this.crossingCount % 2 == 1) {
+      // The point is in the interior of the ring if the number of X-crossings
+      // is
+      // odd.
       return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
     }
-    return Location.EXTERIOR;
   }
 
   public double getX() {
@@ -311,6 +311,32 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
 
   public double getY() {
     return this.y;
+  }
+
+  public boolean isDisjoint() {
+    if (this.pointOnSegment) {
+      return false;
+    } else if (this.crossingCount % 2 == 1) {
+      // The point is in the interior of the ring if the number of X-crossings
+      // is
+      // odd.
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  public boolean isIntersects() {
+    if (this.pointOnSegment) {
+      return true;
+    } else if (this.crossingCount % 2 == 1) {
+      // The point is in the interior of the ring if the number of X-crossings
+      // is
+      // odd.
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**

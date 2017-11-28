@@ -252,7 +252,9 @@ public interface Polygon extends Polygonal {
 
   @Override
   default void forEachPolygon(final Consumer<Polygon> action) {
-    action.accept(this);
+    if (!isEmpty()) {
+      action.accept(this);
+    }
   }
 
   /**
