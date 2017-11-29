@@ -271,11 +271,6 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
       } else if (x2 > maxX) {
         maxX = x2;
       }
-      if (x2 < minX) {
-        minX = x2;
-      } else if (x2 > maxX) {
-        maxX = x2;
-      }
       if (x3 < minX) {
         minX = x3;
       } else if (x3 > maxX) {
@@ -314,7 +309,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
       final double gridMinY = bounds[1];
       final double gridMaxY = bounds[4];
       final double startY;
-      if (maxX <= gridMinY) {
+      if (maxY <= gridMinY) {
         return;
       } else if (minY >= gridMaxY) {
         return;
@@ -342,7 +337,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
             final double lambda2 = (y3y1 * xx3 + x1x3 * yy3) / det;
             if (0 <= lambda2 && lambda2 <= 1) {
               final double lambda3 = 1.0 - lambda1 - lambda2;
-              if (-0.001 <= lambda3 && lambda3 <= 1.001) {
+              if (0 < lambda3 && lambda3 < 1) {
                 final double elevation = lambda1 * z1 + lambda2 * z2 + lambda3 * z3;
                 if (Double.isFinite(elevation)) {
                   setElevation(x, y, elevation);

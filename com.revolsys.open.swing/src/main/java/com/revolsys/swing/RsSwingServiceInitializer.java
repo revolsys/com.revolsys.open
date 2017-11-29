@@ -139,7 +139,7 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("tiledGriddedElevationModelLayer",
       "Tiled Gridded Elevation Model Layer", TiledGriddedElevationModelLayer::new);
 
-    addIoFactoryMenuItem("griddedElevationModel", "Add Gridded DEM Layer", "gridded_dem",
+    addIoFactoryMenuItem("gridded_dem", "Add Gridded DEM Layer", "gridded_dem",
       GriddedElevationModelReadFactory.class);
 
     MapObjectFactoryRegistry.newFactory("triangulatedIrregularNetworkLayer",
