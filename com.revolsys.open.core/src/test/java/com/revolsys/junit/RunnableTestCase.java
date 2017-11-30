@@ -1,7 +1,5 @@
 package com.revolsys.junit;
 
-import com.revolsys.util.Debug;
-
 import junit.framework.TestCase;
 
 public class RunnableTestCase extends TestCase {
@@ -15,9 +13,6 @@ public class RunnableTestCase extends TestCase {
 
   @Override
   protected void runTest() {
-    if (getName().startsWith("XBase Point")) {
-      Debug.noOp();
-    }
     this.action.run();
   }
 }

@@ -10,7 +10,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.AbstractTriangle;
 import com.revolsys.geometry.model.impl.BaseBoundingBox;
-import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.spring.resource.Resource;
 
 public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIrregularNetwork {
@@ -216,28 +215,150 @@ public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIr
         @Override
         protected boolean intersectsBounds(final Object id, final double x, final double y) {
           final Integer triangleIndex = (Integer)id;
-          return newTriangleBoundingBox(triangleIndex).intersects(x, y);
+          final int[] triangleXCoordinates = IntArrayScaleTriangulatedIrregularNetwork.this.triangleXCoordinates;
+          final int[] triangleYCoordinates = IntArrayScaleTriangulatedIrregularNetwork.this.triangleYCoordinates;
+          final int triangleVertexIndex = triangleIndex * 3;
+
+          int minXInt = Integer.MAX_VALUE;
+          int maxXInt = Integer.MIN_VALUE;
+          int minYInt = Integer.MAX_VALUE;
+          int maxYInt = Integer.MIN_VALUE;
+
+          for (int vertexIndex = 0; vertexIndex < 3; vertexIndex++) {
+            final int vertexX = triangleXCoordinates[triangleVertexIndex + vertexIndex];
+            if (vertexX != Integer.MIN_VALUE) {
+              if (vertexX < minXInt) {
+                minXInt = vertexX;
+              }
+              if (vertexX > maxXInt) {
+                maxXInt = vertexX;
+              }
+            }
+
+            final int vertexY = triangleYCoordinates[triangleVertexIndex + vertexIndex];
+            if (vertexY != Integer.MIN_VALUE) {
+              if (vertexY < minYInt) {
+                minYInt = vertexY;
+              }
+              if (vertexY > maxYInt) {
+                maxYInt = vertexY;
+              }
+            }
+          }
+          if (x < minXInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleX) {
+            return false;
+          } else if (x > maxXInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleX) {
+            return false;
+          } else if (y < minYInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleY) {
+            return false;
+          } else if (y > maxYInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleY) {
+            return false;
+          } else {
+            return true;
+          }
         }
 
         @Override
-        protected boolean intersectsBounds(final Object id, final double minX, final double minY,
-          final double maxX, final double maxY) {
+        protected boolean intersectsBounds(final Object id, double x1, double y1, double x2,
+          double y2) {
           final Integer triangleIndex = (Integer)id;
-          return newTriangleBoundingBox(triangleIndex).intersects(minX, minY, maxX, maxY);
+          final int[] triangleXCoordinates = IntArrayScaleTriangulatedIrregularNetwork.this.triangleXCoordinates;
+          final int[] triangleYCoordinates = IntArrayScaleTriangulatedIrregularNetwork.this.triangleYCoordinates;
+          final int triangleVertexIndex = triangleIndex * 3;
+
+          int minXInt = Integer.MAX_VALUE;
+          int maxXInt = Integer.MIN_VALUE;
+          int minYInt = Integer.MAX_VALUE;
+          int maxYInt = Integer.MIN_VALUE;
+
+          for (int vertexIndex = 0; vertexIndex < 3; vertexIndex++) {
+            final int vertexX = triangleXCoordinates[triangleVertexIndex + vertexIndex];
+            if (vertexX != Integer.MIN_VALUE) {
+              if (vertexX < minXInt) {
+                minXInt = vertexX;
+              }
+              if (vertexX > maxXInt) {
+                maxXInt = vertexX;
+              }
+            }
+
+            final int vertexY = triangleYCoordinates[triangleVertexIndex + vertexIndex];
+            if (vertexY != Integer.MIN_VALUE) {
+              if (vertexY < minYInt) {
+                minYInt = vertexY;
+              }
+              if (vertexY > maxYInt) {
+                maxYInt = vertexY;
+              }
+            }
+          }
+          if (x1 > x2) {
+            final double t = x1;
+            x1 = x2;
+            x2 = t;
+          }
+          if (y1 > y2) {
+            final double t = y1;
+            y1 = y2;
+            y2 = t;
+          }
+
+          if (x2 < minXInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleX) {
+            return false;
+          } else if (x1 > maxXInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleX) {
+            return false;
+          } else if (y2 < minYInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleY) {
+            return false;
+          } else if (y1 > maxYInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleY) {
+            return false;
+          } else {
+            return true;
+          }
+
         }
       };
       triangleSpatialIndex.setUseEquals(true);
 
-      final double[] bounds = RectangleUtil.newBounds(2);
-      for (int triangleIndex = 0; triangleIndex < this.triangleCount; triangleIndex++) {
-        final BoundingBox triangleBoundingBox = newTriangleBoundingBox(triangleIndex);
-        final double minX = triangleBoundingBox.getMinX();
-        final double minY = triangleBoundingBox.getMinY();
-        final double maxX = triangleBoundingBox.getMaxX();
-        final double maxY = triangleBoundingBox.getMaxY();
+      int triangleVertexIndex = 0;
+      final double scaleX = this.scaleX;
+      final double scaleY = this.scaleY;
+      final int[] triangleXCoordinates = this.triangleXCoordinates;
+      final int[] triangleYCoordinates = this.triangleYCoordinates;
+      final int triangleCount = this.triangleCount;
+      for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++) {
+        int minXInt = Integer.MAX_VALUE;
+        int maxXInt = Integer.MIN_VALUE;
+        int minYInt = Integer.MAX_VALUE;
+        int maxYInt = Integer.MIN_VALUE;
+
+        for (int vertexIndex = 0; vertexIndex < 3; vertexIndex++) {
+          final int vertexX = triangleXCoordinates[triangleVertexIndex + vertexIndex];
+          if (vertexX != Integer.MIN_VALUE) {
+            if (vertexX < minXInt) {
+              minXInt = vertexX;
+            }
+            if (vertexX > maxXInt) {
+              maxXInt = vertexX;
+            }
+          }
+
+          final int vertexY = triangleYCoordinates[triangleVertexIndex + vertexIndex];
+          if (vertexY != Integer.MIN_VALUE) {
+            if (vertexY < minYInt) {
+              minYInt = vertexY;
+            }
+            if (vertexY > maxYInt) {
+              maxYInt = vertexY;
+            }
+          }
+        }
+        final double minX = minXInt / scaleX;
+        final double minY = minYInt / scaleY;
+        final double maxX = maxXInt / scaleX;
+        final double maxY = maxYInt / scaleY;
 
         triangleSpatialIndex.insertItem(minX, minY, maxX, maxY, triangleIndex);
-        RectangleUtil.expand(bounds, 2, triangleBoundingBox);
+        triangleVertexIndex += 3;
       }
       this.triangleSpatialIndex = triangleSpatialIndex;
     }

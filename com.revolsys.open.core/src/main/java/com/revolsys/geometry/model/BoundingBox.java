@@ -1075,19 +1075,19 @@ public interface BoundingBox
     if (isEmpty()) {
       return false;
     } else {
-      final double minX1 = getMinX();
-      final double minY1 = getMinY();
-      final double maxX1 = getMaxX();
-      final double maxY1 = getMaxY();
-      return !(x > maxX1 || x < minX1 || y > maxY1 || y < minY1);
+      final double minX = getMinX();
+      final double minY = getMinY();
+      final double maxX = getMaxX();
+      final double maxY = getMaxY();
+      return !(x > maxX || x < minX || y > maxY || y < minY);
     }
   }
 
   default boolean intersects(double x1, double y1, double x2, double y2) {
-    final double minX1 = getMinX();
-    final double minY1 = getMinY();
-    final double maxX1 = getMaxX();
-    final double maxY1 = getMaxY();
+    final double minX = getMinX();
+    final double minY = getMinY();
+    final double maxX = getMaxX();
+    final double maxY = getMaxY();
     if (x1 > x2) {
       final double t = x1;
       x1 = x2;
@@ -1098,7 +1098,7 @@ public interface BoundingBox
       y1 = y2;
       y2 = t;
     }
-    return !(x1 > maxX1 || x2 < minX1 || y1 > maxY1 || y2 < minY1);
+    return !(x1 > maxX || x2 < minX || y1 > maxY || y2 < minY);
   }
 
   /**

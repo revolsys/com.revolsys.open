@@ -150,6 +150,7 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     return points;
   }
 
+  @Override
   public boolean hasElevationFast(final int gridX, final int gridY) {
     final int gridWidth1 = this.gridWidth;
     final int index = gridY * gridWidth1 + gridX;

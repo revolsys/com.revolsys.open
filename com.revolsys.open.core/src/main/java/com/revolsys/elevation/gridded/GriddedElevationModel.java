@@ -24,7 +24,6 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.function.DoubleConsumer3;
 
 public interface GriddedElevationModel extends ObjectWithProperties, BoundingBoxProxy {
@@ -101,9 +100,11 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   void clear();
 
-  // t is a value that goes from 0 to 1 to interpolate in a C1 continuous way across uniformly
+  // t is a value that goes from 0 to 1 to interpolate in a C1 continuous way
+  // across uniformly
   // sampled data points.
-  // when t is 0, this will return B. When t is 1, this will return C. Inbetween values will return
+  // when t is 0, this will return B. When t is 1, this will return C. Inbetween
+  // values will return
   // an interpolation
   // between B and C. A and B are used to calculate slopes at the edges.
   default double CubicHermite(final double A, final double B, final double C, final double D,
@@ -723,9 +724,6 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
         for (int gridY = gridYMin; gridY < gridYMax; gridY++) {
           for (int gridX = gridXMin; gridX < gridXMax; gridX++) {
             final double elevation = getElevation(gridX, gridY);
-            if (elevation < -1000) {
-              Debug.noOp();
-            }
             if (Double.isFinite(elevation)) {
               count++;
               sum += elevation;

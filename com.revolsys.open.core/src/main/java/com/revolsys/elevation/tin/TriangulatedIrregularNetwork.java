@@ -110,21 +110,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   }
 
   default void forEachTriangle(final TriangleConsumer action) {
-    forEachTriangle((triangle) -> {
-      final double x1 = triangle.getX(0);
-      final double y1 = triangle.getY(0);
-      final double z1 = triangle.getZ(0);
-
-      final double x2 = triangle.getX(1);
-      final double y2 = triangle.getY(1);
-      final double z2 = triangle.getZ(1);
-
-      final double x3 = triangle.getX(2);
-      final double y3 = triangle.getY(2);
-      final double z3 = triangle.getZ(2);
-
-      action.accept(x1, y1, z1, x2, y2, z2, x3, y3, z3);
-    });
+    forEachTriangle(action::acceptTriangle);
   }
 
   void forEachVertex(Consumer<Point> action);
