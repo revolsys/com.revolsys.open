@@ -66,7 +66,7 @@ public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
     final int gridCellY = gridY - tileMinGridY;
 
     return model.getElevation(gridCellX, gridCellY);
-    // final int offset = ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE
+    // final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
     // + (gridCellY * this.gridSize + gridCellX) * this.elevationByteCount;
     // double elevation;
     // if (this.isPath) {

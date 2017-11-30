@@ -2,6 +2,8 @@ package com.revolsys.elevation.gridded.scaledint;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.zip.GZIPOutputStream;
@@ -18,8 +20,8 @@ import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class ScaledIntegerGriddedDigitalElevationModelWriter extends AbstractWriter<GriddedElevationModel>
-  implements GriddedElevationModelWriter {
+public class ScaledIntegerGriddedDigitalElevationModelWriter
+  extends AbstractWriter<GriddedElevationModel> implements GriddedElevationModelWriter {
   public static void writeHeader(final ChannelWriter writer, final BoundingBox boundingBox,
     final GeometryFactory geometryFactory, final int gridWidth, final int gridHeight,
     final double gridCellSize) throws IOException {
@@ -32,9 +34,9 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter extends AbstractWri
     if (scaleZ <= 0) {
       scaleZ = 1000;
     }
-    writer.putBytes(ScaledIntegerGriddedDigitalElevationModel.FILE_FORMAT_BYTES); // File //
+    writer.putBytes(ScaledIntegerGriddedDigitalElevation.FILE_FORMAT_BYTES); // File //
     // type
-    writer.putShort(ScaledIntegerGriddedDigitalElevationModel.VERSION); // version
+    writer.putShort(ScaledIntegerGriddedDigitalElevation.VERSION); // version
     writer.putInt(coordinateSystemId); // Coordinate System ID
 
     for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
@@ -63,6 +65,8 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter extends AbstractWri
 
   private int gridHeight;
 
+  private ByteBuffer byteBuffer;
+
   ScaledIntegerGriddedDigitalElevationModelWriter(final Resource resource) {
     this.resource = resource;
   }
@@ -86,7 +90,7 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter extends AbstractWri
     if (this.writer == null) {
       final String fileNameExtension = this.resource.getFileNameExtension();
       if ("zip".equals(fileNameExtension)
-        || ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION_ZIP.equals(fileNameExtension)) {
+        || ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION_ZIP.equals(fileNameExtension)) {
         try {
           final OutputStream bufferedOut = this.resource.newBufferedOutputStream();
           final String fileName = this.resource.getBaseName();
@@ -94,26 +98,33 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter extends AbstractWri
           final ZipEntry zipEntry = new ZipEntry(fileName);
           zipOut.putNextEntry(zipEntry);
           final WritableByteChannel channel = Channels.newChannel(zipOut);
-          this.writer = new ChannelWriter(channel, true);
+          this.writer = new ChannelWriter(channel, true, this.byteBuffer);
         } catch (final IOException e) {
           throw Exceptions.wrap("Error creating: " + this.resource, e);
         }
       } else if ("gz".equals(fileNameExtension)) {
         try {
           String fileName = this.resource.getBaseName();
-          if (!fileName.endsWith("." + ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION)) {
-            fileName += "." + ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION;
+          if (!fileName.endsWith("." + ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION)) {
+            fileName += "." + ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION;
           }
           final OutputStream bufferedOut = this.resource.newBufferedOutputStream();
           final GZIPOutputStream zipOut = new GZIPOutputStream(bufferedOut);
           final WritableByteChannel channel = Channels.newChannel(zipOut);
-          this.writer = new ChannelWriter(channel, true);
+          this.writer = new ChannelWriter(channel, true, this.byteBuffer);
         } catch (final IOException e) {
           throw Exceptions.wrap("Error creating: " + this.resource, e);
         }
       } else {
-        this.writer = this.resource.newChannelWriter();
+        this.writer = this.resource.newChannelWriter(this.byteBuffer);
       }
+    }
+  }
+
+  public void setByteBuffer(final ByteBuffer buffer) {
+    this.byteBuffer = buffer;
+    if (buffer != null) {
+      buffer.order(ByteOrder.BIG_ENDIAN);
     }
   }
 

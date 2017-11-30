@@ -60,8 +60,8 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
   private boolean useLocks = false;
 
   public ScaledIntegerGriddedDigitalElevationModelFile(final Path path) {
-    super(ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE,
-      ScaledIntegerGriddedDigitalElevationModel.RECORD_SIZE);
+    super(ScaledIntegerGriddedDigitalElevation.HEADER_SIZE,
+      ScaledIntegerGriddedDigitalElevation.RECORD_SIZE);
     this.path = path;
     this.openOptions = Paths.OPEN_OPTIONS_READ_SET;
     readHeader();
@@ -71,7 +71,7 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
     final GeometryFactory geometryFactory, final int minX, final int minY, final int gridWidth,
     final int gridHeight, final double gridCellSize) {
     super(geometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize,
-      ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE, 4);
+      ScaledIntegerGriddedDigitalElevation.HEADER_SIZE, 4);
     setZBoundsUpdateRequired(false);
     this.openOptions = Sets.newHash(StandardOpenOption.READ, StandardOpenOption.WRITE,
       StandardOpenOption.SYNC);

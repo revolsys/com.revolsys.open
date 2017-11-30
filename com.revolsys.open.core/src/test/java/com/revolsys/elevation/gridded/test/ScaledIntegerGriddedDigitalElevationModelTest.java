@@ -12,7 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModel;
+import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModelFile;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.Dates;
@@ -23,9 +23,9 @@ public class ScaledIntegerGriddedDigitalElevationModelTest extends GriddedElevat
 
   @Override
   public List<String> getFileExtensions() {
-    return Arrays.asList(ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION,
-      ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION_GZ,
-      ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION_ZIP);
+    return Arrays.asList(ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION,
+      ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION_GZ,
+      ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION_ZIP);
   }
 
   @Test

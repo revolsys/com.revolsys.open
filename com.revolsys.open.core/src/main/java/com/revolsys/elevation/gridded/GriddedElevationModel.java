@@ -8,7 +8,7 @@ import java.util.function.DoubleConsumer;
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
-import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModel;
+import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
 import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
@@ -90,7 +90,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
   }
 
   public static void serviceInit() {
-    IoFactoryRegistry.addFactory(new ScaledIntegerGriddedDigitalElevationModel());
+    IoFactoryRegistry.addFactory(new ScaledIntegerGriddedDigitalElevation());
     IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());
     IoFactoryRegistry.addFactory(new UsgsGriddedElevation());
   }

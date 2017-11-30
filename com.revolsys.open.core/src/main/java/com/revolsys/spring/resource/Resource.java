@@ -15,6 +15,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -386,6 +387,11 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   default ChannelWriter newChannelWriter() {
     return newChannelWriter(8192, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelWriter newChannelWriter(final ByteBuffer buffer) {
+    final WritableByteChannel in = newWritableByteChannel();
+    return new ChannelWriter(in, true, buffer);
   }
 
   default ChannelWriter newChannelWriter(final int capacity) {

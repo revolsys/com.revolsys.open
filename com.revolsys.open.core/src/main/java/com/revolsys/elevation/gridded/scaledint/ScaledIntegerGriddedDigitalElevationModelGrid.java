@@ -104,7 +104,7 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid {
     this.scaleZ = scaleZ;
     this.gridSizePixels = gridTileSize / gridCellSize;
     this.tileBasePath = basePath//
-      .resolve(ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION)//
+      .resolve(ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION)//
       .resolve(Integer.toString(coordinateSystemId))//
       .resolve(Integer.toString(gridTileSize))//
     ;
@@ -118,7 +118,7 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid {
       final int gridCellX = GriddedElevationModel.getGridCellX(tileX, this.gridCellSize, x);
       final int gridCellY = GriddedElevationModel.getGridCellY(tileY, this.gridCellSize, y);
       final int elevationByteSize = 4;
-      final int offset = ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE
+      final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
         + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
       try (
         FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
@@ -160,7 +160,7 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid {
       fileNameBuilder.append('_');
       fileNameBuilder.append(tileY);
       fileNameBuilder.append('.');
-      fileNameBuilder.append(ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION);
+      fileNameBuilder.append(ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION);
       final String fileName = fileNameBuilder.toString();
       final Path path = this.tileBasePath//
         .resolve(Integer.toString(tileX))//

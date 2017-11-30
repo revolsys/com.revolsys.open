@@ -12,7 +12,7 @@ import java.util.zip.ZipOutputStream;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
-import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModel;
+import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -62,7 +62,7 @@ public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<Gridded
       final String fileNameExtension = this.resource.getFileNameExtension();
       final OutputStream bufferedOut = this.resource.newBufferedOutputStream();
       if ("zip".equals(fileNameExtension)
-        || ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION_ZIP.equals(fileNameExtension)) {
+        || ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION_ZIP.equals(fileNameExtension)) {
         try {
           final String fileName = this.resource.getBaseName();
           final ZipOutputStream zipOut = new ZipOutputStream(bufferedOut);
@@ -82,8 +82,8 @@ public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<Gridded
       } else if ("gz".equals(fileNameExtension)) {
         try {
           String fileName = this.resource.getBaseName();
-          if (!fileName.endsWith("." + ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION)) {
-            fileName += "." + ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION;
+          if (!fileName.endsWith("." + ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION)) {
+            fileName += "." + ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION;
           }
           final GZIPOutputStream zipOut = new GZIPOutputStream(bufferedOut);
           this.writer = new OutputStreamWriter(zipOut, StandardCharsets.UTF_8);

@@ -25,7 +25,7 @@ import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class ScaledIntegerGriddedDigitalElevationModel extends AbstractIoFactoryWithCoordinateSystem
+public class ScaledIntegerGriddedDigitalElevation extends AbstractIoFactoryWithCoordinateSystem
   implements GriddedElevationModelReadFactory, GriddedElevationModelWriterFactory {
 
   public static final String MEDIA_TYPE = "image/x-revolsys-sigdem";
@@ -140,7 +140,7 @@ public class ScaledIntegerGriddedDigitalElevationModel extends AbstractIoFactory
     return (G)editor.newGeometry();
   }
 
-  public ScaledIntegerGriddedDigitalElevationModel() {
+  public ScaledIntegerGriddedDigitalElevation() {
     super("Scaled Integer Gridded Digital Elevation Model");
 
     addMediaTypeAndFileExtension(MEDIA_TYPE, FILE_EXTENSION);

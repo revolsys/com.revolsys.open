@@ -128,8 +128,8 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
         if (isMemoryMapped() && channel instanceof FileChannel) {
           final FileChannel fileChannel = (FileChannel)channel;
           final MappedByteBuffer mappedBytes = fileChannel.map(MapMode.READ_ONLY,
-            ScaledIntegerGriddedDigitalElevationModel.HEADER_SIZE,
-            cellCount * ScaledIntegerGriddedDigitalElevationModel.RECORD_SIZE);
+            ScaledIntegerGriddedDigitalElevation.HEADER_SIZE,
+            cellCount * ScaledIntegerGriddedDigitalElevation.RECORD_SIZE);
           final IntBuffer intBuffer = mappedBytes.asIntBuffer();
           for (int index = 0; index < cellCount; index++) {
             elevations[index] = intBuffer.get();

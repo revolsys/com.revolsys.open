@@ -9,7 +9,7 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
-import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModel;
+import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModelGrid;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -35,7 +35,7 @@ public class TiledGriddedElevationModelLayer
   implements ElevationModelLayer {
   private Resource baseResource;
 
-  private String fileExtension = ScaledIntegerGriddedDigitalElevationModel.FILE_EXTENSION;
+  private String fileExtension = ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION;
 
   private String filePrefix = null;
 
