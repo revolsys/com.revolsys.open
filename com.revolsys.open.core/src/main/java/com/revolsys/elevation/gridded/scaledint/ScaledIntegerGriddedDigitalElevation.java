@@ -46,6 +46,10 @@ public class ScaledIntegerGriddedDigitalElevation extends AbstractIoFactoryWithC
 
   public static final short VERSION = 1;
 
+  public static int bufferSize(final int width, final int height) {
+    return HEADER_SIZE + width * height * 4;
+  }
+
   public static double getElevationInterpolated(final Resource baseResource,
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
     final String fileExtension, final double x, final double y) {
