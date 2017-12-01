@@ -1,5 +1,7 @@
 package com.revolsys.geometry.io;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -21,12 +23,21 @@ public interface PointReader extends Reader<Point>, GeometryFactoryProxy {
   }
 
   static PointReader newPointReader(final Object source) {
+    return newPointReader(source, MapEx.EMPTY);
+  }
+
+  static PointReader newPointReader(final Object source, final GeometryFactory geometryFactory) {
+    final MapEx properties = new LinkedHashMapEx("geometryFactory", geometryFactory);
+    return newPointReader(source, properties);
+  }
+
+  static PointReader newPointReader(final Object source, final MapEx properties) {
     final PointReaderFactory readerFactory = IoFactory.factory(PointReaderFactory.class, source);
-    if (readerFactory == null) {
+    if (readerFactory == null || !readerFactory.isGeometrySupported()) {
       return null;
     } else {
       final Resource resource = readerFactory.getZipResource(source);
-      return readerFactory.newPointReader(resource);
+      return readerFactory.newPointReader(resource, properties);
     }
   }
 

@@ -372,6 +372,15 @@ public interface Resource extends org.springframework.core.io.Resource {
     return newChannelReader(8192, ByteOrder.BIG_ENDIAN);
   }
 
+  default ChannelReader newChannelReader(final ByteBuffer byteBuffer) {
+    final ReadableByteChannel in = newReadableByteChannel();
+    if (in == null) {
+      return null;
+    } else {
+      return new ChannelReader(in, byteBuffer);
+    }
+  }
+
   default ChannelReader newChannelReader(final int capacity) {
     return newChannelReader(capacity, ByteOrder.BIG_ENDIAN);
   }
@@ -439,7 +448,11 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   default ReadableByteChannel newReadableByteChannel() {
     final InputStream in = newInputStream();
-    return Channels.newChannel(in);
+    if (in == null) {
+      return null;
+    } else {
+      return Channels.newChannel(in);
+    }
   }
 
   default Reader newReader() {

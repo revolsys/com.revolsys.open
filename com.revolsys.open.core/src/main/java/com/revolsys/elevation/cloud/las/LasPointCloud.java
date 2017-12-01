@@ -3,6 +3,7 @@ package com.revolsys.elevation.cloud.las;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,6 @@ import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V2;
 import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -58,6 +58,12 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
     return new LasPointCloud(resource, geometryFactory);
   }
 
+  public static LasPointCloud newLasPointCloud(final Object source,
+    final GeometryFactory geometryFactory, final ByteBuffer byteBuffer) {
+    final Resource resource = Resource.getResource(source);
+    return new LasPointCloud(resource, geometryFactory, byteBuffer);
+  }
+
   private GeometryFactory geometryFactory = GeometryFactory.fixed3d(1000.0, 1000.0, 1000.0);
 
   private LasPointCloudHeader header;
@@ -84,7 +90,12 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
     this(resource, null);
   }
 
-  public LasPointCloud(final Resource resource, GeometryFactory geometryFactory) {
+  public LasPointCloud(final Resource resource, final GeometryFactory geometryFactory) {
+    this(resource, geometryFactory, null);
+  }
+
+  public LasPointCloud(final Resource resource, GeometryFactory geometryFactory,
+    final ByteBuffer byteBuffer) {
     this.resource = resource;
     Resource fileResource = resource;
     if (resource.getFileNameExtension().equals("zip")) {
@@ -126,10 +137,12 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
         throw new IllegalArgumentException("Cannot find file: " + resource + "!" + fileName);
       }
     }
-    this.reader = fileResource.newChannelReader(8192, ByteOrder.LITTLE_ENDIAN);
+
+    this.reader = fileResource.newChannelReader(byteBuffer);
     if (this.reader == null) {
       this.exists = false;
     } else {
+      this.reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       this.exists = true;
       if (geometryFactory == null || !geometryFactory.isHasCoordinateSystem()) {
         final GeometryFactory geometryFactoryFromPrj = EsriCoordinateSystems
@@ -386,10 +399,6 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
       });
     }
     return this.points.size();
-  }
-
-  public void setCoordinateSystemInternal(final CoordinateSystem coordinateSystem) {
-    this.geometryFactory = this.geometryFactory.convertCoordinateSystem(coordinateSystem);
   }
 
   private void setHeader(final LasPointCloudHeader header) {

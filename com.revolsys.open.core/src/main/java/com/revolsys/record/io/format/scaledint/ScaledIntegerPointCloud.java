@@ -4,14 +4,18 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.io.GeometryWriterFactory;
+import com.revolsys.geometry.io.PointReader;
+import com.revolsys.geometry.io.PointReaderFactory;
 import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.spring.resource.OutputStreamResource;
 import com.revolsys.spring.resource.Resource;
 
-public class ScaledIntegerPointCloud extends GeometryRecordReaderFactory implements GeometryWriterFactory {
+public class ScaledIntegerPointCloud extends GeometryRecordReaderFactory
+  implements GeometryWriterFactory, PointReaderFactory {
 
   public static final String FILE_EXTENSION = "sipc";
 
@@ -40,8 +44,8 @@ public class ScaledIntegerPointCloud extends GeometryRecordReaderFactory impleme
   }
 
   @Override
-  public GeometryReader newGeometryReader(final Resource resource) {
-    return new ScaledIntegerPointCloudGeometryReader(resource);
+  public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
+    return new ScaledIntegerPointCloudGeometryReader(resource, properties);
   }
 
   @Override
@@ -54,5 +58,10 @@ public class ScaledIntegerPointCloud extends GeometryRecordReaderFactory impleme
     final Charset charset) {
     final OutputStreamResource resource = new OutputStreamResource(baseName, out);
     return newGeometryWriter(resource);
+  }
+
+  @Override
+  public PointReader newPointReader(final Resource resource, final MapEx properties) {
+    return new ScaledIntegerPointCloudPointReader(resource, properties);
   }
 }

@@ -1,6 +1,7 @@
 package com.revolsys.record.io.format.scaledint;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.model.Geometry;
@@ -11,7 +12,8 @@ import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geometry> implements GeometryWriter {
+public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geometry>
+  implements GeometryWriter {
   private boolean initialized;
 
   private final Resource resource;
@@ -24,10 +26,11 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
 
   private GeometryFactory geometryFactory;
 
+  private ByteBuffer byteBuffer;
+
   public ScaledIntegerPointCloudGeometryWriter(final Resource resource) {
     this.resource = resource;
     setGeometryFactory(GeometryFactory.fixed3d(0, 1000.0, 1000.0, 1000.0));
-
   }
 
   @Override
@@ -42,15 +45,20 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
   private void initialize() throws IOException {
     if (!this.initialized) {
       this.initialized = true;
-      this.writer = this.resource.newChannelWriter();
+      this.writer = this.resource.newChannelWriter(this.byteBuffer);
 
       final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
-      this.writer.putBytes(ScaledIntegerPointCloud.FILE_TYPE_HEADER_BYTES); // File type
+      this.writer.putBytes(ScaledIntegerPointCloud.FILE_TYPE_HEADER_BYTES); // File
+                                                                            // type
       this.writer.putShort(ScaledIntegerPointCloud.VERSION); // version
       this.writer.putInt(coordinateSystemId);
       this.writer.putDouble(this.scaleXy);
       this.writer.putDouble(this.scaleZ);
     }
+  }
+
+  public void setByteBuffer(final ByteBuffer byteBuffer) {
+    this.byteBuffer = byteBuffer;
   }
 
   @Override

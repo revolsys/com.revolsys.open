@@ -2,6 +2,7 @@ package com.revolsys.elevation.gridded.esriascii;
 
 import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
@@ -52,7 +53,7 @@ public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSy
 
   @Override
   public PointReader newPointReader(final Resource resource,
-    final Map<String, ? extends Object> properties) {
+    final MapEx properties) {
     return new EsriAsciiGriddedElevationModelReader(resource, properties);
   }
 
