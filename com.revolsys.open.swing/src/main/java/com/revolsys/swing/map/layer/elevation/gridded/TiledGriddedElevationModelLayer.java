@@ -171,9 +171,12 @@ public class TiledGriddedElevationModelLayer
       if (this.baseResource.isFile() && this.baseResource.exists()) {
         final Path basePath = this.baseResource.getPath();
         final int coordinateSystemId = getCoordinateSystemId();
-        this.elevationModel = new ScaledIntegerGriddedDigitalElevationModelGrid(basePath,
-          this.filePrefix, coordinateSystemId, this.tileSizePixels, this.minResolution,
+        final ScaledIntegerGriddedDigitalElevationModelGrid elevationModel = new ScaledIntegerGriddedDigitalElevationModelGrid(
+          basePath, this.filePrefix, coordinateSystemId, this.tileSizePixels, this.minResolution,
           this.scaleZ);
+        elevationModel.setCacheChannels(false);
+        this.elevationModel = elevationModel;
+
       }
     }
     return initialized;
