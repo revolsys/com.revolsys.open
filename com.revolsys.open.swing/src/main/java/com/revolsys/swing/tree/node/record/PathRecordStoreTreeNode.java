@@ -45,7 +45,7 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   public PathRecordStoreTreeNode(final Path path) {
     super(path);
     setName(Paths.getFileName(path));
-    super.setIcon(PathTreeNode.ICON_FILE_DATABASE);
+    super.setIcon(PathTreeNode.getIconFile("database"));
   }
 
   public void addRecordStoreConnection() {
@@ -147,6 +147,6 @@ public class PathRecordStoreTreeNode extends PathTreeNode
 
   @Override
   protected void setIcon(final Icon icon) {
-    super.setIcon(PathTreeNode.ICON_FILE_DATABASE);
+    super.setIcon(PathTreeNode.getIconFile("database"));
   }
 }

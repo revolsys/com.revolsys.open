@@ -88,9 +88,9 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
   public Icon getIcon() {
     final Layer layer = getLayer();
     if (layer.isVisible()) {
-      return PathTreeNode.ICON_FOLDER;
+      return PathTreeNode.getIconFolder();
     } else {
-      return Icons.getDisabledIcon(PathTreeNode.ICON_FOLDER);
+      return Icons.getDisabledIcon(PathTreeNode.getIconFolder());
     }
   }
 
