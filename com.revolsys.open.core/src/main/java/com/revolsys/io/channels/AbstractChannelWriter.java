@@ -19,11 +19,13 @@ public class AbstractChannelWriter implements BaseCloseable {
     this.closeChannel = closeChannel;
     if (buffer == null) {
       this.capacity = 8192;
+      this.available = this.capacity;
       this.buffer = ByteBuffer.allocateDirect(this.capacity);
     } else {
-      this.capacity = buffer.capacity();
-      this.buffer = buffer;
       buffer.clear();
+      this.capacity = buffer.capacity();
+      this.available = this.capacity;
+      this.buffer = buffer;
     }
   }
 
@@ -66,7 +68,7 @@ public class AbstractChannelWriter implements BaseCloseable {
   }
 
   public void putBytes(final byte[] bytes, final int length) {
-    if (length < this.available) {
+    if (length <= this.available) {
       this.available -= length;
       this.buffer.put(bytes, 0, length);
     } else {
