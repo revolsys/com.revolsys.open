@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
@@ -274,7 +275,7 @@ public class TriangulationVisualization {
       "/data/dem/elevation/las/bc_093g057c_xl2m_2015_dem_ground.las");
     final TriangulatedIrregularNetwork tin;
     try (
-      final LasPointCloud pointCloud = new LasPointCloud(sourceFile)) {
+      final LasPointCloud pointCloud = PointCloud.newPointCloud(sourceFile)) {
 
       tin = pointCloud.newTriangulatedIrregularNetwork();
     }

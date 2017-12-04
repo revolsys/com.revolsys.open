@@ -2,34 +2,36 @@ package com.revolsys.swing.map.layer.elevation.gridded;
 
 import java.beans.PropertyChangeEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.swing.JFileChooser;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
-import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
+import com.revolsys.elevation.gridded.rasterizer.ColourGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
+import com.revolsys.swing.RsSwingServiceInitializer;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.io.SwingIo;
 import com.revolsys.swing.layout.GroupLayouts;
+import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
@@ -37,11 +39,11 @@ import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.PreferencesUtil;
+import com.revolsys.swing.tree.TreeNodes;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
 
-public class GriddedElevationModelLayer extends AbstractLayer
-  implements ElevationModelLayer {
+public class GriddedElevationModelLayer extends AbstractLayer implements ElevationModelLayer {
   public static final String J_TYPE = "griddedElevationModelLayer";
 
   static {
@@ -63,54 +65,77 @@ public class GriddedElevationModelLayer extends AbstractLayer
       "page:refresh", GriddedElevationModelLayer::revertDo, true);
   }
 
-  public static void saveAs(final String title, final Consumer<File> exportAction) {
-    Invoke.later(() -> {
-      final JFileChooser fileChooser = SwingUtil.newFileChooser("Save As",
-        "com.revolsys.swing.map.layer.elevation.gridded.save", "directory");
-      final String defaultFileExtension = PreferencesUtil.getUserString(
-        "com.revolsys.swing.map.layer.elevation.gridded.save", "fileExtension",
-        ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION);
-
-      final List<FileNameExtensionFilter> fileFilters = new ArrayList<>();
-      for (final GriddedElevationModelWriterFactory factory : IoFactory
-        .factories(GriddedElevationModelWriterFactory.class)) {
-        factory.addFileFilters(fileFilters);
-      }
-      IoFactory.sortFilters(fileFilters);
-
-      fileChooser.setAcceptAllFileFilterUsed(false);
-      fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));
-      for (final FileNameExtensionFilter fileFilter : fileFilters) {
-        fileChooser.addChoosableFileFilter(fileFilter);
-        if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
-          fileChooser.setFileFilter(fileFilter);
+  private static void actionExport(final PathTreeNode node) {
+    final Path path = node.getPath();
+    SwingIo.exportToFile("Gridded Elevation Model", "com.revolsys.swing.io.gridded_dem.export",
+      GriddedElevationModelWriterFactory.class, "asc", path, targetFile -> {
+        try {
+          final GriddedElevationModel elevationModel = GriddedElevationModel
+            .newGriddedElevationModel(path);
+          elevationModel.writeGriddedElevationModel(targetFile);
+        } catch (final Exception e) {
+          Logs.error(RsSwingServiceInitializer.class,
+            "Error exporting gridded elevation:\n" + path + "\n" + targetFile, e);
         }
-      }
+      });
+  }
 
-      fileChooser.setMultiSelectionEnabled(false);
-      final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
-      if (returnVal == JFileChooser.APPROVE_OPTION) {
-        final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
-          .getFileFilter();
-        File file = fileChooser.getSelectedFile();
-        if (file != null) {
-          final String fileExtension = FileUtil.getFileNameExtension(file);
-          final String expectedExtension = fileFilter.getExtensions().get(0);
-          if (!fileExtension.equals(expectedExtension)) {
-            file = FileUtil.getFileWithExtension(file, expectedExtension);
-          }
-          final File targetFile = file;
-          PreferencesUtil.setUserString("com.revolsys.swing.map.layer.elevation.gridded.save",
-            "fileExtension", expectedExtension);
-          PreferencesUtil.setUserString("com.revolsys.swing.map.layer.elevation.gridded.save",
-            "directory", file.getParent());
-          final String description = "Save " + title + " as " + targetFile.getAbsolutePath();
-          Invoke.background(description, () -> {
-            exportAction.accept(targetFile);
-          });
-        }
+  private static void actionZoomTo(final PathTreeNode node) {
+    final Path file = node.getPath();
+    Invoke.background("Zoom to Gridded Elevation Model" + ": " + file, () -> {
+      try (
+        GriddedElevationModelReader reader = GriddedElevationModel
+          .newGriddedElevationModelReader(file)) {
+        final BoundingBox boundingBox = reader.getBoundingBox();
+        final Project project = Project.get();
+        final MapPanel mapPanel = project.getMapPanel();
+        mapPanel.zoomToBoundingBox(boundingBox);
       }
     });
+  }
+
+  public static void factoryInit() {
+    // Rasterizers
+    MapObjectFactoryRegistry.newFactory("hillShadeGriddedElevationModelRasterizer",
+      HillShadeGriddedElevationModelRasterizer::new);
+    MapObjectFactoryRegistry.newFactory("colourGriddedElevationModelRasterizer",
+      ColourGriddedElevationModelRasterizer::new);
+    MapObjectFactoryRegistry.newFactory("rasterizerGriddedElevationModelLayerRenderer",
+      RasterizerGriddedElevationModelLayerRenderer::new);
+    MapObjectFactoryRegistry.newFactory("multipleGriddedElevationModelLayerRenderer",
+      MultipleGriddedElevationModelLayerRenderer::new);
+    MapObjectFactoryRegistry.newFactory("tiledMultipleGriddedElevationModelLayerRenderer",
+      TiledMultipleGriddedElevationModelLayerRenderer::new);
+
+    // Layers
+    MapObjectFactoryRegistry.newFactory("griddedElevationModelLayer",
+      "Gridded Elevation Model Layer", GriddedElevationModelLayer::new);
+
+    MapObjectFactoryRegistry.newFactory("tiledGriddedElevationModelLayer",
+      "Tiled Gridded Elevation Model Layer", TiledGriddedElevationModelLayer::new);
+
+    // Menus
+    final EnableCheck enableCheck = RsSwingServiceInitializer
+      .enableCheck(GriddedElevationModelReadFactory.class);
+    menuItemPathAddLayer("gridded_dem", "Add Gridded Elevation Model Layer", "gridded_dem",
+      GriddedElevationModelReadFactory.class);
+
+    TreeNodes
+      .addMenuItem(PathTreeNode.MENU, "gridded_dem", "Export Gridded Elevation Model",
+        (final PathTreeNode node) -> actionExport(node)) //
+      .setVisibleCheck(enableCheck) //
+      .setIconName("gridded_dem", "save");
+
+    TreeNodes
+      .addMenuItem(PathTreeNode.MENU, "gridded_dem", "Zoom to Gridded Elevation Model",
+        (final PathTreeNode node) -> actionZoomTo(node))
+      .setVisibleCheck(enableCheck) //
+      .setIconName("gridded_dem", "magnifier");
+  }
+
+  private static void saveAs(final String baseName, final Consumer<File> exportAction) {
+    SwingIo.exportToFile("Gridded Elevation Model", "com.revolsys.swing.io.gridded_dem.export",
+      GriddedElevationModelWriterFactory.class, "asc", baseName, exportAction);
   }
 
   private GriddedElevationModel elevationModel;

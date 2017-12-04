@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.io.format.json.JsonWriter;
@@ -22,7 +23,7 @@ public class LasInfo implements Runnable, BaseCloseable {
   private LasPointCloud pointCloud;
 
   public LasInfo(final String fileName) {
-    this.pointCloud = new LasPointCloud(new PathResource(fileName));
+    this.pointCloud = PointCloud.newPointCloud(new PathResource(fileName));
   }
 
   @Override

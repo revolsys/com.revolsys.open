@@ -74,4 +74,9 @@ public class RsCoreServiceInitializer implements ServiceInitializer {
     GriddedElevationModel.serviceInit();
     TriangulatedIrregularNetwork.serviceInit();
   }
+
+  @Override
+  public int priority() {
+    return 0;
+  }
 }

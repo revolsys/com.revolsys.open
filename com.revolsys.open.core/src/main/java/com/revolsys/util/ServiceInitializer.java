@@ -8,4 +8,5 @@ public interface ServiceInitializer {
 
   void initializeService();
 
+  int priority();
 }

@@ -23,7 +23,7 @@ import javax.swing.JLabel;
 import org.apache.commons.collections4.map.HashedMap;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.elevation.cloud.PointCloudReaderFactory;
+import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.io.FileUtil;
@@ -316,9 +316,8 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       }
     }
     final String title = Paths.getBaseName(path);
-    AbstractRecordLayer.exportRecords(title, hasGeometryField, (targetFile) -> {
-      RecordIo.copyRecords(path, targetFile);
-    });
+    AbstractRecordLayer.exportRecords(title, hasGeometryField,
+      targetFile -> RecordIo.copyRecords(path, targetFile));
   }
 
   @Override
@@ -425,7 +424,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
         return false;
       } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, path)) {
         return true;
-      } else if (IoFactory.hasFactory(PointCloudReaderFactory.class, path)) {
+      } else if (IoFactory.hasFactory(PointCloudReadFactory.class, path)) {
         return true;
       } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
         return true;

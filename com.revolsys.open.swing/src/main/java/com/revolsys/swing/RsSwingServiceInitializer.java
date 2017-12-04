@@ -1,26 +1,17 @@
 package com.revolsys.swing;
 
-import java.net.URL;
-
-import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
-import com.revolsys.elevation.gridded.rasterizer.ColourGriddedElevationModelRasterizer;
-import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.LayerGroup;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServer;
 import com.revolsys.swing.map.layer.bing.Bing;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
-import com.revolsys.swing.map.layer.elevation.gridded.MultipleGriddedElevationModelLayerRenderer;
-import com.revolsys.swing.map.layer.elevation.gridded.RasterizerGriddedElevationModelLayerRenderer;
-import com.revolsys.swing.map.layer.elevation.gridded.TiledGriddedElevationModelLayer;
-import com.revolsys.swing.map.layer.elevation.gridded.TiledMultipleGriddedElevationModelLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
@@ -49,22 +40,9 @@ import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.ServiceInitializer;
 
 public class RsSwingServiceInitializer implements ServiceInitializer {
-  private static void actionAddLayer(final PathTreeNode node,
-    final Class<? extends IoFactory> factoryClass) {
-    final URL url = node.getUrl();
-    final Project project = Project.get();
-    project.openFile(url);
-  }
 
-  private static void addIoFactoryMenuItem(final String menuGroup, final String menuName,
-    final String iconName, final Class<? extends IoFactory> factoryClass) {
-    final EnableCheck enableCheck = TreeNodes
-      .enableCheck((final PathTreeNode node) -> node.isReadable(factoryClass));
-    TreeNodes
-      .addMenuItem(PathTreeNode.MENU, menuGroup, menuName,
-        (final PathTreeNode node) -> actionAddLayer(node, factoryClass)) //
-      .setVisibleCheck(enableCheck) //
-      .setIconName(iconName, "add");
+  public static EnableCheck enableCheck(final Class<? extends IoFactory> factoryClass) {
+    return TreeNodes.enableCheck((final PathTreeNode node) -> node.isReadable(factoryClass));
   }
 
   private static void markers() {
@@ -78,6 +56,8 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     markers();
     layerRenderers();
     layers();
+    GriddedElevationModelLayer.factoryInit();
+    PointCloudLayer.factoryInit();
   }
 
   private void layerRenderers() {
@@ -88,19 +68,6 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("scaleStyle", ScaleMultipleRenderer::new);
     MapObjectFactoryRegistry.newFactory("filterStyle", FilterMultipleRenderer::new);
     MapObjectFactoryRegistry.newFactory("gridLayerRenderer", GridLayerRenderer::new);
-
-    MapObjectFactoryRegistry.newFactory("hillShadeGriddedElevationModelRasterizer",
-      HillShadeGriddedElevationModelRasterizer::new);
-    MapObjectFactoryRegistry.newFactory("colourGriddedElevationModelRasterizer",
-      ColourGriddedElevationModelRasterizer::new);
-    MapObjectFactoryRegistry.newFactory("rasterizerGriddedElevationModelLayerRenderer",
-      RasterizerGriddedElevationModelLayerRenderer::new);
-
-    MapObjectFactoryRegistry.newFactory("multipleGriddedElevationModelLayerRenderer",
-      MultipleGriddedElevationModelLayerRenderer::new);
-
-    MapObjectFactoryRegistry.newFactory("tiledMultipleGriddedElevationModelLayerRenderer",
-      TiledMultipleGriddedElevationModelLayerRenderer::new);
   }
 
   private void layers() {
@@ -109,7 +76,7 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("baseMapLayerGroup", "Base Map Layer Group",
       BaseMapLayerGroup::newLayer);
 
-    addIoFactoryMenuItem("record", "Add Record Layer", "map", RecordReaderFactory.class);
+    AbstractLayer.menuItemPathAddLayer("record", "Add Record Layer", "map", RecordReaderFactory.class);
 
     MapObjectFactoryRegistry.newFactory("recordFileLayer", "File", FileRecordLayer::newLayer);
 
@@ -130,30 +97,14 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("geoReferencedImageLayer", "Geo-referenced Image Layer",
       GeoreferencedImageLayer::newLayer);
 
-    addIoFactoryMenuItem("image", "Add Image Layer", "picture",
+    AbstractLayer.menuItemPathAddLayer("image", "Add Image Layer", "picture",
       GeoreferencedImageReadFactory.class);
-
-    MapObjectFactoryRegistry.newFactory("griddedElevationModelLayer",
-      "Gridded Elevation Model Layer", GriddedElevationModelLayer::new);
-
-    MapObjectFactoryRegistry.newFactory("tiledGriddedElevationModelLayer",
-      "Tiled Gridded Elevation Model Layer", TiledGriddedElevationModelLayer::new);
-
-    addIoFactoryMenuItem("gridded_dem", "Add Gridded DEM Layer", "gridded_dem",
-      GriddedElevationModelReadFactory.class);
 
     MapObjectFactoryRegistry.newFactory("triangulatedIrregularNetworkLayer",
       "Triangulated Irregular Network Layer", TriangulatedIrregularNetworkLayer::new);
 
-    addIoFactoryMenuItem("tin", "Add TIN Layer", "tin",
+    AbstractLayer.menuItemPathAddLayer("tin", "Add TIN Layer", "tin",
       TriangulatedIrregularNetworkReadFactory.class);
-
-    MapObjectFactoryRegistry.newFactory("pointCloudLayer", "Point Cloud Layer",
-      PointCloudLayer::new);
-
-    // TODO Need to handle memory and rendering better
-    // addIoFactoryMenuItem("pointCloud", "Add Point Cloud Layer", "point_cloud",
-    // PointCloudReaderFactory.class);
 
     ArcGisRestServer.factoryInit();
 
@@ -167,6 +118,11 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
       OpenStreetMapLayer::new);
 
     WebMercatorTileCache.factoryInit();
+  }
+
+  @Override
+  public int priority() {
+    return 100;
   }
 
 }

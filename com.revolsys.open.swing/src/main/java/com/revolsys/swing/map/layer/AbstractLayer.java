@@ -9,6 +9,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
@@ -57,7 +59,9 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.Panels;
+import com.revolsys.swing.RsSwingServiceInitializer;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
@@ -73,6 +77,8 @@ import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.swing.table.NumberTableCellRenderer;
+import com.revolsys.swing.tree.TreeNodes;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
@@ -1220,5 +1226,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
         .expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);
     }
+  }
+
+  public static void menuItemPathAddLayer(final String menuGroup, final String menuName,
+    final String iconName, final Class<? extends IoFactory> factoryClass) {
+    final EnableCheck enableCheck = RsSwingServiceInitializer.enableCheck(factoryClass);
+    TreeNodes.addMenuItem(PathTreeNode.MENU, menuGroup, menuName, (final PathTreeNode node) -> {
+      final URL url = node.getUrl();
+      final Project project = Project.get();
+      project.openFile(url);
+    })
+      .setVisibleCheck(enableCheck) //
+      .setIconName(iconName, "add");
   }
 }

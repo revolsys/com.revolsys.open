@@ -37,31 +37,20 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Exceptions;
 
-public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSerializer {
+public class LasPointCloud extends BaseObjectWithProperties
+  implements PointCloud<LasPoint>, BaseCloseable, MapSerializer {
 
   public static void forEachPoint(final Object source, final Consumer<? super LasPoint> action) {
-    final Resource resource = Resource.getResource(source);
     try (
-      final LasPointCloud pointCloud = new LasPointCloud(resource)) {
+      final LasPointCloud pointCloud = PointCloud.newPointCloud(source)) {
       pointCloud.forEachPoint(action);
     }
-  }
-
-  public static LasPointCloud newLasPointCloud(final Object source,
-    final GeometryFactory geometryFactory) {
-    final Resource resource = Resource.getResource(source);
-    return new LasPointCloud(resource, geometryFactory);
-  }
-
-  public static LasPointCloud newLasPointCloud(final Object source,
-    final GeometryFactory geometryFactory, final ByteBuffer byteBuffer) {
-    final Resource resource = Resource.getResource(source);
-    return new LasPointCloud(resource, geometryFactory, byteBuffer);
   }
 
   private GeometryFactory geometryFactory = GeometryFactory.fixed3d(1000.0, 1000.0, 1000.0);
@@ -78,24 +67,14 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
 
   private boolean exists;
 
-  public LasPointCloud(final GeometryFactory geometryFactory) {
-    this(LasPointFormat.Core, geometryFactory);
-  }
+  private ByteBuffer byteBuffer;
 
   public LasPointCloud(final LasPointFormat pointFormat, final GeometryFactory geometryFactory) {
     this.setHeader(new LasPointCloudHeader(pointFormat, geometryFactory));
   }
 
-  public LasPointCloud(final Resource resource) {
-    this(resource, null);
-  }
-
-  public LasPointCloud(final Resource resource, final GeometryFactory geometryFactory) {
-    this(resource, geometryFactory, null);
-  }
-
-  public LasPointCloud(final Resource resource, GeometryFactory geometryFactory,
-    final ByteBuffer byteBuffer) {
+  public LasPointCloud(final Resource resource, final MapEx properties) {
+    setProperties(properties);
     this.resource = resource;
     Resource fileResource = resource;
     if (resource.getFileNameExtension().equals("zip")) {
@@ -127,7 +106,7 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
           final GeometryFactory geometryFactoryFromPrj = EsriCoordinateSystems
             .getGeometryFactory(prjResource);
           if (geometryFactoryFromPrj != null) {
-            geometryFactory = geometryFactoryFromPrj;
+            this.geometryFactory = geometryFactoryFromPrj;
           }
         } catch (final URISyntaxException e) {
           // TODO Auto-generated catch block
@@ -138,20 +117,20 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
       }
     }
 
-    this.reader = fileResource.newChannelReader(byteBuffer);
+    this.reader = fileResource.newChannelReader(this.byteBuffer);
     if (this.reader == null) {
       this.exists = false;
     } else {
       this.reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       this.exists = true;
-      if (geometryFactory == null || !geometryFactory.isHasCoordinateSystem()) {
+      if (this.geometryFactory == null || !this.geometryFactory.isHasCoordinateSystem()) {
         final GeometryFactory geometryFactoryFromPrj = EsriCoordinateSystems
           .getGeometryFactory(resource);
         if (geometryFactoryFromPrj != null) {
-          geometryFactory = geometryFactoryFromPrj;
+          this.geometryFactory = geometryFactoryFromPrj;
         }
       }
-      final LasPointCloudHeader header = new LasPointCloudHeader(this.reader, geometryFactory);
+      final LasPointCloudHeader header = new LasPointCloudHeader(this.reader, this.geometryFactory);
       this.setHeader(header);
     }
   }
@@ -399,6 +378,14 @@ public class LasPointCloud implements PointCloud<LasPoint>, BaseCloseable, MapSe
       });
     }
     return this.points.size();
+  }
+
+  public void setByteBuffer(final ByteBuffer byteBuffer) {
+    this.byteBuffer = byteBuffer;
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   private void setHeader(final LasPointCloudHeader header) {

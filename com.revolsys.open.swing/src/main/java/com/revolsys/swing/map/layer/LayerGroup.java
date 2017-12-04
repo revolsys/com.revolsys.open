@@ -22,7 +22,7 @@ import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.elevation.cloud.PointCloudReaderFactory;
+import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.geometry.model.BoundingBox;
@@ -814,7 +814,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layer = new GriddedElevationModelLayer(properties);
     } else if (factoryClass == GeoreferencedImageReadFactory.class) {
       layer = new GeoreferencedImageLayer(properties);
-    } else if (factoryClass == PointCloudReaderFactory.class) {
+    } else if (factoryClass == PointCloudReadFactory.class) {
       layer = new PointCloudLayer(properties);
     } else if (factoryClass == RecordReaderFactory.class) {
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
@@ -875,7 +875,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layer = new GriddedElevationModelLayer(properties);
     } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, url)) {
       layer = new GeoreferencedImageLayer(properties);
-    } else if (IoFactory.hasFactory(PointCloudReaderFactory.class, url)) {
+    } else if (IoFactory.hasFactory(PointCloudReadFactory.class, url)) {
       layer = new PointCloudLayer(properties);
     } else if (IoFactory.hasFactory(RecordReaderFactory.class, url)) {
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);

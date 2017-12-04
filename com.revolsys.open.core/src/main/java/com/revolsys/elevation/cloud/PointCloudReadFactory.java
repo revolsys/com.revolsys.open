@@ -1,21 +1,12 @@
 package com.revolsys.elevation.cloud;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.io.IoFactory;
 import com.revolsys.io.ReadIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public interface PointCloudReaderFactory extends ReadIoFactory {
-  static <P extends Point, PC extends PointCloud<P>> PC openPointCloud(final Resource resource) {
-    final PointCloudReaderFactory factory = IoFactory.factory(PointCloudReaderFactory.class,
-      resource);
-    if (factory == null) {
-      return null;
-    } else {
-      final PC pointCloud = factory.readPointCloud(resource);
-      return pointCloud;
-    }
-  }
+public interface PointCloudReadFactory extends ReadIoFactory {
+  
 
   // TODO figure out how to do this with decent memory usage
   // @Override
@@ -29,5 +20,5 @@ public interface PointCloudReaderFactory extends ReadIoFactory {
   // }
   // }
 
-  <P extends Point, PC extends PointCloud<P>> PC readPointCloud(Resource resource);
+  <P extends Point, PC extends PointCloud<P>> PC newPointCloud(Resource resource, MapEx properties);
 }

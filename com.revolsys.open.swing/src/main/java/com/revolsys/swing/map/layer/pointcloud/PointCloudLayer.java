@@ -1,26 +1,66 @@
 package com.revolsys.swing.map.layer.pointcloud;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
-import com.revolsys.elevation.cloud.PointCloudReaderFactory;
+import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
+import com.revolsys.swing.RsSwingServiceInitializer;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
+import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.tree.TreeNodes;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
 
 public class PointCloudLayer extends AbstractLayer {
 
   public static final String J_TYPE = "pointCloudLayer";
+
+  private static void actionZoomTo(final PathTreeNode node) {
+    final Path file = node.getPath();
+    Invoke.background("Zoom to Point Cloud" + ": " + file, () -> {
+      try (
+        PointCloud<?> pointCloud = PointCloud.newPointCloud(file)) {
+        final BoundingBox boundingBox = pointCloud.getBoundingBox();
+        final Project project = Project.get();
+        final MapPanel mapPanel = project.getMapPanel();
+        mapPanel.zoomToBoundingBox(boundingBox);
+      }
+    });
+  }
+
+  public static void factoryInit() {
+    MapObjectFactoryRegistry.newFactory("pointCloudLayer", "Point Cloud Layer",
+      PointCloudLayer::new);
+
+    // TODO Need to handle memory and rendering better
+    // addIoFactoryMenuItem("pointCloud", "Add Point Cloud Layer", "point_cloud",
+    // PointCloudReadFactory.class);
+
+    final EnableCheck enableCheck = RsSwingServiceInitializer
+      .enableCheck(PointCloudReadFactory.class);
+    TreeNodes
+      .addMenuItem(PathTreeNode.MENU, "point_cloud", "Zoom to Point Cloud",
+        (final PathTreeNode node) -> actionZoomTo(node))
+      .setVisibleCheck(enableCheck) //
+      .setIconName("point_cloud", "magnifier");
+
+  }
 
   private PointCloud<?> pointCloud;
 
@@ -43,7 +83,7 @@ public class PointCloudLayer extends AbstractLayer {
       final Resource pointCloudResource = Resource.getResource(this.url);
       if (pointCloudResource.exists()) {
         try {
-          pointCloud = PointCloudReaderFactory.openPointCloud(pointCloudResource);
+          pointCloud = PointCloud.newPointCloud(pointCloudResource);
           if (pointCloud == null) {
             Logs.error(PointCloudLayer.class, "Cannot load: " + this.url);
           }

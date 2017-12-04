@@ -220,17 +220,15 @@ public interface IoFactory extends Available {
     }
   }
 
-  public static FileNameExtensionFilter newFileFilter(final IoFactory factory) {
-    final List<String> fileExtensions = factory.getFileExtensions();
-    String description = factory.getName();
-    description += " (" + Strings.toString(fileExtensions) + ")";
-    return newFileFilter(description, fileExtensions);
-  }
-
   public static FileNameExtensionFilter newFileFilter(final String description,
     final Collection<String> fileExtensions) {
     final String[] array = fileExtensions.toArray(new String[0]);
     return new FileNameExtensionFilter(description, array);
+  }
+
+  public static FileNameExtensionFilter newFileFilter(final String description,
+    final String fileExtension) {
+    return new FileNameExtensionFilter(description, fileExtension);
   }
 
   public static List<FileNameExtensionFilter> newFileFilters(final Set<String> allExtensions,
@@ -238,7 +236,7 @@ public interface IoFactory extends Available {
     final List<FileNameExtensionFilter> filters = new ArrayList<>();
     final List<? extends IoFactory> factories = IoFactory.factories(factoryClass);
     for (final IoFactory factory : factories) {
-      final FileNameExtensionFilter filter = newFileFilter(factory);
+      final FileNameExtensionFilter filter = factory.newFileFilterAllExtensions();
       filters.add(filter);
       if (allExtensions != null) {
         for (final String fileNameExtension : filter.getExtensions()) {
@@ -338,5 +336,20 @@ public interface IoFactory extends Available {
 
   default boolean isReadFromZipFileSupported() {
     return false;
+  }
+
+  default FileNameExtensionFilter newFileFilter() {
+    final List<String> fileExtensions = getFileExtensions();
+    String description = getName();
+    final String fileExtension = fileExtensions.get(0);
+    description += " (" + fileExtension + ")";
+    return newFileFilter(description, fileExtension);
+  }
+
+  default FileNameExtensionFilter newFileFilterAllExtensions() {
+    final List<String> fileExtensions = getFileExtensions();
+    String description = getName();
+    description += " (" + Strings.toString(fileExtensions) + ")";
+    return newFileFilter(description, fileExtensions);
   }
 }

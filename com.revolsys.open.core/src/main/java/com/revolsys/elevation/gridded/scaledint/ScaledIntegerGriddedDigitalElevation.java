@@ -145,7 +145,7 @@ public class ScaledIntegerGriddedDigitalElevation extends AbstractIoFactoryWithC
   }
 
   public ScaledIntegerGriddedDigitalElevation() {
-    super("Scaled Integer Gridded Digital Elevation Model");
+    super("Scaled Integer Gridded Elevation Model");
 
     addMediaTypeAndFileExtension(MEDIA_TYPE, FILE_EXTENSION);
     addFileExtension(FILE_EXTENSION_ZIP);

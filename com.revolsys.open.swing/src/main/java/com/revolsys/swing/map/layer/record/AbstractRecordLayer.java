@@ -32,7 +32,6 @@ import java.util.function.Predicate;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.undo.UndoableEdit;
@@ -58,9 +57,7 @@ import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
@@ -96,6 +93,7 @@ import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.RecordReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
 import com.revolsys.swing.field.TextField;
+import com.revolsys.swing.io.SwingIo;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.swing.map.MapPanel;
@@ -134,7 +132,6 @@ import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Label;
-import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.ShortCounter;
 
@@ -232,55 +229,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public static void exportRecords(final String title, final boolean hasGeometryField,
+  public static void exportRecords(final String baseName, final boolean hasGeometryField,
     final Consumer<File> exportAction) {
-    Invoke.later(() -> {
-      final JFileChooser fileChooser = SwingUtil.newFileChooser("Export Records",
-        "com.revolsys.swing.map.table.export", "directory");
-      final String defaultFileExtension = PreferencesUtil
-        .getUserString("com.revolsys.swing.map.table.export", "fileExtension", "tsv");
-
-      final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
-      for (final RecordWriterFactory factory : IoFactory.factories(RecordWriterFactory.class)) {
-        if (hasGeometryField || factory.isCustomFieldsSupported()) {
-          recordFileFilters.add(IoFactory.newFileFilter(factory));
-        }
-      }
-      IoFactory.sortFilters(recordFileFilters);
-
-      fileChooser.setAcceptAllFileFilterUsed(false);
-      fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));
-      for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
-        fileChooser.addChoosableFileFilter(fileFilter);
-        if (fileFilter.getExtensions().contains(defaultFileExtension)) {
-          fileChooser.setFileFilter(fileFilter);
-        }
-      }
-
-      fileChooser.setMultiSelectionEnabled(false);
-      final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
-      if (returnVal == JFileChooser.APPROVE_OPTION) {
-        final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
-          .getFileFilter();
-        File file = fileChooser.getSelectedFile();
-        if (file != null) {
-          final String fileExtension = FileUtil.getFileNameExtension(file);
-          final String expectedExtension = fileFilter.getExtensions().get(0);
-          if (!fileExtension.equals(expectedExtension)) {
-            file = FileUtil.getFileWithExtension(file, expectedExtension);
-          }
-          final File targetFile = file;
-          PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "fileExtension",
-            expectedExtension);
-          PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "directory",
-            file.getParent());
-          final String description = "Export " + title + " to " + targetFile.getAbsolutePath();
-          Invoke.background(description, () -> {
-            exportAction.accept(targetFile);
-          });
-        }
-      }
-    });
+    final Predicate<RecordWriterFactory> filter = factory -> hasGeometryField
+      || factory.isCustomFieldsSupported();
+    SwingIo.exportToFile("Records", "com.revolsys.swing.map.table.export",
+      RecordWriterFactory.class, filter, "tsv", true, baseName, exportAction);
   }
 
   public static void forEachSelectedRecords(final Layer layer,
