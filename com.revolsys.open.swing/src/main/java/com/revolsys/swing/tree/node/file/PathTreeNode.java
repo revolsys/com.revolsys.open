@@ -48,6 +48,7 @@ import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.FunctionChildrenTreeNode;
@@ -94,7 +95,8 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   private synchronized static JFileChooser getChooser() {
     if (chooser == null) {
-      chooser = new JFileChooser();
+    	Invoke.andWait(()->
+      chooser = new JFileChooser());
     }
     return chooser;
   }
