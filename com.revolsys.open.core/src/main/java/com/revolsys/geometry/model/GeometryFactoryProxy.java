@@ -113,6 +113,11 @@ public interface GeometryFactoryProxy {
     }
   }
 
+  default boolean isHasCoordinateSystem() {
+    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    return coordinateSystem != null;
+  }
+
   default boolean isProjectionRequired(final GeometryFactory geometryFactory) {
     final GeometryFactory geometryFactoryThis = getGeometryFactory();
     if (geometryFactoryThis == null) {

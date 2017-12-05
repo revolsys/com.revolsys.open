@@ -67,8 +67,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     MenuFactory.addMenuInitializer(LayerGroup.class, (menu) -> {
       menu.addGroup(0, "group");
       Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
-        Icons.getIconWithBadge(PathTreeNode.getIconFolder(), "add"), LayerGroup::actionAddLayerGroup,
-        false);
+        Icons.getIconWithBadge(PathTreeNode.getIconFolder(), "add"),
+        LayerGroup::actionAddLayerGroup, false);
 
       Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer...", "page_add",
         LayerGroup::actionOpenFileLayer, false);
@@ -303,28 +303,16 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public LayerGroup addLayerGroup(final int index, final String name) {
-    synchronized (this.layers) {
-      final Layer layer = getLayer(name);
-      if (layer == null) {
-        final LayerGroup group = new LayerGroup(name);
-        addLayer(index, group);
-        return group;
-      }
-      if (layer instanceof LayerGroup) {
-        return (LayerGroup)layer;
-      } else {
-        throw new IllegalArgumentException("Layer exists with name " + name);
-      }
-    }
-  }
-
-  public LayerGroup addLayerGroup(final String name) {
     if (Property.hasValue(name)) {
       synchronized (this.layers) {
         final Layer layer = getLayer(name);
         if (layer == null) {
           final LayerGroup group = new LayerGroup(name);
-          addLayer(group);
+          if (index < 0) {
+            addLayer(group);
+          } else {
+            addLayer(index, group);
+          }
           return group;
         }
         if (layer instanceof LayerGroup) {
@@ -336,6 +324,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     } else {
       return this;
     }
+  }
+
+  public LayerGroup addLayerGroup(final String name) {
+    return addLayerGroup(0, name);
   }
 
   public void addLayers(final Iterable<Layer> layers) {

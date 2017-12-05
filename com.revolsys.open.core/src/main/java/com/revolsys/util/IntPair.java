@@ -1,5 +1,7 @@
 package com.revolsys.util;
 
+import java.util.List;
+
 public class IntPair implements Comparable<IntPair> {
 
   private int value1;
@@ -77,5 +79,9 @@ public class IntPair implements Comparable<IntPair> {
   @Override
   public String toString() {
     return this.value1 + ", " + this.value2;
+  }
+
+  public static void add(final List<IntPair> list, final int value1, final int value2) {
+    list.add(new IntPair(value1, value2));
   }
 }

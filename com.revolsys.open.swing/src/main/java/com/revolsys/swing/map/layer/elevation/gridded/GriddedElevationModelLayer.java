@@ -18,6 +18,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
+import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
@@ -82,14 +83,12 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
 
   private static void actionZoomTo(final PathTreeNode node) {
     final Path file = node.getPath();
-    Invoke.background("Zoom to Gridded Elevation Model" + ": " + file, () -> {
+    final String baseName = Paths.getBaseName(file);
+    Invoke.background("Zoom to Gridded Elevation Model: " + baseName, () -> {
       try (
         GriddedElevationModelReader reader = GriddedElevationModel
           .newGriddedElevationModelReader(file)) {
-        final BoundingBox boundingBox = reader.getBoundingBox();
-        final Project project = Project.get();
-        final MapPanel mapPanel = project.getMapPanel();
-        mapPanel.zoomToBoundingBox(boundingBox);
+        MapPanel.zoomToBoundingBox(baseName, reader);
       }
     });
   }

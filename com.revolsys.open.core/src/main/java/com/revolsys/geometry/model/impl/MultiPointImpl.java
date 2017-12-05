@@ -35,7 +35,7 @@ package com.revolsys.geometry.model.impl;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.google.common.collect.Lists;
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -199,7 +199,7 @@ public class MultiPointImpl implements MultiPoint {
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    return (List<V>)Lists.newArrayList(this.points);
+    return (List<V>)Lists.newArray(this.points);
   }
 
   @SuppressWarnings("unchecked")
