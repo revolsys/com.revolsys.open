@@ -8,7 +8,8 @@ import java.util.function.BiFunction;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.rasterizer.ColourGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.Viewport2D;
@@ -29,7 +30,11 @@ public class MultipleGriddedElevationModelLayerRenderer
     MenuFactory.addMenuInitializer(MultipleGriddedElevationModelLayerRenderer.class, menu -> {
 
       addAddMenuItem(menu, "Colour", (layer, parent) -> {
-        final ColourGriddedElevationModelRasterizer rasterizer = new ColourGriddedElevationModelRasterizer();
+        final ColorGriddedElevationModelRasterizer rasterizer = new ColorGriddedElevationModelRasterizer();
+        return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
+      });
+      addAddMenuItem(menu, "Colour Ramp", (layer, parent) -> {
+        final ColorRampGriddedElevationModelRasterizer rasterizer = new ColorRampGriddedElevationModelRasterizer();
         return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
       });
       addAddMenuItem(menu, "Hillshade", (layer, parent) -> {

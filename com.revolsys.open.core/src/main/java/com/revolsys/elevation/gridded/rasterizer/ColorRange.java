@@ -4,22 +4,22 @@ import java.awt.Color;
 import java.util.Map;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 
-public class ColorRange extends BaseObjectWithProperties implements MapSerializer {
+public class ColorRange extends BaseObjectWithProperties
+  implements Cloneable, MapSerializer, Comparable<ColorRange> {
 
   private static final int NULL_COLOUR = WebColors.colorToRGB(0, 0, 0, 0);
 
-  private int minBlue;
+  private int blue;
 
-  private Color minColour = WebColors.Black;
+  private Color color = WebColors.Black;
 
-  private int minGreen;
+  private int green;
 
-  private int minRed;
+  private int red;
 
   private int rangeBlue;
 
@@ -29,15 +29,15 @@ public class ColorRange extends BaseObjectWithProperties implements MapSerialize
 
   private double rangeZ;
 
-  private double minZ;
+  private double z;
 
   private double maxZ;
 
-  private Color maxColour = WebColors.White;
+  private Color maxColor = WebColors.White;
 
-  private int maxColourInt = this.maxColour.getRGB();
+  private int maxColourInt = this.maxColor.getRGB();
 
-  private int minColourInt = this.minColour.getRGB();
+  private int colourInt = this.color.getRGB();
 
   private double multipleZ;
 
@@ -45,32 +45,51 @@ public class ColorRange extends BaseObjectWithProperties implements MapSerialize
     updateValues();
   }
 
+  public ColorRange(final double z, final String color) {
+    this.z = z;
+    setColor(Color.decode(color));
+  }
+
   public ColorRange(final Map<String, ? extends Object> config) {
     this();
     setProperties(config);
   }
 
-  public Color getMaxColour() {
-    return this.maxColour;
+  @Override
+  protected ColorRange clone() {
+    return (ColorRange)super.clone();
+  }
+
+  @Override
+  public int compareTo(final ColorRange range) {
+    return Double.compare(this.z, range.z);
+  }
+
+  public Color getColor() {
+    return this.color;
+  }
+
+  public Color getMaxColor() {
+    return this.maxColor;
   }
 
   public int getMaxColourInt() {
     return this.maxColourInt;
   }
 
-  public Color getMinColour() {
-    return this.minColour;
+  public double getMaxZ() {
+    return this.maxZ;
   }
 
   public int getMinColourInt() {
-    return this.minColourInt;
+    return this.colourInt;
   }
 
   public int getValue(final double elevation) {
     if (Double.isNaN(elevation)) {
       return NULL_COLOUR;
-    } else if (elevation <= this.minZ) {
-      return this.minColourInt;
+    } else if (elevation <= this.z) {
+      return this.colourInt;
     } else if (elevation > this.maxZ) {
       return this.maxColourInt;
     } else {
@@ -79,51 +98,70 @@ public class ColorRange extends BaseObjectWithProperties implements MapSerialize
   }
 
   public int getValueFast(final double elevation) {
-    final double elevationPercent = (elevation - this.minZ) * this.multipleZ;
-    final int red = this.minRed + (int)Math.round(elevationPercent * this.rangeRed);
-    final int green = this.minGreen + (int)Math.round(elevationPercent * this.rangeGreen);
-    final int blue = this.minBlue + (int)Math.round(elevationPercent * this.rangeBlue);
-    final int colour = WebColors.colorToRGB(255, red, green, blue);
-    return colour;
+    if (elevation <= this.z) {
+      return this.colourInt;
+    } else if (elevation > this.maxZ) {
+      return NULL_COLOUR;
+    } else {
+      final double elevationPercent = (elevation - this.z) * this.multipleZ;
+      final int red = this.red + (int)Math.round(elevationPercent * this.rangeRed);
+      final int green = this.green + (int)Math.round(elevationPercent * this.rangeGreen);
+      final int blue = this.blue + (int)Math.round(elevationPercent * this.rangeBlue);
+      final int colour = WebColors.colorToRGB(255, red, green, blue);
+      return colour;
+    }
+  }
+
+  public double getZ() {
+    return this.z;
   }
 
   public boolean inRange(final double elevation) {
-    return this.minZ <= elevation && elevation <= this.maxZ;
+    return this.z <= elevation && elevation <= this.maxZ;
   }
 
-  public void setMaxColour(final Color maxColour) {
-    this.maxColour = WebColors.newAlpha(maxColour, 255);
-    this.maxColourInt = this.maxColour.getRGB();
+  public void setColor(Color color) {
+    this.red = color.getRed();
+    this.green = color.getGreen();
+    this.blue = color.getBlue();
+    if (color.getAlpha() != 255) {
+      color = WebColors.newAlpha(color, 255);
+    }
+    this.color = WebColors.newAlpha(color, 255);
+    this.colourInt = color.getRGB();
     updateValues();
   }
 
-  public void setMinColour(final Color minColour) {
-    this.minColour = WebColors.newAlpha(minColour, 255);
-    this.minColourInt = this.minColour.getRGB();
+  public void setMaxColor(final Color maxColour) {
+    this.maxColor = WebColors.newAlpha(maxColour, 255);
+    this.maxColourInt = this.maxColor.getRGB();
     updateValues();
+  }
+
+  public void setMaxZ(final double maxZ) {
+    this.maxZ = maxZ;
+  }
+
+  public void setZ(final double z) {
+    this.z = z;
   }
 
   @Override
   public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
-    addToMap(map, "minColour", this.minColour);
-    addToMap(map, "maxColour", this.maxColour);
-    if (Double.isFinite(this.minZ)) {
-      map.add("minZ", this.minZ);
-      map.add("maxZ", this.maxZ);
+    final MapEx map = newTypeMap("griddedElevationModelColorRamp");
+    addToMap(map, "color", this.color);
+    if (Double.isFinite(this.z)) {
+      map.add("z", this.z);
     }
     return map;
   }
 
   public void updateValues() {
-    this.minRed = this.minColour.getRed();
-    this.rangeRed = this.maxColour.getRed() - this.minRed;
-    this.minGreen = this.minColour.getGreen();
-    this.rangeGreen = this.maxColour.getGreen() - this.minGreen;
-    this.minBlue = this.minColour.getBlue();
-    this.rangeBlue = this.maxColour.getBlue() - this.minBlue;
-    if (Double.isFinite(this.minZ)) {
-      this.rangeZ = this.maxZ - this.minZ;
+    this.rangeRed = this.maxColor.getRed() - this.red;
+    this.rangeGreen = this.maxColor.getGreen() - this.green;
+    this.rangeBlue = this.maxColor.getBlue() - this.blue;
+    if (Double.isFinite(this.z)) {
+      this.rangeZ = this.maxZ - this.z;
     } else {
       this.rangeZ = 0;
     }

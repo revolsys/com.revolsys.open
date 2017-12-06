@@ -7,7 +7,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 
-public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevationModelRasterizer {
+public class ColorGriddedElevationModelRasterizer extends AbstractGriddedElevationModelRasterizer {
 
   private static final int NULL_COLOUR = WebColors.colorToRGB(0, 0, 0, 0);
 
@@ -31,17 +31,17 @@ public class ColourGriddedElevationModelRasterizer extends AbstractGriddedElevat
 
   private double multipleZ;
 
-  public ColourGriddedElevationModelRasterizer() {
-    super("colourGriddedElevationModelRasterizer");
+  public ColorGriddedElevationModelRasterizer() {
+    super("colorGriddedElevationModelRasterizer");
     updateValues();
   }
 
-  public ColourGriddedElevationModelRasterizer(final GriddedElevationModel elevationModel) {
+  public ColorGriddedElevationModelRasterizer(final GriddedElevationModel elevationModel) {
     this();
     setElevationModel(elevationModel);
   }
 
-  public ColourGriddedElevationModelRasterizer(final Map<String, ? extends Object> config) {
+  public ColorGriddedElevationModelRasterizer(final Map<String, ? extends Object> config) {
     this();
     setProperties(config);
   }

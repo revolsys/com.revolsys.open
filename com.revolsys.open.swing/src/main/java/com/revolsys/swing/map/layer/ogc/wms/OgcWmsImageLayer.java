@@ -142,15 +142,17 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
     } else {
       setExists(true);
       final WmsClient wmsClient = wmsLayerDefinition.getWmsClient();
-      final String name = wmsClient.getName();
-      if (Property.hasValue(name)) {
-        this.connectionName = name;
+      final String connectionName = wmsClient.getName();
+      if (Property.hasValue(connectionName)) {
+        this.connectionName = connectionName;
         this.serviceUrl = null;
       } else {
         this.serviceUrl = wmsClient.getServiceUrl().toString();
       }
       final String layerTitle = wmsLayerDefinition.getTitle();
-      setName(layerTitle);
+      if (!Property.hasValue(getName())) {
+        setName(layerTitle);
+      }
       this.layerName = wmsLayerDefinition.getName();
       final long minimumScale = (long)wmsLayerDefinition.getMinimumScale();
       super.setMinimumScale(minimumScale);

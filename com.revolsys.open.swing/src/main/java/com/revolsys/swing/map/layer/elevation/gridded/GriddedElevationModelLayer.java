@@ -12,7 +12,9 @@ import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
-import com.revolsys.elevation.gridded.rasterizer.ColourGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorRange;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -94,11 +96,17 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
   }
 
   public static void factoryInit() {
+    MapObjectFactoryRegistry.newFactory("griddedElevationModelColorRamp", ColorRange::new);
+
     // Rasterizers
+    MapObjectFactoryRegistry.newFactory("colorGriddedElevationModelRasterizer",
+      ColorGriddedElevationModelRasterizer::new);
+    MapObjectFactoryRegistry.newFactory("colorRampGriddedElevationModelRasterizer",
+      ColorRampGriddedElevationModelRasterizer::new);
     MapObjectFactoryRegistry.newFactory("hillShadeGriddedElevationModelRasterizer",
       HillShadeGriddedElevationModelRasterizer::new);
-    MapObjectFactoryRegistry.newFactory("colourGriddedElevationModelRasterizer",
-      ColourGriddedElevationModelRasterizer::new);
+
+    // Renderers
     MapObjectFactoryRegistry.newFactory("rasterizerGriddedElevationModelLayerRenderer",
       RasterizerGriddedElevationModelLayerRenderer::new);
     MapObjectFactoryRegistry.newFactory("multipleGriddedElevationModelLayerRenderer",

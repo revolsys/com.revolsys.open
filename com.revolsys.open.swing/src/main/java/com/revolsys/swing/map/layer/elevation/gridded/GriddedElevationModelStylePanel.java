@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
 
-import com.revolsys.elevation.gridded.rasterizer.ColourGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.swing.field.Field;
@@ -32,7 +32,7 @@ public class GriddedElevationModelStylePanel extends BaseStylePanel
     final JPanel stylePanels = new JPanel(new VerticalLayout(5));
     panel.add(stylePanels, BorderLayout.CENTER);
     addPanel(this, "Opacity", renderer, "opacity");
-    if (this.rasterizer instanceof ColourGriddedElevationModelRasterizer) {
+    if (this.rasterizer instanceof ColorGriddedElevationModelRasterizer) {
       addPanel(this, "Style", this.rasterizer, "minZ", "maxZ", "minColour", "maxColour");
     } else if (this.rasterizer instanceof HillShadeGriddedElevationModelRasterizer) {
       addPanel(this, "Style", this.rasterizer, "azimuthDegrees", "zenithDegrees", "zFactor");

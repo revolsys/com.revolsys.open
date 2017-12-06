@@ -6,8 +6,8 @@ import java.util.Map;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelImage;
-import com.revolsys.elevation.gridded.rasterizer.ColourGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
@@ -106,7 +106,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
         if (elevationModel != null) {
           synchronized (this) {
             if (this.rasterizer == null) {
-              final ColourGriddedElevationModelRasterizer rasterizer = new ColourGriddedElevationModelRasterizer();
+              final ColorRampGriddedElevationModelRasterizer rasterizer = new ColorRampGriddedElevationModelRasterizer();
               setRasterizer(rasterizer);
 
               final String name = this.rasterizer.getName();
