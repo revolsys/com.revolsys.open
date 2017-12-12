@@ -157,7 +157,11 @@ public interface BoundingBox
             throw new IllegalArgumentException("Expecting a ',' not " + FileUtil.getString(reader));
           }
         } else if (WktParser.hasText(reader, "BBOX EMPTY")) {
-          return geometryFactory.newBoundingBoxEmpty();
+          if (geometryFactory == null) {
+            return BoundingBox.empty();
+          } else {
+            return geometryFactory.newBoundingBoxEmpty();
+          }
         }
       } catch (final IOException e) {
         throw Exceptions.wrap("Error reading WKT:" + wkt, e);

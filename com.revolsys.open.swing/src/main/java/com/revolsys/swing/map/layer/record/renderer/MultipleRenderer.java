@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,11 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   public MultipleRenderer(final AbstractRecordLayer layer) {
     super("multipleStyle", "Multiple Styles");
     setIcon(ICON);
+  }
+
+  public MultipleRenderer(final AbstractRecordLayer layer,
+    final AbstractRecordLayerRenderer... renderers) {
+    this(layer, Arrays.asList(renderers));
   }
 
   public MultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {

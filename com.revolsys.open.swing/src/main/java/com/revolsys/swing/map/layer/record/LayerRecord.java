@@ -33,13 +33,15 @@ public interface LayerRecord extends Record {
   default void firePropertyChange(final String fieldName, final Object oldValue,
     final Object newValue) {
     final AbstractRecordLayer layer = getLayer();
-    if (layer.isEventsEnabled()) {
-      final LayerRecord record = getEventRecord();
-      final PropertyChangeEvent fieldEvent = new PropertyChangeEvent(record, fieldName, oldValue,
-        newValue);
-      layer.propertyChange(fieldEvent);
+    if (layer != null) {
+      if (layer.isEventsEnabled()) {
+        final LayerRecord record = getEventRecord();
+        final PropertyChangeEvent fieldEvent = new PropertyChangeEvent(record, fieldName, oldValue,
+          newValue);
+        layer.propertyChange(fieldEvent);
+      }
+      fireRecordUpdated();
     }
-    fireRecordUpdated();
   }
 
   default void fireRecordUpdated() {

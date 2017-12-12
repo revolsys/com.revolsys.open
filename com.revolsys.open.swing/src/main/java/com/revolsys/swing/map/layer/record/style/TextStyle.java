@@ -312,7 +312,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     Logs.error(this, "Error setting " + name + '=' + value, e);
   }
 
-  public void setTextBoxColor(final Color textBoxColor) {
+  public TextStyle setTextBoxColor(final Color textBoxColor) {
     final Object oldTextBoxColor = this.textBoxColor;
     final Object oldTextBoxOpacity = this.textBoxOpacity;
     if (textBoxColor == null) {
@@ -324,9 +324,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("textBoxColor", oldTextBoxColor, this.textBoxColor);
     firePropertyChange("textBoxOpacity", oldTextBoxOpacity, this.textBoxOpacity);
+    return this;
   }
 
-  public void setTextBoxOpacity(final int textBoxOpacity) {
+  public TextStyle setTextBoxOpacity(final int textBoxOpacity) {
     final Object oldTextBoxColor = this.textBoxColor;
     final Object oldTextBoxOpacity = this.textBoxOpacity;
     if (textBoxOpacity < 0 || textBoxOpacity > 255) {
@@ -337,9 +338,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("textBoxColor", oldTextBoxColor, this.textBoxColor);
     firePropertyChange("textBoxOpacity", oldTextBoxOpacity, this.textBoxOpacity);
+    return this;
   }
 
-  public void setTextDx(final Measure<Length> textDx) {
+  public TextStyle setTextDx(final Measure<Length> textDx) {
     final Object oldValue = this.textDy;
     if (textDx == null) {
       this.textDx = this.textDy;
@@ -348,9 +350,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("textDx", oldValue, this.textDx);
     updateTextDeltaUnits(this.textDx.getUnit());
+    return this;
   }
 
-  public void setTextDy(final Measure<Length> textDy) {
+  public TextStyle setTextDy(final Measure<Length> textDy) {
     final Object oldValue = this.textDy;
     if (textDy == null) {
       this.textDy = this.textDx;
@@ -359,16 +362,18 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("textDy", oldValue, this.textDy);
     updateTextDeltaUnits(this.textDy.getUnit());
+    return this;
   }
 
-  public void setTextFaceName(final String textFaceName) {
+  public TextStyle setTextFaceName(final String textFaceName) {
     final Object oldValue = this.textFaceName;
     this.textFaceName = textFaceName;
     this.font = null;
     firePropertyChange("textFaceName", oldValue, this.textFaceName);
+    return this;
   }
 
-  public void setTextFill(final Color fill) {
+  public TextStyle setTextFill(final Color fill) {
     final Object oldTextFill = this.textFill;
     final Object oldTextOpacity = this.textOpacity;
     if (fill == null) {
@@ -379,9 +384,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("textFill", oldTextFill, this.textFill);
     firePropertyChange("textOpacity", oldTextOpacity, this.textOpacity);
+    return this;
   }
 
-  public void setTextHaloFill(final Color fill) {
+  public TextStyle setTextHaloFill(final Color fill) {
     final Object oldValue = this.textHaloFill;
     if (fill == null) {
       this.textHaloFill = new Color(0, 0, 0, this.textOpacity);
@@ -389,19 +395,21 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       this.textHaloFill = WebColors.newAlpha(fill, this.textOpacity);
     }
     firePropertyChange("textHaloFill", oldValue, this.textHaloFill);
+    return this;
   }
 
-  public void setTextHaloRadius(final double textHaloRadius) {
+  public TextStyle setTextHaloRadius(final double textHaloRadius) {
     final Object oldValue = this.textHaloRadius;
     this.textHaloRadius = textHaloRadius;
     firePropertyChange("textHaloRadius", oldValue, this.textHaloRadius);
+    return this;
   }
 
-  public void setTextHaloRadius(final Measure<Length> textHaloRadius) {
-    setTextHaloRadius(textHaloRadius.doubleValue(textHaloRadius.getUnit()));
+  public TextStyle setTextHaloRadius(final Measure<Length> textHaloRadius) {
+    return setTextHaloRadius(textHaloRadius.doubleValue(textHaloRadius.getUnit()));
   }
 
-  public void setTextHorizontalAlignment(final String textHorizontalAlignment) {
+  public TextStyle setTextHorizontalAlignment(final String textHorizontalAlignment) {
     final Object oldValue = this.textHorizontalAlignment;
     if (Property.hasValue(textHorizontalAlignment)) {
       this.textHorizontalAlignment = textHorizontalAlignment;
@@ -409,9 +417,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       this.textHorizontalAlignment = AUTO;
     }
     firePropertyChange("textHorizontalAlignment", oldValue, this.textHorizontalAlignment);
+    return this;
   }
 
-  public void setTextName(final String textName) {
+  public TextStyle setTextName(final String textName) {
     final Object oldValue = this.textName;
     if (textName == null) {
       this.textName = "";
@@ -419,9 +428,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       this.textName = textName;
     }
     firePropertyChange("textName", oldValue, this.textName);
+    return this;
   }
 
-  public void setTextOpacity(final int textOpacity) {
+  public TextStyle setTextOpacity(final int textOpacity) {
     final Object oldTextFill = this.textFill;
     final Object oldTextOpacity = this.textOpacity;
     final Object oldTextHaloFill = this.textHaloFill;
@@ -435,26 +445,30 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     firePropertyChange("textFill", oldTextFill, this.textFill);
     firePropertyChange("textOpacity", oldTextOpacity, this.textOpacity);
     firePropertyChange("textHaloFill", oldTextHaloFill, this.textHaloFill);
+    return this;
   }
 
-  public void setTextOrientation(final double textOrientation) {
+  public TextStyle setTextOrientation(final double textOrientation) {
     final Object oldValue = this.textOrientation;
     this.textOrientation = textOrientation;
     firePropertyChange("textOrientation", oldValue, this.textOrientation);
+    return this;
   }
 
-  public void setTextOrientationType(final String textOrientationType) {
+  public TextStyle setTextOrientationType(final String textOrientationType) {
     final Object oldValue = this.textOrientationType;
     this.textOrientationType = textOrientationType;
     firePropertyChange("textOrientationType", oldValue, this.textOrientationType);
+    return this;
   }
 
   @Deprecated
-  public void setTextPlacement(final String textPlacementType) {
+  public TextStyle setTextPlacement(final String textPlacementType) {
     setTextPlacementType(textPlacementType);
+    return this;
   }
 
-  public void setTextPlacementType(String textPlacementType) {
+  public TextStyle setTextPlacementType(String textPlacementType) {
     final Object oldValue = this.textPlacementType;
     if (Property.hasValue(textPlacementType)) {
       textPlacementType = Strings.replaceAll(textPlacementType, "^point\\(", "vertex\\(");
@@ -463,13 +477,15 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       this.textPlacementType = AUTO;
     }
     firePropertyChange("textPlacementType", oldValue, this.textPlacementType);
+    return this;
   }
 
-  public void setTextSize(final Measure<Length> textSize) {
+  public TextStyle setTextSize(final Measure<Length> textSize) {
     final Object oldValue = this.textSize;
     this.textSize = MarkerStyle.getWithDefault(textSize, MarkerStyle.TEN_PIXELS);
     this.font = null;
     firePropertyChange("textSize", oldValue, this.textSize);
+    return this;
   }
 
   public synchronized void setTextStyle(final Viewport2D viewport, final Graphics2D graphics) {
@@ -494,7 +510,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
   }
 
-  public void setTextVerticalAlignment(final String textVerticalAlignment) {
+  public TextStyle setTextVerticalAlignment(final String textVerticalAlignment) {
     final Object oldValue = this.textVerticalAlignment;
     if (Property.hasValue(textVerticalAlignment)) {
       this.textVerticalAlignment = textVerticalAlignment;
@@ -502,6 +518,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       this.textVerticalAlignment = AUTO;
     }
     firePropertyChange("textVerticalAlignment", oldValue, this.textVerticalAlignment);
+    return this;
   }
 
   @Override
