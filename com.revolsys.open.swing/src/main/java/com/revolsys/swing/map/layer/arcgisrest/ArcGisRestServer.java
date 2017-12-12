@@ -76,7 +76,7 @@ public interface ArcGisRestServer {
 
   public static void initMenus() {
     MenuFactory.addMenuInitializer(FeatureLayer.class, (menu) -> {
-      Menus.addMenuItem(menu, "default", "Add Layer", "map_add",
+      Menus.addMenuItem(menu, "default", "Add Layer", "map:add",
         ArcGisRestServer::actionAddRecordLayer, false);
     });
 

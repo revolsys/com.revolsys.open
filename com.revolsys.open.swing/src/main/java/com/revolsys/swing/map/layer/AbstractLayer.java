@@ -134,6 +134,18 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       false);
   }
 
+  public static void menuItemPathAddLayer(final String menuGroup, final String menuName,
+    final String iconName, final Class<? extends IoFactory> factoryClass) {
+    final EnableCheck enableCheck = RsSwingServiceInitializer.enableCheck(factoryClass);
+    TreeNodes.addMenuItem(PathTreeNode.MENU, menuGroup, menuName, (final PathTreeNode node) -> {
+      final URL url = node.getUrl();
+      final Project project = Project.get();
+      project.openFile(url);
+    })
+      .setVisibleCheck(enableCheck) //
+      .setIconName(iconName, "add");
+  }
+
   private String errorMessage;
 
   private boolean deleted = false;
@@ -827,13 +839,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   @Override
   public final void refresh() {
     Invoke.background("Refresh Layer " + getName(), () -> {
-      try {
-        refreshDo();
-      } catch (final Throwable e) {
-        Logs.error(this, "Unable to refresh layer: " + getName(), e);
-      } finally {
-        refreshPostDo();
-      }
+      refreshBackground();
     });
   }
 
@@ -853,6 +859,16 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   protected void refreshAllDo() {
     refreshDo();
+  }
+
+  protected final void refreshBackground() {
+    try {
+      refreshDo();
+    } catch (final Throwable e) {
+      Logs.error(this, "Unable to refresh layer: " + getName(), e);
+    } finally {
+      refreshPostDo();
+    }
   }
 
   protected void refreshDo() {
@@ -1226,17 +1242,5 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
         .expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);
     }
-  }
-
-  public static void menuItemPathAddLayer(final String menuGroup, final String menuName,
-    final String iconName, final Class<? extends IoFactory> factoryClass) {
-    final EnableCheck enableCheck = RsSwingServiceInitializer.enableCheck(factoryClass);
-    TreeNodes.addMenuItem(PathTreeNode.MENU, menuGroup, menuName, (final PathTreeNode node) -> {
-      final URL url = node.getUrl();
-      final Project project = Project.get();
-      project.openFile(url);
-    })
-      .setVisibleCheck(enableCheck) //
-      .setIconName(iconName, "add");
   }
 }

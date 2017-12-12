@@ -28,6 +28,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryDataType;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
@@ -107,6 +108,9 @@ public final class DataTypes {
 
   public static final GeometryDataType<Geometry, GeometryCollectionImplEditor> GEOMETRY = new GeometryDataType<>(
     Geometry.class, Geometry::newGeometry, GeometryCollectionImplEditor::new);
+
+  public static final DataType GEOMETRY_FACTORY = new FunctionDataType("GeometryFactory",
+    GeometryFactory.class, GeometryFactory::newGeometryFactory);
 
   public static final GeometryDataType<GeometryCollection, GeometryCollectionImplEditor> GEOMETRY_COLLECTION = new GeometryDataType<>(
     GeometryCollection.class, GeometryCollection::newGeometryCollection,
@@ -300,7 +304,9 @@ public final class DataTypes {
   })
   public static <V> V toObject(final Class<?> clazz, final Object value) {
     // TODO enum
-    if (value == null) {
+    if (clazz == null) {
+      return (V)value;
+    } else if (value == null) {
       return null;
     } else if (clazz.isAssignableFrom(value.getClass())) {
       return (V)value;

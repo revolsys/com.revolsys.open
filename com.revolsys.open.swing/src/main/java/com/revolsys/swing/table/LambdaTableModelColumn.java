@@ -6,6 +6,9 @@ import java.util.function.Function;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
+import com.revolsys.swing.menu.BaseJPopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
+
 public class LambdaTableModelColumn<R, V> {
 
   private final String columnName;
@@ -19,6 +22,8 @@ public class LambdaTableModelColumn<R, V> {
   private final BiConsumer<R, V> setValueFunction;
 
   private TableCellEditor cellEditor;
+
+  private MenuFactory headerMenuFactory;
 
   public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
     final Function<R, V> getValueFunction) {
@@ -67,6 +72,21 @@ public class LambdaTableModelColumn<R, V> {
     return this.columnName;
   }
 
+  public BaseJPopupMenu getHeaderMenu() {
+    if (this.headerMenuFactory == null) {
+      return null;
+    } else {
+      return this.headerMenuFactory.newJPopupMenu();
+    }
+  }
+
+  public synchronized MenuFactory getHeaderMenuFactory() {
+    if (this.headerMenuFactory == null) {
+      this.headerMenuFactory = new MenuFactory(this.columnName);
+    }
+    return this.headerMenuFactory;
+  }
+
   public V getValue(final R row) {
     return this.getValueFunction.apply(row);
   }
@@ -83,6 +103,11 @@ public class LambdaTableModelColumn<R, V> {
   @SuppressWarnings("unchecked")
   public void setValue(final R row, final Object value) {
     this.setValueFunction.accept(row, (V)value);
+  }
+
+  public void withHeaderMenu(final BiConsumer<LambdaTableModelColumn<R, V>, MenuFactory> action) {
+    final MenuFactory headerMenuFactory = getHeaderMenuFactory();
+    action.accept(this, headerMenuFactory);
   }
 
 }

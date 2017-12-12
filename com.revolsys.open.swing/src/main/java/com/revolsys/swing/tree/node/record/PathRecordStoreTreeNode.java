@@ -38,7 +38,7 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   static {
     addRefreshMenuItem(MENU);
 
-    TreeNodes.addMenuItem(MENU, "default", "Add Record Store Connection", "database_add",
+    TreeNodes.addMenuItem(MENU, "default", "Add Record Store Connection", "database:add",
       PathRecordStoreTreeNode::isExists, PathRecordStoreTreeNode::addRecordStoreConnection);
   }
 

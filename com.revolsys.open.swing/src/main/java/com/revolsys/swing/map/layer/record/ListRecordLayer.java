@@ -70,6 +70,12 @@ public class ListRecordLayer extends AbstractRecordLayer {
     fireRecordsChanged();
   }
 
+  protected void addRecords(final List<? extends LayerRecord> records) {
+    for (final LayerRecord record : records) {
+      addRecord(record);
+    }
+  }
+
   protected void clearRecords() {
     this.clearSelectedRecords();
     this.records.clear();

@@ -16,8 +16,8 @@ public abstract class GeometryRecordReaderFactory extends AbstractRecordIoFactor
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory, MapEx properties) {
-    final GeometryReader geometryReader = newGeometryReader(resource);
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
+    final GeometryReader geometryReader = newGeometryReader(resource, properties);
     if (geometryReader == null) {
       return null;
     } else {

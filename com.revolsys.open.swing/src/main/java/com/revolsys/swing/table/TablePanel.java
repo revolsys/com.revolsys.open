@@ -252,6 +252,13 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
   }
 
   public JPopupMenu getHeaderMenu(final int eventColumn) {
+    final AbstractTableModel tableModel = getTableModel();
+    if (tableModel != null) {
+      final JPopupMenu menu = tableModel.getHeaderMenu(eventColumn);
+      if (menu != null) {
+        return menu;
+      }
+    }
     return this.headerMenu.newJPopupMenu();
   }
 

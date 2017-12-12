@@ -35,7 +35,7 @@ public class MapGuideWebServer {
     });
 
     MenuFactory.addMenuInitializer(FeatureLayer.class, (menu) -> {
-      Menus.addMenuItem(menu, "default", "Add Layer", "map_add", MapGuideWebServer::actionAddLayer,
+      Menus.addMenuItem(menu, "default", "Add Layer", "map:add", MapGuideWebServer::actionAddLayer,
         false);
     });
   }

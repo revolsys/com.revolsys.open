@@ -8,6 +8,8 @@ import java.util.function.Function;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
+import com.revolsys.swing.menu.BaseJPopupMenu;
+
 public abstract class LambdaTableModel<R> extends AbstractTableModel {
 
   private static final long serialVersionUID = 1L;
@@ -24,30 +26,35 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
     this.rows = rows;
   }
 
-  protected void addColumn(final LambdaTableModelColumn<R, ?> column) {
+  protected LambdaTableModelColumn<R, ?> addColumn(final LambdaTableModelColumn<R, ?> column) {
     this.columns.add(column);
+    return column;
   }
 
-  protected <V> void addColumn(final String columnName, final Class<?> columnClass,
-    final Function<R, V> getValueFunction) {
+  protected <V> LambdaTableModelColumn<R, V> addColumn(final String columnName,
+    final Class<?> columnClass, final Function<R, V> getValueFunction) {
     final LambdaTableModelColumn<R, V> column = new LambdaTableModelColumn<>(columnName,
       columnClass, getValueFunction);
     this.columns.add(column);
+    return column;
   }
 
-  protected <V> void addColumn(final String columnName, final Class<?> columnClass,
-    final Function<R, V> getValueFunction, final BiConsumer<R, V> setValueFunction) {
+  protected <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
+    final Class<?> columnClass, final Function<R, V> getValueFunction,
+    final BiConsumer<R, V> setValueFunction) {
     final LambdaTableModelColumn<R, V> column = new LambdaTableModelColumn<>(columnName,
       columnClass, getValueFunction, setValueFunction);
     this.columns.add(column);
+    return column;
   }
 
-  protected <V> void addColumn(final String columnName, final Class<?> columnClass,
-    final Function<R, V> getValueFunction, final BiConsumer<R, V> setValueFunction,
-    final TableCellEditor cellEditor) {
+  protected <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
+    final Class<?> columnClass, final Function<R, V> getValueFunction,
+    final BiConsumer<R, V> setValueFunction, final TableCellEditor cellEditor) {
     final LambdaTableModelColumn<R, V> column = new LambdaTableModelColumn<>(columnName,
       columnClass, getValueFunction, setValueFunction, cellEditor);
     this.columns.add(column);
+    return column;
   }
 
   public void addRow(final R row) {
@@ -59,14 +66,18 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
   public void applyTableCellEditors(final BaseJTable table) {
     for (int i = 0; i < this.columns.size(); i++) {
       final TableColumn tableColumn = table.getColumnExt(i);
-      final LambdaTableModelColumn<R, ?> column = this.columns.get(i);
+      final LambdaTableModelColumn<R, ?> column = getColumn(i);
       column.applyCellEditor(tableColumn);
     }
   }
 
+  protected LambdaTableModelColumn<R, ?> getColumn(final int columnIndex) {
+    return this.columns.get(columnIndex);
+  }
+
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
-    return this.columns.get(columnIndex).getColumnClass();
+    return getColumn(columnIndex).getColumnClass();
   }
 
   @Override
@@ -76,7 +87,12 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
 
   @Override
   public String getColumnName(final int columnIndex) {
-    return this.columns.get(columnIndex).getColumnName();
+    return getColumn(columnIndex).getColumnName();
+  }
+
+  @Override
+  public BaseJPopupMenu getHeaderMenu(final int columnIndex) {
+    return getColumn(columnIndex).getHeaderMenu();
   }
 
   public R getRow(final int rowIndex) {
@@ -95,18 +111,23 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
     final R row = getRow(rowIndex);
-    return this.columns.get(columnIndex).getValue(row);
+    return getColumn(columnIndex).getValue(row);
   }
 
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
-    return this.columns.get(columnIndex).isEditable();
+    return getColumn(columnIndex).isEditable();
+  }
+
+  protected void setRows(final List<R> rows) {
+    this.rows = rows;
+    fireTableDataChanged();
   }
 
   @Override
   public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     final R row = getRow(rowIndex);
-    this.columns.get(columnIndex).setValue(row, value);
+    getColumn(columnIndex).setValue(row, value);
   }
 
 }

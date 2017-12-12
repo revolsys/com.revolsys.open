@@ -3228,7 +3228,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void updateSpatialIndex(final LayerRecord record, final Geometry oldGeometry) {
     if (oldGeometry != null) {
       final BoundingBox oldBoundingBox = oldGeometry.getBoundingBox();
-      if (removeFromIndex(oldBoundingBox, record)) {
+      if (removeFromIndex(oldBoundingBox, record) || !oldBoundingBox.isHasCoordinateSystem()) {
         addToIndex(record);
       }
     }

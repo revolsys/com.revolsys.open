@@ -43,7 +43,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
     final BiFunction<AbstractRecordLayer, AbstractMultipleRenderer, AbstractRecordLayerRenderer> rendererFactory) {
-    final String iconName = ("style_" + type + "_add").toLowerCase();
+    final String iconName = ("style_" + type + ":add").toLowerCase();
     final String name = "Add " + type + " Style";
     Menus.addMenuItem(menu, "add", name, iconName,
       (final AbstractMultipleRenderer parentRenderer) -> {

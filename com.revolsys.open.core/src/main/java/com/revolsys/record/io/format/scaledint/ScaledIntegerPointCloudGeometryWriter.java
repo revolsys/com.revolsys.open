@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.scaledint;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.model.Geometry;
@@ -59,6 +60,9 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
 
   public void setByteBuffer(final ByteBuffer byteBuffer) {
     this.byteBuffer = byteBuffer;
+    if (byteBuffer != null) {
+      byteBuffer.order(ByteOrder.BIG_ENDIAN);
+    }
   }
 
   @Override

@@ -72,7 +72,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isRecordFileLayer));
 
     TreeNodes
-      .addMenuItem(MENU, "folder", "Add Folder Connection", "link_add",
+      .addMenuItem(MENU, "folder", "Add Folder Connection", "link:add",
         PathTreeNode::actionAddFolderConnection)//
       .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isDirectory));
   }
@@ -95,8 +95,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   private synchronized static JFileChooser getChooser() {
     if (chooser == null) {
-    	Invoke.andWait(()->
-      chooser = new JFileChooser());
+      Invoke.andWait(() -> chooser = new JFileChooser());
     }
     return chooser;
   }
@@ -133,7 +132,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     }
   }
 
-  public synchronized static Icon getIconFile() {
+  public static Icon getIconFile() {
     if (iconFile == null) {
       final JFileChooser chooser = getChooser();
       iconFile = chooser.getIcon(FileUtil.newTempFile("xxxx", "6z4gsdj"));
@@ -151,7 +150,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     return icon;
   }
 
-  public synchronized static Icon getIconFolder() {
+  public static Icon getIconFolder() {
     if (iconFolder == null) {
       iconFolder = Icons.getIcon("folder");
     }

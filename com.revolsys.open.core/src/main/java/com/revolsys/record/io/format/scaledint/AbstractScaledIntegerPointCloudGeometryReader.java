@@ -1,6 +1,8 @@
 package com.revolsys.record.io.format.scaledint;
 
 import java.io.EOFException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.NoSuchElementException;
 
@@ -28,6 +30,8 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
   private GeometryFactory geometryFactory;
 
   private boolean exists = false;
+
+  private ByteBuffer byteBuffer;
 
   public AbstractScaledIntegerPointCloudGeometryReader(final Resource resource,
     final MapEx properties) {
@@ -77,7 +81,7 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
   @Override
   protected void initDo() {
     super.initDo();
-    final ChannelReader reader = this.resource.newChannelReader();
+    final ChannelReader reader = this.resource.newChannelReader(this.byteBuffer);
     this.reader = reader;
     if (reader == null) {
       this.exists = false;
@@ -114,6 +118,13 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
       .setGeometryFactory(geometryFactory) //
       .getRecordDefinition();
     return recordDefinition;
+  }
+
+  public void setByteBuffer(final ByteBuffer byteBuffer) {
+    this.byteBuffer = byteBuffer;
+    if (byteBuffer != null) {
+      byteBuffer.order(ByteOrder.BIG_ENDIAN);
+    }
   }
 
 }

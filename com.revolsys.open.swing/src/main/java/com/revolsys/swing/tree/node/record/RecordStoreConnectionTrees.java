@@ -32,7 +32,7 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
   static {
     // RecordStoreConnectionRegistry
     MenuFactory.addMenuInitializer(RecordStoreConnectionRegistry.class, (menu) -> {
-      TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Add Connection", "database_add",
+      TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Add Connection", "database:add",
         RecordStoreConnectionRegistry::isEditable, RecordStoreConnectionTrees::addConnection);
 
       TreeNodes.addMenuItemNodeValue(menu, "default", 1, "Import Connection...", "database:import",
@@ -53,7 +53,7 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
     });
 
     MenuFactory.addMenuInitializer(RecordDefinitionImpl.class, (menu) -> {
-      TreeNodes.addMenuItemNodeValue(menu, "default", "Add Layer", "map_add",
+      TreeNodes.addMenuItemNodeValue(menu, "default", "Add Layer", "map:add",
         RecordStoreConnectionTrees::addLayer);
       // LazyLoadTreeNode.addRefreshMenuItem(menu);
     });

@@ -71,10 +71,12 @@ public class HillShadeGriddedElevationModelRasterizer
       }
 
     }
-    final int hillshade = (int)(255.0
+    int hillshade = (int)(255.0
       * (this.cosZenithRadians * Math.cos(slopeRadians) + this.sinZenithRadians
         * Math.sin(slopeRadians) * Math.cos(this.azimuthRadians - aspectRadians)));
-
+    if (hillshade < 0) {
+      hillshade = 0;
+    }
     return WebColors.colorToRGB(255, hillshade, hillshade, hillshade);
   }
 

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.Property;
 
 public abstract class AbstractRecord implements Record, Cloneable {
   @Override
@@ -40,7 +41,12 @@ public abstract class AbstractRecord implements Record, Cloneable {
     }
   }
 
-  protected abstract boolean setValue(FieldDefinition fieldDefinition, Object value);
+  protected boolean setValue(final FieldDefinition fieldDefinition, Object value) {
+    final String propertyName = fieldDefinition.getName();
+    value = fieldDefinition.toFieldValueException(value);
+    Property.setSimple(this, propertyName, value);
+    return true;
+  }
 
   @Override
   public final boolean setValue(final int fieldIndex, final Object value) {

@@ -634,17 +634,17 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory newMenuFile() {
     final MenuFactory file = new MenuFactory("File");
 
-    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", this::actionNewProject)
+    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout:add", this::actionNewProject)
       .setAcceleratorControlKey(KeyEvent.VK_N);
 
-    file.addMenuItemTitleIcon("projectOpen", "New Project...", "layout_add", () -> {
+    file.addMenuItemTitleIcon("projectOpen", "New Project...", "layout:add", () -> {
       if (this.project != null) {
         this.project.actionImportProject("New Project from Template", true);
       }
     }).setAcceleratorShiftControlKey(KeyEvent.VK_N);
 
     file
-      .addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add", this::actionOpenProject)
+      .addMenuItemTitleIcon("projectOpen", "Open Project...", "layout:add", this::actionOpenProject)
       .setAcceleratorControlKey(KeyEvent.VK_O);
 
     file.addComponent("projectOpen", this.openRecentMenu);
@@ -863,7 +863,7 @@ public class ProjectFrame extends BaseFrame {
         final String fileName = Paths.getFileName(file);
         final String path = file.getParent().toString();
         final JMenuItem menuItem = MenuFactory
-          .newMenuItem(fileName, path, Icons.getIcon("layout_add"), null, () -> openProject(file))
+          .newMenuItem(fileName, path, Icons.getIcon("layout:add"), null, () -> openProject(file))
           .newMenuItem();
         this.openRecentMenu.add(menuItem);
       }

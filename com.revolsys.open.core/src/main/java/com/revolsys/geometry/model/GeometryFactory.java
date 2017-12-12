@@ -556,6 +556,20 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return GeometryFactory.fixed(coordinateSystemId, axisCount, scaleX, scaleY, scaleZ);
   }
 
+  public static GeometryFactory newGeometryFactory(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof GeometryFactory) {
+      return (GeometryFactory)value;
+    } else if (value instanceof Map) {
+      @SuppressWarnings("unchecked")
+      final Map<String, ? extends Object> properties = (Map<String, ? extends Object>)value;
+      return newGeometryFactory(properties);
+    } else {
+      throw new RuntimeException("Cannot convert " + value + " to GeometryFactory");
+    }
+  }
+
   public static double[] newScalesFixed(final int axisCount, final double scale) {
     final double[] scales = new double[Math.max(axisCount, 2)];
     Arrays.fill(scales, scale);
@@ -1354,6 +1368,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return this.coordinateSystem instanceof GeographicCoordinateSystem;
   }
 
+  @Override
   public boolean isHasCoordinateSystem() {
     return this.coordinateSystem != null;
   }

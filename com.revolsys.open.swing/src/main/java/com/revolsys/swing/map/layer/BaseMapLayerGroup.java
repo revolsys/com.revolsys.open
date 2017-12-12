@@ -35,8 +35,7 @@ public class BaseMapLayerGroup extends LayerGroup {
     } else if (layer instanceof BaseMapLayer) {
       return super.addLayer(index, layer);
     } else {
-      throw new IllegalArgumentException("Layer " + layer.getName() + " must be a subclass of "
-        + BaseMapLayer.class + " not " + layer.getClass());
+      return getParent().addLayer(layer);
     }
   }
 
