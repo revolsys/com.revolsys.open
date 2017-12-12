@@ -184,4 +184,9 @@ public interface MapEx extends MapDefault<String, Object> {
       return value;
     }
   }
+
+  default boolean hasValue(final CharSequence name) {
+    final Object value = getValue(name);
+    return Property.hasValue(value);
+  }
 }
