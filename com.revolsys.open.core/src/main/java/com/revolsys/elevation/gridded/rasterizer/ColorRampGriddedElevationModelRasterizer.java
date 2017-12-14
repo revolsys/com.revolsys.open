@@ -45,7 +45,7 @@ public class ColorRampGriddedElevationModelRasterizer
   private final List<ColorRange> colorRanges = new ArrayList<>();
 
   public ColorRampGriddedElevationModelRasterizer() {
-    super("colourRampGriddedElevationModelRasterizer");
+    super("colorRampGriddedElevationModelRasterizer", "style_color_ramp");
     setColorRanges(SD_A_COLOR_RAMP);
     updateValues();
   }
@@ -62,7 +62,7 @@ public class ColorRampGriddedElevationModelRasterizer
 
   @Override
   public String getName() {
-    return "Multi Colour";
+    return "Color Ramp";
   }
 
   @Override

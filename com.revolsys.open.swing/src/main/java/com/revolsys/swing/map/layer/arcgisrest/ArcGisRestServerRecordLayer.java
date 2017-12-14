@@ -31,7 +31,7 @@ import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.FilterMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
-import com.revolsys.swing.map.layer.record.renderer.MultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.MultipleRecordRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
@@ -309,7 +309,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
 
       final List<MapEx> labellingInfo = drawingInfo.getValue("labelingInfo");
       if (labellingInfo != null) {
-        final MultipleRenderer labelRenderer = new MultipleRenderer(this);
+        final MultipleRecordRenderer labelRenderer = new MultipleRecordRenderer(this);
         labelRenderer.setName("labels");
         for (final MapEx labelProperties : labellingInfo) {
           addTextRenderer(labelRenderer, labelProperties);
@@ -323,7 +323,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     } else if (renderers.size() == 1) {
       setRenderer(renderers.get(0));
     } else {
-      setRenderer(new MultipleRenderer(this, renderers));
+      setRenderer(new MultipleRecordRenderer(this, renderers));
     }
   }
 

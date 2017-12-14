@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.layer.elevation.gridded;
+package com.revolsys.swing.map.layer.elevation.gridded.renderer;
 
 import java.util.function.Predicate;
 

@@ -444,10 +444,10 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     return newRenderer;
   }
 
-  public MultipleRenderer wrapWithMultipleStyle() {
+  public MultipleRecordRenderer wrapWithMultipleStyle() {
     final AbstractRecordLayer layer = getLayer();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
-    final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent);
+    final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
   }

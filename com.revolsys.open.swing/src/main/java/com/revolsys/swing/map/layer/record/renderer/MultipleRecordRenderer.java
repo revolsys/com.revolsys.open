@@ -23,32 +23,32 @@ import com.revolsys.util.Cancellable;
  * Use all the specified renderers to render the layer. All features are
  * rendered using the first renderer, then the second etc.
  */
-public class MultipleRenderer extends AbstractMultipleRenderer {
+public class MultipleRecordRenderer extends AbstractMultipleRenderer {
   private static final Icon ICON = Icons.getIcon("style_multiple");
 
-  public MultipleRenderer(final AbstractRecordLayer layer) {
+  public MultipleRecordRenderer(final AbstractRecordLayer layer) {
     super("multipleStyle", "Multiple Styles");
     setIcon(ICON);
   }
 
-  public MultipleRenderer(final AbstractRecordLayer layer,
+  public MultipleRecordRenderer(final AbstractRecordLayer layer,
     final AbstractRecordLayerRenderer... renderers) {
     this(layer, Arrays.asList(renderers));
   }
 
-  public MultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
+  public MultipleRecordRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
     super("multipleStyle", layer, parent);
     setIcon(ICON);
   }
 
-  public MultipleRenderer(final AbstractRecordLayer layer,
+  public MultipleRecordRenderer(final AbstractRecordLayer layer,
     final List<? extends AbstractRecordLayerRenderer> renderers) {
     super("multipleStyle", "Multiple Styles");
     setIcon(ICON);
     setRenderers(renderers);
   }
 
-  public MultipleRenderer(final Map<String, ? extends Object> properties) {
+  public MultipleRecordRenderer(final Map<String, ? extends Object> properties) {
     super("multipleStyle", "Multiple Styles");
     setIcon(ICON);
     setProperties(properties);

@@ -108,7 +108,7 @@ import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
-import com.revolsys.swing.map.layer.record.renderer.MultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.MultipleRecordRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.QueryFilterField;
@@ -473,7 +473,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       rendererGroup = (AbstractMultipleRenderer)oldRenderer;
     } else {
       final AbstractRecordLayer layer = oldRenderer.getLayer();
-      rendererGroup = new MultipleRenderer(layer);
+      rendererGroup = new MultipleRecordRenderer(layer);
       rendererGroup.addRenderer(oldRenderer);
       setRenderer(rendererGroup);
     }

@@ -207,8 +207,17 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   public void setIcon(final Icon icon) {
     final Object oldValue = this.icon;
-    this.icon = icon;
-    firePropertyChange("icon", oldValue, icon);
+    if (icon == null) {
+      this.icon = ICON;
+    } else {
+      this.icon = icon;
+    }
+    firePropertyChange("icon", oldValue, this.icon);
+  }
+
+  public void setIcon(final String iconName) {
+    final Icon icon = Icons.getIcon(iconName);
+    setIcon(icon);
   }
 
   @Override

@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.swing.map.layer.elevation.gridded.renderer.TiledMultipleGriddedElevationModelLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.panel.BaseStylePanel;
 
 public class TiledMultipleGriddedElevationModelStylePanel extends BaseStylePanel

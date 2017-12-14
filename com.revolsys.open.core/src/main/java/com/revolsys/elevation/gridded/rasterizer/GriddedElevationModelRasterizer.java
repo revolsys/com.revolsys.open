@@ -5,10 +5,12 @@ import java.awt.image.DataBuffer;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
+import com.revolsys.util.IconNameProxy;
 
-public interface GriddedElevationModelRasterizer
-  extends BoundingBoxProxy, PropertyChangeSupportProxy, ObjectWithProperties {
+public interface GriddedElevationModelRasterizer extends BoundingBoxProxy, IconNameProxy,
+  MapSerializer, ObjectWithProperties, PropertyChangeSupportProxy {
 
   GriddedElevationModel getElevationModel();
 

@@ -14,6 +14,7 @@ import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.PercentSlider;
+import com.revolsys.swing.map.layer.elevation.gridded.renderer.RasterizerGriddedElevationModelLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.panel.BaseStylePanel;
 import com.revolsys.util.Property;
 

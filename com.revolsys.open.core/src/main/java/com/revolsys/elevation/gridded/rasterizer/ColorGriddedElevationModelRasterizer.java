@@ -32,7 +32,7 @@ public class ColorGriddedElevationModelRasterizer extends AbstractGriddedElevati
   private double multipleZ;
 
   public ColorGriddedElevationModelRasterizer() {
-    super("colorGriddedElevationModelRasterizer");
+    super("colorGriddedElevationModelRasterizer", "style_color");
     updateValues();
   }
 

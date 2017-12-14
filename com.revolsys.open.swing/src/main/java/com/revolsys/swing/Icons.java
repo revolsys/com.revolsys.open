@@ -23,6 +23,7 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.IconNameProxy;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
@@ -253,6 +254,10 @@ public class Icons {
 
   public static Icon getIconWithBadge(final String iconName, final String badgeName) {
     final Icon icon = getIcon(iconName);
+    if (icon == null) {
+      Logs.error(Icons.class, "Cannot find icon: " + iconName);
+      return getIconWithBadge("page_white", badgeName);
+    }
     return getIconWithBadge(icon, badgeName);
   }
 

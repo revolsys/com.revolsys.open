@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.layer.elevation.gridded;
+package com.revolsys.swing.map.layer.elevation.gridded.renderer;
 
 import java.awt.Graphics2D;
 import java.util.Map;
@@ -6,14 +6,16 @@ import java.util.Map;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelImage;
-import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelStylePanel;
+import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelZRange;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
@@ -45,9 +47,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
 
   public RasterizerGriddedElevationModelLayerRenderer(final ElevationModelLayer layer,
     final MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> parent) {
-    this();
-    setLayer(layer);
-    setParent((LayerRenderer<?>)parent);
+    this(layer, parent, null);
   }
 
   public RasterizerGriddedElevationModelLayerRenderer(final ElevationModelLayer layer,
@@ -177,8 +177,16 @@ public class RasterizerGriddedElevationModelLayerRenderer
     firePropertyChange("opacity", oldValue, opacity);
   }
 
-  public void setRasterizer(final GriddedElevationModelRasterizer rasterizer) {
+  public void setRasterizer(GriddedElevationModelRasterizer rasterizer) {
+    if (rasterizer == null) {
+      rasterizer = new ColorRampGriddedElevationModelRasterizer();
+      setOpacity(0.8f);
+    }
     this.rasterizer = rasterizer;
+    if (rasterizer != null) {
+      final String iconName = rasterizer.getIconName();
+      setIcon(iconName);
+    }
     final LayerRenderer<?> parent = getParent();
     if (parent instanceof GriddedElevationModelZRange) {
       final GriddedElevationModelZRange zRange = (GriddedElevationModelZRange)parent;

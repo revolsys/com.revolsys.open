@@ -27,7 +27,7 @@ import com.revolsys.swing.map.layer.record.RecordStoreLayer;
 import com.revolsys.swing.map.layer.record.renderer.FilterMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
-import com.revolsys.swing.map.layer.record.renderer.MultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.MultipleRecordRenderer;
 import com.revolsys.swing.map.layer.record.renderer.ScaleMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.marker.SvgMarker;
@@ -64,7 +64,7 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("geometryStyle", GeometryStyleRenderer::new);
     MapObjectFactoryRegistry.newFactory("textStyle", TextStyleRenderer::new);
     MapObjectFactoryRegistry.newFactory("markerStyle", MarkerStyleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("multipleStyle", MultipleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("multipleStyle", MultipleRecordRenderer::new);
     MapObjectFactoryRegistry.newFactory("scaleStyle", ScaleMultipleRenderer::new);
     MapObjectFactoryRegistry.newFactory("filterStyle", FilterMultipleRenderer::new);
     MapObjectFactoryRegistry.newFactory("gridLayerRenderer", GridLayerRenderer::new);

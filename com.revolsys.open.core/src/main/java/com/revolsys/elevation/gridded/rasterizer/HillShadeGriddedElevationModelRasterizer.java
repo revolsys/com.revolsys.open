@@ -28,7 +28,7 @@ public class HillShadeGriddedElevationModelRasterizer
   private double azimuthDegrees;
 
   public HillShadeGriddedElevationModelRasterizer() {
-    super("hillShadeGriddedElevationModelRasterizer");
+    super("hillShadeGriddedElevationModelRasterizer", "style_hillshade");
     setZenithDegrees(45.0);
     setAzimuthDegrees(315.0);
   }

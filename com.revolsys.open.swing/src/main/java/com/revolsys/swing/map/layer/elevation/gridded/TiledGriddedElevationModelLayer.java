@@ -24,6 +24,8 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.gridded.renderer.RasterizerGriddedElevationModelLayerRenderer;
+import com.revolsys.swing.map.layer.elevation.gridded.renderer.TiledMultipleGriddedElevationModelLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
@@ -265,7 +267,7 @@ public class TiledGriddedElevationModelLayer
   }
 
   @Override
-  protected void setBoundingBox(final BoundingBox boundingBox) {
+  public void setBoundingBox(final BoundingBox boundingBox) {
     super.setBoundingBox(boundingBox);
   }
 
@@ -310,8 +312,13 @@ public class TiledGriddedElevationModelLayer
       final Map<String, Object> map = (Map<String, Object>)style;
       style = MapObjectFactory.toObject(map);
     }
+
     if (style instanceof TiledMultipleGriddedElevationModelLayerRenderer) {
       final TiledMultipleGriddedElevationModelLayerRenderer renderer = (TiledMultipleGriddedElevationModelLayerRenderer)style;
+      setRenderer(renderer);
+    } else if (style instanceof RasterizerGriddedElevationModelLayerRenderer) {
+      final TiledMultipleGriddedElevationModelLayerRenderer renderer = new TiledMultipleGriddedElevationModelLayerRenderer(
+        this, (RasterizerGriddedElevationModelLayerRenderer)style);
       setRenderer(renderer);
     } else {
       Logs.error(this, "Cannot create renderer for: " + style);

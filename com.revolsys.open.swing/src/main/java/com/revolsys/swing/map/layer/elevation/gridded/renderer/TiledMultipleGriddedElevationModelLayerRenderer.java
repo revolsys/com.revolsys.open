@@ -1,9 +1,11 @@
-package com.revolsys.swing.map.layer.elevation.gridded;
+package com.revolsys.swing.map.layer.elevation.gridded.renderer;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
@@ -11,29 +13,52 @@ import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.logging.Logs;
+import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelZRange;
+import com.revolsys.swing.map.layer.elevation.gridded.TiledGriddedElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.gridded.TiledGriddedElevationModelLayerTile;
+import com.revolsys.swing.map.layer.elevation.gridded.TiledMultipleGriddedElevationModelStylePanel;
+import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
+import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
+import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class MultipleGriddedElevationModelLayerRenderer
-  extends AbstractGriddedElevationModelLayerRenderer implements
-  MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> {
+public class TiledMultipleGriddedElevationModelLayerRenderer extends
+  AbstractTiledLayerRenderer<GriddedElevationModel, TiledGriddedElevationModelLayerTile> implements
+  MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer>,
+  GriddedElevationModelZRange {
   static {
-    MenuFactory.addMenuInitializer(MultipleGriddedElevationModelLayerRenderer.class, menu -> {
+    MenuFactory.addMenuInitializer(TiledMultipleGriddedElevationModelLayerRenderer.class, menu -> {
+      Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
+        ((Predicate<TiledMultipleGriddedElevationModelLayerRenderer>)TiledMultipleGriddedElevationModelLayerRenderer::isEditing)
+          .negate(),
+        TiledMultipleGriddedElevationModelLayerRenderer::showProperties, false);
 
-      addAddMenuItem(menu, "Colour", (layer, parent) -> {
+      menu.addComponentFactory("scale",
+        new TreeItemScaleMenu<>(true, null,
+          TiledMultipleGriddedElevationModelLayerRenderer::getMinimumScale,
+          TiledMultipleGriddedElevationModelLayerRenderer::setMinimumScale));
+      menu.addComponentFactory("scale",
+        new TreeItemScaleMenu<>(false, null,
+          TiledMultipleGriddedElevationModelLayerRenderer::getMaximumScale,
+          TiledMultipleGriddedElevationModelLayerRenderer::setMaximumScale));
+
+      addAddMenuItem(menu, "Color", (layer, parent) -> {
         final ColorGriddedElevationModelRasterizer rasterizer = new ColorGriddedElevationModelRasterizer();
         return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
       });
-      addAddMenuItem(menu, "Colour Ramp", (layer, parent) -> {
+      addAddMenuItem(menu, "Color Ramp", (layer, parent) -> {
         final ColorRampGriddedElevationModelRasterizer rasterizer = new ColorRampGriddedElevationModelRasterizer();
         return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
       });
@@ -45,12 +70,12 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
-    final BiFunction<ElevationModelLayer, MultipleGriddedElevationModelLayerRenderer, RasterizerGriddedElevationModelLayerRenderer> rendererFactory) {
-    final String iconName = ("style_" + type + ":add").toLowerCase();
+    final BiFunction<TiledGriddedElevationModelLayer, TiledMultipleGriddedElevationModelLayerRenderer, RasterizerGriddedElevationModelLayerRenderer> rendererFactory) {
+    final String iconName = ("style_" + type.replace(' ', '_') + ":add").toLowerCase();
     final String name = "Add " + type + " Style";
     Menus.addMenuItem(menu, "add", name, iconName,
-      (final MultipleGriddedElevationModelLayerRenderer parentRenderer) -> {
-        final ElevationModelLayer layer = parentRenderer.getLayer();
+      (final TiledMultipleGriddedElevationModelLayerRenderer parentRenderer) -> {
+        final TiledGriddedElevationModelLayer layer = parentRenderer.getLayer();
         final RasterizerGriddedElevationModelLayerRenderer newRenderer = rendererFactory
           .apply(layer, parentRenderer);
         parentRenderer.addRendererEdit(newRenderer);
@@ -59,26 +84,39 @@ public class MultipleGriddedElevationModelLayerRenderer
 
   private List<RasterizerGriddedElevationModelLayerRenderer> renderers = new ArrayList<>();
 
-  private MultipleGriddedElevationModelLayerRenderer() {
-    super("multipleGriddedElevationModelLayerRenderer", "Styles");
+  private double minZ = Double.NaN;
+
+  private double maxZ = Double.NaN;
+
+  private TiledMultipleGriddedElevationModelLayerRenderer() {
+    super("tiledMultipleGriddedElevationModelLayerRenderer", "Styles");
   }
 
-  public MultipleGriddedElevationModelLayerRenderer(final GriddedElevationModelLayer layer) {
+  public TiledMultipleGriddedElevationModelLayerRenderer(
+    final Map<String, ? extends Object> config) {
+    this();
+    setProperties(config);
+  }
+
+  public TiledMultipleGriddedElevationModelLayerRenderer(
+    final TiledGriddedElevationModelLayer layer) {
     this();
     setLayer(layer);
-    addRenderer(new RasterizerGriddedElevationModelLayerRenderer(layer, this));
+    final HillShadeGriddedElevationModelRasterizer hillshadeRasterizer = new HillShadeGriddedElevationModelRasterizer();
+    final RasterizerGriddedElevationModelLayerRenderer hillshadeRenderer = new RasterizerGriddedElevationModelLayerRenderer(
+      layer, this, hillshadeRasterizer);
+    addRenderer(hillshadeRenderer);
+    final RasterizerGriddedElevationModelLayerRenderer colorRampRenderer = new RasterizerGriddedElevationModelLayerRenderer(
+      layer, this);
+    addRenderer(colorRampRenderer);
   }
 
-  public MultipleGriddedElevationModelLayerRenderer(final GriddedElevationModelLayer layer,
+  public TiledMultipleGriddedElevationModelLayerRenderer(
+    final TiledGriddedElevationModelLayer layer,
     final RasterizerGriddedElevationModelLayerRenderer renderer) {
     this();
     setLayer(layer);
     addRenderer(renderer);
-  }
-
-  public MultipleGriddedElevationModelLayerRenderer(final Map<String, ? extends Object> config) {
-    this();
-    setProperties(config);
   }
 
   @Override
@@ -99,8 +137,6 @@ public class MultipleGriddedElevationModelLayerRenderer
         if (index < 0) {
           index = this.renderers.size();
         }
-        final GriddedElevationModel elevationModel = getElevationModel();
-        renderer.setElevationModel(elevationModel);
         this.renderers.add(index, renderer);
       }
       firePropertyChange("renderers", index, null, renderer);
@@ -119,13 +155,28 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public MultipleGriddedElevationModelLayerRenderer clone() {
-    final MultipleGriddedElevationModelLayerRenderer clone = (MultipleGriddedElevationModelLayerRenderer)super.clone();
+  public TiledMultipleGriddedElevationModelLayerRenderer clone() {
+    final TiledMultipleGriddedElevationModelLayerRenderer clone = (TiledMultipleGriddedElevationModelLayerRenderer)super.clone();
     clone.renderers = JavaBeanUtil.clone(this.renderers);
     for (final RasterizerGriddedElevationModelLayerRenderer renderer : clone.renderers) {
       renderer.setParent(clone);
     }
     return clone;
+  }
+
+  @Override
+  public TiledGriddedElevationModelLayer getLayer() {
+    return (TiledGriddedElevationModelLayer)super.getLayer();
+  }
+
+  @Override
+  public double getMaxZ() {
+    return this.maxZ;
+  }
+
+  @Override
+  public double getMinZ() {
+    return this.minZ;
   }
 
   @Override
@@ -158,12 +209,8 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void refreshIcon() {
-    if (this.renderers != null) {
-      for (final RasterizerGriddedElevationModelLayerRenderer renderer : this.renderers) {
-        renderer.refreshIcon();
-      }
-    }
+  public Form newStylePanel() {
+    return new TiledMultipleGriddedElevationModelStylePanel(this);
   }
 
   @Override
@@ -185,30 +232,41 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final ElevationModelLayer layer) {
-    final List<RasterizerGriddedElevationModelLayerRenderer> renderers = getRenderers();
-    for (final RasterizerGriddedElevationModelLayerRenderer renderer : cancellable
-      .cancellable(renderers)) {
-      final long scaleForVisible = (long)viewport.getScaleForVisible();
-      if (renderer.isVisible(scaleForVisible)) {
-        renderer.render(viewport, cancellable, layer);
+  protected void renderTile(final Viewport2D viewport, final Cancellable cancellable,
+    final TiledGriddedElevationModelLayerTile tile) {
+    final Graphics2D graphics = viewport.getGraphics();
+    if (graphics != null) {
+      final GriddedElevationModel elevationModel = tile.getElevationModel();
+      if (elevationModel != null) {
+        final TiledGriddedElevationModelLayer layer = getLayer();
+        final List<RasterizerGriddedElevationModelLayerRenderer> renderers = getRenderers();
+        for (final RasterizerGriddedElevationModelLayerRenderer renderer : cancellable
+          .cancellable(renderers)) {
+          final long scaleForVisible = (long)viewport.getScaleForVisible();
+          if (renderer.isVisible(scaleForVisible)) {
+            renderer.setElevationModel(elevationModel);
+            renderer.render(viewport, cancellable, layer);
+          }
+        }
       }
     }
   }
 
   @Override
-  public void setElevationModel(final GriddedElevationModel elevationModel) {
-    super.setElevationModel(elevationModel);
-    for (final RasterizerGriddedElevationModelLayerRenderer renderer : this.renderers) {
-      renderer.setElevationModel(elevationModel);
-    }
+  public void setLayer(
+    final AbstractTiledLayer<GriddedElevationModel, TiledGriddedElevationModelLayerTile> layer) {
+    super.setLayer(layer);
+    updateBoundingBox();
   }
 
-  @Override
-  public void setLayer(final ElevationModelLayer layer) {
-    super.setLayer(layer);
-    refreshIcon();
+  public void setMaxZ(final double maxZ) {
+    this.maxZ = maxZ;
+    updateBoundingBox();
+  }
+
+  public void setMinZ(final double minZ) {
+    this.minZ = minZ;
+    updateBoundingBox();
   }
 
   public void setRenderers(
@@ -256,6 +314,22 @@ public class MultipleGriddedElevationModelLayerRenderer
       }
       addToMap(map, "styles", rendererMaps);
     }
+    addToMap(map, "minZ", this.minZ);
+    addToMap(map, "maxZ", this.maxZ);
     return map;
+  }
+
+  public void updateBoundingBox() {
+    final TiledGriddedElevationModelLayer layer = getLayer();
+    if (layer != null) {
+      final BoundingBox boundingBox = layer.getBoundingBox();
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
+      final BoundingBox newBoundingBox = boundingBox.newBoundingBox(minX, minY, this.minZ, maxX,
+        maxY, this.maxZ);
+      layer.setBoundingBox(newBoundingBox);
+    }
   }
 }
