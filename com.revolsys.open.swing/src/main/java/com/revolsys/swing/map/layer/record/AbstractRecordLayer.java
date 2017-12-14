@@ -30,7 +30,6 @@ import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -82,7 +81,6 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BaseDialog;
@@ -2816,8 +2814,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
       setGeometryFactory(geometryFactory);
       final String iconName = recordDefinition.getIconName();
-      final Icon icon = Icons.getIcon(iconName);
-      setIcon(icon);
+      setIcon(iconName);
       this.fieldNames = recordDefinition.getFieldNames();
       List<String> allFieldNames = this.fieldNamesSets.get(ALL.toUpperCase());
       if (Property.hasValue(allFieldNames)) {

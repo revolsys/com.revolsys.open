@@ -52,7 +52,7 @@ public class GridLayer extends AbstractLayer {
     if (getRenderer() == null) {
       setRenderer(new GridLayerRenderer(this));
     }
-    setIcon(Icons.getIcon("grid"));
+    setIcon("grid");
   }
 
   public RectangularMapGrid getGrid() {

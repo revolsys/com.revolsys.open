@@ -25,7 +25,6 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.RsSwingServiceInitializer;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -162,7 +161,7 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
         this);
       setRenderer(renderer);
     }
-    setIcon(Icons.getIcon("gridded_dem"));
+    setIcon("gridded_dem");
   }
 
   @Override
@@ -187,7 +186,10 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
 
   @Override
   public double getElevation(final double x, final double y) {
-    return this.elevationModel.getElevation(x, y);
+    final double elevation = this.elevationModel.getElevation(x, y);
+    System.out.println(elevation + "\t" + this.elevationModel.getElevationBilinear(x, y) + "\t"
+      + this.elevationModel.getElevationBicubic(x, y));
+    return elevation;
   }
 
   public GriddedElevationModel getElevationModel() {

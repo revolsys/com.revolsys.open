@@ -133,38 +133,6 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
-  public double getElevation(int gridX, int gridY) {
-    final int width = getGridWidth();
-    final int height = getGridHeight();
-    if (gridX < 0 || gridY < 0) {
-      return Double.NaN;
-    } else {
-      if (gridX >= width) {
-        if (gridX == width) {
-          gridX--;
-        } else {
-          return Double.NaN;
-        }
-      }
-      if (gridY >= height) {
-        if (gridY == height) {
-          gridY--;
-        } else {
-          return Double.NaN;
-        }
-      }
-      return getElevationDo(gridX, gridY, width);
-    }
-  }
-
-  protected abstract double getElevationDo(int gridX, int gridY, int gridWidth);
-
-  @Override
-  public double getElevationFast(final int gridX, final int gridY) {
-    return getElevationDo(gridX, gridY, this.gridWidth);
-  }
-
-  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
@@ -198,34 +166,24 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
+  public double getGridMinX() {
+    return this.bounds[0];
+  }
+
+  @Override
+  public double getGridMinY() {
+    return this.bounds[1];
+  }
+
+  @Override
   public int getGridWidth() {
     return this.gridWidth;
-  }
-
-  @Override
-  public double getMaxX() {
-    return this.bounds[3];
-  }
-
-  @Override
-  public double getMaxY() {
-    return this.bounds[4];
   }
 
   @Override
   public double getMaxZ() {
     updateZBoundingBox();
     return this.bounds[5];
-  }
-
-  @Override
-  public double getMinX() {
-    return this.bounds[0];
-  }
-
-  @Override
-  public double getMinY() {
-    return this.bounds[1];
   }
 
   @Override

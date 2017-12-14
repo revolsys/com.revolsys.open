@@ -45,7 +45,7 @@ public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
   }
 
   @Override
-  protected double getElevationDo(final int gridX, final int gridY, final int gridWidth) {
+  public double getElevationFast(final int gridX, final int gridY) {
     final double gridCellSize = getGridCellSize();
     final int tileMinGridX = Math.floorDiv(gridX, this.gridTileWidth) * this.gridTileWidth;
     final int tileMinGridY = Math.floorDiv(gridY, this.gridTileHeight) * this.gridTileHeight;

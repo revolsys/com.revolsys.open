@@ -23,7 +23,6 @@ import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -88,7 +87,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     setRenderer(new GeoreferencedImageLayerRenderer(this));
     final int opacity = Maps.getInteger(config, "opacity", 255);
     setOpacity(opacity);
-    setIcon(Icons.getIcon("picture"));
+    setIcon("picture");
   }
 
   public void cancelChanges() {

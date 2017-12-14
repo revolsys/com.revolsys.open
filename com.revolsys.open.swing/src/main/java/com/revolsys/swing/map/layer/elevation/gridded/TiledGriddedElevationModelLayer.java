@@ -55,6 +55,7 @@ public class TiledGriddedElevationModelLayer
 
   public TiledGriddedElevationModelLayer() {
     super("tiledGriddedElevationModelLayer");
+    setIcon("gridded_dem");
   }
 
   public TiledGriddedElevationModelLayer(final Map<String, ? extends Object> config) {
@@ -69,10 +70,16 @@ public class TiledGriddedElevationModelLayer
       if (elevationModel == null) {
         return Double.NaN;
       } else {
-        return elevationModel.getElevation(x, y);
+        final double elevation = elevationModel.getElevation(x, y);
+        System.out.println(elevation + "\t" + elevationModel.getElevationBilinear(x, y) + "\t"
+          + elevationModel.getElevationBicubic(x, y));
+        return elevation;
       }
     } else {
-      return this.elevationModel.getElevation(x, y);
+      final double elevation = this.elevationModel.getElevation(x, y);
+      System.out.println(elevation + "\t" + this.elevationModel.getElevationBilinear(x, y) + "\t"
+        + this.elevationModel.getElevationBicubic(x, y));
+      return elevation;
     }
   }
 

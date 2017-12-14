@@ -53,7 +53,7 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer
     final TriangulatedIrregularNetworkLayerRenderer renderer = new TriangulatedIrregularNetworkLayerRenderer(
       this);
     setRenderer(renderer);
-    setIcon(Icons.getIcon("tin"));
+    setIcon("tin");
   }
 
   @Override

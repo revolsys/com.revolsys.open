@@ -971,6 +971,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     }
   }
 
+  public void setIcon(final String iconName) {
+    Icon icon2 = Icons.getIcon(iconName);
+    setIcon(icon2);
+  }
+
   protected void setInitialized(final boolean initialized) {
     this.initialized = initialized;
     firePropertyChange("initialized", !initialized, this.initialized);

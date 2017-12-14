@@ -10,7 +10,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ExecutorServiceFactory;
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
 import com.revolsys.util.CaseConverter;
@@ -29,7 +28,7 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
 
   BingLayer() {
     super("bing");
-    setIcon(Icons.getIcon("bing"));
+    setIcon("bing");
   }
 
   public BingLayer(final Map<String, ? extends Object> properties) {

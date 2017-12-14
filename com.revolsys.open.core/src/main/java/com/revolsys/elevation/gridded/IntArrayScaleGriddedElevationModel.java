@@ -68,20 +68,8 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   }
 
   @Override
-  protected double getElevationDo(final int gridX, final int gridY, final int gridWidth) {
-    final int index = gridY * gridWidth + gridX;
-    final int elevationInt = this.elevations[index];
-    if (elevationInt == NULL_VALUE) {
-      return Double.NaN;
-    } else {
-      return toDoubleZ(elevationInt);
-    }
-  }
-
-  @Override
   public double getElevationFast(final int gridX, final int gridY) {
-    final int gridWidth1 = this.gridWidth;
-    final int index = gridY * gridWidth1 + gridX;
+    final int index = gridY * this.gridWidth + gridX;
     final int elevationInt = this.elevations[index];
     if (elevationInt == NULL_VALUE) {
       return Double.NaN;
@@ -105,8 +93,8 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   public LineStringEditor getNullBoundaryPoints() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final LineStringEditor points = new LineStringEditor(geometryFactory);
-    final double minX = getMinX();
-    final double minY = getMinY();
+    final double minX = getGridMinX();
+    final double minY = getGridMinY();
 
     final double gridCellSize = getGridCellSize();
     final int gridHeight = getGridHeight();

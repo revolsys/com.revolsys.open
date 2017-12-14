@@ -24,6 +24,7 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.function.DoubleConsumer3;
 
 public interface GriddedElevationModel extends ObjectWithProperties, BoundingBoxProxy {
@@ -100,23 +101,6 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   void clear();
 
-  // t is a value that goes from 0 to 1 to interpolate in a C1 continuous way
-  // across uniformly
-  // sampled data points.
-  // when t is 0, this will return B. When t is 1, this will return C. Inbetween
-  // values will return
-  // an interpolation
-  // between B and C. A and B are used to calculate slopes at the edges.
-  default double CubicHermite(final double A, final double B, final double C, final double D,
-    final double t) {
-    final double a = -A / 2.0f + 3.0f * B / 2.0f - 3.0f * C / 2.0f + D / 2.0f;
-    final double b = A - 5.0f * B / 2.0f + 2.0f * C - D / 2.0f;
-    final double c = -A / 2.0f + C / 2.0f;
-    final double d = B;
-
-    return a * t * t * t + b * t * t + c * t + d;
-  }
-
   default void forEachElevationFinite(final DoubleConsumer action) {
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
@@ -132,8 +116,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   default void forEachPoint(final DoubleConsumer3 action) {
     final double gridCellSize = getGridCellSize();
-    final double minY = getMinY();
-    final double minX = getMinX();
+    final double minY = getGridMinY();
+    final double minX = getGridMinX();
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
     for (int gridY = 0; gridY < gridHeight; gridY++) {
@@ -155,8 +139,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
     final BoundingBox convertexBoundingBox = boundingBox.convert(geometryFactory);
     final double gridCellSize = getGridCellSize();
-    final double minY = getMinY();
-    final double minX = getMinX();
+    final double minY = getGridMinY();
+    final double minX = getGridMinX();
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
 
@@ -217,8 +201,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   default void forEachPointFinite(final DoubleConsumer3 action) {
     final double gridCellSize = getGridCellSize();
-    final double minY = getMinY();
-    final double minX = getMinX();
+    final double minY = getGridMinY();
+    final double minX = getGridMinX();
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
     for (int gridY = 0; gridY < gridHeight; gridY++) {
@@ -246,8 +230,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
   default Polygon getBoundaryXY() {
     final GeometryFactory geometryFactory = getGeometryFactory().convertAxisCount(2);
     final LineStringEditor points = new LineStringEditor(geometryFactory);
-    final double minX = getMinX();
-    final double minY = getMinY();
+    final double minX = getGridMinX();
+    final double minY = getGridMinY();
 
     final double gridCellSize = getGridCellSize();
     final int gridHeight = getGridHeight();
@@ -480,20 +464,53 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     }
   }
 
-  @Override
-  BoundingBox getBoundingBox();
-
   default int getColour(final int gridX, final int gridY) {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * <p>Get the elevation at the given coordinates by rounding down to the grid cell.</p>
+   *
+   * <code>
+   * gridX = floor(x - minX / gridCellSize);
+   * gridY = floor(y - minY / gridCellSize);
+   * z = getElevation(gridX, gridY)
+   * </code>
+   *
+   * @param x The x coordinate.
+   * @param y The y coordinate.
+   * @return The elevation (z-coordinate).
+   * @see #getElevation(int, int)
+   */
   default double getElevation(final double x, final double y) {
     final int gridX = getGridCellX(x);
     final int gridY = getGridCellY(y);
     return getElevation(gridX, gridY);
   }
 
-  double getElevation(final int x, final int y);
+  default double getElevation(int gridX, int gridY) {
+    final int width = getGridWidth();
+    final int height = getGridHeight();
+    if (gridX < 0 || gridY < 0) {
+      return Double.NaN;
+    } else {
+      if (gridX >= width) {
+        if (gridX == width) {
+          gridX--;
+        } else {
+          return Double.NaN;
+        }
+      }
+      if (gridY >= height) {
+        if (gridY == height) {
+          gridY--;
+        } else {
+          return Double.NaN;
+        }
+      }
+      return getElevationFast(gridX, gridY);
+    }
+  }
 
   default double getElevation(Point point) {
     point = convertGeometry(point);
@@ -502,7 +519,100 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     return getElevation(x, y);
   }
 
+  /**
+   * Get the elevation using <a href="https://en.wikipedia.org/wiki/Bicubic_interpolation">Bicubic interpolation</a> using the 4x4 grid cells -1, 0, 1, 2.
+   *
+   * @param x The x-coordinate.
+   * @param y The y-coordinate.
+   * @return The interpolated elevation (z-coordinate).
+   */
+  default double getElevationBicubic(final double x, final double y) {
+    final double gridCellSize = getGridCellSize();
+
+    final double xGrid = (x - getGridMinX()) / gridCellSize;
+    final int gridX = (int)Math.floor(xGrid);
+    final double xPercent = xGrid - gridX;
+
+    final double yGrid = (y - getGridMinY()) / gridCellSize;
+    final int gridY = (int)Math.floor(yGrid);
+    final double yPercent = yGrid - gridY;
+
+    final double z1 = getElevationCubic(gridX, gridY - 1, xPercent);
+    final double z2 = getElevationCubic(gridX, gridY, xPercent);
+    final double z3 = getElevationCubic(gridX, gridY + 1, xPercent);
+    final double z4 = getElevationCubic(gridX, gridY + 2, xPercent);
+
+    return MathUtil.cubicInterpolate(z1, z2, z3, z4, yPercent);
+  }
+
+  /**
+   * Get the elevation of the point location using <a href="https://en.wikipedia.org/wiki/Bilinear_interpolation">Bilinear Interpolation</a> using the 2x2 grid cells 0, 1.
+   *
+   * @param x The x-coordinate.
+   * @param y The y-coordinate.
+   * @return The interpolated elevation (z-coordinate).
+   */
+  default double getElevationBilinear(final double x, final double y) {
+    final double gridCellSize = getGridCellSize();
+    final double minX = getGridMinX();
+    final double xGrid = (x - minX) / gridCellSize;
+    final int gridX = (int)Math.floor(xGrid);
+    final double minY = getGridMinY();
+    final double yGrid = (y - minY) / gridCellSize;
+    final int gridY = (int)Math.floor(yGrid);
+    final double z11 = getElevation(gridX, gridY);
+    double z21 = getElevation(gridX + 1, gridY);
+    if (!Double.isFinite(z21)) {
+      z21 = z11;
+    }
+    final double z12 = getElevation(gridX, gridY + 1);
+    if (!Double.isFinite(z12)) {
+      z21 = z11;
+    }
+    double z22 = getElevation(gridX + 1, gridY + 1);
+    if (!Double.isFinite(z22)) {
+      z22 = z21;
+    }
+    // Calculation is simplified as only the percent is required.
+    final double xPercent = xGrid - gridX;
+    final double yPercent = yGrid - gridY;
+    final double x2x = 1 - xPercent;
+    final double y2y = 1 - yPercent;
+    return z11 * x2x * y2y + z21 * xPercent * y2y + z12 * x2x * yPercent
+      + z22 * xPercent * yPercent;
+    // MathUtil.bilinearInterpolation(double, double, double, double, double, double, double,
+    // double, double, double)
+  }
+
+  default double getElevationCubic(final int gridX, final int gridY, final double xPercent) {
+    final double z1 = getElevation(gridX - 1, gridY);
+    final double z2 = getElevation(gridX, gridY);
+    final double z3 = getElevation(gridX + 1, gridY);
+    final double z4 = getElevation(gridX + 2, gridY);
+    return MathUtil.cubicInterpolate(z1, z2, z3, z4, xPercent);
+  }
+
   double getElevationFast(int gridX, int gridY);
+
+  /**
+   * <p>Get the elevation at the given coordinates by rounding to the nearest grid cell.</p>
+   *
+   * <code>
+   * gridX = round(x - minX / gridCellSize);
+   * gridY = round(y - minY / gridCellSize);
+   * z = getElevation(gridX, gridY)
+   * </code>
+   *
+   * @param x The x coordinate.
+   * @param y The y coordinate.
+   * @return The elevation (z-coordinate).
+   * @see #getElevation(int, int)
+   */
+  default double getElevationNearestNeighbour(final double x, final double y) {
+    final int gridX = getGridCellXRound(x);
+    final int gridY = getGridCellYRound(y);
+    return getElevation(gridX, gridY);
+  }
 
   @Override
   default GeometryFactory getGeometryFactory() {
@@ -513,7 +623,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
   double getGridCellSize();
 
   default int getGridCellX(final double x) {
-    final double minX = getMinX();
+    final double minX = getGridMinX();
     final double gridCellSize = getGridCellSize();
     final double deltaX = x - minX;
     final double cellDiv = deltaX / gridCellSize;
@@ -521,23 +631,23 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
   }
 
   default int getGridCellXRound(final double x) {
-    final double minX = getMinX();
+    final double minX = getGridMinX();
     final double gridCellSize = getGridCellSize();
     final double deltaX = x - minX;
     final double cellDiv = deltaX / gridCellSize;
-    return (int)Math.floor(cellDiv);
-  }
-
-  default int getGridCellY(final double y) {
-    final double minY = getMinY();
-    final double gridCellSize = getGridCellSize();
-    final double deltaY = y - minY;
-    final double cellDiv = deltaY / gridCellSize;
     return (int)Math.round(cellDiv);
   }
 
+  default int getGridCellY(final double y) {
+    final double minY = getGridMinY();
+    final double gridCellSize = getGridCellSize();
+    final double deltaY = y - minY;
+    final double cellDiv = deltaY / gridCellSize;
+    return (int)Math.floor(cellDiv);
+  }
+
   default int getGridCellYRound(final double y) {
-    final double minY = getMinY();
+    final double minY = getGridMinY();
     final double gridCellSize = getGridCellSize();
     final double deltaY = y - minY;
     final double cellDiv = deltaY / gridCellSize;
@@ -546,31 +656,21 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   int getGridHeight();
 
-  int getGridWidth();
-
-  default double getMaxX() {
-    final BoundingBox boundingBox = getBoundingBox();
-    return boundingBox.getMaxX();
-  }
-
-  default double getMaxY() {
-    final BoundingBox boundingBox = getBoundingBox();
-    return boundingBox.getMaxY();
-  }
-
-  default double getMaxZ() {
-    final BoundingBox boundingBox = getBoundingBox();
-    return boundingBox.getMaxZ();
-  }
-
-  default double getMinX() {
+  default double getGridMinX() {
     final BoundingBox boundingBox = getBoundingBox();
     return boundingBox.getMinX();
   }
 
-  default double getMinY() {
+  default double getGridMinY() {
     final BoundingBox boundingBox = getBoundingBox();
     return boundingBox.getMinY();
+  }
+
+  int getGridWidth();
+
+  default double getMaxZ() {
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.getMaxZ();
   }
 
   default double getMinZ() {
@@ -581,8 +681,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
   default LineStringEditor getNullBoundaryPoints() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final LineStringEditor points = new LineStringEditor(geometryFactory);
-    final double minX = getMinX();
-    final double minY = getMinY();
+    final double minX = getGridMinX();
+    final double minY = getGridMinY();
 
     final double gridCellSize = getGridCellSize();
     final int gridHeight = getGridHeight();
@@ -631,13 +731,13 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
   }
 
   default double getX(final int i) {
-    final double minX = getMinX();
+    final double minX = getGridMinX();
     final double gridCellSize = getGridCellSize();
     return minX + i * gridCellSize;
   }
 
   default double getY(final int i) {
-    final double maxY = getMinY();
+    final double maxY = getGridMinY();
     final double gridCellSize = getGridCellSize();
     return maxY + i * gridCellSize;
   }
@@ -698,8 +798,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     int width, int height, double gridCellSize);
 
   default GriddedElevationModel resample(final int newGridCellSize) {
-    final int tileX = (int)getMinX();
-    final int tileY = (int)getMinY();
+    final int tileX = (int)getGridMinX();
+    final int tileY = (int)getGridMinY();
     final double gridCellSize = getGridCellSize();
     final double cellRatio = gridCellSize / newGridCellSize;
     final int step = (int)Math.round(1 / cellRatio);
@@ -794,8 +894,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
       final int gridWidth = getGridWidth();
       final int gridHeight = getGridHeight();
 
-      final double minX1 = elevationModel.getMinX();
-      final double minY1 = elevationModel.getMinY();
+      final double minX1 = elevationModel.getGridMinX();
+      final double minY1 = elevationModel.getGridMinY();
 
       int startX = getGridCellX(minX1);
       int endX = startX + elevationModel.getGridWidth();
@@ -813,8 +913,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
       if (endY > gridHeight) {
         endY = gridHeight;
       }
-      final int minX = (int)(getMinX() + startX * gridCellSize);
-      final int minY = (int)(getMinY() + startY * gridCellSize);
+      final int minX = (int)(getGridMinX() + startX * gridCellSize);
+      final int minY = (int)(getGridMinY() + startY * gridCellSize);
 
       double y = minY;
       for (int gridY = startY; gridY < endY; gridY++) {
@@ -835,8 +935,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     final double y2, final double z2, final double x3, final double y3, final double z3);
 
   default void setElevationsNull(final GriddedElevationModel elevationModel) {
-    final double minX1 = elevationModel.getMinX();
-    final double minY1 = elevationModel.getMinY();
+    final double minX1 = elevationModel.getGridMinX();
+    final double minY1 = elevationModel.getGridMinY();
 
     int startX = getGridCellX(minX1);
     if (startX < 0) {
@@ -848,8 +948,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     }
 
     final double gridCellSize = getGridCellSize();
-    final int minX = (int)(getMinX() + startX * gridCellSize);
-    final int minY = (int)(getMinY() + startY * gridCellSize);
+    final int minX = (int)(getGridMinX() + startX * gridCellSize);
+    final int minY = (int)(getGridMinY() + startY * gridCellSize);
 
     double y = minY;
     final int gridWidth = getGridWidth();
@@ -880,7 +980,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   @SuppressWarnings("unchecked")
   default <G extends Geometry> G setGeometryElevations(final G geometry) {
-    final GeometryEditor<?> editor = geometry.newGeometryEditor(3);
+    final GeometryEditor<?> editor = geometry.newGeometryEditor();
+    editor.setAxisCount(3);
     for (final Vertex vertex : geometry.vertices()) {
       final double x = vertex.getX();
       final double y = vertex.getY();

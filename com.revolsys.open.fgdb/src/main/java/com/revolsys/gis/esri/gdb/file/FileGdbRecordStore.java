@@ -741,7 +741,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           final PathName typePath = PathName.newPathName(schemaName.newChild(tableName));
           final RecordStoreSchema schema = getSchema(schemaName);
           final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
-          recordDefinition.setPolygonRingDirection(ClockDirection.NONE);
+          recordDefinition.setPolygonRingDirection(ClockDirection.CLOCKWISE);
           String lengthFieldName = null;
           String areaFieldName = null;
           if (deTable instanceof DEFeatureClass) {

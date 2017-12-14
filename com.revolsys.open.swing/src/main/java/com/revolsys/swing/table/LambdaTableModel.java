@@ -50,6 +50,25 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
 
   protected <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
     final Class<?> columnClass, final Function<R, V> getValueFunction,
+    final BiConsumer<R, V> setValueFunction, final Function<V, ? extends Object> renderFunction) {
+    final LambdaTableModelColumn<R, V> column = new LambdaTableModelColumn<>(columnName,
+      columnClass, getValueFunction, setValueFunction, renderFunction);
+    this.columns.add(column);
+    return column;
+  }
+
+  protected <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
+    final Class<?> columnClass, final Function<R, V> getValueFunction,
+    final BiConsumer<R, V> setValueFunction, final Function<V, ? extends Object> renderFunction,
+    final TableCellEditor cellEditor) {
+    final LambdaTableModelColumn<R, V> column = new LambdaTableModelColumn<>(columnName,
+      columnClass, getValueFunction, setValueFunction, renderFunction, cellEditor);
+    this.columns.add(column);
+    return column;
+  }
+
+  protected <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
+    final Class<?> columnClass, final Function<R, V> getValueFunction,
     final BiConsumer<R, V> setValueFunction, final TableCellEditor cellEditor) {
     final LambdaTableModelColumn<R, V> column = new LambdaTableModelColumn<>(columnName,
       columnClass, getValueFunction, setValueFunction, cellEditor);
@@ -63,11 +82,11 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
     fireTableRowsInserted(rowCount, rowCount);
   }
 
-  public void applyTableCellEditors(final BaseJTable table) {
+  public void applyTableColumnSettings(final BaseJTable table) {
     for (int i = 0; i < this.columns.size(); i++) {
       final TableColumn tableColumn = table.getColumnExt(i);
       final LambdaTableModelColumn<R, ?> column = getColumn(i);
-      column.applyCellEditor(tableColumn);
+      column.applySettings(tableColumn);
     }
   }
 

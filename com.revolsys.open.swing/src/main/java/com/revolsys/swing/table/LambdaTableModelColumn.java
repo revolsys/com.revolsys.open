@@ -4,6 +4,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import com.revolsys.swing.menu.BaseJPopupMenu;
@@ -22,6 +23,8 @@ public class LambdaTableModelColumn<R, V> {
   private final BiConsumer<R, V> setValueFunction;
 
   private TableCellEditor cellEditor;
+
+  private TableCellRenderer cellRenderer;
 
   private MenuFactory headerMenuFactory;
 
@@ -45,6 +48,29 @@ public class LambdaTableModelColumn<R, V> {
 
   public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
     final Function<R, V> getValueFunction, final BiConsumer<R, V> setValueFunction,
+    final Function<V, ? extends Object> renderFunction) {
+    this.columnName = columnName;
+    this.columnClass = columnClass;
+    this.editable = true;
+    this.getValueFunction = getValueFunction;
+    this.setValueFunction = setValueFunction;
+    this.cellRenderer = new LambdaCellRenderer<>(renderFunction);
+  }
+
+  public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
+    final Function<R, V> getValueFunction, final BiConsumer<R, V> setValueFunction,
+    final Function<V, ? extends Object> renderFunction, final TableCellEditor cellEditor) {
+    this.columnName = columnName;
+    this.columnClass = columnClass;
+    this.editable = true;
+    this.getValueFunction = getValueFunction;
+    this.setValueFunction = setValueFunction;
+    this.cellRenderer = new LambdaCellRenderer<>(renderFunction);
+    this.cellEditor = cellEditor;
+  }
+
+  public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
+    final Function<R, V> getValueFunction, final BiConsumer<R, V> setValueFunction,
     final TableCellEditor cellEditor) {
     this.columnName = columnName;
     this.columnClass = columnClass;
@@ -54,9 +80,12 @@ public class LambdaTableModelColumn<R, V> {
     this.cellEditor = cellEditor;
   }
 
-  public void applyCellEditor(final TableColumn tableColumn) {
+  public void applySettings(final TableColumn tableColumn) {
     if (this.cellEditor != null) {
       tableColumn.setCellEditor(this.cellEditor);
+    }
+    if (this.cellRenderer != null) {
+      tableColumn.setCellRenderer(this.cellRenderer);
     }
   }
 

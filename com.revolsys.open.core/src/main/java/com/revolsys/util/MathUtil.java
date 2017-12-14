@@ -119,6 +119,19 @@ public interface MathUtil {
     return (a + b) / 2d;
   }
 
+  static double bilinearInterpolation(final double q11, final double q12, final double q21,
+    final double q22, final double x1, final double x2, final double y1, final double y2,
+    final double x, final double y) {
+    final double x2x1 = x2 - x1;
+    final double y2y1 = y2 - y1;
+    final double x2x = x2 - x;
+    final double y2y = y2 - y;
+    final double yy1 = y - y1;
+    final double xx1 = x - x1;
+    return 1.0 / (x2x1 * y2y1)
+      * (q11 * x2x * y2y + q21 * xx1 * y2y + q12 * x2x * yy1 + q22 * xx1 * yy1);
+  }
+
   /**
    * Clamps a <tt>double</tt> value to a given range.
    * @param x the value to clamp
@@ -151,6 +164,21 @@ public interface MathUtil {
       return max;
     }
     return x;
+  }
+
+  /**
+   *
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param a
+   * @param b
+   * @param c
+   * @param d
+   * @param t The va
+   * @return
+   */
+  static double cubicInterpolate(final double a, final double b, final double c, final double d,
+    final double t) {
+    return b + 0.5 * t * (c - a + t * (2 * a - 5 * b + 4 * c - d + t * (3 * (b - c) + d - a)));
   }
 
   /**

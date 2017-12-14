@@ -13,7 +13,6 @@ import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.RsSwingServiceInitializer;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -72,7 +71,7 @@ public class PointCloudLayer extends AbstractLayer {
     setSelectSupported(false);
     setQuerySupported(false);
     setRenderer(new PointCloudLayerRenderer(this));
-    setIcon(Icons.getIcon("point_cloud"));
+    setIcon("point_cloud");
   }
 
   public void cancelChanges() {
