@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 import com.revolsys.elevation.tin.TriangleConsumer;
 import com.revolsys.geometry.model.Geometry;
@@ -314,6 +315,13 @@ public class QuadEdgeSubdivision {
     return null;
   }
 
+  public void forEachTriangle(final Consumer<? super Triangle> action) {
+    forEachTriangle((x1, y1, z1, x2, y2, z2, x3, y3, z3) -> {
+      final Triangle triangle = new TriangleDoubleXYZ(x1, y1, z1, x2, y2, z2, x3, y3, z3);
+      action.accept(triangle);
+    });
+  }
+
   public void forEachTriangle(final TriangleConsumer action) {
     if (this.visitIndex == Short.MAX_VALUE) {
       this.visitIndex = Short.MIN_VALUE;
@@ -451,11 +459,10 @@ public class QuadEdgeSubdivision {
     final double x = vertex.getX();
     final double y = vertex.getY();
     /*
-     * This code is based on Guibas and Stolfi (1985), with minor modifications
-     * and a bug fix from Dani Lischinski (Graphic Gems 1993). (The modification
-     * I believe is the test for the inserted site falling exactly on an
-     * existing edge. Without this test zero-width triangles have been observed
-     * to be created)
+     * This code is based on Guibas and Stolfi (1985), with minor modifications and a bug fix from
+     * Dani Lischinski (Graphic Gems 1993). (The modification I believe is the test for the inserted
+     * site falling exactly on an existing edge. Without this test zero-width triangles have been
+     * observed to be created)
      */
     QuadEdge edge = findQuadEdge(x, y);
     if (edge != null) {
@@ -488,8 +495,8 @@ public class QuadEdgeSubdivision {
         }
       }
       /*
-       * Connect the new point to the vertices of the containing triangle (or
-       * quadrilateral, if the new point fell on an existing edge.)
+       * Connect the new point to the vertices of the containing triangle (or quadrilateral, if the
+       * new point fell on an existing edge.)
        */
       final QuadEdge base = makeEdge(edgeFromPoint, vertex);
       base.splice(edge);

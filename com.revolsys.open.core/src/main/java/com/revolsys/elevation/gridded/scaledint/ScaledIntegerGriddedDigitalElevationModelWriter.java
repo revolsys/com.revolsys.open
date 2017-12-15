@@ -43,7 +43,11 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter
       final double offset = geometryFactory.getOffset(axisIndex);
       writer.putDouble(offset);
       final double scale = geometryFactory.getScale(axisIndex);
-      writer.putDouble(scale);
+      if (scale <= 0) {
+        writer.putDouble(1000);
+      } else {
+        writer.putDouble(scale);
+      }
     }
 
     writer.putDouble(boundingBox.getMinX()); // minX

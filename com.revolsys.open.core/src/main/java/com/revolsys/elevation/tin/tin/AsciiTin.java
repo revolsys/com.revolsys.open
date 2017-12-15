@@ -1,7 +1,6 @@
 package com.revolsys.elevation.tin.tin;
 
-import java.util.Map;
-
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
@@ -27,7 +26,7 @@ public class AsciiTin extends AbstractIoFactoryWithCoordinateSystem
 
   @Override
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final Resource resource,
-    final Map<String, ? extends Object> properties) {
+    final MapEx properties) {
     try {
       GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
       if (geometryFactory == null) {

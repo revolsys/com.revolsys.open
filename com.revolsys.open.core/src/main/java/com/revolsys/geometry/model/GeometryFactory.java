@@ -354,6 +354,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return fixed(coordinateSystemId, 2, scaleX, scaleY);
   }
 
+  public static GeometryFactory fixed3d(final CoordinateSystem coordinateSystem,
+    final double scaleX, final double scaleY, final double scaleZ) {
+    return fixed(coordinateSystem, 3, scaleX, scaleY, scaleZ);
+  }
+
   public static GeometryFactory fixed3d(final double scaleX, final double scaleY,
     final double scaleZ) {
     return fixed(0, 3, scaleX, scaleY, scaleZ);

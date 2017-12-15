@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.elevation.tin.IntArrayScaleTriangulatedIrregularNetwork;
@@ -49,6 +50,7 @@ import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Side;
+import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.RectangleUtil;
@@ -148,6 +150,12 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     this.bounds[3] += delta;
   }
 
+  @Override
+  public void forEachTriangle(final Consumer<? super Triangle> action) {
+    buildTin();
+    this.subdivision.forEachTriangle(action);
+  }
+
   /**
    * Gets the faces of the computed triangulation as a {@link Polygonal}.
    *
@@ -159,6 +167,11 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     if (this.subdivision != null) {
       this.subdivision.forEachTriangle(action);
     }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<Point> action) {
+    this.vertices.forEach(action);
   }
 
   public Geometry getBoundary() {
@@ -204,6 +217,7 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     return this.subdivision;
   }
 
+  @Override
   public final int getTriangleCount() {
     buildTin();
     if (this.subdivision == null) {
@@ -244,10 +258,12 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     }
   }
 
+  @Override
   public int getVertexCount() {
     return this.vertices.size();
   }
 
+  @Override
   public final List<Point> getVertices() {
     return this.vertices;
   }

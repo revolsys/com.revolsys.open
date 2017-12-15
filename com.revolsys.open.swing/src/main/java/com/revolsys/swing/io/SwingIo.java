@@ -26,9 +26,10 @@ public class SwingIo {
     Invoke.later(() -> {
       final JFileChooser fileChooser = SwingUtil.newFileChooser("Export " + title, preferencesGroup,
         "directory");
+      fileChooser.setAcceptAllFileFilterUsed(false);
       final String defaultFileExtension = PreferencesUtil.getUserString(preferencesGroup,
         "fileExtension", initialFileExtension);
-      final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
+      final List<FileNameExtensionFilter> fileFilters = new ArrayList<>();
       for (final F factory : IoFactory.factories(factoryClass)) {
         if (factoryFilter.test(factory)) {
           final FileNameExtensionFilter fileFilter;
@@ -37,20 +38,21 @@ public class SwingIo {
           } else {
             fileFilter = factory.newFileFilterAllExtensions();
           }
-          recordFileFilters.add(fileFilter);
+          fileFilters.add(fileFilter);
+          final List<String> extensions = fileFilter.getExtensions();
+          if (extensions.contains(defaultFileExtension)) {
+            fileChooser.setFileFilter(fileFilter);
+          }
         }
       }
-      IoFactory.sortFilters(recordFileFilters);
-      fileChooser.setAcceptAllFileFilterUsed(false);
-      fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), baseName));
-      for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
+      IoFactory.sortFilters(fileFilters);
+      for (final FileNameExtensionFilter fileFilter : fileFilters) {
         fileChooser.addChoosableFileFilter(fileFilter);
-        final List<String> extensions = fileFilter.getExtensions();
-        if (extensions.contains(defaultFileExtension)) {
-          fileChooser.setFileFilter(fileFilter);
-        }
       }
+
       fileChooser.setMultiSelectionEnabled(false);
+      fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), baseName));
+
       final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
       if (returnVal == JFileChooser.APPROVE_OPTION) {
         final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser

@@ -73,14 +73,14 @@ public class TiledGriddedElevationModelLayer
         return Double.NaN;
       } else {
         final double elevation = elevationModel.getElevation(x, y);
-        System.out.println(elevation + "\t" + elevationModel.getElevationBilinear(x, y) + "\t"
-          + elevationModel.getElevationBicubic(x, y));
+        // System.out.println(elevation + "\t" + elevationModel.getElevationBilinear(x, y) + "\t"
+        // + elevationModel.getElevationBicubic(x, y));
         return elevation;
       }
     } else {
       final double elevation = this.elevationModel.getElevation(x, y);
-      System.out.println(elevation + "\t" + this.elevationModel.getElevationBilinear(x, y) + "\t"
-        + this.elevationModel.getElevationBicubic(x, y));
+      // System.out.println(elevation + "\t" + this.elevationModel.getElevationBilinear(x, y) + "\t"
+      // + this.elevationModel.getElevationBicubic(x, y));
       return elevation;
     }
   }

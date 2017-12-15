@@ -1,15 +1,13 @@
 package com.revolsys.elevation.tin;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.elevation.tin.compactbinary.CompactBinaryTin;
+import com.revolsys.elevation.tin.compactbinary.ScaledIntegerTriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.tin.AsciiTin;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -19,7 +17,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
@@ -36,8 +33,8 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
 
   static final String GEOMETRY_FACTORY = "geometryFactory";
 
-  static boolean forEachTriangle(final Object source,
-    final Map<String, ? extends Object> properties, final TriangleConsumer action) {
+  static boolean forEachTriangle(final Object source, final MapEx properties,
+    final TriangleConsumer action) {
     final TriangulatedIrregularNetworkReadFactory factory = IoFactory
       .factory(TriangulatedIrregularNetworkReadFactory.class, source);
     if (factory == null) {
@@ -50,8 +47,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   }
 
   static boolean forEachTriangle(final Object source, final TriangleConsumer action) {
-    final Map<String, Object> properties = Collections.emptyMap();
-    return forEachTriangle(source, properties, action);
+    return forEachTriangle(source, MapEx.EMPTY, action);
   }
 
   /**
@@ -67,33 +63,39 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   }
 
   static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final Object source) {
-    final Map<String, Object> properties = Collections.emptyMap();
-    return newTriangulatedIrregularNetwork(source, properties);
+    return newTriangulatedIrregularNetwork(source, MapEx.EMPTY);
   }
 
   static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final Object source,
-    final Map<String, ? extends Object> properties) {
+    final MapEx properties) {
     final TriangulatedIrregularNetworkReadFactory factory = IoFactory
       .factory(TriangulatedIrregularNetworkReadFactory.class, source);
     if (factory == null) {
       return null;
     } else {
       final Resource resource = factory.getZipResource(source);
-      final TriangulatedIrregularNetwork dem = factory.newTriangulatedIrregularNetwork(resource,
+      final TriangulatedIrregularNetwork tin = factory.newTriangulatedIrregularNetwork(resource,
         properties);
-      return dem;
+      return tin;
     }
   }
 
   public static void serviceInit() {
-    IoFactoryRegistry.addFactory(new CompactBinaryTin());
+    IoFactoryRegistry.addFactory(new ScaledIntegerTriangulatedIrregularNetwork());
     IoFactoryRegistry.addFactory(new AsciiTin());
   }
 
   default void cancelChanges() {
   }
 
-  void forEachTriangle(final BoundingBox boundingBox, final Consumer<? super Triangle> action);
+  default void forEachTriangle(final BoundingBox boundingBox,
+    final Consumer<? super Triangle> action) {
+    forEachTriangle(triangle -> {
+      if (triangle.intersects(boundingBox)) {
+        action.accept(triangle);
+      }
+    });
+  }
 
   default void forEachTriangle(final BoundingBox boundingBox,
     final Predicate<? super Triangle> filter, final Consumer<? super Triangle> action) {
@@ -102,6 +104,21 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   }
 
   void forEachTriangle(final Consumer<? super Triangle> action);
+
+  default void forEachTriangle(final double x, final double y,
+    final Consumer<? super Triangle> action) {
+    forEachTriangle(triangle -> {
+      if (triangle.intersects(x, y)) {
+        action.accept(triangle);
+      }
+    });
+  }
+
+  default void forEachTriangle(final double x, final double y,
+    final Predicate<? super Triangle> filter, final Consumer<? super Triangle> action) {
+    final Consumer<? super Triangle> filteredAction = Predicates.newConsumer(filter, action);
+    forEachTriangle(x, y, filteredAction);
+  }
 
   default void forEachTriangle(final Predicate<? super Triangle> filter,
     final Consumer<? super Triangle> action) {
@@ -118,7 +135,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   BoundingBox getBoundingBox();
 
   default double getElevation(final double x, final double y) {
-    final List<Triangle> triangles = getTriangles(new PointDoubleXY(x, y));
+    final List<Triangle> triangles = getTriangles(x, y);
     for (final Triangle triangle : triangles) {
       return triangle.getElevation(x, y);
     }
@@ -203,7 +220,9 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
     return Double.NaN;
   }
 
-  Resource getResource();
+  default Resource getResource() {
+    return null;
+  }
 
   int getTriangleCount();
 
@@ -254,8 +273,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
     return writeTriangulatedIrregularNetwork(MapEx.EMPTY);
   }
 
-  default boolean writeTriangulatedIrregularNetwork(
-    final Map<String, ? extends Object> properties) {
+  default boolean writeTriangulatedIrregularNetwork(final MapEx properties) {
     final Resource resource = getResource();
     if (resource == null) {
       return false;
@@ -266,12 +284,10 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   }
 
   default void writeTriangulatedIrregularNetwork(final Object target) {
-    final Map<String, ? extends Object> properties = Collections.emptyMap();
-    writeTriangulatedIrregularNetwork(target, properties);
+    writeTriangulatedIrregularNetwork(target, MapEx.EMPTY);
   }
 
-  default void writeTriangulatedIrregularNetwork(final Object target,
-    final Map<String, ? extends Object> properties) {
+  default void writeTriangulatedIrregularNetwork(final Object target, final MapEx properties) {
     try (
       TriangulatedIrregularNetworkWriter writer = TriangulatedIrregularNetworkWriter
         .newTriangulatedIrregularNetworkWriter(target, properties)) {

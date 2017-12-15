@@ -1,13 +1,12 @@
 package com.revolsys.elevation.tin;
 
-import java.util.Map;
-
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.ReadIoFactory;
 import com.revolsys.spring.resource.Resource;
 
 public interface TriangulatedIrregularNetworkReadFactory extends ReadIoFactory {
-  default void forEachTriangle(final Resource resource,
-    final Map<String, ? extends Object> properties, final TriangleConsumer action) {
+  default void forEachTriangle(final Resource resource, final MapEx properties,
+    final TriangleConsumer action) {
     final TriangulatedIrregularNetwork tin = newTriangulatedIrregularNetwork(resource, properties);
     tin.forEachTriangle((triangle) -> {
       final double x1 = triangle.getX(0);
@@ -25,6 +24,5 @@ public interface TriangulatedIrregularNetworkReadFactory extends ReadIoFactory {
     });
   }
 
-  TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(Resource resource,
-    Map<String, ? extends Object> properties);
+  TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(Resource resource, MapEx properties);
 }

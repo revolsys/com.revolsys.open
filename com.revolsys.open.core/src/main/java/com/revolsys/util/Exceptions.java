@@ -12,6 +12,8 @@ public interface Exceptions {
         e = wrappedException.getCause();
       } else if (clazz.isAssignableFrom(e.getClass())) {
         return true;
+      } else {
+        return false;
       }
     }
     return false;
