@@ -1,7 +1,6 @@
 package com.revolsys.record.code;
 
 import com.revolsys.datatype.AbstractDataType;
-import com.revolsys.util.Strings;
 
 public class CodeDataType extends AbstractDataType {
   public CodeDataType() {
@@ -10,8 +9,12 @@ public class CodeDataType extends AbstractDataType {
 
   @Override
   public boolean equals(final Object value1, final Object value2) {
-    final String code1 = Code.getCode(value1);
-    final String code2 = Code.getCode(value2);
-    return Strings.equals(code1, code2);
+    final Object code1 = Code.getCode(value1);
+    final Object code2 = Code.getCode(value2);
+    if (code1 == null) {
+      return code2 == null;
+    } else {
+      return code1.equals(code2);
+    }
   }
 }

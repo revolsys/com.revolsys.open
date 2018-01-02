@@ -15,13 +15,18 @@ public class LambdaCellRenderer<R> extends DefaultTableRenderer {
 
   public LambdaCellRenderer(final Function<R, ? extends Object> renderFunction) {
     this.renderFunction = renderFunction;
+    if (renderFunction == null) {
+      throw new IllegalArgumentException("Render function must not be null");
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Component getTableCellRendererComponent(final JTable table, Object value,
     final boolean isSelected, final boolean hasFocus, final int row, final int column) {
-    value = this.renderFunction.apply((R)value);
+    if (value != null) {
+      value = this.renderFunction.apply((R)value);
+    }
     if (value == null) {
       value = "-";
     }

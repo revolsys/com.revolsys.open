@@ -22,7 +22,7 @@ public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
     final boolean allowNull, final boolean idSuffix) {
     final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable, allowNull);
 
-    final ComboBox<Identifier> comboBox = ComboBox.newComboBox(fieldName, model, (id) -> {
+    final ComboBox<Identifier> comboBox = ComboBox.newComboBox(fieldName, model, id -> {
       if (id == null || id == Identifier.NULL) {
         return null;
       } else {
@@ -32,7 +32,7 @@ public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
         } else {
           final String string = Strings.toString(":", values);
           if (idSuffix) {
-            return string + " (" + id + ")";
+            return string + " (" + ((Identifier)id).toIdString() + ")";
           } else {
             return string;
           }

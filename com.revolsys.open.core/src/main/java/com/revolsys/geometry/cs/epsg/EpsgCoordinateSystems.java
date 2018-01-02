@@ -18,6 +18,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -42,13 +43,15 @@ import com.revolsys.geometry.cs.Projection;
 import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.csv.CsvIterator;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 
-public final class EpsgCoordinateSystems {
+public final class EpsgCoordinateSystems implements CodeTable {
   private static Set<CoordinateSystem> coordinateSystems;
 
   private static IntHashMap<List<CoordinateSystem>> coordinateSystemsByCoordinateSystem = new IntHashMap<>();
@@ -677,6 +680,56 @@ public final class EpsgCoordinateSystems {
     return EpsgCoordinateSystems.<CoordinateSystem> getCoordinateSystem(4326);
   }
 
+  private Map<Identifier, List<Object>> codes;
+
+  private List<Identifier> identifiers;
+
   private EpsgCoordinateSystems() {
+  }
+
+  @Override
+  public Map<Identifier, List<Object>> getCodes() {
+    if (this.codes == null) {
+      final Map<Identifier, List<Object>> codesById = new HashMap<>();
+      for (final CoordinateSystem coordinateSystem : coordinateSystems) {
+        final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+        final Identifier id = Identifier.newIdentifier(coordinateSystemId);
+        final List<Object> code = Collections.singletonList(coordinateSystem);
+        codesById.put(id, code);
+      }
+      this.codes = codesById;
+    }
+    return this.codes;
+  }
+
+  @Override
+  public List<Identifier> getIdentifiers() {
+    if (this.identifiers == null) {
+      final List<Identifier> identifiers = new ArrayList<>();
+      for (final CoordinateSystem coordinateSystem : coordinateSystems) {
+        final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+        final Identifier id = Identifier.newIdentifier(coordinateSystemId);
+        identifiers.add(id);
+      }
+      this.identifiers = Collections.unmodifiableList(identifiers);
+    }
+    return this.identifiers;
+  }
+
+  @Override
+  public String getIdFieldName() {
+    return "coordinateSystemId";
+  }
+
+  @Override
+  public <V> V getValue(final Identifier id) {
+    final int coordinateSystemId = id.getInteger(0);
+    return getCoordinateSystem(coordinateSystemId);
+  }
+
+  @Override
+  public List<Object> getValues(final Identifier id) {
+
+    return CodeTable.super.getValues(id);
   }
 }

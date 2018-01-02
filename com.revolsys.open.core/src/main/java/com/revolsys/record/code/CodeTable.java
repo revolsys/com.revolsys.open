@@ -183,6 +183,11 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return getValues(identifier);
   }
 
+  @Override
+  default boolean isEmpty() {
+    return false;
+  }
+
   default boolean isLoaded() {
     return true;
   }

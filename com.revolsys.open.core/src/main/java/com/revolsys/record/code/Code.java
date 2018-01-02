@@ -29,14 +29,15 @@ public interface Code extends Describable, Identifier {
     return descriptions;
   }
 
-  static String getCode(final Object value) {
+  @SuppressWarnings("unchecked")
+  static <C> C getCode(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Code) {
       final Code code = (Code)value;
       return code.getCode();
     } else {
-      return value.toString();
+      return (C)value;
     }
   }
 
@@ -49,15 +50,21 @@ public interface Code extends Describable, Identifier {
     return Collections.unmodifiableMap(code);
   }
 
-  default boolean equalsCode(final String code) {
-    final String codeThis = getCode();
+  default boolean equalsCode(final Object code) {
+    final Object codeThis = getCode();
     return codeThis.equals(code);
   }
 
-  String getCode();
+  <C> C getCode();
 
   @Override
   default List<Object> getValues() {
-    return Collections.<Object> singletonList(getCode());
+    final Object code = getCode();
+    return Collections.singletonList(code);
+  }
+
+  @Override
+  default String toIdString() {
+    return getCode().toString();
   }
 }

@@ -1,8 +1,32 @@
 package com.revolsys.geometry.cs;
 
-public interface VerticalCoordinateSystem {
+import com.revolsys.record.code.Code;
 
-  public static final int CGVD28 = 5713; // Canadian Geodetic Vertical Datum of 1928
+public interface VerticalCoordinateSystem extends Code {
 
-  public static final int CGVD2013 = 6647; // Canadian Geodetic Vertical Datum of 2013
+  @SuppressWarnings("unchecked")
+  @Override
+  default <C> C getCode() {
+    return (C)(Integer)getCoordinateSystemId();
+  }
+
+  int getCoordinateSystemId();
+
+  String getCoordinateSystemName();
+
+  String getDatumName();
+
+  @Override
+  default String getDescription() {
+    return getCoordinateSystemName();
+  }
+
+  @Override
+  default Integer getInteger(final int index) {
+    if (index == 0) {
+      return getCoordinateSystemId();
+    } else {
+      throw new ArrayIndexOutOfBoundsException(index);
+    }
+  }
 }

@@ -113,9 +113,10 @@ public enum LasPointFormat implements Code {
     this.minVersion = minVersion;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public String getCode() {
-    return Integer.toString(this.id);
+  public <C> C getCode() {
+    return (C)(Integer)this.id;
   }
 
   @Override

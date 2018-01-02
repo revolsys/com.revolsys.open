@@ -220,6 +220,10 @@ public interface Identifier {
     setIdentifier(record, record.getRecordDefinition().getFieldNames());
   }
 
+  default String toIdString() {
+    return toString();
+  }
+
   @SuppressWarnings("unchecked")
   default <V> V toSingleValue() {
     final List<Object> values = getValues();
