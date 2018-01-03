@@ -25,11 +25,13 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import com.revolsys.collection.ValueHolder;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.io.FileNames;
@@ -79,35 +81,70 @@ public interface Paths {
   }
 
   static boolean deleteDirectories(final Path path) {
-    if (Paths.exists(path)) {
-      try {
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+    final ValueHolder<IOException> firstException = new ValueHolder<>();
+    final LinkedList<Boolean> errors = new LinkedList<>();
+    try {
+      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult postVisitDirectory(final Path dir, final IOException exception)
+          throws IOException {
+          final Boolean hasError = errors.removeLast();
+          if (exception == null) {
+            if (!hasError) {
+              try {
+                Files.delete(dir);
+              } catch (final NoSuchFileException e) {
+                // Ignore as we want it to not exist
+              } catch (final IOException e) {
+                errors.removeLast();
+                errors.addLast(Boolean.TRUE);
+                if (firstException.isEmpty()) {
+                  firstException.setValue(e);
+                }
+              }
+            }
+            return FileVisitResult.CONTINUE;
+          } else {
+            throw exception;
+          }
+        }
 
-          @Override
-          public FileVisitResult postVisitDirectory(final Path dir, final IOException exception)
-            throws IOException {
+        @Override
+        public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+          throws IOException {
+          errors.addLast(Boolean.FALSE);
+          return FileVisitResult.CONTINUE;
+        }
 
-            if (exception == null) {
-              Files.delete(dir);
-              return FileVisitResult.CONTINUE;
-            } else {
-              throw exception;
+        @Override
+        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
+          throws IOException {
+          try {
+            Files.delete(file);
+          } catch (final NoSuchFileException e) {
+            // Ignore as we want it to not exist
+          } catch (final IOException e) {
+            errors.removeLast();
+            errors.addLast(Boolean.TRUE);
+            if (firstException.isEmpty()) {
+              firstException.setValue(e);
             }
           }
-
-          @Override
-          public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
-            throws IOException {
-            Files.delete(file);
-            return FileVisitResult.CONTINUE;
-          }
-        });
+          return FileVisitResult.CONTINUE;
+        }
+      });
+      if (firstException.isEmpty()) {
         return true;
-      } catch (final IOException e) {
+      } else {
+        final IOException exception = firstException.getValue();
+        Logs.error(Paths.class, "Unable to delete: " + path, exception);
         return false;
       }
+    } catch (final NoSuchFileException e) {
+      return !exists(path);
+    } catch (final IOException e) {
+      return false;
     }
-    return true;
   }
 
   public static boolean deleteFiles(final Path path, final String glob) {

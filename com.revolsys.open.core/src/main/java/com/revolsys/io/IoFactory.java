@@ -326,6 +326,8 @@ public interface IoFactory extends Available {
         }
       } else if (filename.endsWith(".gz")) {
         return new GzipResource(resource);
+      } else if (filename.endsWith(getFileExtensions().get(0) + "z")) {
+        return new GzipResource(resource);
       }
     }
     return resource;

@@ -24,18 +24,6 @@ import com.revolsys.util.Exceptions;
 
 public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectWithProperties
   implements GriddedElevationModelReader {
-  protected static GeometryFactory readGeometryFactory(final ChannelReader reader) {
-    final int coordinateSystemId = reader.getInt();
-    final double offsetX = reader.getDouble();
-    final double scaleX = reader.getDouble();
-    final double offsetY = reader.getDouble();
-    final double scaleY = reader.getDouble();
-    final double offsetZ = reader.getDouble();
-    final double scaleZ = reader.getDouble();
-    return GeometryFactory.newWithOffsets(coordinateSystemId, offsetX, scaleX, offsetY, scaleY,
-      offsetZ, scaleZ);
-  }
-
   private boolean initialized;
 
   private Resource resource;
@@ -165,8 +153,9 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
     this.reader.getBytes(fileTypeBytes);
     @SuppressWarnings("unused")
     final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8);
+    @SuppressWarnings("unused")
     final short version = this.reader.getShort();
-    final GeometryFactory geometryFactory = readGeometryFactory(this.reader);
+    final GeometryFactory geometryFactory = GeometryFactory.readOffsetScaled3d(this.reader);
     this.geometryFactory = geometryFactory;
     final double minX = this.reader.getDouble();
     final double minY = this.reader.getDouble();

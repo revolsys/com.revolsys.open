@@ -50,14 +50,14 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
   static Path getTilePath(final Path basePath, final String filePrefix,
     final int coordinateSystemId, final String gridTileOrCellSize, final int tileMinX,
     final int tileMinY, final String fileExtension) {
-    final Path fileExtensionDirectory = basePath.resolve(fileExtension);
-    final Path coordinateSystemDirectory = fileExtensionDirectory
-      .resolve(Integer.toString(coordinateSystemId));
-    final Path resolutionDirectory = coordinateSystemDirectory.resolve(gridTileOrCellSize);
-    final Path directoryX = resolutionDirectory.resolve(Integer.toString(tileMinX));
     final String fileName = getTileFileName(filePrefix, coordinateSystemId, gridTileOrCellSize,
       tileMinX, tileMinY, fileExtension);
-    return directoryX.resolve(fileName);
+    return basePath //
+      .resolve(fileExtension) //
+      .resolve(Integer.toString(coordinateSystemId)) //
+      .resolve(gridTileOrCellSize) //
+      .resolve(Integer.toString(tileMinX)) //
+      .resolve(fileName);
   }
 
   static Resource getTileResource(final Resource basePath, final String filePrefix,
@@ -70,15 +70,14 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
   static Resource getTileResource(final Resource basePath, final String filePrefix,
     final int coordinateSystemId, final String gridTileOrCellSize, final int tileMinX,
     final int tileMinY, final String fileSuffix, final String fileExtension) {
-    final Resource fileExtensionDirectory = basePath.createRelative(fileExtension);
-    final Resource coordinateSystemDirectory = fileExtensionDirectory
-      .createRelative(Integer.toString(coordinateSystemId));
-    final Resource resolutionDirectory = coordinateSystemDirectory
-      .createRelative(gridTileOrCellSize);
-    final Resource directoryX = resolutionDirectory.createRelative(Integer.toString(tileMinX));
     final String fileName = getTileFileName(filePrefix, coordinateSystemId, gridTileOrCellSize,
       tileMinX, tileMinY, fileSuffix, fileExtension);
-    return directoryX.createRelative(fileName);
+    return basePath //
+      .createRelative(fileExtension) //
+      .createRelative(Integer.toString(coordinateSystemId)) //
+      .createRelative(gridTileOrCellSize) //
+      .createRelative(Integer.toString(tileMinX)) //
+      .createRelative(fileName);
   }
 
   default BoundingBox getBoundingBox(final String mapTileName, final int srid) {

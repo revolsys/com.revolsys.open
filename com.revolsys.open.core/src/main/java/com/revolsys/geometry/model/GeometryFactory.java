@@ -77,6 +77,8 @@ import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.geometry.util.RectangleUtil;
+import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.MathUtil;
@@ -602,7 +604,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
   }
 
-  public static GeometryFactory newWithOffsets(final int coordinateSystemId, final double offsetX,
+  public static GeometryFactory offsetScaled3d(final int coordinateSystemId, final double offsetX,
     final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
     final double scaleZ) {
     if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
@@ -611,6 +613,17 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       return new GeometryFactoryWithOffsets(coordinateSystemId, offsetX, scaleX, offsetY, scaleY,
         offsetZ, scaleZ);
     }
+  }
+
+  public static GeometryFactory readOffsetScaled3d(final ChannelReader reader) {
+    final int coordinateSystemId = reader.getInt();
+    final double offsetX = reader.getDouble();
+    final double scaleX = reader.getDouble();
+    final double offsetY = reader.getDouble();
+    final double scaleY = reader.getDouble();
+    final double offsetZ = reader.getDouble();
+    final double scaleZ = reader.getDouble();
+    return offsetScaled3d(coordinateSystemId, offsetX, scaleX, offsetY, scaleY, offsetZ, scaleZ);
   }
 
   public static double toResolution(final double scale) {
@@ -627,6 +640,18 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
 
   public static GeometryFactory worldMercator() {
     return floating3d(3857);
+  }
+
+  public static void writeOffsetScaled3d(final ChannelWriter writer,
+    final GeometryFactory geometryFactory) {
+    final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+    writer.putInt(coordinateSystemId);
+    writer.putDouble(geometryFactory.getOffsetX());
+    writer.putDouble(geometryFactory.getScaleX());
+    writer.putDouble(geometryFactory.getOffsetY());
+    writer.putDouble(geometryFactory.getScaleY());
+    writer.putDouble(geometryFactory.getOffsetZ());
+    writer.putDouble(geometryFactory.getScaleZ());
   }
 
   protected final int axisCount;
@@ -807,6 +832,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       return GeometryFactory.floating(coordinateSystemId, this.axisCount);
     }
   }
+
+  public abstract GeometryFactory convertToFixed(double defaultScale);
 
   public double[] copyPrecise(final double[] values) {
     final double[] valuesPrecise = new double[values.length];

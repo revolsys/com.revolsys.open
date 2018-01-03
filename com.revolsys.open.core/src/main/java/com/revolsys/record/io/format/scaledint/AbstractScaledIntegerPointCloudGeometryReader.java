@@ -87,23 +87,16 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
       this.exists = false;
     } else {
       this.exists = true;
-      final byte[] fileTypeBytes = new byte[6];
-      reader.getBytes(fileTypeBytes);
-      final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
-                                                                                 // type
-      if (!ScaledIntegerPointCloud.FILE_TYPE_HEADER.equals(fileType)
-        && !"POINTZ".equals(fileType)) {
+      final String fileType = reader.getString(4, StandardCharsets.UTF_8); // File type
+      if (!ScaledIntegerPointCloud.FILE_TYPE_HEADER.equals(fileType)) {
         throw new IllegalArgumentException("File must start with the text: "
           + ScaledIntegerPointCloud.FILE_TYPE_HEADER + " not " + fileType);
       }
       @SuppressWarnings("unused")
       final short version = reader.getShort();
-      final int coordinateSystemId = reader.getInt();
-      this.scaleXy = reader.getDouble();
-
-      this.scaleZ = reader.getDouble();
-      this.geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, this.scaleXy, this.scaleXy,
-        this.scaleZ);
+      @SuppressWarnings("unused")
+      final short flags = reader.getShort();
+      this.geometryFactory = GeometryFactory.readOffsetScaled3d(reader);
     }
   }
 

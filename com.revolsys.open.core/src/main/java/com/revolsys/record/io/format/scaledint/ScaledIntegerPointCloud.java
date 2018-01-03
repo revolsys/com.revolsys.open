@@ -5,10 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.io.GeometryReader;
-import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.io.GeometryWriterFactory;
-import com.revolsys.geometry.io.PointReader;
 import com.revolsys.geometry.io.PointReaderFactory;
 import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.spring.resource.OutputStreamResource;
@@ -19,12 +16,12 @@ public class ScaledIntegerPointCloud extends GeometryRecordReaderFactory
 
   public static final String FILE_EXTENSION = "sipc";
 
-  public static final String FILE_TYPE_HEADER = "SIPC  ";
+  public static final String FILE_TYPE_HEADER = "SIPC";
 
   public static final byte[] FILE_TYPE_HEADER_BYTES = FILE_TYPE_HEADER
     .getBytes(StandardCharsets.UTF_8);
 
-  public static final int HEADER_SIZE = 28;
+  public static final int HEADER_SIZE = 64;
 
   public static final String MIME_TYPE = "application/x-revolsys-sipc";
 
@@ -44,24 +41,32 @@ public class ScaledIntegerPointCloud extends GeometryRecordReaderFactory
   }
 
   @Override
-  public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
+  public ScaledIntegerPointCloudGeometryReader newGeometryReader(final Resource resource,
+    final MapEx properties) {
     return new ScaledIntegerPointCloudGeometryReader(resource, properties);
   }
 
   @Override
-  public GeometryWriter newGeometryWriter(final Resource resource) {
-    return new ScaledIntegerPointCloudGeometryWriter(resource);
+  public ScaledIntegerPointCloudGeometryWriter newGeometryWriter(final Resource resource,
+    final MapEx properties) {
+    return new ScaledIntegerPointCloudGeometryWriter(resource, properties);
   }
 
   @Override
-  public GeometryWriter newGeometryWriter(final String baseName, final OutputStream out,
-    final Charset charset) {
+  public ScaledIntegerPointCloudGeometryWriter newGeometryWriter(final String baseName,
+    final OutputStream out, final Charset charset) {
     final OutputStreamResource resource = new OutputStreamResource(baseName, out);
-    return newGeometryWriter(resource);
+    return newGeometryWriter(resource, MapEx.EMPTY);
   }
 
   @Override
-  public PointReader newPointReader(final Resource resource, final MapEx properties) {
+  public ScaledIntegerPointCloudPointReader newPointReader(final Resource resource,
+    final MapEx properties) {
     return new ScaledIntegerPointCloudPointReader(resource, properties);
   }
 }

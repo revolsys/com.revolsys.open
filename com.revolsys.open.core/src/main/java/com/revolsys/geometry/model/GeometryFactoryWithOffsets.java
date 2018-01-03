@@ -1,5 +1,7 @@
 package com.revolsys.geometry.model;
 
+import java.util.Arrays;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.CoordinateSystem;
 
@@ -25,6 +27,15 @@ public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
   private GeometryFactoryWithOffsets(final CoordinateSystem coordinateSystem, final double offsetX,
     final double offsetY, final double offsetZ, final double[] scales) {
     super(coordinateSystem, 3, scales);
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+    this.offsetZ = offsetZ;
+  }
+
+  protected GeometryFactoryWithOffsets(final CoordinateSystem coordinateSystem,
+    final int coordinateSystemId, final int axisCount, final double offsetX, final double scaleX,
+    final double offsetY, final double scaleY, final double offsetZ, final double scaleZ) {
+    super(coordinateSystem, coordinateSystemId, axisCount, scaleX, scaleY, scaleZ);
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.offsetZ = offsetZ;
@@ -60,6 +71,29 @@ public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
         return new GeometryFactoryWithOffsets(coordinateSystem, this.offsetX, this.offsetY,
           this.offsetZ, this.scales);
       }
+    }
+  }
+
+  @Override
+  public GeometryFactory convertToFixed(final double defaultScale) {
+    boolean conversionRequired = false;
+    for (final double scale : this.scales) {
+      if (scale <= 0) {
+        conversionRequired = true;
+      }
+    }
+    if (conversionRequired) {
+      final double[] scales = Arrays.copyOf(this.scales, 3);
+      for (int i = 0; i < scales.length; i++) {
+        final double scale = scales[i];
+        if (scale <= 0) {
+          scales[i] = defaultScale;
+        }
+      }
+      return new GeometryFactoryWithOffsets(this.coordinateSystem, this.offsetX, this.offsetY,
+        this.offsetZ, scales[0], scales[1], scales[2]);
+    } else {
+      return this;
     }
   }
 
@@ -109,17 +143,29 @@ public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
 
   @Override
   public int toIntX(final double x) {
-    return (int)Math.round((x - this.offsetX) / this.resolutionX);
+    if (Double.isFinite(x)) {
+      return (int)Math.round((x - this.offsetX) / this.resolutionX);
+    } else {
+      return Integer.MIN_VALUE;
+    }
   }
 
   @Override
   public int toIntY(final double y) {
-    return (int)Math.round((y - this.offsetY) / this.resolutionY);
+    if (Double.isFinite(y)) {
+      return (int)Math.round((y - this.offsetY) / this.resolutionY);
+    } else {
+      return Integer.MIN_VALUE;
+    }
   }
 
   @Override
   public int toIntZ(final double z) {
-    return (int)Math.round((z - this.offsetZ) / this.resolutionZ);
+    if (Double.isFinite(z)) {
+      return (int)Math.round((z - this.offsetZ) / this.resolutionZ);
+    } else {
+      return Integer.MIN_VALUE;
+    }
   }
 
   @Override

@@ -187,8 +187,8 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
                                                                                  // type
       final short version = this.reader.getShort();
-      final GeometryFactory geometryFactory = ScaledIntegerGriddedDigitalElevationModelReader
-        .readGeometryFactory(this.reader);
+      final GeometryFactory geometryFactory = GeometryFactory
+        .readOffsetScaled3d(this.reader);
       this.scaleZ = geometryFactory.getScaleZ();
 
       final double minX = reader.getDouble();

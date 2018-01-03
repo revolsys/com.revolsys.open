@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileIoFactory;
@@ -14,6 +15,14 @@ import com.revolsys.spring.resource.Resource;
 
 public interface RecordWriterFactory
   extends FileIoFactory, GeometryWriterFactory, IoFactoryWithCoordinateSystem {
+
+  @Override
+  default GeometryWriter newGeometryWriter(final Resource resource, final MapEx properties) {
+    final RecordDefinition recordDefinition = Records.newGeometryRecordDefinition();
+    final RecordWriter recordWriter = newRecordWriter(recordDefinition, resource);
+    recordWriter.setProperties(properties);
+    return new RecordWriterGeometryWriter(recordWriter);
+  }
 
   @Override
   default GeometryWriter newGeometryWriter(final String baseName, final OutputStream out,

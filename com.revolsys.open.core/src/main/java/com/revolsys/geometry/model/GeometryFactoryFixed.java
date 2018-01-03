@@ -74,6 +74,28 @@ public class GeometryFactoryFixed extends GeometryFactory {
   }
 
   @Override
+  public GeometryFactory convertToFixed(final double defaultScale) {
+    boolean conversionRequired = false;
+    for (final double scale : this.scales) {
+      if (scale <= 0) {
+        conversionRequired = true;
+      }
+    }
+    if (conversionRequired) {
+      final double[] scales = Arrays.copyOf(this.scales, this.scales.length);
+      for (int i = 0; i < scales.length; i++) {
+        final double scale = scales[i];
+        if (scale <= 0) {
+          scales[i] = defaultScale;
+        }
+      }
+      return convertScales(scales);
+    } else {
+      return this;
+    }
+  }
+
+  @Override
   protected boolean equalsScales(final double[] scales) {
     final int minLength = Math.min(this.scales.length, scales.length);
     for (int i = 0; i < minLength; i++) {

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -21,17 +22,13 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
 
   private ChannelWriter writer;
 
-  private double scaleXy;
-
-  private double scaleZ;
-
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.fixed3d(0, 1000.0, 1000.0, 1000.0);
 
   private ByteBuffer byteBuffer;
 
-  public ScaledIntegerPointCloudGeometryWriter(final Resource resource) {
+  public ScaledIntegerPointCloudGeometryWriter(final Resource resource, final MapEx properties) {
     this.resource = resource;
-    setGeometryFactory(GeometryFactory.fixed3d(0, 1000.0, 1000.0, 1000.0));
+    setProperties(properties);
   }
 
   @Override
@@ -43,18 +40,21 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
     }
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
   private void initialize() throws IOException {
     if (!this.initialized) {
       this.initialized = true;
-      this.writer = this.resource.newChannelWriter(this.byteBuffer);
-
-      final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
-      this.writer.putBytes(ScaledIntegerPointCloud.FILE_TYPE_HEADER_BYTES); // File
-                                                                            // type
-      this.writer.putShort(ScaledIntegerPointCloud.VERSION); // version
-      this.writer.putInt(coordinateSystemId);
-      this.writer.putDouble(this.scaleXy);
-      this.writer.putDouble(this.scaleZ);
+      final ChannelWriter writer = this.resource.newChannelWriter(this.byteBuffer);
+      this.writer = writer;
+      final GeometryFactory geometryFactory = this.geometryFactory;
+      writer.putBytes(ScaledIntegerPointCloud.FILE_TYPE_HEADER_BYTES); // File
+                                                                       // type
+      writer.putShort(ScaledIntegerPointCloud.VERSION); // version
+      writer.putShort((short)0); // Flags
+      GeometryFactory.writeOffsetScaled3d(writer, geometryFactory);
     }
   }
 
@@ -67,15 +67,7 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
 
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-    this.scaleXy = geometryFactory.getScaleXY();
-    if (this.scaleXy <= 0) {
-      this.scaleXy = 1000;
-    }
-    this.scaleZ = geometryFactory.getScaleZ();
-    if (this.scaleZ <= 0) {
-      this.scaleZ = 1000;
-    }
+    this.geometryFactory = geometryFactory.convertToFixed(1000.0);
   }
 
   @Override
@@ -91,26 +83,13 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
     try {
       initialize();
       final ChannelWriter writer = this.writer;
-      final double scaleXy = this.scaleXy;
-      final double scaleZ = this.scaleZ;
-      if (Double.isFinite(x)) {
-        final int intValue = (int)Math.round(x * scaleXy);
-        writer.putInt(intValue);
-      } else {
-        writer.putInt(Integer.MIN_VALUE);
-      }
-      if (Double.isFinite(y)) {
-        final int intValue = (int)Math.round(y * scaleXy);
-        writer.putInt(intValue);
-      } else {
-        writer.putInt(Integer.MIN_VALUE);
-      }
-      if (Double.isFinite(z)) {
-        final int intValue = (int)Math.round(z * scaleZ);
-        writer.putInt(intValue);
-      } else {
-        writer.putInt(Integer.MIN_VALUE);
-      }
+      final GeometryFactory geometryFactory = this.geometryFactory;
+      final int xInt = geometryFactory.toIntX(x);
+      writer.putInt(xInt);
+      final int yInt = geometryFactory.toIntY(y);
+      writer.putInt(yInt);
+      final int zInt = geometryFactory.toIntZ(z);
+      writer.putInt(zInt);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
@@ -125,7 +104,7 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
       final double z = point.getZ();
       write(x, y, z);
     } else {
-      throw new IllegalArgumentException("Only points supported");
+      throw new IllegalArgumentException("Only points supported: " + geometry);
     }
   }
 }
