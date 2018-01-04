@@ -7,7 +7,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 
 public class PointDouble extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -108,7 +108,7 @@ public class PointDouble extends AbstractPoint implements Serializable {
   }
 
   @Override
-  public void forEachVertex(final DoubleConsumer3 action) {
+  public void forEachVertex(final Consumer3Double action) {
     if (!isEmpty()) {
       final double x = this.coordinates[0];
       final double y = this.coordinates[1];

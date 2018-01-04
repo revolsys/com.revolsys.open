@@ -84,7 +84,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.function.Function4Double;
 import com.revolsys.util.number.Doubles;
 
@@ -1383,7 +1383,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   void forEachVertex(double[] coordinates, Consumer<double[]> action);
 
-  void forEachVertex(DoubleConsumer3 action);
+  void forEachVertex(Consumer3Double action);
 
   default void forEachVertex(final GeometryFactory geometryFactory,
     final Consumer<double[]> action) {

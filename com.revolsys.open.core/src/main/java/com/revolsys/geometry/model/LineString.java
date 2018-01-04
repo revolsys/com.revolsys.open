@@ -78,7 +78,7 @@ import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.number.Doubles;
 
 /**
@@ -759,7 +759,7 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default void forEachVertex(final DoubleConsumer3 action) {
+  default void forEachVertex(final Consumer3Double action) {
     if (!isEmpty()) {
       final int vertexCount = getVertexCount();
       for (int i = 0; i < vertexCount; i++) {

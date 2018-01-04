@@ -3,7 +3,7 @@ package com.revolsys.geometry.model.impl;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 
 public abstract class AbstractTriangle extends AbstractPolygon implements Triangle {
   /**
@@ -53,7 +53,7 @@ public abstract class AbstractTriangle extends AbstractPolygon implements Triang
   }
 
   @Override
-  public void forEachVertex(final DoubleConsumer3 action) {
+  public void forEachVertex(final Consumer3Double action) {
     if (!isEmpty()) {
       for (int i = 0; i < 3; i++) {
         final double x = getX(i);

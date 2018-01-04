@@ -47,7 +47,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.function.Function4Double;
 
 public class RectangleXY extends AbstractPolygon {
@@ -147,7 +147,7 @@ public class RectangleXY extends AbstractPolygon {
     }
 
     @Override
-    public void forEachVertex(final DoubleConsumer3 action) {
+    public void forEachVertex(final Consumer3Double action) {
       action.accept(RectangleXY.this.minX, RectangleXY.this.minY, Double.NaN);
       action.accept(RectangleXY.this.maxX, RectangleXY.this.minY, Double.NaN);
       action.accept(RectangleXY.this.maxX, RectangleXY.this.maxY, Double.NaN);
@@ -354,7 +354,7 @@ public class RectangleXY extends AbstractPolygon {
   }
 
   @Override
-  public void forEachVertex(final DoubleConsumer3 action) {
+  public void forEachVertex(final Consumer3Double action) {
     action.accept(this.minX, this.minY, Double.NaN);
     action.accept(this.maxX, this.minY, Double.NaN);
     action.accept(this.maxX, this.maxY, Double.NaN);

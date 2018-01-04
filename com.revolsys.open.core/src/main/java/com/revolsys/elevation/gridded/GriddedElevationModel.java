@@ -25,7 +25,7 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 
 public interface GriddedElevationModel extends ObjectWithProperties, BoundingBoxProxy {
   String GEOMETRY_FACTORY = "geometryFactory";
@@ -114,7 +114,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     }
   }
 
-  default void forEachPoint(final DoubleConsumer3 action) {
+  default void forEachPoint(final Consumer3Double action) {
     final double gridCellSize = getGridCellSize();
     final double minY = getGridMinY();
     final double minX = getGridMinX();
@@ -199,7 +199,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     }
   }
 
-  default void forEachPointFinite(final DoubleConsumer3 action) {
+  default void forEachPointFinite(final Consumer3Double action) {
     final double gridCellSize = getGridCellSize();
     final double minY = getGridMinY();
     final double minX = getGridMinX();

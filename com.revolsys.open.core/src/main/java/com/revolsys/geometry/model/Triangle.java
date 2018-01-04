@@ -680,4 +680,16 @@ public interface Triangle extends Polygon {
     return false;
   }
 
+  static double getElevation(final List<Triangle> triangles, final double x, final double y) {
+    for (final Triangle triangle : triangles) {
+      if (triangle.contains(x, y)) {
+        final double z = triangle.getElevation(x, y);
+        if (Double.isFinite(z)) {
+          return z;
+        }
+      }
+    }
+    return Double.NaN;
+  }
+
 }

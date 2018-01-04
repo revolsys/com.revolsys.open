@@ -85,7 +85,7 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 
 /**
  * Supplies a set of utility methods for building Geometry objects from lists
@@ -126,7 +126,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
 
     @Override
-    public void forEachVertex(final DoubleConsumer3 action) {
+    public void forEachVertex(final Consumer3Double action) {
     }
 
     @Override

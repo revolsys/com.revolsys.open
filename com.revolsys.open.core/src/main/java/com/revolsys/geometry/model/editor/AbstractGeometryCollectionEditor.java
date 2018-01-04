@@ -15,7 +15,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.function.Function4Double;
 
 public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G extends Geometry, GE extends GeometryEditor<?>>
@@ -193,7 +193,7 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
   }
 
   @Override
-  public void forEachVertex(final DoubleConsumer3 action) {
+  public void forEachVertex(final Consumer3Double action) {
     for (final GeometryEditor<?> editor : this.editors) {
       editor.forEachVertex(action);
     }

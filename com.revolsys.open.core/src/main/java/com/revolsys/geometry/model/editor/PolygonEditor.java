@@ -16,7 +16,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.function.Function4Double;
 
 public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
@@ -196,7 +196,7 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   }
 
   @Override
-  public void forEachVertex(final DoubleConsumer3 action) {
+  public void forEachVertex(final Consumer3Double action) {
     for (final GeometryEditor<?> editor : this.editors) {
       editor.forEachVertex(action);
     }

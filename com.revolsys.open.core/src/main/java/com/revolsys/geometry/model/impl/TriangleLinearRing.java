@@ -5,7 +5,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.function.Function4Double;
 
 public class TriangleLinearRing extends AbstractLineString implements LinearRing {
@@ -71,7 +71,7 @@ public class TriangleLinearRing extends AbstractLineString implements LinearRing
   }
 
   @Override
-  public void forEachVertex(final DoubleConsumer3 action) {
+  public void forEachVertex(final Consumer3Double action) {
     if (!isEmpty()) {
       final Triangle triangle = this.triangle;
       for (int i = 0; i < 3; i++) {

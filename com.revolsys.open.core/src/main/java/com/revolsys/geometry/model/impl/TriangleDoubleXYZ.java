@@ -3,7 +3,7 @@ package com.revolsys.geometry.model.impl;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.util.function.BiConsumerDouble;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 
 public class TriangleDoubleXYZ extends AbstractTriangle {
   private static final long serialVersionUID = 1l;
@@ -76,7 +76,7 @@ public class TriangleDoubleXYZ extends AbstractTriangle {
   }
 
   @Override
-  public void forEachVertex(final DoubleConsumer3 action) {
+  public void forEachVertex(final Consumer3Double action) {
     if (!isEmpty()) {
       action.accept(this.x1, this.y1, this.z1);
       action.accept(this.x2, this.y2, this.z2);

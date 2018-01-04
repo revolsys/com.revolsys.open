@@ -51,7 +51,7 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.DoubleConsumer3;
+import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.function.Function4Double;
 
 /**
@@ -239,7 +239,7 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
-  public void forEachVertex(final DoubleConsumer3 action) {
+  public void forEachVertex(final Consumer3Double action) {
     for (final Geometry editor : this.geometries) {
       editor.forEachVertex(action);
     }
