@@ -135,6 +135,18 @@ public interface Polygonal extends Geometry {
     return getCoordinate(partIndex, ringIndex, vertexIndex, Z);
   }
 
+  default Polygonal intersectionPolygonal(final Geometry geometry) {
+    final Geometry intersection = intersection(geometry);
+    if (intersection instanceof Polygonal) {
+      return (Polygonal)intersection;
+    } else {
+      final List<Polygon> polygons = new ArrayList<>();
+      intersection.forEachPolygon(polygons::add);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.polygonal(polygons);
+    }
+  }
+
   @Override
   default boolean isContainedInBoundary(final BoundingBox boundingBox) {
     return false;

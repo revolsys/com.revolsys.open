@@ -326,10 +326,11 @@ public interface Paths {
 
   static boolean hasFileNameExtension(final Path path, final String... fileExtensions) {
     final String fileName = getFileName(path);
-    final String fileNameExtension = FileNames.getFileNameExtension(fileName);
-    for (final String expectedFileExtension : fileExtensions) {
-      if (expectedFileExtension.equals(fileNameExtension)) {
-        return true;
+    for (final String fileNameExtension : FileNames.getFileNameExtensions(fileName)) {
+      for (final String expectedFileExtension : fileExtensions) {
+        if (expectedFileExtension.equals(fileNameExtension)) {
+          return true;
+        }
       }
     }
     return false;
