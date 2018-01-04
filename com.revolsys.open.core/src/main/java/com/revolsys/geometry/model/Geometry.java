@@ -1661,7 +1661,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     final int axisCount = getAxisCount();
     if (axisCount == 2) {
       return GeometryFactory.DEFAULT_2D;
-    } else if (axisCount == 2) {
+    } else if (axisCount == 3) {
       return GeometryFactory.DEFAULT_3D;
     } else {
       return GeometryFactory.floating(0, axisCount);

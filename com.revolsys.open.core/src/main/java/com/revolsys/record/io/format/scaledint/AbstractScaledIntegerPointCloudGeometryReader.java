@@ -23,10 +23,6 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
 
   private ChannelReader reader;
 
-  private double scaleXy;
-
-  private double scaleZ;
-
   private GeometryFactory geometryFactory;
 
   private boolean exists = false;
@@ -64,9 +60,9 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
         final int xInt = reader.getInt();
         final int yInt = reader.getInt();
         final int zInt = reader.getInt();
-        final double x = xInt / this.scaleXy;
-        final double y = yInt / this.scaleXy;
-        final double z = zInt / this.scaleZ;
+        final double x = this.geometryFactory.toDoubleX(xInt);
+        final double y = this.geometryFactory.toDoubleY(yInt);
+        final double z = this.geometryFactory.toDoubleZ(zInt);
         return (G)this.geometryFactory.point(x, y, z);
       } catch (final WrappedException e) {
         if (e.getCause() instanceof EOFException) {
@@ -87,7 +83,8 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
       this.exists = false;
     } else {
       this.exists = true;
-      final String fileType = reader.getString(4, StandardCharsets.UTF_8); // File type
+      final String fileType = reader.getString(4, StandardCharsets.UTF_8); // File
+                                                                           // type
       if (!ScaledIntegerPointCloud.FILE_TYPE_HEADER.equals(fileType)) {
         throw new IllegalArgumentException("File must start with the text: "
           + ScaledIntegerPointCloud.FILE_TYPE_HEADER + " not " + fileType);

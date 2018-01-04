@@ -1,5 +1,7 @@
 package com.revolsys.geometry.model.impl;
 
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Triangle;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.DoubleConsumer3;
 
@@ -52,6 +54,16 @@ public class TriangleDoubleXYZ extends AbstractTriangle {
   @Override
   public TriangleDoubleXYZ clone() {
     return (TriangleDoubleXYZ)super.clone();
+  }
+
+  @Override
+  public boolean contains(final double x, final double y) {
+    return Triangle.containsPoint(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y);
+  }
+
+  @Override
+  public boolean containsPoint(final double x, final double y) {
+    return Triangle.containsPoint(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y);
   }
 
   @Override
@@ -128,6 +140,11 @@ public class TriangleDoubleXYZ extends AbstractTriangle {
     return new double[] {
       this.x1, this.y1, this.z1, this.x2, this.y2, this.z2, this.x3, this.y3, this.z3
     };
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return GeometryFactory.DEFAULT_3D;
   }
 
   @Override
