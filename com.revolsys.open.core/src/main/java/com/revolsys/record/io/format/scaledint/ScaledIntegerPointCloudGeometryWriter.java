@@ -54,7 +54,7 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
                                                                        // type
       writer.putShort(ScaledIntegerPointCloud.VERSION); // version
       writer.putShort((short)0); // Flags
-      GeometryFactory.writeOffsetScaled3d(writer, geometryFactory);
+      geometryFactory.writeOffsetScaled3d(writer);
     }
   }
 

@@ -29,12 +29,6 @@ public class ScaledIntegerTriangulatedIrregularNetworkReader extends BaseObjectW
 
   private ChannelReader in;
 
-  private double scaleX;
-
-  private double scaleY;
-
-  private double scaleZ;
-
   private boolean closed = false;
 
   private boolean exists;
@@ -62,23 +56,22 @@ public class ScaledIntegerTriangulatedIrregularNetworkReader extends BaseObjectW
 
   public void forEachTriangle(final TriangleConsumer action) {
     open();
+    final GeometryFactory geometryFactory = this.geometryFactory;
+    final ChannelReader in = this.in;
     try {
-      final double scaleX = this.scaleX;
-      final double scaleY = this.scaleY;
-      final double scaleZ = this.scaleZ;
       boolean hasMore = true;
       while (hasMore) {
         int triangleVertexCount = 0;
         try {
-          final double x1 = getDouble(scaleX);
-          final double y1 = getDouble(scaleY);
-          final double z1 = getDouble(scaleZ);
-          final double x2 = getDouble(scaleX);
-          final double y2 = getDouble(scaleY);
-          final double z2 = getDouble(scaleZ);
-          final double x3 = getDouble(scaleX);
-          final double y3 = getDouble(scaleY);
-          final double z3 = getDouble(scaleZ);
+          final double x1 = geometryFactory.toDoubleX(in.getInt());
+          final double y1 = geometryFactory.toDoubleY(in.getInt());
+          final double z1 = geometryFactory.toDoubleZ(in.getInt());
+          final double x2 = geometryFactory.toDoubleX(in.getInt());
+          final double y2 = geometryFactory.toDoubleY(in.getInt());
+          final double z2 = geometryFactory.toDoubleZ(in.getInt());
+          final double x3 = geometryFactory.toDoubleX(in.getInt());
+          final double y3 = geometryFactory.toDoubleY(in.getInt());
+          final double z3 = geometryFactory.toDoubleZ(in.getInt());
           action.accept(x1, y1, z1, x2, y2, z2, x3, y3, z3);
           triangleVertexCount = 9;
         } catch (final WrappedException e) {
@@ -91,15 +84,6 @@ public class ScaledIntegerTriangulatedIrregularNetworkReader extends BaseObjectW
       }
     } finally {
       close();
-    }
-  }
-
-  private double getDouble(final double scale) {
-    final int intValue = this.in.getInt();
-    if (intValue == Integer.MIN_VALUE) {
-      return Double.NaN;
-    } else {
-      return intValue / scale;
     }
   }
 
@@ -183,12 +167,7 @@ public class ScaledIntegerTriangulatedIrregularNetworkReader extends BaseObjectW
       StandardCharsets.ISO_8859_1); // File type
     @SuppressWarnings("unused")
     final short version = this.in.getShort();
-    final int coordinateSystemId = this.in.getInt(); // Coordinate System ID
-    this.scaleX = this.in.getDouble();
-    this.scaleY = this.in.getDouble();
-    this.scaleZ = this.in.getDouble();
-    this.geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, this.scaleX, this.scaleY,
-      this.scaleZ);
+    this.geometryFactory = GeometryFactory.readOffsetScaled3d(this.in);
     final double minX = this.in.getDouble();
     final double minY = this.in.getDouble();
     final double maxX = this.in.getDouble();

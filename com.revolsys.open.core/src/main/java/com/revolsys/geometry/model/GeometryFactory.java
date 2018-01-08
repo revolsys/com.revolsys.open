@@ -642,18 +642,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return floating3d(3857);
   }
 
-  public static void writeOffsetScaled3d(final ChannelWriter writer,
-    final GeometryFactory geometryFactory) {
-    final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
-    writer.putInt(coordinateSystemId);
-    writer.putDouble(geometryFactory.getOffsetX());
-    writer.putDouble(geometryFactory.getScaleX());
-    writer.putDouble(geometryFactory.getOffsetY());
-    writer.putDouble(geometryFactory.getScaleY());
-    writer.putDouble(geometryFactory.getOffsetZ());
-    writer.putDouble(geometryFactory.getScaleZ());
-  }
-
   protected final int axisCount;
 
   private final BoundingBox boundingBoxEmpty = new BoundingBoxEmpty(this);
@@ -2385,5 +2373,16 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     string.append(", axisCount=");
     string.append(this.axisCount);
     return string.toString();
+  }
+
+  public void writeOffsetScaled3d(final ChannelWriter writer) {
+    final int coordinateSystemId = getCoordinateSystemId();
+    writer.putInt(coordinateSystemId);
+    writer.putDouble(getOffsetX());
+    writer.putDouble(getScaleX());
+    writer.putDouble(getOffsetY());
+    writer.putDouble(getScaleY());
+    writer.putDouble(getOffsetZ());
+    writer.putDouble(getScaleZ());
   }
 }

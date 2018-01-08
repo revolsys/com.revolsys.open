@@ -37,40 +37,11 @@ public class ScaledIntegerTriangulatedIrregularNetworkWriter extends BaseObjectW
       ChannelWriter out = this.resource.newChannelWriter()) {
       final BoundingBox tinBoundingBox = tin.getBoundingBox();
 
-      final GeometryFactory geometryFactory = tin.getGeometryFactory();
-
-      final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
-      double scaleX;
-      {
-        double scale = geometryFactory.getScaleX();
-        if (scale <= 0) {
-          scale = 1000;
-        }
-        scaleX = scale;
-      }
-      double scaleY;
-      {
-        double scale = geometryFactory.getScaleY();
-        if (scale <= 0) {
-          scale = 1000;
-        }
-        scaleY = scale;
-      }
-      double scaleZ;
-      {
-        double scale = geometryFactory.getScaleZ();
-        if (scale <= 0) {
-          scale = 1000;
-        }
-        scaleZ = scale;
-      }
+      final GeometryFactory geometryFactory = tin.getGeometryFactory().convertToFixed(1000.0);
 
       out.putBytes(ScaledIntegerTriangulatedIrregularNetwork.FILE_TYPE_BYTES);
       out.putShort(ScaledIntegerTriangulatedIrregularNetwork.VERSION);
-      out.putInt(coordinateSystemId); // Coordinate System ID
-      out.putDouble(scaleX); // Scale X
-      out.putDouble(scaleY); // Scale Y
-      out.putDouble(scaleZ); // Scale Z
+      geometryFactory.writeOffsetScaled3d(out);
       out.putDouble(tinBoundingBox.getMinX()); // minX
       out.putDouble(tinBoundingBox.getMinY()); // minY
       out.putDouble(tinBoundingBox.getMaxX()); // maxX
@@ -81,24 +52,12 @@ public class ScaledIntegerTriangulatedIrregularNetworkWriter extends BaseObjectW
           final double x = triangle.getX(i);
           final double y = triangle.getY(i);
           final double z = triangle.getZ(i);
-          if (Double.isFinite(x)) {
-            final int intX = (int)Math.round(x * scaleX);
-            out.putInt(intX);
-          } else {
-            out.putInt(Integer.MIN_VALUE);
-          }
-          if (Double.isFinite(y)) {
-            final int intY = (int)Math.round(y * scaleY);
-            out.putInt(intY);
-          } else {
-            out.putInt(Integer.MIN_VALUE);
-          }
-          if (Double.isFinite(z)) {
-            final int intZ = (int)Math.round(z * scaleZ);
-            out.putInt(intZ);
-          } else {
-            out.putInt(Integer.MIN_VALUE);
-          }
+          final int intX = geometryFactory.toIntX(x);
+          out.putInt(intX);
+          final int intY = geometryFactory.toIntY(y);
+          out.putInt(intY);
+          final int intZ = geometryFactory.toIntZ(z);
+          out.putInt(intZ);
         }
       });
     } catch (final Exception e) {
