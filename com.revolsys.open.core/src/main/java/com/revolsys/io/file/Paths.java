@@ -47,6 +47,10 @@ public interface Paths {
 
   OpenOption[] OPEN_OPTIONS_NONE = new OpenOption[0];
 
+  OpenOption[] OPEN_OPTIONS_APPEND = {
+    StandardOpenOption.APPEND, StandardOpenOption.WRITE
+  };
+
   Set<OpenOption> OPEN_OPTIONS_NONE_SET = Collections.emptySet();
 
   Set<OpenOption> OPEN_OPTIONS_WRITE_SET = Sets.newHash(StandardOpenOption.WRITE,

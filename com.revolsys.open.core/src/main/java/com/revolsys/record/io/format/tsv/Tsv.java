@@ -87,8 +87,7 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory,
-    final MapEx properties) {
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
     final CsvRecordReader reader = new CsvRecordReader(resource, recordFactory,
       Tsv.FIELD_SEPARATOR);
     reader.setProperties(properties);
@@ -96,7 +95,7 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+  public CsvRecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     return new CsvRecordWriter(recordDefinition, resource, Tsv.FIELD_SEPARATOR, true, true);
   }

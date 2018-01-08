@@ -29,6 +29,8 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private final boolean useQuotes;
 
+  private boolean paused = false;
+
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Path path,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     this(recordDefinition, new PathResource(path), fieldSeparator, useQuotes, ewkt);
@@ -99,6 +101,29 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     return this.recordDefinition;
   }
 
+  public void pause() {
+    final Resource resource = getResource();
+    if (resource == null) {
+      throw new IllegalStateException("Cannot pause without a resource");
+    }
+    if (!this.paused) {
+      final Writer out = this.out;
+      if (out != null) {
+        this.paused = true;
+        flush();
+        try {
+          out.flush();
+        } catch (final IOException e) {
+        }
+        try {
+          out.close();
+        } catch (final IOException e) {
+        }
+        this.out = null;
+      }
+    }
+  }
+
   private void string(final Object value) throws IOException {
     final Writer out = this.out;
     if (out != null) {
@@ -121,7 +146,12 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   @Override
   public void write(final Record record) {
-    final Writer out = this.out;
+    Writer out = this.out;
+    if (this.paused) {
+      this.paused = false;
+      final Resource resource = getResource();
+      out = this.out = resource.newWriterAppend();
+    }
     if (out != null) {
       try {
         final RecordDefinition recordDefinition = this.recordDefinition;

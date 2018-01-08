@@ -441,6 +441,10 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
+  default OutputStream newOutputStreamAppend() {
+    throw new UnsupportedOperationException("Cannot created appended output stream for:" + this);
+  }
+
   default PrintWriter newPrintWriter() {
     final Writer writer = newWriter();
     return new PrintWriter(writer);
@@ -499,6 +503,11 @@ public interface Resource extends org.springframework.core.io.Resource {
   default Writer newWriter(final Charset charset) {
     final OutputStream stream = newOutputStream();
     return new OutputStreamWriter(stream, charset);
+  }
+
+  default Writer newWriterAppend() {
+    final OutputStream stream = newOutputStreamAppend();
+    return FileUtil.newUtf8Writer(stream);
   }
 
   default Path toPath() {
