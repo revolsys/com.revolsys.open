@@ -230,7 +230,9 @@ public class ChannelReader implements BaseCloseable {
     final ByteBuffer buffer = this.buffer;
     final ByteBuffer tempBuffer = this.tempBuffer;
     tempBuffer.clear();
-    tempBuffer.put(buffer);
+    if (this.available > 0) {
+      tempBuffer.put(buffer);
+    }
     final int readCount = count - this.available;
     this.available = 0;
     read(readCount);

@@ -7,6 +7,7 @@ import java.util.function.DoubleConsumer;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.gridded.byn.Byn;
 import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
 import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation;
@@ -94,6 +95,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     IoFactoryRegistry.addFactory(new ScaledIntegerGriddedDigitalElevation());
     IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());
     IoFactoryRegistry.addFactory(new UsgsGriddedElevation());
+    IoFactoryRegistry.addFactory(new Byn());
   }
 
   default void cancelChanges() {

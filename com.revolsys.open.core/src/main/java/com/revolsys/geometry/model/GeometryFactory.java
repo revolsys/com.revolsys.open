@@ -543,6 +543,10 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return dataTypes;
   }
 
+  public static GeometryFactory nad83() {
+    return floating3d(4269);
+  }
+
   @SuppressWarnings("unchecked")
   public static <G extends Geometry> G newGeometry(final List<? extends Geometry> geometries) {
     if (geometries == null || geometries.size() == 0) {
