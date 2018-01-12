@@ -83,7 +83,7 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
   }
 
   public static TablePanel newPanel() {
-    final BaseJTable table = newTable();
+    final BaseJTable table = newTaskTable();
     final TablePanel panel = new TablePanel(table);
     final BackgroundTaskTableModel model = table.getTableModel();
     final JToolBar toolBar = panel.getToolBar();
@@ -93,7 +93,7 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
     return panel;
   }
 
-  public static BaseJTable newTable() {
+  private static BaseJTable newTaskTable() {
     final BackgroundTaskTableModel model = new BackgroundTaskTableModel();
     final BaseJTable table = new BaseJTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -301,7 +301,8 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
 
   private void removeDoneWorkers(final List<SwingWorker<?, ?>> workers) {
     for (final Iterator<Entry<SwingWorker<?, ?>, BackgroundTask>> iterator = this.taskBySwingWorker
-      .entrySet().iterator(); iterator.hasNext();) {
+      .entrySet()
+      .iterator(); iterator.hasNext();) {
       final Entry<SwingWorker<?, ?>, BackgroundTask> entry = iterator.next();
       final SwingWorker<?, ?> worker = entry.getKey();
       if (worker.isDone() || !workers.contains(worker)) {

@@ -826,8 +826,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public RecordDefinition getRecordDefinition(final RecordDefinition sourceRecordDefinition) {
+  public <RD extends RecordDefinition> RD getRecordDefinition(
+    final RecordDefinition sourceRecordDefinition) {
     synchronized (this.apiSync) {
       if (getGeometryFactory() == null) {
         setGeometryFactory(sourceRecordDefinition.getGeometryFactory());
@@ -842,7 +844,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           recordDefinition = newTableRecordDefinition(sourceRecordDefinition);
         }
       }
-      return recordDefinition;
+      return (RD)recordDefinition;
     }
   }
 
@@ -914,11 +916,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       appendQueryValue(query, whereClause, whereCondition);
     }
     return whereClause;
-  }
-
-  protected boolean hasCatalogPath(final String path) {
-    final String catalogPath = this.catalogPathByPath.get(path);
-    return catalogPath != null;
   }
 
   private boolean hasChildDataset(final Geodatabase geodatabase, final String parentCatalogPath,

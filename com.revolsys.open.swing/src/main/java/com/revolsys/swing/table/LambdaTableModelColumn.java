@@ -7,8 +7,10 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import com.revolsys.swing.map.layer.elevation.gridded.ColorTableCellRenderer;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.function.Function3;
 
 public class LambdaTableModelColumn<R, V> {
 
@@ -20,6 +22,8 @@ public class LambdaTableModelColumn<R, V> {
 
   private final Function<R, V> getValueFunction;
 
+  private Function3<Integer, Integer, R, V> getValueIndexFunction;
+
   private final BiConsumer<R, V> setValueFunction;
 
   private TableCellEditor cellEditor;
@@ -28,33 +32,24 @@ public class LambdaTableModelColumn<R, V> {
 
   private MenuFactory headerMenuFactory;
 
+  public LambdaTableModelColumn(final String columnName, final Class<?> columnClass) {
+    this(columnName, columnClass, null);
+  }
+
   public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
     final Function<R, V> getValueFunction) {
-    this.columnName = columnName;
-    this.columnClass = columnClass;
-    this.editable = false;
-    this.getValueFunction = getValueFunction;
-    this.setValueFunction = null;
+    this(columnName, columnClass, getValueFunction, null);
   }
 
   public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
     final Function<R, V> getValueFunction, final BiConsumer<R, V> setValueFunction) {
-    this.columnName = columnName;
-    this.columnClass = columnClass;
-    this.editable = true;
-    this.getValueFunction = getValueFunction;
-    this.setValueFunction = setValueFunction;
+    this(columnName, columnClass, getValueFunction, setValueFunction, null, null);
   }
 
   public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
     final Function<R, V> getValueFunction, final BiConsumer<R, V> setValueFunction,
     final Function<V, ? extends Object> renderFunction) {
-    this.columnName = columnName;
-    this.columnClass = columnClass;
-    this.editable = true;
-    this.getValueFunction = getValueFunction;
-    this.setValueFunction = setValueFunction;
-    this.cellRenderer = new LambdaCellRenderer<>(renderFunction);
+    this(columnName, columnClass, getValueFunction, setValueFunction, renderFunction, null);
   }
 
   public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
@@ -62,22 +57,19 @@ public class LambdaTableModelColumn<R, V> {
     final Function<V, ? extends Object> renderFunction, final TableCellEditor cellEditor) {
     this.columnName = columnName;
     this.columnClass = columnClass;
-    this.editable = true;
+    this.editable = setValueFunction != null;
     this.getValueFunction = getValueFunction;
     this.setValueFunction = setValueFunction;
-    this.cellRenderer = new LambdaCellRenderer<>(renderFunction);
+    if (renderFunction != null) {
+      this.cellRenderer = new LambdaCellRenderer<>(renderFunction);
+    }
     this.cellEditor = cellEditor;
   }
 
   public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
     final Function<R, V> getValueFunction, final BiConsumer<R, V> setValueFunction,
     final TableCellEditor cellEditor) {
-    this.columnName = columnName;
-    this.columnClass = columnClass;
-    this.editable = true;
-    this.getValueFunction = getValueFunction;
-    this.setValueFunction = setValueFunction;
-    this.cellEditor = cellEditor;
+    this(columnName, columnClass, getValueFunction, setValueFunction, null, cellEditor);
   }
 
   public void applySettings(final TableColumn tableColumn) {
@@ -116,8 +108,16 @@ public class LambdaTableModelColumn<R, V> {
     return this.headerMenuFactory;
   }
 
-  public V getValue(final R row) {
-    return this.getValueFunction.apply(row);
+  public V getValue(final int rowIndex, final int columnIndex, final R row) {
+    if (this.getValueFunction == null) {
+      if (this.getValueIndexFunction == null) {
+        return null;
+      } else {
+        return this.getValueIndexFunction.apply(rowIndex, columnIndex, row);
+      }
+    } else {
+      return this.getValueFunction.apply(row);
+    }
   }
 
   public boolean isEditable() {
@@ -126,6 +126,16 @@ public class LambdaTableModelColumn<R, V> {
 
   public LambdaTableModelColumn<R, V> setCellEditor(final TableCellEditor editor) {
     this.cellEditor = editor;
+    return this;
+  }
+
+  public void setCellRenderer(final ColorTableCellRenderer cellRenderer) {
+    this.cellRenderer = cellRenderer;
+  }
+
+  public LambdaTableModelColumn<R, V> setGetValueIndexFunction(
+    final Function3<Integer, Integer, R, V> getValueIndexFunction) {
+    this.getValueIndexFunction = getValueIndexFunction;
     return this;
   }
 

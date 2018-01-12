@@ -29,9 +29,9 @@ public class ColorRange extends BaseObjectWithProperties
 
   private double rangeZ;
 
-  private double z;
+  private double percent;
 
-  private double maxZ;
+  private double maxPercent;
 
   private Color maxColor = WebColors.White;
 
@@ -41,13 +41,17 @@ public class ColorRange extends BaseObjectWithProperties
 
   private double multipleZ;
 
+  private double minZ;
+
+  private double maxZ;
+
   public ColorRange() {
     updateValues();
   }
 
-  public ColorRange(final double z, final String color) {
-    this.z = z;
-    setColor(Color.decode(color));
+  public ColorRange(final double percent, final Color color) {
+    this.percent = percent;
+    setColor(color);
   }
 
   public ColorRange(final Map<String, ? extends Object> config) {
@@ -56,13 +60,13 @@ public class ColorRange extends BaseObjectWithProperties
   }
 
   @Override
-  protected ColorRange clone() {
+  public ColorRange clone() {
     return (ColorRange)super.clone();
   }
 
   @Override
   public int compareTo(final ColorRange range) {
-    return Double.compare(this.z, range.z);
+    return Double.compare(this.percent, range.percent);
   }
 
   public Color getColor() {
@@ -77,18 +81,22 @@ public class ColorRange extends BaseObjectWithProperties
     return this.maxColourInt;
   }
 
-  public double getMaxZ() {
-    return this.maxZ;
+  public double getMaxPercent() {
+    return this.maxPercent;
   }
 
   public int getMinColourInt() {
     return this.colourInt;
   }
 
+  public double getPercent() {
+    return this.percent;
+  }
+
   public int getValue(final double elevation) {
     if (Double.isNaN(elevation)) {
       return NULL_COLOUR;
-    } else if (elevation <= this.z) {
+    } else if (elevation <= this.minZ) {
       return this.colourInt;
     } else if (elevation > this.maxZ) {
       return this.maxColourInt;
@@ -98,12 +106,12 @@ public class ColorRange extends BaseObjectWithProperties
   }
 
   public int getValueFast(final double elevation) {
-    if (elevation <= this.z) {
+    if (elevation <= this.minZ) {
       return this.colourInt;
     } else if (elevation > this.maxZ) {
       return NULL_COLOUR;
     } else {
-      final double elevationPercent = (elevation - this.z) * this.multipleZ;
+      final double elevationPercent = (elevation - this.minZ) * this.multipleZ;
       final int red = this.red + (int)Math.round(elevationPercent * this.rangeRed);
       final int green = this.green + (int)Math.round(elevationPercent * this.rangeGreen);
       final int blue = this.blue + (int)Math.round(elevationPercent * this.rangeBlue);
@@ -112,12 +120,8 @@ public class ColorRange extends BaseObjectWithProperties
     }
   }
 
-  public double getZ() {
-    return this.z;
-  }
-
   public boolean inRange(final double elevation) {
-    return this.z <= elevation && elevation <= this.maxZ;
+    return this.percent <= elevation && elevation <= this.maxPercent;
   }
 
   public void setColor(Color color) {
@@ -138,20 +142,31 @@ public class ColorRange extends BaseObjectWithProperties
     updateValues();
   }
 
-  public void setMaxZ(final double maxZ) {
-    this.maxZ = maxZ;
+  public void setMaxPercent(final double maxPercent) {
+    this.maxPercent = maxPercent;
+    updateValues();
   }
 
-  public void setZ(final double z) {
-    this.z = z;
+  public void setMinMaxZ(final double minZ, final double maxZ) {
+    this.minZ = minZ;
+    this.maxZ = maxZ;
+    if (Double.isFinite(this.minZ)) {
+      this.rangeZ = maxZ - minZ;
+    } else {
+      this.rangeZ = 0;
+    }
+  }
+
+  public void setPercent(final double percent) {
+    this.percent = percent;
   }
 
   @Override
   public MapEx toMap() {
     final MapEx map = newTypeMap("griddedElevationModelColorRamp");
     addToMap(map, "color", this.color);
-    if (Double.isFinite(this.z)) {
-      map.add("z", this.z);
+    if (Double.isFinite(this.percent)) {
+      map.add("percent", this.percent);
     }
     return map;
   }
@@ -160,11 +175,6 @@ public class ColorRange extends BaseObjectWithProperties
     this.rangeRed = this.maxColor.getRed() - this.red;
     this.rangeGreen = this.maxColor.getGreen() - this.green;
     this.rangeBlue = this.maxColor.getBlue() - this.blue;
-    if (Double.isFinite(this.z)) {
-      this.rangeZ = this.maxZ - this.z;
-    } else {
-      this.rangeZ = 0;
-    }
     if (this.rangeZ == 0) {
       this.multipleZ = 0;
     } else {

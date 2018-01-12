@@ -94,7 +94,11 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
 
   private byte getByte() {
     final String string = getString(1);
-    return Byte.valueOf(string);
+    if (string.isEmpty()) {
+      return 0;
+    } else {
+      return Byte.valueOf(string);
+    }
   }
 
   protected ReadableByteChannel getChannel() {
@@ -138,23 +142,39 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
 
   private Double getDouble(final int length) {
     final String string = getString(length);
-    return Double.parseDouble(string);
+    if (string.isEmpty()) {
+      return null;
+    } else {
+      return Double.parseDouble(string);
+    }
   }
 
   private double getDouble12() {
     final String string = getString(12);
-    return Double.parseDouble(string);
+    if (string.isEmpty()) {
+      return 0;
+    } else {
+      return Double.parseDouble(string);
+    }
   }
 
   private double getDouble24() {
     final String string = getString(24);
-    return Double.valueOf(string);
+    if (string.isEmpty()) {
+      return 0;
+    } else {
+      return Double.valueOf(string);
+    }
   }
 
   private Double getDoubleSci() {
     String string = getString(24);
-    string = string.replace("D", "E");
-    return Double.valueOf(string);
+    if (string.isEmpty()) {
+      return null;
+    } else {
+      string = string.replace("D", "E");
+      return Double.valueOf(string);
+    }
   }
 
   @Override
@@ -170,12 +190,20 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
 
   private int getInteger() {
     final String string = getString(6);
-    return Integer.valueOf(string);
+    if (string.isEmpty()) {
+      return 0;
+    } else {
+      return Integer.valueOf(string);
+    }
   }
 
   private int getInteger(final int length) {
     final String string = getString(length);
-    return Integer.valueOf(string);
+    if (string.isEmpty()) {
+      return 0;
+    } else {
+      return Integer.valueOf(string);
+    }
   }
 
   private double[] getPolygonCoordinates() {
@@ -192,7 +220,11 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
 
   private short getShort() {
     final String string = getString(5);
-    return Short.valueOf(string);
+    if (string.isEmpty()) {
+      return 0;
+    } else {
+      return Short.valueOf(string);
+    }
   }
 
   private String getString(final int length) {

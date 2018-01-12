@@ -10,7 +10,7 @@ import javax.swing.table.TableColumn;
 
 import com.revolsys.swing.menu.BaseJPopupMenu;
 
-public abstract class LambdaTableModel<R> extends AbstractTableModel {
+public class LambdaTableModel<R> extends AbstractTableModel {
 
   private static final long serialVersionUID = 1L;
 
@@ -26,12 +26,12 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
     this.rows = rows;
   }
 
-  protected LambdaTableModelColumn<R, ?> addColumn(final LambdaTableModelColumn<R, ?> column) {
+  public LambdaTableModelColumn<R, ?> addColumn(final LambdaTableModelColumn<R, ?> column) {
     this.columns.add(column);
     return column;
   }
 
-  protected <V> LambdaTableModelColumn<R, V> addColumn(final String columnName,
+  public <V> LambdaTableModelColumn<R, V> addColumn(final String columnName,
     final Class<?> columnClass, final Function<R, V> getValueFunction) {
     final LambdaTableModelColumn<R, V> column = new LambdaTableModelColumn<>(columnName,
       columnClass, getValueFunction);
@@ -39,7 +39,7 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
     return column;
   }
 
-  protected <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
+  public <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
     final Class<?> columnClass, final Function<R, V> getValueFunction,
     final BiConsumer<R, V> setValueFunction) {
     final LambdaTableModelColumn<R, V> column = new LambdaTableModelColumn<>(columnName,
@@ -48,7 +48,7 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
     return column;
   }
 
-  protected <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
+  public <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
     final Class<?> columnClass, final Function<R, V> getValueFunction,
     final BiConsumer<R, V> setValueFunction, final Function<V, ? extends Object> renderFunction) {
     final LambdaTableModelColumn<R, V> column = new LambdaTableModelColumn<>(columnName,
@@ -57,7 +57,7 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
     return column;
   }
 
-  protected <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
+  public <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
     final Class<?> columnClass, final Function<R, V> getValueFunction,
     final BiConsumer<R, V> setValueFunction, final Function<V, ? extends Object> renderFunction,
     final TableCellEditor cellEditor) {
@@ -67,12 +67,20 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
     return column;
   }
 
-  protected <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
+  public <V> LambdaTableModelColumn<R, ?> addColumn(final String columnName,
     final Class<?> columnClass, final Function<R, V> getValueFunction,
     final BiConsumer<R, V> setValueFunction, final TableCellEditor cellEditor) {
     final LambdaTableModelColumn<R, V> column = new LambdaTableModelColumn<>(columnName,
       columnClass, getValueFunction, setValueFunction, cellEditor);
     this.columns.add(column);
+    return column;
+  }
+
+  public LambdaTableModelColumn<R, ?> addColumnIndex() {
+    final LambdaTableModelColumn<R, Integer> column = new LambdaTableModelColumn<>("index",
+      Integer.TYPE);
+    column.setGetValueIndexFunction((rowIndex, columnIndex, row) -> rowIndex);
+    addColumn(column);
     return column;
   }
 
@@ -90,7 +98,7 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
     }
   }
 
-  protected LambdaTableModelColumn<R, ?> getColumn(final int columnIndex) {
+  public LambdaTableModelColumn<R, ?> getColumn(final int columnIndex) {
     return this.columns.get(columnIndex);
   }
 
@@ -130,7 +138,8 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
     final R row = getRow(rowIndex);
-    return getColumn(columnIndex).getValue(row);
+    final LambdaTableModelColumn<R, ?> column = getColumn(columnIndex);
+    return column.getValue(rowIndex, columnIndex, row);
   }
 
   @Override
@@ -138,7 +147,14 @@ public abstract class LambdaTableModel<R> extends AbstractTableModel {
     return getColumn(columnIndex).isEditable();
   }
 
-  protected void setRows(final List<R> rows) {
+  @Override
+  public BaseJTable newTable() {
+    final BaseJTable table = super.newTable();
+    applyTableColumnSettings(table);
+    return table;
+  }
+
+  public void setRows(final List<R> rows) {
     this.rows = rows;
     fireTableDataChanged();
   }

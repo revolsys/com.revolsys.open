@@ -47,12 +47,7 @@ public class Log4jTableModel extends AbstractTableModel {
     tabs.setSelectedIndex(tabIndex);
   }
 
-  public static TablePanel newPanel() {
-    final BaseJTable table = newTable();
-    return new TablePanel(table);
-  }
-
-  public static BaseJTable newTable() {
+  private static BaseJTable newLogTable() {
     final Log4jTableModel model = new Log4jTableModel();
     final BaseJTable table = new BaseJTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -90,6 +85,11 @@ public class Log4jTableModel extends AbstractTableModel {
       }
     });
     return table;
+  }
+
+  public static TablePanel newPanel() {
+    final BaseJTable table = newLogTable();
+    return new TablePanel(table);
   }
 
   private final ListLog4jAppender appender = new ListLog4jAppender(this);

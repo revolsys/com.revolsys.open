@@ -22,6 +22,8 @@ public abstract class AbstractGriddedElevationModelRasterizer
 
   private final String type;
 
+  protected double rangeZ;
+
   public AbstractGriddedElevationModelRasterizer(final String type, final String iconName) {
     this.type = type;
     this.iconName = iconName;
@@ -55,6 +57,10 @@ public abstract class AbstractGriddedElevationModelRasterizer
   @Override
   public double getMinZ() {
     return this.minZ;
+  }
+
+  public double getRangeZ() {
+    return this.rangeZ;
   }
 
   @Override
@@ -95,6 +101,7 @@ public abstract class AbstractGriddedElevationModelRasterizer
   }
 
   protected void updateValues() {
+    this.rangeZ = this.maxZ - this.minZ;
   }
 
 }

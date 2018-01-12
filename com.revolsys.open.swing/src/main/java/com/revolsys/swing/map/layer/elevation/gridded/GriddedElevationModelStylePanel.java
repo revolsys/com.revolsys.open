@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.swing.field.Field;
@@ -37,17 +38,23 @@ public class GriddedElevationModelStylePanel extends BaseStylePanel
       addPanel(this, "Style", this.rasterizer, "minZ", "maxZ", "minColour", "maxColour");
     } else if (this.rasterizer instanceof HillShadeGriddedElevationModelRasterizer) {
       addPanel(this, "Style", this.rasterizer, "azimuthDegrees", "zenithDegrees", "zFactor");
+    } else if (this.rasterizer instanceof ColorRampGriddedElevationModelRasterizer) {
+      addPanel(this, "Style", this.rasterizer, "colorRanges");
     }
   }
 
   @Override
   protected Field newField(final String fieldName, final Class<?> fieldClass, final Object value) {
     if ("opacity".equals(fieldName)) {
-
       final PercentSlider opacityField = new PercentSlider("opacity", (float)value);
       Property.addListener(opacityField, this);
       opacityField.setMaximumSize(new Dimension(100, 25));
       return opacityField;
+    } else if ("colorRanges".equals(fieldName)) {
+      final ColorRampStylePanel field = new ColorRampStylePanel(
+        (ColorRampGriddedElevationModelRasterizer)this.rasterizer);
+      Property.addListener(field, this);
+      return field;
     } else {
       return super.newField(fieldName, fieldClass, value);
     }

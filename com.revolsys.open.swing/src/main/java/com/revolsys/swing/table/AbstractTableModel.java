@@ -8,12 +8,14 @@ import java.util.function.IntConsumer;
 
 import javax.annotation.PreDestroy;
 import javax.swing.JComponent;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumnModel;
 
 import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.tsv.Tsv;
@@ -22,6 +24,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.undo.AbstractUndoableEdit;
+import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.function.IntBiConsumer;
 
 public abstract class AbstractTableModel extends javax.swing.table.AbstractTableModel
@@ -34,6 +38,8 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private BaseJTable table;
+
+  private final UndoManager undoManager = new UndoManager();
 
   public AbstractTableModel() {
   }
@@ -48,7 +54,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   * @param iconName
   * @param action
   */
-  protected void addMenuItem(final String groupName, final int index, final String title,
+  public void addMenuItem(final String groupName, final int index, final String title,
     final String iconName, final Consumer<BaseJTable> action) {
     getMenu().addMenuItem(groupName, index, title, iconName, () -> {
       final BaseJTable eventTable = TablePanel.getEventTable();
@@ -68,7 +74,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
    * @param iconName
    * @param action
    */
-  protected void addMenuItem(final String groupName, final int index, final String title,
+  public void addMenuItem(final String groupName, final int index, final String title,
     final String iconName, final IntBiConsumer action) {
     getMenu().addMenuItem(groupName, index, title, iconName, () -> {
       final int eventRow = TablePanel.getEventRow();
@@ -88,7 +94,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   * @param iconName
   * @param action
   */
-  protected void addMenuItem(final String groupName, final int index, final String title,
+  public void addMenuItem(final String groupName, final int index, final String title,
     final String iconName, final IntConsumer action) {
     getMenu().addMenuItem(groupName, index, title, iconName, () -> {
       final int eventRow = TablePanel.getEventRow();
@@ -108,7 +114,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
    * @param iconName
    * @param action
    */
-  protected void addMenuItem(final String groupName, final String title, final String iconName,
+  public void addMenuItem(final String groupName, final String title, final String iconName,
     final Consumer<BaseJTable> action) {
     addMenuItem(groupName, -1, title, iconName, action);
   }
@@ -123,7 +129,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
    * @param iconName
    * @param action
    */
-  protected void addMenuItem(final String groupName, final String title, final String iconName,
+  public void addMenuItem(final String groupName, final String title, final String iconName,
     final IntBiConsumer action) {
     addMenuItem(groupName, -1, title, iconName, action);
   }
@@ -137,7 +143,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
    * @param iconName
    * @param action
    */
-  protected void addMenuItem(final String groupName, final String title, final String iconName,
+  public void addMenuItem(final String groupName, final String title, final String iconName,
     final IntConsumer action) {
     addMenuItem(groupName, -1, title, iconName, action);
   }
@@ -194,6 +200,10 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
     return this.table;
   }
 
+  public UndoManager getUndoManager() {
+    return this.undoManager;
+  }
+
   public boolean isEmpty() {
     return getRowCount() == 0;
   }
@@ -202,8 +212,21 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
     return null;
   }
 
+  public BaseJTable newTable() {
+    final BaseJTable table = new BaseJTable(this);
+    this.undoManager.addKeyMap(table);
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    table.setAutoCreateColumnsFromModel(true);
+    return table;
+  }
+
   public TableColumnModel newTableColumnModel() {
     return null;
+  }
+
+  public TablePanel newTablePanel() {
+    final BaseJTable table = newTable();
+    return new TablePanel(table);
   }
 
   public void setMenu(final MenuFactory menu) {
@@ -212,6 +235,37 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   public void setTable(final BaseJTable table) {
     this.table = table;
+  }
+
+  public void setValueUndo(final Object value, final int rowIndex, final int columnIndex) {
+    final Object oldValue = getValueAt(rowIndex, columnIndex);
+    if (!DataType.equal(value, oldValue)) {
+      this.undoManager.addEdit(new AbstractUndoableEdit() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public boolean canRedo() {
+          final Object currentValue = getValueAt(rowIndex, columnIndex);
+          return DataType.equal(currentValue, oldValue);
+        }
+
+        @Override
+        public boolean canUndo() {
+          final Object currentValue = getValueAt(rowIndex, columnIndex);
+          return DataType.equal(currentValue, value);
+        }
+
+        @Override
+        protected void redoDo() {
+          setValueAt(value, rowIndex, columnIndex);
+        }
+
+        @Override
+        protected void undoDo() {
+          setValueAt(oldValue, rowIndex, columnIndex);
+        }
+      });
+    }
   }
 
   public String toCopyValue(final int row, final int column, final Object value) {
