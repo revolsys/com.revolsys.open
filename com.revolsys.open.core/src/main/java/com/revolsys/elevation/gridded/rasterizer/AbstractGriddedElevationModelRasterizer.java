@@ -30,6 +30,11 @@ public abstract class AbstractGriddedElevationModelRasterizer
   }
 
   @Override
+  public AbstractGriddedElevationModelRasterizer clone() {
+    return (AbstractGriddedElevationModelRasterizer)super.clone();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return this.elevationModel.getBoundingBox();
   }

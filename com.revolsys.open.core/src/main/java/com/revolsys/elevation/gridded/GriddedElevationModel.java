@@ -6,9 +6,14 @@ import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.awt.gradient.GradientStop;
+import com.revolsys.awt.gradient.MultiStopLinearGradient;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.byn.Byn;
 import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
+import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
 import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
@@ -23,6 +28,7 @@ import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
@@ -96,6 +102,18 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());
     IoFactoryRegistry.addFactory(new UsgsGriddedElevation());
     IoFactoryRegistry.addFactory(new Byn());
+
+    MapObjectFactoryRegistry.newFactory("gradientStop", GradientStop::new);
+    MapObjectFactoryRegistry.newFactory("multiStopLinearGradient", MultiStopLinearGradient::new);
+
+    // Rasterizers
+    MapObjectFactoryRegistry.newFactory("colorGriddedElevationModelRasterizer",
+      ColorGriddedElevationModelRasterizer::new);
+    MapObjectFactoryRegistry.newFactory("colorRampGriddedElevationModelRasterizer",
+      ColorRampGriddedElevationModelRasterizer::new);
+    MapObjectFactoryRegistry.newFactory("hillShadeGriddedElevationModelRasterizer",
+      HillShadeGriddedElevationModelRasterizer::new);
+
   }
 
   default void cancelChanges() {

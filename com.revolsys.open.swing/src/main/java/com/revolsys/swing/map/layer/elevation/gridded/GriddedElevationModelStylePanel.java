@@ -76,4 +76,11 @@ public class GriddedElevationModelStylePanel extends BaseStylePanel
       setFieldValue(name, value);
     }
   }
+
+  @Override
+  public void save() {
+    final RasterizerGriddedElevationModelLayerRenderer renderer = getRenderer();
+    renderer.setRasterizer(this.rasterizer);
+    super.save();
+  }
 }

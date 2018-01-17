@@ -33,7 +33,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
 
   private GriddedElevationModelImage image;
 
-  private Thread worker;
+  private transient Thread worker;
 
   private GriddedElevationModelRasterizer rasterizer;
 
@@ -66,6 +66,15 @@ public class RasterizerGriddedElevationModelLayerRenderer
   public RasterizerGriddedElevationModelLayerRenderer(final Map<String, ? extends Object> config) {
     this();
     setProperties(config);
+  }
+
+  @Override
+  public RasterizerGriddedElevationModelLayerRenderer clone() {
+    final RasterizerGriddedElevationModelLayerRenderer clone = (RasterizerGriddedElevationModelLayerRenderer)super.clone();
+    clone.rasterizer = this.rasterizer.clone();
+    clone.worker = null;
+    clone.image = null;
+    return clone;
   }
 
   @SuppressWarnings("unchecked")

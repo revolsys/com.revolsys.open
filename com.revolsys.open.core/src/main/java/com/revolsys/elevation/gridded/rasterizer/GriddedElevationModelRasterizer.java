@@ -9,8 +9,10 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.util.IconNameProxy;
 
-public interface GriddedElevationModelRasterizer extends BoundingBoxProxy, IconNameProxy,
+public interface GriddedElevationModelRasterizer extends BoundingBoxProxy, Cloneable, IconNameProxy,
   MapSerializer, ObjectWithProperties, PropertyChangeSupportProxy {
+
+  GriddedElevationModelRasterizer clone();
 
   GriddedElevationModel getElevationModel();
 

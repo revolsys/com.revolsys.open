@@ -22,7 +22,6 @@ import javax.swing.table.TableModel;
 
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.elevation.gridded.rasterizer.ColorRange;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.MenuFactory;
@@ -115,6 +114,10 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
   private final MenuFactory headerMenu = new MenuFactory(getClass().getName());
 
+  public TablePanel(final AbstractTableModel tableModel) {
+    this(new BaseJTable(tableModel));
+  }
+
   public TablePanel(final BaseJTable table) {
     super(new BorderLayout());
     eventRow = -1;
@@ -141,10 +144,6 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
     menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value", "paste_plain",
       new ObjectPropertyEnableCheck(this, "canPaste"), this::pasteFieldValue);
-  }
-
-  public TablePanel(final LambdaTableModel<ColorRange> tableModel) {
-    this(new BaseJTable(tableModel));
   }
 
   @Override

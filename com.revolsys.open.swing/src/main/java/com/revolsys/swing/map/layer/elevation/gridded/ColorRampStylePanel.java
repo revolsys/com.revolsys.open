@@ -1,39 +1,34 @@
 package com.revolsys.swing.map.layer.elevation.gridded;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
 
+import com.revolsys.awt.gradient.GradientStop;
+import com.revolsys.awt.gradient.MultiStopLinearGradient;
 import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
-import com.revolsys.elevation.gridded.rasterizer.ColorRange;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.table.LambdaTableModel;
 import com.revolsys.swing.table.TablePanel;
 
 public class ColorRampStylePanel extends ValueField {
 
-  private final ColorRampGriddedElevationModelRasterizer style;
-
-  private final List<ColorRange> colorRanges;
-
   public ColorRampStylePanel(final ColorRampGriddedElevationModelRasterizer style) {
     super("colorRanges", null);
-    this.style = style;
-    this.colorRanges = new ArrayList<>(style.getColorRanges());
-    final LambdaTableModel<ColorRange> tableModel = new LambdaTableModel<ColorRange>(
-      this.colorRanges);
+    final MultiStopLinearGradient gradient = (MultiStopLinearGradient)style.getGradient();
+    final LambdaTableModel<GradientStop> tableModel = new LambdaTableModel<GradientStop>(
+      gradient.getStops());
 
     tableModel.addColumnIndex();
 
-    tableModel.addColumn("Elevation", Double.TYPE, ColorRange::getPercent, ColorRange::setPercent);
+    tableModel.addColumn("Elevation", Double.TYPE, GradientStop::getPercent,
+      GradientStop::setPercent);
 
     tableModel
-      .addColumn("Color", Color.class, ColorRange::getColor, ColorRange::setColor,
+      .addColumn("Color", Color.class, GradientStop::getColor, GradientStop::setColor,
         new ColorTableCellEditor())//
       .setCellRenderer(new ColorTableCellRenderer());
 
     tableModel.addMenuItem("row", "Delete", "delete", (rowIndex, columnIndex) -> {
-      this.colorRanges.remove(rowIndex);
+      gradient.removeStop(rowIndex);
       tableModel.fireTableRowsDeleted(rowIndex, columnIndex);
     });
 
@@ -41,9 +36,4 @@ public class ColorRampStylePanel extends ValueField {
     add(tablePanel);
   }
 
-  @Override
-  protected void saveDo() {
-    this.style.setColorRanges(this.colorRanges);
-    super.saveDo();
-  }
 }
