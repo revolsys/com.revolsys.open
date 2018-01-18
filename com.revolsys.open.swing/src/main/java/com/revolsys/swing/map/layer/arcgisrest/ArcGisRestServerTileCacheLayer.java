@@ -102,7 +102,7 @@ public class ArcGisRestServerTileCacheLayer
     if (mapService != null) {
       if (!isHasError()) {
         try {
-          final double metresPerPixel = viewport.getUnitsPerPixel();
+          final double metresPerPixel = viewport.getMetresPerPixel();
           final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
           final double resolution = getResolution(viewport);
           if (resolution > 0) {
@@ -143,7 +143,7 @@ public class ArcGisRestServerTileCacheLayer
     if (mapService == null) {
       return 0;
     } else {
-      final double metresPerPixel = viewport.getUnitsPerPixel();
+      final double metresPerPixel = viewport.getMetresPerPixel();
       final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
       return mapService.getResolution(zoomLevel);
     }

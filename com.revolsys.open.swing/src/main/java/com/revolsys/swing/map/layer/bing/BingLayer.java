@@ -70,7 +70,7 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
   public List<BingMapTile> getOverlappingMapTiles(final Viewport2D viewport) {
     final List<BingMapTile> tiles = new ArrayList<>();
     try {
-      final double metresPerPixel = viewport.getUnitsPerPixel();
+      final double metresPerPixel = viewport.getMetresPerPixel();
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
@@ -102,7 +102,7 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
 
   @Override
   public double getResolution(final Viewport2D viewport) {
-    final double metresPerPixel = viewport.getUnitsPerPixel();
+    final double metresPerPixel = viewport.getMetresPerPixel();
     final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
     return this.client.getResolution(zoomLevel);
   }

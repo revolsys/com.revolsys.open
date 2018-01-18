@@ -20,6 +20,7 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -211,10 +212,13 @@ public interface BoundingBox
     return s.toString();
   }
 
+  /**
+   * If the coordinate system is a projected coordinate system then clip to the {@link CoordinateSystem#getAreaBoundingBox()}.
+   */
   default BoundingBox clipToCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    if (coordinateSystem == null) {
+    if (coordinateSystem == null || coordinateSystem instanceof GeographicCoordinateSystem) {
       return this;
     } else {
       final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();

@@ -43,7 +43,7 @@ import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.field.LengthMeasureTextField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.component.MarkerField;
 import com.revolsys.swing.map.layer.Layer;
@@ -337,7 +337,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
   private Field newScaleField(final String fieldName, final Long value) {
     final List<Long> scales = new ArrayList<>();
     scales.add(Long.MAX_VALUE);
-    scales.addAll(MapPanel.SCALES);
+    scales.addAll(Viewport2D.SCALES);
     final ComboBox<Long> field = ComboBox.newComboBox(fieldName, scales, MapScale::formatScale);
     ((FunctionStringConverter<?>)field.getRenderer()).setHorizontalAlignment(SwingConstants.RIGHT);
     ((JTextField)field.getEditor().getEditorComponent())

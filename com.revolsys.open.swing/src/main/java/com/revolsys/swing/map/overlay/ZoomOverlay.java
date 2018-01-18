@@ -197,24 +197,26 @@ public class ZoomOverlay extends AbstractOverlay {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent event) {
     if (canOverrideOverlayAction(ACTION_ZOOM)) {
-      int numSteps = 1;
-      if (event.getUnitsToScroll() < 0) {
-        numSteps = -1;
-      }
-      if (SwingUtil.isScrollReversed()) {
-        numSteps = -numSteps;
-      }
-      if (!isWheelForwardsZoomIn()) {
-        numSteps = -numSteps;
-      }
+      if (Math.abs(event.getWheelRotation()) == 1 && event.getModifiersEx() == 0) {
+        int numSteps = 1;
+        if (event.getUnitsToScroll() < 0) {
+          numSteps = -1;
+        }
+        if (SwingUtil.isScrollReversed()) {
+          numSteps = -numSteps;
+        }
+        if (!isWheelForwardsZoomIn()) {
+          numSteps = -numSteps;
+        }
 
-      final int x = event.getX();
-      final int y = event.getY();
-      final Viewport2D viewport = getViewport();
-      final Point mapPoint = viewport.toModelPoint(x, y);
-      final MapPanel map = getMap();
-      map.zoom(mapPoint, numSteps);
-      event.consume();
+        final int x = event.getX();
+        final int y = event.getY();
+        final Viewport2D viewport = getViewport();
+        final Point mapPoint = viewport.toModelPoint(x, y);
+        final MapPanel map = getMap();
+        map.zoom(mapPoint, numSteps);
+        event.consume();
+      }
     }
   }
 

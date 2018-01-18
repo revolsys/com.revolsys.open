@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.old;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.map.ComponentViewport2D;
@@ -36,8 +37,10 @@ public class FactorZoomMode implements ZoomMode {
         newBoundingBox = boundingBox.convert(geometryFactory);
       }
 
-      final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
-      newBoundingBox = boundingBox.intersection(areaBoundingBox);
+      if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+        final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
+        newBoundingBox = boundingBox.intersection(areaBoundingBox);
+      }
     }
     final double viewAspectRatio = viewport.getViewAspectRatio();
     final double modelAspectRatio = newBoundingBox.getAspectRatio();

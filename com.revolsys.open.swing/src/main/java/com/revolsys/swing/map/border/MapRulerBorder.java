@@ -276,7 +276,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
         if (startIndex < minIndex) {
           startIndex = minIndex;
         }
-        for (long index = startIndex; index < maxIndex; index++) {
+        for (long index = startIndex; index <= maxIndex; index++) {
           final Measure<Q> measureValue = Measure.valueOf(index, stepUnit);
           final double value = toBaseUnit(measureValue);
           final double displayValue = measureValue.doubleValue(displayUnit);
@@ -373,7 +373,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
         if (startIndex < minIndex) {
           startIndex = minIndex;
         }
-        for (long index = startIndex; index < maxIndex; index++) {
+        for (long index = startIndex; index <= maxIndex; index++) {
           final Measure<Q> measureValue = Measure.valueOf(index, stepUnit);
           final double value = toBaseUnit(measureValue);
           final double displayValue = measureValue.doubleValue(displayUnit);
@@ -433,12 +433,19 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
     this.rulerCoordinateSystem = this.rulerGeometryFactory.getCoordinateSystem();
     this.baseUnit = this.rulerCoordinateSystem.getUnit();
 
-    final BoundingBox areaBoundingBox = this.rulerCoordinateSystem.getAreaBoundingBox();
+    if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
+      this.areaMinX = -180;
+      this.areaMaxX = 180;
+      this.areaMinY = -90;
+      this.areaMaxY = 90;
+    } else {
+      final BoundingBox areaBoundingBox = this.rulerCoordinateSystem.getAreaBoundingBox();
 
-    this.areaMinX = areaBoundingBox.getMinX();
-    this.areaMaxX = areaBoundingBox.getMaxX();
-    this.areaMinY = areaBoundingBox.getMinY();
-    this.areaMaxY = areaBoundingBox.getMaxY();
+      this.areaMinX = areaBoundingBox.getMinX();
+      this.areaMaxX = areaBoundingBox.getMaxX();
+      this.areaMinY = areaBoundingBox.getMinY();
+      this.areaMaxY = areaBoundingBox.getMaxY();
+    }
   }
 
   @SuppressWarnings("unchecked")

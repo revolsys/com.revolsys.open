@@ -13,7 +13,7 @@ import javax.swing.SwingConstants;
 
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.component.ComponentFactory;
-import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Exceptions;
@@ -107,7 +107,7 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
       }
       addScaleMenuItem(layerScale, menu, object, 0);
       boolean scaleIncluded = layerScale == 0;
-      for (final long scale : MapPanel.SCALES) {
+      for (final long scale : Viewport2D.SCALES) {
         if (layerScale == scale) {
           scaleIncluded = true;
         } else if (!scaleIncluded) {

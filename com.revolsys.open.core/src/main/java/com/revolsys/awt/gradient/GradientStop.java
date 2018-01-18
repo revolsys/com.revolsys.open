@@ -154,7 +154,7 @@ public class GradientStop extends BaseObjectWithProperties
 
   @Override
   public MapEx toMap() {
-    final MapEx map = newTypeMap("griddedElevationModelColorRamp");
+    final MapEx map = newTypeMap("gradientStop");
     addToMap(map, "color", this.color);
     if (Double.isFinite(this.percent)) {
       map.add("percent", this.percent);

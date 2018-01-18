@@ -149,7 +149,7 @@ public class TiledGriddedElevationModelLayer
 
   @Override
   public double getResolution(final Viewport2D viewport) {
-    final double metresPerPixel = viewport.getUnitsPerPixel();
+    final double metresPerPixel = viewport.getMetresPerPixel();
     final int count = this.resolutions.size();
     for (int i = 0; i < count - 1; i++) {
       final double resolution1 = this.resolutions.get(i);

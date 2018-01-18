@@ -12,7 +12,6 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -93,7 +92,6 @@ import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
@@ -102,10 +100,6 @@ import com.revolsys.value.GlobalBooleanValue;
 
 public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyChangeListener {
   public static final String MAP_PANEL = "INTERNAL_layeredPanel";
-
-  public static final List<Long> SCALES = Arrays.asList(500000000L, 250000000L, 100000000L,
-    50000000L, 25000000L, 10000000L, 5000000L, 2500000L, 1000000L, 500000L, 250000L, 100000L,
-    50000L, 25000L, 10000L, 5000L, 2500L, 1000L, 500L, 250L, 100L, 50L, 25L, 10L, 5L, 1L);
 
   private static final long serialVersionUID = 1L;
 
@@ -205,8 +199,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private double scale = 500000000;
 
-  private List<Long> scales = new ArrayList<>();
-
   private SelectMapCoordinateSystem selectCoordinateSystem;
 
   private final GlobalBooleanValue settingBoundingBox = new GlobalBooleanValue(false);
@@ -278,9 +270,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       this.zoomHistoryIndex = 0;
     }
     Property.addListener(this.viewport, this);
-
-    initScales();
-    this.viewport.setScales(getScales());
 
     final MapRulerBorder border = new MapRulerBorder(this.viewport);
     this.layeredPanel.setBorder(border);
@@ -641,11 +630,15 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public double getScale() {
-    return this.scale;
+    if (this.viewport == null) {
+      return Double.NaN;
+    } else {
+      return this.viewport.getScale();
+    }
   }
 
   public List<Long> getScales() {
-    return this.scales;
+    return this.viewport.getScales();
   }
 
   public List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
@@ -672,52 +665,12 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.viewport;
   }
 
-  public long getZoomInScale(final double scale, final int steps) {
-    final long scaleCeil = (long)Math.floor(scale);
-    for (int i = 0; i < this.scales.size(); i++) {
-      long nextScale = this.scales.get(i);
-      if (nextScale < scaleCeil) {
-        for (int j = 1; j < steps && i + j < this.scales.size(); j++) {
-          nextScale = this.scales.get(i + j);
-        }
-        return nextScale;
-      }
-    }
-    return this.scales.get(this.scales.size() - 1);
-  }
-
-  public long getZoomOutScale(final double scale, final int steps) {
-    final long scaleCeil = (long)Math.floor(scale);
-    for (int i = this.scales.size() - 1; i >= 0; i--) {
-      long nextScale = this.scales.get(i);
-      if (nextScale > scaleCeil) {
-        for (int j = 1; j < steps && i - j >= 0; j++) {
-          nextScale = this.scales.get(i - j);
-        }
-        return nextScale;
-      }
-    }
-    return this.scales.get(0);
-  }
-
   public boolean hasOverlayAction() {
     return !this.overlayActionStack.isEmpty();
   }
 
   public boolean hasOverlayAction(final String overlayAction) {
     return this.overlayActionStack.contains(overlayAction);
-  }
-
-  public void initScales() {
-    // double multiplier = 0.001;
-    // for (int i = 0; i < 9; i++) {
-    // addScale(1 * multiplier);
-    // addScale(2 * multiplier);
-    // addScale(5 * multiplier);
-    // multiplier *= 10;
-    // }
-    // Collections.reverse(this.scales);
-    this.scales = SCALES;
   }
 
   public boolean isInitializing() {
@@ -916,34 +869,37 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     final String propertyName = event.getPropertyName();
+    final Object oldValue = event.getOldValue();
+    final Object newValue = event.getNewValue();
     if (AbstractRecordLayer.RECORDS_SELECTED.equals(propertyName)) {
-      final List<LayerRecord> oldRecords = (List<LayerRecord>)event.getOldValue();
+      final List<LayerRecord> oldRecords = (List<LayerRecord>)oldValue;
       this.selectedRecordsIndex.removeRecords(oldRecords);
 
-      final List<LayerRecord> newRecords = (List<LayerRecord>)event.getNewValue();
+      final List<LayerRecord> newRecords = (List<LayerRecord>)newValue;
       this.selectedRecordsIndex.addRecords(newRecords);
     } else if (source == this.project) {
       if ("viewBoundingBox".equals(propertyName)) {
-        final BoundingBox boundingBox = (BoundingBox)event.getNewValue();
+        final BoundingBox boundingBox = (BoundingBox)newValue;
         setBoundingBox(boundingBox);
       } else if ("geometryFactory".equals(propertyName)) {
-        final GeometryFactory geometryFactory = (GeometryFactory)event.getNewValue();
-        setGeometryFactory(geometryFactory);
+        final GeometryFactory oldGeometryFactory = (GeometryFactory)oldValue;
+        final GeometryFactory newGeometryFactory = (GeometryFactory)newValue;
+        setGeometryFactory(oldGeometryFactory, newGeometryFactory);
       }
     } else if (source == this.viewport) {
       if ("geometryFactory".equals(propertyName)) {
-        final GeometryFactory geometryFactory = this.viewport.getGeometryFactory();
-        setGeometryFactory(geometryFactory);
+        final GeometryFactory oldGeometryFactory = (GeometryFactory)oldValue;
+        final GeometryFactory newGeometryFactory = (GeometryFactory)newValue;
+        setGeometryFactory(oldGeometryFactory, newGeometryFactory);
       } else if ("boundingBox".equals(propertyName)) {
         final BoundingBox boundingBox = this.viewport.getBoundingBox();
         setBoundingBox(boundingBox);
-      } else if ("scale".equals(propertyName)) {
-        final double scale = this.viewport.getScale();
-        setScale(scale);
+      } else if ("unitsPerPixel".equals(propertyName)) {
+        repaint();
       }
     } else if (source == this.baseMapOverlay) {
       if ("layer".equals(propertyName)) {
-        final Layer layer = (Layer)event.getNewValue();
+        final Layer layer = (Layer)newValue;
         if (this.baseMapLayerField != null) {
           if (layer == null) {
             this.baseMapLayerField.setSelectedItem(0);
@@ -956,7 +912,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       if ("layers".equals(propertyName)) {
         if (this.baseMapOverlay != null) {
           final Layer selectedLayer = this.baseMapOverlay.getLayer();
-          final Layer newLayer = (Layer)event.getNewValue();
+          final Layer newLayer = (Layer)newValue;
           if (selectedLayer != newLayer) {
             if (selectedLayer != null) {
               final LayerGroup selectedLayerParent = selectedLayer.getLayerGroup();
@@ -991,12 +947,12 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       final LayerRecord record = (LayerRecord)source;
       if (propertyName.equals(record.getGeometryFieldName())) {
         if (record.isSelected()) {
-          final Geometry oldValue = (Geometry)event.getOldValue();
-          if (oldValue == null) {
+          final Geometry oldGeometry = (Geometry)oldValue;
+          if (oldGeometry == null) {
             final BoundingBox boundingBox = record.getGeometry().getBoundingBox();
             this.selectedRecordsIndex.removeItem(boundingBox, record);
           } else {
-            final BoundingBox boundingBox = oldValue.getBoundingBox();
+            final BoundingBox boundingBox = oldGeometry.getBoundingBox();
             this.selectedRecordsIndex.removeItem(boundingBox, record);
           }
           this.selectedRecordsIndex.addRecord(record);
@@ -1035,7 +991,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
           if (this.project != null) {
             this.project.setViewBoundingBox(resizedBoundingBox);
 
-            setScale(this.viewport.getScale());
+            // setScale(this.viewport.getScale());
             synchronized (this.zoomHistory) {
               if (this.updateZoomHistory.isTrue() && !this.viewport.isComponentResizing()) {
                 BoundingBox currentBoundingBox = null;
@@ -1074,15 +1030,17 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     });
   }
 
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    if (!isSameCoordinateSystem(geometryFactory)) {
-      final LayerRecordQuadTree selectedRecordsIndex = new LayerRecordQuadTree(geometryFactory);
-      AbstractRecordLayer.forEachSelectedRecords(this.project, selectedRecordsIndex::addRecords);
-      this.selectedRecordsIndex = selectedRecordsIndex;
-    }
-    this.project.setGeometryFactory(geometryFactory);
-    this.viewport.setGeometryFactory(geometryFactory);
+  private void setGeometryFactory(final GeometryFactory oldGeometryFactory,
+    final GeometryFactory newGeometryFactory) {
+    final LayerRecordQuadTree selectedRecordsIndex = new LayerRecordQuadTree(newGeometryFactory);
+    AbstractRecordLayer.forEachSelectedRecords(this.project, selectedRecordsIndex::addRecords);
+    this.selectedRecordsIndex = selectedRecordsIndex;
+
+    this.project.setGeometryFactory(newGeometryFactory);
+    this.viewport.setGeometryFactory(newGeometryFactory);
+
     repaint();
+    firePropertyChange("geometryFactory", oldGeometryFactory, newGeometryFactory);
   }
 
   public void setInitializing(final boolean initializing) {
@@ -1149,23 +1107,16 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public synchronized void setScale(double scale) {
-    if (!this.settingScale && !Double.isNaN(scale) && !Double.isInfinite(scale)) {
+    if (!this.settingScale && this.viewport != null && Double.isFinite(scale) && scale > 0) {
       try {
         this.settingScale = true;
         if (!getGeometryFactory().isGeographics()) {
           scale = Doubles.makePrecise(10.0, scale);
         }
         if (scale >= 0.1) {
-          final double oldValue = this.scale;
-          final double oldUnitsPerPixel = getUnitsPerPixel();
-          if (scale != oldValue) {
+          if (scale != this.scale) {
             this.viewport.setScale(scale);
             this.scale = scale;
-            firePropertyChange("scale", oldValue, scale);
-            final double unitsPerPixel = getUnitsPerPixel();
-            if (Math.abs(unitsPerPixel - oldUnitsPerPixel) > 0.0001) {
-              firePropertyChange("unitsPerPixel", oldUnitsPerPixel, unitsPerPixel);
-            }
             repaint();
           }
         }
@@ -1185,17 +1136,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     Invoke.later(() -> {
       this.toolTipOverlay.setText(location, text);
     });
-  }
-
-  public void setUnitsPerPixel(final double unitsPerPixel) {
-    if (this.viewport != null) {
-      double scale = this.viewport.getScaleForUnitsPerPixel(unitsPerPixel);
-      scale = Doubles.makePrecise(10.0, scale);
-      final double oldUnitsPerPixel = getUnitsPerPixel();
-      if (!MathUtil.precisionEqual(unitsPerPixel, oldUnitsPerPixel, 10000000.0)) {
-        setScale(scale);
-      }
-    }
   }
 
   private void setViewportCursor(final Cursor cursor) {
@@ -1259,27 +1199,39 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public void zoom(final Point mapPoint, final int steps) {
-    final Viewport2D viewport = getViewport();
-    final BoundingBox boundingBox = getBoundingBox();
-    final double width = boundingBox.getWidth();
-    final double height = boundingBox.getHeight();
-    final double scale = getScale();
     long newScale;
-    if (steps == 0) {
-      return;
-    } else if (steps < 0) {
-      newScale = getZoomInScale(scale, -steps);
-    } else {
-      newScale = getZoomOutScale(scale, steps);
-    }
-    if (newScale > 0 && Math.abs(newScale - scale) > 0.0001) {
-      final double unitsPerPixel = viewport.getUnitsPerPixel(newScale);
+    if (steps != 0) {
+      double newUnitsPerPixel;
+      if (this.viewport.isZoomByUnitsPerPixel()) {
+        final double oldUnitsPerPixel = getUnitsPerPixel();
+        if (steps < 0) {
+          newUnitsPerPixel = this.viewport.getZoomInUnitsPerPixel(oldUnitsPerPixel, -steps);
+        } else {
+          newUnitsPerPixel = this.viewport.getZoomOutUnitsPerPixel(oldUnitsPerPixel, steps);
+        }
+      } else {
+        final double oldScale = getScale();
+        if (steps < 0) {
+          newScale = this.viewport.getZoomInScale(oldScale, -steps);
+        } else {
+          newScale = this.viewport.getZoomOutScale(oldScale, steps);
+        }
+        if (newScale > 0 && Math.abs(newScale - oldScale) > 0.0001) {
+          return;
+        } else {
+          newUnitsPerPixel = this.viewport.getUnitsPerPixel(newScale);
+        }
+      }
+      final Viewport2D viewport = getViewport();
+      final BoundingBox boundingBox = getBoundingBox();
+      final double width = boundingBox.getWidth();
+      final double height = boundingBox.getHeight();
 
       final int viewWidthPixels = viewport.getViewWidthPixels();
-      final double newWidth = viewWidthPixels * unitsPerPixel;
+      final double newWidth = viewWidthPixels * newUnitsPerPixel;
 
       final int viewHeightPixels = viewport.getViewHeightPixels();
-      final double newHeight = viewHeightPixels * unitsPerPixel;
+      final double newHeight = viewHeightPixels * newUnitsPerPixel;
 
       final double x = mapPoint.getX();
       final double x1 = boundingBox.getMinX();
@@ -1303,9 +1255,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public void zoomIn() {
-    final double scale = getScale();
-    final long newScale = getZoomInScale(scale, 1);
-    setScale(newScale);
+    this.viewport.zoomIn();
   }
 
   public void zoomNext() {
@@ -1313,9 +1263,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public void zoomOut() {
-    final double scale = getScale();
-    final long newScale = getZoomOutScale(scale, 1);
-    setScale(newScale);
+    this.viewport.zoomOut();
   }
 
   public void zoomPrevious() {

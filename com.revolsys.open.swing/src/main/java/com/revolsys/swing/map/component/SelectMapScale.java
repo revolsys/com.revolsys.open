@@ -20,7 +20,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
-public class SelectMapScale extends JComboBox
+public class SelectMapScale extends JComboBox<Long>
   implements ItemListener, PropertyChangeListener, ActionListener {
   private static final long serialVersionUID = 1L;
 
@@ -31,14 +31,15 @@ public class SelectMapScale extends JComboBox
     this.map = new WeakReference<>(map);
 
     setEditable(true);
-    final FunctionStringConverter renderer = new FunctionStringConverter(MapScale::formatScale);
+    final FunctionStringConverter<Long> renderer = new FunctionStringConverter<Long>(
+      MapScale::formatScale);
     renderer.setHorizontalAlignment(SwingConstants.RIGHT);
     final SelectMapScaleEditor editor = new SelectMapScaleEditor(getEditor(), renderer);
     setEditor(editor);
     setRenderer(renderer);
     addItemListener(this);
     addActionListener(this);
-    Property.addListener(map, "scale", this);
+    Property.addListener(map.getViewport(), "scale", this);
     final Dimension size = new Dimension(140, 22);
     setPreferredSize(size);
     setMaximumSize(size);
@@ -103,7 +104,7 @@ public class SelectMapScale extends JComboBox
         }
         final Number newValue = (Number)event.getNewValue();
 
-        if (scale > 0 && !Double.isInfinite(scale) && !Double.isNaN(scale)) {
+        if (scale > 0 && Double.isFinite(scale)) {
           if (currentScale != newValue.doubleValue()) {
             Invoke.later(() -> setSelectedItem(scale));
           }
