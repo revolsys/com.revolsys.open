@@ -3,15 +3,13 @@ package com.revolsys.swing.map.layer.elevation.gridded.renderer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
-import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.logging.Logs;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -19,7 +17,6 @@ import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -27,41 +24,18 @@ import com.revolsys.util.Property;
 public class MultipleGriddedElevationModelLayerRenderer
   extends AbstractGriddedElevationModelLayerRenderer implements
   MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> {
+
   static {
     MenuFactory.addMenuInitializer(MultipleGriddedElevationModelLayerRenderer.class, menu -> {
-
-      addAddMenuItem(menu, "Color", (layer, parent) -> {
-        final ColorGriddedElevationModelRasterizer rasterizer = new ColorGriddedElevationModelRasterizer();
-        return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
-      });
-      addAddMenuItem(menu, "Color Ramp", (layer, parent) -> {
-        final ColorRampGriddedElevationModelRasterizer rasterizer = new ColorRampGriddedElevationModelRasterizer();
-        return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
-      });
-      addAddMenuItem(menu, "Hillshade", (layer, parent) -> {
-        final HillShadeGriddedElevationModelRasterizer rasterizer = new HillShadeGriddedElevationModelRasterizer();
-        return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
-      });
+      RasterizerGriddedElevationModelLayerRenderer.initMenus(menu);
     });
-  }
-
-  protected static void addAddMenuItem(final MenuFactory menu, final String type,
-    final BiFunction<ElevationModelLayer, MultipleGriddedElevationModelLayerRenderer, RasterizerGriddedElevationModelLayerRenderer> rendererFactory) {
-    final String iconName = ("style_" + type.replace(' ', '_') + ":add").toLowerCase();
-    final String name = "Add " + type + " Style";
-    Menus.addMenuItem(menu, "add", name, iconName,
-      (final MultipleGriddedElevationModelLayerRenderer parentRenderer) -> {
-        final ElevationModelLayer layer = parentRenderer.getLayer();
-        final RasterizerGriddedElevationModelLayerRenderer newRenderer = rendererFactory
-          .apply(layer, parentRenderer);
-        parentRenderer.addRendererEdit(newRenderer);
-      }, false);
   }
 
   private List<RasterizerGriddedElevationModelLayerRenderer> renderers = new ArrayList<>();
 
   private MultipleGriddedElevationModelLayerRenderer() {
     super("multipleGriddedElevationModelLayerRenderer", "Styles");
+    setIcon(Icons.getIcon("folder:palette"));
   }
 
   public MultipleGriddedElevationModelLayerRenderer(final GriddedElevationModelLayer layer) {

@@ -54,4 +54,6 @@ public interface GriddedElevationModelRasterizer extends BoundingBoxProxy, Clone
   void setMaxZ(double maxZ);
 
   void setMinZ(double minZ);
+
+  void updateValues();
 }

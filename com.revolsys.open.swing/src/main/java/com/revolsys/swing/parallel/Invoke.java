@@ -187,6 +187,10 @@ public class Invoke {
     }
   }
 
+  public static boolean hasWorker() {
+    return !getWorkers().isEmpty();
+  }
+
   public static void later(final Runnable runnable) {
     if (SwingUtilities.isEventDispatchThread()) {
       runnable.run();

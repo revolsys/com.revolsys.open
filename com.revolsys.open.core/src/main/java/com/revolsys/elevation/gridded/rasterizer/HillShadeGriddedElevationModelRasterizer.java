@@ -226,7 +226,7 @@ public class HillShadeGriddedElevationModelRasterizer
   }
 
   @Override
-  protected void updateValues() {
+  public void updateValues() {
     if (this.elevationModel != null) {
       final double cellSize = this.elevationModel.getGridCellSize();
       this.oneDivCellSizeTimes8 = 1.0 / (8 * cellSize);

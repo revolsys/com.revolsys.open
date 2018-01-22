@@ -105,7 +105,7 @@ public class ColorGriddedElevationModelRasterizer extends AbstractGriddedElevati
   }
 
   @Override
-  protected void updateValues() {
+  public void updateValues() {
     this.minRed = this.minColour.getRed();
     this.rangeRed = this.maxColour.getRed() - this.minRed;
     this.minGreen = this.minColour.getGreen();

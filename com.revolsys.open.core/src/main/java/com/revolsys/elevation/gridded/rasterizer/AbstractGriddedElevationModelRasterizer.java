@@ -105,7 +105,8 @@ public abstract class AbstractGriddedElevationModelRasterizer
     return map;
   }
 
-  protected void updateValues() {
+  @Override
+  public void updateValues() {
     this.rangeZ = this.maxZ - this.minZ;
   }
 

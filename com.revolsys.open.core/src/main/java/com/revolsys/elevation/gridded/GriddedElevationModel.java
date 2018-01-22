@@ -6,14 +6,14 @@ import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.awt.gradient.GradientStop;
-import com.revolsys.awt.gradient.MultiStopLinearGradient;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.byn.Byn;
 import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
 import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
-import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.gradient.GradientStop;
+import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradient;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
 import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
@@ -109,8 +109,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     // Rasterizers
     MapObjectFactoryRegistry.newFactory("colorGriddedElevationModelRasterizer",
       ColorGriddedElevationModelRasterizer::new);
-    MapObjectFactoryRegistry.newFactory("colorRampGriddedElevationModelRasterizer",
-      ColorRampGriddedElevationModelRasterizer::new);
+    MapObjectFactoryRegistry.newFactory("colorGradientGriddedElevationModelRasterizer",
+      ColorGradientGriddedElevationModelRasterizer::new);
     MapObjectFactoryRegistry.newFactory("hillShadeGriddedElevationModelRasterizer",
       HillShadeGriddedElevationModelRasterizer::new);
 

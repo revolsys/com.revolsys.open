@@ -163,7 +163,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     fileChooser.setAcceptAllFileFilterUsed(true);
     fileChooser.addChoosableFileFilter(filter);
     fileChooser.setFileFilter(filter);
-    if (!OS.isMac()) {
+    if (OS.isMac()) {
+      fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    } else {
       fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     }
     final Window window = SwingUtil.getActiveWindow();

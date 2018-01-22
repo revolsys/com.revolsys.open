@@ -2,12 +2,15 @@ package com.revolsys.swing.map.layer.elevation.gridded.renderer;
 
 import java.awt.Graphics2D;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelImage;
-import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
@@ -29,6 +32,49 @@ public class RasterizerGriddedElevationModelLayerRenderer
       menu -> Menus.addMenuItem(menu, "layer", "Delete", "delete",
         RasterizerGriddedElevationModelLayerRenderer::isHasParent,
         RasterizerGriddedElevationModelLayerRenderer::delete, true));
+  }
+
+  private static void addAddMenuItem(final MenuFactory menu, final String type,
+    final BiFunction<ElevationModelLayer, IMultipleGriddedElevationModelLayerRenderer, RasterizerGriddedElevationModelLayerRenderer> rendererFactory) {
+    final String iconName = ("style_" + type.replace(' ', '_') + ":add").toLowerCase();
+    final String name = "Add " + type + " Style";
+    Menus.addMenuItem(menu, "add", name, iconName,
+      (final IMultipleGriddedElevationModelLayerRenderer parentRenderer) -> {
+        final ElevationModelLayer layer = parentRenderer.getLayer();
+        final RasterizerGriddedElevationModelLayerRenderer newRenderer = rendererFactory
+          .apply(layer, parentRenderer);
+        parentRenderer.addRendererEdit(newRenderer);
+      }, false);
+  }
+
+  public static void initMenus(final MenuFactory menu) {
+    addAddMenuItem(menu, "Color", RasterizerGriddedElevationModelLayerRenderer::newColor);
+
+    addAddMenuItem(menu, "Color Gradient",
+      RasterizerGriddedElevationModelLayerRenderer::newColorGradient);
+
+    addAddMenuItem(menu, "Hillshade", RasterizerGriddedElevationModelLayerRenderer::newHillshade);
+  }
+
+  public static RasterizerGriddedElevationModelLayerRenderer newColor(
+    final ElevationModelLayer layer, final IMultipleGriddedElevationModelLayerRenderer parent) {
+    final ColorGriddedElevationModelRasterizer rasterizer = new ColorGriddedElevationModelRasterizer();
+    return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
+  }
+
+  public static RasterizerGriddedElevationModelLayerRenderer newColorGradient(
+    final ElevationModelLayer layer, final IMultipleGriddedElevationModelLayerRenderer parent) {
+    final ColorGradientGriddedElevationModelRasterizer rasterizer = new ColorGradientGriddedElevationModelRasterizer();
+    final RasterizerGriddedElevationModelLayerRenderer renderer = new RasterizerGriddedElevationModelLayerRenderer(
+      layer, parent, rasterizer);
+    renderer.setOpacity(0.8f);
+    return renderer;
+  }
+
+  public static RasterizerGriddedElevationModelLayerRenderer newHillshade(
+    final ElevationModelLayer layer, final IMultipleGriddedElevationModelLayerRenderer parent) {
+    final HillShadeGriddedElevationModelRasterizer rasterizer = new HillShadeGriddedElevationModelRasterizer();
+    return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
   }
 
   private GriddedElevationModelImage image;
@@ -71,7 +117,9 @@ public class RasterizerGriddedElevationModelLayerRenderer
   @Override
   public RasterizerGriddedElevationModelLayerRenderer clone() {
     final RasterizerGriddedElevationModelLayerRenderer clone = (RasterizerGriddedElevationModelLayerRenderer)super.clone();
-    clone.rasterizer = this.rasterizer.clone();
+    if (this.rasterizer != null) {
+      clone.rasterizer = this.rasterizer.clone();
+    }
     clone.worker = null;
     clone.image = null;
     return clone;
@@ -115,7 +163,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
         if (elevationModel != null) {
           synchronized (this) {
             if (this.rasterizer == null) {
-              final ColorRampGriddedElevationModelRasterizer rasterizer = new ColorRampGriddedElevationModelRasterizer();
+              final ColorGradientGriddedElevationModelRasterizer rasterizer = new ColorGradientGriddedElevationModelRasterizer();
               setRasterizer(rasterizer);
 
               final String name = this.rasterizer.getName();
@@ -174,6 +222,14 @@ public class RasterizerGriddedElevationModelLayerRenderer
     }
   }
 
+  @Override
+  public void setLayer(final ElevationModelLayer layer) {
+    super.setLayer(layer);
+    if (this.rasterizer != null) {
+      this.rasterizer.updateValues();
+    }
+  }
+
   public void setOpacity(final float opacity) {
     final float oldValue = this.opacity;
     if (opacity < 0) {
@@ -186,32 +242,32 @@ public class RasterizerGriddedElevationModelLayerRenderer
     firePropertyChange("opacity", oldValue, opacity);
   }
 
-  public void setRasterizer(GriddedElevationModelRasterizer rasterizer) {
-    if (rasterizer == null) {
-      rasterizer = new ColorRampGriddedElevationModelRasterizer();
-      setOpacity(0.8f);
-    }
-    this.rasterizer = rasterizer;
+  public void setRasterizer(final GriddedElevationModelRasterizer rasterizer) {
     if (rasterizer != null) {
+      this.rasterizer = rasterizer;
       final String iconName = rasterizer.getIconName();
       setIcon(iconName);
-    }
-    final LayerRenderer<?> parent = getParent();
-    if (parent instanceof GriddedElevationModelZRange) {
-      final GriddedElevationModelZRange zRange = (GriddedElevationModelZRange)parent;
-      if (!Double.isFinite(rasterizer.getMinZ())) {
-        final double minZ = zRange.getMinZ();
-        rasterizer.setMinZ(minZ);
+
+      final LayerRenderer<?> parent = getParent();
+      if (parent instanceof GriddedElevationModelZRange) {
+        final GriddedElevationModelZRange zRange = (GriddedElevationModelZRange)parent;
+        if (!Double.isFinite(rasterizer.getMinZ())) {
+          final double minZ = zRange.getMinZ();
+          rasterizer.setMinZ(minZ);
+        }
+        if (!Double.isFinite(rasterizer.getMaxZ())) {
+          final double maxZ = zRange.getMaxZ();
+          rasterizer.setMaxZ(maxZ);
+        }
       }
-      if (!Double.isFinite(rasterizer.getMaxZ())) {
-        final double maxZ = zRange.getMaxZ();
-        rasterizer.setMaxZ(maxZ);
+      final GriddedElevationModel elevationModel = getElevationModel();
+      if (elevationModel == null) {
+        rasterizer.updateValues();
+      } else {
+        rasterizer.setElevationModel(elevationModel);
       }
     }
-    final GriddedElevationModel elevationModel = getElevationModel();
-    if (elevationModel != null) {
-      rasterizer.setElevationModel(elevationModel);
-    }
+
     this.redraw = true;
   }
 

@@ -9,8 +9,8 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
-import com.revolsys.elevation.gridded.rasterizer.ColorRampGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.swing.field.Field;
@@ -38,8 +38,8 @@ public class GriddedElevationModelStylePanel extends BaseStylePanel
       addPanel(this, "Style", this.rasterizer, "minZ", "maxZ", "minColour", "maxColour");
     } else if (this.rasterizer instanceof HillShadeGriddedElevationModelRasterizer) {
       addPanel(this, "Style", this.rasterizer, "azimuthDegrees", "zenithDegrees", "zFactor");
-    } else if (this.rasterizer instanceof ColorRampGriddedElevationModelRasterizer) {
-      addPanel(this, "Style", this.rasterizer, "colorRanges");
+    } else if (this.rasterizer instanceof ColorGradientGriddedElevationModelRasterizer) {
+      addPanel(this, "Style", this.rasterizer, "gradient");
     }
   }
 
@@ -50,9 +50,9 @@ public class GriddedElevationModelStylePanel extends BaseStylePanel
       Property.addListener(opacityField, this);
       opacityField.setMaximumSize(new Dimension(100, 25));
       return opacityField;
-    } else if ("colorRanges".equals(fieldName)) {
-      final ColorRampStylePanel field = new ColorRampStylePanel(
-        (ColorRampGriddedElevationModelRasterizer)this.rasterizer);
+    } else if ("gradient".equals(fieldName)) {
+      final ColorGradientField field = new ColorGradientField(
+        (ColorGradientGriddedElevationModelRasterizer)this.rasterizer);
       Property.addListener(field, this);
       return field;
     } else {

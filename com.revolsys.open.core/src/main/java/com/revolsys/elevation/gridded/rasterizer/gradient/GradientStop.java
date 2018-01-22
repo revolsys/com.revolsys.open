@@ -1,4 +1,4 @@
-package com.revolsys.awt.gradient;
+package com.revolsys.elevation.gridded.rasterizer.gradient;
 
 import java.awt.Color;
 import java.util.Map;
@@ -23,27 +23,23 @@ public class GradientStop extends BaseObjectWithProperties
 
   private Color color = WebColors.Black;
 
-  private int colourInt = this.color.getRGB();
+  private int colorInt = this.color.getRGB();
 
   private int green;
 
   private int greenRange;
 
-  private Color maxColor = WebColors.White;
+  private Color previousColor = WebColors.White;
 
-  private int maxColourInt = this.maxColor.getRGB();
+  private int previousColorInt = this.previousColor.getRGB();
 
-  private double percent;
-
-  private double percentMax;
+  private double previousValue;
 
   private int red;
 
   private int redRange;
 
-  private double valueMax;
-
-  private double valueMin;
+  private double value;
 
   private double valueRange;
 
@@ -53,8 +49,8 @@ public class GradientStop extends BaseObjectWithProperties
     updateValues();
   }
 
-  public GradientStop(final double percent, final Color color) {
-    this.percent = percent;
+  public GradientStop(final double value, final Color color) {
+    this.value = value;
     setColor(color);
   }
 
@@ -70,7 +66,12 @@ public class GradientStop extends BaseObjectWithProperties
 
   @Override
   public int compareTo(final GradientStop range) {
-    return Double.compare(this.percent, range.percent);
+    final int compare = Double.compare(this.value, range.value);
+    if (compare == 0) {
+      return 1;
+    } else {
+      return compare;
+    }
   }
 
   public Color getColor() {
@@ -78,40 +79,36 @@ public class GradientStop extends BaseObjectWithProperties
   }
 
   public int getMaxColourInt() {
-    return this.maxColourInt;
+    return this.previousColorInt;
   }
 
   public int getMinColourInt() {
-    return this.colourInt;
+    return this.colorInt;
   }
 
-  public double getPercent() {
-    return this.percent;
+  public double getValue() {
+    return this.value;
   }
 
-  public double getPercentMax() {
-    return this.percentMax;
-  }
-
-  public int getValue(final double elevation) {
-    if (Double.isNaN(elevation)) {
+  public int getValue(final double value) {
+    if (Double.isNaN(value)) {
       return NULL_COLOUR;
-    } else if (elevation <= this.valueMin) {
-      return this.colourInt;
-    } else if (elevation > this.valueMax) {
-      return this.maxColourInt;
+    } else if (value <= this.previousValue) {
+      return this.previousColorInt;
+    } else if (value > this.value) {
+      return this.colorInt;
     } else {
-      return getValueFast(elevation);
+      return getValueFast(value);
     }
   }
 
-  public int getValueFast(final double elevation) {
-    if (elevation <= this.valueMin) {
-      return this.colourInt;
-    } else if (elevation > this.valueMax) {
+  public int getValueFast(final double value) {
+    if (value <= this.previousValue) {
+      return this.previousColorInt;
+    } else if (value > this.value) {
       return NULL_COLOUR;
     } else {
-      final double elevationPercent = (elevation - this.valueMin) * this.valueRangeMultiple;
+      final double elevationPercent = (value - this.previousValue) * this.valueRangeMultiple;
       final int alpha = this.alpha + (int)Math.round(elevationPercent * this.alphaRange);
       final int red = this.red + (int)Math.round(elevationPercent * this.redRange);
       final int green = this.green + (int)Math.round(elevationPercent * this.greenRange);
@@ -122,7 +119,7 @@ public class GradientStop extends BaseObjectWithProperties
   }
 
   public boolean inRange(final double elevation) {
-    return this.valueMin <= elevation && elevation <= this.valueMax;
+    return this.previousValue <= elevation && elevation <= this.value;
   }
 
   public void setColor(final Color color) {
@@ -131,52 +128,62 @@ public class GradientStop extends BaseObjectWithProperties
     this.green = color.getGreen();
     this.blue = color.getBlue();
     this.color = color;
-    this.colourInt = color.getRGB();
+    this.colorInt = color.getRGB();
     updateValues();
   }
 
-  public void setMinMax(final double minZ, final double maxZ, final Color maxColor) {
-    this.valueMin = minZ;
-    this.valueMax = maxZ;
-    if (Double.isFinite(this.valueMin)) {
-      this.valueRange = maxZ - minZ;
+  public void setPrevious(final double previousValue, final Color previousColor) {
+    this.previousValue = previousValue;
+    if (Double.isFinite(this.previousValue)) {
+      this.valueRange = this.value - previousValue;
     } else {
       this.valueRange = 0;
     }
-    this.maxColor = maxColor;
-    this.maxColourInt = this.maxColor.getRGB();
+    this.previousColor = previousColor;
+    this.previousColorInt = this.previousColor.getRGB();
     updateValues();
   }
 
-  public void setPercent(final double percent) {
-    this.percent = percent;
+  public void setPrevious(final GradientStop previousStop) {
+    this.previousColor = previousStop.getColor();
+    this.previousColorInt = this.previousColor.getRGB();
+    this.previousValue = previousStop.getValue();
+  }
+
+  public void setValue(final double value) {
+    this.value = value;
   }
 
   @Override
   public MapEx toMap() {
     final MapEx map = newTypeMap("gradientStop");
     addToMap(map, "color", this.color);
-    if (Double.isFinite(this.percent)) {
-      map.add("percent", this.percent);
+    if (Double.isFinite(this.value)) {
+      map.add("percent", this.value);
     }
     return map;
   }
 
+  @Override
+  public String toString() {
+    return this.value + " " + this.color;
+  }
+
   public void updateValues() {
-    if (Double.isFinite(this.valueMin) && Double.isFinite(this.valueMax)) {
+    if (Double.isFinite(this.previousValue) && Double.isFinite(this.value)) {
       this.valueRange = 0;
       this.valueRangeMultiple = 0;
     } else {
-      this.valueRange = this.valueMax - this.valueMin;
+      this.valueRange = this.value - this.previousValue;
       if (this.valueRange == 0) {
         this.valueRangeMultiple = 0;
       } else {
         this.valueRangeMultiple = 1 / this.valueRange;
       }
     }
-    this.alphaRange = this.maxColor.getAlpha() - this.alpha;
-    this.redRange = this.maxColor.getRed() - this.red;
-    this.greenRange = this.maxColor.getGreen() - this.green;
-    this.blueRange = this.maxColor.getBlue() - this.blue;
+    this.alphaRange = this.previousColor.getAlpha() - this.alpha;
+    this.redRange = this.previousColor.getRed() - this.red;
+    this.greenRange = this.previousColor.getGreen() - this.green;
+    this.blueRange = this.previousColor.getBlue() - this.blue;
   }
 }

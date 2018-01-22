@@ -1,4 +1,4 @@
-package com.revolsys.awt.gradient;
+package com.revolsys.elevation.gridded.rasterizer.gradient;
 
 public interface LinearGradient extends Cloneable {
 
@@ -8,9 +8,9 @@ public interface LinearGradient extends Cloneable {
 
   int getColorIntForValue(double elevation);
 
-  void setValueMax(double valueMax);
+  double getValueMax();
 
-  void setValueMin(double valueMin);
+  double getValueMin();
 
   void updateValues();
 }

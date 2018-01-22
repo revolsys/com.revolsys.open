@@ -1,4 +1,4 @@
-package com.revolsys.swing.table;
+package com.revolsys.swing.table.lambda;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -7,9 +7,11 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import com.revolsys.swing.map.layer.elevation.gridded.ColorTableCellRenderer;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.function.Consumer4;
 import com.revolsys.util.function.Function3;
 
 public class LambdaTableModelColumn<R, V> {
@@ -18,7 +20,7 @@ public class LambdaTableModelColumn<R, V> {
 
   private final Class<?> columnClass;
 
-  private final boolean editable;
+  private boolean editable;
 
   private final Function<R, V> getValueFunction;
 
@@ -31,6 +33,10 @@ public class LambdaTableModelColumn<R, V> {
   private TableCellRenderer cellRenderer;
 
   private MenuFactory headerMenuFactory;
+
+  private Consumer4<Integer, Integer, R, V> setValueIndexFunction;
+
+  private int columnIndex;
 
   public LambdaTableModelColumn(final String columnName, final Class<?> columnClass) {
     this(columnName, columnClass, null);
@@ -48,13 +54,13 @@ public class LambdaTableModelColumn<R, V> {
 
   public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
     final Function<R, V> getValueFunction, final BiConsumer<R, V> setValueFunction,
-    final Function<V, ? extends Object> renderFunction) {
+    final LambdaStringValue<V> renderFunction) {
     this(columnName, columnClass, getValueFunction, setValueFunction, renderFunction, null);
   }
 
   public LambdaTableModelColumn(final String columnName, final Class<?> columnClass,
     final Function<R, V> getValueFunction, final BiConsumer<R, V> setValueFunction,
-    final Function<V, ? extends Object> renderFunction, final TableCellEditor cellEditor) {
+    final LambdaStringValue<V> renderFunction, final TableCellEditor cellEditor) {
     this.columnName = columnName;
     this.columnClass = columnClass;
     this.editable = setValueFunction != null;
@@ -87,6 +93,10 @@ public class LambdaTableModelColumn<R, V> {
 
   public Class<?> getColumnClass() {
     return this.columnClass;
+  }
+
+  public int getColumnIndex() {
+    return this.columnIndex;
   }
 
   public String getColumnName() {
@@ -124,13 +134,31 @@ public class LambdaTableModelColumn<R, V> {
     return this.editable;
   }
 
+  @SuppressWarnings("unchecked")
+  public LambdaTableModelColumn<R, V> setAlignment(final int alignment) {
+    if (this.cellRenderer == null) {
+      this.cellRenderer = new DefaultTableRenderer(null, alignment);
+    } else if (this.cellRenderer instanceof LambdaCellRenderer) {
+      LambdaCellRenderer<V> lambdaRenderer = (LambdaCellRenderer<V>)this.cellRenderer;
+      final LambdaStringValue<V> renderFunction = lambdaRenderer.getRenderFunction();
+      lambdaRenderer = new LambdaCellRenderer<>(renderFunction, alignment);
+    } else {
+      throw new IllegalArgumentException("Cannot change alignment");
+    }
+    return this;
+  }
+
   public LambdaTableModelColumn<R, V> setCellEditor(final TableCellEditor editor) {
     this.cellEditor = editor;
     return this;
   }
 
-  public void setCellRenderer(final ColorTableCellRenderer cellRenderer) {
+  public void setCellRenderer(final TableCellRenderer cellRenderer) {
     this.cellRenderer = cellRenderer;
+  }
+
+  public void setColumnIndex(final int columnIndex) {
+    this.columnIndex = columnIndex;
   }
 
   public LambdaTableModelColumn<R, V> setGetValueIndexFunction(
@@ -139,14 +167,29 @@ public class LambdaTableModelColumn<R, V> {
     return this;
   }
 
-  @SuppressWarnings("unchecked")
-  public void setValue(final R row, final Object value) {
-    this.setValueFunction.accept(row, (V)value);
+  public LambdaTableModelColumn<R, V> setSetValueIndexFunction(
+    final Consumer4<Integer, Integer, R, V> setValueIndexFunction) {
+    this.setValueIndexFunction = setValueIndexFunction;
+    this.editable = this.setValueIndexFunction != null || this.setValueFunction != null;
+    return this;
   }
 
-  public void withHeaderMenu(final BiConsumer<LambdaTableModelColumn<R, V>, MenuFactory> action) {
+  @SuppressWarnings("unchecked")
+  public void setValue(final int rowIndex, final int columnIndex, final R row, final Object value) {
+    if (this.setValueFunction == null) {
+      if (this.setValueIndexFunction != null) {
+        this.setValueIndexFunction.accept(rowIndex, columnIndex, row, (V)value);
+      }
+    } else {
+      this.setValueFunction.accept(row, (V)value);
+    }
+  }
+
+  public LambdaTableModelColumn<R, V> withHeaderMenu(
+    final BiConsumer<LambdaTableModelColumn<R, V>, MenuFactory> action) {
     final MenuFactory headerMenuFactory = getHeaderMenuFactory();
     action.accept(this, headerMenuFactory);
+    return this;
   }
 
 }

@@ -4,15 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
 
 import javax.swing.JPanel;
 
 import org.jdesktop.swingx.JXBusyLabel;
 
-import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BusyLabelPainter;
-import com.revolsys.util.Property;
 
 public class SwingWorkerProgressBar extends JPanel implements PropertyChangeListener {
   private static final long serialVersionUID = -5112492385171847107L;
@@ -30,15 +27,11 @@ public class SwingWorkerProgressBar extends JPanel implements PropertyChangeList
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    final List<?> workers = (List<?>)event.getNewValue();
-    boolean visible;
-    if (Property.isEmpty(workers)) {
-      visible = false;
-    } else {
-      visible = true;
-    }
-    this.busyLabel.setBusy(visible);
-    SwingUtil.setVisible(this, visible);
+    Invoke.later(() -> {
+      final boolean visible = Invoke.hasWorker();
+      this.busyLabel.setBusy(visible);
+      setVisible(visible);
+    });
   }
 
   @Override

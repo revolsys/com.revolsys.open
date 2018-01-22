@@ -311,7 +311,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
     } else if (Measure.class.equals(fieldClass)) {
       field = new LengthMeasureTextField(fieldName, (Measure<Length>)value, NonSI.PIXEL);
     } else {
-      field = new TextField(fieldName, value, 20);
+      field = new TextField(fieldName, value, 40);
     }
     return field;
   }
