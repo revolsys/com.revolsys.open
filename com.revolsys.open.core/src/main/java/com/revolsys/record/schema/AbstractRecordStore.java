@@ -63,6 +63,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<>();
 
+  private boolean initialized = false;
+
   protected AbstractRecordStore() {
     this(ArrayRecord.FACTORY);
   }
@@ -256,7 +258,16 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   @Override
   @PostConstruct
-  public void initialize() {
+  public final void initialize() {
+    synchronized (this) {
+      if (!this.initialized) {
+        this.initialized = true;
+        initializeDo();
+      }
+    }
+  }
+
+  protected void initializeDo() {
     getStatistics().connect();
   }
 
@@ -275,6 +286,10 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public boolean isClosed() {
     return this.closed;
+  }
+
+  public boolean isInitialized() {
+    return this.initialized;
   }
 
   @Override

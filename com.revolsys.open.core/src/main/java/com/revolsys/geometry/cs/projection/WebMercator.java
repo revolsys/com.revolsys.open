@@ -15,15 +15,13 @@ public class WebMercator extends AbstractCoordinatesProjection {
 
     lat = 180 / Math.PI * (2 * Math.atan(Math.exp(lat * Math.PI / 180)) - Math.PI / 2);
 
-    targetCoordinates[targetOffset] = Math.toRadians(lon);
-    targetCoordinates[targetOffset + 1] = Math.toRadians(lat);
+    targetCoordinates[targetOffset] = lon;
+    targetCoordinates[targetOffset + 1] = lat;
   }
 
   @Override
-  public void project(final double xDegrees, final double yDegrees,
-    final double[] targetCoordinates, final int targetOffset) {
-    final double lon = Math.toDegrees(xDegrees);
-    final double lat = Math.toDegrees(yDegrees);
+  public void project(final double lon, final double lat, final double[] targetCoordinates,
+    final int targetOffset) {
 
     final double x = lon * 20037508.34 / 180;
     double y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);

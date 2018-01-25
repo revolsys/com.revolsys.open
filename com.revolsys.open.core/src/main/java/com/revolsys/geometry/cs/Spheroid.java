@@ -23,9 +23,15 @@ public class Spheroid implements Serializable {
 
   private final String name;
 
+  /** Radius of earth at equator. */
   private final double semiMajorAxis;
 
+  private final double semiMajorAxisSq;
+
+  /** Radius of earth at poles. */
   private double semiMinorAxis;
+
+  private final double semiMinorAxisSq;
 
   public Spheroid(final String name, final double semiMajorAxis, final double inverseFlattening,
     final Authority authority) {
@@ -49,9 +55,8 @@ public class Spheroid implements Serializable {
     if (Double.isNaN(semiMinorAxis)) {
       this.semiMinorAxis = semiMajorAxis - semiMajorAxis * f;
     }
-
-    // double a2 = this.semiMajorAxis * this.semiMajorAxis;
-    // double b2 = this.semiMinorAxis * this.semiMinorAxis;
+    this.semiMajorAxisSq = semiMajorAxis * semiMajorAxis;
+    this.semiMinorAxisSq = semiMinorAxis * semiMinorAxis;
     // eccentricitySquared = 1.0 - b2 / a2;
 
     this.eccentricitySquared = f + f - f * f;
@@ -112,6 +117,27 @@ public class Spheroid implements Serializable {
 
   public String getName() {
     return this.name;
+  }
+
+  public double getRadiusFromDegrees(final double lat) {
+    final double phi = Math.toRadians(lat);
+    return getRadiusFromRadians(phi);
+  }
+
+  /**
+   * R(phi)=sqrt(((a² cos(phi))²+(b² sin(phi))²)/((a cos(phi))²+(b sin(phi))²))
+   */
+  public double getRadiusFromRadians(final double lat) {
+    final double cosLat = Math.cos(lat);
+    final double sinLat = Math.sin(lat);
+    final double aCosLat = this.semiMajorAxis * cosLat;
+    final double aSqCosLat = this.semiMajorAxisSq * cosLat;
+    final double bSinLat = this.semiMinorAxis * sinLat;
+    final double bSqSinLat = this.semiMinorAxisSq * sinLat;
+    return Math.sqrt( //
+      (aSqCosLat * aSqCosLat + bSqSinLat * bSinLat) / //
+        (aCosLat * aCosLat + bSinLat * bSinLat)//
+    );
   }
 
   public double getSemiMajorAxis() {

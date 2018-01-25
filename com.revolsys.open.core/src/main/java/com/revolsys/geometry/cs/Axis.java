@@ -2,19 +2,29 @@ package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
 
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+
 public class Axis implements Serializable {
-  /**
-   *
-   */
   private static final long serialVersionUID = 5463484439488623454L;
 
-  private final String direction;
+  private final String abbreviation;
 
-  private final String name;
+  private final AxisName axisName;
+
+  private final String orientation;
+
+  private final UnitOfMeasure unit;
+
+  public Axis(final AxisName axisName, final String orientation, final String abbreviation,
+    final UnitOfMeasure unit) {
+    this.axisName = axisName;
+    this.orientation = orientation;
+    this.abbreviation = abbreviation;
+    this.unit = unit;
+  }
 
   public Axis(final String name, final String direction) {
-    this.name = name;
-    this.direction = direction;
+    this(EpsgCoordinateSystems.getAxisName(name), direction, null, null);
   }
 
   @Override
@@ -25,9 +35,9 @@ public class Axis implements Serializable {
       return true;
     } else if (object instanceof Axis) {
       final Axis axis = (Axis)object;
-      if (!this.name.equals(axis.name)) {
+      if (!this.axisName.equals(axis.axisName)) {
         return false;
-      } else if (!this.direction.equals(axis.direction)) {
+      } else if (!this.orientation.equals(axis.orientation)) {
         return false;
       } else {
         return true;
@@ -37,25 +47,37 @@ public class Axis implements Serializable {
     }
   }
 
-  public String getDirection() {
-    return this.direction;
+  public String getAbbreviation() {
+    return this.abbreviation;
+  }
+
+  public AxisName getAxisName() {
+    return this.axisName;
   }
 
   public String getName() {
-    return this.name;
+    return this.axisName.getName();
+  }
+
+  public String getOrientation() {
+    return this.orientation;
+  }
+
+  public UnitOfMeasure getUnit() {
+    return this.unit;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + this.name.hashCode();
-    result = prime * result + this.direction.hashCode();
+    result = prime * result + this.axisName.hashCode();
+    result = prime * result + this.orientation.hashCode();
     return result;
   }
 
   @Override
   public String toString() {
-    return this.name;
+    return getName();
   }
 }

@@ -40,7 +40,9 @@ public class PrimeMeridian implements Serializable {
       return true;
     } else if (object instanceof PrimeMeridian) {
       final PrimeMeridian primeMeridian = (PrimeMeridian)object;
-      return this.longitude == primeMeridian.longitude;
+      if (this.longitude == primeMeridian.longitude) {
+        return true;
+      }
     }
     return false;
   }

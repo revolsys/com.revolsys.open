@@ -1,6 +1,6 @@
 package com.revolsys.geometry.cs.projection;
 
-import com.revolsys.geometry.cs.Datum;
+import com.revolsys.geometry.cs.GeodeticDatum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
@@ -19,11 +19,11 @@ public class Mercator1SPSpherical extends AbstractCoordinatesProjection {
 
   public Mercator1SPSpherical(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
-    final Datum datum = geographicCS.getDatum();
+    final GeodeticDatum geodeticDatum = geographicCS.getDatum();
     final double centralMeridian = cs
       .getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
 
-    final Spheroid spheroid = datum.getSpheroid();
+    final Spheroid spheroid = geodeticDatum.getSpheroid();
     this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
@@ -41,13 +41,16 @@ public class Mercator1SPSpherical extends AbstractCoordinatesProjection {
 
     final double phi = Angle.PI_OVER_2 - 2 * Math.atan(Math.pow(Math.E, -dY / this.r));
 
-    targetCoordinates[targetOffset] = lambda;
-    targetCoordinates[targetOffset + 1] = phi;
+    targetCoordinates[targetOffset] = Math.toDegrees(lambda);
+    targetCoordinates[targetOffset + 1] = Math.toDegrees(phi);
   }
 
   @Override
-  public void project(final double lambda, final double phi, final double[] targetCoordinates,
+  public void project(final double lon, final double lat, final double[] targetCoordinates,
     final int targetOffset) {
+    final double lambda = Math.toRadians(lon);
+    final double phi = Math.toRadians(lat);
+
     final double x = this.r * (lambda - this.lambda0);
 
     final double y = this.r * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2));

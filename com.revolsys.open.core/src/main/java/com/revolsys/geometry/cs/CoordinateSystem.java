@@ -7,7 +7,7 @@ import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
-import com.revolsys.geometry.cs.projection.CoordinatesProjection;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -23,7 +23,7 @@ public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
 
   List<Axis> getAxis();
 
-  CoordinatesProjection getCoordinatesProjection();
+  CoordinatesOperation getCoordinatesOperation(CoordinateSystem coordinateSystem);
 
   @Override
   default CoordinateSystem getCoordinateSystem() {

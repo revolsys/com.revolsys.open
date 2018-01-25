@@ -9,8 +9,8 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.byn.Byn;
 import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
-import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.gradient.GradientStop;
 import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradient;
@@ -598,6 +598,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     final double yPercent = yGrid - gridY;
     final double x2x = 1 - xPercent;
     final double y2y = 1 - yPercent;
+
     return z11 * x2x * y2y + z21 * xPercent * y2y + z12 * x2x * yPercent
       + z22 * xPercent * yPercent;
     // MathUtil.bilinearInterpolation(double, double, double, double, double, double, double,

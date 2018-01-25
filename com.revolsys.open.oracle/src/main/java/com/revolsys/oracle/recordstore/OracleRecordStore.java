@@ -59,8 +59,6 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     "ORACLE_OCM", "ORDDATA", "ORDPLUGINS", "ORDSYS", "OSE$HTTP$ADMIN", "OUTLN", "PERFSTAT", "SDE",
     "SYS", "SYSTEM", "TRACESVR", "TSMSYS", "WMSYS", "XDB");
 
-  private boolean initialized;
-
   private final IntHashMap<CoordinateSystem> oracleCoordinateSystems = new IntHashMap<>();
 
   private boolean useSchemaSequencePrefix = true;
@@ -343,54 +341,51 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   @Override
   @PostConstruct
-  public void initialize() {
-    super.initialize();
-    if (!this.initialized) {
-      this.initialized = true;
-      final JdbcFieldAdder attributeAdder = new JdbcFieldAdder();
-      addFieldAdder("NUMBER", attributeAdder);
+  public void initializeDo() {
+    super.initializeDo();
+    final JdbcFieldAdder attributeAdder = new JdbcFieldAdder();
+    addFieldAdder("NUMBER", attributeAdder);
 
-      addFieldAdder("CHAR", attributeAdder);
-      addFieldAdder("NCHAR", attributeAdder);
-      addFieldAdder("VARCHAR", attributeAdder);
-      addFieldAdder("VARCHAR2", attributeAdder);
-      addFieldAdder("NVARCHAR2", new JdbcFieldAdder(DataTypes.STRING));
-      addFieldAdder("LONG", attributeAdder);
-      addFieldAdder("CLOB", attributeAdder);
-      addFieldAdder("NCLOB", attributeAdder);
+    addFieldAdder("CHAR", attributeAdder);
+    addFieldAdder("NCHAR", attributeAdder);
+    addFieldAdder("VARCHAR", attributeAdder);
+    addFieldAdder("VARCHAR2", attributeAdder);
+    addFieldAdder("NVARCHAR2", new JdbcFieldAdder(DataTypes.STRING));
+    addFieldAdder("LONG", attributeAdder);
+    addFieldAdder("CLOB", attributeAdder);
+    addFieldAdder("NCLOB", attributeAdder);
 
-      addFieldAdder("DATE", attributeAdder);
-      addFieldAdder("TIMESTAMP", attributeAdder);
+    addFieldAdder("DATE", attributeAdder);
+    addFieldAdder("TIMESTAMP", attributeAdder);
 
-      final OracleSdoGeometryFieldAdder sdoGeometryAttributeAdder = new OracleSdoGeometryFieldAdder(
-        this);
-      addFieldAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
-      addFieldAdder("MDSYS.SDO_GEOMETRY", sdoGeometryAttributeAdder);
+    final OracleSdoGeometryFieldAdder sdoGeometryAttributeAdder = new OracleSdoGeometryFieldAdder(
+      this);
+    addFieldAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
+    addFieldAdder("MDSYS.SDO_GEOMETRY", sdoGeometryAttributeAdder);
 
-      final OracleBlobFieldAdder blobAdder = new OracleBlobFieldAdder();
-      addFieldAdder("BLOB", blobAdder);
+    final OracleBlobFieldAdder blobAdder = new OracleBlobFieldAdder();
+    addFieldAdder("BLOB", blobAdder);
 
-      final OracleClobFieldAdder clobAdder = new OracleClobFieldAdder();
-      addFieldAdder("CLOB", clobAdder);
+    final OracleClobFieldAdder clobAdder = new OracleClobFieldAdder();
+    addFieldAdder("CLOB", clobAdder);
 
-      setPrimaryKeySql(
-        "SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
-      setPrimaryKeyTableCondition(" AND cols.table_name = ?");
+    setPrimaryKeySql(
+      "SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
+    setPrimaryKeyTableCondition(" AND cols.table_name = ?");
 
-      setSchemaPermissionsSql("select distinct p.owner \"SCHEMA_NAME\" "
-        + "from ALL_TAB_PRIVS_RECD P "
-        + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
-      setSchemaTablePermissionsSql(
-        "select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\", c.table_type \"TABLE_TYPE\" "
-          + "  from ALL_TAB_PRIVS_RECD P "
-          + "    join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
-          + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') "
-          + "  union all "
-          + "select user \"SCHEMA_NAME\", t.table_name, 'ALL', comments, c.table_type \"TABLE_TYPE\" "
-          + "from user_tables t join user_tab_comments c on (t.table_name = c.table_name) and c.table_type in ('TABLE', 'VIEW')");
+    setSchemaPermissionsSql("select distinct p.owner \"SCHEMA_NAME\" "
+      + "from ALL_TAB_PRIVS_RECD P "
+      + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
+    setSchemaTablePermissionsSql(
+      "select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\", c.table_type \"TABLE_TYPE\" "
+        + "  from ALL_TAB_PRIVS_RECD P "
+        + "    join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
+        + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') "
+        + "  union all "
+        + "select user \"SCHEMA_NAME\", t.table_name, 'ALL', comments, c.table_type \"TABLE_TYPE\" "
+        + "from user_tables t join user_tab_comments c on (t.table_name = c.table_name) and c.table_type in ('TABLE', 'VIEW')");
 
-      addRecordStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
-    }
+    addRecordStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
   }
 
   private void initSettings() {

@@ -2,6 +2,7 @@ package com.revolsys.io.channels;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 import com.revolsys.io.BaseCloseable;
 
@@ -125,6 +126,19 @@ public class AbstractChannelWriter implements BaseCloseable {
     }
     this.available -= 2;
     this.buffer.putShort(s);
+  }
+
+  /**
+   * Convert the string to UTF-8 bytes and write the number of bytes followed by the bytes.
+   */
+  public void putStringUtf8ByteCount(final String string) {
+    if (string == null) {
+      putInt(-1);
+    } else {
+      final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+      putInt(bytes.length);
+      putBytes(bytes);
+    }
   }
 
   public void putUnsignedByte(final short b) {

@@ -7,12 +7,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
+import javax.measure.unit.NonSI;
+import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
+import com.revolsys.geometry.cs.projection.CopyOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
+import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -181,6 +188,51 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
+  public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem == null || this == coordinateSystem) {
+      return null;
+    } else {
+      final List<CoordinatesOperation> operations = new ArrayList<>();
+      final CoordinatesOperation inverseOperation = this.getInverseCoordinatesOperation();
+      if (inverseOperation == null) {
+        return null;
+      }
+      final Unit<Length> linearUnit1 = this.getLengthUnit();
+      if (!linearUnit1.equals(SI.METRE)) {
+        operations.add(new UnitConverstionOperation(linearUnit1, SI.METRE));
+      }
+      operations.add(inverseOperation);
+
+      if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+        final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
+        final CoordinatesOperation projectOperation = projectedCoordinateSystem.getProjectCoordinatesOperation();
+        if (projectOperation != null) {
+          operations.add(projectOperation);
+        }
+        final Unit<Length> linearUnit2 = projectedCoordinateSystem.getLengthUnit();
+        if (!linearUnit2.equals(SI.METRE)) {
+          operations.add(new UnitConverstionOperation(SI.METRE, linearUnit2));
+        }
+      } else if (coordinateSystem instanceof GeographicCoordinateSystem) {
+        final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
+        final Unit<Angle> angularUnit2 = geographicCoordinateSystem.getUnit();
+        if (!angularUnit2.equals(NonSI.DEGREE_ANGLE)) {
+          operations.add(new UnitConverstionOperation(NonSI.DEGREE_ANGLE, angularUnit2, 2));
+        }
+      } else {
+        return null;
+      }
+      switch (operations.size()) {
+        case 0:
+          return null;
+        case 1:
+          return operations.get(0);
+        default:
+          return new ChainedCoordinatesOperation(operations);
+      }
+    }
+  }
+
   public synchronized CoordinatesProjection getCoordinatesProjection() {
     if (this.coordinatesProjection == null) {
       this.coordinatesProjection = ProjectionFactory.newCoordinatesProjection(this);
@@ -211,6 +263,20 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return this.geographicCoordinateSystem;
   }
 
+  /**
+   * Get the operation to convert coordinates to geographics coordinates.
+   *
+   * @return The coordinates operation.
+   */
+  public CoordinatesOperation getInverseCoordinatesOperation() {
+    final CoordinatesProjection projection = getCoordinatesProjection();
+    if (projection == null) {
+      return null;
+    } else {
+      return projection.getInverseOperation();
+    }
+  }
+
   @Override
   public Unit<Length> getLengthUnit() {
     return this.linearUnit.getUnit();
@@ -227,6 +293,21 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   public Map<String, Object> getParameters() {
     return this.parameters;
+  }
+
+  /**
+   * Get the operation to convert geographics coordinates to projected
+   * coordinates.
+   *
+   * @return The coordinates operation.
+   */
+  public CoordinatesOperation getProjectCoordinatesOperation() {
+    final CoordinatesProjection projection = getCoordinatesProjection();
+    if (projection == null) {
+      return new CopyOperation();
+    } else {
+      return projection.getProjectOperation();
+    }
   }
 
   public Projection getProjection() {

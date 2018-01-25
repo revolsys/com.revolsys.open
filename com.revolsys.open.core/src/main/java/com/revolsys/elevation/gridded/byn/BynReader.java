@@ -14,7 +14,6 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 
 public class BynReader extends BaseObjectWithProperties implements GriddedElevationModelReader {
@@ -103,15 +102,20 @@ public class BynReader extends BaseObjectWithProperties implements GriddedElevat
     if (this.exists) {
       try {
         final ChannelReader reader = this.reader;
-        final int cellCount = this.gridWidth * this.gridHeight;
+        final int gridWidth = this.gridWidth;
+        final int gridHeight = this.gridHeight;
+        final int cellCount = gridWidth * gridHeight;
         final int[] elevations = new int[cellCount];
-        for (int index = 0; index < cellCount; index++) {
-          final int elevation = reader.getInt();
-          elevations[index] = elevation;
+        for (int gridY = gridHeight - 1; gridY >= 0; gridY--) {
+          int index = gridY * gridWidth;
+          for (int gridX = 0; gridX < gridWidth; gridX++) {
+            final int elevation = reader.getInt();
+            elevations[index++] = elevation;
+          }
         }
         final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
-          this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight,
-          this.gridCellSize, elevations);
+          this.geometryFactory, this.boundingBox, gridWidth, gridHeight, this.gridCellSize,
+          elevations);
         elevationModel.setResource(this.resource);
         return elevationModel;
       } catch (final RuntimeException e) {
@@ -176,7 +180,6 @@ public class BynReader extends BaseObjectWithProperties implements GriddedElevat
     this.gridHeight = (north - south) / cellHeight + 1;
 
     this.boundingBox = this.geometryFactory.newBoundingBox(2, minX, minY, maxX, maxY);
-    Debug.noOp();
   }
 
   public void setByteBuffer(final ByteBuffer byteBuffer) {

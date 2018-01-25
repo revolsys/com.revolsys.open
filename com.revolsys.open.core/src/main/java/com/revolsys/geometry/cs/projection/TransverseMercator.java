@@ -1,6 +1,6 @@
 package com.revolsys.geometry.cs.projection;
 
-import com.revolsys.geometry.cs.Datum;
+import com.revolsys.geometry.cs.GeodeticDatum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
@@ -73,7 +73,7 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
     this.coordinateSystem = coordinateSystem;
     final GeographicCoordinateSystem geographicCS = coordinateSystem
       .getGeographicCoordinateSystem();
-    final Datum datum = geographicCS.getDatum();
+    final GeodeticDatum geodeticDatum = geographicCS.getDatum();
     final double latitudeOfNaturalOrigin = coordinateSystem
       .getDoubleParameter(ProjectionParameterNames.LATITUDE_OF_CENTER);
     final double centralMeridian = coordinateSystem
@@ -81,7 +81,7 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
     final double scaleFactor = coordinateSystem
       .getDoubleParameter(ProjectionParameterNames.SCALE_FACTOR);
 
-    final Spheroid spheroid = datum.getSpheroid();
+    final Spheroid spheroid = geodeticDatum.getSpheroid();
     this.x0 = coordinateSystem.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
     this.y0 = coordinateSystem.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
@@ -187,8 +187,8 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
     final double lambda = this.lambda0 + (d - (1 + 2 * t1 + c1) * d3 / 6
       + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + this.ePrimeSqTimes8 + 24 * t1Sq) * d5 / 120) / cosPhi1;
 
-    targetCoordinates[targetOffset] = lambda;
-    targetCoordinates[targetOffset + 1] = phi;
+    targetCoordinates[targetOffset] = Math.toDegrees(lambda);
+    targetCoordinates[targetOffset + 1] = Math.toDegrees(phi);
   }
 
   /**
@@ -238,8 +238,11 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
    * @param to The ordinates to write the converted ordinates to.
    */
   @Override
-  public void project(final double lambda, final double phi, final double[] targetCoordinates,
+  public void project(final double lon, final double lat, final double[] targetCoordinates,
     final int targetOffset) {
+    final double lambda = Math.toRadians(lon);
+    final double phi = Math.toRadians(lat);
+
     final double cosPhi = Math.cos(phi);
     final double sinPhi = Math.sin(phi);
     final double tanPhi = Math.tan(phi);

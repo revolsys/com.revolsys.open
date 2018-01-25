@@ -32,8 +32,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 
 public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
-  private boolean initialized;
-
   public GeoPackageRecordStore(final DataSource dataSource) {
     super(dataSource);
   }
@@ -65,7 +63,8 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
 
   @Override
   @PostConstruct
-  public void initialize() {
+  public void initializeDo() {
+    super.initializeDo();
     setUsesSchema(false);
 
     final String filter = "WHERE NOT (NAME LIKE 'GPKG%' OR NAME LIKE 'RTREE%' OR NAME LIKE 'SQLITE%')";
@@ -114,10 +113,6 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     } catch (final SQLException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-    }
-    if (!this.initialized) {
-      this.initialized = true;
-
     }
   }
 

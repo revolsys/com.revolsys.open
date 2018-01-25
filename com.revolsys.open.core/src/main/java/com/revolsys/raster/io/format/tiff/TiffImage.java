@@ -183,7 +183,7 @@ public class TiffImage extends JaiGeoreferencedImage {
 
   public static LinearUnit getLinearUnit(final Map<Integer, Object> geoKeys) {
     final int linearUnitId = Maps.getInteger(geoKeys, LINEAR_UNIT_ID, 0);
-    return EpsgCoordinateSystems.getLinearUnit(linearUnitId);
+    return EpsgCoordinateSystems.getUnit(linearUnitId);
   }
 
   public static Projection getProjection(final Map<Integer, Object> geoKeys) {
@@ -193,7 +193,8 @@ public class TiffImage extends JaiGeoreferencedImage {
       return null;
     } else {
       final Authority projectionAuthority = new EpsgAuthority(projectionId);
-      final Projection projection = new Projection(projectionName, projectionAuthority);
+      final Projection projection = new Projection(projectionAuthority, projectionName, true,
+        false);
       return projection;
     }
   }

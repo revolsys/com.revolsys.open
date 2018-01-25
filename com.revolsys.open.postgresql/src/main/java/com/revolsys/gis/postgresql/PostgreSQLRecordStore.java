@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.postgresql.jdbc.PgConnection;
@@ -180,9 +179,8 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  @PostConstruct
-  public void initialize() {
-    super.initialize();
+  public void initializeDo() {
+    super.initializeDo();
     final JdbcFieldAdder numberFieldAdder = new JdbcFieldAdder(DataTypes.DECIMAL);
     addFieldAdder("numeric", numberFieldAdder);
 

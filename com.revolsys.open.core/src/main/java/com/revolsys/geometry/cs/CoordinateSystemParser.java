@@ -34,7 +34,7 @@ public class CoordinateSystemParser {
 
         final Spheroid spheroid = new Spheroid(spheroidName, semiMajorAxis, inverseFlattening,
           null);
-        final Datum datum = new Datum(datumName, spheroid, null);
+        final GeodeticDatum geodeticDatum = new GeodeticDatum(datumName, spheroid, null);
         final PrimeMeridian primeMeridian = new PrimeMeridian(primeMeridianName, longitude, null);
 
         AngularUnit angularUnit = angularUnitsByName.get(angularUnitName);
@@ -45,7 +45,7 @@ public class CoordinateSystemParser {
 
         final Authority authority = new BaseAuthority(authorityName, id);
         final GeographicCoordinateSystem cs = new GeographicCoordinateSystem(Integer.parseInt(id),
-          csName, datum, primeMeridian, angularUnit, null, authority);
+          csName, geodeticDatum, primeMeridian, angularUnit, null, authority);
         coordinateSystems.add(cs);
       }
     } catch (final IOException e) {

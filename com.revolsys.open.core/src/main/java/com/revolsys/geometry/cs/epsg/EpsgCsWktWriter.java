@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 import com.revolsys.geometry.cs.AngularUnit;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.Datum;
+import com.revolsys.geometry.cs.GeodeticDatum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.LinearUnit;
 import com.revolsys.geometry.cs.PrimeMeridian;
@@ -49,15 +49,15 @@ public class EpsgCsWktWriter {
     }
   }
 
-  public static void write(final PrintWriter out, final Datum datum) {
-    if (datum != null) {
+  public static void write(final PrintWriter out, final GeodeticDatum geodeticDatum) {
+    if (geodeticDatum != null) {
       out.print(",DATUM[");
-      write(out, datum.getName());
-      final Spheroid spheroid = datum.getSpheroid();
+      write(out, geodeticDatum.getName());
+      final Spheroid spheroid = geodeticDatum.getSpheroid();
       if (spheroid != null) {
         write(out, spheroid);
       }
-      final Authority authority = datum.getAuthority();
+      final Authority authority = geodeticDatum.getAuthority();
       write(out, authority);
       out.write(']');
     }
@@ -68,8 +68,8 @@ public class EpsgCsWktWriter {
     if (coordinateSystem != null) {
       out.print("GEOGCS[");
       write(out, coordinateSystem.getCoordinateSystemName());
-      final Datum datum = coordinateSystem.getDatum();
-      write(out, datum);
+      final GeodeticDatum geodeticDatum = coordinateSystem.getDatum();
+      write(out, geodeticDatum);
       final PrimeMeridian primeMeridian = coordinateSystem.getPrimeMeridian();
       write(out, primeMeridian);
       final AngularUnit unit = coordinateSystem.getAngularUnit();

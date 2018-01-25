@@ -2,19 +2,10 @@ package com.revolsys.geometry.cs.projection;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.measure.quantity.Angle;
-import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
-
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Projection;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -58,112 +49,10 @@ public final class ProjectionFactory {
 
   public static CoordinatesOperation getCoordinatesOperation(
     final CoordinateSystem fromCoordinateSystem, final CoordinateSystem toCoordinateSystem) {
-    if (fromCoordinateSystem == null || toCoordinateSystem == null
-      || fromCoordinateSystem == toCoordinateSystem) {
+    if (fromCoordinateSystem == null) {
       return null;
     } else {
-      final List<CoordinatesOperation> operations = new ArrayList<>();
-      if (fromCoordinateSystem instanceof ProjectedCoordinateSystem) {
-        final ProjectedCoordinateSystem pcs1 = (ProjectedCoordinateSystem)fromCoordinateSystem;
-        final CoordinatesOperation inverseOperation = getInverseCoordinatesOperation(pcs1);
-        if (inverseOperation == null) {
-          return null;
-        }
-        final Unit<Length> linearUnit1 = pcs1.getLengthUnit();
-        if (!linearUnit1.equals(SI.METRE)) {
-          operations.add(new UnitConverstionOperation(linearUnit1, SI.METRE));
-        }
-        operations.add(inverseOperation);
-      } else if (fromCoordinateSystem instanceof GeographicCoordinateSystem) {
-        final GeographicCoordinateSystem gcs1 = (GeographicCoordinateSystem)fromCoordinateSystem;
-        final Unit<Angle> angularUnit1 = gcs1.getUnit();
-        if (toCoordinateSystem instanceof GeographicCoordinateSystem) {
-          final GeographicCoordinateSystem gcs2 = (GeographicCoordinateSystem)toCoordinateSystem;
-          // TODO Datum shift
-          final Unit<Angle> angularUnit2 = gcs2.getUnit();
-          if (!angularUnit1.equals(angularUnit2)) {
-            return new UnitConverstionOperation(angularUnit1, angularUnit2, 2);
-          } else {
-            return null;
-          }
-        } else {
-          if (!angularUnit1.equals(SI.RADIAN)) {
-            CoordinatesOperation converstionOperation;
-            if (angularUnit1.equals(NonSI.DEGREE_ANGLE)) {
-              converstionOperation = DegreesToRadiansOperation.INSTANCE;
-            } else {
-              converstionOperation = new UnitConverstionOperation(angularUnit1, SI.RADIAN, 2);
-            }
-
-            operations.add(converstionOperation);
-          }
-        }
-      } else {
-        return null;
-      }
-      if (toCoordinateSystem instanceof ProjectedCoordinateSystem) {
-        final ProjectedCoordinateSystem pcs2 = (ProjectedCoordinateSystem)toCoordinateSystem;
-        final CoordinatesOperation projectOperation = getProjectCoordinatesOperation(pcs2);
-        if (projectOperation != null) {
-          operations.add(projectOperation);
-        }
-        final Unit<Length> linearUnit2 = pcs2.getLengthUnit();
-        if (!linearUnit2.equals(SI.METRE)) {
-          operations.add(new UnitConverstionOperation(SI.METRE, linearUnit2));
-        }
-      } else if (toCoordinateSystem instanceof GeographicCoordinateSystem) {
-        final GeographicCoordinateSystem gcs2 = (GeographicCoordinateSystem)toCoordinateSystem;
-        final Unit<Angle> angularUnit2 = gcs2.getUnit();
-        if (!angularUnit2.equals(SI.RADIAN)) {
-          operations.add(new UnitConverstionOperation(SI.RADIAN, angularUnit2, 2));
-        }
-      }
-      switch (operations.size()) {
-        case 0:
-          return null;
-        case 1:
-          return operations.get(0);
-        default:
-          return new ChainedCoordinatesOperation(operations);
-      }
-    }
-  }
-
-  public static CoordinatesProjection getCoordinatesProjection(
-    final CoordinateSystem coordinateSystem) {
-    return coordinateSystem.getCoordinatesProjection();
-  }
-
-  /**
-   * Get the operation to convert coordinates to geographics coordinates.
-   *
-   * @param coordinateSystem The coordinate system.
-   * @return The coordinates operation.
-   */
-  public static CoordinatesOperation getInverseCoordinatesOperation(
-    final CoordinateSystem coordinateSystem) {
-    final CoordinatesProjection projection = getCoordinatesProjection(coordinateSystem);
-    if (projection == null) {
-      return null;
-    } else {
-      return projection.getInverseOperation();
-    }
-  }
-
-  /**
-   * Get the operation to convert geographics coordinates to projected
-   * coordinates.
-   *
-   * @param coordinateSystem The coordinate system.
-   * @return The coordinates operation.
-   */
-  public static CoordinatesOperation getProjectCoordinatesOperation(
-    final CoordinateSystem coordinateSystem) {
-    final CoordinatesProjection projection = getCoordinatesProjection(coordinateSystem);
-    if (projection == null) {
-      return new CopyOperation();
-    } else {
-      return projection.getProjectOperation();
+      return fromCoordinateSystem.getCoordinatesOperation(toCoordinateSystem);
     }
   }
 

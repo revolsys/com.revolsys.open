@@ -1,6 +1,6 @@
 package com.revolsys.geometry.cs.projection;
 
-import com.revolsys.geometry.cs.Datum;
+import com.revolsys.geometry.cs.GeodeticDatum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
@@ -42,12 +42,12 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
 
   public TransverseMercatorSouthOriented(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
-    final Datum datum = geographicCS.getDatum();
+    final GeodeticDatum geodeticDatum = geographicCS.getDatum();
     final double centralMeridian = cs
       .getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
     final double scaleFactor = cs.getDoubleParameter(ProjectionParameterNames.SCALE_FACTOR);
 
-    this.spheroid = datum.getSpheroid();
+    this.spheroid = geodeticDatum.getSpheroid();
     this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
@@ -118,29 +118,30 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
     final double lambda = this.lambda0 + (d - (1 + 2 * t1 + c1) * d3 / 6
       + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8 * this.eSq + 24 * t1Sq) * d5 / 120) / cosPhi1;
 
-    final double lon = Math.toDegrees(lambda);
-    final double lat = Math.toDegrees(phi);
-    targetCoordinates[targetOffset] = lon;
-    targetCoordinates[targetOffset + 1] = lat;
+    targetCoordinates[targetOffset] = Math.toDegrees(lambda);
+    targetCoordinates[targetOffset + 1] = Math.toDegrees(phi);
   }
 
   @Override
   public void project(final double lon, final double lat, final double[] targetCoordinates,
     final int targetOffset) {
+    final double lambda = Math.toRadians(lon);
+    final double phi = Math.toRadians(lat);
+
     // ep2 = the second eccentricity squared.
     // N = the radius of curvature of the spheroid in the prime vertical plane
-    final double n = this.spheroid.primeVerticalRadiusOfCurvature(lat);
-    final double n2 = this.ep2 * Math.pow(Math.cos(lat), 2.0);
+    final double n = this.spheroid.primeVerticalRadiusOfCurvature(phi);
+    final double n2 = this.ep2 * Math.pow(Math.cos(phi), 2.0);
     final double n4 = n2 * n2;
     final double n6 = n4 * n2;
     final double n8 = n4 * n4;
-    final double t = Math.tan(lat);
+    final double t = Math.tan(phi);
     final double t2 = t * t;
     final double t4 = t2 * t2;
     final double t6 = t4 * t2;
-    final double cosLat = Math.cos(lat);
-    final double sinLat = Math.sin(lat);
-    final double l = lon - this.lambda0;
+    final double cosLat = Math.cos(phi);
+    final double sinLat = Math.sin(phi);
+    final double l = lambda - this.lambda0;
     final double l2 = l * l;
     final double l3 = l2 * l;
     final double l4 = l2 * l2;
@@ -166,7 +167,7 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
     v2 = 61.0 - 58.0 * t2 + t4 + 270.0 * n2 - 330.0 * t2 * n2 + 445.0 * n4 + 324.0 * n6
       - 680.0 * n4 * t2 + 88.0 * n8 - 600.0 * n6 * t2 - 192.0 * n8 * t2;
     v3 = 1385.0 - 311.0 * t2 + 543.0 * t4 - t6;
-    final double y = s0(lat) / n + u0 + u1 * v1 + u2 * v2 + u3 * v3;
+    final double y = s0(phi) / n + u0 + u1 * v1 + u2 * v2 + u3 * v3;
 
     targetCoordinates[targetOffset] = this.x0 - n * x * this.k0;
     targetCoordinates[targetOffset + 1] = this.y0 - n * y * this.k0;

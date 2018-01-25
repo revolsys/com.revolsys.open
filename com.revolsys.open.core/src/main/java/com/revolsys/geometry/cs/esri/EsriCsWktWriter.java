@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import com.revolsys.geometry.cs.AngularUnit;
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.Datum;
+import com.revolsys.geometry.cs.GeodeticDatum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.LinearUnit;
 import com.revolsys.geometry.cs.PrimeMeridian;
@@ -74,11 +74,11 @@ public class EsriCsWktWriter {
     }
   }
 
-  public static void write(final Writer out, final Datum datum, final int indentLevel)
+  public static void write(final Writer out, final GeodeticDatum geodeticDatum, final int indentLevel)
     throws IOException {
     out.write("DATUM[");
-    write(out, datum.getName(), incrementIndent(indentLevel));
-    final Spheroid spheroid = datum.getSpheroid();
+    write(out, geodeticDatum.getName(), incrementIndent(indentLevel));
+    final Spheroid spheroid = geodeticDatum.getSpheroid();
     if (spheroid != null) {
       out.write(",");
       indent(out, incrementIndent(indentLevel));
@@ -92,11 +92,11 @@ public class EsriCsWktWriter {
     final int indentLevel) throws IOException {
     out.write("GEOGCS[");
     write(out, coordinateSystem.getCoordinateSystemName(), incrementIndent(indentLevel));
-    final Datum datum = coordinateSystem.getDatum();
-    if (datum != null) {
+    final GeodeticDatum geodeticDatum = coordinateSystem.getDatum();
+    if (geodeticDatum != null) {
       out.write(",");
       indent(out, incrementIndent(indentLevel));
-      write(out, datum, incrementIndent(indentLevel));
+      write(out, geodeticDatum, incrementIndent(indentLevel));
     }
     final PrimeMeridian primeMeridian = coordinateSystem.getPrimeMeridian();
     if (primeMeridian != null) {

@@ -1,17 +1,11 @@
 package com.revolsys.geometry.cs;
 
-import java.io.Serializable;
-
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-public class LinearUnit implements Serializable {
-  /**
-   *
-   */
-  private static final long serialVersionUID = 4000991484199279234L;
+public class LinearUnit implements UnitOfMeasure {
 
   /**
    * Get the linear unit representing the conversion factor from
@@ -147,6 +141,21 @@ public class LinearUnit implements Serializable {
 
   public boolean isDeprecated() {
     return this.deprecated;
+  }
+
+  @Override
+  public double toBase(final double value) {
+    final double baseValue;
+    if (Double.isFinite(this.conversionFactor)) {
+      baseValue = value * this.conversionFactor;
+    } else {
+      baseValue = value;
+    }
+    if (this.baseUnit == null) {
+      return baseValue;
+    } else {
+      return this.baseUnit.toBase(baseValue);
+    }
   }
 
   @Override

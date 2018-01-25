@@ -13,7 +13,6 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
 import com.revolsys.swing.menu.MenuFactory;
@@ -22,8 +21,8 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class MultipleGriddedElevationModelLayerRenderer
-  extends AbstractGriddedElevationModelLayerRenderer implements
-  MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> {
+  extends AbstractGriddedElevationModelLayerRenderer
+  implements IMultipleGriddedElevationModelLayerRenderer {
 
   static {
     MenuFactory.addMenuInitializer(MultipleGriddedElevationModelLayerRenderer.class, menu -> {
@@ -136,6 +135,13 @@ public class MultipleGriddedElevationModelLayerRenderer
   @Override
   public boolean isSameLayer(final Layer layer) {
     return getLayer() == layer;
+  }
+
+  @Override
+  public void refresh() {
+    for (final RasterizerGriddedElevationModelLayerRenderer renderer : this.renderers) {
+      renderer.refresh();
+    }
   }
 
   @Override

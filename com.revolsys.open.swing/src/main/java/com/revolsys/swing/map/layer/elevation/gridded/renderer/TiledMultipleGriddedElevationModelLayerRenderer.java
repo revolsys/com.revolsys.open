@@ -185,6 +185,12 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
     return new TiledMultipleGriddedElevationModelStylePanel(this);
   }
 
+  public void refresh() {
+    for (final RasterizerGriddedElevationModelLayerRenderer renderer : this.renderers) {
+      renderer.refresh();
+    }
+  }
+
   @Override
   public int removeRenderer(final RasterizerGriddedElevationModelLayerRenderer renderer) {
     boolean removed = false;

@@ -168,7 +168,7 @@ public class WktCsParser {
     return new Axis(name, direction);
   }
 
-  private Datum processDatum(final List<Object> values) {
+  private GeodeticDatum processDatum(final List<Object> values) {
     final String name = (String)values.get(0);
     Spheroid spheroid = null;
     Authority authority = null;
@@ -183,12 +183,12 @@ public class WktCsParser {
         toWgs84 = (ToWgs84)value;
       }
     }
-    return new Datum(name, spheroid, toWgs84, authority);
+    return new GeodeticDatum(name, spheroid, toWgs84, authority);
   }
 
   private GeographicCoordinateSystem processGeographicCoordinateSystem(final List<Object> values) {
     final String name = (String)values.get(0);
-    final Datum datum = (Datum)values.get(1);
+    final GeodeticDatum geodeticDatum = (GeodeticDatum)values.get(1);
     final PrimeMeridian primeMeridian = (PrimeMeridian)values.get(2);
     final AngularUnit angularUnit = (AngularUnit)values.get(3);
     int index = 4;
@@ -212,7 +212,7 @@ public class WktCsParser {
         authorityId = Integer.parseInt(authorityCode);
       }
     }
-    return new GeographicCoordinateSystem(authorityId, name, datum, primeMeridian, angularUnit,
+    return new GeographicCoordinateSystem(authorityId, name, geodeticDatum, primeMeridian, angularUnit,
       axis, authority);
   }
 

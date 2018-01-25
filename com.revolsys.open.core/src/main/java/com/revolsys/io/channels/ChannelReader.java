@@ -86,8 +86,9 @@ public class ChannelReader implements BaseCloseable {
   public byte[] getBytes(final byte[] bytes) {
     final int byteCount = bytes.length;
     if (this.available < byteCount) {
-      this.buffer.get(bytes, 0, this.available);
       int offset = this.available;
+      this.buffer.get(bytes, 0, offset);
+      this.available = 0;
       do {
         int bytesToRead = byteCount - offset;
         read(bytesToRead);
@@ -174,6 +175,17 @@ public class ChannelReader implements BaseCloseable {
       }
     }
     return new String(bytes, 0, i, charset);
+  }
+
+  public String getStringUtf8ByteCount() {
+    final int byteCount = getInt();
+    if (byteCount < 0) {
+      return null;
+    } else if (byteCount == 0) {
+      return "";
+    } else {
+      return getString(byteCount, StandardCharsets.UTF_8);
+    }
   }
 
   public short getUnsignedByte() {

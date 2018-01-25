@@ -172,11 +172,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   @PostConstruct
   @Override
-  public void initialize() {
+  public void initializeDo() {
+    super.initializeDo();
     if (!this.directory.exists()) {
       this.directory.mkdirs();
     }
-    super.initialize();
   }
 
   @Override

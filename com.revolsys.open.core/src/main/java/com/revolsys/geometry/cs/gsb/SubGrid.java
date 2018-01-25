@@ -19,452 +19,317 @@
  */
 package com.revolsys.geometry.cs.gsb;
 
-import java.io.InputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.io.Serializable;
-import java.util.ArrayList;
+
+import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
 
 /**
  * Models the NTv2 Sub Grid within a Grid Shift File
- * 
+ *
  * @author Peter Yuill
  */
 public class SubGrid implements Cloneable, Serializable {
-    
-    private static final int REC_SIZE = 16;
-    
-    private String subGridName;
-    private String parentSubGridName;
-    private String created;
-    private String updated;
-    private double minLat;
-    private double maxLat;
-    private double minLon;
-    private double maxLon;
-    private double latInterval;
-    private double lonInterval;
-    private int nodeCount;
-    
-    private int lonColumnCount;
-    private int latRowCount;
-    private float[] latShift;
-    private float[] lonShift;
-    private float[] latAccuracy;
-    private float[] lonAccuracy;
-    
-    private RandomAccessFile raf;
-    private long subGridOffset;
-    boolean bigEndian;
-    private SubGrid[] subGrid;
-    
-    /**
-     * Construct a Sub Grid from an InputStream, loading the node data into
-     * arrays in this object.
-     * 
-     * @param in GridShiftFile InputStream
-     * @param bigEndian is the file bigEndian?
-     * @param loadAccuracy is the node Accuracy data to be loaded?
-     * @throws Exception
-     */
-    public SubGrid(InputStream in, boolean bigEndian, boolean loadAccuracy) throws IOException {
-        byte[] b8 = new byte[8];
-        byte[] b4 = new byte[4];
-        in.read(b8);
-        in.read(b8);
-        subGridName = new String(b8).trim();
-        in.read(b8);
-        in.read(b8);
-        parentSubGridName = new String(b8).trim();
-        in.read(b8);
-        in.read(b8);
-        created = new String(b8);
-        in.read(b8);
-        in.read(b8);
-        updated = new String(b8);
-        in.read(b8);
-        in.read(b8);
-        minLat = Util.getDouble(b8, bigEndian);
-        in.read(b8);
-        in.read(b8);
-        maxLat = Util.getDouble(b8, bigEndian);
-        in.read(b8);
-        in.read(b8);
-        minLon = Util.getDouble(b8, bigEndian);
-        in.read(b8);
-        in.read(b8);
-        maxLon = Util.getDouble(b8, bigEndian);
-        in.read(b8);
-        in.read(b8);
-        latInterval = Util.getDouble(b8, bigEndian);
-        in.read(b8);
-        in.read(b8);
-        lonInterval = Util.getDouble(b8, bigEndian);
-        lonColumnCount = 1 + (int)((maxLon - minLon) / lonInterval);
-        latRowCount = 1 + (int)((maxLat - minLat) / latInterval);
-        in.read(b8);
-        in.read(b8);
-        nodeCount = Util.getInt(b8, bigEndian);
-        if (nodeCount != lonColumnCount * latRowCount) {
-            throw new IllegalStateException("SubGrid " + subGridName + " has inconsistent grid dimesions");
-        }
-        latShift = new float[nodeCount];
-        lonShift = new float[nodeCount];
-        if (loadAccuracy) {
-            latAccuracy = new float[nodeCount];
-            lonAccuracy = new float[nodeCount];
-        }
-        
-        for (int i = 0; i < nodeCount; i++) {
-            in.read(b4);
-            latShift[i] = Util.getFloat(b4, bigEndian);
-            in.read(b4);
-            lonShift[i] = Util.getFloat(b4, bigEndian);
-            in.read(b4);
-            if (loadAccuracy) {
-                latAccuracy[i] = Util.getFloat(b4, bigEndian);
-            }
-            in.read(b4);
-            if (loadAccuracy) {
-                lonAccuracy[i] = Util.getFloat(b4, bigEndian);
-            }
-        }
+  private final String subGridName;
+
+  private final String parentSubGridName;
+
+  private final String created;
+
+  private final String updated;
+
+  private final double minLat;
+
+  private final double maxLat;
+
+  private final double minLon;
+
+  private final double maxLon;
+
+  private final double latInterval;
+
+  private final double lonInterval;
+
+  private final int nodeCount;
+
+  private final int lonColumnCount;
+
+  private final int latRowCount;
+
+  private final FloatArrayGriddedElevationModel latShifts;
+
+  private final FloatArrayGriddedElevationModel lonShifts;
+
+  private FloatArrayGriddedElevationModel latAccuracies;
+
+  private FloatArrayGriddedElevationModel lonAccuracies;
+
+  private long subGridOffset;
+
+  private SubGrid[] subGrid;
+
+  /**
+   * Construct a Sub Grid from an InputStream, loading the node data into
+   * arrays in this object.
+   *
+   * @param in GridShiftFile InputStream
+   * @param bigEndian is the file bigEndian?
+   * @param loadAccuracy is the node Accuracy data to be loaded?
+   * @throws Exception
+   */
+  public SubGrid(final GridShiftFile file, final boolean loadAccuracy) throws IOException {
+    this.subGridName = file.readRecordString();
+    this.parentSubGridName = file.readRecordString();
+    this.created = file.readRecordString();
+    this.updated = file.readRecordString();
+    this.minLat = file.readRecordDouble();
+    this.maxLat = file.readRecordDouble();
+    this.minLon = file.readRecordDouble();
+    this.maxLon = file.readRecordDouble();
+    this.latInterval = file.readRecordDouble();
+    this.lonInterval = file.readRecordDouble();
+    if (this.latInterval != this.lonInterval) {
+      throw new IllegalStateException("latInterval != lonInterval");
     }
-    
-    /**
-     * Construct a Sub Grid from a RandomAccessFile. Only the headers
-     * are loaded into this object, the node data is accessed directly
-     * from the RandomAccessFile.
-     * 
-     * @param in GridShiftFile RandomAccessFile
-     * @param bigEndian is the file bigEndian?
-     * @throws Exception
-     */
-    public SubGrid(RandomAccessFile raf, long subGridOffset, boolean bigEndian) throws IOException {
-        this.raf = raf;
-        this.subGridOffset = subGridOffset;
-        this.bigEndian = bigEndian;
-        raf.seek(subGridOffset);
-        byte[] b8 = new byte[8];
-        raf.read(b8);
-        raf.read(b8);
-        subGridName = new String(b8).trim();
-        raf.read(b8);
-        raf.read(b8);
-        parentSubGridName = new String(b8).trim();
-        raf.read(b8);
-        raf.read(b8);
-        created = new String(b8);
-        raf.read(b8);
-        raf.read(b8);
-        updated = new String(b8);
-        raf.read(b8);
-        raf.read(b8);
-        minLat = Util.getDouble(b8, bigEndian);
-        raf.read(b8);
-        raf.read(b8);
-        maxLat = Util.getDouble(b8, bigEndian);
-        raf.read(b8);
-        raf.read(b8);
-        minLon = Util.getDouble(b8, bigEndian);
-        raf.read(b8);
-        raf.read(b8);
-        maxLon = Util.getDouble(b8, bigEndian);
-        raf.read(b8);
-        raf.read(b8);
-        latInterval = Util.getDouble(b8, bigEndian);
-        raf.read(b8);
-        raf.read(b8);
-        lonInterval = Util.getDouble(b8, bigEndian);
-        lonColumnCount = 1 + (int)((maxLon - minLon) / lonInterval);
-        latRowCount = 1 + (int)((maxLat - minLat) / latInterval);
-        raf.read(b8);
-        raf.read(b8);
-        nodeCount = Util.getInt(b8, bigEndian);
-        if (nodeCount != lonColumnCount * latRowCount) {
-            throw new IllegalStateException("SubGrid " + subGridName + " has inconsistent grid dimesions");
-        }
+    this.lonColumnCount = 1 + (int)((this.maxLon - this.minLon) / this.lonInterval);
+    this.latRowCount = 1 + (int)((this.maxLat - this.minLat) / this.latInterval);
+    final int nodeCount = file.readRecordInt();
+    this.nodeCount = nodeCount;
+    if (nodeCount != this.lonColumnCount * this.latRowCount) {
+      throw new IllegalStateException(
+        "SubGridOld " + this.subGridName + " has inconsistent grid dimensions");
     }
-    
-    /**
-     * Tests if a specified coordinate is within this Sub Grid
-     * or one of its Sub Grids. If the coordinate is outside
-     * this Sub Grid, null is returned. If the coordinate is
-     * within this Sub Grid, but not within any of its Sub Grids,
-     * this Sub Grid is returned. If the coordinate is within
-     * one of this Sub Grid's Sub Grids, the method is called
-     * recursively on the child Sub Grid.
-     * 
-     * @param lon Longitude in Positive West Seconds
-     * @param lat Latitude in Seconds
-     * @return the Sub Grid containing the Coordinate or null
-     */
-    public SubGrid getSubGridForCoord(double lon, double lat) {
-        if (isCoordWithin(lon, lat)) {
-            if (subGrid == null) {
-                return this;
-            } else {
-                for (int i = 0; i < subGrid.length; i++) {
-                    if (subGrid[i].isCoordWithin(lon, lat)) {
-                        return subGrid[i].getSubGridForCoord(lon, lat);
-                    }
-                }
-                return this;
-            }
-        } else {
-            return null;
-        }
-    }
-    
-    /**
-     * Tests if a specified coordinate is within this Sub Grid.
-     * A coordinate on either outer edge (maximum Latitude or
-     * maximum Longitude) is deemed to be outside the grid.
-     * 
-     * @param lon Longitude in Positive West Seconds
-     * @param lat Latitude in Seconds
-     * @return true or false
-     */
-    private boolean isCoordWithin(double lon, double lat) {
-        if ((lon >= minLon) && (lon < maxLon) && (lat >= minLat) && (lat < maxLat)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    /**
-     * Bi-Linear interpolation of four nearest node values as described in
-     * 'GDAit Software Architecture Manual' produced by the <a 
-     * href='http://www.sli.unimelb.edu.au/gda94'>Geomatics
-     * Department of the University of Melbourne</a>
-     * @param a value at the A node
-     * @param b value at the B node
-     * @param c value at the C node
-     * @param d value at the D node
-     * @param X Longitude factor
-     * @param Y Latitude factor
-     * @return interpolated value
-     */
-    private final double interpolate(float a, float b, float c, float d, double X, double Y) {
-        return (double)a + (((double)b - (double)a) * X) + (((double)c - (double)a) * Y) +
-            (((double)a + (double)d - (double)b - (double)c) * X * Y);
-    }
-    
-    /**
-     * Interpolate shift and accuracy values for a coordinate in the 'from' datum
-     * of the GridShiftFile. The algorithm is described in
-     * 'GDAit Software Architecture Manual' produced by the <a 
-     * href='http://www.sli.unimelb.edu.au/gda94'>Geomatics
-     * Department of the University of Melbourne</a>
-     * <p>This method is thread safe for both memory based and file based node data.
-     * @param gs GridShift object containing the coordinate to shift and the shift values
-     * @return the GridShift object supplied, with values updated.
-     * @throws IOException
-     */
-    public GridShift interpolateGridShift(GridShift gs) throws IOException {
-        int lonIndex = (int)((gs.getLonPositiveWestSeconds() - minLon) / lonInterval);
-        int latIndex = (int)((gs.getLatSeconds() - minLat) / latInterval);
-        
-        double X = (gs.getLonPositiveWestSeconds() - (minLon + (lonInterval * lonIndex))) / lonInterval;
-        double Y = (gs.getLatSeconds() - (minLat + (latInterval * latIndex))) / latInterval;
-        
-        // Find the nodes at the four corners of the cell
-        
-        int indexA = lonIndex + (latIndex * lonColumnCount);
-        int indexB = indexA + 1;
-        int indexC = indexA + lonColumnCount;
-        int indexD = indexC + 1;
-        
-        if (raf == null) {
-            gs.setLonShiftPositiveWestSeconds(interpolate(
-                lonShift[indexA], lonShift[indexB], lonShift[indexC], lonShift[indexD], X, Y));
-        
-            gs.setLatShiftSeconds(interpolate(
-                latShift[indexA], latShift[indexB], latShift[indexC], latShift[indexD], X, Y));
-        
-            if (lonAccuracy == null) {
-                gs.setLonAccuracyAvailable(false);
-            } else {
-                gs.setLonAccuracyAvailable(true);
-                gs.setLonAccuracySeconds(interpolate(
-                    lonAccuracy[indexA], lonAccuracy[indexB], lonAccuracy[indexC], lonAccuracy[indexD], X, Y));
-            }
-        
-            if (latAccuracy == null) {
-                gs.setLatAccuracyAvailable(false);
-            } else {
-                gs.setLatAccuracyAvailable(true);
-                gs.setLatAccuracySeconds(interpolate(
-                    latAccuracy[indexA], latAccuracy[indexB], latAccuracy[indexC], latAccuracy[indexD], X, Y));
-            }
-        } else {
-            synchronized(raf) {
-                byte[] b4 = new byte[4];
-                long nodeOffset = subGridOffset + (11 * REC_SIZE) + (indexA * REC_SIZE);
-                raf.seek(nodeOffset);
-                raf.read(b4);
-                float latShiftA = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float lonShiftA = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float latAccuracyA = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float lonAccuracyA = Util.getFloat(b4, bigEndian);
-            
-                nodeOffset = subGridOffset + (11 * REC_SIZE) + (indexB * REC_SIZE);
-                raf.seek(nodeOffset);
-                raf.read(b4);
-                float latShiftB = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float lonShiftB = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float latAccuracyB = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float lonAccuracyB = Util.getFloat(b4, bigEndian);
-            
-                nodeOffset = subGridOffset + (11 * REC_SIZE) + (indexC * REC_SIZE);
-                raf.seek(nodeOffset);
-                raf.read(b4);
-                float latShiftC = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float lonShiftC = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float latAccuracyC = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float lonAccuracyC = Util.getFloat(b4, bigEndian);
-            
-                nodeOffset = subGridOffset + (11 * REC_SIZE) + (indexD * REC_SIZE);
-                raf.seek(nodeOffset);
-                raf.read(b4);
-                float latShiftD = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float lonShiftD = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float latAccuracyD = Util.getFloat(b4, bigEndian);
-                raf.read(b4);
-                float lonAccuracyD = Util.getFloat(b4, bigEndian);
-            
-                gs.setLonShiftPositiveWestSeconds(interpolate(
-                    lonShiftA, lonShiftB, lonShiftC, lonShiftD, X, Y));
-        
-                gs.setLatShiftSeconds(interpolate(
-                    latShiftA, latShiftB, latShiftC, latShiftD, X, Y));
-        
-                gs.setLonAccuracyAvailable(true);
-                gs.setLonAccuracySeconds(interpolate(
-                        lonAccuracyA, lonAccuracyB, lonAccuracyC, lonAccuracyD, X, Y));
-        
-                gs.setLatAccuracyAvailable(true);
-                gs.setLatAccuracySeconds(interpolate(
-                        latAccuracyA, latAccuracyB, latAccuracyC, latAccuracyD, X, Y));
-            }
-        }
-        return gs;
-    }
-    
-    public String getParentSubGridName() {
-        return parentSubGridName;
+    final float[] latShifts = new float[nodeCount];
+    final float[] lonShifts = new float[nodeCount];
+    final float[] latAccuracies;
+    final float[] lonAccuracies;
+    if (loadAccuracy) {
+      latAccuracies = new float[nodeCount];
+      lonAccuracies = new float[nodeCount];
+    } else {
+      latAccuracies = null;
+      lonAccuracies = null;
     }
 
-    public String getSubGridName() {
-        return subGridName;
+    for (int i = 0; i < nodeCount; i++) {
+      final float latShift = file.readFloat();
+      latShifts[i] = latShift;
+      final float lonShift = file.readFloat();
+      lonShifts[i] = lonShift;
+
+      final float latAccuracy = file.readFloat();
+      if (loadAccuracy) {
+        latAccuracies[i] = latAccuracy;
+      }
+      final float lonAccuracy = file.readFloat();
+      if (loadAccuracy) {
+        lonAccuracies[i] = lonAccuracy;
+      }
     }
 
-    public int getNodeCount() {
-        return nodeCount;
+    this.latShifts = new FloatArrayGriddedElevationModel(null, this.minLon, this.minLat,
+      this.lonColumnCount, this.latRowCount, this.lonInterval, latShifts);
+    this.lonShifts = new FloatArrayGriddedElevationModel(null, this.minLon, this.minLat,
+      this.lonColumnCount, this.latRowCount, this.lonInterval, latShifts);
+    if (loadAccuracy) {
+      this.latAccuracies = new FloatArrayGriddedElevationModel(null, this.minLon, this.minLat,
+        this.lonColumnCount, this.latRowCount, this.lonInterval, latAccuracies);
+      this.lonAccuracies = new FloatArrayGriddedElevationModel(null, this.minLon, this.minLat,
+        this.lonColumnCount, this.latRowCount, this.lonInterval, lonAccuracies);
     }
+  }
 
-    public int getSubGridCount() {
-        return (subGrid == null) ? 0 : subGrid.length;
+  /**
+   * Make a deep clone of this Sub Grid
+   */
+  @Override
+  public Object clone() {
+    SubGrid clone = null;
+    try {
+      clone = (SubGrid)super.clone();
+    } catch (final CloneNotSupportedException cnse) {
     }
+    // Do a deep clone of the sub grids
+    if (this.subGrid != null) {
+      clone.subGrid = new SubGrid[this.subGrid.length];
+      for (int i = 0; i < this.subGrid.length; i++) {
+        clone.subGrid[i] = (SubGrid)this.subGrid[i].clone();
+      }
+    }
+    return clone;
+  }
 
-    public SubGrid getSubGrid(int index) {
-        return (subGrid == null) ? null : subGrid[index];
-    }
-    
-    /**
-     * Set an array of Sub Grids of this sub grid
-     * @param subGrid
-     */
-    public void setSubGridArray(SubGrid[] subGrid) {
-        this.subGrid = subGrid;
-    }
-    
-    public String toString() {
-        return subGridName;
-    }
-    
-    public String getDetails() {
-        StringBuffer buf = new StringBuffer("Sub Grid : ");
-        buf.append(subGridName);
-        buf.append("\nParent   : ");
-        buf.append(parentSubGridName);
-        buf.append("\nCreated  : ");
-        buf.append(created);
-        buf.append("\nUpdated  : ");
-        buf.append(updated);
-        buf.append("\nMin Lat  : ");
-        buf.append(minLat);
-        buf.append("\nMax Lat  : ");
-        buf.append(maxLat);
-        buf.append("\nMin Lon  : ");
-        buf.append(minLon);
-        buf.append("\nMax Lon  : ");
-        buf.append(maxLon);
-        buf.append("\nLat Intvl: ");
-        buf.append(latInterval);
-        buf.append("\nLon Intvl: ");
-        buf.append(lonInterval);
-        buf.append("\nNode Cnt : ");
-        buf.append(nodeCount);
-        return buf.toString();
-    }
-    
-    /**
-     * Make a deep clone of this Sub Grid
-     */
-    public Object clone() {
-        SubGrid clone = null;
-        try {
-            clone = (SubGrid)super.clone();
-        } catch (CloneNotSupportedException cnse) {
+  public String getDetails() {
+    final StringBuffer buf = new StringBuffer("Sub Grid : ");
+    buf.append(this.subGridName);
+    buf.append("\nParent   : ");
+    buf.append(this.parentSubGridName);
+    buf.append("\nCreated  : ");
+    buf.append(this.created);
+    buf.append("\nUpdated  : ");
+    buf.append(this.updated);
+    buf.append("\nMin Lat  : ");
+    buf.append(this.minLat);
+    buf.append("\nMax Lat  : ");
+    buf.append(this.maxLat);
+    buf.append("\nMin Lon  : ");
+    buf.append(this.minLon);
+    buf.append("\nMax Lon  : ");
+    buf.append(this.maxLon);
+    buf.append("\nLat Intvl: ");
+    buf.append(this.latInterval);
+    buf.append("\nLon Intvl: ");
+    buf.append(this.lonInterval);
+    buf.append("\nNode Cnt : ");
+    buf.append(this.nodeCount);
+    return buf.toString();
+  }
+
+  /**
+   * @return
+   */
+  public double getMaxLat() {
+    return this.maxLat;
+  }
+
+  /**
+   * @return
+   */
+  public double getMaxLon() {
+    return this.maxLon;
+  }
+
+  /**
+   * @return
+   */
+  public double getMinLat() {
+    return this.minLat;
+  }
+
+  /**
+   * @return
+   */
+  public double getMinLon() {
+    return this.minLon;
+  }
+
+  public int getNodeCount() {
+    return this.nodeCount;
+  }
+
+  public String getParentSubGridName() {
+    return this.parentSubGridName;
+  }
+
+  public SubGrid getSubGrid(final int index) {
+    return this.subGrid == null ? null : this.subGrid[index];
+  }
+
+  public int getSubGridCount() {
+    return this.subGrid == null ? 0 : this.subGrid.length;
+  }
+
+  /**
+   * Tests if a specified coordinate is within this Sub Grid
+   * or one of its Sub Grids. If the coordinate is outside
+   * this Sub Grid, null is returned. If the coordinate is
+   * within this Sub Grid, but not within any of its Sub Grids,
+   * this Sub Grid is returned. If the coordinate is within
+   * one of this Sub Grid's Sub Grids, the method is called
+   * recursively on the child Sub Grid.
+   *
+   * @param lon Longitude in Positive West Seconds
+   * @param lat Latitude in Seconds
+   * @return the Sub Grid containing the Coordinate or null
+   */
+  public SubGrid getSubGridForCoord(final double lon, final double lat) {
+    if (isCoordWithin(lon, lat)) {
+      if (this.subGrid == null) {
+        return this;
+      } else {
+        for (int i = 0; i < this.subGrid.length; i++) {
+          if (this.subGrid[i].isCoordWithin(lon, lat)) {
+            return this.subGrid[i].getSubGridForCoord(lon, lat);
+          }
         }
-        // Do a deep clone of the sub grids
-        if (subGrid != null) {
-            clone.subGrid = new SubGrid[subGrid.length];
-            for (int i = 0; i < subGrid.length; i++) {
-                clone.subGrid[i] = (SubGrid)subGrid[i].clone();
-            }
-        }
-        return clone;
+        return this;
+      }
+    } else {
+      return null;
     }
-    /**
-     * @return
-     */
-    public double getMaxLat() {
-        return maxLat;
+  }
+
+  public String getSubGridName() {
+    return this.subGridName;
+  }
+
+  /**
+   * Interpolate shift and accuracy values for a coordinate in the 'from' datum
+   * of the GridShiftFile. The algorithm is described in
+   * 'GDAit Software Architecture Manual' produced by the <a
+   * href='http://www.sli.unimelb.edu.au/gda94'>Geomatics
+   * Department of the University of Melbourne</a>
+   * <p>This method is thread safe for both memory based and file based node data.
+   * @param gs GridShift object containing the coordinate to shift and the shift values
+   * @return the GridShift object supplied, with values updated.
+   * @throws IOException
+   */
+  public GridShift interpolateGridShift(final GridShift gs) throws IOException {
+    final double x = gs.getLonPositiveWestSeconds();
+    final double y = gs.getLatSeconds();
+
+    final double lonShift = this.lonShifts.getElevationBilinear(x, y);
+    gs.setLonShiftPositiveWestSeconds(lonShift);
+
+    final double latShift = this.latShifts.getElevationBilinear(x, y);
+    gs.setLatShiftSeconds(latShift);
+
+    if (this.lonAccuracies == null) {
+      gs.setLonAccuracyAvailable(false);
+    } else {
+      gs.setLonAccuracyAvailable(true);
+      final double lonAccuracy = this.lonAccuracies.getElevationBilinear(x, y);
+      gs.setLonAccuracySeconds(lonAccuracy);
     }
 
-    /**
-     * @return
-     */
-    public double getMaxLon() {
-        return maxLon;
+    if (this.latAccuracies == null) {
+      gs.setLatAccuracyAvailable(false);
+    } else {
+      gs.setLatAccuracyAvailable(true);
+      final double latAccuracy = this.latAccuracies.getElevationBilinear(x, y);
+      gs.setLatAccuracySeconds(latAccuracy);
     }
+    return gs;
+  }
 
-    /**
-     * @return
-     */
-    public double getMinLat() {
-        return minLat;
+  /**
+   * Tests if a specified coordinate is within this Sub Grid.
+   * A coordinate on either outer edge (maximum Latitude or
+   * maximum Longitude) is deemed to be outside the grid.
+   *
+   * @param lon Longitude in Positive West Seconds
+   * @param lat Latitude in Seconds
+   * @return true or false
+   */
+  private boolean isCoordWithin(final double lon, final double lat) {
+    if (lon >= this.minLon && lon < this.maxLon && lat >= this.minLat && lat < this.maxLat) {
+      return true;
+    } else {
+      return false;
     }
+  }
 
-    /**
-     * @return
-     */
-    public double getMinLon() {
-        return minLon;
-    }
+  /**
+   * Set an array of Sub Grids of this sub grid
+   * @param subGrid
+   */
+  public void setSubGridArray(final SubGrid[] subGrid) {
+    this.subGrid = subGrid;
+  }
+
+  @Override
+  public String toString() {
+    return this.subGridName;
+  }
 
 }

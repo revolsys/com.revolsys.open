@@ -83,14 +83,21 @@ public class Projection implements Serializable, Comparable<Projection> {
 
   private final String normalizedName;
 
+  private boolean reverse;
+
+  private boolean deprecated;
+
+  public Projection(final Authority authority, final String name, final boolean reverse,
+    final boolean deprecated) {
+    this(name);
+    this.authority = authority;
+    this.reverse = reverse;
+    this.deprecated = deprecated;
+  }
+
   public Projection(final String name) {
     this.name = name;
     this.normalizedName = getNormalizedName(name);
-  }
-
-  public Projection(final String name, final Authority authority) {
-    this(name);
-    this.authority = authority;
   }
 
   @Override
@@ -126,6 +133,14 @@ public class Projection implements Serializable, Comparable<Projection> {
   @Override
   public int hashCode() {
     return getNormalizedName().hashCode();
+  }
+
+  public boolean isDeprecated() {
+    return this.deprecated;
+  }
+
+  public boolean isReverse() {
+    return this.reverse;
   }
 
   @Override

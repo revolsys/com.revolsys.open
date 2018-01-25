@@ -1,6 +1,6 @@
 package com.revolsys.geometry.cs.projection;
 
-import com.revolsys.geometry.cs.Datum;
+import com.revolsys.geometry.cs.GeodeticDatum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
@@ -29,7 +29,7 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
 
   public LambertConicConformal(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
-    final Datum datum = geographicCS.getDatum();
+    final GeodeticDatum geodeticDatum = geographicCS.getDatum();
     final double latitudeOfProjection = cs
       .getDoubleParameter(ProjectionParameterNames.LATITUDE_OF_CENTER);
     final double centralMeridian = cs
@@ -39,7 +39,7 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
     final double secondStandardParallel = cs
       .getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_2);
 
-    final Spheroid spheroid = datum.getSpheroid();
+    final Spheroid spheroid = geodeticDatum.getSpheroid();
     this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
@@ -97,8 +97,8 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
     } while (!Double.isNaN(phi) && delta > 1.0e-011);
     final double lambda = theta / this.n + this.lambda0;
 
-    targetCoordinates[targetOffset] = lambda;
-    targetCoordinates[targetOffset + 1] = phi;
+    targetCoordinates[targetOffset] = Math.toDegrees(lambda);
+    targetCoordinates[targetOffset + 1] = Math.toDegrees(phi);
   }
 
   private double m(final double phi) {
@@ -107,8 +107,10 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
   }
 
   @Override
-  public void project(final double lambda, final double phi, final double[] targetCoordinates,
+  public void project(final double lon, final double lat, final double[] targetCoordinates,
     final int targetOffset) {
+    final double lambda = Math.toRadians(lon);
+    final double phi = Math.toRadians(lat);
 
     final double t = t(phi);
     final double rho = this.a * this.f * Math.pow(t, this.n);

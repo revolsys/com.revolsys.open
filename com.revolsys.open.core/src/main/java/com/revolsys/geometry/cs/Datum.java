@@ -1,54 +1,27 @@
 package com.revolsys.geometry.cs;
 
-import java.io.Serializable;
-
 import com.revolsys.util.Equals;
 
-public class Datum implements Serializable {
-  /**
-   *
-   */
-  private static final long serialVersionUID = 4603557237435332398L;
-
+public class Datum {
   private final Authority authority;
 
-  private boolean deprecated;
+  private final boolean deprecated;
 
   private final String name;
 
-  private PrimeMeridian primeMeridian;
+  private final Area area;
 
-  private final Spheroid spheroid;
-
-  private ToWgs84 toWgs84;
-
-  public Datum(final String name, final Spheroid spheroid, final Authority authority) {
-    this.name = name;
-    this.spheroid = spheroid;
+  public Datum(final Authority authority, final String name, final Area area,
+    final boolean deprecated) {
     this.authority = authority;
-  }
-
-  public Datum(final String name, final Spheroid spheroid, final PrimeMeridian primeMeridian,
-    final Authority authority, final boolean deprecated) {
     this.name = name;
-    this.spheroid = spheroid;
-    this.primeMeridian = primeMeridian;
-    this.authority = authority;
+    this.area = area;
     this.deprecated = deprecated;
   }
 
-  public Datum(final String name, final Spheroid spheroid, final ToWgs84 toWgs84,
-    final Authority authority) {
-    this.name = name;
-    this.spheroid = spheroid;
-    this.toWgs84 = toWgs84;
-    this.authority = authority;
-  }
-
-  @Override
-  public boolean equals(final Object object) {
+  public boolean equals(final Datum object) {
     if (object instanceof Datum) {
-      final Datum datum = (Datum)object;
+      final Datum datum = object;
       if (Equals.equals(this.authority, datum.authority)) {
         return true;
       } else if (this.name == null) {
@@ -57,8 +30,6 @@ public class Datum implements Serializable {
         }
         // } else if (!name.equalsIgnoreCase(datum.name)) {
         // return false;
-      } else if (this.spheroid.equals(datum.spheroid)) {
-        return false;
       } else {
         return true;
       }
@@ -73,13 +44,13 @@ public class Datum implements Serializable {
       return false;
     } else if (!Equals.equals(this.name, datum.name)) {
       return false;
-    } else if (!this.primeMeridian.equalsExact(this.primeMeridian)) {
-      return false;
-    } else if (!this.spheroid.equalsExact(datum.spheroid)) {
-      return false;
     } else {
       return true;
     }
+  }
+
+  public Area getArea() {
+    return this.area;
   }
 
   public Authority getAuthority() {
@@ -90,25 +61,9 @@ public class Datum implements Serializable {
     return this.name;
   }
 
-  public PrimeMeridian getPrimeMeridian() {
-    return this.primeMeridian;
-  }
-
-  public Spheroid getSpheroid() {
-    return this.spheroid;
-  }
-
-  public ToWgs84 getToWgs84() {
-    return this.toWgs84;
-  }
-
   @Override
   public int hashCode() {
-    if (this.spheroid != null) {
-      return this.spheroid.hashCode();
-    } else {
-      return 1;
-    }
+    return this.authority.hashCode();
   }
 
   public boolean isDeprecated() {

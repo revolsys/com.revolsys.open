@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.beans.ObjectException;
@@ -182,8 +181,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   private int geodatabaseReferenceCount;
 
   private final Map<PathName, AtomicLong> idGenerators = new HashMap<>();
-
-  private boolean initialized;
 
   private final Map<String, Table> tableByCatalogPath = new HashMap<>();
 
@@ -940,55 +937,50 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  @PostConstruct
-  public void initialize() {
+  public void initializeDo() {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (!this.initialized) {
-          Geodatabase geodatabase = null;
-          this.initialized = true;
-          try {
-            super.initialize();
-            final File file = new File(this.fileName);
-            if (file.exists()) {
-              if (file.isDirectory()) {
-                if (!new File(this.fileName, "gdb").exists()) {
-                  throw new IllegalArgumentException(
-                    FileUtil.getCanonicalPath(file) + " is not a valid ESRI File Geodatabase");
-                }
-                geodatabase = getSingleThreadResult(() -> {
-                  return EsriFileGdb.openGeodatabase(this.fileName);
-                });
-              } else {
+        Geodatabase geodatabase = null;
+        try {
+          super.initialize();
+          final File file = new File(this.fileName);
+          if (file.exists()) {
+            if (file.isDirectory()) {
+              if (!new File(this.fileName, "gdb").exists()) {
                 throw new IllegalArgumentException(
-                  FileUtil.getCanonicalPath(file) + " ESRI File Geodatabase must be a directory");
+                  FileUtil.getCanonicalPath(file) + " is not a valid ESRI File Geodatabase");
               }
-            } else if (this.createMissingRecordStore) {
-              geodatabase = newGeodatabase();
+              geodatabase = getSingleThreadResult(() -> {
+                return EsriFileGdb.openGeodatabase(this.fileName);
+              });
             } else {
               throw new IllegalArgumentException(
-                "ESRI file geodatabase not found " + this.fileName);
+                FileUtil.getCanonicalPath(file) + " ESRI File Geodatabase must be a directory");
             }
-            if (geodatabase == null) {
-              throw new IllegalArgumentException(
-                "Unable to open ESRI file geodatabase not found " + this.fileName);
-            }
-            final VectorOfWString domainNames = geodatabase.getDomains();
-            for (int i = 0; i < domainNames.size(); i++) {
-              final String domainName = domainNames.get(i);
-              loadDomain(geodatabase, domainName);
-            }
-            this.exists = true;
-          } catch (final Throwable e) {
-            try {
-              closeDo();
-            } finally {
-              Exceptions.throwUncheckedException(e);
-            }
+          } else if (this.createMissingRecordStore) {
+            geodatabase = newGeodatabase();
+          } else {
+            throw new IllegalArgumentException("ESRI file geodatabase not found " + this.fileName);
+          }
+          if (geodatabase == null) {
+            throw new IllegalArgumentException(
+              "Unable to open ESRI file geodatabase not found " + this.fileName);
+          }
+          final VectorOfWString domainNames = geodatabase.getDomains();
+          for (int i = 0; i < domainNames.size(); i++) {
+            final String domainName = domainNames.get(i);
+            loadDomain(geodatabase, domainName);
+          }
+          this.exists = true;
+        } catch (final Throwable e) {
+          try {
+            closeDo();
           } finally {
-            if (geodatabase != null) {
-              closeGeodatabase(geodatabase);
-            }
+            Exceptions.throwUncheckedException(e);
+          }
+        } finally {
+          if (geodatabase != null) {
+            closeGeodatabase(geodatabase);
           }
         }
       }

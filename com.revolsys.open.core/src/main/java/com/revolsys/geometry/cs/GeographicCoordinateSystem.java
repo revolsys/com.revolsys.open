@@ -6,10 +6,15 @@ import java.util.List;
 import javax.measure.converter.UnitConverter;
 import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
+import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.geometry.cs.projection.CoordinatesProjection;
+import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.ProjectionFactory;
+import com.revolsys.geometry.cs.projection.RadiansToDegreesOperation;
+import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -44,7 +49,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   private final List<Axis> axis = new ArrayList<>();
 
-  private final Datum datum;
+  private final GeodeticDatum geodeticDatum;
 
   private boolean deprecated;
 
@@ -54,12 +59,12 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   private final PrimeMeridian primeMeridian;
 
-  public GeographicCoordinateSystem(final int id, final String name, final Datum datum,
+  public GeographicCoordinateSystem(final int id, final String name, final GeodeticDatum geodeticDatum,
     final AngularUnit angularUnit, final List<Axis> axis, final Area area,
     final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
-    this.datum = datum;
+    this.geodeticDatum = geodeticDatum;
     this.primeMeridian = null;
     this.angularUnit = angularUnit;
     if (axis != null && !axis.isEmpty()) {
@@ -69,12 +74,12 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     this.authority = authority;
   }
 
-  public GeographicCoordinateSystem(final int id, final String name, final Datum datum,
+  public GeographicCoordinateSystem(final int id, final String name, final GeodeticDatum geodeticDatum,
     final PrimeMeridian primeMeridian, final AngularUnit angularUnit, final List<Axis> axis,
     final Area area, final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
-    this.datum = datum;
+    this.geodeticDatum = geodeticDatum;
     this.primeMeridian = primeMeridian;
     this.angularUnit = angularUnit;
     if (axis != null && !axis.isEmpty()) {
@@ -85,12 +90,12 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     this.deprecated = deprecated;
   }
 
-  public GeographicCoordinateSystem(final int id, final String name, final Datum datum,
+  public GeographicCoordinateSystem(final int id, final String name, final GeodeticDatum geodeticDatum,
     final PrimeMeridian primeMeridian, final AngularUnit angularUnit, final List<Axis> axis,
     final Authority authority) {
     this.id = id;
     this.name = name;
-    this.datum = datum;
+    this.geodeticDatum = geodeticDatum;
     this.primeMeridian = primeMeridian;
     this.angularUnit = angularUnit;
     if (axis != null && !axis.isEmpty()) {
@@ -116,7 +121,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
       return true;
     } else if (object instanceof GeographicCoordinateSystem) {
       final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)object;
-      if (!equals(this.datum, cs.datum)) {
+      if (!equals(this.geodeticDatum, cs.geodeticDatum)) {
         return false;
       } else if (!equals(getPrimeMeridian(), cs.getPrimeMeridian())) {
         return false;
@@ -154,7 +159,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
         return false;
       } else if (!equals(this.axis, cs.axis)) {
         return false;
-      } else if (!equals(this.datum, cs.datum)) {
+      } else if (!equals(this.geodeticDatum, cs.geodeticDatum)) {
         return false;
       } else if (this.deprecated != cs.deprecated) {
         return false;
@@ -200,8 +205,54 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public CoordinatesProjection getCoordinatesProjection() {
-    return null;
+  public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem == null || this == coordinateSystem) {
+      return null;
+    } else if (coordinateSystem instanceof GeographicCoordinateSystem) {
+      final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
+      final Unit<Angle> angularUnit1 = getUnit();
+
+      // TODO GeodeticDatum shift
+      final Unit<Angle> angularUnit2 = geographicCoordinateSystem.getUnit();
+      if (!angularUnit1.equals(angularUnit2)) {
+        return new UnitConverstionOperation(angularUnit1, angularUnit2, 2);
+      } else {
+        return null;
+      }
+    } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
+      final List<CoordinatesOperation> operations = new ArrayList<>();
+      final Unit<Angle> angularUnit1 = getUnit();
+      if (!angularUnit1.equals(NonSI.DEGREE_ANGLE)) {
+        CoordinatesOperation converstionOperation;
+        if (angularUnit1.equals(SI.RADIAN)) {
+          converstionOperation = RadiansToDegreesOperation.INSTANCE;
+        } else {
+          converstionOperation = new UnitConverstionOperation(angularUnit1, NonSI.DEGREE_ANGLE, 2);
+        }
+
+        operations.add(converstionOperation);
+      }
+      // TODO geodeticDatum shift
+      final CoordinatesOperation projectOperation = projectedCoordinateSystem.getProjectCoordinatesOperation();
+      if (projectOperation != null) {
+        operations.add(projectOperation);
+      }
+      final Unit<Length> linearUnit2 = projectedCoordinateSystem.getLengthUnit();
+      if (!linearUnit2.equals(SI.METRE)) {
+        operations.add(new UnitConverstionOperation(SI.METRE, linearUnit2));
+      }
+      switch (operations.size()) {
+        case 0:
+          return null;
+        case 1:
+          return operations.get(0);
+        default:
+          return new ChainedCoordinatesOperation(operations);
+      }
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -214,8 +265,8 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return this.name;
   }
 
-  public Datum getDatum() {
-    return this.datum;
+  public GeodeticDatum getDatum() {
+    return this.geodeticDatum;
   }
 
   @Override
@@ -223,7 +274,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     final Unit<Angle> unit = this.angularUnit.getUnit();
     final UnitConverter radianConverter = unit.getConverterTo(SI.RADIAN);
 
-    final Spheroid spheroid = this.datum.getSpheroid();
+    final Spheroid spheroid = this.geodeticDatum.getSpheroid();
     final double radius = spheroid.getSemiMajorAxis();
     final double radianFactor = radianConverter.convert(1);
     return SI.METRE.times(radius).times(radianFactor);
@@ -231,10 +282,10 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   public PrimeMeridian getPrimeMeridian() {
     if (this.primeMeridian == null) {
-      if (this.datum == null) {
+      if (this.geodeticDatum == null) {
         return null;
       } else {
-        return this.datum.getPrimeMeridian();
+        return this.geodeticDatum.getPrimeMeridian();
       }
     } else {
       return this.primeMeridian;
@@ -251,8 +302,8 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    if (this.datum != null) {
-      result = prime * result + this.datum.hashCode();
+    if (this.geodeticDatum != null) {
+      result = prime * result + this.geodeticDatum.hashCode();
     }
     if (getPrimeMeridian() != null) {
       result = prime * result + getPrimeMeridian().hashCode();

@@ -1,17 +1,11 @@
 package com.revolsys.geometry.cs;
 
-import java.io.Serializable;
-
 import javax.measure.quantity.Angle;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-public class AngularUnit implements Serializable {
-  /**
-   *
-   */
-  private static final long serialVersionUID = -3508138430785747634L;
+public class AngularUnit implements UnitOfMeasure {
 
   /**
    * Get the angular unit representing the conversion factor from
@@ -152,6 +146,35 @@ public class AngularUnit implements Serializable {
 
   public boolean isDeprecated() {
     return this.deprecated;
+  }
+
+  @Override
+  public double toBase(final double value) {
+    final double baseValue;
+    if (Double.isFinite(this.conversionFactor)) {
+      baseValue = value * this.conversionFactor;
+    } else {
+      baseValue = value;
+    }
+    if (this.baseUnit == null) {
+      return baseValue;
+    } else {
+      return this.baseUnit.toBase(baseValue);
+    }
+  }
+
+  public double toDegrees(final double value) {
+    final double baseValue;
+    if (Double.isFinite(this.conversionFactor)) {
+      baseValue = value * this.conversionFactor;
+    } else {
+      baseValue = value;
+    }
+    if (this.baseUnit == null) {
+      return Math.toDegrees(baseValue);
+    } else {
+      return this.baseUnit.toDegrees(baseValue);
+    }
   }
 
   @Override

@@ -47,8 +47,8 @@ public class EpsgVerticalCoordinateSystems implements CodeTable {
   private final List<EpsgVerticalCoordinateSystem> coordinateSystems = new ArrayList<>();
 
   private EpsgVerticalCoordinateSystems() {
-    addCoordinateSystem(5713, "CGVD28 height", "Canadian Geodetic Vertical Datum of 1928");
-    addCoordinateSystem(6647, "CGVD2013 height", "Canadian Geodetic Vertical Datum of 2013");
+    addCoordinateSystem(5713, "CGVD28 height", "Canadian Geodetic Vertical GeodeticDatum of 1928");
+    addCoordinateSystem(6647, "CGVD2013 height", "Canadian Geodetic Vertical GeodeticDatum of 2013");
   }
 
   private void addCoordinateSystem(final EpsgVerticalCoordinateSystem coordinateSystem) {
