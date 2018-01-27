@@ -11,8 +11,9 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.record.code.Code;
 
-public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
+public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializable {
   CoordinateSystem clone();
 
   Area getArea();
@@ -23,6 +24,12 @@ public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
 
   List<Axis> getAxis();
 
+  @SuppressWarnings("unchecked")
+  @Override
+  default <C> C getCode() {
+    return (C)(Integer)getCoordinateSystemId();
+  }
+
   CoordinatesOperation getCoordinatesOperation(CoordinateSystem coordinateSystem);
 
   @Override
@@ -31,8 +38,22 @@ public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
   }
 
   @Override
+  default String getDescription() {
+    return getCoordinateSystemName();
+  }
+
+  @Override
   default GeometryFactory getGeometryFactory() {
     return GeometryFactory.floating3d(this);
+  }
+
+  @Override
+  default Integer getInteger(final int index) {
+    if (index == 0) {
+      return getCoordinateSystemId();
+    } else {
+      throw new ArrayIndexOutOfBoundsException(index);
+    }
   }
 
   Unit<Length> getLengthUnit();

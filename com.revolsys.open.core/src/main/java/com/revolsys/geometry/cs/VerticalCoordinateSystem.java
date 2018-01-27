@@ -1,6 +1,6 @@
 package com.revolsys.geometry.cs;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.measure.quantity.Length;
@@ -12,17 +12,15 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.record.code.Code;
 
-public class VerticalCoordinateSystem implements CoordinateSystem, Code {
-
+public class VerticalCoordinateSystem implements CoordinateSystem {
   private final LinearUnit linearUnit;
 
   private final Area area;
 
   private final Authority authority;
 
-  private final List<Axis> axis = new ArrayList<>();
+  private final List<Axis> axis;
 
   private final VerticalDatum verticalDatum;
 
@@ -39,9 +37,7 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
     this.name = name;
     this.verticalDatum = verticalDatum;
     this.linearUnit = (LinearUnit)axis.get(0).getUnit();
-    if (axis != null && !axis.isEmpty()) {
-      this.axis.addAll(axis);
-    }
+    this.axis = axis;
     this.area = area;
     this.authority = new EpsgAuthority(id);
   }
@@ -135,13 +131,7 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
 
   @Override
   public List<Axis> getAxis() {
-    return this.axis;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <C> C getCode() {
-    return (C)(Integer)getCoordinateSystemId();
+    return Collections.unmodifiableList(this.axis);
   }
 
   @Override
@@ -161,20 +151,6 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
 
   public VerticalDatum getDatum() {
     return this.verticalDatum;
-  }
-
-  @Override
-  public String getDescription() {
-    return getCoordinateSystemName();
-  }
-
-  @Override
-  public Integer getInteger(final int index) {
-    if (index == 0) {
-      return getCoordinateSystemId();
-    } else {
-      throw new ArrayIndexOutOfBoundsException(index);
-    }
   }
 
   @Override
