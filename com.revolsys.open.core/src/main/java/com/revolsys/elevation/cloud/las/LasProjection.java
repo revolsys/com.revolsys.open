@@ -19,11 +19,11 @@ import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.Axis;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.LinearUnit;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Projection;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.io.Buffers;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
@@ -110,7 +110,7 @@ public class LasProjection {
             final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
               .getCoordinateSystem(geoSrid);
             final String name = "unknown";
-            final Projection projection = TiffImage.getProjection(properties);
+            final CoordinateOperationMethod coordinateOperationMethod = TiffImage.getProjection(properties);
             final Area area = null;
 
             final Map<String, Object> parameters = new LinkedHashMap<>();
@@ -131,7 +131,7 @@ public class LasProjection {
             final List<Axis> axis = null;
             final Authority authority = null;
             final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
-              coordinateSystemId, name, geographicCoordinateSystem, area, projection, parameters,
+              coordinateSystemId, name, geographicCoordinateSystem, area, coordinateOperationMethod, parameters,
               linearUnit, axis, authority, false);
             coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(projectedCoordinateSystem);
           }

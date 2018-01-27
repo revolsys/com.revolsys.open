@@ -1,10 +1,10 @@
 package com.revolsys.geometry.cs.projection;
 
-import com.revolsys.geometry.cs.GeodeticDatum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.math.Angle;
 
 /**
@@ -85,7 +85,7 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
   /** Constant n = ( sq(m(phi1)) - sq(m(phi2) ) /( q(phi2) - q(phi1) ) */
   private final double n;
 
-  /** Lattitude of Projection. */
+  /** Lattitude of CoordinateOperationMethod. */
   private final double phi0;
 
   /** First standard parallel. */

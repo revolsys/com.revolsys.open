@@ -1,5 +1,7 @@
-package com.revolsys.geometry.cs;
+package com.revolsys.geometry.cs.datum;
 
+import com.revolsys.geometry.cs.Area;
+import com.revolsys.geometry.cs.Authority;
 import com.revolsys.util.Equals;
 
 public class Datum {

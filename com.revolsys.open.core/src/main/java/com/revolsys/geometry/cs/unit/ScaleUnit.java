@@ -1,4 +1,6 @@
-package com.revolsys.geometry.cs;
+package com.revolsys.geometry.cs.unit;
+
+import com.revolsys.geometry.cs.Authority;
 
 public class ScaleUnit implements UnitOfMeasure {
 
@@ -84,6 +86,11 @@ public class ScaleUnit implements UnitOfMeasure {
     } else {
       return this.baseUnit.toBase(baseValue);
     }
+  }
+
+  @Override
+  public double toNormal(final double value) {
+    return value;
   }
 
   @Override

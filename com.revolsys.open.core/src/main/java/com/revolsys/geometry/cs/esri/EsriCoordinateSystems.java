@@ -1,26 +1,38 @@
 package com.revolsys.geometry.cs.esri;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemException;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.revolsys.collection.set.Sets;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateSystemParser;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.StringWriter;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.WrappedException;
 
@@ -31,11 +43,16 @@ public class EsriCoordinateSystems {
 
   private static Map<String, CoordinateSystem> coordinateSystemsByName = new HashMap<>();
 
+  private static final Set<OpenOption> OPEN_OPTIONS_READ_SET = Sets
+    .newHash(StandardOpenOption.READ);
+
+  private static final FileAttribute<?>[] FILE_ATTRIBUTES_NONE = new FileAttribute[0];
+
   static {
     try {
       final List<GeographicCoordinateSystem> geographicCoordinateSystems = CoordinateSystemParser
-        .getGeographicCoordinateSystems("ESRI", EpsgCoordinateSystems.newReader(
-          EsriCoordinateSystems.class, "/com/revolsys/gis/cs/esri/geographicCoordinateSystem.txt"));
+        .getGeographicCoordinateSystems("ESRI", newReader(EsriCoordinateSystems.class,
+          "/com/revolsys/gis/cs/esri/geographicCoordinateSystem.txt"));
       for (final GeographicCoordinateSystem cs : geographicCoordinateSystems) {
         final int id = getCrsId(cs);
         coordinateSystemsById.put(id, cs);
@@ -43,9 +60,8 @@ public class EsriCoordinateSystems {
         coordinateSystems.put(cs, cs);
       }
       final List<ProjectedCoordinateSystem> projectedCoordinateSystems = CoordinateSystemParser
-        .getProjectedCoordinateSystems(coordinateSystemsById, "ESRI",
-          EpsgCoordinateSystems.newReader(EsriCoordinateSystems.class,
-            "/com/revolsys/gis/cs/esri/projectedCoordinateSystem.txt"));
+        .getProjectedCoordinateSystems(coordinateSystemsById, "ESRI", newReader(
+          EsriCoordinateSystems.class, "/com/revolsys/gis/cs/esri/projectedCoordinateSystem.txt"));
       for (final ProjectedCoordinateSystem cs : projectedCoordinateSystems) {
         final int id = getCrsId(cs);
         coordinateSystemsById.put(id, cs);
@@ -168,6 +184,26 @@ public class EsriCoordinateSystems {
   public static GeometryFactory getGeometryFactory(final String wkt) {
     final CoordinateSystem coordinateSystem = getCoordinateSystem(wkt);
     return getGeometryFactory(coordinateSystem);
+  }
+
+  private static java.io.Reader newReader(final Class<?> clazz, final String fileName)
+    throws IOException {
+    final URL url = clazz.getResource(fileName);
+    if (url == null) {
+      return null;
+    } else {
+      final UrlResource resource = new UrlResource(url);
+      ReadableByteChannel channel;
+      try {
+        final File file = resource.getFile();
+        final Path path = file.toPath();
+        channel = FileChannel.open(path, OPEN_OPTIONS_READ_SET, FILE_ATTRIBUTES_NONE);
+      } catch (final Throwable e) {
+        final InputStream in = url.openStream();
+        channel = Channels.newChannel(in);
+      }
+      return Channels.newReader(channel, StandardCharsets.UTF_8.newDecoder(), 8196);
+    }
   }
 
   public static String toString(final GeometryFactory geometryFactory) {

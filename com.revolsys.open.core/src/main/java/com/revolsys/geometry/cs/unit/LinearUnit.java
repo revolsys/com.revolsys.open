@@ -1,38 +1,41 @@
-package com.revolsys.geometry.cs;
+package com.revolsys.geometry.cs.unit;
 
-import javax.measure.quantity.Angle;
+import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-public class AngularUnit implements UnitOfMeasure {
+import com.revolsys.geometry.cs.Authority;
+import com.revolsys.util.number.Doubles;
+
+public class LinearUnit implements UnitOfMeasure {
 
   /**
-   * Get the angular unit representing the conversion factor from
-   * {@link SI#RADIAN}.
+   * Get the linear unit representing the conversion factor from
+   * {@link SI#METER}.
    *
    * @param conversionFactor The conversion factor.
-   * @return The angular unit.
+   * @return The linear unit.
    */
-  public static Unit<Angle> getUnit(final double conversionFactor) {
+  public static Unit<Length> getUnit(final double conversionFactor) {
     return getUnit(null, conversionFactor);
   }
 
   /**
-   * Get the angular unit representing the conversion factor from the specified
-   * base angular unit.
+   * Get the linear unit representing the conversion factor from the specified
+   * base linear unit.
    *
    * @param baseUnit The base unit.
    * @param conversionFactor The conversion factor.
-   * @return The angular unit.
+   * @return The linear unit.
    */
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public static Unit<Angle> getUnit(final Unit<Angle> baseUnit, final double conversionFactor) {
-    Unit<Angle> unit;
+  public static Unit<Length> getUnit(final Unit<Length> baseUnit, final double conversionFactor) {
+    Unit<Length> unit;
     if (baseUnit == null) {
-      unit = SI.RADIAN;
+      unit = SI.METRE;
     } else {
       unit = baseUnit;
     }
@@ -56,42 +59,37 @@ public class AngularUnit implements UnitOfMeasure {
 
   private final Authority authority;
 
-  private final AngularUnit baseUnit;
+  private final LinearUnit baseUnit;
 
   private final double conversionFactor;
 
   private final boolean deprecated;
 
-  private String name;
+  private final String name;
 
-  private Unit<Angle> unit;
+  private Unit<Length> unit;
 
-  public AngularUnit(final String name, final AngularUnit baseUnit, final double conversionFactor,
+  public LinearUnit(final String name, final double conversionFactor, final Authority authority) {
+    this(name, null, conversionFactor, authority, false);
+  }
+
+  public LinearUnit(final String name, final LinearUnit baseUnit, final double conversionFactor,
     final Authority authority) {
     this(name, baseUnit, conversionFactor, authority, false);
   }
 
-  public AngularUnit(final String name, final AngularUnit baseUnit, final double conversionFactor,
+  public LinearUnit(final String name, final LinearUnit baseUnit, final double conversionFactor,
     final Authority authority, final boolean deprecated) {
     this.name = name;
-    if (name.equals("degree (supplier to define representation)")) {
-      this.name = "degree";
-    }
     this.baseUnit = baseUnit;
     this.conversionFactor = conversionFactor;
     this.authority = authority;
     this.deprecated = deprecated;
-    if (this.name.equals("degree")) {
-      this.unit = NonSI.DEGREE_ANGLE;
-    } else if (baseUnit == null) {
+    if (baseUnit == null) {
       this.unit = getUnit(conversionFactor);
     } else {
       this.unit = getUnit(baseUnit.getUnit(), conversionFactor);
     }
-  }
-
-  public AngularUnit(final String name, final double conversionFactor, final Authority authority) {
-    this(name, null, conversionFactor, authority, false);
   }
 
   @Override
@@ -100,9 +98,9 @@ public class AngularUnit implements UnitOfMeasure {
       return false;
     } else if (object == this) {
       return true;
-    } else if (object instanceof AngularUnit) {
-      final AngularUnit unit = (AngularUnit)object;
-      if (!this.name.equals(unit.name)) {
+    } else if (object instanceof LinearUnit) {
+      final LinearUnit unit = (LinearUnit)object;
+      if (this.name == null && unit.name != null || !this.name.equals(unit.name)) {
         return false;
       } else if (Math.abs(this.conversionFactor - unit.conversionFactor) > 1.0e-10) {
         return false;
@@ -118,7 +116,7 @@ public class AngularUnit implements UnitOfMeasure {
     return this.authority;
   }
 
-  public AngularUnit getBaseUnit() {
+  public LinearUnit getBaseUnit() {
     return this.baseUnit;
   }
 
@@ -130,7 +128,7 @@ public class AngularUnit implements UnitOfMeasure {
     return this.name;
   }
 
-  public Unit<Angle> getUnit() {
+  public Unit<Length> getUnit() {
     return this.unit;
   }
 
@@ -163,7 +161,8 @@ public class AngularUnit implements UnitOfMeasure {
     }
   }
 
-  public double toDegrees(final double value) {
+  @Override
+  public double toNormal(final double value) {
     final double baseValue;
     if (Double.isFinite(this.conversionFactor)) {
       baseValue = value * this.conversionFactor;
@@ -171,9 +170,9 @@ public class AngularUnit implements UnitOfMeasure {
       baseValue = value;
     }
     if (this.baseUnit == null) {
-      return Math.toDegrees(baseValue);
+      return Doubles.makePrecise(1.0e12, baseValue);
     } else {
-      return this.baseUnit.toDegrees(baseValue);
+      return this.baseUnit.toBase(baseValue);
     }
   }
 

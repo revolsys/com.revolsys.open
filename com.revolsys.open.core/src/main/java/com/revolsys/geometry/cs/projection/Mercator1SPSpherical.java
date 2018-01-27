@@ -1,10 +1,10 @@
 package com.revolsys.geometry.cs.projection;
 
-import com.revolsys.geometry.cs.GeodeticDatum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.math.Angle;
 
 public class Mercator1SPSpherical extends AbstractCoordinatesProjection {

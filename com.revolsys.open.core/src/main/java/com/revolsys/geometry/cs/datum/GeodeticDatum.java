@@ -1,4 +1,10 @@
-package com.revolsys.geometry.cs;
+package com.revolsys.geometry.cs.datum;
+
+import com.revolsys.geometry.cs.Area;
+import com.revolsys.geometry.cs.Authority;
+import com.revolsys.geometry.cs.PrimeMeridian;
+import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.ToWgs84;
 
 public class GeodeticDatum extends Datum {
   private PrimeMeridian primeMeridian;

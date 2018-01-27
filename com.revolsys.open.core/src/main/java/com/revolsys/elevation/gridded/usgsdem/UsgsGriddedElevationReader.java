@@ -18,12 +18,12 @@ import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.LinearUnit;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Projection;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
@@ -449,9 +449,9 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           parameters.put(ProjectionParameterNames.FALSE_EASTING, projectionParameters[6]);
           parameters.put(ProjectionParameterNames.FALSE_NORTHING, projectionParameters[7]);
 
-          final Projection projection = EpsgCoordinateSystems.getProjection("Albers_Equal_Area");
+          final CoordinateOperationMethod coordinateOperationMethod = EpsgCoordinateSystems.getProjection("Albers_Equal_Area");
           final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
-            -1, "", geographicCoordinateSystem, null, projection, parameters, linearUnit, null,
+            -1, "", geographicCoordinateSystem, null, coordinateOperationMethod, parameters, linearUnit, null,
             null, false);
           final ProjectedCoordinateSystem projectedCoordinateSystem2 = (ProjectedCoordinateSystem)EpsgCoordinateSystems
             .getCoordinateSystem(projectedCoordinateSystem);

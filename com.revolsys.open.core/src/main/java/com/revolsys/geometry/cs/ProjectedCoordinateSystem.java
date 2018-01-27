@@ -20,6 +20,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.cs.projection.CopyOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -50,17 +51,17 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private final Map<String, Object> parameters = new LinkedHashMap<>();
 
-  private final Projection projection;
+  private final CoordinateOperationMethod coordinateOperationMethod;
 
   public ProjectedCoordinateSystem(final int id, final String name,
     final GeographicCoordinateSystem geographicCoordinateSystem, final Area area,
-    final Projection projection, final Map<String, Object> parameters, final LinearUnit linearUnit,
+    final CoordinateOperationMethod coordinateOperationMethod, final Map<String, Object> parameters, final LinearUnit linearUnit,
     final List<Axis> axis, final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
     this.area = area;
     this.geographicCoordinateSystem = geographicCoordinateSystem;
-    this.projection = projection;
+    this.coordinateOperationMethod = coordinateOperationMethod;
     setParameters(parameters);
     this.linearUnit = linearUnit;
     if (axis != null && !axis.isEmpty()) {
@@ -72,13 +73,13 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   public ProjectedCoordinateSystem(final int id, final String name,
-    final GeographicCoordinateSystem geographicCoordinateSystem, final Projection projection,
+    final GeographicCoordinateSystem geographicCoordinateSystem, final CoordinateOperationMethod coordinateOperationMethod,
     final Map<String, Object> parameters, final LinearUnit linearUnit, final List<Axis> axis,
     final Authority authority) {
     this.id = id;
     this.name = name;
     this.geographicCoordinateSystem = geographicCoordinateSystem;
-    this.projection = projection;
+    this.coordinateOperationMethod = coordinateOperationMethod;
     setParameters(parameters);
     this.linearUnit = linearUnit;
     if (axis != null && !axis.isEmpty()) {
@@ -107,7 +108,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
       if (!this.geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
         return false;
-      } else if (!this.projection.equals(cs.projection)) {
+      } else if (!this.coordinateOperationMethod.equals(cs.coordinateOperationMethod)) {
         return false;
       } else if (!this.normalizedParameters.equals(cs.normalizedParameters)) {
         return false;
@@ -144,7 +145,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
         return false;
       } else if (!DataType.equal(this.normalizedParameters, cs.normalizedParameters)) {
         return false;
-      } else if (!DataType.equal(this.projection, cs.projection)) {
+      } else if (!DataType.equal(this.coordinateOperationMethod, cs.coordinateOperationMethod)) {
         return false;
       } else {
         return true;
@@ -310,8 +311,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     }
   }
 
-  public Projection getProjection() {
-    return this.projection;
+  public CoordinateOperationMethod getCoordinateOperationMethod() {
+    return this.coordinateOperationMethod;
   }
 
   @Override
@@ -327,8 +328,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     if (this.geographicCoordinateSystem != null) {
       result = prime * result + this.geographicCoordinateSystem.hashCode();
     }
-    if (this.projection != null) {
-      result = prime * result + this.projection.hashCode();
+    if (this.coordinateOperationMethod != null) {
+      result = prime * result + this.coordinateOperationMethod.hashCode();
     }
     for (final Entry<String, Object> entry : this.normalizedParameters.entrySet()) {
       final String key = entry.getKey();

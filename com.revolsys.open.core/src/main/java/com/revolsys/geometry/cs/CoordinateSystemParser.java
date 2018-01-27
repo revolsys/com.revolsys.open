@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.unit.AngularUnit;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 
 public class CoordinateSystemParser {
   public static List<GeographicCoordinateSystem> getGeographicCoordinateSystems(
@@ -86,7 +89,7 @@ public class CoordinateSystemParser {
             }
           }
 
-          final Projection projection = EpsgCoordinateSystems.getProjection(projectionName);
+          final CoordinateOperationMethod coordinateOperationMethod = EpsgCoordinateSystems.getProjection(projectionName);
           LinearUnit unit = linearUnitsByName.get(unitName);
           if (unit == null) {
             unit = new LinearUnit(unitName, conversionFactor, null);
@@ -94,7 +97,7 @@ public class CoordinateSystemParser {
           }
           final Authority authority = new BaseAuthority(authorityName, id);
           final ProjectedCoordinateSystem cs = new ProjectedCoordinateSystem(Integer.parseInt(id),
-            csName, geoCs, projection, parameters, unit, null, authority);
+            csName, geoCs, coordinateOperationMethod, parameters, unit, null, authority);
           coordinateSystems.add(cs);
         } catch (final Throwable t) {
 

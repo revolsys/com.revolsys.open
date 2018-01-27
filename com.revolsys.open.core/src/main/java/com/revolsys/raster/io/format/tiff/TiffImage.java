@@ -21,16 +21,16 @@ import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.Axis;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.LinearUnit;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Projection;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
-import com.revolsys.geometry.cs.epsg.EpsgAuthority;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.JaiGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 import com.sun.media.jai.codec.ImageCodec;
 
 @SuppressWarnings("deprecation")
@@ -59,7 +59,7 @@ public class TiffImage extends JaiGeoreferencedImage {
   /** ProjCoordTransGeoKey (3075) */
   public static final int PROJECTION_ID = 3075;
 
-  private static IntHashMap<String> PROJECTION_NAMES = new IntHashMap<>();
+  private static IntHashMap<CoordinateOperationMethod> PROJECTION_BY_ID = new IntHashMap<>();
 
   /** ProjStdParallel1GeoKey (3078) */
   public static final int STANDARD_PARALLEL_1_KEY = 3078;
@@ -70,7 +70,6 @@ public class TiffImage extends JaiGeoreferencedImage {
   public static final int TAG_X_RESOLUTION = 282;
 
   public static final int TAG_Y_RESOLUTION = 283;
-
   static {
     try {
       final OperationRegistry reg = JAI.getDefaultInstance().getOperationRegistry();
@@ -84,20 +83,18 @@ public class TiffImage extends JaiGeoreferencedImage {
 
     } catch (final Throwable t) {
     }
-  }
 
-  static {
-    PROJECTION_NAMES.put(1, "Transverse_Mercator");
+    addProjection(1, "Transverse_Mercator");
     // CT_TransvMercator_Modified_Alaska = 2
     // CT_ObliqueMercator = 3
     // CT_ObliqueMercator_Laborde = 4
     // CT_ObliqueMercator_Rosenmund = 5
     // CT_ObliqueMercator_Spherical = 6
-    PROJECTION_NAMES.put(7, "Mercator");
-    PROJECTION_NAMES.put(8, "Lambert_Conic_Conformal_(2SP)");
-    PROJECTION_NAMES.put(9, "Lambert_Conic_Conformal_(1SP)");
+    addProjection(7, "Mercator");
+    addProjection(8, "Lambert_Conic_Conformal_(2SP)");
+    addProjection(9, "Lambert_Conic_Conformal_(1SP)");
     // CT_LambertAzimEqualArea = 10
-    PROJECTION_NAMES.put(11, "Albers_Equal_Area");
+    addProjection(11, "Albers_Equal_Area");
     // CT_AzimuthalEquidistant = 12
     // CT_EquidistantConic = 13
     // CT_Stereographic = 14
@@ -162,6 +159,14 @@ public class TiffImage extends JaiGeoreferencedImage {
     geoKeys.put(keyId, value);
   }
 
+  private static void addProjection(final int id, final String name) {
+    final CoordinateOperationMethod coordinateOperationMethod = EpsgCoordinateSystems.getProjection(name);
+    if (coordinateOperationMethod == null) {
+      Debug.noOp();
+    }
+    PROJECTION_BY_ID.put(id, coordinateOperationMethod);
+  }
+
   private static Map<Integer, Object> getGeoKeys(final XTIFFDirectory dir) {
     final Map<Integer, Object> geoKeys = new LinkedHashMap<>();
 
@@ -186,17 +191,9 @@ public class TiffImage extends JaiGeoreferencedImage {
     return EpsgCoordinateSystems.getUnit(linearUnitId);
   }
 
-  public static Projection getProjection(final Map<Integer, Object> geoKeys) {
+  public static CoordinateOperationMethod getProjection(final Map<Integer, Object> geoKeys) {
     final int projectionId = Maps.getInteger(geoKeys, PROJECTION_ID, 0);
-    final String projectionName = PROJECTION_NAMES.get(projectionId);
-    if (projectionName == null) {
-      return null;
-    } else {
-      final Authority projectionAuthority = new EpsgAuthority(projectionId);
-      final Projection projection = new Projection(projectionAuthority, projectionName, true,
-        false);
-      return projection;
-    }
+    return PROJECTION_BY_ID.get(projectionId);
   }
 
   public TiffImage(final Resource imageResource) {
@@ -241,7 +238,7 @@ public class TiffImage extends JaiGeoreferencedImage {
           final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
             .getCoordinateSystem(geoSrid);
           final String name = "unknown";
-          final Projection projection = getProjection(geoKeys);
+          final CoordinateOperationMethod coordinateOperationMethod = getProjection(geoKeys);
           final Area area = null;
 
           final Map<String, Object> parameters = new LinkedHashMap<>();
@@ -262,7 +259,7 @@ public class TiffImage extends JaiGeoreferencedImage {
           final List<Axis> axis = null;
           final Authority authority = null;
           final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
-            coordinateSystemId, name, geographicCoordinateSystem, area, projection, parameters,
+            coordinateSystemId, name, geographicCoordinateSystem, area, coordinateOperationMethod, parameters,
             linearUnit, axis, authority, false);
           final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
             .getCoordinateSystem(coordinateSystem);

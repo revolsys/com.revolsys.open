@@ -1,8 +1,6 @@
 package com.revolsys.gis.cs;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -11,9 +9,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.geometry.cs.AxisName;
 import com.revolsys.geometry.cs.CoordinateSystemType;
-import com.revolsys.geometry.cs.UnitOfMeasure;
+import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.io.PathName;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.record.Record;
@@ -30,42 +27,20 @@ import com.revolsys.spring.resource.Resource;
  */
 public final class EpsgCoordinateSystemsLoader {
 
-  public static final List<String> COORDINATE_REFERENCE_SYSTEM_TYPES = Arrays.asList(
-    "geographic 2D", "geographic 3D", "geocentric", "projected", "engineering", "vertical",
-    "compound");
+  public static final List<String> COORDINATE_REFERENCE_SYSTEM_TYPES = Arrays.asList("geocentric",
+    "geographic 3D", "geographic 2D", "projected", "engineering", "vertical", "compound");
 
   public static final List<String> COORDINATE_OPERATION_TYPES = Arrays.asList("conversion",
     "transformation", "concatenated operation");
 
-  private static NumberFormat getFormat() {
-    return new DecimalFormat("#0.00000##########################");
-  }
+  public static final List<String> PARAM_SIGN_REVERSAL = Arrays.asList(null, "No", "Yes");
 
   public static void main(final String[] args) {
     new EpsgCoordinateSystemsLoader().load();
   }
 
-  public static double toDecimalFromSexagesimalDegrees(final double sexagesimal) {
-    final String string = getFormat().format(sexagesimal);
-    final int dotIndex = string.indexOf('.');
-
-    final int degrees = Integer.parseInt(string.substring(0, dotIndex));
-    final int minutes = Integer.parseInt(string.substring(dotIndex + 1, dotIndex + 3));
-    final double seconds = Double.parseDouble(
-      string.substring(dotIndex + 3, dotIndex + 5) + "." + string.substring(dotIndex + 5));
-    double decimal;
-    if (sexagesimal < 0) {
-      decimal = degrees - minutes / 60.0 - seconds / 3600.0;
-    } else {
-      decimal = degrees + minutes / 60.0 + seconds / 3600.0;
-    }
-    return decimal;
-  }
-
   private final Resource baseResource = new PathResource(
     "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg");
-
-  private final Map<Integer, Integer> coordinateSystemUnitMap = new HashMap<>();
 
   private final RecordStore recordStore;
 
@@ -83,101 +58,91 @@ public final class EpsgCoordinateSystemsLoader {
 
   protected void load() {
     try {
-      loadUnitsOfMeasure();
+      loadAlias();
       loadArea();
-      loadCoordinateAxisName();
       loadCoordinateAxis();
+      loadCoordinateAxisName();
+      loadCoordinateReferenceSystem();
       loadCoordinateSystem();
-      loadEllipsoid();
-      loadPrimeMeridians();
-      loadDatum();
       loadCoordOperation();
       loadCoordOperationMethod();
       loadCoordOperationParam();
+      loadCoordOperationParamUsage();
       loadCoordOperationParamValue();
-
-      loadCoordinateReferenceSystem();
+      loadCoordOperationPath();
+      loadDatum();
+      loadEllipsoid();
+      loadPrimeMeridian();
+      loadUnitOfMeasure();
     } catch (final Throwable t) {
       t.printStackTrace();
     }
   }
 
-  private void loadArea() throws IOException {
-    final Query query = new Query("/public/epsg_area") //
-      .setOrderBy("area_code");
+  private void loadAlias() {
     try (
-      final RecordReader reader = this.recordStore.getRecords(query);
+      final RecordReader reader = newReader("/public/epsg_alias", "alias_code");
+      ChannelWriter writer = newWriter("alias")) {
+      for (final Record record : reader) {
+        writeInt(writer, record, "alias_code");
+        writeString(writer, record, "object_table_name");
+        writeInt(writer, record, "object_code");
+        writeInt(writer, record, "naming_system_code");
+        writeString(writer, record, "alias");
+      }
+    }
+  }
+
+  private void loadArea() {
+    try (
+      final RecordReader reader = newReader("/public/epsg_area", "area_code");
       ChannelWriter writer = newWriter("area")) {
       for (final Record record : reader) {
-        final int code = record.getInteger("area_code");
-        final String name = record.getValue("area_name");
-        final double minY = record.getDouble("area_south_bound_lat", Double.NaN);
-        final double maxY = record.getDouble("area_north_bound_lat", Double.NaN);
-        final double minX = record.getDouble("area_west_bound_lon", Double.NaN);
-        final double maxX = record.getDouble("area_east_bound_lon", Double.NaN);
-
-        writer.putInt(code);
-        writer.putStringUtf8ByteCount(name);
-        writer.putDouble(minX);
-        writer.putDouble(minY);
-        writer.putDouble(maxX);
-        writer.putDouble(maxY);
+        writeInt(writer, record, "area_code");
+        writeString(writer, record, "area_name");
+        writeDouble(writer, record, "area_south_bound_lat");
+        writeDouble(writer, record, "area_north_bound_lat");
+        writeDouble(writer, record, "area_west_bound_lon");
+        writeDouble(writer, record, "area_east_bound_lon");
         writeDeprecated(writer, record);
       }
     }
   }
 
-  private void loadCoordinateAxis() throws IOException {
-    final Query query = new Query("/public/epsg_coordinateaxis") //
-      .setOrderByFieldNames("coord_sys_code", "coord_axis_order");
-
+  private void loadCoordinateAxis() {
     try (
-      final RecordReader reader = this.recordStore.getRecords(query);
+      final RecordReader reader = newReader("/public/epsg_coordinateaxis", "coord_sys_code",
+        "coord_axis_order");
       ChannelWriter writer = newWriter("coordinateAxis");) {
-      for (final Record object : reader) {
-        final int coordSysCode = object.getInteger("coord_sys_code");
-        final int nameCode = object.getInteger("coord_axis_name_code");
-        final String orientation = object.getValue("coord_axis_orientation");
-        final String abbreviation = object.getValue("coord_axis_abbreviation");
-        final int uomCode = object.getInteger("uom_code");
-        this.coordinateSystemUnitMap.put(coordSysCode, uomCode);
-
-        writer.putInt(coordSysCode);
-        writer.putInt(nameCode);
-        writer.putStringUtf8ByteCount(orientation);
+      for (final Record record : reader) {
+        writeInt(writer, record, "coord_sys_code");
+        writeInt(writer, record, "coord_axis_name_code");
+        writeString(writer, record, "coord_axis_orientation");
+        final String abbreviation = record.getValue("coord_axis_abbreviation");
         writer.putByte((byte)abbreviation.charAt(0));
-        writer.putInt(uomCode);
+        writeInt(writer, record, "uom_code");
       }
-
     }
-
   }
 
-  private Map<Integer, AxisName> loadCoordinateAxisName() {
-    final Map<Integer, AxisName> coordinateAxisNames = new HashMap<>();
+  private void loadCoordinateAxisName() {
     try (
-      final RecordReader reader = newReader("/public/epsg_coordinateaxisname");
+      final RecordReader reader = newReader("/public/epsg_coordinateaxisname",
+        "coord_axis_name_code");
       ChannelWriter writer = newWriter("coordinateAxisName");) {
-      for (final Record object : reader) {
-        final int code = object.getInteger("coord_axis_name_code");
-        final String name = object.getValue("coord_axis_name");
-        coordinateAxisNames.put(code, new AxisName(code, name));
-        writer.putInt(code);
-        writer.putStringUtf8ByteCount(name);
+      for (final Record record : reader) {
+        writeInt(writer, record, "coord_axis_name_code");
+        writeString(writer, record, "coord_axis_name");
       }
 
     }
-    return coordinateAxisNames;
   }
 
   private void loadCoordinateReferenceSystem() throws IOException {
-    final Query query = new Query("/public/epsg_coordinatereferencesystem") //
-      .addOrderBy("coord_ref_sys_code");
-
     final Map<Integer, List<Record>> recordByKind = new TreeMap<>();
-
     try (
-      final RecordReader reader = this.recordStore.getRecords(query)) {
+      final RecordReader reader = newReader("/public/epsg_coordinatereferencesystem",
+        "coord_ref_sys_code")) {
       for (final Record record : reader) {
         final String code = record.getValue("coord_ref_sys_kind");
         final int kind = COORDINATE_REFERENCE_SYSTEM_TYPES.indexOf(code);
@@ -196,7 +161,7 @@ public final class EpsgCoordinateSystemsLoader {
           writeInt(writer, record, "datum_code", 0);
           writeInt(writer, record, "source_geogcrs_code", 0);
           writeInt(writer, record, "projection_conv_code", 0);
-          writeInt(writer, record, "cmpd_hoizcrs_code", 0);
+          writeInt(writer, record, "cmpd_horizcrs_code", 0);
           writeInt(writer, record, "cmpd_vertcrs_code", 0);
           writeDeprecated(writer, record);
         }
@@ -209,8 +174,7 @@ public final class EpsgCoordinateSystemsLoader {
       final RecordReader reader = newReader("/public/epsg_coordinatesystem");
       ChannelWriter writer = newWriter("coordinateSystem")) {
       for (final Record record : reader) {
-        final int id = record.getInteger("coord_sys_code");
-        writer.putInt(id);
+        writeInt(writer, record, "coord_sys_code");
         writeCodeByte(writer, record, "coord_sys_type", CoordinateSystemType.TYPE_NAMES);
         writeDeprecated(writer, record);
       }
@@ -252,12 +216,25 @@ public final class EpsgCoordinateSystemsLoader {
 
   private void loadCoordOperationParam() {
     try (
-      RecordReader reader = newReader("/public/epsg_coordoperationparam");
+      RecordReader reader = newReader("/public/epsg_coordoperationparam", "parameter_code");
       ChannelWriter writer = newWriter("coordOperationParam");) {
       for (final Record record : reader) {
         writeInt(writer, record, "parameter_code");
         writeString(writer, record, "parameter_name");
         writeDeprecated(writer, record);
+      }
+    }
+  }
+
+  private void loadCoordOperationParamUsage() {
+    try (
+      RecordReader reader = newReader("/public/epsg_coordoperationparamusage");
+      ChannelWriter writer = newWriter("coordOperationParamUsage");) {
+      for (final Record record : reader) {
+        writeInt(writer, record, "coord_op_method_code");
+        writeInt(writer, record, "parameter_code");
+        writeInt(writer, record, "sort_order");
+        writeCodeByte(writer, record, "param_sign_reversal", PARAM_SIGN_REVERSAL);
       }
     }
   }
@@ -273,35 +250,43 @@ public final class EpsgCoordinateSystemsLoader {
         writeDouble(writer, record, "parameter_value");
         writeString(writer, record, "param_value_file_ref");
         writeInt(writer, record, "uom_code", 0);
+      }
+    }
+  }
 
+  private void loadCoordOperationPath() {
+    try (
+      final RecordReader reader = newReader("/public/epsg_coordoperationpath",
+        "concat_operation_code", "op_path_step");
+      ChannelWriter writer = newWriter("coordOperationPath");) {
+      for (final Record record : reader) {
+        writeInt(writer, record, "concat_operation_code");
+        writeInt(writer, record, "single_operation_code");
+        writeInt(writer, record, "op_path_step");
       }
     }
   }
 
   private void loadDatum() throws IOException {
-    final Query query = new Query("/public/epsg_datum") //
-      .setOrderBy("datum_code");
     final List<String> datumTypes = Arrays.asList("geodetic", "vertical", "engineering");
     try (
-      final RecordReader reader = this.recordStore.getRecords(query);
+      final RecordReader reader = newReader("/public/epsg_datum", "datum_code");
       ChannelWriter writer = newWriter("datum")) {
-      for (final Record object : reader) {
-        writeInt(writer, object, "datum_code");
-        writeString(writer, object, "datum_name");
-        writeCodeByte(writer, object, "datum_type", datumTypes);
-        writeInt(writer, object, "ellipsoid_code", 0);
-        writeInt(writer, object, "prime_meridian_code", 0);
-        writeInt(writer, object, "area_of_use_code");
-        writeDeprecated(writer, object);
+      for (final Record record : reader) {
+        writeInt(writer, record, "datum_code");
+        writeString(writer, record, "datum_name");
+        writeCodeByte(writer, record, "datum_type", datumTypes);
+        writeInt(writer, record, "ellipsoid_code", 0);
+        writeInt(writer, record, "prime_meridian_code", 0);
+        writeInt(writer, record, "area_of_use_code");
+        writeDeprecated(writer, record);
       }
     }
   }
 
   private void loadEllipsoid() throws IOException {
-    final Query query = new Query("/public/epsg_ellipsoid") //
-      .setOrderBy("ellipsoid_code");
     try (
-      final RecordReader reader = this.recordStore.getRecords(query);
+      final RecordReader reader = newReader("/public/epsg_ellipsoid", "ellipsoid_code");
       ChannelWriter writer = newWriter("ellipsoid")) {
       for (final Record record : reader) {
         writeInt(writer, record, "ellipsoid_code");
@@ -316,11 +301,9 @@ public final class EpsgCoordinateSystemsLoader {
     }
   }
 
-  private void loadPrimeMeridians() throws IOException {
-    final Query query = new Query("/public/epsg_primemeridian") //
-      .setOrderBy("prime_meridian_code");
+  private void loadPrimeMeridian() throws IOException {
     try (
-      final RecordReader reader = this.recordStore.getRecords(query);
+      final RecordReader reader = newReader("/public/epsg_primemeridian", "prime_meridian_code");
       ChannelWriter writer = newWriter("primeMeridian")) {
       for (final Record record : reader) {
         writeInt(writer, record, "prime_meridian_code");
@@ -335,14 +318,13 @@ public final class EpsgCoordinateSystemsLoader {
     }
   }
 
-  private void loadUnitsOfMeasure() throws IOException {
+  private void loadUnitOfMeasure() throws IOException {
 
     final Map<Integer, Record> baseUnits = new TreeMap<>();
     final Map<Integer, List<Record>> unitsByBase = new TreeMap<>();
 
     try (
       final RecordReader reader = newReader("/public/epsg_unitofmeasure")) {
-
       for (final Record record : reader) {
         final int code = record.getInteger("uom_code");
         final int baseUnitCode = record.getInteger("target_uom_code");
@@ -358,7 +340,25 @@ public final class EpsgCoordinateSystemsLoader {
       for (final Entry<Integer, Record> entry : baseUnits.entrySet()) {
         final int code = entry.getKey();
         final Record record = baseUnits.get(code);
-        writeUnitOfMeasure(unitsByBase, record, writer);
+        loadUnitOfMeasure(unitsByBase, record, writer);
+      }
+    }
+  }
+
+  private void loadUnitOfMeasure(final Map<Integer, List<Record>> unitsByBase, final Record record,
+    final ChannelWriter writer) {
+    final int code = writeInt(writer, record, "uom_code");
+    writeCodeByte(writer, record, "unit_of_meas_type", UnitOfMeasure.TYPE_NAMES);
+    writeInt(writer, record, "target_uom_code");
+    writeDeprecated(writer, record);
+    writeDouble(writer, record, "factor_b");
+    writeDouble(writer, record, "factor_c");
+    writeString(writer, record, "unit_of_meas_name");
+
+    final List<Record> derivedUnits = unitsByBase.get(code);
+    if (derivedUnits != null) {
+      for (final Record derivedRecord : derivedUnits) {
+        loadUnitOfMeasure(unitsByBase, derivedRecord, writer);
       }
     }
   }
@@ -423,23 +423,5 @@ public final class EpsgCoordinateSystemsLoader {
     final String value = record.getValue(fieldName);
     writer.putStringUtf8ByteCount(value);
     return value;
-  }
-
-  private void writeUnitOfMeasure(final Map<Integer, List<Record>> unitsByBase, final Record record,
-    final ChannelWriter writer) {
-    final int code = writeInt(writer, record, "uom_code");
-    writeCodeByte(writer, record, "unit_of_meas_type", UnitOfMeasure.TYPE_NAMES);
-    writeInt(writer, record, "target_uom_code");
-    writeDeprecated(writer, record);
-    writeDouble(writer, record, "factor_b");
-    writeDouble(writer, record, "factor_c");
-    writeString(writer, record, "unit_of_meas_name");
-
-    final List<Record> derivedUnits = unitsByBase.get(code);
-    if (derivedUnits != null) {
-      for (final Record derivedRecord : derivedUnits) {
-        writeUnitOfMeasure(unitsByBase, derivedRecord, writer);
-      }
-    }
   }
 }

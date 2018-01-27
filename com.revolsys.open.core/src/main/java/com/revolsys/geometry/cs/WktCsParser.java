@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.unit.AngularUnit;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.number.Doubles;
@@ -242,7 +245,7 @@ public class WktCsParser {
     final String name = (String)values.get(index++);
     final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)values
       .get(index++);
-    Projection projection = null;
+    CoordinateOperationMethod coordinateOperationMethod = null;
     final Map<String, Object> parameters = new HashMap<>();
 
     LinearUnit linearUnit = null;
@@ -251,8 +254,8 @@ public class WktCsParser {
 
     while (index < values.size()) {
       final Object value = values.get(index++);
-      if (value instanceof Projection) {
-        projection = (Projection)value;
+      if (value instanceof CoordinateOperationMethod) {
+        coordinateOperationMethod = (CoordinateOperationMethod)value;
       } else if (value instanceof Map) {
         final Map<String, List<Object>> map = (Map<String, List<Object>>)value;
         final String key = map.keySet().iterator().next();
@@ -284,13 +287,13 @@ public class WktCsParser {
         }
       }
     }
-    return new ProjectedCoordinateSystem(srid, name, geographicCoordinateSystem, projection,
+    return new ProjectedCoordinateSystem(srid, name, geographicCoordinateSystem, coordinateOperationMethod,
       parameters, linearUnit, axis, authority);
   }
 
-  private Projection processProjection(final List<Object> values) {
+  private CoordinateOperationMethod processProjection(final List<Object> values) {
     final String name = (String)values.get(0);
-    return new Projection(name);
+    return new CoordinateOperationMethod(name);
   }
 
   private Spheroid processSpheroid(final List<Object> values) {

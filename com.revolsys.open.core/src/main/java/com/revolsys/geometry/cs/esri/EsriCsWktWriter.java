@@ -6,15 +6,15 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Map.Entry;
 
-import com.revolsys.geometry.cs.AngularUnit;
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeodeticDatum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.LinearUnit;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Projection;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.unit.AngularUnit;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.util.Exceptions;
 
 public class EsriCsWktWriter {
@@ -151,11 +151,11 @@ public class EsriCsWktWriter {
       indent(out, incrementIndent(indentLevel));
       write(out, geoCs, incrementIndent(indentLevel));
     }
-    final Projection projection = coordinateSystem.getProjection();
-    if (projection != null) {
+    final CoordinateOperationMethod coordinateOperationMethod = coordinateSystem.getCoordinateOperationMethod();
+    if (coordinateOperationMethod != null) {
       out.write(",");
       indent(out, incrementIndent(indentLevel));
-      write(out, projection, incrementIndent(indentLevel));
+      write(out, coordinateOperationMethod, incrementIndent(indentLevel));
     }
     for (final Entry<String, Object> parameter : coordinateSystem.getParameters().entrySet()) {
       final String name = parameter.getKey();
@@ -170,10 +170,10 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  public static void write(final Writer out, final Projection projection, final int indentLevel)
+  public static void write(final Writer out, final CoordinateOperationMethod coordinateOperationMethod, final int indentLevel)
     throws IOException {
     out.write("PROJECTION[");
-    write(out, projection.getName(), incrementIndent(indentLevel));
+    write(out, coordinateOperationMethod.getName(), incrementIndent(indentLevel));
     indent(out, indentLevel);
     out.write(']');
   }

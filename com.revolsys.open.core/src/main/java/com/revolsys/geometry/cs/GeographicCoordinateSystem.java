@@ -10,11 +10,14 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.epsg.CoordinateOperation;
+import com.revolsys.geometry.cs.epsg.EpsgAuthority;
 import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.cs.projection.RadiansToDegreesOperation;
 import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
+import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -59,24 +62,33 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   private final PrimeMeridian primeMeridian;
 
-  public GeographicCoordinateSystem(final int id, final String name, final GeodeticDatum geodeticDatum,
-    final AngularUnit angularUnit, final List<Axis> axis, final Area area,
-    final Authority authority, final boolean deprecated) {
+  private CoordinateSystem sourceCoordinateSystem;
+
+  private CoordinateOperation coordinateOperation;
+
+  public GeographicCoordinateSystem(final int id, final String name,
+    final GeodeticDatum geodeticDatum, final List<Axis> axis, final Area area,
+    final CoordinateSystem sourceCoordinateSystem, final CoordinateOperation coordinateOperation,
+    final boolean deprecated) {
     this.id = id;
     this.name = name;
     this.geodeticDatum = geodeticDatum;
     this.primeMeridian = null;
-    this.angularUnit = angularUnit;
+    this.angularUnit = (AngularUnit)axis.get(0).getUnit();
     if (axis != null && !axis.isEmpty()) {
       this.axis.addAll(axis);
     }
     this.area = area;
-    this.authority = authority;
+    this.authority = new EpsgAuthority(id);
+    this.sourceCoordinateSystem = sourceCoordinateSystem;
+    this.coordinateOperation = coordinateOperation;
+    this.deprecated = deprecated;
   }
 
-  public GeographicCoordinateSystem(final int id, final String name, final GeodeticDatum geodeticDatum,
-    final PrimeMeridian primeMeridian, final AngularUnit angularUnit, final List<Axis> axis,
-    final Area area, final Authority authority, final boolean deprecated) {
+  public GeographicCoordinateSystem(final int id, final String name,
+    final GeodeticDatum geodeticDatum, final PrimeMeridian primeMeridian,
+    final AngularUnit angularUnit, final List<Axis> axis, final Area area,
+    final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
     this.geodeticDatum = geodeticDatum;
@@ -90,9 +102,9 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     this.deprecated = deprecated;
   }
 
-  public GeographicCoordinateSystem(final int id, final String name, final GeodeticDatum geodeticDatum,
-    final PrimeMeridian primeMeridian, final AngularUnit angularUnit, final List<Axis> axis,
-    final Authority authority) {
+  public GeographicCoordinateSystem(final int id, final String name,
+    final GeodeticDatum geodeticDatum, final PrimeMeridian primeMeridian,
+    final AngularUnit angularUnit, final List<Axis> axis, final Authority authority) {
     this.id = id;
     this.name = name;
     this.geodeticDatum = geodeticDatum;
@@ -204,6 +216,10 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return this.axis;
   }
 
+  public CoordinateOperation getCoordinateOperation() {
+    return this.coordinateOperation;
+  }
+
   @Override
   public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null || this == coordinateSystem) {
@@ -234,7 +250,8 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
         operations.add(converstionOperation);
       }
       // TODO geodeticDatum shift
-      final CoordinatesOperation projectOperation = projectedCoordinateSystem.getProjectCoordinatesOperation();
+      final CoordinatesOperation projectOperation = projectedCoordinateSystem
+        .getProjectCoordinatesOperation();
       if (projectOperation != null) {
         operations.add(projectOperation);
       }
@@ -290,6 +307,10 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     } else {
       return this.primeMeridian;
     }
+  }
+
+  public CoordinateSystem getSourceCoordinateSystem() {
+    return this.sourceCoordinateSystem;
   }
 
   @Override

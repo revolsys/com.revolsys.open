@@ -1,4 +1,6 @@
-package com.revolsys.geometry.cs;
+package com.revolsys.geometry.cs.unit;
+
+import com.revolsys.geometry.cs.Authority;
 
 public class Degree extends AngularUnit {
 
@@ -9,6 +11,11 @@ public class Degree extends AngularUnit {
 
   @Override
   public double toDegrees(final double value) {
+    return value;
+  }
+
+  @Override
+  public double toNormal(final double value) {
     return value;
   }
 }

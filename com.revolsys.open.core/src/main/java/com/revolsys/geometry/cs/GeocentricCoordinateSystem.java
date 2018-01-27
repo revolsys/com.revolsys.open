@@ -6,15 +6,14 @@ import java.util.List;
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
-import com.revolsys.geometry.cs.datum.VerticalDatum;
-import com.revolsys.geometry.cs.epsg.EpsgAuthority;
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.record.code.Code;
 
-public class VerticalCoordinateSystem implements CoordinateSystem, Code {
+public class GeocentricCoordinateSystem implements CoordinateSystem {
+  private static final long serialVersionUID = 8655274386401351222L;
 
   private final LinearUnit linearUnit;
 
@@ -24,7 +23,7 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
 
   private final List<Axis> axis = new ArrayList<>();
 
-  private final VerticalDatum verticalDatum;
+  private final GeodeticDatum geodeticDatum;
 
   private boolean deprecated;
 
@@ -32,24 +31,27 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
 
   private final String name;
 
-  public VerticalCoordinateSystem(final int id, final String name,
-    final VerticalDatum verticalDatum, final List<Axis> axis, final Area area,
-    final boolean deprecated) {
+  private final PrimeMeridian primeMeridian;
+
+  public GeocentricCoordinateSystem(final int id, final String name,
+    final GeodeticDatum geodeticDatum, final LinearUnit linearUnit, final List<Axis> axis,
+    final Area area, final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
-    this.verticalDatum = verticalDatum;
-    this.linearUnit = (LinearUnit)axis.get(0).getUnit();
+    this.geodeticDatum = geodeticDatum;
+    this.primeMeridian = null;
+    this.linearUnit = linearUnit;
     if (axis != null && !axis.isEmpty()) {
       this.axis.addAll(axis);
     }
     this.area = area;
-    this.authority = new EpsgAuthority(id);
+    this.authority = authority;
   }
 
   @Override
-  public GeographicCoordinateSystem clone() {
+  public GeocentricCoordinateSystem clone() {
     try {
-      return (GeographicCoordinateSystem)super.clone();
+      return (GeocentricCoordinateSystem)super.clone();
     } catch (final Exception e) {
       return null;
     }
@@ -61,9 +63,11 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
       return false;
     } else if (object == this) {
       return true;
-    } else if (object instanceof VerticalCoordinateSystem) {
-      final VerticalCoordinateSystem cs = (VerticalCoordinateSystem)object;
-      if (!equals(this.verticalDatum, cs.verticalDatum)) {
+    } else if (object instanceof GeocentricCoordinateSystem) {
+      final GeocentricCoordinateSystem cs = (GeocentricCoordinateSystem)object;
+      if (!equals(this.geodeticDatum, cs.geodeticDatum)) {
+        return false;
+      } else if (!equals(getPrimeMeridian(), cs.getPrimeMeridian())) {
         return false;
       } else if (!equals(this.linearUnit, cs.linearUnit)) {
         return false;
@@ -85,7 +89,7 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
     }
   }
 
-  public boolean equalsExact(final VerticalCoordinateSystem cs) {
+  public boolean equalsExact(final GeocentricCoordinateSystem cs) {
     if (cs == null) {
       return false;
     } else if (cs == this) {
@@ -99,13 +103,15 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
         return false;
       } else if (!equals(this.axis, cs.axis)) {
         return false;
-      } else if (!equals(this.verticalDatum, cs.verticalDatum)) {
+      } else if (!equals(this.geodeticDatum, cs.geodeticDatum)) {
         return false;
       } else if (this.deprecated != cs.deprecated) {
         return false;
       } else if (this.id != cs.id) {
         return false;
       } else if (!equals(this.name, cs.name)) {
+        return false;
+      } else if (!equals(getPrimeMeridian(), cs.getPrimeMeridian())) {
         return false;
       } else {
         return true;
@@ -138,12 +144,6 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
     return this.axis;
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <C> C getCode() {
-    return (C)(Integer)getCoordinateSystemId();
-  }
-
   @Override
   public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
     return null;
@@ -159,22 +159,8 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
     return this.name;
   }
 
-  public VerticalDatum getDatum() {
-    return this.verticalDatum;
-  }
-
-  @Override
-  public String getDescription() {
-    return getCoordinateSystemName();
-  }
-
-  @Override
-  public Integer getInteger(final int index) {
-    if (index == 0) {
-      return getCoordinateSystemId();
-    } else {
-      throw new ArrayIndexOutOfBoundsException(index);
-    }
+  public GeodeticDatum getDatum() {
+    return this.geodeticDatum;
   }
 
   @Override
@@ -184,6 +170,18 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
 
   public LinearUnit getLinearUnit() {
     return this.linearUnit;
+  }
+
+  public PrimeMeridian getPrimeMeridian() {
+    if (this.primeMeridian == null) {
+      if (this.geodeticDatum == null) {
+        return null;
+      } else {
+        return this.geodeticDatum.getPrimeMeridian();
+      }
+    } else {
+      return this.primeMeridian;
+    }
   }
 
   @Override
@@ -196,8 +194,11 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    if (this.verticalDatum != null) {
-      result = prime * result + this.verticalDatum.hashCode();
+    if (this.geodeticDatum != null) {
+      result = prime * result + this.geodeticDatum.hashCode();
+    }
+    if (getPrimeMeridian() != null) {
+      result = prime * result + getPrimeMeridian().hashCode();
     }
     return result;
   }

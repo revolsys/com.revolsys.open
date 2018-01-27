@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 import com.revolsys.util.Equals;
 
-public class Projection implements Serializable, Comparable<Projection> {
+public class CoordinateOperationMethod implements Serializable, Comparable<CoordinateOperationMethod> {
   public static final String ALBERS_EQUAL_AREA = "Albers_Equal_Area";
 
   public static final String LAMBERT_CONIC_CONFORMAL_1SP = "Lambert_Conic_Conformal_(1SP)";
@@ -87,7 +87,7 @@ public class Projection implements Serializable, Comparable<Projection> {
 
   private boolean deprecated;
 
-  public Projection(final Authority authority, final String name, final boolean reverse,
+  public CoordinateOperationMethod(final Authority authority, final String name, final boolean reverse,
     final boolean deprecated) {
     this(name);
     this.authority = authority;
@@ -95,24 +95,24 @@ public class Projection implements Serializable, Comparable<Projection> {
     this.deprecated = deprecated;
   }
 
-  public Projection(final String name) {
+  public CoordinateOperationMethod(final String name) {
     this.name = name;
     this.normalizedName = getNormalizedName(name);
   }
 
   @Override
-  public int compareTo(final Projection projection) {
-    return getNormalizedName().compareTo(projection.getNormalizedName());
+  public int compareTo(final CoordinateOperationMethod coordinateOperationMethod) {
+    return getNormalizedName().compareTo(coordinateOperationMethod.getNormalizedName());
   }
 
   @Override
   public boolean equals(final Object obj) {
-    if (obj instanceof Projection) {
-      final Projection projection = (Projection)obj;
-      if (Equals.equals(this.authority, projection.authority)) {
+    if (obj instanceof CoordinateOperationMethod) {
+      final CoordinateOperationMethod coordinateOperationMethod = (CoordinateOperationMethod)obj;
+      if (Equals.equals(this.authority, coordinateOperationMethod.authority)) {
         return true;
       } else {
-        return getNormalizedName().equals(projection.getNormalizedName());
+        return getNormalizedName().equals(coordinateOperationMethod.getNormalizedName());
       }
     }
     return false;

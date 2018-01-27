@@ -3,6 +3,7 @@ package com.revolsys.geometry.cs;
 import java.io.Serializable;
 
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 
 public class Axis implements Serializable {
   private static final long serialVersionUID = 5463484439488623454L;

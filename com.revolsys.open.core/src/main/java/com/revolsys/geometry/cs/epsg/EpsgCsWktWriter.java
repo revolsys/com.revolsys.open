@@ -3,16 +3,16 @@ package com.revolsys.geometry.cs.epsg;
 import java.io.PrintWriter;
 import java.util.Map.Entry;
 
-import com.revolsys.geometry.cs.AngularUnit;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeodeticDatum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.LinearUnit;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Projection;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.unit.AngularUnit;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.util.number.Numbers;
 
 public class EpsgCsWktWriter {
@@ -118,8 +118,8 @@ public class EpsgCsWktWriter {
       final GeographicCoordinateSystem geoCs = coordinateSystem.getGeographicCoordinateSystem();
       out.print(",");
       write(out, geoCs);
-      final Projection projection = coordinateSystem.getProjection();
-      write(out, projection);
+      final CoordinateOperationMethod coordinateOperationMethod = coordinateSystem.getCoordinateOperationMethod();
+      write(out, coordinateOperationMethod);
       for (final Entry<String, Object> parameter : coordinateSystem.getParameters().entrySet()) {
         final String name = parameter.getKey();
         final Object value = parameter.getValue();
@@ -135,10 +135,10 @@ public class EpsgCsWktWriter {
     }
   }
 
-  public static void write(final PrintWriter out, final Projection projection) {
-    if (projection != null) {
+  public static void write(final PrintWriter out, final CoordinateOperationMethod coordinateOperationMethod) {
+    if (coordinateOperationMethod != null) {
       out.print(",PROJECTION[");
-      write(out, projection.getName());
+      write(out, coordinateOperationMethod.getName());
       out.write(']');
     }
   }

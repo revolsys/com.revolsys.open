@@ -1,55 +1,52 @@
 package com.revolsys.geometry.cs.epsg;
 
 import java.io.EOFException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
 import com.revolsys.collection.map.IntHashMap;
-import com.revolsys.collection.set.Sets;
-import com.revolsys.geometry.cs.AngularUnit;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.Axis;
 import com.revolsys.geometry.cs.AxisName;
+import com.revolsys.geometry.cs.CompoundCoordinateSystem;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateSystemType;
-import com.revolsys.geometry.cs.Datum;
-import com.revolsys.geometry.cs.Degree;
-import com.revolsys.geometry.cs.DegreeSexagesimalDMS;
-import com.revolsys.geometry.cs.EngineeringDatum;
-import com.revolsys.geometry.cs.GeodeticDatum;
+import com.revolsys.geometry.cs.EngineeringCoordinateSystem;
+import com.revolsys.geometry.cs.GeocentricCoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.LinearUnit;
+import com.revolsys.geometry.cs.ParameterValue;
+import com.revolsys.geometry.cs.ParameterValueNumber;
+import com.revolsys.geometry.cs.ParameterValueString;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Projection;
-import com.revolsys.geometry.cs.ScaleUnit;
 import com.revolsys.geometry.cs.Spheroid;
-import com.revolsys.geometry.cs.UnitOfMeasure;
-import com.revolsys.geometry.cs.VerticalDatum;
+import com.revolsys.geometry.cs.VerticalCoordinateSystem;
+import com.revolsys.geometry.cs.datum.Datum;
+import com.revolsys.geometry.cs.datum.EngineeringDatum;
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.datum.VerticalDatum;
+import com.revolsys.geometry.cs.unit.AngularUnit;
+import com.revolsys.geometry.cs.unit.Degree;
+import com.revolsys.geometry.cs.unit.DegreeSexagesimalDMS;
+import com.revolsys.geometry.cs.unit.Grad;
+import com.revolsys.geometry.cs.unit.LinearUnit;
+import com.revolsys.geometry.cs.unit.Metre;
+import com.revolsys.geometry.cs.unit.ScaleUnit;
+import com.revolsys.geometry.cs.unit.TimeUnit;
+import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
@@ -57,13 +54,11 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.io.format.csv.CsvIterator;
-import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.NoSuchResourceException;
-import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Dates;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public final class EpsgCoordinateSystems implements CodeTable {
@@ -85,12 +80,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   private static int nextSrid = 2000000;
 
-  private static Map<String, Projection> METHOD_BY_NAME = new TreeMap<>();
-
-  private static final Set<OpenOption> OPEN_OPTIONS_READ_SET = Sets
-    .newHash(StandardOpenOption.READ);
-
-  private static final FileAttribute<?>[] FILE_ATTRIBUTES_NONE = new FileAttribute[0];
+  private static Map<String, CoordinateOperationMethod> METHOD_BY_NAME = new TreeMap<>();
 
   private static final IntHashMap<AxisName> AXIS_NAMES = new IntHashMap<>();
 
@@ -102,25 +92,29 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   private static final IntHashMap<PrimeMeridian> PRIME_MERIDIAN_BY_ID = new IntHashMap<>();
 
-  private static final IntHashMap<Projection> METHOD_BY_ID = new IntHashMap<>();
+  private static final IntHashMap<CoordinateOperationMethod> METHOD_BY_ID = new IntHashMap<>();
 
   private static final IntHashMap<CoordinateSystemType> COORDINATE_SYSTEM_TYPE_BY_ID = new IntHashMap<>();
 
   private static final IntHashMap<CoordinateOperation> OPERATION_BY_ID = new IntHashMap<>();
 
+  private static final IntHashMap<String> PARAM_NAME_BY_ID = new IntHashMap<>();
+
   private static void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    final Integer id = coordinateSystem.getCoordinateSystemId();
-    final String name = coordinateSystem.getCoordinateSystemName();
-    COORDINATE_SYSTEM_BY_ID.put(id, coordinateSystem);
-    coordinateSystemsById.put(id, coordinateSystem);
-    final int hashCode = coordinateSystem.hashCode();
-    List<CoordinateSystem> coordinateSystems = coordinateSystemsByCoordinateSystem.get(hashCode);
-    if (coordinateSystems == null) {
-      coordinateSystems = new ArrayList<>();
-      coordinateSystemsByCoordinateSystem.put(hashCode, coordinateSystems);
+    if (coordinateSystem != null) {
+      final Integer id = coordinateSystem.getCoordinateSystemId();
+      final String name = coordinateSystem.getCoordinateSystemName();
+      COORDINATE_SYSTEM_BY_ID.put(id, coordinateSystem);
+      coordinateSystemsById.put(id, coordinateSystem);
+      final int hashCode = coordinateSystem.hashCode();
+      List<CoordinateSystem> coordinateSystems = coordinateSystemsByCoordinateSystem.get(hashCode);
+      if (coordinateSystems == null) {
+        coordinateSystems = new ArrayList<>();
+        coordinateSystemsByCoordinateSystem.put(hashCode, coordinateSystems);
+      }
+      coordinateSystems.add(coordinateSystem);
+      coordinateSystemsByName.put(name, coordinateSystem);
     }
-    coordinateSystems.add(coordinateSystem);
-    coordinateSystemsByName.put(name, coordinateSystem);
   }
 
   public static void clear() {
@@ -140,6 +134,18 @@ public final class EpsgCoordinateSystems implements CodeTable {
       } else {
         return axisName;
       }
+    }
+  }
+
+  private static <V> V getCode(final IntHashMap<V> valueById, final int id) {
+    if (id == 0) {
+      return null;
+    } else {
+      final V value = valueById.get(id);
+      if (value == null) {
+        throw new IllegalArgumentException("Invalid code for id=" + id);
+      }
+      return value;
     }
   }
 
@@ -198,12 +204,13 @@ public final class EpsgCoordinateSystems implements CodeTable {
               final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSystem;
               GeographicCoordinateSystem geographicCs = projectedCs.getGeographicCoordinateSystem();
               geographicCs = (GeographicCoordinateSystem)getCoordinateSystem(geographicCs);
-              final Projection projection = projectedCs.getProjection();
+              final CoordinateOperationMethod coordinateOperationMethod = projectedCs
+                .getCoordinateOperationMethod();
               final Map<String, Object> parameters = projectedCs.getParameters();
               final LinearUnit linearUnit = projectedCs.getLinearUnit();
               final ProjectedCoordinateSystem newCs = new ProjectedCoordinateSystem(srid, name,
-                geographicCs, area, projection, parameters, linearUnit, axis, authority,
-                deprecated);
+                geographicCs, area, coordinateOperationMethod, parameters, linearUnit, axis,
+                authority, deprecated);
               addCoordinateSystem(newCs);
               return newCs;
             }
@@ -303,34 +310,10 @@ public final class EpsgCoordinateSystems implements CodeTable {
     return coordinateSystems;
   }
 
-  private static Integer getInteger(final String value) {
-    if (value == null || value.equals("")) {
-      return null;
-    } else {
-      return Integer.valueOf(value);
-    }
-  }
-
   @SuppressWarnings("unchecked")
   public static <U extends UnitOfMeasure> U getLinearUnit(final String name) {
     initialize();
     return (U)UNIT_BY_NAME.get(name);
-  }
-
-  private static Map<String, Object> getParameters(final String parametersString) {
-    final Map<String, Object> parameters = new TreeMap<>();
-    final Map<String, Object> jsonParams = Json.toObjectMap(parametersString);
-    for (final Entry<String, Object> parameter : jsonParams.entrySet()) {
-      final String key = parameter.getKey();
-      final Object value = parameter.getValue();
-      if (value instanceof BigDecimal) {
-        final BigDecimal decimal = (BigDecimal)value;
-        parameters.put(key, decimal.doubleValue());
-      } else {
-        parameters.put(key, value);
-      }
-    }
-    return parameters;
   }
 
   public static List<ProjectedCoordinateSystem> getProjectedCoordinateSystems() {
@@ -344,14 +327,14 @@ public final class EpsgCoordinateSystems implements CodeTable {
     return coordinateSystems;
   }
 
-  public static synchronized Projection getProjection(final String name) {
+  public static synchronized CoordinateOperationMethod getProjection(final String name) {
     initialize();
-    Projection projection = METHOD_BY_NAME.get(name);
-    if (projection == null) {
-      projection = new Projection(name);
-      METHOD_BY_NAME.put(name, projection);
+    CoordinateOperationMethod coordinateOperationMethod = METHOD_BY_NAME.get(name);
+    if (coordinateOperationMethod == null) {
+      coordinateOperationMethod = new CoordinateOperationMethod(name);
+      METHOD_BY_NAME.put(name, coordinateOperationMethod);
     }
-    return projection;
+    return coordinateOperationMethod;
   }
 
   @SuppressWarnings("unchecked")
@@ -370,13 +353,15 @@ public final class EpsgCoordinateSystems implements CodeTable {
         final IntHashMap<List<Axis>> axisMap = loadCoordinateAxis();
         loadArea();
         loadPrimeMeridians();
-        loadDatums();
+        loadDatum();
         loadCoordOperationMethod();
-        loadCoordOperation();
+        loadCoordOperationParam();
+        final IntHashMap<Map<String, ParameterValue>> operationParameters = new IntHashMap<>();
+        loadCoordOperationParamValue(operationParameters);
+        loadCoordOperation(operationParameters);
         loadCoordinateSystem();
-        final IntHashMap<ProjectedCoordinateSystem> cs1 = loadCoordinateReferenceSystem(axisMap);
+        loadCoordinateReferenceSystem(axisMap);
 
-        loadProjectedCoordinateSystems(axisMap);
         final ProjectedCoordinateSystem worldMercator = (ProjectedCoordinateSystem)coordinateSystemsById
           .get(3857);
         coordinateSystemsById.put(900913, worldMercator);
@@ -389,7 +374,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  private static void loadArea() throws IOException {
+  private static void loadArea() {
     try (
       ChannelReader reader = newChannelReader("area")) {
       while (true) {
@@ -470,9 +455,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  private static IntHashMap<ProjectedCoordinateSystem> loadCoordinateReferenceSystem(
-    final IntHashMap<List<Axis>> axisMap) throws IOException {
-    final IntHashMap<ProjectedCoordinateSystem> cs = new IntHashMap<>();
+  private static void loadCoordinateReferenceSystem(final IntHashMap<List<Axis>> axisMap) {
     try (
       ChannelReader reader = newChannelReader("coordinateReferenceSystem")) {
       while (true) {
@@ -483,22 +466,54 @@ public final class EpsgCoordinateSystems implements CodeTable {
         final CoordinateSystemType coordinateSystemType = readCode(reader,
           COORDINATE_SYSTEM_TYPE_BY_ID);
         final Datum datum = readCode(reader, DATUM_BY_ID);
-        final int sourceGeograhicCoordinateSystemId = reader.getInt();
-        // final CoordinateSystem sourceCoordinateSystem = readCode(reader,
-        // COORDINATE_SYSTEM_BY_ID);
-        reader.getInt(); // writeInt(writer, record, "projection_conv_code", 0);
-        final int horizontalCoordinateSystemId = reader.getInt();
-        final int verticalCoordinateSystemId = reader.getInt();
-        final boolean deprecated = readBoolean(reader);
+        final CoordinateSystem sourceCoordinateSystem = readCode(reader, COORDINATE_SYSTEM_BY_ID);
 
-        if (type == 0) {
-          final EpsgAuthority authority = new EpsgAuthority(id);
-          final List<Axis> axis = axisMap.get(coordinateSystemType.getId());
-          final AngularUnit angularUnit = (AngularUnit)axis.get(0).getUnit();
-          final GeographicCoordinateSystem coordinateSystem = new GeographicCoordinateSystem(id,
-            name, (GeodeticDatum)datum, angularUnit, axis, area, authority, deprecated);
-          addCoordinateSystem(coordinateSystem);
+        final CoordinateOperation operation = readCode(reader, OPERATION_BY_ID);
+
+        final CoordinateSystem horizontalCoordinateSystem = readCode(reader,
+          COORDINATE_SYSTEM_BY_ID);
+        final VerticalCoordinateSystem verticalCoordinateSystem = (VerticalCoordinateSystem)readCode(
+          reader, COORDINATE_SYSTEM_BY_ID);
+        final boolean deprecated = readBoolean(reader);
+        final List<Axis> axis;
+        if (coordinateSystemType == null) {
+          axis = null;
+        } else {
+          axis = axisMap.get(coordinateSystemType.getId());
         }
+
+        CoordinateSystem coordinateSystem = null;
+        if (type == 0) {
+          // geocentric
+          coordinateSystem = newCoordinateSystemGeocentric(id, name, datum, axis, area, deprecated);
+        } else if (type == 1) {
+          // geographic 3D
+          coordinateSystem = new GeographicCoordinateSystem(id, name, (GeodeticDatum)datum, axis,
+            area, sourceCoordinateSystem, operation, deprecated);
+        } else if (type == 2) {
+          // geographic 2D
+          coordinateSystem = new GeographicCoordinateSystem(id, name, (GeodeticDatum)datum, axis,
+            area, sourceCoordinateSystem, operation, deprecated);
+        } else if (type == 3) {
+          // projected
+          coordinateSystem = newCoordinateSystemProjected(id, name, area, sourceCoordinateSystem,
+            operation, axis, deprecated);
+        } else if (type == 4) {
+          // engineering
+          coordinateSystem = new EngineeringCoordinateSystem(id, name, (EngineeringDatum)datum,
+            axis, area, deprecated);
+        } else if (type == 5) {
+          // vertical
+          coordinateSystem = new VerticalCoordinateSystem(id, name, (VerticalDatum)datum, axis,
+            area, deprecated);
+        } else if (type == 6) {
+          coordinateSystem = new CompoundCoordinateSystem(id, name, horizontalCoordinateSystem,
+            verticalCoordinateSystem, area, deprecated);
+        } else {
+          coordinateSystem = null;
+        }
+
+        addCoordinateSystem(coordinateSystem);
       }
     } catch (final NoSuchResourceException e) {
     } catch (final WrappedException e) {
@@ -507,7 +522,6 @@ public final class EpsgCoordinateSystems implements CodeTable {
         throw e;
       }
     }
-    return cs;
   }
 
   private static void loadCoordinateSystem() {
@@ -531,12 +545,13 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  private static void loadCoordOperation() {
+  private static void loadCoordOperation(
+    final IntHashMap<Map<String, ParameterValue>> operationParameters) {
     try (
       ChannelReader reader = newChannelReader("coordOperation")) {
       while (true) {
         final int id = reader.getInt();
-        final Projection method = readCode(reader, METHOD_BY_ID);
+        final CoordinateOperationMethod method = readCode(reader, METHOD_BY_ID);
         final String name = reader.getStringUtf8ByteCount();
         final byte type = reader.getByte();
         final int sourceCrsCode = reader.getInt();
@@ -547,9 +562,11 @@ public final class EpsgCoordinateSystems implements CodeTable {
         final double accuracy = reader.getDouble();
         final boolean deprecated = readBoolean(reader);
 
+        final Map<String, ParameterValue> parameters = operationParameters.getOrDefault(id,
+          Collections.emptyMap());
         final CoordinateOperation coordinateOperation = new CoordinateOperation(id, method, name,
           type, sourceCrsCode, targetCrsCode, transformationVersion, variant, area, accuracy,
-          deprecated);
+          parameters, deprecated);
         OPERATION_BY_ID.put(id, coordinateOperation);
 
       }
@@ -562,7 +579,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  private static void loadCoordOperationMethod() throws IOException {
+  private static void loadCoordOperationMethod() {
     try (
       ChannelReader reader = newChannelReader("coordOperationMethod")) {
       while (true) {
@@ -573,7 +590,8 @@ public final class EpsgCoordinateSystems implements CodeTable {
         final boolean deprecated = readBoolean(reader);
 
         final EpsgAuthority authority = new EpsgAuthority(id);
-        final Projection method = new Projection(authority, name, reverse, deprecated);
+        final CoordinateOperationMethod method = new CoordinateOperationMethod(authority, name,
+          reverse, deprecated);
         METHOD_BY_ID.put(id, method);
         METHOD_BY_NAME.put("id", method);
       }
@@ -586,7 +604,68 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  private static void loadDatums() throws IOException {
+  private static void loadCoordOperationParam() {
+    try (
+      ChannelReader reader = newChannelReader("coordOperationParam")) {
+      while (true) {
+        final int id = reader.getInt();
+        String name = reader.getStringUtf8ByteCount();
+        if (name != null) {
+          name = name.toLowerCase().replaceAll(" ", "_");
+        }
+        readBoolean(reader);
+        PARAM_NAME_BY_ID.put(id, name);
+      }
+    } catch (final NoSuchResourceException e) {
+    } catch (final WrappedException e) {
+      if (Exceptions.isException(e, EOFException.class)) {
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  private static void loadCoordOperationParamValue(
+    final IntHashMap<Map<String, ParameterValue>> operationParameters) {
+    try (
+      ChannelReader reader = newChannelReader("coordOperationParamValue")) {
+      while (true) {
+        final int operationId = reader.getInt();
+
+        final CoordinateOperationMethod method = readCode(reader, METHOD_BY_ID);
+
+        final String parameterName = readCode(reader, PARAM_NAME_BY_ID);
+        final double value = reader.getDouble();
+        final String fileRef = reader.getStringUtf8ByteCount();
+        final UnitOfMeasure unit = readCode(reader, UNIT_BY_ID);
+        final ParameterValue parameterValue;
+        if (Double.isFinite(value)) {
+          if (Property.hasValue(fileRef)) {
+            throw new IllegalArgumentException(
+              "Cannot have a value and fileRef for coordOperationParamValue=" + operationId + " "
+                + parameterName);
+          } else {
+            parameterValue = new ParameterValueNumber(unit, value);
+          }
+        } else {
+          if (Property.hasValue(fileRef)) {
+            parameterValue = new ParameterValueString(fileRef);
+          } else {
+            parameterValue = null;
+          }
+        }
+        Maps.addToMap(operationParameters, operationId, parameterName, parameterValue);
+      }
+    } catch (final NoSuchResourceException e) {
+    } catch (final WrappedException e) {
+      if (Exceptions.isException(e, EOFException.class)) {
+      } else {
+        Logs.error(EpsgCoordinateSystems.class, "Error loading coordOperationParamValue", e);
+      }
+    }
+  }
+
+  private static void loadDatum() {
     final IntHashMap<Spheroid> ellipsoids = loadEllipsoid();
 
     try (
@@ -625,7 +704,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  private static IntHashMap<Spheroid> loadEllipsoid() throws IOException {
+  private static IntHashMap<Spheroid> loadEllipsoid() {
     final IntHashMap<Spheroid> ellipsoids = new IntHashMap<>();
     try (
       ChannelReader reader = newChannelReader("ellipsoid")) {
@@ -654,7 +733,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
     return ellipsoids;
   }
 
-  private static void loadPrimeMeridians() throws IOException {
+  private static void loadPrimeMeridians() {
     try (
       ChannelReader reader = newChannelReader("primeMeridian")) {
       while (true) {
@@ -673,57 +752,6 @@ public final class EpsgCoordinateSystems implements CodeTable {
       if (Exceptions.isException(e, EOFException.class)) {
       } else {
         throw e;
-      }
-    }
-  }
-
-  private static void loadProjectedCoordinateSystems(final Map<Integer, List<Axis>> axisMap)
-    throws IOException {
-
-    try (
-      java.io.Reader reader = newReader(EpsgCoordinateSystems.class,
-        "/com/revolsys/gis/cs/epsg/projected.csv")) {
-      if (reader != null) {
-        final CsvIterator csv = new CsvIterator(reader);
-        if (csv.hasNext()) {
-          csv.next();
-          while (csv.hasNext()) {
-            final List<String> values = csv.next();
-            final int id = Integer.parseInt(values.get(0));
-            final String name = values.get(1);
-            final Integer geoCsId = getInteger(values.get(2));
-            final Integer unitId = getInteger(values.get(3));
-            final Integer methodCode = getInteger(values.get(4));
-            final String parametersString = values.get(6);
-            final Integer axisId = getInteger(values.get(7));
-            final Integer areaId = getInteger(values.get(8));
-            final boolean deprecated = Boolean.parseBoolean(values.get(9));
-            final CoordinateSystem referencedCoordinateSystem = COORDINATE_SYSTEM_BY_ID
-              .get(geoCsId);
-            if (referencedCoordinateSystem instanceof GeographicCoordinateSystem) {
-              final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)referencedCoordinateSystem;
-              EpsgAuthority authority = new EpsgAuthority(id);
-              final LinearUnit linearUnit = (LinearUnit)UNIT_BY_ID.get(unitId);
-              final Projection projection = METHOD_BY_ID.get(methodCode);
-              final Map<String, Object> parameters = getParameters(parametersString);
-              final List<Axis> axis = axisMap.get(axisId);
-              final Area area = AREA_BY_ID.get(areaId);
-              final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(id,
-                name, geographicCoordinateSystem, area, projection, parameters, linearUnit, axis,
-                authority, deprecated);
-
-              addCoordinateSystem(coordinateSystem);
-              if (id == 3857) {
-                authority = new EpsgAuthority(102100);
-                final ProjectedCoordinateSystem webMercator = new ProjectedCoordinateSystem(102100,
-                  name, geographicCoordinateSystem, area, projection, parameters, linearUnit, axis,
-                  authority, deprecated);
-
-                addCoordinateSystem(webMercator);
-              }
-            }
-          }
-        }
       }
     }
   }
@@ -753,44 +781,47 @@ public final class EpsgCoordinateSystems implements CodeTable {
           final String name = reader.getStringUtf8ByteCount();
           final EpsgAuthority authority = new EpsgAuthority(id);
 
+          UnitOfMeasure unit;
           switch (type) {
             case 0:
               final ScaleUnit baseScaleUnit = (ScaleUnit)UNIT_BY_ID.get(baseId);
-              final ScaleUnit scaleUnit = new ScaleUnit(name, baseScaleUnit, conversionFactor,
-                authority, deprecated);
-              UNIT_BY_NAME.put(name, scaleUnit);
-              UNIT_BY_ID.put(id, scaleUnit);
+              unit = new ScaleUnit(name, baseScaleUnit, conversionFactor, authority, deprecated);
             break;
             case 1:
               final LinearUnit baseLinearUnit = (LinearUnit)UNIT_BY_ID.get(baseId);
-              final LinearUnit linearUnit = new LinearUnit(name, baseLinearUnit, conversionFactor,
-                authority, deprecated);
-              UNIT_BY_NAME.put(name, linearUnit);
-              UNIT_BY_ID.put(id, linearUnit);
+              if (id == 9001) {
+                unit = new Metre(name, baseLinearUnit, conversionFactor, authority, deprecated);
+              } else {
+                unit = new LinearUnit(name, baseLinearUnit, conversionFactor, authority,
+                  deprecated);
+              }
             break;
             case 2:
               final AngularUnit baseAngularUnit = (AngularUnit)UNIT_BY_ID.get(baseId);
-              final AngularUnit angularUnit;
               if (id == 9102) {
-                angularUnit = new Degree(name, baseAngularUnit, conversionFactor, authority,
-                  deprecated);
+                unit = new Degree(name, baseAngularUnit, conversionFactor, authority, deprecated);
+              } else if (id == 9105) {
+                unit = new Grad(name, baseAngularUnit, conversionFactor, authority, deprecated);
               } else if (id == 9110) {
-                angularUnit = new DegreeSexagesimalDMS(name, baseAngularUnit, conversionFactor,
-                  authority, deprecated);
+                unit = new DegreeSexagesimalDMS(name, baseAngularUnit, conversionFactor, authority,
+                  deprecated);
               } else {
-                angularUnit = new AngularUnit(name, baseAngularUnit, conversionFactor, authority,
+                unit = new AngularUnit(name, baseAngularUnit, conversionFactor, authority,
                   deprecated);
               }
-              UNIT_BY_NAME.put(name, angularUnit);
-              UNIT_BY_ID.put(id, angularUnit);
             break;
             case 3:
+              final TimeUnit baseTimeUnit = (TimeUnit)UNIT_BY_ID.get(baseId);
+              unit = new TimeUnit(name, baseTimeUnit, conversionFactor, authority, deprecated);
 
             break;
 
             default:
-            break;
+              throw new IllegalArgumentException("Invalid unitId=" + id);
           }
+          UNIT_BY_NAME.put(name, unit);
+          UNIT_BY_ID.put(id, unit);
+
         }
       }
     } catch (final NoSuchResourceException e) {
@@ -807,23 +838,33 @@ public final class EpsgCoordinateSystems implements CodeTable {
       .newChannelReader();
   }
 
-  public static java.io.Reader newReader(final Class<?> clazz, final String fileName)
-    throws IOException {
-    final URL url = clazz.getResource(fileName);
-    if (url == null) {
+  private static GeocentricCoordinateSystem newCoordinateSystemGeocentric(final int id,
+    final String name, final Datum datum, final List<Axis> axis, final Area area,
+    final boolean deprecated) {
+    final EpsgAuthority authority = new EpsgAuthority(id);
+    final LinearUnit linearUnit = (LinearUnit)axis.get(0).getUnit();
+    final GeodeticDatum geodeticDatum = (GeodeticDatum)datum;
+    return new GeocentricCoordinateSystem(id, name, geodeticDatum, linearUnit, axis, area,
+      authority, deprecated);
+  }
+
+  private static ProjectedCoordinateSystem newCoordinateSystemProjected(final int id,
+    final String name, final Area area, final CoordinateSystem sourceCoordinateSystem,
+    final CoordinateOperation operation, final List<Axis> axis, final boolean deprecated) {
+    final EpsgAuthority authority = new EpsgAuthority(id);
+    final LinearUnit linearUnit = (LinearUnit)axis.get(0).getUnit();
+    final CoordinateOperationMethod method = operation.getMethod();
+    final Map<String, Object> parameters = operation.getParameters();
+    if (sourceCoordinateSystem instanceof GeographicCoordinateSystem) {
+      final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)sourceCoordinateSystem;
+      return new ProjectedCoordinateSystem(id, name, geographicCoordinateSystem, area, method,
+        parameters, linearUnit, axis, authority, deprecated);
+    } else if (!Arrays.asList(5819, 5820, 5821).contains(id)) {
+      Logs.error(EpsgCoordinateSystems.class,
+        id + " " + name + " has a projected coordinate system");
       return null;
     } else {
-      final UrlResource resource = new UrlResource(url);
-      ReadableByteChannel channel;
-      try {
-        final File file = resource.getFile();
-        final Path path = file.toPath();
-        channel = FileChannel.open(path, OPEN_OPTIONS_READ_SET, FILE_ATTRIBUTES_NONE);
-      } catch (final Throwable e) {
-        final InputStream in = url.openStream();
-        channel = Channels.newChannel(in);
-      }
-      return Channels.newReader(channel, StandardCharsets.UTF_8.newDecoder(), 8196);
+      return null;
     }
   }
 
@@ -833,15 +874,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   private static <V> V readCode(final ChannelReader reader, final IntHashMap<V> valueById) {
     final int id = reader.getInt();
-    if (id == 0) {
-      return null;
-    } else {
-      final V value = valueById.get(id);
-      if (value == null) {
-        throw new IllegalArgumentException("Invalid code for id=" + id);
-      }
-      return value;
-    }
+    return getCode(valueById, id);
   }
 
   public static String toWkt(final CoordinateSystem coordinateSystem) {

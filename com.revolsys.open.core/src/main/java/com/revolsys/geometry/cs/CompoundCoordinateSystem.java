@@ -4,27 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.measure.quantity.Length;
+import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
-import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.epsg.EpsgAuthority;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.record.code.Code;
 
-public class VerticalCoordinateSystem implements CoordinateSystem, Code {
-
-  private final LinearUnit linearUnit;
+public class CompoundCoordinateSystem implements CoordinateSystem {
+  private static final long serialVersionUID = 8655274386401351222L;
 
   private final Area area;
 
   private final Authority authority;
 
-  private final List<Axis> axis = new ArrayList<>();
-
-  private final VerticalDatum verticalDatum;
+  private final CoordinateSystem horizontalCoordinateSystem;
 
   private boolean deprecated;
 
@@ -32,24 +27,27 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
 
   private final String name;
 
-  public VerticalCoordinateSystem(final int id, final String name,
-    final VerticalDatum verticalDatum, final List<Axis> axis, final Area area,
-    final boolean deprecated) {
+  private final CoordinateSystem verticalCoordinateSystem;
+
+  private final List<Axis> axis = new ArrayList<>();
+
+  public CompoundCoordinateSystem(final int id, final String name,
+    final CoordinateSystem horizontalCoordinateSystem,
+    final CoordinateSystem verticalCoordinateSystem, final Area area, final boolean deprecated) {
     this.id = id;
     this.name = name;
-    this.verticalDatum = verticalDatum;
-    this.linearUnit = (LinearUnit)axis.get(0).getUnit();
-    if (axis != null && !axis.isEmpty()) {
-      this.axis.addAll(axis);
-    }
+    this.horizontalCoordinateSystem = horizontalCoordinateSystem;
+    this.verticalCoordinateSystem = verticalCoordinateSystem;
+    this.axis.addAll(horizontalCoordinateSystem.getAxis());
+    this.axis.addAll(verticalCoordinateSystem.getAxis());
     this.area = area;
     this.authority = new EpsgAuthority(id);
   }
 
   @Override
-  public GeographicCoordinateSystem clone() {
+  public CompoundCoordinateSystem clone() {
     try {
-      return (GeographicCoordinateSystem)super.clone();
+      return (CompoundCoordinateSystem)super.clone();
     } catch (final Exception e) {
       return null;
     }
@@ -61,11 +59,11 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
       return false;
     } else if (object == this) {
       return true;
-    } else if (object instanceof VerticalCoordinateSystem) {
-      final VerticalCoordinateSystem cs = (VerticalCoordinateSystem)object;
-      if (!equals(this.verticalDatum, cs.verticalDatum)) {
+    } else if (object instanceof CompoundCoordinateSystem) {
+      final CompoundCoordinateSystem cs = (CompoundCoordinateSystem)object;
+      if (!equals(this.horizontalCoordinateSystem, cs.horizontalCoordinateSystem)) {
         return false;
-      } else if (!equals(this.linearUnit, cs.linearUnit)) {
+      } else if (!equals(this.verticalCoordinateSystem, cs.verticalCoordinateSystem)) {
         return false;
       } else {
         return true;
@@ -85,21 +83,19 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
     }
   }
 
-  public boolean equalsExact(final VerticalCoordinateSystem cs) {
+  public boolean equalsExact(final CompoundCoordinateSystem cs) {
     if (cs == null) {
       return false;
     } else if (cs == this) {
       return true;
     } else {
-      if (!equals(this.linearUnit, cs.linearUnit)) {
-        return false;
-      } else if (!equals(this.area, cs.area)) {
+      if (!equals(this.area, cs.area)) {
         return false;
       } else if (!equals(this.authority, cs.authority)) {
         return false;
-      } else if (!equals(this.axis, cs.axis)) {
+      } else if (!equals(this.horizontalCoordinateSystem, cs.horizontalCoordinateSystem)) {
         return false;
-      } else if (!equals(this.verticalDatum, cs.verticalDatum)) {
+      } else if (!equals(this.verticalCoordinateSystem, cs.verticalCoordinateSystem)) {
         return false;
       } else if (this.deprecated != cs.deprecated) {
         return false;
@@ -138,12 +134,6 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
     return this.axis;
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <C> C getCode() {
-    return (C)(Integer)getCoordinateSystemId();
-  }
-
   @Override
   public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
     return null;
@@ -159,45 +149,33 @@ public class VerticalCoordinateSystem implements CoordinateSystem, Code {
     return this.name;
   }
 
-  public VerticalDatum getDatum() {
-    return this.verticalDatum;
-  }
-
-  @Override
-  public String getDescription() {
-    return getCoordinateSystemName();
-  }
-
-  @Override
-  public Integer getInteger(final int index) {
-    if (index == 0) {
-      return getCoordinateSystemId();
-    } else {
-      throw new ArrayIndexOutOfBoundsException(index);
-    }
+  public CoordinateSystem getHorizontalCoordinateSystem() {
+    return this.horizontalCoordinateSystem;
   }
 
   @Override
   public Unit<Length> getLengthUnit() {
-    return this.linearUnit.getUnit();
-  }
-
-  public LinearUnit getLinearUnit() {
-    return this.linearUnit;
+    return this.horizontalCoordinateSystem.getLengthUnit();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Unit<Length> getUnit() {
-    return this.linearUnit.getUnit();
+  public <Q extends Quantity> Unit<Q> getUnit() {
+    return this.horizontalCoordinateSystem.getUnit();
+  }
+
+  public CoordinateSystem getVerticalCoordinateSystem() {
+    return this.verticalCoordinateSystem;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    if (this.verticalDatum != null) {
-      result = prime * result + this.verticalDatum.hashCode();
+    if (this.horizontalCoordinateSystem != null) {
+      result = prime * result + this.horizontalCoordinateSystem.hashCode();
+    }
+    if (this.verticalCoordinateSystem != null) {
+      result = prime * result + this.verticalCoordinateSystem.hashCode();
     }
     return result;
   }

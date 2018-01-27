@@ -1,12 +1,17 @@
 package com.revolsys.geometry.cs.epsg;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.revolsys.geometry.cs.Area;
-import com.revolsys.geometry.cs.Projection;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
+import com.revolsys.geometry.cs.ParameterValue;
 
 public class CoordinateOperation {
   private final int id;
 
-  private final Projection method;
+  private final CoordinateOperationMethod method;
 
   private final String name;
 
@@ -26,10 +31,12 @@ public class CoordinateOperation {
 
   private final boolean deprecated;
 
-  public CoordinateOperation(final int id, final Projection method, final String name,
-    final byte type, final int sourceCrsCode, final int targetCrsCode,
+  private final Map<String, ParameterValue> parameterValues;
+
+  public CoordinateOperation(final int id, final CoordinateOperationMethod method,
+    final String name, final byte type, final int sourceCrsCode, final int targetCrsCode,
     final String transformationVersion, final int variant, final Area area, final double accuracy,
-    final boolean deprecated) {
+    final Map<String, ParameterValue> parameterValues, final boolean deprecated) {
     this.id = id;
     this.method = method;
     this.name = name;
@@ -40,6 +47,7 @@ public class CoordinateOperation {
     this.variant = variant;
     this.area = area;
     this.accuracy = accuracy;
+    this.parameterValues = parameterValues;
     this.deprecated = deprecated;
   }
 
@@ -55,12 +63,27 @@ public class CoordinateOperation {
     return this.id;
   }
 
-  public Projection getMethod() {
+  public CoordinateOperationMethod getMethod() {
     return this.method;
   }
 
   public String getName() {
     return this.name;
+  }
+
+  public Map<String, Object> getParameters() {
+    final Map<String, Object> parameters = new LinkedHashMap<>();
+    for (final Entry<String, ParameterValue> entry : this.parameterValues.entrySet()) {
+      final String parameterName = entry.getKey();
+      final ParameterValue parameterValue = entry.getValue();
+      final Object value = parameterValue.getValue();
+      parameters.put(parameterName, value);
+    }
+    return parameters;
+  }
+
+  public Map<String, ParameterValue> getParameterValues() {
+    return this.parameterValues;
   }
 
   public int getSourceCrsCode() {
@@ -85,5 +108,10 @@ public class CoordinateOperation {
 
   public boolean isDeprecated() {
     return this.deprecated;
+  }
+
+  @Override
+  public String toString() {
+    return this.name;
   }
 }

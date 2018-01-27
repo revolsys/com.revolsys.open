@@ -1059,8 +1059,8 @@ public interface LineSegment extends LineString {
   }
 
   /**
-   * Computes the Projection Factor for the projection of the point p
-   * onto this LineSegmentDouble.  The Projection Factor is the constant r
+   * Computes the CoordinateOperationMethod Factor for the projection of the point p
+   * onto this LineSegmentDouble.  The CoordinateOperationMethod Factor is the constant r
    * by which the vector for this segment must be multiplied to
    * equal the vector for the projection of <tt>p<//t> on the line
    * defined by this segment.
@@ -1081,8 +1081,8 @@ public interface LineSegment extends LineString {
   }
 
   /**
-   * Computes the Projection Factor for the projection of the point p
-   * onto this LineSegmentDouble.  The Projection Factor is the constant r
+   * Computes the CoordinateOperationMethod Factor for the projection of the point p
+   * onto this LineSegmentDouble.  The CoordinateOperationMethod Factor is the constant r
    * by which the vector for this segment must be multiplied to
    * equal the vector for the projection of <tt>p<//t> on the line
    * defined by this segment.
