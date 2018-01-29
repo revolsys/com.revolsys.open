@@ -519,7 +519,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   /**
-   * @return Returns the idParameterName.
+   * @return Returns the idParameterNames.
    */
   public String getIdParameterName() {
     return this.idParameterName;

@@ -1,14 +1,13 @@
 package com.revolsys.geometry.cs.projection;
 
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.math.Angle;
 
 public class LambertConicConformal1SP extends AbstractCoordinatesProjection {
-
   private final double a;
 
   private final double e;
@@ -33,19 +32,17 @@ public class LambertConicConformal1SP extends AbstractCoordinatesProjection {
   public LambertConicConformal1SP(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final GeodeticDatum geodeticDatum = geographicCS.getDatum();
-    this.scaleFactor = cs.getDoubleParameter(ProjectionParameterNames.SCALE_FACTOR);
+    final double latitudeOfProjection = cs.getDoubleParameter(ParameterNames.LATITUDE_OF_ORIGIN);
+    final double centralMeridian = cs.getDoubleParameter(ParameterNames.CENTRAL_MERIDIAN);
+    this.scaleFactor = cs.getDoubleParameter(ParameterNames.SCALE_FACTOR);
 
     final Spheroid spheroid = geodeticDatum.getSpheroid();
-    this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
-    this.y0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
+    this.x0 = cs.getDoubleParameter(ParameterNames.FALSE_EASTING);
+    this.y0 = cs.getDoubleParameter(ParameterNames.FALSE_NORTHING);
 
-    final double longitudeOfNaturalOrigin = cs
-      .getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
-    this.lambda0 = Math.toRadians(longitudeOfNaturalOrigin);
+    this.lambda0 = Math.toRadians(centralMeridian);
 
-    final double latitudeOfNaturalOrigin = cs
-      .getDoubleParameter(ProjectionParameterNames.LATITUDE_OF_CENTER);
-    final double phi0 = Math.toRadians(latitudeOfNaturalOrigin);
+    final double phi0 = Math.toRadians(latitudeOfProjection);
 
     this.a = spheroid.getSemiMajorAxis();
     this.e = spheroid.getEccentricity();

@@ -6,11 +6,12 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Map.Entry;
 
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.unit.AngularUnit;
@@ -59,6 +60,15 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
+  public static void write(final Writer out,
+    final CoordinateOperationMethod coordinateOperationMethod, final int indentLevel)
+    throws IOException {
+    out.write("PROJECTION[");
+    write(out, coordinateOperationMethod.getName(), incrementIndent(indentLevel));
+    indent(out, indentLevel);
+    out.write(']');
+  }
+
   public static void write(final Writer out, final CoordinateSystem coordinateSystem,
     final int indentLevel) {
     try {
@@ -74,8 +84,8 @@ public class EsriCsWktWriter {
     }
   }
 
-  public static void write(final Writer out, final GeodeticDatum geodeticDatum, final int indentLevel)
-    throws IOException {
+  public static void write(final Writer out, final GeodeticDatum geodeticDatum,
+    final int indentLevel) throws IOException {
     out.write("DATUM[");
     write(out, geodeticDatum.getName(), incrementIndent(indentLevel));
     final Spheroid spheroid = geodeticDatum.getSpheroid();
@@ -130,6 +140,22 @@ public class EsriCsWktWriter {
 
   }
 
+  public static void write(final Writer out, final ParameterName name, final Object value,
+    final int indentLevel) throws IOException {
+    out.write(",");
+    indent(out, indentLevel);
+    out.write("PARAMETER[");
+    write(out, name.getName(), -1);
+    out.write(',');
+    if (value instanceof Number) {
+      final Number number = (Number)value;
+      write(out, number, -1);
+    } else {
+      out.write(value.toString());
+    }
+    out.write(']');
+  }
+
   public static void write(final Writer out, final PrimeMeridian primeMeridian,
     final int indentLevel) throws IOException {
     out.write("PRIMEM[");
@@ -151,14 +177,16 @@ public class EsriCsWktWriter {
       indent(out, incrementIndent(indentLevel));
       write(out, geoCs, incrementIndent(indentLevel));
     }
-    final CoordinateOperationMethod coordinateOperationMethod = coordinateSystem.getCoordinateOperationMethod();
+    final CoordinateOperationMethod coordinateOperationMethod = coordinateSystem
+      .getCoordinateOperationMethod();
     if (coordinateOperationMethod != null) {
       out.write(",");
       indent(out, incrementIndent(indentLevel));
       write(out, coordinateOperationMethod, incrementIndent(indentLevel));
     }
-    for (final Entry<String, Object> parameter : coordinateSystem.getParameters().entrySet()) {
-      final String name = parameter.getKey();
+    for (final Entry<ParameterName, Object> parameter : coordinateSystem.getParameters()
+      .entrySet()) {
+      final ParameterName name = parameter.getKey();
       final Object value = parameter.getValue();
       write(out, name, value, incrementIndent(indentLevel));
     }
@@ -166,14 +194,6 @@ public class EsriCsWktWriter {
     if (unit != null) {
       write(out, unit, incrementIndent(indentLevel));
     }
-    indent(out, indentLevel);
-    out.write(']');
-  }
-
-  public static void write(final Writer out, final CoordinateOperationMethod coordinateOperationMethod, final int indentLevel)
-    throws IOException {
-    out.write("PROJECTION[");
-    write(out, coordinateOperationMethod.getName(), incrementIndent(indentLevel));
     indent(out, indentLevel);
     out.write(']');
   }
@@ -200,21 +220,5 @@ public class EsriCsWktWriter {
       out.write(value);
     }
     out.write('"');
-  }
-
-  public static void write(final Writer out, final String name, final Object value,
-    final int indentLevel) throws IOException {
-    out.write(",");
-    indent(out, indentLevel);
-    out.write("PARAMETER[");
-    write(out, name, -1);
-    out.write(',');
-    if (value instanceof Number) {
-      final Number number = (Number)value;
-      write(out, number, -1);
-    } else {
-      out.write(value.toString());
-    }
-    out.write(']');
   }
 }

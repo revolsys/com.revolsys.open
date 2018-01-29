@@ -6,21 +6,21 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ParameterName;
+import com.revolsys.geometry.cs.ParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.CoordinateOperationMethod;
-import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
@@ -437,22 +437,18 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
             "planimetricReferenceSystem=" + planimetricReferenceSystem
               + " not currently supported for USGS DEM: " + this.resource);
         } else if (3 == planimetricReferenceSystem) {
-          final MapEx parameters = new LinkedHashMapEx();
-          parameters.put(ProjectionParameterNames.LONGITUDE_OF_CENTER,
-            fromDms(projectionParameters[4]));
-          parameters.put(ProjectionParameterNames.STANDARD_PARALLEL_1,
-            fromDms(projectionParameters[2]));
-          parameters.put(ProjectionParameterNames.STANDARD_PARALLEL_2,
-            fromDms(projectionParameters[3]));
-          parameters.put(ProjectionParameterNames.LATITUDE_OF_CENTER,
-            fromDms(projectionParameters[5]));
-          parameters.put(ProjectionParameterNames.FALSE_EASTING, projectionParameters[6]);
-          parameters.put(ProjectionParameterNames.FALSE_NORTHING, projectionParameters[7]);
+          final Map<ParameterName, Double> parameters = new LinkedHashMap<>();
+          parameters.put(ParameterNames.CENTRAL_MERIDIAN, fromDms(projectionParameters[4]));
+          parameters.put(ParameterNames.STANDARD_PARALLEL_1, fromDms(projectionParameters[2]));
+          parameters.put(ParameterNames.STANDARD_PARALLEL_2, fromDms(projectionParameters[3]));
+          parameters.put(ParameterNames.LATITUDE_OF_ORIGIN, fromDms(projectionParameters[5]));
+          parameters.put(ParameterNames.FALSE_EASTING, projectionParameters[6]);
+          parameters.put(ParameterNames.FALSE_NORTHING, projectionParameters[7]);
 
-          final CoordinateOperationMethod coordinateOperationMethod = EpsgCoordinateSystems.getProjection("Albers_Equal_Area");
+          final CoordinateOperationMethod coordinateOperationMethod = CoordinateOperationMethod
+            .getMethod("Albers_Equal_Area");
           final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
-            -1, "", geographicCoordinateSystem, null, coordinateOperationMethod, parameters, linearUnit, null,
-            null, false);
+            -1, "", geographicCoordinateSystem, coordinateOperationMethod, parameters, linearUnit);
           final ProjectedCoordinateSystem projectedCoordinateSystem2 = (ProjectedCoordinateSystem)EpsgCoordinateSystems
             .getCoordinateSystem(projectedCoordinateSystem);
           if (projectedCoordinateSystem2 == projectedCoordinateSystem

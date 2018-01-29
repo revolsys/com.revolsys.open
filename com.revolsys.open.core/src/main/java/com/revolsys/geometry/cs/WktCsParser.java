@@ -215,8 +215,8 @@ public class WktCsParser {
         authorityId = Integer.parseInt(authorityCode);
       }
     }
-    return new GeographicCoordinateSystem(authorityId, name, geodeticDatum, primeMeridian, angularUnit,
-      axis, authority);
+    return new GeographicCoordinateSystem(authorityId, name, geodeticDatum, primeMeridian,
+      angularUnit, axis, authority);
   }
 
   private LinearUnit processLinearUnit(final List<Object> values) {
@@ -245,24 +245,24 @@ public class WktCsParser {
     final String name = (String)values.get(index++);
     final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)values
       .get(index++);
-    CoordinateOperationMethod coordinateOperationMethod = null;
-    final Map<String, Object> parameters = new HashMap<>();
+    final Map<ParameterName, Double> parameters = new HashMap<>();
 
     LinearUnit linearUnit = null;
     final List<Axis> axis = new ArrayList<>();
     Authority authority = null;
-
+    String methodName = null;
     while (index < values.size()) {
       final Object value = values.get(index++);
-      if (value instanceof CoordinateOperationMethod) {
-        coordinateOperationMethod = (CoordinateOperationMethod)value;
+      if (value instanceof String) {
+        methodName = (String)value;
       } else if (value instanceof Map) {
         final Map<String, List<Object>> map = (Map<String, List<Object>>)value;
         final String key = map.keySet().iterator().next();
         if (key.equals("PARAMETER")) {
           final List<Object> paramValues = map.get(key);
-          final String paramName = (String)paramValues.get(0);
-          final Object paramValue = paramValues.get(1);
+          final ParameterName paramName = ParameterNames
+            .getParameterName((String)paramValues.get(0));
+          final Double paramValue = (Double)paramValues.get(1);
           parameters.put(paramName, paramValue);
         }
       } else if (value instanceof LinearUnit) {
@@ -287,13 +287,16 @@ public class WktCsParser {
         }
       }
     }
-    return new ProjectedCoordinateSystem(srid, name, geographicCoordinateSystem, coordinateOperationMethod,
-      parameters, linearUnit, axis, authority);
+    final CoordinateOperationMethod coordinateOperationMethod = CoordinateOperationMethod
+      .getMethod(methodName, parameters);
+
+    return new ProjectedCoordinateSystem(srid, name, geographicCoordinateSystem,
+      coordinateOperationMethod, parameters, linearUnit, axis, authority);
   }
 
-  private CoordinateOperationMethod processProjection(final List<Object> values) {
+  private String processProjection(final List<Object> values) {
     final String name = (String)values.get(0);
-    return new CoordinateOperationMethod(name);
+    return name;
   }
 
   private Spheroid processSpheroid(final List<Object> values) {

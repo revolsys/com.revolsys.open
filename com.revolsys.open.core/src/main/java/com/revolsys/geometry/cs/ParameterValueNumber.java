@@ -13,7 +13,11 @@ public class ParameterValueNumber extends Number implements ParameterValue {
   public ParameterValueNumber(final UnitOfMeasure unit, final double unitValue) {
     this.unit = unit;
     this.unitValue = unitValue;
-    this.value = unit.toNormal(unitValue);
+    if (unit == null) {
+      this.value = unitValue;
+    } else {
+      this.value = unit.toNormal(unitValue);
+    }
   }
 
   @Override

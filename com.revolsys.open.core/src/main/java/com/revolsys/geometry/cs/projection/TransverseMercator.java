@@ -1,8 +1,8 @@
 package com.revolsys.geometry.cs.projection;
 
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 
@@ -75,15 +75,14 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
       .getGeographicCoordinateSystem();
     final GeodeticDatum geodeticDatum = geographicCS.getDatum();
     final double latitudeOfNaturalOrigin = coordinateSystem
-      .getDoubleParameter(ProjectionParameterNames.LATITUDE_OF_CENTER);
+      .getDoubleParameter(ParameterNames.LATITUDE_OF_ORIGIN);
     final double centralMeridian = coordinateSystem
-      .getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
-    final double scaleFactor = coordinateSystem
-      .getDoubleParameter(ProjectionParameterNames.SCALE_FACTOR);
+      .getDoubleParameter(ParameterNames.CENTRAL_MERIDIAN);
+    final double scaleFactor = coordinateSystem.getDoubleParameter(ParameterNames.SCALE_FACTOR);
 
     final Spheroid spheroid = geodeticDatum.getSpheroid();
-    this.x0 = coordinateSystem.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
-    this.y0 = coordinateSystem.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
+    this.x0 = coordinateSystem.getDoubleParameter(ParameterNames.FALSE_EASTING);
+    this.y0 = coordinateSystem.getDoubleParameter(ParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
     this.a = spheroid.getSemiMajorAxis();
     this.k0 = scaleFactor;

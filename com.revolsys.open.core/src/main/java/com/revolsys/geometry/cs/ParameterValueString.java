@@ -12,4 +12,9 @@ public class ParameterValueString implements ParameterValue {
   public <V> V getValue() {
     return (V)this.value;
   }
+
+  @Override
+  public String toString() {
+    return this.value;
+  }
 }

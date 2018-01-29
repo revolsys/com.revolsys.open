@@ -60,6 +60,11 @@ public class ScaleUnit implements UnitOfMeasure {
   }
 
   @Override
+  public UnitOfMeasureType getType() {
+    return UnitOfMeasureType.SCALE;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;

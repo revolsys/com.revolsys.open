@@ -4,11 +4,12 @@ import java.io.PrintWriter;
 import java.util.Map.Entry;
 
 import com.revolsys.geometry.cs.Authority;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.unit.AngularUnit;
@@ -36,6 +37,15 @@ public class EpsgCsWktWriter {
       out.write(",\"");
       out.print(authority.getCode());
       out.write("\"]");
+    }
+  }
+
+  public static void write(final PrintWriter out,
+    final CoordinateOperationMethod coordinateOperationMethod) {
+    if (coordinateOperationMethod != null) {
+      out.print(",PROJECTION[");
+      write(out, coordinateOperationMethod.getName());
+      out.write(']');
     }
   }
 
@@ -97,6 +107,19 @@ public class EpsgCsWktWriter {
 
   }
 
+  public static void write(final PrintWriter out, final ParameterName name, final Object value) {
+    out.print(",PARAMETER[");
+    write(out, name.getName());
+    out.write(',');
+    if (value instanceof Number) {
+      final Number number = (Number)value;
+      write(out, number);
+    } else {
+      out.print(value);
+    }
+    out.write(']');
+  }
+
   public static void write(final PrintWriter out, final PrimeMeridian primeMeridian) {
     if (primeMeridian != null) {
       out.print(",PRIMEM[");
@@ -118,10 +141,12 @@ public class EpsgCsWktWriter {
       final GeographicCoordinateSystem geoCs = coordinateSystem.getGeographicCoordinateSystem();
       out.print(",");
       write(out, geoCs);
-      final CoordinateOperationMethod coordinateOperationMethod = coordinateSystem.getCoordinateOperationMethod();
+      final CoordinateOperationMethod coordinateOperationMethod = coordinateSystem
+        .getCoordinateOperationMethod();
       write(out, coordinateOperationMethod);
-      for (final Entry<String, Object> parameter : coordinateSystem.getParameters().entrySet()) {
-        final String name = parameter.getKey();
+      for (final Entry<ParameterName, Object> parameter : coordinateSystem.getParameters()
+        .entrySet()) {
+        final ParameterName name = parameter.getKey();
         final Object value = parameter.getValue();
         write(out, name, value);
       }
@@ -131,14 +156,6 @@ public class EpsgCsWktWriter {
       }
       final Authority authority = coordinateSystem.getAuthority();
       write(out, authority);
-      out.write(']');
-    }
-  }
-
-  public static void write(final PrintWriter out, final CoordinateOperationMethod coordinateOperationMethod) {
-    if (coordinateOperationMethod != null) {
-      out.print(",PROJECTION[");
-      write(out, coordinateOperationMethod.getName());
       out.write(']');
     }
   }
@@ -165,18 +182,5 @@ public class EpsgCsWktWriter {
       out.print(value);
     }
     out.write('"');
-  }
-
-  public static void write(final PrintWriter out, final String name, final Object value) {
-    out.print(",PARAMETER[");
-    write(out, name);
-    out.write(',');
-    if (value instanceof Number) {
-      final Number number = (Number)value;
-      write(out, number);
-    } else {
-      out.print(value);
-    }
-    out.write(']');
   }
 }

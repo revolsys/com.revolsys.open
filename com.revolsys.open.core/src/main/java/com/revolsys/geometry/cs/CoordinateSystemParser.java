@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 
@@ -73,29 +72,47 @@ public class CoordinateSystemParser {
           final int geoCsId = Integer.parseInt(fields[2]);
           final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)geoCsById
             .get(geoCsId);
-          final String projectionName = fields[3];
+          String projectionName = fields[3];
           final String parameterString = fields[4];
           final String unitName = fields[5];
           final double conversionFactor = Double.parseDouble(fields[6]);
 
-          final Map<String, Object> parameters = new LinkedHashMap<>();
+          final Map<ParameterName, Double> parameters = new LinkedHashMap<>();
           for (final String param : parameterString.substring(1, parameterString.length() - 1)
             .split(",")) {
             final String[] paramValues = param.split("=");
             if (paramValues.length == 2) {
-              final String key = new String(paramValues[0].trim());
+              final ParameterName key = ParameterNames.getParameterName(paramValues[1]);
               final Double value = Double.valueOf(paramValues[1].trim());
               parameters.put(key, value);
             }
           }
-
-          final CoordinateOperationMethod coordinateOperationMethod = EpsgCoordinateSystems.getProjection(projectionName);
+          if ("Lambert_Conformal_Conic".equals(projectionName)) {
+            if (parameters.containsKey(ParameterNames.STANDARD_PARALLEL_1)) {
+              projectionName = "Lambert_Conic_Conformal_2SP";
+            } else {
+              projectionName = "Lambert_Conic_Conformal_1SP";
+            }
+          } else if ("Mercator".equals(projectionName)) {
+            if (parameters.containsKey(ParameterNames.STANDARD_PARALLEL_1)) {
+              if (parameters.containsKey(ParameterNames.LATITUDE_OF_ORIGIN)) {
+                projectionName = "Mercator_2SP";
+              } else {
+                projectionName = "Mercator_2SP";
+              }
+            } else {
+              projectionName = "Mercator_1SP";
+            }
+          }
+          final CoordinateOperationMethod coordinateOperationMethod = CoordinateOperationMethod
+            .getMethod(projectionName);
           LinearUnit unit = linearUnitsByName.get(unitName);
           if (unit == null) {
             unit = new LinearUnit(unitName, conversionFactor, null);
             linearUnitsByName.put(unitName, unit);
           }
           final Authority authority = new BaseAuthority(authorityName, id);
+
           final ProjectedCoordinateSystem cs = new ProjectedCoordinateSystem(Integer.parseInt(id),
             csName, geoCs, coordinateOperationMethod, parameters, unit, null, authority);
           coordinateSystems.add(cs);

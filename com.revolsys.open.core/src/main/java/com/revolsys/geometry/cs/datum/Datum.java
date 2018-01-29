@@ -30,8 +30,6 @@ public class Datum {
         if (datum.name != null) {
           return false;
         }
-        // } else if (!name.equalsIgnoreCase(datum.name)) {
-        // return false;
       } else {
         return true;
       }

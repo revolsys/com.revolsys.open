@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.CoordinateOperationMethod;
+import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.ParameterValue;
 
 public class CoordinateOperation {
@@ -31,12 +32,12 @@ public class CoordinateOperation {
 
   private final boolean deprecated;
 
-  private final Map<String, ParameterValue> parameterValues;
+  private final Map<ParameterName, ParameterValue> parameterValues;
 
   public CoordinateOperation(final int id, final CoordinateOperationMethod method,
     final String name, final byte type, final int sourceCrsCode, final int targetCrsCode,
     final String transformationVersion, final int variant, final Area area, final double accuracy,
-    final Map<String, ParameterValue> parameterValues, final boolean deprecated) {
+    final Map<ParameterName, ParameterValue> parameterValues, final boolean deprecated) {
     this.id = id;
     this.method = method;
     this.name = name;
@@ -71,18 +72,23 @@ public class CoordinateOperation {
     return this.name;
   }
 
-  public Map<String, Object> getParameters() {
-    final Map<String, Object> parameters = new LinkedHashMap<>();
-    for (final Entry<String, ParameterValue> entry : this.parameterValues.entrySet()) {
-      final String parameterName = entry.getKey();
+  public Map<ParameterName, Object> getParameters() {
+    final Map<ParameterName, Object> parameters = new LinkedHashMap<>();
+    for (final Entry<ParameterName, ParameterValue> entry : this.parameterValues.entrySet()) {
+      final ParameterName parameterName = entry.getKey();
       final ParameterValue parameterValue = entry.getValue();
-      final Object value = parameterValue.getValue();
+      final Object value;
+      if (parameterValue == null) {
+        value = parameterName.getDefaultValue();
+      } else {
+        value = parameterValue.getValue();
+      }
       parameters.put(parameterName, value);
     }
     return parameters;
   }
 
-  public Map<String, ParameterValue> getParameterValues() {
+  public Map<ParameterName, ParameterValue> getParameterValues() {
     return this.parameterValues;
   }
 

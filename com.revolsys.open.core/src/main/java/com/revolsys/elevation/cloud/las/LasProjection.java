@@ -14,14 +14,12 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
-import com.revolsys.geometry.cs.Area;
-import com.revolsys.geometry.cs.Authority;
-import com.revolsys.geometry.cs.Axis;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ParameterName;
+import com.revolsys.geometry.cs.ParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.CoordinateOperationMethod;
-import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.io.Buffers;
@@ -110,29 +108,27 @@ public class LasProjection {
             final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
               .getCoordinateSystem(geoSrid);
             final String name = "unknown";
-            final CoordinateOperationMethod coordinateOperationMethod = TiffImage.getProjection(properties);
-            final Area area = null;
+            final CoordinateOperationMethod coordinateOperationMethod = TiffImage
+              .getProjection(properties);
 
-            final Map<String, Object> parameters = new LinkedHashMap<>();
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.STANDARD_PARALLEL_1,
-              properties, TiffImage.STANDARD_PARALLEL_1_KEY);
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.STANDARD_PARALLEL_2,
-              properties, TiffImage.STANDARD_PARALLEL_2_KEY);
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.LONGITUDE_OF_CENTER,
-              properties, TiffImage.LONGITUDE_OF_CENTER_2_KEY);
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.LATITUDE_OF_CENTER,
-              properties, TiffImage.LATITUDE_OF_CENTER_2_KEY);
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.FALSE_EASTING,
-              properties, TiffImage.FALSE_EASTING_KEY);
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.FALSE_NORTHING,
-              properties, TiffImage.FALSE_NORTHING_KEY);
+            final Map<ParameterName, Double> parameters = new LinkedHashMap<>();
+            TiffImage.addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_1, properties,
+              TiffImage.STANDARD_PARALLEL_1_KEY);
+            TiffImage.addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_2, properties,
+              TiffImage.STANDARD_PARALLEL_2_KEY);
+            TiffImage.addDoubleParameter(parameters, ParameterNames.CENTRAL_MERIDIAN, properties,
+              TiffImage.LONGITUDE_OF_CENTER_2_KEY);
+            TiffImage.addDoubleParameter(parameters, ParameterNames.LATITUDE_OF_ORIGIN, properties,
+              TiffImage.LATITUDE_OF_CENTER_2_KEY);
+            TiffImage.addDoubleParameter(parameters, ParameterNames.FALSE_EASTING, properties,
+              TiffImage.FALSE_EASTING_KEY);
+            TiffImage.addDoubleParameter(parameters, ParameterNames.FALSE_NORTHING, properties,
+              TiffImage.FALSE_NORTHING_KEY);
 
             final LinearUnit linearUnit = TiffImage.getLinearUnit(properties);
-            final List<Axis> axis = null;
-            final Authority authority = null;
             final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
-              coordinateSystemId, name, geographicCoordinateSystem, area, coordinateOperationMethod, parameters,
-              linearUnit, axis, authority, false);
+              coordinateSystemId, name, geographicCoordinateSystem, coordinateOperationMethod,
+              parameters, linearUnit);
             coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(projectedCoordinateSystem);
           }
         }

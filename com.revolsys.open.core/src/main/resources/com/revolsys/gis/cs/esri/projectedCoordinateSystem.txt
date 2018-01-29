@@ -1376,7 +1376,7 @@
 3385	GDM2000 / Kelantan Grid	4742	Cassini	{Central_Meridian=102.2952416694444, False_Easting=13227.851, False_Northing=8739.894, Latitude_Of_Origin=5.972543658333334}	Meter	1.0
 3386	KKJ / Finland zone 0	4123	Transverse_Mercator	{Central_Meridian=18, False_Easting=500000, False_Northing=0, Latitude_Of_Origin=0, Scale_Factor=1}	Meter	1.0
 3387	KKJ / Finland zone 5	4123	Transverse_Mercator	{Central_Meridian=33, False_Easting=5500000, False_Northing=0, Latitude_Of_Origin=0, Scale_Factor=1}	Meter	1.0
-3388	Pulkovo 1942 / Caspian Sea Mercator	4284	Mercator	{Central_Meridian=51, False_Easting=0, False_Northing=0, Scale_Factor=1}	Meter	1.0
+3388	Pulkovo 1942 / Caspian Sea Mercator	4284	Mercator	{Central_Meridian=51,standard_parallel_1=42, False_Easting=0, False_Northing=0}	Meter	1.0
 3389	Pulkovo 1942 / 3-degree Gauss-Kruger zone 60	4284	Transverse_Mercator	{Central_Meridian=180, False_Easting=60500000, False_Northing=0, Latitude_Of_Origin=0, Scale_Factor=1}	Meter	1.0
 3390	Pulkovo 1995 / 3-degree Gauss-Kruger zone 60	4200	Transverse_Mercator	{Central_Meridian=180, False_Easting=60500000, False_Northing=0, Latitude_Of_Origin=0, Scale_Factor=1}	Meter	1.0
 3391	Karbala 1979 (Polservice) / UTM zone 37N	4743	Transverse_Mercator	{Central_Meridian=39, False_Easting=500000, False_Northing=0, Latitude_Of_Origin=0, Scale_Factor=0.9996}	Meter	1.0

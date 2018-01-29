@@ -2,7 +2,6 @@ package com.revolsys.raster.io.format.tiff;
 
 import java.awt.image.RenderedImage;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.media.jai.JAI;
@@ -16,14 +15,12 @@ import org.libtiff.jai.operator.XTIFFDescriptor;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.geometry.cs.Area;
-import com.revolsys.geometry.cs.Authority;
-import com.revolsys.geometry.cs.Axis;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ParameterName;
+import com.revolsys.geometry.cs.ParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.CoordinateOperationMethod;
-import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -122,8 +119,8 @@ public class TiffImage extends JaiGeoreferencedImage {
     // LambertConicConformal.class);
   }
 
-  public static void addDoubleParameter(final Map<String, Object> parameters, final String name,
-    final Map<Integer, Object> geoKeys, final int key) {
+  public static void addDoubleParameter(final Map<ParameterName, Double> parameters,
+    final ParameterName name, final Map<Integer, Object> geoKeys, final int key) {
     final Double value = Maps.getDouble(geoKeys, key);
     if (value != null) {
       parameters.put(name, value);
@@ -160,7 +157,8 @@ public class TiffImage extends JaiGeoreferencedImage {
   }
 
   private static void addProjection(final int id, final String name) {
-    final CoordinateOperationMethod coordinateOperationMethod = EpsgCoordinateSystems.getProjection(name);
+    final CoordinateOperationMethod coordinateOperationMethod = CoordinateOperationMethod
+      .getMethod(name);
     if (coordinateOperationMethod == null) {
       Debug.noOp();
     }
@@ -239,28 +237,24 @@ public class TiffImage extends JaiGeoreferencedImage {
             .getCoordinateSystem(geoSrid);
           final String name = "unknown";
           final CoordinateOperationMethod coordinateOperationMethod = getProjection(geoKeys);
-          final Area area = null;
 
-          final Map<String, Object> parameters = new LinkedHashMap<>();
-          addDoubleParameter(parameters, ProjectionParameterNames.STANDARD_PARALLEL_1, geoKeys,
+          final Map<ParameterName, Double> parameters = new LinkedHashMap<>();
+          addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_1, geoKeys,
             STANDARD_PARALLEL_1_KEY);
-          addDoubleParameter(parameters, ProjectionParameterNames.STANDARD_PARALLEL_2, geoKeys,
+          addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_2, geoKeys,
             STANDARD_PARALLEL_2_KEY);
-          addDoubleParameter(parameters, ProjectionParameterNames.LONGITUDE_OF_CENTER, geoKeys,
+          addDoubleParameter(parameters, ParameterNames.CENTRAL_MERIDIAN, geoKeys,
             LONGITUDE_OF_CENTER_2_KEY);
-          addDoubleParameter(parameters, ProjectionParameterNames.LATITUDE_OF_CENTER, geoKeys,
+          addDoubleParameter(parameters, ParameterNames.LATITUDE_OF_ORIGIN, geoKeys,
             LATITUDE_OF_CENTER_2_KEY);
-          addDoubleParameter(parameters, ProjectionParameterNames.FALSE_EASTING, geoKeys,
-            FALSE_EASTING_KEY);
-          addDoubleParameter(parameters, ProjectionParameterNames.FALSE_NORTHING, geoKeys,
+          addDoubleParameter(parameters, ParameterNames.FALSE_EASTING, geoKeys, FALSE_EASTING_KEY);
+          addDoubleParameter(parameters, ParameterNames.FALSE_NORTHING, geoKeys,
             FALSE_NORTHING_KEY);
 
           final LinearUnit linearUnit = getLinearUnit(geoKeys);
-          final List<Axis> axis = null;
-          final Authority authority = null;
           final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
-            coordinateSystemId, name, geographicCoordinateSystem, area, coordinateOperationMethod, parameters,
-            linearUnit, axis, authority, false);
+            coordinateSystemId, name, geographicCoordinateSystem, coordinateOperationMethod,
+            parameters, linearUnit);
           final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
             .getCoordinateSystem(coordinateSystem);
           geometryFactory = GeometryFactory

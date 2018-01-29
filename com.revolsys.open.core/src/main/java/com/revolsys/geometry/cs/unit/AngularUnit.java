@@ -132,6 +132,11 @@ public class AngularUnit implements UnitOfMeasure {
     return this.name;
   }
 
+  @Override
+  public UnitOfMeasureType getType() {
+    return UnitOfMeasureType.ANGULAR;
+  }
+
   public Unit<Angle> getUnit() {
     return this.unit;
   }

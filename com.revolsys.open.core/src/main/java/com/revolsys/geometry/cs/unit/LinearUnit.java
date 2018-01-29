@@ -128,6 +128,11 @@ public class LinearUnit implements UnitOfMeasure {
     return this.name;
   }
 
+  @Override
+  public UnitOfMeasureType getType() {
+    return UnitOfMeasureType.LINEAR;
+  }
+
   public Unit<Length> getUnit() {
     return this.unit;
   }

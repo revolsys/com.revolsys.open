@@ -89,9 +89,10 @@ public class EsriCoordinateSystems {
     }
   }
 
-  public static CoordinateSystem getCoordinateSystem(final int crsId) {
+  @SuppressWarnings("unchecked")
+  public static <C extends CoordinateSystem> C getCoordinateSystem(final int crsId) {
     final CoordinateSystem coordinateSystem = coordinateSystemsById.get(crsId);
-    return coordinateSystem;
+    return (C)coordinateSystem;
   }
 
   public static CoordinateSystem getCoordinateSystem(final Object source) {

@@ -60,6 +60,11 @@ public class TimeUnit implements UnitOfMeasure {
   }
 
   @Override
+  public UnitOfMeasureType getType() {
+    return UnitOfMeasureType.TIME;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;

@@ -6,10 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import com.revolsys.collection.map.Maps;
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
+import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateSystemType;
+import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ParameterName;
+import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.io.PathName;
 import com.revolsys.io.channels.ChannelWriter;
@@ -19,6 +28,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.spring.resource.UrlResource;
 
 /**
  * Make sure to watch out for parameter value conversions.
@@ -77,6 +87,8 @@ public final class EpsgCoordinateSystemsLoader {
     } catch (final Throwable t) {
       t.printStackTrace();
     }
+
+    validateEsri();
   }
 
   private void loadAlias() {
@@ -153,7 +165,7 @@ public final class EpsgCoordinateSystemsLoader {
       ChannelWriter writer = newWriter("coordinateReferenceSystem")) {
       for (final List<Record> records : recordByKind.values()) {
         for (final Record record : records) {
-          writeInt(writer, record, "coord_ref_sys_code");
+          final int id = writeInt(writer, record, "coord_ref_sys_code");
           writeString(writer, record, "coord_ref_sys_name");
           writeInt(writer, record, "area_of_use_code");
           writeCodeByte(writer, record, "coord_ref_sys_kind", COORDINATE_REFERENCE_SYSTEM_TYPES);
@@ -226,9 +238,13 @@ public final class EpsgCoordinateSystemsLoader {
     }
   }
 
+  /**
+   * Order of parameters for a coordOperation
+   */
   private void loadCoordOperationParamUsage() {
     try (
-      RecordReader reader = newReader("/public/epsg_coordoperationparamusage");
+      RecordReader reader = newReader("/public/epsg_coordoperationparamusage",
+        "coord_op_method_code", "sort_order");
       ChannelWriter writer = newWriter("coordOperationParamUsage");) {
       for (final Record record : reader) {
         writeInt(writer, record, "coord_op_method_code");
@@ -379,6 +395,43 @@ public final class EpsgCoordinateSystemsLoader {
     return this.baseResource.newChildResource(name + ".bin").newChannelWriter();
   }
 
+  private void validateEsri() {
+    for (final CoordinateSystem coordinateSytstem : EpsgCoordinateSystems.getCoordinateSystems()) {
+      if (coordinateSytstem instanceof GeographicCoordinateSystem) {
+        final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSytstem;
+        final int id = coordinateSytstem.getCoordinateSystemId();
+        final GeographicCoordinateSystem esri = EsriCoordinateSystems.getCoordinateSystem(id);
+        if (esri != null && !geoCs.equalsExact(esri)) {
+          // System.out.println(id + coordinateSytstem.getCoordinateSystemName());
+        }
+      } else if (coordinateSytstem instanceof ProjectedCoordinateSystem) {
+        final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSytstem;
+        final int id = coordinateSytstem.getCoordinateSystemId();
+        final ProjectedCoordinateSystem esri = (ProjectedCoordinateSystem)EsriCoordinateSystems
+          .getCoordinateSystem(new UrlResource("https://epsg.io/" + id + ".esriwkt"));// EsriCoordinateSystems.getCoordinateSystem(id);
+        final CoordinateOperationMethod coordinateOperationMethod = esri
+          .getCoordinateOperationMethod();
+        if (esri != null && !projectedCs.equals(esri) && coordinateOperationMethod != null
+          && coordinateOperationMethod.getName().length() > 0 && !projectedCs.isDeprecated()) {
+          final Map<ParameterName, Object> p1 = projectedCs.getParameters();
+          final Map<ParameterName, Object> p2 = esri.getParameters();
+          final Set<ParameterName> n1 = p1.keySet();
+          final Set<ParameterName> n2 = p2.keySet();
+          if (!n1.equals(n2)) {
+
+            final TreeSet<ParameterName> nm1 = new TreeSet<>(n1);
+            nm1.removeAll(n2);
+            final TreeSet<ParameterName> nm2 = new TreeSet<>(n2);
+            nm2.removeAll(n1);
+            final String m = id + "\t" + coordinateSytstem.getCoordinateSystemName() + "\t" + nm1
+              + "\t" + nm2;
+            System.out.println(m);
+          }
+        }
+      }
+    }
+  }
+
   private void writeByte(final ChannelWriter writer, final Record record, final String fieldName) {
     writer.putByte(record.getByte(fieldName));
   }
@@ -393,9 +446,9 @@ public final class EpsgCoordinateSystemsLoader {
   private void writeDeprecated(final ChannelWriter writer, final Record record) {
     final boolean deprecated = isDeprecated(record);
     if (deprecated) {
-      writer.putByte((byte)0);
-    } else {
       writer.putByte((byte)1);
+    } else {
+      writer.putByte((byte)0);
     }
   }
 

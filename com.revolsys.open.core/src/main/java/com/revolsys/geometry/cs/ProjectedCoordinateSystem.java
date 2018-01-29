@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
@@ -18,7 +17,6 @@ import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.cs.projection.CopyOperation;
-import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
@@ -27,7 +25,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 public class ProjectedCoordinateSystem implements CoordinateSystem {
   private static final long serialVersionUID = 1902383026085071877L;
 
-  private Area area;
+  private final Area area;
 
   private final Authority authority;
 
@@ -35,7 +33,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private CoordinatesProjection coordinatesProjection;
 
-  private boolean deprecated;
+  private final boolean deprecated;
 
   private final GeographicCoordinateSystem geographicCoordinateSystem;
 
@@ -47,22 +45,38 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private final String name;
 
-  private final Map<String, Object> normalizedParameters = new TreeMap<>();
+  private final Map<ParameterName, Object> parameters = new LinkedHashMap<>();
 
-  private final Map<String, Object> parameters = new LinkedHashMap<>();
+  private final Map<ParameterName, ParameterValue> parameterValues;
 
   private final CoordinateOperationMethod coordinateOperationMethod;
 
   public ProjectedCoordinateSystem(final int id, final String name,
     final GeographicCoordinateSystem geographicCoordinateSystem, final Area area,
-    final CoordinateOperationMethod coordinateOperationMethod, final Map<String, Object> parameters, final LinearUnit linearUnit,
+    final CoordinateOperationMethod coordinateOperationMethod,
+    final Map<ParameterName, ParameterValue> parameterValues, final LinearUnit linearUnit,
     final List<Axis> axis, final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
     this.area = area;
     this.geographicCoordinateSystem = geographicCoordinateSystem;
     this.coordinateOperationMethod = coordinateOperationMethod;
-    setParameters(parameters);
+    if (parameterValues == null) {
+      this.parameterValues = new LinkedHashMap<>();
+    } else {
+      this.parameterValues = parameterValues;
+    }
+    for (final Entry<ParameterName, ParameterValue> entry : this.parameterValues.entrySet()) {
+      final ParameterName parameterName = entry.getKey();
+      final ParameterValue parameterValue = entry.getValue();
+      final Object value;
+      if (parameterValue == null) {
+        value = parameterName.getDefaultValue();
+      } else {
+        value = parameterValue.getValue();
+      }
+      this.parameters.put(parameterName, value);
+    }
     this.linearUnit = linearUnit;
     if (axis != null && !axis.isEmpty()) {
       this.axis.add(axis.get(0));
@@ -73,20 +87,22 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   public ProjectedCoordinateSystem(final int id, final String name,
-    final GeographicCoordinateSystem geographicCoordinateSystem, final CoordinateOperationMethod coordinateOperationMethod,
-    final Map<String, Object> parameters, final LinearUnit linearUnit, final List<Axis> axis,
+    final GeographicCoordinateSystem geographicCoordinateSystem,
+    final CoordinateOperationMethod coordinateOperationMethod,
+    final Map<ParameterName, Double> parameters, final LinearUnit linearUnit) {
+    this(id, name, geographicCoordinateSystem, null, coordinateOperationMethod,
+      CoordinateOperationMethod.getParameters(coordinateOperationMethod, parameters, linearUnit),
+      linearUnit, null, null, false);
+  }
+
+  public ProjectedCoordinateSystem(final int id, final String name,
+    final GeographicCoordinateSystem geographicCoordinateSystem,
+    final CoordinateOperationMethod coordinateOperationMethod,
+    final Map<ParameterName, Double> parameters, final LinearUnit linearUnit, final List<Axis> axis,
     final Authority authority) {
-    this.id = id;
-    this.name = name;
-    this.geographicCoordinateSystem = geographicCoordinateSystem;
-    this.coordinateOperationMethod = coordinateOperationMethod;
-    setParameters(parameters);
-    this.linearUnit = linearUnit;
-    if (axis != null && !axis.isEmpty()) {
-      this.axis.add(axis.get(0));
-      this.axis.add(axis.get(1));
-    }
-    this.authority = authority;
+    this(id, name, geographicCoordinateSystem, null, coordinateOperationMethod,
+      CoordinateOperationMethod.getParameters(coordinateOperationMethod, parameters, linearUnit),
+      linearUnit, axis, authority, false);
   }
 
   @Override
@@ -110,7 +126,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
         return false;
       } else if (!this.coordinateOperationMethod.equals(cs.coordinateOperationMethod)) {
         return false;
-      } else if (!this.normalizedParameters.equals(cs.normalizedParameters)) {
+      } else if (!this.parameters.equals(cs.parameters)) {
         return false;
       } else if (!this.linearUnit.equals(cs.linearUnit)) {
         return false;
@@ -143,7 +159,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
         return false;
       } else if (!DataType.equal(this.name, cs.name)) {
         return false;
-      } else if (!DataType.equal(this.normalizedParameters, cs.normalizedParameters)) {
+      } else if (!DataType.equal(this.parameters, cs.parameters)) {
         return false;
       } else if (!DataType.equal(this.coordinateOperationMethod, cs.coordinateOperationMethod)) {
         return false;
@@ -188,6 +204,10 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return this.axis;
   }
 
+  public CoordinateOperationMethod getCoordinateOperationMethod() {
+    return this.coordinateOperationMethod;
+  }
+
   @Override
   public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null || this == coordinateSystem) {
@@ -206,7 +226,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
       if (coordinateSystem instanceof ProjectedCoordinateSystem) {
         final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-        final CoordinatesOperation projectOperation = projectedCoordinateSystem.getProjectCoordinatesOperation();
+        final CoordinatesOperation projectOperation = projectedCoordinateSystem
+          .getProjectCoordinatesOperation();
         if (projectOperation != null) {
           operations.add(projectOperation);
         }
@@ -236,7 +257,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   public synchronized CoordinatesProjection getCoordinatesProjection() {
     if (this.coordinatesProjection == null) {
-      this.coordinatesProjection = ProjectionFactory.newCoordinatesProjection(this);
+      this.coordinatesProjection = this.coordinateOperationMethod.newCoordinatesProjection(this);
     }
     return this.coordinatesProjection;
   }
@@ -251,7 +272,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return this.name;
   }
 
-  public double getDoubleParameter(final String key) {
+  public double getDoubleParameter(final ParameterName key) {
     final Number value = getParameter(key);
     if (value == null) {
       return Double.NaN;
@@ -288,12 +309,16 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V getParameter(final String key) {
-    return (V)this.normalizedParameters.get(key);
+  public <V> V getParameter(final ParameterName key) {
+    return (V)this.parameters.get(key);
   }
 
-  public Map<String, Object> getParameters() {
+  public Map<ParameterName, Object> getParameters() {
     return this.parameters;
+  }
+
+  public Map<ParameterName, ParameterValue> getParameterValues() {
+    return this.parameterValues;
   }
 
   /**
@@ -309,10 +334,6 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     } else {
       return projection.getProjectOperation();
     }
-  }
-
-  public CoordinateOperationMethod getCoordinateOperationMethod() {
-    return this.coordinateOperationMethod;
   }
 
   @Override
@@ -331,10 +352,13 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     if (this.coordinateOperationMethod != null) {
       result = prime * result + this.coordinateOperationMethod.hashCode();
     }
-    for (final Entry<String, Object> entry : this.normalizedParameters.entrySet()) {
-      final String key = entry.getKey();
+    for (final Entry<ParameterName, Object> entry : this.parameters.entrySet()) {
+      final ParameterName key = entry.getKey();
       result = prime * result + key.hashCode();
-      result = prime * result + entry.getValue().hashCode();
+      final Object value = entry.getValue();
+      if (value != null) {
+        result = prime * result + value.hashCode();
+      }
     }
     if (this.linearUnit != null) {
       result = prime * result + this.linearUnit.hashCode();
@@ -349,18 +373,6 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   public void setId(final int id) {
     this.id = id;
-  }
-
-  public void setParameters(final Map<String, Object> parameters) {
-    for (final Entry<String, Object> param : parameters.entrySet()) {
-      final String name = param.getKey().intern();
-      final Object value = param.getValue();
-
-      this.parameters.put(name, value);
-
-      final String normalizedName = ProjectionParameterNames.getParameterName(name);
-      this.normalizedParameters.put(normalizedName, value);
-    }
   }
 
   @Override

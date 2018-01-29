@@ -5,9 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 
@@ -16,18 +16,6 @@ public final class ProjectionFactory {
   private static final Map<String, Class<? extends CoordinatesProjection>> projectionClasses = new HashMap<>();
 
   static {
-    registerCoordinatesProjection(CoordinateOperationMethod.ALBERS_EQUAL_AREA, AlbersConicEqualArea.class);
-    registerCoordinatesProjection(CoordinateOperationMethod.TRANSVERSE_MERCATOR, TransverseMercator.class);
-    registerCoordinatesProjection(CoordinateOperationMethod.MERCATOR, Mercator1SP.class);
-    registerCoordinatesProjection(CoordinateOperationMethod.POPULAR_VISUALISATION_PSEUDO_MERCATOR,
-      WebMercator.class);
-    registerCoordinatesProjection(CoordinateOperationMethod.MERCATOR_1SP, Mercator1SP.class);
-    registerCoordinatesProjection(CoordinateOperationMethod.MERCATOR_2SP, Mercator2SP.class);
-    registerCoordinatesProjection(CoordinateOperationMethod.MERCATOR_1SP_SPHERICAL, Mercator1SPSpherical.class);
-    registerCoordinatesProjection(CoordinateOperationMethod.LAMBERT_CONIC_CONFORMAL_1SP,
-      LambertConicConformal1SP.class);
-    registerCoordinatesProjection(CoordinateOperationMethod.LAMBERT_CONIC_CONFORMAL_2SP,
-      LambertConicConformal.class);
     registerCoordinatesProjection(CoordinateOperationMethod.LAMBERT_CONIC_CONFORMAL_2SP_BELGIUM,
       LambertConicConformal.class);
   }
@@ -58,7 +46,8 @@ public final class ProjectionFactory {
 
   public static CoordinatesProjection newCoordinatesProjection(
     final ProjectedCoordinateSystem coordinateSystem) {
-    final CoordinateOperationMethod coordinateOperationMethod = coordinateSystem.getCoordinateOperationMethod();
+    final CoordinateOperationMethod coordinateOperationMethod = coordinateSystem
+      .getCoordinateOperationMethod();
     final String projectionName = coordinateOperationMethod.getNormalizedName();
     synchronized (projectionClasses) {
       final Class<? extends CoordinatesProjection> projectionClass = projectionClasses
