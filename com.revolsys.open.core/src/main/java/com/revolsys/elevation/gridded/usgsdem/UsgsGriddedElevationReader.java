@@ -22,7 +22,6 @@ import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.ParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -116,8 +115,8 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           if (name.equals(projName)) {
             final String wkt = FileUtil.getString(new InputStreamReader(in, StandardCharsets.UTF_8),
               false);
-            final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(wkt);
-            if (geometryFactory != null) {
+            final GeometryFactory geometryFactory = GeometryFactory.floating3d(wkt);
+            if (geometryFactory.isHasCoordinateSystem()) {
               this.geometryFactory = geometryFactory;
             }
           } else if (name.equals(fileName)) {
@@ -445,8 +444,8 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           parameters.put(ParameterNames.FALSE_EASTING, projectionParameters[6]);
           parameters.put(ParameterNames.FALSE_NORTHING, projectionParameters[7]);
 
-          final CoordinateOperationMethod coordinateOperationMethod = CoordinateOperationMethod
-            .getMethod("Albers_Equal_Area");
+          final CoordinateOperationMethod coordinateOperationMethod = new CoordinateOperationMethod(
+            "Albers_Equal_Area");
           final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
             -1, "", geographicCoordinateSystem, coordinateOperationMethod, parameters, linearUnit);
           final ProjectedCoordinateSystem projectedCoordinateSystem2 = (ProjectedCoordinateSystem)EpsgCoordinateSystems
@@ -483,7 +482,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   }
 
   private void setGeometryFactory(final Resource resource) {
-    final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+    final GeometryFactory geometryFactory = GeometryFactory.floating3d(resource);
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     }

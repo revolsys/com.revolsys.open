@@ -1,11 +1,14 @@
 package com.revolsys.geometry.cs.unit;
 
+import java.security.MessageDigest;
+
 import javax.measure.quantity.Angle;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.Authority;
+import com.revolsys.util.Md5;
 
 public class AngularUnit implements UnitOfMeasure {
 
@@ -67,11 +70,6 @@ public class AngularUnit implements UnitOfMeasure {
   private String name;
 
   private Unit<Angle> unit;
-
-  public AngularUnit(final String name, final AngularUnit baseUnit, final double conversionFactor,
-    final Authority authority) {
-    this(name, baseUnit, conversionFactor, authority, false);
-  }
 
   public AngularUnit(final String name, final AngularUnit baseUnit, final double conversionFactor,
     final Authority authority, final boolean deprecated) {
@@ -205,5 +203,10 @@ public class AngularUnit implements UnitOfMeasure {
   @Override
   public String toString() {
     return this.name;
+  }
+
+  public void updateDigest(final MessageDigest digest) {
+    digest.update((byte)'A');
+    Md5.update(digest, toBase(this.conversionFactor));
   }
 }

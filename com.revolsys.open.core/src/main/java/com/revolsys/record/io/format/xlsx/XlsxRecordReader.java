@@ -23,7 +23,6 @@ import org.xlsx4j.sml.STCellType;
 import org.xlsx4j.sml.SheetData;
 import org.xlsx4j.sml.Worksheet;
 
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
@@ -152,7 +151,7 @@ public class XlsxRecordReader extends AbstractRecordReader {
 
   @Override
   protected GeometryFactory loadGeometryFactory() {
-    return EsriCoordinateSystems.getGeometryFactory(this.resource);
+    return GeometryFactory.floating2d(this.resource);
   }
 
   /**

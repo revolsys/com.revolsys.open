@@ -32,9 +32,6 @@ import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
 import org.apache.pdfbox.pdmodel.graphics.PDExtendedGraphicsState;
 import org.apache.pdfbox.pdmodel.graphics.PDLineDashPattern;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -124,9 +121,7 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     }
     final int srid = geometryFactory.getCoordinateSystemId();
     gcs.setInt("EPSG", srid);
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    final CoordinateSystem esri = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
-    String wkt = EsriCsWktWriter.toWkt(esri);
+    String wkt = geometryFactory.toWktCs();
     wkt = wkt.replaceAll("false_easting", "False_Easting");
     wkt = wkt.replaceAll("false_northing", "False_Northing");
     wkt = wkt.replaceAll("Popular_Visualisation_Pseudo_Mercator", "Mercator");

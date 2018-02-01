@@ -11,9 +11,6 @@ import org.gdal.gdal.Band;
 import org.gdal.gdal.Dataset;
 
 import com.revolsys.gdal.Gdal;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.AbstractGeoreferencedImage;
@@ -37,21 +34,8 @@ public class GdalImage extends AbstractGeoreferencedImage {
     final String projection = dataset.GetProjection();
     final double[] geoTransform = dataset.GetGeoTransform();
     if (projection != null) {
-      final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-        .getCoordinateSystem(projection);
-      if (esriCoordinateSystem != null) {
-        CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
-          .getCoordinateSystem(esriCoordinateSystem);
-        if (epsgCoordinateSystem == null) {
-          epsgCoordinateSystem = esriCoordinateSystem;
-        }
-        final int srid = epsgCoordinateSystem.getCoordinateSystemId();
-        if (srid > 0 && srid < 2000000) {
-          setGeometryFactory(GeometryFactory.floating2d(srid));
-        } else {
-          setGeometryFactory(GeometryFactory.floating2d(epsgCoordinateSystem));
-        }
-      }
+      final GeometryFactory geometryFactory = GeometryFactory.floating2d(projection);
+      setGeometryFactory(geometryFactory);
     }
     setBoundingBox(geoTransform[0], geoTransform[3], geoTransform[1], geoTransform[5]);
     postConstruct();

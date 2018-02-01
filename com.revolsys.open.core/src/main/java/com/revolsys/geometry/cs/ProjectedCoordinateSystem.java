@@ -1,6 +1,7 @@
 package com.revolsys.geometry.cs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +106,14 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       linearUnit, axis, authority, false);
   }
 
+  public ProjectedCoordinateSystem(final int id, final String name,
+    final GeographicCoordinateSystem geographicCoordinateSystem, final String methodName,
+    final Map<ParameterName, ParameterValue> parameterValues, final LinearUnit linearUnit,
+    final Authority authority) {
+    this(id, name, geographicCoordinateSystem, null, new CoordinateOperationMethod(methodName),
+      parameterValues, linearUnit, Collections.emptyList(), authority, false);
+  }
+
   @Override
   public ProjectedCoordinateSystem clone() {
     try {
@@ -124,7 +133,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
       if (!this.geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
         return false;
-      } else if (!this.coordinateOperationMethod.equals(cs.coordinateOperationMethod)) {
+      } else if (this.coordinateOperationMethod == null ? cs.coordinateOperationMethod != null
+        : !this.coordinateOperationMethod.equals(cs.coordinateOperationMethod)) {
         return false;
       } else if (!this.parameters.equals(cs.parameters)) {
         return false;
@@ -138,36 +148,40 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     }
   }
 
-  public boolean equalsExact(final Object object) {
-    if (object == null) {
+  @Override
+  public boolean equalsExact(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof GeocentricCoordinateSystem) {
+      final GeocentricCoordinateSystem geocentricCoordinateSystem = (GeocentricCoordinateSystem)coordinateSystem;
+      return equalsExact(geocentricCoordinateSystem);
+    }
+    return false;
+  }
+
+  public boolean equalsExact(final ProjectedCoordinateSystem cs) {
+    if (cs == null) {
       return false;
-    } else if (object == this) {
+    } else if (cs == this) {
       return true;
-    } else if (object instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
-      if (!this.area.equals(cs.area)) {
-        return false;
-      } else if (!this.authority.equals(cs.authority)) {
-        return false;
-      } else if (!DataType.equal(this.axis, cs.axis)) {
-        return false;
-      } else if (!this.geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
-        return false;
-      } else if (this.id != cs.id) {
-        return false;
-      } else if (!DataType.equal(this.linearUnit, cs.linearUnit)) {
-        return false;
-      } else if (!DataType.equal(this.name, cs.name)) {
-        return false;
-      } else if (!DataType.equal(this.parameters, cs.parameters)) {
-        return false;
-      } else if (!DataType.equal(this.coordinateOperationMethod, cs.coordinateOperationMethod)) {
-        return false;
-      } else {
-        return true;
-      }
-    } else {
+    } else if (!this.area.equals(cs.area)) {
       return false;
+    } else if (!this.authority.equals(cs.authority)) {
+      return false;
+    } else if (!DataType.equal(this.axis, cs.axis)) {
+      return false;
+    } else if (!this.geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
+      return false;
+    } else if (this.id != cs.id) {
+      return false;
+    } else if (!DataType.equal(this.linearUnit, cs.linearUnit)) {
+      return false;
+    } else if (!DataType.equal(this.name, cs.name)) {
+      return false;
+    } else if (!DataType.equal(this.parameters, cs.parameters)) {
+      return false;
+    } else if (!DataType.equal(this.coordinateOperationMethod, cs.coordinateOperationMethod)) {
+      return false;
+    } else {
+      return true;
     }
   }
 
@@ -272,6 +286,11 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return this.name;
   }
 
+  @Override
+  public String getCoordinateSystemType() {
+    return "Projected";
+  }
+
   public double getDoubleParameter(final ParameterName key) {
     final Number value = getParameter(key);
     if (value == null) {
@@ -283,6 +302,10 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   public GeographicCoordinateSystem getGeographicCoordinateSystem() {
     return this.geographicCoordinateSystem;
+  }
+
+  public int getGeographicCoordinateSystemId() {
+    return this.geographicCoordinateSystem.getCoordinateSystemId();
   }
 
   /**

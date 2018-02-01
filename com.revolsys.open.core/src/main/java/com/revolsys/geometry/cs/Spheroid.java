@@ -1,14 +1,13 @@
 package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.util.Md5;
 import com.revolsys.util.number.Doubles;
 
 public class Spheroid implements Serializable {
-  /**
-   *
-   */
   private static final long serialVersionUID = -8349864136575195872L;
 
   private final Authority authority;
@@ -56,7 +55,7 @@ public class Spheroid implements Serializable {
       this.semiMinorAxis = semiMajorAxis - semiMajorAxis * f;
     }
     this.semiMajorAxisSq = semiMajorAxis * semiMajorAxis;
-    this.semiMinorAxisSq = semiMinorAxis * semiMinorAxis;
+    this.semiMinorAxisSq = this.semiMinorAxis * this.semiMinorAxis;
     // eccentricitySquared = 1.0 - b2 / a2;
 
     this.eccentricitySquared = f + f - f * f;
@@ -65,13 +64,17 @@ public class Spheroid implements Serializable {
 
   @Override
   public boolean equals(final Object object) {
-    if (object instanceof Spheroid) {
+    if (object == null) {
+      return false;
+    }
+    if (object == this) {
+      return true;
+    } else if (object instanceof Spheroid) {
       final Spheroid spheroid = (Spheroid)object;
-      if (Double.doubleToLongBits(Doubles.makePrecise(1000000.0, this.inverseFlattening)) != Double
-        .doubleToLongBits(Doubles.makePrecise(1000000.0, spheroid.inverseFlattening))) {
+      if (Doubles.makePrecise(1000000.0, this.inverseFlattening) != Doubles.makePrecise(1000000.0,
+        spheroid.inverseFlattening)) {
         return false;
-      } else if (Double.doubleToLongBits(this.semiMajorAxis) != Double
-        .doubleToLongBits(spheroid.semiMajorAxis)) {
+      } else if (this.semiMajorAxis != spheroid.semiMajorAxis) {
         return false;
       }
       return true;
@@ -183,5 +186,10 @@ public class Spheroid implements Serializable {
   @Override
   public String toString() {
     return this.name;
+  }
+
+  public void updateDigest(final MessageDigest digest) {
+    Md5.update(digest, this.semiMajorAxis);
+    Md5.update(digest, this.inverseFlattening);
   }
 }

@@ -1,7 +1,7 @@
 package com.revolsys.geometry.cs;
 
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.FileNotFoundException;
+import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,14 +13,44 @@ import java.util.Stack;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
-import com.revolsys.io.FileUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Property;
+import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Doubles;
 import com.revolsys.util.number.Integers;
 
 public class WktCsParser {
-  public static CoordinateSystem read(final String wkt) {
-    return new WktCsParser(wkt).parse();
+
+  public static <C extends CoordinateSystem> C read(final Resource resource) {
+    if (resource == null) {
+      return null;
+    } else {
+      final Resource projResource = resource.newResourceChangeExtension("prj");
+      try {
+        final String wkt = projResource.contentsAsString();
+        return read(wkt);
+      } catch (final WrappedException e) {
+        final Throwable cause = e.getCause();
+        if (cause instanceof FileNotFoundException) {
+        } else if (cause instanceof FileSystemException) {
+        } else {
+          Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
+        }
+      } catch (final Exception e) {
+        Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
+      }
+    }
+    return null;
+  }
+
+  public static <C extends CoordinateSystem> C read(final String wkt) {
+    if (Property.hasValue(wkt)) {
+      final WktCsParser parser = new WktCsParser(wkt);
+      return parser.parse();
+    } else {
+      return null;
+    }
   }
 
   private int index = 0;
@@ -29,27 +59,34 @@ public class WktCsParser {
 
   private final String value;
 
-  public WktCsParser(final InputStream in) {
-    this(FileUtil.newUtf8Reader(in));
-  }
-
-  public WktCsParser(final Reader reader) {
-    this(FileUtil.getString(reader));
-  }
-
-  public WktCsParser(final Resource resource) {
-    this(resource.contentsAsString());
-  }
-
   public WktCsParser(final String value) {
     this.value = value;
   }
 
-  public CoordinateSystem parse() {
+  private int getCoordinateSystemId(final Authority authority) {
+    int coordinateSystemId = 0;
+    if (authority != null) {
+      final String code = authority.getCode();
+      if (code != null) {
+        try {
+          coordinateSystemId = Integers.toInteger(code);
+        } catch (final Throwable e) {
+          final Double value = Doubles.toDouble(code);
+          if (value != null) {
+            coordinateSystemId = value.intValue();
+          }
+        }
+      }
+    }
+    return coordinateSystemId;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <C extends CoordinateSystem> C parse() {
     if (this.value.length() == 0) {
       return null;
     } else {
-      return (CoordinateSystem)parseValue();
+      return (C)parseValue();
     }
 
   }
@@ -204,18 +241,8 @@ public class WktCsParser {
     if (index < values.size()) {
       authority = (Authority)values.get(index);
     }
-    final int authorityId;
-    if (authority == null) {
-      authorityId = 0;
-    } else {
-      final String authorityCode = authority.getCode();
-      if (authorityCode == null) {
-        authorityId = 0;
-      } else {
-        authorityId = Integer.parseInt(authorityCode);
-      }
-    }
-    return new GeographicCoordinateSystem(authorityId, name, geodeticDatum, primeMeridian,
+    final int coordinateSystemId = getCoordinateSystemId(authority);
+    return new GeographicCoordinateSystem(coordinateSystemId, name, geodeticDatum, primeMeridian,
       angularUnit, axis, authority);
   }
 
@@ -260,10 +287,10 @@ public class WktCsParser {
         final String key = map.keySet().iterator().next();
         if (key.equals("PARAMETER")) {
           final List<Object> paramValues = map.get(key);
-          final ParameterName paramName = ParameterNames
-            .getParameterName((String)paramValues.get(0));
+          final String paramName = (String)paramValues.get(0);
+          final ParameterName parameterName = ParameterNames.getParameterName(paramName);
           final Double paramValue = (Double)paramValues.get(1);
-          parameters.put(paramName, paramValue);
+          parameters.put(parameterName, paramValue);
         }
       } else if (value instanceof LinearUnit) {
         linearUnit = (LinearUnit)value;
@@ -273,24 +300,11 @@ public class WktCsParser {
         authority = (Authority)value;
       }
     }
-    int srid = -1;
-    if (authority != null) {
-      final String code = authority.getCode();
-      if (code != null) {
-        try {
-          srid = Integers.toInteger(code);
-        } catch (final Throwable e) {
-          final Double value = Doubles.toDouble(code);
-          if (value != null) {
-            srid = value.intValue();
-          }
-        }
-      }
-    }
+    final int coordinateSystemId = getCoordinateSystemId(authority);
     final CoordinateOperationMethod coordinateOperationMethod = CoordinateOperationMethod
       .getMethod(methodName, parameters);
 
-    return new ProjectedCoordinateSystem(srid, name, geographicCoordinateSystem,
+    return new ProjectedCoordinateSystem(coordinateSystemId, name, geographicCoordinateSystem,
       coordinateOperationMethod, parameters, linearUnit, axis, authority);
   }
 

@@ -1,5 +1,6 @@
 package com.revolsys.geometry.cs;
 
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,14 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return distance;
   }
 
+  private static PrimeMeridian getPrimeMeridian(final GeodeticDatum datum) {
+    if (datum == null) {
+      return null;
+    } else {
+      return datum.getPrimeMeridian();
+    }
+  }
+
   private final AngularUnit angularUnit;
 
   private Area area;
@@ -70,36 +79,8 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     final GeodeticDatum geodeticDatum, final List<Axis> axis, final Area area,
     final CoordinateSystem sourceCoordinateSystem, final CoordinateOperation coordinateOperation,
     final boolean deprecated) {
-    this.id = id;
-    this.name = name;
-    this.geodeticDatum = geodeticDatum;
-    this.primeMeridian = null;
-    this.angularUnit = (AngularUnit)axis.get(0).getUnit();
-    if (axis != null && !axis.isEmpty()) {
-      this.axis.addAll(axis);
-    }
-    this.area = area;
-    this.authority = new EpsgAuthority(id);
-    this.sourceCoordinateSystem = sourceCoordinateSystem;
-    this.coordinateOperation = coordinateOperation;
-    this.deprecated = deprecated;
-  }
-
-  public GeographicCoordinateSystem(final int id, final String name,
-    final GeodeticDatum geodeticDatum, final PrimeMeridian primeMeridian,
-    final AngularUnit angularUnit, final List<Axis> axis, final Area area,
-    final Authority authority, final boolean deprecated) {
-    this.id = id;
-    this.name = name;
-    this.geodeticDatum = geodeticDatum;
-    this.primeMeridian = primeMeridian;
-    this.angularUnit = angularUnit;
-    if (axis != null && !axis.isEmpty()) {
-      this.axis.addAll(axis);
-    }
-    this.area = area;
-    this.authority = authority;
-    this.deprecated = deprecated;
+    this(id, name, geodeticDatum, getPrimeMeridian(geodeticDatum), axis, area,
+      sourceCoordinateSystem, coordinateOperation, deprecated);
   }
 
   public GeographicCoordinateSystem(final int id, final String name,
@@ -114,6 +95,25 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
       this.axis.addAll(axis);
     }
     this.authority = authority;
+  }
+
+  public GeographicCoordinateSystem(final int id, final String name,
+    final GeodeticDatum geodeticDatum, final PrimeMeridian primeMeridian, final List<Axis> axis,
+    final Area area, final CoordinateSystem sourceCoordinateSystem,
+    final CoordinateOperation coordinateOperation, final boolean deprecated) {
+    this.id = id;
+    this.name = name;
+    this.geodeticDatum = geodeticDatum;
+    this.primeMeridian = primeMeridian;
+    this.angularUnit = (AngularUnit)axis.get(0).getUnit();
+    if (axis != null && !axis.isEmpty()) {
+      this.axis.addAll(axis);
+    }
+    this.area = area;
+    this.authority = new EpsgAuthority(id);
+    this.sourceCoordinateSystem = sourceCoordinateSystem;
+    this.coordinateOperation = coordinateOperation;
+    this.deprecated = deprecated;
   }
 
   @Override
@@ -135,7 +135,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
       final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)object;
       if (!equals(this.geodeticDatum, cs.geodeticDatum)) {
         return false;
-      } else if (!equals(getPrimeMeridian(), cs.getPrimeMeridian())) {
+      } else if (!equals(this.primeMeridian, cs.primeMeridian)) {
         return false;
       } else if (!equals(this.angularUnit, cs.angularUnit)) {
         return false;
@@ -155,6 +155,15 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     } else {
       return object1.equals(object2);
     }
+  }
+
+  @Override
+  public boolean equalsExact(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof GeographicCoordinateSystem) {
+      final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
+      return equalsExact(geographicCoordinateSystem);
+    }
+    return false;
   }
 
   public boolean equalsExact(final GeographicCoordinateSystem cs) {
@@ -282,6 +291,11 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return this.name;
   }
 
+  @Override
+  public String getCoordinateSystemType() {
+    return "Geographic";
+  }
+
   public GeodeticDatum getDatum() {
     return this.geodeticDatum;
   }
@@ -298,15 +312,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   }
 
   public PrimeMeridian getPrimeMeridian() {
-    if (this.primeMeridian == null) {
-      if (this.geodeticDatum == null) {
-        return null;
-      } else {
-        return this.geodeticDatum.getPrimeMeridian();
-      }
-    } else {
-      return this.primeMeridian;
-    }
+    return this.primeMeridian;
   }
 
   public CoordinateSystem getSourceCoordinateSystem() {
@@ -340,5 +346,12 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   @Override
   public String toString() {
     return this.name;
+  }
+
+  @Override
+  public void updateDigest(final MessageDigest digest) {
+    this.geodeticDatum.updateDigest(digest);
+    this.primeMeridian.updateDigest(digest);
+    this.angularUnit.updateDigest(digest);
   }
 }

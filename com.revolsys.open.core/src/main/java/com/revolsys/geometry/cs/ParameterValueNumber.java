@@ -10,6 +10,10 @@ public class ParameterValueNumber extends Number implements ParameterValue {
 
   private final double value;
 
+  public ParameterValueNumber(final double unitValue) {
+    this(null, unitValue);
+  }
+
   public ParameterValueNumber(final UnitOfMeasure unit, final double unitValue) {
     this.unit = unit;
     this.unitValue = unitValue;

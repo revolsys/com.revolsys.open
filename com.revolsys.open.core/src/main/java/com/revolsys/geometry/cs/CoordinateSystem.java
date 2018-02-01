@@ -1,6 +1,7 @@
 package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
 import java.util.List;
 
 import javax.measure.quantity.Length;
@@ -12,9 +13,12 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.record.code.Code;
+import com.revolsys.util.Md5;
 
 public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializable {
   CoordinateSystem clone();
+
+  boolean equalsExact(CoordinateSystem coordinateSystem);
 
   Area getArea();
 
@@ -36,6 +40,8 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
   default CoordinateSystem getCoordinateSystem() {
     return this;
   }
+
+  String getCoordinateSystemType();
 
   @Override
   default String getDescription() {
@@ -61,4 +67,14 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
   <Q extends Quantity> Unit<Q> getUnit();
 
   boolean isDeprecated();
+
+  default byte[] md5Digest() {
+    final MessageDigest digest = Md5.getMessageDigest();
+    updateDigest(digest);
+    return digest.digest();
+  }
+
+  default void updateDigest(final MessageDigest digest) {
+    Md5.update(digest, toString());
+  }
 }

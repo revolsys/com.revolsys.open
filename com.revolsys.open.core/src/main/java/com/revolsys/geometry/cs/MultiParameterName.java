@@ -58,6 +58,11 @@ public class MultiParameterName implements ParameterName {
   }
 
   @Override
+  public int getId() {
+    return this.parameterNames[0].getId();
+  }
+
+  @Override
   public String getName() {
     return this.parameterNames[0].getName();
   }

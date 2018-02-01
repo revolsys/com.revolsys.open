@@ -1,8 +1,10 @@
 package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.util.Md5;
 
 public class PrimeMeridian implements Serializable {
   /**
@@ -86,5 +88,9 @@ public class PrimeMeridian implements Serializable {
   @Override
   public String toString() {
     return this.name;
+  }
+
+  public void updateDigest(final MessageDigest digest) {
+    Md5.update(digest, this.longitude);
   }
 }

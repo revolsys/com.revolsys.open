@@ -12,8 +12,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -170,9 +168,7 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
                     final Resource wktResource = webService
                       .getResource("CS.CONVERTCOORDINATESYSTEMCODETOWKT", null, csParameters);
                     final String wkt = wktResource.contentsAsString();
-                    final CoordinateSystem coordinateSystem = EsriCoordinateSystems
-                      .getCoordinateSystem(wkt);
-                    geometryFactory = GeometryFactory.floating(coordinateSystem, axisCount);
+                    geometryFactory = GeometryFactory.floating(wkt, axisCount);
                   } catch (final Throwable e) {
 
                   }

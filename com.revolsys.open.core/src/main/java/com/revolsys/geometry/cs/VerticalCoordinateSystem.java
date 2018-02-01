@@ -81,6 +81,15 @@ public class VerticalCoordinateSystem implements CoordinateSystem {
     }
   }
 
+  @Override
+  public boolean equalsExact(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof VerticalCoordinateSystem) {
+      final VerticalCoordinateSystem verticalCoordinateSystem = (VerticalCoordinateSystem)coordinateSystem;
+      return equalsExact(verticalCoordinateSystem);
+    }
+    return false;
+  }
+
   public boolean equalsExact(final VerticalCoordinateSystem cs) {
     if (cs == null) {
       return false;
@@ -147,6 +156,11 @@ public class VerticalCoordinateSystem implements CoordinateSystem {
   @Override
   public String getCoordinateSystemName() {
     return this.name;
+  }
+
+  @Override
+  public String getCoordinateSystemType() {
+    return "Vertical";
   }
 
   public VerticalDatum getDatum() {

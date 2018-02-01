@@ -110,6 +110,15 @@ public class CompoundCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
+  public boolean equalsExact(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof CompoundCoordinateSystem) {
+      final CompoundCoordinateSystem compoundCoordinateSystem = (CompoundCoordinateSystem)coordinateSystem;
+      return equalsExact(compoundCoordinateSystem);
+    }
+    return false;
+  }
+
+  @Override
   public Area getArea() {
     return this.area;
   }
@@ -147,6 +156,11 @@ public class CompoundCoordinateSystem implements CoordinateSystem {
   @Override
   public String getCoordinateSystemName() {
     return this.name;
+  }
+
+  @Override
+  public String getCoordinateSystemType() {
+    return "Compound";
   }
 
   public CoordinateSystem getHorizontalCoordinateSystem() {

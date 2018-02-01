@@ -32,7 +32,6 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -286,19 +285,15 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
               srid = DomUtil.getInteger(sridElement);
             }
           }
+          GeometryFactory geometryFactory = GeometryFactory.floating2d(srid);
           if (srid == 0) {
             final NodeList srsList = doc.getElementsByTagName("SRS");
             for (int i = 0; i < srsList.getLength() && srid == 0; i++) {
               final Node srsNode = srsList.item(i);
               final String srsWkt = srsNode.getTextContent();
-              final CoordinateSystem coordinateSystem = EsriCoordinateSystems
-                .getCoordinateSystem(srsWkt);
-              if (coordinateSystem != null) {
-                srid = coordinateSystem.getCoordinateSystemId();
-              }
+              geometryFactory = GeometryFactory.floating2d(srsWkt);
             }
           }
-          final GeometryFactory geometryFactory = GeometryFactory.floating2d(srid);
           setGeometryFactory(geometryFactory);
 
           final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc, "SourceGCPs");
@@ -348,7 +343,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   protected void loadProjectionFile() {
     final Resource resource = getImageResource();
-    final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+    final GeometryFactory geometryFactory = GeometryFactory.floating2d(resource);
     setGeometryFactory(geometryFactory);
   }
 

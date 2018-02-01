@@ -3,6 +3,7 @@ package com.revolsys.geometry.cs;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,288 +12,99 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.geometry.cs.epsg.EpsgAuthority;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.projection.AlbersConicEqualArea;
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
+import com.revolsys.geometry.cs.projection.LambertConicConformal;
 import com.revolsys.geometry.cs.projection.LambertConicConformal1SP;
 import com.revolsys.geometry.cs.projection.Mercator1SP;
+import com.revolsys.geometry.cs.projection.Mercator1SPSpherical;
 import com.revolsys.geometry.cs.projection.Mercator2SP;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.cs.projection.TransverseMercator;
-import com.revolsys.geometry.cs.projection.TransverseMercatorSouthOriented;
 import com.revolsys.geometry.cs.projection.WebMercator;
 import com.revolsys.geometry.cs.unit.LinearUnit;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Equals;
+import com.revolsys.util.Property;
 
 public class CoordinateOperationMethod
   implements Serializable, Comparable<CoordinateOperationMethod> {
+  public static final String ALBERS_EQUAL_AREA = "Albers_Equal_Area";
 
-  public static final String LAMBERT_CONIC_CONFORMAL_2SP_BELGIUM = "Lambert_Conic_Conformal_(2SP_Belgium)";
+  public static final String LAMBERT_CONIC_CONFORMAL_1SP = "Lambert_Conic_Conformal_1SP";
 
-  public static final String MERCATOR_1SP_SPHERICAL = "Mercator_(1SP)_(Spherical)";
+  public static final String LAMBERT_CONIC_CONFORMAL_2SP = "Lambert_Conic_Conformal_2SP";
+
+  public static final String LAMBERT_CONIC_CONFORMAL_2SP_BELGIUM = "Lambert_Conic_Conformal_2SP_Belgium";
+
+  public static final String MERCATOR = "Mercator";
+
+  public static final String MERCATOR_1SP = "Mercator_1SP";
+
+  public static final String MERCATOR_1SP_SPHERICAL = "Mercator_1SP_Spherical";
+
+  public static final String MERCATOR_2SP = "Mercator_2SP";
+
+  public static final String POPULAR_VISUALISATION_PSEUDO_MERCATOR = "Popular_Visualisation_Pseudo_Mercator";
 
   private static final Map<String, String> PROJECTION_ALIASES = new TreeMap<>();
 
-  private static final IntHashMap<CoordinateOperationMethod> METHOD_BY_ID = new IntHashMap<>();
-
-  private static Map<String, CoordinateOperationMethod> METHOD_BY_NAME = new TreeMap<>();
-
   private static final long serialVersionUID = 6199958151692874551L;
 
+  public static final String TRANSVERSE_MERCATOR = "Transverse_Mercator";
+
+  private static final Map<String, Function<ProjectedCoordinateSystem, CoordinatesProjection>> FACTORY_BY_NAME = new HashMap<>();
+
   static {
-    addMethod(9822, "Albers_Equal_Area", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.STANDARD_PARALLEL_1,
-        ParameterNames.LATITUDE_OF_1ST_STANDARD_PARALLEL), //
-      new MultiParameterName(ParameterNames.STANDARD_PARALLEL_2,
-        ParameterNames.LATITUDE_OF_2ND_STANDARD_PARALLEL), //
-      new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN, ParameterNames.LATITUDE_OF_CENTRE,
-        ParameterNames.LATITUDE_OF_FALSE_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN, ParameterNames.LONGITUDE_OF_CENTRE,
-        ParameterNames.LONGITUDE_OF_FALSE_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING, ParameterNames.EASTING_AT_FALSE_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING, ParameterNames.NORTHING_AT_FALSE_ORIGIN) //
-    ), AlbersConicEqualArea::new, "Albers", "Albers_Equal_Area_Conic", "Albers_Conic_Equal_Area");
+    for (final String alias : Arrays.asList(ALBERS_EQUAL_AREA, "Albers", "Albers_Equal_Area_Conic",
+      "Albers_Conic_Equal_Area")) {
+      addAlias(alias, ALBERS_EQUAL_AREA);
+    }
 
-    addMethod(9806, "CassiniSoldner", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN,
-        ParameterNames.LATITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN,
-        ParameterNames.LONGITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING), //
-      new MultiParameterName(1.0, ParameterNames.SCALE_FACTOR) //
-    ), null, "Cassini");
+    addAlias(LAMBERT_CONIC_CONFORMAL_1SP, LAMBERT_CONIC_CONFORMAL_1SP);
 
-    addMethod(9819, "Krovak", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_CENTRE,
-        ParameterNames.LATITUDE_OF_PROJECTION_CENTRE), //
-      new MultiParameterName(ParameterNames.LONGITUDE_OF_CENTRE,
-        ParameterNames.LONGITUDE_OF_ORIGIN), //
-      new MultiParameterName(ParameterNames.AZIMUTH, ParameterNames.COLATITUDE_OF_CONE_AXIS), //
-      new MultiParameterName(ParameterNames.PSEUDO_STANDARD_PARALLEL_1,
-        ParameterNames.LATITUDE_OF_PSEUDO_STANDARD_PARALLEL), //
-      new MultiParameterName(ParameterNames.SCALE_FACTOR,
-        ParameterNames.SCALE_FACTOR_ON_PSEUDO_STANDARD_PARALLEL), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    ), null);
-
-    addMethod(9820, "Lambert_Azimuthal_Equal_Area", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN, ParameterNames.LATITUDE_OF_CENTRE,
-        ParameterNames.LATITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN, ParameterNames.LONGITUDE_OF_CENTRE,
-        ParameterNames.LONGITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    ), null);
-
-    addMethod(1027, "Lambert_Azimuthal_Equal_Area_Spherical", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN, ParameterNames.LATITUDE_OF_CENTRE,
-        ParameterNames.LATITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN, ParameterNames.LONGITUDE_OF_CENTRE,
-        ParameterNames.LONGITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    ), null);
-
-    addMethod(9801, "Lambert_Conic_Conformal_1SP", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN,
-        ParameterNames.LATITUDE_OF_NATURAL_ORIGIN, ParameterNames.STANDARD_PARALLEL_1), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN,
-        ParameterNames.LONGITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.SCALE_FACTOR,
-        ParameterNames.SCALE_FACTOR_AT_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    ), LambertConicConformal1SP::new);
-
-    addMethod(9802, "Lambert_Conic_Conformal_2SP", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN,
-        ParameterNames.LATITUDE_OF_FALSE_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN,
-        ParameterNames.LONGITUDE_OF_FALSE_ORIGIN), //
-      new MultiParameterName(ParameterNames.STANDARD_PARALLEL_1,
-        ParameterNames.LATITUDE_OF_1ST_STANDARD_PARALLEL), //
-      new MultiParameterName(ParameterNames.STANDARD_PARALLEL_2,
-        ParameterNames.LATITUDE_OF_2ND_STANDARD_PARALLEL), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING, ParameterNames.EASTING_AT_FALSE_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING, ParameterNames.NORTHING_AT_FALSE_ORIGIN) //
-    ), LambertConicConformal1SP::new);
-
-    addMethod(9826, "Lambert_Conic_Conformal_West_Orientated", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN,
-        ParameterNames.LATITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN,
-        ParameterNames.LONGITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.SCALE_FACTOR,
-        ParameterNames.SCALE_FACTOR_AT_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    ), null);
-
-    addMethod(9804, "Mercator_1SP", true, false, Arrays.asList(//
-      new MultiParameterName(0.0, ParameterNames.LATITUDE_OF_ORIGIN,
-        ParameterNames.LATITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN,
-        ParameterNames.LONGITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.SCALE_FACTOR,
-        ParameterNames.SCALE_FACTOR_AT_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    ), Mercator1SP::new, "Mercator_variant_A");
-
-    addMethod(9805, "Mercator_2SP", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.STANDARD_PARALLEL_1,
-        ParameterNames.LATITUDE_OF_1ST_STANDARD_PARALLEL), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN,
-        ParameterNames.LONGITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    ), Mercator2SP::new, "Mercator_variant_B");
-
-    addMethod(1024, "Mercator_Auxiliary_Sphere", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.STANDARD_PARALLEL_1,
-        ParameterNames.LATITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN,
-        ParameterNames.LONGITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING), //
-      new MultiParameterName(0.0, new SingleParameterName("auxiliary_sphere_type")) //
-    ), WebMercator::new, "Popular_Visualisation_Pseudo_Mercator");
-
-    addMethod(9809, "Stereographic_North_Pole", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN, ParameterNames.STANDARD_PARALLEL_1,
-        ParameterNames.LATITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN,
-        ParameterNames.LONGITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.SCALE_FACTOR,
-        ParameterNames.SCALE_FACTOR_AT_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    ), null, "Oblique_Stereographic", "Double_Stereographic");
-
-    addMethod(9829, "Stereographic_South_Pole", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.STANDARD_PARALLEL_1,
-        ParameterNames.LATITUDE_OF_STANDARD_PARALLEL), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN, ParameterNames.LONGITUDE_OF_ORIGIN),
-      new MultiParameterName(1.0, ParameterNames.SCALE_FACTOR), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    ), null, "Polar_Stereographic_variant_B");
-
-    final List<ParameterName> transverseMercatorParameterNames = Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN,
-        ParameterNames.LATITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN,
-        ParameterNames.LONGITUDE_OF_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.SCALE_FACTOR,
-        ParameterNames.SCALE_FACTOR_AT_NATURAL_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    );
-    addMethod(9807, "Transverse_Mercator", true, false, transverseMercatorParameterNames,
-      TransverseMercator::new);
-    addMethod(9808, "Transverse_Mercator_South_Orientated", true, false,
-      transverseMercatorParameterNames, TransverseMercatorSouthOriented::new);
-
-    addMethod(9812, "Hotine_Oblique_Mercator_variant_A", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_CENTRE,
-        ParameterNames.LATITUDE_OF_PROJECTION_CENTRE), //
-      new MultiParameterName(ParameterNames.LONGITUDE_OF_CENTRE,
-        ParameterNames.LONGITUDE_OF_PROJECTION_CENTRE), //
-      new MultiParameterName(ParameterNames.AZIMUTH, ParameterNames.AZIMUTH_OF_INITIAL_LINE), //
-      new MultiParameterName(ParameterNames.RECTIFIED_GRID_ANGLE,
-        ParameterNames.ANGLE_FROM_RECTIFIED_TO_SKEW_GRID), //
-      new MultiParameterName(ParameterNames.SCALE_FACTOR,
-        ParameterNames.SCALE_FACTOR_ON_INITIAL_LINE), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING) //
-    ), null);
-    // "Hotine_Oblique_Mercator_Azimuth_Natural_Origin");
-
-    addMethod(9815, "Hotine_Oblique_Mercator_variant_B", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_CENTRE,
-        ParameterNames.LATITUDE_OF_PROJECTION_CENTRE), //
-      new MultiParameterName(ParameterNames.LONGITUDE_OF_CENTRE,
-        ParameterNames.LONGITUDE_OF_PROJECTION_CENTRE), //
-      new MultiParameterName(ParameterNames.AZIMUTH, ParameterNames.AZIMUTH_OF_INITIAL_LINE), //
-      new MultiParameterName(ParameterNames.RECTIFIED_GRID_ANGLE,
-        ParameterNames.ANGLE_FROM_RECTIFIED_TO_SKEW_GRID), //
-      new MultiParameterName(ParameterNames.SCALE_FACTOR,
-        ParameterNames.SCALE_FACTOR_ON_INITIAL_LINE), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING,
-        ParameterNames.EASTING_AT_PROJECTION_CENTRE), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING,
-        ParameterNames.NORTHING_AT_PROJECTION_CENTRE) //
-    ), null, "Hotine_Oblique_Mercator_Azimuth_Center",
-      "Hotine_Oblique_Mercator_Azimuth_Natural_Origin");
-
-    addMethod(9816, "Tunisia_Mining_Grid", true, false, Arrays.asList(//
-      new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN,
-        ParameterNames.LATITUDE_OF_FALSE_ORIGIN), //
-      new MultiParameterName(ParameterNames.CENTRAL_MERIDIAN,
-        ParameterNames.LONGITUDE_OF_FALSE_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_EASTING, ParameterNames.EASTING_AT_FALSE_ORIGIN), //
-      new MultiParameterName(ParameterNames.FALSE_NORTHING, ParameterNames.NORTHING_AT_FALSE_ORIGIN) //
-    ), null);
+    addAlias(LAMBERT_CONIC_CONFORMAL_2SP, LAMBERT_CONIC_CONFORMAL_2SP);
 
     addAlias(LAMBERT_CONIC_CONFORMAL_2SP_BELGIUM, LAMBERT_CONIC_CONFORMAL_2SP_BELGIUM);
 
+    addAlias(MERCATOR, MERCATOR);
+
+    addAlias(MERCATOR_1SP, MERCATOR_1SP);
+
     addAlias(MERCATOR_1SP_SPHERICAL, MERCATOR_1SP_SPHERICAL);
+
+    addAlias(MERCATOR_2SP, MERCATOR_2SP);
+
+    addAlias(POPULAR_VISUALISATION_PSEUDO_MERCATOR, POPULAR_VISUALISATION_PSEUDO_MERCATOR);
+
+    registerCoordinatesProjection(AlbersConicEqualArea::new, ALBERS_EQUAL_AREA);
+    registerCoordinatesProjection(TransverseMercator::new, TRANSVERSE_MERCATOR);
+    registerCoordinatesProjection(Mercator1SP::new, MERCATOR);
+    registerCoordinatesProjection(WebMercator::new, POPULAR_VISUALISATION_PSEUDO_MERCATOR);
+    registerCoordinatesProjection(Mercator1SP::new, MERCATOR_1SP);
+    registerCoordinatesProjection(Mercator2SP::new, MERCATOR_2SP);
+    registerCoordinatesProjection(Mercator1SPSpherical::new, MERCATOR_1SP_SPHERICAL);
+    registerCoordinatesProjection(LambertConicConformal1SP::new, LAMBERT_CONIC_CONFORMAL_1SP);
+    registerCoordinatesProjection(LambertConicConformal::new, LAMBERT_CONIC_CONFORMAL_2SP);
+    registerCoordinatesProjection(LambertConicConformal::new, LAMBERT_CONIC_CONFORMAL_2SP_BELGIUM);
   }
 
-  public static void addAlias(String name, final String normalizedName) {
-    name = name.toLowerCase().replaceAll("[^a-z0-9]", "");
-    PROJECTION_ALIASES.put(name, normalizedName);
-  }
-
-  public static CoordinateOperationMethod addMethod(final int id, final String name,
-    final boolean reverse, final boolean deprecated, final List<ParameterName> parameterNames) {
-    CoordinateOperationMethod method = METHOD_BY_ID.get(id);
-    if (method == null) {
-      method = new CoordinateOperationMethod(id, name, reverse, deprecated, parameterNames);
-      METHOD_BY_ID.put(id, method);
-      if (!deprecated) {
-        METHOD_BY_NAME.put(method.getName(), method);
-      }
-    } else {
-      Debug.noOp();
-    }
-    return method;
-  }
-
-  private static void addMethod(final int id, final String name, final boolean reverse,
-    final boolean deprecated, final List<ParameterName> parameterNames,
-    final Function<ProjectedCoordinateSystem, CoordinatesProjection> coordinatesProjectionFactory,
-    final String... aliases) {
-    final CoordinateOperationMethod method = new CoordinateOperationMethod(id, name, reverse,
-      deprecated, parameterNames, coordinatesProjectionFactory);
-    METHOD_BY_ID.put(id, method);
-    METHOD_BY_NAME.put(name, method);
-    for (final String alias : aliases) {
-      METHOD_BY_NAME.put(alias, method);
-    }
-  }
-
-  public static synchronized CoordinateOperationMethod getMethod(final String name) {
-    EpsgCoordinateSystems.initialize();
-    CoordinateOperationMethod coordinateOperationMethod = METHOD_BY_NAME.get(name);
-    if (coordinateOperationMethod == null) {
-      coordinateOperationMethod = new CoordinateOperationMethod(name);
-      METHOD_BY_NAME.put(name, coordinateOperationMethod);
-    }
-    return coordinateOperationMethod;
+  public static void addAlias(final String name, final String alias) {
+    PROJECTION_ALIASES.put(normalizeName(name).toLowerCase(), normalizeName(alias));
   }
 
   public static CoordinateOperationMethod getMethod(String methodName,
     final Map<ParameterName, ?> parameters) {
-    if (methodName == null) {
-      return null;
-    } else {
-      if ("Lambert_Conformal_Conic".equals(methodName)) {
+    if (Property.hasValue(methodName)) {
+      if ("Stereographic_North_Pole".equals(methodName)) {
+        if (parameters.size() == 5) {
+          methodName = "Oblique_Stereographic";
+        }
+      } else if ("Stereographic_South_Pole".equals(methodName)) {
+        if (parameters.size() == 5) {
+          methodName = "Polar_Stereographic_variant_B";
+        }
+      } else if ("Lambert_Conformal_Conic".equals(methodName)) {
         if (parameters.containsKey(ParameterNames.STANDARD_PARALLEL_2)) {
           methodName = "Lambert_Conic_Conformal_2SP";
         } else {
@@ -309,25 +121,19 @@ public class CoordinateOperationMethod
           methodName = "Mercator_1SP";
         }
       }
-      return getMethod(methodName);
+      return new CoordinateOperationMethod(methodName);
+    } else {
+      return null;
     }
-  }
 
-  public static IntHashMap<CoordinateOperationMethod> getMethodById() {
-    return METHOD_BY_ID;
   }
 
   public static String getNormalizedName(final String name) {
     if (name == null) {
       return null;
     } else {
-      final String searchName = name.toLowerCase().replaceAll("[^a-z0-9]", "");
-      final String normalizedName = PROJECTION_ALIASES.get(searchName);
-      if (normalizedName == null) {
-        return name;
-      } else {
-        return normalizedName;
-      }
+      final String normalizedName = name.replaceAll("[^a-z0-9_]", "");
+      return PROJECTION_ALIASES.getOrDefault(normalizedName.toLowerCase(), normalizedName);
     }
   }
 
@@ -354,6 +160,14 @@ public class CoordinateOperationMethod
     return name.replaceAll(" ", "_").replaceAll("[^a-zA-Z0-9_]", "");
   }
 
+  private static void registerCoordinatesProjection(
+    final Function<ProjectedCoordinateSystem, CoordinatesProjection> factory,
+    final String... names) {
+    for (final String name : names) {
+      FACTORY_BY_NAME.put(name, factory);
+    }
+  }
+
   private Authority authority;
 
   private final String name;
@@ -366,27 +180,29 @@ public class CoordinateOperationMethod
 
   private List<ParameterName> parameterNames = new ArrayList<>();
 
-  private Function<ProjectedCoordinateSystem, CoordinatesProjection> coordinatesProjectionFactory;
+  private final Function<ProjectedCoordinateSystem, CoordinatesProjection> coordinatesProjectionFactory;
 
   public CoordinateOperationMethod(final int id, final String name, final boolean reverse,
     final boolean deprecated, final List<ParameterName> parameterNames) {
-    this(normalizeName(name));
+    this(name);
     this.authority = new EpsgAuthority(id);
     this.reverse = reverse;
     this.deprecated = deprecated;
     this.parameterNames = parameterNames;
   }
 
-  public CoordinateOperationMethod(final int id, final String name, final boolean reverse,
-    final boolean deprecated, final List<ParameterName> parameterNames,
-    final Function<ProjectedCoordinateSystem, CoordinatesProjection> coordinatesProjectionFactory) {
-    this(id, name, reverse, deprecated, parameterNames);
-    this.coordinatesProjectionFactory = coordinatesProjectionFactory;
-  }
-
   public CoordinateOperationMethod(final String name) {
     this.name = name;
-    this.normalizedName = getNormalizedName(name);
+
+    if (name == null) {
+      this.normalizedName = null;
+    } else {
+      final String normalizedName = normalizeName(name);
+      this.normalizedName = PROJECTION_ALIASES.getOrDefault(normalizedName.toLowerCase(),
+        normalizedName);
+    }
+
+    this.coordinatesProjectionFactory = FACTORY_BY_NAME.get(this.normalizedName);
   }
 
   @Override

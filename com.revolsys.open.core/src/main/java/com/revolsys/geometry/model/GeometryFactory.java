@@ -33,6 +33,8 @@
 package com.revolsys.geometry.model;
 
 import java.io.Serializable;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,6 +56,7 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
+import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
@@ -77,10 +80,13 @@ import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.geometry.util.RectangleUtil;
+import com.revolsys.io.StringWriter;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.wkt.WktParser;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.BiConsumerDouble;
@@ -347,6 +353,17 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
   }
 
+  public static GeometryFactory fixed(final String wkt, final int axisCount,
+    final double... scales) {
+    final CoordinateSystem coordinateSystem = EsriCoordinateSystems.readCoordinateSystem(wkt);
+    return fixed(coordinateSystem, axisCount, scales);
+  }
+
+  public static GeometryFactory fixed2d(final CoordinateSystem coordinateSystem,
+    final double scaleX, final double scaleY) {
+    return fixed(coordinateSystem, 2, scaleX, scaleY);
+  }
+
   public static GeometryFactory fixed2d(final double scaleX, final double scaleY) {
     return fixed(0, 2, scaleX, scaleY);
   }
@@ -354,6 +371,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   public static GeometryFactory fixed2d(final int coordinateSystemId, final double scaleX,
     final double scaleY) {
     return fixed(coordinateSystemId, 2, scaleX, scaleY);
+  }
+
+  public static GeometryFactory fixed2d(final String wkt, final double scaleX,
+    final double scaleY) {
+    return fixed(wkt, 2, scaleX, scaleY);
   }
 
   public static GeometryFactory fixed3d(final CoordinateSystem coordinateSystem,
@@ -369,6 +391,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   public static GeometryFactory fixed3d(final int coordinateSystemId, final double scaleX,
     final double scaleY, final double scaleZ) {
     return fixed(coordinateSystemId, 3, scaleX, scaleY, scaleZ);
+  }
+
+  public static GeometryFactory fixed3d(final String wkt, final double scaleX, final double scaleY,
+    final double scaleZ) {
+    return fixed(wkt, 3, scaleX, scaleY, scaleZ);
   }
 
   /**
@@ -437,6 +464,25 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
   }
 
+  public static GeometryFactory floating(final Resource resource, final int axisCount) {
+    if (resource == null) {
+      return DEFAULT_2D;
+    } else {
+      final CoordinateSystem coordinateSystem = EsriCoordinateSystems
+        .readCoordinateSystem(resource);
+      if (coordinateSystem == null) {
+        return null;
+      } else {
+        return floating(coordinateSystem, axisCount);
+      }
+    }
+  }
+
+  public static GeometryFactory floating(final String wkt, final int axisCount) {
+    final CoordinateSystem coordinateSystem = EsriCoordinateSystems.readCoordinateSystem(wkt);
+    return floating(coordinateSystem, axisCount);
+  }
+
   public static GeometryFactory floating2d(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
       return floating2d(0);
@@ -452,6 +498,14 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
 
   public static GeometryFactory floating2d(final int coordinateSystemId) {
     return floating(coordinateSystemId, 2);
+  }
+
+  public static GeometryFactory floating2d(final Resource resource) {
+    return floating(resource, 2);
+  }
+
+  public static GeometryFactory floating2d(final String wkt) {
+    return floating(wkt, 2);
   }
 
   /**
@@ -484,6 +538,14 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return floating(coordinateSystemId, 3);
   }
 
+  public static GeometryFactory floating3d(final Resource resource) {
+    return floating(resource, 3);
+  }
+
+  public static GeometryFactory floating3d(final String wkt) {
+    return floating(wkt, 3);
+  }
+
   public static GeometryFactory get(final Object factory) {
     if (factory instanceof GeometryFactory) {
       return (GeometryFactory)factory;
@@ -508,28 +570,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
         return "M";
       default:
         return String.valueOf(axisIndex);
-    }
-  }
-
-  /**
-   * <p>
-   * Get a GeometryFactory with the coordinate system, 3D axis (x, y &amp; z)
-   * and a floating precision models.
-   * </p>
-   *
-   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
-   *          coordinate system id</a>.
-   * @return The geometry factory.
-   */
-  public static GeometryFactory getFactory(final String wkt) {
-    final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
-    if (esriCoordinateSystem == null) {
-      return DEFAULT_3D;
-    } else {
-      final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
-        .getCoordinateSystem(esriCoordinateSystem);
-      final int coordinateSystemId = epsgCoordinateSystem.getCoordinateSystemId();
-      return floating3d(coordinateSystemId);
     }
   }
 
@@ -1161,9 +1201,10 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public CoordinateSystem getCoordinateSystem() {
-    return this.coordinateSystem;
+  public <C extends CoordinateSystem> C getCoordinateSystem() {
+    return (C)this.coordinateSystem;
   }
 
   @Override
@@ -2379,6 +2420,22 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return string.toString();
   }
 
+  public String toWktCs() {
+    try (
+      StringWriter stringWriter = new StringWriter()) {
+      writeWktCs(stringWriter, -1);
+      return stringWriter.toString();
+    }
+  }
+
+  public String toWktCsFormatted() {
+    try (
+      StringWriter stringWriter = new StringWriter()) {
+      writeWktCs(stringWriter, 0);
+      return stringWriter.toString();
+    }
+  }
+
   public void writeOffsetScaled3d(final ChannelWriter writer) {
     final int coordinateSystemId = getCoordinateSystemId();
     writer.putInt(coordinateSystemId);
@@ -2389,4 +2446,40 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     writer.putDouble(getOffsetZ());
     writer.putDouble(getScaleZ());
   }
+
+  @Override
+  public void writePrjFile(final Object target) {
+    if (isHasCoordinateSystem()) {
+      final Resource resource = Resource.getResource(target);
+      if (resource != null) {
+        final Resource prjResource = resource.newResourceChangeExtension("prj");
+        if (prjResource != null) {
+          try (
+            final Writer writer = prjResource.newWriter(StandardCharsets.ISO_8859_1)) {
+            writeWktCs(writer, -1);
+          } catch (final Throwable e) {
+            Logs.error(this, "Unable to create: " + resource, e);
+          }
+        }
+      }
+    }
+  }
+
+  private boolean writeWktCs(final Writer writer, final int indentLevel) {
+    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    if (coordinateSystem == null) {
+      return false;
+    } else {
+      final int coordinateSystemId = getCoordinateSystemId();
+      final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
+        .getCoordinateSystem(coordinateSystemId);
+      if (esriCoordinateSystem == null) {
+        EsriCsWktWriter.write(writer, coordinateSystem, indentLevel);
+      } else {
+        EsriCsWktWriter.write(writer, esriCoordinateSystem, indentLevel);
+      }
+      return true;
+    }
+  }
+
 }

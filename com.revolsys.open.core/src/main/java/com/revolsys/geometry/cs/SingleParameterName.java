@@ -21,10 +21,13 @@ public class SingleParameterName implements ParameterName {
     this.id = id;
     this.name = name;
     this.unitOfMeasure = unitOfMeasure;
-    if (id > 0) {
-      if (!ParameterNames._PARAMETER_BY_NAME.containsKey(name)) {
+    if (ParameterNames._PARAMETER_BY_NAME.containsKey(name)) {
+      final ParameterName oldName = ParameterNames._PARAMETER_BY_NAME.get(name);
+      if (oldName.getId() == 0) {
         ParameterNames._PARAMETER_BY_NAME.put(name, this);
       }
+    } else {
+      ParameterNames._PARAMETER_BY_NAME.put(name, this);
     }
   }
 
@@ -54,6 +57,11 @@ public class SingleParameterName implements ParameterName {
       }
     }
     return false;
+  }
+
+  @Override
+  public int getId() {
+    return this.id;
   }
 
   @Override

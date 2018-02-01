@@ -16,7 +16,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.gridded.DoubleArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.io.PointReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -97,7 +96,7 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
           if (name.equals(projName)) {
             final String wkt = FileUtil.getString(new InputStreamReader(in, StandardCharsets.UTF_8),
               false);
-            final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(wkt);
+            final GeometryFactory geometryFactory = GeometryFactory.floating3d(wkt);
             setGeometryFactory(geometryFactory);
           } else if (name.equals(fileName)) {
             this.reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
@@ -294,7 +293,7 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
   }
 
   private void setGeometryFactory(final Resource resource) {
-    final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+    final GeometryFactory geometryFactory = GeometryFactory.floating3d(resource);
     if (geometryFactory != null) {
       setGeometryFactory(geometryFactory);
     }

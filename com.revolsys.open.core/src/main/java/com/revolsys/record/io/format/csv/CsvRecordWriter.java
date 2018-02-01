@@ -5,9 +5,7 @@ import java.io.Writer;
 import java.nio.file.Path;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.EWktWriter;
@@ -40,8 +38,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     this(recordDefinition, resource.newWriter(), fieldSeparator, useQuotes, ewkt);
     setResource(resource);
-    final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
-    EsriCoordinateSystems.writePrjFile(resource, geometryFactory);
+    recordDefinition.writePrjFile(resource);
   }
 
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out,

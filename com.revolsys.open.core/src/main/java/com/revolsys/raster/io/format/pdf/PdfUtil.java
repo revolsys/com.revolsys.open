@@ -159,7 +159,7 @@ public class PdfUtil {
             if (srid == -1) {
               final String wkt = gcs.getString("WKT");
               if (Property.hasValue(wkt)) {
-                geometryFactory = GeometryFactory.getFactory(wkt);
+                geometryFactory = GeometryFactory.floating3d(wkt);
               }
             } else {
               geometryFactory = GeometryFactory.floating3d(srid);

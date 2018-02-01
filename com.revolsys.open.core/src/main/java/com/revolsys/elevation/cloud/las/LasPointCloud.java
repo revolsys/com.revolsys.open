@@ -29,7 +29,6 @@ import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V2;
 import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -103,8 +102,8 @@ public class LasPointCloud extends BaseObjectWithProperties
         try {
           final URI prjUrl = new URI("jar", resource.getUri() + "!/" + baseName + ".prj", null);
           final Resource prjResource = new UrlResource(prjUrl);
-          final GeometryFactory geometryFactoryFromPrj = EsriCoordinateSystems
-            .getGeometryFactory(prjResource);
+          final GeometryFactory geometryFactoryFromPrj = GeometryFactory.floating3d(prjResource);
+
           if (geometryFactoryFromPrj != null) {
             this.geometryFactory = geometryFactoryFromPrj;
           }
@@ -124,8 +123,7 @@ public class LasPointCloud extends BaseObjectWithProperties
       this.reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       this.exists = true;
       if (this.geometryFactory == null || !this.geometryFactory.isHasCoordinateSystem()) {
-        final GeometryFactory geometryFactoryFromPrj = EsriCoordinateSystems
-          .getGeometryFactory(resource);
+        final GeometryFactory geometryFactoryFromPrj = GeometryFactory.floating3d(resource);
         if (geometryFactoryFromPrj != null) {
           this.geometryFactory = geometryFactoryFromPrj;
         }

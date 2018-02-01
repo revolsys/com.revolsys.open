@@ -193,9 +193,12 @@ public final class EpsgCoordinateSystems implements CodeTable {
               final GeographicCoordinateSystem geographicCs = (GeographicCoordinateSystem)coordinateSystem;
               final GeodeticDatum geodeticDatum = geographicCs.getDatum();
               final PrimeMeridian primeMeridian = geographicCs.getPrimeMeridian();
-              final AngularUnit angularUnit = geographicCs.getAngularUnit();
+              final CoordinateSystem sourceCoordinateSystem = geographicCs
+                .getSourceCoordinateSystem();
+              final CoordinateOperation coordinateOperation = geographicCs.getCoordinateOperation();
               final GeographicCoordinateSystem newCs = new GeographicCoordinateSystem(srid, name,
-                geodeticDatum, primeMeridian, angularUnit, axis, area, authority, deprecated);
+                geodeticDatum, primeMeridian, axis, area, sourceCoordinateSystem,
+                coordinateOperation, deprecated);
               addCoordinateSystem(newCs);
               return newCs;
             } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
@@ -347,10 +350,11 @@ public final class EpsgCoordinateSystems implements CodeTable {
         final IntHashMap<List<ParameterName>> paramOrderByMethodId = new IntHashMap<>();
         final IntHashMap<List<Byte>> paramReversalByMethodId = new IntHashMap<>();
         loadCoordOperationParamUsage(paramOrderByMethodId, paramReversalByMethodId);
-        loadCoordOperationMethod(paramOrderByMethodId, paramReversalByMethodId);
+        final IntHashMap<CoordinateOperationMethod> methodById = loadCoordOperationMethod(
+          paramOrderByMethodId, paramReversalByMethodId);
         final IntHashMap<Map<ParameterName, ParameterValue>> operationParameters = new IntHashMap<>();
-        loadCoordOperationParamValue(operationParameters, paramReversalByMethodId);
-        loadCoordOperation(operationParameters, paramReversalByMethodId);
+        loadCoordOperationParamValue(methodById, operationParameters, paramReversalByMethodId);
+        loadCoordOperation(methodById, operationParameters, paramReversalByMethodId);
         loadCoordinateSystem();
         loadCoordinateReferenceSystem(axisMap);
 
@@ -536,15 +540,14 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  private static void loadCoordOperation(
+  private static void loadCoordOperation(final IntHashMap<CoordinateOperationMethod> methodById,
     final IntHashMap<Map<ParameterName, ParameterValue>> operationParameters,
     final IntHashMap<List<Byte>> paramReversal) {
     try (
       ChannelReader reader = newChannelReader("coordOperation")) {
       while (true) {
         final int id = reader.getInt();
-        final CoordinateOperationMethod method = readCode(reader,
-          CoordinateOperationMethod.getMethodById());
+        final CoordinateOperationMethod method = readCode(reader, methodById);
         final String name = reader.getStringUtf8ByteCount();
         final byte type = reader.getByte();
         final int sourceCrsCode = reader.getInt();
@@ -572,9 +575,11 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  private static void loadCoordOperationMethod(
+  private static IntHashMap<CoordinateOperationMethod> loadCoordOperationMethod(
     final IntHashMap<List<ParameterName>> paramOrderByMethodId,
     final IntHashMap<List<Byte>> paramReversalByMethodId) {
+    final IntHashMap<CoordinateOperationMethod> methodById = new IntHashMap<>();
+
     try (
       ChannelReader reader = newChannelReader("coordOperationMethod")) {
       while (true) {
@@ -587,7 +592,9 @@ public final class EpsgCoordinateSystems implements CodeTable {
           Collections.emptyList());
         final List<Byte> reversal = paramReversalByMethodId.getOrDefault(id,
           Collections.emptyList());
-        CoordinateOperationMethod.addMethod(id, name, reverse, deprecated, parameterNames);
+        final CoordinateOperationMethod method = new CoordinateOperationMethod(id, name, reverse,
+          deprecated, parameterNames);
+        methodById.put(id, method);
       }
     } catch (final NoSuchResourceException e) {
     } catch (final WrappedException e) {
@@ -596,6 +603,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
         throw e;
       }
     }
+    return methodById;
   }
 
   private static void loadCoordOperationParam() {
@@ -643,14 +651,14 @@ public final class EpsgCoordinateSystems implements CodeTable {
   }
 
   private static void loadCoordOperationParamValue(
+    final IntHashMap<CoordinateOperationMethod> methodById,
     final IntHashMap<Map<ParameterName, ParameterValue>> operationParameters,
     final IntHashMap<List<Byte>> paramReversal) {
     try (
       ChannelReader reader = newChannelReader("coordOperationParamValue")) {
       while (true) {
         final int operationId = reader.getInt();
-        final CoordinateOperationMethod method = readCode(reader,
-          CoordinateOperationMethod.getMethodById());
+        final CoordinateOperationMethod method = readCode(reader, methodById);
         final ParameterName parameterName = readCode(reader, PARAM_NAME_BY_ID);
         final double value = reader.getDouble();
         final String fileRef = reader.getStringUtf8ByteCount();
@@ -860,7 +868,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
   }
 
   private static ChannelReader newChannelReader(final String fileName) {
-    return new ClassPathResource("com/revolsys/gis/cs/epsg/" + fileName + ".bin")
+    return new ClassPathResource("com/revolsys/geometry/cs/epsg/" + fileName + ".bin")
       .newChannelReader();
   }
 

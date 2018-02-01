@@ -6,7 +6,6 @@ import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriter;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriterFactory;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
@@ -28,7 +27,7 @@ public class AsciiTin extends AbstractIoFactoryWithCoordinateSystem
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final Resource resource,
     final MapEx properties) {
     try {
-      GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+      GeometryFactory geometryFactory = GeometryFactory.floating3d(resource);
       if (geometryFactory == null) {
         geometryFactory = Maps.get(properties, TriangulatedIrregularNetwork.GEOMETRY_FACTORY);
         if (geometryFactory == null) {

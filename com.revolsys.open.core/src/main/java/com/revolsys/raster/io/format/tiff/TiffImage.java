@@ -27,7 +27,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.JaiGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.sun.media.jai.codec.ImageCodec;
 
 @SuppressWarnings("deprecation")
@@ -157,11 +156,7 @@ public class TiffImage extends JaiGeoreferencedImage {
   }
 
   private static void addProjection(final int id, final String name) {
-    final CoordinateOperationMethod coordinateOperationMethod = CoordinateOperationMethod
-      .getMethod(name);
-    if (coordinateOperationMethod == null) {
-      Debug.noOp();
-    }
+    final CoordinateOperationMethod coordinateOperationMethod = new CoordinateOperationMethod(name);
     PROJECTION_BY_ID.put(id, coordinateOperationMethod);
   }
 

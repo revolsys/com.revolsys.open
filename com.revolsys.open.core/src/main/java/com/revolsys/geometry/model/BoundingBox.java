@@ -1305,7 +1305,9 @@ public interface BoundingBox
 
         double xStep;
         final double width = getWidth();
-        if (numX <= 1) {
+        if (!Double.isFinite(width)) {
+          return geometryFactory.polygon();
+        } else if (numX <= 1) {
           numX = 1;
           xStep = width;
         } else {

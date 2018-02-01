@@ -20,6 +20,7 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.record.Record;
@@ -50,7 +51,7 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private final Resource baseResource = new PathResource(
-    "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg");
+    "../com.revolsys.open.core/src/main/resources/com/revolsys/geometry/cs/epsg");
 
   private final RecordStore recordStore;
 
@@ -396,6 +397,7 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private void validateEsri() {
+    EsriCoordinateSystems.getCoordinateSystem(0);
     for (final CoordinateSystem coordinateSytstem : EpsgCoordinateSystems.getCoordinateSystems()) {
       if (coordinateSytstem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSytstem;
@@ -407,8 +409,10 @@ public final class EpsgCoordinateSystemsLoader {
       } else if (coordinateSytstem instanceof ProjectedCoordinateSystem) {
         final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSytstem;
         final int id = coordinateSytstem.getCoordinateSystemId();
-        final ProjectedCoordinateSystem esri = (ProjectedCoordinateSystem)EsriCoordinateSystems
-          .getCoordinateSystem(new UrlResource("https://epsg.io/" + id + ".esriwkt"));// EsriCoordinateSystems.getCoordinateSystem(id);
+        final String wkt = new UrlResource(
+          "http://spatialreference.org/ref/epsg/" + id + "/esriwkt/").contentsAsString();
+        final ProjectedCoordinateSystem esri = GeometryFactory.floating2d(wkt)
+          .getCoordinateSystem();
         final CoordinateOperationMethod coordinateOperationMethod = esri
           .getCoordinateOperationMethod();
         if (esri != null && !projectedCs.equals(esri) && coordinateOperationMethod != null
@@ -425,7 +429,7 @@ public final class EpsgCoordinateSystemsLoader {
             nm2.removeAll(n1);
             final String m = id + "\t" + coordinateSytstem.getCoordinateSystemName() + "\t" + nm1
               + "\t" + nm2;
-            System.out.println(m);
+            // System.out.println(m);
           }
         }
       }

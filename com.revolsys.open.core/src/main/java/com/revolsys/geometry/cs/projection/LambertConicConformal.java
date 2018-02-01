@@ -1,7 +1,7 @@
 package com.revolsys.geometry.cs.projection;
 
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.ParameterNames;
+import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
@@ -30,14 +30,14 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
   public LambertConicConformal(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final GeodeticDatum geodeticDatum = geographicCS.getDatum();
-    final double latitudeOfProjection = cs.getDoubleParameter(ParameterNames.LATITUDE_OF_ORIGIN);
-    final double centralMeridian = cs.getDoubleParameter(ParameterNames.CENTRAL_MERIDIAN);
-    final double firstStandardParallel = cs.getDoubleParameter(ParameterNames.STANDARD_PARALLEL_1);
-    final double secondStandardParallel = cs.getDoubleParameter(ParameterNames.STANDARD_PARALLEL_2);
+    final double latitudeOfProjection = cs.getDoubleParameter(NormalizedParameterNames.LATITUDE_OF_ORIGIN);
+    final double centralMeridian = cs.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
+    final double firstStandardParallel = cs.getDoubleParameter(NormalizedParameterNames.STANDARD_PARALLEL_1);
+    final double secondStandardParallel = cs.getDoubleParameter(NormalizedParameterNames.STANDARD_PARALLEL_2);
 
     final Spheroid spheroid = geodeticDatum.getSpheroid();
-    this.x0 = cs.getDoubleParameter(ParameterNames.FALSE_EASTING);
-    this.y0 = cs.getDoubleParameter(ParameterNames.FALSE_NORTHING);
+    this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
+    this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
     this.a = spheroid.getSemiMajorAxis();
     this.e = spheroid.getEccentricity();

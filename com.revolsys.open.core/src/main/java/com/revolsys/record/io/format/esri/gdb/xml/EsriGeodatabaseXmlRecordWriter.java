@@ -8,8 +8,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -363,32 +361,29 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-          .getCoordinateSystem(coordinateSystem);
-        if (esriCoordinateSystem != null) {
-          this.out.startTag(SPATIAL_REFERENCE);
-          if (esriCoordinateSystem instanceof ProjectedCoordinateSystem) {
-            this.out.attribute(XsiConstants.TYPE, PROJECTED_COORDINATE_SYSTEM_TYPE);
-          } else {
-            this.out.attribute(XsiConstants.TYPE, GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
-          }
-          this.out.element(WKT, EsriCsWktWriter.toWkt(esriCoordinateSystem));
-          this.out.element(X_ORIGIN, 0);
-          this.out.element(Y_ORIGIN, 0);
-          final double scaleXy = geometryFactory.getScaleXY();
-          this.out.element(XY_SCALE, (int)scaleXy);
-          this.out.element(Z_ORIGIN, 0);
-          final double scaleZ = geometryFactory.getScaleZ();
-          this.out.element(Z_SCALE, (int)scaleZ);
-          this.out.element(M_ORIGIN, 0);
-          this.out.element(M_SCALE, 1);
-          this.out.element(XY_TOLERANCE, Doubles.toString(1.0 / scaleXy * 2.0));
-          this.out.element(Z_TOLERANCE, Doubles.toString(1.0 / scaleZ * 2.0));
-          this.out.element(M_TOLERANCE, 1);
-          this.out.element(HIGH_PRECISION, true);
-          this.out.element(WKID, coordinateSystem.getCoordinateSystemId());
-          this.out.endTag(SPATIAL_REFERENCE);
+        final String wkt = geometryFactory.toWktCs();
+        this.out.startTag(SPATIAL_REFERENCE);
+        if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+          this.out.attribute(XsiConstants.TYPE, PROJECTED_COORDINATE_SYSTEM_TYPE);
+        } else {
+          this.out.attribute(XsiConstants.TYPE, GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
         }
+        this.out.element(WKT, wkt);
+        this.out.element(X_ORIGIN, 0);
+        this.out.element(Y_ORIGIN, 0);
+        final double scaleXy = geometryFactory.getScaleXY();
+        this.out.element(XY_SCALE, (int)scaleXy);
+        this.out.element(Z_ORIGIN, 0);
+        final double scaleZ = geometryFactory.getScaleZ();
+        this.out.element(Z_SCALE, (int)scaleZ);
+        this.out.element(M_ORIGIN, 0);
+        this.out.element(M_SCALE, 1);
+        this.out.element(XY_TOLERANCE, Doubles.toString(1.0 / scaleXy * 2.0));
+        this.out.element(Z_TOLERANCE, Doubles.toString(1.0 / scaleZ * 2.0));
+        this.out.element(M_TOLERANCE, 1);
+        this.out.element(HIGH_PRECISION, true);
+        this.out.element(WKID, coordinateSystem.getCoordinateSystemId());
+        this.out.endTag(SPATIAL_REFERENCE);
       }
     }
   }

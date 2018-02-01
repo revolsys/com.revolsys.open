@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -201,10 +200,7 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
         }
         this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         if (this.geometryFactory == null) {
-          this.geometryFactory = EsriCoordinateSystems.getGeometryFactory(this.resource);
-          if (this.geometryFactory != null) {
-            this.geometryFactory = this.geometryFactory.convertAxisCount(axisCount);
-          }
+          this.geometryFactory = GeometryFactory.floating(this.resource, axisCount);
         }
         if (this.geometryFactory == null) {
           this.geometryFactory = GeometryFactory.floating(0, axisCount);

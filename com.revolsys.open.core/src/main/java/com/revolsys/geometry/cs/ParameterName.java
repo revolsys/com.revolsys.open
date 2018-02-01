@@ -17,6 +17,8 @@ public interface ParameterName extends Comparable<ParameterName> {
     return null;
   }
 
+  int getId();
+
   String getName();
 
   UnitOfMeasure getUnitOfMeasure();

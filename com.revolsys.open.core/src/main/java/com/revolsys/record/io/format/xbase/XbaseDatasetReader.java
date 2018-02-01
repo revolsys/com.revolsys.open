@@ -1,9 +1,4 @@
 /*
- * $URL:https://secure.revolsys.com/svn/open.revolsys.com/rs-gis-dbase/trunk/src/main/java/com/revolsys/gis/format/xbase/io/XbaseDatasetReader.java $
- * $Author:paul.austin@revolsys.com $
- * $Date:2007-07-03 19:26:54 -0700 (Tue, 03 Jul 2007) $
- * $Revision:410 $
-
  * Copyright 2004-2005 Revolution Systems Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

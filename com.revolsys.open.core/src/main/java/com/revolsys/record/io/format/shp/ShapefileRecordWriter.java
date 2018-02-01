@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
@@ -169,7 +168,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         this.geometryWriteMethod = ShapefileGeometryUtil.getWriteMethod(this.geometryFactory,
           this.geometryDataType);
       }
-      EsriCoordinateSystems.writePrjFile(this.resource, this.geometryFactory);
+      this.geometryFactory.writePrjFile(this.resource);
     }
   }
 

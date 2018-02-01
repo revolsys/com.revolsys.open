@@ -13,7 +13,6 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
@@ -66,7 +65,7 @@ public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<Gridded
         try {
           final String fileName = this.resource.getBaseName();
           final ZipOutputStream zipOut = new ZipOutputStream(bufferedOut);
-          final String prjString = EsriCoordinateSystems.toString(geometryFactory);
+          final String prjString = geometryFactory.toWktCs();
           if (prjString.length() > 0) {
             final ZipEntry prjEntry = new ZipEntry(FileUtil.getBaseName(fileName) + ".prj");
             zipOut.putNextEntry(prjEntry);
@@ -91,7 +90,7 @@ public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<Gridded
           throw Exceptions.wrap("Error creating: " + this.resource, e);
         }
       } else {
-        EsriCoordinateSystems.writePrjFile(this.resource, geometryFactory);
+        geometryFactory.writePrjFile(this.resource);
         this.writer = this.resource.newWriter();
       }
     }

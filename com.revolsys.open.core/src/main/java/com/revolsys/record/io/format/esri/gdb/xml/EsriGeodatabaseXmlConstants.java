@@ -187,10 +187,10 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName FULL_PROPS_RETRIEVED = new QName(_NAMESPACE_URI, "FullPropsRetrieved", _NAMESPACE_PREFIX);
 
-  QName GEOGRAPHIC_COORDINATE_SYSTEM = new QName(_NAMESPACE_URI, "GeographicCoordinateSystem",
+  QName GEOGRAPHIC_COORDINATE_SYSTEM = new QName(_NAMESPACE_URI, "EsriGdbGeographicCoordinateSystem",
     _NAMESPACE_PREFIX);
 
-  String GEOGRAPHIC_COORDINATE_SYSTEM_TYPE = "esri:GeographicCoordinateSystem";
+  String GEOGRAPHIC_COORDINATE_SYSTEM_TYPE = "esri:EsriGdbGeographicCoordinateSystem";
 
   QName GEOMETRY_DEF = new QName(_NAMESPACE_URI, "GeometryDef", _NAMESPACE_PREFIX);
 
@@ -310,10 +310,10 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName PRECISION = new QName(_NAMESPACE_URI, "Precision", _NAMESPACE_PREFIX);
 
-  QName PROJECTED_COORDINATE_SYSTEM = new QName(_NAMESPACE_URI, "ProjectedCoordinateSystem",
+  QName PROJECTED_COORDINATE_SYSTEM = new QName(_NAMESPACE_URI, "EsriGdbProjectedCoordinateSystem",
     _NAMESPACE_PREFIX);
 
-  String PROJECTED_COORDINATE_SYSTEM_TYPE = "esri:ProjectedCoordinateSystem";
+  String PROJECTED_COORDINATE_SYSTEM_TYPE = "esri:EsriGdbProjectedCoordinateSystem";
 
   QName PROPERTY_ARRAY = new QName(_NAMESPACE_URI, "PropertyArray", _NAMESPACE_PREFIX);
 

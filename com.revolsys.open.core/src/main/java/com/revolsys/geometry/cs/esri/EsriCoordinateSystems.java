@@ -1,251 +1,271 @@
 package com.revolsys.geometry.cs.esri;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.Writer;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystemException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileAttribute;
+import java.io.EOFException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
 
-import com.revolsys.collection.set.Sets;
 import com.revolsys.geometry.cs.Authority;
+import com.revolsys.geometry.cs.BaseAuthority;
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.CoordinateSystemParser;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ParameterName;
+import com.revolsys.geometry.cs.ParameterValue;
+import com.revolsys.geometry.cs.ParameterValueNumber;
+import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.cs.SingleParameterName;
+import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.cs.WktCsParser;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.StringWriter;
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.unit.AngularUnit;
+import com.revolsys.geometry.cs.unit.LinearUnit;
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.UrlResource;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.WrappedException;
 
 public class EsriCoordinateSystems {
-  private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new HashMap<>();
+  private static Map<Integer, CoordinateSystem> COORDINATE_SYSTEM_BY_ID = new HashMap<>();
 
-  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new HashMap<>();
+  private static Map<ByteArray, List<Integer>> COORDINATE_SYSTEM_IDS_BY_DIGEST = new HashMap<>();
 
-  private static Map<String, CoordinateSystem> coordinateSystemsByName = new HashMap<>();
+  private static final Map<String, AngularUnit> ANGULAR_UNITS_BY_NAME = new TreeMap<>();
 
-  private static final Set<OpenOption> OPEN_OPTIONS_READ_SET = Sets
-    .newHash(StandardOpenOption.READ);
-
-  private static final FileAttribute<?>[] FILE_ATTRIBUTES_NONE = new FileAttribute[0];
-
-  static {
-    try {
-      final List<GeographicCoordinateSystem> geographicCoordinateSystems = CoordinateSystemParser
-        .getGeographicCoordinateSystems("ESRI", newReader(EsriCoordinateSystems.class,
-          "/com/revolsys/gis/cs/esri/geographicCoordinateSystem.txt"));
-      for (final GeographicCoordinateSystem cs : geographicCoordinateSystems) {
-        final int id = getCrsId(cs);
-        coordinateSystemsById.put(id, cs);
-        coordinateSystemsByName.put(cs.getCoordinateSystemName(), cs);
-        coordinateSystems.put(cs, cs);
-      }
-      final List<ProjectedCoordinateSystem> projectedCoordinateSystems = CoordinateSystemParser
-        .getProjectedCoordinateSystems(coordinateSystemsById, "ESRI", newReader(
-          EsriCoordinateSystems.class, "/com/revolsys/gis/cs/esri/projectedCoordinateSystem.txt"));
-      for (final ProjectedCoordinateSystem cs : projectedCoordinateSystems) {
-        final int id = getCrsId(cs);
-        coordinateSystemsById.put(id, cs);
-        coordinateSystemsByName.put(cs.getCoordinateSystemName(), cs);
-        coordinateSystems.put(cs, cs);
-      }
-    } catch (final IOException e) {
-      Logs.error(EsriCoordinateSystems.class, e);
-    }
-  }
-
-  public static CoordinateSystem getCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    if (coordinateSystem == null) {
-      return null;
-    } else {
-      CoordinateSystem coordinateSystem2 = coordinateSystemsByName
-        .get(coordinateSystem.getCoordinateSystemName());
-      if (coordinateSystem2 == null) {
-        coordinateSystem2 = coordinateSystems.get(coordinateSystem);
-        if (coordinateSystem2 == null) {
-          return coordinateSystem;
-        }
-      }
-      return coordinateSystem2;
-    }
-  }
+  private static final Map<String, LinearUnit> LINEAR_UNITS_BY_NAME = new TreeMap<>();
 
   @SuppressWarnings("unchecked")
   public static <C extends CoordinateSystem> C getCoordinateSystem(final int crsId) {
-    final CoordinateSystem coordinateSystem = coordinateSystemsById.get(crsId);
+    CoordinateSystem coordinateSystem = COORDINATE_SYSTEM_BY_ID.get(crsId);
+    if (coordinateSystem == null) {
+      coordinateSystem = getGeographicCoordinateSystem(crsId);
+      if (coordinateSystem == null) {
+        coordinateSystem = getProjectedCoordinateSystem(crsId);
+      }
+    }
     return (C)coordinateSystem;
   }
 
-  public static CoordinateSystem getCoordinateSystem(final Object source) {
-    final Resource resource = Resource.getResource(source);
-    if (resource == null) {
-      return null;
-    } else {
+  private static List<Integer> getCoordinateSystemIdsByDigest(
+    final CoordinateSystem coordinateSystem, final ByteArray digest) {
+    List<Integer> ids = COORDINATE_SYSTEM_IDS_BY_DIGEST.get(digest);
+    if (ids == null) {
+      final byte[] bytes = new byte[16];
+      final ByteArray newDigest = new ByteArray(bytes);
+      final String type = coordinateSystem.getCoordinateSystemType();
       try (
-        Reader reader = resource.newReader()) {
-        final CoordinateSystem coordinateSystem = getCoordinateSystem(reader);
-        return getCoordinateSystem(coordinateSystem);
-      } catch (final IOException e) {
-        throw Exceptions.wrap(e);
+        ChannelReader reader = ChannelReader
+          .newChannelReader("classpath:com/revolsys/geometry/cs/esri/" + type + ".digest")) {
+        while (true) {
+          reader.getBytes(bytes);
+          final short count = reader.getShort();
+          if (digest.equals(newDigest)) {
+            ids = new ArrayList<>();
+            for (int i = 0; i < count; i++) {
+              final int csId = reader.getInt();
+              ids.add(csId);
+            }
+            COORDINATE_SYSTEM_IDS_BY_DIGEST.put(digest, ids);
+            return ids;
+          } else {
+            for (int i = 0; i < count; i++) {
+              reader.getInt();
+            }
+          }
+        }
+      } catch (final WrappedException e) {
+        if (Exceptions.isException(e, EOFException.class)) {
+          return Collections.emptyList();
+        } else {
+          throw e;
+        }
       }
+    } else {
+      return ids;
     }
   }
 
-  public static CoordinateSystem getCoordinateSystem(final Reader reader) {
-    return new WktCsParser(reader).parse();
-  }
+  public static GeographicCoordinateSystem getGeographicCoordinateSystem(final int id) {
+    GeographicCoordinateSystem coordinateSystem = (GeographicCoordinateSystem)COORDINATE_SYSTEM_BY_ID
+      .get(id);
+    if (coordinateSystem == null) {
+      try (
+        final ChannelReader reader = ChannelReader
+          .newChannelReader("classpath:com/revolsys/geometry/cs/esri/Geographic.cs")) {
+        while (true) {
+          final int coordinateSystemId = reader.getInt();
+          final String csName = reader.getStringUtf8ByteCount();
+          final String datumName = reader.getStringUtf8ByteCount();
+          final String spheroidName = reader.getStringUtf8ByteCount();
+          final double semiMajorAxis = reader.getDouble();
+          final double inverseFlattening = reader.getDouble();
+          final String primeMeridianName = reader.getStringUtf8ByteCount();
+          final double longitude = reader.getDouble();
+          final String angularUnitName = reader.getStringUtf8ByteCount();
+          final double conversionFactor = reader.getDouble();
 
-  public static CoordinateSystem getCoordinateSystem(final String wkt) {
-    final WktCsParser parser = new WktCsParser(wkt);
-    return getCoordinateSystem(parser);
-  }
+          if (id == coordinateSystemId) {
+            final Spheroid spheroid = new Spheroid(spheroidName, semiMajorAxis, inverseFlattening,
+              null);
+            final PrimeMeridian primeMeridian = new PrimeMeridian(primeMeridianName, longitude,
+              null);
+            final GeodeticDatum geodeticDatum = new GeodeticDatum(null, datumName, null, false,
+              spheroid, primeMeridian);
 
-  public static CoordinateSystem getCoordinateSystem(final WktCsParser parser) {
-    final CoordinateSystem coordinateSystem = parser.parse();
-    return getCoordinateSystem(coordinateSystem);
-  }
+            AngularUnit angularUnit = ANGULAR_UNITS_BY_NAME.get(angularUnitName);
+            if (angularUnit == null) {
+              angularUnit = new AngularUnit(angularUnitName, conversionFactor, null);
+              ANGULAR_UNITS_BY_NAME.put(angularUnitName, angularUnit);
+            }
 
-  public static int getCrsId(final CoordinateSystem coordinateSystem) {
-    final Authority authority = coordinateSystem.getAuthority();
-    if (authority != null) {
-      final String name = authority.getName();
-      final String code = authority.getCode();
-      if (name.equals("ESRI")) {
-        return Integer.parseInt(code);
+            final Authority authority = new BaseAuthority("ESRI", coordinateSystemId);
+            coordinateSystem = new GeographicCoordinateSystem(coordinateSystemId, csName,
+              geodeticDatum, primeMeridian, angularUnit, null, authority);
+            COORDINATE_SYSTEM_BY_ID.put(id, coordinateSystem);
+            return coordinateSystem;
+          }
+        }
+      } catch (final WrappedException e) {
+        if (Exceptions.isException(e, EOFException.class)) {
+          return null;
+        } else {
+          Logs.error("Cannot load coordinate system=" + id, e);
+          throw e;
+        }
       }
     }
-    return 0;
+    return coordinateSystem;
   }
 
-  public static GeometryFactory getGeometryFactory(final CoordinateSystem coordinateSystem) {
-    if (coordinateSystem != null) {
-      final int srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
-      if (srid > 0 && srid < 2000000) {
-        return GeometryFactory.floating2d(srid);
+  private static int getIdUsingDigest(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem == null) {
+      return 0;
+    } else {
+      final ByteArray digest = new ByteArray(coordinateSystem.md5Digest());
+      final List<Integer> ids = getCoordinateSystemIdsByDigest(coordinateSystem, digest);
+      if (ids.isEmpty()) {
+        return 0;
+      } else if (ids.size() == 1) {
+        return ids.get(0);
       } else {
-        return GeometryFactory.floating2d(coordinateSystem);
+        for (final int coordinateSystemId : ids) {
+          final CoordinateSystem coordinateSystem2 = getCoordinateSystem(coordinateSystemId);
+          if (coordinateSystem2 != null) {
+            if (coordinateSystem.getCoordinateSystemName()
+              .equalsIgnoreCase(coordinateSystem2.getCoordinateSystemName())) {
+              return coordinateSystemId;
+            }
+          }
+        }
+        // Match base on names etc
+        return 0;
       }
     }
-    return null;
   }
 
-  public static GeometryFactory getGeometryFactory(final Reader reader) {
-    try {
-      final CoordinateSystem coordinateSystem = getCoordinateSystem(reader);
-      return getGeometryFactory(coordinateSystem);
-    } catch (final Exception e) {
-      Logs.error(EsriCoordinateSystems.class, "Unable to load projection", e);
-      return null;
+  public static ProjectedCoordinateSystem getProjectedCoordinateSystem(final int id) {
+    ProjectedCoordinateSystem coordinateSystem = (ProjectedCoordinateSystem)COORDINATE_SYSTEM_BY_ID
+      .get(id);
+    if (coordinateSystem == null) {
+      try (
+        final ChannelReader reader = ChannelReader
+          .newChannelReader("classpath:com/revolsys/geometry/cs/esri/Projected.cs")) {
+        while (true) {
+          final int coordinateSystemId = reader.getInt();
+          final String csName = reader.getStringUtf8ByteCount();
+
+          final int geographicCoordinateSystemId = reader.getInt();
+          final String projectionName = reader.getStringUtf8ByteCount();
+          final byte parameterCount = reader.getByte();
+          final Map<ParameterName, ParameterValue> parameters = new HashMap<>();
+          for (int i = 0; i < parameterCount; i++) {
+            final String name = reader.getStringUtf8ByteCount();
+            final double value = reader.getDouble();
+            final ParameterName parameterName = new SingleParameterName(name);
+            final ParameterValue parameterValue = new ParameterValueNumber(value);
+            parameters.put(parameterName, parameterValue);
+          }
+          final String unitName = reader.getStringUtf8ByteCount();
+          final double conversionFactor = reader.getDouble();
+
+          if (id == coordinateSystemId) {
+            LinearUnit linearUnit = LINEAR_UNITS_BY_NAME.get(unitName);
+            if (linearUnit == null) {
+              linearUnit = new LinearUnit(unitName, conversionFactor);
+              LINEAR_UNITS_BY_NAME.put(unitName, linearUnit);
+            }
+            final Authority authority = new BaseAuthority("ESRI", coordinateSystemId);
+            final GeographicCoordinateSystem geographicCoordinateSystem = getGeographicCoordinateSystem(
+              geographicCoordinateSystemId);
+            if (geographicCoordinateSystem == null) {
+              Debug.noOp();
+            }
+            coordinateSystem = new ProjectedCoordinateSystem(coordinateSystemId, csName,
+              geographicCoordinateSystem, projectionName, parameters, linearUnit, authority);
+            COORDINATE_SYSTEM_BY_ID.put(id, coordinateSystem);
+            return coordinateSystem;
+          }
+        }
+      } catch (final WrappedException e) {
+        if (Exceptions.isException(e, EOFException.class)) {
+          return null;
+        } else {
+          Logs.error("Cannot load coordinate system=" + id, e);
+          throw e;
+        }
+      }
     }
+    return coordinateSystem;
   }
 
   /**
-   * Construct a new geometry factory from a .prj with the same base name as the resource if it exists. Returns null if the prj file does not exist.
-   * @param resource
-   * @return
+   * Read the coordinate system from the resource. If it is a standard one then
+   *  {@link EpsgCoordinateSystems#getCoordinateSystem(int)} will be used to return that
+   *  coordinate system.
    */
-  public static GeometryFactory getGeometryFactory(final Resource resource) {
-    final Resource projResource = resource.newResourceChangeExtension("prj");
-    try {
-      final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);
-      return getGeometryFactory(coordinateSystem);
-    } catch (final WrappedException e) {
-      final Throwable cause = e.getCause();
-      if (cause instanceof FileNotFoundException) {
-      } else if (cause instanceof FileSystemException) {
-      } else {
-        Logs.error(EsriCoordinateSystems.class, "Unable to load projection from " + projResource,
-          e);
-      }
-    } catch (final Exception e) {
-      Logs.error(EsriCoordinateSystems.class, "Unable to load projection from " + projResource, e);
-    }
-    return null;
+  public static CoordinateSystem readCoordinateSystem(final Resource resource) {
+    final CoordinateSystem coordinateSystem = WktCsParser.read(resource);
+    return readCoordinateSystemPost(coordinateSystem);
   }
 
-  public static GeometryFactory getGeometryFactory(final String wkt) {
-    final CoordinateSystem coordinateSystem = getCoordinateSystem(wkt);
-    return getGeometryFactory(coordinateSystem);
+  /**
+   * Parse the coordinate system from the WKT. If it is a standard one then
+   *  {@link EpsgCoordinateSystems#getCoordinateSystem(int)} will be used to return that
+   *  coordinate system.
+   */
+  public static CoordinateSystem readCoordinateSystem(final String wkt) {
+    final CoordinateSystem coordinateSystem = WktCsParser.read(wkt);
+    return readCoordinateSystemPost(coordinateSystem);
   }
 
-  private static java.io.Reader newReader(final Class<?> clazz, final String fileName)
-    throws IOException {
-    final URL url = clazz.getResource(fileName);
-    if (url == null) {
+  private static CoordinateSystem readCoordinateSystemPost(
+    final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem == null) {
       return null;
     } else {
-      final UrlResource resource = new UrlResource(url);
-      ReadableByteChannel channel;
-      try {
-        final File file = resource.getFile();
-        final Path path = file.toPath();
-        channel = FileChannel.open(path, OPEN_OPTIONS_READ_SET, FILE_ATTRIBUTES_NONE);
-      } catch (final Throwable e) {
-        final InputStream in = url.openStream();
-        channel = Channels.newChannel(in);
+      int id = coordinateSystem.getCoordinateSystemId();
+      if (id == 0) {
+        id = getIdUsingDigest(coordinateSystem);
       }
-      return Channels.newReader(channel, StandardCharsets.UTF_8.newDecoder(), 8196);
-    }
-  }
-
-  public static String toString(final GeometryFactory geometryFactory) {
-    try (
-      StringWriter stringWriter = new StringWriter()) {
-      writePrjFile(stringWriter, geometryFactory);
-      return stringWriter.toString();
-    }
-  }
-
-  public static void writePrjFile(final Object target, final GeometryFactory geometryFactory) {
-    final Resource resource = Resource.getResource(target);
-
-    if (geometryFactory != null && resource != null) {
-      final Resource prjResource = resource.newResourceChangeExtension("prj");
-      if (prjResource != null && geometryFactory.isHasCoordinateSystem()) {
-        try (
-          final Writer writer = prjResource.newWriter(StandardCharsets.ISO_8859_1)) {
-          writePrjFile(writer, geometryFactory);
-        } catch (final Throwable e) {
-          Logs.error(EsriCoordinateSystems.class, "Unable to create: " + resource, e);
-        }
-      }
-    }
-  }
-
-  public static boolean writePrjFile(final Writer writer, final GeometryFactory geometryFactory) {
-    if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
-        final int srid = coordinateSystem.getCoordinateSystemId();
-        final CoordinateSystem esriCoordinateSystem = coordinateSystemsById.get(srid);
-        if (esriCoordinateSystem == null) {
-          EsriCsWktWriter.write(writer, coordinateSystem, -1);
+      if (id > 0) {
+        final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(id);
+        if (epsgCoordinateSystem == null) {
+          final CoordinateSystem esriCoordinateSystem = getCoordinateSystem(id);
+          if (esriCoordinateSystem != null) {
+            return esriCoordinateSystem;
+          }
         } else {
-          EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
+          return epsgCoordinateSystem;
         }
-        return true;
       }
+      return coordinateSystem;
     }
-    return false;
   }
 
 }

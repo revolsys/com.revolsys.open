@@ -28,7 +28,6 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.gdal.Gdal;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
@@ -697,8 +696,7 @@ public class OgrRecordStore extends AbstractRecordStore {
         break;
       }
       final SpatialReference spatialReference = fieldDefinition.GetSpatialRef();
-      final CoordinateSystem coordinateSystem = Gdal.getCoordinateSystem(spatialReference);
-      final GeometryFactory geometryFactory = GeometryFactory.floating(coordinateSystem, axisCount);
+      final GeometryFactory geometryFactory = Gdal.getGeometryFactory(spatialReference, axisCount);
       final FieldDefinition field = new FieldDefinition(fieldName, geometryFieldDataType, false);
       field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       recordDefinition.addField(field);

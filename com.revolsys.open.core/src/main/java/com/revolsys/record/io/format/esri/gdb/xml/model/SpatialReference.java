@@ -2,7 +2,6 @@ package com.revolsys.record.io.format.esri.gdb.xml.model;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -14,9 +13,9 @@ public class SpatialReference {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem instanceof com.revolsys.geometry.cs.GeographicCoordinateSystem) {
-        return new GeographicCoordinateSystem(geometryFactory, wkt);
+        return new EsriGdbGeographicCoordinateSystem(geometryFactory, wkt);
       } else if (coordinateSystem instanceof com.revolsys.geometry.cs.ProjectedCoordinateSystem) {
-        return new ProjectedCoordinateSystem(geometryFactory, wkt);
+        return new EsriGdbProjectedCoordinateSystem(geometryFactory, wkt);
       }
     }
     return null;
@@ -64,34 +63,30 @@ public class SpatialReference {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-          .getCoordinateSystem(coordinateSystem.getCoordinateSystemId());
-        if (esriCoordinateSystem != null) {
-          final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
-          this.wkt = wkt;
-          this.xOrigin = areaBoundingBox.getMinX();
-          this.yOrigin = areaBoundingBox.getMinY();
-          this.xYScale = geometryFactory.getScaleXY();
-          if (this.xYScale == 0) {
-            if (this instanceof ProjectedCoordinateSystem) {
-              this.xYScale = 1000;
-            } else {
-              this.xYScale = 10000000;
-            }
+        final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
+        this.wkt = wkt;
+        this.xOrigin = areaBoundingBox.getMinX();
+        this.yOrigin = areaBoundingBox.getMinY();
+        this.xYScale = geometryFactory.getScaleXY();
+        if (this.xYScale == 0) {
+          if (this instanceof EsriGdbProjectedCoordinateSystem) {
+            this.xYScale = 1000;
+          } else {
+            this.xYScale = 10000000;
           }
-          this.zOrigin = -100000;
-          this.zScale = geometryFactory.getScaleZ();
-          if (this.zScale == 0) {
-            this.zScale = 10000000;
-          }
-          this.mOrigin = -100000;
-          this.mScale = 10000000;
-          this.xYTolerance = 1.0 / this.xYScale;
-          this.zTolerance = 1.0 / this.zScale;
-          this.mTolerance = 1.0 / this.mScale;
-          this.highPrecision = true;
-          this.wkid = coordinateSystem.getCoordinateSystemId();
         }
+        this.zOrigin = -100000;
+        this.zScale = geometryFactory.getScaleZ();
+        if (this.zScale == 0) {
+          this.zScale = 10000000;
+        }
+        this.mOrigin = -100000;
+        this.mScale = 10000000;
+        this.xYTolerance = 1.0 / this.xYScale;
+        this.zTolerance = 1.0 / this.zScale;
+        this.mTolerance = 1.0 / this.mScale;
+        this.highPrecision = true;
+        this.wkid = coordinateSystem.getCoordinateSystemId();
       }
     }
   }

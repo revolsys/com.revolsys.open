@@ -66,7 +66,7 @@ public interface GeometryFactoryProxy {
     }
   }
 
-  default CoordinateSystem getCoordinateSystem() {
+  default <C extends CoordinateSystem> C getCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
       return null;
@@ -194,5 +194,12 @@ public interface GeometryFactoryProxy {
   default int toIntZ(final double z) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.toIntZ(z);
+  }
+
+  default void writePrjFile(final Object target) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory != null) {
+      geometryFactory.writePrjFile(target);
+    }
   }
 }

@@ -1,9 +1,4 @@
 /*
- * $URL: https://secure.revolsys.com/svn/open.revolsys.com/com.revolsys.gis/trunk/com.revolsys.gis.core/src/main/java/com/revolsys/gis/format/core/io/LittleEndianRandomAccessFile.java $
- * $Author: paul.austin@revolsys.com $
- * $Date: 2008-06-03 07:01:55 -0700 (Tue, 03 Jun 2008) $
- * $Revision: 1314 $
-
  * Copyright 2004-2005 Revolution Systems Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

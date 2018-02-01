@@ -7,9 +7,14 @@ import java.nio.ByteOrder;
 import java.nio.channels.WritableByteChannel;
 
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
 public class ChannelWriter extends AbstractChannelWriter implements BaseCloseable {
+
+  public static ChannelWriter newChannelWriter(final Object source) {
+    return Resource.getResource(source).newChannelWriter();
+  }
 
   WritableByteChannel channel;
 

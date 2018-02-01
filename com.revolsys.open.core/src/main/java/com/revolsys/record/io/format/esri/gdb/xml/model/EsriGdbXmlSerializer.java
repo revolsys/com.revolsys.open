@@ -68,10 +68,10 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
       XY_SCALE, Z_ORIGIN, Z_SCALE, M_ORIGIN, M_SCALE, XY_TOLERANCE, Z_TOLERANCE, M_TOLERANCE,
       HIGH_PRECISION, WKID);
 
-    addClassProperties(GeographicCoordinateSystem.class, SPATIAL_REFERENCE,
+    addClassProperties(EsriGdbGeographicCoordinateSystem.class, SPATIAL_REFERENCE,
       GEOGRAPHIC_COORDINATE_SYSTEM);
 
-    addClassProperties(ProjectedCoordinateSystem.class, SPATIAL_REFERENCE,
+    addClassProperties(EsriGdbProjectedCoordinateSystem.class, SPATIAL_REFERENCE,
       PROJECTED_COORDINATE_SYSTEM);
 
     addClassProperties(GeometryDef.class, GEOMETRY_DEF, GEOMETRY_DEF, AVG_NUM_POINTS, GEOMETRY_TYPE,

@@ -54,7 +54,7 @@ public abstract class ArcGisResponse<V> extends AbstractWebService<V> implements
         if (srid == null) {
           final String wkt = spatialReference.getString("wkt");
           if (Property.hasValue(wkt)) {
-            return GeometryFactory.getFactory(wkt);
+            return GeometryFactory.floating3d(wkt);
           } else {
             return GeometryFactory.DEFAULT_3D;
           }

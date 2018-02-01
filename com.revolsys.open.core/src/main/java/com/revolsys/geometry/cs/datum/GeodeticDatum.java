@@ -1,5 +1,7 @@
 package com.revolsys.geometry.cs.datum;
 
+import java.security.MessageDigest;
+
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.PrimeMeridian;
@@ -13,14 +15,8 @@ public class GeodeticDatum extends Datum {
 
   private ToWgs84 toWgs84;
 
-  public GeodeticDatum(final String name, final Spheroid spheroid, final Authority authority) {
-    super(authority, name, null, false);
-    this.spheroid = spheroid;
-  }
-
-  public GeodeticDatum(final Authority authority, final String name,
-    final Area area, final boolean deprecated, final Spheroid spheroid,
-    final PrimeMeridian primeMeridian) {
+  public GeodeticDatum(final Authority authority, final String name, final Area area,
+    final boolean deprecated, final Spheroid spheroid, final PrimeMeridian primeMeridian) {
     super(authority, name, area, deprecated);
     this.spheroid = spheroid;
     this.primeMeridian = primeMeridian;
@@ -35,11 +31,13 @@ public class GeodeticDatum extends Datum {
 
   @Override
   public boolean equals(final Object object) {
-    if (object instanceof GeodeticDatum) {
+    if (object == null) {
+      return false;
+    } else if (object == this) {
+      return true;
+    } else if (object instanceof GeodeticDatum) {
       final GeodeticDatum geodeticDatum = (GeodeticDatum)object;
-      if (super.equals(geodeticDatum)) {
-        return true;
-      } else if (this.spheroid.equals(geodeticDatum.spheroid)) {
+      if (this.spheroid.equals(geodeticDatum.spheroid)) {
         return false;
       } else {
         return true;
@@ -79,5 +77,9 @@ public class GeodeticDatum extends Datum {
     } else {
       return 1;
     }
+  }
+
+  public void updateDigest(final MessageDigest digest) {
+    this.spheroid.updateDigest(digest);
   }
 }

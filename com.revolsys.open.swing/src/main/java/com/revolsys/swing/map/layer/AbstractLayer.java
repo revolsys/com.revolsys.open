@@ -45,8 +45,6 @@ import com.revolsys.collection.map.MapSerializerMap;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
@@ -765,11 +763,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
           }
         }
 
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-          .getCoordinateSystem(coordinateSystem);
         SwingUtil.addLabel(coordinateSystemPanel, "ESRI WKT");
-        final TextArea wktTextArea = new TextArea(EsriCsWktWriter.toString(esriCoordinateSystem),
-          10, 80);
+        final String wktFormatted = geometryFactory.toWktCsFormatted();
+        final TextArea wktTextArea = new TextArea(wktFormatted, 10, 80);
         wktTextArea.setEditable(false);
         wktTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
         coordinateSystemPanel.add(wktTextArea);
@@ -972,7 +968,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   }
 
   public void setIcon(final String iconName) {
-    Icon icon2 = Icons.getIcon(iconName);
+    final Icon icon2 = Icons.getIcon(iconName);
     setIcon(icon2);
   }
 

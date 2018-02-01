@@ -1,7 +1,7 @@
 package com.revolsys.geometry.cs.projection;
 
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.ParameterNames;
+import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
@@ -43,12 +43,12 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
   public TransverseMercatorSouthOriented(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final GeodeticDatum geodeticDatum = geographicCS.getDatum();
-    final double centralMeridian = cs.getDoubleParameter(ParameterNames.CENTRAL_MERIDIAN);
-    final double scaleFactor = cs.getDoubleParameter(ParameterNames.SCALE_FACTOR);
+    final double centralMeridian = cs.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
+    final double scaleFactor = cs.getDoubleParameter(NormalizedParameterNames.SCALE_FACTOR);
 
     this.spheroid = geodeticDatum.getSpheroid();
-    this.x0 = cs.getDoubleParameter(ParameterNames.FALSE_EASTING);
-    this.y0 = cs.getDoubleParameter(ParameterNames.FALSE_NORTHING);
+    this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
+    this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
     this.a = this.spheroid.getSemiMajorAxis();
     this.k0 = scaleFactor;

@@ -69,13 +69,12 @@ public class LinearUnit implements UnitOfMeasure {
 
   private Unit<Length> unit;
 
-  public LinearUnit(final String name, final double conversionFactor, final Authority authority) {
-    this(name, null, conversionFactor, authority, false);
+  public LinearUnit(final String name, final double conversionFactor) {
+    this(name, null, conversionFactor, null, false);
   }
 
-  public LinearUnit(final String name, final LinearUnit baseUnit, final double conversionFactor,
-    final Authority authority) {
-    this(name, baseUnit, conversionFactor, authority, false);
+  public LinearUnit(final String name, final double conversionFactor, final Authority authority) {
+    this(name, null, conversionFactor, authority, false);
   }
 
   public LinearUnit(final String name, final LinearUnit baseUnit, final double conversionFactor,

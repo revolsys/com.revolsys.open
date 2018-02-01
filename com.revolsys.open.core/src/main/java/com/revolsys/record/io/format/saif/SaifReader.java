@@ -1,9 +1,4 @@
 /*
- * $URL:https://secure.revolsys.com/svn/open.revolsys.com/GIS/trunk/src/main/java/com/revolsys/gis/format/saif/io/SaifReader.java $
- * $Author:paul.austin@revolsys.com $
- * $Date:2007-06-09 09:28:28 -0700 (Sat, 09 Jun 2007) $
- * $Revision:265 $
-
  * Copyright 2004-2005 Revolution Systems Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

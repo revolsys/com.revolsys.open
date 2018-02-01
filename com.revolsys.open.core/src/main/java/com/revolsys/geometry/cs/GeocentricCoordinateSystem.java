@@ -89,6 +89,15 @@ public class GeocentricCoordinateSystem implements CoordinateSystem {
     }
   }
 
+  @Override
+  public boolean equalsExact(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof GeocentricCoordinateSystem) {
+      final GeocentricCoordinateSystem geocentricCoordinateSystem = (GeocentricCoordinateSystem)coordinateSystem;
+      return equalsExact(geocentricCoordinateSystem);
+    }
+    return false;
+  }
+
   public boolean equalsExact(final GeocentricCoordinateSystem cs) {
     if (cs == null) {
       return false;
@@ -157,6 +166,11 @@ public class GeocentricCoordinateSystem implements CoordinateSystem {
   @Override
   public String getCoordinateSystemName() {
     return this.name;
+  }
+
+  @Override
+  public String getCoordinateSystemType() {
+    return "Geocentric";
   }
 
   public GeodeticDatum getDatum() {

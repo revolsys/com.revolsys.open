@@ -29,10 +29,6 @@ import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
 
 import com.revolsys.gdal.raster.GdalImageFactory;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
@@ -348,16 +344,6 @@ public class Gdal implements ServiceInitializer {
     return getBufferedImage(file);
   }
 
-  public static CoordinateSystem getCoordinateSystem(final SpatialReference spatialReference) {
-    if (spatialReference == null) {
-      return null;
-    } else {
-      final String wkt = spatialReference.ExportToWkt();
-      final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
-      return EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
-    }
-  }
-
   public static Dataset getDataset(final File file) {
     final int mode = gdalconstConstants.GA_ReadOnly;
     return getDataset(file, mode);
@@ -400,19 +386,13 @@ public class Gdal implements ServiceInitializer {
     }
   }
 
-  public static SpatialReference getSpatialReference(CoordinateSystem coordinateSystem) {
-    if (coordinateSystem == null) {
+  public static GeometryFactory getGeometryFactory(final SpatialReference spatialReference,
+    final int axisCount) {
+    if (spatialReference == null) {
       return null;
     } else {
-      final int srid = coordinateSystem.getCoordinateSystemId();
-      if (srid <= 0) {
-        coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
-        final String wkt = EsriCsWktWriter.toWkt(coordinateSystem);
-        final SpatialReference spatialReference = new SpatialReference(wkt);
-        return spatialReference;
-      } else {
-        return getSpatialReference(srid);
-      }
+      final String wkt = spatialReference.ExportToWkt();
+      return GeometryFactory.floating(wkt, axisCount);
     }
   }
 
@@ -422,8 +402,8 @@ public class Gdal implements ServiceInitializer {
     } else {
       final int srid = geometryFactory.getCoordinateSystemId();
       if (srid <= 0) {
-        final GeometryFactory coordinateSystem = geometryFactory;
-        return getSpatialReference(coordinateSystem);
+        final String wkt = geometryFactory.toWktCs();
+        return new SpatialReference(wkt);
       } else {
         return getSpatialReference(srid);
       }
@@ -494,7 +474,7 @@ public class Gdal implements ServiceInitializer {
         if (Property.hasValue(boundingBoxWkt)) {
           final BoundingBox boundingBox = BoundingBox.newBoundingBox(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
-            setSpatialReference(dataset, boundingBox.getCoordinateSystem());
+            setSpatialReference(dataset, boundingBox.getGeometryFactory());
             final double x = boundingBox.getMinX();
             final double width = boundingBox.getWidth();
             final int imageWidth = dataset.getRasterXSize();
@@ -532,16 +512,15 @@ public class Gdal implements ServiceInitializer {
   }
 
   public static void setProjectionFromPrjFile(final Dataset dataset, final Resource resource) {
-    final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+    final GeometryFactory geometryFactory = GeometryFactory.floating2d(resource);
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      setSpatialReference(dataset, coordinateSystem);
+      setSpatialReference(dataset, geometryFactory);
     }
   }
 
   public static void setSpatialReference(final Dataset dataset,
-    final CoordinateSystem coordinateSystem) {
-    final SpatialReference spatialReference = getSpatialReference(coordinateSystem);
+    final GeometryFactory geometryFactory) {
+    final SpatialReference spatialReference = getSpatialReference(geometryFactory);
     if (spatialReference != null) {
       dataset.SetProjection(spatialReference.ExportToWkt());
     }

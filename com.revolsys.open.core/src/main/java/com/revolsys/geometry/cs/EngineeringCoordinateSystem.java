@@ -87,6 +87,15 @@ public class EngineeringCoordinateSystem implements CoordinateSystem {
     }
   }
 
+  @Override
+  public boolean equalsExact(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof EngineeringCoordinateSystem) {
+      final EngineeringCoordinateSystem engineeringCoordinateSystem = (EngineeringCoordinateSystem)coordinateSystem;
+      return equalsExact(engineeringCoordinateSystem);
+    }
+    return false;
+  }
+
   public boolean equalsExact(final EngineeringCoordinateSystem cs) {
     if (cs == null) {
       return false;
@@ -153,6 +162,11 @@ public class EngineeringCoordinateSystem implements CoordinateSystem {
   @Override
   public String getCoordinateSystemName() {
     return this.name;
+  }
+
+  @Override
+  public String getCoordinateSystemType() {
+    return "Engineering";
   }
 
   public EngineeringDatum getDatum() {

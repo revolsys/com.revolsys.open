@@ -8,9 +8,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.WktCsParser;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
@@ -76,24 +73,13 @@ public class ArcSdeSpatialReferenceCache {
           final double scale = resultSet.getBigDecimal(7).doubleValue();
           final double zScale = resultSet.getBigDecimal(8).doubleValue();
           final double mScale = resultSet.getBigDecimal(9).doubleValue();
-          int srid = resultSet.getInt(10);
+          final int srid = resultSet.getInt(10);
           final String wkt = resultSet.getString(11);
           final GeometryFactory geometryFactory;
-          final double[] scales = {
-            scale, scale, zScale
-          };
           if (srid <= 0) {
-            final CoordinateSystem coordinateSystem = new WktCsParser(wkt).parse();
-            final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-              .getCoordinateSystem(coordinateSystem);
-            srid = esriCoordinateSystem.getCoordinateSystemId();
-            if (srid <= 0) {
-              geometryFactory = GeometryFactory.fixed(coordinateSystem, 3, scales);
-            } else {
-              geometryFactory = GeometryFactory.fixed(srid, 3, scales);
-            }
+            geometryFactory = GeometryFactory.fixed3d(wkt, scale, scale, zScale);
           } else {
-            geometryFactory = GeometryFactory.fixed(srid, 3, scales);
+            geometryFactory = GeometryFactory.fixed3d(srid, scale, scale, zScale);
           }
 
           final ArcSdeSpatialReference spatialReference = new ArcSdeSpatialReference(

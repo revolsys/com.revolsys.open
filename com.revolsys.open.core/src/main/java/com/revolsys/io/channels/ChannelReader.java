@@ -19,9 +19,19 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
 public class ChannelReader implements BaseCloseable {
+
+  public static ChannelReader newChannelReader(final Object source) {
+    final Resource resource = Resource.getResource(source);
+    if (resource == null) {
+      return null;
+    } else {
+      return resource.newChannelReader();
+    }
+  }
 
   private ByteBuffer buffer;
 

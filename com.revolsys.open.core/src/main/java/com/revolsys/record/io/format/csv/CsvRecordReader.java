@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
@@ -98,7 +97,7 @@ public class CsvRecordReader extends AbstractRecordReader {
 
   @Override
   protected GeometryFactory loadGeometryFactory() {
-    return EsriCoordinateSystems.getGeometryFactory(this.resource);
+    return GeometryFactory.floating2d(this.resource);
   }
 
   /**
@@ -124,18 +123,22 @@ public class CsvRecordReader extends AbstractRecordReader {
           case -1:
             return returnEof(values, this.sb, hadQuotes);
           case '"':
-            hadQuotes = true;
-            if (inQuotes) {
-              in.mark(1);
-              final int nextCharacter = in.read();
-              if ('"' == nextCharacter) {
-                this.sb.append('"');
-              } else {
-                inQuotes = false;
-                in.reset();
-              }
+            if (!hadQuotes && this.sb.length() > 0) {
+              this.sb.append('"');
             } else {
-              inQuotes = true;
+              hadQuotes = true;
+              if (inQuotes) {
+                in.mark(1);
+                final int nextCharacter = in.read();
+                if ('"' == nextCharacter) {
+                  this.sb.append('"');
+                } else {
+                  inQuotes = false;
+                  in.reset();
+                }
+              } else {
+                inQuotes = true;
+              }
             }
           break;
           case '\n':
