@@ -20,6 +20,7 @@ import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.util.Debug;
 
 public class EsriCoordinateSystemsLoader {
   public static void main(final String[] args) {
@@ -33,7 +34,7 @@ public class EsriCoordinateSystemsLoader {
     try (
       RecordReader reader = RecordReader.newRecordReader("src/main/data/esri/esriGeographicCs.tsv");
       final ChannelWriter writer = ChannelWriter
-        .newChannelWriter("src/main/resources/com/revolsys/geometry/cs/esri/geographicCs.bin")) {
+        .newChannelWriter("src/main/resources/com/revolsys/geometry/cs/esri/Geographic.cs")) {
 
       for (final Record record : reader) {
         final int id = record.getInteger("ID");
@@ -78,7 +79,7 @@ public class EsriCoordinateSystemsLoader {
     try (
       RecordReader reader = RecordReader.newRecordReader("src/main/data/esri/esriProjectedCs.tsv");
       final ChannelWriter writer = ChannelWriter
-        .newChannelWriter("src/main/resources/com/revolsys/geometry/cs/esri/projectedCs.bin")) {
+        .newChannelWriter("src/main/resources/com/revolsys/geometry/cs/esri/Projected.cs")) {
 
       for (final Record record : reader) {
         final int id = record.getInteger("ID");
@@ -103,7 +104,9 @@ public class EsriCoordinateSystemsLoader {
         final LinearUnit linearUnit = coordinateSystem.getLinearUnit();
         final String unitName = linearUnit.getName();
         final double conversionFactor = linearUnit.getConversionFactor();
-
+        if (id == 3005) {
+          Debug.noOp();
+        }
         writer.putInt(id);
         writer.putStringUtf8ByteCount(csName);
         writer.putInt(geographicCoordinateSystemId);

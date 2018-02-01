@@ -27,7 +27,6 @@ import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.WrappedException;
 
@@ -203,9 +202,6 @@ public class EsriCoordinateSystems {
             final Authority authority = new BaseAuthority("ESRI", coordinateSystemId);
             final GeographicCoordinateSystem geographicCoordinateSystem = getGeographicCoordinateSystem(
               geographicCoordinateSystemId);
-            if (geographicCoordinateSystem == null) {
-              Debug.noOp();
-            }
             coordinateSystem = new ProjectedCoordinateSystem(coordinateSystemId, csName,
               geographicCoordinateSystem, projectionName, parameters, linearUnit, authority);
             COORDINATE_SYSTEM_BY_ID.put(id, coordinateSystem);
