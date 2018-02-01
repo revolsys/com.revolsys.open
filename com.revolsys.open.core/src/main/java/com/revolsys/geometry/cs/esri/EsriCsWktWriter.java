@@ -10,10 +10,13 @@ import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ParameterName;
+import com.revolsys.geometry.cs.ParameterValue;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.VerticalCoordinateSystem;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.util.Exceptions;
@@ -220,5 +223,43 @@ public class EsriCsWktWriter {
       out.write(value);
     }
     out.write('"');
+  }
+
+  public static void write(final Writer out, final VerticalCoordinateSystem coordinateSystem,
+    final int indentLevel) throws IOException {
+    out.write("VERTCS[");
+    write(out, coordinateSystem.getCoordinateSystemName(), incrementIndent(indentLevel));
+    final VerticalDatum datum = coordinateSystem.getDatum();
+    if (datum != null) {
+      out.write(",");
+      indent(out, incrementIndent(indentLevel));
+      write(out, datum, incrementIndent(indentLevel));
+    }
+    for (final Entry<ParameterName, ParameterValue> parameter : coordinateSystem
+      .getParameterValues()
+      .entrySet()) {
+      final ParameterName name = parameter.getKey();
+      final ParameterValue value = parameter.getValue();
+      write(out, name, value, incrementIndent(indentLevel));
+    }
+    final LinearUnit unit = coordinateSystem.getLinearUnit();
+    if (unit != null) {
+      write(out, unit, incrementIndent(indentLevel));
+    }
+    indent(out, indentLevel);
+    out.write(']');
+  }
+
+  public static void write(final Writer out, final VerticalDatum verticalDatum,
+    final int indentLevel) throws IOException {
+    out.write("DATUM[");
+    write(out, verticalDatum.getName(), incrementIndent(indentLevel));
+    final int type = verticalDatum.getDatumType();
+    if (type > 0) {
+      out.write(",");
+      write(out, type, incrementIndent(indentLevel));
+    }
+    indent(out, indentLevel);
+    out.write(']');
   }
 }

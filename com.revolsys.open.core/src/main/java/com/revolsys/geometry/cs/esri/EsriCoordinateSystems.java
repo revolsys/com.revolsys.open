@@ -60,7 +60,7 @@ public class EsriCoordinateSystems {
       final String type = coordinateSystem.getCoordinateSystemType();
       try (
         ChannelReader reader = ChannelReader
-          .newChannelReader("classpath:com/revolsys/geometry/cs/esri/" + type + ".digest")) {
+          .newChannelReader("classpath:CoordinateSystems/esri/" + type + ".digest")) {
         while (true) {
           reader.getBytes(bytes);
           final short count = reader.getShort();
@@ -96,7 +96,7 @@ public class EsriCoordinateSystems {
     if (coordinateSystem == null) {
       try (
         final ChannelReader reader = ChannelReader
-          .newChannelReader("classpath:com/revolsys/geometry/cs/esri/Geographic.cs")) {
+          .newChannelReader("classpath:CoordinateSystems/esri/Geographic.cs")) {
         while (true) {
           final int coordinateSystemId = reader.getInt();
           final String csName = reader.getStringUtf8ByteCount();
@@ -174,7 +174,7 @@ public class EsriCoordinateSystems {
     if (coordinateSystem == null) {
       try (
         final ChannelReader reader = ChannelReader
-          .newChannelReader("classpath:com/revolsys/geometry/cs/esri/Projected.cs")) {
+          .newChannelReader("classpath:CoordinateSystems/esri/Projected.cs")) {
         while (true) {
           final int coordinateSystemId = reader.getInt();
           final String csName = reader.getStringUtf8ByteCount();

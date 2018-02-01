@@ -7,10 +7,10 @@ import com.revolsys.geometry.cs.Authority;
 public class EpsgAuthority implements Authority, Serializable {
   private static final long serialVersionUID = 6255702398027894174L;
 
-  private final int code;
+  private final int id;
 
-  public EpsgAuthority(final int code) {
-    this.code = code;
+  public EpsgAuthority(final int id) {
+    this.id = id;
   }
 
   @Override
@@ -21,7 +21,7 @@ public class EpsgAuthority implements Authority, Serializable {
       return true;
     } else if (object instanceof EpsgAuthority) {
       final EpsgAuthority authority = (EpsgAuthority)object;
-      return this.code == authority.code;
+      return this.id == authority.id;
     } else if (object instanceof Authority) {
       final Authority authority = (Authority)object;
       if (!getName().equals(authority.getName())) {
@@ -38,7 +38,12 @@ public class EpsgAuthority implements Authority, Serializable {
 
   @Override
   public String getCode() {
-    return String.valueOf(this.code);
+    return String.valueOf(this.id);
+  }
+
+  @Override
+  public int getId() {
+    return this.id;
   }
 
   @Override
@@ -51,12 +56,12 @@ public class EpsgAuthority implements Authority, Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + getName().hashCode();
-    result = prime * result + this.code;
+    result = prime * result + this.id;
     return result;
   }
 
   @Override
   public String toString() {
-    return getName() + ":" + this.code;
+    return getName() + ":" + this.id;
   }
 }

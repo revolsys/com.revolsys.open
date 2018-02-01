@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.logging.Logs;
@@ -174,6 +176,10 @@ public class WktCsParser {
             } else {
               return processLinearUnit(values);
             }
+          } else if (name.equals("VDATUM")) {
+            return processVerticalDatum(values);
+          } else if (name.equals("VERTCS")) {
+            return processVerticalCoordinateSystem(values);
           } else {
             return Collections.singletonMap(name, values);
           }
@@ -327,6 +333,56 @@ public class WktCsParser {
 
   private ToWgs84 processToWgs84(final List<Object> values) {
     return new ToWgs84(values);
+  }
+
+  private VerticalCoordinateSystem processVerticalCoordinateSystem(final List<Object> values) {
+    final String name = (String)values.get(0);
+    VerticalDatum verticalDatum = null;
+    final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
+
+    LinearUnit linearUnit = null;
+    Authority authority = null;
+    final List<Axis> axises = new ArrayList<>();
+    for (int i = 1; i < values.size(); i++) {
+      final Object value = values.get(i);
+      if (value instanceof VerticalDatum) {
+        verticalDatum = (VerticalDatum)value;
+      } else if (value instanceof LinearUnit) {
+        linearUnit = (LinearUnit)value;
+      } else if (value instanceof Axis) {
+        final Axis axis = (Axis)value;
+        axises.add(axis);
+      } else if (value instanceof Authority) {
+        authority = (Authority)value;
+      } else if (value instanceof Map) {
+        final Map<String, List<Object>> map = (Map<String, List<Object>>)value;
+        final String key = map.keySet().iterator().next();
+        if (key.equals("PARAMETER")) {
+          final List<Object> paramValues = map.get(key);
+          final String paramName = (String)paramValues.get(0);
+          final ParameterName parameterName = ParameterNames.getParameterName(paramName);
+          final Double paramValue = (Double)paramValues.get(1);
+          parameters.put(parameterName, new ParameterValueNumber(paramValue));
+        }
+      }
+    }
+
+    return new VerticalCoordinateSystem(authority, name, verticalDatum, parameters, linearUnit,
+      axises);
+  }
+
+  private VerticalDatum processVerticalDatum(final List<Object> values) {
+    final String name = (String)values.get(0);
+    int type = 0;
+    Authority authority = null;
+    if (values.size() > 1) {
+      type = ((Number)values.get(1)).intValue();
+      if (values.size() > 2) {
+        authority = (Authority)values.get(2);
+      }
+    }
+
+    return new VerticalDatum(authority, name, type);
   }
 
   private char skipWhitespace() {

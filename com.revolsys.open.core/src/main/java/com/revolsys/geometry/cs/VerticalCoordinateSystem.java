@@ -2,6 +2,7 @@ package com.revolsys.geometry.cs;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
@@ -24,22 +25,46 @@ public class VerticalCoordinateSystem implements CoordinateSystem {
 
   private final VerticalDatum verticalDatum;
 
-  private boolean deprecated;
+  private final boolean deprecated;
 
   private final int id;
 
   private final String name;
 
+  private final Map<ParameterName, ParameterValue> parameterValues;
+
+  public VerticalCoordinateSystem(final Authority authority, final String name,
+    final VerticalDatum verticalDatum, final Map<ParameterName, ParameterValue> parameterValues,
+    final LinearUnit linearUnit, final List<Axis> axis) {
+    this(authority, name, verticalDatum, parameterValues, linearUnit, axis, null, false);
+  }
+
+  private VerticalCoordinateSystem(final Authority authority, final String name,
+    final VerticalDatum verticalDatum, final Map<ParameterName, ParameterValue> parameterValues,
+    final LinearUnit linearUnit, final List<Axis> axis, final Area area, final boolean deprecated) {
+    this.authority = authority;
+    if (authority == null) {
+      this.id = 0;
+    } else {
+      this.id = authority.getId();
+    }
+    this.name = name;
+    this.verticalDatum = verticalDatum;
+    this.parameterValues = parameterValues;
+    this.axis = axis;
+    if (axis.size() > 0) {
+      this.linearUnit = (LinearUnit)axis.get(0).getUnit();
+    } else {
+      this.linearUnit = linearUnit;
+    }
+    this.area = area;
+    this.deprecated = deprecated;
+  }
+
   public VerticalCoordinateSystem(final int id, final String name,
     final VerticalDatum verticalDatum, final List<Axis> axis, final Area area,
     final boolean deprecated) {
-    this.id = id;
-    this.name = name;
-    this.verticalDatum = verticalDatum;
-    this.linearUnit = (LinearUnit)axis.get(0).getUnit();
-    this.axis = axis;
-    this.area = area;
-    this.authority = new EpsgAuthority(id);
+    this(new EpsgAuthority(id), name, verticalDatum, null, null, axis, area, deprecated);
   }
 
   @Override
@@ -174,6 +199,10 @@ public class VerticalCoordinateSystem implements CoordinateSystem {
 
   public LinearUnit getLinearUnit() {
     return this.linearUnit;
+  }
+
+  public Map<ParameterName, ParameterValue> getParameterValues() {
+    return this.parameterValues;
   }
 
   @Override

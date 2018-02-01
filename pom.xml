@@ -58,6 +58,7 @@
     <module>com.revolsys.open.swing</module>
     <module>com.revolsys.open.web</module>
     <module>war-overlay</module>
+    <module>com.revolsys.open.coordinatesystems</module>
   </modules>
 
   <build>

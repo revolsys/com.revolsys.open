@@ -868,8 +868,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
   }
 
   private static ChannelReader newChannelReader(final String fileName) {
-    return new ClassPathResource("com/revolsys/geometry/cs/epsg/" + fileName + ".bin")
-      .newChannelReader();
+    return new ClassPathResource("CoordinateSystems/epsg/" + fileName + ".bin").newChannelReader();
   }
 
   private static GeocentricCoordinateSystem newCoordinateSystemGeocentric(final int id,

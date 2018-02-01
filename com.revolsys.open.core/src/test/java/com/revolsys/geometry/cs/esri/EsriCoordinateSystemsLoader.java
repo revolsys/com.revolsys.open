@@ -13,28 +13,32 @@ import com.revolsys.geometry.cs.ParameterValue;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.VerticalCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
-import com.revolsys.util.Debug;
 
 public class EsriCoordinateSystemsLoader {
   public static void main(final String[] args) {
     new EsriCoordinateSystemsLoader().run();
   }
 
+  private final String mainPath = "../com.revolsys.open.coordinatesystems/src/main/";
+
   private final Map<String, Integer> geographicIdByName = new HashMap<>();
 
   private void geographic() {
     final Map<ByteArray, Map<Integer, GeographicCoordinateSystem>> csBymd5 = new LinkedHashMap<>();
     try (
-      RecordReader reader = RecordReader.newRecordReader("src/main/data/esri/esriGeographicCs.tsv");
+      RecordReader reader = RecordReader
+        .newRecordReader(this.mainPath + "data/esri/esriGeographicCs.tsv");
       final ChannelWriter writer = ChannelWriter
-        .newChannelWriter("src/main/resources/com/revolsys/geometry/cs/esri/Geographic.cs")) {
+        .newChannelWriter(this.mainPath + "resources/CoordinateSystems/esri/Geographic.cs")) {
 
       for (final Record record : reader) {
         final int id = record.getInteger("ID");
@@ -77,9 +81,10 @@ public class EsriCoordinateSystemsLoader {
   private void projected() {
     final Map<ByteArray, Map<Integer, ProjectedCoordinateSystem>> csBymd5 = new LinkedHashMap<>();
     try (
-      RecordReader reader = RecordReader.newRecordReader("src/main/data/esri/esriProjectedCs.tsv");
+      RecordReader reader = RecordReader
+        .newRecordReader(this.mainPath + "data/esri/esriProjectedCs.tsv");
       final ChannelWriter writer = ChannelWriter
-        .newChannelWriter("src/main/resources/com/revolsys/geometry/cs/esri/Projected.cs")) {
+        .newChannelWriter(this.mainPath + "resources/CoordinateSystems/esri/Projected.cs")) {
 
       for (final Record record : reader) {
         final int id = record.getInteger("ID");
@@ -104,23 +109,11 @@ public class EsriCoordinateSystemsLoader {
         final LinearUnit linearUnit = coordinateSystem.getLinearUnit();
         final String unitName = linearUnit.getName();
         final double conversionFactor = linearUnit.getConversionFactor();
-        if (id == 3005) {
-          Debug.noOp();
-        }
         writer.putInt(id);
         writer.putStringUtf8ByteCount(csName);
         writer.putInt(geographicCoordinateSystemId);
         writer.putStringUtf8ByteCount(projectionName);
-        final int parameterCount = parameterValues.size();
-        writer.putByte((byte)parameterCount);
-        for (final Entry<ParameterName, ParameterValue> entry : parameterValues.entrySet()) {
-          final ParameterName parameterName = entry.getKey();
-          final ParameterValue parameterValue = entry.getValue();
-          final String name = parameterName.getName();
-          final double value = parameterValue.getValue();
-          writer.putStringUtf8ByteCount(name);
-          writer.putDouble(value);
-        }
+        writeParameters(writer, parameterValues);
         writer.putStringUtf8ByteCount(unitName);
         writer.putDouble(conversionFactor);
       }
@@ -133,11 +126,50 @@ public class EsriCoordinateSystemsLoader {
     projected();
   }
 
+  private void vertical() {
+    final Map<ByteArray, Map<Integer, VerticalCoordinateSystem>> csBymd5 = new LinkedHashMap<>();
+    try (
+      RecordReader reader = RecordReader
+        .newRecordReader(this.mainPath + "data/esri/esriVerticalCs.tsv");
+      final ChannelWriter writer = ChannelWriter
+        .newChannelWriter(this.mainPath + "resources/CoordinateSystems/esri/Vertical.cs")) {
+
+      for (final Record record : reader) {
+        final int id = record.getInteger("ID");
+        final String wkt = record.getString("WKT");
+        final VerticalCoordinateSystem coordinateSystem = WktCsParser.read(wkt);
+        final byte[] digest = coordinateSystem.md5Digest();
+        Maps.addToMap(Maps::newTree, csBymd5, new ByteArray(digest), id, coordinateSystem);
+
+        final VerticalDatum datum = coordinateSystem.getDatum();
+        if (datum != null) {
+          final Map<ParameterName, ParameterValue> parameterValues = coordinateSystem
+            .getParameterValues();
+          final LinearUnit linearUnit = coordinateSystem.getLinearUnit();
+
+          final String csName = coordinateSystem.getCoordinateSystemName();
+          this.geographicIdByName.put(csName, id);
+          final String datumName = datum.getName();
+          final String linearUnitName = linearUnit.getName();
+          final double conversionFactor = linearUnit.getConversionFactor();
+
+          writer.putInt(id);
+          writer.putStringUtf8ByteCount(csName);
+          writer.putStringUtf8ByteCount(datumName);
+          writeParameters(writer, parameterValues);
+          writer.putStringUtf8ByteCount(linearUnitName);
+          writer.putDouble(conversionFactor);
+        }
+      }
+    }
+    writeDigestFile(csBymd5, "Geographic");
+  }
+
   private <C extends CoordinateSystem> void writeDigestFile(
     final Map<ByteArray, Map<Integer, C>> csBymd5, final String csType) {
     try (
       final ChannelWriter writer = ChannelWriter.newChannelWriter(
-        "src/main/resources/com/revolsys/geometry/cs/esri/" + csType + ".digest")) {
+        this.mainPath + "resources/CoordinateSystems/esri/" + csType + ".digest")) {
 
       for (final Entry<ByteArray, Map<Integer, C>> entry : csBymd5.entrySet()) {
         final ByteArray digest = entry.getKey();
@@ -148,6 +180,20 @@ public class EsriCoordinateSystemsLoader {
           writer.putInt(id);
         }
       }
+    }
+  }
+
+  private void writeParameters(final ChannelWriter writer,
+    final Map<ParameterName, ParameterValue> parameterValues) {
+    final int parameterCount = parameterValues.size();
+    writer.putByte((byte)parameterCount);
+    for (final Entry<ParameterName, ParameterValue> entry : parameterValues.entrySet()) {
+      final ParameterName parameterName = entry.getKey();
+      final ParameterValue parameterValue = entry.getValue();
+      final String name = parameterName.getName();
+      final double value = parameterValue.getValue();
+      writer.putStringUtf8ByteCount(name);
+      writer.putDouble(value);
     }
   }
 }
