@@ -20,6 +20,8 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.ParameterNames;
+import com.revolsys.geometry.cs.ParameterValue;
+import com.revolsys.geometry.cs.ParameterValueNumber;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
@@ -118,11 +120,11 @@ public class TiffImage extends JaiGeoreferencedImage {
     // LambertConicConformal.class);
   }
 
-  public static void addDoubleParameter(final Map<ParameterName, Double> parameters,
+  public static void addDoubleParameter(final Map<ParameterName, ParameterValue> parameters,
     final ParameterName name, final Map<Integer, Object> geoKeys, final int key) {
     final Double value = Maps.getDouble(geoKeys, key);
     if (value != null) {
-      parameters.put(name, value);
+      parameters.put(name, new ParameterValueNumber(value));
     }
   }
 
@@ -233,7 +235,7 @@ public class TiffImage extends JaiGeoreferencedImage {
           final String name = "unknown";
           final CoordinateOperationMethod coordinateOperationMethod = getProjection(geoKeys);
 
-          final Map<ParameterName, Double> parameters = new LinkedHashMap<>();
+          final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
           addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_1, geoKeys,
             STANDARD_PARALLEL_1_KEY);
           addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_2, geoKeys,

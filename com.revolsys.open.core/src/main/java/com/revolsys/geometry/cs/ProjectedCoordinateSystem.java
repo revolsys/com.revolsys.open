@@ -90,19 +90,17 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   public ProjectedCoordinateSystem(final int id, final String name,
     final GeographicCoordinateSystem geographicCoordinateSystem,
     final CoordinateOperationMethod coordinateOperationMethod,
-    final Map<ParameterName, Double> parameters, final LinearUnit linearUnit) {
-    this(id, name, geographicCoordinateSystem, null, coordinateOperationMethod,
-      CoordinateOperationMethod.getParameters(coordinateOperationMethod, parameters, linearUnit),
+    final Map<ParameterName, ParameterValue> parameters, final LinearUnit linearUnit) {
+    this(id, name, geographicCoordinateSystem, null, coordinateOperationMethod, parameters,
       linearUnit, null, null, false);
   }
 
   public ProjectedCoordinateSystem(final int id, final String name,
     final GeographicCoordinateSystem geographicCoordinateSystem,
     final CoordinateOperationMethod coordinateOperationMethod,
-    final Map<ParameterName, Double> parameters, final LinearUnit linearUnit, final List<Axis> axis,
-    final Authority authority) {
-    this(id, name, geographicCoordinateSystem, null, coordinateOperationMethod,
-      CoordinateOperationMethod.getParameters(coordinateOperationMethod, parameters, linearUnit),
+    final Map<ParameterName, ParameterValue> parameters, final LinearUnit linearUnit,
+    final List<Axis> axis, final Authority authority) {
+    this(id, name, geographicCoordinateSystem, null, coordinateOperationMethod, parameters,
       linearUnit, axis, authority, false);
   }
 
@@ -333,7 +331,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   @SuppressWarnings("unchecked")
   public <V> V getParameter(final ParameterName key) {
-    return (V)this.parameters.get(key);
+    return (V)key.getValue(this.parameters);
   }
 
   public Map<ParameterName, Object> getParameters() {

@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Map.Entry;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
@@ -81,6 +82,9 @@ public class EsriCsWktWriter {
       } else if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
         write(out, geoCs, indentLevel);
+      } else if (coordinateSystem instanceof VerticalCoordinateSystem) {
+        final VerticalCoordinateSystem verticalCs = (VerticalCoordinateSystem)coordinateSystem;
+        write(out, verticalCs, indentLevel);
       }
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
@@ -139,11 +143,10 @@ public class EsriCsWktWriter {
   private static void write(final Writer out, final Number number, final int indentLevel)
     throws IOException {
     indent(out, indentLevel);
-    out.write(new DecimalFormat("#0.0###############").format(number));
-
+    out.write(new DecimalFormat("#0.0#################").format(number));
   }
 
-  public static void write(final Writer out, final ParameterName name, final Object value,
+  public static void write(final Writer out, final ParameterName name, final ParameterValue value,
     final int indentLevel) throws IOException {
     out.write(",");
     indent(out, indentLevel);
@@ -151,8 +154,8 @@ public class EsriCsWktWriter {
     write(out, name.getName(), -1);
     out.write(',');
     if (value instanceof Number) {
-      final Number number = (Number)value;
-      write(out, number, -1);
+      final Object originalValue = value.getOriginalValue();
+      out.write(DataTypes.toString(originalValue));
     } else {
       out.write(value.toString());
     }
@@ -187,10 +190,11 @@ public class EsriCsWktWriter {
       indent(out, incrementIndent(indentLevel));
       write(out, coordinateOperationMethod, incrementIndent(indentLevel));
     }
-    for (final Entry<ParameterName, Object> parameter : coordinateSystem.getParameters()
+    for (final Entry<ParameterName, ParameterValue> parameter : coordinateSystem
+      .getParameterValues()
       .entrySet()) {
       final ParameterName name = parameter.getKey();
-      final Object value = parameter.getValue();
+      final ParameterValue value = parameter.getValue();
       write(out, name, value, incrementIndent(indentLevel));
     }
     final LinearUnit unit = coordinateSystem.getLinearUnit();
@@ -252,7 +256,7 @@ public class EsriCsWktWriter {
 
   public static void write(final Writer out, final VerticalDatum verticalDatum,
     final int indentLevel) throws IOException {
-    out.write("DATUM[");
+    out.write("VDATUM[");
     write(out, verticalDatum.getName(), incrementIndent(indentLevel));
     final int type = verticalDatum.getDatumType();
     if (type > 0) {

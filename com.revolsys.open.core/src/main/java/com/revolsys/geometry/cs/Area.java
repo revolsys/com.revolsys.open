@@ -6,9 +6,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 
 public class Area implements Serializable {
-  /**
-   *
-   */
   private static final long serialVersionUID = 2662773652065582230L;
 
   private final Authority authority;

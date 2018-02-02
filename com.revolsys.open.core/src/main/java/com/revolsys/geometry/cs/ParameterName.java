@@ -23,20 +23,10 @@ public interface ParameterName extends Comparable<ParameterName> {
 
   UnitOfMeasure getUnitOfMeasure();
 
-  ParameterValue getValue(final UnitOfMeasure measure, Map<ParameterName, Double> values);
+  <V> V getValue(Map<ParameterName, Object> parameters);
 
   default ParameterValueNumber newParameterValue(final double value) {
     final UnitOfMeasure unitOfMeasure = getUnitOfMeasure();
-    return new ParameterValueNumber(unitOfMeasure, value);
-  }
-
-  default ParameterValue newParameterValue(final UnitOfMeasure measure, final double value) {
-    UnitOfMeasure unitOfMeasure = getUnitOfMeasure();
-    if (unitOfMeasure != null) {
-      if (unitOfMeasure.getType() == measure.getType()) {
-        unitOfMeasure = measure;
-      }
-    }
     return new ParameterValueNumber(unitOfMeasure, value);
   }
 }

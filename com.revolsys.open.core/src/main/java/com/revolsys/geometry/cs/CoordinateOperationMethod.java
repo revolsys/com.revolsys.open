@@ -4,11 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 
@@ -23,7 +20,6 @@ import com.revolsys.geometry.cs.projection.Mercator2SP;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.cs.projection.TransverseMercator;
 import com.revolsys.geometry.cs.projection.WebMercator;
-import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.util.Equals;
 import com.revolsys.util.Property;
 
@@ -137,25 +133,6 @@ public class CoordinateOperationMethod
     }
   }
 
-  public static Map<ParameterName, ParameterValue> getParameters(
-    final CoordinateOperationMethod method, final Map<ParameterName, Double> values,
-    final LinearUnit linearUnit) {
-    if (method == null) {
-      final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
-      for (final ParameterName parameterName : values.keySet()) {
-        final Object value = values.get(parameterName);
-        if (value != null) {
-          final ParameterValue parameterValue = parameterName.newParameterValue(linearUnit,
-            (Double)value);
-          parameters.put(parameterName, parameterValue);
-        }
-      }
-      return parameters;
-    } else {
-      return method.getParameters(values, linearUnit);
-    }
-  }
-
   public static String normalizeName(final String name) {
     return name.replaceAll(" ", "_").replaceAll("[^a-zA-Z0-9_]", "");
   }
@@ -237,32 +214,6 @@ public class CoordinateOperationMethod
 
   public List<ParameterName> getParameterNames() {
     return this.parameterNames;
-  }
-
-  public Map<ParameterName, ParameterValue> getParameters(final Map<ParameterName, Double> values,
-    final LinearUnit linearUnit) {
-    final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
-    final Set<ParameterName> usedNames = new HashSet<>();
-    for (final ParameterName parameterName : this.parameterNames) {
-      ParameterValue value = parameterName.getValue(linearUnit, values);
-      if (value == null) {
-        value = parameterName.getDefaultValue();
-      } else {
-        parameterName.addNames(usedNames);
-      }
-      parameters.put(parameterName, value);
-    }
-    for (final ParameterName parameterName : values.keySet()) {
-      if (!usedNames.contains(parameterName)) {
-        final Object value = values.get(parameterName);
-        if (value != null) {
-          final ParameterValue parameterValue = parameterName.newParameterValue(linearUnit,
-            (Double)value);
-          parameters.put(parameterName, parameterValue);
-        }
-      }
-    }
-    return parameters;
   }
 
   @Override

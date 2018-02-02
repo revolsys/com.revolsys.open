@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.component;
 
-import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
 
 import com.revolsys.geometry.model.GeometryFactory;
@@ -23,9 +22,6 @@ public class SelectMapCoordinateSystem extends CoordinateSystemField {
     setGeometryFactory(geometryFactory);
     this.geometryFactoryListener = Property.addListenerNewValueSource(this.viewport,
       "geometryFactory", this::setGeometryFactory);
-    final Dimension size = new Dimension(200, 22);
-    setMaximumSize(size);
-    setToolTipText("Coordinate System");
   }
 
   @Override

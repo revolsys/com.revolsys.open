@@ -9,18 +9,28 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.field.ArrayListComboBoxModel;
-import com.revolsys.swing.field.ComboBox;
+import com.revolsys.swing.field.BaseComboBox;
 
-public class CoordinateSystemField extends ComboBox<Integer> implements ItemListener {
+public class CoordinateSystemField extends BaseComboBox<Integer> implements ItemListener {
   private static final long serialVersionUID = 1L;
 
-  public static String formatCoordinateSystem(final Object value) {
+  public static String formatCoordinateSystem(final Integer value) {
     final CoordinateSystem coordinateSystem = getCoordinateSystem(value);
     if (coordinateSystem == null) {
       return DataTypes.toString(value);
     } else {
       return coordinateSystem.getCoordinateSystemId() + " "
         + coordinateSystem.getCoordinateSystemName();
+    }
+  }
+
+  public static String formatCoordinateSystem(final Object object) {
+    if (object instanceof CoordinateSystem) {
+      final CoordinateSystem coordinateSystem = (CoordinateSystem)object;
+      return coordinateSystem.getCoordinateSystemId() + " "
+        + coordinateSystem.getCoordinateSystemName();
+    } else {
+      return "-";
     }
   }
 
@@ -44,11 +54,11 @@ public class CoordinateSystemField extends ComboBox<Integer> implements ItemList
   }
 
   public CoordinateSystemField(final String fieldName) {
-    super("fieldName", newModel(), CoordinateSystemField::formatCoordinateSystem, null);
+    super("fieldName", newModel(), CoordinateSystemField::formatCoordinateSystem);
 
-    setEditable(true);
+    setEditable(false);
     addItemListener(this);
-    final Dimension size = new Dimension(200, 22);
+    final Dimension size = new Dimension(240, 22);
     setMaximumSize(size);
     setToolTipText("Coordinate System");
   }

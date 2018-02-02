@@ -265,43 +265,33 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     this.component.repaint();
   }
 
-  /**
-   * Set the coordinate system the map is displayed in.
-   *
-   * @param coordinateSystem The coordinate system the map is displayed in.
-   */
   @Override
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    final GeometryFactory oldGeometryFactory = getGeometryFactory();
-    if (geometryFactory != oldGeometryFactory) {
-      super.setGeometryFactory(geometryFactory);
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
-        final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
-        final double minX = areaBoundingBox.getMinX();
-        final double maxX = areaBoundingBox.getMaxX();
-        final double minY = areaBoundingBox.getMinY();
-        final double maxY = areaBoundingBox.getMaxY();
-        final double logMinX = Math.log10(Math.abs(minX));
-        final double logMinY = Math.log10(Math.abs(minY));
-        final double logMaxX = Math.log10(Math.abs(maxX));
-        final double logMaxY = Math.log10(Math.abs(maxY));
-        final double maxLog = Math
-          .abs(Math.max(Math.max(logMinX, logMinY), Math.max(logMaxX, logMaxY)));
-        this.maxIntegerDigits = (int)Math.floor(maxLog + 1);
-        this.maxDecimalDigits = 15 - this.maxIntegerDigits;
-        getPropertyChangeSupport().firePropertyChange("geometryFactory", oldGeometryFactory,
-          geometryFactory);
-        final BoundingBox boundingBox = getBoundingBox();
-        if (boundingBox != null) {
-          final BoundingBox newBoundingBox = boundingBox.convert(geometryFactory);
-          final BoundingBox intersection = newBoundingBox.intersection(areaBoundingBox);
-          if (intersection.isEmpty()) {
-            setBoundingBox(areaBoundingBox);
-          } else {
-            setBoundingBox(intersection);
-          }
+  protected void setGeometryFactoryPreEvent(final GeometryFactory geometryFactory) {
+    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    if (coordinateSystem != null) {
+      final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
+      final double minX = areaBoundingBox.getMinX();
+      final double maxX = areaBoundingBox.getMaxX();
+      final double minY = areaBoundingBox.getMinY();
+      final double maxY = areaBoundingBox.getMaxY();
+      final double logMinX = Math.log10(Math.abs(minX));
+      final double logMinY = Math.log10(Math.abs(minY));
+      final double logMaxX = Math.log10(Math.abs(maxX));
+      final double logMaxY = Math.log10(Math.abs(maxY));
+      final double maxLog = Math
+        .abs(Math.max(Math.max(logMinX, logMinY), Math.max(logMaxX, logMaxY)));
+      this.maxIntegerDigits = (int)Math.floor(maxLog + 1);
+      this.maxDecimalDigits = 15 - this.maxIntegerDigits;
+
+      final BoundingBox boundingBox = getBoundingBox();
+      if (Property.hasValue(boundingBox)) {
+        final BoundingBox newBoundingBox = boundingBox.convert(geometryFactory);
+        BoundingBox intersection = newBoundingBox.intersection(areaBoundingBox);
+        if (intersection.isEmpty()) {
+          intersection = areaBoundingBox;
         }
+
+        setBoundingBox(intersection);
       }
     }
   }

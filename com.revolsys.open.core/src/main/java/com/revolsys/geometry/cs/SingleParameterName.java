@@ -74,18 +74,10 @@ public class SingleParameterName implements ParameterName {
     return this.unitOfMeasure;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public ParameterValue getValue(final UnitOfMeasure measure,
-    final Map<ParameterName, Double> values) {
-    Object value = values.get(this);
-    if (value == null) {
-      value = values.get(this);
-    }
-    if (value == null) {
-      return null;
-    } else {
-      return newParameterValue(measure, (Double)value);
-    }
+  public <V> V getValue(final Map<ParameterName, Object> parameters) {
+    return (V)parameters.get(this);
   }
 
   @Override

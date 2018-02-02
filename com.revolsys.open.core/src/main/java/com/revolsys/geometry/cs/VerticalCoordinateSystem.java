@@ -15,6 +15,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class VerticalCoordinateSystem implements CoordinateSystem {
+
   private final LinearUnit linearUnit;
 
   private final Area area;

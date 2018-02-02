@@ -19,6 +19,7 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.ParameterNames;
+import com.revolsys.geometry.cs.ParameterValue;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
@@ -111,7 +112,7 @@ public class LasProjection {
             final CoordinateOperationMethod coordinateOperationMethod = TiffImage
               .getProjection(properties);
 
-            final Map<ParameterName, Double> parameters = new LinkedHashMap<>();
+            final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
             TiffImage.addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_1, properties,
               TiffImage.STANDARD_PARALLEL_1_KEY);
             TiffImage.addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_2, properties,

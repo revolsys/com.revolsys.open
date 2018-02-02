@@ -1,8 +1,6 @@
 package com.revolsys.geometry.cs.epsg;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.CoordinateOperationMethod;
@@ -70,22 +68,6 @@ public class CoordinateOperation {
 
   public String getName() {
     return this.name;
-  }
-
-  public Map<ParameterName, Object> getParameters() {
-    final Map<ParameterName, Object> parameters = new LinkedHashMap<>();
-    for (final Entry<ParameterName, ParameterValue> entry : this.parameterValues.entrySet()) {
-      final ParameterName parameterName = entry.getKey();
-      final ParameterValue parameterValue = entry.getValue();
-      final Object value;
-      if (parameterValue == null) {
-        value = parameterName.getDefaultValue();
-      } else {
-        value = parameterValue.getValue();
-      }
-      parameters.put(parameterName, value);
-    }
-    return parameters;
   }
 
   public Map<ParameterName, ParameterValue> getParameterValues() {

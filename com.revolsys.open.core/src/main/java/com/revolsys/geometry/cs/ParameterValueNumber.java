@@ -34,6 +34,12 @@ public class ParameterValueNumber extends Number implements ParameterValue {
     return (float)this.value;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> V getOriginalValue() {
+    return (V)(Double)this.unitValue;
+  }
+
   public UnitOfMeasure getUnit() {
     return this.unit;
   }

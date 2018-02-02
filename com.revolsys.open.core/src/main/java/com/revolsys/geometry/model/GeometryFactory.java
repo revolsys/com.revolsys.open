@@ -410,6 +410,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       if (coordinateSystemId <= 0) {
         return new GeometryFactoryFloating(coordinateSystem, axisCount);
       } else {
+
         return floating(coordinateSystemId, axisCount);
       }
     }
@@ -736,11 +737,14 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       this.axisCount = axisCount;
     }
     this.coordinateSystemId = coordinateSystemId;
+    CoordinateSystem coordinateSystem = null;
     if (coordinateSystemId > 0) {
-      this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
-    } else {
-      this.coordinateSystem = null;
+      coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
+      if (coordinateSystem == null) {
+        coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystemId);
+      }
     }
+    this.coordinateSystem = coordinateSystem;
   }
 
   public void addGeometries(final List<Geometry> geometryList, final Geometry geometry) {

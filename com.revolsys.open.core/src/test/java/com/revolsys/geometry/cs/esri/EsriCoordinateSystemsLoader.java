@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.revolsys.collection.map.Maps;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ParameterName;
@@ -101,7 +102,7 @@ public class EsriCoordinateSystemsLoader {
         final int geographicCoordinateSystemId = this.geographicIdByName
           .getOrDefault(geographicCoordinateSystemName, 0);
         if (geographicCoordinateSystemId == 0) {
-          System.out.println(geographicCoordinateSystemName);
+          System.out.println(wkt);
         }
         final String projectionName = coordinateSystem.getCoordinateOperationMethod().getName();
         final Map<ParameterName, ParameterValue> parameterValues = coordinateSystem
@@ -124,6 +125,7 @@ public class EsriCoordinateSystemsLoader {
   public void run() {
     geographic();
     projected();
+    vertical();
   }
 
   private void vertical() {
@@ -162,7 +164,7 @@ public class EsriCoordinateSystemsLoader {
         }
       }
     }
-    writeDigestFile(csBymd5, "Geographic");
+    writeDigestFile(csBymd5, "Vertical");
   }
 
   private <C extends CoordinateSystem> void writeDigestFile(
@@ -191,9 +193,9 @@ public class EsriCoordinateSystemsLoader {
       final ParameterName parameterName = entry.getKey();
       final ParameterValue parameterValue = entry.getValue();
       final String name = parameterName.getName();
-      final double value = parameterValue.getValue();
+      final Object value = parameterValue.getOriginalValue();
       writer.putStringUtf8ByteCount(name);
-      writer.putDouble(value);
+      writer.putStringUtf8ByteCount(DataTypes.toString(value));
     }
   }
 }

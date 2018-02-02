@@ -30,6 +30,7 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
+import com.revolsys.util.Property;
 
 /**
  * Make sure to watch out for parameter value conversions.
@@ -113,10 +114,10 @@ public final class EpsgCoordinateSystemsLoader {
       for (final Record record : reader) {
         writeInt(writer, record, "area_code");
         writeString(writer, record, "area_name");
-        writeDouble(writer, record, "area_south_bound_lat");
-        writeDouble(writer, record, "area_north_bound_lat");
         writeDouble(writer, record, "area_west_bound_lon");
+        writeDouble(writer, record, "area_south_bound_lat");
         writeDouble(writer, record, "area_east_bound_lon");
+        writeDouble(writer, record, "area_north_bound_lat");
         writeDeprecated(writer, record);
       }
     }
@@ -416,7 +417,8 @@ public final class EpsgCoordinateSystemsLoader {
         final CoordinateOperationMethod coordinateOperationMethod = esri
           .getCoordinateOperationMethod();
         if (esri != null && !projectedCs.equals(esri) && coordinateOperationMethod != null
-          && coordinateOperationMethod.getName().length() > 0 && !projectedCs.isDeprecated()) {
+          && Property.hasValue(coordinateOperationMethod.getName())
+          && !projectedCs.isDeprecated()) {
           final Map<ParameterName, Object> p1 = projectedCs.getParameters();
           final Map<ParameterName, Object> p2 = esri.getParameters();
           final Set<ParameterName> n1 = p1.keySet();

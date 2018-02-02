@@ -9,6 +9,12 @@ public class ParameterValueString implements ParameterValue {
 
   @SuppressWarnings("unchecked")
   @Override
+  public <V> V getOriginalValue() {
+    return (V)this.value;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
   public <V> V getValue() {
     return (V)this.value;
   }

@@ -72,13 +72,13 @@ public class MultiParameterName implements ParameterName {
     return this.parameterNames[0].getUnitOfMeasure();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public ParameterValue getValue(final UnitOfMeasure measure,
-    final Map<ParameterName, Double> values) {
+  public <V> V getValue(final Map<ParameterName, Object> parameters) {
     for (final ParameterName parameterName : this.parameterNames) {
-      final ParameterValue value = parameterName.getValue(measure, values);
+      final Object value = parameters.get(parameterName);
       if (value != null) {
-        return value;
+        return (V)value;
       }
     }
     return null;

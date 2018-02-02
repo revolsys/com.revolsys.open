@@ -1,11 +1,11 @@
 package com.revolsys.geometry.cs;
 
 import java.io.FileNotFoundException;
+import java.math.BigDecimal;
 import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +103,7 @@ public class WktCsParser {
     return name;
   }
 
-  private double parseNumber() {
+  private BigDecimal parseNumber() {
     final int startIndex = this.index;
 
     char currentChar = this.value.charAt(this.index);
@@ -112,7 +112,7 @@ public class WktCsParser {
       currentChar = this.value.charAt(this.index);
     }
     final String string = this.value.substring(startIndex, this.index);
-    return Double.parseDouble(string);
+    return new BigDecimal(string);
   }
 
   private String parseString() {
@@ -278,7 +278,7 @@ public class WktCsParser {
     final String name = (String)values.get(index++);
     final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)values
       .get(index++);
-    final Map<ParameterName, Double> parameters = new HashMap<>();
+    final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
 
     LinearUnit linearUnit = null;
     final List<Axis> axis = new ArrayList<>();
@@ -294,8 +294,9 @@ public class WktCsParser {
         if (key.equals("PARAMETER")) {
           final List<Object> paramValues = map.get(key);
           final String paramName = (String)paramValues.get(0);
-          final ParameterName parameterName = ParameterNames.getParameterName(paramName);
-          final Double paramValue = (Double)paramValues.get(1);
+          final ParameterName parameterName = new SingleParameterName(paramName);
+          final ParameterValueBigDecimal paramValue = new ParameterValueBigDecimal(
+            (BigDecimal)paramValues.get(1));
           parameters.put(parameterName, paramValue);
         }
       } else if (value instanceof LinearUnit) {
@@ -307,8 +308,8 @@ public class WktCsParser {
       }
     }
     final int coordinateSystemId = getCoordinateSystemId(authority);
-    final CoordinateOperationMethod coordinateOperationMethod = CoordinateOperationMethod
-      .getMethod(methodName, parameters);
+    final CoordinateOperationMethod coordinateOperationMethod = new CoordinateOperationMethod(
+      methodName);
 
     return new ProjectedCoordinateSystem(coordinateSystemId, name, geographicCoordinateSystem,
       coordinateOperationMethod, parameters, linearUnit, axis, authority);
@@ -360,9 +361,9 @@ public class WktCsParser {
         if (key.equals("PARAMETER")) {
           final List<Object> paramValues = map.get(key);
           final String paramName = (String)paramValues.get(0);
-          final ParameterName parameterName = ParameterNames.getParameterName(paramName);
-          final Double paramValue = (Double)paramValues.get(1);
-          parameters.put(parameterName, new ParameterValueNumber(paramValue));
+          final ParameterName parameterName = new SingleParameterName(paramName);
+          final BigDecimal paramValue = (BigDecimal)paramValues.get(1);
+          parameters.put(parameterName, new ParameterValueBigDecimal(paramValue));
         }
       }
     }

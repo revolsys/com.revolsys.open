@@ -765,9 +765,10 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     final GeometryFactory oldGeometryFactory = this.geometryFactory;
     if (setGeometryFactoryDo(geometryFactory)) {
-
+      setGeometryFactoryPreEvent(geometryFactory);
       this.propertyChangeSupport.firePropertyChange("geometryFactory", oldGeometryFactory,
         geometryFactory);
+      setGeometryFactoryPostEvent(geometryFactory);
     }
   }
 
@@ -792,6 +793,12 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       this.minUnitsPerPixel = this.unitsPerPixelList.get(this.unitsPerPixelList.size() - 1);
       return true;
     }
+  }
+
+  protected void setGeometryFactoryPostEvent(final GeometryFactory geometryFactory2) {
+  }
+
+  protected void setGeometryFactoryPreEvent(final GeometryFactory geometryFactory2) {
   }
 
   public void setInitialized(final boolean initialized) {

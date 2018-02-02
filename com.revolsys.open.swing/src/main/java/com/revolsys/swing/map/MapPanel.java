@@ -54,7 +54,7 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.field.ComboBox;
+import com.revolsys.swing.field.BaseComboBox;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.ConsumerSelectedItemListener;
 import com.revolsys.swing.listener.EnableComponentListener;
@@ -162,7 +162,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     });
   }
 
-  private ComboBox<Layer> baseMapLayerField;
+  private BaseComboBox<Layer> baseMapLayerField;
 
   private BaseMapLayerGroup baseMapLayers;
 
@@ -783,7 +783,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
     final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(this.baseMapLayers,
       true);
-    this.baseMapLayerField = baseMapLayersModel.newComboBox("baseMapLayer");
+    this.baseMapLayerField = baseMapLayersModel.newBaseComboBox("baseMapLayer");
     this.baseMapLayerField.setMaximumSize(new Dimension(200, 22));
     ConsumerSelectedItemListener.addItemListener(this.baseMapLayerField, this::setBaseMapLayer);
     if (this.baseMapLayers.getLayerCount() > 0) {

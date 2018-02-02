@@ -20,6 +20,8 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.ParameterNames;
+import com.revolsys.geometry.cs.ParameterValue;
+import com.revolsys.geometry.cs.ParameterValueNumber;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
@@ -77,12 +79,12 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     }
   }
 
-  private double fromDms(final double value) {
+  private ParameterValue fromDms(final double value) {
     final double degrees = Math.floor(value / 10000);
     final double minutes = Math.floor(Math.abs(value) % 10000 / 100);
     final double seconds = Math.abs(value) % 100;
     final double decimal = degrees + minutes / 60 + seconds / 3600;
-    return decimal;
+    return new ParameterValueNumber(decimal);
   }
 
   @Override
@@ -436,13 +438,15 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
             "planimetricReferenceSystem=" + planimetricReferenceSystem
               + " not currently supported for USGS DEM: " + this.resource);
         } else if (3 == planimetricReferenceSystem) {
-          final Map<ParameterName, Double> parameters = new LinkedHashMap<>();
+          final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
           parameters.put(ParameterNames.CENTRAL_MERIDIAN, fromDms(projectionParameters[4]));
           parameters.put(ParameterNames.STANDARD_PARALLEL_1, fromDms(projectionParameters[2]));
           parameters.put(ParameterNames.STANDARD_PARALLEL_2, fromDms(projectionParameters[3]));
           parameters.put(ParameterNames.LATITUDE_OF_ORIGIN, fromDms(projectionParameters[5]));
-          parameters.put(ParameterNames.FALSE_EASTING, projectionParameters[6]);
-          parameters.put(ParameterNames.FALSE_NORTHING, projectionParameters[7]);
+          parameters.put(ParameterNames.FALSE_EASTING,
+            new ParameterValueNumber(projectionParameters[6]));
+          parameters.put(ParameterNames.FALSE_NORTHING,
+            new ParameterValueNumber(projectionParameters[7]));
 
           final CoordinateOperationMethod coordinateOperationMethod = new CoordinateOperationMethod(
             "Albers_Equal_Area");

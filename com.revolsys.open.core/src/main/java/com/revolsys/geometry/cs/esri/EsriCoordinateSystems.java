@@ -4,6 +4,7 @@ import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -14,13 +15,15 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.ParameterValue;
-import com.revolsys.geometry.cs.ParameterValueNumber;
+import com.revolsys.geometry.cs.ParameterValueBigDecimal;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.SingleParameterName;
 import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.VerticalCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
@@ -46,6 +49,9 @@ public class EsriCoordinateSystems {
       coordinateSystem = getGeographicCoordinateSystem(crsId);
       if (coordinateSystem == null) {
         coordinateSystem = getProjectedCoordinateSystem(crsId);
+        if (coordinateSystem == null) {
+          coordinateSystem = getVerticalCoordinateSystem(crsId);
+        }
       }
     }
     return (C)coordinateSystem;
@@ -181,15 +187,7 @@ public class EsriCoordinateSystems {
 
           final int geographicCoordinateSystemId = reader.getInt();
           final String projectionName = reader.getStringUtf8ByteCount();
-          final byte parameterCount = reader.getByte();
-          final Map<ParameterName, ParameterValue> parameters = new HashMap<>();
-          for (int i = 0; i < parameterCount; i++) {
-            final String name = reader.getStringUtf8ByteCount();
-            final double value = reader.getDouble();
-            final ParameterName parameterName = new SingleParameterName(name);
-            final ParameterValue parameterValue = new ParameterValueNumber(value);
-            parameters.put(parameterName, parameterValue);
-          }
+          final Map<ParameterName, ParameterValue> parameters = readParameters(reader);
           final String unitName = reader.getStringUtf8ByteCount();
           final double conversionFactor = reader.getDouble();
 
@@ -220,14 +218,58 @@ public class EsriCoordinateSystems {
     return coordinateSystem;
   }
 
+  public static VerticalCoordinateSystem getVerticalCoordinateSystem(final int id) {
+    VerticalCoordinateSystem coordinateSystem = (VerticalCoordinateSystem)COORDINATE_SYSTEM_BY_ID
+      .get(id);
+    if (coordinateSystem == null) {
+      try (
+        final ChannelReader reader = ChannelReader
+          .newChannelReader("classpath:CoordinateSystems/esri/Vertical.cs")) {
+        while (true) {
+          final int coordinateSystemId = reader.getInt();
+          final String csName = reader.getStringUtf8ByteCount();
+          final String datumName = reader.getStringUtf8ByteCount();
+          final Map<ParameterName, ParameterValue> parameters = readParameters(reader);
+          final String linearUnitName = reader.getStringUtf8ByteCount();
+          final double conversionFactor = reader.getDouble();
+
+          if (id == coordinateSystemId) {
+            final VerticalDatum verticalDatum = new VerticalDatum(null, datumName, 0);
+
+            LinearUnit linearUnit = LINEAR_UNITS_BY_NAME.get(linearUnitName);
+            if (linearUnit == null) {
+              linearUnit = new LinearUnit(linearUnitName, conversionFactor, null);
+              LINEAR_UNITS_BY_NAME.put(linearUnitName, linearUnit);
+            }
+
+            final Authority authority = new BaseAuthority("ESRI", coordinateSystemId);
+            coordinateSystem = new VerticalCoordinateSystem(authority, csName, verticalDatum,
+              parameters, linearUnit, Collections.emptyList());
+            COORDINATE_SYSTEM_BY_ID.put(id, coordinateSystem);
+            return coordinateSystem;
+          }
+        }
+      } catch (final WrappedException e) {
+        if (Exceptions.isException(e, EOFException.class)) {
+          return null;
+        } else {
+          Logs.error("Cannot load coordinate system=" + id, e);
+          throw e;
+        }
+      }
+    }
+    return coordinateSystem;
+  }
+
   /**
    * Read the coordinate system from the resource. If it is a standard one then
    *  {@link EpsgCoordinateSystems#getCoordinateSystem(int)} will be used to return that
    *  coordinate system.
    */
-  public static CoordinateSystem readCoordinateSystem(final Resource resource) {
+  @SuppressWarnings("unchecked")
+  public static <C extends CoordinateSystem> C readCoordinateSystem(final Resource resource) {
     final CoordinateSystem coordinateSystem = WktCsParser.read(resource);
-    return readCoordinateSystemPost(coordinateSystem);
+    return (C)readCoordinateSystemPost(coordinateSystem);
   }
 
   /**
@@ -235,9 +277,10 @@ public class EsriCoordinateSystems {
    *  {@link EpsgCoordinateSystems#getCoordinateSystem(int)} will be used to return that
    *  coordinate system.
    */
-  public static CoordinateSystem readCoordinateSystem(final String wkt) {
+  @SuppressWarnings("unchecked")
+  public static <C extends CoordinateSystem> C readCoordinateSystem(final String wkt) {
     final CoordinateSystem coordinateSystem = WktCsParser.read(wkt);
-    return readCoordinateSystemPost(coordinateSystem);
+    return (C)readCoordinateSystemPost(coordinateSystem);
   }
 
   private static CoordinateSystem readCoordinateSystemPost(
@@ -262,6 +305,19 @@ public class EsriCoordinateSystems {
       }
       return coordinateSystem;
     }
+  }
+
+  private static Map<ParameterName, ParameterValue> readParameters(final ChannelReader reader) {
+    final byte parameterCount = reader.getByte();
+    final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
+    for (int i = 0; i < parameterCount; i++) {
+      final String name = reader.getStringUtf8ByteCount();
+      final String value = reader.getStringUtf8ByteCount();
+      final ParameterName parameterName = new SingleParameterName(name);
+      final ParameterValue parameterValue = new ParameterValueBigDecimal(value);
+      parameters.put(parameterName, parameterValue);
+    }
+    return parameters;
   }
 
 }

@@ -4,11 +4,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.function.Consumer;
 
-import com.revolsys.swing.field.ComboBox;
+import javax.swing.JComboBox;
+
 import com.revolsys.swing.parallel.Invoke;
 
 public class ConsumerSelectedItemListener<T> implements ItemListener {
-  public static <V> void addItemListener(final ComboBox<V> comboBox, final Consumer<V> consumer) {
+  public static <V> void addItemListener(final JComboBox<V> comboBox, final Consumer<V> consumer) {
     final ItemListener listener = new ConsumerSelectedItemListener<>(consumer);
     comboBox.addItemListener(listener);
   }
