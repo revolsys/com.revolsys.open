@@ -32,6 +32,8 @@ public class Spheroid implements Serializable {
 
   private final double semiMinorAxisSq;
 
+  private final double flattening;
+
   public Spheroid(final String name, final double semiMajorAxis, final double inverseFlattening,
     final Authority authority) {
     this(name, semiMajorAxis, Double.NaN, inverseFlattening, authority, false);
@@ -49,17 +51,191 @@ public class Spheroid implements Serializable {
     if (Double.isNaN(inverseFlattening)) {
       this.inverseFlattening = semiMajorAxis / (semiMajorAxis - this.semiMinorAxis);
     }
-    final double f = 1.0 / this.inverseFlattening;
+    this.flattening = 1.0 / this.inverseFlattening;
 
     if (Double.isNaN(semiMinorAxis)) {
-      this.semiMinorAxis = semiMajorAxis - semiMajorAxis * f;
+      this.semiMinorAxis = semiMajorAxis - semiMajorAxis * this.flattening;
     }
     this.semiMajorAxisSq = semiMajorAxis * semiMajorAxis;
     this.semiMinorAxisSq = this.semiMinorAxis * this.semiMinorAxis;
     // eccentricitySquared = 1.0 - b2 / a2;
 
-    this.eccentricitySquared = f + f - f * f;
+    this.eccentricitySquared = this.flattening + this.flattening
+      - this.flattening * this.flattening;
     this.eccentricity = Math.sqrt(this.eccentricitySquared);
+  }
+
+  public double azimuthBackwards(double lon1, double lat1, double lon2, double lat2) {
+    final double f = this.flattening;
+
+    lon1 = Math.toRadians(lon1);
+    lon2 = Math.toRadians(lon2);
+
+    lat1 = Math.toRadians(lat1);
+    lat2 = Math.toRadians(lat2);
+
+    final double deltaLon = lon2 - lon1;
+    final double tanU1 = (1 - f) * Math.tan(lat1), cosU1 = 1 / Math.sqrt(1 + tanU1 * tanU1),
+        sinU1 = tanU1 * cosU1;
+    final double tanU2 = (1 - f) * Math.tan(lat2), cosU2 = 1 / Math.sqrt(1 + tanU2 * tanU2),
+        sinU2 = tanU2 * cosU2;
+
+    double lon = deltaLon;
+    double lastLon;
+    double iterationLimit = 100;
+    double cosSqAlpha;
+    double sinSigma;
+    double cos2SigmaM;
+    double sigma;
+    double cosSigma;
+    double sinlon;
+    double coslon;
+
+    do {
+      sinlon = Math.sin(lon);
+      coslon = Math.cos(lon);
+      final double sinSqSigma = cosU2 * sinlon * (cosU2 * sinlon)
+        + (cosU1 * sinU2 - sinU1 * cosU2 * coslon) * (cosU1 * sinU2 - sinU1 * cosU2 * coslon);
+      sinSigma = Math.sqrt(sinSqSigma);
+      if (sinSigma == 0) { // co-incident points
+        return 0;
+      }
+      cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * coslon;
+      sigma = Math.atan2(sinSigma, cosSigma);
+      final double sinAlpha = cosU1 * cosU2 * sinlon / sinSigma;
+      cosSqAlpha = 1 - sinAlpha * sinAlpha;
+      cos2SigmaM = cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha;
+      if (!Double.isFinite(cos2SigmaM)) {// equatorial line: cosSqAlpha=0 (§6)
+        cos2SigmaM = 0;
+      }
+      final double C = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
+      lastLon = lon;
+      lon = deltaLon + (1 - C) * f * sinAlpha
+        * (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
+    } while (Math.abs(lon - lastLon) > 1e-12 && --iterationLimit > 0);
+    if (iterationLimit == 0) {
+      throw new IllegalStateException("Formula failed to converge");
+    }
+    return Math.atan2(cosU1 * sinlon, -sinU1 * cosU2 + cosU1 * sinU2 * coslon);
+  }
+
+  public double azimuthForwards(double lon1, double lat1, double lon2, double lat2) {
+    final double f = this.flattening;
+
+    lon1 = Math.toRadians(lon1);
+    lon2 = Math.toRadians(lon2);
+
+    lat1 = Math.toRadians(lat1);
+    lat2 = Math.toRadians(lat2);
+
+    final double deltaLon = lon2 - lon1;
+    final double tanU1 = (1 - f) * Math.tan(lat1), cosU1 = 1 / Math.sqrt(1 + tanU1 * tanU1),
+        sinU1 = tanU1 * cosU1;
+    final double tanU2 = (1 - f) * Math.tan(lat2), cosU2 = 1 / Math.sqrt(1 + tanU2 * tanU2),
+        sinU2 = tanU2 * cosU2;
+
+    double lon = deltaLon;
+    double lastLon;
+    double iterationLimit = 100;
+    double cosSqAlpha;
+    double sinSigma;
+    double cos2SigmaM;
+    double sigma;
+    double cosSigma;
+    double sinlon;
+    double coslon;
+
+    do {
+      sinlon = Math.sin(lon);
+      coslon = Math.cos(lon);
+      final double sinSqSigma = cosU2 * sinlon * (cosU2 * sinlon)
+        + (cosU1 * sinU2 - sinU1 * cosU2 * coslon) * (cosU1 * sinU2 - sinU1 * cosU2 * coslon);
+      sinSigma = Math.sqrt(sinSqSigma);
+      if (sinSigma == 0) { // co-incident points
+        return 0;
+      }
+      cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * coslon;
+      sigma = Math.atan2(sinSigma, cosSigma);
+      final double sinAlpha = cosU1 * cosU2 * sinlon / sinSigma;
+      cosSqAlpha = 1 - sinAlpha * sinAlpha;
+      cos2SigmaM = cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha;
+      if (!Double.isFinite(cos2SigmaM)) {// equatorial line: cosSqAlpha=0 (§6)
+        cos2SigmaM = 0;
+      }
+      final double C = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
+      lastLon = lon;
+      lon = deltaLon + (1 - C) * f * sinAlpha
+        * (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
+    } while (Math.abs(lon - lastLon) > 1e-12 && --iterationLimit > 0);
+    if (iterationLimit == 0) {
+      throw new IllegalStateException("Formula failed to converge");
+    }
+    return Math.atan2(cosU2 * sinlon, cosU1 * sinU2 - sinU1 * cosU2 * coslon);
+  }
+
+  public double distanceMetres(double lon1, double lat1, double lon2, double lat2) {
+    final double f = this.flattening;
+    final double a = this.semiMajorAxis;
+    final double b = this.semiMinorAxis;
+
+    lon1 = Math.toRadians(lon1);
+    lon2 = Math.toRadians(lon2);
+
+    lat1 = Math.toRadians(lat1);
+    lat2 = Math.toRadians(lat2);
+
+    final double deltaLon = lon2 - lon1;
+    final double tanU1 = (1 - f) * Math.tan(lat1), cosU1 = 1 / Math.sqrt(1 + tanU1 * tanU1),
+        sinU1 = tanU1 * cosU1;
+    final double tanU2 = (1 - f) * Math.tan(lat2), cosU2 = 1 / Math.sqrt(1 + tanU2 * tanU2),
+        sinU2 = tanU2 * cosU2;
+
+    double lon = deltaLon;
+    double lastLon;
+    double iterationLimit = 100;
+    double cosSqAlpha;
+    double sinSigma;
+    double cos2SigmaM;
+    double sigma;
+    double cosSigma;
+    double sinlon;
+    double coslon;
+
+    do {
+      sinlon = Math.sin(lon);
+      coslon = Math.cos(lon);
+      final double sinSqSigma = cosU2 * sinlon * (cosU2 * sinlon)
+        + (cosU1 * sinU2 - sinU1 * cosU2 * coslon) * (cosU1 * sinU2 - sinU1 * cosU2 * coslon);
+      sinSigma = Math.sqrt(sinSqSigma);
+      if (sinSigma == 0) { // co-incident points
+        return 0;
+      }
+      cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * coslon;
+      sigma = Math.atan2(sinSigma, cosSigma);
+      final double sinAlpha = cosU1 * cosU2 * sinlon / sinSigma;
+      cosSqAlpha = 1 - sinAlpha * sinAlpha;
+      cos2SigmaM = cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha;
+      if (!Double.isFinite(cos2SigmaM)) {// equatorial line: cosSqAlpha=0 (§6)
+        cos2SigmaM = 0;
+      }
+      final double C = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
+      lastLon = lon;
+      lon = deltaLon + (1 - C) * f * sinAlpha
+        * (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
+    } while (Math.abs(lon - lastLon) > 1e-12 && --iterationLimit > 0);
+    if (iterationLimit == 0) {
+      throw new IllegalStateException("Formula failed to converge");
+    }
+
+    final double uSq = cosSqAlpha * (a * a - b * b) / (b * b);
+    final double A = 1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)));
+    final double B = uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)));
+    final double deltaSigmaSigma = B * sinSigma
+      * (cos2SigmaM + B / 4 * (cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM) - B / 6 * cos2SigmaM
+        * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2SigmaM * cos2SigmaM)));
+
+    final double s = b * A * (sigma - deltaSigmaSigma);
+    return s;
   }
 
   @Override
