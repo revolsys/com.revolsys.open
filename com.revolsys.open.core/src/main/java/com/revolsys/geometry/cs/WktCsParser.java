@@ -216,20 +216,20 @@ public class WktCsParser {
 
   private GeodeticDatum processDatum(final List<Object> values) {
     final String name = (String)values.get(0);
-    Spheroid spheroid = null;
+    Ellipsoid ellipsoid = null;
     Authority authority = null;
     ToWgs84 toWgs84 = null;
     for (int i = 1; i < values.size(); i++) {
       final Object value = values.get(i);
-      if (value instanceof Spheroid) {
-        spheroid = (Spheroid)value;
+      if (value instanceof Ellipsoid) {
+        ellipsoid = (Ellipsoid)value;
       } else if (value instanceof Authority) {
         authority = (Authority)value;
       } else if (value instanceof ToWgs84) {
         toWgs84 = (ToWgs84)value;
       }
     }
-    return new GeodeticDatum(name, spheroid, toWgs84, authority);
+    return new GeodeticDatum(name, ellipsoid, toWgs84, authority);
   }
 
   private GeographicCoordinateSystem processGeographicCoordinateSystem(final List<Object> values) {
@@ -320,7 +320,7 @@ public class WktCsParser {
     return name;
   }
 
-  private Spheroid processSpheroid(final List<Object> values) {
+  private Ellipsoid processSpheroid(final List<Object> values) {
     final String name = (String)values.get(0);
     final Number semiMajorAxis = (Number)values.get(1);
     final Number inverseFlattening = (Number)values.get(2);
@@ -328,7 +328,7 @@ public class WktCsParser {
     if (values.size() > 3) {
       authority = (Authority)values.get(3);
     }
-    return new Spheroid(name, semiMajorAxis.doubleValue(), inverseFlattening.doubleValue(),
+    return new Ellipsoid(name, semiMajorAxis.doubleValue(), inverseFlattening.doubleValue(),
       authority);
   }
 

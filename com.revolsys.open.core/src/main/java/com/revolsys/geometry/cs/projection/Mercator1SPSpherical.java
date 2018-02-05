@@ -3,7 +3,7 @@ package com.revolsys.geometry.cs.projection;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.math.Angle;
 
@@ -22,11 +22,11 @@ public class Mercator1SPSpherical extends AbstractCoordinatesProjection {
     final GeodeticDatum geodeticDatum = geographicCS.getDatum();
     final double centralMeridian = cs.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
 
-    final Spheroid spheroid = geodeticDatum.getSpheroid();
+    final Ellipsoid ellipsoid = geodeticDatum.getSpheroid();
     this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
-    this.r = spheroid.getSemiMinorAxis();
+    this.r = ellipsoid.getSemiMinorAxis();
 
   }
 

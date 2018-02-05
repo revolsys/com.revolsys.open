@@ -19,7 +19,7 @@ import com.revolsys.geometry.cs.ParameterValueBigDecimal;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.SingleParameterName;
-import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.VerticalCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
@@ -116,12 +116,12 @@ public class EsriCoordinateSystems {
           final double conversionFactor = reader.getDouble();
 
           if (id == coordinateSystemId) {
-            final Spheroid spheroid = new Spheroid(spheroidName, semiMajorAxis, inverseFlattening,
+            final Ellipsoid ellipsoid = new Ellipsoid(spheroidName, semiMajorAxis, inverseFlattening,
               null);
             final PrimeMeridian primeMeridian = new PrimeMeridian(primeMeridianName, longitude,
               null);
             final GeodeticDatum geodeticDatum = new GeodeticDatum(null, datumName, null, false,
-              spheroid, primeMeridian);
+              ellipsoid, primeMeridian);
 
             AngularUnit angularUnit = ANGULAR_UNITS_BY_NAME.get(angularUnitName);
             if (angularUnit == null) {

@@ -34,7 +34,7 @@ import com.revolsys.geometry.cs.ParameterValueNumber;
 import com.revolsys.geometry.cs.ParameterValueString;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.VerticalCoordinateSystem;
 import com.revolsys.geometry.cs.datum.Datum;
 import com.revolsys.geometry.cs.datum.EngineeringDatum;
@@ -700,7 +700,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
   }
 
   private static void loadDatum() {
-    final IntHashMap<Spheroid> ellipsoids = loadEllipsoid();
+    final IntHashMap<Ellipsoid> ellipsoids = loadEllipsoid();
 
     try (
       ChannelReader reader = newChannelReader("datum")) {
@@ -709,7 +709,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
         final int id = reader.getInt();
         final String name = reader.getStringUtf8ByteCount();
         final int datumType = reader.getByte();
-        final Spheroid spheroid = readCode(reader, ellipsoids);
+        final Ellipsoid ellipsoid = readCode(reader, ellipsoids);
         final PrimeMeridian primeMeridian = readCode(reader, PRIME_MERIDIAN_BY_ID);
         final Area area = readCode(reader, AREA_BY_ID);
 
@@ -718,7 +718,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
         Datum datum;
         if (datumType == 0) {
-          datum = new GeodeticDatum(authority, name, area, deprecated, spheroid, primeMeridian);
+          datum = new GeodeticDatum(authority, name, area, deprecated, ellipsoid, primeMeridian);
         } else if (datumType == 1) {
           datum = new VerticalDatum(authority, name, area, deprecated);
         } else if (datumType == 2) {
@@ -738,8 +738,8 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  private static IntHashMap<Spheroid> loadEllipsoid() {
-    final IntHashMap<Spheroid> ellipsoids = new IntHashMap<>();
+  private static IntHashMap<Ellipsoid> loadEllipsoid() {
+    final IntHashMap<Ellipsoid> ellipsoids = new IntHashMap<>();
     try (
       ChannelReader reader = newChannelReader("ellipsoid")) {
       while (true) {
@@ -753,9 +753,9 @@ public final class EpsgCoordinateSystems implements CodeTable {
         final int ellipsoidShape = reader.getByte();
         final boolean deprecated = readBoolean(reader);
         final EpsgAuthority authority = new EpsgAuthority(id);
-        final Spheroid spheroid = new Spheroid(name, semiMajorAxis, semiMinorAxis,
+        final Ellipsoid ellipsoid = new Ellipsoid(name, semiMajorAxis, semiMinorAxis,
           inverseFlattening, authority, deprecated);
-        ellipsoids.put(id, spheroid);
+        ellipsoids.put(id, ellipsoid);
       }
     } catch (final NoSuchResourceException e) {
     } catch (final WrappedException e) {

@@ -13,7 +13,7 @@ import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.ParameterValue;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.VerticalCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
@@ -49,7 +49,7 @@ public class EsriCoordinateSystemsLoader {
         Maps.addToMap(Maps::newTree, csBymd5, new ByteArray(digest), id, coordinateSystem);
 
         final GeodeticDatum datum = coordinateSystem.getDatum();
-        final Spheroid ellipsoid = datum.getSpheroid();
+        final Ellipsoid ellipsoid = datum.getSpheroid();
         final PrimeMeridian primeMeridian = coordinateSystem.getPrimeMeridian();
         final AngularUnit angularUnit = coordinateSystem.getAngularUnit();
 

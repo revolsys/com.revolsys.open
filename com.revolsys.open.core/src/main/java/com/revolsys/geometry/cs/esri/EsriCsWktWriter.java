@@ -14,7 +14,7 @@ import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.ParameterValue;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.VerticalCoordinateSystem;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.datum.VerticalDatum;
@@ -95,11 +95,11 @@ public class EsriCsWktWriter {
     final int indentLevel) throws IOException {
     out.write("DATUM[");
     write(out, geodeticDatum.getName(), incrementIndent(indentLevel));
-    final Spheroid spheroid = geodeticDatum.getSpheroid();
-    if (spheroid != null) {
+    final Ellipsoid ellipsoid = geodeticDatum.getSpheroid();
+    if (ellipsoid != null) {
       out.write(",");
       indent(out, incrementIndent(indentLevel));
-      write(out, spheroid, incrementIndent(indentLevel));
+      write(out, ellipsoid, incrementIndent(indentLevel));
     }
     indent(out, indentLevel);
     out.write(']');
@@ -205,15 +205,15 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  public static void write(final Writer out, final Spheroid spheroid, final int indentLevel)
+  public static void write(final Writer out, final Ellipsoid ellipsoid, final int indentLevel)
     throws IOException {
     out.write("SPHEROID[");
-    write(out, spheroid.getName(), incrementIndent(indentLevel));
+    write(out, ellipsoid.getName(), incrementIndent(indentLevel));
     out.write(',');
-    final double semiMajorAxis = spheroid.getSemiMajorAxis();
+    final double semiMajorAxis = ellipsoid.getSemiMajorAxis();
     write(out, semiMajorAxis, incrementIndent(indentLevel));
     out.write(',');
-    final double inverseFlattening = spheroid.getInverseFlattening();
+    final double inverseFlattening = ellipsoid.getInverseFlattening();
     write(out, inverseFlattening, incrementIndent(indentLevel));
     indent(out, indentLevel);
     out.write(']');

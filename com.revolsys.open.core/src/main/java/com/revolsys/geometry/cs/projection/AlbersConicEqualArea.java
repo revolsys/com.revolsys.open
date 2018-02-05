@@ -3,7 +3,7 @@ package com.revolsys.geometry.cs.projection;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.math.Angle;
 
@@ -100,7 +100,7 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
   private final double semiMajorAxis;
 
   /** The spheriod. */
-  private final Spheroid spheroid;
+  private final Ellipsoid ellipsoid;
 
   /** The false Easting. */
   private final double x0;
@@ -118,7 +118,7 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
     final double centralMeridian = cs.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
     final double latitudeOfProjection = cs
       .getDoubleParameter(NormalizedParameterNames.LATITUDE_OF_ORIGIN);
-    this.spheroid = geodeticDatum.getSpheroid();
+    this.ellipsoid = geodeticDatum.getSpheroid();
     this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
@@ -126,10 +126,10 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
     this.phi1 = Math.toRadians(firstStandardParallel);
     this.phi2 = Math.toRadians(secondStandardParallel);
 
-    this.semiMajorAxis = this.spheroid.getSemiMajorAxis();
+    this.semiMajorAxis = this.ellipsoid.getSemiMajorAxis();
 
-    this.e = this.spheroid.getEccentricity();
-    this.ee = this.spheroid.getEccentricitySquared();
+    this.e = this.ellipsoid.getEccentricity();
+    this.ee = this.ellipsoid.getEccentricitySquared();
 
     final double m1 = m(this.phi1);
     final double m2 = m(this.phi2);

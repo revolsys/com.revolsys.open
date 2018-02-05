@@ -5,27 +5,27 @@ import java.security.MessageDigest;
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.PrimeMeridian;
-import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.ToWgs84;
 
 public class GeodeticDatum extends Datum {
   private PrimeMeridian primeMeridian;
 
-  private final Spheroid spheroid;
+  private final Ellipsoid ellipsoid;
 
   private ToWgs84 toWgs84;
 
   public GeodeticDatum(final Authority authority, final String name, final Area area,
-    final boolean deprecated, final Spheroid spheroid, final PrimeMeridian primeMeridian) {
+    final boolean deprecated, final Ellipsoid ellipsoid, final PrimeMeridian primeMeridian) {
     super(authority, name, area, deprecated);
-    this.spheroid = spheroid;
+    this.ellipsoid = ellipsoid;
     this.primeMeridian = primeMeridian;
   }
 
-  public GeodeticDatum(final String name, final Spheroid spheroid, final ToWgs84 toWgs84,
+  public GeodeticDatum(final String name, final Ellipsoid ellipsoid, final ToWgs84 toWgs84,
     final Authority authority) {
     super(authority, name, null, false);
-    this.spheroid = spheroid;
+    this.ellipsoid = ellipsoid;
     this.toWgs84 = toWgs84;
   }
 
@@ -37,7 +37,7 @@ public class GeodeticDatum extends Datum {
       return true;
     } else if (object instanceof GeodeticDatum) {
       final GeodeticDatum geodeticDatum = (GeodeticDatum)object;
-      if (this.spheroid.equals(geodeticDatum.spheroid)) {
+      if (this.ellipsoid.equals(geodeticDatum.ellipsoid)) {
         return false;
       } else {
         return true;
@@ -51,7 +51,7 @@ public class GeodeticDatum extends Datum {
       return false;
     } else if (!this.primeMeridian.equalsExact(this.primeMeridian)) {
       return false;
-    } else if (!this.spheroid.equalsExact(geodeticDatum.spheroid)) {
+    } else if (!this.ellipsoid.equalsExact(geodeticDatum.ellipsoid)) {
       return false;
     } else {
       return true;
@@ -62,8 +62,8 @@ public class GeodeticDatum extends Datum {
     return this.primeMeridian;
   }
 
-  public Spheroid getSpheroid() {
-    return this.spheroid;
+  public Ellipsoid getSpheroid() {
+    return this.ellipsoid;
   }
 
   public ToWgs84 getToWgs84() {
@@ -72,14 +72,14 @@ public class GeodeticDatum extends Datum {
 
   @Override
   public int hashCode() {
-    if (this.spheroid != null) {
-      return this.spheroid.hashCode();
+    if (this.ellipsoid != null) {
+      return this.ellipsoid.hashCode();
     } else {
       return 1;
     }
   }
 
   public void updateDigest(final MessageDigest digest) {
-    this.spheroid.updateDigest(digest);
+    this.ellipsoid.updateDigest(digest);
   }
 }

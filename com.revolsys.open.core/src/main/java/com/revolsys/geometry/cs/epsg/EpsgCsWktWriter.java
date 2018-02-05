@@ -10,7 +10,7 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
@@ -63,9 +63,9 @@ public class EpsgCsWktWriter {
     if (geodeticDatum != null) {
       out.print(",DATUM[");
       write(out, geodeticDatum.getName());
-      final Spheroid spheroid = geodeticDatum.getSpheroid();
-      if (spheroid != null) {
-        write(out, spheroid);
+      final Ellipsoid ellipsoid = geodeticDatum.getSpheroid();
+      if (ellipsoid != null) {
+        write(out, ellipsoid);
       }
       final Authority authority = geodeticDatum.getAuthority();
       write(out, authority);
@@ -160,17 +160,17 @@ public class EpsgCsWktWriter {
     }
   }
 
-  public static void write(final PrintWriter out, final Spheroid spheroid) {
-    if (spheroid != null) {
+  public static void write(final PrintWriter out, final Ellipsoid ellipsoid) {
+    if (ellipsoid != null) {
       out.print(",SPHEROID[");
-      write(out, spheroid.getName());
+      write(out, ellipsoid.getName());
       out.write(',');
-      final double semiMajorAxis = spheroid.getSemiMajorAxis();
+      final double semiMajorAxis = ellipsoid.getSemiMajorAxis();
       write(out, semiMajorAxis);
       out.print(',');
-      final double inverseFlattening = spheroid.getInverseFlattening();
+      final double inverseFlattening = ellipsoid.getInverseFlattening();
       write(out, inverseFlattening);
-      final Authority authority = spheroid.getAuthority();
+      final Authority authority = ellipsoid.getAuthority();
       write(out, authority);
       out.write(']');
     }

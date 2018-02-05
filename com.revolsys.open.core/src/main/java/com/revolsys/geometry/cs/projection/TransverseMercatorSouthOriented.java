@@ -3,7 +3,7 @@ package com.revolsys.geometry.cs.projection;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 
 public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjection {
@@ -34,7 +34,7 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
 
   private final double lambda0; // central meridian
 
-  private final Spheroid spheroid;
+  private final Ellipsoid ellipsoid;
 
   private final double x0;
 
@@ -46,16 +46,16 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
     final double centralMeridian = cs.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
     final double scaleFactor = cs.getDoubleParameter(NormalizedParameterNames.SCALE_FACTOR);
 
-    this.spheroid = geodeticDatum.getSpheroid();
+    this.ellipsoid = geodeticDatum.getSpheroid();
     this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
-    this.a = this.spheroid.getSemiMajorAxis();
+    this.a = this.ellipsoid.getSemiMajorAxis();
     this.k0 = scaleFactor;
     this.ep2 = (this.a * this.a
-      - this.spheroid.getSemiMinorAxis() * this.spheroid.getSemiMinorAxis())
-      / (this.spheroid.getSemiMinorAxis() * this.spheroid.getSemiMinorAxis());
-    this.eSq = this.spheroid.getEccentricitySquared();
+      - this.ellipsoid.getSemiMinorAxis() * this.ellipsoid.getSemiMinorAxis())
+      / (this.ellipsoid.getSemiMinorAxis() * this.ellipsoid.getSemiMinorAxis());
+    this.eSq = this.ellipsoid.getEccentricitySquared();
     this.e4 = this.eSq * this.eSq;
     this.e6 = this.e4 * this.eSq;
     this.e8 = this.e4 * this.e4;
@@ -128,8 +128,8 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
     final double phi = Math.toRadians(lat);
 
     // ep2 = the second eccentricity squared.
-    // N = the radius of curvature of the spheroid in the prime vertical plane
-    final double n = this.spheroid.primeVerticalRadiusOfCurvature(phi);
+    // N = the radius of curvature of the ellipsoid in the prime vertical plane
+    final double n = this.ellipsoid.primeVerticalRadiusOfCurvature(phi);
     final double n2 = this.ep2 * Math.pow(Math.cos(phi), 2.0);
     final double n4 = n2 * n2;
     final double n6 = n4 * n2;

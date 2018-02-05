@@ -7,7 +7,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.util.Md5;
 import com.revolsys.util.number.Doubles;
 
-public class Spheroid implements Serializable {
+public class Ellipsoid implements Serializable {
   private static final long serialVersionUID = -8349864136575195872L;
 
   private final Authority authority;
@@ -34,12 +34,12 @@ public class Spheroid implements Serializable {
 
   private final double flattening;
 
-  public Spheroid(final String name, final double semiMajorAxis, final double inverseFlattening,
+  public Ellipsoid(final String name, final double semiMajorAxis, final double inverseFlattening,
     final Authority authority) {
     this(name, semiMajorAxis, Double.NaN, inverseFlattening, authority, false);
   }
 
-  public Spheroid(final String name, final double semiMajorAxis, final double semiMinorAxis,
+  public Ellipsoid(final String name, final double semiMajorAxis, final double semiMinorAxis,
     final double inverseFlattening, final Authority authority, final boolean deprecated) {
     this.name = name;
     this.semiMajorAxis = semiMajorAxis;
@@ -173,6 +173,15 @@ public class Spheroid implements Serializable {
     return Math.atan2(cosU2 * sinlon, cosU1 * sinU2 - sinU1 * cosU2 * coslon);
   }
 
+  /**
+   * https://www.movable-type.co.uk/scripts/latlong-vincenty.html
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param lon1
+   * @param lat1
+   * @param lon2
+   * @param lat2
+   * @return
+   */
   public double distanceMetres(double lon1, double lat1, double lon2, double lat2) {
     final double f = this.flattening;
     final double a = this.semiMajorAxis;
@@ -245,12 +254,12 @@ public class Spheroid implements Serializable {
     }
     if (object == this) {
       return true;
-    } else if (object instanceof Spheroid) {
-      final Spheroid spheroid = (Spheroid)object;
+    } else if (object instanceof Ellipsoid) {
+      final Ellipsoid ellipsoid = (Ellipsoid)object;
       if (Doubles.makePrecise(1000000.0, this.inverseFlattening) != Doubles.makePrecise(1000000.0,
-        spheroid.inverseFlattening)) {
+        ellipsoid.inverseFlattening)) {
         return false;
-      } else if (this.semiMajorAxis != spheroid.semiMajorAxis) {
+      } else if (this.semiMajorAxis != ellipsoid.semiMajorAxis) {
         return false;
       }
       return true;
@@ -260,18 +269,18 @@ public class Spheroid implements Serializable {
 
   }
 
-  public boolean equalsExact(final Spheroid spheroid) {
-    if (!DataType.equal(this.authority, spheroid.authority)) {
+  public boolean equalsExact(final Ellipsoid ellipsoid) {
+    if (!DataType.equal(this.authority, ellipsoid.authority)) {
       return false;
       // } else if (deprecated != spheroid.deprecated) {
       // return false;
-    } else if (this.inverseFlattening != spheroid.inverseFlattening) {
+    } else if (this.inverseFlattening != ellipsoid.inverseFlattening) {
       return false;
       // } else if (!Equals.equal(name, spheroid.name)) {
       // return false;
-    } else if (this.semiMajorAxis != spheroid.semiMajorAxis) {
+    } else if (this.semiMajorAxis != ellipsoid.semiMajorAxis) {
       return false;
-    } else if (this.semiMinorAxis != spheroid.semiMinorAxis) {
+    } else if (this.semiMinorAxis != ellipsoid.semiMinorAxis) {
       return false;
     } else {
       return true;

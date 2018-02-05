@@ -3,7 +3,7 @@ package com.revolsys.geometry.cs.projection;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Spheroid;
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.math.Angle;
 
@@ -37,7 +37,7 @@ public class LambertConicConformal1SP extends AbstractCoordinatesProjection {
     final double centralMeridian = cs.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
     this.scaleFactor = cs.getDoubleParameter(NormalizedParameterNames.SCALE_FACTOR);
 
-    final Spheroid spheroid = geodeticDatum.getSpheroid();
+    final Ellipsoid ellipsoid = geodeticDatum.getSpheroid();
     this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
 
@@ -45,8 +45,8 @@ public class LambertConicConformal1SP extends AbstractCoordinatesProjection {
 
     final double phi0 = Math.toRadians(latitudeOfProjection);
 
-    this.a = spheroid.getSemiMajorAxis();
-    this.e = spheroid.getEccentricity();
+    this.a = ellipsoid.getSemiMajorAxis();
+    this.e = ellipsoid.getEccentricity();
     this.ee = this.e * this.e;
 
     final double t0 = t(phi0);
