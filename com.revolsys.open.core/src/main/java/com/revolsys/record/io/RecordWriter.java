@@ -107,4 +107,10 @@ public interface RecordWriter extends Writer<Record> {
     final Record record = newRecord(values);
     write(record);
   }
+
+  default void writeAll(final Iterable<? extends Record> records) {
+    for (final Record record : records) {
+      write(record);
+    }
+  }
 }

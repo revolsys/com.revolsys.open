@@ -29,18 +29,20 @@ public class WktCsParser {
       return null;
     } else {
       final Resource projResource = resource.newResourceChangeExtension("prj");
-      try {
-        final String wkt = projResource.contentsAsString();
-        return read(wkt);
-      } catch (final WrappedException e) {
-        final Throwable cause = e.getCause();
-        if (cause instanceof FileNotFoundException) {
-        } else if (cause instanceof FileSystemException) {
-        } else {
+      if (projResource != null) {
+        try {
+          final String wkt = projResource.contentsAsString();
+          return read(wkt);
+        } catch (final WrappedException e) {
+          final Throwable cause = e.getCause();
+          if (cause instanceof FileNotFoundException) {
+          } else if (cause instanceof FileSystemException) {
+          } else {
+            Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
+          }
+        } catch (final Exception e) {
           Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
         }
-      } catch (final Exception e) {
-        Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
       }
     }
     return null;

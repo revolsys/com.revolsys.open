@@ -477,6 +477,10 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     }
   }
 
+  public void forEachObject(final Consumer<T> action) {
+    forEachEdge(edge -> action.accept(edge.getObject()));
+  }
+
   public int getAxisCount() {
     return this.geometryFactory.getAxisCount();
   }

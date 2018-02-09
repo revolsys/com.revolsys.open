@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Window;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -26,7 +24,7 @@ import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.swing.tree.node.layer.LayerRendererTreeNode;
 import com.revolsys.util.Property;
 
-public class LayerStylePanel extends ValueField implements MouseListener, PropertyChangeListener {
+public class LayerStylePanel extends ValueField implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -57,7 +55,6 @@ public class LayerStylePanel extends ValueField implements MouseListener, Proper
     this.tree.setRootVisible(false);
     final TreePath rendererPath = this.rootNode.getTreePath();
     this.tree.setSelectionPath(rendererPath);
-    this.tree.addMouseListener(this);
     setEditStylePanel(this.rootRenderer);
 
     this.editStyleContainer.setOpaque(false);
@@ -74,43 +71,18 @@ public class LayerStylePanel extends ValueField implements MouseListener, Proper
     splitPane.setDividerLocation(200);
     setPreferredSize(new Dimension(810, 600));
     add(splitPane, BorderLayout.CENTER);
-  }
-
-  @Override
-  public void mouseClicked(final MouseEvent e) {
-    if (e.getClickCount() == 1 && SwingUtil.isLeftButtonAndNoModifiers(e)
-      && e.getClickCount() == 1) {
-      final int x = e.getX();
-      final int y = e.getY();
-      final TreePath path = this.tree.getPathForLocation(x, y);
-      if (path != null) {
-        final Object node = path.getLastPathComponent();
-        if (node instanceof LayerRendererTreeNode) {
-          final LayerRendererTreeNode rendererNode = (LayerRendererTreeNode)node;
-          if (rendererNode != this.currentNode) {
-            final LayerRenderer<?> renderer = rendererNode.getRenderer();
-            setEditStylePanel(renderer);
-            this.currentNode = rendererNode;
-          }
+    this.tree.addTreeSelectionListener(e -> {
+      final TreePath path = e.getPath();
+      final Object node = path.getLastPathComponent();
+      if (node instanceof LayerRendererTreeNode) {
+        final LayerRendererTreeNode rendererNode = (LayerRendererTreeNode)node;
+        if (rendererNode != this.currentNode) {
+          final LayerRenderer<?> renderer = rendererNode.getRenderer();
+          setEditStylePanel(renderer);
+          this.currentNode = rendererNode;
         }
       }
-    }
-  }
-
-  @Override
-  public void mouseEntered(final MouseEvent e) {
-  }
-
-  @Override
-  public void mouseExited(final MouseEvent e) {
-  }
-
-  @Override
-  public void mousePressed(final MouseEvent e) {
-  }
-
-  @Override
-  public void mouseReleased(final MouseEvent e) {
+    });
   }
 
   @SuppressWarnings("unchecked")
