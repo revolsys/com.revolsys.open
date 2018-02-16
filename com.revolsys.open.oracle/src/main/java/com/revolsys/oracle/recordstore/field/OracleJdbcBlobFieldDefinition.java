@@ -23,7 +23,7 @@ public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record object, boolean internStrings) throws SQLException {
     final Blob value = resultSet.getBlob(columnIndex);
     object.setValue(getIndex(), value);
     return columnIndex + 1;

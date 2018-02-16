@@ -27,9 +27,9 @@ public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+    final Record record, final boolean internStrings) throws SQLException {
     String value = resultSet.getString(columnIndex);
-    if (this.intern) {
+    if (this.intern || internStrings) {
       value = value.intern();
     }
     setValue(record, value);

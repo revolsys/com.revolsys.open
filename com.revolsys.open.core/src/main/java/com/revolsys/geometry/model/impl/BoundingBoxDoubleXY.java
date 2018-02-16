@@ -233,8 +233,7 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
   public boolean covers(final double minX, final double maxX, final double minY,
     final double maxY) {
-    return RectangleUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX,
-      maxY);
+    return RectangleUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX, maxY);
   }
 
   @Override
@@ -434,6 +433,14 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
   protected void setMinY(final double minY) {
     this.minY = minY;
+  }
+
+  @Override
+  public RectangleXY toRectangle() {
+    final double width = getWidth();
+    final double height = getHeight();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.newRectangle(this.minX, this.minY, width, height);
   }
 
   @Override

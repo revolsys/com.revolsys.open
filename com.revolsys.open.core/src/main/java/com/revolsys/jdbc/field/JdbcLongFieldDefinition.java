@@ -22,7 +22,7 @@ public class JdbcLongFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+    final Record record, boolean internStrings) throws SQLException {
     final long longValue = resultSet.getLong(columnIndex);
     if (!resultSet.wasNull()) {
       setValue(record, Long.valueOf(longValue));

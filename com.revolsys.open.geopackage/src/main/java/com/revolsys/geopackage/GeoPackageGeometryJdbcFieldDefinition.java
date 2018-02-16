@@ -312,7 +312,7 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record object, boolean internStrings) throws SQLException {
     final Object databaseValue = resultSet.getObject(columnIndex);
     final Object value = toJava(databaseValue);
     object.setValue(getIndex(), value);

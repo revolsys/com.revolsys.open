@@ -36,4 +36,11 @@ public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
     final double maxY) {
     return new BoundingBoxDoubleXYGeometryFactory(this.geometryFactory, minX, minY, maxX, maxY);
   }
+
+  @Override
+  public RectangleXY toRectangle() {
+    final double width = getWidth();
+    final double height = getHeight();
+    return this.geometryFactory.newRectangle(this.minX, this.minY, width, height);
+  }
 }

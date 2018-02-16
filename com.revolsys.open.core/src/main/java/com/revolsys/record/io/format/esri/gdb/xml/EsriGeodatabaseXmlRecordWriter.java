@@ -95,7 +95,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
       }
     }
     if (this.recordDefinition.getField("OBJECTID") == null) {
-      final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(DataTypes.INTEGER);
+      final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(DataTypes.INT);
       fieldType.writeValue(this.out, this.objectId++);
     }
 

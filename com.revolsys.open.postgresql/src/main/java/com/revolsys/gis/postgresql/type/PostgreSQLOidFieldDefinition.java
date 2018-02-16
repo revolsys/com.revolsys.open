@@ -24,7 +24,7 @@ public class PostgreSQLOidFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+    final Record record, boolean internStrings) throws SQLException {
     Object value = resultSet.getObject(columnIndex);
     if (value instanceof PostgreSQLTidWrapper) {
       final PostgreSQLTidWrapper wrapper = (PostgreSQLTidWrapper)value;

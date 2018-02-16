@@ -2,7 +2,6 @@ package com.revolsys.record.io.format.csv;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.Path;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
@@ -11,7 +10,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
@@ -29,9 +27,9 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private boolean paused = false;
 
-  public CsvRecordWriter(final RecordDefinition recordDefinition, final Path path,
+  public CsvRecordWriter(final RecordDefinition recordDefinition, final Object target,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
-    this(recordDefinition, new PathResource(path), fieldSeparator, useQuotes, ewkt);
+    this(recordDefinition, Resource.getResource(target), fieldSeparator, useQuotes, ewkt);
   }
 
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Resource resource,

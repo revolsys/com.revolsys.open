@@ -114,7 +114,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record object, boolean internStrings) throws SQLException {
     final int geometryType = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
       final int numPoints = resultSet.getInt(columnIndex + 1);

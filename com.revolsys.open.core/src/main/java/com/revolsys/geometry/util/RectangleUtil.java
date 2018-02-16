@@ -8,48 +8,20 @@ import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Consumer6Double;
 
 public class RectangleUtil {
-  /**
-   * The bitmask that indicates that a point lies below
-   * this <code>Rectangle2D</code>.
-   * @since 1.2
-   */
-  public static final int OUT_BOTTOM = 4; // 0100 Wikipedia value, others have different bit orders
-
-  /**
-   * The bitmask that indicates that a point lies to the left of
-   * this <code>Rectangle2D</code>.
-   * @since 1.2
-   */
-  public static final int OUT_LEFT = 1; // 0001 Wikipedia value, others have different bit orders
-
-  /**
-   * The bitmask that indicates that a point lies to the right of
-   * this <code>Rectangle2D</code>.
-   * @since 1.2
-   */
-  public static final int OUT_RIGHT = 2; // 0010 Wikipedia value, others have different bit orders
-
-  /**
-   * The bitmask that indicates that a point lies above
-   * this <code>Rectangle2D</code>.
-   * @since 1.2
-   */
-  public static final int OUT_TOP = 8; // 1000 Wikipedia value, others have different bit orders
-
   // https://en.wikipedia.org/wiki/Cohen–Sutherland_algorithm
   public static void clipLine(final double minX, final double minY, final double maxX,
     final double maxY, double lineX1, double lineY1, double lineX2, double lineY2,
     final Consumer4Double action) {
     // compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
-    int outcode1 = getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
-    int outcode2 = getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
+    int outcode1 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
+    int outcode2 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
     boolean accept = false;
 
     while (!accept) {
       if ((outcode1 | outcode2) == 0) {
         // Bitwise OR is 0. Trivially accept and get out of loop
         accept = true;
-      } else if ((outcode1 & outcode2) == 0) {
+      } else if ((outcode1 & outcode2) != 0) {
         // Bitwise AND is not 0. (implies both end points are in the same region outside the
         // window). Reject and get out of loop
         return;
@@ -60,7 +32,7 @@ public class RectangleUtil {
         double y;
 
         // At least one endpoint is outside the clip rectangle; pick it.
-        final int outcodeOut = outcode1 == 0 ? outcode1 : outcode2;
+        final int outcodeOut = outcode1 != 0 ? outcode1 : outcode2;
 
         // Now find the intersection point;
         // use formulas:
@@ -69,22 +41,22 @@ public class RectangleUtil {
         // y = y0 + slope * (xm - x0), where xm is xmin or xmax
         final double deltaY = lineY2 - lineY1;
         final double deltaX = lineX2 - lineX1;
-        if ((outcodeOut & OUT_TOP) != 0) { // point is above the clip rectangle
+        if (OutCode.isTop(outcodeOut)) { // point is above the clip rectangle
           final double ratio = (maxY - lineY1) / deltaY;
           x = lineX1 + deltaX * ratio;
           y = maxY;
-        } else if ((outcodeOut & OUT_BOTTOM) != 0) { // point is below the clip rectangle
+        } else if (OutCode.isBottom(outcodeOut)) { // point is below the clip rectangle
           final double ratio = (minY - lineY1) / deltaY;
           x = lineX2 + deltaX * ratio;
           y = minY;
-        } else if ((outcodeOut & OUT_RIGHT) != 0) { // point is to the right of clip rectangle
+        } else if (OutCode.isRight(outcodeOut)) { // point is to the right of clip
           final double ratio = (maxX - lineX1) / deltaX;
-          y = lineY1 + deltaY * ratio;
           x = maxX;
-        } else if ((outcodeOut & OUT_LEFT) != 0) { // point is to the left of clip rectangle
-          final double ratio = (minX - lineX1) / deltaX;
           y = lineY1 + deltaY * ratio;
+        } else if (OutCode.isLeft(outcodeOut)) { // point is to the left of clip rectangle
+          final double ratio = (minX - lineX1) / deltaX;
           x = minX;
+          y = lineY1 + deltaY * ratio;
         } else {
           throw new IllegalStateException("Cannot clip as both points are inside the rectangle");
         }
@@ -94,11 +66,11 @@ public class RectangleUtil {
         if (outcodeOut == outcode1) {
           lineX1 = x;
           lineY1 = y;
-          outcode1 = getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
+          outcode1 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
         } else {
           lineX2 = x;
           lineY2 = y;
-          outcode2 = getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
+          outcode2 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
         }
       }
     }
@@ -112,8 +84,8 @@ public class RectangleUtil {
     final double maxY, double lineX1, double lineY1, double lineZ1, double lineX2, double lineY2,
     double lineZ2, final Consumer6Double action) {
     // compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
-    int outcode1 = getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
-    int outcode2 = getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
+    int outcode1 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
+    int outcode2 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
     boolean accept = false;
 
     while (!accept) {
@@ -141,22 +113,23 @@ public class RectangleUtil {
         // y = y0 + slope * (xm - x0), where xm is xmin or xmax
         final double deltaY = lineY2 - lineY1;
         final double deltaX = lineX2 - lineX1;
-        if ((outcodeOut & OUT_TOP) != 0) { // point is above the clip rectangle
+        if (OutCode.isTop(outcodeOut)) { // point is above the clip rectangle
           final double ratio = (maxY - lineY1) / deltaY;
           x = lineX1 + deltaX * ratio;
           y = maxY;
           z = lineZ1 + deltaX * ratio;
-        } else if ((outcodeOut & OUT_BOTTOM) != 0) { // point is below the clip rectangle
+        } else if (OutCode.isBottom(outcodeOut)) { // point is below the clip rectangle
           final double ratio = (minY - lineY1) / deltaY;
           x = lineX2 + deltaX * ratio;
           y = minY;
           z = lineZ1 + deltaX * ratio;
-        } else if ((outcodeOut & OUT_RIGHT) != 0) { // point is to the right of clip rectangle
+        } else if (OutCode.isRight(outcodeOut)) { // point is to the right of clip
+                                                  // rectangle
           final double ratio = (maxX - lineX1) / deltaX;
           y = lineY1 + deltaY * ratio;
           x = maxX;
           z = lineZ1 + deltaY * ratio;
-        } else if ((outcodeOut & OUT_LEFT) != 0) { // point is to the left of clip rectangle
+        } else if (OutCode.isLeft(outcodeOut)) { // point is to the left of clip rectangle
           final double ratio = (minX - lineX1) / deltaX;
           y = lineY1 + deltaY * ratio;
           x = minX;
@@ -171,12 +144,12 @@ public class RectangleUtil {
           lineX1 = x;
           lineY1 = y;
           lineZ1 = z;
-          outcode1 = getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
+          outcode1 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
         } else {
           lineX2 = x;
           lineY2 = y;
           lineZ2 = z;
-          outcode2 = getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
+          outcode2 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
         }
       }
     }
@@ -338,22 +311,6 @@ public class RectangleUtil {
     }
   }
 
-  public static int getOutcode(final double minX, final double minY, final double maxX,
-    final double maxY, final double x, final double y) {
-    int out = 0;
-    if (x < minX) {
-      out = OUT_LEFT;
-    } else if (x > maxX) {
-      out = OUT_RIGHT;
-    }
-    if (y < minY) {
-      out |= OUT_BOTTOM;
-    } else if (y > maxY) {
-      out |= OUT_TOP;
-    }
-    return out;
-  }
-
   /**
    * Point intersects the bounding box of the line.
    *
@@ -454,15 +411,15 @@ public class RectangleUtil {
   public static boolean intersectsLine(final double minX, final double minY, final double maxX,
     final double maxY, double x1, double y1, final double x2, final double y2) {
     int out1, out2;
-    if ((out2 = getOutcode(minX, minY, maxX, maxY, x2, y2)) == 0) {
+    if ((out2 = OutCode.getOutcode(minX, minY, maxX, maxY, x2, y2)) == 0) {
       return true;
     }
-    while ((out1 = getOutcode(minX, minY, maxX, maxY, x1, y1)) != 0) {
+    while ((out1 = OutCode.getOutcode(minX, minY, maxX, maxY, x1, y1)) != 0) {
       if ((out1 & out2) != 0) {
         return false;
-      } else if ((out1 & (OUT_LEFT | OUT_RIGHT)) != 0) {
+      } else if ((out1 & (OutCode.OUT_LEFT | OutCode.OUT_RIGHT)) != 0) {
         double x;
-        if ((out1 & OUT_RIGHT) != 0) {
+        if (OutCode.isRight(out1)) {
           x = maxX;
         } else {
           x = minX;
@@ -471,7 +428,7 @@ public class RectangleUtil {
         x1 = x;
       } else {
         double y;
-        if ((out1 & OUT_BOTTOM) != 0) {
+        if (OutCode.isBottom(out1)) {
           y = maxY;
         } else {
           y = minY;
@@ -515,8 +472,8 @@ public class RectangleUtil {
   public static boolean intersectsOutcode(final double minX1, final double minY1,
     final double maxX1, final double maxY1, double minX2, double minY2, double maxX2,
     double maxY2) {
-    int out1 = getOutcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
-    int out2 = getOutcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
+    int out1 = OutCode.getOutcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
+    int out2 = OutCode.getOutcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
     while (true) {
       if ((out1 | out2) == 0) {
         return true;
@@ -533,16 +490,16 @@ public class RectangleUtil {
 
         double x = 0;
         double y = 0;
-        if ((out & OUT_TOP) != 0) {
+        if (OutCode.isTop(out)) {
           x = minX2 + (maxX2 - minX2) * (maxY1 - minY2) / (maxY2 - minY2);
           y = maxY1;
-        } else if ((out & OUT_BOTTOM) != 0) {
+        } else if (OutCode.isBottom(out)) {
           x = minX2 + (maxX2 - minX2) * (minY1 - minY2) / (maxY2 - minY2);
           y = minY1;
-        } else if ((out & OUT_RIGHT) != 0) {
+        } else if (OutCode.isRight(out)) {
           y = minY2 + (maxY2 - minY2) * (maxX1 - minX2) / (maxX2 - minX2);
           x = maxX1;
-        } else if ((out & OUT_LEFT) != 0) {
+        } else if (OutCode.isLeft(out)) {
           y = minY2 + (maxY2 - minY2) * (minX1 - minX2) / (maxX2 - minX2);
           x = minX1;
         }
@@ -550,11 +507,11 @@ public class RectangleUtil {
         if (out == out1) {
           minX2 = x;
           minY2 = y;
-          out1 = getOutcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
+          out1 = OutCode.getOutcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
         } else {
           maxX2 = x;
           maxY2 = y;
-          out2 = getOutcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
+          out2 = OutCode.getOutcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
         }
       }
     }

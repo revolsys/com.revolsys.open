@@ -121,7 +121,7 @@ public final class DataTypes {
 
   public static final DataType INT = new Integers();
 
-  public static final DataType INTEGER = new BigIntegers();
+  public static final DataType BIG_INTEGER = new BigIntegers();
 
   public static final GeometryDataType<LineString, LineStringEditor> LINE_STRING = new GeometryDataType<>(
     LineString.class, LineString::newLineString, LineStringEditor::new);

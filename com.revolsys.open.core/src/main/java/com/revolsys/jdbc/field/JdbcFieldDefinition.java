@@ -162,7 +162,7 @@ public class JdbcFieldDefinition extends FieldDefinition {
   }
 
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+    final Record record, boolean internStrings) throws SQLException {
     final Object value = resultSet.getObject(columnIndex);
     setValue(record, value);
     return columnIndex + 1;

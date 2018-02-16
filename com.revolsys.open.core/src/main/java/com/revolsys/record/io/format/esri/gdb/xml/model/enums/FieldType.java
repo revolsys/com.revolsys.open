@@ -23,10 +23,10 @@ public enum FieldType {
   esriFieldTypeGUID(DataTypes.UUID),
 
   /** Long Integer. */
-  esriFieldTypeInteger(DataTypes.INTEGER),
+  esriFieldTypeInteger(DataTypes.INT),
 
   /** Long Integer representing an object identifier. */
-  esriFieldTypeOID(DataTypes.INTEGER),
+  esriFieldTypeOID(DataTypes.INT),
 
   /** Raster. */
   esriFieldTypeRaster(DataTypes.BLOB),

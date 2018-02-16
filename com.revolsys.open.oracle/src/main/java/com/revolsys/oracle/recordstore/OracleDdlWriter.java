@@ -142,7 +142,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("VARCHAR2(");
       out.print(attribute.getLength());
       out.print(")");
-    } else if (dataType == DataTypes.INTEGER) {
+    } else if (dataType == DataTypes.BIG_INTEGER) {
       out.print("NUMBER(");
       out.print(attribute.getLength());
       out.print(')');

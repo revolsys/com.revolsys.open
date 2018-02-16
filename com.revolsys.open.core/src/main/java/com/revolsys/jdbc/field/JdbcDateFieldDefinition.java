@@ -25,7 +25,7 @@ public class JdbcDateFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+    final Record record, boolean internStrings) throws SQLException {
     final Date value = resultSet.getDate(columnIndex);
     setValue(record, value);
     return columnIndex + 1;

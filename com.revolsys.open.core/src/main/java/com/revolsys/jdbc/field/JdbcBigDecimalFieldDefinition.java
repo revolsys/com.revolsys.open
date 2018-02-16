@@ -22,7 +22,7 @@ public class JdbcBigDecimalFieldDefinition extends JdbcDecimalFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+    final Record record, boolean internStrings) throws SQLException {
     final BigDecimal value = resultSet.getBigDecimal(columnIndex);
     setValue(record, value);
     return columnIndex + 1;

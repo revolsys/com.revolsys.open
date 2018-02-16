@@ -30,7 +30,8 @@ import com.revolsys.util.count.LabelCountMap;
 public class JdbcQueryIterator extends AbstractIterator<Record> implements RecordReader {
   public static Record getNextRecord(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition, final List<FieldDefinition> fields,
-    final RecordFactory<Record> recordFactory, final ResultSet resultSet) {
+    final RecordFactory<Record> recordFactory, final ResultSet resultSet,
+    final boolean internStrings) {
     final Record record = recordFactory.newRecord(recordDefinition);
     if (record != null) {
       record.setState(RecordState.INITIALIZING);
@@ -38,7 +39,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
       for (final FieldDefinition field : fields) {
         final JdbcFieldDefinition jdbcField = (JdbcFieldDefinition)field;
         try {
-          columnIndex = jdbcField.setFieldValueFromResultSet(resultSet, columnIndex, record);
+          columnIndex = jdbcField.setFieldValueFromResultSet(resultSet, columnIndex, record,
+            internStrings);
         } catch (final SQLException e) {
           throw new RuntimeException(
             "Unable to get value " + (columnIndex + 1) + " from result set", e);
@@ -56,6 +58,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
     return statement.executeQuery();
   }
+
+  private boolean internStrings;
 
   private JdbcConnection connection;
 
@@ -129,7 +133,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     try {
       if (this.resultSet != null && this.resultSet.next() && !this.query.isCancelled()) {
         final Record record = getNextRecord(this.recordStore, this.recordDefinition, this.fields,
-          this.recordFactory, this.resultSet);
+          this.recordFactory, this.resultSet, this.internStrings);
         if (this.labelCountMap != null) {
           this.labelCountMap.addCount(record);
         }
@@ -243,6 +247,14 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
   @Override
   protected void initDo() {
     this.resultSet = getResultSet();
+  }
+
+  public boolean isInternStrings() {
+    return this.internStrings;
+  }
+
+  public void setInternStrings(final boolean internStrings) {
+    this.internStrings = internStrings;
   }
 
   protected void setQuery(final Query query) {

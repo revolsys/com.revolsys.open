@@ -141,7 +141,8 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
 
   public LineStringEditor appendVertex(final double x, final double y,
     final boolean allowRepeated) {
-    if (allowRepeated || !equalsVertex(getLastVertexIndex(), x, y)) {
+    final int lastVertexIndex = getLastVertexIndex();
+    if (allowRepeated || lastVertexIndex < 0 || !equalsVertex(lastVertexIndex, x, y)) {
       appendVertex(x, y);
     }
     return this;
@@ -159,6 +160,11 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       appendVertex(point);
     }
     return this;
+  }
+
+  public void appendVertex(final LineString line, final int vertexIndex) {
+    final Point point = line.getPoint(vertexIndex);
+    appendVertex(point);
   }
 
   public LineStringEditor appendVertex(final Point point) {

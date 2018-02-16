@@ -167,8 +167,14 @@ public class Integers extends AbstractDataType {
 
   @Override
   protected Object toObjectDo(final Object value) {
-    final String string = DataTypes.toString(value);
-    return Integer.valueOf(string);
+    if (value instanceof Integer) {
+      return value;
+    } else if (value instanceof Number) {
+      return ((Number)value).intValue();
+    } else {
+      final String string = DataTypes.toString(value);
+      return Integer.valueOf(string);
+    }
   }
 
   @Override

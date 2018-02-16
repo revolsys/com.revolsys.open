@@ -57,7 +57,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
                   int i = 0;
                   do {
                     final Record object = JdbcQueryIterator.getNextRecord(recordStore,
-                      recordDefinition, attributes, recordFactory, resultSet);
+                      recordDefinition, attributes, recordFactory, resultSet, this.internStrings);
                     results.add(object);
                     i++;
                   } while (resultSet.next() && i < pageSize);

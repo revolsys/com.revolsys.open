@@ -23,7 +23,7 @@ public class GmlFieldTypeRegistry {
     addFieldType(new SimpleFieldType(DataTypes.DOUBLE));
     addFieldType(new SimpleFieldType(DataTypes.FLOAT));
     addFieldType(new SimpleFieldType(DataTypes.INT));
-    addFieldType(new SimpleFieldType(DataTypes.INTEGER));
+    addFieldType(new SimpleFieldType(DataTypes.BIG_INTEGER));
     addFieldType(new SimpleFieldType(DataTypes.LONG));
     addFieldType(new SimpleFieldType(DataTypes.QNAME));
     addFieldType(new SimpleFieldType(DataTypes.SHORT));

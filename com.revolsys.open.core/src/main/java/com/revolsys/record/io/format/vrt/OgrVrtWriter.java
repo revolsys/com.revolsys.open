@@ -59,7 +59,7 @@ public class OgrVrtWriter {
           String type = "String";
           if (Arrays
             .asList(DataTypes.BYTE, DataTypes.SHORT, DataTypes.INT, DataTypes.LONG,
-              DataTypes.INTEGER)
+              DataTypes.BIG_INTEGER)
             .contains(fieldType)) {
             type = "Integer";
           } else if (Arrays.asList(DataTypes.FLOAT, DataTypes.DOUBLE, DataTypes.DECIMAL)

@@ -22,7 +22,7 @@ public class JdbcFloatFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+    final Record record, boolean internStrings) throws SQLException {
     final float longValue = resultSet.getFloat(columnIndex);
     if (!resultSet.wasNull()) {
       setValue(record, Float.valueOf(longValue));

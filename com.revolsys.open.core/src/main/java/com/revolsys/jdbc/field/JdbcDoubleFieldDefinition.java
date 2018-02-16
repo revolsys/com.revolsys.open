@@ -22,7 +22,7 @@ public class JdbcDoubleFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+    final Record record, boolean internStrings) throws SQLException {
     final double longValue = resultSet.getDouble(columnIndex);
     if (!resultSet.wasNull()) {
       setValue(record, Double.valueOf(longValue));

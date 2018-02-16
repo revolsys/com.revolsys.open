@@ -43,7 +43,7 @@ public class GeoNamesService {
     recordDefinition.addField("adminName3", DataTypes.STRING, false);
     recordDefinition.addField("adminName4", DataTypes.STRING, false);
     recordDefinition.addField("adminCode1", DataTypes.STRING, false);
-    recordDefinition.addField("population", DataTypes.INTEGER, false);
+    recordDefinition.addField("population", DataTypes.INT, false);
     recordDefinition.addField("countryCode", DataTypes.STRING, false);
     recordDefinition.addField("countryName", DataTypes.STRING, false);
     recordDefinition.addField("timeZoneId", DataTypes.STRING, false);
@@ -59,7 +59,7 @@ public class GeoNamesService {
     wikipediaRecordDefinition.addField("feature", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("thumbnailImg", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("lang", DataTypes.STRING, false);
-    wikipediaRecordDefinition.addField("population", DataTypes.INTEGER, false);
+    wikipediaRecordDefinition.addField("population", DataTypes.INT, false);
     wikipediaRecordDefinition.addField("geometry", DataTypes.POINT, false);
 
     WIKIPEDIA_RECORD_DEFINITION = wikipediaRecordDefinition;

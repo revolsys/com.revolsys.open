@@ -62,7 +62,7 @@ public class Oracle implements JdbcDatabaseFactory {
       .setDefaultValue("localhost")
       //
       .addProperty(URL_FIELD, true), //
-    new FieldDefinition("port", DataTypes.INTEGER, false) //
+    new FieldDefinition("port", DataTypes.INT, false) //
       .setMinValue(0)
       //
       .setMaxValue(65535)

@@ -617,7 +617,7 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
             int columnIndex = 1;
             for (final FieldDefinition idField : recordDefinition.getIdFields()) {
               ((JdbcFieldDefinition)idField).setFieldValueFromResultSet(generatedKeyResultSet,
-                columnIndex++, record);
+                columnIndex++, record, false);
             }
           }
         }

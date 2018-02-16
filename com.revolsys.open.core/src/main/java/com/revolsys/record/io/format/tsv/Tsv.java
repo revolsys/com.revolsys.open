@@ -47,6 +47,11 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   public static RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+    final Object target, final boolean useQuotes, final boolean ewkt) {
+    return new CsvRecordWriter(recordDefinition, target, Tsv.FIELD_SEPARATOR, useQuotes, ewkt);
+  }
+
+  public static RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Writer writer, final boolean useQuotes, final boolean ewkt) {
     return new CsvRecordWriter(recordDefinition, writer, Tsv.FIELD_SEPARATOR, useQuotes, ewkt);
   }

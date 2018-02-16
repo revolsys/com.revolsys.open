@@ -28,6 +28,8 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
+import com.revolsys.geometry.model.impl.RectangleXY;
+import com.revolsys.geometry.util.OutCode;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.logging.Logs;
@@ -36,19 +38,13 @@ import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.Consumer3;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.number.Doubles;
 
 public interface BoundingBox
   extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
-  public static final int OUT_LEFT = 1;
-
-  public static final int OUT_TOP = 2;
-
-  public static final int OUT_RIGHT = 4;
-
-  public static final int OUT_BOTTOM = 8;
-
   static BoundingBox empty() {
     return GeometryFactory.DEFAULT_3D.newBoundingBoxEmpty();
   }
@@ -963,18 +959,18 @@ public interface BoundingBox
     final double minX = getMinX();
     final double maxX = getMaxX();
     if (x < minX) {
-      out = OUT_LEFT;
+      out = OutCode.OUT_LEFT;
     } else if (x > maxX) {
-      out = OUT_RIGHT;
+      out = OutCode.OUT_RIGHT;
     } else {
       out = 0;
     }
     final double minY = getMinY();
     final double maxY = getMaxY();
     if (y < minY) {
-      out |= OUT_TOP;
+      out |= OutCode.OUT_BOTTOM;
     } else if (y > maxY) {
-      out |= OUT_BOTTOM;
+      out |= OutCode.OUT_TOP;
     }
     return out;
   }
@@ -1196,6 +1192,95 @@ public interface BoundingBox
     return BoundingBoxDoubleXY.EMPTY;
   }
 
+  /**
+   * The outcode must be outside the rectangle and opposing outcode must be inside the rectangle
+   */
+  default void outCodeIntersection(final int outCode, final double x1, final double y1,
+    final double x2, final double y2, final BiConsumerDouble action) {
+    double x;
+    double y;
+    final double deltaX = x2 - x1;
+    final double deltaY = y2 - y1;
+    if (OutCode.isTop(outCode)) {
+      final double maxY = getMaxY();
+      final double ratio = (maxY - y1) / deltaY;
+      x = x1 + deltaX * ratio;
+      y = maxY;
+    } else if (OutCode.isBottom(outCode)) {
+      final double minY = getMinY();
+      final double ratio = (minY - y1) / deltaY;
+      x = x2 + deltaX * ratio;
+      y = minY;
+    } else if (OutCode.isRight(outCode)) {
+      final double maxX = getMaxX();
+      final double ratio = (maxX - x1) / deltaX;
+      y = y1 + deltaY * ratio;
+      x = maxX;
+    } else if (OutCode.isLeft(outCode)) {
+      final double minX = getMinX();
+      final double ratio = (minX - x1) / deltaX;
+      y = y1 + deltaY * ratio;
+      x = minX;
+    } else {
+      throw new IllegalArgumentException("Outcode " + outCode);
+    }
+    action.accept(x, y);
+  }
+
+  default void outCodeIntersection(int out1, int out2, double x1, double y1, double x2, double y2,
+    final Consumer4Double action) {
+    final double minX = getMinX();
+    final double minY = getMinY();
+    final double maxX = getMaxX();
+    final double maxY = getMaxY();
+
+    while (true) {
+      if ((out1 | out2) == 0) {
+        action.accept(x1, y1, x2, y2);
+        return;
+      } else if ((out1 & out2) != 0) {
+        return;
+      } else {
+        double x;
+        double y;
+
+        final int outcodeOut = out1 != 0 ? out1 : out2;
+
+        final double deltaY = y2 - y1;
+        final double deltaX = x2 - x1;
+        if (OutCode.isTop(outcodeOut)) {
+          final double ratio = (maxY - y1) / deltaY;
+          x = x1 + deltaX * ratio;
+          y = maxY;
+        } else if (OutCode.isBottom(outcodeOut)) {
+          final double ratio = (minY - y1) / deltaY;
+          x = x2 + deltaX * ratio;
+          y = minY;
+        } else if (OutCode.isRight(outcodeOut)) {
+          final double ratio = (maxX - x1) / deltaX;
+          x = maxX;
+          y = y1 + deltaY * ratio;
+        } else if (OutCode.isLeft(outcodeOut)) {
+          final double ratio = (minX - x1) / deltaX;
+          x = minX;
+          y = y1 + deltaY * ratio;
+        } else {
+          throw new IllegalStateException("Cannot clip as both points are inside the rectangle");
+        }
+
+        if (outcodeOut == out1) {
+          x1 = x;
+          y1 = y;
+          out1 = getOutcode(x1, y1);
+        } else {
+          x2 = x;
+          y2 = y;
+          out2 = getOutcode(x2, y2);
+        }
+      }
+    }
+  }
+
   default BoundingBox toCoordinateSystem(final CoordinateSystem coordinateSystem,
     final int minAxisCount) {
     final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
@@ -1394,5 +1479,14 @@ public interface BoundingBox
   default Polygon toPolygon(final int numX, final int numY) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return toPolygon(geometryFactory, numX, numY);
+  }
+
+  default RectangleXY toRectangle() {
+    final double minX = getMinX();
+    final double minY = getMinY();
+    final double width = getWidth();
+    final double height = getHeight();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.newRectangle(minX, minY, width, height);
   }
 }

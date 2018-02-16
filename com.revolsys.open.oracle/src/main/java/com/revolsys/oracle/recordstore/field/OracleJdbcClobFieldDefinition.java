@@ -24,7 +24,7 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record object, boolean internStrings) throws SQLException {
     final Clob value = resultSet.getClob(columnIndex);
     object.setValue(getIndex(), value);
     return columnIndex + 1;

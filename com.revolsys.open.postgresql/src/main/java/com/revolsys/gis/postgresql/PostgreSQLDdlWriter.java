@@ -138,7 +138,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
       out.print("date");
     } else if (dataType == DataTypes.DATE_TIME) {
       out.print("timestamp");
-    } else if (dataType == DataTypes.INTEGER) {
+    } else if (dataType == DataTypes.BIG_INTEGER) {
       out.print("NUMERIC(");
       out.print(attribute.getLength());
       out.print(')');

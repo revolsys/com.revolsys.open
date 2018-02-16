@@ -835,6 +835,7 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     return Property.hasValue(geometry);
   }
 
+  @Override
   default boolean hasValue(final CharSequence name) {
     final Object value = getValue(name);
     return Property.hasValue(value);
@@ -1110,6 +1111,13 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     final Object oldValue = getValue(index);
     Property.set(this, fieldName, value);
     return DataType.equal(oldValue, value);
+  }
+
+  default <T> T setValue(final Record source, final CharSequence fieldName) {
+    @SuppressWarnings("unchecked")
+    final T value = (T)source.getValue(fieldName);
+    setValue(fieldName, value);
+    return value;
   }
 
   @SuppressWarnings("rawtypes")
