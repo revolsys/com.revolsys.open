@@ -90,6 +90,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     super();
 
     final boolean autoCommit = Booleans.getBoolean(properties.get("autoCommit"));
+    this.internStrings = Booleans.getBoolean(properties.get("internStrings"));
     this.connection = recordStore.getJdbcConnection(autoCommit);
     this.recordFactory = query.getRecordFactory();
     if (this.recordFactory == null) {

@@ -276,11 +276,11 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
     this.baseMapOverlay = new LayerRendererOverlay(this);
     this.baseMapOverlay.setLayer(NullLayer.INSTANCE);
-    this.layeredPane.add(this.baseMapOverlay, new Integer(0));
+    this.layeredPane.add(this.baseMapOverlay, Integer.valueOf(0));
     Property.addListener(this.baseMapOverlay, "layer", this);
 
     this.layerOverlay = new LayerRendererOverlay(this, project);
-    this.layeredPane.add(this.layerOverlay, new Integer(1));
+    this.layeredPane.add(this.layerOverlay, Integer.valueOf(1));
 
     Property.addListener(this.baseMapLayers, this);
     Property.addListener(project, this);
@@ -315,7 +315,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public void addMapOverlay(final int zIndex, final JComponent overlay) {
-    this.layeredPane.add(overlay, new Integer(zIndex));
+    this.layeredPane.add(overlay, Integer.valueOf(zIndex));
     if (overlay instanceof PropertyChangeListener) {
       final PropertyChangeListener listener = (PropertyChangeListener)overlay;
       Property.addListener(this, listener);

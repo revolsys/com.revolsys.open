@@ -243,7 +243,7 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
     for (int i = 0; i < this.edge.size() - 2; i++) {
       if (this.edge.equalsVertex2d(i, i + 2)) {
         // add base of collapse as node
-        collapsedVertexIndexes.add(new Integer(i + 1));
+        collapsedVertexIndexes.add(i + 1);
       }
     }
   }

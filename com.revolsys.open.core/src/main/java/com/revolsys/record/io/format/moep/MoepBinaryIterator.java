@@ -357,7 +357,7 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
       final int z = readLEShort(this.in);
       final LineString line = readContourLine(numCoords);
       object.setGeometryValue(line);
-      object.setValue(MoepConstants.ELEVATION, new Integer(z));
+      object.setValue(MoepConstants.ELEVATION, z);
 
     } else {
       final LineString line = readSimpleLine(numCoords);

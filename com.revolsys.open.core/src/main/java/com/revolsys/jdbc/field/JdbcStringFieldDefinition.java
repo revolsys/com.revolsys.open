@@ -29,7 +29,7 @@ public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
     final Record record, final boolean internStrings) throws SQLException {
     String value = resultSet.getString(columnIndex);
-    if (this.intern || internStrings) {
+    if (value != null && (this.intern || internStrings)) {
       value = value.intern();
     }
     setValue(record, value);

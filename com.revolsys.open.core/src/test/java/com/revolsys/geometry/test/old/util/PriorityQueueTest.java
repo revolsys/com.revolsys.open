@@ -18,7 +18,7 @@ public class PriorityQueueTest extends TestCase {
 
   private void addRandomItems(final PriorityQueue q, final int num) {
     for (int i = 0; i < num; i++) {
-      q.add(new Integer((int)(num * Math.random())));
+      q.add((int)(num * Math.random()));
     }
   }
 
@@ -38,11 +38,11 @@ public class PriorityQueueTest extends TestCase {
 
   public void testOrder1() throws Exception {
     final PriorityQueue q = new PriorityQueue();
-    q.add(new Integer(1));
-    q.add(new Integer(10));
-    q.add(new Integer(5));
-    q.add(new Integer(8));
-    q.add(new Integer(-1));
+    q.add(1);
+    q.add(10);
+    q.add(5);
+    q.add(8);
+    q.add(-1);
     checkOrder(q);
   }
 

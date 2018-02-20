@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -26,6 +27,8 @@ import com.revolsys.properties.ObjectPropertyProxy;
 import com.revolsys.properties.ObjectWithProperties;
 
 public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Externalizable {
+  private static final int[] EMPTY_IDS = new int[0];
+
   public static <V> Predicate<Node<V>> filterDegree(final int degree) {
     return (node) -> {
       return node.getDegree() == degree;
@@ -109,9 +112,9 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
 
   private int id;
 
-  private int[] inEdgeIds = new int[0];
+  private int[] inEdgeIds = EMPTY_IDS;
 
-  private int[] outEdgeIds = new int[0];
+  private int[] outEdgeIds = EMPTY_IDS;
 
   public Node() {
   }
@@ -182,6 +185,20 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
       this.graph.evict(this);
     }
     super.finalize();
+  }
+
+  public void forEachInEdge(final Consumer<Edge<T>> action) {
+    for (final int edgeId : this.inEdgeIds) {
+      final Edge<T> edge = this.graph.getEdge(edgeId);
+      action.accept(edge);
+    }
+  }
+
+  public void forEachOutEdge(final Consumer<Edge<T>> action) {
+    for (final int edgeId : this.outEdgeIds) {
+      final Edge<T> edge = this.graph.getEdge(edgeId);
+      action.accept(edge);
+    }
   }
 
   public Point get3dCoordinates(final String typePath) {
@@ -333,6 +350,10 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return this.id;
   }
 
+  public int getInEdgeCount() {
+    return this.inEdgeIds.length;
+  }
+
   public int getInEdgeIndex(final Edge<T> edge) {
     return getInEdges().indexOf(edge);
   }
@@ -359,6 +380,10 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     final int nextIndex = (index + 1) % this.outEdgeIds.length;
     final Graph<T> graph = getGraph();
     return graph.getEdge(this.outEdgeIds[nextIndex]);
+  }
+
+  public int getOutEdgeCount() {
+    return this.outEdgeIds.length;
   }
 
   public int getOutEdgeIndex(final Edge<T> edge) {

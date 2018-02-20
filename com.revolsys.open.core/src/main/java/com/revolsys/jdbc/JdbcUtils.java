@@ -335,7 +335,9 @@ public final class JdbcUtils {
       }
       final String fromClause = query.getFromClause();
       final LockMode lockMode = query.getLockMode();
-      sql = newSelectSql(recordDefinition, "T", fromClause, fieldNames, query, orderBy, lockMode);
+      final boolean distinct = query.isDistinct();
+      sql = newSelectSql(recordDefinition, "T", distinct, fromClause, fieldNames, query, orderBy,
+        lockMode);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
         final StringBuilder newSql = new StringBuilder("SELECT ");
@@ -385,12 +387,15 @@ public final class JdbcUtils {
   }
 
   public static String newSelectSql(final RecordDefinition recordDefinition,
-    final String tablePrefix, final String fromClause, final List<String> fieldNames,
-    final Query query, final Map<? extends CharSequence, Boolean> orderBy,
-    final LockMode lockMode) {
+    final String tablePrefix, final boolean distinct, final String fromClause,
+    final List<String> fieldNames, final Query query,
+    final Map<? extends CharSequence, Boolean> orderBy, final LockMode lockMode) {
     final String typePath = recordDefinition.getPath();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
+    if (distinct) {
+      sql.append("DISTINCT ");
+    }
     boolean hasColumns = false;
     if (fieldNames.isEmpty() || fieldNames.remove("*")) {
       addColumnNames(sql, recordDefinition, tablePrefix);

@@ -37,7 +37,7 @@ public class RecordGraph extends Graph<Record> {
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
       return addEdge(record, line);
-    } else if (geometry.isGeometryCollection()) {
+    } else if (geometry != null && geometry.isGeometryCollection()) {
       if (geometry.getGeometryCount() == 1) {
         final Geometry part = geometry.getGeometry(0);
         if (part instanceof LineString) {

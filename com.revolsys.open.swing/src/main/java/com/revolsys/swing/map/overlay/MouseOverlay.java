@@ -61,7 +61,7 @@ public class MouseOverlay extends JComponent
     this.mapPanel = mapPanel;
     this.viewport = mapPanel.getViewport();
     setFocusable(true);
-    layeredPane.add(this, new Integer(Integer.MAX_VALUE));
+    layeredPane.add(this, Integer.valueOf(Integer.MAX_VALUE));
     addMouseListener(this);
     addMouseMotionListener(this);
     addMouseWheelListener(this);

@@ -259,7 +259,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
      */
     @Override
     public Integer next() {
-      return new Integer(nextEntry().getIntKey());
+      return nextEntry().getIntKey();
     }
   }
 

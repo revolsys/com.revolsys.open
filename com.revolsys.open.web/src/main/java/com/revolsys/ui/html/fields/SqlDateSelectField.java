@@ -100,7 +100,7 @@ public class SqlDateSelectField extends Field {
     super(name, required);
     for (int i = startYear; i <= endYear; i++) {
       final String val = String.valueOf(i);
-      this.yearOptions.add(new FieldValue(new Integer(i), val, val));
+      this.yearOptions.add(new FieldValue(i, val, val));
     }
     this.startYear = startYear;
     this.endYear = endYear;

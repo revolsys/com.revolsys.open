@@ -32,19 +32,19 @@ import java.util.zip.ZipFile;
 import com.revolsys.gis.parser.ParseException;
 
 public class OsnIterator implements Iterator<Object> {
-  public static final Object BOOLEAN_VALUE = new Integer(9);
+  public static final Object BOOLEAN_VALUE = 9;
 
-  public static final Object END_DOCUMENT = new Integer(1);
+  public static final Object END_DOCUMENT = 1;
 
-  public static final Object END_LIST = new Integer(12);
+  public static final Object END_LIST = 12;
 
-  public static final Object END_OBJECT = new Integer(3);
+  public static final Object END_OBJECT = 3;
 
-  public static final Object END_RELATION = new Integer(16);
+  public static final Object END_RELATION = 16;
 
-  public static final Object END_SET = new Integer(14);
+  public static final Object END_SET = 14;
 
-  public static final Object ENUM_TAG = new Integer(8);
+  public static final Object ENUM_TAG = 8;
 
   private static final Object IN_ATTRIBUTE = "attribute";
 
@@ -70,25 +70,25 @@ public class OsnIterator implements Iterator<Object> {
 
   private static final boolean[] IS_WHITESPACE_CHARACTER = new boolean[256];
 
-  public static final Object NULL_VALUE = new Integer(10);
+  public static final Object NULL_VALUE = 10;
 
-  public static final Object NUMERIC_VALUE = new Integer(5);
+  public static final Object NUMERIC_VALUE = 5;
 
-  public static final Object START_ATTRIBUTE = new Integer(4);
+  public static final Object START_ATTRIBUTE = 4;
 
-  public static final Object START_DEFINITION = new Integer(2);
+  public static final Object START_DEFINITION = 2;
 
-  public static final Object START_DOCUMENT = new Integer(0);
+  public static final Object START_DOCUMENT = 0;
 
-  public static final Object START_LIST = new Integer(11);
+  public static final Object START_LIST = 11;
 
-  public static final Object START_RELATION = new Integer(15);
+  public static final Object START_RELATION = 15;
 
-  public static final Object START_SET = new Integer(13);
+  public static final Object START_SET = 13;
 
-  public static final Object TEXT_VALUE = new Integer(7);
+  public static final Object TEXT_VALUE = 7;
 
-  public static final Object UNKNOWN = new Integer(-1);
+  public static final Object UNKNOWN = -1;
 
   static {
     for (int c = 'a'; c <= 'z'; c++) {

@@ -148,6 +148,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return query;
   }
 
+  private boolean distinct = false;
+
   private Cancellable cancellable;
 
   private RecordFactory<Record> recordFactory;
@@ -401,6 +403,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.whereCondition;
   }
 
+  public boolean isDistinct() {
+    return this.distinct;
+  }
+
   public Query newQuery(final RecordDefinition recordDefinition) {
     final Query query = clone();
     query.setRecordDefinition(recordDefinition);
@@ -421,6 +427,11 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   public void setCancellable(final Cancellable cancellable) {
     this.cancellable = cancellable;
+  }
+
+  public Query setDistinct(final boolean distinct) {
+    this.distinct = distinct;
+    return this;
   }
 
   public Query setFieldNames(final List<String> fieldNames) {
@@ -501,8 +512,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.recordFactory = (RecordFactory<Record>)recordFactory;
   }
 
-  public void setSql(final String sql) {
+  public Query setSql(final String sql) {
     this.sql = sql;
+    return this;
   }
 
   public void setStatistics(final LabelCountMap labelCountMap) {
