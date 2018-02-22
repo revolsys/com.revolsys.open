@@ -60,6 +60,13 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     }
   }
 
+  @Override
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    final Object databaseValue = resultSet.getObject(columnIndex);
+    return toJava(databaseValue);
+  }
+
   private Geometry parseCollection(final GeometryFactory geometryFactory, final ByteBuffer data) {
     final int count = data.getInt();
     final Geometry[] geoms = new Geometry[count];
@@ -308,15 +315,6 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     }
     throw new IllegalArgumentException(
       "Invalid Geometry header, expecting GP\n" + Arrays.toString(data));
-  }
-
-  @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object, boolean internStrings) throws SQLException {
-    final Object databaseValue = resultSet.getObject(columnIndex);
-    final Object value = toJava(databaseValue);
-    object.setValue(getIndex(), value);
-    return columnIndex + 1;
   }
 
   @Override

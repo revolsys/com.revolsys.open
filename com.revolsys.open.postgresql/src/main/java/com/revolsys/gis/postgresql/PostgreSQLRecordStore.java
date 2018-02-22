@@ -13,7 +13,10 @@ import org.postgresql.jdbc.PgConnection;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.datatype.CollectionDataType;
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.gis.postgresql.type.PostgreSQLArrayFieldDefinition;
 import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryFieldAdder;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
@@ -81,10 +84,25 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   @Override
   protected JdbcFieldDefinition addField(final JdbcRecordDefinition recordDefinition,
-    final String dbColumnName, final String name, final String dataType, final int sqlType,
+    final String dbColumnName, final String name, final String dbDataType, final int sqlType,
     final int length, final int scale, final boolean required, final String description) {
-    final JdbcFieldDefinition field = super.addField(recordDefinition, dbColumnName, name, dataType,
-      sqlType, length, scale, required, description);
+    final JdbcFieldDefinition field;
+    if (dbDataType.charAt(0) == '_') {
+      final String elementDbDataType = dbDataType.substring(1);
+      final JdbcFieldAdder fieldAdder = getFieldAdder(elementDbDataType);
+      final JdbcFieldDefinition elementField = fieldAdder.newField(this, recordDefinition,
+        dbColumnName, name, elementDbDataType, sqlType, length, scale, required, description);
+
+      final DataType elementDataType = elementField.getDataType();
+      final CollectionDataType listDataType = new CollectionDataType(
+        "List" + elementDataType.getName(), List.class, elementDataType);
+      field = new PostgreSQLArrayFieldDefinition(dbColumnName, name, listDataType, sqlType, length,
+        scale, required, description, elementField, getProperties());
+      recordDefinition.addField(field);
+    } else {
+      field = super.addField(recordDefinition, dbColumnName, name, dbDataType, sqlType, length,
+        scale, required, description);
+    }
     if (!dbColumnName.matches("[a-z_]+")) {
       field.setQuoteName(true);
     }

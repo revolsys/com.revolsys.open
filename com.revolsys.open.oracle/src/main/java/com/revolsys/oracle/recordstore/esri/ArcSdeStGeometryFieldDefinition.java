@@ -113,10 +113,12 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object, boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
     final int geometryType = resultSet.getInt(columnIndex);
-    if (!resultSet.wasNull()) {
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
       final int numPoints = resultSet.getInt(columnIndex + 1);
       final Blob blob = resultSet.getBlob(columnIndex + 2);
       try (
@@ -133,11 +135,17 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
         final GeometryFactory geometryFactory = this.geometryFactory;
         final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn, geometryFactory,
           geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
-        object.setValue(getIndex(), geometry);
+        return geometry;
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }
     }
+  }
+
+  @Override
+  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final Record object, final boolean internStrings) throws SQLException {
+    super.setFieldValueFromResultSet(resultSet, columnIndex, object, internStrings);
     return columnIndex + 3;
   }
 

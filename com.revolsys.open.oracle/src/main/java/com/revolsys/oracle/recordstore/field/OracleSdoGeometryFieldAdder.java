@@ -13,13 +13,13 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.logging.Logs;
 import com.revolsys.oracle.recordstore.OracleRecordStore;
 import com.revolsys.record.property.FieldProperties;
-import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStoreSchema;
 
 public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
@@ -108,44 +108,6 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
     this.recordStore = recordStore;
   }
 
-  @Override
-  public FieldDefinition addField(final AbstractJdbcRecordStore recordStore,
-    final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
-    final String dataTypeName, final int sqlType, final int length, final int scale,
-    final boolean required, final String description) {
-    final PathName typePath = recordDefinition.getPathName();
-    final String columnName = name.toUpperCase();
-    final RecordStoreSchema schema = recordDefinition.getSchema();
-
-    GeometryFactory geometryFactory = getColumnProperty(schema, typePath, columnName,
-      GEOMETRY_FACTORY);
-    if (geometryFactory == null) {
-      geometryFactory = schema.getGeometryFactory();
-    }
-    if (geometryFactory == null) {
-      geometryFactory = GeometryFactory.DEFAULT_2D;
-    }
-    DataType dataType = getColumnProperty(schema, typePath, columnName, GEOMETRY_TYPE);
-    if (dataType == null) {
-      dataType = DataTypes.GEOMETRY;
-    }
-
-    int axisCount = getIntegerColumnProperty(schema, typePath, columnName, AXIS_COUNT);
-    if (axisCount == -1) {
-      axisCount = geometryFactory.getAxisCount();
-    }
-    int oracleSrid = getIntegerColumnProperty(schema, typePath, columnName, ORACLE_SRID);
-    if (oracleSrid == -1) {
-      oracleSrid = 0;
-    }
-    final FieldDefinition fieldDefinition = new OracleSdoGeometryJdbcFieldDefinition(dbName, name,
-      dataType, sqlType, required, description, null, geometryFactory, axisCount, oracleSrid);
-    recordDefinition.addField(fieldDefinition);
-    fieldDefinition.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
-    return fieldDefinition;
-
-  }
-
   protected double getScale(final Object[] values, final int axisIndex) throws SQLException {
     if (axisIndex >= values.length) {
       return 0;
@@ -219,5 +181,42 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
         Logs.error(this, "Unable to initialize", e);
       }
     }
+  }
+
+  @Override
+  public JdbcFieldDefinition newField(final AbstractJdbcRecordStore recordStore,
+    final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
+    final String dbDataType, final int sqlType, final int length, final int scale,
+    final boolean required, final String description) {
+    final PathName typePath = recordDefinition.getPathName();
+    final String columnName = name.toUpperCase();
+    final RecordStoreSchema schema = recordDefinition.getSchema();
+
+    GeometryFactory geometryFactory = getColumnProperty(schema, typePath, columnName,
+      GEOMETRY_FACTORY);
+    if (geometryFactory == null) {
+      geometryFactory = schema.getGeometryFactory();
+    }
+    if (geometryFactory == null) {
+      geometryFactory = GeometryFactory.DEFAULT_2D;
+    }
+    DataType dataType = getColumnProperty(schema, typePath, columnName, GEOMETRY_TYPE);
+    if (dataType == null) {
+      dataType = DataTypes.GEOMETRY;
+    }
+
+    int axisCount = getIntegerColumnProperty(schema, typePath, columnName, AXIS_COUNT);
+    if (axisCount == -1) {
+      axisCount = geometryFactory.getAxisCount();
+    }
+    int oracleSrid = getIntegerColumnProperty(schema, typePath, columnName, ORACLE_SRID);
+    if (oracleSrid == -1) {
+      oracleSrid = 0;
+    }
+    final OracleSdoGeometryJdbcFieldDefinition field = new OracleSdoGeometryJdbcFieldDefinition(
+      dbName, name, dataType, sqlType, required, description, null, geometryFactory, axisCount,
+      oracleSrid);
+    field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+    return field;
   }
 }

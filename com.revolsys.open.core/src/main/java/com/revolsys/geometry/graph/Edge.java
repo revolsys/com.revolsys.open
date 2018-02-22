@@ -289,6 +289,18 @@ public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Exte
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if (obj == this) {
+      return true;
+    } else if (obj instanceof Edge<?>) {
+      final Edge<?> edge = (Edge<?>)obj;
+      return edge.id == this.id && edge.graph == this.graph;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   protected void finalize() throws Throwable {
     if (this.graph != null) {
       this.graph.evict(this);
@@ -329,6 +341,11 @@ public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Exte
     } else {
       return Direction.NONE;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T2 extends T> T2 getEdgeObject() {
+    return (T2)this.graph.getEdgeObject(this.id);
   }
 
   public List<Edge<T>> getEdgesToNextJunctionNode(final Node<T> node) {
@@ -482,7 +499,7 @@ public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Exte
 
   @Override
   public int hashCode() {
-    return this.id;
+    return Integer.hashCode(this.id);
   }
 
   public boolean hasNode(final Node<T> node) {
@@ -504,6 +521,10 @@ public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Exte
     } else {
       return hasNode(node);
     }
+  }
+
+  public boolean isLoop() {
+    return this.fromNodeId == this.toNodeId;
   }
 
   public boolean isRemoved() {

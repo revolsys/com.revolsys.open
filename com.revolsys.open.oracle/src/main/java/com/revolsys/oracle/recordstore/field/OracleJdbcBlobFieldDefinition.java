@@ -11,7 +11,6 @@ import java.util.Collections;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.record.Record;
 import com.revolsys.spring.resource.Resource;
 
 public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
@@ -22,11 +21,9 @@ public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object, boolean internStrings) throws SQLException {
-    final Blob value = resultSet.getBlob(columnIndex);
-    object.setValue(getIndex(), value);
-    return columnIndex + 1;
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    return resultSet.getBlob(columnIndex);
   }
 
   @Override

@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.record.Record;
 import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 
@@ -24,11 +23,9 @@ public class JdbcDateFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record, boolean internStrings) throws SQLException {
-    final Date value = resultSet.getDate(columnIndex);
-    setValue(record, value);
-    return columnIndex + 1;
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    return resultSet.getDate(columnIndex);
   }
 
   @Override

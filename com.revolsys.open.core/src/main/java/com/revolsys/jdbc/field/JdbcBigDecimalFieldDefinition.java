@@ -1,11 +1,8 @@
 package com.revolsys.jdbc.field;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-
-import com.revolsys.record.Record;
 
 public class JdbcBigDecimalFieldDefinition extends JdbcDecimalFieldDefinition {
   public JdbcBigDecimalFieldDefinition(final String dbName, final String name, final int sqlType,
@@ -21,10 +18,9 @@ public class JdbcBigDecimalFieldDefinition extends JdbcDecimalFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record, boolean internStrings) throws SQLException {
-    final BigDecimal value = resultSet.getBigDecimal(columnIndex);
-    setValue(record, value);
-    return columnIndex + 1;
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    return resultSet.getBigDecimal(columnIndex);
   }
+
 }

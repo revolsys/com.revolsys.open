@@ -8,13 +8,13 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.record.Record;
 
 public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
   public JdbcBigIntegerFieldDefinition(final String dbName, final String name, final int sqlType,
     final int length, final boolean required, final String description,
     final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.BIG_INTEGER, sqlType, length, 0, required, description, properties);
+    super(dbName, name, DataTypes.BIG_INTEGER, sqlType, length, 0, required, description,
+      properties);
   }
 
   @Override
@@ -24,8 +24,8 @@ public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record, boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
     Object value;
     final int length = getLength();
     if (length <= 2) {
@@ -44,10 +44,11 @@ public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
         value = number.toBigInteger();
       }
     }
-    if (!resultSet.wasNull()) {
-      setValue(record, value);
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
+      return value;
     }
-    return columnIndex + 1;
   }
 
   @Override

@@ -20,8 +20,14 @@ public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    return resultSet.getBlob(columnIndex);
+  }
+
+  @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record, boolean internStrings) throws SQLException {
+    final Record record, final boolean internStrings) throws SQLException {
     final Blob value = resultSet.getBlob(columnIndex);
     setValue(record, value);
     return columnIndex + 1;

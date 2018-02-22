@@ -499,7 +499,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     return closestDistance;
   }
 
-  public Edge<T> getEdge(final int edgeId) {
+   public Edge<T> getEdge(final int edgeId) {
     return this.edgesById.get(edgeId);
   }
 
@@ -552,6 +552,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     return new EdgeLineList(this, edgeIds);
   }
 
+  @SuppressWarnings("unchecked")
   public T getEdgeObject(final int edgeId) {
     return this.edgeObjectsById.get(edgeId);
   }
@@ -561,6 +562,18 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     for (final Edge<T> edge : getEdges()) {
       final T object = edge.getObject();
       objects.add(object);
+    }
+    return objects;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T2 extends T> List<T2> getEdgeObjects(final int... ids) {
+    final List<T2> objects = new ArrayList<>();
+    for (final int edgeId : ids) {
+      final T object = getEdgeObject(edgeId);
+      if (object != null) {
+        objects.add((T2)object);
+      }
     }
     return objects;
   }

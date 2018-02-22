@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.record.Record;
 
 public class JdbcIntegerFieldDefinition extends JdbcFieldDefinition {
   public JdbcIntegerFieldDefinition(final String dbName, final String name, final int sqlType,
@@ -21,13 +20,14 @@ public class JdbcIntegerFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record, boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
     final int value = resultSet.getInt(columnIndex);
-    if (!resultSet.wasNull()) {
-      setValue(record, Integer.valueOf(value));
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
+      return Integer.valueOf(value);
     }
-    return columnIndex + 1;
   }
 
   @Override

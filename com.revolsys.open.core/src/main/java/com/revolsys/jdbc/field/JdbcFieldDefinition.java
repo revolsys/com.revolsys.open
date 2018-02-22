@@ -157,14 +157,20 @@ public class JdbcFieldDefinition extends FieldDefinition {
     return this.sqlType;
   }
 
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    return resultSet.getObject(columnIndex);
+  }
+
   public boolean isQuoteName() {
     return this.quoteName;
   }
 
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record, boolean internStrings) throws SQLException {
-    final Object value = resultSet.getObject(columnIndex);
-    setValue(record, value);
+    final Record record, final boolean internStrings) throws SQLException {
+    final Object value = getValueFromResultSet(resultSet, columnIndex, internStrings);
+    final int index = getIndex();
+    record.setValue(index, value);
     return columnIndex + 1;
   }
 

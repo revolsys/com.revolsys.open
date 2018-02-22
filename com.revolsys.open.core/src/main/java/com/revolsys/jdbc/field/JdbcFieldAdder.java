@@ -157,8 +157,21 @@ public class JdbcFieldAdder {
     final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
     final String dataType, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
+    final JdbcFieldDefinition field = newField(recordStore, recordDefinition, dbName, name,
+      dataType, sqlType, length, scale, required, description);
+    recordDefinition.addField(field);
+    return field;
+  }
+
+  public void initialize(final JdbcRecordStoreSchema schema) {
+  }
+
+  public JdbcFieldDefinition newField(final AbstractJdbcRecordStore recordStore,
+    final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
+    final String dbDataType, final int sqlType, final int length, final int scale,
+    final boolean required, final String description) {
     JdbcFieldDefinition field;
-    if (dataType.equals("oid")) {
+    if (dbDataType.equals("oid")) {
       field = new JdbcBlobFieldDefinition(dbName, name, sqlType, length, required, description,
         null);
     } else {
@@ -239,10 +252,6 @@ public class JdbcFieldAdder {
         break;
       }
     }
-    recordDefinition.addField(field);
     return field;
-  }
-
-  public void initialize(final JdbcRecordStoreSchema schema) {
   }
 }

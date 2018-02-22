@@ -154,10 +154,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   protected JdbcFieldDefinition addField(final JdbcRecordDefinition recordDefinition,
     final String dbColumnName, final String name, final String dataType, final int sqlType,
     final int length, final int scale, final boolean required, final String description) {
-    JdbcFieldAdder fieldAdder = this.fieldDefinitionAdders.get(dataType);
-    if (fieldAdder == null) {
-      fieldAdder = new JdbcFieldAdder(DataTypes.OBJECT);
-    }
+    final JdbcFieldAdder fieldAdder = getFieldAdder(dataType);
     return (JdbcFieldDefinition)fieldAdder.addField(this, recordDefinition, dbColumnName, name,
       dataType, sqlType, length, scale, required, description);
   }
@@ -325,6 +322,14 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       final FieldDefinition attribute = recordDefinition.getField(columnName);
       return (JdbcFieldDefinition)attribute;
     }
+  }
+
+  public JdbcFieldAdder getFieldAdder(final String dataType) {
+    JdbcFieldAdder fieldAdder = this.fieldDefinitionAdders.get(dataType);
+    if (fieldAdder == null) {
+      fieldAdder = new JdbcFieldAdder(DataTypes.OBJECT);
+    }
+    return fieldAdder;
   }
 
   @Override

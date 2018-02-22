@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.record.Record;
 import com.revolsys.util.Property;
 
 public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
@@ -26,14 +25,13 @@ public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record, final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
     String value = resultSet.getString(columnIndex);
     if (value != null && (this.intern || internStrings)) {
       value = value.intern();
     }
-    setValue(record, value);
-    return columnIndex + 1;
+    return value;
   }
 
   @Override

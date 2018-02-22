@@ -175,6 +175,18 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return false;
   }
 
+  @Override
+  public boolean equals(final Object other) {
+    if (other == this) {
+      return true;
+    } else if (other instanceof Node<?>) {
+      final Node<?> node = (Node<?>)other;
+      return node.id == this.id && node.graph == this.graph;
+    } else {
+      return super.equals(other);
+    }
+  }
+
   public boolean equalsCoordinate(final double x, final double y) {
     return this.getX() == x && this.getY() == y;
   }
@@ -188,15 +200,17 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
   }
 
   public void forEachInEdge(final Consumer<Edge<T>> action) {
+    final Graph<T> graph = this.graph;
     for (final int edgeId : this.inEdgeIds) {
-      final Edge<T> edge = this.graph.getEdge(edgeId);
+      final Edge<T> edge = graph.getEdge(edgeId);
       action.accept(edge);
     }
   }
 
   public void forEachOutEdge(final Consumer<Edge<T>> action) {
+    final Graph<T> graph = this.graph;
     for (final int edgeId : this.outEdgeIds) {
-      final Edge<T> edge = this.graph.getEdge(edgeId);
+      final Edge<T> edge = graph.getEdge(edgeId);
       action.accept(edge);
     }
   }
@@ -350,6 +364,11 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return this.id;
   }
 
+  public Edge<T> getInEdge(final int i) {
+    final int edgeId = this.inEdgeIds[i];
+    return this.graph.getEdge(edgeId);
+  }
+
   public int getInEdgeCount() {
     return this.inEdgeIds.length;
   }
@@ -361,6 +380,15 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
   public List<Edge<T>> getInEdges() {
     final Graph<T> graph = getGraph();
     return graph.getEdges(this.inEdgeIds);
+  }
+
+  public <T2 extends T> List<T2> getInObjects() {
+    if (this.inEdgeIds.length == 0) {
+      return Collections.emptyList();
+    } else {
+      final Graph<T> graph = getGraph();
+      return graph.getEdgeObjects(this.inEdgeIds);
+    }
   }
 
   public Edge<T> getNextEdge(final Edge<T> edge) {
@@ -380,6 +408,11 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     final int nextIndex = (index + 1) % this.outEdgeIds.length;
     final Graph<T> graph = getGraph();
     return graph.getEdge(this.outEdgeIds[nextIndex]);
+  }
+
+  public Edge<T> getOutEdge(final int i) {
+    final int edgeId = this.outEdgeIds[i];
+    return this.graph.getEdge(edgeId);
   }
 
   public int getOutEdgeCount() {
@@ -403,6 +436,15 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
       }
     }
     return edges;
+  }
+
+  public <T2 extends T> List<T2> getOutObjects() {
+    if (this.outEdgeIds.length == 0) {
+      return Collections.emptyList();
+    } else {
+      final Graph<T> graph = getGraph();
+      return graph.getEdgeObjects(this.outEdgeIds);
+    }
   }
 
   @Override
@@ -481,7 +523,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
 
   @Override
   public int hashCode() {
-    return this.id;
+    return Integer.hashCode(this.id);
   }
 
   public boolean isRemoved() {

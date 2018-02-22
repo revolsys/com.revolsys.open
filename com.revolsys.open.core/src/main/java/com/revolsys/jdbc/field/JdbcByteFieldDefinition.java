@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.record.Record;
 
 public class JdbcByteFieldDefinition extends JdbcFieldDefinition {
   public JdbcByteFieldDefinition(final String dbName, final String name, final int sqlType,
@@ -21,13 +20,14 @@ public class JdbcByteFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record, boolean internStrings) throws SQLException {
-    final byte byteValue = resultSet.getByte(columnIndex);
-    if (!resultSet.wasNull()) {
-      setValue(record, Byte.valueOf(byteValue));
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    final byte value = resultSet.getByte(columnIndex);
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
+      return Byte.valueOf(value);
     }
-    return columnIndex + 1;
   }
 
   @Override

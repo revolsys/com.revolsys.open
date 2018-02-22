@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.record.Record;
 
 public class JdbcFloatFieldDefinition extends JdbcFieldDefinition {
   public JdbcFloatFieldDefinition(final String dbName, final String name, final int sqlType,
@@ -21,13 +20,14 @@ public class JdbcFloatFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record, boolean internStrings) throws SQLException {
-    final float longValue = resultSet.getFloat(columnIndex);
-    if (!resultSet.wasNull()) {
-      setValue(record, Float.valueOf(longValue));
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    final float value = resultSet.getFloat(columnIndex);
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
+      return Float.valueOf(value);
     }
-    return columnIndex + 1;
   }
 
   @Override
