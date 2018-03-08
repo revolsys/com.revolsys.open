@@ -330,6 +330,19 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     return true;
   }
 
+  default boolean equalValues(final Map<String, ? extends Object> map, final String... fieldNames) {
+    if (map == null) {
+      return false;
+    } else {
+      for (final String fieldName : fieldNames) {
+        if (!equalValue(map, fieldName)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
   /**
    * Equal if the map has all the fields and values of this record
    * @param map

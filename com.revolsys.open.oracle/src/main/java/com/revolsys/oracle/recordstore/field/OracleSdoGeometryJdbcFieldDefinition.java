@@ -181,9 +181,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Record record) throws SQLException {
-    final String name = getName();
-    final Object value = record.getValue(name);
+    final int parameterIndex, final Object value) throws SQLException {
     if (Property.isEmpty(value)) {
       setNull(statement, parameterIndex);
     } else {

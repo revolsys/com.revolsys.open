@@ -74,6 +74,12 @@ public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
     return resultSet.getInt(columnIndex);
   }
 
+  @Override
+  public int setInsertPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
+    return parameterIndex;
+  }
+
   /**
    * Ignore any inserted value.
    */

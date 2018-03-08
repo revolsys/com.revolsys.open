@@ -178,6 +178,11 @@ public class JdbcFieldDefinition extends FieldDefinition {
     final int parameterIndex, final Record record) throws SQLException {
     final String name = getName();
     final Object value = record.getValue(name);
+    return setInsertPreparedStatementValue(statement, parameterIndex, value);
+  }
+
+  public int setInsertPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
     return setPreparedStatementValue(statement, parameterIndex, value);
   }
 

@@ -11,7 +11,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.record.Record;
 import com.revolsys.util.Property;
 
 public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
@@ -76,9 +75,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Record record) throws SQLException {
-    final String name = getName();
-    final Object value = record.getValue(name);
+    final int parameterIndex, final Object value) throws SQLException {
     final Object jdbcValue = getInsertUpdateValue(value);
     if (jdbcValue == null) {
       final int sqlType = getSqlType();

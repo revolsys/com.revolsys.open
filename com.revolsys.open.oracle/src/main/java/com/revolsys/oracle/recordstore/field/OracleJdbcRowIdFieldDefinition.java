@@ -49,6 +49,12 @@ public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
+    return parameterIndex;
+  }
+
+  @Override
+  public int setInsertPreparedStatementValue(final PreparedStatement statement,
     final int parameterIndex, final Record record) throws SQLException {
     return parameterIndex;
   }

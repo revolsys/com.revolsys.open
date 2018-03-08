@@ -11,7 +11,6 @@ import java.util.Map;
 import com.revolsys.datatype.CollectionDataType;
 import com.revolsys.datatype.DataType;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.record.Record;
 
 public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
 
@@ -26,10 +25,6 @@ public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
     super(dbName, name, dataType, sqlType, length, scale, required, description, properties);
     this.elementDataType = dataType.getContentType();
     this.elementField = elementField;
-  }
-
-  @Override
-  public void addInsertStatementPlaceHolder(final StringBuilder sql, final boolean generateKeys) {
   }
 
   @Override
@@ -52,16 +47,15 @@ public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Record record) throws SQLException {
-    return parameterIndex;
+    final int parameterIndex, final Object value) throws SQLException {
+    statement.setObject(parameterIndex, value);
+    return parameterIndex + 1;
   }
 
   @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
-    // value = new PostgreSQLTidWrapper(value);
-    statement.setObject(parameterIndex, value);
-    return parameterIndex + 1;
+    return setInsertPreparedStatementValue(statement, parameterIndex, value);
   }
 
 }

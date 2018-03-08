@@ -421,4 +421,14 @@ public class Angle {
     }
     return angle;
   }
+
+  public static String toDmsString(final double angle) {
+    return (int)Math.floor(angle) + " " + (int)Math.floor(angle * 60 % 60) + " "
+      + angle * 3600 % 60;
+  }
+
+  public static String toDmsStringRadians(double angle) {
+    angle = Math.toDegrees(angle);
+    return toDmsString(angle);
+  }
 }

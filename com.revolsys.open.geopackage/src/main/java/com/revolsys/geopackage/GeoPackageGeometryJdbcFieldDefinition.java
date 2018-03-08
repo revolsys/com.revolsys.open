@@ -317,11 +317,9 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       "Invalid Geometry header, expecting GP\n" + Arrays.toString(data));
   }
 
-  @Override
+
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Record record) throws SQLException {
-    final String name = getName();
-    final Object value = record.getValue(name);
+    final int parameterIndex, final Object value) throws SQLException {
     final Object jdbcValue = getInsertUpdateValue(value);
     if (jdbcValue == null) {
       final int sqlType = getSqlType();
@@ -331,6 +329,7 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     }
     return parameterIndex + 1;
   }
+  
 
   @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
