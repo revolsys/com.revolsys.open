@@ -63,7 +63,7 @@ public class EpsgCsWktWriter {
     if (geodeticDatum != null) {
       out.print(",DATUM[");
       write(out, geodeticDatum.getName());
-      final Ellipsoid ellipsoid = geodeticDatum.getSpheroid();
+      final Ellipsoid ellipsoid = geodeticDatum.getEllipsoid();
       if (ellipsoid != null) {
         write(out, ellipsoid);
       }

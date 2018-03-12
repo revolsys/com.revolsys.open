@@ -59,7 +59,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private final RecordStoreSchema rootSchema;
 
-  private final CategoryLabelCountMap statistics = new CategoryLabelCountMap();
+  private CategoryLabelCountMap statistics;
 
   private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<>();
 
@@ -268,7 +268,10 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   protected void initializeDo() {
-    getStatistics().connect();
+    final CategoryLabelCountMap statistics = getStatistics();
+    if (statistics != null) {
+      statistics.connect();
+    }
   }
 
   protected void initRecordDefinition(final RecordDefinition recordDefinition) {
@@ -352,12 +355,25 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public void setLabel(final String label) {
     this.label = label;
-    getStatistics().setPrefix(label);
+    final CategoryLabelCountMap statistics = getStatistics();
+    if (statistics != null) {
+      statistics.setPrefix(label);
+    }
   }
 
   @Override
   public void setLoadFullSchema(final boolean loadFullSchema) {
     this.loadFullSchema = loadFullSchema;
+  }
+
+  public void setLogCounts(final boolean logCounts) {
+    if (logCounts) {
+      if (this.statistics == null) {
+        this.statistics = new CategoryLabelCountMap();
+      }
+    } else {
+      this.statistics = null;
+    }
   }
 
   @Override

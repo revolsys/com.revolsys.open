@@ -49,7 +49,7 @@ public class EsriCoordinateSystemsLoader {
         Maps.addToMap(Maps::newTree, csBymd5, new ByteArray(digest), id, coordinateSystem);
 
         final GeodeticDatum datum = coordinateSystem.getDatum();
-        final Ellipsoid ellipsoid = datum.getSpheroid();
+        final Ellipsoid ellipsoid = datum.getEllipsoid();
         final PrimeMeridian primeMeridian = coordinateSystem.getPrimeMeridian();
         final AngularUnit angularUnit = coordinateSystem.getAngularUnit();
 

@@ -35,7 +35,7 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
     final double firstStandardParallel = cs.getDoubleParameter(NormalizedParameterNames.STANDARD_PARALLEL_1);
     final double secondStandardParallel = cs.getDoubleParameter(NormalizedParameterNames.STANDARD_PARALLEL_2);
 
-    final Ellipsoid ellipsoid = geodeticDatum.getSpheroid();
+    final Ellipsoid ellipsoid = geodeticDatum.getEllipsoid();
     this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);

@@ -305,7 +305,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     final Unit<Angle> unit = this.angularUnit.getUnit();
     final UnitConverter radianConverter = unit.getConverterTo(SI.RADIAN);
 
-    final Ellipsoid ellipsoid = this.geodeticDatum.getSpheroid();
+    final Ellipsoid ellipsoid = this.geodeticDatum.getEllipsoid();
     final double radius = ellipsoid.getSemiMajorAxis();
     final double radianFactor = radianConverter.convert(1);
     return SI.METRE.times(radius).times(radianFactor);

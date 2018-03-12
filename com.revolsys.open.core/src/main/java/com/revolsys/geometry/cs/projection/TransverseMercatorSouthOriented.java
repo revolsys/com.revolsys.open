@@ -46,7 +46,7 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
     final double centralMeridian = cs.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
     final double scaleFactor = cs.getDoubleParameter(NormalizedParameterNames.SCALE_FACTOR);
 
-    this.ellipsoid = geodeticDatum.getSpheroid();
+    this.ellipsoid = geodeticDatum.getEllipsoid();
     this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);

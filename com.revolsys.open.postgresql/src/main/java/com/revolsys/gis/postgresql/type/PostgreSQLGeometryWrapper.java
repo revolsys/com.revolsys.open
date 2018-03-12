@@ -2,8 +2,6 @@ package com.revolsys.gis.postgresql.type;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Map;
 
 import org.postgresql.util.PGobject;
@@ -471,49 +469,6 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     return this.geometry;
   }
 
-  private ByteBuffer newByteBuffer(final String wkb) {
-    final byte[] bytes = new byte[wkb.length() / 2];
-    int charIndex = 0;
-    for (int byteIndex = 0; byteIndex < bytes.length; byteIndex++) {
-
-      final char highChar = wkb.charAt(charIndex++);
-      final char lowChar = wkb.charAt(charIndex++);
-      int highByte;
-      if (highChar >= '0' && highChar <= '9') {
-        highByte = (byte)(highChar - '0');
-      } else if (highChar >= 'A' && highChar <= 'F') {
-        highByte = (byte)(highChar - 'A' + 10);
-      } else if (highChar >= 'a' && highChar <= 'f') {
-        highByte = (byte)(highChar - 'a' + 10);
-      } else {
-        throw new IllegalArgumentException("No valid Hex char " + highChar);
-      }
-      byte lowByte;
-      if (lowChar >= '0' && lowChar <= '9') {
-        lowByte = (byte)(lowChar - '0');
-      } else if (lowChar >= 'A' && lowChar <= 'F') {
-        lowByte = (byte)(lowChar - 'A' + 10);
-      } else if (lowChar >= 'a' && lowChar <= 'f') {
-        lowByte = (byte)(lowChar - 'a' + 10);
-      } else {
-        throw new IllegalArgumentException("No valid Hex char " + lowChar);
-      }
-
-      final byte b = (byte)((highByte << 4) + lowByte);
-      bytes[byteIndex] = b;
-    }
-    final ByteBuffer buffer = ByteBuffer.wrap(bytes);
-    final byte endian = buffer.get();
-    if (endian == 0) {
-      buffer.order(ByteOrder.BIG_ENDIAN);
-    } else if (endian == 1) {
-      buffer.order(ByteOrder.LITTLE_ENDIAN);
-    } else {
-      throw new IllegalArgumentException("Unknown Endian type:" + endian);
-    }
-    return buffer;
-  }
-
   public void newGeometry(GeometryFactory geometryFactory) {
     final String value = getValue().trim();
     int srid = -1;
@@ -532,54 +487,72 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     if (srid != -1 && geometryFactory.getCoordinateSystemId() != srid) {
       geometryFactory = GeometryFactory.floating(srid, geometryFactory.getAxisCount());
     }
-    if (wkt.startsWith("00") || wkt.startsWith("01")) {
-      this.geometry = parseWkb(geometryFactory, wkt);
+    if (wkt.startsWith("00")) {
+      this.geometry = parseWkbBigEndian(geometryFactory, wkt);
+    } else if (wkt.startsWith("01")) {
+      this.geometry = parseWkbLittleEndian(geometryFactory, wkt);
     } else {
       this.geometry = geometryFactory.geometry(value);
     }
   }
 
-  private Geometry parseCollection(final GeometryFactory geometryFactory, final ByteBuffer data) {
+  private Geometry parseCollection(final GeometryFactory geometryFactory, final ValueGetter data) {
     final int count = data.getInt();
     final Geometry[] geoms = new Geometry[count];
     parseGeometryArray(geometryFactory, data, geoms);
     return geometryFactory.geometry(geoms);
   }
 
-  private double[] parseCoordinates(final int axisCount, final ByteBuffer data, final boolean hasZ,
+  private double[] parseCoordinates(final int axisCount, final ValueGetter data, final boolean hasZ,
     final boolean hasM) {
     final int vertexCount = data.getInt();
     final double[] coordinates = new double[axisCount * vertexCount];
-
     int coordinateIndex = 0;
-    for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
-      final double x = data.getDouble();
-      coordinates[coordinateIndex++] = x;
 
-      final double y = data.getDouble();
-      coordinates[coordinateIndex++] = y;
-
-      if (hasM) {
-        if (hasZ) {
+    if (hasM) {
+      if (hasZ) {
+        for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+          final double x = data.getDouble();
+          final double y = data.getDouble();
           final double z = data.getDouble();
+          final double m = data.getDouble();
+          coordinates[coordinateIndex++] = x;
+          coordinates[coordinateIndex++] = y;
           coordinates[coordinateIndex++] = z;
-
-          final double m = data.getDouble();
-          coordinates[coordinateIndex++] = m;
-        } else {
-          coordinateIndex++; // no z so increment index
-          final double m = data.getDouble();
           coordinates[coordinateIndex++] = m;
         }
-      } else if (hasZ) {
+      } else {
+        for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+          final double x = data.getDouble();
+          final double y = data.getDouble();
+          final double m = data.getDouble();
+          coordinates[coordinateIndex++] = x;
+          coordinates[coordinateIndex++] = y;
+          coordinateIndex++; // Skip z
+          coordinates[coordinateIndex++] = m;
+        }
+      }
+    } else if (hasZ) {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+        final double x = data.getDouble();
+        final double y = data.getDouble();
         final double z = data.getDouble();
+        coordinates[coordinateIndex++] = x;
+        coordinates[coordinateIndex++] = y;
         coordinates[coordinateIndex++] = z;
+      }
+    } else {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+        final double x = data.getDouble();
+        final double y = data.getDouble();
+        coordinates[coordinateIndex++] = x;
+        coordinates[coordinateIndex++] = y;
       }
     }
     return coordinates;
   }
 
-  private Geometry parseGeometry(final GeometryFactory geometryFactory, final ByteBuffer data) {
+  private Geometry parseGeometry(final GeometryFactory geometryFactory, final ValueGetter data) {
     final int typeword = data.getInt();
 
     final int realtype = typeword & 0x1FFFFFFF;
@@ -640,22 +613,22 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  private void parseGeometryArray(final GeometryFactory geometryFactory, final ByteBuffer data,
+  private void parseGeometryArray(final GeometryFactory geometryFactory, final ValueGetter data,
     final Geometry[] container) {
     for (int i = 0; i < container.length; ++i) {
-      data.get(); // read endian
+      data.getByte(); // read endian
       container[i] = parseGeometry(geometryFactory, data);
     }
   }
 
-  private LinearRing parseLinearRing(final GeometryFactory geometryFactory, final ByteBuffer data,
+  private LinearRing parseLinearRing(final GeometryFactory geometryFactory, final ValueGetter data,
     final boolean hasZ, final boolean hasM) {
     final int axisCount = geometryFactory.getAxisCount();
     final double[] coordinates = parseCoordinates(axisCount, data, hasZ, hasM);
     return geometryFactory.linearRing(axisCount, coordinates);
   }
 
-  private LineString parseLineString(final GeometryFactory geometryFactory, final ByteBuffer data,
+  private LineString parseLineString(final GeometryFactory geometryFactory, final ValueGetter data,
     final boolean hasZ, final boolean hasM) {
     final int axisCount = geometryFactory.getAxisCount();
     final double[] coordinates = parseCoordinates(axisCount, data, hasZ, hasM);
@@ -663,7 +636,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
   }
 
   private Geometry parseMultiLineString(final GeometryFactory geometryFactory,
-    final ByteBuffer data) {
+    final ValueGetter data) {
     final int count = data.getInt();
     final LineString[] lines = new LineString[count];
     parseGeometryArray(geometryFactory, data, lines);
@@ -674,7 +647,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  private Geometry parseMultiPoint(final GeometryFactory geometryFactory, final ByteBuffer data) {
+  private Geometry parseMultiPoint(final GeometryFactory geometryFactory, final ValueGetter data) {
     final Point[] points = new Point[data.getInt()];
     parseGeometryArray(geometryFactory, data, points);
     if (points.length == 1) {
@@ -684,7 +657,8 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  private Geometry parseMultiPolygon(final GeometryFactory geometryFactory, final ByteBuffer data) {
+  private Geometry parseMultiPolygon(final GeometryFactory geometryFactory,
+    final ValueGetter data) {
     final int count = data.getInt();
     final Polygon[] polys = new Polygon[count];
     parseGeometryArray(geometryFactory, data, polys);
@@ -695,7 +669,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  private Point parsePoint(final GeometryFactory geometryFactory, final ByteBuffer data,
+  private Point parsePoint(final GeometryFactory geometryFactory, final ValueGetter data,
     final boolean hasZ, final boolean hasM) {
     final double x = data.getDouble();
     final double y = data.getDouble();
@@ -717,7 +691,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  private Polygon parsePolygon(final GeometryFactory geometryFactory, final ByteBuffer data,
+  private Polygon parsePolygon(final GeometryFactory geometryFactory, final ValueGetter data,
     final boolean hasZ, final boolean hasM) {
     final int count = data.getInt();
     final LinearRing[] rings = new LinearRing[count];
@@ -727,9 +701,13 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     return geometryFactory.polygon(rings);
   }
 
-  private Geometry parseWkb(final GeometryFactory geometryFactory, final String wkb) {
-    final ByteBuffer buffer = newByteBuffer(wkb);
-    final Geometry newGeometry = parseGeometry(geometryFactory, buffer);
-    return newGeometry;
+  private Geometry parseWkbBigEndian(final GeometryFactory geometryFactory, final String wkb) {
+    final ValueGetter valueGetter = new BigEndianValueGetter(wkb);
+    return parseGeometry(geometryFactory, valueGetter);
+  }
+
+  private Geometry parseWkbLittleEndian(final GeometryFactory geometryFactory, final String wkb) {
+    final ValueGetter valueGetter = new LittleEndianValueGetter(wkb);
+    return parseGeometry(geometryFactory, valueGetter);
   }
 }

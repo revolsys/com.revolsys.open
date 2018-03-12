@@ -192,14 +192,16 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   default void addStatistic(final String statisticName, final Record object) {
-    if (getStatistics() != null) {
-      getStatistics().addCount(statisticName, object);
+    final CategoryLabelCountMap statistics = getStatistics();
+    if (statistics != null) {
+      statistics.addCount(statisticName, object);
     }
   }
 
   default void addStatistic(final String statisticName, final String typePath, final int count) {
-    if (getStatistics() != null) {
-      getStatistics().addCount(statisticName, typePath, count);
+    final CategoryLabelCountMap statistics = getStatistics();
+    if (statistics != null) {
+      statistics.addCount(statisticName, typePath, count);
     }
   }
 
@@ -223,6 +225,11 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
       }
     }
     return false;
+  }
+
+  default boolean deleteRecord(final PathName typePath, final Object identifier) {
+    final Identifier id = Identifier.newIdentifier(identifier);
+    return deleteRecord(typePath, id);
   }
 
   default boolean deleteRecord(final Record record) {
@@ -413,7 +420,11 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   default LabelCountMap getStatistics(final String name) {
     final CategoryLabelCountMap statistics = getStatistics();
-    return statistics.getLabelCountMap(name);
+    if (statistics == null) {
+      return null;
+    } else {
+      return statistics.getLabelCountMap(name);
+    }
   }
 
   @Override
@@ -651,7 +662,9 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   default void setStatistics(final String name, final LabelCountMap labelCountMap) {
     final CategoryLabelCountMap categoryLabelCountMap = getStatistics();
-    categoryLabelCountMap.setLabelCountMap(name, labelCountMap);
+    if (categoryLabelCountMap != null) {
+      categoryLabelCountMap.setLabelCountMap(name, labelCountMap);
+    }
   }
 
   default void updateRecord(final Record record) {

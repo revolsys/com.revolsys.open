@@ -30,7 +30,7 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
     final GeodeticDatum geodeticDatum = geographicCS.getDatum();
     final double centralMeridian = cs.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
 
-    final Ellipsoid ellipsoid = geodeticDatum.getSpheroid();
+    final Ellipsoid ellipsoid = geodeticDatum.getEllipsoid();
     this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);

@@ -1,6 +1,8 @@
 package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.MessageDigest;
 
 import com.revolsys.datatype.DataType;
@@ -89,7 +91,7 @@ public class Ellipsoid implements Serializable {
       + a / Math.sqrt(1 - esq * (sinPhi2 * sinPhi2))) / 2;
 
     final double distance = distanceMetres(lon1, lat1, lon2, lat2);
-    final double azimuth = azimuthForwards(lon1, lat1, lon2, lat2);
+    final double azimuth = azimuth(lon1, lat1, lon2, lat2);
 
     // c1 is always 0 as dh is 0
 
@@ -108,58 +110,64 @@ public class Ellipsoid implements Serializable {
     return Math.toDegrees(spaz);
   }
 
-  public double azimuthForwards(double lon1, double lat1, double lon2, double lat2) {
+  public double azimuth(final double lon1, final double lat1, final double lon2,
+    final double lat2) {
+    final double lambda1 = Math.toRadians(lon1);
+    final double phi1 = Math.toRadians(lat1);
+    final double lambda2 = Math.toRadians(lon2);
+    final double phi2 = Math.toRadians(lat2);
+    return distanceMetresRadians(lambda1, phi1, lambda2, phi2);
+  }
+
+  public double azimuthRadians(final double lambda1, final double phi1, final double lambda2,
+    final double phi2) {
     final double f = this.flattening;
 
-    lon1 = Math.toRadians(lon1);
-    lon2 = Math.toRadians(lon2);
+    final double deltaLambda = lambda2 - lambda1;
+    final double tanU1 = (1 - f) * Math.tan(phi1);
+    final double cosU1 = 1 / Math.sqrt(1 + tanU1 * tanU1);
+    final double sinU1 = tanU1 * cosU1;
+    final double tanU2 = (1 - f) * Math.tan(phi2);
+    final double cosU2 = 1 / Math.sqrt(1 + tanU2 * tanU2);
+    final double sinU2 = tanU2 * cosU2;
 
-    lat1 = Math.toRadians(lat1);
-    lat2 = Math.toRadians(lat2);
-
-    final double deltaLon = lon2 - lon1;
-    final double tanU1 = (1 - f) * Math.tan(lat1), cosU1 = 1 / Math.sqrt(1 + tanU1 * tanU1),
-        sinU1 = tanU1 * cosU1;
-    final double tanU2 = (1 - f) * Math.tan(lat2), cosU2 = 1 / Math.sqrt(1 + tanU2 * tanU2),
-        sinU2 = tanU2 * cosU2;
-
-    double lon = deltaLon;
-    double lastLon;
+    double lambda = deltaLambda;
+    double lastLambda;
     double iterationLimit = 100;
     double cosSqAlpha;
     double sinSigma;
     double cos2SigmaM;
     double sigma;
     double cosSigma;
-    double sinlon;
-    double coslon;
+    double sinLambda;
+    double cosLambda;
 
     do {
-      sinlon = Math.sin(lon);
-      coslon = Math.cos(lon);
-      final double sinSqSigma = cosU2 * sinlon * (cosU2 * sinlon)
-        + (cosU1 * sinU2 - sinU1 * cosU2 * coslon) * (cosU1 * sinU2 - sinU1 * cosU2 * coslon);
+      sinLambda = Math.sin(lambda);
+      cosLambda = Math.cos(lambda);
+      final double sinSqSigma = cosU2 * sinLambda * (cosU2 * sinLambda)
+        + (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda) * (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda);
       sinSigma = Math.sqrt(sinSqSigma);
       if (sinSigma == 0) { // co-incident points
         return 0;
       }
-      cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * coslon;
+      cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda;
       sigma = Math.atan2(sinSigma, cosSigma);
-      final double sinAlpha = cosU1 * cosU2 * sinlon / sinSigma;
+      final double sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma;
       cosSqAlpha = 1 - sinAlpha * sinAlpha;
       cos2SigmaM = cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha;
       if (!Double.isFinite(cos2SigmaM)) {// equatorial line: cosSqAlpha=0 (§6)
         cos2SigmaM = 0;
       }
       final double C = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
-      lastLon = lon;
-      lon = deltaLon + (1 - C) * f * sinAlpha
+      lastLambda = lambda;
+      lambda = deltaLambda + (1 - C) * f * sinAlpha
         * (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
-    } while (Math.abs(lon - lastLon) > 1e-12 && --iterationLimit > 0);
+    } while (Math.abs(lambda - lastLambda) > 1e-12 && --iterationLimit > 0);
     if (iterationLimit == 0) {
       throw new IllegalStateException("Formula failed to converge");
     }
-    double azimuth = Math.atan2(cosU2 * sinlon, cosU1 * sinU2 - sinU1 * cosU2 * coslon);
+    double azimuth = Math.atan2(cosU2 * sinLambda, cosU1 * sinU2 - sinU1 * cosU2 * cosLambda);
     if (azimuth > Angle.PI_TIMES_2) {
       azimuth -= Angle.PI_TIMES_2;
     } else if (azimuth < 0) {
@@ -171,62 +179,85 @@ public class Ellipsoid implements Serializable {
   /**
    * https://www.movable-type.co.uk/scripts/latlong-vincenty.html
    * @author Paul Austin <paul.austin@revolsys.com>
-   * @param lon1
-   * @param lat1
+   * @param lambda1
+   * @param phi1
    * @param lon2
    * @param lat2
    * @return
    */
-  public double distanceMetres(double lon1, double lat1, double lon2, double lat2) {
+  public double distanceMetres(final double lon1, final double lat1, final double lon2,
+    final double lat2) {
+    final double lambda1 = Math.toRadians(lon1);
+    final double phi1 = Math.toRadians(lat1);
+    final double lambda2 = Math.toRadians(lon2);
+    final double phi2 = Math.toRadians(lat2);
+    return distanceMetresRadians(lambda1, phi1, lambda2, phi2);
+  }
+
+  public double distanceMetres(final double lon1, final double lat1, final double h1,
+    final double lon2, final double lat2, final double h2) {
+
+    final double distance = distanceMetres(lon1, lat1, lon2, lat2);
+    final double angleForwards = azimuth(lon1, lat1, lon2, lat2);
+    final double angleBackwards = azimuth(lon2, lat2, lon1, lat1);
+
+    final double r1 = radius(lat1, angleForwards);
+    final double r2 = radius(lat2, angleBackwards);
+    final double deltaH = h2 - h1;
+    final double delhsq = deltaH * deltaH;
+    final double twor = r1 + r2;
+    final double lo = twor * Math.sin(distance / twor);
+    final double losq = lo * lo;
+    return Math.sqrt(losq * (h1 / r1 + 1.) * (h2 / r2 + 1.) + delhsq);
+  }
+
+  public double distanceMetresRadians(final double lambda1, final double phi1, final double lambda2,
+    final double phi2) {
     final double f = this.flattening;
     final double a = this.semiMajorAxis;
     final double b = this.semiMinorAxis;
 
-    lon1 = Math.toRadians(lon1);
-    lon2 = Math.toRadians(lon2);
+    final double deltaLambda = lambda2 - lambda1;
+    final double tanU1 = (1 - f) * Math.tan(phi1);
+    final double cosU1 = 1 / Math.sqrt(1 + tanU1 * tanU1);
+    final double sinU1 = tanU1 * cosU1;
+    final double tanU2 = (1 - f) * Math.tan(phi2);
+    final double cosU2 = 1 / Math.sqrt(1 + tanU2 * tanU2);
+    final double sinU2 = tanU2 * cosU2;
 
-    lat1 = Math.toRadians(lat1);
-    lat2 = Math.toRadians(lat2);
-
-    final double deltaLon = lon2 - lon1;
-    final double tanU1 = (1 - f) * Math.tan(lat1), cosU1 = 1 / Math.sqrt(1 + tanU1 * tanU1),
-        sinU1 = tanU1 * cosU1;
-    final double tanU2 = (1 - f) * Math.tan(lat2), cosU2 = 1 / Math.sqrt(1 + tanU2 * tanU2),
-        sinU2 = tanU2 * cosU2;
-
-    double lon = deltaLon;
-    double lastLon;
+    double lambda = deltaLambda;
+    double lastLambda;
     double iterationLimit = 100;
     double cosSqAlpha;
     double sinSigma;
     double cos2SigmaM;
     double sigma;
     double cosSigma;
-    double sinlon;
-    double coslon;
+    double sinLambda;
+    double cosLambda;
 
     do {
-      sinlon = Math.sin(lon);
-      coslon = Math.cos(lon);
-      final double sinSqSigma = cosU2 * sinlon * (cosU2 * sinlon)
-        + (cosU1 * sinU2 - sinU1 * cosU2 * coslon) * (cosU1 * sinU2 - sinU1 * cosU2 * coslon);
+      sinLambda = Math.sin(lambda);
+      cosLambda = Math.cos(lambda);
+      final double sinSqSigma = cosU2 * sinLambda * (cosU2 * sinLambda)
+        + (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda) * (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda);
       sinSigma = Math.sqrt(sinSqSigma);
       if (sinSigma == 0) { // co-incident points
         return 0;
       }
-      cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * coslon;
+      cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda;
       sigma = Math.atan2(sinSigma, cosSigma);
-      final double sinAlpha = cosU1 * cosU2 * sinlon / sinSigma;
+      final double sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma;
       cosSqAlpha = 1 - sinAlpha * sinAlpha;
       cos2SigmaM = cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha;
       if (!Double.isFinite(cos2SigmaM)) {// equatorial line: cosSqAlpha=0 (§6)
         cos2SigmaM = 0;
       }
       final double C = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
-      lastLon = lon;
-      lon = deltaLon + (1 - C) * f * sinAlpha
+      lastLambda = lambda;
+      lambda = deltaLambda + (1 - C) * f * sinAlpha
         * (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
-    } while (Math.abs(lon - lastLon) > 1e-12 && --iterationLimit > 0);
+    } while (Math.abs(lambda - lastLambda) > 1e-12 && --iterationLimit > 0);
     if (iterationLimit == 0) {
       throw new IllegalStateException("Formula failed to converge");
     }
@@ -240,23 +271,6 @@ public class Ellipsoid implements Serializable {
 
     final double s = b * A * (sigma - deltaSigmaSigma);
     return s;
-  }
-
-  public double distanceMetres(final double lon1, final double lat1, final double h1,
-    final double lon2, final double lat2, final double h2) {
-
-    final double distance = distanceMetres(lon1, lat1, lon2, lat2);
-    final double angleForwards = azimuthForwards(lon1, lat1, lon2, lat2);
-    final double angleBackwards = azimuthForwards(lon2, lat2, lon1, lat1);
-
-    final double r1 = radius(lat1, angleForwards);
-    final double r2 = radius(lat2, angleBackwards);
-    final double deltaH = h2 - h1;
-    final double delhsq = deltaH * deltaH;
-    final double twor = r1 + r2;
-    final double lo = twor * Math.sin(distance / twor);
-    final double losq = lo * lo;
-    return Math.sqrt(losq * (h1 / r1 + 1.) * (h2 / r2 + 1.) + delhsq);
   }
 
   @Override
@@ -297,6 +311,57 @@ public class Ellipsoid implements Serializable {
     } else {
       return true;
     }
+  }
+
+  public double geodeticAzimuth(final double lon1, final double lat1, final double h1, double xsi,
+    double eta, final double lon2, final double lat2, final double h2, final double x0,
+    final double y0, final double z0, double spaz) {
+    final double lambda1 = Math.toRadians(lon1);
+    final double phi1 = Math.toRadians(lat1);
+    final double lambda2 = Math.toRadians(lon2);
+    final double phi2 = Math.toRadians(lat2);
+    spaz = Math.toRadians(spaz);
+    xsi = Math.toRadians(xsi);
+    eta = Math.toRadians(eta);
+    final double radians = geodeticAzimuthRadians(lambda1, phi1, h1, xsi, eta, lambda2, phi2, h2,
+      x0, y0, z0, spaz);
+    return Math.toDegrees(radians);
+  }
+
+  public double geodeticAzimuthRadians(final double lambda1, final double phi1, final double h1,
+    final double xsi, final double eta, final double lambda2, final double phi2, final double h2,
+    final double x0, final double y0, final double z0, final double spaz) {
+    final double a = this.semiMajorAxis;
+    final double b = this.semiMinorAxis;
+
+    final double phim = (phi1 + phi2) / 2.;
+    final double esq = (a * a - b * b) / (a * a);
+    final double sinPhi1 = Math.sin(phi1);
+    final double mm1 = Math.sqrt(1. - esq * (sinPhi1 * sinPhi1));
+    final double sinPhi2 = Math.sin(phi2);
+    final double mm2 = Math.sqrt(1. - esq * (sinPhi2 * sinPhi2));
+    final double mm = (a * (1 - esq) / (mm1 * (mm1 * mm1)) + a * (1 - esq) / (mm2 * (mm2 * mm2)))
+      / 2;
+    final double nm = (a / mm1 + a / mm2) / 2;
+
+    final double a12 = azimuthRadians(lambda1, phi1, lambda2, phi2);
+
+    final double s12 = distanceMetresRadians(lambda1, phi1, lambda2, phi2);
+
+    // Always 0 as dh = 0
+    final double c1 = 0;// (-(xsi) * Math.sin(a12) + eta * Math.cos(a12)) * 0 / sqrt(ssq - 0 * 0);
+
+    final double cosPhi2 = Math.cos(phi2);
+    final double c2 = h2 / mm * esq * Math.sin(a12) * Math.cos(a12) * (cosPhi2 * cosPhi2);
+
+    final double cosPhim = Math.cos(phim);
+    final double c3 = -esq * (s12 * s12) * (cosPhim * cosPhim) * Math.sin(a12 * 2) / (nm * nm * 12);
+
+    double geodeticAzimuth = spaz - eta * Math.tan(phi1) + c1 + c2 + c3;
+    if (geodeticAzimuth < 0) {
+      geodeticAzimuth = Angle.PI_TIMES_2 + geodeticAzimuth;
+    }
+    return geodeticAzimuth;
   }
 
   public Authority getAuthority() {
@@ -380,28 +445,37 @@ public class Ellipsoid implements Serializable {
     return n0;
   }
 
+  protected void print(final String fn, final double a12) {
+    System.out
+      .println(fn + "=" + new BigDecimal(a12).setScale(18, RoundingMode.HALF_UP).toPlainString());
+  }
+
   public double radius(final double lat, final double alpha) {
     final double phi = Math.toRadians(lat);
     final double ecc = this.eccentricitySquared;
     final double sinPhi = Math.sin(phi);
-    final double denom = Math.sqrt(1. - ecc * (sinPhi * sinPhi));
+    final double denom = Math.sqrt(1 - ecc * (sinPhi * sinPhi));
     final double pvrad = this.semiMajorAxis / denom;
-    final double merrad = this.semiMajorAxis * (1. - ecc) / (denom * (denom * denom));
+    final double merrad = this.semiMajorAxis * (1 - ecc) / (denom * (denom * denom));
     final double cosAlpha = Math.cos(alpha);
     final double sinAlpha = Math.sin(alpha);
     return pvrad * merrad / (pvrad * (cosAlpha * cosAlpha) + merrad * (sinAlpha * sinAlpha));
   }
 
-  public double slopeDistance(final double lon1, final double lat1, final double h1, double xsi,
-    double eta, final double lon2, final double lat2, final double h2, final double x0,
-    final double y0, final double z0) {
+  public double slopeDistance(final double lon1, final double lat1, final double h1,
+    final double xsi, final double eta, final double lon2, final double lat2, final double h2,
+    final double x0, final double y0, final double z0) {
     final double lambda1 = Math.toRadians(lon1);
     final double phi1 = Math.toRadians(lat1);
     final double lambda2 = Math.toRadians(lon2);
     final double phi2 = Math.toRadians(lat2);
-    eta = Math.toRadians(eta);
-    xsi = Math.toRadians(xsi);
 
+    return slopeDistanceRadians(lambda1, phi1, h1, lambda2, phi2, h2, x0, y0, z0);
+  }
+
+  public double slopeDistanceRadians(final double lambda1, final double phi1, final double h1,
+    final double lambda2, final double phi2, final double h2, final double x0, final double y0,
+    final double z0) {
     final double[] p1 = toCaresian(phi1, lambda1, h1, x0, y0, z0);
     final double[] p2 = toCaresian(phi2, lambda2, h2, x0, y0, z0);
 
@@ -412,6 +486,50 @@ public class Ellipsoid implements Serializable {
     final double slopeDistance = Math.sqrt(ssq);
 
     return slopeDistance;
+  }
+
+  public double spatialDirection(final double lon1, final double lat1, final double h1, double xsi,
+    double eta, final double lon2, final double lat2, final double h2, final double x0,
+    final double y0, final double z0, final double d12) {
+
+    final double a = this.semiMajorAxis;
+    final double b = this.semiMinorAxis;
+
+    final double lambda1 = Math.toRadians(lon1);
+    final double phi1 = Math.toRadians(lat1);
+    final double lambda2 = Math.toRadians(lon2);
+    final double phi2 = Math.toRadians(lat2);
+    eta = Math.toRadians(eta);
+    xsi = Math.toRadians(xsi);
+
+    final double phim = (phi1 + phi2) / 2;
+    final double esq = (a * a - b * b) / (a * a);
+
+    final double sinPhi1 = Math.sin(phi1);
+    final double sinPhi2 = Math.sin(phi2);
+    final double d__1 = Math.sqrt(1. - esq * (sinPhi1 * sinPhi1));
+    final double d__4 = Math.sqrt(1 - esq * (sinPhi2 * sinPhi2));
+    final double mm = (a * (1 - esq) / (d__1 * (d__1 * d__1))
+      + a * (1 - esq) / (d__4 * (d__4 * d__4))) / 2.;
+    final double nm = (a / Math.sqrt(1 - esq * (sinPhi1 * sinPhi1))
+      + a / Math.sqrt(1 - esq * (sinPhi2 * sinPhi2))) / 2.;
+
+    final double s12 = distanceMetres(lon1, lat1, lon2, lat2);
+    final double a12 = azimuth(lon1, lat1, lon2, lat2);
+
+    final double ssq = this.slopeDistanceRadians(lambda1, phi1, h1, lambda2, phi2, h2, x0, y0, z0);
+
+    final double dh = 0;
+    final double c1 = (-xsi * Math.sin(a12) + eta * Math.cos(a12)) * dh / Math.sqrt(ssq - dh * dh);
+
+    final double cosPhi2 = Math.cos(phi2);
+    final double c2 = h2 / mm * esq * Math.sin(a12) * Math.cos(a12) * (cosPhi2 * cosPhi2);
+
+    final double cosPhim = Math.cos(phim);
+    final double c3 = -esq * (s12 * s12) * (cosPhim * cosPhim) * Math.sin(a12 * 2.)
+      / (nm * nm * 12.);
+
+    return d12 - c1 - c2 - c3;
   }
 
   private double[] toCaresian(final double phi, final double rlam, final double h, final double x0,
@@ -426,7 +544,7 @@ public class Ellipsoid implements Serializable {
     final double n = a / Math.sqrt(1 - e2 * (sp * sp));
     final double x = x0 + (n + h) * cp * Math.cos(rlam);
     final double y = y0 + (n + h) * cp * Math.sin(rlam);
-    final double z = z0 + (n * (1. - e2) + h) * sp;
+    final double z = z0 + (n * (1 - e2) + h) * sp;
     return new double[] {
       x, y, z
     };

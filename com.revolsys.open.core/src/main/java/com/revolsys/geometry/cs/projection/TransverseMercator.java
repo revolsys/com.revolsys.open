@@ -80,7 +80,7 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
       .getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
     final double scaleFactor = coordinateSystem.getDoubleParameter(NormalizedParameterNames.SCALE_FACTOR);
 
-    final Ellipsoid ellipsoid = geodeticDatum.getSpheroid();
+    final Ellipsoid ellipsoid = geodeticDatum.getEllipsoid();
     this.x0 = coordinateSystem.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = coordinateSystem.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);

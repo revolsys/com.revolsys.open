@@ -95,7 +95,7 @@ public class EsriCsWktWriter {
     final int indentLevel) throws IOException {
     out.write("DATUM[");
     write(out, geodeticDatum.getName(), incrementIndent(indentLevel));
-    final Ellipsoid ellipsoid = geodeticDatum.getSpheroid();
+    final Ellipsoid ellipsoid = geodeticDatum.getEllipsoid();
     if (ellipsoid != null) {
       out.write(",");
       indent(out, incrementIndent(indentLevel));

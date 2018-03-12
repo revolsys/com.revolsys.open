@@ -879,7 +879,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       final CoordinateSystem coordinateSystem = this.geometryFactory2d.getCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
-        final double radius = geoCs.getDatum().getSpheroid().getSemiMajorAxis();
+        final double radius = geoCs.getDatum().getEllipsoid().getSemiMajorAxis();
         convertedValue = Math.toDegrees(convertedValue / radius);
 
       }
@@ -968,7 +968,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       final CoordinateSystem coordinateSystem = this.geometryFactory2d.getCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
-        final double radius = geoCs.getDatum().getSpheroid().getSemiMajorAxis();
+        final double radius = geoCs.getDatum().getEllipsoid().getSemiMajorAxis();
         convertedValue = Math.toDegrees(convertedValue / radius);
 
       }

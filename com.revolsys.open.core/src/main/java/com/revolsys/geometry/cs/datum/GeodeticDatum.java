@@ -62,7 +62,7 @@ public class GeodeticDatum extends Datum {
     return this.primeMeridian;
   }
 
-  public Ellipsoid getSpheroid() {
+  public Ellipsoid getEllipsoid() {
     return this.ellipsoid;
   }
 
