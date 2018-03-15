@@ -376,6 +376,10 @@ public class Ellipsoid implements Serializable {
     return this.eccentricitySquared;
   }
 
+  public double getFlattening() {
+    return this.flattening;
+  }
+
   public double getInverseFlattening() {
     return this.inverseFlattening;
   }
