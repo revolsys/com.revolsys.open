@@ -273,6 +273,59 @@ public class Ellipsoid implements Serializable {
     return s;
   }
 
+  public double ellipsoidDirection(final double lon1, final double lat1, final double h1,
+    double xsi, double eta, final double lon2, final double lat2, final double h2, final double x0,
+    final double y0, final double z0, double spatialDirection) {
+    final double lambda1 = Math.toRadians(lon1);
+    final double phi1 = Math.toRadians(lat1);
+    final double lambda2 = Math.toRadians(lon2);
+    final double phi2 = Math.toRadians(lat2);
+    eta = Math.toRadians(eta);
+    xsi = Math.toRadians(xsi);
+    spatialDirection = Math.toRadians(spatialDirection);
+    final double radians = ellipsoidDirectionRadians(lambda1, phi1, h1, xsi, eta, lambda2, phi2, h2,
+      x0, y0, z0, spatialDirection);
+    return Math.toDegrees(radians);
+  }
+
+  public double ellipsoidDirectionRadians(final double lambda1, final double phi1, final double h1,
+    final double xsi, final double eta, final double lambda2, final double phi2, final double h2,
+    final double x0, final double y0, final double z0, final double spatialDirection) {
+
+    final double a = this.semiMajorAxis;
+    final double b = this.semiMinorAxis;
+
+    final double esq = (a * a - b * b) / (a * a);
+
+    final double sinPhi1 = Math.sin(phi1);
+    final double sinPhi2 = Math.sin(phi2);
+    final double d__1 = Math.sqrt(1. - esq * (sinPhi1 * sinPhi1));
+    final double d__4 = Math.sqrt(1 - esq * (sinPhi2 * sinPhi2));
+    final double mm = (a * (1 - esq) / (d__1 * (d__1 * d__1))
+      + a * (1 - esq) / (d__4 * (d__4 * d__4))) / 2;
+    final double nm = (a / Math.sqrt(1 - esq * (sinPhi1 * sinPhi1))
+      + a / Math.sqrt(1 - esq * (sinPhi2 * sinPhi2))) / 2;
+
+    final double s12 = distanceMetresRadians(lambda1, phi1, lambda2, phi2);
+    final double a12 = azimuthRadians(lambda1, phi1, lambda2, phi2);
+
+    final double slopeDistance = this.slopeDistanceRadians(lambda1, phi1, h1, lambda2, phi2, h2, x0,
+      y0, z0);
+
+    final double dh = h2 - h1;
+    final double c1 = (-xsi * Math.sin(a12) + eta * Math.cos(a12)) * dh
+      / Math.sqrt(slopeDistance * slopeDistance - dh * dh);
+
+    final double cosPhi2 = Math.cos(phi2);
+    final double c2 = h2 * esq * Math.sin(a12) * Math.cos(a12) * cosPhi2 * cosPhi2 / mm;
+
+    final double phim = (phi1 + phi2) / 2;
+    final double cosPhim = Math.cos(phim);
+    final double c3 = -esq * s12 * s12 * cosPhim * cosPhim * Math.sin(a12 * 2) / (nm * nm * 12);
+
+    return spatialDirection + c1 + c2 + c3;
+  }
+
   @Override
   public boolean equals(final Object object) {
     if (object == null) {
@@ -429,6 +482,32 @@ public class Ellipsoid implements Serializable {
     return result;
   }
 
+  public double horizontalEllipsoidFactor(final double lon1, final double lat1, final double h1,
+    final double lon2, final double lat2, final double h2, final double spatialDistance) {
+    final double lambda1 = Math.toRadians(lon1);
+    final double phi1 = Math.toRadians(lat1);
+    final double lambda2 = Math.toRadians(lon2);
+    final double phi2 = Math.toRadians(lat2);
+    return this.horizontalEllipsoidFactorRadians(lambda1, phi1, h1, lambda2, phi2, h2,
+      spatialDistance);
+  }
+
+  public double horizontalEllipsoidFactorRadians(final double lambda1, final double phi1,
+    final double h1, final double lambda2, final double phi2, final double h2,
+    final double spatialDistance) {
+    final double a12 = azimuthRadians(lambda1, phi1, lambda2, phi2);
+    final double a21 = azimuthRadians(lambda2, phi2, lambda1, phi1);
+    final double r1 = radius(phi1, a12);
+    final double r2 = radius(phi2, a21);
+
+    final double deltaH = Math.abs(h2 - h1);
+    if (deltaH > 30) {
+      return r1 / (r1 + h1);
+    } else {
+      return 1 / Math.sqrt((h1 / r1 + 1) * (h2 / r2 + 1));
+    }
+  }
+
   public boolean isDeprecated() {
     return this.deprecated;
   }
@@ -456,11 +535,24 @@ public class Ellipsoid implements Serializable {
 
   public double radius(final double lat, final double alpha) {
     final double phi = Math.toRadians(lat);
-    final double ecc = this.eccentricitySquared;
+    final double eccentricitySquared = this.eccentricitySquared;
     final double sinPhi = Math.sin(phi);
-    final double denom = Math.sqrt(1 - ecc * (sinPhi * sinPhi));
-    final double pvrad = this.semiMajorAxis / denom;
-    final double merrad = this.semiMajorAxis * (1 - ecc) / (denom * (denom * denom));
+    final double denom = Math.sqrt(1 - eccentricitySquared * (sinPhi * sinPhi));
+    final double a = this.semiMajorAxis;
+    final double pvrad = a / denom;
+    final double merrad = a * (1 - eccentricitySquared) / (denom * (denom * denom));
+    final double cosAlpha = Math.cos(alpha);
+    final double sinAlpha = Math.sin(alpha);
+    return pvrad * merrad / (pvrad * (cosAlpha * cosAlpha) + merrad * (sinAlpha * sinAlpha));
+  }
+
+  double radiusRadians(final double phi, final double alpha) {
+    final double a = this.semiMajorAxis;
+    final double ecc = this.eccentricity;
+    final double sinPhi = Math.sin(phi);
+    final double denom = Math.sqrt(1. - ecc * (sinPhi * sinPhi));
+    final double pvrad = a / denom;
+    final double merrad = a * (1. - ecc) / (denom * (denom * denom));
     final double cosAlpha = Math.cos(alpha);
     final double sinAlpha = Math.sin(alpha);
     return pvrad * merrad / (pvrad * (cosAlpha * cosAlpha) + merrad * (sinAlpha * sinAlpha));
@@ -480,8 +572,8 @@ public class Ellipsoid implements Serializable {
   public double slopeDistanceRadians(final double lambda1, final double phi1, final double h1,
     final double lambda2, final double phi2, final double h2, final double x0, final double y0,
     final double z0) {
-    final double[] p1 = toCaresian(phi1, lambda1, h1, x0, y0, z0);
-    final double[] p2 = toCaresian(phi2, lambda2, h2, x0, y0, z0);
+    final double[] p1 = toCartesian(lambda1, phi1, h1, x0, y0, z0);
+    final double[] p2 = toCartesian(lambda2, phi2, h2, x0, y0, z0);
 
     final double deltaX = p1[0] - p2[0];
     final double deltaY = p1[1] - p2[1];
@@ -518,13 +610,16 @@ public class Ellipsoid implements Serializable {
     final double nm = (a / Math.sqrt(1 - esq * (sinPhi1 * sinPhi1))
       + a / Math.sqrt(1 - esq * (sinPhi2 * sinPhi2))) / 2.;
 
-    final double s12 = distanceMetres(lon1, lat1, lon2, lat2);
-    final double a12 = azimuth(lon1, lat1, lon2, lat2);
+    final double s12 = distanceMetresRadians(lambda1, phi1, lambda2, phi2);
+    final double a12 = azimuthRadians(lambda1, phi1, lambda2, phi2);
 
-    final double ssq = this.slopeDistanceRadians(lambda1, phi1, h1, lambda2, phi2, h2, x0, y0, z0);
+    // final double slopeDistance = this.slopeDistanceRadians(lambda1, phi1, h1, lambda2, phi2, h2,
+    // x0,
+    // y0, z0);
 
-    final double dh = 0;
-    final double c1 = (-xsi * Math.sin(a12) + eta * Math.cos(a12)) * dh / Math.sqrt(ssq - dh * dh);
+    // final double dh = 0;
+    final double c1 = 0;// (-xsi * Math.sin(a12) + eta * Math.cos(a12)) * dh / Math.sqrt(ssq - dh *
+                        // dh);
 
     final double cosPhi2 = Math.cos(phi2);
     final double c2 = h2 / mm * esq * Math.sin(a12) * Math.cos(a12) * (cosPhi2 * cosPhi2);
@@ -536,8 +631,42 @@ public class Ellipsoid implements Serializable {
     return d12 - c1 - c2 - c3;
   }
 
-  private double[] toCaresian(final double phi, final double rlam, final double h, final double x0,
-    final double y0, final double z0) {
+  public double spatialDistance(final double lon1, final double lat1, final double h1,
+    final double heightOfInstrument, final double heightOfTarget, final double lon2,
+    final double lat2, final double h2, final double spatialDistance) {
+    final double lambda1 = Math.toRadians(lon1);
+    final double phi1 = Math.toRadians(lat1);
+    final double lambda2 = Math.toRadians(lon2);
+    final double phi2 = Math.toRadians(lat2);
+    return spatialDistanceRadians(lambda1, phi1, h1, heightOfInstrument, heightOfTarget, lambda2,
+      phi2, h2, spatialDistance);
+  }
+
+  public double spatialDistanceRadians(final double lambda1, final double phi1, double h1,
+    final double heightOfInstrument, final double heightOfTarget, final double lambda2,
+    final double phi2, double h2, final double spatialDistance) {
+
+    final double a12 = azimuthRadians(lambda1, phi1, lambda2, phi2);
+    final double a21 = azimuthRadians(lambda2, phi2, lambda1, phi1);
+    final double r1 = radius(phi1, a12);
+    final double r2 = radius(phi2, a21);
+
+    h1 += heightOfInstrument;
+    h2 += heightOfTarget;
+    final double deltaH = h2 - h1;
+    final double deltaHSq = deltaH * deltaH;
+    if (spatialDistance * spatialDistance - deltaHSq >= 0) {
+      final double twor = r1 + r2;
+      final double lo = Math
+        .sqrt((spatialDistance * spatialDistance - deltaHSq) / ((h1 / r1 + 1) * (h2 / r2 + 1)));
+      return twor * Math.asin(lo / twor);
+    } else {
+      return spatialDistance;
+    }
+  }
+
+  private double[] toCartesian(final double lambda, final double phi, final double h,
+    final double x0, final double y0, final double z0) {
     final double a = this.semiMajorAxis;
     final double b = this.semiMinorAxis;
 
@@ -546,8 +675,8 @@ public class Ellipsoid implements Serializable {
     final double cp = Math.cos(phi);
 
     final double n = a / Math.sqrt(1 - e2 * (sp * sp));
-    final double x = x0 + (n + h) * cp * Math.cos(rlam);
-    final double y = y0 + (n + h) * cp * Math.sin(rlam);
+    final double x = x0 + (n + h) * cp * Math.cos(lambda);
+    final double y = y0 + (n + h) * cp * Math.sin(lambda);
     final double z = z0 + (n * (1 - e2) + h) * sp;
     return new double[] {
       x, y, z

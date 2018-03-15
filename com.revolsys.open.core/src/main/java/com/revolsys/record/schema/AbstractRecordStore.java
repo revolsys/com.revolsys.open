@@ -157,7 +157,9 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       this.recordStoreExtensions.clear();
       this.iteratorFactory = null;
       this.label = "deleted";
-      this.statistics.clear();
+      if (this.statistics != null) {
+        this.statistics.clear();
+      }
       this.typeRecordDefinitionProperties.clear();
     }
   }

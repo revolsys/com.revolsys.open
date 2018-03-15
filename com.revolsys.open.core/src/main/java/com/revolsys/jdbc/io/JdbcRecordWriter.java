@@ -118,7 +118,9 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
         throw new RuntimeException("Unable to create connection", e);
       }
     }
-    statistics.connect();
+    if (statistics != null) {
+      statistics.connect();
+    }
   }
 
   public JdbcRecordWriter(final JdbcRecordStore recordStore,
@@ -146,6 +148,9 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
   public void close() {
     flush();
     closeDo();
+    if (this.statistics != null) {
+      this.statistics.disconnect();
+    }
   }
 
   private void close(final Map<JdbcRecordDefinition, String> sqlMap,
