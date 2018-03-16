@@ -32,6 +32,9 @@
  */
 package com.revolsys.math;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.MathUtil;
@@ -422,6 +425,21 @@ public class Angle {
     return angle;
   }
 
+  public static double toDecimalDegrees(double degrees, final double minutes,
+    final double seconds) {
+    boolean negative = false;
+    if (degrees < 0) {
+      degrees = -degrees;
+      negative = true;
+    }
+    final double decimalDegrees = degrees + minutes / 60.0 + seconds / 3600;
+    if (negative) {
+      return -decimalDegrees;
+    } else {
+      return decimalDegrees;
+    }
+  }
+
   public static double toDecimalDegrees(String text) {
     if (text != null) {
       text = text.toString().trim();
@@ -438,6 +456,7 @@ public class Angle {
         double decimalDegrees = 0;
         if (parts.length > 0) {
           decimalDegrees = Double.parseDouble(parts[0]);
+          System.out.println(decimalDegrees);
           if (decimalDegrees < 0) {
             negative = true;
             decimalDegrees = -decimalDegrees;
@@ -445,12 +464,16 @@ public class Angle {
         }
         if (parts.length > 1) {
           final double minutes = Double.parseDouble(parts[1]) / 60;
+          System.out
+            .println(new BigDecimal(minutes).setScale(20, RoundingMode.HALF_UP).toPlainString());
           if (!Double.isNaN(minutes)) {
             decimalDegrees += minutes;
           }
         }
         if (parts.length > 2) {
           final double seconds = Double.parseDouble(parts[2]) / 3600;
+          System.out
+            .println(new BigDecimal(seconds).setScale(20, RoundingMode.HALF_UP).toPlainString());
           if (!Double.isNaN(seconds)) {
             decimalDegrees += seconds;
           }
@@ -463,6 +486,162 @@ public class Angle {
       }
     }
     return Double.NaN;
+  }
+
+  public static String toDegreesMinutesSeconds(final double decimalDegrees) {
+    if (!Double.isNaN(decimalDegrees)) {
+      final double degrees = Math.floor(decimalDegrees);
+      final StringBuilder text = new StringBuilder();
+      text.append(degrees);
+      text.append('°');
+      final double decimal = decimalDegrees - degrees;
+      final double minutes = Math.floor(decimal * 60);
+      if (minutes < 10) {
+        text.append('0');
+      }
+      text.append(minutes);
+      text.append('\'');
+      final double seconds = decimal * 3600 % 60;
+      if (seconds < 10) {
+        text.append('0');
+      }
+      text.append(seconds);
+      text.append('\'');
+      return text.toString();
+    }
+    return null;
+  }
+
+  public static String toDegreesMinutesSeconds(double decimalDegrees,
+    final int secondsDecimalPlaces, final boolean spaceSeparator) {
+    if (!Double.isNaN(decimalDegrees)) {
+      final StringBuilder text = new StringBuilder();
+      if (decimalDegrees < 0) {
+        text.append('-');
+        decimalDegrees = -decimalDegrees;
+      }
+      final int degrees = (int)Math.floor(decimalDegrees);
+      if (degrees < 10) {
+        text.append('0');
+      }
+      text.append(degrees);
+      if (spaceSeparator) {
+        text.append(' ');
+      } else {
+        text.append('°');
+      }
+      final double decimal = decimalDegrees - degrees;
+      final int minutes = (int)Math.floor(decimal * 60);
+      if (minutes < 10) {
+        text.append('0');
+      }
+      text.append(minutes);
+      if (spaceSeparator) {
+        text.append(' ');
+      } else {
+        text.append('\'');
+      }
+      final double seconds = decimalDegrees * 3600 % 60;
+      final BigDecimal secondsBig = new BigDecimal(seconds);
+      if (seconds < 10) {
+        text.append('0');
+      }
+      text.append(secondsBig.setScale(secondsDecimalPlaces, RoundingMode.HALF_UP).toPlainString());
+      if (!spaceSeparator) {
+        text.append('\'');
+      }
+      return text.toString();
+    }
+    return null;
+  }
+
+  public static String toDegreesMinutesSecondsLat(double angle, final int secondsDecimalPlaces) {
+    if (!Double.isNaN(angle)) {
+      boolean negative = false;
+      if (angle < 0) {
+        angle = -angle;
+        negative = true;
+      }
+      final int degrees = (int)angle;
+      final double f = (angle - degrees) * 60;
+      int minutes = (int)f;
+      double seconds = (f - minutes) * 60;
+      if (Math.abs(seconds - 60) <= 1e-6) {
+        seconds = 0.;
+        ++minutes;
+      }
+
+      final StringBuilder text = new StringBuilder();
+      if (degrees < 10) {
+        text.append('0');
+      }
+      text.append(degrees);
+      text.append(' ');
+      if (minutes < 10) {
+        text.append('0');
+      }
+      text.append(minutes);
+      text.append(' ');
+      final BigDecimal secondsBig = new BigDecimal(seconds);
+      if (seconds < 10) {
+        text.append('0');
+      }
+      text.append(secondsBig.setScale(secondsDecimalPlaces, RoundingMode.HALF_UP).toPlainString());
+
+      if (negative) {
+        text.append('S');
+      } else {
+        text.append('N');
+      }
+      return text.toString();
+    }
+    return null;
+  }
+
+  public static String toDegreesMinutesSecondsLon(double angle, final int secondsDecimalPlaces) {
+    if (!Double.isNaN(angle)) {
+      boolean negative = false;
+      if (angle < 0) {
+        angle = -angle;
+        negative = true;
+      }
+      final int degrees = (int)angle;
+      final double f = (angle - degrees) * 60;
+      int minutes = (int)f;
+      double seconds = (f - minutes) * 60;
+      if (Math.abs(seconds - 60) <= 1e-6) {
+        seconds = 0.;
+        ++minutes;
+      }
+
+      final StringBuilder text = new StringBuilder();
+      if (degrees < 100) {
+        text.append('0');
+      }
+      if (degrees < 10) {
+        text.append('0');
+      }
+      text.append(degrees);
+      text.append(' ');
+      if (minutes < 10) {
+        text.append('0');
+      }
+      text.append(minutes);
+      text.append(' ');
+      final BigDecimal secondsBig = new BigDecimal(seconds);
+      if (seconds < 10) {
+        text.append('0');
+      }
+      text.append(secondsBig.setScale(secondsDecimalPlaces, RoundingMode.HALF_UP).toPlainString());
+
+      if (negative) {
+        text.append('W');
+      } else {
+        text.append('E');
+      }
+      return text.toString();
+    }
+    return null;
   }
 
   public static String toDmsString(final double angle) {

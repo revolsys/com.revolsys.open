@@ -3,8 +3,6 @@ package com.revolsys.geometry.cs.projection;
 import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.math.Angle;
-import com.revolsys.math.FastMath;
 
 /**
  * An implementation of the Transverse Mercator projection. See section 1.3.5 of
@@ -15,68 +13,9 @@ import com.revolsys.math.FastMath;
  * @author Paul Austin
  */
 public class TransverseMercatorThomas extends AbstractCoordinatesProjection {
-
-  /**
-   * Then the meridional arc distance from equator to the projection origin (MO) is computed from
-   *
-   *
-   * Note: if the projection grid origin is very close to but not exactly at the pole (within 2" or 50m), the tangent function in the equation above for QO is unstable and may fail. MO may instead be calculated (as in the USGS formula below) from:
-   *
-   * MO = a[(1 – e2/4 – 3e4/64 – 5e6/256 –....)φO – (3e2/8 + 3e4/32 + 45e6/1024+....)sin2φO
-   *      + (15e4/256 + 45e6/1024 +.....)sin4φO – (35e6/3072 + ....)sin6φO + .....]
-   * @param phi
-   * @return
-   */
-  private static double mo(final double phi) {
-    final double B = 0;
-    final double e = 0;
-    final double h1 = 0;
-    final double h2 = 0;
-    final double h3 = 0;
-    final double h4 = 0;
-    if (phi == 0) {
-      return 0;
-    } else if (phi == Angle.PI_OVER_2) {
-      return B * Angle.PI_OVER_2;
-    } else if (phi == -Angle.PI_OVER_2) {
-      return B * -Angle.PI_OVER_2;
-    } else {
-      final double QO = FastMath.asinh(Math.tan(phi)) - e * FastMath.atanh(e * Math.sin(phi));
-      final double βO = Math.atan(Math.sinh(QO));
-      final double ξO0 = Math.asin(Math.sin(βO));
-      // Note: The previous two steps are taken from the generic calculation flow given below for
-      // latitude φ, but here for φO may be simplified to ξO0 = βO = atan(sinh QO).
-      final double ξO1 = h1 * Math.sin(2 * ξO0);
-      final double ξO2 = h2 * Math.sin(4 * ξO0);
-      final double ξO3 = h3 * Math.sin(6 * ξO0);
-      final double ξO4 = h4 * Math.sin(8 * ξO0);
-      final double ξO = ξO0 + ξO1 + ξO2 + ξO3 + ξO4;
-      return B * ξO;
-    }
-  }
-
-  /** Scale Factor. */
   private final double ko;
 
-  /** False Easting. */
   private final double xo;
-
-  /** False Northing. */
-  private final double yo;
-
-  private final double mo;
-
-  private final double n;
-
-  private final double B;
-
-  private final double h1Prime;
-
-  private final double h2Prime;
-
-  private final double h3Prime;
-
-  private final double h4Prime;
 
   private final double e;
 
@@ -87,6 +26,16 @@ public class TransverseMercatorThomas extends AbstractCoordinatesProjection {
   private final double b;
 
   private final String name;
+
+  private final double a0;
+
+  private final double a2;
+
+  private final double a4;
+
+  private final double a6;
+
+  private final double a8;
 
   public TransverseMercatorThomas(final ProjectedCoordinateSystem coordinateSystem) {
     this(//
@@ -105,26 +54,22 @@ public class TransverseMercatorThomas extends AbstractCoordinatesProjection {
     final double yo) {
     this.name = name;
     this.xo = xo;
-    this.yo = yo;
     this.λo = Math.toRadians(longitudeOrigin);
-    final double φo = Math.toRadians(latitudeOrigin);
     this.ko = ko;
 
     this.a = ellipsoid.getSemiMajorAxis();
     this.b = ellipsoid.getSemiMinorAxis();
-    final double f = ellipsoid.getFlattening();
-    this.e = ellipsoid.getEccentricity();
-    this.mo = mo(φo);
-    this.n = f / (2 - f);
-    final double n2 = this.n * this.n;
-    final double n3 = this.n * n2;
-    final double n4 = n2 * n2;
-    this.B = this.a / (1 + this.n) * (1 + n2 / 4 + n4 / 64);
+    final double e2 = (this.a * this.a - this.b * this.b) / (this.a * this.a);
+    this.e = Math.sqrt(e2);
 
-    this.h1Prime = this.n / 2 - 2 / 3 * n2 + 37 / 96 * n3 - 1 / 360 * n4;
-    this.h2Prime = 1 / 48 * n2 + 1 / 15 * n3 - 437 / 1440 * n4;
-    this.h3Prime = 17 / 480 * n3 - 37 / 840 * n4;
-    this.h4Prime = 4397 / 161280 * n4;
+    final double e4 = e2 * e2;
+    final double e6 = e4 * e2;
+    final double e8 = e6 * e2;
+    this.a0 = 1 - e2 / 4 - e4 * 3 / 64 - e6 * 5 / 256 - e8 * 175 / 16384;
+    this.a2 = (e2 + e4 / 4. + e6 * 15. / 128. - e8 * 455. / 4096.) * .375;
+    this.a4 = (e4 + e6 * 3. / 4. - e8 * 77. / 128.) * .05859375;
+    this.a6 = (e6 - e8 * 41. / 32.) * .011393229166666666;
+    this.a8 = e8 * -315. / 131072.;
   }
 
   /**
@@ -134,35 +79,67 @@ public class TransverseMercatorThomas extends AbstractCoordinatesProjection {
    * @param targetCoordinates The ordinates to write the converted ordinates to.
    */
   @Override
-  public void inverse(final double x, final double y, final double[] targetCoordinates,
+  public void inverse(double x, double y, final double[] targetCoordinates,
     final int targetOffset) {
-    final double ηPrime = (x - this.xo) / (this.B * this.ko);
-    final double ξPrime = (y - this.yo + this.ko * this.mo) / (this.B * this.ko);
+    x = (x - this.xo) / this.ko;
+    y /= this.ko;
+    final double a = this.a;
+    final double b = this.b;
+    final double e = this.e;
 
-    final double ξ1Prime = this.h1Prime * Math.sin(2 * ξPrime) * Math.cosh(2 * ηPrime);
-    final double η1Prime = this.h1Prime * Math.cos(2 * ξPrime) * Math.sinh(2 * ηPrime);
-    final double ξ2Prime = this.h2Prime * Math.sin(4 * ξPrime) * Math.cosh(4 * ηPrime);
-    final double η2Prime = this.h2Prime * Math.cos(4 * ξPrime) * Math.sinh(4 * ηPrime);
-    final double ξ3Prime = this.h3Prime * Math.sin(6 * ξPrime) * Math.cosh(6 * ηPrime);
-    final double η3Prime = this.h3Prime * Math.cos(6 * ξPrime) * Math.sinh(6 * ηPrime);
-    final double ξ4Prime = this.h4Prime * Math.sin(8 * ξPrime) * Math.cosh(8 * ηPrime);
-    final double η4Prime = this.h4Prime * Math.cos(8 * ξPrime) * Math.sinh(8 * ηPrime);
-    final double ξ0Prime = ξPrime - (ξ1Prime + ξ2Prime + ξ3Prime + ξ4Prime);
-    final double η0Prime = ηPrime - (η1Prime + η2Prime + η3Prime + η4Prime);
-    final double βPrime = Math.asin(Math.sin(ξ0Prime) / Math.cosh(η0Prime));
-    final double QPrime = FastMath.asinh(Math.tan(βPrime));
-    double QPrimePrime = QPrime + this.e * FastMath.atanh(this.e * Math.tanh(QPrime));
-    final double lastQPrimePrime = QPrimePrime;
-    int i = 0;
+    double phi1 = y / a;
+    double dphi;
     do {
-      QPrimePrime = QPrime + this.e * FastMath.atanh(this.e * Math.tanh(QPrimePrime));
-    } while (Math.abs(lastQPrimePrime - QPrimePrime) < 1.0e-011 && ++i < 100);
+      dphi = (a * (this.a0 * phi1 - this.a2 * Math.sin(phi1 * 2) + this.a4 * Math.sin(phi1 * 4)
+        - this.a6 * Math.sin(phi1 * 6) + this.a8 * Math.sin(phi1 * 8)) - y)
+        / (a * (this.a0 - this.a2 * 2 * Math.cos(phi1 * 2) + this.a4 * 4. * Math.cos(phi1 * 4)
+          - this.a6 * 6 * Math.cos(phi1 * 6) + this.a8 * 8 * Math.cos(phi1 * 8)));
+      phi1 -= dphi;
 
-    final double λ = this.λo + Math.asin(Math.tanh(η0Prime) / Math.cos(βPrime));
-    final double φ = Math.atan(Math.sinh(QPrimePrime));
+    } while (Math.abs(dphi) >= 1e-15);
 
-    targetCoordinates[targetOffset] = Math.toDegrees(λ);
-    targetCoordinates[targetOffset + 1] = Math.toDegrees(φ);
+    final double t = Math.tan(phi1);
+    final double tp2 = t * t;
+    final double tp4 = tp2 * tp2;
+    final double tp6 = tp2 * tp4;
+
+    final double sp = Math.sin(phi1);
+    final double sp2 = sp * sp;
+    final double cp = Math.cos(phi1);
+
+    final double eta = Math.sqrt((a * a - b * b) / (b * b) * (cp * cp));
+    final double etap2 = eta * eta;
+    final double etap4 = etap2 * etap2;
+    final double etap6 = etap2 * etap4;
+    final double etap8 = etap4 * etap4;
+    final double dn = a / Math.sqrt(1. - e * e * (sp * sp));
+    final double d__2 = 1. - e * e * sp2;
+    final double dm = a * (1 - e * e) / Math.sqrt(d__2 * (d__2 * d__2));
+    final double xbydn = x / dn;
+
+    final double φ = phi1 + t * (-(x * x) / (dm * 2 * dn)
+      + xbydn * (xbydn * xbydn) * x / (dm * 24)
+        * (tp2 * 3 + 5 + etap2 - etap4 * 4. - etap2 * 9 * tp2)
+      - xbydn * (xbydn * xbydn * xbydn * xbydn) * x / (dm * 720)
+        * (tp2 * 90 + 61 + etap2 * 46 + tp4 * 45 - tp2 * 252 * etap2 - etap4 * 3 + etap6 * 100
+          - tp2 * 66 * etap4 - tp4 * 90 * etap2 + etap8 * 88 + tp4 * 225 * etap4 + tp2 * 84. * etap6
+          - tp2 * 192. * etap8)
+      + xbydn * xbydn * xbydn * (xbydn * xbydn * xbydn * xbydn) * x / (dm * 40320)
+        * (tp2 * 3633 + 1385 + tp4 * 4095 + tp6 * 1574));
+
+    final double λ = this.λo + (xbydn - xbydn * (xbydn * xbydn) / 6 * (tp2 * 2 + 1. + etap2)
+      + xbydn * (xbydn * xbydn * xbydn * xbydn) / 120
+        * (etap2 * 6 + 5 + tp2 * 28 - etap4 * 3 + tp2 * 8 * etap2 + tp4 * 24 - etap6 * 4
+          + tp2 * 4 * etap4 + tp2 * 24 * etap6)
+      - xbydn * xbydn * xbydn * (xbydn * xbydn * xbydn * xbydn) / 5040
+        * (tp2 * 662 + 61 + tp4 * 1320 + tp6 * 720))
+      / cp;
+
+    final double lon = Math.toDegrees(λ);
+    final double lat = Math.toDegrees(φ);
+
+    targetCoordinates[targetOffset] = lon;
+    targetCoordinates[targetOffset + 1] = lat;
   }
 
   /**
@@ -183,20 +160,11 @@ public class TransverseMercatorThomas extends AbstractCoordinatesProjection {
     final double t = Math.tan(phi);
     final double a = this.a;
     final double b = this.b;
-    final double e = Math.sqrt((a * a - b * b) / (a * a));
-    final double eta = Math.sqrt((a * a - b * b) / (b * b) * (cp * cp));
+    final double e = this.e;
 
-    final double e2 = (a * a - b * b) / (a * a);
-    final double e4 = e2 * e2;
-    final double e6 = e4 * e2;
-    final double e8 = e6 * e2;
-    final double a0 = 1 - e2 / 4 - e4 * 3 / 64 - e6 * 5 / 256 - e8 * 175 / 16384;
-    final double a2 = (e2 + e4 / 4. + e6 * 15. / 128. - e8 * 455. / 4096.) * .375;
-    final double a4 = (e4 + e6 * 3. / 4. - e8 * 77. / 128.) * .05859375;
-    final double a6 = (e6 - e8 * 41. / 32.) * .011393229166666666;
-    final double a8 = e8 * -315. / 131072.;
-    final double sphi = a * (a0 * phi - a2 * Math.sin(phi * 2) + a4 * Math.sin(phi * 4)
-      - a6 * Math.sin(phi * 6) + a8 * Math.sin(phi * 8));
+    final double eta = Math.sqrt((a * a - b * b) / (b * b) * (cp * cp));
+    final double sphi = a * (this.a0 * phi - this.a2 * Math.sin(phi * 2)
+      + this.a4 * Math.sin(phi * 4) - this.a6 * Math.sin(phi * 6) + this.a8 * Math.sin(phi * 8));
 
     final double dn = a / Math.sqrt(1. - e * e * (sp * sp));
     double x = 0;
