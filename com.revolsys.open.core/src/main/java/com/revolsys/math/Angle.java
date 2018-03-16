@@ -422,6 +422,49 @@ public class Angle {
     return angle;
   }
 
+  public static double toDecimalDegrees(String text) {
+    if (text != null) {
+      text = text.toString().trim();
+
+      if (text.length() > 0) {
+        boolean negative = false;
+        if (text.endsWith("S") || text.endsWith("W")) {
+          negative = true;
+          text = text.substring(0, text.length() - 1).trim();
+        } else if (text.endsWith("E") || text.endsWith("N")) {
+          text = text.substring(0, text.length() - 1).trim();
+        }
+        final String[] parts = text.split("[\\*°'\":\\s]+");
+        double decimalDegrees = 0;
+        if (parts.length > 0) {
+          decimalDegrees = Double.parseDouble(parts[0]);
+          if (decimalDegrees < 0) {
+            negative = true;
+            decimalDegrees = -decimalDegrees;
+          }
+        }
+        if (parts.length > 1) {
+          final double minutes = Double.parseDouble(parts[1]) / 60;
+          if (!Double.isNaN(minutes)) {
+            decimalDegrees += minutes;
+          }
+        }
+        if (parts.length > 2) {
+          final double seconds = Double.parseDouble(parts[2]) / 3600;
+          if (!Double.isNaN(seconds)) {
+            decimalDegrees += seconds;
+          }
+        }
+        if (negative) {
+          return -decimalDegrees;
+        } else {
+          return decimalDegrees;
+        }
+      }
+    }
+    return Double.NaN;
+  }
+
   public static String toDmsString(final double angle) {
     return (int)Math.floor(angle) + " " + (int)Math.floor(angle * 60 % 60) + " "
       + angle * 3600 % 60;

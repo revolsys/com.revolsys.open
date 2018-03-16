@@ -18,7 +18,7 @@ import com.revolsys.geometry.cs.projection.Mercator1SP;
 import com.revolsys.geometry.cs.projection.Mercator1SPSpherical;
 import com.revolsys.geometry.cs.projection.Mercator2SP;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
-import com.revolsys.geometry.cs.projection.TransverseMercator;
+import com.revolsys.geometry.cs.projection.TransverseMercatorUsgs;
 import com.revolsys.geometry.cs.projection.WebMercator;
 import com.revolsys.util.Equals;
 import com.revolsys.util.Property;
@@ -74,7 +74,7 @@ public class CoordinateOperationMethod
     addAlias(POPULAR_VISUALISATION_PSEUDO_MERCATOR, POPULAR_VISUALISATION_PSEUDO_MERCATOR);
 
     registerCoordinatesProjection(AlbersConicEqualArea::new, ALBERS_EQUAL_AREA);
-    registerCoordinatesProjection(TransverseMercator::new, TRANSVERSE_MERCATOR);
+    registerCoordinatesProjection(TransverseMercatorUsgs::new, TRANSVERSE_MERCATOR);
     registerCoordinatesProjection(Mercator1SP::new, MERCATOR);
     registerCoordinatesProjection(WebMercator::new, POPULAR_VISUALISATION_PSEUDO_MERCATOR);
     registerCoordinatesProjection(Mercator1SP::new, MERCATOR_1SP);

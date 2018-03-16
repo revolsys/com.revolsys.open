@@ -37,6 +37,10 @@ public class Ellipsoid implements Serializable {
 
   private final double flattening;
 
+  public Ellipsoid(final String name, final double semiMajorAxis, final double inverseFlattening) {
+    this(name, semiMajorAxis, Double.NaN, inverseFlattening, null, false);
+  }
+
   public Ellipsoid(final String name, final double semiMajorAxis, final double inverseFlattening,
     final Authority authority) {
     this(name, semiMajorAxis, Double.NaN, inverseFlattening, authority, false);

@@ -1,10 +1,8 @@
 package com.revolsys.geometry.cs.projection;
 
 import com.revolsys.geometry.cs.Ellipsoid;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.datum.GeodeticDatum;
 
 /**
  * An implementation of the Transverse Mercator projection. See section 1.3.5 of
@@ -18,8 +16,7 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
   /** The length in metres of the semi-major axis of the ellipsoid. */
   private final double a;
 
-  /** The coordinate system providing the parameters for the projection. */
-  private final ProjectedCoordinateSystem coordinateSystem;
+  private final String name;
 
   /** The eccentricity ^ 4 of the ellipsoid. */
   private final double ePow4;
@@ -70,24 +67,27 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
    * @param coordinateSystem The coordinate system.
    */
   public TransverseMercatorUsgs(final ProjectedCoordinateSystem coordinateSystem) {
-    this.coordinateSystem = coordinateSystem;
-    final GeographicCoordinateSystem geographicCS = coordinateSystem
-      .getGeographicCoordinateSystem();
-    final GeodeticDatum geodeticDatum = geographicCS.getDatum();
-    final double latitudeOfNaturalOrigin = coordinateSystem
-      .getDoubleParameter(NormalizedParameterNames.LATITUDE_OF_ORIGIN);
-    final double centralMeridian = coordinateSystem
-      .getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
-    final double scaleFactor = coordinateSystem
-      .getDoubleParameter(NormalizedParameterNames.SCALE_FACTOR);
+    this(//
+      coordinateSystem.getCoordinateSystemName(), //
+      coordinateSystem.getEllipsoid(), //
+      coordinateSystem.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN), //
+      coordinateSystem.getDoubleParameter(NormalizedParameterNames.LATITUDE_OF_ORIGIN), //
+      coordinateSystem.getDoubleParameter(NormalizedParameterNames.SCALE_FACTOR), //
+      coordinateSystem.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING), //
+      coordinateSystem.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING) //
+    );
+  }
 
-    final Ellipsoid ellipsoid = geodeticDatum.getEllipsoid();
-    this.x0 = coordinateSystem.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
-    this.y0 = coordinateSystem.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
-    this.lambda0 = Math.toRadians(centralMeridian);
+  public TransverseMercatorUsgs(final String name, final Ellipsoid ellipsoid,
+    final double longitudeOrigin, final double latitudeOrigin, final double ko, final double xo,
+    final double yo) {
+    this.name = name;
+    this.x0 = xo;
+    this.y0 = yo;
+    this.lambda0 = Math.toRadians(longitudeOrigin);
     this.a = ellipsoid.getSemiMajorAxis();
-    this.k0 = scaleFactor;
-    final double phi0 = Math.toRadians(latitudeOfNaturalOrigin);
+    this.k0 = ko;
+    final double phi0 = Math.toRadians(latitudeOrigin);
     this.eSq = ellipsoid.getEccentricitySquared();
     this.sqrt1MinusESq = Math.sqrt(1 - this.eSq);
 
@@ -276,6 +276,6 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
    */
   @Override
   public String toString() {
-    return this.coordinateSystem.getCoordinateSystemName();
+    return this.name;
   }
 }

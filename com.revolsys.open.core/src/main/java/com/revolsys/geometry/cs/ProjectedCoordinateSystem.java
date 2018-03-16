@@ -298,6 +298,10 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     }
   }
 
+  public Ellipsoid getEllipsoid() {
+    return this.geographicCoordinateSystem.getDatum().getEllipsoid();
+  }
+
   public GeographicCoordinateSystem getGeographicCoordinateSystem() {
     return this.geographicCoordinateSystem;
   }
