@@ -11,12 +11,7 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
  *
  * @author Paul Austin
  */
-public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
-
-  /** The length in metres of the semi-major axis of the ellipsoid. */
-  private final double a;
-
-  private final String name;
+public class TransverseMercatorUsgs extends TransverseMercator {
 
   /** The eccentricity ^ 4 of the ellipsoid. */
   private final double ePow4;
@@ -32,20 +27,8 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
 
   private final double sqrt1MinusESq;
 
-  /** Scale Factor. */
-  private final double k0;
-
-  /** Latitude of origin in radians. */
-  private final double lambda0;
-
   /** The value of m at the latitude of origin. */
-  private final double m0;
-
-  /** False Easting. */
-  private final double x0;
-
-  /** False Northing. */
-  private final double y0;
+  private final double mo;
 
   private final double e1Time2Div2MinusE1Pow3Times27Div32;
 
@@ -81,19 +64,14 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
   public TransverseMercatorUsgs(final String name, final Ellipsoid ellipsoid,
     final double longitudeOrigin, final double latitudeOrigin, final double ko, final double xo,
     final double yo) {
-    this.name = name;
-    this.x0 = xo;
-    this.y0 = yo;
-    this.lambda0 = Math.toRadians(longitudeOrigin);
-    this.a = ellipsoid.getSemiMajorAxis();
-    this.k0 = ko;
+    super(name, ellipsoid, longitudeOrigin, latitudeOrigin, ko, xo, yo);
     final double phi0 = Math.toRadians(latitudeOrigin);
     this.eSq = ellipsoid.getEccentricitySquared();
     this.sqrt1MinusESq = Math.sqrt(1 - this.eSq);
 
     this.ePow4 = this.eSq * this.eSq;
     this.ePow6 = this.ePow4 * this.eSq;
-    this.m0 = m(phi0);
+    this.mo = m(phi0);
     this.ePrimeSq = this.eSq / (1 - this.eSq);
     this.ePrimeSqTimes9 = 9 * this.ePrimeSq;
     this.ePrimeSqTimes8 = 8 * this.ePrimeSq;
@@ -140,11 +118,11 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
    *
    * e1 = [1 – (1 – e &circ; 2) &circ; 0.5] / [1 + (1 – e &circ; 2) &circ; 0.5]
    * μ1 = M1 / [a * (1 – e &circ; 2 / 4 – 3 * e &circ; 4 / 64 – 5 * e &circ; 6 / 256 – ....)]
-   * M1 = MO + (y – y0) / k0
+   * M1 = MO + (y – yo) / ko
    * T1 = tanϕ1 &circ; 2
    * C1 = e' &circ; 2 * cosϕ1 &circ; 2
    * e' &circ; 2 = e &circ; 2 / (1 – e &circ; 2)
-   * D = (x – x0) / (ν1 * kO)
+   * D = (x – xo) / (ν1 * kO)
    * </pre>
    * @param from The ordinates to convert.
    * @param to The ordinates to write the converted ordinates to.
@@ -154,10 +132,10 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
     final int targetOffset) {
     final double eSq = this.eSq;
     final double a = this.a;
-    final double k0 = this.k0;
+    final double k0 = this.ko;
     final double ePrimeSq = this.ePrimeSq;
 
-    final double m = this.m0 + (y - this.y0) / k0;
+    final double m = this.mo + (y - this.yo) / k0;
     final double mu = m / this.aTimes1MinusEsqDiv4MinesEPow4Times3Div64MinusEPow6Times5Div256;
     final double phi1 = mu + this.e1Time2Div2MinusE1Pow3Times27Div32 * Math.sin(2 * mu)
       + this.e1Pow2Times21Div16MinusE1Pow4Times55Div32 * Math.sin(4 * mu)
@@ -170,7 +148,7 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
     final double nu1 = a / Math.sqrt(oneMinusESqSinPhi1Sq);
     final double rho1 = a * (1 - eSq) / (oneMinusESqSinPhi1Sq * Math.sqrt(oneMinusESqSinPhi1Sq));
     final double c1 = ePrimeSq * cosPhi1 * cosPhi1;
-    final double d = (x - this.x0) / (nu1 * k0);
+    final double d = (x - this.xo) / (nu1 * k0);
     final double d2 = d * d;
     final double d3 = d2 * d;
     final double d4 = d2 * d2;
@@ -184,7 +162,7 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
       * (d2 / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - this.ePrimeSqTimes9) * d4 / 24
         + (61 + 90 * t1 + 298 * c1 + 45 * t1Sq - 252 * ePrimeSq - 3 * c1Sq) * d6 / 720);
 
-    final double lambda = this.lambda0 + (d - (1 + 2 * t1 + c1) * d3 / 6
+    final double lambda = this.λo + (d - (1 + 2 * t1 + c1) * d3 / 6
       + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + this.ePrimeSqTimes8 + 24 * t1Sq) * d5 / 120) / cosPhi1;
 
     targetCoordinates[targetOffset] = Math.toDegrees(lambda);
@@ -219,11 +197,11 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
    * metres.
    *
    * <pre>
-   * x = x0 + kO * ν * [
+   * x = xo + kO * ν * [
    *   A + (1 – T + C) * A &circ; 3 / 6 +
    *   (5 – 18 * T + T &circ; 2 + 72 *C – 58 *e' &circ; 2 ) * A &circ; 5 / 120
    * ]
-   * y = y0 + kO * { M – MO + ν * tanϕ * [
+   * y = yo + kO * { M – MO + ν * tanϕ * [
    *   A &circ; 2 / 2 +
    *   (5 – T + 9 * C + 4 * C &circ; 2) * A &circ; 4 / 24 +
    *   (61 – 58 * T + T &circ; 2 + 600 * C – 330 * e' &circ; 2 ) * A &circ; 6 / 720
@@ -252,30 +230,20 @@ public class TransverseMercatorUsgs extends AbstractCoordinatesProjection {
     final double tSq = t * t;
     final double c = this.ePrimeSq * cosPhi * cosPhi;
     final double cSq = c * c;
-    final double a1 = (lambda - this.lambda0) * cosPhi;
+    final double a1 = (lambda - this.λo) * cosPhi;
     final double a1Pow2 = a1 * a1;
     final double a1Pow3 = a1Pow2 * a1;
     final double a1Pow4 = a1Pow2 * a1Pow2;
     final double a1Pow5 = a1Pow4 * a1;
     final double a1Pow6 = a1Pow4 * a1Pow2;
-    final double x = this.x0 + this.k0 * nu * (a1 + (1 - t + c) * a1Pow3 / 6
+    final double x = this.xo + this.ko * nu * (a1 + (1 - t + c) * a1Pow3 / 6
       + (5 - 18 * t + tSq + 72 * c - 58 * this.ePrimeSq) * a1Pow5 / 120);
 
     final double m = m(phi);
-    final double y = this.y0
-      + this.k0 * (m - this.m0 + nu * tanPhi * (a1Pow2 / 2 + (5 - t + 9 * c + 4 * cSq) * a1Pow4 / 24
+    final double y = this.yo
+      + this.ko * (m - this.mo + nu * tanPhi * (a1Pow2 / 2 + (5 - t + 9 * c + 4 * cSq) * a1Pow4 / 24
         + (61 - 58 * t + tSq + 600 * c - 330 * this.ePrimeSq) * a1Pow6 / 720));
     targetCoordinates[targetOffset] = x;
     targetCoordinates[targetOffset + 1] = y;
-  }
-
-  /**
-   * Return the string representation of the projection.
-   *
-   * @return The string.
-   */
-  @Override
-  public String toString() {
-    return this.name;
   }
 }

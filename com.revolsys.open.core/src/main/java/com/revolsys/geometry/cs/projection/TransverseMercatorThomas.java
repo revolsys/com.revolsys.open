@@ -12,20 +12,9 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
  *
  * @author Paul Austin
  */
-public class TransverseMercatorThomas extends AbstractCoordinatesProjection {
-  private final double ko;
-
-  private final double xo;
+public class TransverseMercatorThomas extends TransverseMercator {
 
   private final double e;
-
-  private final double λo;
-
-  private final double a;
-
-  private final double b;
-
-  private final String name;
 
   private final double a0;
 
@@ -52,13 +41,7 @@ public class TransverseMercatorThomas extends AbstractCoordinatesProjection {
   public TransverseMercatorThomas(final String name, final Ellipsoid ellipsoid,
     final double longitudeOrigin, final double latitudeOrigin, final double ko, final double xo,
     final double yo) {
-    this.name = name;
-    this.xo = xo;
-    this.λo = Math.toRadians(longitudeOrigin);
-    this.ko = ko;
-
-    this.a = ellipsoid.getSemiMajorAxis();
-    this.b = ellipsoid.getSemiMinorAxis();
+    super(name, ellipsoid, longitudeOrigin, latitudeOrigin, ko, xo, yo);
     final double e2 = (this.a * this.a - this.b * this.b) / (this.a * this.a);
     this.e = Math.sqrt(e2);
 
@@ -87,53 +70,56 @@ public class TransverseMercatorThomas extends AbstractCoordinatesProjection {
     final double b = this.b;
     final double e = this.e;
 
-    double phi1 = y / a;
-    double dphi;
+    double φ1 = y / a;
+    double deltaφ;
     do {
-      dphi = (a * (this.a0 * phi1 - this.a2 * Math.sin(phi1 * 2) + this.a4 * Math.sin(phi1 * 4)
-        - this.a6 * Math.sin(phi1 * 6) + this.a8 * Math.sin(phi1 * 8)) - y)
-        / (a * (this.a0 - this.a2 * 2 * Math.cos(phi1 * 2) + this.a4 * 4. * Math.cos(phi1 * 4)
-          - this.a6 * 6 * Math.cos(phi1 * 6) + this.a8 * 8 * Math.cos(phi1 * 8)));
-      phi1 -= dphi;
+      deltaφ = (a * (this.a0 * φ1 - this.a2 * Math.sin(φ1 * 2) + this.a4 * Math.sin(φ1 * 4)
+        - this.a6 * Math.sin(φ1 * 6) + this.a8 * Math.sin(φ1 * 8)) - y)
+        / (a * (this.a0 - this.a2 * 2 * Math.cos(φ1 * 2) + this.a4 * 4. * Math.cos(φ1 * 4)
+          - this.a6 * 6 * Math.cos(φ1 * 6) + this.a8 * 8 * Math.cos(φ1 * 8)));
+      φ1 -= deltaφ;
 
-    } while (Math.abs(dphi) >= 1e-15);
+    } while (Math.abs(deltaφ) >= 1e-15);
 
-    final double t = Math.tan(phi1);
-    final double tp2 = t * t;
-    final double tp4 = tp2 * tp2;
-    final double tp6 = tp2 * tp4;
+    final double tanφ = Math.tan(φ1);
+    final double tanφPow2 = tanφ * tanφ;
+    final double tanφPow4 = tanφPow2 * tanφPow2;
+    final double tanφPow6 = tanφPow2 * tanφPow4;
 
-    final double sp = Math.sin(phi1);
-    final double sp2 = sp * sp;
-    final double cp = Math.cos(phi1);
+    final double sinφ = Math.sin(φ1);
+    final double sinφPow2 = sinφ * sinφ;
+    final double cosφ = Math.cos(φ1);
 
-    final double eta = Math.sqrt((a * a - b * b) / (b * b) * (cp * cp));
-    final double etap2 = eta * eta;
-    final double etap4 = etap2 * etap2;
-    final double etap6 = etap2 * etap4;
-    final double etap8 = etap4 * etap4;
-    final double dn = a / Math.sqrt(1. - e * e * (sp * sp));
-    final double d__2 = 1. - e * e * sp2;
-    final double dm = a * (1 - e * e) / Math.sqrt(d__2 * (d__2 * d__2));
-    final double xbydn = x / dn;
+    final double eta = Math.sqrt((a * a - b * b) / (b * b) * (cosφ * cosφ));
+    final double etaPow2 = eta * eta;
+    final double etaPow4 = etaPow2 * etaPow2;
+    final double etaPow6 = etaPow2 * etaPow4;
+    final double etaPow8 = etaPow4 * etaPow4;
+    final double ePow2 = e * e;
+    final double dn = a / Math.sqrt(1. - ePow2 * (sinφ * sinφ));
+    final double d__2 = 1 - ePow2 * sinφPow2;
+    final double dm = a * (1 - ePow2) / Math.sqrt(d__2 * (d__2 * d__2));
+    final double xOverDn = x / dn;
+    final double xOverDnPow2 = xOverDn * xOverDn;
+    final double xOverDnPow4 = xOverDnPow2 * xOverDnPow2;
+    final double xOverDnPow6 = xOverDnPow2 * xOverDnPow4;
+    final double λ = this.λo + (xOverDn - xOverDn * xOverDnPow2 / 6 * (tanφPow2 * 2 + 1 + etaPow2)
+      + xOverDn * xOverDnPow4 / 120
+        * (etaPow2 * 6 + 5 + tanφPow2 * 28 - etaPow4 * 3 + tanφPow2 * 8 * etaPow2 + tanφPow4 * 24
+          - etaPow6 * 4 + tanφPow2 * 4 * etaPow4 + tanφPow2 * 24 * etaPow6)
+      - xOverDn * xOverDnPow6 / 5040 * (tanφPow2 * 662 + 61 + tanφPow4 * 1320 + tanφPow6 * 720))
+      / cosφ;
 
-    final double φ = phi1 + t * (-(x * x) / (dm * 2 * dn)
-      + xbydn * (xbydn * xbydn) * x / (dm * 24)
-        * (tp2 * 3 + 5 + etap2 - etap4 * 4. - etap2 * 9 * tp2)
-      - xbydn * (xbydn * xbydn * xbydn * xbydn) * x / (dm * 720)
-        * (tp2 * 90 + 61 + etap2 * 46 + tp4 * 45 - tp2 * 252 * etap2 - etap4 * 3 + etap6 * 100
-          - tp2 * 66 * etap4 - tp4 * 90 * etap2 + etap8 * 88 + tp4 * 225 * etap4 + tp2 * 84. * etap6
-          - tp2 * 192. * etap8)
-      + xbydn * xbydn * xbydn * (xbydn * xbydn * xbydn * xbydn) * x / (dm * 40320)
-        * (tp2 * 3633 + 1385 + tp4 * 4095 + tp6 * 1574));
-
-    final double λ = this.λo + (xbydn - xbydn * (xbydn * xbydn) / 6 * (tp2 * 2 + 1. + etap2)
-      + xbydn * (xbydn * xbydn * xbydn * xbydn) / 120
-        * (etap2 * 6 + 5 + tp2 * 28 - etap4 * 3 + tp2 * 8 * etap2 + tp4 * 24 - etap6 * 4
-          + tp2 * 4 * etap4 + tp2 * 24 * etap6)
-      - xbydn * xbydn * xbydn * (xbydn * xbydn * xbydn * xbydn) / 5040
-        * (tp2 * 662 + 61 + tp4 * 1320 + tp6 * 720))
-      / cp;
+    final double φ = φ1 + tanφ * (-(x * x) / (dm * 2 * dn)
+      + xOverDn * xOverDnPow2 * x / (dm * 24)
+        * (tanφPow2 * 3 + 5 + etaPow2 - etaPow4 * 4. - etaPow2 * 9 * tanφPow2)
+      - xOverDn * xOverDnPow4 * x / (dm * 720)
+        * (tanφPow2 * 90 + 61 + etaPow2 * 46 + tanφPow4 * 45 - tanφPow2 * 252 * etaPow2
+          - etaPow4 * 3 + etaPow6 * 100 - tanφPow2 * 66 * etaPow4 - tanφPow4 * 90 * etaPow2
+          + etaPow8 * 88 + tanφPow4 * 225 * etaPow4 + tanφPow2 * 84 * etaPow6
+          - tanφPow2 * 192 * etaPow8)
+      + xOverDn * xOverDnPow6 * x / (dm * 40320)
+        * (tanφPow2 * 3633 + 1385 + tanφPow4 * 4095 + tanφPow6 * 1574));
 
     final double lon = Math.toDegrees(λ);
     final double lat = Math.toDegrees(φ);
@@ -151,65 +137,60 @@ public class TransverseMercatorThomas extends AbstractCoordinatesProjection {
   @Override
   public void project(final double lon, final double lat, final double[] targetCoordinates,
     final int targetOffset) {
-    final double deltaLambda = Math.toRadians(lon) - this.λo;
-    final double phi = Math.toRadians(lat);
+    final double λ = Math.toRadians(lon);
+    final double φ = Math.toRadians(lat);
+    final double deltaλ = λ - this.λo;
 
-    final double sing = 2e-9;
-    final double sp = Math.sin(phi);
-    final double cp = Math.cos(phi);
-    final double t = Math.tan(phi);
+    final double sinφ = Math.sin(φ);
+    final double sinφPow2 = sinφ * sinφ;
+    final double cosφ = Math.cos(φ);
+    final double cosφPow2 = cosφ * cosφ;
+    final double cosφPow4 = cosφPow2 * cosφPow2;
+    final double cosφPow6 = cosφPow2 * cosφPow4;
+    final double tanφ = Math.tan(φ);
+    final double tanφPow2 = tanφ * tanφ;
+    final double tanφPow4 = tanφPow2 * tanφPow2;
+    final double tanφPow6 = tanφPow2 * tanφPow4;
     final double a = this.a;
     final double b = this.b;
     final double e = this.e;
 
-    final double eta = Math.sqrt((a * a - b * b) / (b * b) * (cp * cp));
-    final double sphi = a * (this.a0 * phi - this.a2 * Math.sin(phi * 2)
-      + this.a4 * Math.sin(phi * 4) - this.a6 * Math.sin(phi * 6) + this.a8 * Math.sin(phi * 8));
+    final double eta = Math.sqrt((a * a - b * b) / (b * b) * cosφPow2);
+    final double sφ = a * (this.a0 * φ - this.a2 * Math.sin(φ * 2) + this.a4 * Math.sin(φ * 4)
+      - this.a6 * Math.sin(φ * 6) + this.a8 * Math.sin(φ * 8));
 
-    final double dn = a / Math.sqrt(1. - e * e * (sp * sp));
+    final double dn = a / Math.sqrt(1. - e * e * sinφPow2);
     double x = 0;
-    double y = sphi;
-    if (Math.abs(deltaLambda) >= sing) {
-      final double deltaLambdaSq = deltaLambda * deltaLambda;
-      final double cpSq = cp * cp;
-      final double tSq = t * t;
-      final double etaSq = eta * eta;
-      x = dn * (deltaLambda * cp
-        + deltaLambda * deltaLambdaSq * (cp * cpSq) / 6. * (1. - tSq + eta * eta)
-        + deltaLambda * (deltaLambdaSq * deltaLambdaSq) * (cp * (cpSq * cpSq)) / 120.
-          * (5. - tSq * 18. + tSq * tSq + eta * eta * 14. - tSq * 58. * etaSq + etaSq * etaSq * 13.
-            + etaSq * (etaSq * etaSq) * 4. - etaSq * etaSq * 64. * tSq
-            - etaSq * (etaSq * etaSq) * 24. * tSq)
-        + deltaLambdaSq * deltaLambda * (deltaLambdaSq * deltaLambdaSq) / 5040.
-          * (cpSq * cp * (cpSq * cpSq))
-          * (61. - tSq * 479. + tSq * tSq * 179. - tSq * (tSq * tSq)));
+    double y = sφ;
+    if (Math.abs(deltaλ) >= 2e-9) {
+      final double deltaλPow2 = deltaλ * deltaλ;
+      final double deltaλPow4 = deltaλPow2 * deltaλPow2;
+      final double deltaλPow6 = deltaλPow2 * deltaλPow4;
+      final double etaPow2 = eta * eta;
+      final double etaPow4 = etaPow2 * etaPow2;
+      final double etaPow6 = etaPow2 * etaPow4;
+      final double etaPow8 = etaPow4 * etaPow4;
+      x = dn
+        * (deltaλ * cosφ + deltaλ * deltaλPow2 * (cosφ * cosφPow2) / 6 * (1 - tanφPow2 + etaPow2)
+          + deltaλ * deltaλPow4 * (cosφ * cosφPow4) / 120
+            * (5 - tanφPow2 * 18 + tanφPow4 + etaPow2 * 14 - tanφPow2 * 58 * etaPow2 + etaPow4 * 13
+              + etaPow6 * 4 - etaPow4 * 64 * tanφPow2 - etaPow6 * 24 * tanφPow2)
+          + deltaλ * deltaλPow6 / 5040. * (cosφ * cosφPow6)
+            * (61 - tanφPow2 * 479 + tanφPow4 * 179 - tanφPow6));
 
-      y = sphi + dn * (deltaLambdaSq / 2. * sp * cp
-        + deltaLambdaSq * deltaLambdaSq / 24. * sp * (cp * cpSq)
-          * (5. - tSq + etaSq * 9. + etaSq * etaSq * 4.)
-        + deltaLambdaSq * (deltaLambdaSq * deltaLambdaSq) / 720. * sp * (cp * (cpSq * cpSq))
-          * (61. - tSq * 58. + tSq * tSq + etaSq * 270. - tSq * 330. * etaSq + etaSq * etaSq * 445.
-            + etaSq * (etaSq * etaSq) * 324. - etaSq * etaSq * 680. * tSq
-            + eta * etaSq * (eta * etaSq) * 88. - etaSq * (etaSq * etaSq) * 600. * tSq
-            - etaSq * etaSq * (etaSq * etaSq) * 192. * tSq)
-        + deltaLambdaSq * deltaLambdaSq * (deltaLambdaSq * deltaLambdaSq) / 40320. * sp
-          * (cp * cpSq * (cpSq * cpSq))
-          * (1385. - tSq * 3111. + tSq * tSq * 543. - tSq * (tSq * tSq)));
+      y = sφ + dn * (deltaλPow2 / 2 * sinφ * cosφ
+        + deltaλPow4 / 24 * sinφ * (cosφ * cosφPow2) * (5 - tanφPow2 + etaPow2 * 9 + etaPow4 * 4)
+        + deltaλPow6 / 720. * sinφ * (cosφ * cosφPow4)
+          * (61 - tanφPow2 * 58 + tanφPow4 + etaPow2 * 270 - tanφPow2 * 330 * etaPow2
+            + etaPow4 * 445 + etaPow6 * 324 - etaPow4 * 680 * tanφPow2 + etaPow6 * 88
+            - etaPow6 * 600 * tanφPow2 - etaPow8 * 192 * tanφPow2)
+        + deltaλPow4 * deltaλPow4 / 40320 * sinφ * (cosφ * cosφPow6)
+          * (1385 - tanφPow2 * 3111 + tanφPow4 * 543 - tanφPow6));
     }
 
     x = this.xo + this.ko * x;
     y = this.ko * y;
     targetCoordinates[targetOffset] = x;
     targetCoordinates[targetOffset + 1] = y;
-  }
-
-  /**
-   * Return the string representation of the projection.
-   *
-   * @return The string.
-   */
-  @Override
-  public String toString() {
-    return this.name;
   }
 }
