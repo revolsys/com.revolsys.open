@@ -24,24 +24,24 @@ public class TransverseMercatorEpsg extends TransverseMercator {
    *
    * MO = a[(1 – e2/4 – 3e4/64 – 5e6/256 –....)φO – (3e2/8 + 3e4/32 + 45e6/1024+....)sin2φO
    *      + (15e4/256 + 45e6/1024 +.....)sin4φO – (35e6/3072 + ....)sin6φO + .....]
-   * @param phi
+   * @param φ
    * @return
    */
-  private static double mo(final double phi) {
+  private static double mo(final double φ) {
     final double B = 0;
     final double e = 0;
     final double h1 = 0;
     final double h2 = 0;
     final double h3 = 0;
     final double h4 = 0;
-    if (phi == 0) {
+    if (φ == 0) {
       return 0;
-    } else if (phi == Angle.PI_OVER_2) {
+    } else if (φ == Angle.PI_OVER_2) {
       return B * Angle.PI_OVER_2;
-    } else if (phi == -Angle.PI_OVER_2) {
+    } else if (φ == -Angle.PI_OVER_2) {
       return B * -Angle.PI_OVER_2;
     } else {
-      final double QO = FastMath.asinh(Math.tan(phi)) - e * FastMath.atanh(e * Math.sin(phi));
+      final double QO = FastMath.asinh(Math.tan(φ)) - e * FastMath.atanh(e * Math.sin(φ));
       final double βO = Math.atan(Math.sinh(QO));
       final double ξO0 = Math.asin(Math.sin(βO));
       // Note: The previous two steps are taken from the generic calculation flow given below for

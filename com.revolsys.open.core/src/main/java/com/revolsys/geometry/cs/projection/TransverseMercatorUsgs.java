@@ -65,13 +65,13 @@ public class TransverseMercatorUsgs extends TransverseMercator {
     final double longitudeOrigin, final double latitudeOrigin, final double ko, final double xo,
     final double yo) {
     super(name, ellipsoid, longitudeOrigin, latitudeOrigin, ko, xo, yo);
-    final double phi0 = Math.toRadians(latitudeOrigin);
+    final double φ0 = Math.toRadians(latitudeOrigin);
     this.eSq = ellipsoid.getEccentricitySquared();
     this.sqrt1MinusESq = Math.sqrt(1 - this.eSq);
 
     this.ePow4 = this.eSq * this.eSq;
     this.ePow6 = this.ePow4 * this.eSq;
-    this.mo = m(phi0);
+    this.mo = m(φ0);
     this.ePrimeSq = this.eSq / (1 - this.eSq);
     this.ePrimeSqTimes9 = 9 * this.ePrimeSq;
     this.ePrimeSqTimes8 = 8 * this.ePrimeSq;
@@ -132,45 +132,45 @@ public class TransverseMercatorUsgs extends TransverseMercator {
     final int targetOffset) {
     final double eSq = this.eSq;
     final double a = this.a;
-    final double k0 = this.ko;
+    final double ko = this.ko;
     final double ePrimeSq = this.ePrimeSq;
 
-    final double m = this.mo + (y - this.yo) / k0;
+    final double m = this.mo + (y - this.yo) / ko;
     final double mu = m / this.aTimes1MinusEsqDiv4MinesEPow4Times3Div64MinusEPow6Times5Div256;
-    final double phi1 = mu + this.e1Time2Div2MinusE1Pow3Times27Div32 * Math.sin(2 * mu)
+    final double φ1 = mu + this.e1Time2Div2MinusE1Pow3Times27Div32 * Math.sin(2 * mu)
       + this.e1Pow2Times21Div16MinusE1Pow4Times55Div32 * Math.sin(4 * mu)
       + this.e1Pow3Times151Div96 * Math.sin(6 * mu) + this.e1Pow4Times1097Div512 * Math.sin(8 * mu);
-    final double cosPhi1 = Math.cos(phi1);
-    final double sinPhi = Math.sin(phi1);
-    final double tanPhi1 = Math.tan(phi1);
+    final double cosφ1 = Math.cos(φ1);
+    final double sinφ = Math.sin(φ1);
+    final double tanφ1 = Math.tan(φ1);
 
-    final double oneMinusESqSinPhi1Sq = 1 - eSq * sinPhi * sinPhi;
-    final double nu1 = a / Math.sqrt(oneMinusESqSinPhi1Sq);
-    final double rho1 = a * (1 - eSq) / (oneMinusESqSinPhi1Sq * Math.sqrt(oneMinusESqSinPhi1Sq));
-    final double c1 = ePrimeSq * cosPhi1 * cosPhi1;
-    final double d = (x - this.xo) / (nu1 * k0);
+    final double oneMinusESqSinφ1Sq = 1 - eSq * sinφ * sinφ;
+    final double nu1 = a / Math.sqrt(oneMinusESqSinφ1Sq);
+    final double rho1 = a * (1 - eSq) / (oneMinusESqSinφ1Sq * Math.sqrt(oneMinusESqSinφ1Sq));
+    final double c1 = ePrimeSq * cosφ1 * cosφ1;
+    final double d = (x - this.xo) / (nu1 * ko);
     final double d2 = d * d;
     final double d3 = d2 * d;
     final double d4 = d2 * d2;
     final double d5 = d4 * d;
     final double d6 = d4 * d2;
-    final double t1 = tanPhi1 * tanPhi1;
+    final double t1 = tanφ1 * tanφ1;
 
     final double c1Sq = c1 * c1;
     final double t1Sq = t1 * t1;
-    final double phi = phi1 - nu1 * tanPhi1 / rho1
+    final double φ = φ1 - nu1 * tanφ1 / rho1
       * (d2 / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - this.ePrimeSqTimes9) * d4 / 24
         + (61 + 90 * t1 + 298 * c1 + 45 * t1Sq - 252 * ePrimeSq - 3 * c1Sq) * d6 / 720);
 
-    final double lambda = this.λo + (d - (1 + 2 * t1 + c1) * d3 / 6
-      + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + this.ePrimeSqTimes8 + 24 * t1Sq) * d5 / 120) / cosPhi1;
+    final double λ = this.λo + (d - (1 + 2 * t1 + c1) * d3 / 6
+      + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + this.ePrimeSqTimes8 + 24 * t1Sq) * d5 / 120) / cosφ1;
 
-    targetCoordinates[targetOffset] = Math.toDegrees(lambda);
-    targetCoordinates[targetOffset + 1] = Math.toDegrees(phi);
+    targetCoordinates[targetOffset] = Math.toDegrees(λ);
+    targetCoordinates[targetOffset + 1] = Math.toDegrees(φ);
   }
 
   /**
-   * Calculate the value of m for the given value of phi using the following
+   * Calculate the value of m for the given value of φ using the following
    * forumla.
    *
    * <pre>
@@ -182,14 +182,14 @@ public class TransverseMercatorUsgs extends TransverseMercator {
    * ]
    * </pre>
    *
-   * @param phi The phi value in radians.
+   * @param φ The φ value in radians.
    * @return The value of m.
    */
-  private double m(final double phi) {
-    return this.a * ((1 - this.eSq / 4 - 3 * this.ePow4 / 64 - 5 * this.ePow6 / 256) * phi
-      - (3 * this.eSq / 8 + 3 * this.ePow4 / 32 + 45 * this.ePow6 / 1024) * Math.sin(2 * phi)
-      + (15 * this.ePow4 / 256 + 45 * this.ePow6 / 1024) * Math.sin(4 * phi)
-      - 35 * this.ePow6 / 3072 * Math.sin(6 * phi));
+  private double m(final double φ) {
+    return this.a * ((1 - this.eSq / 4 - 3 * this.ePow4 / 64 - 5 * this.ePow6 / 256) * φ
+      - (3 * this.eSq / 8 + 3 * this.ePow4 / 32 + 45 * this.ePow6 / 1024) * Math.sin(2 * φ)
+      + (15 * this.ePow4 / 256 + 45 * this.ePow6 / 1024) * Math.sin(4 * φ)
+      - 35 * this.ePow6 / 3072 * Math.sin(6 * φ));
   }
 
   /**
@@ -218,31 +218,31 @@ public class TransverseMercatorUsgs extends TransverseMercator {
   @Override
   public void project(final double lon, final double lat, final double[] targetCoordinates,
     final int targetOffset) {
-    final double lambda = Math.toRadians(lon);
-    final double phi = Math.toRadians(lat);
+    final double λ = Math.toRadians(lon);
+    final double φ = Math.toRadians(lat);
 
-    final double cosPhi = Math.cos(phi);
-    final double sinPhi = Math.sin(phi);
-    final double tanPhi = Math.tan(phi);
+    final double cosφ = Math.cos(φ);
+    final double sinφ = Math.sin(φ);
+    final double tanφ = Math.tan(φ);
 
-    final double nu = this.a / Math.sqrt(1 - this.eSq * sinPhi * sinPhi);
-    final double t = tanPhi * tanPhi;
-    final double tSq = t * t;
-    final double c = this.ePrimeSq * cosPhi * cosPhi;
-    final double cSq = c * c;
-    final double a1 = (lambda - this.λo) * cosPhi;
+    final double nu = this.a / Math.sqrt(1 - this.eSq * sinφ * sinφ);
+    final double tanφPow2 = tanφ * tanφ;
+    final double tanφPow4 = tanφPow2 * tanφPow2;
+    final double c = this.ePrimeSq * cosφ * cosφ;
+    final double cPow2 = c * c;
+    final double a1 = (λ - this.λo) * cosφ;
     final double a1Pow2 = a1 * a1;
     final double a1Pow3 = a1Pow2 * a1;
     final double a1Pow4 = a1Pow2 * a1Pow2;
     final double a1Pow5 = a1Pow4 * a1;
     final double a1Pow6 = a1Pow4 * a1Pow2;
-    final double x = this.xo + this.ko * nu * (a1 + (1 - t + c) * a1Pow3 / 6
-      + (5 - 18 * t + tSq + 72 * c - 58 * this.ePrimeSq) * a1Pow5 / 120);
+    final double x = this.xo + this.ko * nu * (a1 + (1 - tanφPow2 + c) * a1Pow3 / 6
+      + (5 - 18 * tanφPow2 + tanφPow4 + 72 * c - 58 * this.ePrimeSq) * a1Pow5 / 120);
 
-    final double m = m(phi);
-    final double y = this.yo
-      + this.ko * (m - this.mo + nu * tanPhi * (a1Pow2 / 2 + (5 - t + 9 * c + 4 * cSq) * a1Pow4 / 24
-        + (61 - 58 * t + tSq + 600 * c - 330 * this.ePrimeSq) * a1Pow6 / 720));
+    final double m = m(φ);
+    final double y = this.yo + this.ko
+      * (m - this.mo + nu * tanφ * (a1Pow2 / 2 + (5 - tanφPow2 + 9 * c + 4 * cPow2) * a1Pow4 / 24
+        + (61 - 58 * tanφPow2 + tanφPow4 + 600 * c - 330 * this.ePrimeSq) * a1Pow6 / 720));
     targetCoordinates[targetOffset] = x;
     targetCoordinates[targetOffset + 1] = y;
   }
