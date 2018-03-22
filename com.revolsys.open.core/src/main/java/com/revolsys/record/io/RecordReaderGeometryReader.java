@@ -1,6 +1,7 @@
 package com.revolsys.record.io;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.map.MapEx;
@@ -17,7 +18,6 @@ public class RecordReaderGeometryReader implements Iterator<Geometry>, GeometryR
 
   public RecordReaderGeometryReader(final RecordReader reader) {
     this.reader = reader;
-    this.iterator = reader.iterator();
   }
 
   @Override
@@ -52,6 +52,7 @@ public class RecordReaderGeometryReader implements Iterator<Geometry>, GeometryR
 
   @Override
   public Iterator<Geometry> iterator() {
+    open();
     return this;
   }
 
@@ -66,7 +67,22 @@ public class RecordReaderGeometryReader implements Iterator<Geometry>, GeometryR
   }
 
   @Override
+  public void open() {
+    this.iterator = this.reader.iterator();
+  }
+
+  @Override
   public void remove() {
     this.iterator.remove();
+  }
+
+  @Override
+  public void setProperties(final Map<String, ? extends Object> properties) {
+    this.reader.setProperties(properties);
+  }
+
+  @Override
+  public void setProperty(final String name, final Object value) {
+    this.reader.setProperty(name, value);
   }
 }
