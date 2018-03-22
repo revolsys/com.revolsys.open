@@ -267,11 +267,12 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     }
   }
 
-  public synchronized CoordinatesProjection getCoordinatesProjection() {
+  @SuppressWarnings("unchecked")
+  public synchronized <P extends CoordinatesProjection> P getCoordinatesProjection() {
     if (this.coordinatesProjection == null) {
       this.coordinatesProjection = this.coordinateOperationMethod.newCoordinatesProjection(this);
     }
-    return this.coordinatesProjection;
+    return (P)this.coordinatesProjection;
   }
 
   @Override

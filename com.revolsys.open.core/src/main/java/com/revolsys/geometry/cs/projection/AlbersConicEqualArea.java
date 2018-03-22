@@ -1,9 +1,9 @@
 package com.revolsys.geometry.cs.projection;
 
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.math.Angle;
 
@@ -71,42 +71,48 @@ import com.revolsys.math.Angle;
  */
 public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
 
-  /** Constant c = sq(m(phi1) + n * q(phi1) */
+  /** Constant c = sq(m(φ1) + n * q(φ1) */
   private final double c;
 
   private final double e;
 
   /** sq(e). */
-  private final double ee;
+  private final double ePow2;
 
   /** Central Meridian. */
-  private final double lambda0;
+  private final double λo;
 
-  /** Constant n = ( sq(m(phi1)) - sq(m(phi2) ) /( q(phi2) - q(phi1) ) */
+  /** Constant n = ( sq(m(φ1)) - sq(m(φ2) ) /( q(φ2) - q(φ1) ) */
   private final double n;
 
   /** Lattitude of CoordinateOperationMethod. */
-  private final double phi0;
+  private final double φo;
 
   /** First standard parallel. */
-  private final double phi1;
+  private final double φ1;
 
   /** Second standard parallel. */
-  private final double phi2;
+  private final double φ2;
 
-  /** Constant rho0 = semiMajorAxis * sqrt( C - n * q(phi0) ) / n. */
-  private final double rho0;
+  /** Constant ρo = semiMajorAxis * sqrt( C - n * q(φo) ) / n. */
+  private final double ρo;
 
-  private final double semiMajorAxis;
+  private final double a;
 
   /** The spheriod. */
   private final Ellipsoid ellipsoid;
 
   /** The false Easting. */
-  private final double x0;
+  private final double xo;
 
   /** The false Northing. */
-  private final double y0;
+  private final double yo;
+
+  private final double aPow2;
+
+  private final double nPow2;
+
+  private final double oneOver2e;
 
   public AlbersConicEqualArea(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
@@ -119,117 +125,122 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
     final double latitudeOfProjection = cs
       .getDoubleParameter(NormalizedParameterNames.LATITUDE_OF_ORIGIN);
     this.ellipsoid = geodeticDatum.getEllipsoid();
-    this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
-    this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
-    this.lambda0 = Math.toRadians(centralMeridian);
-    this.phi0 = Math.toRadians(latitudeOfProjection);
-    this.phi1 = Math.toRadians(firstStandardParallel);
-    this.phi2 = Math.toRadians(secondStandardParallel);
+    this.xo = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
+    this.yo = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
+    this.λo = Math.toRadians(centralMeridian);
+    this.φo = Math.toRadians(latitudeOfProjection);
+    this.φ1 = Math.toRadians(firstStandardParallel);
+    this.φ2 = Math.toRadians(secondStandardParallel);
 
-    this.semiMajorAxis = this.ellipsoid.getSemiMajorAxis();
+    this.a = this.ellipsoid.getSemiMajorAxis();
+    this.aPow2 = Math.pow(this.a, 2);
 
     this.e = this.ellipsoid.getEccentricity();
-    this.ee = this.ellipsoid.getEccentricitySquared();
+    this.oneOver2e = 1 / (this.e * 2);
+    this.ePow2 = this.ellipsoid.getEccentricitySquared();
 
-    final double m1 = m(this.phi1);
-    final double m2 = m(this.phi2);
-    final double q0 = q(this.phi0);
-    final double q1 = q(this.phi1);
-    final double q2 = q(this.phi2);
+    final double m1 = m(this.φ1);
+    final double m2 = m(this.φ2);
+    final double q0 = q(this.φo);
+    final double q1 = q(this.φ1);
+    final double q2 = q(this.φ2);
 
     this.n = (m1 * m1 - m2 * m2) / (q2 - q1);
+    this.nPow2 = Math.pow(this.n, 2);
     this.c = m1 * m1 + this.n * q1;
-    this.rho0 = this.semiMajorAxis * Math.sqrt(this.c - this.n * q0) / this.n;
+    this.ρo = this.a * Math.sqrt(this.c - this.n * q0) / this.n;
   }
 
   /**
-   * n = sin(phi1) + sin (phi2)
+   * n = sin(φ1) + sin (φ2)
    * <p>
-   * phi = sin-1( ( C - (rho ^ 2) * (n ^ 2) ) / 2 * n )
+   * φ = sin-1( ( C - (ρ ^ 2) * (n ^ 2) ) / 2 * n )
    * <p>
-   * lambda =
+   * λ =
    */
   @Override
   public void inverse(final double x, final double y, final double[] targetCoordinates,
     final int targetOffset) {
-    final double dX = x - this.x0;
-    final double dY = y - this.y0;
-    final double theta = Math.atan(dX / (this.rho0 - dY));
-    final double rho = Math.sqrt(dX * dX + Math.pow(this.rho0 - dY, 2.0));
-    final double q = (this.c
-      - rho * rho * this.n * this.n / (this.semiMajorAxis * this.semiMajorAxis)) / this.n;
-    final double lambda = this.lambda0 + theta / this.n;
-    double li = Math.asin(q / 2.0);
-    if (!Double.isNaN(li)) {
-      double delta = 10e010;
+    final double ΔX = x - this.xo;
+    final double ΔY = y - this.yo;
+    final double e = this.e;
+    final double ePow2 = this.ePow2;
+    final double oneOver2e = this.oneOver2e;
+    final double n = this.n;
+
+    final double ρo = this.ρo;
+
+    final double θ = Math.atan(ΔX / (ρo - ΔY));
+    final double ρ = Math.sqrt(Math.pow(ΔX, 2) + Math.pow(ρo - ΔY, 2));
+    final double ρPow2 = Math.pow(ρ, 2);
+    final double q = (this.c - ρPow2 * this.nPow2 / this.aPow2) / n;
+    final double λ = this.λo + θ / n;
+    double φ = Math.asin(q / 2.0);
+    if (Double.isFinite(φ)) {
+      double Δφ;
       final double maxIter = 1000;
       int i = 0;
       do {
-        final double sinLi = Math.sin(li);
+        final double sinφ = Math.sin(φ);
+        final double eSinφ = e * sinφ;
 
-        final double j1 = Math.pow(1.0 - this.ee * Math.pow(sinLi, 2.0), 2.0)
-          / (2.0 * Math.cos(li));
-        final double k1 = q / (1.0 - this.ee);
-        final double k2 = sinLi / (1.0 - this.ee * Math.pow(sinLi, 2.0));
-        final double k3 = 1.0 / (2.0 * this.e)
-          * Math.log((1.0 - this.e * sinLi) / (1.0 + this.e * sinLi));
-        final double lip1 = li + j1 * (k1 - k2 + k3);
-        delta = Math.abs(lip1 - li);
-        li = lip1;
+        final double oneMinusEpow2TimesSinφPow2 = 1.0 - ePow2 * Math.pow(sinφ, 2);
+        final double j1 = Math.pow(oneMinusEpow2TimesSinφPow2, 2) / (2 * Math.cos(φ));
+        final double k1 = q / (1 - ePow2);
+        final double k2 = sinφ / oneMinusEpow2TimesSinφPow2;
+        final double k3 = oneOver2e * Math.log((1.0 - eSinφ) / (1 + eSinφ));
+        final double newφ = φ + j1 * (k1 - k2 + k3);
+        Δφ = Math.abs(newφ - φ);
+        φ = newφ;
         i++;
-      } while (!Double.isNaN(li) && delta > 1.0e-011 && i < maxIter);
+      } while (Double.isFinite(φ) && Δφ > 1e-011 && i < maxIter);
     }
-    double phi;
-    if (Double.isNaN(li)) {
-      phi = Angle.PI_OVER_2;
-    } else {
-      phi = li;
+    if (!Double.isFinite(φ)) {
+      φ = Angle.PI_OVER_2;
     }
-    targetCoordinates[targetOffset] = Math.toDegrees(lambda);
-    targetCoordinates[targetOffset + 1] = Math.toDegrees(phi);
+    targetCoordinates[targetOffset] = Math.toDegrees(λ);
+    targetCoordinates[targetOffset + 1] = Math.toDegrees(φ);
   }
 
   /**
    * <pre>
-   * cos(phi) / sqrt(1 - sq(e) * sq(sin(phi)))
+   * cos(φ) / sqrt(1 - sq(e) * sq(sin(φ)))
    * </pre>
    *
-   * @param phi The lattitude in radians.
+   * @param φ The lattitude in radians.
    * @return
    */
-  private double m(final double phi) {
-    final double sinPhi = Math.sin(phi);
-    final double m = Math.cos(phi) / Math.sqrt(1.0 - this.ee * sinPhi * sinPhi);
-    return m;
+  private double m(final double φ) {
+    final double sinφ = Math.sin(φ);
+    return Math.cos(φ) / Math.sqrt(1.0 - this.ePow2 * Math.pow(sinφ, 2));
   }
 
   /**
    * <pre>
    * a = semiMajorAxis
-   * lambda = lon;
-   * phi = lat;
+   * λ = lon;
+   * φ = lat;
    *
-   * x = rho * sin(theta)
-   * y = rho0 - rho * sin(theta)
+   * x = ρ * sin(θ)
+   * y = ρo - ρ * sin(θ)
    *
-   * rho = a * sqrt(C - n * q) / n
+   * ρ = a * sqrt(C - n * q) / n
    *
    * </pre>
    */
   @Override
   public void project(final double lon, final double lat, final double[] targetCoordinates,
     final int targetOffset) {
-    final double lambda = Math.toRadians(lon);
-    final double phi = Math.toRadians(lat);
-    final double q = q(phi);
-    final double lminusl0 = lambda - this.lambda0;
+    final double λ = Math.toRadians(lon);
+    final double φ = Math.toRadians(lat);
+    final double q = q(φ);
+    final double Δλ = λ - this.λo;
     final double n = this.n;
-    final double theta = n * lminusl0;
-    final double sqrtCminsNQOverN = Math.sqrt(this.c - n * q) / n;
-    final double rho = this.semiMajorAxis * sqrtCminsNQOverN;
+    final double θ = n * Δλ;
+    final double ρ = this.a * (Math.sqrt(this.c - n * q) / n);
 
-    final double x = this.x0 + rho * Math.sin(theta);
-    final double y = this.y0 + this.rho0 - rho * Math.cos(theta);
+    final double x = this.xo + ρ * Math.sin(θ);
+    final double y = this.yo + this.ρo - ρ * Math.cos(θ);
 
     targetCoordinates[targetOffset] = x;
     targetCoordinates[targetOffset + 1] = y;
@@ -239,21 +250,22 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
    * <pre>
    * (1 - sq(e)) *
    * (
-   *   sin(phi) / (1 - sq(e) * sq(sin(phi))) ) -
+   *   sin(φ) / (1 - sq(e) * sq(sin(φ))) ) -
    *   (1 / (2 * e)) *
-   *   ln( ( 1 - e * sin(phi) ) / ( 1 + e sin(phi)))
+   *   ln( ( 1 - e * sin(φ) ) / ( 1 + e sin(φ)))
    * )
    *
    * </pre>
    *
-   * @param phi The lattitude in radians
+   * @param φ The lattitude in radians
    * @return
    */
-  private double q(final double phi) {
-    final double sinPhi = Math.sin(phi);
-    final double eSinPhi = this.e * sinPhi;
-    final double q = (1.0 - this.ee) * (sinPhi / (1.0 - this.ee * sinPhi * sinPhi)
-      - 1.0 / (2.0 * this.e) * Math.log((1.0 - eSinPhi) / (1.0 + eSinPhi)));
+  private double q(final double φ) {
+    final double sinφ = Math.sin(φ);
+    final double eSinφ = this.e * sinφ;
+    double ePow2 = this.ePow2;
+    final double q = (1.0 - ePow2) * (sinφ / (1.0 - ePow2 * Math.pow(sinφ, 2))
+      - this.oneOver2e * Math.log((1.0 - eSinφ) / (1.0 + eSinφ)));
     return q;
   }
 }
