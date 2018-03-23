@@ -420,7 +420,7 @@ $(document).ready(function() {
     jQuery.validator.setDefaults({
       highlight : function(element) { 
         if (element.type === "radio") {
-          this.findByName(element.name).addClass(errorClass).removeClass(validClass);
+          this.findByName(element.name).addClass('has-error has-feedback').removeClass('has-success has-feedback');
         } else {
           var group = $(element).closest('.form-group');
           group.removeClass('has-success has-feedback').addClass('has-error has-feedback');
@@ -430,7 +430,7 @@ $(document).ready(function() {
       },
       unhighlight : function(element) {
         if (element.type === "radio") {
-          this.findByName(element.name).removeClass(errorClass).addClass(validClass);
+          this.findByName(element.name).removeClass('has-error has-feedback').addClass('has-success has-feedback');
         } else {
           var group = $(element).closest('.form-group');
           group.removeClass('has-error has-feedback').addClass('has-success has-feedback');
