@@ -4,7 +4,7 @@ import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.math.Angle;
-import com.revolsys.math.FastMath;
+import com.revolsys.util.MathUtil;
 
 /**
  * An implementation of the Transverse Mercator projection. See section 1.3.5 of
@@ -14,45 +14,11 @@ import com.revolsys.math.FastMath;
  *
  * @author Paul Austin
  */
-public class TransverseMercatorEpsg extends TransverseMercator {
+public class TransverseMercatorJhs extends TransverseMercator {
 
-  /**
-   * Then the meridional arc distance from equator to the projection origin (MO) is computed from
-   *
-   *
-   * Note: if the projection grid origin is very close to but not exactly at the pole (within 2" or 50m), the tangent function in the equation above for QO is unstable and may fail. MO may instead be calculated (as in the USGS formula below) from:
-   *
-   * MO = a[(1 – e2/4 – 3e4/64 – 5e6/256 –....)φO – (3e2/8 + 3e4/32 + 45e6/1024+....)sin2φO
-   *      + (15e4/256 + 45e6/1024 +.....)sin4φO – (35e6/3072 + ....)sin6φO + .....]
-   * @param φ
-   * @return
-   */
-  private static double mo(final double φ) {
-    final double B = 0;
-    final double e = 0;
-    final double h1 = 0;
-    final double h2 = 0;
-    final double h3 = 0;
-    final double h4 = 0;
-    if (φ == 0) {
-      return 0;
-    } else if (φ == Angle.PI_OVER_2) {
-      return B * Angle.PI_OVER_2;
-    } else if (φ == -Angle.PI_OVER_2) {
-      return B * -Angle.PI_OVER_2;
-    } else {
-      final double QO = FastMath.asinh(Math.tan(φ)) - e * FastMath.atanh(e * Math.sin(φ));
-      final double βO = Math.atan(Math.sinh(QO));
-      final double ξO0 = Math.asin(Math.sin(βO));
-      // Note: The previous two steps are taken from the generic calculation flow given below for
-      // latitude φ, but here for φO may be simplified to ξO0 = βO = atan(sinh QO).
-      final double ξO1 = h1 * Math.sin(2 * ξO0);
-      final double ξO2 = h2 * Math.sin(4 * ξO0);
-      final double ξO3 = h3 * Math.sin(6 * ξO0);
-      final double ξO4 = h4 * Math.sin(8 * ξO0);
-      final double ξO = ξO0 + ξO1 + ξO2 + ξO3 + ξO4;
-      return B * ξO;
-    }
+  public static TransverseMercatorJhs newUtm(final Ellipsoid ellipsoid,
+    final double utmReferenceMeridian) {
+    return new TransverseMercatorJhs("UTM", ellipsoid, utmReferenceMeridian, 0, 0.9996, 500000, 0);
   }
 
   private final double n;
@@ -84,7 +50,7 @@ public class TransverseMercatorEpsg extends TransverseMercator {
    *
    * @param coordinateSystem The coordinate system.
    */
-  public TransverseMercatorEpsg(final ProjectedCoordinateSystem coordinateSystem) {
+  public TransverseMercatorJhs(final ProjectedCoordinateSystem coordinateSystem) {
     this(//
       coordinateSystem.getCoordinateSystemName(), //
       coordinateSystem.getEllipsoid(), //
@@ -96,17 +62,16 @@ public class TransverseMercatorEpsg extends TransverseMercator {
     );
   }
 
-  public TransverseMercatorEpsg(final String name, final Ellipsoid ellipsoid,
+  public TransverseMercatorJhs(final String name, final Ellipsoid ellipsoid,
     final double longitudeOrigin, final double latitudeOrigin, final double ko, final double xo,
     final double yo) {
     super(name, ellipsoid, longitudeOrigin, latitudeOrigin, ko, xo, yo);
     final double f = ellipsoid.getFlattening();
     this.e = ellipsoid.getEccentricity();
-    this.mo = mo(this.φo);
     this.n = f / (2 - f);
-    final double n2 = this.n * this.n;
-    final double n3 = this.n * n2;
-    final double n4 = n2 * n2;
+    final double n2 = Math.pow(this.n, 2);
+    final double n3 = Math.pow(this.n, 3);
+    final double n4 = Math.pow(this.n, 4);
     this.B = this.a / (1 + this.n) * (1 + n2 / 4 + n4 / 64);
     this.h1 = this.n / 2 - 2 / 3 * n2 + 5 / 16 * n3 + 41 / 180 * n4;
     this.h2 = 13 / 48 * n2 - 3 / 5 * n3 + 557 / 1440 * n4;
@@ -117,6 +82,7 @@ public class TransverseMercatorEpsg extends TransverseMercator {
     this.h2Prime = 1 / 48 * n2 + 1 / 15 * n3 - 437 / 1440 * n4;
     this.h3Prime = 17 / 480 * n3 - 37 / 840 * n4;
     this.h4Prime = 4397 / 161280 * n4;
+    this.mo = mo(this.φo);
   }
 
   /**
@@ -142,12 +108,12 @@ public class TransverseMercatorEpsg extends TransverseMercator {
     final double ξ0Prime = ξPrime - (ξ1Prime + ξ2Prime + ξ3Prime + ξ4Prime);
     final double η0Prime = ηPrime - (η1Prime + η2Prime + η3Prime + η4Prime);
     final double βPrime = Math.asin(Math.sin(ξ0Prime) / Math.cosh(η0Prime));
-    final double QPrime = FastMath.asinh(Math.tan(βPrime));
-    double QPrimePrime = QPrime + this.e * FastMath.atanh(this.e * Math.tanh(QPrime));
+    final double QPrime = MathUtil.asinh(Math.tan(βPrime));
+    double QPrimePrime = QPrime + this.e * MathUtil.atanh(this.e * Math.tanh(QPrime));
     final double lastQPrimePrime = QPrimePrime;
     int i = 0;
     do {
-      QPrimePrime = QPrime + this.e * FastMath.atanh(this.e * Math.tanh(QPrimePrime));
+      QPrimePrime = QPrime + this.e * MathUtil.atanh(this.e * Math.tanh(QPrimePrime));
     } while (Math.abs(lastQPrimePrime - QPrimePrime) < 1.0e-011 && ++i < 100);
 
     final double λ = this.λo + Math.asin(Math.tanh(η0Prime) / Math.cos(βPrime));
@@ -155,6 +121,30 @@ public class TransverseMercatorEpsg extends TransverseMercator {
 
     targetCoordinates[targetOffset] = Math.toDegrees(λ);
     targetCoordinates[targetOffset + 1] = Math.toDegrees(φ);
+  }
+
+  private double mo(final double φ) {
+    final double B = this.B;
+    final double e = this.e;
+    if (φ == 0) {
+      return 0;
+    } else if (φ == Angle.PI_OVER_2) {
+      return B * Angle.PI_OVER_2;
+    } else if (φ == -Angle.PI_OVER_2) {
+      return B * -Angle.PI_OVER_2;
+    } else {
+      final double QO = MathUtil.asinh(Math.tan(φ)) - e * MathUtil.atanh(e * Math.sin(φ));
+      final double βO = Math.atan(Math.sinh(QO));
+      final double ξO0 = Math.asin(Math.sin(βO));
+      // Note: The previous two steps are taken from the generic calculation flow given below for
+      // latitude φ, but here for φO may be simplified to ξO0 = βO = atan(sinh QO).
+      final double ξO1 = this.h1 * Math.sin(2 * ξO0);
+      final double ξO2 = this.h2 * Math.sin(4 * ξO0);
+      final double ξO3 = this.h3 * Math.sin(6 * ξO0);
+      final double ξO4 = this.h4 * Math.sin(8 * ξO0);
+      final double ξO = ξO0 + ξO1 + ξO2 + ξO3 + ξO4;
+      return B * ξO;
+    }
   }
 
   /**
@@ -169,23 +159,34 @@ public class TransverseMercatorEpsg extends TransverseMercator {
     final double λ = Math.toRadians(lon);
     final double φ = Math.toRadians(lat);
 
-    final double Q = FastMath.asinh(Math.tan(φ)) - this.e * FastMath.atanh(this.e * Math.sin(φ));
+    final double ko = this.ko;
+    final double B = this.B;
+    final double e = this.e;
+    final double h1 = this.h1;
+    final double h2 = this.h2;
+    final double h3 = this.h3;
+    final double h4 = this.h4;
+
+    final double Q = MathUtil.asinh(Math.tan(φ)) - e * MathUtil.atanh(e * Math.sin(φ));
     final double β = Math.atan(Math.sinh(Q));
-    final double η0 = FastMath.atanh(Math.cos(β) * Math.sin(λ - this.λo));
+
+    final double η0 = MathUtil.atanh(Math.cos(β) * Math.sin(λ - this.λo));
     final double ξ0 = Math.asin(Math.sin(β) * Math.cosh(η0));
-    final double ξ1 = this.h1 * Math.sin(2 * ξ0) * Math.cosh(2 * η0);
-    final double η1 = this.h1 * Math.cos(2 * ξ0) * Math.sinh(2 * η0);
-    final double ξ2 = this.h2 * Math.sin(4 * ξ0) * Math.cosh(4 * η0);
-    final double η2 = this.h2 * Math.cos(4 * ξ0) * Math.sinh(4 * η0);
-    final double ξ3 = this.h3 * Math.sin(6 * ξ0) * Math.cosh(6 * η0);
-    final double η3 = this.h3 * Math.cos(6 * ξ0) * Math.sinh(6 * η0);
-    final double ξ4 = this.h4 * Math.sin(8 * ξ0) * Math.cosh(8 * η0);
-    final double η4 = this.h4 * Math.cos(8 * ξ0) * Math.sinh(8 * η0);
-    final double ξ = ξ0 + ξ1 + ξ2 + ξ3 + ξ4;
+
+    final double η1 = h1 * Math.cos(2 * ξ0) * Math.sinh(2 * η0);
+    final double η2 = h2 * Math.cos(4 * ξ0) * Math.sinh(4 * η0);
+    final double η3 = h3 * Math.cos(6 * ξ0) * Math.sinh(6 * η0);
+    final double η4 = h4 * Math.cos(8 * ξ0) * Math.sinh(8 * η0);
     final double η = η0 + η1 + η2 + η3 + η4;
 
-    final double x = this.xo + this.ko * this.B * η;
-    final double y = this.yo + this.ko * (this.B * ξ - this.mo);
+    final double ξ1 = h1 * Math.sin(2 * ξ0) * Math.cosh(2 * η0);
+    final double ξ2 = h2 * Math.sin(4 * ξ0) * Math.cosh(4 * η0);
+    final double ξ3 = h3 * Math.sin(6 * ξ0) * Math.cosh(6 * η0);
+    final double ξ4 = h4 * Math.sin(8 * ξ0) * Math.cosh(8 * η0);
+    final double ξ = ξ0 + ξ1 + ξ2 + ξ3 + ξ4;
+
+    final double x = this.xo + ko * B * η;
+    final double y = this.yo + ko * (B * ξ - this.mo);
     targetCoordinates[targetOffset] = x;
     targetCoordinates[targetOffset + 1] = y;
   }

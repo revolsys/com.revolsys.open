@@ -2,6 +2,7 @@ package com.revolsys.geometry.cs.projection;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,8 +14,12 @@ import com.revolsys.record.io.RecordReader;
 
 public class TransverseMercatorTest {
 
+  private static final double DP_5 = 5e-5;
+
+  private static final double DP_4 = 1e-4;
+
   private void assertDms(final String label, final int degrees, final int minutes,
-    final double seconds, final double decimalDegrees) {
+    final double seconds, final double decimalDegrees, final double secondsPrecision) {
     final int degrees2 = Math.abs((int)decimalDegrees);
     final double f = (Math.abs(decimalDegrees) - degrees2) * 60;
     int minutes2 = (int)f;
@@ -27,7 +32,7 @@ public class TransverseMercatorTest {
     Assert.assertEquals(label + "\tnegative", degrees < 0, decimalDegrees < 0);
     Assert.assertEquals(label + "\tdegrees", Math.abs(degrees), degrees2);
     Assert.assertEquals(label + "\tminutes", minutes, minutes2);
-    Assert.assertEquals(label + "\tseconds", seconds, seconds2, 5e-5);
+    Assert.assertEquals(label + "\tseconds", seconds, seconds2, secondsPrecision);
   }
 
   private boolean equalDms(final String a, final String b, final double minDiff) {
@@ -63,8 +68,13 @@ public class TransverseMercatorTest {
     }
   }
 
+  // @Test
+  // public void testMascotJhs() {
+  // testUtmMascot(TransverseMercatorJhs::newUtm);
+  // }
+
   @Test
-  public void testFile() {
+  public void testMascotThomas() {
     final Map<Integer, CoordinatesProjection> projectionById = new HashMap<>();
     try (
       RecordReader recordReader = RecordReader
@@ -114,9 +124,9 @@ public class TransverseMercatorTest {
         final double lonActual = coordinates[0];
         final double latActual = coordinates[1];
         assertDms(monumentId + "\tlon", longitudeDegrees, longitudeMinutes, longitudeSeconds,
-          lonActual);
+          lonActual, DP_5);
         assertDms(monumentId + "\tlat", latitudeDegrees, latitudeMinutes, latitudeSeconds,
-          latActual);
+          latActual, DP_5);
 
         final String lonStringActual = Angle.toDegreesMinutesSecondsLon(lonActual, 5);
         final String latStringActual = Angle.toDegreesMinutesSecondsLat(latActual, 5);
@@ -126,6 +136,66 @@ public class TransverseMercatorTest {
         if (!equalDms(latStringCalc, latStringActual, 0.00005)) {
           Assert.assertEquals(monumentId + "\tlat dms", latStringCalc, latStringActual);
         }
+      }
+    }
+  }
+
+  @Test
+  public void testMascotUsgs() {
+    testUtmMascot(TransverseMercatorUsgs::newUtm);
+  }
+
+  private void testUtmMascot(
+    final BiFunction<Ellipsoid, Double, TransverseMercator> projectionFactory) {
+    final Map<Integer, CoordinatesProjection> projectionById = new HashMap<>();
+    try (
+      RecordReader recordReader = RecordReader
+        .newRecordReader("../../com.revolsys.open-testdata/cs/transverseMercator/mascot.csv")) {
+      for (final Record record : recordReader) {
+        final String monumentId = record.getValue("monumentId");
+        final int longitudeDegrees = record.getInteger("longitudeDegrees");
+        final int longitudeMinutes = record.getInteger("longitudeMinutes");
+        final double longitudeSeconds = record.getDouble("longitudeSeconds");
+        final int latitudeDegrees = record.getInteger("latitudeDegrees");
+        final int latitudeMinutes = record.getInteger("latitudeMinutes");
+        final double latitudeSeconds = record.getDouble("latitudeSeconds");
+        final double lon = record.getDouble("lon");
+        final double lat = record.getDouble("lat");
+        final double lonCalc = Angle.toDecimalDegrees(longitudeDegrees, longitudeMinutes,
+          longitudeSeconds);
+        final double latCalc = Angle.toDecimalDegrees(latitudeDegrees, latitudeMinutes,
+          latitudeSeconds);
+
+        Assert.assertEquals(monumentId + "\tlon", lon, lonCalc, 1e-12);
+        Assert.assertEquals(monumentId + "\tlat", lat, latCalc, 1e-12);
+
+        final double x = record.getDouble("x");
+        final double y = record.getDouble("y");
+        final int utmReferenceMeridian = record.getInteger("utmReferenceMeridian");
+        CoordinatesProjection mercator = projectionById.get(utmReferenceMeridian);
+        if (mercator == null) {
+          final Ellipsoid ellipsoid = new Ellipsoid("NAD83", 6378137, 298.257222101);
+          mercator = projectionFactory.apply(ellipsoid, (double)utmReferenceMeridian);
+          projectionById.put(utmReferenceMeridian, mercator);
+        }
+
+        final double[] coordinates = new double[2];
+
+        mercator.project(lon, lat, coordinates, 0);
+
+        final double xActual = coordinates[0];
+        final double yActual = coordinates[1];
+        Assert.assertEquals(monumentId + "\tproj x", x, xActual, 1e-3);
+        Assert.assertEquals(monumentId + "\tproj y", y, yActual, 2e-3);
+
+        mercator.inverse(x, y, coordinates, 0);
+
+        final double lonActual = coordinates[0];
+        final double latActual = coordinates[1];
+        assertDms(monumentId + "\tlon", longitudeDegrees, longitudeMinutes, longitudeSeconds,
+          lonActual, DP_4);
+        assertDms(monumentId + "\tlat", latitudeDegrees, latitudeMinutes, latitudeSeconds,
+          latActual, DP_4);
       }
     }
   }
