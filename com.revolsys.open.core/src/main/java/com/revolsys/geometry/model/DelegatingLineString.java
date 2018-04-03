@@ -5,8 +5,8 @@ import java.util.function.Consumer;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Consumer3Double;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 public interface DelegatingLineString extends LineString {

@@ -32,9 +32,9 @@
  */
 package com.revolsys.geometry.precision;
 
-import com.revolsys.geometry.index.strtree.StrTreeLeaf;
 import com.revolsys.geometry.index.strtree.ItemDistance;
 import com.revolsys.geometry.index.strtree.StrTree;
+import com.revolsys.geometry.index.strtree.StrTreeLeaf;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;

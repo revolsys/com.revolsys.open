@@ -38,7 +38,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 
 /**
- * Measures the degree of similarity between two {@link Geometry}s
+ * QuantityType the degree of similarity between two {@link Geometry}s
  * using the Hausdorff distance metric.
  * The measure is normalized to lie in the range [0, 1].
  * Higher measures indicate a great degree of similarity.

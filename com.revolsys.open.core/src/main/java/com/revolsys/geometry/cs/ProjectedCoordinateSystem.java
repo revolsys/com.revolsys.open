@@ -7,11 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.measure.Unit;
 import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
@@ -22,6 +20,9 @@ import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+
+import si.uom.NonSI;
+import tec.uom.se.unit.Units;
 
 public class ProjectedCoordinateSystem implements CoordinateSystem {
   private static final long serialVersionUID = 1902383026085071877L;
@@ -231,8 +232,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
         return null;
       }
       final Unit<Length> linearUnit1 = this.getLengthUnit();
-      if (!linearUnit1.equals(SI.METRE)) {
-        operations.add(new UnitConverstionOperation(linearUnit1, SI.METRE));
+      if (!linearUnit1.equals(Units.METRE)) {
+        operations.add(new UnitConverstionOperation(linearUnit1, Units.METRE));
       }
       operations.add(inverseOperation);
 
@@ -244,8 +245,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
           operations.add(projectOperation);
         }
         final Unit<Length> linearUnit2 = projectedCoordinateSystem.getLengthUnit();
-        if (!linearUnit2.equals(SI.METRE)) {
-          operations.add(new UnitConverstionOperation(SI.METRE, linearUnit2));
+        if (!linearUnit2.equals(Units.METRE)) {
+          operations.add(new UnitConverstionOperation(Units.METRE, linearUnit2));
         }
       } else if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;

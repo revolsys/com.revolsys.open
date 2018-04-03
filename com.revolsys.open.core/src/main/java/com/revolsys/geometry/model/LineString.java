@@ -42,10 +42,9 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.LineIntersector;
@@ -76,10 +75,14 @@ import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
+import com.revolsys.util.QuantityType;
 import com.revolsys.util.function.BiConsumerDouble;
-import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Consumer3Double;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.number.Doubles;
+
+import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 /**
  * Models an OGC-style <code>LineString</code>. A LineString consists of a
@@ -733,6 +736,19 @@ public interface LineString extends Lineal {
   }
 
   @Override
+  default void forEachVertex(final Consumer3Double action) {
+    if (!isEmpty()) {
+      final int vertexCount = getVertexCount();
+      for (int i = 0; i < vertexCount; i++) {
+        final double x = getX(i);
+        final double y = getY(i);
+        final double z = getZ(i);
+        action.accept(x, y, z);
+      }
+    }
+  }
+
+  @Override
   default void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final double[] coordinates, final Consumer<double[]> action) {
     final int axisCount = coordinates.length;
@@ -755,19 +771,6 @@ public interface LineString extends Lineal {
         coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
       }
       action.accept(coordinates);
-    }
-  }
-
-  @Override
-  default void forEachVertex(final Consumer3Double action) {
-    if (!isEmpty()) {
-      final int vertexCount = getVertexCount();
-      for (int i = 0; i < vertexCount; i++) {
-        final double x = getX(i);
-        final double y = getY(i);
-        final double z = getZ(i);
-        action.accept(x, y, z);
-      }
     }
   }
 
@@ -972,15 +975,15 @@ public interface LineString extends Lineal {
           lat0 = lat1;
         }
       }
-      final Measure<Length> lengthMeasure = Measure.valueOf(length, SI.METRE);
-      length = lengthMeasure.doubleValue(unit);
+      final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, Units.METRE);
+      length = QuantityType.doubleValue(lengthMeasure, unit);
     } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
       final Unit<Length> lengthUnit = projectedCoordinateSystem.getLengthUnit();
 
       length = getLength();
-      final Measure<Length> lengthMeasure = Measure.valueOf(length, lengthUnit);
-      length = lengthMeasure.doubleValue(unit);
+      final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, lengthUnit);
+      length = QuantityType.doubleValue(lengthMeasure, unit);
     } else {
       length = getLength();
     }

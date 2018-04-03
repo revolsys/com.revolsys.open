@@ -1,63 +1,39 @@
 package com.revolsys.geometry.cs.unit;
 
+import static tec.uom.se.AbstractUnit.ONE;
+
 import java.security.MessageDigest;
+import java.util.Map;
 
+import javax.measure.Unit;
 import javax.measure.quantity.Angle;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.util.Md5;
 
+import si.uom.NonSI;
+import tec.uom.se.unit.AlternateUnit;
+import tec.uom.se.unit.Units;
+
 public class AngularUnit implements UnitOfMeasure {
 
-  /**
-   * Get the angular unit representing the conversion factor from
-   * {@link SI#RADIAN}.
-   *
-   * @param conversionFactor The conversion factor.
-   * @return The angular unit.
-   */
-  public static Unit<Angle> getUnit(final double conversionFactor) {
-    return getUnit(null, conversionFactor);
-  }
-
-  /**
-   * Get the angular unit representing the conversion factor from the specified
-   * base angular unit.
-   *
-   * @param baseUnit The base unit.
-   * @param conversionFactor The conversion factor.
-   * @return The angular unit.
-   */
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static Unit<Angle> getUnit(final Unit<Angle> baseUnit, final double conversionFactor) {
-    Unit<Angle> unit;
-    if (baseUnit == null) {
-      unit = SI.RADIAN;
-    } else {
-      unit = baseUnit;
-    }
-    if (conversionFactor != 1) {
-      unit = unit.times(conversionFactor);
-      // Normalize the unit
-      for (final Unit siUnit : SI.getInstance().getUnits()) {
-        if (siUnit.equals(unit)) {
-          return siUnit;
-        }
-      }
-      for (final Unit nonSiUnit : NonSI.getInstance().getUnits()) {
-        if (nonSiUnit.equals(unit)) {
-          return nonSiUnit;
-        }
-      }
-    }
-    return unit;
-
-  }
+  private static final Map<String, Unit<Angle>> UNIT_BY_NAME = Maps
+    .<String, Unit<Angle>> buildHash()
+    .add("radian", Units.RADIAN)
+    .add("degree", NonSI.DEGREE_ANGLE)
+    .add("degree minute", NonSI.DEGREE_ANGLE)
+    .add("degree minute second", NonSI.DEGREE_ANGLE)
+    .add("degree minute second hemisphere", NonSI.DEGREE_ANGLE)
+    .add("degree hemisphere", NonSI.DEGREE_ANGLE)
+    .add("degree minute hemisphere", NonSI.DEGREE_ANGLE)
+    .add("hemisphere degree", NonSI.DEGREE_ANGLE)
+    .add("hemisphere degree minute", NonSI.DEGREE_ANGLE)
+    .add("hemisphere degree minute second", NonSI.DEGREE_ANGLE)
+    .add("sexagesimal dms.s", NonSI.DEGREE_ANGLE)
+    .add("sexagesimal dms", NonSI.DEGREE_ANGLE)
+    .add("sexagesimal dm", NonSI.DEGREE_ANGLE)
+    .getMap();
 
   private final Authority authority;
 
@@ -81,12 +57,19 @@ public class AngularUnit implements UnitOfMeasure {
     this.conversionFactor = conversionFactor;
     this.authority = authority;
     this.deprecated = deprecated;
-    if (this.name.equals("degree")) {
-      this.unit = NonSI.DEGREE_ANGLE;
-    } else if (baseUnit == null) {
-      this.unit = getUnit(conversionFactor);
-    } else {
-      this.unit = getUnit(baseUnit.getUnit(), conversionFactor);
+    this.unit = UNIT_BY_NAME.get(name.toLowerCase());
+    if (this.unit == null) {
+      if (baseUnit == null) {
+        if (conversionFactor == 1) {
+          this.unit = new AlternateUnit<>(ONE, name);
+        } else {
+          System.err.println("Invalid conversion factor for " + name);
+        }
+      } else if (Double.isFinite(conversionFactor)) {
+        this.unit = baseUnit.getUnit().multiply(conversionFactor);
+      } else {
+        this.unit = baseUnit.getUnit();
+      }
     }
   }
 
@@ -197,6 +180,20 @@ public class AngularUnit implements UnitOfMeasure {
       return Math.toDegrees(baseValue);
     } else {
       return this.baseUnit.toDegrees(baseValue);
+    }
+  }
+
+  public double toRadians(final double value) {
+    final double baseValue;
+    if (Double.isFinite(this.conversionFactor)) {
+      baseValue = value * this.conversionFactor;
+    } else {
+      baseValue = value;
+    }
+    if (this.baseUnit == null) {
+      return baseValue;
+    } else {
+      return this.baseUnit.toRadians(baseValue);
     }
   }
 

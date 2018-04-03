@@ -11,12 +11,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.measure.Measurable;
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -38,10 +35,14 @@ import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
+import com.revolsys.util.QuantityType;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.Consumer3;
 import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.number.Doubles;
+
+import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 public interface BoundingBox
   extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
@@ -833,13 +834,13 @@ public interface BoundingBox
     }
   }
 
-  default Measure<Length> getHeightLength() {
+  default Quantity<Length> getHeightLength() {
     final double height = getHeight();
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     if (coordinateSystem == null) {
-      return Measure.valueOf(height, SI.METRE);
+      return Quantities.getQuantity(height, Units.METRE);
     } else {
-      return Measure.valueOf(height, coordinateSystem.getLengthUnit());
+      return Quantities.getQuantity(height, coordinateSystem.getLengthUnit());
     }
   }
 
@@ -847,18 +848,18 @@ public interface BoundingBox
     return Double.NaN;
   }
 
-  default <Q extends Quantity> Measurable<Q> getMaximum(final int axisIndex) {
+  default <Q extends Quantity<Q>> Quantity<Q> getMaximum(final int axisIndex) {
     final Unit<Q> unit = getUnit();
     final double max = this.getMax(axisIndex);
-    return Measure.valueOf(max, unit);
+    return Quantities.getQuantity(max, unit);
   }
 
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  default <Q extends Quantity> double getMaximum(final int axisIndex, final Unit convertUnit) {
-    final Measurable<Quantity> max = getMaximum(axisIndex);
-    return max.doubleValue(convertUnit);
+  default <Q extends Quantity<Q>> double getMaximum(final int axisIndex, final Unit convertUnit) {
+    final Quantity<Q> max = getMaximum(axisIndex);
+    return QuantityType.doubleValue(max, convertUnit);
   }
 
   /**
@@ -889,18 +890,16 @@ public interface BoundingBox
     return Double.NaN;
   }
 
-  default <Q extends Quantity> Measurable<Q> getMinimum(final int axisIndex) {
+  default <Q extends Quantity<Q>> Quantity<Q> getMinimum(final int axisIndex) {
     final Unit<Q> unit = getUnit();
     final double min = this.getMin(axisIndex);
-    return Measure.valueOf(min, unit);
+    return Quantities.getQuantity(min, unit);
   }
 
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  default <Q extends Quantity> double getMinimum(final int axisIndex, final Unit convertUnit) {
-    final Measurable<Quantity> min = getMinimum(axisIndex);
-    return min.doubleValue(convertUnit);
+  default <Q extends Quantity<Q>> double getMinimum(final int axisIndex,
+    final Unit<Q> convertUnit) {
+    final Quantity<Q> min = getMinimum(axisIndex);
+    return QuantityType.doubleValue(min, convertUnit);
   }
 
   default double[] getMinMaxValues() {
@@ -993,10 +992,10 @@ public interface BoundingBox
   }
 
   @SuppressWarnings("unchecked")
-  default <Q extends Quantity> Unit<Q> getUnit() {
+  default <Q extends Quantity<Q>> Unit<Q> getUnit() {
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     if (coordinateSystem == null) {
-      return (Unit<Q>)SI.METRE;
+      return (Unit<Q>)Units.METRE;
     } else {
       return coordinateSystem.<Q> getUnit();
     }
@@ -1018,13 +1017,13 @@ public interface BoundingBox
     }
   }
 
-  default Measure<Length> getWidthLength() {
+  default Quantity<Length> getWidthLength() {
     final double width = getWidth();
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     if (coordinateSystem == null) {
-      return Measure.valueOf(width, SI.METRE);
+      return Quantities.getQuantity(width, Units.METRE);
     } else {
-      return Measure.valueOf(width, coordinateSystem.getLengthUnit());
+      return Quantities.getQuantity(width, coordinateSystem.getLengthUnit());
     }
   }
 

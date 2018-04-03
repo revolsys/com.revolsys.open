@@ -5,12 +5,15 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.io.Buffers;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
 
-public class LasZipHeader {
+public class LasZipHeader implements MapSerializer {
   public static final Version VERSION_1_0 = new Version(1, 0);
 
   public static final byte LASZIP_COMPRESSOR_POINTWISE = 1;
@@ -128,5 +131,24 @@ public class LasZipHeader {
 
   public boolean isCompressor(final byte compressor) {
     return this.compressor == compressor;
+  }
+
+  @Override
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
+    addToMap(map, "compressor", this.compressor);
+    addToMap(map, "coder", this.coder);
+    addToMap(map, "version", this.version);
+    addToMap(map, "versionRevision", this.versionRevision);
+    addToMap(map, "options", this.options);
+    addToMap(map, "chunkSize", this.chunkSize);
+    addToMap(map, "numberOfSpecialEvlrs", this.numberOfSpecialEvlrs);
+    addToMap(map, "offsetToSpecialEvlrs", this.offsetToSpecialEvlrs);
+    addToMap(map, "numItems", this.numItems);
+    addToMap(map, "types", this.types);
+    addToMap(map, "sizes", this.sizes);
+    addToMap(map, "versions", this.versions);
+
+    return map;
   }
 }

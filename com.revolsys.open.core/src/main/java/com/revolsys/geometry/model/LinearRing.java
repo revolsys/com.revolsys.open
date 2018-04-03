@@ -32,10 +32,10 @@
  */
 package com.revolsys.geometry.model;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
-import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -46,6 +46,9 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.editor.LinearRingEditor;
 import com.revolsys.geometry.model.prep.PreparedLinearRing;
+import com.revolsys.util.QuantityType;
+
+import tec.uom.se.quantity.Quantities;
 
 /**
  * Models an OGC SFS <code>LinearRing</code>.
@@ -194,10 +197,10 @@ public interface LinearRing extends LineString {
       final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
       final Unit<Length> lengthUnit = projectedCoordinateSystem.getLengthUnit();
       @SuppressWarnings("unchecked")
-      final Unit<Area> areaUnit = (Unit<Area>)lengthUnit.times(lengthUnit);
+      final Unit<Area> areaUnit = (Unit<Area>)lengthUnit.multiply(lengthUnit);
       area = getPolygonArea();
-      final Measure<Area> areaMeasure = Measure.valueOf(area, areaUnit);
-      area = areaMeasure.doubleValue(unit);
+      final Quantity<Area> areaMeasure = Quantities.getQuantity(area, areaUnit);
+      area = QuantityType.doubleValue(areaMeasure, unit);
     } else {
       area = getPolygonArea();
     }

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
@@ -145,6 +146,8 @@ public interface MapSerializer {
         } else {
           return null;
         }
+      } else if (value.getClass().isArray()) {
+        return Lists.arrayToList(value);
       } else if (value instanceof Component) {
         return null;
       } else {

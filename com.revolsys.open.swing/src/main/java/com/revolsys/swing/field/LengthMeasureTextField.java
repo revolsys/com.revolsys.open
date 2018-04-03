@@ -7,19 +7,22 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.listener.WeakFocusListener;
+
+import systems.uom.common.USCustomary;
+import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 public class LengthMeasureTextField extends ValueField implements ItemListener {
 
@@ -28,11 +31,11 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
   private static final Map<Unit<Length>, String> UNITS = new LinkedHashMap<>();
 
   static {
-    UNITS.put(NonSI.PIXEL, "Pixel");
-    UNITS.put(SI.METRE, "Metre");
-    UNITS.put(SI.KILOMETRE, "Kilometre");
-    UNITS.put(NonSI.FOOT, "Foot");
-    UNITS.put(NonSI.MILE, "Mile");
+    UNITS.put(CustomUnits.PIXEL, "Pixel");
+    UNITS.put(Units.METRE, "Metre");
+    UNITS.put(CustomUnits.KILOMETRE, "Kilometre");
+    UNITS.put(USCustomary.FOOT, "Foot");
+    UNITS.put(USCustomary.MILE, "Mile");
   }
 
   private Number number;
@@ -43,15 +46,15 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
 
   private final NumberTextField valueField;
 
-  public LengthMeasureTextField(final Measure<Length> value, final Unit<Length> unit) {
+  public LengthMeasureTextField(final Quantity<Length> value, final Unit<Length> unit) {
     this(null, value, unit);
   }
 
-  public LengthMeasureTextField(final String fieldName, final Measure<Length> value) {
+  public LengthMeasureTextField(final String fieldName, final Quantity<Length> value) {
     this(fieldName, value, value.getUnit());
   }
 
-  public LengthMeasureTextField(final String fieldName, final Measure<Length> value,
+  public LengthMeasureTextField(final String fieldName, final Quantity<Length> value,
     final Unit<Length> unit) {
     super(fieldName, value);
     setOpaque(false);
@@ -59,7 +62,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     if (value == null) {
       this.number = 0;
       if (unit == null) {
-        this.unit = NonSI.PIXEL;
+        this.unit = CustomUnits.PIXEL;
       } else {
         this.unit = unit;
       }
@@ -83,8 +86,8 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     GroupLayouts.makeColumns(this, 2, true);
   }
 
-  public Measure<Length> getLength() {
-    return Measure.valueOf(this.number.doubleValue(), this.unit);
+  public Quantity<Length> getLength() {
+    return Quantities.getQuantity(this.number.doubleValue(), this.unit);
   }
 
   public Number getNumber() {
@@ -127,7 +130,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
   @Override
   public boolean setFieldValue(final Object value) {
     final boolean updated = super.setFieldValue(value);
-    final Measure<Length> fieldValue = getFieldValue();
+    final Quantity<Length> fieldValue = getFieldValue();
     setNumber(fieldValue.getValue());
     setUnit(fieldValue.getUnit());
     return updated;
@@ -139,7 +142,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     this.valueField.setFieldValue(value);
     if (!DataType.equal(oldValue, this.number)) {
       firePropertyChange("number", oldValue, this.number);
-      setFieldValue(Measure.valueOf(this.number.doubleValue(), this.unit));
+      setFieldValue(Quantities.getQuantity(this.number.doubleValue(), this.unit));
     }
   }
 
@@ -157,7 +160,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     this.unitField.setSelectedItem(this.unit);
     if (!DataType.equal(oldValue, this.unit)) {
       firePropertyChange("unit", oldValue, this.unit);
-      setFieldValue(Measure.valueOf(this.number.doubleValue(), unit));
+      setFieldValue(Quantities.getQuantity(this.number.doubleValue(), unit));
     }
   }
 

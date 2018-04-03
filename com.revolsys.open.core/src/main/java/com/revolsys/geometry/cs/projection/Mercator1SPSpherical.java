@@ -1,9 +1,9 @@
 package com.revolsys.geometry.cs.projection;
 
+import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.math.Angle;
 

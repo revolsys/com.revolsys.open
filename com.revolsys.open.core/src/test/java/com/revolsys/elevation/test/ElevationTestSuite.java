@@ -4,8 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.revolsys.elevation.gridded.test.ScaledIntegerGriddedDigitalElevationModelTest;
 import com.revolsys.elevation.gridded.test.EsriAsciiGriddedElevationModelTest;
+import com.revolsys.elevation.gridded.test.ScaledIntegerGriddedDigitalElevationModelTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({

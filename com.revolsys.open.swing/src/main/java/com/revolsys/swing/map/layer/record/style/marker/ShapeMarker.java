@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -270,9 +270,9 @@ public class ShapeMarker extends AbstractMarker {
 
     final AffineTransform savedTransform = graphics.getTransform();
     try {
-      final Measure<Length> markerWidth = style.getMarkerWidth();
+      final Quantity<Length> markerWidth = style.getMarkerWidth();
       final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
-      final Measure<Length> markerHeight = style.getMarkerHeight();
+      final Quantity<Length> markerHeight = style.getMarkerHeight();
       final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
       final String orientationType = style.getMarkerOrientationType();
       if ("none".equals(orientationType)) {

@@ -3,8 +3,8 @@ package com.revolsys.geometry.cs;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;

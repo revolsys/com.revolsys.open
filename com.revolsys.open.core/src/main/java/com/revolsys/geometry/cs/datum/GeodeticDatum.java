@@ -4,8 +4,8 @@ import java.security.MessageDigest;
 
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.Authority;
-import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.Ellipsoid;
+import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ToWgs84;
 
 public class GeodeticDatum extends Datum {

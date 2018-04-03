@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.Map;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 
@@ -96,9 +96,9 @@ public class SvgMarker extends AbstractMarker {
         BaseCloseable transformCloseable = new CloseableAffineTransform(graphics)) {
         Viewport2D.setUseModelCoordinates(viewport, graphics, false);
 
-        final Measure<Length> markerWidth = style.getMarkerWidth();
+        final Quantity<Length> markerWidth = style.getMarkerWidth();
         final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
-        final Measure<Length> markerHeight = style.getMarkerHeight();
+        final Quantity<Length> markerHeight = style.getMarkerHeight();
         final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
         final String orientationType = style.getMarkerOrientationType();
         if ("none".equals(orientationType)) {
@@ -113,8 +113,8 @@ public class SvgMarker extends AbstractMarker {
           graphics.rotate(Math.toRadians(orientation));
         }
 
-        final Measure<Length> deltaX = style.getMarkerDx();
-        final Measure<Length> deltaY = style.getMarkerDy();
+        final Quantity<Length> deltaX = style.getMarkerDx();
+        final Quantity<Length> deltaY = style.getMarkerDy();
         double dx = Viewport2D.toDisplayValue(viewport, deltaX);
         double dy = Viewport2D.toDisplayValue(viewport, deltaY);
 

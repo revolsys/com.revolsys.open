@@ -1,61 +1,33 @@
 package com.revolsys.geometry.cs.unit;
 
-import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
+import static tec.uom.se.AbstractUnit.ONE;
 
+import java.util.Map;
+
+import javax.measure.Unit;
+import javax.measure.quantity.Length;
+
+import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.util.number.Doubles;
 
+import systems.uom.common.USCustomary;
+import tec.uom.se.unit.AlternateUnit;
+import tec.uom.se.unit.Units;
+
 public class LinearUnit implements UnitOfMeasure {
 
-  /**
-   * Get the linear unit representing the conversion factor from
-   * {@link SI#METER}.
-   *
-   * @param conversionFactor The conversion factor.
-   * @return The linear unit.
-   */
-  public static Unit<Length> getUnit(final double conversionFactor) {
-    return getUnit(null, conversionFactor);
-  }
-
-  /**
-   * Get the linear unit representing the conversion factor from the specified
-   * base linear unit.
-   *
-   * @param baseUnit The base unit.
-   * @param conversionFactor The conversion factor.
-   * @return The linear unit.
-   */
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static Unit<Length> getUnit(final Unit<Length> baseUnit, final double conversionFactor) {
-    Unit<Length> unit;
-    if (baseUnit == null) {
-      unit = SI.METRE;
-    } else {
-      unit = baseUnit;
-    }
-    if (conversionFactor != 1) {
-      unit = unit.times(conversionFactor);
-      // Normalize the unit
-      for (final Unit siUnit : SI.getInstance().getUnits()) {
-        if (siUnit.equals(unit)) {
-          return siUnit;
-        }
-      }
-      for (final Unit nonSiUnit : NonSI.getInstance().getUnits()) {
-        if (nonSiUnit.equals(unit)) {
-          return nonSiUnit;
-        }
-      }
-    }
-    return unit;
-
-  }
+  private static final Map<String, Unit<Length>> UNIT_BY_NAME = Maps
+    .<String, Unit<Length>> buildHash()
+    .add("metre", Units.METRE)
+    .add("meter", Units.METRE)
+    .add("millimetre", CustomUnits.MILLIMETRE)
+    .add("centimetre", CustomUnits.CENTIMETRE)
+    .add("kilometre", CustomUnits.KILOMETRE)
+    .add("foot", USCustomary.FOOT)
+    .add("yard", USCustomary.YARD)
+    .add("us survey foot", USCustomary.FOOT_SURVEY)
+    .getMap();
 
   private final Authority authority;
 
@@ -84,10 +56,19 @@ public class LinearUnit implements UnitOfMeasure {
     this.conversionFactor = conversionFactor;
     this.authority = authority;
     this.deprecated = deprecated;
-    if (baseUnit == null) {
-      this.unit = getUnit(conversionFactor);
-    } else {
-      this.unit = getUnit(baseUnit.getUnit(), conversionFactor);
+    this.unit = UNIT_BY_NAME.get(name.toLowerCase());
+    if (this.unit == null) {
+      if (baseUnit == null) {
+        if (conversionFactor == 1) {
+          this.unit = new AlternateUnit<>(ONE, name);
+        } else {
+          System.err.println("Invalid conversion factor for " + name);
+        }
+      } else if (Double.isFinite(conversionFactor)) {
+        this.unit = baseUnit.getUnit().multiply(conversionFactor);
+      } else {
+        this.unit = baseUnit.getUnit();
+      }
     }
   }
 

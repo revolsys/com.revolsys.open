@@ -99,7 +99,7 @@ public class LasProjection {
         coordinateSystemId = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID,
           0);
         if (coordinateSystemId != 0) {
-          coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
+          coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
         }
       } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
         final int geoSrid = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID,

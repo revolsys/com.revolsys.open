@@ -5,17 +5,19 @@ import java.awt.print.PageFormat;
 import java.awt.print.Pageable;
 import java.awt.print.Printable;
 
-import javax.measure.Measure;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
+import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.util.QuantityType;
+
+import systems.uom.common.USCustomary;
+import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 public class MapPageable implements Pageable {
-
   private final Rectangle2D.Double contentRect;
 
   private double coreCellsPerHeight;
@@ -53,14 +55,17 @@ public class MapPageable implements Pageable {
     this.scale = scale;
     this.dpi = dpi;
     this.modelGridSizeMetres = gridSizeMetres;
-    final Unit<Length> pixelSize = NonSI.INCH.divide(dpi);
+    final Unit<Length> pixelSize = USCustomary.INCH.divide(dpi);
 
     this.mapBoundingBox = boundingBox;
 
-    this.rulerSizePixels = Measure.valueOf(0.5, SI.CENTIMETRE).doubleValue(pixelSize);
+    this.rulerSizePixels = QuantityType
+      .doubleValue(Quantities.getQuantity(0.5, CustomUnits.CENTIMETRE), pixelSize);
 
-    final double modelWidthMetres = this.mapBoundingBox.getWidthLength().doubleValue(SI.METRE);
-    final double modelHeightMetres = this.mapBoundingBox.getWidthLength().doubleValue(SI.METRE);
+    final double modelWidthMetres = QuantityType.doubleValue(this.mapBoundingBox.getWidthLength(),
+      Units.METRE);
+    final double modelHeightMetres = QuantityType.doubleValue(this.mapBoundingBox.getWidthLength(),
+      Units.METRE);
 
     final double printWidthPixels = pageFormat.getImageableWidth() * dpi / 72;
     final double printHeightPixels = pageFormat.getImageableHeight() * dpi / 72;
@@ -68,8 +73,10 @@ public class MapPageable implements Pageable {
     final double widthPixels = printWidthPixels - 2 * this.rulerSizePixels;
     final double heightPixels = printHeightPixels - 3 * this.rulerSizePixels;
 
-    final double pageWidthMetres = Measure.valueOf(widthPixels, pixelSize).doubleValue(SI.METRE);
-    final double pageHeightMetres = Measure.valueOf(heightPixels, pixelSize).doubleValue(SI.METRE);
+    final double pageWidthMetres = QuantityType
+      .doubleValue(Quantities.getQuantity(widthPixels, pixelSize), Units.METRE);
+    final double pageHeightMetres = QuantityType
+      .doubleValue(Quantities.getQuantity(heightPixels, pixelSize), Units.METRE);
 
     this.modelPageWidth = pageWidthMetres * scale;
     this.modelPageHeight = pageHeightMetres * scale;

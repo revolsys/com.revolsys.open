@@ -8,6 +8,11 @@ public interface UnitOfMeasure {
 
   UnitOfMeasureType getType();
 
+  @SuppressWarnings("unchecked")
+  default <U extends UnitOfMeasure> ValueWithUnit<U> newValue(final double value) {
+    return (ValueWithUnit<U>)new ValueWithUnit<>(this, value);
+  }
+
   double toBase(final double value);
 
   default double toNormal(final double value) {

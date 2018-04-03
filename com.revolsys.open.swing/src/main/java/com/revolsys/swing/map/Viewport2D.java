@@ -13,13 +13,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.measure.Measurable;
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.awt.CloseableAffineTransform;
 import com.revolsys.beans.PropertyChangeSupport;
@@ -27,6 +23,7 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -45,7 +42,12 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.util.Property;
+import com.revolsys.util.QuantityType;
 import com.revolsys.util.number.Doubles;
+
+import systems.uom.common.USCustomary;
+import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportProxy {
 
@@ -65,10 +67,10 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     100000.0, 50000.0, 20000.0, 10000.0, 5000.0, 2000.0, 1000.0, 500.0, 200.0, 100.0, 50.0, 20.0,
     10.0, 5.0, 2.0, 1.0, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001);
 
-  public static double getScale(final Measurable<Length> viewWidth,
-    final Measurable<Length> modelWidth) {
-    final double width1 = viewWidth.doubleValue(SI.METRE);
-    final double width2 = modelWidth.doubleValue(SI.METRE);
+  public static double getScale(final Quantity<Length> viewWidth,
+    final Quantity<Length> modelWidth) {
+    final double width1 = QuantityType.doubleValue(viewWidth, Units.METRE);
+    final double width2 = QuantityType.doubleValue(modelWidth, Units.METRE);
     if (width1 == 0 || width2 == 0) {
       return Double.NaN;
     } else {
@@ -101,7 +103,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return null;
   }
 
-  public static double toDisplayValue(final Viewport2D viewport, final Measure<Length> measure) {
+  public static double toDisplayValue(final Viewport2D viewport, final Quantity<Length> measure) {
     if (viewport == null) {
       return measure.getValue().doubleValue();
     } else {
@@ -109,7 +111,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     }
   }
 
-  public static double toModelValue(final Viewport2D viewport, final Measure<Length> measure) {
+  public static double toModelValue(final Viewport2D viewport, final Quantity<Length> measure) {
     if (viewport == null) {
       return measure.getValue().doubleValue();
     } else {
@@ -305,7 +307,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return height;
   }
 
-  public Measurable<Length> getModelHeightLength() {
+  public Quantity<Length> getModelHeightLength() {
     return getBoundingBox().getHeightLength();
   }
 
@@ -322,7 +324,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return width;
   }
 
-  public Measurable<Length> getModelWidthLength() {
+  public Quantity<Length> getModelWidthLength() {
     return getBoundingBox().getWidthLength();
   }
 
@@ -426,7 +428,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public Unit<Length> getScreenUnit() {
     final int screenResolution = getScreenResolution();
-    return NonSI.INCH.divide(screenResolution);
+    return USCustomary.INCH.divide(screenResolution);
   }
 
   public double getUnitsPerPixel() {
@@ -451,30 +453,30 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     }
   }
 
-  public Measurable<Length> getViewHeightLength() {
+  public Quantity<Length> getViewHeightLength() {
     double width = getViewHeightPixels();
     if (width < 0) {
       width = 0;
     }
-    return Measure.valueOf(width, getScreenUnit());
+    return Quantities.getQuantity(width, getScreenUnit());
   }
 
   public int getViewHeightPixels() {
     return this.viewHeight;
   }
 
-  public <Q extends Quantity> Unit<Q> getViewToModelUnit(final Unit<Q> modelUnit) {
+  public <Q extends Quantity<Q>> Unit<Q> getViewToModelUnit(final Unit<Q> modelUnit) {
     final double viewWidth = getViewWidthPixels();
     final double modelWidth = getModelWidth();
-    return modelUnit.times(modelWidth).divide(viewWidth);
+    return modelUnit.multiply(modelWidth).divide(viewWidth);
   }
 
-  public Measure<Length> getViewWidthLength() {
+  public Quantity<Length> getViewWidthLength() {
     double width = getViewWidthPixels();
     if (width < 0) {
       width = 0;
     }
-    return Measure.valueOf(width, getScreenUnit());
+    return Quantities.getQuantity(width, getScreenUnit());
   }
 
   public int getViewWidthPixels() {
@@ -658,16 +660,17 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
         if (unitsPerPixel < this.minUnitsPerPixel) {
           unitsPerPixel = this.minUnitsPerPixel;
         }
-        final double pixelSizeMetres = Measure.valueOf(1, getScreenUnit()).doubleValue(SI.METRE);
+        final double pixelSizeMetres = QuantityType
+          .doubleValue(Quantities.getQuantity(1, getScreenUnit()), Units.METRE);
         this.unitsPerPixel = unitsPerPixel;
         setModelToScreenTransform(
           newModelToScreenTransform(boundingBox, viewWidthPixels, viewHeightPixels));
         this.screenToModelTransform = newScreenToModelTransform(boundingBox, viewWidthPixels,
           viewHeightPixels);
-        final Measure<Length> modelWidthLength = boundingBox.getWidthLength();
+        final Quantity<Length> modelWidthLength = boundingBox.getWidthLength();
         double modelWidthMetres;
         if (getGeometryFactory().isProjected()) {
-          modelWidthMetres = modelWidthLength.doubleValue(SI.METRE);
+          modelWidthMetres = QuantityType.doubleValue(modelWidthLength, Units.METRE);
         } else {
           final double minX = boundingBox.getMinX();
           final double centreY = boundingBox.getCentreY();
@@ -869,13 +872,13 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     this.zoomByUnitsPerPixel = zoomByUnitsPerPixel;
   }
 
-  public double toDisplayValue(final Measure<Length> value) {
+  public double toDisplayValue(final Quantity<Length> value) {
     double convertedValue;
     final Unit<Length> unit = value.getUnit();
-    if (unit.equals(NonSI.PIXEL)) {
-      convertedValue = value.doubleValue(NonSI.PIXEL);
+    if (unit.equals(CustomUnits.PIXEL)) {
+      convertedValue = QuantityType.doubleValue(value, CustomUnits.PIXEL);
     } else {
-      convertedValue = value.doubleValue(SI.METRE);
+      convertedValue = QuantityType.doubleValue(value, Units.METRE);
       final CoordinateSystem coordinateSystem = this.geometryFactory2d.getCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
@@ -956,15 +959,15 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return toModelPoint(geometryFactory, x, y);
   }
 
-  public double toModelValue(final Measure<Length> value) {
+  public double toModelValue(final Quantity<Length> value) {
     double convertedValue;
     final Unit<Length> unit = value.getUnit();
-    if (unit.equals(NonSI.PIXEL)) {
-      convertedValue = value.doubleValue(NonSI.PIXEL);
+    if (unit.equals(CustomUnits.PIXEL)) {
+      convertedValue = QuantityType.doubleValue(value, CustomUnits.PIXEL);
       final double modelUnitsPerViewUnit = getModelUnitsPerViewUnit();
       convertedValue *= modelUnitsPerViewUnit;
     } else {
-      convertedValue = value.doubleValue(SI.METRE);
+      convertedValue = QuantityType.doubleValue(value, Units.METRE);
       final CoordinateSystem coordinateSystem = this.geometryFactory2d.getCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;

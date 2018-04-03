@@ -4,12 +4,10 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.measure.converter.UnitConverter;
+import javax.measure.Unit;
+import javax.measure.UnitConverter;
 import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.epsg.CoordinateOperation;
@@ -19,8 +17,12 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.RadiansToDegreesOperation;
 import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
 import com.revolsys.geometry.cs.unit.AngularUnit;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+
+import si.uom.NonSI;
+import tec.uom.se.unit.Units;
 
 public class GeographicCoordinateSystem implements CoordinateSystem {
   public static final double EARTH_RADIUS = 6378137;
@@ -250,7 +252,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
       final Unit<Angle> angularUnit1 = getUnit();
       if (!angularUnit1.equals(NonSI.DEGREE_ANGLE)) {
         CoordinatesOperation converstionOperation;
-        if (angularUnit1.equals(SI.RADIAN)) {
+        if (angularUnit1.equals(Units.RADIAN)) {
           converstionOperation = RadiansToDegreesOperation.INSTANCE;
         } else {
           converstionOperation = new UnitConverstionOperation(angularUnit1, NonSI.DEGREE_ANGLE, 2);
@@ -265,8 +267,8 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
         operations.add(projectOperation);
       }
       final Unit<Length> linearUnit2 = projectedCoordinateSystem.getLengthUnit();
-      if (!linearUnit2.equals(SI.METRE)) {
-        operations.add(new UnitConverstionOperation(SI.METRE, linearUnit2));
+      if (!linearUnit2.equals(Units.METRE)) {
+        operations.add(new UnitConverstionOperation(Units.METRE, linearUnit2));
       }
       switch (operations.size()) {
         case 0:
@@ -303,12 +305,22 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   @Override
   public Unit<Length> getLengthUnit() {
     final Unit<Angle> unit = this.angularUnit.getUnit();
-    final UnitConverter radianConverter = unit.getConverterTo(SI.RADIAN);
+    final UnitConverter radianConverter = unit.getConverterTo(Units.RADIAN);
 
     final Ellipsoid ellipsoid = this.geodeticDatum.getEllipsoid();
     final double radius = ellipsoid.getSemiMajorAxis();
     final double radianFactor = radianConverter.convert(1);
-    return SI.METRE.times(radius).times(radianFactor);
+    return Units.METRE.multiply(radius).multiply(radianFactor);
+  }
+
+  @Override
+  public LinearUnit getLinearUnit() {
+
+    final Ellipsoid ellipsoid = this.geodeticDatum.getEllipsoid();
+    final double radius = ellipsoid.getSemiMajorAxis();
+    final double radianFactor = this.angularUnit.toRadians(1);
+    final double metres = radius * radianFactor;
+    return new LinearUnit("custom", metres);
   }
 
   public PrimeMeridian getPrimeMeridian() {

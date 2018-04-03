@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
-import javax.measure.Measure;
+import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
 import com.revolsys.io.FileUtil;
@@ -39,9 +39,9 @@ public class ImageMarker extends AbstractMarker {
     final double modelX, final double modelY, double orientation) {
     if (this.image != null) {
       final AffineTransform savedTransform = graphics.getTransform();
-      final Measure<Length> markerWidth = style.getMarkerWidth();
+      final Quantity<Length> markerWidth = style.getMarkerWidth();
       final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
-      final Measure<Length> markerHeight = style.getMarkerHeight();
+      final Quantity<Length> markerHeight = style.getMarkerHeight();
       final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
 
       final String orientationType = style.getMarkerOrientationType();

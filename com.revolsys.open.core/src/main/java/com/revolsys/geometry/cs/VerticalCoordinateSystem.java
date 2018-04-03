@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.epsg.EpsgAuthority;

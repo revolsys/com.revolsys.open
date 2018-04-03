@@ -10,10 +10,9 @@ import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.measure.Measurable;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.Unit;
 import javax.swing.JComponent;
 
 import com.revolsys.awt.CloseableAffineTransform;
@@ -25,6 +24,7 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
+import com.revolsys.util.QuantityType;
 import com.revolsys.value.GlobalBooleanValue;
 
 public class ComponentViewport2D extends Viewport2D implements PropertyChangeListener {
@@ -140,11 +140,11 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   public double getMaxScale() {
     final BoundingBox areaBoundingBox = getGeometryFactory().getCoordinateSystem()
       .getAreaBoundingBox();
-    final Measurable<Length> areaWidth = areaBoundingBox.getWidthLength();
-    final Measurable<Length> areaHeight = areaBoundingBox.getHeightLength();
+    final Quantity<Length> areaWidth = areaBoundingBox.getWidthLength();
+    final Quantity<Length> areaHeight = areaBoundingBox.getHeightLength();
 
-    final Measurable<Length> viewWidth = getViewWidthLength();
-    final Measurable<Length> viewHeight = getViewHeightLength();
+    final Quantity<Length> viewWidth = getViewWidthLength();
+    final Quantity<Length> viewHeight = getViewHeightLength();
 
     final double maxHorizontalScale = getScale(viewWidth, areaWidth);
     final double maxVerticalScale = getScale(viewHeight, areaHeight);
@@ -155,22 +155,22 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   public double getModelHeight(final double scale) {
     final Unit<Length> scaleUnit = getScaleUnit(scale);
 
-    final Measurable<Length> viewHeight = getViewHeightLength();
-    final double height = viewHeight.doubleValue(scaleUnit);
+    final Quantity<Length> viewHeight = getViewHeightLength();
+    final double height = QuantityType.doubleValue(viewHeight, scaleUnit);
     return height;
   }
 
-  public <Q extends Quantity> Unit<Q> getModelToScreenUnit(final Unit<Q> modelUnit) {
+  public <Q extends Quantity<Q>> Unit<Q> getModelToScreenUnit(final Unit<Q> modelUnit) {
     final double viewWidth = getViewWidthPixels();
     final double modelWidth = getModelWidth();
-    return modelUnit.times(viewWidth).divide(modelWidth);
+    return modelUnit.multiply(viewWidth).divide(modelWidth);
   }
 
   public double getModelWidth(final double scale) {
     final Unit<Length> scaleUnit = getScaleUnit(scale);
 
-    final Measurable<Length> viewWidth = getViewWidthLength();
-    final double width = viewWidth.doubleValue(scaleUnit);
+    final Quantity<Length> viewWidth = getViewWidthLength();
+    final double width = QuantityType.doubleValue(viewWidth, scaleUnit);
     return width;
   }
 
@@ -201,10 +201,10 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     return scaleUnit;
   }
 
-  public <Q extends Quantity> Unit<Q> getScreenToModelUnit(final Unit<Q> modelUnit) {
+  public <Q extends Quantity<Q>> Unit<Q> getScreenToModelUnit(final Unit<Q> modelUnit) {
     final double viewWidth = getViewWidthPixels();
     final double modelWidth = getModelWidth();
-    return modelUnit.times(modelWidth).divide(viewWidth);
+    return modelUnit.multiply(modelWidth).divide(viewWidth);
   }
 
   public BoundingBox getValidBoundingBox(final BoundingBox boundingBox) {

@@ -3,7 +3,7 @@ package com.revolsys.swing.map.layer.record.style.marker;
 import java.awt.Graphics2D;
 import java.util.Map;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 
@@ -26,8 +26,8 @@ public abstract class AbstractMarker extends BaseObjectWithPropertiesAndChange i
       graphics.rotate(Math.toRadians(orientation));
     }
 
-    final Measure<Length> deltaX = style.getMarkerDx();
-    final Measure<Length> deltaY = style.getMarkerDy();
+    final Quantity<Length> deltaX = style.getMarkerDx();
+    final Quantity<Length> deltaY = style.getMarkerDy();
     double dx = Viewport2D.toDisplayValue(viewport, deltaX);
     double dy = Viewport2D.toDisplayValue(viewport, deltaY);
     final String verticalAlignment = style.getMarkerVerticalAlignment();

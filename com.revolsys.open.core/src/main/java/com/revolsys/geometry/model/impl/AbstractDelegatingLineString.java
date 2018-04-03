@@ -10,8 +10,8 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Consumer3Double;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 public class AbstractDelegatingLineString extends AbstractLineString

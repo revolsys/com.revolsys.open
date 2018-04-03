@@ -5,9 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.measure.Measure;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
+import javax.measure.Unit;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,7 +23,11 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.test.TestConstants;
 import com.revolsys.geometry.util.RectangleUtil;
+import com.revolsys.util.QuantityType;
 import com.revolsys.util.number.Doubles;
+
+import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 // TODO
 //clipToCoordinateSystem()
@@ -90,8 +92,8 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("Bounds", Lists.newArray(bounds),
       Lists.newArray(boundingBox.getMinMaxValues()));
 
-    Unit unit = SI.METRE;
-    Unit lengthUnit = SI.METRE;
+    Unit unit = Units.METRE;
+    Unit lengthUnit = Units.METRE;
     final StringBuilder wkt = new StringBuilder();
     final int srid = boundingBox.getCoordinateSystemId();
     if (geometryFactory == GeometryFactory.DEFAULT_3D) {
@@ -163,9 +165,9 @@ public class BoundingBoxTest implements TestConstants {
       for (int i = 0; i < axisCount; i++) {
         assertMinMax(boundingBox, i, bounds[i], bounds[axisCount + i]);
 
-        Assert.assertEquals("Minimum " + i, Measure.valueOf(bounds[i], unit),
+        Assert.assertEquals("Minimum " + i, Quantities.getQuantity(bounds[i], unit),
           boundingBox.getMinimum(i));
-        Assert.assertEquals("Maximum" + i, Measure.valueOf(bounds[axisCount + i], unit),
+        Assert.assertEquals("Maximum" + i, Quantities.getQuantity(bounds[axisCount + i], unit),
           boundingBox.getMaximum(i));
 
         Assert.assertEquals("Minimum " + i, bounds[i], boundingBox.getMinimum(i, unit), 0);
@@ -176,8 +178,8 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("MinX", minX, boundingBox.getMinX(), 0);
     Assert.assertEquals("MaxX", maxX, boundingBox.getMaxX(), 0);
 
-    Assert.assertEquals("MinimumX", Measure.valueOf(minX, unit), boundingBox.getMinimum(0));
-    Assert.assertEquals("MaximumX", Measure.valueOf(maxX, unit), boundingBox.getMaximum(0));
+    Assert.assertEquals("MinimumX", Quantities.getQuantity(minX, unit), boundingBox.getMinimum(0));
+    Assert.assertEquals("MaximumX", Quantities.getQuantity(maxX, unit), boundingBox.getMaximum(0));
 
     Assert.assertEquals("MinimumX", minX, boundingBox.getMinimum(0, unit), 0);
     Assert.assertEquals("MaximumX", maxX, boundingBox.getMaximum(0, unit), 0);
@@ -185,8 +187,8 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("MinY", minY, boundingBox.getMinY(), 0);
     Assert.assertEquals("MaxY", maxY, boundingBox.getMaxY(), 0);
 
-    Assert.assertEquals("MinimumY", Measure.valueOf(minY, unit), boundingBox.getMinimum(1));
-    Assert.assertEquals("MaximumY", Measure.valueOf(maxY, unit), boundingBox.getMaximum(1));
+    Assert.assertEquals("MinimumY", Quantities.getQuantity(minY, unit), boundingBox.getMinimum(1));
+    Assert.assertEquals("MaximumY", Quantities.getQuantity(maxY, unit), boundingBox.getMaximum(1));
 
     Assert.assertEquals("MinimumY", minY, boundingBox.getMinimum(1, unit), 0);
     Assert.assertEquals("MaximumY", maxY, boundingBox.getMaximum(1, unit), 0);
@@ -194,11 +196,14 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("WKT", wkt.toString(), boundingBox.toString());
     Assert.assertEquals("Area", area, boundingBox.getArea(), 0);
     Assert.assertEquals("Width", width, boundingBox.getWidth(), 0);
-    Assert.assertEquals("Width", width, boundingBox.getWidthLength().doubleValue(lengthUnit), 0);
-    Assert.assertEquals("Width", Measure.valueOf(width, lengthUnit), boundingBox.getWidthLength());
+    Assert.assertEquals("Width", width,
+      QuantityType.doubleValue(boundingBox.getWidthLength(), lengthUnit), 0);
+    Assert.assertEquals("Width", Quantities.getQuantity(width, lengthUnit),
+      boundingBox.getWidthLength());
     Assert.assertEquals("Height", height, boundingBox.getHeight(), 0);
-    Assert.assertEquals("Height", height, boundingBox.getHeightLength().doubleValue(lengthUnit), 0);
-    Assert.assertEquals("Height", Measure.valueOf(height, lengthUnit),
+    Assert.assertEquals("Height", height,
+      QuantityType.doubleValue(boundingBox.getHeightLength(), lengthUnit), 0);
+    Assert.assertEquals("Height", Quantities.getQuantity(height, lengthUnit),
       boundingBox.getHeightLength());
 
     Assert.assertEquals("Aspect Ratio", width / height, boundingBox.getAspectRatio(), 0);

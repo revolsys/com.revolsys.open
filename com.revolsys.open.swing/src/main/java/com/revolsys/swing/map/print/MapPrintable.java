@@ -12,13 +12,14 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 
-import javax.measure.Measure;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-
+import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.util.QuantityType;
+
+import systems.uom.common.USCustomary;
+import tec.uom.se.quantity.Quantities;
 
 public class MapPrintable implements Printable {
   private final BoundingBox boundingBox;
@@ -33,7 +34,8 @@ public class MapPrintable implements Printable {
 
   private final Project map;
 
-  private double millimetre = Measure.valueOf(1, SI.MILLIMETRE).doubleValue(NonSI.INCH.divide(72));
+  private double millimetre = QuantityType
+    .doubleValue(Quantities.getQuantity(1, CustomUnits.MILLIMETRE), USCustomary.INCH.divide(72));
 
   private double minorDivisions = 200;
 
@@ -53,7 +55,9 @@ public class MapPrintable implements Printable {
     this.contentRect = contentRect;
     this.dpi = dpi;
     this.rulerSizePixels = rulerSizePixels;
-    this.millimetre = Measure.valueOf(1, SI.MILLIMETRE).doubleValue(NonSI.INCH.divide(dpi));
+    this.millimetre = QuantityType.doubleValue(Quantities.getQuantity(1, CustomUnits.MILLIMETRE),
+      USCustomary.INCH.divide(dpi));
+    ;
     this.minorDivisions = minorDivisions;
     this.majorDivisions = minorDivisions * 5;
     this.scale = scale;

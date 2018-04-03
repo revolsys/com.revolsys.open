@@ -37,9 +37,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.index.strtree.Boundable;
-import com.revolsys.geometry.index.strtree.StrTreeNode;
-import com.revolsys.geometry.index.strtree.StrTreeLeaf;
 import com.revolsys.geometry.index.strtree.StrTree;
+import com.revolsys.geometry.index.strtree.StrTreeLeaf;
+import com.revolsys.geometry.index.strtree.StrTreeNode;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

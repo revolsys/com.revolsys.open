@@ -3,12 +3,13 @@ package com.revolsys.geometry.cs;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.epsg.EpsgAuthority;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -173,7 +174,12 @@ public class CompoundCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public <Q extends Quantity> Unit<Q> getUnit() {
+  public LinearUnit getLinearUnit() {
+    return this.horizontalCoordinateSystem.getLinearUnit();
+  }
+
+  @Override
+  public <Q extends Quantity<Q>> Unit<Q> getUnit() {
     return this.horizontalCoordinateSystem.getUnit();
   }
 

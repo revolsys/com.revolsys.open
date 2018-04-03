@@ -46,8 +46,8 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Consumer3Double;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 /**

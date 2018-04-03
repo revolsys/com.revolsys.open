@@ -414,7 +414,23 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     addToMap(map, "systemIdentifier", this.systemIdentifier);
     addToMap(map, "generatingSoftware", this.generatingSoftware);
     addToMap(map, "date", this.date);
+    if (this.geometryFactory != null) {
+      final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
+      if (coordinateSystemId > 0) {
+        addToMap(map, "coordinateSystemId", coordinateSystemId);
+      }
+
+      final CoordinateSystem coordinateSystem = this.geometryFactory.getCoordinateSystem();
+      if (coordinateSystem != null) {
+        addToMap(map, "coordinateSystemName", coordinateSystem.getCoordinateSystemName());
+        addToMap(map, "coordinateSystem", coordinateSystem.toEsriWktCs());
+      }
+    }
+    addToMap(map, "boundingBox", getBoundingBox());
     addToMap(map, "headerSize", this.headerSize);
+    if (this.laszip) {
+      addToMap(map, "laszip", this.lasZipHeader);
+    }
     addToMap(map, "pointRecordsOffset", this.pointRecordsOffset, 0);
     addToMap(map, "pointFormat", this.pointFormat.getId());
     addToMap(map, "pointCount", this.pointCount);

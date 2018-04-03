@@ -12,7 +12,7 @@ import com.revolsys.spring.resource.PathResource;
 
 public class LasInfo implements Runnable, BaseCloseable {
 
-  public static void main(final String[] args) {
+  public static void main(final String... args) {
     final String fileName = args[0];
     try (
       final LasInfo lasInfo = new LasInfo(fileName)) {

@@ -11,13 +11,12 @@ import java.beans.PropertyChangeEvent;
 import java.util.List;
 import java.util.Map;
 
-import javax.measure.Measure;
-import javax.measure.unit.NonSI;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
@@ -33,6 +32,8 @@ import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Cancellable;
+
+import tec.uom.se.quantity.Quantities;
 
 public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
 
@@ -56,7 +57,7 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
 
     this.textStyle = new TextStyle();
     this.textStyle.setTextName("[formattedName]");
-    this.textStyle.setTextSize(Measure.valueOf(12, NonSI.PIXEL));
+    this.textStyle.setTextSize(Quantities.getQuantity(12, CustomUnits.PIXEL));
     this.textStyle.setTextPlacementType("auto");
     this.textStyle.setTextHorizontalAlignment("center");
     this.textStyle.setTextVerticalAlignment("middle");

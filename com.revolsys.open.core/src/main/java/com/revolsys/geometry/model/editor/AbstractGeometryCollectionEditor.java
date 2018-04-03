@@ -14,8 +14,8 @@ import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.function.BiConsumerDouble;
-import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Consumer3Double;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G extends Geometry, GE extends GeometryEditor<?>>

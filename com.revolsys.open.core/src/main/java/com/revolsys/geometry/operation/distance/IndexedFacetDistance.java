@@ -33,9 +33,9 @@
 
 package com.revolsys.geometry.operation.distance;
 
-import com.revolsys.geometry.index.strtree.StrTreeLeaf;
 import com.revolsys.geometry.index.strtree.ItemDistance;
 import com.revolsys.geometry.index.strtree.StrTree;
+import com.revolsys.geometry.index.strtree.StrTreeLeaf;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Polygonal;

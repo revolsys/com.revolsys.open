@@ -3,9 +3,9 @@ package com.revolsys.geometry.cs;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.datum.EngineeringDatum;
 import com.revolsys.geometry.cs.epsg.EpsgAuthority;
@@ -180,7 +180,16 @@ public class EngineeringCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public <Q extends Quantity> Unit<Q> getUnit() {
+  public LinearUnit getLinearUnit() {
+    if (this.unit instanceof LinearUnit) {
+      return (LinearUnit)this.unit;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public <Q extends Quantity<Q>> Unit<Q> getUnit() {
     if (this.unit instanceof LinearUnit) {
       final LinearUnit linearUnit = (LinearUnit)this.unit;
       return (Unit<Q>)linearUnit.getUnit();

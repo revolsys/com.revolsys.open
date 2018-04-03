@@ -1,7 +1,7 @@
 package com.revolsys.geometry.cs.projection;
 
-import javax.measure.converter.UnitConverter;
-import javax.measure.unit.Unit;
+import javax.measure.Unit;
+import javax.measure.UnitConverter;
 
 public class UnitConverstionOperation implements CoordinatesOperation {
   private int axisCount = 0;

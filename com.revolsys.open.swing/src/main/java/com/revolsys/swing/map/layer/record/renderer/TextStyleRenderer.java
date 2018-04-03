@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.Unit;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -45,6 +45,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.layer.record.style.panel.TextStylePanel;
 import com.revolsys.util.Property;
+
+import tec.uom.se.quantity.Quantities;
 
 public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   private static final Pattern FIELD_PATTERN = Pattern.compile("\\[([\\w.]+)\\]");
@@ -130,10 +132,10 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
 
           style.setTextStyle(viewport, graphics);
 
-          final Measure<Length> textDx = style.getTextDx();
+          final Quantity<Length> textDx = style.getTextDx();
           double dx = Viewport2D.toDisplayValue(viewport, textDx);
 
-          final Measure<Length> textDy = style.getTextDy();
+          final Quantity<Length> textDy = style.getTextDy();
           double dy = -Viewport2D.toDisplayValue(viewport, textDy);
 
           final FontMetrics fontMetrics = graphics.getFontMetrics();
@@ -220,7 +222,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
             final double radius = style.getTextHaloRadius();
             final Unit<Length> unit = style.getTextSizeUnit();
             final double textHaloRadius = Viewport2D.toDisplayValue(viewport,
-              Measure.valueOf(radius, unit));
+              Quantities.getQuantity(radius, unit));
             if (textHaloRadius > 0) {
               final Stroke savedStroke = graphics.getStroke();
               final Stroke outlineStroke = new BasicStroke((float)(textHaloRadius + 1),

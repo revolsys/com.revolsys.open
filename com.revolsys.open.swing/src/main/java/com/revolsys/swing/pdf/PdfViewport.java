@@ -16,9 +16,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.Unit;
 
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSDictionary;
@@ -53,6 +53,8 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
+
+import tec.uom.se.quantity.Quantities;
 
 public class PdfViewport extends Viewport2D implements BaseCloseable {
 
@@ -255,10 +257,10 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
 
             // style.setTextStyle(viewport, graphics);
 
-            final Measure<Length> textDx = style.getTextDx();
+            final Quantity<Length> textDx = style.getTextDx();
             double dx = Viewport2D.toDisplayValue(this, textDx);
 
-            final Measure<Length> textDy = style.getTextDy();
+            final Quantity<Length> textDy = style.getTextDy();
             double dy = -Viewport2D.toDisplayValue(this, textDy);
             final Font font = style.getFont(this);
             final FontMetrics fontMetrics = this.canvas.getFontMetrics(font);
@@ -413,7 +415,7 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
         graphicsState.setStrokingAlphaConstant(lineOpacity / 255f);
       }
 
-      final Measure<Length> lineWidth = style.getLineWidth();
+      final Quantity<Length> lineWidth = style.getLineWidth();
       final Unit<Length> unit = lineWidth.getUnit();
       graphicsState.setLineWidth((float)toDisplayValue(lineWidth));
 
@@ -428,14 +430,15 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
         for (int i = 0; i < dashArray.length; i++) {
           if (i < lineDashArray.size()) {
             final Double dashDouble = lineDashArray.get(i);
-            final Measure<Length> dashMeasure = Measure.valueOf(dashDouble, unit);
+            final Quantity<Length> dashMeasure = Quantities.getQuantity(dashDouble, unit);
             final float dashFloat = (float)toDisplayValue(dashMeasure);
             dashArray[i] = dashFloat;
           } else {
             dashArray[i] = dashArray[i - 1];
           }
         }
-        final int offset = (int)toDisplayValue(Measure.valueOf(style.getLineDashOffset(), unit));
+        final int offset = (int)toDisplayValue(
+          Quantities.getQuantity(style.getLineDashOffset(), unit));
         final COSArray dashCosArray = new COSArray();
         dashCosArray.setFloatArray(dashArray);
         final PDLineDashPattern pattern = new PDLineDashPattern(dashCosArray, offset);

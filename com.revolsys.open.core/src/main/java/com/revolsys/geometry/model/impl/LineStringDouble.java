@@ -13,8 +13,8 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Consumer3Double;
+import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 public class LineStringDouble extends AbstractLineString {

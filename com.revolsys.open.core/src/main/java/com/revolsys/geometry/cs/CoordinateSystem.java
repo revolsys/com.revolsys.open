@@ -5,13 +5,14 @@ import java.io.Writer;
 import java.security.MessageDigest;
 import java.util.List;
 
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -73,7 +74,9 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
 
   Unit<Length> getLengthUnit();
 
-  <Q extends Quantity> Unit<Q> getUnit();
+  LinearUnit getLinearUnit();
+
+  <Q extends Quantity<Q>> Unit<Q> getUnit();
 
   boolean isDeprecated();
 
