@@ -41,7 +41,7 @@ public class UnitConverstionOperation implements CoordinatesOperation {
         } else {
           value = Double.NaN;
         }
-        targetCoordinates[vertexIndex * sourceAxisCount + axisIndex] = value;
+        targetCoordinates[vertexIndex * targetAxisCount + axisIndex] = value;
       }
     }
   }

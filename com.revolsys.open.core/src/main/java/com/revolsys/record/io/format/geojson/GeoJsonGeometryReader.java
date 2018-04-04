@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
@@ -27,8 +28,9 @@ public class GeoJsonGeometryReader extends AbstractIterator<Geometry> implements
 
   private JsonParser in;
 
-  public GeoJsonGeometryReader(final Resource resource) {
+  public GeoJsonGeometryReader(final Resource resource, final MapEx properties) {
     this.in = new JsonParser(resource);
+    setProperties(properties);
   }
 
   @Override

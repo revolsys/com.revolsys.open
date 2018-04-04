@@ -64,7 +64,7 @@ public class MonotoneChainBuilder {
     double startY1 = points.getY(safeStart);
     double startX2 = points.getX(safeStart + 1);
     double startY2 = points.getY(safeStart + 1);
-    while (safeStart < size - 1 && startX1 == startX2 && startY1 == startY2) {
+    while (safeStart < size - 2 && startX1 == startX2 && startY1 == startY2) {
       startX1 = startX2;
       startY1 = startY2;
       safeStart++;

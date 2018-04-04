@@ -159,7 +159,7 @@ public class GradientStop extends BaseObjectWithProperties
     final MapEx map = newTypeMap("gradientStop");
     addToMap(map, "color", this.color);
     if (Double.isFinite(this.value)) {
-      map.add("percent", this.value);
+      map.add("value", this.value);
     }
     return map;
   }

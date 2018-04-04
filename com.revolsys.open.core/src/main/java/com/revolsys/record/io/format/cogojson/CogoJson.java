@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.GeometryRecordReaderFactory;
@@ -34,9 +35,8 @@ public class CogoJson extends GeometryRecordReaderFactory implements RecordWrite
   }
 
   @Override
-  public GeometryReader newGeometryReader(final Resource resource) {
-    final GeoJsonGeometryReader iterator = new GeoJsonGeometryReader(resource);
-    return iterator;
+  public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
+    return new GeoJsonGeometryReader(resource, properties);
   }
 
   @Override

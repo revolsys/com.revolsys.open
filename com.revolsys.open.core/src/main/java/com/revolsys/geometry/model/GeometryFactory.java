@@ -418,20 +418,24 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
 
   protected static GeometryFactory floating(final CoordinateSystem coordinateSystem,
     final int coordinateSystemId, final int axisCount) {
-    synchronized (factoryFloatingBySridAndAxisCount) {
-      GeometryFactory factory = null;
-      IntHashMap<GeometryFactory> factoriesByAxisCount = factoryFloatingBySridAndAxisCount
-        .get(coordinateSystemId);
-      if (factoriesByAxisCount == null) {
-        factoriesByAxisCount = new IntHashMap<>();
-        factoryFloatingBySridAndAxisCount.put(coordinateSystemId, factoriesByAxisCount);
+    if (coordinateSystemId <= 0) {
+      return floating(coordinateSystem, axisCount);
+    } else {
+      synchronized (factoryFloatingBySridAndAxisCount) {
+        GeometryFactory factory = null;
+        IntHashMap<GeometryFactory> factoriesByAxisCount = factoryFloatingBySridAndAxisCount
+          .get(coordinateSystemId);
+        if (factoriesByAxisCount == null) {
+          factoriesByAxisCount = new IntHashMap<>();
+          factoryFloatingBySridAndAxisCount.put(coordinateSystemId, factoriesByAxisCount);
+        }
+        factory = factoriesByAxisCount.get(axisCount);
+        if (factory == null) {
+          factory = new GeometryFactoryFloating(coordinateSystem, coordinateSystemId, axisCount);
+          factoriesByAxisCount.put(axisCount, factory);
+        }
+        return factory;
       }
-      factory = factoriesByAxisCount.get(axisCount);
-      if (factory == null) {
-        factory = new GeometryFactoryFloating(coordinateSystem, coordinateSystemId, axisCount);
-        factoriesByAxisCount.put(axisCount, factory);
-      }
-      return factory;
     }
   }
 

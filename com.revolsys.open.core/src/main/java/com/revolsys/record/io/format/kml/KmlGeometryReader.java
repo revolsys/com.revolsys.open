@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import javax.xml.stream.XMLStreamException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -31,8 +32,9 @@ public class KmlGeometryReader extends AbstractIterator<Geometry>
     this.in = StaxReader.newXmlReader(in);
   }
 
-  public KmlGeometryReader(final Resource resource) {
+  public KmlGeometryReader(final Resource resource, final MapEx properties) {
     this.in = StaxReader.newXmlReader(resource);
+    setProperties(properties);
   }
 
   @Override

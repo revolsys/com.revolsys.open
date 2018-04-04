@@ -7,7 +7,11 @@ public interface LambdaStringValue<R> extends StringValue {
   @Override
   @SuppressWarnings("unchecked")
   default String getString(final Object value) {
-    return toString((R)value);
+    if (value == null) {
+      return null;
+    } else {
+      return toString((R)value);
+    }
   }
 
   String toString(R value);

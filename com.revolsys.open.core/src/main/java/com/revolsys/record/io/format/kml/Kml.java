@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Set;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
@@ -77,9 +78,8 @@ public class Kml extends GeometryRecordReaderFactory
   }
 
   @Override
-  public GeometryReader newGeometryReader(final Resource resource) {
-    final KmlGeometryReader iterator = new KmlGeometryReader(resource);
-    return iterator;
+  public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
+    return new KmlGeometryReader(resource, properties);
   }
 
   @Override

@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.GeometryRecordReaderFactory;
@@ -78,9 +79,8 @@ public class GeoJson extends GeometryRecordReaderFactory implements RecordWriter
   }
 
   @Override
-  public GeometryReader newGeometryReader(final Resource resource) {
-    final GeoJsonGeometryReader iterator = new GeoJsonGeometryReader(resource);
-    return iterator;
+  public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
+    return new GeoJsonGeometryReader(resource, properties);
   }
 
   @Override

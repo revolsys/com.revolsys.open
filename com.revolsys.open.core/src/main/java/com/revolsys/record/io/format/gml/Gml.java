@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.GeometryRecordReaderFactory;
@@ -95,9 +96,8 @@ public class Gml extends GeometryRecordReaderFactory implements RecordWriterFact
   }
 
   @Override
-  public GeometryReader newGeometryReader(final Resource resource) {
-    final GmlGeometryReader iterator = new GmlGeometryReader(resource);
-    return iterator;
+  public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
+    return new GmlGeometryReader(resource, properties);
   }
 
   @Override

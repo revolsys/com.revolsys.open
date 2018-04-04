@@ -178,20 +178,25 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("MinX", minX, boundingBox.getMinX(), 0);
     Assert.assertEquals("MaxX", maxX, boundingBox.getMaxX(), 0);
 
-    Assert.assertEquals("MinimumX", Quantities.getQuantity(minX, unit), boundingBox.getMinimum(0));
-    Assert.assertEquals("MaximumX", Quantities.getQuantity(maxX, unit), boundingBox.getMaximum(0));
+    if (!boundingBox.isEmpty()) {
+      Assert.assertEquals("MinimumX", Quantities.getQuantity(minX, unit),
+        boundingBox.getMinimum(0));
+      Assert.assertEquals("MaximumX", Quantities.getQuantity(maxX, unit),
+        boundingBox.getMaximum(0));
 
-    Assert.assertEquals("MinimumX", minX, boundingBox.getMinimum(0, unit), 0);
-    Assert.assertEquals("MaximumX", maxX, boundingBox.getMaximum(0, unit), 0);
+      Assert.assertEquals("MinimumX", minX, boundingBox.getMinimum(0, unit), 0);
+      Assert.assertEquals("MaximumX", maxX, boundingBox.getMaximum(0, unit), 0);
 
+      Assert.assertEquals("MinimumY", Quantities.getQuantity(minY, unit),
+        boundingBox.getMinimum(1));
+      Assert.assertEquals("MaximumY", Quantities.getQuantity(maxY, unit),
+        boundingBox.getMaximum(1));
+
+      Assert.assertEquals("MinimumY", minY, boundingBox.getMinimum(1, unit), 0);
+      Assert.assertEquals("MaximumY", maxY, boundingBox.getMaximum(1, unit), 0);
+    }
     Assert.assertEquals("MinY", minY, boundingBox.getMinY(), 0);
     Assert.assertEquals("MaxY", maxY, boundingBox.getMaxY(), 0);
-
-    Assert.assertEquals("MinimumY", Quantities.getQuantity(minY, unit), boundingBox.getMinimum(1));
-    Assert.assertEquals("MaximumY", Quantities.getQuantity(maxY, unit), boundingBox.getMaximum(1));
-
-    Assert.assertEquals("MinimumY", minY, boundingBox.getMinimum(1, unit), 0);
-    Assert.assertEquals("MaximumY", maxY, boundingBox.getMaximum(1, unit), 0);
 
     Assert.assertEquals("WKT", wkt.toString(), boundingBox.toString());
     Assert.assertEquals("Area", area, boundingBox.getArea(), 0);

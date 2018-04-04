@@ -9,6 +9,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
@@ -91,12 +92,13 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
 
   private StaxReader in;
 
-  public GmlGeometryReader(final Resource resource) {
+  public GmlGeometryReader(final Resource resource, final MapEx properties) {
     try {
       this.in = StaxReader.newXmlReader(resource);
     } catch (final Exception e) {
       throw new IllegalArgumentException("Unable to open resource " + resource);
     }
+    setProperties(properties);
   }
 
   @Override
