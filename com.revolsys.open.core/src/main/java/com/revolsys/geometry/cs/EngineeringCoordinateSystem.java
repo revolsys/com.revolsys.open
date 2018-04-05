@@ -1,6 +1,5 @@
 package com.revolsys.geometry.cs;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.measure.Quantity;
@@ -8,44 +7,25 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
 import com.revolsys.geometry.cs.datum.EngineeringDatum;
-import com.revolsys.geometry.cs.epsg.EpsgAuthority;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
-public class EngineeringCoordinateSystem implements CoordinateSystem {
+public class EngineeringCoordinateSystem extends AbstractCoordinateSystem {
   private static final long serialVersionUID = 8655274386401351222L;
 
   private final UnitOfMeasure unit;
 
-  private final Area area;
-
-  private final Authority authority;
-
-  private final List<Axis> axis = new ArrayList<>();
-
   private final EngineeringDatum engineeringDatum;
-
-  private boolean deprecated;
-
-  private final int id;
-
-  private final String name;
 
   public EngineeringCoordinateSystem(final int id, final String name,
     final EngineeringDatum engineeringDatum, final List<Axis> axis, final Area area,
     final boolean deprecated) {
-    this.id = id;
-    this.name = name;
+    super(id, name, axis, area, deprecated);
     this.engineeringDatum = engineeringDatum;
     this.unit = axis.get(0).getUnit();
-    if (axis != null && !axis.isEmpty()) {
-      this.axis.addAll(axis);
-    }
-    this.area = area;
-    this.authority = new EpsgAuthority(id);
   }
 
   @Override
@@ -77,16 +57,6 @@ public class EngineeringCoordinateSystem implements CoordinateSystem {
     }
   }
 
-  private boolean equals(final Object object1, final Object object2) {
-    if (object1 == object2) {
-      return true;
-    } else if (object1 == null || object2 == null) {
-      return false;
-    } else {
-      return object1.equals(object2);
-    }
-  }
-
   @Override
   public boolean equalsExact(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem instanceof EngineeringCoordinateSystem) {
@@ -97,71 +67,22 @@ public class EngineeringCoordinateSystem implements CoordinateSystem {
   }
 
   public boolean equalsExact(final EngineeringCoordinateSystem cs) {
-    if (cs == null) {
-      return false;
-    } else if (cs == this) {
-      return true;
-    } else {
+    if (super.equalsExact(cs)) {
       if (!equals(this.unit, cs.unit)) {
         return false;
-      } else if (!equals(this.area, cs.area)) {
-        return false;
-      } else if (!equals(this.authority, cs.authority)) {
-        return false;
-      } else if (!equals(this.axis, cs.axis)) {
-        return false;
       } else if (!equals(this.engineeringDatum, cs.engineeringDatum)) {
-        return false;
-      } else if (this.deprecated != cs.deprecated) {
-        return false;
-      } else if (this.id != cs.id) {
-        return false;
-      } else if (!equals(this.name, cs.name)) {
         return false;
       } else {
         return true;
       }
-    }
-  }
-
-  @Override
-  public Area getArea() {
-    return this.area;
-  }
-
-  @Override
-  public BoundingBox getAreaBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (this.area != null) {
-      return this.area.getLatLonBounds().convert(geometryFactory);
     } else {
-      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
+      return false;
     }
-  }
-
-  @Override
-  public Authority getAuthority() {
-    return this.authority;
-  }
-
-  @Override
-  public List<Axis> getAxis() {
-    return this.axis;
   }
 
   @Override
   public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
     return null;
-  }
-
-  @Override
-  public int getCoordinateSystemId() {
-    return this.id;
-  }
-
-  @Override
-  public String getCoordinateSystemName() {
-    return this.name;
   }
 
   @Override
@@ -209,12 +130,13 @@ public class EngineeringCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public boolean isDeprecated() {
-    return this.deprecated;
-  }
-
-  @Override
-  public String toString() {
-    return this.name;
+  protected BoundingBox newAreaBoundingBox() {
+    final Area area = getArea();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (area != null) {
+      return area.getLatLonBounds().convert(geometryFactory);
+    } else {
+      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
+    }
   }
 }

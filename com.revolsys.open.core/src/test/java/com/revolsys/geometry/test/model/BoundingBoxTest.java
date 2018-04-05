@@ -275,7 +275,7 @@ public class BoundingBoxTest implements TestConstants {
     assertBoundingBox(null, emptyList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     // Different number of axis and values
-    for (int axisCount = 2; axisCount < 6; axisCount++) {
+    for (int axisCount = 2; axisCount < 5; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
         Point[] points = new Point[valueCount];
         final double[] bounds = RectangleUtil.newBounds(axisCount);
@@ -349,7 +349,7 @@ public class BoundingBoxTest implements TestConstants {
     assertBoundingBox(null, emptyCoordinatesList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     // Different number of axis and values
-    for (int axisCount = 2; axisCount < 6; axisCount++) {
+    for (int axisCount = 2; axisCount < 5; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
         final List<Point> points = new ArrayList<>();
         final double[] bounds = RectangleUtil.newBounds(axisCount);

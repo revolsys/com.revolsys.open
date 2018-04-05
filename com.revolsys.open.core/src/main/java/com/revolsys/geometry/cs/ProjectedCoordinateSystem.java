@@ -24,28 +24,14 @@ import com.revolsys.geometry.model.GeometryFactory;
 import si.uom.NonSI;
 import tec.uom.se.unit.Units;
 
-public class ProjectedCoordinateSystem implements CoordinateSystem {
+public class ProjectedCoordinateSystem extends AbstractCoordinateSystem {
   private static final long serialVersionUID = 1902383026085071877L;
-
-  private final Area area;
-
-  private final Authority authority;
-
-  private final List<Axis> axis = new ArrayList<>();
 
   private CoordinatesProjection coordinatesProjection;
 
-  private final boolean deprecated;
-
   private final GeographicCoordinateSystem geographicCoordinateSystem;
 
-  private int id;
-
-  private BoundingBox areaBoundingBox;
-
   private final LinearUnit linearUnit;
-
-  private final String name;
 
   private final Map<ParameterName, Object> parameters = new LinkedHashMap<>();
 
@@ -58,9 +44,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     final CoordinateOperationMethod coordinateOperationMethod,
     final Map<ParameterName, ParameterValue> parameterValues, final LinearUnit linearUnit,
     final List<Axis> axis, final Authority authority, final boolean deprecated) {
-    this.id = id;
-    this.name = name;
-    this.area = area;
+    super(id, name, axis, area, deprecated);
     this.geographicCoordinateSystem = geographicCoordinateSystem;
     this.coordinateOperationMethod = coordinateOperationMethod;
     if (parameterValues == null) {
@@ -80,12 +64,6 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       this.parameters.put(parameterName, value);
     }
     this.linearUnit = linearUnit;
-    if (axis != null && !axis.isEmpty()) {
-      this.axis.add(axis.get(0));
-      this.axis.add(axis.get(1));
-    }
-    this.authority = authority;
-    this.deprecated = deprecated;
   }
 
   public ProjectedCoordinateSystem(final int id, final String name,
@@ -115,11 +93,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   @Override
   public ProjectedCoordinateSystem clone() {
-    try {
-      return (ProjectedCoordinateSystem)super.clone();
-    } catch (final Exception e) {
-      return null;
-    }
+    return (ProjectedCoordinateSystem)super.clone();
   }
 
   @Override
@@ -157,64 +131,21 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   public boolean equalsExact(final ProjectedCoordinateSystem cs) {
-    if (cs == null) {
-      return false;
-    } else if (cs == this) {
-      return true;
-    } else if (!this.area.equals(cs.area)) {
-      return false;
-    } else if (!this.authority.equals(cs.authority)) {
-      return false;
-    } else if (!DataType.equal(this.axis, cs.axis)) {
-      return false;
-    } else if (!this.geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
-      return false;
-    } else if (this.id != cs.id) {
-      return false;
-    } else if (!DataType.equal(this.linearUnit, cs.linearUnit)) {
-      return false;
-    } else if (!DataType.equal(this.name, cs.name)) {
-      return false;
-    } else if (!DataType.equal(this.parameters, cs.parameters)) {
-      return false;
-    } else if (!DataType.equal(this.coordinateOperationMethod, cs.coordinateOperationMethod)) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  @Override
-  public Area getArea() {
-    return this.area;
-  }
-
-  @Override
-  public BoundingBox getAreaBoundingBox() {
-    if (this.areaBoundingBox == null) {
-      final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
-        .getGeometryFactory();
-      BoundingBox boundingBox;
-      if (this.area == null) {
-        boundingBox = geographicGeometryFactory.newBoundingBox(-180, -90, 180, 90);
+    if (super.equalsExact(cs)) {
+      if (!this.geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
+        return false;
+      } else if (!DataType.equal(this.linearUnit, cs.linearUnit)) {
+        return false;
+      } else if (!DataType.equal(this.parameters, cs.parameters)) {
+        return false;
+      } else if (!DataType.equal(this.coordinateOperationMethod, cs.coordinateOperationMethod)) {
+        return false;
       } else {
-        final BoundingBox latLonBounds = this.area.getLatLonBounds();
-        boundingBox = latLonBounds.convert(geographicGeometryFactory);
+        return true;
       }
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      this.areaBoundingBox = boundingBox.convert(geometryFactory);
+    } else {
+      return false;
     }
-    return this.areaBoundingBox;
-  }
-
-  @Override
-  public Authority getAuthority() {
-    return this.authority;
-  }
-
-  @Override
-  public List<Axis> getAxis() {
-    return this.axis;
   }
 
   public CoordinateOperationMethod getCoordinateOperationMethod() {
@@ -277,16 +208,6 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public int getCoordinateSystemId() {
-    return this.id;
-  }
-
-  @Override
-  public String getCoordinateSystemName() {
-    return this.name;
-  }
-
-  @Override
   public String getCoordinateSystemType() {
     return "Projected";
   }
@@ -331,6 +252,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return this.linearUnit.getUnit();
   }
 
+  @Override
   public LinearUnit getLinearUnit() {
     return this.linearUnit;
   }
@@ -394,16 +316,18 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public boolean isDeprecated() {
-    return this.deprecated;
-  }
-
-  public void setId(final int id) {
-    this.id = id;
-  }
-
-  @Override
-  public String toString() {
-    return this.name;
+  protected BoundingBox newAreaBoundingBox() {
+    final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
+      .getGeometryFactory();
+    BoundingBox boundingBox;
+    final Area area = getArea();
+    if (area == null) {
+      boundingBox = geographicGeometryFactory.newBoundingBox(-180, -90, 180, 90);
+    } else {
+      final BoundingBox latLonBounds = area.getLatLonBounds();
+      boundingBox = latLonBounds.convert(geographicGeometryFactory);
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return boundingBox.convert(geometryFactory);
   }
 }

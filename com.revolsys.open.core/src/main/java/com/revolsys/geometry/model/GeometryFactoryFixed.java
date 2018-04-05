@@ -29,8 +29,8 @@ public class GeometryFactoryFixed extends GeometryFactory {
     initScales(scales);
   }
 
-  protected GeometryFactoryFixed(final CoordinateSystem coordinateSystem,
-    final int coordinateSystemId, final int axisCount, final double... scales) {
+  public GeometryFactoryFixed(final CoordinateSystem coordinateSystem, final int coordinateSystemId,
+    final int axisCount, final double... scales) {
     super(coordinateSystem, coordinateSystemId, axisCount);
     initScales(scales);
   }
@@ -45,8 +45,10 @@ public class GeometryFactoryFixed extends GeometryFactory {
   public GeometryFactory convertAxisCount(final int axisCount) {
     if (axisCount == this.axisCount) {
       return this;
+    } else if (this.coordinateSystem == null) {
+      return fixed(this.coordinateSystemId, axisCount, this.scales);
     } else {
-      return fixed(this.coordinateSystem, this.coordinateSystemId, axisCount, this.scales);
+      return this.coordinateSystem.getGeometryFactoryFixed(axisCount, this.scales);
     }
   }
 
@@ -55,11 +57,10 @@ public class GeometryFactoryFixed extends GeometryFactory {
     if (coordinateSystem == null) {
       return this;
     } else {
-      final CoordinateSystem coordinateSystemThis = this.coordinateSystem;
-      if (coordinateSystem == coordinateSystemThis) {
+      if (coordinateSystem == this.coordinateSystem) {
         return this;
       } else {
-        return fixed(coordinateSystem, this.axisCount, this.scales);
+        return coordinateSystem.getGeometryFactoryFixed(this.axisCount, this.scales);
       }
     }
   }
@@ -96,7 +97,7 @@ public class GeometryFactoryFixed extends GeometryFactory {
   }
 
   @Override
-  protected boolean equalsScales(final double[] scales) {
+  public boolean equalsScales(final double[] scales) {
     final int minLength = Math.min(this.scales.length, scales.length);
     for (int i = 0; i < minLength; i++) {
       final double scale1 = this.scales[i];

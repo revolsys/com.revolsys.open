@@ -8,17 +8,31 @@ public class GeometryFactoryFloating extends GeometryFactory {
 
   private static final long serialVersionUID = 1L;
 
-  protected GeometryFactoryFloating(final CoordinateSystem coordinateSystem, final int axisCount) {
+  public GeometryFactoryFloating(final CoordinateSystem coordinateSystem, final int axisCount) {
     super(coordinateSystem, axisCount);
   }
 
-  protected GeometryFactoryFloating(final CoordinateSystem coordinateSystem,
+  public GeometryFactoryFloating(final CoordinateSystem coordinateSystem,
     final int coordinateSystemId, final int axisCount) {
     super(coordinateSystem, coordinateSystemId, axisCount);
   }
 
-  protected GeometryFactoryFloating(final int coordinateSystemId, final int axisCount) {
+  public GeometryFactoryFloating(final int coordinateSystemId, final int axisCount) {
     super(coordinateSystemId, axisCount);
+  }
+
+  @Override
+  public GeometryFactory convertCoordinateSystem(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem == null) {
+      return this;
+    } else {
+      final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
+      if (coordinateSystem == coordinateSystemThis) {
+        return this;
+      } else {
+        return coordinateSystem.getGeometryFactoryFloating(this.axisCount);
+      }
+    }
   }
 
   @Override

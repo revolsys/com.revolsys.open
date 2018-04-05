@@ -1,6 +1,5 @@
 package com.revolsys.geometry.cs;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.measure.Unit;
@@ -12,40 +11,22 @@ import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
-public class GeocentricCoordinateSystem implements CoordinateSystem {
+public class GeocentricCoordinateSystem extends AbstractCoordinateSystem {
   private static final long serialVersionUID = 8655274386401351222L;
 
   private final LinearUnit linearUnit;
 
-  private final Area area;
-
-  private final Authority authority;
-
-  private final List<Axis> axis = new ArrayList<>();
-
   private final GeodeticDatum geodeticDatum;
-
-  private boolean deprecated;
-
-  private final int id;
-
-  private final String name;
 
   private final PrimeMeridian primeMeridian;
 
   public GeocentricCoordinateSystem(final int id, final String name,
     final GeodeticDatum geodeticDatum, final LinearUnit linearUnit, final List<Axis> axis,
     final Area area, final Authority authority, final boolean deprecated) {
-    this.id = id;
-    this.name = name;
+    super(id, name, axis, area, deprecated, authority);
     this.geodeticDatum = geodeticDatum;
     this.primeMeridian = null;
     this.linearUnit = linearUnit;
-    if (axis != null && !axis.isEmpty()) {
-      this.axis.addAll(axis);
-    }
-    this.area = area;
-    this.authority = authority;
   }
 
   @Override
@@ -79,16 +60,6 @@ public class GeocentricCoordinateSystem implements CoordinateSystem {
     }
   }
 
-  private boolean equals(final Object object1, final Object object2) {
-    if (object1 == object2) {
-      return true;
-    } else if (object1 == null || object2 == null) {
-      return false;
-    } else {
-      return object1.equals(object2);
-    }
-  }
-
   @Override
   public boolean equalsExact(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem instanceof GeocentricCoordinateSystem) {
@@ -99,73 +70,24 @@ public class GeocentricCoordinateSystem implements CoordinateSystem {
   }
 
   public boolean equalsExact(final GeocentricCoordinateSystem cs) {
-    if (cs == null) {
-      return false;
-    } else if (cs == this) {
-      return true;
-    } else {
+    if (super.equalsExact(cs)) {
       if (!equals(this.linearUnit, cs.linearUnit)) {
         return false;
-      } else if (!equals(this.area, cs.area)) {
-        return false;
-      } else if (!equals(this.authority, cs.authority)) {
-        return false;
-      } else if (!equals(this.axis, cs.axis)) {
-        return false;
       } else if (!equals(this.geodeticDatum, cs.geodeticDatum)) {
-        return false;
-      } else if (this.deprecated != cs.deprecated) {
-        return false;
-      } else if (this.id != cs.id) {
-        return false;
-      } else if (!equals(this.name, cs.name)) {
         return false;
       } else if (!equals(getPrimeMeridian(), cs.getPrimeMeridian())) {
         return false;
       } else {
         return true;
       }
-    }
-  }
-
-  @Override
-  public Area getArea() {
-    return this.area;
-  }
-
-  @Override
-  public BoundingBox getAreaBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (this.area != null) {
-      return this.area.getLatLonBounds().convert(geometryFactory);
     } else {
-      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
+      return false;
     }
-  }
-
-  @Override
-  public Authority getAuthority() {
-    return this.authority;
-  }
-
-  @Override
-  public List<Axis> getAxis() {
-    return this.axis;
   }
 
   @Override
   public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
     return null;
-  }
-
-  @Override
-  public int getCoordinateSystemId() {
-    return this.id;
-  }
-
-  @Override
-  public String getCoordinateSystemName() {
-    return this.name;
   }
 
   @Override
@@ -182,6 +104,7 @@ public class GeocentricCoordinateSystem implements CoordinateSystem {
     return this.linearUnit.getUnit();
   }
 
+  @Override
   public LinearUnit getLinearUnit() {
     return this.linearUnit;
   }
@@ -218,12 +141,13 @@ public class GeocentricCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public boolean isDeprecated() {
-    return this.deprecated;
-  }
-
-  @Override
-  public String toString() {
-    return this.name;
+  protected BoundingBox newAreaBoundingBox() {
+    final Area area = getArea();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (area != null) {
+      return area.getLatLonBounds().convert(geometryFactory);
+    } else {
+      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
+    }
   }
 }

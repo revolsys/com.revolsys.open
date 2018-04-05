@@ -66,19 +66,17 @@ import com.revolsys.util.WrappedException;
 public final class EpsgCoordinateSystems implements CodeTable {
   private static Set<CoordinateSystem> coordinateSystems;
 
-  private static IntHashMap<List<CoordinateSystem>> coordinateSystemsByCoordinateSystem = new IntHashMap<>();
+  private static final IntHashMap<List<CoordinateSystem>> COORDINATE_SYSTEMS_BY_HASH_CODE = new IntHashMap<>();
 
-  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new TreeMap<>();
+  private static final IntHashMap<CoordinateSystem> COORDINATE_SYSTEM_BY_ID = new IntHashMap<>();
 
-  private final static IntHashMap<CoordinateSystem> COORDINATE_SYSTEM_BY_ID = new IntHashMap<>();
-
-  private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<>();
+  private static final Map<String, CoordinateSystem> COORDINATE_SYSTEM_BY_NAME = new TreeMap<>();
 
   private static boolean initialized = false;
 
   private static final IntHashMap<UnitOfMeasure> UNIT_BY_ID = new IntHashMap<>();
 
-  private static Map<String, UnitOfMeasure> UNIT_BY_NAME = new TreeMap<>();
+  private static final Map<String, UnitOfMeasure> UNIT_BY_NAME = new TreeMap<>();
 
   private static int nextSrid = 2000000;
 
@@ -103,23 +101,23 @@ public final class EpsgCoordinateSystems implements CodeTable {
       final Integer id = coordinateSystem.getCoordinateSystemId();
       final String name = coordinateSystem.getCoordinateSystemName();
       COORDINATE_SYSTEM_BY_ID.put(id, coordinateSystem);
-      coordinateSystemsById.put(id, coordinateSystem);
       final int hashCode = coordinateSystem.hashCode();
-      List<CoordinateSystem> coordinateSystems = coordinateSystemsByCoordinateSystem.get(hashCode);
+      List<CoordinateSystem> coordinateSystems = COORDINATE_SYSTEMS_BY_HASH_CODE.get(hashCode);
       if (coordinateSystems == null) {
         coordinateSystems = new ArrayList<>();
-        coordinateSystemsByCoordinateSystem.put(hashCode, coordinateSystems);
+        COORDINATE_SYSTEMS_BY_HASH_CODE.put(hashCode, coordinateSystems);
       }
       coordinateSystems.add(coordinateSystem);
-      coordinateSystemsByName.put(name, coordinateSystem);
+      COORDINATE_SYSTEM_BY_NAME.put(name, coordinateSystem);
     }
   }
 
-  public static void clear() {
+  public static synchronized void clear() {
+    initialized = false;
     coordinateSystems = null;
-    coordinateSystemsByCoordinateSystem.clear();
-    coordinateSystemsById.clear();
-    coordinateSystemsByName.clear();
+    COORDINATE_SYSTEMS_BY_HASH_CODE.clear();
+    COORDINATE_SYSTEM_BY_ID.clear();
+    COORDINATE_SYSTEM_BY_NAME.clear();
   }
 
   public static AxisName getAxisName(final String name) {
@@ -154,14 +152,14 @@ public final class EpsgCoordinateSystems implements CodeTable {
       return null;
     } else {
       int srid = coordinateSystem.getCoordinateSystemId();
-      CoordinateSystem matchedCoordinateSystem = coordinateSystemsById.get(srid);
+      CoordinateSystem matchedCoordinateSystem = COORDINATE_SYSTEM_BY_ID.get(srid);
       if (matchedCoordinateSystem == null) {
-        matchedCoordinateSystem = coordinateSystemsByName
+        matchedCoordinateSystem = COORDINATE_SYSTEM_BY_NAME
           .get(coordinateSystem.getCoordinateSystemName());
         if (matchedCoordinateSystem == null) {
           final int hashCode = coordinateSystem.hashCode();
           int matchCoordinateSystemId = 0;
-          final List<CoordinateSystem> coordinateSystems = coordinateSystemsByCoordinateSystem
+          final List<CoordinateSystem> coordinateSystems = COORDINATE_SYSTEMS_BY_HASH_CODE
             .get(hashCode);
           if (coordinateSystems != null) {
             for (final CoordinateSystem coordinateSystem3 : coordinateSystems) {
@@ -235,9 +233,10 @@ public final class EpsgCoordinateSystems implements CodeTable {
     return (C)COORDINATE_SYSTEM_BY_ID.get(crsId);
   }
 
-  public static CoordinateSystem getCoordinateSystem(final String name) {
+  @SuppressWarnings("unchecked")
+  public static <C extends CoordinateSystem> C getCoordinateSystem(final String name) {
     initialize();
-    return coordinateSystemsByName.get(name);
+    return (C)COORDINATE_SYSTEM_BY_NAME.get(name);
   }
 
   public static Set<CoordinateSystem> getCoordinateSystems() {
@@ -269,7 +268,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   public static Map<Integer, CoordinateSystem> getCoordinateSystemsById() {
     initialize();
-    return new TreeMap<>(coordinateSystemsById);
+    return new TreeMap<>(COORDINATE_SYSTEM_BY_ID);
   }
 
   public static int getCrsId(final CoordinateSystem coordinateSystem) {
@@ -303,7 +302,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   public static List<GeographicCoordinateSystem> getGeographicCoordinateSystems() {
     final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<>();
-    for (final CoordinateSystem coordinateSystem : coordinateSystemsByName.values()) {
+    for (final CoordinateSystem coordinateSystem : COORDINATE_SYSTEM_BY_NAME.values()) {
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
         coordinateSystems.add(geographicCoordinateSystem);
@@ -320,7 +319,7 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   public static List<ProjectedCoordinateSystem> getProjectedCoordinateSystems() {
     final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<>();
-    for (final CoordinateSystem coordinateSystem : coordinateSystemsByName.values()) {
+    for (final CoordinateSystem coordinateSystem : COORDINATE_SYSTEM_BY_NAME.values()) {
       if (coordinateSystem instanceof ProjectedCoordinateSystem) {
         final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
         coordinateSystems.add(projectedCoordinateSystem);
@@ -358,11 +357,11 @@ public final class EpsgCoordinateSystems implements CodeTable {
         loadCoordinateSystem();
         loadCoordinateReferenceSystem(axisMap);
 
-        final ProjectedCoordinateSystem worldMercator = (ProjectedCoordinateSystem)coordinateSystemsById
+        final ProjectedCoordinateSystem worldMercator = (ProjectedCoordinateSystem)COORDINATE_SYSTEM_BY_ID
           .get(3857);
-        coordinateSystemsById.put(900913, worldMercator);
+        COORDINATE_SYSTEM_BY_ID.put(900913, worldMercator);
         coordinateSystems = Collections
-          .unmodifiableSet(new LinkedHashSet<>(coordinateSystemsById.values()));
+          .unmodifiableSet(new LinkedHashSet<>(COORDINATE_SYSTEM_BY_ID.values()));
         Dates.debugEllapsedTime(EpsgCoordinateSystems.class, "initialize", startTime);
       } catch (final Throwable t) {
         t.printStackTrace();

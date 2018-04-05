@@ -293,12 +293,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     if (coordinateSystem == null) {
       return GeometryFactory.fixed(0, axisCount, scales);
     } else {
-      final int srid = coordinateSystem.getCoordinateSystemId();
-      if (srid <= 0) {
-        return GeometryFactory.fixed(coordinateSystem, axisCount, scales);
-      } else {
-        return GeometryFactory.fixed(srid, axisCount, scales);
-      }
+      return coordinateSystem.getGeometryFactoryFixed(axisCount, scales);
     }
   }
 

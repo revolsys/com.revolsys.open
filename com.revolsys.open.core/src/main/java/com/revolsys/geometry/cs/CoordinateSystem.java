@@ -60,8 +60,12 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
 
   @Override
   default GeometryFactory getGeometryFactory() {
-    return GeometryFactory.floating3d(this);
+    return getGeometryFactoryFloating(3);
   }
+
+  GeometryFactory getGeometryFactoryFixed(int axisCount, double... scales);
+
+  GeometryFactory getGeometryFactoryFloating(int axisCount);
 
   @Override
   default Integer getInteger(final int index) {

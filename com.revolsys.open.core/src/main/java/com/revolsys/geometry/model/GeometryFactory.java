@@ -181,9 +181,9 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
   }
 
-  private static final IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
+  private static final IntHashMap<List<GeometryFactory>[]> factoriesBySrid = new IntHashMap<>();
 
-  private static final IntHashMap<IntHashMap<GeometryFactory>> factoryFloatingBySridAndAxisCount = new IntHashMap<>();
+  private static final IntHashMap<GeometryFactory[]> factoryFloatingBySridAndAxisCount = new IntHashMap<>();
 
   private static final double[] SCALES_FLOATING_2 = new double[2];
 
@@ -207,24 +207,10 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public static void clear() {
+    factoryFloatingBySridAndAxisCount.clear();
     factoriesBySrid.clear();
   }
 
-  public static GeometryFactory fixed(final CoordinateSystem coordinateSystem, final int axisCount,
-    final double... scales) {
-    if (coordinateSystem == null) {
-      return fixed(0, axisCount, scales);
-    } else {
-      final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-      if (coordinateSystemId == 0) {
-        return new GeometryFactoryFixed(coordinateSystem, axisCount, scales);
-      } else {
-        return fixed(coordinateSystem, coordinateSystemId, axisCount, scales);
-      }
-    }
-
-  }
-
   /**
    * <p>
    * Get a GeometryFactory with the coordinate system, number of axis and a
@@ -245,123 +231,60 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
    *          metres.
    * @return The geometry factory.
    */
-  protected static GeometryFactory fixed(final CoordinateSystem coordinateSystem,
-    final int coordinateSystemId, final int axisCount, final double... scales) {
-    if (scales == null) {
-      return floating(coordinateSystem, coordinateSystemId, axisCount);
-    } else {
-      boolean allZero = true;
-      for (final double scale : scales) {
-        if (scale > 0) {
-          allZero = false;
-        }
-      }
-      if (allZero) {
-        return floating(coordinateSystem, coordinateSystemId, axisCount);
-      }
-    }
-    synchronized (factoriesBySrid) {
-      GeometryFactory factory = null;
-      IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid
-        .get(coordinateSystemId);
-      if (factoriesByAxisCount == null) {
-        factoriesByAxisCount = new IntHashMap<>();
-        factoriesBySrid.put(coordinateSystemId, factoriesByAxisCount);
-      }
-      List<GeometryFactory> factories = factoriesByAxisCount.get(axisCount);
-      if (factories == null) {
-        factories = new ArrayList<>();
-        factoriesByAxisCount.put(axisCount, factories);
-      } else {
-        final int size = factories.size();
-        for (int i = 0; i < size; i++) {
-          final GeometryFactory matchFactory = factories.get(i);
-          if (matchFactory.equalsScales(scales)) {
-            return matchFactory;
-          }
-        }
-      }
-      if (factory == null) {
-        factory = new GeometryFactoryFixed(coordinateSystem, coordinateSystemId, axisCount, scales);
-        factories.add(factory);
-      }
-      return factory;
-    }
-  }
-
-  /**
-   * <p>
-   * Get a GeometryFactory with the coordinate system, number of axis and a
-   * fixed x, y &amp; fixed z precision models.
-   * </p>
-   *
-   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
-   *          coordinate system id</a>.
-   * @param axisCount The number of coordinate axis. 2 for 2D x &amp; y
-   *          coordinates. 3 for 3D x, y &amp; z coordinates.
-   * @param scaleXY The scale factor used to round the x, y coordinates. The
-   *          precision is 1 / scaleXy. A scale factor of 1000 will give a
-   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
-   *          metres.
-   * @param scaleZ The scale factor used to round the z coordinates. The
-   *          precision is 1 / scaleZ. A scale factor of 1000 will give a
-   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
-   *          metres.
-   * @return The geometry factory.
-   */
+  @SuppressWarnings("unchecked")
   public static GeometryFactory fixed(final int coordinateSystemId, final int axisCount,
     final double... scales) {
-    if (scales == null) {
-      return floating(coordinateSystemId, axisCount);
-    } else {
-      boolean allZero = true;
-      for (final double scale : scales) {
-        if (scale > 0) {
-          allZero = false;
-        }
-      }
-      if (allZero) {
-        return floating(coordinateSystemId, axisCount);
-      }
-    }
-    synchronized (factoriesBySrid) {
-      GeometryFactory factory = null;
-      IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid
-        .get(coordinateSystemId);
-      if (factoriesByAxisCount == null) {
-        factoriesByAxisCount = new IntHashMap<>();
-        factoriesBySrid.put(coordinateSystemId, factoriesByAxisCount);
-      }
-      List<GeometryFactory> factories = factoriesByAxisCount.get(axisCount);
-      if (factories == null) {
-        factories = new ArrayList<>();
-        factoriesByAxisCount.put(axisCount, factories);
+    final CoordinateSystem coordinateSystem = EpsgCoordinateSystems
+      .getCoordinateSystem(coordinateSystemId);
+    if (coordinateSystem == null) {
+      if (axisCount < 2 || axisCount > 4) {
+        throw new IllegalArgumentException("AxisCount must be in the range 2..4 not " + axisCount);
       } else {
-        final int size = factories.size();
-        for (int i = 0; i < size; i++) {
-          final GeometryFactory matchFactory = factories.get(i);
-          if (matchFactory.equalsScales(scales)) {
-            return matchFactory;
+        if (scales == null) {
+          return floating(coordinateSystemId, axisCount);
+        } else {
+          boolean allZero = true;
+          for (final double scale : scales) {
+            if (scale > 0) {
+              allZero = false;
+            }
+          }
+          if (allZero) {
+            return floating(coordinateSystemId, axisCount);
           }
         }
+        synchronized (factoriesBySrid) {
+          List<GeometryFactory>[] factoriesByAxisCount = factoriesBySrid.get(coordinateSystemId);
+          if (factoriesByAxisCount == null) {
+            factoriesByAxisCount = new List[3];
+            factoriesBySrid.put(coordinateSystemId, factoriesByAxisCount);
+          }
+          final int index = axisCount - 2;
+          List<GeometryFactory> geometryFactories = factoriesByAxisCount[index];
+          if (geometryFactories == null) {
+            geometryFactories = new ArrayList<>();
+            factoriesByAxisCount[index] = geometryFactories;
+          }
+          for (final GeometryFactory geometryFactory : geometryFactories) {
+            if (geometryFactory.equalsScales(scales)) {
+              return geometryFactory;
+            }
+          }
+          final GeometryFactory geometryFactory = new GeometryFactoryFixed(coordinateSystemId,
+            axisCount, scales);
+          geometryFactories.add(geometryFactory);
+          return geometryFactory;
+        }
       }
-      if (factory == null) {
-        factory = new GeometryFactoryFixed(coordinateSystemId, axisCount, scales);
-        factories.add(factory);
-      }
-      return factory;
+    } else {
+      return coordinateSystem.getGeometryFactoryFixed(axisCount, scales);
     }
   }
 
   public static GeometryFactory fixed(final String wkt, final int axisCount,
     final double... scales) {
     final CoordinateSystem coordinateSystem = EsriCoordinateSystems.readCoordinateSystem(wkt);
-    return fixed(coordinateSystem, axisCount, scales);
-  }
-
-  public static GeometryFactory fixed2d(final CoordinateSystem coordinateSystem,
-    final double scaleX, final double scaleY) {
-    return fixed(coordinateSystem, 2, scaleX, scaleY);
+    return coordinateSystem.getGeometryFactoryFixed(axisCount, scales);
   }
 
   public static GeometryFactory fixed2d(final double scaleX, final double scaleY) {
@@ -376,11 +299,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   public static GeometryFactory fixed2d(final String wkt, final double scaleX,
     final double scaleY) {
     return fixed(wkt, 2, scaleX, scaleY);
-  }
-
-  public static GeometryFactory fixed3d(final CoordinateSystem coordinateSystem,
-    final double scaleX, final double scaleY, final double scaleZ) {
-    return fixed(coordinateSystem, 3, scaleX, scaleY, scaleZ);
   }
 
   public static GeometryFactory fixed3d(final double scaleX, final double scaleY,
@@ -399,47 +317,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   /**
-   * get a  geometry factory with a floating scale.
-   */
-  public static GeometryFactory floating(final CoordinateSystem coordinateSystem,
-    final int axisCount) {
-    if (coordinateSystem == null) {
-      return floating(0, axisCount);
-    } else {
-      final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-      if (coordinateSystemId <= 0) {
-        return new GeometryFactoryFloating(coordinateSystem, axisCount);
-      } else {
-
-        return floating(coordinateSystemId, axisCount);
-      }
-    }
-  }
-
-  protected static GeometryFactory floating(final CoordinateSystem coordinateSystem,
-    final int coordinateSystemId, final int axisCount) {
-    if (coordinateSystemId <= 0) {
-      return floating(coordinateSystem, axisCount);
-    } else {
-      synchronized (factoryFloatingBySridAndAxisCount) {
-        GeometryFactory factory = null;
-        IntHashMap<GeometryFactory> factoriesByAxisCount = factoryFloatingBySridAndAxisCount
-          .get(coordinateSystemId);
-        if (factoriesByAxisCount == null) {
-          factoriesByAxisCount = new IntHashMap<>();
-          factoryFloatingBySridAndAxisCount.put(coordinateSystemId, factoriesByAxisCount);
-        }
-        factory = factoriesByAxisCount.get(axisCount);
-        if (factory == null) {
-          factory = new GeometryFactoryFloating(coordinateSystem, coordinateSystemId, axisCount);
-          factoriesByAxisCount.put(axisCount, factory);
-        }
-        return factory;
-      }
-    }
-  }
-
-  /**
    * <p>
    * Get a GeometryFactory with the coordinate system, number of axis and a
    * floating precision model.
@@ -452,20 +329,31 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
    * @return The geometry factory.
    */
   public static GeometryFactory floating(final int coordinateSystemId, final int axisCount) {
-    synchronized (factoryFloatingBySridAndAxisCount) {
-      GeometryFactory factory = null;
-      IntHashMap<GeometryFactory> factoriesByAxisCount = factoryFloatingBySridAndAxisCount
-        .get(coordinateSystemId);
-      if (factoriesByAxisCount == null) {
-        factoriesByAxisCount = new IntHashMap<>();
-        factoryFloatingBySridAndAxisCount.put(coordinateSystemId, factoriesByAxisCount);
+    final CoordinateSystem coordinateSystem = EpsgCoordinateSystems
+      .getCoordinateSystem(coordinateSystemId);
+    if (coordinateSystem == null) {
+      synchronized (factoryFloatingBySridAndAxisCount) {
+        if (axisCount < 2 || axisCount > 4) {
+          throw new IllegalArgumentException(
+            "AxisCount must be in the range 2..4 not " + axisCount);
+        } else {
+          GeometryFactory[] factoriesByAxisCount = factoryFloatingBySridAndAxisCount
+            .get(coordinateSystemId);
+          if (factoriesByAxisCount == null) {
+            factoriesByAxisCount = new GeometryFactory[3];
+            factoryFloatingBySridAndAxisCount.put(coordinateSystemId, factoriesByAxisCount);
+          }
+          final int index = axisCount - 2;
+          GeometryFactory geometryFactory = factoriesByAxisCount[index];
+          if (geometryFactory == null) {
+            geometryFactory = new GeometryFactoryFloating(coordinateSystemId, axisCount);
+            factoriesByAxisCount[index] = geometryFactory;
+          }
+          return geometryFactory;
+        }
       }
-      factory = factoriesByAxisCount.get(axisCount);
-      if (factory == null) {
-        factory = new GeometryFactoryFloating(coordinateSystemId, axisCount);
-        factoriesByAxisCount.put(axisCount, factory);
-      }
-      return factory;
+    } else {
+      return coordinateSystem.getGeometryFactoryFloating(axisCount);
     }
   }
 
@@ -478,26 +366,17 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       if (coordinateSystem == null) {
         return null;
       } else {
-        return floating(coordinateSystem, axisCount);
+        return coordinateSystem.getGeometryFactoryFloating(axisCount);
       }
     }
   }
 
   public static GeometryFactory floating(final String wkt, final int axisCount) {
     final CoordinateSystem coordinateSystem = EsriCoordinateSystems.readCoordinateSystem(wkt);
-    return floating(coordinateSystem, axisCount);
-  }
-
-  public static GeometryFactory floating2d(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
-      return floating2d(0);
+      return null;
     } else {
-      final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-      if (coordinateSystemId <= 0) {
-        return new GeometryFactoryFloating(coordinateSystem, 2);
-      } else {
-        return floating2d(coordinateSystemId);
-      }
+      return coordinateSystem.getGeometryFactoryFloating(axisCount);
     }
   }
 
@@ -511,22 +390,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
 
   public static GeometryFactory floating2d(final String wkt) {
     return floating(wkt, 2);
-  }
-
-  /**
-   * get a 3d geometry factory with a floating scale.
-   */
-  public static GeometryFactory floating3d(final CoordinateSystem coordinateSystem) {
-    if (coordinateSystem == null) {
-      return DEFAULT_3D;
-    } else {
-      final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-      if (coordinateSystemId == 0) {
-        return new GeometryFactoryFloating(coordinateSystem, 3);
-      } else {
-        return floating3d(coordinateSystemId);
-      }
-    }
   }
 
   /**
@@ -646,7 +509,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     final double offsetX, final double scaleX, final double offsetY, final double scaleY,
     final double offsetZ, final double scaleZ) {
     if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
-      return fixed(coordinateSystem, 3, scaleX, scaleY, scaleZ);
+      return coordinateSystem.getGeometryFactoryFixed(3, scaleX, scaleY, scaleZ);
     } else {
       return new GeometryFactoryWithOffsets(coordinateSystem, offsetX, scaleX, offsetY, scaleY,
         offsetZ, scaleZ);
@@ -839,30 +702,29 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   public GeometryFactory convertAxisCount(final int axisCount) {
     if (axisCount == this.axisCount) {
       return this;
+    } else if (this.coordinateSystem == null) {
+      return floating(this.coordinateSystemId, axisCount);
     } else {
-      return floating(this.coordinateSystem, this.coordinateSystemId, axisCount);
+      return this.coordinateSystem.getGeometryFactoryFloating(axisCount);
     }
   }
 
   public GeometryFactory convertAxisCountAndScales(final int axisCount, final double... scales) {
-    return fixed(this.coordinateSystem, this.coordinateSystemId, axisCount, scales);
-  }
-
-  public GeometryFactory convertCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    if (coordinateSystem == null) {
-      return this;
+    if (this.coordinateSystem == null) {
+      return fixed(this.coordinateSystemId, axisCount, scales);
     } else {
-      final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
-      if (coordinateSystem == coordinateSystemThis) {
-        return this;
-      } else {
-        return GeometryFactory.floating(coordinateSystem, this.axisCount);
-      }
+      return this.coordinateSystem.getGeometryFactoryFixed(axisCount, scales);
     }
   }
 
+  public abstract GeometryFactory convertCoordinateSystem(final CoordinateSystem coordinateSystem);
+
   public GeometryFactory convertScales(final double... scales) {
-    return fixed(this.coordinateSystem, this.coordinateSystemId, this.axisCount, scales);
+    if (this.coordinateSystem == null) {
+      return fixed(this.coordinateSystemId, this.axisCount, scales);
+    } else {
+      return this.coordinateSystem.getGeometryFactoryFixed(this.axisCount, scales);
+    }
   }
 
   public GeometryFactory convertSrid(final int coordinateSystemId) {
@@ -881,7 +743,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return valuesPrecise;
   }
 
-  protected boolean equalsScales(final double[] scales) {
+  public boolean equalsScales(final double[] scales) {
     for (int i = 0; i < scales.length; i++) {
       final double scale2 = scales[i];
       if (0 != scale2) {
@@ -2348,7 +2210,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public GeometryFactory to2dFloating() {
-    return floating(this.coordinateSystem, this.coordinateSystemId, 2);
+    if (this.coordinateSystem == null) {
+      return floating(this.coordinateSystemId, this.axisCount);
+    } else {
+      return this.coordinateSystem.getGeometryFactoryFloating(this.axisCount);
+    }
   }
 
   @Override

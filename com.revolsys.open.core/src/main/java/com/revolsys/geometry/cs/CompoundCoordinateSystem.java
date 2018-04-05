@@ -7,42 +7,34 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import com.revolsys.geometry.cs.epsg.EpsgAuthority;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
-public class CompoundCoordinateSystem implements CoordinateSystem {
+public class CompoundCoordinateSystem extends AbstractCoordinateSystem {
   private static final long serialVersionUID = 8655274386401351222L;
 
-  private final Area area;
-
-  private final Authority authority;
+  private static List<Axis> getAxis(final CoordinateSystem horizontalCoordinateSystem,
+    final VerticalCoordinateSystem verticalCoordinateSystem) {
+    final List<Axis> axis = new ArrayList<>();
+    axis.addAll(horizontalCoordinateSystem.getAxis());
+    axis.addAll(verticalCoordinateSystem.getAxis());
+    return axis;
+  }
 
   private final CoordinateSystem horizontalCoordinateSystem;
 
-  private boolean deprecated;
-
-  private final int id;
-
-  private final String name;
-
-  private final CoordinateSystem verticalCoordinateSystem;
-
-  private final List<Axis> axis = new ArrayList<>();
+  private final VerticalCoordinateSystem verticalCoordinateSystem;
 
   public CompoundCoordinateSystem(final int id, final String name,
     final CoordinateSystem horizontalCoordinateSystem,
-    final CoordinateSystem verticalCoordinateSystem, final Area area, final boolean deprecated) {
-    this.id = id;
-    this.name = name;
+    final VerticalCoordinateSystem verticalCoordinateSystem, final Area area,
+    final boolean deprecated) {
+    super(id, name, getAxis(horizontalCoordinateSystem, verticalCoordinateSystem), area,
+      deprecated);
     this.horizontalCoordinateSystem = horizontalCoordinateSystem;
     this.verticalCoordinateSystem = verticalCoordinateSystem;
-    this.axis.addAll(horizontalCoordinateSystem.getAxis());
-    this.axis.addAll(verticalCoordinateSystem.getAxis());
-    this.area = area;
-    this.authority = new EpsgAuthority(id);
   }
 
   @Override
@@ -74,39 +66,17 @@ public class CompoundCoordinateSystem implements CoordinateSystem {
     }
   }
 
-  private boolean equals(final Object object1, final Object object2) {
-    if (object1 == object2) {
-      return true;
-    } else if (object1 == null || object2 == null) {
-      return false;
-    } else {
-      return object1.equals(object2);
-    }
-  }
-
   public boolean equalsExact(final CompoundCoordinateSystem cs) {
-    if (cs == null) {
-      return false;
-    } else if (cs == this) {
-      return true;
-    } else {
-      if (!equals(this.area, cs.area)) {
-        return false;
-      } else if (!equals(this.authority, cs.authority)) {
-        return false;
-      } else if (!equals(this.horizontalCoordinateSystem, cs.horizontalCoordinateSystem)) {
+    if (super.equalsExact(cs)) {
+      if (!equals(this.horizontalCoordinateSystem, cs.horizontalCoordinateSystem)) {
         return false;
       } else if (!equals(this.verticalCoordinateSystem, cs.verticalCoordinateSystem)) {
-        return false;
-      } else if (this.deprecated != cs.deprecated) {
-        return false;
-      } else if (this.id != cs.id) {
-        return false;
-      } else if (!equals(this.name, cs.name)) {
         return false;
       } else {
         return true;
       }
+    } else {
+      return false;
     }
   }
 
@@ -120,43 +90,8 @@ public class CompoundCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public Area getArea() {
-    return this.area;
-  }
-
-  @Override
-  public BoundingBox getAreaBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (this.area != null) {
-      return this.area.getLatLonBounds().convert(geometryFactory);
-    } else {
-      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
-    }
-  }
-
-  @Override
-  public Authority getAuthority() {
-    return this.authority;
-  }
-
-  @Override
-  public List<Axis> getAxis() {
-    return this.axis;
-  }
-
-  @Override
   public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
     return null;
-  }
-
-  @Override
-  public int getCoordinateSystemId() {
-    return this.id;
-  }
-
-  @Override
-  public String getCoordinateSystemName() {
-    return this.name;
   }
 
   @Override
@@ -183,7 +118,7 @@ public class CompoundCoordinateSystem implements CoordinateSystem {
     return this.horizontalCoordinateSystem.getUnit();
   }
 
-  public CoordinateSystem getVerticalCoordinateSystem() {
+  public VerticalCoordinateSystem getVerticalCoordinateSystem() {
     return this.verticalCoordinateSystem;
   }
 
@@ -201,12 +136,13 @@ public class CompoundCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public boolean isDeprecated() {
-    return this.deprecated;
-  }
-
-  @Override
-  public String toString() {
-    return this.name;
+  protected BoundingBox newAreaBoundingBox() {
+    final Area area = getArea();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (area != null) {
+      return area.getLatLonBounds().convert(geometryFactory);
+    } else {
+      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
+    }
   }
 }

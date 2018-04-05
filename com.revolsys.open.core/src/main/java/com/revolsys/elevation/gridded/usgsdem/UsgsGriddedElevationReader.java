@@ -22,6 +22,7 @@ import com.revolsys.geometry.cs.ParameterNames;
 import com.revolsys.geometry.cs.ParameterValue;
 import com.revolsys.geometry.cs.ParameterValueNumber;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.cs.VerticalCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
@@ -388,6 +389,22 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         } else if (planimetricUom == 2) {
           linearUnit = EpsgCoordinateSystems.getLinearUnit("metre");
         }
+        VerticalCoordinateSystem verticalCoordinateSystem;
+        switch (horizontalDatum) {
+          case 1: // Mean Sea Level
+            verticalCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(5714);
+          break;
+          case 2: // NGVD_1929
+            verticalCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(5702);
+          break;
+          case 3: // NAVD_1988
+            verticalCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(5703);
+          break;
+
+          default:
+            throw new IllegalArgumentException("verticalDatum=" + horizontalDatum
+              + " not currently supported for USGS DEM: " + this.resource);
+        }
         GeographicCoordinateSystem geographicCoordinateSystem;
         switch (horizontalDatum) {
           case 0:
@@ -477,7 +494,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         } else if (coordinateSystem == null) {
           throw new IllegalArgumentException("No coordinate system found: " + this.resource);
         } else {
-          this.geometryFactory = GeometryFactory.fixed3d(coordinateSystem, 0, 0, scaleZ);
+          this.geometryFactory = coordinateSystem.getGeometryFactoryFixed(3, 0.0, 0.0, scaleZ);
         }
         if (horizontalDatum == 3 || horizontalDatum == 4) {
         } else {
