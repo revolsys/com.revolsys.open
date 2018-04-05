@@ -24,7 +24,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import si.uom.NonSI;
 import tec.uom.se.unit.Units;
 
-public class ProjectedCoordinateSystem extends AbstractCoordinateSystem {
+public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSystem {
   private static final long serialVersionUID = 1902383026085071877L;
 
   private CoordinatesProjection coordinatesProjection;

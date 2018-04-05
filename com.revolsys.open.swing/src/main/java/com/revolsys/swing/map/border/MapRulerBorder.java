@@ -436,7 +436,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
     } else {
       this.rulerGeometryFactory = rulerGeometryFactory;
     }
-    this.rulerCoordinateSystem = this.rulerGeometryFactory.getCoordinateSystem();
+    this.rulerCoordinateSystem = this.rulerGeometryFactory.getHorizontalCoordinateSystem();
     this.baseUnit = this.rulerCoordinateSystem.getUnit();
 
     if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {

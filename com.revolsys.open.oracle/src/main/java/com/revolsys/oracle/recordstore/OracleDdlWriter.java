@@ -81,7 +81,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("','");
       out.print(name.toLowerCase());
       out.print("',");
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       out.print(coordinateSystem.getCoordinateSystemId());
       out.print(",'");
       out.print(geometryType);
@@ -182,7 +182,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       final String name = geometryField.getName();
       final int axisCount = geometryFactory.getAxisCount();
       final DataType dataType = geometryField.getDataType();
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       final int srid = coordinateSystem.getCoordinateSystemId();
 
       out.print(

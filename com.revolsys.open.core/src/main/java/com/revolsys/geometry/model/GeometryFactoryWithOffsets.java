@@ -24,24 +24,7 @@ public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
     this.offsetZ = offsetZ;
   }
 
-  private GeometryFactoryWithOffsets(final CoordinateSystem coordinateSystem, final double offsetX,
-    final double offsetY, final double offsetZ, final double[] scales) {
-    super(coordinateSystem, 3, scales);
-    this.offsetX = offsetX;
-    this.offsetY = offsetY;
-    this.offsetZ = offsetZ;
-  }
-
-  protected GeometryFactoryWithOffsets(final CoordinateSystem coordinateSystem,
-    final int coordinateSystemId, final int axisCount, final double offsetX, final double scaleX,
-    final double offsetY, final double scaleY, final double offsetZ, final double scaleZ) {
-    super(coordinateSystem, coordinateSystemId, axisCount, scaleX, scaleY, scaleZ);
-    this.offsetX = offsetX;
-    this.offsetY = offsetY;
-    this.offsetZ = offsetZ;
-  }
-
-  public GeometryFactoryWithOffsets(final int coordinateSystemId, final double offsetX,
+  protected GeometryFactoryWithOffsets(final int coordinateSystemId, final double offsetX,
     final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
     final double scaleZ) {
     super(coordinateSystemId, 3, scaleX, scaleY, scaleZ);
@@ -50,26 +33,17 @@ public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
     this.offsetZ = offsetZ;
   }
 
-  public GeometryFactoryWithOffsets(final int coordinateSystemId, final int axisCount,
-    final double offset, final double scale) {
-    super(coordinateSystemId, axisCount, newScalesFixed(axisCount, scale));
-    this.offsetX = offset;
-    this.offsetY = offset;
-    this.offsetZ = offset;
-  }
-
   @Override
   public GeometryFactoryWithOffsets convertCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
       return this;
     } else {
-      final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
-      if (coordinateSystem == coordinateSystemThis) {
+      if (coordinateSystem == this.coordinateSystem) {
         return this;
       } else {
-        return new GeometryFactoryWithOffsets(coordinateSystem, this.offsetX, this.offsetY,
-          this.offsetZ, this.scales);
+        return new GeometryFactoryWithOffsets(coordinateSystem, this.offsetX, this.scaleX,
+          this.offsetY, this.scaleY, this.offsetZ, this.scaleZ);
       }
     }
   }

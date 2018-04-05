@@ -4,6 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.CoordinateSystemsTest;
 import com.revolsys.geometry.test.editor.GeometryEditorSuite;
 import com.revolsys.geometry.test.model.GeometrySuite;
 import com.revolsys.geometry.test.model.operation.OperationTests;
@@ -13,6 +15,7 @@ import com.revolsys.geometry.test.testrunner.TopologyTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+  CoordinateSystemsTest.class, //
   GeometrySuite.class, //
   GeometryEditorSuite.class, //
   OperationTests.class, //

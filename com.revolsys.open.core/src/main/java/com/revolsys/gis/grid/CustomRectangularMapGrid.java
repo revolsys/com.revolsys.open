@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -129,11 +128,6 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   @Override
-  public CoordinateSystem getCoordinateSystem() {
-    return this.geometryFactory.getCoordinateSystem();
-  }
-
-  @Override
   public String getFormattedMapTileName(final String name) {
     return name;
   }
@@ -161,7 +155,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   public String getName() {
     final StringBuilder string = new StringBuilder();
     if (this.geometryFactory != null) {
-      string.append(this.geometryFactory.getCoordinateSystem().getCoordinateSystemName());
+      string.append(this.geometryFactory.getHorizontalCoordinateSystem().getCoordinateSystemName());
       string.append(" ");
     }
     if (this.originX != 0 && this.originY != 0) {

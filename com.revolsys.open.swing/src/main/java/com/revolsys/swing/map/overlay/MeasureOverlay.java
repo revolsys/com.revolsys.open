@@ -563,7 +563,7 @@ public class MeasureOverlay extends AbstractOverlay {
       } else {
 
         Unit<Length> lengthUnit = Units.METRE;
-        final CoordinateSystem coordinateSystem = measureGeometry.getCoordinateSystem();
+        final CoordinateSystem coordinateSystem = measureGeometry.getHorizontalCoordinateSystem();
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           lengthUnit = coordinateSystem.getLengthUnit();
         }

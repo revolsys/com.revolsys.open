@@ -59,7 +59,6 @@ import com.revolsys.geometry.algorithm.ConvexHull;
 import com.revolsys.geometry.algorithm.InteriorPointArea;
 import com.revolsys.geometry.algorithm.InteriorPointLine;
 import com.revolsys.geometry.algorithm.PointLocator;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
@@ -1378,12 +1377,12 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
+  void forEachVertex(Consumer3Double action);
+
   void forEachVertex(CoordinatesOperation coordinatesOperation, double[] coordinates,
     Consumer<double[]> action);
 
   void forEachVertex(double[] coordinates, Consumer<double[]> action);
-
-  void forEachVertex(Consumer3Double action);
 
   default void forEachVertex(final GeometryFactory geometryFactory,
     final Consumer<double[]> action) {
@@ -1541,17 +1540,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     final String geometryType = getGeometryType();
     final int index = SORTED_GEOMETRY_TYPES.indexOf(geometryType);
     return index;
-  }
-
-  /**
-   *
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @return
-   */
-
-  @Override
-  default CoordinateSystem getCoordinateSystem() {
-    return getGeometryFactory().getCoordinateSystem();
   }
 
   @Override

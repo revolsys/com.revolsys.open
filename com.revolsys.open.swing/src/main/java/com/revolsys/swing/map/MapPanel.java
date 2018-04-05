@@ -124,7 +124,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
    */
   public static <GFP extends GeometryFactoryProxy> void promptCoordinateSystem(final String title,
     final GFP geometryFactoryProxy, final Consumer<GeometryFactory> action) {
-    if (geometryFactoryProxy.isHasCoordinateSystem()) {
+    if (geometryFactoryProxy.isHasHorizontalCoordinateSystem()) {
       final GeometryFactory geometryFactory = geometryFactoryProxy.getGeometryFactory();
       action.accept(geometryFactory);
     } else {
@@ -143,7 +143,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
         valueField.showDialog();
         if (valueField.isSaved()) {
           final GeometryFactory geometryFactory = coordinateSystemField.getGeometryFactory();
-          if (geometryFactory.isHasCoordinateSystem()) {
+          if (geometryFactory.isHasHorizontalCoordinateSystem()) {
             Invoke.background(title, () -> action.accept(geometryFactory));
           }
         }
@@ -1317,7 +1317,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public void zoomToWorld() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
     setBoundingBox(boundingBox);
   }

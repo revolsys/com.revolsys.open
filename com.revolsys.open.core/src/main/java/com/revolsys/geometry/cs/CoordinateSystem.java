@@ -45,12 +45,6 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
 
   CoordinatesOperation getCoordinatesOperation(CoordinateSystem coordinateSystem);
 
-  @SuppressWarnings("unchecked")
-  @Override
-  default <C extends CoordinateSystem> C getCoordinateSystem() {
-    return (C)this;
-  }
-
   String getCoordinateSystemType();
 
   @Override
@@ -66,6 +60,11 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
   GeometryFactory getGeometryFactoryFixed(int axisCount, double... scales);
 
   GeometryFactory getGeometryFactoryFloating(int axisCount);
+
+  @Override
+  default <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
+    return null;
+  }
 
   @Override
   default Integer getInteger(final int index) {

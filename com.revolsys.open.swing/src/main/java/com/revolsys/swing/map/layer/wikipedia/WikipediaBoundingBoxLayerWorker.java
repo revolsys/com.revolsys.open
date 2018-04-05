@@ -55,7 +55,7 @@ public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<La
   protected List<LayerRecord> handleBackground() {
     BoundingBox boundingBox = this.boundingBox;
     GeometryFactory geometryFactory = this.geometryFactory;
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
       geometryFactory = projCs.getGeographicCoordinateSystem().getGeometryFactory();

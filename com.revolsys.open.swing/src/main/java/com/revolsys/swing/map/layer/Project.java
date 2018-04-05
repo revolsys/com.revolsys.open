@@ -145,7 +145,7 @@ public class Project extends LayerGroup {
   public BoundingBox getBoundingBox() {
     final BoundingBox boundingBox = super.getBoundingBox();
     if (boundingBox.isEmpty()) {
-      final CoordinateSystem coordinateSystem = getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
       return coordinateSystem.getAreaBoundingBox();
     } else {
       return boundingBox;
@@ -659,7 +659,7 @@ public class Project extends LayerGroup {
     } else {
       // TODO really should be min scale
       double minDimension;
-      if (viewBoundingBox.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
+      if (viewBoundingBox.getHorizontalCoordinateSystem() instanceof GeographicCoordinateSystem) {
         minDimension = 0.000005;
       } else {
         minDimension = 0.5;
@@ -717,7 +717,7 @@ public class Project extends LayerGroup {
       BoundingBox defaultBoundingBox = null;
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (geometryFactory != null) {
-        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
         if (coordinateSystem != null) {
           defaultBoundingBox = coordinateSystem.getAreaBoundingBox();
         }

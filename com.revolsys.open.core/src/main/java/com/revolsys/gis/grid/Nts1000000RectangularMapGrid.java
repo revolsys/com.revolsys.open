@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
@@ -44,11 +43,6 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     final double lon = getLongitude(mapTileName);
     return getGeometryFactory().newBoundingBox(lon, lat, lon - this.tileWidth,
       lat + this.tileHeight);
-  }
-
-  @Override
-  public CoordinateSystem getCoordinateSystem() {
-    return this.geometryFactory.getCoordinateSystem();
   }
 
   @Override

@@ -413,7 +413,7 @@ public final class EpsgCoordinateSystemsLoader {
         final String wkt = new UrlResource(
           "http://spatialreference.org/ref/epsg/" + id + "/esriwkt/").contentsAsString();
         final ProjectedCoordinateSystem esri = GeometryFactory.floating2d(wkt)
-          .getCoordinateSystem();
+          .getHorizontalCoordinateSystem();
         final CoordinateOperationMethod coordinateOperationMethod = esri
           .getCoordinateOperationMethod();
         if (esri != null && !projectedCs.equals(esri) && coordinateOperationMethod != null

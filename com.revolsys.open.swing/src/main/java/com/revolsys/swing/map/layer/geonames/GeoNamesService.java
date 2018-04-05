@@ -87,7 +87,7 @@ public class GeoNamesService {
   public List<Record> getNames(final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = GeometryFactory.floating3d(4326);
     final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)geometryFactory
-      .getCoordinateSystem();
+      .getHorizontalCoordinateSystem();
     final BoundingBox geographicBoundingBox = boundingBox.convert(geometryFactory);
     final Map<String, Object> params = new HashMap<>();
 

@@ -23,7 +23,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import si.uom.NonSI;
 import tec.uom.se.unit.Units;
 
-public class GeographicCoordinateSystem extends AbstractCoordinateSystem {
+public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSystem {
   public static final double EARTH_RADIUS = 6378137;
 
   private static final long serialVersionUID = 8655274386401351222L;

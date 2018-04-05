@@ -187,7 +187,7 @@ public interface LinearRing extends LineString {
 
   default double getPolygonArea(final Unit<Area> unit) {
     double area = 0;
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
     if (coordinateSystem instanceof GeographicCoordinateSystem) {
       // TODO better algorithm than converting to world mercator
       final GeometryFactory geometryFactory = GeometryFactory.worldMercator();

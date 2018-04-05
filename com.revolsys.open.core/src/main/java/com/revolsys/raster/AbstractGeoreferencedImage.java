@@ -161,7 +161,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   @Override
   public AbstractGeoreferencedImage getImage(final CoordinateSystem coordinateSystem) {
     synchronized (this.projectedImages) {
-      if (coordinateSystem.equals(getCoordinateSystem())) {
+      if (coordinateSystem.equals(getHorizontalCoordinateSystem())) {
         return this;
       } else {
         AbstractGeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
@@ -193,7 +193,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   @Override
   public AbstractGeoreferencedImage getImage(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     return getImage(coordinateSystem);
   }
 

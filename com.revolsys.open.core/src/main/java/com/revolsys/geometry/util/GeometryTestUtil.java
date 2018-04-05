@@ -38,7 +38,7 @@ public class GeometryTestUtil {
   }
 
   private static Point getCentre(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
     final Point centre = areaBoundingBox.getCentre();
     return centre;

@@ -227,7 +227,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
 
   public void writeExtent(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       if (coordinateSystem != null) {
         final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
         this.out.startTag(EXTENT);
@@ -359,7 +359,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
 
   public void writeSpatialReference(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       if (coordinateSystem != null) {
         final String wkt = geometryFactory.toWktCs();
         this.out.startTag(SPATIAL_REFERENCE);

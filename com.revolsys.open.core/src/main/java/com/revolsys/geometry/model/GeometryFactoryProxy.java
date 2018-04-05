@@ -51,8 +51,8 @@ public interface GeometryFactoryProxy {
       } else if (coordinateSystemId == 0 || coordinateSystemIdThis == 0) {
         return null;
       } else {
-        final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
-        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        final CoordinateSystem coordinateSystemThis = getHorizontalCoordinateSystem();
+        final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
         if (coordinateSystem == coordinateSystemThis) {
           return null;
         } else if (coordinateSystem == null || coordinateSystemThis == null) {
@@ -97,6 +97,15 @@ public interface GeometryFactoryProxy {
     return GeometryFactory.DEFAULT_3D;
   }
 
+  default <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      return null;
+    } else {
+      return geometryFactory.getHorizontalCoordinateSystem();
+    }
+  }
+
   default GeometryFactory getNonZeroGeometryFactory(GeometryFactory geometryFactory) {
     final GeometryFactory geometryFactoryThis = getGeometryFactory();
     if (geometryFactory == null) {
@@ -113,8 +122,8 @@ public interface GeometryFactoryProxy {
     }
   }
 
-  default boolean isHasCoordinateSystem() {
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+  default boolean isHasHorizontalCoordinateSystem() {
+    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
     return coordinateSystem != null;
   }
 

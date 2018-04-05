@@ -54,7 +54,7 @@ public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<Lay
   protected List<LayerRecord> handleBackground() {
     BoundingBox boundingBox = this.boundingBox;
     GeometryFactory geometryFactory = this.geometryFactory;
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
       final GeographicCoordinateSystem geoCs = projCs.getGeographicCoordinateSystem();

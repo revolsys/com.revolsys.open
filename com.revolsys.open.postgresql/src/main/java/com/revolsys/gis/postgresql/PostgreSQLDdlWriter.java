@@ -81,7 +81,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
       out.print("','");
       out.print(name.toLowerCase());
       out.print("',");
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       out.print(coordinateSystem.getCoordinateSystemId());
       out.print(",'");
       out.print(geometryType);
@@ -209,7 +209,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
       out.print("', ");
       out.print(geometryFactory.getAxisCount());
       out.print(",");
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       out.print(coordinateSystem.getCoordinateSystemId());
       out.print(",'");
       out.print(geometryType);

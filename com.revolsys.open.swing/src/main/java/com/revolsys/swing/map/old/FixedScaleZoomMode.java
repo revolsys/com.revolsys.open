@@ -61,7 +61,7 @@ public class FixedScaleZoomMode implements ZoomMode {
     if (!Double.isNaN(viewAspectRatio) && !boundingBox.isEmpty()) {
 
       final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
       final GeometryFactory bboxGeometryFactory = boundingBox.getGeometryFactory();
       BoundingBox newBoundingBox = boundingBox;

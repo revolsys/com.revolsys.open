@@ -172,8 +172,7 @@ public abstract class AbstractCoordinateSystem implements CoordinateSystem {
             return matchFactory;
           }
         }
-        final GeometryFactory geometryFactory = new GeometryFactoryFixed(this, this.id, axisCount,
-          scales);
+        final GeometryFactory geometryFactory = new GeometryFactoryFixed(this, axisCount, scales);
         geometryFactories.add(geometryFactory);
         return geometryFactory;
       }
@@ -198,7 +197,7 @@ public abstract class AbstractCoordinateSystem implements CoordinateSystem {
         synchronized (SYNC) {
           geometryFactory = this.geometryFactoryByAxisCount[index];
           if (geometryFactory == null) {
-            geometryFactory = new GeometryFactoryFloating(this, this.id, axisCount);
+            geometryFactory = new GeometryFactoryFloating(this, axisCount);
             this.geometryFactoryByAxisCount[index] = geometryFactory;
           }
         }

@@ -192,15 +192,15 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     GeometryFactory geometryFactory;
     if (boundingBox == null) {
       geometryFactory = GeometryFactory.worldMercator();
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       boundingBox = coordinateSystem.getAreaBoundingBox();
     } else {
       geometryFactory = boundingBox.getGeometryFactory();
-      if (!geometryFactory.isHasCoordinateSystem()) {
+      if (!geometryFactory.isHasHorizontalCoordinateSystem()) {
         geometryFactory = GeometryFactory.worldMercator();
       }
       if (boundingBox.isEmpty()) {
-        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
         if (coordinateSystem != null) {
           boundingBox = coordinateSystem.getAreaBoundingBox();
         }
@@ -879,7 +879,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       convertedValue = QuantityType.doubleValue(value, CustomUnits.PIXEL);
     } else {
       convertedValue = QuantityType.doubleValue(value, Units.METRE);
-      final CoordinateSystem coordinateSystem = this.geometryFactory2d.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = this.geometryFactory2d.getHorizontalCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
         final double radius = geoCs.getDatum().getEllipsoid().getSemiMajorAxis();
@@ -968,7 +968,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       convertedValue *= modelUnitsPerViewUnit;
     } else {
       convertedValue = QuantityType.doubleValue(value, Units.METRE);
-      final CoordinateSystem coordinateSystem = this.geometryFactory2d.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = this.geometryFactory2d.getHorizontalCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
         final double radius = geoCs.getDatum().getEllipsoid().getSemiMajorAxis();

@@ -23,15 +23,9 @@ public class GeometryFactoryFixed extends GeometryFactory {
 
   protected double scaleZ = 0;
 
-  protected GeometryFactoryFixed(final CoordinateSystem coordinateSystem, final int axisCount,
+  public GeometryFactoryFixed(final CoordinateSystem coordinateSystem, final int axisCount,
     final double... scales) {
     super(coordinateSystem, axisCount);
-    initScales(scales);
-  }
-
-  public GeometryFactoryFixed(final CoordinateSystem coordinateSystem, final int coordinateSystemId,
-    final int axisCount, final double... scales) {
-    super(coordinateSystem, coordinateSystemId, axisCount);
     initScales(scales);
   }
 

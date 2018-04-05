@@ -127,7 +127,7 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
       if (geometryFactory == null) {
         toolTip = "Map Resolution (m/pixel)";
       } else {
-        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
         this.projected = !geometryFactory.isGeographics();
         if (this.projected) {
           this.format = new DecimalFormat("#,###.###", FORMAT_SYMBOLS);

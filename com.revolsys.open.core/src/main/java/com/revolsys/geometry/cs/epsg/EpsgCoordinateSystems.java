@@ -28,6 +28,7 @@ import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.EngineeringCoordinateSystem;
 import com.revolsys.geometry.cs.GeocentricCoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.HorizontalCoordinateSystem;
 import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.ParameterNames;
 import com.revolsys.geometry.cs.ParameterValue;
@@ -145,8 +146,28 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  public synchronized static CoordinateSystem getCoordinateSystem(
-    final CoordinateSystem coordinateSystem) {
+  public static CompoundCoordinateSystem getCompound(final int horizontalCoordinateSystemId,
+    final int verticalCoordinateSystemId) {
+    final HorizontalCoordinateSystem horizontalCoordinateSystem = getCoordinateSystem(
+      horizontalCoordinateSystemId);
+    final VerticalCoordinateSystem verticalCoordinateSystem = getCoordinateSystem(
+      verticalCoordinateSystemId);
+    if (horizontalCoordinateSystem == null) {
+      throw new IllegalArgumentException(
+        "horizontalCoordinateSystemId=" + horizontalCoordinateSystemId + " doesn't exist");
+    }
+    if (verticalCoordinateSystem == null) {
+      throw new IllegalArgumentException(
+        "verticalCoordinateSystemId=" + verticalCoordinateSystemId + " doesn't exist");
+    }
+    final CompoundCoordinateSystem compoundCoordinateSystem = new CompoundCoordinateSystem(
+      horizontalCoordinateSystem, verticalCoordinateSystem);
+    return getCoordinateSystem(compoundCoordinateSystem);
+  }
+
+  @SuppressWarnings("unchecked")
+  public synchronized static <C extends CoordinateSystem> C getCoordinateSystem(
+    final C coordinateSystem) {
     initialize();
     if (coordinateSystem == null) {
       return null;
@@ -198,11 +219,11 @@ public final class EpsgCoordinateSystems implements CodeTable {
                 geodeticDatum, primeMeridian, axis, area, sourceCoordinateSystem,
                 coordinateOperation, deprecated);
               addCoordinateSystem(newCs);
-              return newCs;
+              return (C)newCs;
             } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
               final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSystem;
               GeographicCoordinateSystem geographicCs = projectedCs.getGeographicCoordinateSystem();
-              geographicCs = (GeographicCoordinateSystem)getCoordinateSystem(geographicCs);
+              geographicCs = getCoordinateSystem(geographicCs);
               final CoordinateOperationMethod coordinateOperationMethod = projectedCs
                 .getCoordinateOperationMethod();
               final Map<ParameterName, ParameterValue> parameters = projectedCs
@@ -212,13 +233,13 @@ public final class EpsgCoordinateSystems implements CodeTable {
                 geographicCs, area, coordinateOperationMethod, parameters, linearUnit, axis,
                 authority, deprecated);
               addCoordinateSystem(newCs);
-              return newCs;
+              return (C)newCs;
             }
             return coordinateSystem;
           }
         }
       }
-      return matchedCoordinateSystem;
+      return (C)matchedCoordinateSystem;
     }
   }
 
@@ -465,8 +486,8 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
         final CoordinateOperation operation = readCode(reader, OPERATION_BY_ID);
 
-        final CoordinateSystem horizontalCoordinateSystem = readCode(reader,
-          COORDINATE_SYSTEM_BY_ID);
+        final HorizontalCoordinateSystem horizontalCoordinateSystem = (HorizontalCoordinateSystem)readCode(
+          reader, COORDINATE_SYSTEM_BY_ID);
         final VerticalCoordinateSystem verticalCoordinateSystem = (VerticalCoordinateSystem)readCode(
           reader, COORDINATE_SYSTEM_BY_ID);
         final boolean deprecated = readBoolean(reader);

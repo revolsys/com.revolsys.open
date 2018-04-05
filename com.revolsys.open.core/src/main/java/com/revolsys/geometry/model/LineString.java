@@ -961,7 +961,7 @@ public interface LineString extends Lineal {
   @Override
   default double getLength(final Unit<Length> unit) {
     double length = 0;
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
     if (coordinateSystem instanceof GeographicCoordinateSystem) {
       final int vertexCount = getVertexCount();
       if (vertexCount > 1) {

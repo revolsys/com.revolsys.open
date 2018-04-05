@@ -14,9 +14,11 @@ import java.util.zip.ZipInputStream;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
+import com.revolsys.geometry.cs.CompoundCoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.HorizontalCoordinateSystem;
 import com.revolsys.geometry.cs.ParameterName;
 import com.revolsys.geometry.cs.ParameterNames;
 import com.revolsys.geometry.cs.ParameterValue;
@@ -119,7 +121,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
             final String wkt = FileUtil.getString(new InputStreamReader(in, StandardCharsets.UTF_8),
               false);
             final GeometryFactory geometryFactory = GeometryFactory.floating3d(wkt);
-            if (geometryFactory.isHasCoordinateSystem()) {
+            if (geometryFactory.isHasHorizontalCoordinateSystem()) {
               this.geometryFactory = geometryFactory;
             }
           } else if (name.equals(fileName)) {
@@ -164,6 +166,29 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     }
   }
 
+  private int getGeographicCoordinateSystemId(final Integer horizontalDatum) {
+    int geographicCoordinateSystemId;
+    switch (horizontalDatum) {
+      case 1: // NAD 27
+        geographicCoordinateSystemId = 4267;
+      break;
+      case 2: // WGS 72
+        geographicCoordinateSystemId = 4322;
+      break;
+      case 3: // WGS 84
+        geographicCoordinateSystemId = 4326;
+      break;
+      case 4: // NAD 83
+        geographicCoordinateSystemId = 4269;
+      break;
+
+      default:
+        throw new IllegalArgumentException("horizontalDatum=" + horizontalDatum
+          + " not currently supported for USGS DEM: " + this.resource);
+    }
+    return geographicCoordinateSystemId;
+  }
+
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
@@ -205,6 +230,26 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     }
     final String s = new String(this.bytes, offset, size - offset, StandardCharsets.US_ASCII);
     return s;
+  }
+
+  private int getVerticalCoordinateSystemId(final Integer verticalDatum) {
+    int verticalCoordinateSystemId;
+    switch (verticalDatum) {
+      case 1: // Mean Sea Level
+        verticalCoordinateSystemId = 5714;
+      break;
+      case 2: // NGVD_1929
+        verticalCoordinateSystemId = 5702;
+      break;
+      case 3: // NAVD_1988
+        verticalCoordinateSystemId = 5703;
+      break;
+
+      default:
+        throw new IllegalArgumentException("verticalDatum=" + verticalDatum
+          + " not currently supported for USGS DEM: " + this.resource);
+    }
+    return verticalCoordinateSystemId;
   }
 
   private void init() {
@@ -389,67 +434,28 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         } else if (planimetricUom == 2) {
           linearUnit = EpsgCoordinateSystems.getLinearUnit("metre");
         }
-        VerticalCoordinateSystem verticalCoordinateSystem;
-        switch (horizontalDatum) {
-          case 1: // Mean Sea Level
-            verticalCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(5714);
-          break;
-          case 2: // NGVD_1929
-            verticalCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(5702);
-          break;
-          case 3: // NAVD_1988
-            verticalCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(5703);
-          break;
+        final int verticalCoordinateSystemId = getVerticalCoordinateSystemId(verticalDatum);
+        final int geographicCoordinateSystemId = getGeographicCoordinateSystemId(horizontalDatum);
 
-          default:
-            throw new IllegalArgumentException("verticalDatum=" + horizontalDatum
-              + " not currently supported for USGS DEM: " + this.resource);
-        }
-        GeographicCoordinateSystem geographicCoordinateSystem;
-        switch (horizontalDatum) {
-          case 0:
-            geographicCoordinateSystem = null;
-          break;
-          case 1:
-            geographicCoordinateSystem = (GeographicCoordinateSystem)EpsgCoordinateSystems
-              .getCoordinateSystem("NAD27");
-          break;
-          case 2:
-            geographicCoordinateSystem = (GeographicCoordinateSystem)EpsgCoordinateSystems
-              .getCoordinateSystem("WGS 72");
-          break;
-          case 3:
-            geographicCoordinateSystem = (GeographicCoordinateSystem)EpsgCoordinateSystems
-              .getCoordinateSystem("WGS 84");
-          break;
-          case 4:
-            geographicCoordinateSystem = (GeographicCoordinateSystem)EpsgCoordinateSystems
-              .getCoordinateSystem("NAD83");
-          break;
-
-          default:
-            throw new IllegalArgumentException("horizontalDatum=" + horizontalDatum
-              + " not currently supported for USGS DEM: " + this.resource);
-        }
         final double scaleZ = 1.0 / this.resolutionZ;
-        int coordinateSystemId = 0;
-        CoordinateSystem coordinateSystem = null;
+        int horizontalCoordinateSystemId = 0;
+        HorizontalCoordinateSystem horizontalCoordinateSystem = null;
         if (0 == planimetricReferenceSystem) {
-          coordinateSystemId = geographicCoordinateSystem.getCoordinateSystemId();
+          horizontalCoordinateSystemId = geographicCoordinateSystemId;
         } else if (1 == planimetricReferenceSystem) {
           // UTM Zones
           switch (horizontalDatum) {
             case 1: // NAD27
-              coordinateSystemId = 26700 + zone;
+              horizontalCoordinateSystemId = 26700 + zone;
             break;
             case 2: // WGS 72
-              coordinateSystemId = 32200 + zone;
+              horizontalCoordinateSystemId = 32200 + zone;
             break;
             case 3: // WGS 84
-              coordinateSystemId = 32600 + zone;
+              horizontalCoordinateSystemId = 32600 + zone;
             break;
             case 4: // NAD 83
-              coordinateSystemId = 26900 + zone;
+              horizontalCoordinateSystemId = 26900 + zone;
             break;
 
             default:
@@ -474,26 +480,40 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
 
           final CoordinateOperationMethod coordinateOperationMethod = new CoordinateOperationMethod(
             "Albers_Equal_Area");
+          final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
+            .getCoordinateSystem(geographicCoordinateSystemId);
           final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
             -1, "", geographicCoordinateSystem, coordinateOperationMethod, parameters, linearUnit);
-          final ProjectedCoordinateSystem projectedCoordinateSystem2 = (ProjectedCoordinateSystem)EpsgCoordinateSystems
+          final ProjectedCoordinateSystem projectedCoordinateSystem2 = EpsgCoordinateSystems
             .getCoordinateSystem(projectedCoordinateSystem);
           if (projectedCoordinateSystem2 == projectedCoordinateSystem
             || projectedCoordinateSystem2 == null) {
-            coordinateSystem = projectedCoordinateSystem2;
+            horizontalCoordinateSystem = projectedCoordinateSystem;
           } else {
-            coordinateSystemId = projectedCoordinateSystem2.getCoordinateSystemId();
+            horizontalCoordinateSystemId = projectedCoordinateSystem2.getCoordinateSystemId();
           }
         } else {
           throw new IllegalArgumentException(
             "planimetricReferenceSystem=" + planimetricReferenceSystem
               + " not currently supported for USGS DEM: " + this.resource);
         }
-        if (coordinateSystemId > 0) {
-          this.geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, 0, 0, scaleZ);
-        } else if (coordinateSystem == null) {
+        if (horizontalCoordinateSystemId > 0) {
+          horizontalCoordinateSystem = EpsgCoordinateSystems
+            .getCoordinateSystem(horizontalCoordinateSystemId);
+        }
+        if (horizontalCoordinateSystem == null) {
           throw new IllegalArgumentException("No coordinate system found: " + this.resource);
         } else {
+          CoordinateSystem coordinateSystem;
+          if (horizontalCoordinateSystemId > 0) {
+            coordinateSystem = EpsgCoordinateSystems.getCompound(horizontalCoordinateSystemId,
+              verticalCoordinateSystemId);
+          } else {
+            final VerticalCoordinateSystem verticalCoordinateSystem = EpsgCoordinateSystems
+              .getCoordinateSystem(verticalCoordinateSystemId);
+            coordinateSystem = new CompoundCoordinateSystem(horizontalCoordinateSystem,
+              verticalCoordinateSystem);
+          }
           this.geometryFactory = coordinateSystem.getGeometryFactoryFixed(3, 0.0, 0.0, scaleZ);
         }
         if (horizontalDatum == 3 || horizontalDatum == 4) {

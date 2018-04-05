@@ -143,7 +143,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
         final double offsetY = reader.getDouble();
         final double offsetZ = reader.getDouble();
 
-        final CoordinateSystem coordinateSystem = this.geometryFactory.getCoordinateSystem();
+        final CoordinateSystem coordinateSystem = this.geometryFactory.getHorizontalCoordinateSystem();
         this.geometryFactory = GeometryFactory.newWithOffsets(coordinateSystem, offsetX, scaleX,
           offsetY, scaleY, offsetZ, scaleZ);
 
@@ -349,7 +349,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       double scaleX = geometryFactory.getScaleX();
       if (scaleX == 0) {
         scaleX = 1000;
@@ -420,7 +420,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
         addToMap(map, "coordinateSystemId", coordinateSystemId);
       }
 
-      final CoordinateSystem coordinateSystem = this.geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = this.geometryFactory.getHorizontalCoordinateSystem();
       if (coordinateSystem != null) {
         addToMap(map, "coordinateSystemName", coordinateSystem.getCoordinateSystemName());
         addToMap(map, "coordinateSystem", coordinateSystem.toEsriWktCs());

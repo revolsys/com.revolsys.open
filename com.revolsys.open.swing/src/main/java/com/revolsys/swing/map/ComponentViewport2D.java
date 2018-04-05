@@ -138,7 +138,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   }
 
   public double getMaxScale() {
-    final BoundingBox areaBoundingBox = getGeometryFactory().getCoordinateSystem()
+    final BoundingBox areaBoundingBox = getGeometryFactory().getHorizontalCoordinateSystem()
       .getAreaBoundingBox();
     final Quantity<Length> areaWidth = areaBoundingBox.getWidthLength();
     final Quantity<Length> areaHeight = areaBoundingBox.getHeightLength();
@@ -196,7 +196,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   }
 
   public Unit<Length> getScaleUnit(final double scale) {
-    final Unit<Length> lengthUnit = getGeometryFactory().getCoordinateSystem().getLengthUnit();
+    final Unit<Length> lengthUnit = getGeometryFactory().getHorizontalCoordinateSystem().getLengthUnit();
     final Unit<Length> scaleUnit = lengthUnit.divide(scale);
     return scaleUnit;
   }
@@ -267,7 +267,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
   @Override
   protected void setGeometryFactoryPreEvent(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     if (coordinateSystem != null) {
       final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
       final double minX = areaBoundingBox.getMinX();

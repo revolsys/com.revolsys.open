@@ -11,7 +11,7 @@ public class AlbersConicEqualAreaTest {
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating2d(3005);
 
   private static final AlbersConicEqualArea PROJECTION = ((ProjectedCoordinateSystem)GEOMETRY_FACTORY
-    .getCoordinateSystem()).getCoordinatesProjection();
+    .getHorizontalCoordinateSystem()).getCoordinatesProjection();
 
   private void assertProjection(final double x, final double y, final double lon,
     final double lat) {

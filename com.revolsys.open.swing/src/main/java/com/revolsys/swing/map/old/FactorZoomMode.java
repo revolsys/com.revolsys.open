@@ -25,7 +25,7 @@ public class FactorZoomMode implements ZoomMode {
   public BoundingBox getBoundingBox(final ComponentViewport2D viewport,
     final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     final GeometryFactory bboxGeometryFactory = boundingBox.getGeometryFactory();
     BoundingBox newBoundingBox = boundingBox;
     if (bboxGeometryFactory == null) {

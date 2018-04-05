@@ -214,7 +214,7 @@ public interface BoundingBox
    */
   default BoundingBox clipToCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     if (coordinateSystem == null || coordinateSystem instanceof GeographicCoordinateSystem) {
       return this;
     } else {
@@ -254,7 +254,7 @@ public interface BoundingBox
     } else if (factory == geometryFactory) {
       return this;
     } else {
-      if (factory == null || factory.getCoordinateSystem() == null) {
+      if (factory == null || factory.getHorizontalCoordinateSystem() == null) {
         final int axisCount = Math.min(geometryFactory.getAxisCount(), getAxisCount());
         final double[] minMaxValues = getMinMaxValues(axisCount);
         return geometryFactory.newBoundingBox(axisCount, minMaxValues);
@@ -776,12 +776,12 @@ public interface BoundingBox
    * @return The geometry factory.
    */
   @Override
-  default CoordinateSystem getCoordinateSystem() {
+  default CoordinateSystem getHorizontalCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
       return null;
     } else {
-      return geometryFactory.getCoordinateSystem();
+      return geometryFactory.getHorizontalCoordinateSystem();
     }
   }
 
@@ -836,7 +836,7 @@ public interface BoundingBox
 
   default Quantity<Length> getHeightLength() {
     final double height = getHeight();
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
     if (coordinateSystem == null) {
       return Quantities.getQuantity(height, Units.METRE);
     } else {
@@ -993,7 +993,7 @@ public interface BoundingBox
 
   @SuppressWarnings("unchecked")
   default <Q extends Quantity<Q>> Unit<Q> getUnit() {
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
     if (coordinateSystem == null) {
       return (Unit<Q>)Units.METRE;
     } else {
@@ -1019,7 +1019,7 @@ public interface BoundingBox
 
   default Quantity<Length> getWidthLength() {
     final double width = getWidth();
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
     if (coordinateSystem == null) {
       return Quantities.getQuantity(width, Units.METRE);
     } else {
@@ -1060,7 +1060,7 @@ public interface BoundingBox
     if (isEmpty() || other.isEmpty()) {
       return false;
     } else {
-      final CoordinateSystem coordinateSystem = getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
       final BoundingBox convertedBoundingBox = other.toCoordinateSystem(coordinateSystem, 2);
       return intersectsFast(convertedBoundingBox);
     }
@@ -1282,7 +1282,7 @@ public interface BoundingBox
 
   default BoundingBox toCoordinateSystem(final CoordinateSystem coordinateSystem,
     final int minAxisCount) {
-    final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
+    final CoordinateSystem coordinateSystemThis = getHorizontalCoordinateSystem();
     if (coordinateSystem == null || coordinateSystemThis == null) {
       return this;
     } else {
@@ -1303,7 +1303,7 @@ public interface BoundingBox
     if (geometryFactory == null) {
       return this;
     } else {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       return toCoordinateSystem(coordinateSystem, minAxisCount);
     }
   }
@@ -1380,7 +1380,7 @@ public interface BoundingBox
       }
       try {
         double minStep = 0.00001;
-        final CoordinateSystem coordinateSystem = factory.getCoordinateSystem();
+        final CoordinateSystem coordinateSystem = factory.getHorizontalCoordinateSystem();
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           minStep = 1;
         } else {

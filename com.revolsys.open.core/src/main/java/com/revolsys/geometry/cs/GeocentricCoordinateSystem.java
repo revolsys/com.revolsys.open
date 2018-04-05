@@ -11,7 +11,7 @@ import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
-public class GeocentricCoordinateSystem extends AbstractCoordinateSystem {
+public class GeocentricCoordinateSystem extends AbstractHorizontalCoordinateSystem {
   private static final long serialVersionUID = 8655274386401351222L;
 
   private final LinearUnit linearUnit;

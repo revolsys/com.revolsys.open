@@ -732,7 +732,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       panel.add(extentPanel);
 
       final JPanel coordinateSystemPanel = Panels.titledTransparent("Coordinate System");
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       if (coordinateSystem == null) {
         coordinateSystemPanel.add(new JLabel("Unknown"));
       } else {
@@ -945,13 +945,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     } else {
       this.geometryFactory = geometryFactory;
       if (Property.isEmpty(this.boundingBox)) {
-        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
         if (coordinateSystem != null) {
           this.boundingBox = coordinateSystem.getAreaBoundingBox();
         }
       } else if (this.boundingBox != null
-        && !this.boundingBox.getGeometryFactory().isHasCoordinateSystem()
-        && geometryFactory.isHasCoordinateSystem()) {
+        && !this.boundingBox.getGeometryFactory().isHasHorizontalCoordinateSystem()
+        && geometryFactory.isHasHorizontalCoordinateSystem()) {
         this.boundingBox = this.boundingBox.convert(geometryFactory);
       }
       return geometryFactory;

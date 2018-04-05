@@ -12,12 +12,7 @@ public class GeometryFactoryFloating extends GeometryFactory {
     super(coordinateSystem, axisCount);
   }
 
-  public GeometryFactoryFloating(final CoordinateSystem coordinateSystem,
-    final int coordinateSystemId, final int axisCount) {
-    super(coordinateSystem, coordinateSystemId, axisCount);
-  }
-
-  public GeometryFactoryFloating(final int coordinateSystemId, final int axisCount) {
+  protected GeometryFactoryFloating(final int coordinateSystemId, final int axisCount) {
     super(coordinateSystemId, axisCount);
   }
 
@@ -26,8 +21,7 @@ public class GeometryFactoryFloating extends GeometryFactory {
     if (coordinateSystem == null) {
       return this;
     } else {
-      final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
-      if (coordinateSystem == coordinateSystemThis) {
+      if (coordinateSystem == this.coordinateSystem) {
         return this;
       } else {
         return coordinateSystem.getGeometryFactoryFloating(this.axisCount);

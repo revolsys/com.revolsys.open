@@ -11,7 +11,7 @@ public class SpatialReference {
 
   public static SpatialReference get(final GeometryFactory geometryFactory, final String wkt) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       if (coordinateSystem instanceof com.revolsys.geometry.cs.GeographicCoordinateSystem) {
         return new EsriGdbGeographicCoordinateSystem(geometryFactory, wkt);
       } else if (coordinateSystem instanceof com.revolsys.geometry.cs.ProjectedCoordinateSystem) {
@@ -61,7 +61,7 @@ public class SpatialReference {
   protected SpatialReference(final GeometryFactory geometryFactory, final String wkt) {
     this.geometryFactory = geometryFactory;
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       if (coordinateSystem != null) {
         final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
         this.wkt = wkt;

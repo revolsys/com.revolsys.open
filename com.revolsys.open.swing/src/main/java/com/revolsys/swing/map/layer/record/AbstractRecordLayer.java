@@ -46,7 +46,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -942,16 +941,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     } else {
       final Class<?> typeClass = field.getTypeClass();
       return CompareUtil.getComparator(typeClass);
-    }
-  }
-
-  @Override
-  public CoordinateSystem getCoordinateSystem() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (geometryFactory == null) {
-      return null;
-    } else {
-      return geometryFactory.getCoordinateSystem();
     }
   }
 
@@ -3225,7 +3214,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void updateSpatialIndex(final LayerRecord record, final Geometry oldGeometry) {
     if (oldGeometry != null) {
       final BoundingBox oldBoundingBox = oldGeometry.getBoundingBox();
-      if (removeFromIndex(oldBoundingBox, record) || !oldBoundingBox.isHasCoordinateSystem()) {
+      if (removeFromIndex(oldBoundingBox, record)
+        || !oldBoundingBox.isHasHorizontalCoordinateSystem()) {
         addToIndex(record);
       }
     }

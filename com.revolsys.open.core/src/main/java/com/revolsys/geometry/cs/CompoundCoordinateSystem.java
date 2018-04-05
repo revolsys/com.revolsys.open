@@ -23,12 +23,20 @@ public class CompoundCoordinateSystem extends AbstractCoordinateSystem {
     return axis;
   }
 
-  private final CoordinateSystem horizontalCoordinateSystem;
+  private final HorizontalCoordinateSystem horizontalCoordinateSystem;
 
   private final VerticalCoordinateSystem verticalCoordinateSystem;
 
+  public CompoundCoordinateSystem(final HorizontalCoordinateSystem horizontalCoordinateSystem,
+    final VerticalCoordinateSystem verticalCoordinateSystem) {
+    this(0,
+      horizontalCoordinateSystem.getCoordinateSystemName() + " + "
+        + verticalCoordinateSystem.getCoordinateSystemName(),
+      horizontalCoordinateSystem, verticalCoordinateSystem, null, false);
+  }
+
   public CompoundCoordinateSystem(final int id, final String name,
-    final CoordinateSystem horizontalCoordinateSystem,
+    final HorizontalCoordinateSystem horizontalCoordinateSystem,
     final VerticalCoordinateSystem verticalCoordinateSystem, final Area area,
     final boolean deprecated) {
     super(id, name, getAxis(horizontalCoordinateSystem, verticalCoordinateSystem), area,
@@ -99,8 +107,10 @@ public class CompoundCoordinateSystem extends AbstractCoordinateSystem {
     return "Compound";
   }
 
-  public CoordinateSystem getHorizontalCoordinateSystem() {
-    return this.horizontalCoordinateSystem;
+  @SuppressWarnings("unchecked")
+  @Override
+  public <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
+    return (C)this.horizontalCoordinateSystem;
   }
 
   @Override

@@ -92,7 +92,7 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
   String getMapTileName(final double x, final double y);
 
   default String getMapTileName(final Geometry geometry) {
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
     final Geometry projectedGeometry = geometry
       .convertGeometry(coordinateSystem.getGeometryFactory());
     final Point centroid = projectedGeometry.getCentroid();

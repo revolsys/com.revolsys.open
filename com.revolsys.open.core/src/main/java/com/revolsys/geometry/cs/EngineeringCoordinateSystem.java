@@ -13,7 +13,7 @@ import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
-public class EngineeringCoordinateSystem extends AbstractCoordinateSystem {
+public class EngineeringCoordinateSystem extends AbstractHorizontalCoordinateSystem {
   private static final long serialVersionUID = 8655274386401351222L;
 
   private final UnitOfMeasure unit;
@@ -109,6 +109,7 @@ public class EngineeringCoordinateSystem extends AbstractCoordinateSystem {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <Q extends Quantity<Q>> Unit<Q> getUnit() {
     if (this.unit instanceof LinearUnit) {

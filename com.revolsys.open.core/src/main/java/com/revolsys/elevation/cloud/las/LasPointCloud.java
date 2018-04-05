@@ -122,7 +122,7 @@ public class LasPointCloud extends BaseObjectWithProperties
     } else {
       this.reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       this.exists = true;
-      if (this.geometryFactory == null || !this.geometryFactory.isHasCoordinateSystem()) {
+      if (this.geometryFactory == null || !this.geometryFactory.isHasHorizontalCoordinateSystem()) {
         final GeometryFactory geometryFactoryFromPrj = GeometryFactory.floating3d(resource);
         if (geometryFactoryFromPrj != null) {
           this.geometryFactory = geometryFactoryFromPrj;

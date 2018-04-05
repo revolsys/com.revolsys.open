@@ -39,7 +39,7 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
   }
 
   public GeoreferencedImage getImage(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
 
     return getImage(coordinateSystem);
   }
@@ -54,7 +54,7 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
         GeoreferencedImage image = getData();
         if (image == null) {
           image = loadData();
-          this.projectedImages.put(geometryFactory.getCoordinateSystem(), image);
+          this.projectedImages.put(geometryFactory.getHorizontalCoordinateSystem(), image);
         }
         if (image != null) {
           projectedImage = image.getImage(coordinateSystem, getResolution());
@@ -67,7 +67,7 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
 
   @Override
   public GeoreferencedImage loadData(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     return loadData(coordinateSystem);
   }
 

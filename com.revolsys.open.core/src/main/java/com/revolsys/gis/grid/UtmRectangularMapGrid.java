@@ -34,11 +34,6 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   @Override
-  public CoordinateSystem getCoordinateSystem() {
-    return COORDINATE_SYSTEM;
-  }
-
-  @Override
   public String getFormattedMapTileName(final String name) {
     return name.toUpperCase();
   }
@@ -46,6 +41,11 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   @Override
   public GeometryFactory getGeometryFactory() {
     return GEOMETRY_FACTORY;
+  }
+
+  @Override
+  public <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
+    return (C)COORDINATE_SYSTEM;
   }
 
   public int getHorizontalZone(final double lat, final double lon) {

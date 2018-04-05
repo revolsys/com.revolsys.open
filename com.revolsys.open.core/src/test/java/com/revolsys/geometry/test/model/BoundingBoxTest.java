@@ -97,7 +97,7 @@ public class BoundingBoxTest implements TestConstants {
     final StringBuilder wkt = new StringBuilder();
     final int srid = boundingBox.getCoordinateSystemId();
     if (geometryFactory == GeometryFactory.DEFAULT_3D) {
-      Assert.assertEquals("coordinateSystem", null, boundingBox.getCoordinateSystem());
+      Assert.assertEquals("coordinateSystem", null, boundingBox.getHorizontalCoordinateSystem());
       Assert.assertEquals("srid", 0, srid);
     } else {
       if (srid > 0) {
@@ -106,8 +106,8 @@ public class BoundingBoxTest implements TestConstants {
         wkt.append(";");
       }
       Assert.assertEquals("srid", geometryFactory.getCoordinateSystemId(), srid);
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      Assert.assertEquals("coordinateSystem", coordinateSystem, boundingBox.getCoordinateSystem());
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
+      Assert.assertEquals("coordinateSystem", coordinateSystem, boundingBox.getHorizontalCoordinateSystem());
       if (coordinateSystem != null) {
         unit = coordinateSystem.getUnit();
         lengthUnit = coordinateSystem.getLengthUnit();
