@@ -12,7 +12,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   implements GriddedElevationModel {
   protected double[] bounds = RectangleUtil.newBounds(3);
 
-  private int gridHeight;
+  protected int gridHeight;
 
   protected int gridWidth;
 
@@ -20,7 +20,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
 
   private double colourGreyMultiple;
 
-  private double gridCellSize;
+  protected double gridCellSize;
 
   private Resource resource;
 
@@ -48,16 +48,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     final double maxX = boundingBox.getMaxX();
     final double maxY = boundingBox.getMaxY();
     final double maxZ = boundingBox.getMaxZ();
-    this.bounds = new double[] {
-      minX, minY, minZ, maxX, maxY, maxZ
-    };
-    if (Double.isFinite(minZ)) {
-      this.colourGreyMultiple = 1.0 / (maxZ - minZ);
-      this.minColourMultiple = minZ * this.colourGreyMultiple;
-      this.zBoundsUpdateRequired = false;
-    }
-    this.boundingBox = new BoundingBoxDoubleGf(geometryFactory, 3, this.bounds);
-
+    setBounds(minX, minY, minZ, maxX, maxY, maxZ);
   }
 
   public AbstractGriddedElevationModel(final GeometryFactory geometryFactory, final double minX,
@@ -73,14 +64,22 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     this.boundingBox = new BoundingBoxDoubleGf(geometryFactory, 3, this.bounds);
   }
 
+  protected AbstractGriddedElevationModel(final GeometryFactory geometryFactory,
+    final int gridWidth, final double gridCellSize) {
+    this.gridWidth = gridWidth;
+    this.gridHeight = 0;
+    this.gridCellSize = gridCellSize;
+    setGeometryFactory(geometryFactory);
+  }
+
   @Override
   public void clear() {
     clearCachedObjects();
-  };
+  }
 
   protected void clearCachedObjects() {
     this.zBoundsUpdateRequired = true;
-  }
+  };
 
   protected void expandZ() {
     this.bounds[2] = Double.NaN;
@@ -215,6 +214,19 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.bounds = boundingBox.getMinMaxValues(3);
+  }
+
+  protected void setBounds(final double minX, final double minY, final double minZ,
+    final double maxX, final double maxY, final double maxZ) {
+    this.bounds = new double[] {
+      minX, minY, minZ, maxX, maxY, maxZ
+    };
+    if (Double.isFinite(minZ)) {
+      this.colourGreyMultiple = 1.0 / (maxZ - minZ);
+      this.minColourMultiple = minZ * this.colourGreyMultiple;
+      this.zBoundsUpdateRequired = false;
+    }
+    this.boundingBox = new BoundingBoxDoubleGf(this.geometryFactory, 3, this.bounds);
   }
 
   @Override

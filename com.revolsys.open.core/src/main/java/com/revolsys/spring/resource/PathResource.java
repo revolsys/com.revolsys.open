@@ -104,20 +104,20 @@ public class PathResource extends AbstractResource implements WritableResource {
   }
 
   @Override
-  public void copyFrom(final Resource target) {
-    if (target != null) {
+  public void copyFrom(final Resource source) {
+    if (source != null) {
       try (
-        ReadableByteChannel in = target.newReadableByteChannel()) {
+        ReadableByteChannel in = source.newReadableByteChannel()) {
         try (
           FileChannel out = newWritableByteChannel();) {
           if (in instanceof FileChannel) {
             final FileChannel fileIn = (FileChannel)in;
             Channels.copy(fileIn, out);
           } else {
-            final long size = target.contentLength();
+            final long size = source.contentLength();
             long count = 0;
             while (count < size) {
-              count += out.transferFrom(in, count, count);
+              count += out.transferFrom(in, count, size - count);
             }
           }
         } catch (final IOException e) {

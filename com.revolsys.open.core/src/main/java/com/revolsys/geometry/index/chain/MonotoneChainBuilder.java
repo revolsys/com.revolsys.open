@@ -72,7 +72,7 @@ public class MonotoneChainBuilder {
       startY2 = points.getY(safeStart + 1);
     }
     // check if there are NO non-zero-length segments
-    if (safeStart >= size - 1) {
+    if (safeStart >= size - 2) {
       return size - 1;
     }
     // determine overall quadrant for chain (which is the starting quadrant)

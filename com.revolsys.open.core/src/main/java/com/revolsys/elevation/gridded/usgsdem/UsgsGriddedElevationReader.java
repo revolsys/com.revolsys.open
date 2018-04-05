@@ -14,7 +14,6 @@ import java.util.zip.ZipInputStream;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
-import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
@@ -27,7 +26,6 @@ import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.InputStreamResource;
@@ -38,31 +36,33 @@ import com.revolsys.util.Exceptions;
 public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   implements GriddedElevationModelReader {
 
+  private BoundingBox boundingBox = BoundingBox.empty();
+
   private final ByteBuffer buffer = ByteBuffer.allocateDirect(1024);
 
   private final byte[] bytes = new byte[1024];
 
-  private final Resource resource;
-
   private ReadableByteChannel channel;
 
-  private double resolutionZ;
+  private final double[] cornersX = new double[4];
 
-  private int rasterColCount;
-
-  private int rasterRowCount;
-
-  private int resolutionX;
+  private final double[] cornersY = new double[4];
 
   private GeometryFactory geometryFactory = GeometryFactory.wgs84();
 
-  private double[] polygonBounds;
+  private int gridHeight;
 
-  private BoundingBox boundingBox = BoundingBox.empty();
+  private int gridWidth;
 
   private boolean initialized;
 
+  private int resolutionX;
+
   private int resolutionY;
+
+  private double resolutionZ;
+
+  private final Resource resource;
 
   public UsgsGriddedElevationReader(final Resource resource,
     final Map<String, ? extends Object> properties) {
@@ -93,7 +93,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     return this.boundingBox;
   }
 
-  private byte getByte() {
+  private byte getByte1() {
     final String string = getString(1);
     if (string.isEmpty()) {
       return 0;
@@ -141,39 +141,24 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     }
   }
 
-  private Double getDouble(final int length) {
-    final String string = getString(length);
+  private double getDms() {
+    final int degrees = getInteger(4);
+    final double minutes = getInteger(2);
+    final double seconds = getDoubleSci(7);
+    final double fractional = minutes / 60 + seconds / 3600;
+    if (degrees < 0) {
+      return degrees - fractional;
+    } else {
+      return degrees + fractional;
+    }
+  }
+
+  private Double getDoubleSci(final int length) {
+    String string = getString(length);
     if (string.isEmpty()) {
       return null;
     } else {
-      return Double.parseDouble(string);
-    }
-  }
-
-  private double getDouble12() {
-    final String string = getString(12);
-    if (string.isEmpty()) {
-      return 0;
-    } else {
-      return Double.parseDouble(string);
-    }
-  }
-
-  private double getDouble24() {
-    final String string = getString(24);
-    if (string.isEmpty()) {
-      return 0;
-    } else {
-      return Double.valueOf(string);
-    }
-  }
-
-  private Double getDoubleSci() {
-    String string = getString(24);
-    if (string.isEmpty()) {
-      return null;
-    } else {
-      string = string.replace("D", "E");
+      string = string.replace('D', 'E');
       return Double.valueOf(string);
     }
   }
@@ -189,15 +174,6 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     return this.resolutionX;
   }
 
-  private int getInteger() {
-    final String string = getString(6);
-    if (string.isEmpty()) {
-      return 0;
-    } else {
-      return Integer.valueOf(string);
-    }
-  }
-
   private int getInteger(final int length) {
     final String string = getString(length);
     if (string.isEmpty()) {
@@ -207,19 +183,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     }
   }
 
-  private double[] getPolygonCoordinates() {
-    final int polygonSides = getInteger();
-    final double[] bounds = new double[polygonSides * 2 + 2];
-    int i = 0;
-    for (; i < bounds.length - 2; i++) {
-      bounds[i] = getDouble24();
-    }
-    bounds[i++] = bounds[0];
-    bounds[i++] = bounds[1];
-    return bounds;
-  }
-
-  private short getShort() {
+  private short getShort5() {
     final String string = getString(5);
     if (string.isEmpty()) {
       return 0;
@@ -257,47 +221,58 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   public final GriddedElevationModel read() {
     init();
     try {
-      final double minX = this.boundingBox.getMinX();
+      final UsgsGriddedElevationModel elevationModel = new UsgsGriddedElevationModel(
+        this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight, this.resolutionX);
+
       final double minY = this.boundingBox.getMinY();
-      final double width = this.boundingBox.getWidth();
-      final double height = this.boundingBox.getHeight();
+      int gridHeight = 0;
+      int columnCount = 0;
+      final double yShift = this.resolutionY / 2.0;
+      while (columnCount < this.gridWidth && readBuffer()) {
+        final int rowIndex = getInteger(6) - 1;
+        final int columnIndex = getInteger(6) - 1;
 
-      final int gridWidth = (int)Math.ceil(width / this.resolutionX);
-      final int gridHeight = (int)Math.ceil(width / this.resolutionX);
-      final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
-        this.geometryFactory, minX, minY, gridWidth, gridHeight, this.resolutionX);
+        final int rowCount = getInteger(6);
 
-      while (readBuffer()) {
-        final int rowIndex = getInteger() - 1;
-        int columnIndex = getInteger() - 1;
+        final int colCount = getInteger(6);
+        columnCount += colCount;
 
-        final int rowCount = getInteger();
-        final int colCount = getInteger();
+        final double x = getDoubleSci(24);
+        final double y = getDoubleSci(24) + yShift;
 
-        final double x1 = getDouble24();
-        final double y1 = getDouble24();
-        final double z1 = getDouble24();
-        final double minZ = getDouble24();
-        final double maxZ = getDouble24();
+        final int gridYMax = rowIndex + rowCount;
+        if (gridYMax > gridHeight) {
+          gridHeight = gridYMax;
+        }
+
+        final double zOffset = getDoubleSci(24);
+        final double minZ = getDoubleSci(24);
+        final double maxZ = getDoubleSci(24);
 
         for (int i = 0; i < colCount; i++) {
-          final double x = x1 + i * this.resolutionX;
+          final int[] elevations = new int[rowCount];
+          final int gridX = columnIndex + i;
           for (int j = 0; j < rowCount; j++) {
-            final double y = y1 + j * this.resolutionY;
             if (j > 145) {
               final int offset = (j - 146) % 170;
               if (offset == 0) {
                 readBuffer();
               }
             }
-            final int value = getInteger();
-            final double elevation = z1 + value * this.resolutionZ;
+            final int value = getInteger(6);
+            final double elevation = zOffset + value * this.resolutionZ;
+            int elevationInt;
             if (elevation > -32767) {
-              elevationModel.setElevation(x, y, elevation);
+              elevationInt = this.geometryFactory.toIntZ(elevation);
+            } else {
+              elevationInt = Integer.MIN_VALUE;
             }
+            elevations[j] = elevationInt;
           }
+          final double deltaY = y - minY;
+          final int gridY = (int)Math.floor(deltaY / this.resolutionY) - 1;
+          elevationModel.setColumn(gridX, gridY, elevations);
         }
-        columnIndex++;
       }
 
       elevationModel.setResource(this.resource);
@@ -329,39 +304,52 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     return true;
   }
 
+  @SuppressWarnings("unused")
   private void readHeader() {
     try {
       if (readBuffer()) {
         final String fileName = getString(40);
         final String descriptor = getString(40);
         skip(29); // Blank 81 - 109
-        final String seGeographic = getString(26);
+        final double maxLon = getDms();
+        final double minLat = getDms();
         final String processCode = getString(1);
         skip(1);// Blank 137
         final String sectionIndicator = getString(3);
         final String originCode = getString(4);
-        final int demLevelCode = getInteger();
-        final int elevationPattern = getInteger();
-        final int planimetricReferenceSystem = getInteger();
-        final int zone = getInteger();
+        final int demLevelCode = getInteger(6);
+        final int elevationPattern = getInteger(6);
+        final int planimetricReferenceSystem = getInteger(6);
+        final int zone = getInteger(6);
         final double[] projectionParameters = new double[15];
         for (int i = 0; i < projectionParameters.length; i++) {
-          projectionParameters[i] = getDoubleSci();
+          projectionParameters[i] = getDoubleSci(24);
         }
-        final int planimetricUom = getInteger();
-        final int verticalUom = getInteger();
-        this.polygonBounds = getPolygonCoordinates();
+        final int planimetricUom = getInteger(6);
+        final int verticalUom = getInteger(6);
+        final int cornerCount = getInteger(6);
+        if (cornerCount != 4) {
+          throw new IllegalArgumentException("Only for corners are supported");
+        }
+        for (int i = 0; i < 4; i++) {
+          this.cornersX[i] = getDoubleSci(24);
+          this.cornersY[i] = getDoubleSci(24);
+        }
+        double minX = Math.min(this.cornersX[0], this.cornersX[1]);
+        double maxX = Math.max(this.cornersX[2], this.cornersX[3]);
+        double minY = Math.min(this.cornersY[0], this.cornersY[3]);
+        double maxY = Math.max(this.cornersY[1], this.cornersY[2]);
 
-        final double min = getDouble24();
-        final double max = getDouble24();
-        final double angle = getDouble24();
+        final double minZ = getDoubleSci(24);
+        final double maxZ = getDoubleSci(24);
+        final double angle = getDoubleSci(24);
         if (angle != 0) {
           throw new IllegalArgumentException(
             "Angle=" + angle + " not currently supported for USGS DEM: " + this.resource);
         }
-        final int verticalAccuracy = getInteger();
-        final double resolutionX = getDouble12();
-        final double resolutionY = getDouble12();
+        final int verticalAccuracy = getInteger(6);
+        final double resolutionX = getDoubleSci(12);
+        final double resolutionY = getDoubleSci(12);
         if (resolutionX != resolutionY) {
           throw new IllegalArgumentException("resolutionX " + resolutionX + " != " + resolutionY
             + " resolutionY for USGS DEM: " + this.resource);
@@ -372,18 +360,18 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           throw new IllegalArgumentException("resolutionX " + resolutionX
             + " must currently be an integer for USGS DEM: " + this.resource);
         }
-        this.resolutionZ = getDouble12();
-        this.rasterRowCount = getInteger();
-        this.rasterColCount = getInteger();
-        final Short largestContourInterval = getShort();
-        final Byte largestContourIntervalUnits = getByte();
-        final Short smallestContourInterval = getShort();
-        final Byte smallest = getByte();
+        this.resolutionZ = getDoubleSci(12);
+        final int rasterRowCount = getInteger(6);
+        this.gridWidth = getInteger(6);
+        final Short largestContourInterval = getShort5();
+        final Byte largestContourIntervalUnits = getByte1();
+        final Short smallestContourInterval = getShort5();
+        final Byte smallest = getByte1();
         final Integer sourceYear = getInteger(4);
         final Integer revisionYear = getInteger(4);
         final String inspectionFlag = getString(1);
         final String dataValidationFlag = getString(1);
-        final String suspectAndVoidAreaFlag = getString(1);
+        final Integer suspectAndVoidAreaFlag = getInteger(2);
         final Integer verticalDatum = getInteger(2);
         final Integer horizontalDatum = getInteger(2);
         final Integer dataEdition = getInteger(4);
@@ -392,7 +380,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         final Integer edgeMatchNorth = getInteger(2);
         final Integer edgeMatchEast = getInteger(2);
         final Integer edgeMatchSouth = getInteger(2);
-        final Double verticalDatumShift = getDouble(7);
+        final Double verticalDatumShift = getDoubleSci(7);
 
         LinearUnit linearUnit = null;
         if (planimetricUom == 1) {
@@ -432,7 +420,26 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         if (0 == planimetricReferenceSystem) {
           coordinateSystemId = geographicCoordinateSystem.getCoordinateSystemId();
         } else if (1 == planimetricReferenceSystem) {
-          coordinateSystemId = 26900 + zone;
+          // UTM Zones
+          switch (horizontalDatum) {
+            case 1: // NAD27
+              coordinateSystemId = 26700 + zone;
+            break;
+            case 2: // WGS 72
+              coordinateSystemId = 32200 + zone;
+            break;
+            case 3: // WGS 84
+              coordinateSystemId = 32600 + zone;
+            break;
+            case 4: // NAD 83
+              coordinateSystemId = 26900 + zone;
+            break;
+
+            default:
+              throw new IllegalArgumentException("UTM horizontalDatum=" + horizontalDatum
+                + " not currently supported for USGS DEM: " + this.resource);
+          }
+
         } else if (2 == planimetricReferenceSystem) {
           throw new IllegalArgumentException(
             "planimetricReferenceSystem=" + planimetricReferenceSystem
@@ -472,9 +479,16 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         } else {
           this.geometryFactory = GeometryFactory.fixed3d(coordinateSystem, 0, 0, scaleZ);
         }
-        final Polygon polygon = this.geometryFactory
-          .polygon(this.geometryFactory.linearRing(2, this.polygonBounds));
-        this.boundingBox = polygon.getBoundingBox();
+        if (horizontalDatum == 3 || horizontalDatum == 4) {
+        } else {
+          minX = Math.floor(minX / resolutionX) * resolutionX + resolutionX / 2;
+          maxX = Math.ceil(maxX / resolutionX) * resolutionX - resolutionX / 2;
+          minY = Math.floor(minY / resolutionY) * resolutionY - resolutionY / 2;
+          maxY = Math.ceil(maxY / resolutionY) * resolutionY + resolutionY / 2;
+          this.gridHeight = (int)((maxY - minY) / resolutionY);
+        }
+        this.boundingBox = this.geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY,
+          maxZ);
       }
     } catch (final Exception e) {
       try {

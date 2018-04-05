@@ -815,8 +815,11 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     return newElevationModel(geometryFactory, x, y, width, height, gridCellSize);
   }
 
-  GriddedElevationModel newElevationModel(GeometryFactory geometryFactory, double x, double y,
-    int width, int height, double gridCellSize);
+  default GriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
+    final double x, final double y, final int width, final int height, final double gridCellSize) {
+    return new IntArrayScaleGriddedElevationModel(geometryFactory, x, y, width, height,
+      gridCellSize);
+  }
 
   default GriddedElevationModel resample(final int newGridCellSize) {
     final int tileX = (int)getGridMinX();
@@ -878,7 +881,9 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
     setElevation(gridX, gridY, elevation);
   }
 
-  void setElevation(final int gridX, final int gridY, final double elevation);
+  default void setElevation(final int gridX, final int gridY, final double elevation) {
+    throw new UnsupportedOperationException("Elevation model is readonly");
+  }
 
   default void setElevation(final int gridX, final int gridY,
     final GriddedElevationModel elevationModel, final double x, final double y) {
