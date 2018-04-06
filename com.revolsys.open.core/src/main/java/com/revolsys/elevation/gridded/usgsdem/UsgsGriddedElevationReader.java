@@ -171,7 +171,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     }
   }
 
-  private int getGeographicCoordinateSystemId(final Integer horizontalDatum) {
+  private int getGeographicCoordinateSystemId(final int horizontalDatum) {
     int geographicCoordinateSystemId;
     switch (horizontalDatum) {
       case 1: // NAD 27
@@ -210,7 +210,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     if (string.isEmpty()) {
       return 0;
     } else {
-      return Integer.valueOf(string);
+      return Integer.parseInt(string);
     }
   }
 
@@ -230,7 +230,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     if (string.isEmpty()) {
       return 0;
     } else {
-      return Short.valueOf(string);
+      return Short.parseShort(string);
     }
   }
 
@@ -250,7 +250,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
 
   private VerticalCoordinateSystem getVerticalCoordinateSystem(final LinearUnit verticalUom) {
     final boolean metres = verticalUom instanceof Metre;
-    final Integer verticalDatum = getInteger(2);
+    final int verticalDatum = getInteger(2);
     switch (verticalDatum) {
       case 1: // Mean Sea Level
         if (metres) {
@@ -442,27 +442,26 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         this.resolutionZ = getDoubleSci(12);
         final int rasterRowCount = getInteger(6);
         this.gridWidth = getInteger(6);
-        final Short largestContourInterval = getShort5();
-        final Byte largestContourIntervalUnits = getByte1();
-        final Short smallestContourInterval = getShort5();
-        final Byte smallest = getByte1();
-        final Integer sourceYear = getInteger(4);
-        final Integer revisionYear = getInteger(4);
+        final short largestContourInterval = getShort5();
+        final byte largestContourIntervalUnits = getByte1();
+        final short smallestContourInterval = getShort5();
+        final byte smallest = getByte1();
+        final int sourceYear = getInteger(4);
+        final int revisionYear = getInteger(4);
         final String inspectionFlag = getString(1);
         final String dataValidationFlag = getString(1);
-        final Integer suspectAndVoidAreaFlag = getInteger(2);
+        final int suspectAndVoidAreaFlag = getInteger(2);
         final VerticalCoordinateSystem verticalCoordinateSystem = getVerticalCoordinateSystem(
           verticalUom);
-        final Integer horizontalDatum = getInteger(2);
-        final Integer dataEdition = getInteger(4);
-        final Integer percentVoid = getInteger(4);
-        final Integer edgeMatchWest = getInteger(2);
-        final Integer edgeMatchNorth = getInteger(2);
-        final Integer edgeMatchEast = getInteger(2);
-        final Integer edgeMatchSouth = getInteger(2);
-        final Double verticalDatumShift = getDoubleSci(7);
-
+        final int horizontalDatum = getInteger(2);
         final int geographicCoordinateSystemId = getGeographicCoordinateSystemId(horizontalDatum);
+        final int dataEdition = getInteger(4);
+        final int percentVoid = getInteger(4);
+        final int edgeMatchWest = getInteger(2);
+        final int edgeMatchNorth = getInteger(2);
+        final int edgeMatchEast = getInteger(2);
+        final int edgeMatchSouth = getInteger(2);
+        final Double verticalDatumShift = getDoubleSci(7);
 
         final double scaleZ = 1.0 / this.resolutionZ;
         int horizontalCoordinateSystemId = 0;
