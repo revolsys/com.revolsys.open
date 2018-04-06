@@ -13,6 +13,11 @@ import com.revolsys.util.number.Doubles;
 public class Ellipsoid implements Serializable {
   private static final long serialVersionUID = -8349864136575195872L;
 
+  public static Ellipsoid newMajorMinor(final String name, final double semiMajorAxis,
+    final double semiMinorAxis) {
+    return new Ellipsoid(name, semiMajorAxis, semiMinorAxis, Double.NaN, null, false);
+  }
+
   private final Authority authority;
 
   private final boolean deprecated;

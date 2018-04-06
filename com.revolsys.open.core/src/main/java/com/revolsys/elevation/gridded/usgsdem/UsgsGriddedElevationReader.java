@@ -6,7 +6,9 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -14,6 +16,7 @@ import java.util.zip.ZipInputStream;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
+import com.revolsys.geometry.cs.Axis;
 import com.revolsys.geometry.cs.CompoundCoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -25,8 +28,10 @@ import com.revolsys.geometry.cs.ParameterValue;
 import com.revolsys.geometry.cs.ParameterValueNumber;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.VerticalCoordinateSystem;
+import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
+import com.revolsys.geometry.cs.unit.Metre;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
@@ -209,6 +214,17 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     }
   }
 
+  private LinearUnit getLinearUnit() {
+    final int planimetricUom = getInteger(6);
+    LinearUnit linearUnit = null;
+    if (planimetricUom == 1) {
+      linearUnit = EpsgCoordinateSystems.getLinearUnit("foot");
+    } else if (planimetricUom == 2) {
+      linearUnit = EpsgCoordinateSystems.getLinearUnit("metre");
+    }
+    return linearUnit;
+  }
+
   private short getShort5() {
     final String string = getString(5);
     if (string.isEmpty()) {
@@ -232,24 +248,41 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     return s;
   }
 
-  private int getVerticalCoordinateSystemId(final Integer verticalDatum) {
-    int verticalCoordinateSystemId;
+  private VerticalCoordinateSystem getVerticalCoordinateSystem(final LinearUnit verticalUom) {
+    final boolean metres = verticalUom instanceof Metre;
+    final Integer verticalDatum = getInteger(2);
     switch (verticalDatum) {
       case 1: // Mean Sea Level
-        verticalCoordinateSystemId = 5714;
-      break;
+        if (metres) {
+          return EpsgCoordinateSystems.getCoordinateSystem(5714);
+        } else {
+          final VerticalDatum datum = EpsgCoordinateSystems.getDatum(5100);
+          final List<Axis> axis = Collections.singletonList(new Axis("Up", "UP"));
+          final Map<ParameterName, ParameterValue> parameters = Collections.emptyMap();
+          return new VerticalCoordinateSystem(null, "MSL height (ftUS)", datum, parameters,
+            verticalUom, axis);
+        }
       case 2: // NGVD_1929
-        verticalCoordinateSystemId = 5702;
-      break;
+        if (metres) {
+          final VerticalDatum datum = EpsgCoordinateSystems.getDatum(5102);
+          final List<Axis> axis = Collections.singletonList(new Axis("Up", "UP"));
+          final Map<ParameterName, ParameterValue> parameters = Collections.emptyMap();
+          return new VerticalCoordinateSystem(null, "NGVD29 height (metre)", datum, parameters,
+            verticalUom, axis);
+        } else {
+          return EpsgCoordinateSystems.getCoordinateSystem(5702);
+        }
       case 3: // NAVD_1988
-        verticalCoordinateSystemId = 5703;
-      break;
+        if (metres) {
+          return EpsgCoordinateSystems.getCoordinateSystem(5703);
+        } else {
+          return EpsgCoordinateSystems.getCoordinateSystem(6360);
+        }
 
       default:
         throw new IllegalArgumentException("verticalDatum=" + verticalDatum
           + " not currently supported for USGS DEM: " + this.resource);
     }
-    return verticalCoordinateSystemId;
   }
 
   private void init() {
@@ -371,8 +404,8 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         for (int i = 0; i < projectionParameters.length; i++) {
           projectionParameters[i] = getDoubleSci(24);
         }
-        final int planimetricUom = getInteger(6);
-        final int verticalUom = getInteger(6);
+        final LinearUnit horizontalUom = getLinearUnit();
+        final LinearUnit verticalUom = getLinearUnit();
         final int cornerCount = getInteger(6);
         if (cornerCount != 4) {
           throw new IllegalArgumentException("Only for corners are supported");
@@ -418,7 +451,8 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         final String inspectionFlag = getString(1);
         final String dataValidationFlag = getString(1);
         final Integer suspectAndVoidAreaFlag = getInteger(2);
-        final Integer verticalDatum = getInteger(2);
+        final VerticalCoordinateSystem verticalCoordinateSystem = getVerticalCoordinateSystem(
+          verticalUom);
         final Integer horizontalDatum = getInteger(2);
         final Integer dataEdition = getInteger(4);
         final Integer percentVoid = getInteger(4);
@@ -428,13 +462,6 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         final Integer edgeMatchSouth = getInteger(2);
         final Double verticalDatumShift = getDoubleSci(7);
 
-        LinearUnit linearUnit = null;
-        if (planimetricUom == 1) {
-          linearUnit = EpsgCoordinateSystems.getLinearUnit("foot");
-        } else if (planimetricUom == 2) {
-          linearUnit = EpsgCoordinateSystems.getLinearUnit("metre");
-        }
-        final int verticalCoordinateSystemId = getVerticalCoordinateSystemId(verticalDatum);
         final int geographicCoordinateSystemId = getGeographicCoordinateSystemId(horizontalDatum);
 
         final double scaleZ = 1.0 / this.resolutionZ;
@@ -483,7 +510,8 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
             .getCoordinateSystem(geographicCoordinateSystemId);
           final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
-            -1, "", geographicCoordinateSystem, coordinateOperationMethod, parameters, linearUnit);
+            -1, "", geographicCoordinateSystem, coordinateOperationMethod, parameters,
+            horizontalUom);
           final ProjectedCoordinateSystem projectedCoordinateSystem2 = EpsgCoordinateSystems
             .getCoordinateSystem(projectedCoordinateSystem);
           if (projectedCoordinateSystem2 == projectedCoordinateSystem
@@ -504,13 +532,12 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         if (horizontalCoordinateSystem == null) {
           throw new IllegalArgumentException("No coordinate system found: " + this.resource);
         } else {
+          final int verticalCoordinateSystemId = verticalCoordinateSystem.getCoordinateSystemId();
           CoordinateSystem coordinateSystem;
-          if (horizontalCoordinateSystemId > 0) {
+          if (horizontalCoordinateSystemId > 0 && verticalCoordinateSystemId > 0) {
             coordinateSystem = EpsgCoordinateSystems.getCompound(horizontalCoordinateSystemId,
               verticalCoordinateSystemId);
           } else {
-            final VerticalCoordinateSystem verticalCoordinateSystem = EpsgCoordinateSystems
-              .getCoordinateSystem(verticalCoordinateSystemId);
             coordinateSystem = new CompoundCoordinateSystem(horizontalCoordinateSystem,
               verticalCoordinateSystem);
           }

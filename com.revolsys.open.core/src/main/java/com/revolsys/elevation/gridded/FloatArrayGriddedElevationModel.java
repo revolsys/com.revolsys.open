@@ -12,6 +12,11 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
 
   private final float[] elevations;
 
+  public FloatArrayGriddedElevationModel(final double x, final double y, final int gridWidth,
+    final int gridHeight, final double gridCellSize, final float[] elevations) {
+    this(GeometryFactory.DEFAULT_3D, x, y, gridWidth, gridHeight, gridCellSize, elevations);
+  }
+
   public FloatArrayGriddedElevationModel(final GeometryFactory geometryFactory,
     final BoundingBox boundingBox, final int gridWidth, final int gridHeight,
     final double gridCellSize, final float[] elevations) {

@@ -400,7 +400,7 @@ public interface BoundingBox
       final double maxX = getMaxX();
       final double maxY = getMaxY();
 
-      return RectangleUtil.covers(minX, minY, maxX, maxY, x, y, x, y);
+      return x >= minX && x <= maxX && y >= minY && y <= maxY;
     }
   }
 

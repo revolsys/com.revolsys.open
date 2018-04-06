@@ -231,6 +231,11 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.minY = Double.POSITIVE_INFINITY;
   }
 
+  @Override
+  public boolean covers(final double x, final double y) {
+    return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
+  }
+
   public boolean covers(final double minX, final double maxX, final double minY,
     final double maxY) {
     return RectangleUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX, maxY);

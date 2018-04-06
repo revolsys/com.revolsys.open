@@ -11,6 +11,7 @@ import javax.measure.quantity.Length;
 
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.epsg.CoordinateOperation;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.RadiansToDegreesOperation;
@@ -91,6 +92,11 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
     this.angularUnit = (AngularUnit)axis.get(0).getUnit();
     this.sourceCoordinateSystem = sourceCoordinateSystem;
     this.coordinateOperation = coordinateOperation;
+  }
+
+  public GeographicCoordinateSystem(final String name, final Ellipsoid ellipsoid) {
+    this(0, name, new GeodeticDatum(name, ellipsoid, null, null), new PrimeMeridian(name, 0, null),
+      EpsgCoordinateSystems.getUnit(9102), null, null);
   }
 
   @Override
