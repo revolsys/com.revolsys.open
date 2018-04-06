@@ -25,24 +25,12 @@ public class UnitConverstionOperation implements CoordinatesOperation {
   }
 
   @Override
-  public void perform(final int sourceAxisCount, final double[] sourceCoordinates,
-    final int targetAxisCount, final double[] targetCoordinates) {
-    final int numPoints = sourceCoordinates.length / sourceAxisCount;
-    final int axisCount = this.axisCount;
+  public void perform(final CoordinatesOperationPoint point) {
     final UnitConverter converter = this.converter;
-    for (int vertexIndex = 0; vertexIndex < numPoints; vertexIndex++) {
-      for (int axisIndex = 0; axisIndex < targetAxisCount; axisIndex++) {
-        double value;
-        if (axisIndex < sourceAxisCount) {
-          value = sourceCoordinates[vertexIndex * sourceAxisCount + axisIndex];
-          if (axisIndex < axisCount) {
-            value = converter.convert(value);
-          }
-        } else {
-          value = Double.NaN;
-        }
-        targetCoordinates[vertexIndex * targetAxisCount + axisIndex] = value;
-      }
+    point.x = converter.convert(point.x);
+    point.y = converter.convert(point.y);
+    if (this.axisCount > 2) {
+      point.z = converter.convert(point.z);
     }
   }
 

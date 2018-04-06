@@ -6,6 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+  EllipsoidTest.class, //
   CompoundCoorindateSystemTest.class
 })
 public class CoordinateSystemsTest {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -133,32 +134,26 @@ public class LineStringDouble extends AbstractLineString {
       final int vertexCount = this.vertexCount;
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
       final int targetAxisCount = axisCount;
-      double[] targetCoordinates;
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
         .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
         if (sourceAxisCount == geometryFactory.getAxisCount()) {
           return sourceCoordinates;
         } else {
-          final double[] coordinates = new double[targetAxisCount * vertexCount];
-          int i = 0;
-          for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-            for (int axisIndex = 0; axisIndex < targetAxisCount; axisIndex++) {
-              final double coordinate;
-              if (axisIndex < sourceAxisCount) {
-                coordinate = sourceCoordinates[vertexIndex * sourceAxisCount + axisIndex];
-              } else {
-                coordinate = Double.NaN;
-              }
-              coordinates[i++] = coordinate;
-            }
-          }
-          return coordinates;
+          return getCoordinates(targetAxisCount);
         }
       } else {
-        targetCoordinates = new double[targetAxisCount * vertexCount];
-        coordinatesOperation.perform(sourceAxisCount, sourceCoordinates, targetAxisCount,
-          targetCoordinates);
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+        final double[] targetCoordinates = new double[targetAxisCount * vertexCount];
+        int targetOffset = 0;
+        int sourceOffset = 0;
+        for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+          point.setPoint(this.coordinates, sourceOffset, sourceAxisCount);
+          coordinatesOperation.perform(point);
+          point.copyCoordinatesTo(targetCoordinates, targetOffset, targetAxisCount);
+          targetOffset += targetAxisCount;
+          sourceOffset += sourceAxisCount;
+        }
         return targetCoordinates;
       }
     }
@@ -241,35 +236,6 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    final int axisCount = getAxisCount();
-    int coordinatesLength = coordinates.length;
-    if (coordinatesLength > axisCount) {
-      coordinatesLength = axisCount;
-    }
-    final int coordinateCount = this.vertexCount * axisCount;
-    for (int coordinateIndex = 0; coordinateIndex < coordinateCount; coordinateIndex += axisCount) {
-      System.arraycopy(this.coordinates, coordinateIndex, coordinates, 0, coordinatesLength);
-      action.accept(coordinates);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
-    final int axisCount = getAxisCount();
-    int coordinatesLength = coordinates.length;
-    if (coordinatesLength > axisCount) {
-      coordinatesLength = axisCount;
-    }
-    final int coordinateCount = this.vertexCount * axisCount;
-    for (int coordinateIndex = 0; coordinateIndex < coordinateCount; coordinateIndex += axisCount) {
-      System.arraycopy(this.coordinates, coordinateIndex, coordinates, 0, coordinatesLength);
-      action.accept(coordinates);
-    }
-  }
-
-  @Override
   public void forEachVertex(final Consumer3Double action) {
     final int vertexCount = this.vertexCount;
     final double[] coordinates = this.coordinates;
@@ -290,6 +256,31 @@ public class LineStringDouble extends AbstractLineString {
         action.accept(x, y, z);
         coordinateIndex += axisIgnoreCount;
       }
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    final int axisCount = getAxisCount();
+    final int coordinateCount = this.vertexCount * axisCount;
+    final double[] coordinates = this.coordinates;
+    for (int coordinateOffset = 0; coordinateOffset < coordinateCount; coordinateOffset += axisCount) {
+      point.setPoint(coordinates, coordinateOffset, axisCount);
+      coordinatesOperation.perform(point);
+      action.accept(point);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
+    final int axisCount = getAxisCount();
+    final int coordinateCount = this.vertexCount * axisCount;
+    final double[] coordinates = this.coordinates;
+    for (int coordinateOffset = 0; coordinateOffset < coordinateCount; coordinateOffset += axisCount) {
+      point.setPoint(coordinates, coordinateOffset, axisCount);
+      action.accept(point);
     }
   }
 

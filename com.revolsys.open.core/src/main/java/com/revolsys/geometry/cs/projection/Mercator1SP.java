@@ -15,7 +15,7 @@ public class Mercator1SP extends AbstractCoordinatesProjection {
 
   private final double eOver2;
 
-  private final double lambda0; // central meridian
+  private final double λ0; // central meridian
 
   private final double x0;
 
@@ -29,7 +29,7 @@ public class Mercator1SP extends AbstractCoordinatesProjection {
     final Ellipsoid ellipsoid = geodeticDatum.getEllipsoid();
     this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
-    this.lambda0 = Math.toRadians(centralMeridian);
+    this.λ0 = Math.toRadians(centralMeridian);
     this.a = ellipsoid.getSemiMajorAxis();
     this.e = ellipsoid.getEccentricity();
     this.eOver2 = this.e / 2;
@@ -37,43 +37,38 @@ public class Mercator1SP extends AbstractCoordinatesProjection {
   }
 
   @Override
-  public void inverse(final double x, final double y, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double dX = x - this.x0;
-    final double dY = y - this.y0;
+  public void inverse(final CoordinatesOperationPoint point) {
+    final double dX = point.x - this.x0;
+    final double dY = point.y - this.y0;
 
-    final double lambda = dX / this.a + this.lambda0;
+    final double λ = dX / this.a + this.λ0;
 
     final double t = Math.pow(Math.E, -dY / this.a);
-    // TODO phi
-    double phi = Angle.PI_OVER_2 - 2 * Math.atan(t);
+    // TODO φ
+    double φ = Angle.PI_OVER_2 - 2 * Math.atan(t);
     double delta = 10e010;
     do {
-      final double eSinPhi = this.e * Math.sin(phi);
-      final double phi1 = Angle.PI_OVER_2
+      final double eSinPhi = this.e * Math.sin(φ);
+      final double φ1 = Angle.PI_OVER_2
         - 2 * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2));
-      delta = Math.abs(phi1 - phi);
-      phi = phi1;
+      delta = Math.abs(φ1 - φ);
+      φ = φ1;
     } while (delta > 1.0e-011);
 
-    targetCoordinates[targetOffset] = Math.toDegrees(lambda);
-    targetCoordinates[targetOffset + 1] = Math.toDegrees(phi);
+    point.x = λ;
+    point.y = φ;
   }
 
   @Override
-  public void project(final double lon, final double lat, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double lambda = Math.toRadians(lon);
-    final double phi = Math.toRadians(lat);
+  public void project(final CoordinatesOperationPoint point) {
+    final double λ = point.x;
+    final double φ = point.y;
 
-    final double x = this.a * (lambda - this.lambda0);
-
-    final double eSinPhi = this.e * Math.sin(phi);
-    final double y = this.a * Math.log(
-      Math.tan(Angle.PI_OVER_4 + phi / 2) * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2));
-
-    targetCoordinates[targetOffset] = x;
-    targetCoordinates[targetOffset + 1] = y;
+    final double a2 = this.a;
+    final double eSinPhi = this.e * Math.sin(φ);
+    point.x = a2 * (λ - this.λ0);
+    point.y = a2 * Math.log(
+      Math.tan(Angle.PI_OVER_4 + φ / 2) * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2));
   }
 
 }

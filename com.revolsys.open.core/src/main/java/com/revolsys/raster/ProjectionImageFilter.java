@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -73,17 +74,15 @@ public class ProjectionImageFilter extends WholeImageFilter {
     if (operation == null) {
       return inPixels;
     }
-    final double[] source = new double[2];
-    final double[] dest = new double[2];
+    final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
     for (int i = 0; i < newImageWidth; i++) {
       final double newImageX = newMinX + i * this.destPixelSize;
-      dest[0] = newImageX;
       for (int j = 0; j < newImageHeight; j++) {
         final double newImageY = newMaxY - j * this.destPixelSize;
-        dest[1] = newImageY;
-        operation.perform(2, dest, 2, source);
-        final double imageX = source[0];
-        final double imageY = source[1];
+        point.setPoint(newImageX, newImageY);
+        operation.perform(point);
+        final double imageX = point.x;
+        final double imageY = point.y;
         final int imageI = (int)((imageX - minX) / pixelWidth);
         final int imageJ = imageHeight - (int)((imageY - minY) / pixelHeight);
         if (imageI > -1 && imageI < imageWidth) {

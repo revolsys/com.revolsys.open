@@ -87,15 +87,11 @@ public class TransverseMercatorJhs extends TransverseMercator {
 
   /**
    * Project the projected coordinates in metres to lon/lat cordinates in degrees.
-   * @param x The x coordinate.
-   * @param y The y coordinate.
-   * @param targetCoordinates The ordinates to write the converted ordinates to.
    */
   @Override
-  public void inverse(final double x, final double y, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double ηPrime = (x - this.xo) / (this.B * this.ko);
-    final double ξPrime = (y - this.yo + this.ko * this.mo) / (this.B * this.ko);
+  public void inverse(final CoordinatesOperationPoint point) {
+    final double ηPrime = (point.x - this.xo) / (this.B * this.ko);
+    final double ξPrime = (point.y - this.yo + this.ko * this.mo) / (this.B * this.ko);
 
     final double ξ1Prime = this.h1Prime * Math.sin(2 * ξPrime) * Math.cosh(2 * ηPrime);
     final double η1Prime = this.h1Prime * Math.cos(2 * ξPrime) * Math.sinh(2 * ηPrime);
@@ -116,11 +112,8 @@ public class TransverseMercatorJhs extends TransverseMercator {
       QPrimePrime = QPrime + this.e * MathUtil.atanh(this.e * Math.tanh(QPrimePrime));
     } while (Math.abs(lastQPrimePrime - QPrimePrime) < 1.0e-011 && ++i < 100);
 
-    final double λ = this.λo + Math.asin(Math.tanh(η0Prime) / Math.cos(βPrime));
-    final double φ = Math.atan(Math.sinh(QPrimePrime));
-
-    targetCoordinates[targetOffset] = Math.toDegrees(λ);
-    targetCoordinates[targetOffset + 1] = Math.toDegrees(φ);
+    point.x = this.λo + Math.asin(Math.tanh(η0Prime) / Math.cos(βPrime));
+    point.y = Math.atan(Math.sinh(QPrimePrime));
   }
 
   private double mo(final double φ) {
@@ -149,15 +142,13 @@ public class TransverseMercatorJhs extends TransverseMercator {
 
   /**
    * Project the lon/lat ordinates in degrees to projected coordinates in metres.
-   *
    * @param from The ordinates to convert.
    * @param to The ordinates to write the converted ordinates to.
    */
   @Override
-  public void project(final double lon, final double lat, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double λ = Math.toRadians(lon);
-    final double φ = Math.toRadians(lat);
+  public void project(final CoordinatesOperationPoint point) {
+    final double λ = point.x;
+    final double φ = point.y;
 
     final double ko = this.ko;
     final double B = this.B;
@@ -187,7 +178,7 @@ public class TransverseMercatorJhs extends TransverseMercator {
 
     final double x = this.xo + ko * B * η;
     final double y = this.yo + ko * (B * ξ - this.mo);
-    targetCoordinates[targetOffset] = x;
-    targetCoordinates[targetOffset + 1] = y;
+    point.x = x;
+    point.y = y;
   }
 }

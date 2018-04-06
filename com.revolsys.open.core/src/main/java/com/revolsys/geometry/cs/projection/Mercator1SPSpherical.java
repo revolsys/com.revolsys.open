@@ -9,7 +9,7 @@ import com.revolsys.math.Angle;
 
 public class Mercator1SPSpherical extends AbstractCoordinatesProjection {
   /** The central origin. */
-  private final double lambda0;
+  private final double λ0;
 
   private final double r;
 
@@ -18,44 +18,39 @@ public class Mercator1SPSpherical extends AbstractCoordinatesProjection {
   private final double y0;
 
   public Mercator1SPSpherical(final ProjectedCoordinateSystem cs) {
-    final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
-    final GeodeticDatum geodeticDatum = geographicCS.getDatum();
+    final GeographicCoordinateSystem geograφcCS = cs.getGeographicCoordinateSystem();
+    final GeodeticDatum geodeticDatum = geograφcCS.getDatum();
     final double centralMeridian = cs.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
 
     final Ellipsoid ellipsoid = geodeticDatum.getEllipsoid();
     this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
-    this.lambda0 = Math.toRadians(centralMeridian);
+    this.λ0 = Math.toRadians(centralMeridian);
     this.r = ellipsoid.getSemiMinorAxis();
 
   }
 
   @Override
-  public void inverse(final double x, final double y, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double dX = x - this.x0;
-    final double dY = y - this.y0;
+  public void inverse(final CoordinatesOperationPoint point) {
+    final double dX = point.x - this.x0;
+    final double dY = point.y - this.y0;
 
-    final double lambda = dX / this.r + this.lambda0;
+    final double r2 = this.r;
+    final double λ = dX / r2 + this.λ0;
+    final double φ = Angle.PI_OVER_2 - 2 * Math.atan(Math.pow(Math.E, -dY / r2));
 
-    final double phi = Angle.PI_OVER_2 - 2 * Math.atan(Math.pow(Math.E, -dY / this.r));
-
-    targetCoordinates[targetOffset] = Math.toDegrees(lambda);
-    targetCoordinates[targetOffset + 1] = Math.toDegrees(phi);
+    point.x = λ;
+    point.y = φ;
   }
 
   @Override
-  public void project(final double lon, final double lat, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double lambda = Math.toRadians(lon);
-    final double phi = Math.toRadians(lat);
+  public void project(final CoordinatesOperationPoint point) {
+    final double λ = point.x;
+    final double φ = point.y;
 
-    final double x = this.r * (lambda - this.lambda0);
-
-    final double y = this.r * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2));
-
-    targetCoordinates[targetOffset] = this.x0 + x;
-    targetCoordinates[targetOffset + 1] = this.y0 + y;
+    final double r2 = this.r;
+    point.x = this.x0 + r2 * (λ - this.λ0);
+    point.y = this.y0 + r2 * Math.log(Math.tan(Angle.PI_OVER_4 + φ / 2));
   }
 
 }

@@ -55,6 +55,7 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
@@ -217,21 +218,24 @@ public interface LineString extends Lineal {
 
   default double[] convertCoordinates(GeometryFactory geometryFactory, final int axisCount) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    final double[] coordinates = getCoordinates(axisCount);
+    final double[] targetCoordinates = getCoordinates(axisCount);
     if (isEmpty()) {
-      return coordinates;
+      return targetCoordinates;
     } else {
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
-      double[] targetCoordinates;
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
         .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
-        return coordinates;
+        return targetCoordinates;
       } else {
-        final int sourceAxisCount = getAxisCount();
-        targetCoordinates = new double[sourceAxisCount * getVertexCount()];
-        coordinatesOperation.perform(sourceAxisCount, coordinates, sourceAxisCount,
-          targetCoordinates);
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+        final int coordinateCount = getVertexCount() * axisCount;
+        for (int coordinateOffset = 0; coordinateOffset < coordinateCount; coordinateOffset += axisCount) {
+          point.setPoint(targetCoordinates, coordinateOffset, axisCount);
+          coordinatesOperation.perform(point);
+          point.copyCoordinatesTo(targetCoordinates, coordinateOffset, axisCount);
+        }
+
         return targetCoordinates;
       }
     }
@@ -241,13 +245,13 @@ public interface LineString extends Lineal {
     final GeometryFactory geometryFactory, final double[] targetCoordinates) {
     final double x = getX(vertexIndex);
     final double y = getY(vertexIndex);
-    targetCoordinates[X] = x;
-    targetCoordinates[Y] = y;
+    final CoordinatesOperationPoint point = new CoordinatesOperationPoint(x, y);
     final CoordinatesOperation coordinatesOperation = getGeometryFactory()
       .getCoordinatesOperation(geometryFactory);
     if (coordinatesOperation != null) {
-      coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
+      coordinatesOperation.perform(point);
     }
+    point.copyCoordinatesTo(targetCoordinates, 2);
   }
 
   default int copyCoordinates(final int axisCount, final double nanValue,
@@ -350,24 +354,21 @@ public interface LineString extends Lineal {
         .getCoordinatesOperation(geometryFactory);
       double line2x1 = line.getX(0);
       double line2y1 = line.getY(0);
-      double[] coordinates = null;
+      CoordinatesOperationPoint point = null;
       if (coordinatesOperation != null) {
-        coordinates = new double[] {
-          line2x1, line2y1
-        };
-        coordinatesOperation.perform(2, coordinates, 2, coordinates);
-        line2x1 = coordinates[X];
-        line2y1 = coordinates[Y];
+        point = new CoordinatesOperationPoint(line2x1, line2y1);
+        coordinatesOperation.perform(point);
+        line2x1 = point.x;
+        line2y1 = point.y;
       }
       for (int vertexIndex2 = 1; vertexIndex2 < vertexCount2; vertexIndex2++) {
         double line2x2 = line.getX(vertexIndex2);
         double line2y2 = line.getY(vertexIndex2);
         if (coordinatesOperation != null) {
-          coordinates[X] = line2x2;
-          coordinates[Y] = line2y2;
-          coordinatesOperation.perform(2, coordinates, 2, coordinates);
-          line2x2 = coordinates[X];
-          line2y2 = coordinates[Y];
+          point.setPoint(line2x2, line2y2);
+          coordinatesOperation.perform(point);
+          line2x2 = point.x;
+          line2y2 = point.y;
         }
         double line1x1 = getX(0);
         double line1y1 = getY(0);
@@ -750,27 +751,28 @@ public interface LineString extends Lineal {
 
   @Override
   default void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    final int axisCount = coordinates.length;
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     final int vertexCount = getVertexCount();
-    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += axisCount) {
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
-      }
-      coordinatesOperation.perform(axisCount, coordinates, axisCount, coordinates);
-      action.accept(coordinates);
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += 1) {
+      final double x = getCoordinate(vertexIndex, 0);
+      final double y = getCoordinate(vertexIndex, 1);
+      final double z = getCoordinate(vertexIndex, 2);
+      point.setPoint(x, y, z);
+      coordinatesOperation.perform(point);
+      action.accept(point);
     }
   }
 
   @Override
-  default void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
-    final int axisCount = coordinates.length;
+  default void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
     final int vertexCount = getVertexCount();
-    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += axisCount) {
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
-      }
-      action.accept(coordinates);
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += 1) {
+      final double x = getCoordinate(vertexIndex, 0);
+      final double y = getCoordinate(vertexIndex, 1);
+      final double z = getCoordinate(vertexIndex, 2);
+      point.setPoint(x, y, z);
+      action.accept(point);
     }
   }
 
@@ -1494,19 +1496,16 @@ public interface LineString extends Lineal {
           previousY = y;
         }
       } else {
-        final double[] coordinates = new double[] {
-          getX(0), getY(0)
-        };
-        coordinatesOperation.perform(2, coordinates, 2, coordinates);
-        double previousX = coordinates[X];
-        double previousY = coordinates[Y];
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(getX(0), getY(0));
+        coordinatesOperation.perform(point);
+        double previousX = point.x;
+        double previousY = point.x;
 
         for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
-          coordinates[X] = getX(vertexIndex);
-          coordinates[Y] = getY(vertexIndex);
-          coordinatesOperation.perform(2, coordinates, 2, coordinates);
-          final double x = coordinates[X];
-          final double y = coordinates[Y];
+          point.setPoint(getX(vertexIndex), getY(vertexIndex));
+          coordinatesOperation.perform(point);
+          final double x = point.x;
+          final double y = point.y;
           if (RectangleUtil.intersectsLine(minX, minY, maxX, maxY, //
             previousX, previousY, x, y)) {
             return true;

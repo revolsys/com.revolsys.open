@@ -57,15 +57,11 @@ public class TransverseMercatorThomas extends TransverseMercator {
 
   /**
    * Project the projected coordinates in metres to lon/lat cordinates in degrees.
-   * @param x The x coordinate.
-   * @param y The y coordinate.
-   * @param targetCoordinates The ordinates to write the converted ordinates to.
    */
   @Override
-  public void inverse(double x, double y, final double[] targetCoordinates,
-    final int targetOffset) {
-    x = (x - this.xo) / this.ko;
-    y /= this.ko;
+  public void inverse(final CoordinatesOperationPoint point) {
+    final double x = (point.x - this.xo) / this.ko;
+    final double y = point.y / this.ko;
     final double a = this.a;
     final double b = this.b;
     final double e = this.e;
@@ -103,14 +99,14 @@ public class TransverseMercatorThomas extends TransverseMercator {
     final double xOverDnPow2 = xOverDn * xOverDn;
     final double xOverDnPow4 = xOverDnPow2 * xOverDnPow2;
     final double xOverDnPow6 = xOverDnPow2 * xOverDnPow4;
-    final double λ = this.λo + (xOverDn - xOverDn * xOverDnPow2 / 6 * (tanφPow2 * 2 + 1 + etaPow2)
+
+    point.x = this.λo + (xOverDn - xOverDn * xOverDnPow2 / 6 * (tanφPow2 * 2 + 1 + etaPow2)
       + xOverDn * xOverDnPow4 / 120
         * (etaPow2 * 6 + 5 + tanφPow2 * 28 - etaPow4 * 3 + tanφPow2 * 8 * etaPow2 + tanφPow4 * 24
           - etaPow6 * 4 + tanφPow2 * 4 * etaPow4 + tanφPow2 * 24 * etaPow6)
       - xOverDn * xOverDnPow6 / 5040 * (tanφPow2 * 662 + 61 + tanφPow4 * 1320 + tanφPow6 * 720))
       / cosφ;
-
-    final double φ = φ1 + tanφ * (-(x * x) / (dm * 2 * dn)
+    point.y = φ1 + tanφ * (-(x * x) / (dm * 2 * dn)
       + xOverDn * xOverDnPow2 * x / (dm * 24)
         * (tanφPow2 * 3 + 5 + etaPow2 - etaPow4 * 4. - etaPow2 * 9 * tanφPow2)
       - xOverDn * xOverDnPow4 * x / (dm * 720)
@@ -120,25 +116,17 @@ public class TransverseMercatorThomas extends TransverseMercator {
           - tanφPow2 * 192 * etaPow8)
       + xOverDn * xOverDnPow6 * x / (dm * 40320)
         * (tanφPow2 * 3633 + 1385 + tanφPow4 * 4095 + tanφPow6 * 1574));
-
-    final double lon = Math.toDegrees(λ);
-    final double lat = Math.toDegrees(φ);
-
-    targetCoordinates[targetOffset] = lon;
-    targetCoordinates[targetOffset + 1] = lat;
   }
 
   /**
    * Project the lon/lat ordinates in degrees to projected coordinates in metres.
-   *
    * @param from The ordinates to convert.
    * @param to The ordinates to write the converted ordinates to.
    */
   @Override
-  public void project(final double lon, final double lat, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double λ = Math.toRadians(lon);
-    final double φ = Math.toRadians(lat);
+  public void project(final CoordinatesOperationPoint point) {
+    final double λ = point.x;
+    final double φ = point.y;
     final double deltaλ = λ - this.λo;
 
     final double sinφ = Math.sin(φ);
@@ -190,7 +178,7 @@ public class TransverseMercatorThomas extends TransverseMercator {
 
     x = this.xo + this.ko * x;
     y = this.ko * y;
-    targetCoordinates[targetOffset] = x;
-    targetCoordinates[targetOffset + 1] = y;
+    point.x = x;
+    point.y = y;
   }
 }

@@ -38,6 +38,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -344,12 +345,12 @@ public class RectangleXY extends AbstractPolygon {
 
   @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    this.ring.forEachVertex(coordinatesOperation, coordinates, action);
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    this.ring.forEachVertex(coordinatesOperation, point, action);
   }
 
   @Override
-  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+  public void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
     this.ring.forEachVertex(coordinates, action);
   }
 

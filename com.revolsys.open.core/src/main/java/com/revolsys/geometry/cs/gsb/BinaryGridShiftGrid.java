@@ -6,10 +6,10 @@ import java.util.List;
 import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
-public class BindaryGridShiftGrid extends BoundingBoxDoubleXY {
+public class BinaryGridShiftGrid extends BoundingBoxDoubleXY {
   private static final long serialVersionUID = 1L;
 
-  private final List<BindaryGridShiftGrid> grids = new ArrayList<>();
+  private final List<BinaryGridShiftGrid> grids = new ArrayList<>();
 
   private final FloatArrayGriddedElevationModel latAccuracies;
 
@@ -24,7 +24,7 @@ public class BindaryGridShiftGrid extends BoundingBoxDoubleXY {
   private final String parentName;
 
   @SuppressWarnings("unused")
-  public BindaryGridShiftGrid(final BindaryGridShiftFile file, final boolean loadAccuracy) {
+  public BinaryGridShiftGrid(final BinaryGridShiftFile file, final boolean loadAccuracy) {
     this.name = file.readRecordString();
     this.parentName = file.readRecordString();
     final String created = file.readRecordString();
@@ -44,7 +44,7 @@ public class BindaryGridShiftGrid extends BoundingBoxDoubleXY {
     final int nodeCount = file.readRecordInt();
     if (nodeCount != gridWidth * gridHeight) {
       throw new IllegalStateException(
-        "BindaryGridShiftGrid " + this.name + " has inconsistent grid dimensions");
+        "BinaryGridShiftGrid " + this.name + " has inconsistent grid dimensions");
     }
     final float[] latShifts = new float[nodeCount];
     final float[] lonShifts = new float[nodeCount];
@@ -77,14 +77,14 @@ public class BindaryGridShiftGrid extends BoundingBoxDoubleXY {
       gridHeight, gridCellSizeX, latShifts);
   }
 
-  public void addGrid(final BindaryGridShiftGrid grid) {
+  public void addGrid(final BinaryGridShiftGrid grid) {
     this.grids.add(grid);
   }
 
-  public BindaryGridShiftGrid getGrid(final double lon, final double lat) {
+  public BinaryGridShiftGrid getGrid(final double lon, final double lat) {
     if (covers(lon, lat)) {
-      for (final BindaryGridShiftGrid grid : this.grids) {
-        final BindaryGridShiftGrid childGrid = grid.getGrid(lon, lat);
+      for (final BinaryGridShiftGrid grid : this.grids) {
+        final BinaryGridShiftGrid childGrid = grid.getGrid(lon, lat);
         if (childGrid != null) {
           return childGrid;
         }

@@ -110,19 +110,19 @@ public class TransverseMercatorTest {
           projectionById.put(utmReferenceMeridian, mercator);
         }
 
-        final double[] coordinates = new double[2];
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(x, y);
 
-        mercator.project(lon, lat, coordinates, 0);
+        mercator.project(point);
 
-        final double xActual = coordinates[0];
-        final double yActual = coordinates[1];
+        final double xActual = point.x;
+        final double yActual = point.y;
         Assert.assertEquals(monumentId + "\tproj x", x, xActual, 1e-3);
         Assert.assertEquals(monumentId + "\tproj y", y, yActual, 2e-3);
 
-        mercator.inverse(x, y, coordinates, 0);
+        mercator.inverse(point);
 
-        final double lonActual = coordinates[0];
-        final double latActual = coordinates[1];
+        final double lonActual = point.x;
+        final double latActual = point.y;
         assertDms(monumentId + "\tlon", longitudeDegrees, longitudeMinutes, longitudeSeconds,
           lonActual, DP_5);
         assertDms(monumentId + "\tlat", latitudeDegrees, latitudeMinutes, latitudeSeconds,
@@ -179,19 +179,19 @@ public class TransverseMercatorTest {
           projectionById.put(utmReferenceMeridian, mercator);
         }
 
-        final double[] coordinates = new double[2];
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(x, y);
 
-        mercator.project(lon, lat, coordinates, 0);
+        mercator.project(point);
 
-        final double xActual = coordinates[0];
-        final double yActual = coordinates[1];
+        final double xActual = point.x;
+        final double yActual = point.y;
         Assert.assertEquals(monumentId + "\tproj x", x, xActual, 1e-3);
         Assert.assertEquals(monumentId + "\tproj y", y, yActual, 2e-3);
 
-        mercator.inverse(x, y, coordinates, 0);
+        mercator.inverse(point);
 
-        final double lonActual = coordinates[0];
-        final double latActual = coordinates[1];
+        final double lonActual = point.x;
+        final double latActual = point.y;
         assertDms(monumentId + "\tlon", longitudeDegrees, longitudeMinutes, longitudeSeconds,
           lonActual, DP_4);
         assertDms(monumentId + "\tlat", latitudeDegrees, latitudeMinutes, latitudeSeconds,

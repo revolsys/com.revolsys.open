@@ -15,15 +15,15 @@ public class AlbersConicEqualAreaTest {
 
   private void assertProjection(final double x, final double y, final double lon,
     final double lat) {
-    final double[] coordinates = new double[2];
-    PROJECTION.inverse(x, y, coordinates, 0);
-    final double lonActual = coordinates[0];
-    final double latActual = coordinates[1];
+    final CoordinatesOperationPoint point = new CoordinatesOperationPoint(x, y);
+    PROJECTION.inverse(point);
+    final double lonActual = point.x;
+    final double latActual = point.y;
     Assert.assertEquals("lon", lon, lonActual, 1e-20);
     Assert.assertEquals("lat", lat, latActual, 1e-20);
-    PROJECTION.project(lon, lat, coordinates, 0);
-    final double xActual = coordinates[0];
-    final double yActual = coordinates[1];
+    PROJECTION.project(point);
+    final double xActual = point.x;
+    final double yActual = point.y;
     Assert.assertEquals("x", x, xActual, 2e-3);
     Assert.assertEquals("y", y, yActual, 2e-3);
   }

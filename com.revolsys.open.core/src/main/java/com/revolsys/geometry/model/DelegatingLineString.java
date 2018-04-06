@@ -3,6 +3,7 @@ package com.revolsys.geometry.model;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer3Double;
@@ -48,13 +49,13 @@ public interface DelegatingLineString extends LineString {
 
   @Override
   default void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     final LineString line = getLineString();
-    line.forEachVertex(coordinatesOperation, coordinates, action);
+    line.forEachVertex(coordinatesOperation, point, action);
   }
 
   @Override
-  default void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+  default void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
     final LineString line = getLineString();
     line.forEachVertex(coordinates, action);
   }

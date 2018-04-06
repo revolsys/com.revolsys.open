@@ -8,26 +8,10 @@ public class InverseOperation implements CoordinatesOperation {
   }
 
   @Override
-  public void perform(final int sourceAxisCount, final double[] sourceCoordinates,
-    final int targetAxisCount, final double[] targetCoordinates) {
-    final CoordinatesProjection projection = this.projection;
-    final int sourceLength = sourceCoordinates.length;
-    int targetOffset = 0;
-    for (int sourceOffset = 0; sourceOffset < sourceLength; sourceOffset += sourceAxisCount) {
-      final double x = sourceCoordinates[sourceOffset];
-      final double y = sourceCoordinates[sourceOffset + 1];
-      projection.inverse(x, y, targetCoordinates, targetOffset);
-      for (int axisIndex = 2; axisIndex < targetAxisCount; axisIndex++) {
-        double value;
-        if (axisIndex < sourceAxisCount) {
-          value = sourceCoordinates[sourceOffset + axisIndex];
-        } else {
-          value = Double.NaN;
-        }
-        targetCoordinates[targetOffset + axisIndex] = value;
-      }
-      targetOffset += targetAxisCount;
-    }
+  public void perform(final CoordinatesOperationPoint point) {
+    this.projection.inverse(point);
+    point.x = Math.toDegrees(point.x);
+    point.y = Math.toDegrees(point.y);
   }
 
   @Override

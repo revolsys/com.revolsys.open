@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -101,35 +102,27 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
 
   @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     if (!isEmpty()) {
-      if (coordinates == null) {
-        this.point.forEachVertex(coordinatesOperation, coordinates, action);
+      if (this.coordinates == null) {
+        this.point.forEachVertex(coordinatesOperation, point, action);
       } else {
-        int coordinatesLength = coordinates.length;
-        final int axisCount = getAxisCount();
-        if (coordinatesLength > axisCount) {
-          coordinatesLength = axisCount;
-        }
-        coordinatesOperation.perform(axisCount, this.coordinates, coordinatesLength, coordinates);
-        action.accept(coordinates);
+        point.setPoint(this);
+        coordinatesOperation.perform(point);
+        action.accept(point);
       }
     }
   }
 
   @Override
-  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
+  public void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
     if (!isEmpty()) {
-      if (coordinates == null) {
-        this.point.forEachVertex(coordinates, action);
+      if (this.coordinates == null) {
+        this.point.forEachVertex(point, action);
       } else {
-        int coordinatesLength = coordinates.length;
-        final int axisCount = getAxisCount();
-        if (coordinatesLength > axisCount) {
-          coordinatesLength = axisCount;
-        }
-        System.arraycopy(this.coordinates, 0, coordinates, 0, coordinatesLength);
-        action.accept(coordinates);
+        point.setPoint(this);
+        action.accept(point);
       }
     }
   }

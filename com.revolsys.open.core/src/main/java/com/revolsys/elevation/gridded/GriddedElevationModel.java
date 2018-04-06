@@ -17,6 +17,7 @@ import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradien
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
 import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
@@ -197,21 +198,21 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
         }
       }
     } else {
-      final double[] coordinates = new double[2];
+      final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
       for (int gridY = startGridY; gridY < endGridY; gridY++) {
         final double y = minY + gridY * gridCellSize;
         for (int gridX = startGridX; gridX < endGridX; gridX++) {
           final double x = minX + gridX * gridCellSize;
           final double z = getElevationFast(gridX, gridY);
           if (Double.isFinite(z)) {
-            coordinates[0] = x;
-            coordinates[1] = y;
-            projection.perform(2, coordinates, 2, coordinates);
-            final double targetX = coordinates[0];
-            final double targetY = coordinates[1];
+            point.setPoint(x, y, z);
+            projection.perform(point);
+            final double targetX = point.x;
+            final double targetY = point.y;
+            final double targetZ = point.z;
             if (boundingBox.covers(targetX, targetY)) {
-              final Point point = targetGeometryFactory.point(targetX, targetY, z);
-              action.accept(point);
+              final Point targetPoint = targetGeometryFactory.point(targetX, targetY, targetZ);
+              action.accept(targetPoint);
             }
           }
         }
@@ -905,10 +906,10 @@ public interface GriddedElevationModel extends ObjectWithProperties, BoundingBox
 
   default void setElevations(final Geometry geometry) {
     if (geometry != null) {
-      geometry.forEachVertex(getGeometryFactory(), coordinates -> {
-        final double x = coordinates[0];
-        final double y = coordinates[1];
-        final double z = coordinates[2];
+      geometry.forEachVertex(getGeometryFactory(), point -> {
+        final double x = point.x;
+        final double y = point.y;
+        final double z = point.z;
         setElevation(x, y, z);
       });
     }

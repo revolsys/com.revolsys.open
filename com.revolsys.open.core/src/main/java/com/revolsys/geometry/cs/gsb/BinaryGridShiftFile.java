@@ -11,10 +11,11 @@ import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.spring.resource.Resource;
 
-public class BindaryGridShiftFile {
+public class BinaryGridShiftFile {
   private static GeographicCoordinateSystem getCoordinateSystem(final String name) {
     final GeographicCoordinateSystem coordinateSystem = EpsgCoordinateSystems
       .getCoordinateSystem(name);
@@ -43,7 +44,7 @@ public class BindaryGridShiftFile {
 
   private final String version;
 
-  private final List<BindaryGridShiftGrid> grids = new ArrayList<>();
+  private final List<BinaryGridShiftGrid> grids = new ArrayList<>();
 
   private transient ChannelReader in;
 
@@ -56,7 +57,7 @@ public class BindaryGridShiftFile {
   private final CoordinatesOperation reverseOperation = this::shiftReverse;
 
   @SuppressWarnings("unused")
-  public BindaryGridShiftFile(final Object source, final boolean loadAccuracy) {
+  public BinaryGridShiftFile(final Object source, final boolean loadAccuracy) {
     try (
       ChannelReader in = Resource.getResource(source).newChannelReader()) {
       this.in = in;
@@ -102,13 +103,12 @@ public class BindaryGridShiftFile {
     return this.fromCoordinateSystem;
   }
 
-  public BindaryGridShiftGrid getGrid(final double lonPositiveWestSeconds,
-    final double latSeconds) {
-    for (final BindaryGridShiftGrid topLevelSubGrid : this.grids) {
-      final BindaryGridShiftGrid bindaryGridShiftGrid = topLevelSubGrid
+  public BinaryGridShiftGrid getGrid(final double lonPositiveWestSeconds, final double latSeconds) {
+    for (final BinaryGridShiftGrid topLevelSubGrid : this.grids) {
+      final BinaryGridShiftGrid binaryGridShiftGrid = topLevelSubGrid
         .getGrid(lonPositiveWestSeconds, latSeconds);
-      if (bindaryGridShiftGrid != null) {
-        return bindaryGridShiftGrid;
+      if (binaryGridShiftGrid != null) {
+        return binaryGridShiftGrid;
       }
     }
     return null;
@@ -127,23 +127,23 @@ public class BindaryGridShiftFile {
   }
 
   private void loadGrids(final boolean loadAccuracy, final int gridCount) {
-    final List<BindaryGridShiftGrid> grids = new ArrayList<>();
+    final List<BinaryGridShiftGrid> grids = new ArrayList<>();
     for (int i = 0; i < gridCount; i++) {
-      final BindaryGridShiftGrid grid = new BindaryGridShiftGrid(this, loadAccuracy);
+      final BinaryGridShiftGrid grid = new BinaryGridShiftGrid(this, loadAccuracy);
       grids.add(grid);
     }
-    final Map<String, BindaryGridShiftGrid> gridByName = new HashMap<>();
-    for (final BindaryGridShiftGrid grid : grids) {
+    final Map<String, BinaryGridShiftGrid> gridByName = new HashMap<>();
+    for (final BinaryGridShiftGrid grid : grids) {
       if (!grid.hasParent()) {
         this.grids.add(grid);
       }
       final String name = grid.getName();
       gridByName.put(name, grid);
     }
-    for (final BindaryGridShiftGrid grid : grids) {
+    for (final BinaryGridShiftGrid grid : grids) {
       if (grid.hasParent()) {
         final String parentName = grid.getParentName();
-        final BindaryGridShiftGrid parentGrid = gridByName.get(parentName);
+        final BinaryGridShiftGrid parentGrid = gridByName.get(parentName);
         parentGrid.addGrid(grid);
       }
     }
@@ -191,95 +191,43 @@ public class BindaryGridShiftFile {
     return value;
   }
 
-  public void shiftForward(final int sourceAxisCount, final double[] sourceCoordinates,
-    final int targetAxisCount, final double[] targetCoordinates) {
-    final int sourceLength = sourceCoordinates.length;
-    int targetOffset = 0;
-    for (int sourceOffset = 0; sourceOffset < sourceLength; sourceOffset += sourceAxisCount) {
-      final double lon = sourceCoordinates[sourceOffset];
-      final double lat = sourceCoordinates[sourceOffset + 1];
-      final double lonPositiveWestSeconds = -lon * 3600;
-      final double latSeconds = lat * 3600;
-      final BindaryGridShiftGrid bindaryGridShiftGrid = getGrid(lonPositiveWestSeconds, latSeconds);
-      if (bindaryGridShiftGrid == null) {
-        targetCoordinates[targetOffset] = lon;
-        targetCoordinates[targetOffset + 1] = lat;
-      } else {
-        final double lonShift = bindaryGridShiftGrid.getLonShift(lonPositiveWestSeconds,
-          latSeconds);
-        final double latShift = bindaryGridShiftGrid.getLatShift(lonPositiveWestSeconds,
-          latSeconds);
-
-        targetCoordinates[targetOffset] = -(lonPositiveWestSeconds + lonShift) / 3600;
-        targetCoordinates[targetOffset + 1] = (latSeconds + latShift) / 3600;
-      }
-      for (int axisIndex = 2; axisIndex < targetAxisCount; axisIndex++) {
-        double value;
-        if (axisIndex < sourceAxisCount) {
-          value = sourceCoordinates[sourceOffset + axisIndex];
-        } else {
-          value = Double.NaN;
-        }
-        targetCoordinates[targetOffset + axisIndex] = value;
-      }
-      targetOffset += targetAxisCount;
+  public void shiftForward(final CoordinatesOperationPoint point) {
+    final double lon = point.x;
+    final double lat = point.y;
+    final double lonPositiveWestSeconds = -lon * 3600;
+    final double latSeconds = lat * 3600;
+    final BinaryGridShiftGrid binaryGridShiftGrid = getGrid(lonPositiveWestSeconds, latSeconds);
+    if (binaryGridShiftGrid != null) {
+      final double lonShift = binaryGridShiftGrid.getLonShift(lonPositiveWestSeconds, latSeconds);
+      final double latShift = binaryGridShiftGrid.getLatShift(lonPositiveWestSeconds, latSeconds);
+      point.x = -(lonPositiveWestSeconds + lonShift) / 3600;
+      point.y = (latSeconds + latShift) / 3600;
     }
   }
 
-  // final GridShift forwardGs = new GridShift();
-  // forwardGs.setLonPositiveWestSeconds(gs.getLonPositiveWestSeconds());
-  // forwardGs.setLatSeconds(gs.getLatSeconds());
-  // for (int i = 0; i < 4; i++) {
-  // if (!gridShiftForward(forwardGs)) {
-  // return false;
-  // }
-  // forwardGs.setLonPositiveWestSeconds(
-  // gs.getLonPositiveWestSeconds() - forwardGs.getLonShiftPositiveWestSeconds());
-  // forwardGs.setLatSeconds(gs.getLatSeconds() - forwardGs.getLatShiftSeconds());
-  // }
-  // gs.setLonShiftPositiveWestSeconds(-forwardGs.getLonShiftPositiveWestSeconds());
-  // gs.setLatShiftSeconds(-forwardGs.getLatShiftSeconds());
-
-  public void shiftReverse(final int sourceAxisCount, final double[] sourceCoordinates,
-    final int targetAxisCount, final double[] targetCoordinates) {
-    final int sourceLength = sourceCoordinates.length;
-    int targetOffset = 0;
-    for (int sourceOffset = 0; sourceOffset < sourceLength; sourceOffset += sourceAxisCount) {
-      final double lon = sourceCoordinates[sourceOffset];
-      final double lat = sourceCoordinates[sourceOffset + 1];
-      final double lonPositiveWestSeconds = -lon * 3600;
-      final double latSeconds = lat * 3600;
-      double lonShift = 0;
-      double latShift = 0;
-      for (int i = 0; i < 4; i++) {
-        final double forwardLonPositiveWestSeconds = lonPositiveWestSeconds - lonShift;
-        final double forwardLatSeconds = latSeconds - latShift;
-        final BindaryGridShiftGrid bindaryGridShiftGrid = getGrid(forwardLonPositiveWestSeconds,
+  public void shiftReverse(final CoordinatesOperationPoint point) {
+    final double lon = point.x;
+    final double lat = point.y;
+    final double lonPositiveWestSeconds = -lon * 3600;
+    final double latSeconds = lat * 3600;
+    double lonShift = 0;
+    double latShift = 0;
+    for (int i = 0; i < 4; i++) {
+      final double forwardLonPositiveWestSeconds = lonPositiveWestSeconds - lonShift;
+      final double forwardLatSeconds = latSeconds - latShift;
+      final BinaryGridShiftGrid binaryGridShiftGrid = getGrid(forwardLonPositiveWestSeconds,
+        forwardLatSeconds);
+      if (binaryGridShiftGrid == null) {
+        break;
+      } else {
+        lonShift = binaryGridShiftGrid.getLonShift(forwardLonPositiveWestSeconds,
           forwardLatSeconds);
-        if (bindaryGridShiftGrid == null) {
-          targetCoordinates[targetOffset] = lon;
-          targetCoordinates[targetOffset + 1] = lat;
-          break;
-        } else {
-          lonShift = bindaryGridShiftGrid.getLonShift(forwardLonPositiveWestSeconds,
-            forwardLatSeconds);
-          latShift = bindaryGridShiftGrid.getLatShift(forwardLonPositiveWestSeconds,
-            forwardLatSeconds);
-        }
+        latShift = binaryGridShiftGrid.getLatShift(forwardLonPositiveWestSeconds,
+          forwardLatSeconds);
       }
-      targetCoordinates[targetOffset] = -(lonPositiveWestSeconds - lonShift) / 3600;
-      targetCoordinates[targetOffset + 1] = (latSeconds - latShift) / 3600;
-      for (int axisIndex = 2; axisIndex < targetAxisCount; axisIndex++) {
-        double value;
-        if (axisIndex < sourceAxisCount) {
-          value = sourceCoordinates[sourceOffset + axisIndex];
-        } else {
-          value = Double.NaN;
-        }
-        targetCoordinates[targetOffset + axisIndex] = value;
-      }
-      targetOffset += targetAxisCount;
     }
+    point.x = -(lonPositiveWestSeconds - lonShift) / 3600;
+    point.y = (latSeconds - latShift) / 3600;
   }
 
   @Override

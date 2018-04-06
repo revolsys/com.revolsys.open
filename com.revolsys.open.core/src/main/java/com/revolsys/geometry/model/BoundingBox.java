@@ -20,6 +20,7 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
@@ -287,7 +288,7 @@ public interface BoundingBox
           bounds[2] = Double.NaN;
           bounds[3] = Double.NaN;
 
-          final double[] to = new double[2];
+          final CoordinatesOperationPoint to = new CoordinatesOperationPoint();
           expand(geometryFactory, bounds, operation, to, minX, minY);
           expand(geometryFactory, bounds, operation, to, minX, maxY);
           expand(geometryFactory, bounds, operation, to, minX, minY);
@@ -599,10 +600,11 @@ public interface BoundingBox
   }
 
   default void expand(final GeometryFactory geometryFactory, final double[] bounds,
-    final CoordinatesOperation operation, final double[] to, final double... from) {
-
-    operation.perform(2, from, 2, to);
-    RectangleUtil.expand(geometryFactory, bounds, to);
+    final CoordinatesOperation operation, final CoordinatesOperationPoint point, final double x,
+    final double y) {
+    point.setPoint(x, y);
+    operation.perform(point);
+    RectangleUtil.expand(geometryFactory, bounds, point.x, point.y);
   }
 
   default BoundingBox expand(final Point point) {
@@ -771,21 +773,6 @@ public interface BoundingBox
   }
 
   /**
-   * Get the geometry factory.
-   *
-   * @return The geometry factory.
-   */
-  @Override
-  default CoordinateSystem getHorizontalCoordinateSystem() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (geometryFactory == null) {
-      return null;
-    } else {
-      return geometryFactory.getHorizontalCoordinateSystem();
-    }
-  }
-
-  /**
    * maxX,minY
    * minX,minY
    * minX,maxY
@@ -841,6 +828,21 @@ public interface BoundingBox
       return Quantities.getQuantity(height, Units.METRE);
     } else {
       return Quantities.getQuantity(height, coordinateSystem.getLengthUnit());
+    }
+  }
+
+  /**
+   * Get the geometry factory.
+   *
+   * @return The geometry factory.
+   */
+  @Override
+  default CoordinateSystem getHorizontalCoordinateSystem() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      return null;
+    } else {
+      return geometryFactory.getHorizontalCoordinateSystem();
     }
   }
 

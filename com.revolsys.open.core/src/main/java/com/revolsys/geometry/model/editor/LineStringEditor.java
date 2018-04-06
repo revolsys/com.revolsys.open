@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -424,37 +425,33 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
 
   @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    if (coordinates == null) {
-      this.line.forEachVertex(coordinatesOperation, coordinates, action);
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    if (this.coordinates == null) {
+      this.line.forEachVertex(coordinatesOperation, point, action);
     } else {
       final int axisCount = getAxisCount();
-      int coordinatesLength = coordinates.length;
-      if (coordinatesLength > axisCount) {
-        coordinatesLength = axisCount;
-      }
       final int coordinateCount = this.vertexCount * axisCount;
-      for (int coordinateIndex = 0; coordinateIndex < coordinateCount; coordinateIndex += axisCount) {
-        System.arraycopy(this.coordinates, coordinateIndex, coordinates, 0, coordinatesLength);
-        action.accept(coordinates);
+      final double[] coordinates = this.coordinates;
+      for (int coordinateOffset = 0; coordinateOffset < coordinateCount; coordinateOffset += axisCount) {
+        point.setPoint(coordinates, coordinateOffset, axisCount);
+        coordinatesOperation.perform(point);
+        action.accept(point);
       }
     }
   }
 
   @Override
-  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
-    if (coordinates == null) {
-      this.line.forEachVertex(coordinates, action);
+  public void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
+    if (this.coordinates == null) {
+      this.line.forEachVertex(point, action);
     } else {
       final int axisCount = getAxisCount();
-      int coordinatesLength = coordinates.length;
-      if (coordinatesLength > axisCount) {
-        coordinatesLength = axisCount;
-      }
       final int coordinateCount = this.vertexCount * axisCount;
-      for (int coordinateIndex = 0; coordinateIndex < coordinateCount; coordinateIndex += axisCount) {
-        System.arraycopy(this.coordinates, coordinateIndex, coordinates, 0, coordinatesLength);
-        action.accept(coordinates);
+      final double[] coordinates = this.coordinates;
+      for (int coordinateOffset = 0; coordinateOffset < coordinateCount; coordinateOffset += axisCount) {
+        point.setPoint(coordinates, coordinateOffset, axisCount);
+        action.accept(point);
       }
     }
   }

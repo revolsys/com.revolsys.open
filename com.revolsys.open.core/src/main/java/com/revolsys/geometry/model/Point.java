@@ -40,6 +40,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PointEditor;
@@ -232,22 +233,20 @@ public interface Point extends Punctual, Serializable {
 
   default double[] convertCoordinates(GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    final double[] coordinates = getCoordinates();
+    final int targetAxisCount = geometryFactory.getAxisCount();
+    final double[] targetCoordinates = getCoordinates(targetAxisCount);
     if (isEmpty()) {
-      return coordinates;
+      return targetCoordinates;
     } else {
-
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
-      double[] targetCoordinates;
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
         .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
-        return coordinates;
+        return targetCoordinates;
       } else {
-        final int sourceAxisCount = getAxisCount();
-        targetCoordinates = new double[sourceAxisCount * getVertexCount()];
-        coordinatesOperation.perform(sourceAxisCount, coordinates, sourceAxisCount,
-          targetCoordinates);
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(this);
+        coordinatesOperation.perform(point);
+        point.copyCoordinatesTo(targetCoordinates);
         return targetCoordinates;
       }
     }
@@ -262,15 +261,9 @@ public interface Point extends Punctual, Serializable {
       if (coordinatesOperation == null) {
         return this;
       } else {
-        final double sourceX = getX();
-        final double sourceY = getY();
-        final double[] targetCoordinates = new double[] {
-          sourceX, sourceY
-        };
-        coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
-        final double targetX = targetCoordinates[X];
-        final double targetY = targetCoordinates[Y];
-        return new PointDoubleXY(targetX, targetY);
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(this);
+        coordinatesOperation.perform(point);
+        return new PointDoubleXY(point.x, point.y);
       }
     }
   }
@@ -301,9 +294,9 @@ public interface Point extends Punctual, Serializable {
         final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
           .getCoordinatesOperation(geometryFactory);
         if (coordinatesOperation != null) {
-          final int sourceAxisCount = getAxisCount();
-          final int targetAxisCount = geometryFactory.getAxisCount();
-          coordinatesOperation.perform(sourceAxisCount, coordinates, targetAxisCount, coordinates);
+          final CoordinatesOperationPoint point = new CoordinatesOperationPoint(this);
+          coordinatesOperation.perform(point);
+          point.copyCoordinatesTo(coordinates);
         }
       }
     }
@@ -568,42 +561,35 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
-  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    if (!isEmpty()) {
-      final int coordinatesLength = coordinates.length;
-      coordinates[0] = getX();
-      coordinates[1] = getY();
-      for (int i = 2; i < coordinatesLength; i++) {
-        final double value = getCoordinate(i);
-        coordinates[i] = value;
-      }
-      coordinatesOperation.perform(coordinatesLength, coordinates, coordinatesLength, coordinates);
-      action.accept(coordinates);
-    }
-  }
-
-  @Override
-  default void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
-    if (!isEmpty()) {
-      final int coordinatesLength = coordinates.length;
-      coordinates[0] = getX();
-      coordinates[1] = getY();
-      for (int i = 2; i < coordinatesLength; i++) {
-        final double value = getCoordinate(i);
-        coordinates[i] = value;
-      }
-      action.accept(coordinates);
-    }
-  }
-
-  @Override
   default void forEachVertex(final Consumer3Double action) {
     if (!isEmpty()) {
       final double x = getX();
       final double y = getY();
       final double z = getZ();
       action.accept(x, y, z);
+    }
+  }
+
+  @Override
+  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    if (!isEmpty()) {
+      point.x = getX();
+      point.y = getY();
+      point.z = getZ();
+      coordinatesOperation.perform(point);
+      action.accept(point);
+    }
+  }
+
+  @Override
+  default void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
+    if (!isEmpty()) {
+      point.x = getX();
+      point.y = getY();
+      point.z = getZ();
+      action.accept(point);
     }
   }
 
@@ -935,21 +921,20 @@ public interface Point extends Punctual, Serializable {
       return geometryFactory.point();
     } else {
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
-      double[] targetCoordinates;
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
         .getCoordinatesOperation(geometryFactory);
-      final double[] coordinates = getCoordinates();
       if (coordinatesOperation == null) {
-        targetCoordinates = coordinates;
+        final double[] coordinates = getCoordinates();
+        return geometryFactory.point(coordinates);
       } else {
-        final int sourceAxisCount = getAxisCount();
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(this);
+        coordinatesOperation.perform(point);
         final int targetAxisCount = geometryFactory.getAxisCount();
-        targetCoordinates = new double[targetAxisCount];
-        coordinatesOperation.perform(sourceAxisCount, coordinates, targetAxisCount,
-          targetCoordinates);
+        final double[] targetCoordinates = new double[targetAxisCount];
+        point.copyCoordinatesTo(targetCoordinates);
+        return geometryFactory.point(targetCoordinates);
       }
 
-      return geometryFactory.point(targetCoordinates);
     }
   }
 

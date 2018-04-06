@@ -127,14 +127,13 @@ public class TransverseMercatorUsgs extends TransverseMercator {
    * @param to The ordinates to write the converted ordinates to.
    */
   @Override
-  public void inverse(final double x, final double y, final double[] targetCoordinates,
-    final int targetOffset) {
+  public void inverse(final CoordinatesOperationPoint point) {
     final double ePow2 = this.ePow2;
     final double a = this.a;
     final double ko = this.ko;
     final double ePrimePow2 = this.ePrimePow2;
 
-    final double M1 = this.mo + (y - this.yo) / ko;
+    final double M1 = this.mo + (point.y - this.yo) / ko;
     final double μ1 = M1 / this.aTimes1MinusEsqDiv4MinesEPow4Times3Div64MinusEPow6Times5Div256;
     final double φ1 = μ1 + this.threeTimesE1Div2Minus27TimeE1Pow3Div32 * Math.sin(2 * μ1)
       + this.e1Pow2Times21Div16MinusE1Pow4Times55Div32 * Math.sin(4 * μ1)
@@ -148,7 +147,7 @@ public class TransverseMercatorUsgs extends TransverseMercator {
     final double ν1 = a / Math.sqrt(oneMinusESqSinφ1Sq);
     final double ρ1 = a * (1 - ePow2) / Math.pow(oneMinusESqSinφ1Sq, 1.5);
     final double C1 = ePrimePow2 * Math.pow(cosφ1, 2);
-    final double D = (x - this.xo) / (ν1 * ko);
+    final double D = (point.x - this.xo) / (ν1 * ko);
     final double D2 = Math.pow(D, 2);
     final double D3 = Math.pow(D, 3);
     final double D4 = Math.pow(D, 4);
@@ -159,15 +158,11 @@ public class TransverseMercatorUsgs extends TransverseMercator {
 
     final double C12 = Math.pow(C1, 2);
 
-    final double φ = φ1
+    point.x = this.λo + (D - (1 + 2 * T1 + C1) * D3 / 6
+      + (5 - 2 * C1 + 28 * T1 - 3 * C12 + 8 * ePrimePow2 + 24 * T12) * D5 / 120) / cosφ1;
+    point.y = φ1
       - ν1 * tanφ1 / ρ1 * (D2 / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C12 - 9 * ePrimePow2) * D4 / 24
         + (61 + 90 * T1 + 298 * C1 + 45 * T12 - 252 * ePrimePow2 - 3 * C12) * D6 / 720);
-
-    final double λ = this.λo + (D - (1 + 2 * T1 + C1) * D3 / 6
-      + (5 - 2 * C1 + 28 * T1 - 3 * C12 + 8 * ePrimePow2 + 24 * T12) * D5 / 120) / cosφ1;
-
-    targetCoordinates[targetOffset] = Math.toDegrees(λ);
-    targetCoordinates[targetOffset + 1] = Math.toDegrees(φ);
   }
 
   /**
@@ -217,10 +212,12 @@ public class TransverseMercatorUsgs extends TransverseMercator {
    * @param to The ordinates to write the converted ordinates to.
    */
   @Override
-  public void project(final double lon, final double lat, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double λ = Math.toRadians(lon);
-    final double φ = Math.toRadians(lat);
+  public void project(final CoordinatesOperationPoint point) {
+    final double λ = point.x;
+    final double φ = point.y;
+
+    final double ePrimePow2 = this.ePrimePow2;
+    final double ko = this.ko;
 
     final double cosφ = Math.cos(φ);
     final double sinφ = Math.sin(φ);
@@ -229,22 +226,20 @@ public class TransverseMercatorUsgs extends TransverseMercator {
     final double nu = this.a / Math.sqrt(1 - this.ePow2 * sinφ * sinφ);
     final double tanφPow2 = tanφ * tanφ;
     final double tanφPow4 = tanφPow2 * tanφPow2;
-    final double c = this.ePrimePow2 * cosφ * cosφ;
+    final double c = ePrimePow2 * cosφ * cosφ;
     final double cPow2 = c * c;
     final double a1 = (λ - this.λo) * cosφ;
-    final double a1Pow2 = a1 * a1;
-    final double a1Pow3 = a1Pow2 * a1;
-    final double a1Pow4 = a1Pow2 * a1Pow2;
-    final double a1Pow5 = a1Pow4 * a1;
-    final double a1Pow6 = a1Pow4 * a1Pow2;
-    final double x = this.xo + this.ko * nu * (a1 + (1 - tanφPow2 + c) * a1Pow3 / 6
-      + (5 - 18 * tanφPow2 + tanφPow4 + 72 * c - 58 * this.ePrimePow2) * a1Pow5 / 120);
-
+    final double a1Pow2 = Math.pow(a1, 2);
+    final double a1Pow3 = Math.pow(a1, 3);
+    final double a1Pow4 = Math.pow(a1, 4);
+    final double a1Pow5 = Math.pow(a1, 5);
+    final double a1Pow6 = Math.pow(a1, 6);
     final double m = m(φ);
-    final double y = this.yo + this.ko
+
+    point.x = this.xo + ko * nu * (a1 + (1 - tanφPow2 + c) * a1Pow3 / 6
+      + (5 - 18 * tanφPow2 + tanφPow4 + 72 * c - 58 * ePrimePow2) * a1Pow5 / 120);
+    point.y = this.yo + ko
       * (m - this.mo + nu * tanφ * (a1Pow2 / 2 + (5 - tanφPow2 + 9 * c + 4 * cPow2) * a1Pow4 / 24
-        + (61 - 58 * tanφPow2 + tanφPow4 + 600 * c - 330 * this.ePrimePow2) * a1Pow6 / 720));
-    targetCoordinates[targetOffset] = x;
-    targetCoordinates[targetOffset + 1] = y;
+        + (61 - 58 * tanφPow2 + tanφPow4 + 600 * c - 330 * ePrimePow2) * a1Pow6 / 720));
   }
 }

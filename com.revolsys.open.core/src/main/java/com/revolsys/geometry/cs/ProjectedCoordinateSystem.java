@@ -15,7 +15,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
-import com.revolsys.geometry.cs.projection.CopyOperation;
+import com.revolsys.geometry.cs.projection.NoOpOperation;
 import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
@@ -279,7 +279,7 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
   public CoordinatesOperation getProjectCoordinatesOperation() {
     final CoordinatesProjection projection = getCoordinatesProjection();
     if (projection == null) {
-      return new CopyOperation();
+      return new NoOpOperation();
     } else {
       return projection.getProjectOperation();
     }

@@ -159,10 +159,9 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
    * λ =
    */
   @Override
-  public void inverse(final double x, final double y, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double ΔX = x - this.xo;
-    final double ΔY = y - this.yo;
+  public void inverse(final CoordinatesOperationPoint point) {
+    final double ΔX = point.x - this.xo;
+    final double ΔY = point.y - this.yo;
     final double e = this.e;
     final double ePow2 = this.ePow2;
     final double oneOver2e = this.oneOver2e;
@@ -198,8 +197,8 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
     if (!Double.isFinite(φ)) {
       φ = Angle.PI_OVER_2;
     }
-    targetCoordinates[targetOffset] = Math.toDegrees(λ);
-    targetCoordinates[targetOffset + 1] = Math.toDegrees(φ);
+    point.x = λ;
+    point.y = φ;
   }
 
   /**
@@ -229,21 +228,17 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
    * </pre>
    */
   @Override
-  public void project(final double lon, final double lat, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double λ = Math.toRadians(lon);
-    final double φ = Math.toRadians(lat);
+  public void project(final CoordinatesOperationPoint point) {
+    final double λ = point.x;
+    final double φ = point.y;
     final double q = q(φ);
     final double Δλ = λ - this.λo;
     final double n = this.n;
     final double θ = n * Δλ;
     final double ρ = this.a * (Math.sqrt(this.c - n * q) / n);
 
-    final double x = this.xo + ρ * Math.sin(θ);
-    final double y = this.yo + this.ρo - ρ * Math.cos(θ);
-
-    targetCoordinates[targetOffset] = x;
-    targetCoordinates[targetOffset + 1] = y;
+    point.x = this.xo + ρ * Math.sin(θ);
+    point.y = this.yo + this.ρo - ρ * Math.cos(θ);
   }
 
   /**
@@ -263,7 +258,7 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
   private double q(final double φ) {
     final double sinφ = Math.sin(φ);
     final double eSinφ = this.e * sinφ;
-    double ePow2 = this.ePow2;
+    final double ePow2 = this.ePow2;
     final double q = (1.0 - ePow2) * (sinφ / (1.0 - ePow2 * Math.pow(sinφ, 2))
       - this.oneOver2e * Math.log((1.0 - eSinφ) / (1.0 + eSinφ)));
     return q;

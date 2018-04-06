@@ -7,23 +7,9 @@ public class DegreesToRadiansOperation implements CoordinatesOperation {
   }
 
   @Override
-  public void perform(final int sourceAxisCount, final double[] sourceCoordinates,
-    final int targetAxisCount, final double[] targetCoordinates) {
-    final int numPoints = sourceCoordinates.length / sourceAxisCount;
-    for (int vertexIndex = 0; vertexIndex < numPoints; vertexIndex++) {
-      for (int axisIndex = 0; axisIndex < targetAxisCount; axisIndex++) {
-        double value;
-        if (axisIndex < sourceAxisCount) {
-          value = sourceCoordinates[vertexIndex * sourceAxisCount + axisIndex];
-          if (axisIndex < 2) {
-            value = Math.toRadians(value);
-          }
-        } else {
-          value = Double.NaN;
-        }
-        targetCoordinates[vertexIndex * targetAxisCount + axisIndex] = value;
-      }
-    }
+  public void perform(final CoordinatesOperationPoint point) {
+    point.x = Math.toRadians(point.x);
+    point.y = Math.toRadians(point.y);
   }
 
 }

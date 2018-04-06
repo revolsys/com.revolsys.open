@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.Circle;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
@@ -246,6 +247,18 @@ public interface Triangle extends Polygon {
     return (int)z;
   }
 
+  static double getElevation(final List<Triangle> triangles, final double x, final double y) {
+    for (final Triangle triangle : triangles) {
+      if (triangle.contains(x, y)) {
+        final double z = triangle.getElevation(x, y);
+        if (Double.isFinite(z)) {
+          return z;
+        }
+      }
+    }
+    return Double.NaN;
+  }
+
   default boolean circumcircleContains(final double x, final double y) {
     final double x1 = getCoordinate(0, X);
     final double y1 = getCoordinate(0, Y);
@@ -358,27 +371,28 @@ public interface Triangle extends Polygon {
 
   @Override
   default void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    final int axisCount = coordinates.length;
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     final int vertexCount = getVertexCount();
-    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += axisCount) {
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
-      }
-      coordinatesOperation.perform(axisCount, coordinates, axisCount, coordinates);
-      action.accept(coordinates);
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = getX(vertexIndex);
+      final double y = getY(vertexIndex);
+      final double z = getZ(vertexIndex);
+      point.setPoint(x, y, z);
+      coordinatesOperation.perform(point);
+      action.accept(point);
     }
   }
 
   @Override
-  default void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
-    final int axisCount = coordinates.length;
+  default void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
     final int vertexCount = getVertexCount();
-    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += axisCount) {
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
-      }
-      action.accept(coordinates);
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = getX(vertexIndex);
+      final double y = getY(vertexIndex);
+      final double z = getZ(vertexIndex);
+      point.setPoint(x, y, z);
+      action.accept(point);
     }
   }
 
@@ -678,18 +692,6 @@ public interface Triangle extends Polygon {
   @Override
   default boolean isEmpty() {
     return false;
-  }
-
-  static double getElevation(final List<Triangle> triangles, final double x, final double y) {
-    for (final Triangle triangle : triangles) {
-      if (triangle.contains(x, y)) {
-        final double z = triangle.getElevation(x, y);
-        if (Double.isFinite(z)) {
-          return z;
-        }
-      }
-    }
-    return Double.NaN;
   }
 
 }

@@ -32,7 +32,7 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
 
   private final double k0;
 
-  private final double lambda0; // central meridian
+  private final double λ0; // central meridian
 
   private final Ellipsoid ellipsoid;
 
@@ -49,7 +49,7 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
     this.ellipsoid = geodeticDatum.getEllipsoid();
     this.x0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
-    this.lambda0 = Math.toRadians(centralMeridian);
+    this.λ0 = Math.toRadians(centralMeridian);
     this.a = this.ellipsoid.getSemiMajorAxis();
     this.k0 = scaleFactor;
     this.ep2 = (this.a * this.a
@@ -88,19 +88,17 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
   }
 
   @Override
-  public void inverse(final double x, final double y, final double[] targetCoordinates,
-    final int targetOffset) {
-
-    final double phi1 = footPointLatitude(y - this.y0);
-    final double cosPhi1 = Math.cos(phi1);
-    final double sinPhi = Math.sin(phi1);
+  public void inverse(final CoordinatesOperationPoint point) {
+    final double φ1 = footPointLatitude(point.y - this.y0);
+    final double cosPhi1 = Math.cos(φ1);
+    final double sinPhi = Math.sin(φ1);
     final double sinPhi1Sq = sinPhi * sinPhi;
-    final double tanPhi1 = Math.tan(phi1);
+    final double tanPhi1 = Math.tan(φ1);
 
     final double nu1 = this.a / Math.sqrt(1 - this.eSq * sinPhi1Sq);
     final double rho1 = this.a * (1 - this.eSq) / Math.pow(1 - this.eSq * sinPhi1Sq, 1.5);
     final double c1 = this.eSq * cosPhi1 * cosPhi1;
-    final double d = (x - this.x0) / (nu1 * this.k0);
+    final double d = (point.x - this.x0) / (nu1 * this.k0);
     final double d2 = d * d;
     final double d3 = d2 * d;
     final double d4 = d2 * d2;
@@ -110,37 +108,32 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
 
     final double c1Sq = c1 * c1;
     final double t1Sq = t1 * t1;
-    final double phi = phi1 - nu1 * Math.tan(phi1 / rho1)
+    point.x = this.λ0 + (d - (1 + 2 * t1 + c1) * d3 / 6
+      + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8 * this.eSq + 24 * t1Sq) * d5 / 120) / cosPhi1;
+    point.y = φ1 - nu1 * Math.tan(φ1 / rho1)
       * (d2 / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - 9 * this.eSq) * d4 / 24
         + (61 + 90 * t1 + 298 * c1 + 45 * t1Sq - 252 * this.eSq - 3 * c1Sq) * d6 / 720);
-
-    final double lambda = this.lambda0 + (d - (1 + 2 * t1 + c1) * d3 / 6
-      + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8 * this.eSq + 24 * t1Sq) * d5 / 120) / cosPhi1;
-
-    targetCoordinates[targetOffset] = Math.toDegrees(lambda);
-    targetCoordinates[targetOffset + 1] = Math.toDegrees(phi);
   }
 
   @Override
-  public void project(final double lon, final double lat, final double[] targetCoordinates,
-    final int targetOffset) {
-    final double lambda = Math.toRadians(lon);
-    final double phi = Math.toRadians(lat);
+  public void project(final CoordinatesOperationPoint point) {
+    final double λ = point.x;
+    final double φ = point.y;
 
     // ep2 = the second eccentricity squared.
     // N = the radius of curvature of the ellipsoid in the prime vertical plane
-    final double n = this.ellipsoid.primeVerticalRadiusOfCurvature(phi);
-    final double n2 = this.ep2 * Math.pow(Math.cos(phi), 2.0);
+    final double n = this.ellipsoid.primeVerticalRadiusOfCurvature(φ);
+    final double n2 = this.ep2 * Math.pow(Math.cos(φ), 2.0);
     final double n4 = n2 * n2;
     final double n6 = n4 * n2;
     final double n8 = n4 * n4;
-    final double t = Math.tan(phi);
+    final double t = Math.tan(φ);
     final double t2 = t * t;
     final double t4 = t2 * t2;
     final double t6 = t4 * t2;
-    final double cosLat = Math.cos(phi);
-    final double sinLat = Math.sin(phi);
-    final double l = lambda - this.lambda0;
+    final double cosLat = Math.cos(φ);
+    final double sinLat = Math.sin(φ);
+    final double l = λ - this.λ0;
     final double l2 = l * l;
     final double l3 = l2 * l;
     final double l4 = l2 * l2;
@@ -166,10 +159,10 @@ public class TransverseMercatorSouthOriented extends AbstractCoordinatesProjecti
     v2 = 61.0 - 58.0 * t2 + t4 + 270.0 * n2 - 330.0 * t2 * n2 + 445.0 * n4 + 324.0 * n6
       - 680.0 * n4 * t2 + 88.0 * n8 - 600.0 * n6 * t2 - 192.0 * n8 * t2;
     v3 = 1385.0 - 311.0 * t2 + 543.0 * t4 - t6;
-    final double y = s0(phi) / n + u0 + u1 * v1 + u2 * v2 + u3 * v3;
+    final double y = s0(φ) / n + u0 + u1 * v1 + u2 * v2 + u3 * v3;
 
-    targetCoordinates[targetOffset] = this.x0 - n * x * this.k0;
-    targetCoordinates[targetOffset + 1] = this.y0 - n * y * this.k0;
+    point.x = this.x0 - n * x * this.k0;
+    point.y = this.y0 - n * y * this.k0;
   }
 
   private double s0(final double lat) {

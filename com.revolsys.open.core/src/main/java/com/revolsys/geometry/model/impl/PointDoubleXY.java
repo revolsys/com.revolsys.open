@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.MathUtil;
@@ -102,29 +103,28 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    if (!isEmpty()) {
-      coordinates[0] = this.x;
-      coordinates[1] = this.y;
-      coordinatesOperation.perform(2, coordinates, 2, coordinates);
-      action.accept(coordinates);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
-    if (!isEmpty()) {
-      coordinates[0] = this.x;
-      coordinates[1] = this.y;
-      action.accept(coordinates);
-    }
-  }
-
-  @Override
   public void forEachVertex(final Consumer3Double action) {
     if (!isEmpty()) {
       action.accept(this.x, this.y, java.lang.Double.NaN);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    if (!isEmpty()) {
+      point.setPoint(this.x, this.y);
+      coordinatesOperation.perform(point);
+      action.accept(point);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
+    if (!isEmpty()) {
+      point.setPoint(this.x, this.y);
+      action.accept(point);
     }
   }
 

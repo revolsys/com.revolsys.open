@@ -1,23 +1,21 @@
 package com.revolsys.geometry.cs.gsb;
 
-import java.util.Arrays;
-
 import org.junit.Test;
+
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
 public class GridShiftTest {
 
   @Test
   public void testGridShift() {
-    final BindaryGridShiftFile file = new BindaryGridShiftFile(
+    final BinaryGridShiftFile file = new BinaryGridShiftFile(
       "ftp://ftp.gdbc.gov.bc.ca/sections/outgoing/gsr/NTv2.0/BC_27_05.GSB", false);
 
-    final double[] coordinates = {
-      -123, 49
-    };
-    System.out.println(Arrays.toString(coordinates));
-    file.getForwardOperation().perform(2, coordinates, 2, coordinates);
-    System.out.println(Arrays.toString(coordinates));
-    file.getReverseOperation().perform(2, coordinates, 2, coordinates);
-    System.out.println(Arrays.toString(coordinates));
+    final CoordinatesOperationPoint point = new CoordinatesOperationPoint(-123, 49);
+    System.out.println(point);
+    file.getForwardOperation().perform(point);
+    System.out.println(point);
+    file.getReverseOperation().perform(point);
+    System.out.println(point);
   }
 }

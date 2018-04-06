@@ -60,6 +60,7 @@ import com.revolsys.geometry.algorithm.InteriorPointArea;
 import com.revolsys.geometry.algorithm.InteriorPointLine;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
@@ -1369,59 +1370,58 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   void forEachVertex(BiConsumerDouble action);
 
-  default void forEachVertex(final Consumer<double[]> action) {
+  default void forEachVertex(final Consumer<CoordinatesOperationPoint> action) {
     if (!isEmpty()) {
-      final int axisCount = getAxisCount();
-      final double[] coordinates = new double[axisCount];
-      forEachVertex(coordinates, action);
+      final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+      forEachVertex(point, action);
     }
   }
 
   void forEachVertex(Consumer3Double action);
 
-  void forEachVertex(CoordinatesOperation coordinatesOperation, double[] coordinates,
-    Consumer<double[]> action);
+  void forEachVertex(CoordinatesOperation coordinatesOperation, CoordinatesOperationPoint point,
+    Consumer<CoordinatesOperationPoint> action);
 
-  void forEachVertex(double[] coordinates, Consumer<double[]> action);
+  void forEachVertex(CoordinatesOperationPoint coordinates,
+    Consumer<CoordinatesOperationPoint> action);
 
   default void forEachVertex(final GeometryFactory geometryFactory,
-    final Consumer<double[]> action) {
+    final Consumer<CoordinatesOperationPoint> action) {
     if (!isEmpty()) {
       int axisCount = getAxisCount();
       final int axisCount2 = geometryFactory.getAxisCount();
       if (axisCount2 < axisCount) {
         axisCount = axisCount2;
       }
-      final double[] coordinates = new double[axisCount];
+      final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
       if (isProjectionRequired(geometryFactory)) {
         final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
-        forEachVertex(coordinatesOperation, coordinates, action);
+        forEachVertex(coordinatesOperation, point, action);
       } else {
-        forEachVertex(coordinates, action);
+        forEachVertex(point, action);
       }
     }
   }
 
   default void forEachVertex(final GeometryFactory geometryFactory, final int axisCount,
-    final Consumer<double[]> action) {
+    final Consumer<CoordinatesOperationPoint> action) {
     if (!isEmpty()) {
-      final double[] coordinates = new double[axisCount];
-      Arrays.fill(coordinates, Double.NaN);
+      final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
       if (isProjectionRequired(geometryFactory)) {
         final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
 
-        forEachVertex(coordinatesOperation, coordinates, action);
+        forEachVertex(coordinatesOperation, point, action);
       } else {
-        forEachVertex(coordinates, action);
+        forEachVertex(point, action);
       }
     }
   }
 
-  default void forEachVertex(final int axisCount, final Consumer<double[]> action) {
+  default void forEachVertex(final int axisCount,
+    final Consumer<CoordinatesOperationPoint> action) {
     if (!isEmpty()) {
-      final double[] coordinates = new double[axisCount];
-      Arrays.fill(coordinates, Double.NaN);
-      forEachVertex(coordinates, action);
+      final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+      forEachVertex(point, action);
     }
   }
 

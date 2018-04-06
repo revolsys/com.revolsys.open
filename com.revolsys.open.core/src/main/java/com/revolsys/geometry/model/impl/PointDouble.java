@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
@@ -81,33 +82,6 @@ public class PointDouble extends AbstractPoint implements Serializable {
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final double[] coordinates, final Consumer<double[]> action) {
-    if (!isEmpty()) {
-      int coordinatesLength = coordinates.length;
-      final int axisCount = getAxisCount();
-      if (coordinatesLength > axisCount) {
-        coordinatesLength = axisCount;
-      }
-      coordinatesOperation.perform(axisCount, this.coordinates, coordinatesLength, coordinates);
-      action.accept(coordinates);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final double[] coordinates, final Consumer<double[]> action) {
-    if (!isEmpty()) {
-      int coordinatesLength = coordinates.length;
-      final int axisCount = getAxisCount();
-      if (coordinatesLength > axisCount) {
-        coordinatesLength = axisCount;
-      }
-      System.arraycopy(this.coordinates, 0, coordinates, 0, coordinatesLength);
-      action.accept(coordinates);
-    }
-  }
-
-  @Override
   public void forEachVertex(final Consumer3Double action) {
     if (!isEmpty()) {
       final double x = this.coordinates[0];
@@ -120,6 +94,25 @@ public class PointDouble extends AbstractPoint implements Serializable {
       }
 
       action.accept(x, y, z);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    if (!isEmpty()) {
+      point.setPoint(this);
+      coordinatesOperation.perform(point);
+      action.accept(point);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
+    if (!isEmpty()) {
+      point.setPoint(this);
+      action.accept(point);
     }
   }
 
