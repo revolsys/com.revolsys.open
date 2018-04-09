@@ -15,7 +15,10 @@ public class WebMercator extends AbstractCoordinatesProjection {
 
   private final double a;
 
+  private final String name;
+
   public WebMercator(final ProjectedCoordinateSystem cs) {
+    this.name = cs.getCoordinateSystemName();
     final double centralMeridian = cs.getDoubleParameter(NormalizedParameterNames.CENTRAL_MERIDIAN);
     this.xo = cs.getDoubleParameter(NormalizedParameterNames.FALSE_EASTING);
     this.yo = cs.getDoubleParameter(NormalizedParameterNames.FALSE_NORTHING);
@@ -42,4 +45,8 @@ public class WebMercator extends AbstractCoordinatesProjection {
     point.y = this.yo + a * Math.log(Math.tan(Angle.PI_OVER_4 + φ / 2));
   }
 
+  @Override
+  public String toString() {
+    return this.name;
+  }
 }

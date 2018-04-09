@@ -465,12 +465,6 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return this.viewHeight;
   }
 
-  public <Q extends Quantity<Q>> Unit<Q> getViewToModelUnit(final Unit<Q> modelUnit) {
-    final double viewWidth = getViewWidthPixels();
-    final double modelWidth = getModelWidth();
-    return modelUnit.multiply(modelWidth).divide(viewWidth);
-  }
-
   public Quantity<Length> getViewWidthLength() {
     double width = getViewWidthPixels();
     if (width < 0) {
@@ -879,7 +873,8 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       convertedValue = QuantityType.doubleValue(value, CustomUnits.PIXEL);
     } else {
       convertedValue = QuantityType.doubleValue(value, Units.METRE);
-      final CoordinateSystem coordinateSystem = this.geometryFactory2d.getHorizontalCoordinateSystem();
+      final CoordinateSystem coordinateSystem = this.geometryFactory2d
+        .getHorizontalCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
         final double radius = geoCs.getDatum().getEllipsoid().getSemiMajorAxis();
@@ -968,7 +963,8 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       convertedValue *= modelUnitsPerViewUnit;
     } else {
       convertedValue = QuantityType.doubleValue(value, Units.METRE);
-      final CoordinateSystem coordinateSystem = this.geometryFactory2d.getHorizontalCoordinateSystem();
+      final CoordinateSystem coordinateSystem = this.geometryFactory2d
+        .getHorizontalCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
         final double radius = geoCs.getDatum().getEllipsoid().getSemiMajorAxis();

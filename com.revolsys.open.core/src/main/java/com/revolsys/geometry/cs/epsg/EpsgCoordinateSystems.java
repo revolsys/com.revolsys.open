@@ -65,6 +65,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public final class EpsgCoordinateSystems implements CodeTable {
+
   private static Set<CoordinateSystem> coordinateSystems;
 
   private static final IntHashMap<List<CoordinateSystem>> COORDINATE_SYSTEMS_BY_HASH_CODE = new IntHashMap<>();
@@ -95,7 +96,9 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   private static final IntHashMap<CoordinateOperation> OPERATION_BY_ID = new IntHashMap<>();
 
-  private static final IntHashMap<ParameterName> PARAM_NAME_BY_ID = new IntHashMap<>();
+  private static final IntHashMap<ParameterName> PARAM_NAME_BY_ID = new IntHashMap<>();;
+
+  private static final EpsgSystemOfUnits SYSTEM_OF_UNITS = new EpsgSystemOfUnits();
 
   private static void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
@@ -854,11 +857,14 @@ public final class EpsgCoordinateSystems implements CodeTable {
               final AngularUnit baseAngularUnit = (AngularUnit)UNIT_BY_ID.get(baseId);
               if (id == 9102) {
                 unit = new Degree(name, baseAngularUnit, conversionFactor, authority, deprecated);
+                SYSTEM_OF_UNITS.addUnit(unit, "Degree", "deg");
               } else if (id == 9105) {
                 unit = new Grad(name, baseAngularUnit, conversionFactor, authority, deprecated);
               } else if (id == 9110) {
                 unit = new DegreeSexagesimalDMS(name, baseAngularUnit, conversionFactor, authority,
                   deprecated);
+              } else if (id == 9122) {
+                unit = new Degree(name, baseAngularUnit, conversionFactor, authority, deprecated);
               } else {
                 unit = new AngularUnit(name, baseAngularUnit, conversionFactor, authority,
                   deprecated);
@@ -980,6 +986,11 @@ public final class EpsgCoordinateSystems implements CodeTable {
   @Override
   public String getIdFieldName() {
     return "coordinateSystemId";
+  }
+
+  @Override
+  public String getName() {
+    return "EPSG Units";
   }
 
   @Override
