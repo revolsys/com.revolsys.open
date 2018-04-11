@@ -2,18 +2,25 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.image.BufferedImage;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.revolsys.util.Cancellable;
 
 public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, Void>
   implements Cancellable {
+
+  private static final GeometryStyle STYLE_AREA = GeometryStyle.polygon(WebColors.FireBrick, 1,
+    WebColors.newAlpha(WebColors.FireBrick, 16));
 
   private final LayerRendererOverlay overlay;
 
@@ -47,6 +54,19 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
               final LayerRenderer<Layer> renderer = layer.getRenderer();
               if (renderer != null) {
                 renderer.render(viewport, this);
+              }
+            }
+            if (this.overlay.isShowAreaBoundingBox()) {
+              final BoundingBox areaBoundingBox = boundingBox.getAreaBoundingBox();
+              if (!areaBoundingBox.isEmpty()) {
+                final Polygon viewportPolygon = boundingBox.expandPercent(0.1).toPolygon(0);
+                final Polygon areaPolygon = areaBoundingBox.expand(viewport.getUnitsPerPixel())
+                  .toPolygon(0);
+                final Polygon drawPolygon = (Polygon)viewportPolygon.difference(areaPolygon);
+                try (
+                  BaseCloseable closeable = viewport.setUseModelCoordinates(true)) {
+                  viewport.drawGeometry(drawPolygon, STYLE_AREA);
+                }
               }
             }
             if (!isCancelled()) {

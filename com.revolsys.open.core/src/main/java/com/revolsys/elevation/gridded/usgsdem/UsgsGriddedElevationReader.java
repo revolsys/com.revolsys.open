@@ -299,6 +299,10 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   @Override
   public final GriddedElevationModel read() {
     init();
+    final int resolutionY = this.resolutionY;
+    final double resolutionZ = this.resolutionZ;
+    final double scaleY = 1 / resolutionY;
+    final double scaleZ = 1 / resolutionZ;
     try {
       final UsgsGriddedElevationModel elevationModel = new UsgsGriddedElevationModel(
         this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight, this.resolutionX);
@@ -306,7 +310,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
       final double minY = this.boundingBox.getMinY();
       int gridHeight = 0;
       int columnCount = 0;
-      final double yShift = this.resolutionY / 2.0;
+      final double yShift = resolutionY / 2.0;
       while (columnCount < this.gridWidth && readBuffer()) {
         final int rowIndex = getInteger(6) - 1;
         final int columnIndex = getInteger(6) - 1;
@@ -324,7 +328,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           gridHeight = gridYMax;
         }
 
-        final double zOffset = getDoubleSci(24);
+        final double zOffset = getDoubleSci(24) * scaleZ;
         final double minZ = getDoubleSci(24);
         final double maxZ = getDoubleSci(24);
 
@@ -339,17 +343,14 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
               }
             }
             final int value = getInteger(6);
-            final double elevation = zOffset + value * this.resolutionZ;
-            int elevationInt;
-            if (elevation > -32767) {
-              elevationInt = this.geometryFactory.toIntZ(elevation);
+            if (value > -32767) {
+              elevations[j] = (int)Math.round(zOffset + value);
             } else {
-              elevationInt = Integer.MIN_VALUE;
+              elevations[j] = Integer.MIN_VALUE;
             }
-            elevations[j] = elevationInt;
           }
           final double deltaY = y - minY;
-          final int gridY = (int)Math.floor(deltaY / this.resolutionY) - 1;
+          final int gridY = (int)Math.floor(deltaY * scaleY) - 1;
           elevationModel.setColumn(gridX, gridY, elevations);
         }
       }

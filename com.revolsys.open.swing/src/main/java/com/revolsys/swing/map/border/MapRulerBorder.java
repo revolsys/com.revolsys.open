@@ -19,19 +19,20 @@ import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
 import javax.swing.border.AbstractBorder;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.unit.Degree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 
 import tec.uom.se.quantity.Quantities;
 
 public class MapRulerBorder extends AbstractBorder {
+
+  private static final Color COLOR_OUTSIDE_AREA = new Color(239, 239, 239);
 
   private static final double[] GEOGRAPHICS_STEPS = {
     30, 10, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13,
@@ -96,12 +97,15 @@ public class MapRulerBorder extends AbstractBorder {
 
   private String unitLabel;
 
+  private BoundingBox boundingBox;
+
+  private double pixelsPerUnit;
+
   public MapRulerBorder(final Viewport2D viewport) {
     this.viewport = viewport;
-    final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-    setRulerGeometryFactory(geometryFactory);
-    Property.addListenerNewValue(viewport, "geometryFactory", this::setRulerGeometryFactory);
-    Property.addListenerNewValue(viewport, "unitsPerPixel", this::setUnitsPerPixel);
+    final BoundingBox boundingBox = viewport.getBoundingBox();
+    setBoundingBox(boundingBox);
+    Property.addListenerNewValue(viewport, "boundingBox", this::setBoundingBox);
   }
 
   private <Q extends Quantity<Q>> void drawLabel(final Graphics2D graphics, final int textX,
@@ -176,59 +180,58 @@ public class MapRulerBorder extends AbstractBorder {
     final int width, final int height) {
     final Graphics2D graphics = (Graphics2D)g;
     if (width > 0) {
-      graphics.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-      final FontMetrics fontMetrics = graphics.getFontMetrics();
-      this.labelHeight = fontMetrics.getHeight();
 
       paintBackground(graphics, x, y, width, height);
 
-      final BoundingBox boundingBox = this.viewport.getBoundingBox();
-      if (boundingBox.getWidth() > 0) {
-        paintRuler(graphics, boundingBox, true, x, y, width, height);
+      if (this.boundingBox.getWidth() > 0) {
+        graphics.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
+        final FontMetrics fontMetrics = graphics.getFontMetrics();
+        this.labelHeight = fontMetrics.getHeight();
+
+        paintRuler(graphics, true, x, y, width, height);
         graphics.setColor(Color.BLACK);
         graphics.drawRect(this.rulerSize - 1, this.rulerSize - 1, width - 2 * this.rulerSize + 1,
           height - 2 * this.rulerSize + 1);
       }
+      g.setColor(WebColors.DarkGray);
+      g.drawRect(0, 0, width - 1, height - 1);
     }
   }
 
-  private <Q extends Quantity<Q>> void paintHorizontalRuler(final Graphics2D g,
-    final BoundingBox boundingBox, final int x, final int y, final int width, final int height,
-    final boolean top) {
+  private <Q extends Quantity<Q>> void paintHorizontalRuler(final Graphics2D g, final int x,
+    final int y, final int width, final int height, final boolean top) {
     final double viewSize = this.viewport.getViewWidthPixels();
     if (viewSize > 0) {
       final AffineTransform transform = g.getTransform();
       final Shape clip = g.getClip();
       try {
         int textY;
-        LineSegment line;
 
-        final double x1 = boundingBox.getMinX();
-        final double x2 = boundingBox.getMaxX();
-        double y0;
+        final double minX = this.boundingBox.getMinX();
+        double maxX = this.boundingBox.getMaxX();
         if (top) {
           g.translate(this.rulerSize, 0);
           textY = this.labelHeight;
-          y0 = boundingBox.getMaxY();
         } else {
           g.translate(this.rulerSize, height - this.rulerSize);
           textY = this.rulerSize - 3;
-          y0 = boundingBox.getMinY();
         }
-        line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x1, y0, x2, y0);
-
-        line = line.convertGeometry(this.rulerGeometryFactory);
 
         g.setClip(0, 0, width - 2 * this.rulerSize, this.rulerSize);
 
-        final double mapSize = boundingBox.getWidth();
-        final double minX = line.getX(0);
-        double maxX = line.getX(1);
+        if (minX < this.areaMinX) {
+          final double delta = this.areaMinX - minX;
+          final int minPixel = (int)Math.floor(delta * this.pixelsPerUnit);
+          g.setColor(COLOR_OUTSIDE_AREA);
+          g.fillRect(0, 0, minPixel, this.rulerSize);
+        }
         if (maxX > this.areaMaxX) {
+          final double delta = this.areaMaxX - minX;
+          final int maxPixel = (int)Math.floor(delta * this.pixelsPerUnit);
+          g.setColor(COLOR_OUTSIDE_AREA);
+          g.fillRect(maxPixel, 0, width - 2 * this.rulerSize - maxPixel, this.rulerSize);
           maxX = this.areaMaxX;
         }
-
-        final double pixelsPerUnit = viewSize / mapSize;
 
         final long minIndex = (long)Math.floor(this.areaMinX / this.step);
         final long maxIndex = (long)Math.floor(maxX / this.step);
@@ -238,7 +241,7 @@ public class MapRulerBorder extends AbstractBorder {
         }
         for (long index = startIndex; index <= maxIndex; index++) {
           final double value = this.step * index;
-          final int pixel = (int)((value - minX) * pixelsPerUnit);
+          final int pixel = (int)((value - minX) * this.pixelsPerUnit);
           boolean found = false;
           int barSize = 4;
 
@@ -269,52 +272,50 @@ public class MapRulerBorder extends AbstractBorder {
     }
   }
 
-  private <Q extends Quantity<Q>> void paintRuler(final Graphics2D g, final BoundingBox boundingBox,
-    final boolean horizontal, final int x, final int y, final int width, final int height) {
-    paintHorizontalRuler(g, boundingBox, x, y, width, height, true);
-    paintHorizontalRuler(g, boundingBox, x, y, width, height, false);
+  private <Q extends Quantity<Q>> void paintRuler(final Graphics2D g, final boolean horizontal,
+    final int x, final int y, final int width, final int height) {
+    paintHorizontalRuler(g, x, y, width, height, true);
+    paintHorizontalRuler(g, x, y, width, height, false);
 
-    paintVerticalRuler(g, boundingBox, x, y, width, height, true);
-    paintVerticalRuler(g, boundingBox, x, y, width, height, false);
+    paintVerticalRuler(g, x, y, width, height, true);
+    paintVerticalRuler(g, x, y, width, height, false);
 
   }
 
-  private <Q extends Quantity<Q>> void paintVerticalRuler(final Graphics2D g,
-    final BoundingBox boundingBox, final int x, final int y, final int width, final int height,
-    final boolean left) {
+  private <Q extends Quantity<Q>> void paintVerticalRuler(final Graphics2D g, final int x,
+    final int y, final int width, final int height, final boolean left) {
     final double viewSize = this.viewport.getViewHeightPixels();
     if (viewSize > 0) {
       final AffineTransform transform = g.getTransform();
       final Shape clip = g.getClip();
       try {
         int textX;
-        LineSegment line;
-        final double y1 = boundingBox.getMinY();
-        final double y2 = boundingBox.getMaxY();
-        double x0;
+        final double minY = this.boundingBox.getMinY();
+        double maxY = this.boundingBox.getMaxY();
         if (left) {
-          g.translate(0, -this.rulerSize);
+          g.translate(0, this.rulerSize);
           textX = this.labelHeight;
-          x0 = boundingBox.getMinX();
         } else {
-          g.translate(width - this.rulerSize, -this.rulerSize);
+          g.translate(width - this.rulerSize, this.rulerSize);
           textX = this.rulerSize - 3;
-          x0 = boundingBox.getMaxX();
         }
-        line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x0, y1, x0, y2);
 
-        line = line.convertGeometry(this.rulerGeometryFactory);
+        final int rulerHeight = height - 2 * this.rulerSize;
+        g.setClip(0, 0, this.rulerSize, rulerHeight);
 
-        g.setClip(0, this.rulerSize * 2, this.rulerSize, height - 2 * this.rulerSize);
-
-        final double mapSize = boundingBox.getHeight();
-        final double minY = line.getY(0);
-        double maxY = line.getY(1);
+        if (minY < this.areaMinY) {
+          final double delta = this.areaMinY - minY;
+          final int minPixel = (int)Math.floor(delta * this.pixelsPerUnit);
+          g.setColor(COLOR_OUTSIDE_AREA);
+          g.fillRect(0, rulerHeight - minPixel, this.rulerSize, minPixel);
+        }
         if (maxY > this.areaMaxY) {
+          final double delta = this.areaMaxY - minY;
+          final int maxPixel = (int)Math.floor(delta * this.pixelsPerUnit);
+          g.setColor(COLOR_OUTSIDE_AREA);
+          g.fillRect(0, 0, this.rulerSize, rulerHeight - maxPixel);
           maxY = this.areaMaxY;
         }
-
-        final double pixelsPerUnit = viewSize / mapSize;
 
         final long minIndex = (long)Math.ceil(this.areaMinY / this.step);
         final long maxIndex = (long)Math.ceil(maxY / this.step);
@@ -324,7 +325,7 @@ public class MapRulerBorder extends AbstractBorder {
         }
         for (long index = startIndex; index <= maxIndex; index++) {
           final double value = this.step * index;
-          final int pixel = (int)((value - minY) * pixelsPerUnit);
+          final int pixel = (int)((value - minY) * this.pixelsPerUnit);
           boolean found = false;
           int barSize = 4;
 
@@ -338,7 +339,7 @@ public class MapRulerBorder extends AbstractBorder {
               found = true;
               final AffineTransform transform2 = g.getTransform();
               try {
-                g.translate(textX, height - pixel - 3);
+                g.translate(textX, rulerHeight - pixel - 3);
                 g.rotate(-Math.PI / 2);
                 drawLabel(g, 0, 0, value, value);
               } finally {
@@ -349,10 +350,10 @@ public class MapRulerBorder extends AbstractBorder {
           }
 
           if (left) {
-            g.drawLine(this.rulerSize - 1 - barSize, height - pixel, this.rulerSize - 1,
-              height - pixel);
+            g.drawLine(this.rulerSize - 1 - barSize, rulerHeight - pixel, this.rulerSize - 1,
+              rulerHeight - pixel);
           } else {
-            g.drawLine(0, height - pixel, barSize, height - pixel);
+            g.drawLine(0, rulerHeight - pixel, barSize, rulerHeight - pixel);
           }
 
         }
@@ -364,48 +365,48 @@ public class MapRulerBorder extends AbstractBorder {
     }
   }
 
-  private void setRulerGeometryFactory(final GeometryFactory rulerGeometryFactory) {
-    this.rulerGeometryFactory = rulerGeometryFactory;
-    if (rulerGeometryFactory == null) {
-      this.rulerGeometryFactory = this.viewport.getGeometryFactory();
-    } else {
-      this.rulerGeometryFactory = rulerGeometryFactory;
-    }
-    this.rulerCoordinateSystem = this.rulerGeometryFactory.getHorizontalCoordinateSystem();
-    this.baseUnit = this.rulerCoordinateSystem.getUnit();
-    this.unitLabel = this.baseUnit.getSymbol();
-    if (this.unitLabel == null) {
-      this.unitLabel = this.baseUnit.getName();
-    }
-    this.steps = STEPS;
-    if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
-      final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)this.rulerCoordinateSystem;
-      if (geoCs.getAngularUnit() instanceof Degree) {
-        this.areaMinX = -180;
-        this.areaMaxX = 180;
-        this.areaMinY = -90;
-        this.areaMaxY = 90;
-        this.steps = GEOGRAPHICS_STEPS;
-        this.unitLabel = "°";
-      }
-    } else {
-      final BoundingBox areaBoundingBox = this.rulerCoordinateSystem.getAreaBoundingBox();
-
-      this.areaMinX = areaBoundingBox.getMinX();
-      this.areaMaxX = areaBoundingBox.getMaxX();
-      this.areaMinY = areaBoundingBox.getMinY();
-      this.areaMaxY = areaBoundingBox.getMaxY();
-    }
-    updateValues();
-  }
-
-  private void setUnitsPerPixel(final double unitsPerPixel) {
-    this.unitsPerPixel = unitsPerPixel;
-    updateValues();
-  }
-
-  private void updateValues() {
+  private void setBoundingBox(final BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
+    this.unitsPerPixel = this.viewport.getUnitsPerPixel();
+    this.pixelsPerUnit = this.viewport.getPixelsPerXUnit();
+    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+    setRulerGeometryFactory(geometryFactory);
     this.stepLevel = getStepLevel(this.steps);
     this.step = this.steps[this.stepLevel];
+  }
+
+  private void setRulerGeometryFactory(final GeometryFactory rulerGeometryFactory) {
+    if (this.rulerGeometryFactory != rulerGeometryFactory) {
+      if (rulerGeometryFactory == null) {
+        this.rulerGeometryFactory = this.viewport.getGeometryFactory();
+      } else {
+        this.rulerGeometryFactory = rulerGeometryFactory;
+      }
+      this.rulerCoordinateSystem = this.rulerGeometryFactory.getHorizontalCoordinateSystem();
+      this.baseUnit = this.rulerCoordinateSystem.getUnit();
+      this.unitLabel = this.baseUnit.getSymbol();
+      if (this.unitLabel == null) {
+        this.unitLabel = this.baseUnit.getName();
+      }
+      this.steps = STEPS;
+      if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
+        final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)this.rulerCoordinateSystem;
+        if (geoCs.getAngularUnit() instanceof Degree) {
+          this.areaMinX = -180;
+          this.areaMaxX = 180;
+          this.areaMinY = -90;
+          this.areaMaxY = 90;
+          this.steps = GEOGRAPHICS_STEPS;
+          this.unitLabel = "°";
+        }
+      } else {
+        final BoundingBox areaBoundingBox = this.rulerCoordinateSystem.getAreaBoundingBox();
+
+        this.areaMinX = areaBoundingBox.getMinX();
+        this.areaMaxX = areaBoundingBox.getMaxX();
+        this.areaMinY = areaBoundingBox.getMinY();
+        this.areaMaxY = areaBoundingBox.getMaxY();
+      }
+    }
   }
 }

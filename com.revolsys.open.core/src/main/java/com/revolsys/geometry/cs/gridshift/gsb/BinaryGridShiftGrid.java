@@ -1,23 +1,23 @@
-package com.revolsys.geometry.cs.gsb;
+package com.revolsys.geometry.cs.gridshift.gsb;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.grid.FloatArrayGrid;
 
 public class BinaryGridShiftGrid extends BoundingBoxDoubleXY {
   private static final long serialVersionUID = 1L;
 
   private final List<BinaryGridShiftGrid> grids = new ArrayList<>();
 
-  private final FloatArrayGriddedElevationModel latAccuracies;
+  private final FloatArrayGrid latAccuracies;
 
-  private final FloatArrayGriddedElevationModel latShifts;
+  private final FloatArrayGrid latShifts;
 
-  private final FloatArrayGriddedElevationModel lonAccuracies;
+  private final FloatArrayGrid lonAccuracies;
 
-  private final FloatArrayGriddedElevationModel lonShifts;
+  private final FloatArrayGrid lonShifts;
 
   private final String name;
 
@@ -57,10 +57,10 @@ public class BinaryGridShiftGrid extends BoundingBoxDoubleXY {
         latAccuracies[i] = file.readFloat();
         lonAccuracies[i] = file.readFloat();
       }
-      this.lonAccuracies = new FloatArrayGriddedElevationModel(this.minX, this.minY, gridWidth,
-        gridHeight, gridCellSizeY, lonAccuracies);
-      this.latAccuracies = new FloatArrayGriddedElevationModel(this.minX, this.minY, gridWidth,
-        gridHeight, gridCellSizeY, latAccuracies);
+      this.lonAccuracies = new FloatArrayGrid(this.minX, this.minY, gridWidth, gridHeight,
+        gridCellSizeY, lonAccuracies);
+      this.latAccuracies = new FloatArrayGrid(this.minX, this.minY, gridWidth, gridHeight,
+        gridCellSizeY, latAccuracies);
     } else {
       for (int i = 0; i < nodeCount; i++) {
         latShifts[i] = file.readFloat();
@@ -71,10 +71,10 @@ public class BinaryGridShiftGrid extends BoundingBoxDoubleXY {
       this.lonAccuracies = null;
       this.latAccuracies = null;
     }
-    this.lonShifts = new FloatArrayGriddedElevationModel(this.minX, this.minY, gridWidth,
-      gridHeight, gridCellSizeX, lonShifts);
-    this.latShifts = new FloatArrayGriddedElevationModel(this.minX, this.minY, gridWidth,
-      gridHeight, gridCellSizeX, latShifts);
+    this.lonShifts = new FloatArrayGrid(this.minX, this.minY, gridWidth, gridHeight, gridCellSizeX,
+      lonShifts);
+    this.latShifts = new FloatArrayGrid(this.minX, this.minY, gridWidth, gridHeight, gridCellSizeX,
+      latShifts);
   }
 
   public void addGrid(final BinaryGridShiftGrid grid) {
@@ -96,19 +96,19 @@ public class BinaryGridShiftGrid extends BoundingBoxDoubleXY {
   }
 
   public double getLatAccuracy(final double lon, final double lat) {
-    return this.latAccuracies.getElevationBilinear(lon, lat);
+    return this.latAccuracies.getValueBilinear(lon, lat);
   }
 
   public double getLatShift(final double lon, final double lat) {
-    return this.latShifts.getElevationBilinear(lon, lat);
+    return this.latShifts.getValueBilinear(lon, lat);
   }
 
   public double getLonAccuracy(final double lon, final double lat) {
-    return this.lonAccuracies.getElevationBilinear(lon, lat);
+    return this.lonAccuracies.getValueBilinear(lon, lat);
   }
 
   public double getLonShift(final double lon, final double lat) {
-    return this.lonShifts.getElevationBilinear(lon, lat);
+    return this.lonShifts.getValueBilinear(lon, lat);
   }
 
   public String getName() {

@@ -10,6 +10,8 @@ import javax.measure.quantity.Angle;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.Authority;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.util.Md5;
 
 import si.uom.NonSI;
@@ -27,6 +29,7 @@ public class AngularUnit implements UnitOfMeasure {
     .add("degree minute second hemisphere", NonSI.DEGREE_ANGLE)
     .add("degree hemisphere", NonSI.DEGREE_ANGLE)
     .add("degree minute hemisphere", NonSI.DEGREE_ANGLE)
+    .add("degree (supplier to define representation)", NonSI.DEGREE_ANGLE)
     .add("hemisphere degree", NonSI.DEGREE_ANGLE)
     .add("hemisphere degree minute", NonSI.DEGREE_ANGLE)
     .add("hemisphere degree minute second", NonSI.DEGREE_ANGLE)
@@ -46,6 +49,10 @@ public class AngularUnit implements UnitOfMeasure {
   private String name;
 
   private Unit<Angle> unit;
+
+  public CoordinatesOperation fromRadiansOperation = this::fromRadians;
+
+  public CoordinatesOperation toRadiansOperation = this::toRadians;
 
   public AngularUnit(final String name, final AngularUnit baseUnit, final double conversionFactor,
     final Authority authority, final boolean deprecated) {
@@ -94,6 +101,25 @@ public class AngularUnit implements UnitOfMeasure {
       }
     } else {
       return false;
+    }
+  }
+
+  public void fromRadians(final CoordinatesOperationPoint point) {
+    point.x = fromRadians(point.x);
+    point.y = fromRadians(point.y);
+  }
+
+  public double fromRadians(final double value) {
+    final double baseValue;
+    if (Double.isFinite(this.conversionFactor)) {
+      baseValue = value / this.conversionFactor;
+    } else {
+      baseValue = value;
+    }
+    if (this.baseUnit == null) {
+      return baseValue;
+    } else {
+      return this.baseUnit.fromRadians(baseValue);
     }
   }
 
@@ -181,6 +207,11 @@ public class AngularUnit implements UnitOfMeasure {
     } else {
       return this.baseUnit.toDegrees(baseValue);
     }
+  }
+
+  public void toRadians(final CoordinatesOperationPoint point) {
+    point.x = toRadians(point.x);
+    point.y = toRadians(point.y);
   }
 
   public double toRadians(final double value) {

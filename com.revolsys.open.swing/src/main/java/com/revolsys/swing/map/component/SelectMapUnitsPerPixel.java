@@ -29,6 +29,8 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
+import si.uom.NonSI;
+
 public class SelectMapUnitsPerPixel extends JComboBox<Double>
   implements ItemListener, PropertyChangeListener, ActionListener {
 
@@ -136,7 +138,11 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
           this.format = new DecimalFormat("#,###.#######", FORMAT_SYMBOLS);
         }
         final Unit<?> unit = coordinateSystem.getUnit();
-        this.unitString = unit.toString();
+        if (unit == NonSI.DEGREE_ANGLE) {
+          this.unitString = "°";
+        } else {
+          this.unitString = unit.getSymbol();
+        }
         toolTip = "Map Resolution (" + unit + "/pixel)";
       }
       final ComboBoxModel<Double> model = newModel(this.viewport);

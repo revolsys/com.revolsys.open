@@ -14,14 +14,12 @@ import com.revolsys.geometry.cs.epsg.CoordinateOperation;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.RadiansToDegreesOperation;
 import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
-import si.uom.NonSI;
 import tec.uom.se.unit.Units;
 
 public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSystem {
@@ -176,17 +174,8 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
     } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
       final List<CoordinatesOperation> operations = new ArrayList<>();
-      final Unit<Angle> angularUnit1 = getUnit();
-      if (!angularUnit1.equals(NonSI.DEGREE_ANGLE)) {
-        CoordinatesOperation converstionOperation;
-        if (angularUnit1.equals(Units.RADIAN)) {
-          converstionOperation = RadiansToDegreesOperation.INSTANCE;
-        } else {
-          converstionOperation = new UnitConverstionOperation(angularUnit1, NonSI.DEGREE_ANGLE, 2);
-        }
-
-        operations.add(converstionOperation);
-      }
+      final AngularUnit angularUnit = getAngularUnit();
+      operations.add(angularUnit.toRadiansOperation);
       // TODO geodeticDatum shift
       final CoordinatesOperation projectOperation = projectedCoordinateSystem
         .getProjectCoordinatesOperation();

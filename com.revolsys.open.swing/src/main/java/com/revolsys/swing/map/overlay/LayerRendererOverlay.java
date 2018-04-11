@@ -47,6 +47,8 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
 
   private Viewport2D viewport;
 
+  private boolean showAreaBoundingBox = false;
+
   public LayerRendererOverlay(final MapPanel mapPanel) {
     this(mapPanel, null);
   }
@@ -79,6 +81,10 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
 
   public Viewport2D getViewport() {
     return this.viewport;
+  }
+
+  public boolean isShowAreaBoundingBox() {
+    return this.showAreaBoundingBox;
   }
 
   @Override
@@ -191,5 +197,10 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
       redraw();
       firePropertyChange("layer", old, layer);
     }
+  }
+
+  public void setShowAreaBoundingBox(final boolean showAreaBoundingBox) {
+    this.showAreaBoundingBox = showAreaBoundingBox;
+    redraw();
   }
 }

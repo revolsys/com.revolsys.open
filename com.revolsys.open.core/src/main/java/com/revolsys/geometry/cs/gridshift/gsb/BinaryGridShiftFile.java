@@ -1,4 +1,4 @@
-package com.revolsys.geometry.cs.gsb;
+package com.revolsys.geometry.cs.gridshift.gsb;
 
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;

@@ -5,7 +5,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class UsgsGriddedElevationModel extends AbstractGriddedElevationModel {
-  private static final int NULL_VALUE = Integer.MIN_VALUE;
+  public static final int NULL_VALUE = Integer.MIN_VALUE;
 
   private final UsgsGriddedElevationModelColumn[] columns;
 

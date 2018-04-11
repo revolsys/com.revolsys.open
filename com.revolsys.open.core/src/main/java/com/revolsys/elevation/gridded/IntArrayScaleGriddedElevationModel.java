@@ -61,8 +61,8 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   public void forEachElevationFinite(final DoubleConsumer action) {
     for (final int elevation : this.elevations) {
       if (elevation != NULL_VALUE) {
-        final double z = toDoubleZ(elevation);
-        action.accept(z);
+        final double value = toDoubleZ(elevation);
+        action.accept(value);
       }
     }
   }
@@ -128,8 +128,8 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
           if (countZ > 0) {
             final double x = minX + gridCellSize * gridX;
             final double y = minY + gridCellSize * gridY;
-            final double z = toDoubleZ((int)(sumZ / countZ));
-            points.appendVertex(x, y, z);
+            final double value = toDoubleZ((int)(sumZ / countZ));
+            points.appendVertex(x, y, value);
           }
         }
         index++;

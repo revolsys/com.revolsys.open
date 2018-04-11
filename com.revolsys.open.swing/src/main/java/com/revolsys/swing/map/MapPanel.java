@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.undo.UndoableEdit;
@@ -50,6 +51,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
@@ -280,6 +282,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     Property.addListener(this.baseMapOverlay, "layer", this);
 
     this.layerOverlay = new LayerRendererOverlay(this, project);
+    this.layerOverlay.setShowAreaBoundingBox(project.getProperty("showAreaBoundingBox", true));
     this.layeredPane.add(this.layerOverlay, Integer.valueOf(1));
 
     Property.addListener(this.baseMapLayers, this);
@@ -747,6 +750,16 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     add(this.statusBarPanel, BorderLayout.SOUTH);
     this.statusBarPanel.add(this.leftStatusBar, BorderLayout.WEST);
     this.statusBarPanel.add(this.rightStatusBar, BorderLayout.EAST);
+
+    final JToggleButton showAreaBBOXButton = new JToggleButton(Icons.getIcon("area_bbox"));
+    showAreaBBOXButton.setToolTipText("Show/Hide Max Extents");
+    showAreaBBOXButton.addActionListener(event -> {
+      final boolean selected = showAreaBBOXButton.isSelected();
+      this.layerOverlay.setShowAreaBoundingBox(selected);
+      this.project.setProperty("showAreaBoundingBox", selected);
+    });
+    showAreaBBOXButton.setBorderPainted(false);
+    this.leftStatusBar.add(showAreaBBOXButton);
 
     addPointerLocation(false);
     addPointerLocation(true);

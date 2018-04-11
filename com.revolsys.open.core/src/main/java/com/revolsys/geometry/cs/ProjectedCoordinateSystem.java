@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.measure.Unit;
-import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
 
 import com.revolsys.datatype.DataType;
@@ -17,11 +16,11 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.cs.projection.NoOpOperation;
 import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
+import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
-import si.uom.NonSI;
 import tec.uom.se.unit.Units;
 
 public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSystem {
@@ -169,6 +168,7 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
       operations.add(inverseOperation);
 
       if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+        // TODO datum conversion
         final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
         final CoordinatesOperation projectOperation = projectedCoordinateSystem
           .getProjectCoordinatesOperation();
@@ -181,10 +181,9 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
         }
       } else if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
-        final Unit<Angle> angularUnit2 = geographicCoordinateSystem.getUnit();
-        if (!angularUnit2.equals(NonSI.DEGREE_ANGLE)) {
-          operations.add(new UnitConverstionOperation(NonSI.DEGREE_ANGLE, angularUnit2, 2));
-        }
+        // TODO datum conversion
+        final AngularUnit angularUnit = geographicCoordinateSystem.getAngularUnit();
+        operations.add(angularUnit.fromRadiansOperation);
       } else {
         return null;
       }

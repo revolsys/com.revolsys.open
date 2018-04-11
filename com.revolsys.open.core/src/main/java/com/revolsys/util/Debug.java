@@ -100,6 +100,10 @@ public class Debug {
     System.out.println(object);
   }
 
+  public static void println(final Object... values) {
+    System.out.println(Strings.toString(",", values));
+  }
+
   public static void printTime() {
     println(new Timestamp(System.currentTimeMillis()));
   }

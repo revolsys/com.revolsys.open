@@ -40,6 +40,14 @@ public interface GeometryFactoryProxy {
     return geometry;
   }
 
+  default BoundingBox getAreaBoundingBox() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory != null) {
+      return geometryFactory.getAreaBoundingBox();
+    }
+    return BoundingBox.empty();
+  }
+
   default CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       return null;

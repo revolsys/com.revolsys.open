@@ -1024,6 +1024,16 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
   }
 
+  @Override
+  public BoundingBox getAreaBoundingBox() {
+    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    if (coordinateSystem == null) {
+      return BoundingBox.empty();
+    } else {
+      return coordinateSystem.getAreaBoundingBox();
+    }
+  }
+
   public final int getAxisCount() {
     return this.axisCount;
   }
