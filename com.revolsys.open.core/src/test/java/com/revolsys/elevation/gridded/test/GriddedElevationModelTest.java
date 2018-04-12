@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
+import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevationModel;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.Dates;
 

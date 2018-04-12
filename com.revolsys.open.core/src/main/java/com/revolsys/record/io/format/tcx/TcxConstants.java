@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.tcx;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public interface TcxConstants {
@@ -24,7 +25,7 @@ public interface TcxConstants {
 
   QName EXTENSIONS = new QName(_NS_URI, "Extensions");
 
-  GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(4326);
+  GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(EpsgCoordinateSystems.WGS84_ID);
 
   QName HEART_RATE_BPM = new QName(_NS_URI, "HeartRateBpm");
 

@@ -8,6 +8,7 @@ import org.junit.Test;
 import com.revolsys.geometry.algorithm.LineStringLocation;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -90,7 +91,7 @@ public class LineStringTest {
       geometryFactory2 = GeometryFactory
         .floating(geographicCoordinateSystem.getCoordinateSystemId(), axisCount);
     } else {
-      geometryFactory2 = GeometryFactory.floating(26910, axisCount);
+      geometryFactory2 = GeometryFactory.floating(EpsgCoordinateSystems.nad83UtmId(10), axisCount);
     }
 
     assertCoordinatesEquals(point, coordinates);
@@ -197,7 +198,7 @@ public class LineStringTest {
   @Test
   public void constructEmpty() {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
-      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, axisCount,
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(EpsgCoordinateSystems.nad83UtmId(10), axisCount,
         GeometryFactory.newScalesFixed(axisCount, 1000.0));
 
       // Empty Constructor
@@ -249,10 +250,10 @@ public class LineStringTest {
       if (axisCountLess > 2) {
         axisCountLess--;
       }
-      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, axisCount,
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(EpsgCoordinateSystems.nad83UtmId(10), axisCount,
         GeometryFactory.newScalesFixed(axisCount, 1000.0));
-      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(26910, axisCount + 1);
-      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(26910, axisCountLess);
+      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(EpsgCoordinateSystems.nad83UtmId(10), axisCount + 1);
+      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(EpsgCoordinateSystems.nad83UtmId(10), axisCountLess);
       final double[] coordinatesExtra = new double[axisCount + 1];
       final double[] coordinates = new double[axisCount];
       final double[] coordinatesLess = new double[axisCountLess];
@@ -355,7 +356,7 @@ public class LineStringTest {
 
   @Test
   public void testMerge() {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed3d(26910, 1.0, 1.0, 1.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed3d(EpsgCoordinateSystems.nad83UtmId(10), 1.0, 1.0, 1.0);
 
     // Last point is duplicated
     final LineString line1 = geometryFactory.lineString(3, START_X, START_Y, 0, START_X + 100,
@@ -418,7 +419,7 @@ public class LineStringTest {
 
   @Test
   public void testSplit() {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed3d(26910, 1000.0, 1000.0, 1.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed3d(EpsgCoordinateSystems.nad83UtmId(10), 1000.0, 1000.0, 1.0);
 
     // Last point is duplicated
     final LineString line = geometryFactory.lineString(3, START_X, START_Y, 0, START_X + 100,

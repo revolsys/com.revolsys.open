@@ -16,7 +16,7 @@ public class EsriGeodatabaseXmlRecordWriterFactory extends AbstractIoFactoryWith
     super(EsriGeodatabaseXmlConstants.FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(EsriGeodatabaseXmlConstants.MEDIA_TYPE,
       EsriGeodatabaseXmlConstants.FILE_EXTENSION);
-    setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(4326));
+    setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(EpsgCoordinateSystems.WGS84_ID));
   }
 
   @Override

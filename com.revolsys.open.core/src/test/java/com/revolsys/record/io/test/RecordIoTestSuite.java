@@ -11,6 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
@@ -72,7 +73,8 @@ public class RecordIoTestSuite {
               maxRingCount = 0;
             }
             for (int ringCount = 0; ringCount <= maxRingCount; ringCount++) {
-              final GeometryFactory geometryFactory = GeometryFactory.floating(4326, axisCount);
+              final GeometryFactory geometryFactory = GeometryFactory
+                .floating(EpsgCoordinateSystems.WGS84_ID, axisCount);
               double delta = 1.0;
               if (geometryFactory.isProjected()) {
                 delta = 1000.0;

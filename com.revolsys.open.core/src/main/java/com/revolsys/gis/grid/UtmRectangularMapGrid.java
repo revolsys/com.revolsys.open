@@ -13,9 +13,9 @@ import com.revolsys.util.number.Doubles;
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems
-    .getCoordinateSystem(4326);
+    .getCoordinateSystem(EpsgCoordinateSystems.WGS84_ID);
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(4326);
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(EpsgCoordinateSystems.WGS84_ID);
 
   public static final UtmRectangularMapGrid INSTANCE = new UtmRectangularMapGrid();
 
@@ -144,7 +144,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     final int horizontalZone = getHorizontalZone(sheet);
     final int verticalZone = getVerticalZone(sheet);
     if (horizontalZone < 24 && verticalZone >= 'n') {
-      return 26900 + horizontalZone;
+      return EpsgCoordinateSystems.nad83UtmId(horizontalZone);
     } else {
       throw new IllegalArgumentException("UTM Zone " + sheet + " is not in North America");
     }

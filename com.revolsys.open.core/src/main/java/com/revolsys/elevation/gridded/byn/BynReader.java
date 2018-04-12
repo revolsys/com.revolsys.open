@@ -8,6 +8,7 @@ import java.util.Map;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
@@ -154,9 +155,10 @@ public class BynReader extends BaseObjectWithProperties implements GriddedElevat
     final short datum = this.reader.getShort();
     final short ellipsoid = this.reader.getShort();
     if (datum == 0) {
-      this.geometryFactory = GeometryFactory.fixed3d(4326, 3600.0, 3600.0, scaleZ);
+      this.geometryFactory = GeometryFactory.fixed3d(EpsgCoordinateSystems.WGS84_ID, 3600.0, 3600.0, scaleZ);
     } else if (datum == 1) {
-      this.geometryFactory = GeometryFactory.fixed3d(4269, 3600.0, 3600.0, scaleZ);
+      this.geometryFactory = GeometryFactory.fixed3d(EpsgCoordinateSystems.NAD83_ID, 3600.0, 3600.0,
+        scaleZ);
     } else {
     }
     final short byteOrder = this.reader.getShort();

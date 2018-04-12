@@ -17,7 +17,7 @@ import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.spring.resource.Resource;
 
-public class BinaryGridShiftFile {
+public class GsbGridShiftFile {
   private static GeographicCoordinateSystem getCoordinateSystem(final String name) {
     final GeographicCoordinateSystem coordinateSystem = EpsgCoordinateSystems
       .getCoordinateSystem(name);
@@ -46,7 +46,7 @@ public class BinaryGridShiftFile {
 
   private final String version;
 
-  private final List<BinaryGridShiftGrid> grids = new ArrayList<>();
+  private final List<GsbGridShiftGrid> grids = new ArrayList<>();
 
   private transient ChannelReader in;
 
@@ -54,12 +54,12 @@ public class BinaryGridShiftFile {
 
   private GeographicCoordinateSystem toCoordinateSystem;
 
-  private final GridShiftOperation forwardOperation = this::shiftForward;
+  private final GridShiftOperation forwardOperation = new GsbGridShiftOperation(this);
 
   private final GridShiftOperation inverseOperation = this::shiftInverse;
 
   @SuppressWarnings("unused")
-  public BinaryGridShiftFile(final Object source, final boolean loadAccuracy) {
+  public GsbGridShiftFile(final Object source, final boolean loadAccuracy) {
     try (
       ChannelReader in = Resource.getResource(source).newChannelReader()) {
       this.in = in;
@@ -97,6 +97,11 @@ public class BinaryGridShiftFile {
     }
   }
 
+  public void addGridShiftOperation(final GeographicCoordinateSystem sourceCs,
+    final GeographicCoordinateSystem targetCs) {
+    sourceCs.addGridShiftOperation(targetCs, this.forwardOperation);
+  }
+
   public GridShiftOperation getForwardOperation() {
     return this.forwardOperation;
   }
@@ -105,12 +110,12 @@ public class BinaryGridShiftFile {
     return this.fromCoordinateSystem;
   }
 
-  public BinaryGridShiftGrid getGrid(final double lonPositiveWestSeconds, final double latSeconds) {
-    for (final BinaryGridShiftGrid topLevelSubGrid : this.grids) {
-      final BinaryGridShiftGrid binaryGridShiftGrid = topLevelSubGrid
-        .getGrid(lonPositiveWestSeconds, latSeconds);
-      if (binaryGridShiftGrid != null) {
-        return binaryGridShiftGrid;
+  public GsbGridShiftGrid getGrid(final double lonPositiveWestSeconds, final double latSeconds) {
+    for (final GsbGridShiftGrid topLevelSubGrid : this.grids) {
+      final GsbGridShiftGrid gsbGridShiftGrid = topLevelSubGrid.getGrid(lonPositiveWestSeconds,
+        latSeconds);
+      if (gsbGridShiftGrid != null) {
+        return gsbGridShiftGrid;
       }
     }
     return null;
@@ -132,25 +137,25 @@ public class BinaryGridShiftFile {
     try (
       TsvWriter writer = Tsv.plainWriter("/Users/paustin/Downloads/bc.tsv")) {
       writer.write("polygon");
-      final List<BinaryGridShiftGrid> grids = new ArrayList<>();
+      final List<GsbGridShiftGrid> grids = new ArrayList<>();
       for (int i = 0; i < gridCount; i++) {
-        final BinaryGridShiftGrid grid = new BinaryGridShiftGrid(this, loadAccuracy);
+        final GsbGridShiftGrid grid = new GsbGridShiftGrid(this, loadAccuracy);
         grids.add(grid);
         writer.write(grid.getBoundingBox().toPolygon(100));
       }
     }
-    final Map<String, BinaryGridShiftGrid> gridByName = new HashMap<>();
-    for (final BinaryGridShiftGrid grid : this.grids) {
+    final Map<String, GsbGridShiftGrid> gridByName = new HashMap<>();
+    for (final GsbGridShiftGrid grid : this.grids) {
       if (!grid.hasParent()) {
         this.grids.add(grid);
       }
       final String name = grid.getName();
       gridByName.put(name, grid);
     }
-    for (final BinaryGridShiftGrid grid : this.grids) {
+    for (final GsbGridShiftGrid grid : this.grids) {
       if (grid.hasParent()) {
         final String parentName = grid.getParentName();
-        final BinaryGridShiftGrid parentGrid = gridByName.get(parentName);
+        final GsbGridShiftGrid parentGrid = gridByName.get(parentName);
         parentGrid.addGrid(grid);
       }
     }
@@ -198,23 +203,6 @@ public class BinaryGridShiftFile {
     return value;
   }
 
-  public boolean shiftForward(final CoordinatesOperationPoint point) {
-    final double lon = point.x;
-    final double lat = point.y;
-    final double lonPositiveWestSeconds = -lon * 3600;
-    final double latSeconds = lat * 3600;
-    final BinaryGridShiftGrid binaryGridShiftGrid = getGrid(lonPositiveWestSeconds, latSeconds);
-    if (binaryGridShiftGrid == null) {
-      return false;
-    } else {
-      final double lonShift = binaryGridShiftGrid.getLonShift(lonPositiveWestSeconds, latSeconds);
-      final double latShift = binaryGridShiftGrid.getLatShift(lonPositiveWestSeconds, latSeconds);
-      point.x = -(lonPositiveWestSeconds + lonShift) / 3600;
-      point.y = (latSeconds + latShift) / 3600;
-      return true;
-    }
-  }
-
   public boolean shiftInverse(final CoordinatesOperationPoint point) {
     final double lon = point.x;
     final double lat = point.y;
@@ -225,19 +213,17 @@ public class BinaryGridShiftFile {
     for (int i = 0; i < 4; i++) {
       final double forwardLonPositiveWestSeconds = lonPositiveWestSeconds - lonShift;
       final double forwardLatSeconds = latSeconds - latShift;
-      final BinaryGridShiftGrid binaryGridShiftGrid = getGrid(forwardLonPositiveWestSeconds,
+      final GsbGridShiftGrid gsbGridShiftGrid = getGrid(forwardLonPositiveWestSeconds,
         forwardLatSeconds);
-      if (binaryGridShiftGrid == null) {
+      if (gsbGridShiftGrid == null) {
         if (i == 0) {
           return false;
         } else {
           return true;
         }
       } else {
-        lonShift = binaryGridShiftGrid.getLonShift(forwardLonPositiveWestSeconds,
-          forwardLatSeconds);
-        latShift = binaryGridShiftGrid.getLatShift(forwardLonPositiveWestSeconds,
-          forwardLatSeconds);
+        lonShift = gsbGridShiftGrid.getLonShift(forwardLonPositiveWestSeconds, forwardLatSeconds);
+        latShift = gsbGridShiftGrid.getLatShift(forwardLonPositiveWestSeconds, forwardLatSeconds);
       }
     }
     point.x = -(lonPositiveWestSeconds - lonShift) / 3600;

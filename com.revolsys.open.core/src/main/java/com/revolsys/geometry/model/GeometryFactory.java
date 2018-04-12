@@ -455,7 +455,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public static GeometryFactory nad83() {
-    return floating3d(4269);
+    return floating3d(EpsgCoordinateSystems.NAD83_ID);
   }
 
   @SuppressWarnings("unchecked")
@@ -557,7 +557,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public static GeometryFactory wgs84() {
-    return floating3d(4326);
+    return floating3d(EpsgCoordinateSystems.WGS84_ID);
   }
 
   public static GeometryFactory worldMercator() {
@@ -1114,7 +1114,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       final int coordinateSystemId = geographicCs.getCoordinateSystemId();
       return floating(coordinateSystemId, this.axisCount);
     } else {
-      return floating(4326, this.axisCount);
+      return floating(EpsgCoordinateSystems.WGS84_ID, this.axisCount);
     }
   }
 

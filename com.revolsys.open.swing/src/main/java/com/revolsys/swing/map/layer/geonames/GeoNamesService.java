@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -85,7 +86,7 @@ public class GeoNamesService {
   }
 
   public List<Record> getNames(final BoundingBox boundingBox) {
-    final GeometryFactory geometryFactory = GeometryFactory.floating3d(4326);
+    final GeometryFactory geometryFactory = GeometryFactory.floating3d(EpsgCoordinateSystems.WGS84_ID);
     final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)geometryFactory
       .getHorizontalCoordinateSystem();
     final BoundingBox geographicBoundingBox = boundingBox.convert(geometryFactory);
@@ -113,7 +114,7 @@ public class GeoNamesService {
   }
 
   public List<Record> getWikipediaArticles(final BoundingBox boundingBox) {
-    final BoundingBox geographicBoundingBox = boundingBox.convert(GeometryFactory.floating3d(4326));
+    final BoundingBox geographicBoundingBox = boundingBox.convert(GeometryFactory.floating3d(EpsgCoordinateSystems.WGS84_ID));
     final Map<String, Object> params = new HashMap<>();
 
     params.put("north", geographicBoundingBox.getMaxY());

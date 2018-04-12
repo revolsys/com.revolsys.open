@@ -7,7 +7,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
 public class EllipsoidTest {
   private static final GeographicCoordinateSystem NAD83 = EpsgCoordinateSystems
-    .getCoordinateSystem(4269);
+    .getCoordinateSystem(EpsgCoordinateSystems.NAD83_ID);
 
   private static final Ellipsoid NAD83_ELLIPSOID = NAD83.getDatum().getEllipsoid();
 

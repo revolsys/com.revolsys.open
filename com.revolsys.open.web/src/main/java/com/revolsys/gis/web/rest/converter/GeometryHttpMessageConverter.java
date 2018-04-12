@@ -29,7 +29,7 @@ import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<Geometry> {
-  private GeometryFactory geometryFactory = GeometryFactory.floating3d(4326);
+  private GeometryFactory geometryFactory = GeometryFactory.wgs84();
 
   public GeometryHttpMessageConverter() {
     super(Geometry.class, IoFactory.mediaTypes(GeometryReaderFactory.class),

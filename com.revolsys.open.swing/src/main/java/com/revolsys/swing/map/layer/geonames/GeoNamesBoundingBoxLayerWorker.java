@@ -7,6 +7,7 @@ import java.util.Map;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -22,7 +23,7 @@ import com.revolsys.swing.parallel.AbstractSwingWorker;
 public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<LayerRecord>, Void> {
 
   public static BoundingBoxRecordLayer newLayer(final Map<String, ? extends Object> config) {
-    final GeometryFactory wgs84 = GeometryFactory.floating3d(4326);
+    final GeometryFactory wgs84 = GeometryFactory.floating3d(EpsgCoordinateSystems.WGS84_ID);
     final BoundingBoxRecordLayer layer = new BoundingBoxRecordLayer("geoname", "Geo Names",
       GeoNamesBoundingBoxLayerWorker.class, wgs84);
 

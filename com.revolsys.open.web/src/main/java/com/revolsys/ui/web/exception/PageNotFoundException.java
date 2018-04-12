@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class PageNotFoundException extends RuntimeException {
   /** The unique serial version UID for the class. */
-  private static final long serialVersionUID = -2691390352514959032L;
+  private static final long serialVersionUID = 1L;
 
   /**
    * Construct a new PageNotFoundException.

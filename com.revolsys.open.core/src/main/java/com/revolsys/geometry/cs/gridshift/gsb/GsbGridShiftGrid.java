@@ -7,9 +7,9 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.grid.FloatArrayGrid;
 
-public class BinaryGridShiftGrid {
+public class GsbGridShiftGrid {
 
-  private final List<BinaryGridShiftGrid> grids = new ArrayList<>();
+  private final List<GsbGridShiftGrid> grids = new ArrayList<>();
 
   private final FloatArrayGrid latAccuracies;
 
@@ -31,10 +31,10 @@ public class BinaryGridShiftGrid {
 
   private final double maxX;
 
-  private final BinaryGridShiftFile file;
+  private final GsbGridShiftFile file;
 
   @SuppressWarnings("unused")
-  public BinaryGridShiftGrid(final BinaryGridShiftFile file, final boolean loadAccuracy) {
+  public GsbGridShiftGrid(final GsbGridShiftFile file, final boolean loadAccuracy) {
     this.file = file;
     this.name = file.readRecordString();
     this.parentName = file.readRecordString();
@@ -55,7 +55,7 @@ public class BinaryGridShiftGrid {
     final int nodeCount = file.readRecordInt();
     if (nodeCount != gridWidth * gridHeight) {
       throw new IllegalStateException(
-        "BinaryGridShiftGrid " + this.name + " has inconsistent grid dimensions");
+        "GsbGridShiftGrid " + this.name + " has inconsistent grid dimensions");
     }
     final float[] latShifts = new float[nodeCount];
     final float[] lonShifts = new float[nodeCount];
@@ -88,7 +88,7 @@ public class BinaryGridShiftGrid {
       latShifts);
   }
 
-  public void addGrid(final BinaryGridShiftGrid grid) {
+  public void addGrid(final GsbGridShiftGrid grid) {
     this.grids.add(grid);
   }
 
@@ -103,10 +103,10 @@ public class BinaryGridShiftGrid {
       this.maxY / 3600);
   }
 
-  public BinaryGridShiftGrid getGrid(final double lonSeconds, final double latSeconds) {
+  public GsbGridShiftGrid getGrid(final double lonSeconds, final double latSeconds) {
     if (covers(lonSeconds, latSeconds)) {
-      for (final BinaryGridShiftGrid grid : this.grids) {
-        final BinaryGridShiftGrid childGrid = grid.getGrid(lonSeconds, latSeconds);
+      for (final GsbGridShiftGrid grid : this.grids) {
+        final GsbGridShiftGrid childGrid = grid.getGrid(lonSeconds, latSeconds);
         if (childGrid != null) {
           return childGrid;
         }

@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.capabilities.WmsCapabilities;
@@ -33,7 +34,7 @@ public class WmsClient extends AbstractWebService<WmsLayerDefinition>
   public static final String J_TYPE = "ogcWmsServer";
 
   public static int getCoordinateSystemId(final String srs) {
-    int coordinateSystemId = 4326;
+    int coordinateSystemId = EpsgCoordinateSystems.WGS84_ID;
     try {
       final int colonIndex = srs.indexOf(':');
       if (colonIndex != -1) {

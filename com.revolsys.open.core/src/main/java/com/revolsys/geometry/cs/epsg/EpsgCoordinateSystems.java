@@ -67,39 +67,45 @@ import com.revolsys.util.WrappedException;
 
 public final class EpsgCoordinateSystems implements CodeTable {
 
-  private static Set<CoordinateSystem> coordinateSystems;
+  private static final IntHashMap<Area> AREA_BY_ID = new IntHashMap<>();
 
-  private static final IntHashMap<List<CoordinateSystem>> COORDINATE_SYSTEMS_BY_HASH_CODE = new IntHashMap<>();
+  private static final Map<String, AxisName> AXIS_NAME_BY_NAME = new HashMap<>();
+
+  private static final IntHashMap<AxisName> AXIS_NAMES = new IntHashMap<>();
 
   private static final IntHashMap<CoordinateSystem> COORDINATE_SYSTEM_BY_ID = new IntHashMap<>();
 
   private static final Map<String, CoordinateSystem> COORDINATE_SYSTEM_BY_NAME = new TreeMap<>();
 
+  private static final IntHashMap<CoordinateSystemType> COORDINATE_SYSTEM_TYPE_BY_ID = new IntHashMap<>();
+
+  private static final IntHashMap<List<CoordinateSystem>> COORDINATE_SYSTEMS_BY_HASH_CODE = new IntHashMap<>();
+
+  private static Set<CoordinateSystem> coordinateSystems;
+
+  private static final IntHashMap<Datum> DATUM_BY_ID = new IntHashMap<>();
+
   private static boolean initialized = false;
+
+  public static final int NAD27_ID = 4267;
+
+  public static final int NAD83_ID = 4269;
+
+  private static int nextSrid = 2000000;
+
+  private static final IntHashMap<CoordinateOperation> OPERATION_BY_ID = new IntHashMap<>();
+
+  private static final IntHashMap<ParameterName> PARAM_NAME_BY_ID = new IntHashMap<>();
+
+  private static final IntHashMap<PrimeMeridian> PRIME_MERIDIAN_BY_ID = new IntHashMap<>();;
+
+  private static final EpsgSystemOfUnits SYSTEM_OF_UNITS = new EpsgSystemOfUnits();
 
   private static final IntHashMap<UnitOfMeasure> UNIT_BY_ID = new IntHashMap<>();
 
   private static final Map<String, UnitOfMeasure> UNIT_BY_NAME = new TreeMap<>();
 
-  private static int nextSrid = 2000000;
-
-  private static final IntHashMap<AxisName> AXIS_NAMES = new IntHashMap<>();
-
-  private static final Map<String, AxisName> AXIS_NAME_BY_NAME = new HashMap<>();
-
-  private static final IntHashMap<Area> AREA_BY_ID = new IntHashMap<>();
-
-  private static final IntHashMap<Datum> DATUM_BY_ID = new IntHashMap<>();
-
-  private static final IntHashMap<PrimeMeridian> PRIME_MERIDIAN_BY_ID = new IntHashMap<>();
-
-  private static final IntHashMap<CoordinateSystemType> COORDINATE_SYSTEM_TYPE_BY_ID = new IntHashMap<>();
-
-  private static final IntHashMap<CoordinateOperation> OPERATION_BY_ID = new IntHashMap<>();
-
-  private static final IntHashMap<ParameterName> PARAM_NAME_BY_ID = new IntHashMap<>();;
-
-  private static final EpsgSystemOfUnits SYSTEM_OF_UNITS = new EpsgSystemOfUnits();
+  public static final int WGS84_ID = 4326;
 
   private static void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
@@ -905,6 +911,22 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
+  public static final int nad27UtmId(final int zone) {
+    if (zone >= 1 && zone <= 22) {
+      return 26700 + zone;
+    } else {
+      throw new IllegalArgumentException("Invalid NAD27 / UTM zone " + zone);
+    }
+  }
+
+  public static final int nad83UtmId(final int zone) {
+    if (zone >= 1 && zone <= 23) {
+      return 26900 + zone;
+    } else {
+      throw new IllegalArgumentException("Invalid NAD83 / UTM zone " + zone);
+    }
+  }
+
   private static ChannelReader newChannelReader(final String fileName) {
     return new ClassPathResource("CoordinateSystems/epsg/" + fileName + ".bin").newChannelReader();
   }
@@ -955,8 +977,24 @@ public final class EpsgCoordinateSystems implements CodeTable {
     return stringWriter.toString();
   }
 
-  public static CoordinateSystem wgs84() {
-    return EpsgCoordinateSystems.<CoordinateSystem> getCoordinateSystem(4326);
+  public static final int wgs72UtmId(final int zone) {
+    if (zone >= 1 && zone <= 60) {
+      return 32200 + zone;
+    } else {
+      throw new IllegalArgumentException("Invalid WGS 72 / UTM zone " + zone);
+    }
+  }
+
+  public static GeographicCoordinateSystem wgs84() {
+    return EpsgCoordinateSystems.getCoordinateSystem(WGS84_ID);
+  }
+
+  public static final int wgs84UtmId(final int zone) {
+    if (zone >= 1 && zone <= 60) {
+      return 32600 + zone;
+    } else {
+      throw new IllegalArgumentException("Invalid WGS 84 / UTM zone " + zone);
+    }
   }
 
   private Map<Identifier, List<Object>> codes;

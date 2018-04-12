@@ -49,8 +49,13 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
   }
 
   private static ArrayListComboBoxModel<Integer> newModel() {
-    return new ArrayListComboBoxModel<>(3857, 3005, 26907, 26908, 26909, 26910, 26911, 4326, 4269,
-      4267);
+    return new ArrayListComboBoxModel<>(3857, 3005, //
+      EpsgCoordinateSystems.nad83UtmId(7), //
+      EpsgCoordinateSystems.nad83UtmId(8), //
+      EpsgCoordinateSystems.nad83UtmId(9), //
+      EpsgCoordinateSystems.nad83UtmId(10), //
+      EpsgCoordinateSystems.nad83UtmId(11), //
+      EpsgCoordinateSystems.WGS84_ID, EpsgCoordinateSystems.NAD83_ID, EpsgCoordinateSystems.NAD27_ID);
   }
 
   public CoordinateSystemField(final String fieldName) {

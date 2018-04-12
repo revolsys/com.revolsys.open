@@ -35,6 +35,7 @@ import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
@@ -114,7 +115,7 @@ public class SaifReader extends AbstractReader<Record>
   /** The directory the SAIF archive is extracted to. */
   private File saifArchiveDirectory;
 
-  private int srid = 26910;
+  private int srid = EpsgCoordinateSystems.nad83UtmId(10);
 
   /** Mapping between type names and file names. */
   private final Map<String, String> typePathFileNameMap = new HashMap<>();
@@ -529,7 +530,7 @@ public class SaifReader extends AbstractReader<Record>
         final Record coordinateSystem = spatialReferencing.getValue("coordSystem");
         if (coordinateSystem.getRecordDefinition().getPath().equals("/UTM")) {
           final Number srid = coordinateSystem.getValue("zone");
-          setSrid(26900 + srid.intValue());
+          setSrid(EpsgCoordinateSystems.nad83UtmId(srid.intValue()));
         }
       }
     } finally {

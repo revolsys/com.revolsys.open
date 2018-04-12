@@ -28,16 +28,16 @@ public class Nadcon5GridShiftOperation implements GridShiftOperation {
       final int sourceDatumIndex = region.getDatumIndex(this.sourceDatumName);
       final int targetDatumIndex = region.getDatumIndex(this.targetDatumName);
 
-      double newLat = lat;
       double newLon = lon;
+      double newLat = lat;
       if (targetDatumIndex > sourceDatumIndex) {
         for (int i = sourceDatumIndex; i < targetDatumIndex; ++i) {
           final int fileIndex = i;
           final double lonShift = region.getLonShift(fileIndex, newLon, newLat);
           final double latShift = region.getLatShift(fileIndex, newLon, newLat);
           if (Double.isFinite(lonShift)) {
-            newLat += latShift;
             newLon += lonShift;
+            newLat += latShift;
             if (!region.covers(newLon, newLat)) {
               return false;
             }
@@ -51,8 +51,8 @@ public class Nadcon5GridShiftOperation implements GridShiftOperation {
           final double lonShift = region.getLonShift(fileIndex, newLon, newLat);
           final double latShift = region.getLatShift(fileIndex, newLon, newLat);
           if (Double.isFinite(lonShift)) {
-            newLat -= latShift;
             newLon -= lonShift;
+            newLat -= latShift;
             if (!region.covers(newLon, newLat)) {
               return false;
             }

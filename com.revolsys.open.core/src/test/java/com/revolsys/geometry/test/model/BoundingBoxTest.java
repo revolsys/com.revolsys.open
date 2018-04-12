@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -107,7 +108,8 @@ public class BoundingBoxTest implements TestConstants {
       }
       Assert.assertEquals("srid", geometryFactory.getCoordinateSystemId(), srid);
       final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      Assert.assertEquals("coordinateSystem", coordinateSystem, boundingBox.getHorizontalCoordinateSystem());
+      Assert.assertEquals("coordinateSystem", coordinateSystem,
+        boundingBox.getHorizontalCoordinateSystem());
       if (coordinateSystem != null) {
         unit = coordinateSystem.getUnit();
         lengthUnit = coordinateSystem.getLengthUnit();
@@ -299,12 +301,14 @@ public class BoundingBoxTest implements TestConstants {
         final BoundingBox noGeometryFactory = noGf.newBoundingBox(axisCount, points);
         assertBoundingBox(null, noGeometryFactory, noGf, false, axisCount, bounds);
 
-        final GeometryFactory gfFloating = GeometryFactory.floating(4326, axisCount);
+        final GeometryFactory gfFloating = GeometryFactory.floating(EpsgCoordinateSystems.WGS84_ID,
+          axisCount);
         assertBoundingBox(null, gfFloating.newBoundingBox(axisCount, points), gfFloating, false,
           axisCount, bounds);
 
         final double[] scales = GeometryFactory.newScalesFixed(axisCount, 10.0);
-        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, scales);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(EpsgCoordinateSystems.WGS84_ID,
+          axisCount, scales);
 
         points = gfFixed.getPrecise(points);
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
@@ -373,12 +377,14 @@ public class BoundingBoxTest implements TestConstants {
         final BoundingBox noGeometryFactory = noGf.newBoundingBox(axisCount, points);
         assertBoundingBox(null, noGeometryFactory, noGf, false, axisCount, bounds);
 
-        final GeometryFactory gfFloating = GeometryFactory.floating(4326, axisCount);
+        final GeometryFactory gfFloating = GeometryFactory.floating(EpsgCoordinateSystems.WGS84_ID,
+          axisCount);
         assertBoundingBox(null, gfFloating.newBoundingBox(axisCount, points), gfFloating, false,
           axisCount, bounds);
 
         final double[] scales = GeometryFactory.newScalesFixed(axisCount, 10.0);
-        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, scales);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(EpsgCoordinateSystems.WGS84_ID,
+          axisCount, scales);
 
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
         assertBoundingBox(null, gfFixed.newBoundingBox(axisCount, points), gfFixed, false,

@@ -37,9 +37,9 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
 
   private final Map<String, Integer> coordinateSystemIdBySrsName = Maps
     .<String, Integer> buildHash()//
-    // .add("UTM83-09", 26909) //
-    // .add("UTM83-10", 26910) //
-    // .add("UTM83-11", 26911) //
+    // .add("UTM83-09", EpsgCoordinateSystems.nad83UtmId(9)) //
+    // .add("UTM83-10", EpsgCoordinateSystems.nad83UtmId(10)) //
+    // .add("UTM83-11", EpsgCoordinateSystems.nad83UtmId(11)) //
     // .add("UTM83-12", 26912) //
     // .add("WORLD-MERCATOR", 3857) //
     .getMap();

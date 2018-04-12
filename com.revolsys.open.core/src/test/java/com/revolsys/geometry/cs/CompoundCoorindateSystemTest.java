@@ -10,7 +10,7 @@ public class CompoundCoorindateSystemTest {
   @Test
   public void testStandard() {
     final CompoundCoordinateSystem compoundCoordinateSystem = EpsgCoordinateSystems
-      .getCompound(4269, 5703);
+      .getCompound(EpsgCoordinateSystems.NAD83_ID, 5703);
     Assert.assertEquals(5498, compoundCoordinateSystem.getCoordinateSystemId());
   }
 }

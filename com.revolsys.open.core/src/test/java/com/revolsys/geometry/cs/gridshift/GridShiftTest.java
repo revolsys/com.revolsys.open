@@ -3,7 +3,7 @@ package com.revolsys.geometry.cs.gridshift;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.geometry.cs.gridshift.gsb.BinaryGridShiftFile;
+import com.revolsys.geometry.cs.gridshift.gsb.GsbGridShiftFile;
 import com.revolsys.geometry.cs.gridshift.nadcon5.Nadcon5GridShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
@@ -51,7 +51,7 @@ public class GridShiftTest {
 
   @Test
   public void testGridShift() {
-    final BinaryGridShiftFile file = new BinaryGridShiftFile(
+    final GsbGridShiftFile file = new GsbGridShiftFile(
       "ftp://ftp.gdbc.gov.bc.ca/sections/outgoing/gsr/NTv2.0/BC_27_05.GSB", false);
 
     final CoordinatesOperationPoint point = new CoordinatesOperationPoint(-123, 49);

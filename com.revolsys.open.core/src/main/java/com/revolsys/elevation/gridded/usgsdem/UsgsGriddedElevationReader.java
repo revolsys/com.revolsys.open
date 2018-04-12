@@ -175,16 +175,16 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     int geographicCoordinateSystemId;
     switch (horizontalDatum) {
       case 1: // NAD 27
-        geographicCoordinateSystemId = 4267;
+        geographicCoordinateSystemId = EpsgCoordinateSystems.NAD27_ID;
       break;
       case 2: // WGS 72
         geographicCoordinateSystemId = 4322;
       break;
       case 3: // WGS 84
-        geographicCoordinateSystemId = 4326;
+        geographicCoordinateSystemId = EpsgCoordinateSystems.WGS84_ID;
       break;
       case 4: // NAD 83
-        geographicCoordinateSystemId = 4269;
+        geographicCoordinateSystemId = EpsgCoordinateSystems.NAD83_ID;
       break;
 
       default:
@@ -473,16 +473,16 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           // UTM Zones
           switch (horizontalDatum) {
             case 1: // NAD27
-              horizontalCoordinateSystemId = 26700 + zone;
+              horizontalCoordinateSystemId = EpsgCoordinateSystems.nad27UtmId(zone);
             break;
             case 2: // WGS 72
-              horizontalCoordinateSystemId = 32200 + zone;
+              horizontalCoordinateSystemId = EpsgCoordinateSystems.wgs72UtmId(zone);
             break;
             case 3: // WGS 84
-              horizontalCoordinateSystemId = 32600 + zone;
+              horizontalCoordinateSystemId = EpsgCoordinateSystems.wgs84UtmId(zone);
             break;
             case 4: // NAD 83
-              horizontalCoordinateSystemId = 26900 + zone;
+              horizontalCoordinateSystemId = EpsgCoordinateSystems.nad83UtmId(zone);
             break;
 
             default:
