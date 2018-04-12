@@ -2,7 +2,7 @@ package com.revolsys.record.io.format.kml;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 
 public interface Kml22Constants {
   String KML_NS_URI = "http://www.opengis.net/kml/2.2";
@@ -15,7 +15,7 @@ public interface Kml22Constants {
 
   QName COLOR_MODE = new QName(KML_NS_URI, "colorMode");
 
-  int COORDINATE_SYSTEM_ID = EpsgCoordinateSystems.WGS84_ID;
+  int COORDINATE_SYSTEM_ID = EpsgId.WGS84;
 
   QName COORDINATES = new QName(KML_NS_URI, "coordinates");
 

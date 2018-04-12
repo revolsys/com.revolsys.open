@@ -6,9 +6,7 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -16,7 +14,6 @@ import java.util.zip.ZipInputStream;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
-import com.revolsys.geometry.cs.Axis;
 import com.revolsys.geometry.cs.CompoundCoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -28,8 +25,8 @@ import com.revolsys.geometry.cs.ParameterValue;
 import com.revolsys.geometry.cs.ParameterValueNumber;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.VerticalCoordinateSystem;
-import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.cs.unit.Metre;
 import com.revolsys.geometry.model.BoundingBox;
@@ -175,16 +172,16 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     int geographicCoordinateSystemId;
     switch (horizontalDatum) {
       case 1: // NAD 27
-        geographicCoordinateSystemId = EpsgCoordinateSystems.NAD27_ID;
+        geographicCoordinateSystemId = EpsgId.NAD27;
       break;
       case 2: // WGS 72
         geographicCoordinateSystemId = 4322;
       break;
       case 3: // WGS 84
-        geographicCoordinateSystemId = EpsgCoordinateSystems.WGS84_ID;
+        geographicCoordinateSystemId = EpsgId.WGS84;
       break;
       case 4: // NAD 83
-        geographicCoordinateSystemId = EpsgCoordinateSystems.NAD83_ID;
+        geographicCoordinateSystemId = EpsgId.NAD83;
       break;
 
       default:
@@ -254,29 +251,21 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     switch (verticalDatum) {
       case 1: // Mean Sea Level
         if (metres) {
-          return EpsgCoordinateSystems.getCoordinateSystem(5714);
+          return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.MSL_HEIGHT_METRE);
         } else {
-          final VerticalDatum datum = EpsgCoordinateSystems.getDatum(5100);
-          final List<Axis> axis = Collections.singletonList(new Axis("Up", "UP"));
-          final Map<ParameterName, ParameterValue> parameters = Collections.emptyMap();
-          return new VerticalCoordinateSystem(null, "MSL height (ftUS)", datum, parameters,
-            verticalUom, axis);
+          return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.MSL_HEIGHT_FOOT);
         }
       case 2: // NGVD_1929
         if (metres) {
-          final VerticalDatum datum = EpsgCoordinateSystems.getDatum(5102);
-          final List<Axis> axis = Collections.singletonList(new Axis("Up", "UP"));
-          final Map<ParameterName, ParameterValue> parameters = Collections.emptyMap();
-          return new VerticalCoordinateSystem(null, "NGVD29 height (metre)", datum, parameters,
-            verticalUom, axis);
+          return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.NGVD29_HEIGHT_METRE);
         } else {
-          return EpsgCoordinateSystems.getCoordinateSystem(5702);
+          return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.NGVD29_HEIGHT_FOOT_US);
         }
       case 3: // NAVD_1988
         if (metres) {
-          return EpsgCoordinateSystems.getCoordinateSystem(5703);
+          return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.NAVD88_HEIGHT_METRE);
         } else {
-          return EpsgCoordinateSystems.getCoordinateSystem(6360);
+          return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.NAVD88_HEIGHT_FOOT);
         }
 
       default:
@@ -473,16 +462,16 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           // UTM Zones
           switch (horizontalDatum) {
             case 1: // NAD27
-              horizontalCoordinateSystemId = EpsgCoordinateSystems.nad27UtmId(zone);
+              horizontalCoordinateSystemId = EpsgId.nad27Utm(zone);
             break;
             case 2: // WGS 72
-              horizontalCoordinateSystemId = EpsgCoordinateSystems.wgs72UtmId(zone);
+              horizontalCoordinateSystemId = EpsgId.wgs72Utm(zone);
             break;
             case 3: // WGS 84
-              horizontalCoordinateSystemId = EpsgCoordinateSystems.wgs84UtmId(zone);
+              horizontalCoordinateSystemId = EpsgId.wgs84Utm(zone);
             break;
             case 4: // NAD 83
-              horizontalCoordinateSystemId = EpsgCoordinateSystems.nad83UtmId(zone);
+              horizontalCoordinateSystemId = EpsgId.nad83Utm(zone);
             break;
 
             default:
@@ -518,7 +507,8 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
             || projectedCoordinateSystem2 == null) {
             horizontalCoordinateSystem = projectedCoordinateSystem;
           } else {
-            horizontalCoordinateSystemId = projectedCoordinateSystem2.getCoordinateSystemId();
+            horizontalCoordinateSystemId = projectedCoordinateSystem2
+              .getHorizontalCoordinateSystemId();
           }
         } else {
           throw new IllegalArgumentException(

@@ -38,9 +38,9 @@ public class GeodeticDatum extends Datum {
     } else if (object instanceof GeodeticDatum) {
       final GeodeticDatum geodeticDatum = (GeodeticDatum)object;
       if (this.ellipsoid.equals(geodeticDatum.ellipsoid)) {
-        return false;
-      } else {
         return true;
+      } else {
+        return false;
       }
     }
     return false;
@@ -58,12 +58,12 @@ public class GeodeticDatum extends Datum {
     }
   }
 
-  public PrimeMeridian getPrimeMeridian() {
-    return this.primeMeridian;
-  }
-
   public Ellipsoid getEllipsoid() {
     return this.ellipsoid;
+  }
+
+  public PrimeMeridian getPrimeMeridian() {
+    return this.primeMeridian;
   }
 
   public ToWgs84 getToWgs84() {

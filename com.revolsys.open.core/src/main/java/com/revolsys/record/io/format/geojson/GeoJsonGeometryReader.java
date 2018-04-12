@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
@@ -80,7 +80,7 @@ public class GeoJsonGeometryReader extends AbstractIterator<Geometry> implements
   protected void initDo() {
     this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (this.geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.floating3d(EpsgCoordinateSystems.WGS84_ID);
+      this.geometryFactory = GeometryFactory.floating3d(EpsgId.WGS84);
     }
     if (this.in.hasNext()) {
       this.in.next();

@@ -36,6 +36,10 @@ public class GeographicCoordinateSystemGridShiftOperation implements Coordinates
     }
   }
 
+  public void removeOperation(final GridShiftOperation operation) {
+    this.operations.remove(operation);
+  }
+
   @Override
   public String toString() {
     return this.sourceCoordinateSystem + " -> " + this.targetCoordinateSystem;

@@ -56,12 +56,12 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.HorizontalCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.cs.VerticalCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.NoOpOperation;
-import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.AbstractPoint;
@@ -455,7 +455,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public static GeometryFactory nad83() {
-    return floating3d(EpsgCoordinateSystems.NAD83_ID);
+    return floating3d(EpsgId.NAD83);
   }
 
   @SuppressWarnings("unchecked")
@@ -557,7 +557,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public static GeometryFactory wgs84() {
-    return floating3d(EpsgCoordinateSystems.WGS84_ID);
+    return floating3d(EpsgId.WGS84);
   }
 
   public static GeometryFactory worldMercator() {
@@ -577,8 +577,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   private final EmptyPoint emptyPoint = new EmptyPoint();
 
   private transient final WktParser parser = new WktParser(this);
-
-  private final IntHashMap<CoordinatesOperation> coordinatesOperationById = new IntHashMap<>();
 
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount) {
     if (axisCount < 2) {
@@ -1053,43 +1051,15 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
    */
   @Override
   public CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
-    if (geometryFactory == this) {
-      return null;
-    } else if (geometryFactory == null) {
-      return null;
-    } else if (!geometryFactory.isHasHorizontalCoordinateSystem()) {
-      return null;
-    } else if (!isHasHorizontalCoordinateSystem()) {
+    if (geometryFactory == this || geometryFactory == null) {
       return null;
     } else {
-      if (hasSameCoordinateSystem(geometryFactory)) {
+      final CoordinateSystem otherCoordinateSystem = geometryFactory
+        .getHorizontalCoordinateSystem();
+      if (this.horizontalCoordinateSystem == null || otherCoordinateSystem == null) {
         return null;
       } else {
-        final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-        final int otherCoordinateSystemId = geometryFactory.getCoordinateSystemId();
-        if (otherCoordinateSystemId > 0) {
-          CoordinatesOperation coordinatesOperation = this.coordinatesOperationById
-            .get(otherCoordinateSystemId);
-          if (coordinatesOperation == null) {
-            final CoordinateSystem otherCoordinateSystem = geometryFactory
-              .getHorizontalCoordinateSystem();
-            try {
-              coordinatesOperation = ProjectionFactory.getCoordinatesOperation(coordinateSystem,
-                otherCoordinateSystem);
-              this.coordinatesOperationById.put(otherCoordinateSystemId, coordinatesOperation);
-            } catch (final IllegalArgumentException e) {
-              this.coordinatesOperationById.put(otherCoordinateSystemId, new NoOpOperation());
-              Logs.error(this,
-                "Cannot get conversion from " + coordinateSystem + " to " + otherCoordinateSystem,
-                e);
-            }
-          }
-          return coordinatesOperation;
-        } else {
-          final CoordinateSystem otherCoordinateSystem = geometryFactory
-            .getHorizontalCoordinateSystem();
-          return ProjectionFactory.getCoordinatesOperation(coordinateSystem, otherCoordinateSystem);
-        }
+        return this.horizontalCoordinateSystem.getCoordinatesOperation(otherCoordinateSystem);
       }
     }
   }
@@ -1114,7 +1084,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       final int coordinateSystemId = geographicCs.getCoordinateSystemId();
       return floating(coordinateSystemId, this.axisCount);
     } else {
-      return floating(EpsgCoordinateSystems.WGS84_ID, this.axisCount);
+      return floating(EpsgId.WGS84, this.axisCount);
     }
   }
 
@@ -1286,6 +1256,18 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return 0;
   }
 
+  public VerticalCoordinateSystem getVerticalCoordinateSystem() {
+    if (this.coordinateSystem instanceof CompoundCoordinateSystem) {
+      final CompoundCoordinateSystem compoundCoordinateSystem = (CompoundCoordinateSystem)this.coordinateSystem;
+      return compoundCoordinateSystem.getVerticalCoordinateSystem();
+    } else if (this.coordinateSystem instanceof VerticalCoordinateSystem) {
+      final VerticalCoordinateSystem verticalCoordinateSystem = (VerticalCoordinateSystem)this.coordinateSystem;
+      return verticalCoordinateSystem;
+    } else {
+      return null;
+    }
+  }
+
   @Override
   public int hashCode() {
     return this.coordinateSystemId;
@@ -1366,7 +1348,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     if (coordinateSystemThis == coordinateSystem //
       || coordinateSystemThis == null //
       || coordinateSystem == null //
-      || coordinateSystemThis.getCoordinateSystemId() == coordinateSystem.getCoordinateSystemId() //
+      || coordinateSystemThis.getHorizontalCoordinateSystemId() == coordinateSystem
+        .getHorizontalCoordinateSystemId() //
       || coordinateSystemThis.equals(coordinateSystem)) {
       return false;
     } else {
@@ -1387,11 +1370,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public boolean isSameCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    final int coordinateSystemId = getCoordinateSystemId();
+    final int coordinateSystemId = getHorizontalCoordinateSystemId();
     if (coordinateSystem == null) {
       return this.coordinateSystem == null;
     } else {
-      final int coordinateSystemId2 = coordinateSystem.getCoordinateSystemId();
+      final int coordinateSystemId2 = coordinateSystem.getHorizontalCoordinateSystemId();
       if (coordinateSystemId == coordinateSystemId2) {
         return true;
       } else {
@@ -1416,8 +1399,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     if (geometryFactory == null) {
       return false;
     } else {
-      final int coordinateSystemId = getCoordinateSystemId();
-      final int coordinateSystemId2 = geometryFactory.getCoordinateSystemId();
+      final int coordinateSystemId = getHorizontalCoordinateSystemId();
+      final int coordinateSystemId2 = geometryFactory.getHorizontalCoordinateSystemId();
       if (coordinateSystemId == coordinateSystemId2) {
         return true;
       } else {
@@ -2356,7 +2339,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public void writeOffsetScaled3d(final ChannelWriter writer) {
-    final int coordinateSystemId = getCoordinateSystemId();
+    final int coordinateSystemId = getHorizontalCoordinateSystemId();
     writer.putInt(coordinateSystemId);
     writer.putDouble(getOffsetX());
     writer.putDouble(getScaleX());
@@ -2389,7 +2372,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     if (coordinateSystem == null) {
       return false;
     } else {
-      final int coordinateSystemId = getCoordinateSystemId();
+      final int coordinateSystemId = getHorizontalCoordinateSystemId();
       final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
         .getCoordinateSystem(coordinateSystemId);
       if (esriCoordinateSystem == null) {

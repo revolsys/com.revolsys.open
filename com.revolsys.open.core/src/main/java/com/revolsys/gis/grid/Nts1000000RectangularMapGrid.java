@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
@@ -18,7 +18,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     .compile("^" + NtsConstants.REGEX_1000000 + ".*");
 
   private final GeometryFactory geometryFactory = GeometryFactory
-    .floating2d(EpsgCoordinateSystems.WGS84_ID);
+    .floating2d(EpsgId.WGS84);
 
   private double precisionScale = 1;
 

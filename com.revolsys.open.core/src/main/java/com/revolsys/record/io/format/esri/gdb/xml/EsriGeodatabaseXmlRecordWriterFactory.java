@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
@@ -16,7 +17,7 @@ public class EsriGeodatabaseXmlRecordWriterFactory extends AbstractIoFactoryWith
     super(EsriGeodatabaseXmlConstants.FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(EsriGeodatabaseXmlConstants.MEDIA_TYPE,
       EsriGeodatabaseXmlConstants.FILE_EXTENSION);
-    setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(EpsgCoordinateSystems.WGS84_ID));
+    setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(EpsgId.WGS84));
   }
 
   @Override

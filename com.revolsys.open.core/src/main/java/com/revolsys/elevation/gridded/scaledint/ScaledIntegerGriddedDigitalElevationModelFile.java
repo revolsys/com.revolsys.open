@@ -31,7 +31,7 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
     final int gridHeight, final double gridCellSize) {
 
     final Path rowDirectory = basePath.resolve(Integer.toString(minX));
-    final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+    final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
     final String fileName = RectangularMapGrid.getTileFileName("dem", coordinateSystemId,
       Integer.toString((int)gridCellSize * gridWidth), minX, minY, "demcs");
     final Path path = rowDirectory.resolve(fileName);

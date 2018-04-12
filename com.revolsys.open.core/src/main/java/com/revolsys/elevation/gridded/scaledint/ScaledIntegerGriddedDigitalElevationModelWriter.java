@@ -25,7 +25,7 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter
   public static void writeHeader(final ChannelWriter writer, final BoundingBox boundingBox,
     final GeometryFactory geometryFactory, final int gridWidth, final int gridHeight,
     final double gridCellSize) throws IOException {
-    final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+    final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
     double scaleXY = geometryFactory.getScaleXY();
     if (scaleXY <= 0) {
       scaleXY = 1000;

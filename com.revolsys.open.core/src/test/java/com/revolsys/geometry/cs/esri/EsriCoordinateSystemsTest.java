@@ -19,7 +19,7 @@ public class EsriCoordinateSystemsTest {
         final int id = record.getInteger("ID");
         final String wkt = record.getString("WKT");
         final GeometryFactory geometryFactory = GeometryFactory.floating2d(wkt);
-        final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+        final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
         Assert.assertEquals(id, coordinateSystemId);
         Assert.assertEquals(2, geometryFactory.getAxisCount());
         final String actualWkt = geometryFactory.toWktCs();
@@ -52,7 +52,7 @@ public class EsriCoordinateSystemsTest {
         final String wkt = record.getString("WKT");
         if (wkt.contains("VDATUM")) {
           final CoordinateSystem coordinateSystem = CoordinateSystem.getCoordinateSystem(wkt);
-          final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+          final int coordinateSystemId = coordinateSystem.getHorizontalCoordinateSystemId();
           Assert.assertEquals(id, coordinateSystemId);
           final String actualWkt = coordinateSystem.toEsriWktCs();
           if (Property.isEmpty(actualWkt)) {

@@ -90,10 +90,10 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
     final GeographicCoordinateSystem targetGeoCs) {
     addInverseOperations(operations);
 
-    final GeographicCoordinateSystem sourceGeoCs = this.geographicCoordinateSystem;
     final Radian radian = Radian.getInstance();
     final AngularUnit targetAngularUnit = targetGeoCs.getAngularUnit();
-    sourceGeoCs.addConversionOperation(operations, targetGeoCs, radian, targetAngularUnit);
+    this.geographicCoordinateSystem.addConversionOperation(operations, targetGeoCs, radian,
+      targetAngularUnit);
   }
 
   @Override
@@ -101,10 +101,10 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
     final ProjectedCoordinateSystem coordinateSystem) {
     addInverseOperations(operations);
 
-    final GeographicCoordinateSystem sourceGeoCs = this.geographicCoordinateSystem;
     final GeographicCoordinateSystem targetGeoCs = coordinateSystem.geographicCoordinateSystem;
     final Radian radian = Radian.getInstance();
-    sourceGeoCs.addConversionOperation(operations, targetGeoCs, radian, radian);
+    this.geographicCoordinateSystem.addConversionOperation(operations, targetGeoCs, radian, radian);
+
     coordinateSystem.addProjectionOperations(operations);
   }
 
@@ -226,7 +226,7 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
   }
 
   public int getGeographicCoordinateSystemId() {
-    return this.geographicCoordinateSystem.getCoordinateSystemId();
+    return this.geographicCoordinateSystem.getHorizontalCoordinateSystemId();
   }
 
   @Override

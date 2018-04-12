@@ -9,12 +9,10 @@ import java.util.Map;
 
 import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.gridshift.GridShiftOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.record.io.format.tsv.Tsv;
-import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.spring.resource.Resource;
 
 public class GsbGridShiftFile {
@@ -56,7 +54,7 @@ public class GsbGridShiftFile {
 
   private final GridShiftOperation forwardOperation = new GsbGridShiftOperation(this);
 
-  private final GridShiftOperation inverseOperation = this::shiftInverse;
+  private final GridShiftOperation inverseOperation = new GsbGridShiftInverseOperation(this);
 
   @SuppressWarnings("unused")
   public GsbGridShiftFile(final Object source, final boolean loadAccuracy) {
@@ -97,9 +95,63 @@ public class GsbGridShiftFile {
     }
   }
 
-  public void addGridShiftOperation(final GeographicCoordinateSystem sourceCs,
-    final GeographicCoordinateSystem targetCs) {
+  public void addForwardGridShiftOperation(final HorizontalCoordinateSystemProxy sourceCs,
+    final HorizontalCoordinateSystemProxy targetCs) {
+    sourceCs.addGridShiftOperation(targetCs, this.inverseOperation);
+  }
+
+  public void addForwardGridShiftOperation(final int sourceCsId, final int targetCsId) {
+    final GeographicCoordinateSystem sourceCs = EpsgCoordinateSystems
+      .getCoordinateSystem(sourceCsId);
+    final GeographicCoordinateSystem targetCs = EpsgCoordinateSystems
+      .getCoordinateSystem(targetCsId);
+    if (sourceCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + sourceCsId);
+    } else if (targetCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + targetCs);
+    } else {
+      sourceCs.addGridShiftOperation(targetCs, this.inverseOperation);
+    }
+  }
+
+  public void addGridShiftOperation(final HorizontalCoordinateSystemProxy sourceCs,
+    final HorizontalCoordinateSystemProxy targetCs) {
     sourceCs.addGridShiftOperation(targetCs, this.forwardOperation);
+    targetCs.addGridShiftOperation(sourceCs, this.inverseOperation);
+  }
+
+  public void addGridShiftOperation(final int sourceCsId, final int targetCsId) {
+    final GeographicCoordinateSystem sourceCs = EpsgCoordinateSystems
+      .getCoordinateSystem(sourceCsId);
+    final GeographicCoordinateSystem targetCs = EpsgCoordinateSystems
+      .getCoordinateSystem(targetCsId);
+    if (sourceCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + sourceCsId);
+    } else if (targetCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + targetCs);
+    } else {
+      sourceCs.addGridShiftOperation(targetCs, this.forwardOperation);
+      targetCs.addGridShiftOperation(sourceCs, this.inverseOperation);
+    }
+  }
+
+  public void addInverseGridShiftOperation(final HorizontalCoordinateSystemProxy sourceCs,
+    final HorizontalCoordinateSystemProxy targetCs) {
+    sourceCs.addGridShiftOperation(targetCs, this.inverseOperation);
+  }
+
+  public void addInverseGridShiftOperation(final int sourceCsId, final int targetCsId) {
+    final GeographicCoordinateSystem sourceCs = EpsgCoordinateSystems
+      .getCoordinateSystem(sourceCsId);
+    final GeographicCoordinateSystem targetCs = EpsgCoordinateSystems
+      .getCoordinateSystem(targetCsId);
+    if (sourceCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + sourceCsId);
+    } else if (targetCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + targetCs);
+    } else {
+      sourceCs.addGridShiftOperation(targetCs, this.inverseOperation);
+    }
   }
 
   public GridShiftOperation getForwardOperation() {
@@ -134,25 +186,20 @@ public class GsbGridShiftFile {
   }
 
   private void loadGrids(final boolean loadAccuracy, final int gridCount) {
-    try (
-      TsvWriter writer = Tsv.plainWriter("/Users/paustin/Downloads/bc.tsv")) {
-      writer.write("polygon");
-      final List<GsbGridShiftGrid> grids = new ArrayList<>();
-      for (int i = 0; i < gridCount; i++) {
-        final GsbGridShiftGrid grid = new GsbGridShiftGrid(this, loadAccuracy);
-        grids.add(grid);
-        writer.write(grid.getBoundingBox().toPolygon(100));
-      }
+    final List<GsbGridShiftGrid> grids = new ArrayList<>();
+    for (int i = 0; i < gridCount; i++) {
+      final GsbGridShiftGrid grid = new GsbGridShiftGrid(this, loadAccuracy);
+      grids.add(grid);
     }
     final Map<String, GsbGridShiftGrid> gridByName = new HashMap<>();
-    for (final GsbGridShiftGrid grid : this.grids) {
+    for (final GsbGridShiftGrid grid : grids) {
       if (!grid.hasParent()) {
         this.grids.add(grid);
       }
       final String name = grid.getName();
       gridByName.put(name, grid);
     }
-    for (final GsbGridShiftGrid grid : this.grids) {
+    for (final GsbGridShiftGrid grid : grids) {
       if (grid.hasParent()) {
         final String parentName = grid.getParentName();
         final GsbGridShiftGrid parentGrid = gridByName.get(parentName);
@@ -203,32 +250,63 @@ public class GsbGridShiftFile {
     return value;
   }
 
-  public boolean shiftInverse(final CoordinatesOperationPoint point) {
-    final double lon = point.x;
-    final double lat = point.y;
-    final double lonPositiveWestSeconds = -lon * 3600;
-    final double latSeconds = lat * 3600;
-    double lonShift = 0;
-    double latShift = 0;
-    for (int i = 0; i < 4; i++) {
-      final double forwardLonPositiveWestSeconds = lonPositiveWestSeconds - lonShift;
-      final double forwardLatSeconds = latSeconds - latShift;
-      final GsbGridShiftGrid gsbGridShiftGrid = getGrid(forwardLonPositiveWestSeconds,
-        forwardLatSeconds);
-      if (gsbGridShiftGrid == null) {
-        if (i == 0) {
-          return false;
-        } else {
-          return true;
-        }
-      } else {
-        lonShift = gsbGridShiftGrid.getLonShift(forwardLonPositiveWestSeconds, forwardLatSeconds);
-        latShift = gsbGridShiftGrid.getLatShift(forwardLonPositiveWestSeconds, forwardLatSeconds);
-      }
+  public void removeForwardGridShiftOperation(final HorizontalCoordinateSystemProxy sourceCs,
+    final HorizontalCoordinateSystemProxy targetCs) {
+    sourceCs.removeGridShiftOperation(targetCs, this.inverseOperation);
+  }
+
+  public void removeForwardGridShiftOperation(final int sourceCsId, final int targetCsId) {
+    final GeographicCoordinateSystem sourceCs = EpsgCoordinateSystems
+      .getCoordinateSystem(sourceCsId);
+    final GeographicCoordinateSystem targetCs = EpsgCoordinateSystems
+      .getCoordinateSystem(targetCsId);
+    if (sourceCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + sourceCsId);
+    } else if (targetCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + targetCs);
+    } else {
+      sourceCs.removeGridShiftOperation(targetCs, this.inverseOperation);
     }
-    point.x = -(lonPositiveWestSeconds - lonShift) / 3600;
-    point.y = (latSeconds - latShift) / 3600;
-    return true;
+  }
+
+  public void removeGridShiftOperation(final HorizontalCoordinateSystemProxy sourceCs,
+    final HorizontalCoordinateSystemProxy targetCs) {
+    sourceCs.removeGridShiftOperation(targetCs, this.forwardOperation);
+    targetCs.removeGridShiftOperation(sourceCs, this.inverseOperation);
+  }
+
+  public void removeGridShiftOperation(final int sourceCsId, final int targetCsId) {
+    final GeographicCoordinateSystem sourceCs = EpsgCoordinateSystems
+      .getCoordinateSystem(sourceCsId);
+    final GeographicCoordinateSystem targetCs = EpsgCoordinateSystems
+      .getCoordinateSystem(targetCsId);
+    if (sourceCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + sourceCsId);
+    } else if (targetCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + targetCs);
+    } else {
+      sourceCs.removeGridShiftOperation(targetCs, this.forwardOperation);
+      targetCs.removeGridShiftOperation(sourceCs, this.inverseOperation);
+    }
+  }
+
+  public void removeInverseGridShiftOperation(final HorizontalCoordinateSystemProxy sourceCs,
+    final HorizontalCoordinateSystemProxy targetCs) {
+    sourceCs.removeGridShiftOperation(targetCs, this.inverseOperation);
+  }
+
+  public void removeInverseGridShiftOperation(final int sourceCsId, final int targetCsId) {
+    final GeographicCoordinateSystem sourceCs = EpsgCoordinateSystems
+      .getCoordinateSystem(sourceCsId);
+    final GeographicCoordinateSystem targetCs = EpsgCoordinateSystems
+      .getCoordinateSystem(targetCsId);
+    if (sourceCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + sourceCsId);
+    } else if (targetCs == null) {
+      throw new IllegalArgumentException("Coordinate system doesn't exist" + targetCs);
+    } else {
+      sourceCs.removeGridShiftOperation(targetCs, this.inverseOperation);
+    }
   }
 
   @Override

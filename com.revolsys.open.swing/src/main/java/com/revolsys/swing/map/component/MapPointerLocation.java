@@ -86,7 +86,7 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener {
       geometryFactory = geometryFactory.convertScales(1000.0, 1000.0);
     }
     if (geometryFactory != this.geometryFactory) {
-      final int srid = geometryFactory.getCoordinateSystemId();
+      final int srid = geometryFactory.getHorizontalCoordinateSystemId();
       this.geometryFactory = geometryFactory;
       final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       this.setToolTipText(coordinateSystem.getCoordinateSystemName());

@@ -149,11 +149,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   public static SpatialReference getSpatialReference(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null || geometryFactory.getCoordinateSystemId() == 0) {
+    if (geometryFactory == null || geometryFactory.getHorizontalCoordinateSystemId() == 0) {
       return null;
     } else {
       final String wkt = getSingleThreadResult(() -> {
-        return EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getCoordinateSystemId());
+        return EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getHorizontalCoordinateSystemId());
       });
       final SpatialReference spatialReference = SpatialReference.get(geometryFactory, wkt);
       return spatialReference;

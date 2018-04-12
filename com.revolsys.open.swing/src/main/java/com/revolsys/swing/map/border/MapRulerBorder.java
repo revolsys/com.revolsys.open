@@ -103,9 +103,9 @@ public class MapRulerBorder extends AbstractBorder {
 
   public MapRulerBorder(final Viewport2D viewport) {
     this.viewport = viewport;
-    final BoundingBox boundingBox = viewport.getBoundingBox();
-    setBoundingBox(boundingBox);
-    Property.addListenerNewValue(viewport, "boundingBox", this::setBoundingBox);
+    updateValues();
+    Property.addListenerRunnable(viewport, "boundingBox", this::updateValues);
+    Property.addListenerRunnable(viewport, "unitsPerPixel", this::updateValues);
   }
 
   private <Q extends Quantity<Q>> void drawLabel(final Graphics2D graphics, final int textX,
@@ -179,7 +179,7 @@ public class MapRulerBorder extends AbstractBorder {
   public void paintBorder(final Component c, final Graphics g, final int x, final int y,
     final int width, final int height) {
     final Graphics2D graphics = (Graphics2D)g;
-    if (width > 0) {
+    if (width > 0 && this.unitsPerPixel > 0) {
 
       paintBackground(graphics, x, y, width, height);
 
@@ -219,7 +219,10 @@ public class MapRulerBorder extends AbstractBorder {
 
         g.setClip(0, 0, width - 2 * this.rulerSize, this.rulerSize);
 
+        final long maxIndex = (long)Math.floor(maxX / this.step);
+        long startIndex = (long)Math.floor(minX / this.step);
         if (minX < this.areaMinX) {
+          startIndex = (long)Math.floor((this.areaMinX - minX) / this.step);
           final double delta = this.areaMinX - minX;
           final int minPixel = (int)Math.floor(delta * this.pixelsPerUnit);
           g.setColor(COLOR_OUTSIDE_AREA);
@@ -233,12 +236,6 @@ public class MapRulerBorder extends AbstractBorder {
           maxX = this.areaMaxX;
         }
 
-        final long minIndex = (long)Math.floor(this.areaMinX / this.step);
-        final long maxIndex = (long)Math.floor(maxX / this.step);
-        long startIndex = (long)Math.floor(minX / this.step);
-        if (startIndex < minIndex) {
-          startIndex = minIndex;
-        }
         for (long index = startIndex; index <= maxIndex; index++) {
           final double value = this.step * index;
           final int pixel = (int)((value - minX) * this.pixelsPerUnit);
@@ -365,16 +362,6 @@ public class MapRulerBorder extends AbstractBorder {
     }
   }
 
-  private void setBoundingBox(final BoundingBox boundingBox) {
-    this.boundingBox = boundingBox;
-    this.unitsPerPixel = this.viewport.getUnitsPerPixel();
-    this.pixelsPerUnit = this.viewport.getPixelsPerXUnit();
-    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    setRulerGeometryFactory(geometryFactory);
-    this.stepLevel = getStepLevel(this.steps);
-    this.step = this.steps[this.stepLevel];
-  }
-
   private void setRulerGeometryFactory(final GeometryFactory rulerGeometryFactory) {
     if (this.rulerGeometryFactory != rulerGeometryFactory) {
       if (rulerGeometryFactory == null) {
@@ -408,5 +395,16 @@ public class MapRulerBorder extends AbstractBorder {
         this.areaMaxY = areaBoundingBox.getMaxY();
       }
     }
+  }
+
+  private void updateValues() {
+    this.boundingBox = this.viewport.getBoundingBox();
+    this.unitsPerPixel = this.viewport.getUnitsPerPixel();
+    this.pixelsPerUnit = this.viewport.getPixelsPerXUnit();
+    final GeometryFactory geometryFactory = this.boundingBox.getGeometryFactory();
+    setRulerGeometryFactory(geometryFactory);
+    this.stepLevel = getStepLevel(this.steps);
+    this.step = this.steps[this.stepLevel];
+    this.viewport.update();
   }
 }

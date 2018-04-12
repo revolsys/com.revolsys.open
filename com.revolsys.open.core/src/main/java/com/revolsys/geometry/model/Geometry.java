@@ -1112,8 +1112,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       final int axisCount = getAxisCount();
       final int axisCount2 = geometry.getAxisCount();
       if (axisCount == axisCount2) {
-        final int srid = getCoordinateSystemId();
-        final int otherSrid = geometry.getCoordinateSystemId();
+        final int srid = getHorizontalCoordinateSystemId();
+        final int otherSrid = geometry.getHorizontalCoordinateSystemId();
         if (srid == 0 || otherSrid == 0 || srid == otherSrid) {
           return equals(axisCount, geometry);
         }
@@ -1741,9 +1741,9 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (geometryFactory == null) {
       return geometryFactoryThis;
     } else {
-      final int srid = geometryFactory.getCoordinateSystemId();
+      final int srid = geometryFactory.getHorizontalCoordinateSystemId();
       if (srid == 0) {
-        final int geometrySrid = geometryFactoryThis.getCoordinateSystemId();
+        final int geometrySrid = geometryFactoryThis.getHorizontalCoordinateSystemId();
         if (geometrySrid != 0) {
           geometryFactory = geometryFactory.convertSrid(geometrySrid);
         }

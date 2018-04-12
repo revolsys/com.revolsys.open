@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
@@ -21,7 +21,7 @@ import com.revolsys.util.Property;
 
 public class WebMercatorTileCacheLayer
   extends AbstractTiledImageLayer<WebMercatorTileCacheMapTile> {
-  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(EpsgCoordinateSystems.WGS84_ID);
+  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(EpsgId.WGS84);
 
   private static final BoundingBox MAX_BOUNDING_BOX = GEOMETRY_FACTORY.newBoundingBox(-180, -85,
     180, 85);

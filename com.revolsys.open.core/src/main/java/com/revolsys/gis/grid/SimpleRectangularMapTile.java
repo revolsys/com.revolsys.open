@@ -1,7 +1,7 @@
 package com.revolsys.gis.grid;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
@@ -86,13 +86,13 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
 
   @Override
   public Polygon getPolygon(final int numPoints) {
-    final GeometryFactory factory = GeometryFactory.floating3d(EpsgCoordinateSystems.WGS84_ID);
+    final GeometryFactory factory = GeometryFactory.floating3d(EpsgId.WGS84);
     return getPolygon(factory, numPoints);
   }
 
   @Override
   public Polygon getPolygon(final int numXPoints, final int numYPoints) {
-    final GeometryFactory factory = GeometryFactory.floating3d(EpsgCoordinateSystems.WGS84_ID);
+    final GeometryFactory factory = GeometryFactory.floating3d(EpsgId.WGS84);
     return getPolygon(factory, numXPoints, numYPoints);
   }
 

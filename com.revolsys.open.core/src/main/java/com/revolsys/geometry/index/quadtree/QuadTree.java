@@ -172,7 +172,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     final BoundingBox convertedBoundingBox = convertBoundingBox(boundingBox);
     if (convertedBoundingBox == null || convertedBoundingBox.isEmpty()) {
       throw new IllegalArgumentException("Item bounding box " + boundingBox
-        + " must not be null or empty in coordinate system: " + getCoordinateSystemId());
+        + " must not be null or empty in coordinate system: " + getHorizontalCoordinateSystemId());
     } else {
       final double minX = convertedBoundingBox.getMinX();
       final double minY = convertedBoundingBox.getMinY();

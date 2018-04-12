@@ -18,7 +18,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -46,7 +46,7 @@ public class GpxIterator extends BaseObjectWithProperties
   private File file;
 
   private final GeometryFactory geometryFactory = GeometryFactory
-    .floating3d(EpsgCoordinateSystems.WGS84_ID);
+    .floating3d(EpsgId.WGS84);
 
   private boolean hasNext = true;
 

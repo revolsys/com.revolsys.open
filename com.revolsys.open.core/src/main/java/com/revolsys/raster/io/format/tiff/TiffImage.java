@@ -255,7 +255,7 @@ public class TiffImage extends JaiGeoreferencedImage {
           final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
             .getCoordinateSystem(coordinateSystem);
           geometryFactory = GeometryFactory
-            .floating2d(epsgCoordinateSystem.getCoordinateSystemId());
+            .floating2d(epsgCoordinateSystem.getHorizontalCoordinateSystemId());
         }
       }
     } else {

@@ -130,7 +130,7 @@ public class EWktWriter {
 
   public static String toString(final Geometry geometry) {
     final StringWriter out = new StringWriter();
-    final int srid = geometry.getCoordinateSystemId();
+    final int srid = geometry.getHorizontalCoordinateSystemId();
     if (srid > 0) {
       out.write("SRID=");
       out.write(Integer.toString(srid));
@@ -183,7 +183,7 @@ public class EWktWriter {
   public static void write(final Writer writer, final Geometry geometry, final boolean ewkt) {
     if (ewkt) {
       try {
-        final int srid = geometry.getCoordinateSystemId();
+        final int srid = geometry.getHorizontalCoordinateSystemId();
         if (srid > 0) {
           writer.write("SRID=");
           writer.write(Integer.toString(srid));

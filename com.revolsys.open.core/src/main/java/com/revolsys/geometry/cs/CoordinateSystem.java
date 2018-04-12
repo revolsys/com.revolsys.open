@@ -31,6 +31,7 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
 
   Area getArea();
 
+  @Override
   BoundingBox getAreaBoundingBox();
 
   Authority getAuthority();
@@ -44,6 +45,8 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
   }
 
   CoordinatesOperation getCoordinatesOperation(CoordinateSystem coordinateSystem);
+
+  int getCoordinateSystemId();
 
   String getCoordinateSystemType();
 

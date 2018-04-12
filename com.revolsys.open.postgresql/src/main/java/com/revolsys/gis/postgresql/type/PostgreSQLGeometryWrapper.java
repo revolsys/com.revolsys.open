@@ -439,7 +439,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     final StringWriter wkt = new StringWriter();
     try (
       final PrintWriter writer = new PrintWriter(wkt)) {
-      final int srid = geometry.getCoordinateSystemId();
+      final int srid = geometry.getHorizontalCoordinateSystemId();
       if (srid > 0) {
         writer.print("SRID=");
         writer.print(srid);
@@ -484,7 +484,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     } else {
       wkt = value;
     }
-    if (srid != -1 && geometryFactory.getCoordinateSystemId() != srid) {
+    if (srid != -1 && geometryFactory.getHorizontalCoordinateSystemId() != srid) {
       geometryFactory = GeometryFactory.floating(srid, geometryFactory.getAxisCount());
     }
     if (wkt.startsWith("00")) {
@@ -565,7 +565,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     if (hasS) {
       final int coordinateSystemId = data.getInt();
       if (coordinateSystemId >= 0
-        && currentGeometryFactory.getCoordinateSystemId() != coordinateSystemId) {
+        && currentGeometryFactory.getHorizontalCoordinateSystemId() != coordinateSystemId) {
         currentGeometryFactory = currentGeometryFactory.convertSrid(coordinateSystemId);
       }
     }

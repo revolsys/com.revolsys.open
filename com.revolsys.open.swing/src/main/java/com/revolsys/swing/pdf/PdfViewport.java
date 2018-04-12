@@ -121,7 +121,7 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     } else {
       gcs.setName(COSName.TYPE, "GEOGCS");
     }
-    final int srid = geometryFactory.getCoordinateSystemId();
+    final int srid = geometryFactory.getHorizontalCoordinateSystemId();
     gcs.setInt("EPSG", srid);
     String wkt = geometryFactory.toWktCs();
     wkt = wkt.replaceAll("false_easting", "False_Easting");

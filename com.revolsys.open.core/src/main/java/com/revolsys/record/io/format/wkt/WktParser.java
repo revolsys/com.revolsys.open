@@ -329,7 +329,7 @@ public class WktParser {
             throw new IllegalArgumentException(
               "Invalid WKT geometry. Missing srid number after 'SRID=': "
                 + FileUtil.getString(reader, 50));
-          } else if (srid != this.geometryFactory.getCoordinateSystemId()) {
+          } else if (srid != this.geometryFactory.getHorizontalCoordinateSystemId()) {
             geometryFactory = GeometryFactory.floating(srid, axisCount);
           }
           if (!hasChar(reader, ';')) {
@@ -402,8 +402,8 @@ public class WktParser {
         throw new IllegalArgumentException(
           "Invalid WKT geometry type: " + FileUtil.getString(reader, 50));
       }
-      if (this.geometryFactory.getCoordinateSystemId() == 0) {
-        final int srid = geometry.getCoordinateSystemId();
+      if (this.geometryFactory.getHorizontalCoordinateSystemId() == 0) {
+        final int srid = geometry.getHorizontalCoordinateSystemId();
         if (useAxisCountFromGeometryFactory) {
           geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
           if (geometry.getGeometryFactory() == geometryFactory) {
@@ -445,7 +445,7 @@ public class WktParser {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getCoordinateSystemId();
+        final int srid = geometryFactory.getHorizontalCoordinateSystemId();
         final double[] scales = geometryFactory.newScales(axisCount);
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
       }
@@ -495,7 +495,7 @@ public class WktParser {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getCoordinateSystemId();
+        final int srid = geometryFactory.getHorizontalCoordinateSystemId();
         final double[] scales = geometryFactory.newScales(axisCount);
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
       }
@@ -517,7 +517,7 @@ public class WktParser {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getCoordinateSystemId();
+        final int srid = geometryFactory.getHorizontalCoordinateSystemId();
         final double[] scales = geometryFactory.newScales(axisCount);
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
       }
@@ -540,7 +540,7 @@ public class WktParser {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getCoordinateSystemId();
+        final int srid = geometryFactory.getHorizontalCoordinateSystemId();
         final double[] scales = geometryFactory.newScales(axisCount);
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
       }
@@ -558,7 +558,7 @@ public class WktParser {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getCoordinateSystemId();
+        final int srid = geometryFactory.getHorizontalCoordinateSystemId();
         final double[] scales = geometryFactory.newScales(axisCount);
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
       }
@@ -577,7 +577,7 @@ public class WktParser {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getCoordinateSystemId();
+        final int srid = geometryFactory.getHorizontalCoordinateSystemId();
         final double[] scales = geometryFactory.newScales(axisCount);
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
       }
@@ -666,7 +666,7 @@ public class WktParser {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getCoordinateSystemId();
+        final int srid = geometryFactory.getHorizontalCoordinateSystemId();
         final double[] scales = geometryFactory.newScales(axisCount);
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
       }
@@ -720,7 +720,7 @@ public class WktParser {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
-        final int srid = geometryFactory.getCoordinateSystemId();
+        final int srid = geometryFactory.getHorizontalCoordinateSystemId();
         final double[] scales = geometryFactory.newScales(axisCount);
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
       }

@@ -116,8 +116,8 @@ public class EsriCoordinateSystems {
           final double conversionFactor = reader.getDouble();
 
           if (id == coordinateSystemId) {
-            final Ellipsoid ellipsoid = new Ellipsoid(spheroidName, semiMajorAxis, inverseFlattening,
-              null);
+            final Ellipsoid ellipsoid = new Ellipsoid(spheroidName, semiMajorAxis,
+              inverseFlattening, null);
             final PrimeMeridian primeMeridian = new PrimeMeridian(primeMeridianName, longitude,
               null);
             final GeodeticDatum geodeticDatum = new GeodeticDatum(null, datumName, null, false,

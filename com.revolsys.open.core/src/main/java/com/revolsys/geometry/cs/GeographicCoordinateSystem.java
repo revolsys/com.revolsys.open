@@ -1,6 +1,7 @@
 package com.revolsys.geometry.cs;
 
 import java.security.MessageDigest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,7 +103,7 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
   protected void addConversionOperation(final List<CoordinatesOperation> operations,
     final GeographicCoordinateSystem targetGeoCs, final AngularUnit sourceAngularUnit,
     final AngularUnit targetAngularUnit) {
-    if (this.gridShiftOperationsByCoordinateSystem != null) {
+    if (this != targetGeoCs && this.gridShiftOperationsByCoordinateSystem != null) {
       final GeographicCoordinateSystemGridShiftOperation gridShiftOperation = this.gridShiftOperationsByCoordinateSystem
         .get(targetGeoCs);
       if (gridShiftOperation != null) {
@@ -119,9 +120,11 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
   @Override
   protected void addCoordinatesOperations(final List<CoordinatesOperation> operations,
     final GeographicCoordinateSystem targetGeoCs) {
-    final AngularUnit angularUnit = getAngularUnit();
-    final AngularUnit targetAngularUnit = targetGeoCs.getAngularUnit();
-    addConversionOperation(operations, targetGeoCs, angularUnit, targetAngularUnit);
+    if (this != targetGeoCs) {
+      final AngularUnit angularUnit = getAngularUnit();
+      final AngularUnit targetAngularUnit = targetGeoCs.getAngularUnit();
+      addConversionOperation(operations, targetGeoCs, angularUnit, targetAngularUnit);
+    }
   }
 
   @Override
@@ -139,6 +142,9 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
 
   public synchronized void addGridShiftOperation(final GeographicCoordinateSystem coordinateSystem,
     final GridShiftOperation operation) {
+    if (this.gridShiftOperationsByCoordinateSystem == null) {
+      this.gridShiftOperationsByCoordinateSystem = new HashMap<>();
+    }
     GeographicCoordinateSystemGridShiftOperation operations = this.gridShiftOperationsByCoordinateSystem
       .get(coordinateSystem);
     if (operations == null) {
@@ -272,6 +278,17 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
       return area.getLatLonBounds().convert(geometryFactory);
     } else {
       return geometryFactory.newBoundingBox(-180, -90, 180, 90);
+    }
+  }
+
+  public synchronized void removeGridShiftOperation(
+    final GeographicCoordinateSystem coordinateSystem, final GridShiftOperation operation) {
+    if (this.gridShiftOperationsByCoordinateSystem != null) {
+      final GeographicCoordinateSystemGridShiftOperation operations = this.gridShiftOperationsByCoordinateSystem
+        .get(coordinateSystem);
+      if (operations != null) {
+        operations.removeOperation(operation);
+      }
     }
   }
 

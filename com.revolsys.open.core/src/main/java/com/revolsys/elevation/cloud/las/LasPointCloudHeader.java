@@ -415,7 +415,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     addToMap(map, "generatingSoftware", this.generatingSoftware);
     addToMap(map, "date", this.date);
     if (this.geometryFactory != null) {
-      final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
+      final int coordinateSystemId = this.geometryFactory.getHorizontalCoordinateSystemId();
       if (coordinateSystemId > 0) {
         addToMap(map, "coordinateSystemId", coordinateSystemId);
       }

@@ -7,6 +7,7 @@ import java.awt.event.ItemListener;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.field.ArrayListComboBoxModel;
 import com.revolsys.swing.field.BaseComboBox;
@@ -19,7 +20,7 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
     if (coordinateSystem == null) {
       return DataTypes.toString(value);
     } else {
-      return coordinateSystem.getCoordinateSystemId() + " "
+      return coordinateSystem.getHorizontalCoordinateSystemId() + " "
         + coordinateSystem.getCoordinateSystemName();
     }
   }
@@ -27,8 +28,13 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
   public static String formatCoordinateSystem(final Object object) {
     if (object instanceof CoordinateSystem) {
       final CoordinateSystem coordinateSystem = (CoordinateSystem)object;
-      return coordinateSystem.getCoordinateSystemId() + " "
-        + coordinateSystem.getCoordinateSystemName();
+      final int id = coordinateSystem.getCoordinateSystemId();
+      final String name = coordinateSystem.getCoordinateSystemName();
+      if (id > 0) {
+        return id + " " + name;
+      } else {
+        return name;
+      }
     } else {
       return "-";
     }
@@ -50,12 +56,12 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
 
   private static ArrayListComboBoxModel<Integer> newModel() {
     return new ArrayListComboBoxModel<>(3857, 3005, //
-      EpsgCoordinateSystems.nad83UtmId(7), //
-      EpsgCoordinateSystems.nad83UtmId(8), //
-      EpsgCoordinateSystems.nad83UtmId(9), //
-      EpsgCoordinateSystems.nad83UtmId(10), //
-      EpsgCoordinateSystems.nad83UtmId(11), //
-      EpsgCoordinateSystems.WGS84_ID, EpsgCoordinateSystems.NAD83_ID, EpsgCoordinateSystems.NAD27_ID);
+      EpsgId.nad83Utm(7), //
+      EpsgId.nad83Utm(8), //
+      EpsgId.nad83Utm(9), //
+      EpsgId.nad83Utm(10), //
+      EpsgId.nad83Utm(11), //
+      EpsgId.WGS84, EpsgId.NAD83, EpsgId.NAD27);
   }
 
   public CoordinateSystemField(final String fieldName) {
@@ -69,7 +75,7 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
   }
 
   public void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    final int srid = coordinateSystem.getCoordinateSystemId();
+    final int srid = coordinateSystem.getHorizontalCoordinateSystemId();
     addCoordinateSystem(srid);
   }
 
@@ -107,7 +113,7 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
-    final int srid = geometryFactory.getCoordinateSystemId();
+    final int srid = geometryFactory.getHorizontalCoordinateSystemId();
     setSelectedItem(srid);
   }
 }

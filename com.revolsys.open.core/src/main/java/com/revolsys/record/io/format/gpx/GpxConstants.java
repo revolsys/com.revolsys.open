@@ -4,7 +4,7 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -25,7 +25,7 @@ public final class GpxConstants {
   public static final QName EXTENSION_ELEMENT = new QName(GPX_NS_URI, "extensions");
 
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory
-    .floating3d(EpsgCoordinateSystems.WGS84_ID);
+    .floating3d(EpsgId.WGS84);
 
   public static final QName GPX_ELEMENT = new QName(GPX_NS_URI, "gpx");
 

@@ -4,13 +4,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 
 public class CompoundCoorindateSystemTest {
 
   @Test
   public void testStandard() {
     final CompoundCoordinateSystem compoundCoordinateSystem = EpsgCoordinateSystems
-      .getCompound(EpsgCoordinateSystems.NAD83_ID, 5703);
-    Assert.assertEquals(5498, compoundCoordinateSystem.getCoordinateSystemId());
+      .getCompound(EpsgId.NAD83, 5703);
+    Assert.assertEquals(5498, compoundCoordinateSystem.getHorizontalCoordinateSystemId());
   }
 }

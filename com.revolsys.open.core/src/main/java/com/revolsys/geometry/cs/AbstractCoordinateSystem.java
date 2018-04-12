@@ -1,13 +1,20 @@
 package com.revolsys.geometry.cs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.revolsys.beans.Classes;
 import com.revolsys.geometry.cs.epsg.EpsgAuthority;
+import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.NoOpOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryFixed;
 import com.revolsys.geometry.model.GeometryFactoryFloating;
+import com.revolsys.logging.Logs;
 
 public abstract class AbstractCoordinateSystem implements CoordinateSystem {
   private static final long serialVersionUID = 1L;
@@ -32,6 +39,8 @@ public abstract class AbstractCoordinateSystem implements CoordinateSystem {
 
   private List<GeometryFactory>[] geometryFactoryFixedByAxisCount;
 
+  private Map<CoordinateSystem, CoordinatesOperation> coordinatesOperationByCoordinateSystem;
+
   public AbstractCoordinateSystem(final int id, final String name, final List<Axis> axis,
     final Area area, final boolean deprecated) {
     this(id, name, axis, area, deprecated, new EpsgAuthority(id));
@@ -52,6 +61,18 @@ public abstract class AbstractCoordinateSystem implements CoordinateSystem {
   public AbstractCoordinateSystem(final int id, final String name, final List<Axis> axis,
     final Authority authority) {
     this(id, name, axis, null, false, authority);
+  }
+
+  protected void addCoordinatesOperations(final List<CoordinatesOperation> operations,
+    final GeographicCoordinateSystem coordinateSystem) {
+    throw new IllegalArgumentException("Coordinate system type not supported\n"
+      + Classes.className(coordinateSystem) + "\n" + coordinateSystem);
+  }
+
+  protected void addCoordinatesOperations(final List<CoordinatesOperation> operations,
+    final ProjectedCoordinateSystem coordinateSystem) {
+    throw new IllegalArgumentException("Coordinate system type not supported\n"
+      + Classes.className(coordinateSystem) + "\n" + coordinateSystem);
   }
 
   @Override
@@ -118,6 +139,39 @@ public abstract class AbstractCoordinateSystem implements CoordinateSystem {
   @Override
   public List<Axis> getAxis() {
     return this.axis;
+  }
+
+  @Override
+  public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem == this) {
+      return null;
+    } else {
+      if (this.coordinatesOperationByCoordinateSystem == null) {
+        synchronized (this) {
+          if (this.coordinatesOperationByCoordinateSystem == null) {
+            this.coordinatesOperationByCoordinateSystem = new HashMap<>();
+          }
+        }
+      }
+      synchronized (this.coordinatesOperationByCoordinateSystem) {
+        CoordinatesOperation coordinatesOperation = this.coordinatesOperationByCoordinateSystem
+          .get(coordinateSystem);
+        if (coordinatesOperation == null) {
+          try {
+            coordinatesOperation = newCoordinatesOperation(coordinateSystem);
+          } catch (final IllegalArgumentException e) {
+            coordinatesOperation = NoOpOperation.INSTANCE;
+            Logs.error(this, "Cannot get conversion from " + this + " to " + coordinateSystem, e);
+          }
+          this.coordinatesOperationByCoordinateSystem.put(coordinateSystem, coordinatesOperation);
+        }
+        if (coordinatesOperation == NoOpOperation.INSTANCE) {
+          return null;
+        } else {
+          return coordinatesOperation;
+        }
+      }
+    }
   }
 
   @Override
@@ -212,6 +266,30 @@ public abstract class AbstractCoordinateSystem implements CoordinateSystem {
   }
 
   protected abstract BoundingBox newAreaBoundingBox();
+
+  protected CoordinatesOperation newCoordinatesOperation(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem == null || this == coordinateSystem) {
+      return null;
+    } else {
+      final List<CoordinatesOperation> operations = new ArrayList<>();
+      if (coordinateSystem instanceof GeographicCoordinateSystem) {
+        addCoordinatesOperations(operations, (GeographicCoordinateSystem)coordinateSystem);
+      } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+        addCoordinatesOperations(operations, (ProjectedCoordinateSystem)coordinateSystem);
+      } else {
+        throw new IllegalArgumentException("Coordinate system type not supported\n"
+          + Classes.className(coordinateSystem) + "\n" + coordinateSystem);
+      }
+      final int operationCount = operations.size();
+      if (operationCount == 0) {
+        return NoOpOperation.INSTANCE;
+      } else if (operationCount == 1) {
+        return operations.get(0);
+      } else {
+        return new ChainedCoordinatesOperation(operations);
+      }
+    }
+  }
 
   @Override
   public String toString() {

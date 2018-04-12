@@ -169,7 +169,7 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
         final String name = coordinateSystem.getCoordinateSystemName();
         return name;
       } else if (column == 1) {
-        return coordinateSystem.getCoordinateSystemId();
+        return coordinateSystem.getHorizontalCoordinateSystemId();
       } else {
         return null;
       }

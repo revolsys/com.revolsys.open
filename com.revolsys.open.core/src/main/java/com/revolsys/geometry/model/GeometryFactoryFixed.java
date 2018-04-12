@@ -122,8 +122,8 @@ public class GeometryFactoryFixed extends GeometryFactory {
     if (geometry == null) {
       return null;
     } else {
-      final int coordinateSystemId = getCoordinateSystemId();
-      final int geometrySrid = geometry.getCoordinateSystemId();
+      final int coordinateSystemId = getHorizontalCoordinateSystemId();
+      final int geometrySrid = geometry.getHorizontalCoordinateSystemId();
       if (coordinateSystemId == 0 && geometrySrid != 0) {
         final GeometryFactory geometryFactory = GeometryFactory.fixed(geometrySrid, this.axisCount,
           this.scales);

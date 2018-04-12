@@ -109,7 +109,6 @@ public class Nadcon5Region {
     this.maxX = maxX;
     this.maxY = maxY;
     this.boundingBox = GeometryFactory.nad83().newBoundingBox(minX - 360, minY, maxX - 360, maxY);
-    System.out.println(this.boundingBox.toPolygon(100));
     this.datumNames = Arrays.asList(datumNames);
 
     this.lonAccuracies = new Nadcon5FileGrid[datumNames.length - 1];

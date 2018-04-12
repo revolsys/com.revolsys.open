@@ -31,7 +31,7 @@ public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
     super(geometryFactory, minX, minY, Integer.MAX_VALUE, Integer.MAX_VALUE, gridCellSize);
     this.gridTileWidth = gridTileWidth;
     this.gridTileHeight = gridTileHeight;
-    this.coordinateSystemId = geometryFactory.getCoordinateSystemId();
+    this.coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
     final Resource fileExtensionDirectory = baseResource.createRelative("demcs");
     final Resource coordinateSystemDirectory = fileExtensionDirectory
       .createRelative(Integer.toString(this.coordinateSystemId));

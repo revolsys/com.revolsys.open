@@ -3,7 +3,7 @@ package com.revolsys.record.io.format.geojson;
 import java.io.BufferedWriter;
 import java.io.Writer;
 
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -323,7 +323,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   private void srid(final int srid) {
     if (isAllowCustomCoordinateSystem()) {
       final String urn;
-      if (srid == EpsgCoordinateSystems.WGS84_ID) {
+      if (srid == EpsgId.WGS84) {
         urn = "urn:ogc:def:crs:OGC::CRS84";
       } else {
         urn = GeoJson.URN_OGC_DEF_CRS_EPSG + srid;
@@ -402,7 +402,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
             Geometry geometry = (Geometry)value;
             if (!this.allowCustomCoordinateSystem) {
               final GeometryFactory wgs84 = geometryFactory
-                .convertSrid(EpsgCoordinateSystems.WGS84_ID);
+                .convertSrid(EpsgId.WGS84);
               geometry = geometry.convertGeometry(wgs84);
             }
             geometry(geometry);
@@ -469,7 +469,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
   protected int writeSrid(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final int srid = geometryFactory.getCoordinateSystemId();
+      final int srid = geometryFactory.getHorizontalCoordinateSystemId();
       if (srid != 0 && srid != this.srid) {
         this.out.endAttribute();
         srid(srid);

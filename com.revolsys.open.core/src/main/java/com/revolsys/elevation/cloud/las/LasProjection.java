@@ -155,7 +155,7 @@ public class LasProjection {
       header.removeLasProperties(LASF_PROJECTION);
       final LasPointFormat pointFormat = header.getPointFormat();
       if (pointFormat.getId() <= 5) {
-        final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+        final int coordinateSystemId = coordinateSystem.getHorizontalCoordinateSystemId();
         int keyId;
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           keyId = TiffImage.PROJECTED_COORDINATE_SYSTEM_ID;

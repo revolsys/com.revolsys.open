@@ -82,7 +82,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print(name.toLowerCase());
       out.print("',");
       final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      out.print(coordinateSystem.getCoordinateSystemId());
+      out.print(coordinateSystem.getHorizontalCoordinateSystemId());
       out.print(",'");
       out.print(geometryType);
       out.print("', ");
@@ -183,7 +183,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       final int axisCount = geometryFactory.getAxisCount();
       final DataType dataType = geometryField.getDataType();
       final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      final int srid = coordinateSystem.getCoordinateSystemId();
+      final int srid = coordinateSystem.getHorizontalCoordinateSystemId();
 
       out.print(
         "INSERT INTO USER_SDO_GEOM_METADATA(TABLE_NAME, COLUMN_NAME, DIMINFO, SRID) VALUES('");

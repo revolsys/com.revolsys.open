@@ -86,7 +86,7 @@ public class SpatialReference {
         this.zTolerance = 1.0 / this.zScale;
         this.mTolerance = 1.0 / this.mScale;
         this.highPrecision = true;
-        this.wkid = coordinateSystem.getCoordinateSystemId();
+        this.wkid = coordinateSystem.getHorizontalCoordinateSystemId();
       }
     }
   }
@@ -108,7 +108,7 @@ public class SpatialReference {
       if (coordinateSystem == null) {
         coordinateSystemId = 0;
       } else {
-        coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+        coordinateSystemId = coordinateSystem.getHorizontalCoordinateSystemId();
       }
 
       if (this.xYScale == FLOATING_SCALE) {

@@ -400,7 +400,7 @@ public class Gdal implements ServiceInitializer {
     if (geometryFactory == null) {
       return null;
     } else {
-      final int srid = geometryFactory.getCoordinateSystemId();
+      final int srid = geometryFactory.getHorizontalCoordinateSystemId();
       if (srid <= 0) {
         final String wkt = geometryFactory.toWktCs();
         return new SpatialReference(wkt);

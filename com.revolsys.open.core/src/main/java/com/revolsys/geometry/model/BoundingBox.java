@@ -172,7 +172,7 @@ public interface BoundingBox
 
   static String toString(final BoundingBox boundingBox) {
     final StringBuilder s = new StringBuilder();
-    final int srid = boundingBox.getCoordinateSystemId();
+    final int srid = boundingBox.getHorizontalCoordinateSystemId();
     if (srid > 0) {
       s.append("SRID=");
       s.append(srid);
@@ -322,8 +322,8 @@ public interface BoundingBox
       geometryFactory = geometryFactory.convertAxisCount(axisCount);
       boolean copy = false;
       if (geometryFactory != null && sourceGeometryFactory != geometryFactory) {
-        final int srid = getCoordinateSystemId();
-        final int srid2 = geometryFactory.getCoordinateSystemId();
+        final int srid = getHorizontalCoordinateSystemId();
+        final int srid2 = geometryFactory.getHorizontalCoordinateSystemId();
         if (srid <= 0) {
           if (srid2 > 0) {
             copy = true;
@@ -551,7 +551,7 @@ public interface BoundingBox
       return boundingBox.isEmpty();
     } else if (boundingBox.isEmpty()) {
       return false;
-    } else if (getCoordinateSystemId() == boundingBox.getCoordinateSystemId()) {
+    } else if (getHorizontalCoordinateSystemId() == boundingBox.getHorizontalCoordinateSystemId()) {
       if (getMaxX() == boundingBox.getMaxX()) {
         if (getMaxY() == boundingBox.getMaxY()) {
           if (getMinX() == boundingBox.getMinX()) {
@@ -1289,7 +1289,7 @@ public interface BoundingBox
       return this;
     } else {
       if (coordinateSystemThis == coordinateSystem || coordinateSystemThis
-        .getCoordinateSystemId() == coordinateSystem.getCoordinateSystemId()) {
+        .getHorizontalCoordinateSystemId() == coordinateSystem.getHorizontalCoordinateSystemId()) {
         return this;
       } else {
         final GeometryFactory geometryFactory = getGeometryFactory()

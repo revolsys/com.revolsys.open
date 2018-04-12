@@ -320,7 +320,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   protected void fireGeometryFactoryChanged(final GeometryFactory oldGeometryFactory,
     final GeometryFactory newGeometryFactory) {
     firePropertyChange("geometryFactory", oldGeometryFactory, this.geometryFactory);
-    final int coordinateSystemId = newGeometryFactory.getCoordinateSystemId();
+    final int coordinateSystemId = newGeometryFactory.getHorizontalCoordinateSystemId();
     firePropertyChange("srid", -2, coordinateSystemId);
   }
 
@@ -738,7 +738,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       } else {
         final int axisCount = geometryFactory.getAxisCount();
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "ID",
-          coordinateSystem.getCoordinateSystemId(), 10);
+          coordinateSystem.getHorizontalCoordinateSystemId(), 10);
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount", axisCount, 10);
 
         final double scaleX = geometryFactory.getScaleX();

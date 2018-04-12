@@ -79,7 +79,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       this.spreadsheetPackage = SpreadsheetMLPackage.createPackage();
       final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
       if (geometryFactory != null) {
-        final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+        final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
         if (coordinateSystemId > 0) {
           this.spreadsheetPackage.addDocPropsCustomPart();
           final DocPropsCustomPart customProperties = this.spreadsheetPackage

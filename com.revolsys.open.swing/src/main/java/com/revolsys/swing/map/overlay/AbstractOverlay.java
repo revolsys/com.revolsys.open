@@ -167,7 +167,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
           text.append(location.getIndexString());
           text.append("</td><td style=\"border-right: solid black 1px\">");
           final Point point = location.getSourcePoint();
-          text.append(point.getCoordinateSystemId());
+          text.append(point.getHorizontalCoordinateSystemId());
           text.append("</td><td>");
           appendPoint(text, point);
           text.append("</td></tr>");
@@ -677,7 +677,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
       final Point mousePoint = getEventPoint();
       appendPoint(text, mousePoint);
       text.append(" (");
-      text.append(mousePoint.getCoordinateSystemId());
+      text.append(mousePoint.getHorizontalCoordinateSystemId());
       text.append(")</div>");
       int i = 1;
       for (final Point snapPoint : this.snapPoints) {
@@ -699,7 +699,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
         text.append(".</b> ");
         appendPoint(text, snapPoint);
         text.append(" (");
-        text.append(snapPoint.getCoordinateSystemId());
+        text.append(snapPoint.getHorizontalCoordinateSystemId());
         text.append(")</div>");
 
         final Map<String, Set<CloseLocation>> typeLocationsMap = new TreeMap<>();

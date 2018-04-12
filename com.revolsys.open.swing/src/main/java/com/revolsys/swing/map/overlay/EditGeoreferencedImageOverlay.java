@@ -312,7 +312,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         appendPoint(toolTip, point);
         if (!source) {
           toolTip.append(" (");
-          toolTip.append(point.getCoordinateSystemId());
+          toolTip.append(point.getHorizontalCoordinateSystemId());
           toolTip.append(")");
         }
         toolTip.append("</div>");

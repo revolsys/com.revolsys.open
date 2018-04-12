@@ -34,7 +34,7 @@ public class TiledGriddedElevationModelLayerTile extends AbstractMapTile<Gridded
   public boolean equals(final Object obj) {
     if (obj instanceof TiledGriddedElevationModelLayerTile) {
       final TiledGriddedElevationModelLayerTile tile = (TiledGriddedElevationModelLayerTile)obj;
-      if (tile.getCoordinateSystemId() == getCoordinateSystemId()) {
+      if (tile.getHorizontalCoordinateSystemId() == getHorizontalCoordinateSystemId()) {
         if (tile.getTileSize() == getTileSize()) {
           if (tile.getTileX() == getTileX()) {
             if (tile.getTileY() == getTileY()) {
@@ -47,13 +47,13 @@ public class TiledGriddedElevationModelLayerTile extends AbstractMapTile<Gridded
     return false;
   }
 
-  @Override
-  public int getCoordinateSystemId() {
-    return this.coordinateSystemId;
-  }
-
   public GriddedElevationModel getElevationModel() {
     return getData();
+  }
+
+  @Override
+  public int getHorizontalCoordinateSystemId() {
+    return this.coordinateSystemId;
   }
 
   public int getTileSize() {

@@ -80,7 +80,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
     final double scaleX = geometryFactory.getScaleX();
     final double scaleY = geometryFactory.getScaleY();
-    final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+    final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
     if (axisCount >= 3) {
       final double[] scales = geometryFactory.newScales(axisCount);
       this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, axisCount, scales);

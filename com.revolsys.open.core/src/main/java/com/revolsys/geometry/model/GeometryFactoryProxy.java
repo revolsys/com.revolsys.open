@@ -1,10 +1,11 @@
 package com.revolsys.geometry.model;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 
-public interface GeometryFactoryProxy {
+public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
   default BoundingBox convertBoundingBox(final BoundingBoxProxy boundingBoxProxy) {
     if (boundingBoxProxy != null) {
       final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
@@ -52,8 +53,8 @@ public interface GeometryFactoryProxy {
     if (geometryFactory == null) {
       return null;
     } else {
-      final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
-      final int coordinateSystemIdThis = getCoordinateSystemId();
+      final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
+      final int coordinateSystemIdThis = getHorizontalCoordinateSystemId();
       if (coordinateSystemId == coordinateSystemIdThis) {
         return null;
       } else if (coordinateSystemId == 0 || coordinateSystemIdThis == 0) {
@@ -105,6 +106,7 @@ public interface GeometryFactoryProxy {
     return GeometryFactory.DEFAULT_3D;
   }
 
+  @Override
   default <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
@@ -119,9 +121,9 @@ public interface GeometryFactoryProxy {
     if (geometryFactory == null) {
       return geometryFactoryThis;
     } else {
-      final int srid = geometryFactory.getCoordinateSystemId();
+      final int srid = geometryFactory.getHorizontalCoordinateSystemId();
       if (srid == 0) {
-        final int geometrySrid = geometryFactoryThis.getCoordinateSystemId();
+        final int geometrySrid = geometryFactoryThis.getHorizontalCoordinateSystemId();
         if (geometrySrid != 0) {
           geometryFactory = geometryFactory.convertSrid(geometrySrid);
         }

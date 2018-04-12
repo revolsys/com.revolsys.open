@@ -402,14 +402,14 @@ public final class EpsgCoordinateSystemsLoader {
     for (final CoordinateSystem coordinateSytstem : EpsgCoordinateSystems.getCoordinateSystems()) {
       if (coordinateSytstem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSytstem;
-        final int id = coordinateSytstem.getCoordinateSystemId();
+        final int id = coordinateSytstem.getHorizontalCoordinateSystemId();
         final GeographicCoordinateSystem esri = EsriCoordinateSystems.getCoordinateSystem(id);
         if (esri != null && !geoCs.equalsExact(esri)) {
           // System.out.println(id + coordinateSytstem.getCoordinateSystemName());
         }
       } else if (coordinateSytstem instanceof ProjectedCoordinateSystem) {
         final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSytstem;
-        final int id = coordinateSytstem.getCoordinateSystemId();
+        final int id = coordinateSytstem.getHorizontalCoordinateSystemId();
         final String wkt = new UrlResource(
           "http://spatialreference.org/ref/epsg/" + id + "/esriwkt/").contentsAsString();
         final ProjectedCoordinateSystem esri = GeometryFactory.floating2d(wkt)

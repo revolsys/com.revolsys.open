@@ -3,11 +3,12 @@ package com.revolsys.geometry.cs;
 import org.junit.Test;
 
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
 public class EllipsoidTest {
   private static final GeographicCoordinateSystem NAD83 = EpsgCoordinateSystems
-    .getCoordinateSystem(EpsgCoordinateSystems.NAD83_ID);
+    .getCoordinateSystem(EpsgId.NAD83);
 
   private static final Ellipsoid NAD83_ELLIPSOID = NAD83.getDatum().getEllipsoid();
 

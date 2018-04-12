@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -74,9 +74,9 @@ public class PointTest implements TestConstants {
       final GeographicCoordinateSystem geographicCoordinateSystem = projectedCs
         .getGeographicCoordinateSystem();
       geometryFactory2 = GeometryFactory
-        .floating(geographicCoordinateSystem.getCoordinateSystemId(), axisCount);
+        .floating(geographicCoordinateSystem.getHorizontalCoordinateSystemId(), axisCount);
     } else {
-      geometryFactory2 = GeometryFactory.floating(EpsgCoordinateSystems.nad83UtmId(10), axisCount);
+      geometryFactory2 = GeometryFactory.floating(EpsgId.nad83Utm(10), axisCount);
     }
 
     assertCoordinatesEquals(point, coordinates);
@@ -144,7 +144,7 @@ public class PointTest implements TestConstants {
   @Test
   public void constructEmpty() {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
-      final GeometryFactory geometryFactory = GeometryFactory.fixed(EpsgCoordinateSystems.nad83UtmId(10), axisCount,
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(EpsgId.nad83Utm(10), axisCount,
         GeometryFactory.newScalesFixed(axisCount, 1000.0));
 
       final Point pointEmpty = geometryFactory.point();
@@ -177,10 +177,10 @@ public class PointTest implements TestConstants {
       if (axisCountLess > 2) {
         axisCountLess--;
       }
-      final GeometryFactory geometryFactory = GeometryFactory.fixed(EpsgCoordinateSystems.nad83UtmId(10), axisCount,
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(EpsgId.nad83Utm(10), axisCount,
         GeometryFactory.newScalesFixed(axisCount, 1000.0));
-      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(EpsgCoordinateSystems.nad83UtmId(10), axisCount + 1);
-      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(EpsgCoordinateSystems.nad83UtmId(10), axisCountLess);
+      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(EpsgId.nad83Utm(10), axisCount + 1);
+      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(EpsgId.nad83Utm(10), axisCountLess);
       final double[] coordinatesExtra = new double[axisCount + 1];
       final double[] coordinates = new double[axisCount];
       final double[] coordinatesLess = new double[axisCountLess];

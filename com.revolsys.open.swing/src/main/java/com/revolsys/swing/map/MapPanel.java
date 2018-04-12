@@ -133,7 +133,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       Invoke.later(() -> {
         final Project project = Project.get();
         final MapPanel mapPanel = project.getMapPanel();
-        final int mapCoordinateSystemId = mapPanel.getCoordinateSystemId();
+        final int mapCoordinateSystemId = mapPanel.getHorizontalCoordinateSystemId();
         final CoordinateSystemField coordinateSystemField = new CoordinateSystemField(
           "coordinateSystem");
         coordinateSystemField.setSelectedItem(mapCoordinateSystemId);

@@ -47,7 +47,7 @@ public class TestUtil {
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
           otherGeometryFactory = GeometryFactory
-            .fixed(projectedCoordinateSystem.getCoordinateSystemId(), axisCount, scales);
+            .fixed(projectedCoordinateSystem.getHorizontalCoordinateSystemId(), axisCount, scales);
         } else {
           otherGeometryFactory = GeometryFactory.fixed(3005, axisCount, scales);
         }
@@ -74,8 +74,8 @@ public class TestUtil {
 
   public static boolean equalsExpectedGeometry(final int i, final Geometry actualGeometry,
     final Geometry expectedGeometry) {
-    final int actualSrid = actualGeometry.getCoordinateSystemId();
-    final int expectedSrid = expectedGeometry.getCoordinateSystemId();
+    final int actualSrid = actualGeometry.getHorizontalCoordinateSystemId();
+    final int expectedSrid = expectedGeometry.getHorizontalCoordinateSystemId();
     if (actualSrid != expectedSrid) {
       System.err.println(i + "\tEquals Srid\t" + expectedSrid + "\t" + actualSrid);
       return false;

@@ -204,7 +204,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
         axisCount = 3;
       }
       final double[] scales = geometryFactory.newScales(axisCount);
-      geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(), axisCount,
+      geometryFactory = GeometryFactory.fixed(geometryFactory.getHorizontalCoordinateSystemId(), axisCount,
         scales);
 
       final FieldDefinition geometryField = recordDefinition.getGeometryField();

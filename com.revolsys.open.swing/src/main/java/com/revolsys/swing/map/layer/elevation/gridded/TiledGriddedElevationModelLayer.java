@@ -179,7 +179,7 @@ public class TiledGriddedElevationModelLayer
       this.baseResource = Resource.getResource(this.url);
       if (this.baseResource.isFile() && this.baseResource.exists()) {
         final Path basePath = this.baseResource.getPath();
-        final int coordinateSystemId = getCoordinateSystemId();
+        final int coordinateSystemId = getHorizontalCoordinateSystemId();
         final ScaledIntegerGriddedDigitalElevationModelGrid elevationModel = new ScaledIntegerGriddedDigitalElevationModelGrid(
           basePath, this.filePrefix, coordinateSystemId, this.tileSizePixels, this.minResolution,
           this.scaleZ);
@@ -202,11 +202,11 @@ public class TiledGriddedElevationModelLayer
 
   public GriddedElevationModel newGriddedElevationModel(final int tileSize, final int tileX,
     final int tileY) {
-    final String fileName = Strings.toString("_", this.filePrefix, getCoordinateSystemId(),
+    final String fileName = Strings.toString("_", this.filePrefix, getHorizontalCoordinateSystemId(),
       tileSize, tileX, tileY) + "." + this.fileExtension;
     final Resource path = this.baseResource //
       .createRelative(this.fileExtension) //
-      .createRelative(getCoordinateSystemId()) //
+      .createRelative(getHorizontalCoordinateSystemId()) //
       .createRelative(tileSize) //
       .createRelative(tileX) //
       .createRelative(fileName);
@@ -259,7 +259,7 @@ public class TiledGriddedElevationModelLayer
   protected TiledGriddedElevationModelLayerTile newTile(final int resolution, final int tileSize,
     final int tileX, final int tileY) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final int coordinateSystemId = getCoordinateSystemId();
+    final int coordinateSystemId = getHorizontalCoordinateSystemId();
     final BoundingBox tileBoundingBox = geometryFactory.newBoundingBox(2, tileX, tileY,
       tileX + tileSize, tileY + tileSize);
     return new TiledGriddedElevationModelLayerTile(this, tileBoundingBox, coordinateSystemId,

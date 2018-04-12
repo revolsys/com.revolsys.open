@@ -196,7 +196,7 @@ public class WKBReader {
     int coordinateSystemId = 0;
     if (hasSRID) {
       coordinateSystemId = this.dis.readInt();
-      if (coordinateSystemId != geometryFactory.getCoordinateSystemId()) {
+      if (coordinateSystemId != geometryFactory.getHorizontalCoordinateSystemId()) {
         geometryFactory = geometryFactory.convertSrid(coordinateSystemId);
       }
     }

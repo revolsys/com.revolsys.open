@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -21,7 +21,7 @@ public class PolygonTest {
     new PointDoubleXY(0.0, 0));
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory
-    .floating2d(EpsgCoordinateSystems.WGS84_ID);
+    .floating2d(EpsgId.WGS84);
 
   private static final List<Point> INTERIOR_2 = Arrays.<Point> asList(new PointDoubleXY(2.0, 2.0),
     new PointDoubleXY(8.0, 2.0), new PointDoubleXY(8.0, 8.0), new PointDoubleXY(2.0, 8.0),

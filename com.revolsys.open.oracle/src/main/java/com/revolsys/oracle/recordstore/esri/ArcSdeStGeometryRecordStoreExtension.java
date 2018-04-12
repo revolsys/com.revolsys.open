@@ -72,7 +72,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
             columnName, JdbcFieldAdder.GEOMETRY_FACTORY);
           int srid = spatialReference.getCoordinateSystemId();
           if (srid <= 0) {
-            srid = geometryFactory.getCoordinateSystemId();
+            srid = geometryFactory.getHorizontalCoordinateSystemId();
           }
           axisCount = Math.min(axisCount, 3);
           final double[] scales = spatialReference.getGeometryFactory().newScales(axisCount);

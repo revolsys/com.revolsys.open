@@ -87,10 +87,6 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   private static boolean initialized = false;
 
-  public static final int NAD27_ID = 4267;
-
-  public static final int NAD83_ID = 4269;
-
   private static int nextSrid = 2000000;
 
   private static final IntHashMap<CoordinateOperation> OPERATION_BY_ID = new IntHashMap<>();
@@ -104,8 +100,6 @@ public final class EpsgCoordinateSystems implements CodeTable {
   private static final IntHashMap<UnitOfMeasure> UNIT_BY_ID = new IntHashMap<>();
 
   private static final Map<String, UnitOfMeasure> UNIT_BY_NAME = new TreeMap<>();
-
-  public static final int WGS84_ID = 4326;
 
   private static void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
@@ -911,22 +905,6 @@ public final class EpsgCoordinateSystems implements CodeTable {
     }
   }
 
-  public static final int nad27UtmId(final int zone) {
-    if (zone >= 1 && zone <= 22) {
-      return 26700 + zone;
-    } else {
-      throw new IllegalArgumentException("Invalid NAD27 / UTM zone " + zone);
-    }
-  }
-
-  public static final int nad83UtmId(final int zone) {
-    if (zone >= 1 && zone <= 23) {
-      return 26900 + zone;
-    } else {
-      throw new IllegalArgumentException("Invalid NAD83 / UTM zone " + zone);
-    }
-  }
-
   private static ChannelReader newChannelReader(final String fileName) {
     return new ClassPathResource("CoordinateSystems/epsg/" + fileName + ".bin").newChannelReader();
   }
@@ -977,24 +955,8 @@ public final class EpsgCoordinateSystems implements CodeTable {
     return stringWriter.toString();
   }
 
-  public static final int wgs72UtmId(final int zone) {
-    if (zone >= 1 && zone <= 60) {
-      return 32200 + zone;
-    } else {
-      throw new IllegalArgumentException("Invalid WGS 72 / UTM zone " + zone);
-    }
-  }
-
   public static GeographicCoordinateSystem wgs84() {
-    return EpsgCoordinateSystems.getCoordinateSystem(WGS84_ID);
-  }
-
-  public static final int wgs84UtmId(final int zone) {
-    if (zone >= 1 && zone <= 60) {
-      return 32600 + zone;
-    } else {
-      throw new IllegalArgumentException("Invalid WGS 84 / UTM zone " + zone);
-    }
+    return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.WGS84);
   }
 
   private Map<Identifier, List<Object>> codes;
