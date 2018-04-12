@@ -1,6 +1,5 @@
 package com.revolsys.geometry.cs;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,17 +10,13 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
-import com.revolsys.geometry.cs.projection.NoOpOperation;
-import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
+import com.revolsys.geometry.cs.unit.Radian;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-
-import tec.uom.se.unit.Units;
 
 public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSystem {
   private static final long serialVersionUID = 1902383026085071877L;
@@ -91,6 +86,55 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
   }
 
   @Override
+  protected void addCoordinatesOperations(final List<CoordinatesOperation> operations,
+    final GeographicCoordinateSystem targetGeoCs) {
+    addInverseOperations(operations);
+
+    final GeographicCoordinateSystem sourceGeoCs = this.geographicCoordinateSystem;
+    final Radian radian = Radian.getInstance();
+    final AngularUnit targetAngularUnit = targetGeoCs.getAngularUnit();
+    sourceGeoCs.addConversionOperation(operations, targetGeoCs, radian, targetAngularUnit);
+  }
+
+  @Override
+  protected void addCoordinatesOperations(final List<CoordinatesOperation> operations,
+    final ProjectedCoordinateSystem coordinateSystem) {
+    addInverseOperations(operations);
+
+    final GeographicCoordinateSystem sourceGeoCs = this.geographicCoordinateSystem;
+    final GeographicCoordinateSystem targetGeoCs = coordinateSystem.geographicCoordinateSystem;
+    final Radian radian = Radian.getInstance();
+    sourceGeoCs.addConversionOperation(operations, targetGeoCs, radian, radian);
+    coordinateSystem.addProjectionOperations(operations);
+  }
+
+  protected void addInverseOperations(final List<CoordinatesOperation> operations) {
+    final CoordinatesProjection projection = getCoordinatesProjection();
+    if (projection != null) {
+      final CoordinatesOperation inverseOperation = projection.getInverseOperation();
+      if (inverseOperation != null) {
+        this.linearUnit.addToMetresOperation(operations);
+        operations.add(inverseOperation);
+        return;
+      }
+    }
+    throw new IllegalArgumentException("No inverse operation found for " + this);
+  }
+
+  protected void addProjectionOperations(final List<CoordinatesOperation> operations) {
+    final CoordinatesProjection projection = getCoordinatesProjection();
+    if (projection != null) {
+      final CoordinatesOperation projectionOperation = projection.getProjectOperation();
+      if (projectionOperation != null) {
+        operations.add(projectionOperation);
+        this.linearUnit.addFromMetresOperation(operations);
+        return;
+      }
+    }
+    throw new IllegalArgumentException("No projection operation found for " + this);
+  }
+
+  @Override
   public ProjectedCoordinateSystem clone() {
     return (ProjectedCoordinateSystem)super.clone();
   }
@@ -151,53 +195,6 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
     return this.coordinateOperationMethod;
   }
 
-  @Override
-  public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
-    if (coordinateSystem == null || this == coordinateSystem) {
-      return null;
-    } else {
-      final List<CoordinatesOperation> operations = new ArrayList<>();
-      final CoordinatesOperation inverseOperation = this.getInverseCoordinatesOperation();
-      if (inverseOperation == null) {
-        return null;
-      }
-      final Unit<Length> linearUnit1 = this.getLengthUnit();
-      if (!linearUnit1.equals(Units.METRE)) {
-        operations.add(new UnitConverstionOperation(linearUnit1, Units.METRE));
-      }
-      operations.add(inverseOperation);
-
-      if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-        // TODO datum conversion
-        final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-        final CoordinatesOperation projectOperation = projectedCoordinateSystem
-          .getProjectCoordinatesOperation();
-        if (projectOperation != null) {
-          operations.add(projectOperation);
-        }
-        final Unit<Length> linearUnit2 = projectedCoordinateSystem.getLengthUnit();
-        if (!linearUnit2.equals(Units.METRE)) {
-          operations.add(new UnitConverstionOperation(Units.METRE, linearUnit2));
-        }
-      } else if (coordinateSystem instanceof GeographicCoordinateSystem) {
-        final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
-        // TODO datum conversion
-        final AngularUnit angularUnit = geographicCoordinateSystem.getAngularUnit();
-        operations.add(angularUnit.fromRadiansOperation);
-      } else {
-        return null;
-      }
-      switch (operations.size()) {
-        case 0:
-          return null;
-        case 1:
-          return operations.get(0);
-        default:
-          return new ChainedCoordinatesOperation(operations);
-      }
-    }
-  }
-
   @SuppressWarnings("unchecked")
   public synchronized <P extends CoordinatesProjection> P getCoordinatesProjection() {
     if (this.coordinatesProjection == null) {
@@ -232,20 +229,6 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
     return this.geographicCoordinateSystem.getCoordinateSystemId();
   }
 
-  /**
-   * Get the operation to convert coordinates to geographics coordinates.
-   *
-   * @return The coordinates operation.
-   */
-  public CoordinatesOperation getInverseCoordinatesOperation() {
-    final CoordinatesProjection projection = getCoordinatesProjection();
-    if (projection == null) {
-      return null;
-    } else {
-      return projection.getInverseOperation();
-    }
-  }
-
   @Override
   public Unit<Length> getLengthUnit() {
     return this.linearUnit.getUnit();
@@ -267,21 +250,6 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
 
   public Map<ParameterName, ParameterValue> getParameterValues() {
     return this.parameterValues;
-  }
-
-  /**
-   * Get the operation to convert geographics coordinates to projected
-   * coordinates.
-   *
-   * @return The coordinates operation.
-   */
-  public CoordinatesOperation getProjectCoordinatesOperation() {
-    final CoordinatesProjection projection = getCoordinatesProjection();
-    if (projection == null) {
-      return new NoOpOperation();
-    } else {
-      return projection.getProjectOperation();
-    }
   }
 
   @Override

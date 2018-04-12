@@ -10,9 +10,11 @@ import java.util.Map;
 import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.gridshift.GridShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.record.io.format.tsv.Tsv;
+import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.spring.resource.Resource;
 
 public class BinaryGridShiftFile {
@@ -52,9 +54,9 @@ public class BinaryGridShiftFile {
 
   private GeographicCoordinateSystem toCoordinateSystem;
 
-  private final CoordinatesOperation forwardOperation = this::shiftForward;
+  private final GridShiftOperation forwardOperation = this::shiftForward;
 
-  private final CoordinatesOperation reverseOperation = this::shiftReverse;
+  private final GridShiftOperation inverseOperation = this::shiftInverse;
 
   @SuppressWarnings("unused")
   public BinaryGridShiftFile(final Object source, final boolean loadAccuracy) {
@@ -95,7 +97,7 @@ public class BinaryGridShiftFile {
     }
   }
 
-  public CoordinatesOperation getForwardOperation() {
+  public GridShiftOperation getForwardOperation() {
     return this.forwardOperation;
   }
 
@@ -114,8 +116,8 @@ public class BinaryGridShiftFile {
     return null;
   }
 
-  public CoordinatesOperation getReverseOperation() {
-    return this.reverseOperation;
+  public GridShiftOperation getInverseOperation() {
+    return this.inverseOperation;
   }
 
   public GeographicCoordinateSystem getToCoordinateSystem() {
@@ -127,20 +129,25 @@ public class BinaryGridShiftFile {
   }
 
   private void loadGrids(final boolean loadAccuracy, final int gridCount) {
-    final List<BinaryGridShiftGrid> grids = new ArrayList<>();
-    for (int i = 0; i < gridCount; i++) {
-      final BinaryGridShiftGrid grid = new BinaryGridShiftGrid(this, loadAccuracy);
-      grids.add(grid);
+    try (
+      TsvWriter writer = Tsv.plainWriter("/Users/paustin/Downloads/bc.tsv")) {
+      writer.write("polygon");
+      final List<BinaryGridShiftGrid> grids = new ArrayList<>();
+      for (int i = 0; i < gridCount; i++) {
+        final BinaryGridShiftGrid grid = new BinaryGridShiftGrid(this, loadAccuracy);
+        grids.add(grid);
+        writer.write(grid.getBoundingBox().toPolygon(100));
+      }
     }
     final Map<String, BinaryGridShiftGrid> gridByName = new HashMap<>();
-    for (final BinaryGridShiftGrid grid : grids) {
+    for (final BinaryGridShiftGrid grid : this.grids) {
       if (!grid.hasParent()) {
         this.grids.add(grid);
       }
       final String name = grid.getName();
       gridByName.put(name, grid);
     }
-    for (final BinaryGridShiftGrid grid : grids) {
+    for (final BinaryGridShiftGrid grid : this.grids) {
       if (grid.hasParent()) {
         final String parentName = grid.getParentName();
         final BinaryGridShiftGrid parentGrid = gridByName.get(parentName);
@@ -191,21 +198,24 @@ public class BinaryGridShiftFile {
     return value;
   }
 
-  public void shiftForward(final CoordinatesOperationPoint point) {
+  public boolean shiftForward(final CoordinatesOperationPoint point) {
     final double lon = point.x;
     final double lat = point.y;
     final double lonPositiveWestSeconds = -lon * 3600;
     final double latSeconds = lat * 3600;
     final BinaryGridShiftGrid binaryGridShiftGrid = getGrid(lonPositiveWestSeconds, latSeconds);
-    if (binaryGridShiftGrid != null) {
+    if (binaryGridShiftGrid == null) {
+      return false;
+    } else {
       final double lonShift = binaryGridShiftGrid.getLonShift(lonPositiveWestSeconds, latSeconds);
       final double latShift = binaryGridShiftGrid.getLatShift(lonPositiveWestSeconds, latSeconds);
       point.x = -(lonPositiveWestSeconds + lonShift) / 3600;
       point.y = (latSeconds + latShift) / 3600;
+      return true;
     }
   }
 
-  public void shiftReverse(final CoordinatesOperationPoint point) {
+  public boolean shiftInverse(final CoordinatesOperationPoint point) {
     final double lon = point.x;
     final double lat = point.y;
     final double lonPositiveWestSeconds = -lon * 3600;
@@ -218,7 +228,11 @@ public class BinaryGridShiftFile {
       final BinaryGridShiftGrid binaryGridShiftGrid = getGrid(forwardLonPositiveWestSeconds,
         forwardLatSeconds);
       if (binaryGridShiftGrid == null) {
-        break;
+        if (i == 0) {
+          return false;
+        } else {
+          return true;
+        }
       } else {
         lonShift = binaryGridShiftGrid.getLonShift(forwardLonPositiveWestSeconds,
           forwardLatSeconds);
@@ -228,6 +242,7 @@ public class BinaryGridShiftFile {
     }
     point.x = -(lonPositiveWestSeconds - lonShift) / 3600;
     point.y = (latSeconds - latShift) / 3600;
+    return true;
   }
 
   @Override

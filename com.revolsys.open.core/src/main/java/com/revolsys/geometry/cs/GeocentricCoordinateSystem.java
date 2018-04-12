@@ -6,7 +6,6 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -83,11 +82,6 @@ public class GeocentricCoordinateSystem extends AbstractHorizontalCoordinateSyst
     } else {
       return false;
     }
-  }
-
-  @Override
-  public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
-    return null;
   }
 
   @Override

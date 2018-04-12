@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.geometry.cs.gridshift.gsb.BinaryGridShiftFile;
-import com.revolsys.geometry.cs.gridshift.nadcon5.Nadcon5CoordinatesOperation;
+import com.revolsys.geometry.cs.gridshift.nadcon5.Nadcon5GridShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.record.Record;
@@ -24,7 +24,7 @@ public class GridShiftTest {
         final String sourceDatumName = record.getString("sourceDatumName");
         final String targetDatumName = record.getString("targetDatumName");
 
-        final CoordinatesOperation operation = new Nadcon5CoordinatesOperation(sourceDatumName,
+        final CoordinatesOperation operation = new Nadcon5GridShiftOperation(sourceDatumName,
           targetDatumName);
         final CoordinatesOperationPoint point = new CoordinatesOperationPoint(lon, lat);
         final double expectedLon = record.getDouble("expectedLon");
@@ -58,7 +58,7 @@ public class GridShiftTest {
     System.out.println(point);
     file.getForwardOperation().perform(point);
     System.out.println(point);
-    file.getReverseOperation().perform(point);
+    file.getInverseOperation().perform(point);
     System.out.println(point);
   }
 }

@@ -3,6 +3,7 @@ package com.revolsys.geometry.cs.unit;
 import static tec.uom.se.AbstractUnit.ONE;
 
 import java.security.MessageDigest;
+import java.util.List;
 import java.util.Map;
 
 import javax.measure.Unit;
@@ -36,6 +37,7 @@ public class AngularUnit implements UnitOfMeasure {
     .add("sexagesimal dms.s", NonSI.DEGREE_ANGLE)
     .add("sexagesimal dms", NonSI.DEGREE_ANGLE)
     .add("sexagesimal dm", NonSI.DEGREE_ANGLE)
+    .add("grad", CustomUnits.GRAD)
     .getMap();
 
   private final Authority authority;
@@ -46,13 +48,11 @@ public class AngularUnit implements UnitOfMeasure {
 
   private final boolean deprecated;
 
+  public CoordinatesOperation fromRadiansOperation = this::fromRadians;
+
   private String name;
 
   private Unit<Angle> unit;
-
-  public CoordinatesOperation fromRadiansOperation = this::fromRadians;
-
-  public CoordinatesOperation toRadiansOperation = this::toRadians;
 
   public AngularUnit(final String name, final AngularUnit baseUnit, final double conversionFactor,
     final Authority authority, final boolean deprecated) {
@@ -84,6 +84,40 @@ public class AngularUnit implements UnitOfMeasure {
     this(name, null, conversionFactor, authority, false);
   }
 
+  public void addConversionOperation(final List<CoordinatesOperation> operations,
+    final AngularUnit targetAngularUnit) {
+    if (this != targetAngularUnit) {
+      if (targetAngularUnit instanceof Radian) {
+        addToRadiansOperation(operations);
+      } else if (targetAngularUnit instanceof Degree) {
+        addToDegreesOperation(operations);
+      } else {
+        operations.add(point -> {
+          final double x = toRadians(point.x);
+          point.x = targetAngularUnit.fromRadians(x);
+          final double y = toRadians(point.y);
+          point.y = targetAngularUnit.fromRadians(y);
+        });
+      }
+    }
+  }
+
+  public void addFromDegreesOperation(final List<CoordinatesOperation> operations) {
+    operations.add(this::fromDegrees);
+  }
+
+  public void addFromRadiansOperation(final List<CoordinatesOperation> operations) {
+    operations.add(this::fromRadians);
+  }
+
+  public void addToDegreesOperation(final List<CoordinatesOperation> operations) {
+    operations.add(this::toDegrees);
+  }
+
+  public void addToRadiansOperation(final List<CoordinatesOperation> operations) {
+    operations.add(this::toRadians);
+  }
+
   @Override
   public boolean equals(final Object object) {
     if (object == null) {
@@ -104,7 +138,17 @@ public class AngularUnit implements UnitOfMeasure {
     }
   }
 
-  public void fromRadians(final CoordinatesOperationPoint point) {
+  protected void fromDegrees(final CoordinatesOperationPoint point) {
+    point.x = fromDegrees(point.x);
+    point.y = fromDegrees(point.y);
+  }
+
+  public double fromDegrees(final double value) {
+    final double radians = toRadians(value);
+    return Math.toDegrees(radians);
+  }
+
+  protected void fromRadians(final CoordinatesOperationPoint point) {
     point.x = fromRadians(point.x);
     point.y = fromRadians(point.y);
   }
@@ -177,6 +221,11 @@ public class AngularUnit implements UnitOfMeasure {
     }
   }
 
+  protected void toDegrees(final CoordinatesOperationPoint point) {
+    point.x = toDegrees(point.x);
+    point.y = toDegrees(point.y);
+  }
+
   public double toDegrees(final double value) {
     final double baseValue;
     if (Double.isFinite(this.conversionFactor)) {
@@ -209,7 +258,7 @@ public class AngularUnit implements UnitOfMeasure {
     }
   }
 
-  public void toRadians(final CoordinatesOperationPoint point) {
+  protected void toRadians(final CoordinatesOperationPoint point) {
     point.x = toRadians(point.x);
     point.y = toRadians(point.y);
   }
@@ -235,6 +284,6 @@ public class AngularUnit implements UnitOfMeasure {
 
   public void updateDigest(final MessageDigest digest) {
     digest.update((byte)'A');
-    Md5.update(digest, toBase(this.conversionFactor));
+    Md5.update(digest, Math.round(toBase(1) * 1e6) / 1e6);
   }
 }

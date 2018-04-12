@@ -797,8 +797,8 @@ public class Ellipsoid implements Serializable {
   }
 
   public void updateDigest(final MessageDigest digest) {
-    Md5.update(digest, this.semiMajorAxis);
-    Md5.update(digest, this.inverseFlattening);
+    Md5.update(digest, Doubles.makePrecise(10, this.semiMajorAxis));
+    Md5.update(digest, Doubles.makePrecise(1e6, this.inverseFlattening));
   }
 
 }

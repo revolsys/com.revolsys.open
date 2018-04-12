@@ -47,6 +47,7 @@ import com.revolsys.geometry.cs.unit.DegreeSexagesimalDMS;
 import com.revolsys.geometry.cs.unit.Grad;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.cs.unit.Metre;
+import com.revolsys.geometry.cs.unit.Radian;
 import com.revolsys.geometry.cs.unit.ScaleUnit;
 import com.revolsys.geometry.cs.unit.TimeUnit;
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
@@ -253,8 +254,12 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   @SuppressWarnings("unchecked")
   public static <C extends CoordinateSystem> C getCoordinateSystem(final int crsId) {
-    initialize();
-    return (C)COORDINATE_SYSTEM_BY_ID.get(crsId);
+    if (crsId > 0) {
+      initialize();
+      return (C)COORDINATE_SYSTEM_BY_ID.get(crsId);
+    } else {
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -399,13 +404,18 @@ public final class EpsgCoordinateSystems implements CodeTable {
       while (true) {
         final int code = reader.getInt();
         final String name = reader.getStringUtf8ByteCount();
-        final double minX = reader.getDouble();
+        double minX = reader.getDouble();
         final double minY = reader.getDouble();
         final double maxX = reader.getDouble();
         final double maxY = reader.getDouble();
         final boolean deprecated = readBoolean(reader);
         final Authority authority = new EpsgAuthority(code);
 
+        if (minX > maxX) {
+          if (minX > 0) {
+            minX -= 360;
+          }
+        }
         BoundingBox boundingBox;
         if (Double.isFinite(minX) || Double.isFinite(minX) || Double.isFinite(minX)
           || Double.isFinite(minX)) {
@@ -855,7 +865,9 @@ public final class EpsgCoordinateSystems implements CodeTable {
             break;
             case 2:
               final AngularUnit baseAngularUnit = (AngularUnit)UNIT_BY_ID.get(baseId);
-              if (id == 9102) {
+              if (id == 9101) {
+                unit = new Radian(name, baseAngularUnit, conversionFactor, authority, deprecated);
+              } else if (id == 9102) {
                 unit = new Degree(name, baseAngularUnit, conversionFactor, authority, deprecated);
                 SYSTEM_OF_UNITS.addUnit(unit, "Degree", "deg");
               } else if (id == 9105) {

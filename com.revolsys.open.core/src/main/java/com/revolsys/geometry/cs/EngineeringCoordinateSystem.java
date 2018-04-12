@@ -7,7 +7,6 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
 import com.revolsys.geometry.cs.datum.EngineeringDatum;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.geometry.model.BoundingBox;
@@ -78,11 +77,6 @@ public class EngineeringCoordinateSystem extends AbstractHorizontalCoordinateSys
     } else {
       return false;
     }
-  }
-
-  @Override
-  public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
-    return null;
   }
 
   @Override

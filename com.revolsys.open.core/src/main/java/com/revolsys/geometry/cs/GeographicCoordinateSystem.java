@@ -1,8 +1,8 @@
 package com.revolsys.geometry.cs;
 
 import java.security.MessageDigest;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.measure.Unit;
 import javax.measure.UnitConverter;
@@ -12,11 +12,11 @@ import javax.measure.quantity.Length;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.epsg.CoordinateOperation;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
+import com.revolsys.geometry.cs.gridshift.GridShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.UnitConverstionOperation;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
+import com.revolsys.geometry.cs.unit.Radian;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -52,6 +52,8 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
       return datum.getPrimeMeridian();
     }
   }
+
+  private Map<GeographicCoordinateSystem, GeographicCoordinateSystemGridShiftOperation> gridShiftOperationsByCoordinateSystem;
 
   private final AngularUnit angularUnit;
 
@@ -95,6 +97,55 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
   public GeographicCoordinateSystem(final String name, final Ellipsoid ellipsoid) {
     this(0, name, new GeodeticDatum(name, ellipsoid, null, null), new PrimeMeridian(name, 0, null),
       EpsgCoordinateSystems.getUnit(9102), null, null);
+  }
+
+  protected void addConversionOperation(final List<CoordinatesOperation> operations,
+    final GeographicCoordinateSystem targetGeoCs, final AngularUnit sourceAngularUnit,
+    final AngularUnit targetAngularUnit) {
+    if (this.gridShiftOperationsByCoordinateSystem != null) {
+      final GeographicCoordinateSystemGridShiftOperation gridShiftOperation = this.gridShiftOperationsByCoordinateSystem
+        .get(targetGeoCs);
+      if (gridShiftOperation != null) {
+        sourceAngularUnit.addToDegreesOperation(operations);
+        operations.add(gridShiftOperation);
+        targetAngularUnit.addFromDegreesOperation(operations);
+        return;
+      }
+    }
+    sourceAngularUnit.addConversionOperation(operations, targetAngularUnit);
+
+  }
+
+  @Override
+  protected void addCoordinatesOperations(final List<CoordinatesOperation> operations,
+    final GeographicCoordinateSystem targetGeoCs) {
+    final AngularUnit angularUnit = getAngularUnit();
+    final AngularUnit targetAngularUnit = targetGeoCs.getAngularUnit();
+    addConversionOperation(operations, targetGeoCs, angularUnit, targetAngularUnit);
+  }
+
+  @Override
+  protected void addCoordinatesOperations(final List<CoordinatesOperation> operations,
+    final ProjectedCoordinateSystem targetProjCs) {
+    final AngularUnit angularUnit = getAngularUnit();
+    final GeographicCoordinateSystem targetGeoCs = targetProjCs.getGeographicCoordinateSystem();
+
+    // Convert units, datum conversion if supported and convert to radians
+    final Radian radian = Radian.getInstance();
+    addConversionOperation(operations, targetGeoCs, angularUnit, radian);
+
+    targetProjCs.addProjectionOperations(operations);
+  }
+
+  public synchronized void addGridShiftOperation(final GeographicCoordinateSystem coordinateSystem,
+    final GridShiftOperation operation) {
+    GeographicCoordinateSystemGridShiftOperation operations = this.gridShiftOperationsByCoordinateSystem
+      .get(coordinateSystem);
+    if (operations == null) {
+      operations = new GeographicCoordinateSystemGridShiftOperation(this, coordinateSystem);
+      this.gridShiftOperationsByCoordinateSystem.put(coordinateSystem, operations);
+    }
+    operations.addOperation(operation);
   }
 
   @Override
@@ -154,49 +205,6 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
 
   public CoordinateOperation getCoordinateOperation() {
     return this.coordinateOperation;
-  }
-
-  @Override
-  public CoordinatesOperation getCoordinatesOperation(final CoordinateSystem coordinateSystem) {
-    if (coordinateSystem == null || this == coordinateSystem) {
-      return null;
-    } else if (coordinateSystem instanceof GeographicCoordinateSystem) {
-      final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
-      final Unit<Angle> angularUnit1 = getUnit();
-
-      // TODO GeodeticDatum shift
-      final Unit<Angle> angularUnit2 = geographicCoordinateSystem.getUnit();
-      if (!angularUnit1.equals(angularUnit2)) {
-        return new UnitConverstionOperation(angularUnit1, angularUnit2, 2);
-      } else {
-        return null;
-      }
-    } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-      final List<CoordinatesOperation> operations = new ArrayList<>();
-      final AngularUnit angularUnit = getAngularUnit();
-      operations.add(angularUnit.toRadiansOperation);
-      // TODO geodeticDatum shift
-      final CoordinatesOperation projectOperation = projectedCoordinateSystem
-        .getProjectCoordinatesOperation();
-      if (projectOperation != null) {
-        operations.add(projectOperation);
-      }
-      final Unit<Length> linearUnit2 = projectedCoordinateSystem.getLengthUnit();
-      if (!linearUnit2.equals(Units.METRE)) {
-        operations.add(new UnitConverstionOperation(Units.METRE, linearUnit2));
-      }
-      switch (operations.size()) {
-        case 0:
-          return null;
-        case 1:
-          return operations.get(0);
-        default:
-          return new ChainedCoordinatesOperation(operations);
-      }
-    } else {
-      return null;
-    }
   }
 
   @Override

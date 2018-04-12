@@ -60,6 +60,7 @@ import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.NoOpOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.LineStringEditor;
@@ -1072,9 +1073,16 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
           if (coordinatesOperation == null) {
             final CoordinateSystem otherCoordinateSystem = geometryFactory
               .getHorizontalCoordinateSystem();
-            coordinatesOperation = ProjectionFactory.getCoordinatesOperation(coordinateSystem,
-              otherCoordinateSystem);
-            this.coordinatesOperationById.put(otherCoordinateSystemId, coordinatesOperation);
+            try {
+              coordinatesOperation = ProjectionFactory.getCoordinatesOperation(coordinateSystem,
+                otherCoordinateSystem);
+              this.coordinatesOperationById.put(otherCoordinateSystemId, coordinatesOperation);
+            } catch (final IllegalArgumentException e) {
+              this.coordinatesOperationById.put(otherCoordinateSystemId, new NoOpOperation());
+              Logs.error(this,
+                "Cannot get conversion from " + coordinateSystem + " to " + otherCoordinateSystem,
+                e);
+            }
           }
           return coordinatesOperation;
         } else {

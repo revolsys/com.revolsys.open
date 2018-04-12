@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.logging.Logs;
@@ -62,7 +63,7 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
                 final Polygon viewportPolygon = boundingBox.expandPercent(0.1).toPolygon(0);
                 final Polygon areaPolygon = areaBoundingBox.expand(viewport.getUnitsPerPixel())
                   .toPolygon(0);
-                final Polygon drawPolygon = (Polygon)viewportPolygon.difference(areaPolygon);
+                final Geometry drawPolygon = viewportPolygon.difference(areaPolygon);
                 try (
                   BaseCloseable closeable = viewport.setUseModelCoordinates(true)) {
                   viewport.drawGeometry(drawPolygon, STYLE_AREA);

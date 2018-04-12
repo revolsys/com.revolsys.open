@@ -1,17 +1,39 @@
 package com.revolsys.geometry.cs.unit;
 
+import java.util.List;
+
 import com.revolsys.geometry.cs.Authority;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
 public class Degree extends AngularUnit {
+  private static Degree instance;
+
+  public static Degree getInstance() {
+    return instance;
+  }
 
   public Degree(final String name, final AngularUnit baseUnit, final double conversionFactor,
     final Authority authority, final boolean deprecated) {
     super(name, baseUnit, conversionFactor, authority, deprecated);
+    instance = this;
   }
 
   @Override
-  public void fromRadians(final CoordinatesOperationPoint point) {
+  public void addFromDegreesOperation(final List<CoordinatesOperation> operations) {
+  }
+
+  @Override
+  public void addToDegreesOperation(final List<CoordinatesOperation> operations) {
+  }
+
+  @Override
+  public double fromDegrees(final double value) {
+    return value;
+  }
+
+  @Override
+  protected void fromRadians(final CoordinatesOperationPoint point) {
     point.x = Math.toDegrees(point.x);
     point.y = Math.toDegrees(point.y);
   }
@@ -32,7 +54,7 @@ public class Degree extends AngularUnit {
   }
 
   @Override
-  public void toRadians(final CoordinatesOperationPoint point) {
+  protected void toRadians(final CoordinatesOperationPoint point) {
     point.x = Math.toRadians(point.x);
     point.y = Math.toRadians(point.y);
   }

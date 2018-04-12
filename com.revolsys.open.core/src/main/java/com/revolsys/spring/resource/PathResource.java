@@ -94,34 +94,41 @@ public class PathResource extends AbstractResource implements WritableResource {
   }
 
   @Override
-  public void copyFrom(final InputStream in) {
+  public boolean copyFrom(final InputStream in) {
     final File file = getFile();
     final File parent = file.getParentFile();
     if (!parent.exists()) {
       parent.mkdirs();
     }
-    super.copyFrom(in);
+    return super.copyFrom(in);
   }
 
   @Override
-  public void copyFrom(final Resource source) {
-    if (source != null) {
+  public boolean copyFrom(final Resource source) {
+    if (source == null) {
+      return false;
+    } else {
       try (
         ReadableByteChannel in = source.newReadableByteChannel()) {
-        try (
-          FileChannel out = newWritableByteChannel();) {
-          if (in instanceof FileChannel) {
-            final FileChannel fileIn = (FileChannel)in;
-            Channels.copy(fileIn, out);
-          } else {
-            final long size = source.contentLength();
-            long count = 0;
-            while (count < size) {
-              count += out.transferFrom(in, count, size - count);
+        if (in == null) {
+          return false;
+        } else {
+          try (
+            FileChannel out = newWritableByteChannel();) {
+            if (in instanceof FileChannel) {
+              final FileChannel fileIn = (FileChannel)in;
+              Channels.copy(fileIn, out);
+            } else {
+              final long size = source.contentLength();
+              long count = 0;
+              while (count < size) {
+                count += out.transferFrom(in, count, size - count);
+              }
             }
+            return true;
+          } catch (final IOException e) {
+            throw Exceptions.wrap(e);
           }
-        } catch (final IOException e) {
-          throw Exceptions.wrap(e);
         }
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
@@ -130,23 +137,34 @@ public class PathResource extends AbstractResource implements WritableResource {
   }
 
   @Override
-  public void copyTo(final Resource target) {
-    if (target != null) {
+  public boolean copyTo(final Resource target) {
+    if (target == null) {
+      return false;
+    } else {
       try (
         WritableByteChannel out = target.newWritableByteChannel()) {
-        copyTo(out);
+        return copyTo(out);
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }
     }
   }
 
-  public void copyTo(final WritableByteChannel out) {
-    try (
-      FileChannel in = newReadableByteChannel()) {
-      Channels.copy(in, out);
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
+  public boolean copyTo(final WritableByteChannel out) {
+    if (out == null) {
+      return false;
+    } else {
+      try (
+        FileChannel in = newReadableByteChannel()) {
+        if (in == null) {
+          return false;
+        } else {
+          Channels.copy(in, out);
+          return true;
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
     }
   }
 

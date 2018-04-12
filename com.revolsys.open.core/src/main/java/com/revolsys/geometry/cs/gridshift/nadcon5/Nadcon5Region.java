@@ -9,19 +9,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.Exceptions;
 
 public class Nadcon5Region {
-  private static final Map<String, Integer> CS_ID_BY_DATUM_NAME = Maps
-    .<String, Integer> buildLinkedHash() //
-    .getMap();
-
-  public static final String NAD27 = "NAD27";
-
-  public static final String NAD83_CURRENT = "NAD83(2011)";
 
   private static final Map<String, Nadcon5Region> REGION_BY_NAME = new LinkedHashMap<>();
 
@@ -31,19 +23,19 @@ public class Nadcon5Region {
 
   static {
     addRegion("StGeorge", "20160901", 56.3, 56.8, 190.0, 190.8, "SG1897", "SG1952", "NAD83(1986)",
-      "NAD83(1992)", "NAD83(NSRS2007)", NAD83_CURRENT);
+      "NAD83(1992)", "NAD83(NSRS2007)", Nadcon5.NAD83_CURRENT);
     addRegion("StPaul", "20160901", 56.9, 57.4, 189.3, 190.4, "SP1897", "SP1952", "NAD83(1986)",
-      "NAD83(1992)", "NAD83(NSRS2007)", NAD83_CURRENT);
+      "NAD83(1992)", "NAD83(NSRS2007)", Nadcon5.NAD83_CURRENT);
     addRegion("StLawrence", "20160901", 62.7, 64.0, 187.5, 192.0, "SL1952", "NAD83(1986)",
-      "NAD83(1992)", "NAD83(NSRS2007)", NAD83_CURRENT);
-    addRegion("Alaska", "20160901", 50.0, 73.0, 172.0, 232.0, NAD27, "NAD83(1986)", "NAD83(1992)",
-      "NAD83(NSRS2007)", NAD83_CURRENT);
-    addRegion("Conus", "20160901", 24.0, 50.0, 235.0, 294.0, "USSD", NAD27, "NAD83(1986)",
-      "NAD83(HARN)", "NAD83(FBN)", "NAD83(NSRS2007)", NAD83_CURRENT);
+      "NAD83(1992)", "NAD83(NSRS2007)", Nadcon5.NAD83_CURRENT);
+    addRegion("Alaska", "20160901", 50.0, 73.0, 172.0, 232.0, Nadcon5.NAD27, "NAD83(1986)",
+      "NAD83(1992)", "NAD83(NSRS2007)", Nadcon5.NAD83_CURRENT);
+    addRegion("Conus", "20160901", 24.0, 50.0, 235.0, 294.0, "USSD", Nadcon5.NAD27, "NAD83(1986)",
+      "NAD83(HARN)", "NAD83(FBN)", "NAD83(NSRS2007)", Nadcon5.NAD83_CURRENT);
     addRegion("Hawaii", "20160901", 18.0, 23.0, 199.0, 206.0, "OHD", "NAD83(1986)", "NAD83(1993)",
       "NAD83(PA11)");
     addRegion("PRVI", "20160901", 17.0, 19.0, 291.0, 296.0, "PR40", "NAD83(1986)", "NAD83(1993)",
-      "NAD83(1997)", "NAD83(2002)", "NAD83(NSRS2007)", NAD83_CURRENT);
+      "NAD83(1997)", "NAD83(2002)", "NAD83(NSRS2007)", Nadcon5.NAD83_CURRENT);
     addRegion("AS", "20160901", -16.0, -13.0, 188.0, 193.0, "AS62", "NAD83(1993)", "NAD83(2002)",
       "NAD83(PA11)");
     addRegion("GuamCNMI", "20160901", 12.0, 22.0, 143.0, 147.0, "GU63", "NAD83(1993)",
@@ -62,7 +54,7 @@ public class Nadcon5Region {
 
   public static Nadcon5Region getRegion(final double x, final double y) {
     for (final Nadcon5Region region : REGIONS) {
-      if (region.intersectsBounds(x, y)) {
+      if (region.covers(x, y)) {
         return region;
       }
     }
@@ -95,6 +87,14 @@ public class Nadcon5Region {
 
   private final String name;
 
+  private final double minX;
+
+  private final double minY;
+
+  private final double maxX;
+
+  private final double maxY;
+
   public Nadcon5Region(final String name, final String dateString, final double minX,
     final double minY, final double maxX, final double maxY, final String... datumNames) {
     this.name = name;
@@ -104,7 +104,12 @@ public class Nadcon5Region {
     } catch (final ParseException e) {
       throw Exceptions.wrap("Invalid date " + dateString, e);
     }
-    this.boundingBox = new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
+    this.minX = minX;
+    this.minY = minY;
+    this.maxX = maxX;
+    this.maxY = maxY;
+    this.boundingBox = GeometryFactory.nad83().newBoundingBox(minX - 360, minY, maxX - 360, maxY);
+    System.out.println(this.boundingBox.toPolygon(100));
     this.datumNames = Arrays.asList(datumNames);
 
     this.lonAccuracies = new Nadcon5FileGrid[datumNames.length - 1];
@@ -113,13 +118,7 @@ public class Nadcon5Region {
     this.latShifts = new Nadcon5FileGrid[datumNames.length - 1];
     this.ehtAccuracies = new Nadcon5FileGrid[datumNames.length - 1];
     this.ehtShifts = new Nadcon5FileGrid[datumNames.length - 1];
-    for (final String datumName : datumNames) {
-      if (!CS_ID_BY_DATUM_NAME.containsKey(datumName)) {
-        System.out.println(datumName);
-        CS_ID_BY_DATUM_NAME.put(datumName, -1);
-      }
 
-    }
     String sourceDatumName = datumNames[0];
     for (int datumIndex = 1; datumIndex < datumNames.length; datumIndex++) {
       final String targetDatumName = datumNames[datumIndex];
@@ -138,6 +137,10 @@ public class Nadcon5Region {
         "trn");
       sourceDatumName = targetDatumName;
     }
+  }
+
+  public boolean covers(final double x, final double y) {
+    return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
   }
 
   public BoundingBox getBoundingBox() {
@@ -192,10 +195,6 @@ public class Nadcon5Region {
 
   public String getName() {
     return this.name;
-  }
-
-  public boolean intersectsBounds(final double x, final double y) {
-    return this.boundingBox.intersects(x, y);
   }
 
   @Override

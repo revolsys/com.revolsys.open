@@ -172,21 +172,36 @@ public interface Resource extends org.springframework.core.io.Resource {
     return FileUtil.getString(reader);
   }
 
-  default void copyFrom(final InputStream in) {
-    try (
-      final InputStream in2 = in;
-      final OutputStream out = newBufferedOutputStream();) {
-      FileUtil.copy(in2, out);
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
+  default boolean copyFrom(final InputStream in) {
+    if (in == null) {
+      return false;
+    } else {
+      try (
+        final InputStream in2 = in;
+        final OutputStream out = newBufferedOutputStream();) {
+        if (out == null) {
+          return false;
+        } else {
+          FileUtil.copy(in2, out);
+          return true;
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
     }
   }
 
-  default void copyFrom(final Resource source) {
-    if (source != null) {
+  default boolean copyFrom(final Resource source) {
+    if (source == null) {
+      return false;
+    } else {
       try (
         final InputStream in = source.newBufferedInputStream()) {
-        copyFrom(in);
+        if (in == null) {
+          return false;
+        } else {
+          return copyFrom(in);
+        }
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }
@@ -203,9 +218,11 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
-  default void copyTo(final Resource target) {
-    if (target != null) {
-      target.copyFrom(this);
+  default boolean copyTo(final Resource target) {
+    if (target == null) {
+      return false;
+    } else {
+      return target.copyFrom(this);
     }
   }
 

@@ -3,11 +3,11 @@ package com.revolsys.geometry.cs.gridshift.gsb;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.grid.FloatArrayGrid;
 
-public class BinaryGridShiftGrid extends BoundingBoxDoubleXY {
-  private static final long serialVersionUID = 1L;
+public class BinaryGridShiftGrid {
 
   private final List<BinaryGridShiftGrid> grids = new ArrayList<>();
 
@@ -23,8 +23,19 @@ public class BinaryGridShiftGrid extends BoundingBoxDoubleXY {
 
   private final String parentName;
 
+  private final double minY;
+
+  private final double maxY;
+
+  private final double minX;
+
+  private final double maxX;
+
+  private final BinaryGridShiftFile file;
+
   @SuppressWarnings("unused")
   public BinaryGridShiftGrid(final BinaryGridShiftFile file, final boolean loadAccuracy) {
+    this.file = file;
     this.name = file.readRecordString();
     this.parentName = file.readRecordString();
     final String created = file.readRecordString();
@@ -81,10 +92,21 @@ public class BinaryGridShiftGrid extends BoundingBoxDoubleXY {
     this.grids.add(grid);
   }
 
-  public BinaryGridShiftGrid getGrid(final double lon, final double lat) {
-    if (covers(lon, lat)) {
+  public boolean covers(final double x, final double y) {
+    return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
+  }
+
+  public BoundingBox getBoundingBox() {
+    final GeometryFactory geometryFactory = this.file.getFromCoordinateSystem()
+      .getGeometryFactoryFloating(2);
+    return geometryFactory.newBoundingBox(-this.minX / 3600, this.minY / 3600, -this.maxX / 3600,
+      this.maxY / 3600);
+  }
+
+  public BinaryGridShiftGrid getGrid(final double lonSeconds, final double latSeconds) {
+    if (covers(lonSeconds, latSeconds)) {
       for (final BinaryGridShiftGrid grid : this.grids) {
-        final BinaryGridShiftGrid childGrid = grid.getGrid(lon, lat);
+        final BinaryGridShiftGrid childGrid = grid.getGrid(lonSeconds, latSeconds);
         if (childGrid != null) {
           return childGrid;
         }
