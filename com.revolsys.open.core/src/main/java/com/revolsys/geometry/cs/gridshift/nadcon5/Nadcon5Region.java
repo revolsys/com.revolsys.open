@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.Exceptions;
@@ -44,21 +45,13 @@ public class Nadcon5Region {
 
   private static void addRegion(final String name, final String dateString, final double minY,
     final double maxY, final double minX, final double maxX, final String... datumNames) {
-    final Nadcon5Region region = new Nadcon5Region(name, dateString, minX, minY, maxX, maxY,
+    final int index = REGIONS.size();
+    final Nadcon5Region region = new Nadcon5Region(index, name, dateString, minX, minY, maxX, maxY,
       datumNames);
     REGIONS.add(region);
     REGION_NAMES.add(name);
     REGION_BY_NAME.put(name, region);
 
-  }
-
-  public static Nadcon5Region getRegion(final double x, final double y) {
-    for (final Nadcon5Region region : REGIONS) {
-      if (region.covers(x, y)) {
-        return region;
-      }
-    }
-    return null;
   }
 
   public static Nadcon5Region getRegion(final String name) {
@@ -73,17 +66,7 @@ public class Nadcon5Region {
 
   private final List<String> datumNames;
 
-  private final Nadcon5FileGrid[] ehtAccuracies;
-
-  private final Nadcon5FileGrid[] ehtShifts;
-
-  private final Nadcon5FileGrid[] latAccuracies;
-
-  private final Nadcon5FileGrid[] latShifts;
-
-  private final Nadcon5FileGrid[] lonAccuracies;
-
-  private final Nadcon5FileGrid[] lonShifts;
+  private final Nadcon5RegionDatumGrids[] grids;
 
   private final String name;
 
@@ -95,8 +78,12 @@ public class Nadcon5Region {
 
   private final double maxY;
 
-  public Nadcon5Region(final String name, final String dateString, final double minX,
-    final double minY, final double maxX, final double maxY, final String... datumNames) {
+  private final int index;
+
+  public Nadcon5Region(final int index, final String name, final String dateString,
+    final double minX, final double minY, final double maxX, final double maxY,
+    final String... datumNames) {
+    this.index = index;
     this.name = name;
     try {
       this.dateString = dateString;
@@ -111,34 +98,20 @@ public class Nadcon5Region {
     this.boundingBox = GeometryFactory.nad83().newBoundingBox(minX - 360, minY, maxX - 360, maxY);
     this.datumNames = Arrays.asList(datumNames);
 
-    this.lonAccuracies = new Nadcon5FileGrid[datumNames.length - 1];
-    this.lonShifts = new Nadcon5FileGrid[datumNames.length - 1];
-    this.latAccuracies = new Nadcon5FileGrid[datumNames.length - 1];
-    this.latShifts = new Nadcon5FileGrid[datumNames.length - 1];
-    this.ehtAccuracies = new Nadcon5FileGrid[datumNames.length - 1];
-    this.ehtShifts = new Nadcon5FileGrid[datumNames.length - 1];
+    this.grids = new Nadcon5RegionDatumGrids[datumNames.length - 1];
 
     String sourceDatumName = datumNames[0];
     for (int datumIndex = 1; datumIndex < datumNames.length; datumIndex++) {
       final String targetDatumName = datumNames[datumIndex];
       final int fileIndex = datumIndex - 1;
-      this.lonAccuracies[fileIndex] = new Nadcon5FileGrid(this, sourceDatumName, targetDatumName,
-        "lon", "err");
-      this.lonShifts[fileIndex] = new Nadcon5FileGrid(this, sourceDatumName, targetDatumName, "lon",
-        "trn");
-      this.latAccuracies[fileIndex] = new Nadcon5FileGrid(this, sourceDatumName, targetDatumName,
-        "lat", "err");
-      this.latShifts[fileIndex] = new Nadcon5FileGrid(this, sourceDatumName, targetDatumName, "lat",
-        "trn");
-      this.ehtAccuracies[fileIndex] = new Nadcon5FileGrid(this, sourceDatumName, targetDatumName,
-        "eht", "err");
-      this.ehtShifts[fileIndex] = new Nadcon5FileGrid(this, sourceDatumName, targetDatumName, "eht",
-        "trn");
+      this.grids[fileIndex] = new Nadcon5RegionDatumGrids(this, sourceDatumName, targetDatumName);
       sourceDatumName = targetDatumName;
     }
   }
 
-  public boolean covers(final double x, final double y) {
+  public boolean covers(final CoordinatesOperationPoint point) {
+    final double x = point.x;
+    final double y = point.y;
     return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
   }
 
@@ -168,28 +141,32 @@ public class Nadcon5Region {
     return this.datumNames;
   }
 
-  public double getEhtAccuracy(final int fileIndex, final double lon, final double lat) {
-    return Math.pow(this.ehtAccuracies[fileIndex].getValueBiquadratic(lon, lat), 2);
+  protected List<Nadcon5RegionDatumGrids> getGrids(final int sourceDatumIndex,
+    final int targetDatumIndex) {
+    final List<Nadcon5RegionDatumGrids> grids = new ArrayList<>();
+    if (sourceDatumIndex == -1 || targetDatumIndex == -1) {
+
+    } else if (targetDatumIndex > sourceDatumIndex) {
+      for (int i = sourceDatumIndex; i < targetDatumIndex; ++i) {
+        grids.add(this.grids[i]);
+      }
+    } else {
+      for (int i = sourceDatumIndex; i > targetDatumIndex; --i) {
+        grids.add(this.grids[i]);
+      }
+    }
+    return grids;
   }
 
-  public double getEhtShift(final int fileIndex, final double lon, final double lat) {
-    return this.ehtShifts[fileIndex].getValueBiquadratic(lon, lat);
+  public List<Nadcon5RegionDatumGrids> getGrids(final String sourceDatumName,
+    final String targetDatumName) {
+    final int sourceDatumIndex = getDatumIndex(sourceDatumName);
+    final int targetDatumIndex = getDatumIndex(sourceDatumName);
+    return getGrids(sourceDatumIndex, targetDatumIndex);
   }
 
-  public double getLatAccuracy(final int fileIndex, final double lon, final double lat) {
-    return Math.pow(this.latAccuracies[fileIndex].getValueBiquadratic(lon, lat), 2);
-  }
-
-  public double getLatShift(final int fileIndex, final double lon, final double lat) {
-    return this.latShifts[fileIndex].getValueBiquadratic(lon, lat) / 3600.0;
-  }
-
-  public double getLonAccuracy(final int fileIndex, final double lon, final double lat) {
-    return Math.pow(this.lonAccuracies[fileIndex].getValueBiquadratic(lon, lat), 2);
-  }
-
-  public double getLonShift(final int fileIndex, final double lon, final double lat) {
-    return this.lonShifts[fileIndex].getValueBiquadratic(lon, lat) / 3600.0;
+  public int getIndex() {
+    return this.index;
   }
 
   public String getName() {

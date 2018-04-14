@@ -1,5 +1,8 @@
 package com.revolsys.geometry.cs.gridshift.nadcon5;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.revolsys.geometry.cs.gridshift.GridShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
@@ -9,66 +12,58 @@ public class Nadcon5GridShiftOperation implements GridShiftOperation {
 
   private final String targetDatumName;
 
+  private final List<List<Nadcon5RegionDatumGrids>> REGION_GRIDS = new ArrayList<>();
+
+  private final boolean[] REGION_INVERSE = new boolean[Nadcon5Region.REGIONS.size()];
+
   public Nadcon5GridShiftOperation(final String sourceDatumName, final String targetDatumName) {
     this.sourceDatumName = sourceDatumName;
     this.targetDatumName = targetDatumName;
+    for (int regionIndex = 0; regionIndex < Nadcon5Region.REGIONS.size(); regionIndex++) {
+      final Nadcon5Region region = Nadcon5Region.REGIONS.get(regionIndex);
+      final int sourceDatumIndex = region.getDatumIndex(this.sourceDatumName);
+      final int targetDatumIndex = region.getDatumIndex(this.targetDatumName);
+      this.REGION_INVERSE[regionIndex] = sourceDatumIndex > targetDatumIndex;
+      this.REGION_GRIDS.add(region.getGrids(sourceDatumIndex, targetDatumIndex));
+    }
   }
 
   @Override
   public boolean shift(final CoordinatesOperationPoint point) {
-    double lon = point.x;
-    if (lon < 0) {
-      lon += 360;
+    final double x = point.x;
+    final double y = point.y;
+    final double z = point.z;
+    if (point.x < 0) {
+      point.x += 360;
     }
-    final double lat = point.y;
-    final Nadcon5Region region = Nadcon5Region.getRegion(lon, lat);
-    if (region == null) {
-      return false;
-    } else {
-      final int sourceDatumIndex = region.getDatumIndex(this.sourceDatumName);
-      final int targetDatumIndex = region.getDatumIndex(this.targetDatumName);
-
-      double newLon = lon;
-      double newLat = lat;
-      if (targetDatumIndex > sourceDatumIndex) {
-        for (int i = sourceDatumIndex; i < targetDatumIndex; ++i) {
-          final int fileIndex = i;
-          final double lonShift = region.getLonShift(fileIndex, newLon, newLat);
-          final double latShift = region.getLatShift(fileIndex, newLon, newLat);
-          if (Double.isFinite(lonShift)) {
-            newLon += lonShift;
-            newLat += latShift;
-            if (!region.covers(newLon, newLat)) {
+    for (final Nadcon5Region region : Nadcon5Region.REGIONS) {
+      if (region.covers(point)) {
+        final int index = region.getIndex();
+        final List<Nadcon5RegionDatumGrids> grids = this.REGION_GRIDS.get(index);
+        final boolean inverse = this.REGION_INVERSE[index];
+        if (inverse) {
+          for (final Nadcon5RegionDatumGrids grid : grids) {
+            if (!grid.shiftInverse(point)) {
+              point.resetPoint(x, y, z);
               return false;
             }
-          } else {
-            return false;
           }
-        }
-      } else {
-        for (int j = sourceDatumIndex; j > targetDatumIndex; --j) {
-          final int fileIndex = j - 1;
-          final double lonShift = region.getLonShift(fileIndex, newLon, newLat);
-          final double latShift = region.getLatShift(fileIndex, newLon, newLat);
-          if (Double.isFinite(lonShift)) {
-            newLon -= lonShift;
-            newLat -= latShift;
-            if (!region.covers(newLon, newLat)) {
+        } else {
+          for (final Nadcon5RegionDatumGrids grid : grids) {
+            if (!grid.shiftForward(point)) {
+              point.resetPoint(x, y, z);
               return false;
             }
-          } else {
-            return false;
           }
         }
+        if (point.x > 180) {
+          point.x = point.x - 360;
+        }
+        return true;
       }
-      if (newLon > 180) {
-        point.x = newLon - 360;
-      } else {
-        point.x = newLon;
-      }
-      point.y = newLat;
-      return true;
     }
+    point.resetPoint(x, y, z);
+    return false;
   }
 
   @Override

@@ -79,6 +79,12 @@ public class CoordinatesOperationPoint {
     }
   }
 
+  public void resetPoint(final double x, final double y, final double z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
   public void setPoint(final double x, final double y) {
     this.x = x;
     this.y = y;
