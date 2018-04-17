@@ -80,8 +80,8 @@ public abstract class AbstractGriddedElevationModelRasterizer
       this.width = elevationModel.getGridWidth();
       this.height = elevationModel.getGridHeight();
       if (Double.isNaN(this.minZ)) {
-        this.minZ = this.elevationModel.getMinZ();
-        this.maxZ = this.elevationModel.getMaxZ();
+        this.minZ = this.elevationModel.getMinValue();
+        this.maxZ = this.elevationModel.getMaxValue();
       }
     }
     updateValues();

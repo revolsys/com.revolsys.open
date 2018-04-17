@@ -14,6 +14,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -265,6 +266,21 @@ public class ChannelReader implements BaseCloseable {
     }
     tempBuffer.flip();
     return tempBuffer;
+  }
+
+  public void seek(final long position) {
+    try {
+      if (this.channel instanceof FileChannel) {
+        final FileChannel fileChannel = (FileChannel)this.channel;
+        fileChannel.position(position);
+        this.available = 0;
+        this.buffer.clear();
+      } else {
+        throw new IllegalArgumentException("Not supported");
+      }
+    } catch (final IOException e) {
+      Exceptions.wrap(e);
+    }
   }
 
   public void setByteOrder(final ByteOrder byteOrder) {

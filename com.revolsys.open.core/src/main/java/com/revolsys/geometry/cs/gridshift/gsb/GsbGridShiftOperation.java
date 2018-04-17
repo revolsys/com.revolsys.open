@@ -1,9 +1,9 @@
 package com.revolsys.geometry.cs.gridshift.gsb;
 
-import com.revolsys.geometry.cs.gridshift.GridShiftOperation;
+import com.revolsys.geometry.cs.gridshift.GridHorizontalShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
-public class GsbGridShiftOperation implements GridShiftOperation {
+public class GsbGridShiftOperation implements GridHorizontalShiftOperation {
 
   private final GsbGridShiftFile file;
 
@@ -12,7 +12,7 @@ public class GsbGridShiftOperation implements GridShiftOperation {
   }
 
   @Override
-  public boolean shift(final CoordinatesOperationPoint point) {
+  public boolean horizontalShift(final CoordinatesOperationPoint point) {
     final double lon = point.x;
     final double lat = point.y;
     final double lonPositiveWestSeconds = -lon * 3600;

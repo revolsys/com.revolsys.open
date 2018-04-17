@@ -157,15 +157,21 @@ public class CoordinateOperationMethod
 
   private List<ParameterName> parameterNames = new ArrayList<>();
 
+  private final List<Boolean> parameterReversal = new ArrayList<>();
+
   private final Function<ProjectedCoordinateSystem, CoordinatesProjection> coordinatesProjectionFactory;
 
   public CoordinateOperationMethod(final int id, final String name, final boolean reverse,
-    final boolean deprecated, final List<ParameterName> parameterNames) {
+    final boolean deprecated, final List<ParameterName> parameterNames,
+    final List<Byte> parameterReversal) {
     this(name);
     this.authority = new EpsgAuthority(id);
     this.reverse = reverse;
     this.deprecated = deprecated;
     this.parameterNames = parameterNames;
+    for (final Byte reverseParamater : parameterReversal) {
+      this.parameterReversal.add(reverseParamater == 1);
+    }
   }
 
   public CoordinateOperationMethod(final String name) {

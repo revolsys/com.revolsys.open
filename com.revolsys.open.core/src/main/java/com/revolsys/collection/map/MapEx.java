@@ -19,11 +19,20 @@ public interface MapEx extends MapDefault<String, Object> {
       final Map<String, Object> emptyMap = Collections.emptyMap();
       return emptyMap.entrySet();
     }
+
+    @Override
+    public String toString() {
+      return "{}";
+    }
   };
 
   default MapEx add(final String key, final Object value) {
     put(key, value);
     return this;
+  }
+
+  default Boolean getBoolean(final CharSequence name) {
+    return getValue(name, DataTypes.BOOLEAN);
   }
 
   default Byte getByte(final CharSequence name) {

@@ -40,15 +40,16 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
   void clear();
 
   default void forEachPoint(final Consumer3Double action) {
-    final double gridCellSize = getGridCellSize();
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
     final double minY = getGridMinY();
     final double minX = getGridMinX();
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
     for (int gridY = 0; gridY < gridHeight; gridY++) {
-      final double y = minY + gridY * gridCellSize;
+      final double y = minY + gridY * gridCellHeight;
       for (int gridX = 0; gridX < gridWidth; gridX++) {
-        final double x = minX + gridX * gridCellSize;
+        final double x = minX + gridX * gridCellWidth;
         final double value = getValueFast(gridX, gridY);
         action.accept(x, y, value);
       }
@@ -63,35 +64,36 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
       .getCoordinatesOperation(targetGeometryFactory);
 
     final BoundingBox convertexBoundingBox = boundingBox.convert(geometryFactory);
-    final double gridCellSize = getGridCellSize();
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
     final double minY = getGridMinY();
     final double minX = getGridMinX();
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
 
-    int startGridX = (int)Math.floor((convertexBoundingBox.getMinX() - minX) / gridCellSize);
+    int startGridX = (int)Math.floor((convertexBoundingBox.getMinX() - minX) / gridCellWidth);
     if (startGridX < 0) {
       startGridX = 0;
     }
-    int endGridX = (int)Math.ceil((convertexBoundingBox.getMaxX() - minX) / gridCellSize);
+    int endGridX = (int)Math.ceil((convertexBoundingBox.getMaxX() - minX) / gridCellWidth);
     if (endGridX > gridWidth) {
       endGridX = gridWidth;
     }
 
-    int startGridY = (int)Math.floor((convertexBoundingBox.getMinY() - minY) / gridCellSize);
+    int startGridY = (int)Math.floor((convertexBoundingBox.getMinY() - minY) / gridCellHeight);
     if (startGridY < 0) {
       startGridY = 0;
     }
-    int endGridY = (int)Math.ceil((convertexBoundingBox.getMaxY() - minY) / gridCellSize);
+    int endGridY = (int)Math.ceil((convertexBoundingBox.getMaxY() - minY) / gridCellHeight);
     if (endGridY > gridHeight) {
       endGridY = gridHeight;
     }
 
     if (projection == null) {
       for (int gridY = startGridY; gridY < endGridY; gridY++) {
-        final double y = minY + gridY * gridCellSize;
+        final double y = minY + gridY * gridCellHeight;
         for (int gridX = startGridX; gridX < endGridX; gridX++) {
-          final double x = minX + gridX * gridCellSize;
+          final double x = minX + gridX * gridCellWidth;
           final double value = getValueFast(gridX, gridY);
           if (Double.isFinite(value)) {
             if (boundingBox.covers(x, y)) {
@@ -104,9 +106,9 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     } else {
       final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
       for (int gridY = startGridY; gridY < endGridY; gridY++) {
-        final double y = minY + gridY * gridCellSize;
+        final double y = minY + gridY * gridCellHeight;
         for (int gridX = startGridX; gridX < endGridX; gridX++) {
-          final double x = minX + gridX * gridCellSize;
+          final double x = minX + gridX * gridCellWidth;
           final double value = getValueFast(gridX, gridY);
           if (Double.isFinite(value)) {
             point.setPoint(x, y, value);
@@ -125,15 +127,16 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
   }
 
   default void forEachPointFinite(final Consumer3Double action) {
-    final double gridCellSize = getGridCellSize();
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
     final double minY = getGridMinY();
     final double minX = getGridMinX();
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
     for (int gridY = 0; gridY < gridHeight; gridY++) {
-      final double y = minY + gridY * gridCellSize;
+      final double y = minY + gridY * gridCellHeight;
       for (int gridX = 0; gridX < gridWidth; gridX++) {
-        final double x = minX + gridX * gridCellSize;
+        final double x = minX + gridX * gridCellWidth;
         final double value = getValueFast(gridX, gridY);
         if (Double.isFinite(value)) {
           action.accept(x, y, value);
@@ -171,7 +174,8 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     final double minX = getGridMinX();
     final double minY = getGridMinY();
 
-    final double gridCellSize = getGridCellSize();
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
     final int gridHeight = getGridHeight();
     final int gridWidth = getGridWidth();
     final int maxGridXIndex = gridWidth - 1;
@@ -203,11 +207,11 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
         if (gridY > maxGridY) {
           maxGridY = gridY;
         }
-        double x = minX + gridX * gridCellSize;
+        double x = minX + gridX * gridCellWidth;
         if (gridX == maxGridXIndex) {
-          x += gridCellSize;
+          x += gridCellWidth;
         }
-        final double y = minY + gridY * gridCellSize;
+        final double y = minY + gridY * gridCellHeight;
         final int vertexCount = points.getVertexCount();
         if (vertexCount < 2) {
           points.appendVertex(x, y);
@@ -247,13 +251,13 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
       final double value = getValue(gridX, gridY);
       if (Double.isFinite(value)) {
         maxGridY = gridY;
-        double x = minX + gridX * gridCellSize;
+        double x = minX + gridX * gridCellWidth;
         if (gridX == maxGridXIndex) {
-          x += gridCellSize;
+          x += gridCellWidth;
         }
-        double y = minY + gridY * gridCellSize;
+        double y = minY + gridY * gridCellHeight;
         if (gridY == maxGridYIndex) {
-          y += gridCellSize;
+          y += gridCellHeight;
         }
 
         final int vertexCount = points.getVertexCount();
@@ -294,13 +298,13 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     while (gridX >= minGridX) {
       final double value = getValue(gridX, gridY);
       if (Double.isFinite(value)) {
-        double x = minX + gridX * gridCellSize;
+        double x = minX + gridX * gridCellWidth;
         if (gridX == maxGridXIndex) {
-          x += gridCellSize;
+          x += gridCellWidth;
         }
-        double y = minY + gridY * gridCellSize;
+        double y = minY + gridY * gridCellHeight;
         if (gridY == maxGridYIndex) {
-          y += gridCellSize;
+          y += gridCellHeight;
         }
         final int vertexCount = points.getVertexCount();
         if (vertexCount < 2) {
@@ -340,8 +344,8 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     while (gridY > firstGridY) {
       final double value = getValue(gridX, gridY);
       if (Double.isFinite(value)) {
-        final double x = minX + gridX * gridCellSize;
-        final double y = minY + gridY * gridCellSize;
+        final double x = minX + gridX * gridCellWidth;
+        final double y = minY + gridY * gridCellHeight;
         final int vertexCount = points.getVertexCount();
         if (vertexCount < 2) {
           points.appendVertex(x, y);
@@ -412,41 +416,53 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     return boundingBox.getGeometryFactory();
   }
 
-  double getGridCellSize();
+  double getGridCellHeight();
+
+  double getGridCellWidth();
 
   default int getGridCellX(final double x) {
     final double minX = getGridMinX();
-    final double gridCellSize = getGridCellSize();
+    final double gridCellWidth = getGridCellWidth();
     final double deltaX = x - minX;
-    final double cellDiv = deltaX / gridCellSize;
+    final double cellDiv = deltaX / gridCellWidth;
     return (int)Math.floor(cellDiv);
   }
 
   default int getGridCellXRound(final double x) {
     final double minX = getGridMinX();
-    final double gridCellSize = getGridCellSize();
+    final double gridCellWidth = getGridCellWidth();
     final double deltaX = x - minX;
-    final double cellDiv = deltaX / gridCellSize;
+    final double cellDiv = deltaX / gridCellWidth;
     return (int)Math.round(cellDiv);
   }
 
   default int getGridCellY(final double y) {
     final double minY = getGridMinY();
-    final double gridCellSize = getGridCellSize();
+    final double gridCellHeight = getGridCellHeight();
     final double deltaY = y - minY;
-    final double cellDiv = deltaY / gridCellSize;
+    final double cellDiv = deltaY / gridCellHeight;
     return (int)Math.floor(cellDiv);
   }
 
   default int getGridCellYRound(final double y) {
     final double minY = getGridMinY();
-    final double gridCellSize = getGridCellSize();
+    final double gridCellHeight = getGridCellHeight();
     final double deltaY = y - minY;
-    final double cellDiv = deltaY / gridCellSize;
+    final double cellDiv = deltaY / gridCellHeight;
     return (int)Math.round(cellDiv);
   }
 
   int getGridHeight();
+
+  default double getGridMaxX() {
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.getMaxX();
+  }
+
+  default double getGridMaxY() {
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.getMaxY();
+  }
 
   default double getGridMinX() {
     final BoundingBox boundingBox = getBoundingBox();
@@ -466,10 +482,16 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
 
   Resource getResource();
 
-  default double getScaleXY() {
+  default double getScaleX() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final double scaleXy = geometryFactory.getScaleXY();
-    return scaleXy;
+    final double scaleX = geometryFactory.getScaleX();
+    return scaleX;
+  }
+
+  default double getScaleY() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final double scaleY = geometryFactory.getScaleY();
+    return scaleY;
   }
 
   /**
@@ -531,13 +553,14 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
    * @return The interpolated elevation (z-coordinate).
    */
   default double getValueBicubic(final double x, final double y) {
-    final double gridCellSize = getGridCellSize();
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
 
-    final double xGrid = (x - getGridMinX()) / gridCellSize;
+    final double xGrid = (x - getGridMinX()) / gridCellWidth;
     final int gridX = (int)Math.floor(xGrid);
     final double xPercent = xGrid - gridX;
 
-    final double yGrid = (y - getGridMinY()) / gridCellSize;
+    final double yGrid = (y - getGridMinY()) / gridCellHeight;
     final int gridY = (int)Math.floor(yGrid);
     final double yPercent = yGrid - gridY;
 
@@ -557,12 +580,13 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
    * @return The interpolated elevation (z-coordinate).
    */
   default double getValueBilinear(final double x, final double y) {
-    final double gridCellSize = getGridCellSize();
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
     final double minX = getGridMinX();
-    final double xGrid = (x - minX) / gridCellSize;
+    final double xGrid = (x - minX) / gridCellWidth;
     final int gridX = (int)Math.floor(xGrid);
     final double minY = getGridMinY();
-    final double yGrid = (y - minY) / gridCellSize;
+    final double yGrid = (y - minY) / gridCellHeight;
     final int gridY = (int)Math.floor(yGrid);
     final double z11 = getValue(gridX, gridY);
     double z21 = getValue(gridX + 1, gridY);
@@ -621,14 +645,14 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
 
   default double getX(final int i) {
     final double minX = getGridMinX();
-    final double gridCellSize = getGridCellSize();
-    return minX + i * gridCellSize;
+    final double gridCellWidth = getGridCellWidth();
+    return minX + i * gridCellWidth;
   }
 
   default double getY(final int i) {
     final double maxY = getGridMinY();
-    final double gridCellSize = getGridCellSize();
-    return maxY + i * gridCellSize;
+    final double gridCellHeight = getGridCellHeight();
+    return maxY + i * gridCellHeight;
   }
 
   default boolean hasValue(final int gridX, final int gridY) {
@@ -676,37 +700,51 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
 
   default Grid newGrid(final double x, final double y, final int width, final int height) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final double gridCellSize = getGridCellSize();
-    return newGrid(geometryFactory, x, y, width, height, gridCellSize);
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
+    return newGrid(geometryFactory, x, y, width, height, gridCellWidth, gridCellHeight);
   }
 
   default Grid newGrid(final GeometryFactory geometryFactory, final double x, final double y,
     final int width, final int height, final double gridCellSize) {
-    return new IntArrayScaleGrid(geometryFactory, x, y, width, height, gridCellSize);
+    return newGrid(geometryFactory, x, y, width, height, gridCellSize, gridCellSize);
+  }
+
+  default Grid newGrid(final GeometryFactory geometryFactory, final double x, final double y,
+    final int width, final int height, final double gridCellWidth, final double gridCellHeight) {
+    return new IntArrayScaleGrid(geometryFactory, x, y, width, height, gridCellWidth,
+      gridCellHeight);
   }
 
   default Grid resample(final int newGridCellSize) {
+    return resample(newGridCellSize, newGridCellSize);
+  }
+
+  default Grid resample(final int newGridCellWidth, final int newGridCellHeight) {
     final int tileX = (int)getGridMinX();
     final int tileY = (int)getGridMinY();
-    final double gridCellSize = getGridCellSize();
-    final double cellRatio = gridCellSize / newGridCellSize;
-    final int step = (int)Math.round(1 / cellRatio);
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
+    final double cellRatioX = gridCellWidth / newGridCellWidth;
+    final double cellRatioY = gridCellHeight / newGridCellHeight;
+    final int stepX = (int)Math.round(1 / cellRatioX);
+    final int stepY = (int)Math.round(1 / cellRatioY);
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
 
-    final int newGridWidth = (int)Math.round(gridWidth * cellRatio);
-    final int newGridHeight = (int)Math.round(gridHeight * cellRatio);
+    final int newGridWidth = (int)Math.round(gridWidth * cellRatioX);
+    final int newGridHeight = (int)Math.round(gridHeight * cellRatioY);
 
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Grid newDem = new IntArrayScaleGrid(geometryFactory, tileX, tileY, newGridWidth,
-      newGridHeight, newGridCellSize);
+      newGridHeight, newGridCellWidth, newGridCellHeight);
 
     int newGridY = 0;
-    for (int gridYMin = 0; gridYMin < gridHeight; gridYMin += step) {
-      final int gridYMax = gridYMin + step;
+    for (int gridYMin = 0; gridYMin < gridHeight; gridYMin += stepY) {
+      final int gridYMax = gridYMin + stepY;
       int newGridX = 0;
-      for (int gridXMin = 0; gridXMin < gridWidth; gridXMin += step) {
-        final int gridXMax = gridXMin + step;
+      for (int gridXMin = 0; gridXMin < gridWidth; gridXMin += stepX) {
+        final int gridXMax = gridXMin + stepX;
         int count = 0;
         double sum = 0;
         for (int gridY = gridYMin; gridY < gridYMax; gridY++) {
@@ -778,8 +816,9 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
   }
 
   default void setValues(final Grid grid) {
-    final double gridCellSize = getGridCellSize();
-    if (grid.getGridCellSize() == gridCellSize) {
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
+    if (grid.getGridCellWidth() == gridCellWidth && grid.getGridCellHeight() == gridCellHeight) {
       final int gridWidth = getGridWidth();
       final int gridHeight = getGridHeight();
 
@@ -802,21 +841,22 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
       if (endY > gridHeight) {
         endY = gridHeight;
       }
-      final int minX = (int)(getGridMinX() + startX * gridCellSize);
-      final int minY = (int)(getGridMinY() + startY * gridCellSize);
+      final int minX = (int)(getGridMinX() + startX * gridCellWidth);
+      final int minY = (int)(getGridMinY() + startY * gridCellHeight);
 
       double y = minY;
       for (int gridY = startY; gridY < endY; gridY++) {
         double x = minX;
         for (int gridX = startX; gridX < endX; gridX++) {
           setValue(gridX, gridY, grid, x, y);
-          x += gridCellSize;
+          x += gridCellWidth;
         }
-        y += gridCellSize;
+        y += gridCellHeight;
       }
     } else {
       throw new IllegalArgumentException(
-        "gridCellSize " + grid.getGridCellSize() + " != " + gridCellSize);
+        "gridCellWidth " + grid.getGridCellWidth() + " != " + gridCellWidth + " or "
+          + "gridCellHeight " + grid.getGridCellHeight() + " != " + gridCellHeight);
     }
   }
 
@@ -836,9 +876,10 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
       startY = 0;
     }
 
-    final double gridCellSize = getGridCellSize();
-    final int minX = (int)(getGridMinX() + startX * gridCellSize);
-    final int minY = (int)(getGridMinY() + startY * gridCellSize);
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
+    final int minX = (int)(getGridMinX() + startX * gridCellWidth);
+    final int minY = (int)(getGridMinY() + startY * gridCellHeight);
 
     double y = minY;
     final int gridWidth = getGridWidth();
@@ -851,9 +892,9 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
         if (Double.isFinite(elevation)) {
           setValueNull(gridX, gridY);
         }
-        x += gridCellSize;
+        x += gridCellWidth;
       }
-      y += gridCellSize;
+      y += gridCellHeight;
     }
   }
 
@@ -866,4 +907,6 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
       setValueNull(gridX, gridY);
     }
   }
+
+  void updateValues();
 }

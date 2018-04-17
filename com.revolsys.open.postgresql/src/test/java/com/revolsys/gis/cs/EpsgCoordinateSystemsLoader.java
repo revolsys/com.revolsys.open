@@ -1,8 +1,10 @@
 package com.revolsys.gis.cs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -10,6 +12,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import com.revolsys.collection.map.IntHashMap;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.CoordinateOperationMethod;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -23,14 +28,19 @@ import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 /**
  * Make sure to watch out for parameter value conversions.
@@ -56,6 +66,36 @@ public final class EpsgCoordinateSystemsLoader {
 
   private final RecordStore recordStore;
 
+  private final IntHashMap<MapEx> areaById = new IntHashMap<>();
+
+  private final IntHashMap<String> axisNameById = new IntHashMap<>();
+
+  private final IntHashMap<MapEx> aliasById = new IntHashMap<>();
+
+  private final IntHashMap<MapEx> coordinateSystemById = new IntHashMap<>();
+
+  private final IntHashMap<MapEx> coordinateOperationById = new IntHashMap<>();
+
+  private final IntHashMap<String> coordinateOperationMethodNameById = new IntHashMap<>();
+
+  private final IntHashMap<String> parameterNameById = new IntHashMap<>();
+
+  private final IntHashMap<Map<String, Boolean>> coordinateOperationMethodParamReversals = new IntHashMap<>();
+
+  private final IntHashMap<List<String>> coordinateOperationMethodParamNames = new IntHashMap<>();
+
+  private final IntHashMap<MapEx> coordinateOperationPathById = new IntHashMap<>();
+
+  private final IntHashMap<MapEx> datumById = new IntHashMap<>();
+
+  private final IntHashMap<MapEx> ellipsoidById = new IntHashMap<>();
+
+  private final IntHashMap<MapEx> primeMeridianById = new IntHashMap<>();
+
+  private final IntHashMap<String> unitOfMeasureNameById = new IntHashMap<>();
+
+  private final IntHashMap<MapEx> coordinateReferenceSystemById = new IntHashMap<>();
+
   public EpsgCoordinateSystemsLoader() {
     final Map<String, Object> parameters = new HashMap<>();
     parameters.put("url", "jdbc:postgresql://localhost:5432/epsg");
@@ -64,45 +104,60 @@ public final class EpsgCoordinateSystemsLoader {
     this.recordStore = RecordStore.newRecordStore(parameters);
   }
 
+  private MapEx getCoordinateReferenceSystemById(final int id) {
+    MapEx coordinateReferenceSystem = this.coordinateReferenceSystemById.get(id);
+    if (coordinateReferenceSystem == null) {
+      coordinateReferenceSystem = new LinkedHashMapEx() //
+        .add("id", id);
+      this.coordinateReferenceSystemById.put(id, coordinateReferenceSystem);
+    }
+    return coordinateReferenceSystem;
+  }
+
   protected boolean isDeprecated(final Record object) {
     return object.getInteger("deprecated") == 1;
   }
 
   protected void load() {
     try {
+      loadUnitOfMeasure();
       loadAlias();
       loadArea();
-      loadCoordinateAxis();
       loadCoordinateAxisName();
-      loadCoordinateReferenceSystem();
       loadCoordinateSystem();
-      loadCoordOperation();
+      loadCoordinateAxis();
       loadCoordOperationMethod();
       loadCoordOperationParam();
       loadCoordOperationParamUsage();
+      loadCoordOperation();
       loadCoordOperationParamValue();
       loadCoordOperationPath();
-      loadDatum();
       loadEllipsoid();
       loadPrimeMeridian();
-      loadUnitOfMeasure();
+      loadDatum();
+      loadCoordinateReferenceSystem();
+
+      writeJson();
     } catch (final Throwable t) {
       t.printStackTrace();
     }
 
-    validateEsri();
+    // validateEsri();
   }
 
   private void loadAlias() {
     try (
       final RecordReader reader = newReader("/public/epsg_alias", "alias_code");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("alias")) {
       for (final Record record : reader) {
-        writeInt(writer, record, "alias_code");
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "alias_code");
         writeString(writer, record, "object_table_name");
         writeInt(writer, record, "object_code");
         writeInt(writer, record, "naming_system_code");
         writeString(writer, record, "alias");
+        this.aliasById.put(id, record);
       }
     }
   }
@@ -110,15 +165,23 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadArea() {
     try (
       final RecordReader reader = newReader("/public/epsg_area", "area_code");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("area")) {
       for (final Record record : reader) {
-        writeInt(writer, record, "area_code");
-        writeString(writer, record, "area_name");
-        writeDouble(writer, record, "area_west_bound_lon");
-        writeDouble(writer, record, "area_south_bound_lat");
-        writeDouble(writer, record, "area_east_bound_lon");
-        writeDouble(writer, record, "area_north_bound_lat");
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "area_code");
+        final String name = writeString(writer, record, "area_name");
+        final double minX = writeDouble(writer, record, "area_west_bound_lon");
+        final double minY = writeDouble(writer, record, "area_south_bound_lat");
+        final double maxX = writeDouble(writer, record, "area_east_bound_lon");
+        final double maxY = writeDouble(writer, record, "area_north_bound_lat");
         writeDeprecated(writer, record);
+        final String bbox = "BBOX(" + minX + " " + minY + "," + maxX + " " + maxY + ")";
+        this.areaById.put(id, new LinkedHashMapEx() //
+          .add("id", id) //
+          .add("name", name) //
+          .add("bbox", bbox) //
+        );
       }
     }
   }
@@ -127,14 +190,25 @@ public final class EpsgCoordinateSystemsLoader {
     try (
       final RecordReader reader = newReader("/public/epsg_coordinateaxis", "coord_sys_code",
         "coord_axis_order");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("coordinateAxis");) {
       for (final Record record : reader) {
-        writeInt(writer, record, "coord_sys_code");
-        writeInt(writer, record, "coord_axis_name_code");
-        writeString(writer, record, "coord_axis_orientation");
+        recordWriter.write(record);
+        final int coordinateSystemId = writeInt(writer, record, "coord_sys_code");
+        final int axisNameId = writeInt(writer, record, "coord_axis_name_code");
+        final String orientation = writeString(writer, record, "coord_axis_orientation");
         final String abbreviation = record.getValue("coord_axis_abbreviation");
         writer.putByte((byte)abbreviation.charAt(0));
-        writeInt(writer, record, "uom_code");
+        final int uomId = writeInt(writer, record, "uom_code");
+        final MapEx axis = new LinkedHashMapEx() //
+          .add("name", this.axisNameById.get(axisNameId))//
+          .add("abbreviation", abbreviation)//
+          .add("orientation", orientation)//
+          .add("units", this.unitOfMeasureNameById.get(uomId))//
+        ;
+        final MapEx coordinateSystem = this.coordinateSystemById.get(coordinateSystemId);
+        final List<MapEx> axes = coordinateSystem.getValue("axes");
+        axes.add(axis);
       }
     }
   }
@@ -143,10 +217,13 @@ public final class EpsgCoordinateSystemsLoader {
     try (
       final RecordReader reader = newReader("/public/epsg_coordinateaxisname",
         "coord_axis_name_code");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("coordinateAxisName");) {
       for (final Record record : reader) {
-        writeInt(writer, record, "coord_axis_name_code");
-        writeString(writer, record, "coord_axis_name");
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "coord_axis_name_code");
+        final String name = writeString(writer, record, "coord_axis_name");
+        this.axisNameById.put(id, name);
       }
 
     }
@@ -156,8 +233,10 @@ public final class EpsgCoordinateSystemsLoader {
     final Map<Integer, List<Record>> recordByKind = new TreeMap<>();
     try (
       final RecordReader reader = newReader("/public/epsg_coordinatereferencesystem",
-        "coord_ref_sys_code")) {
+        "coord_ref_sys_code");
+      final RecordWriter recordWriter = newTsvWriter(reader);) {
       for (final Record record : reader) {
+        recordWriter.write(record);
         final String code = record.getValue("coord_ref_sys_kind");
         final int kind = COORDINATE_REFERENCE_SYSTEM_TYPES.indexOf(code);
         Maps.addToList(recordByKind, kind, record);
@@ -168,16 +247,40 @@ public final class EpsgCoordinateSystemsLoader {
       for (final List<Record> records : recordByKind.values()) {
         for (final Record record : records) {
           final int id = writeInt(writer, record, "coord_ref_sys_code");
-          writeString(writer, record, "coord_ref_sys_name");
-          writeInt(writer, record, "area_of_use_code");
-          writeCodeByte(writer, record, "coord_ref_sys_kind", COORDINATE_REFERENCE_SYSTEM_TYPES);
-          writeInt(writer, record, "coord_sys_code", 0);
-          writeInt(writer, record, "datum_code", 0);
+          final String name = writeString(writer, record, "coord_ref_sys_name");
+          final int areaId = writeInt(writer, record, "area_of_use_code");
+          final String type = writeCodeByte(writer, record, "coord_ref_sys_kind",
+            COORDINATE_REFERENCE_SYSTEM_TYPES);
+          final int coordinateSystemId = writeInt(writer, record, "coord_sys_code", 0);
+          final int datumId = writeInt(writer, record, "datum_code", 0);
           writeInt(writer, record, "source_geogcrs_code", 0);
-          writeInt(writer, record, "projection_conv_code", 0);
-          writeInt(writer, record, "cmpd_horizcrs_code", 0);
-          writeInt(writer, record, "cmpd_vertcrs_code", 0);
+          final int coordinateOperationId = writeInt(writer, record, "projection_conv_code", 0);
+          final int horizId = writeInt(writer, record, "cmpd_horizcrs_code", 0);
+          final int verticalId = writeInt(writer, record, "cmpd_vertcrs_code", 0);
           writeDeprecated(writer, record);
+
+          final MapEx coordinateReferenceSystem = getCoordinateReferenceSystemById(id) //
+            .add("name", name) //
+            .add("type", type) //
+            .add("area", this.areaById.get(areaId)) //
+            .add("coordinateSystem", this.coordinateSystemById.get(coordinateSystemId)) //
+          ;
+          if (datumId > 0) {
+            coordinateReferenceSystem.add("datum", this.datumById.get(datumId));
+          }
+          if (horizId > 0) {
+            coordinateReferenceSystem.add("horizontalCoordinateSystem",
+              this.coordinateReferenceSystemById.get(horizId));
+          }
+          if (verticalId > 0) {
+            coordinateReferenceSystem.add("verticalCoordinateSystem",
+              this.coordinateReferenceSystemById.get(verticalId));
+          }
+          if (coordinateOperationId > 0) {
+            coordinateReferenceSystem.add("coordinateOperation",
+              this.coordinateOperationById.get(coordinateOperationId));
+          }
+
         }
       }
     }
@@ -186,11 +289,21 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadCoordinateSystem() throws IOException {
     try (
       final RecordReader reader = newReader("/public/epsg_coordinatesystem");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("coordinateSystem")) {
       for (final Record record : reader) {
-        writeInt(writer, record, "coord_sys_code");
-        writeCodeByte(writer, record, "coord_sys_type", CoordinateSystemType.TYPE_NAMES);
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "coord_sys_code");
+        final String type = writeCodeByte(writer, record, "coord_sys_type",
+          CoordinateSystemType.TYPE_NAMES);
         writeDeprecated(writer, record);
+
+        final MapEx coordinateSystem = new LinkedHashMapEx() //
+          .add("id", id) //
+          .add("name", record.get("coord_sys_name")) //
+          .add("type", type) //
+          .add("axes", new ArrayList<MapEx>());
+        this.coordinateSystemById.put(id, coordinateSystem);
       }
     }
   }
@@ -198,19 +311,47 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadCoordOperation() {
     try (
       final RecordReader reader = newReader("/public/epsg_coordoperation", "coord_op_code");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("coordOperation");) {
       for (final Record record : reader) {
-        writeInt(writer, record, "coord_op_code");
-        writeInt(writer, record, "coord_op_method_code", 0);
-        writeString(writer, record, "coord_op_name");
-        writeCodeByte(writer, record, "coord_op_type", COORDINATE_OPERATION_TYPES);
-        writeInt(writer, record, "source_crs_code", 0);
-        writeInt(writer, record, "target_crs_code", 0);
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "coord_op_code");
+        final int methodId = writeInt(writer, record, "coord_op_method_code", 0);
+        final String name = writeString(writer, record, "coord_op_name");
+        final String type = writeCodeByte(writer, record, "coord_op_type",
+          COORDINATE_OPERATION_TYPES);
+        final int sourceCoordinateSystemId = writeInt(writer, record, "source_crs_code", 0);
+        final int targetCoordinateSystemId = writeInt(writer, record, "target_crs_code", 0);
         writeString(writer, record, "coord_tfm_version");
         writeInt(writer, record, "coord_op_variant", 0);
         writeInt(writer, record, "area_of_use", 0);
         writeDouble(writer, record, "coord_op_accuracy");
         writeDeprecated(writer, record);
+        final LinkedHashMapEx parameters = new LinkedHashMapEx();
+        final List<String> parameterNames = this.coordinateOperationMethodParamNames.get(methodId);
+        if (parameterNames != null) {
+          for (final String parameterName : parameterNames) {
+            parameters.put(parameterName, null);
+          }
+        }
+        final MapEx coordinateOperation = new LinkedHashMapEx() //
+          .add("id", id) //
+          .add("name", name) //
+          .add("type", type);
+
+        if (sourceCoordinateSystemId > 0) {
+          coordinateOperation.add("sourceCoordinateSystemId", sourceCoordinateSystemId);
+        }
+        if (targetCoordinateSystemId > 0) {
+          coordinateOperation.add("targetCoordinateSystemId", targetCoordinateSystemId);
+        }
+        if (methodId > 0) {
+          coordinateOperation.add("method", this.coordinateOperationMethodNameById.get(methodId));
+        }
+        if (!parameters.isEmpty()) {
+          coordinateOperation.add("parameters", parameters);
+        }
+        this.coordinateOperationById.put(id, coordinateOperation);
       }
     }
   }
@@ -218,12 +359,15 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadCoordOperationMethod() {
     try (
       RecordReader reader = newReader("/public/epsg_coordoperationmethod");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("coordOperationMethod");) {
       for (final Record record : reader) {
-        writeInt(writer, record, "coord_op_method_code");
-        writeString(writer, record, "coord_op_method_name");
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "coord_op_method_code");
+        final String name = writeString(writer, record, "coord_op_method_name");
         writeByte(writer, record, "reverse_op");
         writeDeprecated(writer, record);
+        this.coordinateOperationMethodNameById.put(id, name);
       }
     }
   }
@@ -231,11 +375,14 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadCoordOperationParam() {
     try (
       RecordReader reader = newReader("/public/epsg_coordoperationparam", "parameter_code");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("coordOperationParam");) {
       for (final Record record : reader) {
-        writeInt(writer, record, "parameter_code");
-        writeString(writer, record, "parameter_name");
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "parameter_code");
+        final String name = writeString(writer, record, "parameter_name");
         writeDeprecated(writer, record);
+        this.parameterNameById.put(id, name);
       }
     }
   }
@@ -247,12 +394,29 @@ public final class EpsgCoordinateSystemsLoader {
     try (
       RecordReader reader = newReader("/public/epsg_coordoperationparamusage",
         "coord_op_method_code", "sort_order");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("coordOperationParamUsage");) {
       for (final Record record : reader) {
-        writeInt(writer, record, "coord_op_method_code");
-        writeInt(writer, record, "parameter_code");
+        recordWriter.write(record);
+        final int methodId = writeInt(writer, record, "coord_op_method_code");
+        final int parameterId = writeInt(writer, record, "parameter_code");
         writeInt(writer, record, "sort_order");
-        writeCodeByte(writer, record, "param_sign_reversal", PARAM_SIGN_REVERSAL);
+        final String reserse = writeCodeByte(writer, record, "param_sign_reversal",
+          PARAM_SIGN_REVERSAL);
+
+        final String parameterName = this.parameterNameById.get(parameterId);
+        Map<String, Boolean> reversals = this.coordinateOperationMethodParamReversals.get(methodId);
+        if (reversals == null) {
+          reversals = new LinkedHashMap<>();
+          this.coordinateOperationMethodParamReversals.put(methodId, reversals);
+        }
+        reversals.put(parameterName, "Yes".equals(reserse));
+        List<String> names = this.coordinateOperationMethodParamNames.get(methodId);
+        if (names == null) {
+          names = new ArrayList<>();
+          this.coordinateOperationMethodParamNames.put(methodId, names);
+        }
+        names.add(parameterName);
       }
     }
   }
@@ -260,14 +424,33 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadCoordOperationParamValue() {
     try (
       RecordReader reader = newReader("/public/epsg_coordoperationparamvalue");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("coordOperationParamValue");) {
       for (final Record record : reader) {
-        writeInt(writer, record, "coord_op_code");
-        writeInt(writer, record, "coord_op_method_code");
-        writeInt(writer, record, "parameter_code");
-        writeDouble(writer, record, "parameter_value");
-        writeString(writer, record, "param_value_file_ref");
-        writeInt(writer, record, "uom_code", 0);
+        recordWriter.write(record);
+        final int opertaionId = writeInt(writer, record, "coord_op_code");
+        final int methodId = writeInt(writer, record, "coord_op_method_code");
+        final int parameterId = writeInt(writer, record, "parameter_code");
+        double parameterValue = writeDouble(writer, record, "parameter_value");
+        final String fileValue = writeString(writer, record, "param_value_file_ref");
+        final int uomCode = writeInt(writer, record, "uom_code", 0);
+
+        final MapEx operation = this.coordinateOperationById.get(opertaionId);
+        final MapEx parameters = operation.getValue("parameters");
+
+        final String parameterName = this.parameterNameById.get(parameterId);
+        String value;
+        if (Double.isFinite(parameterValue)) {
+          final Map<String, Boolean> reversals = this.coordinateOperationMethodParamReversals
+            .get(methodId);
+          if (reversals.get(parameterName) == Boolean.TRUE) {
+            parameterValue = -parameterValue;
+          }
+          value = Doubles.toString(parameterValue) + " " + this.unitOfMeasureNameById.get(uomCode);
+        } else {
+          value = fileValue;
+        }
+        parameters.put(parameterName, value);
       }
     }
   }
@@ -276,11 +459,24 @@ public final class EpsgCoordinateSystemsLoader {
     try (
       final RecordReader reader = newReader("/public/epsg_coordoperationpath",
         "concat_operation_code", "op_path_step");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("coordOperationPath");) {
       for (final Record record : reader) {
-        writeInt(writer, record, "concat_operation_code");
-        writeInt(writer, record, "single_operation_code");
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "concat_operation_code");
+        final int stepOperationId = writeInt(writer, record, "single_operation_code");
         writeInt(writer, record, "op_path_step");
+        final MapEx coordinateOperation = this.coordinateOperationById.get(id);
+        List<MapEx> operations = coordinateOperation.getValue("operations");
+        if (operations == null) {
+          operations = new ArrayList<>();
+          coordinateOperation.put("operations", operations);
+        }
+        final MapEx step = this.coordinateOperationById.get(stepOperationId);
+        if (step == null) {
+          Logs.error(this, "Cannot find operation " + stepOperationId);
+        }
+        operations.add(step);
       }
     }
   }
@@ -289,15 +485,31 @@ public final class EpsgCoordinateSystemsLoader {
     final List<String> datumTypes = Arrays.asList("geodetic", "vertical", "engineering");
     try (
       final RecordReader reader = newReader("/public/epsg_datum", "datum_code");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("datum")) {
       for (final Record record : reader) {
-        writeInt(writer, record, "datum_code");
-        writeString(writer, record, "datum_name");
-        writeCodeByte(writer, record, "datum_type", datumTypes);
-        writeInt(writer, record, "ellipsoid_code", 0);
-        writeInt(writer, record, "prime_meridian_code", 0);
-        writeInt(writer, record, "area_of_use_code");
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "datum_code");
+        final String name = writeString(writer, record, "datum_name");
+        final String type = writeCodeByte(writer, record, "datum_type", datumTypes);
+        final int ellipsoidId = writeInt(writer, record, "ellipsoid_code", 0);
+        final int primeMeridianId = writeInt(writer, record, "prime_meridian_code", 0);
+        final int areaId = writeInt(writer, record, "area_of_use_code");
         writeDeprecated(writer, record);
+
+        final MapEx datum = new LinkedHashMapEx() //
+          .add("id", id) //
+          .add("name", name) //
+          .add("type", type) //
+        ;
+        if (ellipsoidId > 0) {
+          datum.add("ellipsoid", this.ellipsoidById.get(ellipsoidId));
+        }
+        if (primeMeridianId > 0) {
+          datum.add("primeMeridian", this.primeMeridianById.get(primeMeridianId));
+        }
+        datum.add("area", this.areaById.get(areaId));
+        this.datumById.put(id, datum);
       }
     }
   }
@@ -305,16 +517,33 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadEllipsoid() throws IOException {
     try (
       final RecordReader reader = newReader("/public/epsg_ellipsoid", "ellipsoid_code");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("ellipsoid")) {
       for (final Record record : reader) {
-        writeInt(writer, record, "ellipsoid_code");
-        writeString(writer, record, "ellipsoid_name");
-        writeInt(writer, record, "uom_code");
-        writeDouble(writer, record, "semi_minor_axis");
-        writeDouble(writer, record, "semi_major_axis");
-        writeDouble(writer, record, "inv_flattening");
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "ellipsoid_code");
+        final String name = writeString(writer, record, "ellipsoid_name");
+        final int uomId = writeInt(writer, record, "uom_code");
+        final double semiMinorAxis = writeDouble(writer, record, "semi_minor_axis");
+        final double semiMajorAxis = writeDouble(writer, record, "semi_major_axis");
+        final double inverseFlattening = writeDouble(writer, record, "inv_flattening");
         writeByte(writer, record, "ellipsoid_shape");
         writeDeprecated(writer, record);
+        final MapEx ellipsoid = new LinkedHashMapEx() //
+          .add("id", id) //
+          .add("name", name) //
+          .add("units", this.unitOfMeasureNameById.get(uomId))//
+          .add("semiMajorAxis", semiMajorAxis)//
+        ;
+
+        if (Double.isFinite(semiMinorAxis)) {
+          ellipsoid.add("semiMinorAxis", semiMinorAxis);
+        }
+        if (Double.isFinite(inverseFlattening)) {
+          ellipsoid.add("inverseFlattening", inverseFlattening);
+        }
+
+        this.ellipsoidById.put(id, ellipsoid);
       }
     }
   }
@@ -322,13 +551,23 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadPrimeMeridian() throws IOException {
     try (
       final RecordReader reader = newReader("/public/epsg_primemeridian", "prime_meridian_code");
+      final RecordWriter recordWriter = newTsvWriter(reader);
       ChannelWriter writer = newWriter("primeMeridian")) {
       for (final Record record : reader) {
-        writeInt(writer, record, "prime_meridian_code");
-        writeString(writer, record, "prime_meridian_name");
-        writeInt(writer, record, "uom_code");
-        writeDouble(writer, record, "greenwich_longitude");
+        recordWriter.write(record);
+        final int id = writeInt(writer, record, "prime_meridian_code");
+        final String name = writeString(writer, record, "prime_meridian_name");
+        final int uomId = writeInt(writer, record, "uom_code");
+        final double longitude = writeDouble(writer, record, "greenwich_longitude");
 
+        final MapEx primeMeridan = new LinkedHashMapEx() //
+          .add("id", id) //
+          .add("name", name) //
+          .add("units", this.unitOfMeasureNameById.get(uomId))//
+          .add("longitude", longitude)//
+        ;
+
+        this.primeMeridianById.put(id, primeMeridan);
         if (isDeprecated(record)) {
           System.err.println("Add deprecated support to prime meridian");
         }
@@ -343,11 +582,13 @@ public final class EpsgCoordinateSystemsLoader {
 
     try (
       final RecordReader reader = newReader("/public/epsg_unitofmeasure")) {
+      final RecordWriter recordWriter = newTsvWriter(reader);
       for (final Record record : reader) {
-        final int code = record.getInteger("uom_code");
+        recordWriter.write(record);
+        final int id = record.getInteger("uom_code");
         final int baseUnitCode = record.getInteger("target_uom_code");
-        if (code == baseUnitCode) {
-          baseUnits.put(code, record);
+        if (id == baseUnitCode) {
+          baseUnits.put(id, record);
         } else {
           Maps.addToList(unitsByBase, baseUnitCode, record);
         }
@@ -356,8 +597,8 @@ public final class EpsgCoordinateSystemsLoader {
     try (
       ChannelWriter writer = newWriter("unitOfMeasure")) {
       for (final Entry<Integer, Record> entry : baseUnits.entrySet()) {
-        final int code = entry.getKey();
-        final Record record = baseUnits.get(code);
+        final int id = entry.getKey();
+        final Record record = baseUnits.get(id);
         loadUnitOfMeasure(unitsByBase, record, writer);
       }
     }
@@ -365,20 +606,22 @@ public final class EpsgCoordinateSystemsLoader {
 
   private void loadUnitOfMeasure(final Map<Integer, List<Record>> unitsByBase, final Record record,
     final ChannelWriter writer) {
-    final int code = writeInt(writer, record, "uom_code");
+    final int id = writeInt(writer, record, "uom_code");
     writeCodeByte(writer, record, "unit_of_meas_type", UnitOfMeasure.TYPE_NAMES);
     writeInt(writer, record, "target_uom_code");
     writeDeprecated(writer, record);
     writeDouble(writer, record, "factor_b");
     writeDouble(writer, record, "factor_c");
-    writeString(writer, record, "unit_of_meas_name");
+    final String name = writeString(writer, record, "unit_of_meas_name");
 
-    final List<Record> derivedUnits = unitsByBase.get(code);
+    final List<Record> derivedUnits = unitsByBase.get(id);
     if (derivedUnits != null) {
       for (final Record derivedRecord : derivedUnits) {
         loadUnitOfMeasure(unitsByBase, derivedRecord, writer);
       }
     }
+    this.unitOfMeasureNameById.put(id, name);
+
   }
 
   private RecordReader newReader(final String path) {
@@ -391,6 +634,14 @@ public final class EpsgCoordinateSystemsLoader {
       query.addOrderBy(fieldName);
     }
     return this.recordStore.getRecords(query);
+  }
+
+  private RecordWriter newTsvWriter(final RecordReader reader) {
+    final RecordDefinition recordDefinition = reader.getRecordDefinition();
+    final String name = recordDefinition.getPathName().getName();
+    final Resource resource = Resource.getResource("/Data/EPSG/" + name + ".tsv");
+    resource.createParentDirectories();
+    return RecordWriter.newRecordWriter(recordDefinition, resource);
   }
 
   private ChannelWriter newWriter(final String name) {
@@ -442,11 +693,12 @@ public final class EpsgCoordinateSystemsLoader {
     writer.putByte(record.getByte(fieldName));
   }
 
-  private void writeCodeByte(final ChannelWriter writer, final Record object,
+  private String writeCodeByte(final ChannelWriter writer, final Record object,
     final String fieldName, final List<String> codes) {
     final String code = object.getValue(fieldName);
     final int index = codes.indexOf(code);
     writer.putByte((byte)index);
+    return code;
   }
 
   private void writeDeprecated(final ChannelWriter writer, final Record record) {
@@ -458,10 +710,11 @@ public final class EpsgCoordinateSystemsLoader {
     }
   }
 
-  private void writeDouble(final ChannelWriter writer, final Record record,
+  private double writeDouble(final ChannelWriter writer, final Record record,
     final String fieldName) {
-    final double semiMinorAxis = record.getDouble(fieldName, Double.NaN);
-    writer.putDouble(semiMinorAxis);
+    final double value = record.getDouble(fieldName, Double.NaN);
+    writer.putDouble(value);
+    return value;
   }
 
   private int writeInt(final ChannelWriter writer, final Record record, final String fieldName) {
@@ -475,6 +728,20 @@ public final class EpsgCoordinateSystemsLoader {
     final int value = record.getInteger(fieldName, defaultValue);
     writer.putInt(value);
     return value;
+  }
+
+  private void writeJson() {
+    writeJson("cs", this.coordinateReferenceSystemById);
+    writeJson("operation", this.coordinateOperationById);
+  }
+
+  private void writeJson(final String name, final IntHashMap<MapEx> valuesById) {
+    for (final MapEx coordinateOperation : valuesById.values()) {
+      final int id = coordinateOperation.getInteger("id");
+      final Resource resource = Resource.getResource("/Data/EPSG/" + name + "/" + id + ".json");
+      resource.createParentDirectories();
+      Json.writeMap(coordinateOperation, resource);
+    }
   }
 
   private String writeString(final ChannelWriter writer, final Record record,

@@ -1,10 +1,11 @@
 package com.revolsys.elevation.gridded;
 
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.grid.AbstractGrid;
 import com.revolsys.io.BaseCloseable;
 
-public abstract class DirectFileElevationModel extends AbstractGriddedElevationModel
-  implements BaseCloseable {
+public abstract class DirectFileElevationModel extends AbstractGrid
+  implements GriddedElevationModel, BaseCloseable {
 
   protected final int elevationByteCount;
 
@@ -41,7 +42,7 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   }
 
   @Override
-  public double getElevationFast(final int gridX, final int gridY) {
+  public double getValueFast(final int gridX, final int gridY) {
     final int offset = this.headerSize + (gridY * this.gridWidth + gridX) * this.elevationByteCount;
     return readElevation(offset);
   }
@@ -61,8 +62,8 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   }
 
   @Override
-  public GriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
-    final double x, final double y, final int width, final int height, final double gridCellSize) {
+  public GriddedElevationModel newGrid(final GeometryFactory geometryFactory, final double x,
+    final double y, final int width, final int height, final double gridCellSize) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -70,7 +71,7 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   protected abstract double readElevation(final int offset);
 
   @Override
-  public void setElevation(final int gridX, final int gridY, final double elevation) {
+  public void setValue(final int gridX, final int gridY, final double elevation) {
     final int gridWidth = getGridWidth();
     final int offset = this.headerSize + (gridY * gridWidth + gridX) * this.elevationByteCount;
     writeElevation(offset, elevation);

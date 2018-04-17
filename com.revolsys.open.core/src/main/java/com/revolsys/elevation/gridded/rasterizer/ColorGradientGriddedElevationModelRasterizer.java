@@ -46,7 +46,7 @@ public class ColorGradientGriddedElevationModelRasterizer
 
   @Override
   public int getValue(final int gridX, final int gridY) {
-    final double elevation = this.elevationModel.getElevation(gridX, gridY);
+    final double elevation = this.elevationModel.getValue(gridX, gridY);
     return this.gradient.getColorIntForValue(elevation);
 
   }

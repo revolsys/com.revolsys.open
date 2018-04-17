@@ -7,12 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.gridshift.GridShiftOperation;
+import com.revolsys.geometry.cs.gridshift.GridHorizontalShiftOperation;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.Resource;
 
 public class GsbGridShiftFile {
@@ -52,14 +57,17 @@ public class GsbGridShiftFile {
 
   private GeographicCoordinateSystem toCoordinateSystem;
 
-  private final GridShiftOperation forwardOperation = new GsbGridShiftOperation(this);
+  private final GridHorizontalShiftOperation forwardOperation = new GsbGridShiftOperation(this);
 
-  private final GridShiftOperation inverseOperation = new GsbGridShiftInverseOperation(this);
+  private final GridHorizontalShiftOperation inverseOperation = new GsbGridShiftInverseOperation(this);
+
+  private final Resource resource;
 
   @SuppressWarnings("unused")
   public GsbGridShiftFile(final Object source, final boolean loadAccuracy) {
+    this.resource = Resource.getResource(source);
     try (
-      ChannelReader in = Resource.getResource(source).newChannelReader()) {
+      ChannelReader in = this.resource.newChannelReader()) {
       this.in = in;
       in.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       final String overviewHeaderCountId = in.getString(8, StandardCharsets.ISO_8859_1);
@@ -154,7 +162,7 @@ public class GsbGridShiftFile {
     }
   }
 
-  public GridShiftOperation getForwardOperation() {
+  public GridHorizontalShiftOperation getForwardOperation() {
     return this.forwardOperation;
   }
 
@@ -173,7 +181,7 @@ public class GsbGridShiftFile {
     return null;
   }
 
-  public GridShiftOperation getInverseOperation() {
+  public GridHorizontalShiftOperation getInverseOperation() {
     return this.inverseOperation;
   }
 
@@ -312,6 +320,28 @@ public class GsbGridShiftFile {
   @Override
   public String toString() {
     return this.fromCoordinateSystem + " -> " + this.toCoordinateSystem;
+  }
+
+  public void writeGridExtents() {
+    final RecordDefinition recordDefinition = new RecordDefinitionBuilder() //
+      .addField("name", DataTypes.STRING) //
+      .addField(DataTypes.POLYGON) //
+      .setGeometryFactory(this.fromCoordinateSystem.getGeometryFactoryFloating(2))
+      .getRecordDefinition();
+    try (
+      RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition,
+        this.resource.newResourceChangeExtension("tsv"))) {
+      writeGridExtents(writer, this.grids);
+    }
+  }
+
+  private void writeGridExtents(final RecordWriter writer, final List<GsbGridShiftGrid> grids) {
+    for (final GsbGridShiftGrid grid : grids) {
+      final String name = grid.getName();
+      final Polygon polygon = grid.getBoundingBox().toPolygon(10);
+      writer.write(name, polygon);
+      writeGridExtents(writer, grid.getGrids());
+    }
   }
 
 }

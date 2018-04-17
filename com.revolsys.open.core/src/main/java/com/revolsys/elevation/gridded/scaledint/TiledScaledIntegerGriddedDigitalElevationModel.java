@@ -3,14 +3,15 @@ package com.revolsys.elevation.gridded.scaledint;
 import java.util.Map;
 
 import com.revolsys.collection.map.LruMap;
-import com.revolsys.elevation.gridded.AbstractGriddedElevationModel;
 import com.revolsys.elevation.gridded.DirectFileElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.grid.AbstractGrid;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.IntPair;
 
-public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGriddedElevationModel {
+public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
+  implements GriddedElevationModel {
 
   private int gridTileWidth;
 
@@ -44,9 +45,17 @@ public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
   public void clear() {
   }
 
+  public int getGridTileHeight() {
+    return this.gridTileHeight;
+  }
+
+  public int getGridTileWidth() {
+    return this.gridTileWidth;
+  }
+
   @Override
-  public double getElevationFast(final int gridX, final int gridY) {
-    final double gridCellSize = getGridCellSize();
+  public double getValueFast(final int gridX, final int gridY) {
+    final double gridCellSize = getGridCellWidth();
     final int tileMinGridX = Math.floorDiv(gridX, this.gridTileWidth) * this.gridTileWidth;
     final int tileMinGridY = Math.floorDiv(gridY, this.gridTileHeight) * this.gridTileHeight;
 
@@ -55,7 +64,7 @@ public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
     if (model == null) {
 
       final int tileMinX = (int)(tileMinGridX * gridCellSize);
-      final int tileMinY = (int)(tileMinGridY * gridCellSize);
+      final int tileMinY = (int)(tileMinGridY * this.gridCellHeight);
       model = new ScaledIntegerGriddedDigitalElevationModelFile(this.baseResource.toPath(),
         getGeometryFactory(), tileMinX, tileMinY, this.gridTileWidth, this.gridTileHeight,
         gridCellSize);
@@ -65,7 +74,7 @@ public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
     final int gridCellX = gridX - tileMinGridX;
     final int gridCellY = gridY - tileMinGridY;
 
-    return model.getElevation(gridCellX, gridCellY);
+    return model.getValue(gridCellX, gridCellY);
     // final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
     // + (gridCellY * this.gridSize + gridCellX) * this.elevationByteCount;
     // double elevation;
@@ -102,14 +111,6 @@ public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
     // return elevation;
   }
 
-  public int getGridTileHeight() {
-    return this.gridTileHeight;
-  }
-
-  public int getGridTileWidth() {
-    return this.gridTileWidth;
-  }
-
   @Override
   public boolean isEmpty() {
     return false;
@@ -121,13 +122,9 @@ public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
   }
 
   @Override
-  public GriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
-    final double x, final double y, final int width, final int height, final double gridCellSize) {
+  public GriddedElevationModel newGrid(final GeometryFactory geometryFactory, final double x,
+    final double y, final int width, final int height, final double gridCellSize) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setElevation(final int x, final int y, final double elevation) {
   }
 
   public void setGridTileHeight(final int gridTileHeight) {
@@ -136,6 +133,10 @@ public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
 
   public void setGridTileWidth(final int gridTileWidth) {
     this.gridTileWidth = gridTileWidth;
+  }
+
+  @Override
+  public void setValue(final int x, final int y, final double elevation) {
   }
 
 }

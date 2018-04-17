@@ -24,7 +24,7 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter
   extends AbstractWriter<GriddedElevationModel> implements GriddedElevationModelWriter {
   public static void writeHeader(final ChannelWriter writer, final BoundingBox boundingBox,
     final GeometryFactory geometryFactory, final int gridWidth, final int gridHeight,
-    final double gridCellSize) throws IOException {
+    final double gridCellWidth, final double gridCellHeight) throws IOException {
     final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
     double scaleXY = geometryFactory.getScaleXY();
     if (scaleXY <= 0) {
@@ -56,9 +56,10 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter
     writer.putDouble(boundingBox.getMaxX()); // maxX
     writer.putDouble(boundingBox.getMaxY()); // maxY
     writer.putDouble(boundingBox.getMaxZ()); // maxZ
-    writer.putInt((int)gridCellSize); // Grid Cell Size
     writer.putInt(gridWidth); // Grid Width
     writer.putInt(gridHeight); // Grid Height
+    writer.putDouble(gridCellWidth); // Grid Cell Width
+    writer.putDouble(gridCellHeight); // Grid Cell Height
   }
 
   private Resource resource;
@@ -155,7 +156,7 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter
     final GeometryFactory geometryFactory = elevationModel.getGeometryFactory();
     for (int gridY = 0; gridY < gridHeight; gridY++) {
       for (int gridX = 0; gridX < gridWidth; gridX++) {
-        final double elevation = elevationModel.getElevation(gridX, gridY);
+        final double elevation = elevationModel.getValue(gridX, gridY);
         final int zInt = geometryFactory.toIntZ(elevation);
         out.putInt(zInt);
       }
@@ -164,13 +165,14 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter
 
   private void writeHeader(final GriddedElevationModel elevationModel) throws IOException {
     final GeometryFactory geometryFactory = elevationModel.getGeometryFactory();
-    elevationModel.updateZBoundingBox();
+    elevationModel.updateValues();
     final BoundingBox boundingBox = elevationModel.getBoundingBox();
     this.gridWidth = elevationModel.getGridWidth();
     this.gridHeight = elevationModel.getGridHeight();
-    final double gridCellSize = elevationModel.getGridCellSize();
+    final double gridCellWidth = elevationModel.getGridCellWidth();
+    final double gridCellHeight = elevationModel.getGridCellHeight();
 
     writeHeader(this.writer, boundingBox, geometryFactory, this.gridWidth, this.gridHeight,
-      gridCellSize);
+      gridCellWidth, gridCellHeight);
   }
 }

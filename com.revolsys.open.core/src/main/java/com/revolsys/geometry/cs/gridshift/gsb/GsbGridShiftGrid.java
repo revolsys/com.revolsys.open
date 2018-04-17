@@ -46,12 +46,8 @@ public class GsbGridShiftGrid {
     this.maxX = file.readRecordDouble();
     final double gridCellSizeY = file.readRecordDouble();
     final double gridCellSizeX = file.readRecordDouble();
-    if (gridCellSizeX != gridCellSizeY) {
-      throw new IllegalStateException(
-        "latInterval=" + gridCellSizeY + " != lonInterval=" + gridCellSizeX);
-    }
-    final int gridWidth = 1 + (int)((this.maxX - this.minX) / gridCellSizeY);
-    final int gridHeight = 1 + (int)((this.maxY - this.minY) / gridCellSizeX);
+    final int gridWidth = 1 + (int)((this.maxX - this.minX) / gridCellSizeX);
+    final int gridHeight = 1 + (int)((this.maxY - this.minY) / gridCellSizeY);
     final int nodeCount = file.readRecordInt();
     if (nodeCount != gridWidth * gridHeight) {
       throw new IllegalStateException(
@@ -83,9 +79,9 @@ public class GsbGridShiftGrid {
       this.latAccuracies = null;
     }
     this.lonShifts = new FloatArrayGrid(this.minX, this.minY, gridWidth, gridHeight, gridCellSizeX,
-      lonShifts);
+      gridCellSizeY, lonShifts);
     this.latShifts = new FloatArrayGrid(this.minX, this.minY, gridWidth, gridHeight, gridCellSizeX,
-      latShifts);
+      gridCellSizeY, latShifts);
   }
 
   public void addGrid(final GsbGridShiftGrid grid) {
@@ -115,6 +111,10 @@ public class GsbGridShiftGrid {
     } else {
       return null;
     }
+  }
+
+  public List<GsbGridShiftGrid> getGrids() {
+    return this.grids;
   }
 
   public double getLatAccuracy(final double lon, final double lat) {

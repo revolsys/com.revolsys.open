@@ -11,12 +11,13 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.revolsys.collection.map.IntHashMap;
-import com.revolsys.elevation.gridded.AbstractGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.grid.AbstractGrid;
 import com.revolsys.io.BaseCloseable;
 
-public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGriddedElevationModel {
+public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
+  implements GriddedElevationModel {
 
   private class FileChannelHolder implements BaseCloseable {
     private final int tileX;
@@ -124,7 +125,8 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGridd
   public ScaledIntegerGriddedDigitalElevationModelGrid(final Path basePath, final String filePrefix,
     final int coordinateSystemId, final int gridTileSize, final int gridCellSize,
     final double scaleZ) {
-    setGridCellSize(gridCellSize);
+    setGridCellWidth(gridCellSize);
+    setGridCellHeight(gridCellSize);
     this.coordinateSystemId = coordinateSystemId;
     this.gridTileSize = gridTileSize;
     this.gridCellSizeInt = gridCellSize;
@@ -165,71 +167,6 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGridd
   // return Double.NaN;
   // }
   // }
-
-  @Override
-  public double getElevation(final double x, final double y) {
-    final int gridCellSize = this.gridCellSizeInt;
-    final int gridX = (int)Math.floor(x / gridCellSize);
-    final int gridY = (int)Math.floor(y / gridCellSize);
-
-    return getElevation(gridX, gridY);
-  }
-
-  @Override
-  public double getElevation(final int gridX, final int gridY) {
-    final int gridTileSize = this.gridTileSize;
-    final int tileX = Math.floorDiv(gridX, gridTileSize) * gridTileSize;
-    final int tileY = Math.floorDiv(gridY, gridTileSize) * gridTileSize;
-
-    try {
-      final int gridCellX = gridX - tileX;
-      final int gridCellY = gridY - tileY;
-      final int elevationByteSize = 4;
-      final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
-        + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
-      try (
-        FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
-        final int elevationInt = channelHolder.getInt(offset);
-        if (elevationInt == Integer.MIN_VALUE) {
-          return Double.NaN;
-        } else {
-          return elevationInt / this.scaleZ;
-        }
-      }
-    } catch (final NoSuchFileException e) {
-      return Double.NaN;
-    } catch (final IOException e) {
-      return Double.NaN;
-    }
-  }
-
-  @Override
-  public double getElevationFast(final int gridX, final int gridY) {
-    final int gridTileSize = this.gridTileSize;
-    final int tileX = Math.floorDiv(gridX, gridTileSize) * gridTileSize;
-    final int tileY = Math.floorDiv(gridY, gridTileSize) * gridTileSize;
-
-    try {
-      final int gridCellX = gridX - tileX;
-      final int gridCellY = gridY - tileY;
-      final int elevationByteSize = 4;
-      final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
-        + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
-      try (
-        FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
-        final int elevationInt = channelHolder.getInt(offset);
-        if (elevationInt == Integer.MIN_VALUE) {
-          return Double.NaN;
-        } else {
-          return elevationInt / this.scaleZ;
-        }
-      }
-    } catch (final NoSuchFileException e) {
-      return Double.NaN;
-    } catch (final IOException e) {
-      return Double.NaN;
-    }
-  }
 
   private FileChannelHolder getFileChannel(final int tileX, final int tileY) throws IOException {
     synchronized (this.channelsByXandY) {
@@ -286,13 +223,78 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGridd
     return 0;
   }
 
+  @Override
+  public double getValue(final double x, final double y) {
+    final int gridCellSize = this.gridCellSizeInt;
+    final int gridX = (int)Math.floor(x / gridCellSize);
+    final int gridY = (int)Math.floor(y / gridCellSize);
+
+    return getValue(gridX, gridY);
+  }
+
+  @Override
+  public double getValue(final int gridX, final int gridY) {
+    final int gridTileSize = this.gridTileSize;
+    final int tileX = Math.floorDiv(gridX, gridTileSize) * gridTileSize;
+    final int tileY = Math.floorDiv(gridY, gridTileSize) * gridTileSize;
+
+    try {
+      final int gridCellX = gridX - tileX;
+      final int gridCellY = gridY - tileY;
+      final int elevationByteSize = 4;
+      final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
+        + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
+      try (
+        FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
+        final int elevationInt = channelHolder.getInt(offset);
+        if (elevationInt == Integer.MIN_VALUE) {
+          return Double.NaN;
+        } else {
+          return elevationInt / this.scaleZ;
+        }
+      }
+    } catch (final NoSuchFileException e) {
+      return Double.NaN;
+    } catch (final IOException e) {
+      return Double.NaN;
+    }
+  }
+
+  @Override
+  public double getValueFast(final int gridX, final int gridY) {
+    final int gridTileSize = this.gridTileSize;
+    final int tileX = Math.floorDiv(gridX, gridTileSize) * gridTileSize;
+    final int tileY = Math.floorDiv(gridY, gridTileSize) * gridTileSize;
+
+    try {
+      final int gridCellX = gridX - tileX;
+      final int gridCellY = gridY - tileY;
+      final int elevationByteSize = 4;
+      final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
+        + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
+      try (
+        FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
+        final int elevationInt = channelHolder.getInt(offset);
+        if (elevationInt == Integer.MIN_VALUE) {
+          return Double.NaN;
+        } else {
+          return elevationInt / this.scaleZ;
+        }
+      }
+    } catch (final NoSuchFileException e) {
+      return Double.NaN;
+    } catch (final IOException e) {
+      return Double.NaN;
+    }
+  }
+
   public boolean isCacheChannels() {
     return this.cacheChannels;
   }
 
   @Override
-  public GriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
-    final double x, final double y, final int width, final int height, final double gridCellSize) {
+  public GriddedElevationModel newGrid(final GeometryFactory geometryFactory, final double x,
+    final double y, final int width, final int height, final double gridCellSize) {
     throw new UnsupportedOperationException("Tiled elevation models are too large to copy");
   }
 
@@ -301,7 +303,7 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGridd
   }
 
   @Override
-  public void setElevation(final int gridX, final int gridY, final double elevation) {
+  public void setValue(final int gridX, final int gridY, final double elevation) {
     throw new UnsupportedOperationException("Grid is read only");
   }
 }

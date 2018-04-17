@@ -1,81 +1,127 @@
 package com.revolsys.elevation.gridded;
 
-import java.util.Arrays;
-import java.util.function.DoubleConsumer;
-
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.editor.LineStringEditor;
+import com.revolsys.grid.DoubleArrayGrid;
 
-public class DoubleArrayGriddedElevationModel extends AbstractGriddedElevationModel {
-  private static final double NULL_VALUE = Double.NaN;
+public class DoubleArrayGriddedElevationModel extends DoubleArrayGrid
+  implements GriddedElevationModel {
 
-  private final double[] elevations;
+  public DoubleArrayGriddedElevationModel(final double x, final double y, final int gridWidth,
+    final int gridHeight, final double gridCellWidth, final double gridCellHeight,
+    final double[] values) {
+    super(x, y, gridWidth, gridHeight, gridCellWidth, gridCellHeight, values);
+  }
+
+  public DoubleArrayGriddedElevationModel(final double x, final double y, final int gridWidth,
+    final int gridHeight, final double gridCellSize, final double[] values) {
+    super(x, y, gridWidth, gridHeight, gridCellSize, values);
+  }
+
+  public DoubleArrayGriddedElevationModel(final GeometryFactory geometryFactory,
+    final BoundingBox boundingBox, final int gridWidth, final int gridHeight,
+    final double gridCellWidth, final double gridCellHeight, final double[] values) {
+    super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellWidth, gridCellHeight,
+      values);
+  }
+
+  public DoubleArrayGriddedElevationModel(final GeometryFactory geometryFactory,
+    final BoundingBox boundingBox, final int gridWidth, final int gridHeight,
+    final double gridCellSize, final double[] values) {
+    super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellSize, values);
+  }
 
   public DoubleArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
     final double y, final int gridWidth, final int gridHeight, final double gridCellSize) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
-    this.elevations = new double[gridWidth * gridHeight];
-    Arrays.fill(this.elevations, NULL_VALUE);
+  }
+
+  public DoubleArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
+    final double y, final int gridWidth, final int gridHeight, final double gridCellWidth,
+    final double gridCellHeight) {
+    super(geometryFactory, x, y, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
+  }
+
+  public DoubleArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
+    final double y, final int gridWidth, final int gridHeight, final double gridCellWidth,
+    final double gridCellHeight, final double[] values) {
+    super(geometryFactory, x, y, gridWidth, gridHeight, gridCellWidth, gridCellHeight, values);
+  }
+
+  public DoubleArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
+    final double y, final int gridWidth, final int gridHeight, final double gridCellSize,
+    final double[] values) {
+    super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize, values);
   }
 
   @Override
-  public void clear() {
-    super.clear();
-    Arrays.fill(this.elevations, NULL_VALUE);
-  }
+  public LineStringEditor getNullBoundaryPoints() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final LineStringEditor points = new LineStringEditor(geometryFactory);
+    final double minX = getGridMinX();
+    final double minY = getGridMinY();
 
-  @Override
-  protected void expandZ() {
-    for (final double elevation : this.elevations) {
-      expandZ(elevation);
-    }
-  }
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
+    final int gridHeight = getGridHeight();
+    final int gridWidth = getGridWidth();
+    final double[] elevations = this.cells;
+    int index = 0;
+    final int[] offsets = {
+      -1, 0, 1
+    };
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      for (int gridX = 0; gridX < gridWidth; gridX++) {
+        final double elevation = elevations[index];
+        if (elevation == NULL_VALUE) {
+          int countZ = 0;
+          double sumZ = 0;
+          for (final int offsetY : offsets) {
+            if (!(gridY == 0 && offsetY == -1 || gridY == gridHeight - 1 && offsetY == 1)) {
+              final int offsetIndex = index + offsetY * gridWidth;
+              for (final int offsetX : offsets) {
+                if (!(gridX == 0 && offsetX == -1 || gridX == gridWidth - 1 && offsetX == 1)) {
+                  final double elevationNeighbour = elevations[offsetIndex + offsetX];
+                  if (elevationNeighbour != NULL_VALUE) {
+                    sumZ += elevationNeighbour;
+                    countZ++;
+                  }
+                }
+              }
+            }
+          }
 
-  @Override
-  public void forEachElevationFinite(final DoubleConsumer action) {
-    for (final double z : this.elevations) {
-      if (Double.isFinite(z)) {
-        action.accept(z);
+          if (countZ > 0) {
+            final double x = minX + gridCellWidth * gridX;
+            final double y = minY + gridCellHeight * gridY;
+            final double z = sumZ / countZ;
+            points.appendVertex(x, y, z);
+          }
+        }
+        index++;
       }
     }
+    return points;
   }
 
   @Override
-  public double getElevationFast(final int x, final int y) {
-    final int index = y * this.gridWidth + x;
-    final double elevation = this.elevations[index];
-    return elevation;
-  }
-
-  @Override
-  public DoubleArrayGriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
+  public DoubleArrayGriddedElevationModel newGrid(final GeometryFactory geometryFactory,
     final double x, final double y, final int width, final int height, final double cellSize) {
     return new DoubleArrayGriddedElevationModel(geometryFactory, x, y, width, height, cellSize);
   }
 
   @Override
-  public void setElevation(final int gridX, final int gridY, final double elevation) {
-    final int width = getGridWidth();
-    final int height = getGridHeight();
-    if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
-      final int index = gridY * width + gridX;
-      if (Double.isFinite(elevation)) {
-        this.elevations[index] = elevation;
-      } else {
-        this.elevations[index] = NULL_VALUE;
-      }
-      clearCachedObjects();
-    }
+  public DoubleArrayGriddedElevationModel newGrid(final int gridWidth, final int gridHeight,
+    final double gridCellWidth, final double gridCellHeight, final double[] newValues) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final BoundingBox boundingBox = getBoundingBox();
+    return new DoubleArrayGriddedElevationModel(geometryFactory, boundingBox, gridWidth, gridHeight,
+      gridCellWidth, gridCellHeight, newValues);
   }
 
   @Override
-  public void setElevationNull(final int gridX, final int gridY) {
-    final int width = getGridWidth();
-    final int height = getGridHeight();
-    if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
-      final int index = gridY * width + gridX;
-      this.elevations[index] = NULL_VALUE;
-      clearCachedObjects();
-    }
+  public DoubleArrayGriddedElevationModel resample(final int newGridCellSize) {
+    return (DoubleArrayGriddedElevationModel)super.resample(newGridCellSize);
   }
-
 }

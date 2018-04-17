@@ -1,10 +1,11 @@
 package com.revolsys.elevation.gridded.usgsdem;
 
-import com.revolsys.elevation.gridded.AbstractGriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.grid.AbstractGrid;
 
-public class UsgsGriddedElevationModel extends AbstractGriddedElevationModel {
+public class UsgsGriddedElevationModel extends AbstractGrid implements GriddedElevationModel {
   public static final int NULL_VALUE = Integer.MIN_VALUE;
 
   private final UsgsGriddedElevationModelColumn[] columns;
@@ -17,7 +18,7 @@ public class UsgsGriddedElevationModel extends AbstractGriddedElevationModel {
   }
 
   @Override
-  protected void expandZ() {
+  protected void expandRange() {
     int min = Integer.MAX_VALUE;
     int max = Integer.MIN_VALUE;
     for (final UsgsGriddedElevationModelColumn column : this.columns) {
@@ -34,20 +35,8 @@ public class UsgsGriddedElevationModel extends AbstractGriddedElevationModel {
     }
     final double minZ = toDoubleZ(min);
     final double maxZ = toDoubleZ(max);
-    setZRange(minZ, maxZ);
+    setValueRange(minZ, maxZ);
 
-  }
-
-  @Override
-  public double getElevationFast(final int gridX, final int gridY) {
-    final UsgsGriddedElevationModelColumn column = this.columns[gridX];
-    if (column != null) {
-      final int elevationInt = column.getElevationInt(gridY);
-      if (elevationInt != NULL_VALUE) {
-        return toDoubleZ(elevationInt);
-      }
-    }
-    return Double.NaN;
   }
 
   public int getElevationInt(final int gridX, final int gridY) {
@@ -61,7 +50,19 @@ public class UsgsGriddedElevationModel extends AbstractGriddedElevationModel {
   }
 
   @Override
-  public boolean hasElevationFast(final int gridX, final int gridY) {
+  public double getValueFast(final int gridX, final int gridY) {
+    final UsgsGriddedElevationModelColumn column = this.columns[gridX];
+    if (column != null) {
+      final int elevationInt = column.getElevationInt(gridY);
+      if (elevationInt != NULL_VALUE) {
+        return toDoubleZ(elevationInt);
+      }
+    }
+    return Double.NaN;
+  }
+
+  @Override
+  public boolean hasValueFast(final int gridX, final int gridY) {
     if (gridX >= 0 && gridX < this.gridWidth) {
       final UsgsGriddedElevationModelColumn column = this.columns[gridX];
       if (column != null) {
@@ -86,8 +87,8 @@ public class UsgsGriddedElevationModel extends AbstractGriddedElevationModel {
   public void update(final double minX, final double minY, final double minZ, final Double maxZ,
     final int gridHeight) {
     this.gridHeight = gridHeight;
-    final double maxX = minX + this.gridWidth * this.gridCellSize;
-    final double maxY = minY + gridHeight * this.gridCellSize;
+    final double maxX = minX + this.gridWidth * this.gridCellWidth;
+    final double maxY = minY + gridHeight * this.gridCellHeight;
     setBounds(minX, minY, minZ, maxX, maxY, maxZ);
   }
 }

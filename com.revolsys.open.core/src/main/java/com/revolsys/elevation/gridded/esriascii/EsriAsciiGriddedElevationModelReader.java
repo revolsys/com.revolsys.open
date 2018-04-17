@@ -193,7 +193,7 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
         for (int gridY = this.height - 1; gridY >= 0; gridY--) {
           for (int gridX = 0; gridX < this.width; gridX++) {
             if (this.elevation != this.noDataValue) {
-              elevationModel.setElevation(gridX, gridY, this.elevation);
+              elevationModel.setValue(gridX, gridY, this.elevation);
             }
             this.elevation = Readers.readDouble(this.reader);
           }

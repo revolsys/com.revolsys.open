@@ -72,7 +72,7 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
     final int gridHeight, final double gridCellSize) {
     super(geometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize,
       ScaledIntegerGriddedDigitalElevation.HEADER_SIZE, 4);
-    setZBoundsUpdateRequired(false);
+    setModified(false);
     this.openOptions = Sets.newHash(StandardOpenOption.READ, StandardOpenOption.WRITE,
       StandardOpenOption.SYNC);
     this.createMissing = true;
@@ -105,11 +105,12 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
       final ChannelWriter writer = new ChannelWriter(this.channel)) {
       final int gridWidth = getGridWidth();
       final int gridHeight = getGridHeight();
-      final double gridCellSize = getGridCellSize();
+      final double gridCellWidth = getGridCellWidth();
+      final double gridCellHeight = getGridCellHeight();
       final BoundingBox boundingBox = getBoundingBox();
       final GeometryFactory geometryFactory = getGeometryFactory();
       ScaledIntegerGriddedDigitalElevationModelWriter.writeHeader(writer, boundingBox,
-        geometryFactory, gridWidth, gridHeight, (int)gridCellSize);
+        geometryFactory, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
       final int count = gridWidth * gridHeight;
       for (int i = 0; i < count; i++) {
         writer.putInt(Integer.MIN_VALUE);
@@ -187,8 +188,7 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
                                                                                  // type
       final short version = this.reader.getShort();
-      final GeometryFactory geometryFactory = GeometryFactory
-        .readOffsetScaled3d(this.reader);
+      final GeometryFactory geometryFactory = GeometryFactory.readOffsetScaled3d(this.reader);
       this.scaleZ = geometryFactory.getScaleZ();
 
       final double minX = reader.getDouble();
@@ -197,27 +197,32 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
       final double maxX = reader.getDouble();
       final double maxY = reader.getDouble();
       final double maxZ = reader.getDouble();
-      final int gridCellSize = reader.getInt(); // Grid Cell Size
-      final int gridWidth = reader.getInt(); // Grid Width
-      final int gridHeight = reader.getInt(); // Grid Height
-
+      int gridWidth;
+      int gridHeight;
+      final double gridCellWidth;
+      final double gridCellHeight;
+      if (version == 1) {
+        gridCellWidth = reader.getInt();
+        gridCellHeight = gridCellWidth;
+        gridWidth = reader.getInt();
+        gridHeight = reader.getInt();
+      } else {
+        gridWidth = reader.getInt();
+        gridHeight = reader.getInt();
+        gridCellWidth = reader.getDouble();
+        gridCellHeight = reader.getDouble();
+      }
       setGeometryFactory(geometryFactory);
       final BoundingBox boundingBox = geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX,
         maxY, maxZ);
       setBoundingBox(boundingBox);
-      setGridCellSize(gridCellSize);
       setGridWidth(gridWidth);
       setGridHeight(gridHeight);
+      setGridCellWidth(gridCellWidth);
+      setGridCellHeight(gridCellHeight);
     } catch (final IOException e) {
       throw Exceptions.wrap("Unable to read: " + this.path, e);
     }
-  }
-
-  @Override
-  public void setElevationNull(final int gridX, final int gridY) {
-    final int gridWidth = getGridWidth();
-    final int offset = this.headerSize + (gridY * gridWidth + gridX) * this.elevationByteCount;
-    writeElevation(offset, Integer.MIN_VALUE);
   }
 
   public void setElevations(final double x, final double y, final double[] elevations) {
@@ -265,6 +270,13 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
 
   public void setUseLocks(final boolean useLocks) {
     this.useLocks = useLocks;
+  }
+
+  @Override
+  public void setValueNull(final int gridX, final int gridY) {
+    final int gridWidth = getGridWidth();
+    final int offset = this.headerSize + (gridY * gridWidth + gridX) * this.elevationByteCount;
+    writeElevation(offset, Integer.MIN_VALUE);
   }
 
   @Override

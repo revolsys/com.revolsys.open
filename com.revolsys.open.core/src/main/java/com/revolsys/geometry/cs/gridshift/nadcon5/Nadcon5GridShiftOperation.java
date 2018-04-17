@@ -3,10 +3,10 @@ package com.revolsys.geometry.cs.gridshift.nadcon5;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.cs.gridshift.GridShiftOperation;
+import com.revolsys.geometry.cs.gridshift.GridHorizontalShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
-public class Nadcon5GridShiftOperation implements GridShiftOperation {
+public class Nadcon5GridShiftOperation implements GridHorizontalShiftOperation {
 
   private final String sourceDatumName;
 
@@ -29,7 +29,7 @@ public class Nadcon5GridShiftOperation implements GridShiftOperation {
   }
 
   @Override
-  public boolean shift(final CoordinatesOperationPoint point) {
+  public boolean horizontalShift(final CoordinatesOperationPoint point) {
     final double x = point.x;
     final double y = point.y;
     final double z = point.z;

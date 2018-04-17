@@ -5,6 +5,7 @@ import java.util.Map;
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.grid.Grid;
 import com.revolsys.util.MathUtil;
 
 public class HillShadeGriddedElevationModelRasterizer
@@ -95,7 +96,7 @@ public class HillShadeGriddedElevationModelRasterizer
     double b = Double.NaN;
     double c = Double.NaN;
     double d = Double.NaN;
-    final double e = elevationModel.getElevationFast(gridX, gridY);
+    final double e = elevationModel.getValueFast(gridX, gridY);
     if (Double.isFinite(e)) {
       double f = Double.NaN;
       double g = Double.NaN;
@@ -111,27 +112,27 @@ public class HillShadeGriddedElevationModelRasterizer
       if (!lastY) {
         final int gridY2 = gridY + 1;
         if (!firstX) {
-          a = elevationModel.getElevationFast(gridX0, gridY2);
+          a = elevationModel.getValueFast(gridX0, gridY2);
         }
-        b = elevationModel.getElevationFast(gridX, gridY2);
+        b = elevationModel.getValueFast(gridX, gridY2);
         if (!lastX) {
-          c = elevationModel.getElevationFast(gridX2, gridY2);
+          c = elevationModel.getValueFast(gridX2, gridY2);
         }
       }
       if (!firstX) {
-        d = elevationModel.getElevationFast(gridX0, gridY);
+        d = elevationModel.getValueFast(gridX0, gridY);
       }
       if (!lastX) {
-        f = elevationModel.getElevationFast(gridX2, gridY);
+        f = elevationModel.getValueFast(gridX2, gridY);
       }
       if (!firstY) {
         final int gridY0 = gridY - 1;
         if (!firstX) {
-          g = elevationModel.getElevationFast(gridX0, gridY0);
+          g = elevationModel.getValueFast(gridX0, gridY0);
         }
-        h = elevationModel.getElevationFast(gridX, gridY0);
+        h = elevationModel.getValueFast(gridX, gridY0);
         if (!lastX) {
-          i = elevationModel.getElevationFast(gridX2, gridY0);
+          i = elevationModel.getValueFast(gridX2, gridY0);
         }
       }
 
@@ -177,7 +178,7 @@ public class HillShadeGriddedElevationModelRasterizer
       }
       return getHillShade(a, b, c, d, f, g, h, i);
     } else {
-      return GriddedElevationModel.NULL_COLOUR;
+      return Grid.NULL_COLOUR;
     }
   }
 
@@ -228,8 +229,8 @@ public class HillShadeGriddedElevationModelRasterizer
   @Override
   public void updateValues() {
     if (this.elevationModel != null) {
-      final double cellSize = this.elevationModel.getGridCellSize();
-      this.oneDivCellSizeTimes8 = 1.0 / (8 * cellSize);
+      final double gridCellWidth = this.elevationModel.getGridCellWidth();
+      this.oneDivCellSizeTimes8 = 1.0 / (8 * gridCellWidth);
     }
   }
 }

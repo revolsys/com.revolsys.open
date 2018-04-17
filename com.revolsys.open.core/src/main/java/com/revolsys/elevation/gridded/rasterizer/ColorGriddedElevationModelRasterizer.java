@@ -62,7 +62,7 @@ public class ColorGriddedElevationModelRasterizer extends AbstractGriddedElevati
   @Override
   public int getValue(final int gridX, final int gridY) {
     final int colour;
-    final double elevation = this.elevationModel.getElevation(gridX, gridY);
+    final double elevation = this.elevationModel.getValue(gridX, gridY);
     if (Double.isNaN(elevation)) {
       colour = NULL_COLOUR;
     } else {
@@ -95,8 +95,8 @@ public class ColorGriddedElevationModelRasterizer extends AbstractGriddedElevati
       double modelMaxZ = Double.NaN;
       final GriddedElevationModel elevationModel = getElevationModel();
       if (elevationModel != null) {
-        modelMinZ = elevationModel.getMinZ();
-        modelMaxZ = elevationModel.getMaxZ();
+        modelMinZ = elevationModel.getMinValue();
+        modelMaxZ = elevationModel.getMaxValue();
       }
       addToMap(map, "minZ", this.minZ, modelMinZ);
       addToMap(map, "maxZ", this.maxZ, modelMaxZ);

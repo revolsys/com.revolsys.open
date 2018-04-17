@@ -7,47 +7,71 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class FloatArrayGrid extends AbstractGrid {
-  private static final float NULL_VALUE = -Float.MAX_VALUE;
+  protected static final float NULL_VALUE = -Float.MAX_VALUE;
 
-  private final float[] values;
+  protected final float[] cells;
+
+  public FloatArrayGrid(final double x, final double y, final int gridWidth, final int gridHeight,
+    final double gridCellWidth, final double gridCellHeight, final float[] values) {
+    this(GeometryFactory.DEFAULT_3D, x, y, gridWidth, gridHeight, gridCellWidth, gridCellHeight,
+      values);
+  }
 
   public FloatArrayGrid(final double x, final double y, final int gridWidth, final int gridHeight,
     final double gridCellSize, final float[] values) {
-    this(GeometryFactory.DEFAULT_3D, x, y, gridWidth, gridHeight, gridCellSize, values);
+    this(x, y, gridWidth, gridHeight, gridCellSize, gridCellSize, values);
+  }
+
+  public FloatArrayGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,
+    final int gridWidth, final int gridHeight, final double gridCellWidth,
+    final double gridCellHeight, final float[] values) {
+    super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
+    this.cells = values;
   }
 
   public FloatArrayGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,
     final int gridWidth, final int gridHeight, final double gridCellSize, final float[] values) {
-    super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellSize);
-    this.values = values;
+    this(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellSize, gridCellSize, values);
   }
 
   public FloatArrayGrid(final GeometryFactory geometryFactory, final double x, final double y,
     final int gridWidth, final int gridHeight, final double gridCellSize) {
-    super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
+    this(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize, gridCellSize);
+  }
+
+  public FloatArrayGrid(final GeometryFactory geometryFactory, final double x, final double y,
+    final int gridWidth, final int gridHeight, final double gridCellWidth,
+    final double gridCellHeight) {
+    super(geometryFactory, x, y, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
     final int size = gridWidth * gridHeight;
     final float[] values = new float[size];
     Arrays.fill(values, NULL_VALUE);
-    this.values = values;
+    this.cells = values;
+  }
+
+  public FloatArrayGrid(final GeometryFactory geometryFactory, final double x, final double y,
+    final int gridWidth, final int gridHeight, final double gridCellWidth,
+    final double gridCellHeight, final float[] values) {
+    super(geometryFactory, x, y, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
+    this.cells = values;
   }
 
   public FloatArrayGrid(final GeometryFactory geometryFactory, final double x, final double y,
     final int gridWidth, final int gridHeight, final double gridCellSize, final float[] values) {
-    super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
-    this.values = values;
+    this(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize, gridCellSize, values);
   }
 
   @Override
   public void clear() {
     super.clear();
-    Arrays.fill(this.values, NULL_VALUE);
+    Arrays.fill(this.cells, NULL_VALUE);
   }
 
   @Override
   protected void expandRange() {
     float min = Float.MAX_VALUE;
     float max = -Float.MAX_VALUE;
-    for (final float value : this.values) {
+    for (final float value : this.cells) {
       if (value != NULL_VALUE) {
         if (value < min) {
           min = value;
@@ -59,13 +83,13 @@ public class FloatArrayGrid extends AbstractGrid {
     }
     final double minZ = min;
     final double maxZ = max;
-    setZRange(minZ, maxZ);
+    setValueRange(minZ, maxZ);
 
   }
 
   @Override
   public void forEachValueFinite(final DoubleConsumer action) {
-    for (final float value : this.values) {
+    for (final float value : this.cells) {
       if (value != NULL_VALUE) {
         action.accept(value);
       }
@@ -75,7 +99,7 @@ public class FloatArrayGrid extends AbstractGrid {
   @Override
   public double getValueFast(final int gridX, final int gridY) {
     final int index = gridY * this.gridWidth + gridX;
-    final float value = this.values[index];
+    final float value = this.cells[index];
     if (value == NULL_VALUE) {
       return Double.NaN;
     } else {
@@ -86,7 +110,7 @@ public class FloatArrayGrid extends AbstractGrid {
   @Override
   public boolean hasValueFast(final int gridX, final int gridY) {
     final int index = gridY * this.gridWidth + gridX;
-    final float value = this.values[index];
+    final float value = this.cells[index];
     if (value == NULL_VALUE) {
       return false;
     } else {
@@ -100,49 +124,56 @@ public class FloatArrayGrid extends AbstractGrid {
     return new FloatArrayGrid(geometryFactory, x, y, width, height, cellSize);
   }
 
+  public FloatArrayGrid newGrid(final int gridWidth, final int gridHeight,
+    final double gridCellWidth, final double gridCellHeight, final float[] newValues) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final BoundingBox boundingBox = getBoundingBox();
+    return new FloatArrayGrid(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellWidth,
+      gridCellHeight, newValues);
+  }
+
   @Override
-  public Grid resample(final int newGridCellSize) {
-    final double gridCellSize = getGridCellSize();
-    final double cellRatio = gridCellSize / newGridCellSize;
-    final int step = (int)Math.round(1 / cellRatio);
+  public FloatArrayGrid resample(final int newGridCellSize) {
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
+    final double cellRatioX = gridCellWidth / newGridCellSize;
+    final double cellRatioY = gridCellHeight / newGridCellSize;
+    final int stepX = (int)Math.round(1 / cellRatioX);
+    final int stepY = (int)Math.round(1 / cellRatioY);
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
 
-    final int newGridWidth = (int)Math.round(gridWidth * cellRatio);
-    final int newGridHeight = (int)Math.round(gridHeight * cellRatio);
+    final int newGridWidth = (int)Math.round(gridWidth * cellRatioX);
+    final int newGridHeight = (int)Math.round(gridHeight * cellRatioY);
 
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final float[] oldValues = this.values;
+    final float[] oldValues = this.cells;
     final float[] newValues = new float[newGridWidth * newGridHeight];
 
     int newIndex = 0;
-    for (int gridYMin = 0; gridYMin < gridHeight; gridYMin += step) {
-      final int gridYMax = gridYMin + step;
-      for (int gridXMin = 0; gridXMin < gridWidth; gridXMin += step) {
-        final int gridXMax = gridXMin + step;
+    for (int gridYMin = 0; gridYMin < gridHeight; gridYMin += stepY) {
+      final int gridYMax = gridYMin + stepY;
+      for (int gridXMin = 0; gridXMin < gridWidth; gridXMin += stepX) {
+        final int gridXMax = gridXMin + stepX;
         int count = 0;
-        double sum = 0;
+        long sum = 0;
         for (int gridY = gridYMin; gridY < gridYMax; gridY++) {
           for (int gridX = gridXMin; gridX < gridXMax; gridX++) {
-            final float value = oldValues[gridY * gridWidth + gridX];
-            if (value != NULL_VALUE) {
+            final float oldValue = oldValues[gridY * gridWidth + gridX];
+            if (oldValue != NULL_VALUE) {
               count++;
-              sum += value;
+              sum += oldValue;
             }
           }
         }
         if (count > 0) {
-          newValues[newIndex] = (float)(sum / count);
+          newValues[newIndex] = (int)(sum / count);
         } else {
           newValues[newIndex] = NULL_VALUE;
         }
         newIndex++;
       }
     }
-    final BoundingBox boundingBox = getBoundingBox();
-
-    return new FloatArrayGrid(geometryFactory, boundingBox, newGridWidth, newGridHeight,
-      newGridCellSize, newValues);
+    return newGrid(newGridWidth, newGridHeight, newGridCellSize, newGridCellSize, newValues);
   }
 
   @Override
@@ -152,7 +183,7 @@ public class FloatArrayGrid extends AbstractGrid {
     if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
       final int index = gridY * width + gridX;
       final float valueFloat = (float)value;
-      this.values[index] = valueFloat;
+      this.cells[index] = valueFloat;
       clearCachedObjects();
     }
   }
@@ -163,7 +194,7 @@ public class FloatArrayGrid extends AbstractGrid {
     final int height = getGridHeight();
     if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
       final int index = gridY * width + gridX;
-      this.values[index] = NULL_VALUE;
+      this.cells[index] = NULL_VALUE;
       clearCachedObjects();
     }
   }

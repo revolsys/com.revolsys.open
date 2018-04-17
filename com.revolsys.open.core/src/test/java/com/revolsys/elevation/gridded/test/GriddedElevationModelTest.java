@@ -19,11 +19,11 @@ public abstract class GriddedElevationModelTest {
     final GriddedElevationModel actualModel) {
     for (int gridY = 0; gridY < expectedModel.getGridHeight(); gridY++) {
       for (int gridX = 0; gridX < expectedModel.getGridWidth(); gridX++) {
-        final double expectedElevation = expectedModel.getElevation(gridX, gridY);
-        final double actualElevation = actualModel.getElevation(gridX, gridY);
+        final double expectedElevation = expectedModel.getValue(gridX, gridY);
+        final double actualElevation = actualModel.getValue(gridX, gridY);
         final String message = "Elevation (" + gridX + "," + gridY + ")";
         if (Double.isInfinite(actualElevation) && expectedElevation == 1) {
-          actualModel.getElevation(gridX, gridY);
+          actualModel.getValue(gridX, gridY);
         }
         Assert.assertEquals(message, expectedElevation, actualElevation, 0);
       }
@@ -75,7 +75,7 @@ public abstract class GriddedElevationModelTest {
         } else {
           elevation = gridX + gridY / 1000.0;
         }
-        model.setElevation(gridX, gridY, elevation);
+        model.setValue(gridX, gridY, elevation);
       }
     }
     return model;

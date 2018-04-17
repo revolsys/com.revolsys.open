@@ -90,7 +90,7 @@ public class ScaledIntegerGriddedDigitalElevationModelTest extends GriddedElevat
     try (
       final ScaledIntegerGriddedDigitalElevationModelFile actualModel = new ScaledIntegerGriddedDigitalElevationModelFile(
         path, geometryFactory, 0, 0, 255, 255, 1)) {
-      actualModel.setElevations(expectedModel);
+      actualModel.setValues(expectedModel);
       assertModelEquals(expectedModel, actualModel);
     }
 

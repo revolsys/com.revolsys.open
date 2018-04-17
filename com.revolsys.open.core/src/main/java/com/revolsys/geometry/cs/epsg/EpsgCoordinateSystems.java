@@ -623,10 +623,10 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
         final List<ParameterName> parameterNames = paramOrderByMethodId.getOrDefault(id,
           Collections.emptyList());
-        final List<Byte> reversal = paramReversalByMethodId.getOrDefault(id,
+        final List<Byte> parameterReversal = paramReversalByMethodId.getOrDefault(id,
           Collections.emptyList());
         final CoordinateOperationMethod method = new CoordinateOperationMethod(id, name, reverse,
-          deprecated, parameterNames);
+          deprecated, parameterNames, parameterReversal);
         methodById.put(id, method);
       }
     } catch (final NoSuchResourceException e) {

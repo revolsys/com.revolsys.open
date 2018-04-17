@@ -107,8 +107,11 @@ public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<Gridded
         final BoundingBox boundingBox = model.getBoundingBox();
         final int width = model.getGridWidth();
         final int height = model.getGridHeight();
-        final double cellSize = model.getGridCellSize();
-
+        final double cellSize = model.getGridCellWidth();
+        final double gridCellHeight = model.getGridCellHeight();
+        if (cellSize != gridCellHeight) {
+          throw new IllegalArgumentException("Can only write grids with square cells");
+        }
         this.writer.write("NCOLS ");
         this.writer.write(Integers.toString(width));
         this.writer.write('\n');
@@ -135,7 +138,7 @@ public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<Gridded
 
         for (int gridY = height - 1; gridY >= 0; gridY--) {
           for (int gridX = 0; gridX < width; gridX++) {
-            final double elevation = model.getElevation(gridX, gridY);
+            final double elevation = model.getValue(gridX, gridY);
             if (Double.isFinite(elevation)) {
               final String elevationString = Doubles.toString(elevation);
               this.writer.write(elevationString);

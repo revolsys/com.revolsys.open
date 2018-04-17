@@ -19,7 +19,9 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
 
   private double colourGreyMultiple;
 
-  protected double gridCellSize;
+  protected double gridCellWidth;
+
+  protected double gridCellHeight;
 
   private Resource resource;
 
@@ -27,7 +29,9 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
 
   private BoundingBox boundingBox;
 
-  private double scaleXY;
+  private double scaleX;
+
+  private double scaleY;
 
   private boolean modified;
 
@@ -36,9 +40,16 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
 
   public AbstractGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,
     final int gridWidth, final int gridHeight, final double gridCellSize) {
+    this(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellSize, gridCellSize);
+  }
+
+  public AbstractGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,
+    final int gridWidth, final int gridHeight, final double gridCellWidth,
+    final double gridCellheight) {
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
-    this.gridCellSize = gridCellSize;
+    this.gridCellWidth = gridCellWidth;
+    this.gridCellWidth = gridCellheight;
     setGeometryFactory(geometryFactory);
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();
@@ -51,12 +62,19 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
 
   public AbstractGrid(final GeometryFactory geometryFactory, final double minX, final double minY,
     final int gridWidth, final int gridHeight, final double gridCellSize) {
+    this(geometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize, gridCellSize);
+  }
+
+  public AbstractGrid(final GeometryFactory geometryFactory, final double minX, final double minY,
+    final int gridWidth, final int gridHeight, final double gridCellWidth,
+    final double gridCellHeight) {
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
-    this.gridCellSize = gridCellSize;
+    this.gridCellWidth = gridCellWidth;
+    this.gridCellHeight = gridCellHeight;
     setGeometryFactory(geometryFactory);
     this.bounds = new double[] {
-      minX, minY, Double.NaN, minX + gridWidth * gridCellSize, minY + gridHeight * gridCellSize,
+      minX, minY, Double.NaN, minX + gridWidth * gridCellWidth, minY + gridHeight * gridCellHeight,
       Double.NaN
     };
     this.boundingBox = new BoundingBoxDoubleGf(geometryFactory, 3, this.bounds);
@@ -64,9 +82,15 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
 
   protected AbstractGrid(final GeometryFactory geometryFactory, final int gridWidth,
     final double gridCellSize) {
+    this(geometryFactory, gridWidth, gridCellSize, gridCellSize);
+  }
+
+  protected AbstractGrid(final GeometryFactory geometryFactory, final int gridWidth,
+    final double gridCellWidth, final double gridCellHeight) {
     this.gridWidth = gridWidth;
     this.gridHeight = 0;
-    this.gridCellSize = gridCellSize;
+    this.gridCellWidth = gridCellWidth;
+    this.gridCellHeight = gridCellHeight;
     setGeometryFactory(geometryFactory);
   }
 
@@ -77,7 +101,7 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
 
   protected void clearCachedObjects() {
     this.modified = true;
-  };
+  }
 
   protected void expandRange() {
     this.bounds[2] = Double.NaN;
@@ -93,7 +117,7 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
       }
     }
 
-  }
+  };
 
   protected void expandRange(final double value) {
     if (Double.isFinite(value)) {
@@ -134,15 +158,20 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
   }
 
   @Override
-  public double getGridCellSize() {
-    return this.gridCellSize;
+  public double getGridCellHeight() {
+    return this.gridCellHeight;
+  }
+
+  @Override
+  public double getGridCellWidth() {
+    return this.gridCellWidth;
   }
 
   @Override
   public int getGridCellX(final double x) {
     final double minX = this.bounds[0];
     final double deltaX = x - minX;
-    final double cellDiv = deltaX / this.gridCellSize;
+    final double cellDiv = deltaX / this.gridCellWidth;
     final int gridX = (int)Math.floor(cellDiv);
     return gridX;
   }
@@ -151,7 +180,7 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
   public int getGridCellY(final double y) {
     final double minY = this.bounds[1];
     final double deltaY = y - minY;
-    final double cellDiv = deltaY / this.gridCellSize;
+    final double cellDiv = deltaY / this.gridCellHeight;
     final int gridY = (int)Math.floor(cellDiv);
     return gridY;
   }
@@ -192,8 +221,13 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
   }
 
   @Override
-  public double getScaleXY() {
-    return this.scaleXY;
+  public double getScaleX() {
+    return this.scaleX;
+  }
+
+  @Override
+  public double getScaleY() {
+    return this.scaleY;
   }
 
   @Override
@@ -226,11 +260,16 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
-    this.scaleXY = geometryFactory.getScaleXY();
+    this.scaleX = geometryFactory.getScaleX();
+    this.scaleY = geometryFactory.getScaleY();
   }
 
-  public void setGridCellSize(final int gridCellSize) {
-    this.gridCellSize = gridCellSize;
+  public void setGridCellHeight(final double gridCellHeight) {
+    this.gridCellHeight = gridCellHeight;
+  }
+
+  public void setGridCellWidth(final double gridCellWidth) {
+    this.gridCellWidth = gridCellWidth;
   }
 
   public void setGridHeight(final int gridHeight) {
@@ -239,6 +278,25 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
 
   public void setGridWidth(final int gridWidth) {
     this.gridWidth = gridWidth;
+  }
+
+  protected void setModified(final boolean modified) {
+    this.modified = modified;
+  }
+
+  public void setResource(final Resource resource) {
+    this.resource = resource;
+  }
+
+  protected void setValueRange(final double minValue, final double maxValue) {
+    final double oldMinZ = this.bounds[2];
+    if (minValue < oldMinZ || !Double.isFinite(oldMinZ)) {
+      this.bounds[2] = minValue;
+    }
+    final double oldMaxZ = this.bounds[5];
+    if (maxValue < oldMaxZ || !Double.isFinite(oldMaxZ)) {
+      this.bounds[5] = maxValue;
+    }
   }
 
   @Override
@@ -271,7 +329,8 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
       } else if (y3 > maxY) {
         maxY = y3;
       }
-      final double gridCellSize = this.gridCellSize;
+      final double gridCellWidth = this.gridCellWidth;
+      final double gridCellHeight = this.gridCellHeight;
       final double[] bounds = this.bounds;
       final double gridMinX = bounds[0];
       final double gridMaxX = bounds[3];
@@ -283,7 +342,7 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
       } else if (minX < gridMinX) {
         startX = gridMinX;
       } else {
-        startX = Math.ceil(minX / gridCellSize) * gridCellSize;
+        startX = Math.ceil(minX / gridCellWidth) * gridCellWidth;
       }
       if (maxX > gridMaxX) {
         maxX = gridMaxX;
@@ -298,7 +357,7 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
       } else if (minY < gridMinY) {
         startY = gridMinY;
       } else {
-        startY = Math.ceil(minY / gridCellSize) * gridCellSize;
+        startY = Math.ceil(minY / gridCellHeight) * gridCellHeight;
       }
       if (maxY > gridMaxY) {
         maxY = gridMaxY;
@@ -310,9 +369,9 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
       final double y3y1 = y3 - y1;
       final double det = y2y3 * x1x3 + x3x2 * y1y3;
 
-      for (double y = startY; y < maxY; y += gridCellSize) {
+      for (double y = startY; y < maxY; y += gridCellHeight) {
         final double yy3 = y - y3;
-        for (double x = startX; x < maxX; x += gridCellSize) {
+        for (double x = startX; x < maxX; x += gridCellWidth) {
           final double xx3 = x - x3;
           final double lambda1 = (y2y3 * xx3 + x3x2 * yy3) / det;
           if (0 <= lambda1 && lambda1 <= 1) {
@@ -332,21 +391,16 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
     }
   }
 
-  protected void setZRange(final double minZ, final double maxZ) {
-    final double oldMinZ = this.bounds[2];
-    if (minZ < oldMinZ || !Double.isFinite(oldMinZ)) {
-      this.bounds[2] = minZ;
-    }
-    final double oldMaxZ = this.bounds[5];
-    if (maxZ < oldMaxZ || !Double.isFinite(oldMaxZ)) {
-      this.bounds[5] = maxZ;
-    }
-  }
-
   @Override
   public String toString() {
     return getBoundingBox() + " " + this.gridWidth + "x" + this.gridHeight + " c="
-      + this.gridCellSize;
+      + this.gridCellWidth + "x" + this.gridCellHeight;
+  }
+
+  @Override
+  public void updateValues() {
+    expandRange();
+    this.boundingBox = this.geometryFactory.newBoundingBox(3, this.bounds);
   }
 
 }

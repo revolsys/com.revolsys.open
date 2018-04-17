@@ -6,36 +6,59 @@ import java.util.function.DoubleConsumer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
-public class IntArrayScaleGrid extends AbstractGrid {
-  protected static final int NULL_VALUE = Integer.MIN_VALUE;
+public class DoubleArrayGrid extends AbstractGrid {
+  protected static final double NULL_VALUE = -Double.MAX_VALUE;
 
-  protected final int[] cells;
+  protected final double[] cells;
 
-  public IntArrayScaleGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,
+  public DoubleArrayGrid(final double x, final double y, final int gridWidth, final int gridHeight,
+    final double gridCellWidth, final double gridCellHeight, final double[] values) {
+    this(GeometryFactory.DEFAULT_3D, x, y, gridWidth, gridHeight, gridCellWidth, gridCellHeight,
+      values);
+  }
+
+  public DoubleArrayGrid(final double x, final double y, final int gridWidth, final int gridHeight,
+    final double gridCellSize, final double[] values) {
+    this(x, y, gridWidth, gridHeight, gridCellSize, gridCellSize, values);
+  }
+
+  public DoubleArrayGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,
     final int gridWidth, final int gridHeight, final double gridCellWidth,
-    final double gridCellHeight, final int[] cells) {
+    final double gridCellHeight, final double[] values) {
     super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
-    this.cells = cells;
+    this.cells = values;
   }
 
-  public IntArrayScaleGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,
-    final int gridWidth, final int gridHeight, final double gridCellSize, final int[] cells) {
-    this(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellSize, gridCellSize, cells);
+  public DoubleArrayGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,
+    final int gridWidth, final int gridHeight, final double gridCellSize, final double[] values) {
+    this(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellSize, gridCellSize, values);
   }
 
-  public IntArrayScaleGrid(final GeometryFactory geometryFactory, final double x, final double y,
+  public DoubleArrayGrid(final GeometryFactory geometryFactory, final double x, final double y,
     final int gridWidth, final int gridHeight, final double gridCellSize) {
     this(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize, gridCellSize);
   }
 
-  public IntArrayScaleGrid(final GeometryFactory geometryFactory, final double x, final double y,
+  public DoubleArrayGrid(final GeometryFactory geometryFactory, final double x, final double y,
     final int gridWidth, final int gridHeight, final double gridCellWidth,
     final double gridCellHeight) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
     final int size = gridWidth * gridHeight;
-    final int[] cells = new int[size];
-    Arrays.fill(cells, NULL_VALUE);
-    this.cells = cells;
+    final double[] values = new double[size];
+    Arrays.fill(values, NULL_VALUE);
+    this.cells = values;
+  }
+
+  public DoubleArrayGrid(final GeometryFactory geometryFactory, final double x, final double y,
+    final int gridWidth, final int gridHeight, final double gridCellWidth,
+    final double gridCellHeight, final double[] values) {
+    super(geometryFactory, x, y, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
+    this.cells = values;
+  }
+
+  public DoubleArrayGrid(final GeometryFactory geometryFactory, final double x, final double y,
+    final int gridWidth, final int gridHeight, final double gridCellSize, final double[] values) {
+    this(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize, gridCellSize, values);
   }
 
   @Override
@@ -46,29 +69,28 @@ public class IntArrayScaleGrid extends AbstractGrid {
 
   @Override
   protected void expandRange() {
-    int min = Integer.MAX_VALUE;
-    int max = Integer.MIN_VALUE;
-    for (final int valueInt : this.cells) {
-      if (valueInt != NULL_VALUE) {
-        if (valueInt < min) {
-          min = valueInt;
+    double min = Double.MAX_VALUE;
+    double max = -Double.MAX_VALUE;
+    for (final double value : this.cells) {
+      if (value != NULL_VALUE) {
+        if (value < min) {
+          min = value;
         }
-        if (valueInt > max) {
-          max = valueInt;
+        if (value > max) {
+          max = value;
         }
       }
     }
-    final double minZ = toDoubleZ(min);
-    final double maxZ = toDoubleZ(max);
+    final double minZ = min;
+    final double maxZ = max;
     setValueRange(minZ, maxZ);
 
   }
 
   @Override
   public void forEachValueFinite(final DoubleConsumer action) {
-    for (final int elevation : this.cells) {
-      if (elevation != NULL_VALUE) {
-        final double value = toDoubleZ(elevation);
+    for (final double value : this.cells) {
+      if (value != NULL_VALUE) {
         action.accept(value);
       }
     }
@@ -77,31 +99,19 @@ public class IntArrayScaleGrid extends AbstractGrid {
   @Override
   public double getValueFast(final int gridX, final int gridY) {
     final int index = gridY * this.gridWidth + gridX;
-    final int elevationInt = this.cells[index];
-    if (elevationInt == NULL_VALUE) {
+    final double value = this.cells[index];
+    if (value == NULL_VALUE) {
       return Double.NaN;
     } else {
-      return toDoubleZ(elevationInt);
-    }
-  }
-
-  public int getValueInt(final int gridX, final int gridY) {
-    final int width = getGridWidth();
-    final int height = getGridHeight();
-    if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
-      final int index = gridY * width + gridX;
-      return this.cells[index];
-    } else {
-      return NULL_VALUE;
+      return value;
     }
   }
 
   @Override
   public boolean hasValueFast(final int gridX, final int gridY) {
-    final int gridWidth1 = this.gridWidth;
-    final int index = gridY * gridWidth1 + gridX;
-    final int elevationInt = this.cells[index];
-    if (elevationInt == NULL_VALUE) {
+    final int index = gridY * this.gridWidth + gridX;
+    final double value = this.cells[index];
+    if (value == NULL_VALUE) {
       return false;
     } else {
       return true;
@@ -109,21 +119,21 @@ public class IntArrayScaleGrid extends AbstractGrid {
   }
 
   @Override
-  public IntArrayScaleGrid newGrid(final GeometryFactory geometryFactory, final double x,
+  public DoubleArrayGrid newGrid(final GeometryFactory geometryFactory, final double x,
     final double y, final int width, final int height, final double cellSize) {
-    return new IntArrayScaleGrid(geometryFactory, x, y, width, height, cellSize);
+    return new DoubleArrayGrid(geometryFactory, x, y, width, height, cellSize);
   }
 
-  public IntArrayScaleGrid newGrid(final int gridWidth, final int gridHeight,
-    final double gridCellWidth, final double gridCellHeight, final int[] newValues) {
+  public DoubleArrayGrid newGrid(final int gridWidth, final int gridHeight,
+    final double gridCellWidth, final double gridCellHeight, final double[] newValues) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = getBoundingBox();
-    return new IntArrayScaleGrid(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellWidth,
+    return new DoubleArrayGrid(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellWidth,
       gridCellHeight, newValues);
   }
 
   @Override
-  public Grid resample(final int newGridCellSize) {
+  public DoubleArrayGrid resample(final int newGridCellSize) {
     final double gridCellWidth = getGridCellWidth();
     final double gridCellHeight = getGridCellHeight();
     final double cellRatioX = gridCellWidth / newGridCellSize;
@@ -136,8 +146,8 @@ public class IntArrayScaleGrid extends AbstractGrid {
     final int newGridWidth = (int)Math.round(gridWidth * cellRatioX);
     final int newGridHeight = (int)Math.round(gridHeight * cellRatioY);
 
-    final int[] oldValues = this.cells;
-    final int[] newValues = new int[newGridWidth * newGridHeight];
+    final double[] oldValues = this.cells;
+    final double[] newValues = new double[newGridWidth * newGridHeight];
 
     int newIndex = 0;
     for (int gridYMin = 0; gridYMin < gridHeight; gridYMin += stepY) {
@@ -148,10 +158,10 @@ public class IntArrayScaleGrid extends AbstractGrid {
         long sum = 0;
         for (int gridY = gridYMin; gridY < gridYMax; gridY++) {
           for (int gridX = gridXMin; gridX < gridXMax; gridX++) {
-            final int elevation = oldValues[gridY * gridWidth + gridX];
-            if (elevation != NULL_VALUE) {
+            final double oldValue = oldValues[gridY * gridWidth + gridX];
+            if (oldValue != NULL_VALUE) {
               count++;
-              sum += elevation;
+              sum += oldValue;
             }
           }
         }
@@ -167,22 +177,13 @@ public class IntArrayScaleGrid extends AbstractGrid {
   }
 
   @Override
-  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
-    if (geometryFactory.getScaleZ() <= 0) {
-      throw new IllegalArgumentException("Geometry factory must have a z scale factor");
-    }
-    super.setGeometryFactory(geometryFactory);
-  }
-
-  @Override
-  public void setValue(final int gridX, final int gridY, final double elevation) {
+  public void setValue(final int gridX, final int gridY, final double value) {
     final int width = getGridWidth();
     final int height = getGridHeight();
-    final GeometryFactory geometryFactory = getGeometryFactory();
     if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
       final int index = gridY * width + gridX;
-      final int elevationInt = geometryFactory.toIntZ(elevation);
-      this.cells[index] = elevationInt;
+      final double valueDouble = value;
+      this.cells[index] = valueDouble;
       clearCachedObjects();
     }
   }
@@ -197,5 +198,4 @@ public class IntArrayScaleGrid extends AbstractGrid {
       clearCachedObjects();
     }
   }
-
 }

@@ -35,14 +35,14 @@ public class GridShiftTest {
         final String sourceDatumName = record.getString("sourceDatumName");
         final String targetDatumName = record.getString("targetDatumName");
 
-        final GridShiftOperation operation = new Nadcon5GridShiftOperation(sourceDatumName,
+        final GridHorizontalShiftOperation operation = new Nadcon5GridShiftOperation(sourceDatumName,
           targetDatumName);
         final CoordinatesOperationPoint point = new CoordinatesOperationPoint(lon, lat);
         final double expectedLon = record.getDouble("expectedLon");
         final double expectedLat = record.getDouble("expectedLat");
 
         try {
-          if (operation.shift(point)) {
+          if (operation.horizontalShift(point)) {
 
             final double actualLon = point.x;
             final double actualLat = point.y;
