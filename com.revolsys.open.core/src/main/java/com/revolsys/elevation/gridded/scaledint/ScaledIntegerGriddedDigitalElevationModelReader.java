@@ -36,7 +36,9 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
 
   private BoundingBox boundingBox;
 
-  private int gridCellSize;
+  private double gridCellWidth;
+
+  private double gridCellHeight;
 
   private int gridWidth;
 
@@ -74,9 +76,15 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
   }
 
   @Override
-  public double getGridCellSize() {
+  public double getGridCellHeight() {
     init();
-    return this.gridCellSize;
+    return this.gridCellHeight;
+  }
+
+  @Override
+  public double getGridCellWidth() {
+    init();
+    return this.gridCellWidth;
   }
 
   private void init() {
@@ -131,7 +139,7 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
         }
         final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
           this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight,
-          this.gridCellSize, elevations);
+          this.gridCellWidth, this.gridCellHeight, elevations);
         elevationModel.setResource(this.resource);
         return elevationModel;
       } catch (final ClosedByInterruptException e) {
@@ -163,9 +171,17 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
     final double maxX = this.reader.getDouble();
     final double maxY = this.reader.getDouble();
     final double maxZ = this.reader.getDouble();
-    this.gridCellSize = this.reader.getInt();
-    this.gridWidth = this.reader.getInt();
-    this.gridHeight = this.reader.getInt();
+    if (version == 1) {
+      this.gridCellWidth = this.reader.getInt();
+      this.gridCellHeight = this.gridCellWidth;
+      this.gridWidth = this.reader.getInt();
+      this.gridHeight = this.reader.getInt();
+    } else {
+      this.gridWidth = this.reader.getInt();
+      this.gridHeight = this.reader.getInt();
+      this.gridCellWidth = this.reader.getDouble();
+      this.gridCellHeight = this.reader.getDouble();
+    }
 
     this.boundingBox = geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY, maxZ);
   }

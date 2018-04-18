@@ -11,7 +11,9 @@ public interface GriddedElevationModelReader
     ObjectWithProperties.super.close();
   }
 
-  double getGridCellSize();
+  double getGridCellHeight();
+
+  double getGridCellWidth();
 
   GriddedElevationModel read();
 }

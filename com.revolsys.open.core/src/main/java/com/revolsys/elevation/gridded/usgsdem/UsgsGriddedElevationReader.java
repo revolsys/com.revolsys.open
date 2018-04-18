@@ -197,7 +197,13 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   }
 
   @Override
-  public double getGridCellSize() {
+  public double getGridCellHeight() {
+    init();
+    return this.resolutionY;
+  }
+
+  @Override
+  public double getGridCellWidth() {
     init();
     return this.resolutionX;
   }

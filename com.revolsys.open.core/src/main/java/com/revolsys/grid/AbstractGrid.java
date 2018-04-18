@@ -45,11 +45,11 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
 
   public AbstractGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,
     final int gridWidth, final int gridHeight, final double gridCellWidth,
-    final double gridCellheight) {
+    final double gridCellHeight) {
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
     this.gridCellWidth = gridCellWidth;
-    this.gridCellWidth = gridCellheight;
+    this.gridCellHeight = gridCellHeight;
     setGeometryFactory(geometryFactory);
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();

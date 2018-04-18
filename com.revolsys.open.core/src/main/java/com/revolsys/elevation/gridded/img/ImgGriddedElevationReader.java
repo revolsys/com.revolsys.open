@@ -17,7 +17,7 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
-import com.revolsys.geometry.cs.datum.Datum;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
@@ -41,20 +41,6 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   ChannelReader channel;
 
-  private char path;
-
-  private char filename;
-
-  private char IGEFilename;
-
-  private int endOfFile;
-
-  private short entryHeaderLength;
-
-  private int version;
-
-  private boolean treeDirty;
-
   private HfaEntry root;
 
   private HfaDictionary dictionary;
@@ -69,10 +55,6 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   private final StringBuilder stringBuilder = new StringBuilder();
 
-  private String proName;
-
-  private Object upperLeftCenter;
-
   private double upperLeftCenterX;
 
   private double upperLeftCenterY;
@@ -81,15 +63,13 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   private double lowerRightCenterY;
 
-  private double pixelSizeWidth;
+  private double gridCellWidth;
 
-  private double pixelSizeHeight;
+  private double gridCellHeight;
 
   private String units;
 
   private MapEx proParameters;
-
-  private Datum datum;
 
   public ImgGriddedElevationReader(final Resource resource,
     final Map<String, ? extends Object> properties) {
@@ -102,7 +82,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     this.channel.close();
   }
 
-  public HfaType findType(final String typeName) {
+  protected HfaType findType(final String typeName) {
     return this.dictionary.findType(typeName);
   }
 
@@ -167,16 +147,16 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     padfGeoTransform[5] = 1.0;
 
     if (loadMapInfo()) {
-      padfGeoTransform[0] = this.upperLeftCenterX - this.pixelSizeWidth * 0.5;
-      padfGeoTransform[1] = this.pixelSizeWidth;
+      padfGeoTransform[0] = this.upperLeftCenterX - this.gridCellWidth * 0.5;
+      padfGeoTransform[1] = this.gridCellWidth;
       if (padfGeoTransform[1] == 0.0) {
         padfGeoTransform[1] = 1.0;
       }
       padfGeoTransform[2] = 0.0;
       if (this.upperLeftCenterY >= this.lowerRightCenterY) {
-        padfGeoTransform[5] = -this.pixelSizeHeight;
+        padfGeoTransform[5] = -this.gridCellHeight;
       } else {
-        padfGeoTransform[5] = this.pixelSizeHeight;
+        padfGeoTransform[5] = this.gridCellHeight;
       }
       if (padfGeoTransform[5] == 0.0) {
         padfGeoTransform[5] = 1.0;
@@ -219,6 +199,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
       // we don't because we are lazy.
 
       // Fetch geotransform values.
+      @SuppressWarnings("unused")
       final double adfXForm[] = {
         poXForm0.GetDoubleField("polycoefvector[0]"), poXForm0.GetDoubleField("polycoefmtx[0]"),
         poXForm0.GetDoubleField("polycoefmtx[2]"), poXForm0.GetDoubleField("polycoefvector[1]"),
@@ -243,17 +224,13 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
   }
 
   @Override
-  public double getGridCellSize() {
-    // TODO Auto-generated method stub
-    return 0;
+  public double getGridCellHeight() {
+    return this.gridCellHeight;
   }
 
-  public double getPixelSizeHeight() {
-    return this.pixelSizeHeight;
-  }
-
-  public double getPixelSizeWidth() {
-    return this.pixelSizeWidth;
+  @Override
+  public double getGridCellWidth() {
+    return this.gridCellWidth;
   }
 
   private void init() {
@@ -267,7 +244,6 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
         readHeader();
         for (final HfaBand band : this.bands) {
           band.loadBlockInfo();
-          band.getBlock(0, 0);
         }
       }
     }
@@ -287,7 +263,8 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
       }
 
       if (mapInfoEntry != null) {
-        this.proName = mapInfoEntry.getString("proName");
+        @SuppressWarnings("unused")
+        final String proName = mapInfoEntry.getString("proName");
 
         final MapEx upperLeftCenter = mapInfoEntry.getValue("upperLeftCenter");
         this.upperLeftCenterX = upperLeftCenter.getDouble("x");
@@ -298,12 +275,12 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
         this.lowerRightCenterY = lowerRightCenter.getDouble("y");
 
         final MapEx pixelSize = mapInfoEntry.getValue("pixelSize");
-        this.pixelSizeWidth = pixelSize.getDouble("width", Double.NaN);
-        this.pixelSizeHeight = pixelSize.getDouble("height", Double.NaN);
+        this.gridCellWidth = pixelSize.getDouble("width", Double.NaN);
+        this.gridCellHeight = pixelSize.getDouble("height", Double.NaN);
 
-        if (!Double.isFinite(this.pixelSizeWidth)) {
-          this.pixelSizeWidth = pixelSize.getDouble("x");
-          this.pixelSizeHeight = pixelSize.getDouble("y");
+        if (!Double.isFinite(this.gridCellWidth)) {
+          this.gridCellWidth = pixelSize.getDouble("x");
+          this.gridCellHeight = pixelSize.getDouble("y");
         }
 
         this.units = mapInfoEntry.GetStringField("units");
@@ -341,14 +318,18 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
   @Override
   public final GriddedElevationModel read() {
     init();
+    for (final HfaBand band : this.bands) {
+      band.loadBlockInfo();
+      return band.getGriddedElevationModel();
+    }
     return null;
   }
 
-  byte readByte() {
+  protected byte readByte() {
     return this.channel.getByte();
   }
 
-  char readChar() {
+  protected char readChar() {
     this.c = (char)readByte();
     return this.c;
   }
@@ -377,7 +358,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     return false;
   }
 
-  double readDouble() {
+  protected double readDouble() {
     return this.channel.getDouble();
   }
 
@@ -424,10 +405,11 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     return fields;
   }
 
-  float readFloat() {
+  protected float readFloat() {
     return this.channel.getFloat();
   }
 
+  @SuppressWarnings("unused")
   private void readHeader() {
     init();
     final int byteCount = 16;
@@ -452,7 +434,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     }
   }
 
-  int readInt() {
+  protected int readInt() {
     return this.channel.getInt();
   }
 
@@ -467,9 +449,9 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
         if (datumEntry != null) {
           final String datumName = datumEntry.getString("datumname");
           // Fetch the fields.
-          final String proType = projectionEntry.getString("proType");
+          // final String proType = projectionEntry.getString("proType");
           final int proNumber = projectionEntry.getInteger("proNumber");
-          final String proExeName = projectionEntry.getString("proExeName");
+          // final String proExeName = projectionEntry.getString("proExeName");
           final String proName = projectionEntry.getString("proName");
           final int proZone = projectionEntry.getInteger("proZone");
 
@@ -481,27 +463,34 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
           // psProParms.proParams[i] = projectionEntry.GetDoubleField(szFieldName);
           // }
 
-          final MapEx spheroidEntry = projectionEntry.getValue("proSpheroid");
-          final String sphereName = spheroidEntry.getString("sphereName");
-          double a = spheroidEntry.getDouble("a");
-          if (a == 0) {
-            a = 6378137.0;
-          }
-          double b = spheroidEntry.getDouble("b");
-          if (b == 0) {
-            b = 6356752.3;
-          }
-          final double eSquared = spheroidEntry.getDouble("eSquared");
-          final double radius = spheroidEntry.getDouble("radius");
+          // final MapEx spheroidEntry = projectionEntry.getValue("proSpheroid");
+          // final String sphereName = spheroidEntry.getString("sphereName");
+          // double a = spheroidEntry.getDouble("a");
+          // if (a == 0) {
+          // a = 6378137.0;
+          // }
+          // double b = spheroidEntry.getDouble("b");
+          // if (b == 0) {
+          // b = 6356752.3;
+          // }
+          // final double eSquared = spheroidEntry.getDouble("eSquared");
+          // final double radius = spheroidEntry.getDouble("radius");
 
           if (proNumber == 0) {
             if ("NAD83".equals(datumName)) {
               this.geometryFactory = GeometryFactory.nad83();
-              this.boundingBox = this.geometryFactory.newBoundingBox(
-                this.upperLeftCenterX - this.pixelSizeWidth / 2,
-                this.lowerRightCenterY - this.pixelSizeHeight / 2,
-                this.lowerRightCenterX + this.pixelSizeWidth / 2,
-                this.upperLeftCenterY + this.pixelSizeHeight / 2);
+            } else {
+              throw new RuntimeException(
+                "Only NAD83 is supported, contact developer for assistance");
+            }
+          } else if (proNumber == 1) {
+            if ("NAD83".equals(datumName)) {
+              if ("UTM".equals(proName)) {
+                this.geometryFactory = GeometryFactory.floating3d(EpsgId.nad83Utm(proZone));
+              } else {
+                throw new RuntimeException(
+                  "Only UTM is supported, contact developer for assistance");
+              }
             } else {
               throw new RuntimeException(
                 "Only NAD83 is supported, contact developer for assistance");
@@ -510,21 +499,27 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
             throw new RuntimeException(
               "Only geographic coordinate systems are supported, contact developer for assistance");
           }
+          this.boundingBox = this.geometryFactory.newBoundingBox(
+            this.upperLeftCenterX - this.gridCellWidth / 2,
+            this.lowerRightCenterY - this.gridCellHeight / 2,
+            this.lowerRightCenterX + this.gridCellWidth / 2,
+            this.upperLeftCenterY + this.gridCellHeight / 2);
+
         }
       }
     }
   }
 
-  short readShort() {
+  protected short readShort() {
     return this.channel.getShort();
   }
 
-  private String readString() {
+  protected String readString() {
     final char endChar = ',';
     return readString(endChar);
   }
 
-  private String readString(final char endChar) {
+  protected String readString(final char endChar) {
     this.stringBuilder.setLength(0);
     for (readChar(); this.c != endChar; readChar()) {
       this.stringBuilder.append(this.c);
@@ -532,7 +527,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     return this.stringBuilder.toString();
   }
 
-  public String readString0() {
+  protected String readString0() {
     this.stringBuilder.setLength(0);
     for (readChar(); this.c != 0; readChar()) {
       this.stringBuilder.append(this.c);
@@ -540,15 +535,10 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     return this.stringBuilder.toString();
   }
 
-  String readString0(final int byteCount) {
+  protected String readString0(final int byteCount) {
     final String string = this.channel.getUsAsciiString(byteCount - 1);
     readByte();
     return string;
-  }
-
-  private String readStringCurrent() {
-    final char endChar = ',';
-    return readStringCurrent(endChar);
   }
 
   private String readStringCurrent(final char endChar) {
@@ -559,19 +549,19 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     return this.stringBuilder.toString();
   }
 
-  public short readUnsignedByte() {
+  protected short readUnsignedByte() {
     return this.channel.getUnsignedByte();
   }
 
-  public long readUnsignedInt() {
+  protected long readUnsignedInt() {
     return this.channel.getUnsignedInt();
   }
 
-  int readUnsignedShort() {
+  protected int readUnsignedShort() {
     return this.channel.getUnsignedShort();
   }
 
-  public void seek(final long position) {
+  protected void seek(final long position) {
     this.channel.seek(position);
   }
 

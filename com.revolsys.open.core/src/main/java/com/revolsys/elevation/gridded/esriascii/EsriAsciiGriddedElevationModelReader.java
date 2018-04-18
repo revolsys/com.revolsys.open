@@ -127,7 +127,12 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
   }
 
   @Override
-  public double getGridCellSize() {
+  public double getGridCellHeight() {
+    return this.gridCellSize;
+  }
+
+  @Override
+  public double getGridCellWidth() {
     init();
     return this.gridCellSize;
   }

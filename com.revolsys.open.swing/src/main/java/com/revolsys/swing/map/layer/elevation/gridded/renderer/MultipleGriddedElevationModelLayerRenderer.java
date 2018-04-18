@@ -46,6 +46,7 @@ public class MultipleGriddedElevationModelLayerRenderer
     addRenderer(hillshadeRenderer);
     final RasterizerGriddedElevationModelLayerRenderer colorRampRenderer = new RasterizerGriddedElevationModelLayerRenderer(
       layer, this);
+    colorRampRenderer.setOpacity(0.8f);
     addRenderer(colorRampRenderer);
   }
 

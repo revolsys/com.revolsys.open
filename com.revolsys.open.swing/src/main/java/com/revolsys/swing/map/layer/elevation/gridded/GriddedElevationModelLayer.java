@@ -176,10 +176,11 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
 
   @Override
   public double getElevation(final double x, final double y) {
-    final double elevation = this.elevationModel.getValue(x, y);
-    // System.out.println(elevation + "\t" + this.elevationModel.getElevationBilinear(x, y) + "\t"
-    // + this.elevationModel.getElevationBicubic(x, y));
-    return elevation;
+    if (this.elevationModel == null) {
+      return Double.NaN;
+    } else {
+      return this.elevationModel.getValue(x, y);
+    }
   }
 
   public GriddedElevationModel getElevationModel() {
