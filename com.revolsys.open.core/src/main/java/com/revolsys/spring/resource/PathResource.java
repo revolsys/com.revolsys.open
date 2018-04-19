@@ -114,17 +114,14 @@ public class PathResource extends AbstractResource implements WritableResource {
           return false;
         } else {
           try (
-            FileChannel out = newWritableByteChannel();) {
+            FileChannel out = newWritableByteChannel()) {
+            final long size;
             if (in instanceof FileChannel) {
-              final FileChannel fileIn = (FileChannel)in;
-              Channels.copy(fileIn, out);
+              size = ((FileChannel)in).size();
             } else {
-              final long size = source.contentLength();
-              long count = 0;
-              while (count < size) {
-                count += out.transferFrom(in, count, size - count);
-              }
+              size = source.contentLength();
             }
+            Channels.copy(in, out, size);
             return true;
           } catch (final IOException e) {
             throw Exceptions.wrap(e);

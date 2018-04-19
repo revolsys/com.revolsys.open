@@ -3,7 +3,7 @@ package com.revolsys.geometry.cs;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.cs.gridshift.GridHorizontalShiftOperation;
+import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
@@ -12,7 +12,7 @@ public class GeographicCoordinateSystemGridShiftOperation implements Coordinates
 
   private final GeographicCoordinateSystem targetCoordinateSystem;
 
-  private final List<GridHorizontalShiftOperation> operations = new ArrayList<>();
+  private final List<HorizontalShiftOperation> operations = new ArrayList<>();
 
   public GeographicCoordinateSystemGridShiftOperation(
     final GeographicCoordinateSystem sourceCoordinateSystem,
@@ -21,7 +21,7 @@ public class GeographicCoordinateSystemGridShiftOperation implements Coordinates
     this.targetCoordinateSystem = targetCoordinateSystem;
   }
 
-  public synchronized void addOperation(final GridHorizontalShiftOperation operation) {
+  public synchronized void addOperation(final HorizontalShiftOperation operation) {
     if (!this.operations.contains(operation)) {
       this.operations.add(operation);
     }
@@ -29,14 +29,14 @@ public class GeographicCoordinateSystemGridShiftOperation implements Coordinates
 
   @Override
   public void perform(final CoordinatesOperationPoint point) {
-    for (final GridHorizontalShiftOperation operation : this.operations) {
+    for (final HorizontalShiftOperation operation : this.operations) {
       if (operation.horizontalShift(point)) {
         return;
       }
     }
   }
 
-  public void removeOperation(final GridHorizontalShiftOperation operation) {
+  public void removeOperation(final HorizontalShiftOperation operation) {
     this.operations.remove(operation);
   }
 

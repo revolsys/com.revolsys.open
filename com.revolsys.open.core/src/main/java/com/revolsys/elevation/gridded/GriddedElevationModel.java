@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
+import com.revolsys.elevation.gridded.esrifloatgrid.EsriFloatGridGriddedElevation;
 import com.revolsys.elevation.gridded.img.ImgGriddedElevation;
 import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
@@ -90,6 +91,7 @@ public interface GriddedElevationModel extends Grid {
   public static void serviceInit() {
     IoFactoryRegistry.addFactory(new ScaledIntegerGriddedDigitalElevation());
     IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());
+    IoFactoryRegistry.addFactory(new EsriFloatGridGriddedElevation());
     IoFactoryRegistry.addFactory(new UsgsGriddedElevation());
     IoFactoryRegistry.addFactory(new ImgGriddedElevation());
 

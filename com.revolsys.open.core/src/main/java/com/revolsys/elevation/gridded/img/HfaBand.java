@@ -1,5 +1,6 @@
 package com.revolsys.elevation.gridded.img;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.collection.map.MapEx;
@@ -7,6 +8,7 @@ import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.grid.FloatArrayGrid;
 
 public class HfaBand {
 
@@ -32,7 +34,7 @@ public class HfaBand {
 
   private final String dataType;
 
-  HfaEntry poNode;
+  HfaEntry node;
 
   private final int blockWidth;
 
@@ -48,7 +50,7 @@ public class HfaBand {
 
   private boolean bNoDataSet;
 
-  private double dfNoData;
+  private double nullValue;
 
   private final boolean bOverviewsPending = true;
 
@@ -66,7 +68,7 @@ public class HfaBand {
     final HfaEntry node) {
     this.reader = reader;
     this.bandNumber = bandNumber;
-    this.poNode = node;
+    this.node = node;
     this.dataType = node.getString("pixelType");
     this.blockWidth = node.getInteger("blockWidth");
     this.blockHeight = node.getInteger("blockHeight");
@@ -77,43 +79,26 @@ public class HfaBand {
     this.blockColumnCount = (this.gridHeight + this.blockHeight - 1) / this.blockHeight;
 
     this.nBlocks = this.blockColumnCount * this.blockColumnCount;
+
+    final HfaEntry noDataNode = this.node.GetNamedChild("Eimg_NonInitializedValue");
+    if (noDataNode != null) {
+      final Object nullValue = noDataNode.getValue("valueBD");
+      if (nullValue instanceof Double) {
+        this.nullValue = (Double)nullValue;
+      } else if (nullValue instanceof HfaBinaryData) {
+        final HfaBinaryData nullData = (HfaBinaryData)nullValue;
+        this.nullValue = ((double[])nullData.getData())[0];
+      }
+    }
   }
 
   public String getBandName() {
-    final String bandName = this.poNode.getName();
+    final String bandName = this.node.getName();
     if (bandName.length() > 0) {
       return bandName;
     } else {
       return "Layer_" + this.bandNumber;
     }
-  }
-
-  public Object getBlock(final int blockIndex) {
-    loadBlockInfo();
-    final MapEx blockInfo = this.blockInfoList.get(blockIndex);
-    final long offset = blockInfo.getLong("offset");
-    this.reader.seek(offset);
-
-    final String compressionType = blockInfo.getString("compressionType");
-
-    if (!"no compression".equals(compressionType)) {
-      throw new RuntimeException(compressionType + " not supported");
-    }
-    final int cellCount = this.blockWidth * this.blockHeight;
-    if ("f32".equals(this.dataType)) {
-      final float[] cells = new float[cellCount];
-      for (int i = 0; i < cellCount; i++) {
-        cells[i] = this.reader.readFloat();
-      }
-      return cells;
-    } else {
-      throw new RuntimeException(this.dataType + " not supported");
-    }
-  }
-
-  public Object getBlock(final int blockX, final int blockY) {
-    final int blockIndex = blockY * this.blockRowCount + blockX;
-    return getBlock(blockIndex);
   }
 
   public GriddedElevationModel getGriddedElevationModel() {
@@ -132,6 +117,7 @@ public class HfaBand {
         final int blockCellCount = blockWidth * blockHeight;
         final float[] block = new float[blockCellCount];
         final float[] cells = new float[cellCount];
+        Arrays.fill(cells, FloatArrayGrid.NULL_VALUE);
         int blockIndex = 0;
         for (int blockY = 0; blockY < blockRowCount; blockY++) {
 
@@ -161,7 +147,12 @@ public class HfaBand {
 
               if ("no compression".equals(compressionType)) {
                 for (int i = 0; i < blockCellCount; i++) {
-                  block[i] = reader.readFloat();
+                  final float value = reader.readFloat();
+                  if (value == this.nullValue) {
+                    block[i] = FloatArrayGrid.NULL_VALUE;
+                  } else {
+                    block[i] = value;
+                  }
                 }
 
               } else if ("ESRI GRID compression".equals(compressionType)) {
@@ -183,8 +174,8 @@ public class HfaBand {
         }
         final GeometryFactory geometryFactory = reader.getGeometryFactory();
         final BoundingBox boundingBox = reader.getBoundingBox();
-        double gridCellWidth = reader.getGridCellWidth();
-        double gridCellHeight = reader.getGridCellHeight();
+        final double gridCellWidth = reader.getGridCellWidth();
+        final double gridCellHeight = reader.getGridCellHeight();
         this.elevationModel = new FloatArrayGriddedElevationModel(geometryFactory, boundingBox,
           gridWidth, gridHeight, gridCellWidth, gridCellHeight, cells);
       } else {
@@ -200,9 +191,9 @@ public class HfaBand {
 
   public void loadBlockInfo() {
     if (this.blockInfoList == null) {
-      final HfaEntry rasterDMSEntry = this.poNode.GetNamedChild("RasterDMS");
+      final HfaEntry rasterDMSEntry = this.node.GetNamedChild("RasterDMS");
       if (rasterDMSEntry == null) {
-        if (this.poNode.GetNamedChild("ExternalRasterDMS") != null) {
+        if (this.node.GetNamedChild("ExternalRasterDMS") != null) {
           throw new IllegalArgumentException("ExternalRasterDMS is not supporte");
         } else {
           throw new IllegalArgumentException(
@@ -220,150 +211,160 @@ public class HfaBand {
   }
 
   void uncompressBlock(final float[] block) {
-    final int nMaxPixels = block.length;
+    final int blockLength = block.length;
 
     final int minValue = this.reader.readInt();
-    final int nNumRuns = this.reader.readInt();
-    final int nDataOffset = this.reader.readInt();
-    final int nNumBits = this.reader.readByte();
+    final float minFloat = Float.intBitsToFloat(minValue);
+    final int runCount = this.reader.readInt();
+    final int offset = this.reader.readInt();
+    final int bitCount = this.reader.readByte();
 
     // If this is not run length encoded, but just reduced
     // precision, handle it now.
 
-    int nPixelsOutput = 0;
+    int cellIndex = 0;
 
-    if (nNumRuns == -1) {
-      // pabyValues = pabyCData + 13;
-      // nValueBitOffset = 0;
+    if (runCount == -1) {
+      int valueBitOffset = 0;
 
-      if (nNumBits > Integer.MAX_VALUE / nMaxPixels || nNumBits * nMaxPixels > Integer.MAX_VALUE - 7
-        || (nNumBits * nMaxPixels + 7) / 8 > Integer.MAX_VALUE - 13) {
+      if (bitCount > Integer.MAX_VALUE / blockLength
+        || bitCount * blockLength > Integer.MAX_VALUE - 7
+        || (bitCount * blockLength + 7) / 8 > Integer.MAX_VALUE - 13) {
         throw new RuntimeException("Integer overflow : nNumBits * nMaxPixels + 7");
       }
 
       // Loop over block pixels.
-      for (nPixelsOutput = 0; nPixelsOutput < nMaxPixels; nPixelsOutput++) {
+      for (cellIndex = 0; cellIndex < blockLength; cellIndex++) {
         // Extract the data value in a way that depends on the number
         // of bits in it.
 
         int rawValue = 0;
+        byte bitFlags = 0;
 
-        if (nNumBits == 0) {
-          // nRawValue = 0;
-        } else if (nNumBits == 1) {
-          // nRawValue = pabyValues[nValueBitOffset >> 3] >> (nValueBitOffset & 7) & 0x1;
-          // nValueBitOffset++;
-          throw new RuntimeException();
-        } else if (nNumBits == 2) {
-          // nRawValue = pabyValues[nValueBitOffset >> 3] >> (nValueBitOffset & 7) & 0x3;
-          // nValueBitOffset += 2;
-          throw new RuntimeException();
-        } else if (nNumBits == 4) {
-          // nRawValue = pabyValues[nValueBitOffset >> 3] >> (nValueBitOffset & 7) & 0xf;
-          // nValueBitOffset += 4;
-          throw new RuntimeException();
-        } else if (nNumBits == 8) {
+        if (bitCount == 0) {
+          // rawValue = 0;
+        } else if (bitCount == 1) {
+          if (valueBitOffset % 8 == 0) {
+            bitFlags = this.reader.readByte();
+            valueBitOffset = 0;
+          }
+          rawValue = bitFlags >> valueBitOffset & 0x1;
+          valueBitOffset++;
+        } else if (bitCount == 2) {
+          if (valueBitOffset % 8 == 0) {
+            bitFlags = this.reader.readByte();
+            valueBitOffset = 0;
+          }
+          rawValue = bitFlags >> valueBitOffset & 0x3;
+          valueBitOffset++;
+        } else if (bitCount == 4) {
+          rawValue = bitFlags >> valueBitOffset & 0xf;
+          valueBitOffset++;
+        } else if (bitCount == 8) {
           rawValue = this.reader.readByte();
-        } else if (nNumBits == 16) {
+        } else if (bitCount == 16) {
           rawValue = this.reader.readShort();
-        } else if (nNumBits == 32) {
+        } else if (bitCount == 32) {
           rawValue = this.reader.readInt();
         } else {
-          throw new RuntimeException("Unsupported nNumBits value: " + nNumBits);
+          throw new RuntimeException("Unsupported nNumBits value: " + bitCount);
         }
 
         // Offset by the minimum value.
         final int intValue = minValue + rawValue;
 
-        block[nPixelsOutput] = Float.intBitsToFloat(intValue);
+        block[cellIndex] = Float.intBitsToFloat(intValue);
 
       }
 
-    }
-
-    // Establish data pointers for runs.
-    if (nNumRuns < 0 || nDataOffset < 0) {
-      throw new RuntimeException(
-        String.format("nNumRuns=%d, nDataOffset=%d", nNumRuns, nDataOffset));
-    }
-
-    if (nNumRuns != 0
-      && (nNumBits > Integer.MAX_VALUE / nNumRuns || nNumBits * nNumRuns > Integer.MAX_VALUE - 7
-        || (nNumBits * nNumRuns + 7) / 8 > Integer.MAX_VALUE - nDataOffset)) {
+    } else if (runCount < 0 || offset < 0) {
+      throw new RuntimeException(String.format("nNumRuns=%d, nDataOffset=%d", runCount, offset));
+    } else if (runCount != 0
+      && (bitCount > Integer.MAX_VALUE / runCount || bitCount * runCount > Integer.MAX_VALUE - 7
+        || (bitCount * runCount + 7) / 8 > Integer.MAX_VALUE - offset)) {
       throw new RuntimeException("Integer overflow: nDataOffset + (nNumBits * nNumRuns + 7)/8");
-    }
+    } else {
 
-    // nValueBitOffset = 0;
-
-    // Loop over runs.
-    for (int iRun = 0; iRun < nNumRuns; iRun++) {
-      int nRepeatCount = 0;
-      final short firstByte = this.reader.readUnsignedByte();
-      // Get the repeat count. This can be stored as one, two, three
-      // or four bytes depending on the low order two bits of the
-      // first byte.
-      if ((firstByte & 0xc0) == 0x00) {
-        nRepeatCount = firstByte & 0x3f;
-      } else if ((firstByte & 0xc0) == 0x40) {
-        nRepeatCount = firstByte & 0x3f;
-        nRepeatCount = nRepeatCount * 256 + this.reader.readUnsignedByte();
-      } else if ((firstByte & 0xc0) == 0x80) {
-        nRepeatCount = firstByte & 0x3f;
-        nRepeatCount = nRepeatCount * 256 + this.reader.readUnsignedByte();
-        nRepeatCount = nRepeatCount * 256 + this.reader.readUnsignedByte();
-      } else if ((firstByte & 0xc0) == 0xc0) {
-        nRepeatCount = firstByte & 0x3f;
-        nRepeatCount = nRepeatCount * 256 + this.reader.readUnsignedByte();
-        nRepeatCount = nRepeatCount * 256 + this.reader.readUnsignedByte();
-        nRepeatCount = nRepeatCount * 256 + this.reader.readUnsignedByte();
+      final int[] reapeatCounts = new int[runCount];
+      for (int runIndex = 0; runIndex < runCount; runIndex++) {
+        int repeatCount = 0;
+        final short firstByte = this.reader.readUnsignedByte();
+        // Get the repeat count. This can be stored as one, two, three
+        // or four bytes depending on the low order two bits of the
+        // first byte.
+        if ((firstByte & 0xc0) == 0x00) {
+          repeatCount = firstByte & 0x3f;
+        } else if ((firstByte & 0xc0) == 0x40) {
+          repeatCount = firstByte & 0x3f;
+          repeatCount = repeatCount * 256 + this.reader.readUnsignedByte();
+        } else if ((firstByte & 0xc0) == 0x80) {
+          repeatCount = firstByte & 0x3f;
+          repeatCount = repeatCount * 256 + this.reader.readUnsignedByte();
+          repeatCount = repeatCount * 256 + this.reader.readUnsignedByte();
+        } else if ((firstByte & 0xc0) == 0xc0) {
+          repeatCount = firstByte & 0x3f;
+          repeatCount = repeatCount * 256 + this.reader.readUnsignedByte();
+          repeatCount = repeatCount * 256 + this.reader.readUnsignedByte();
+          repeatCount = repeatCount * 256 + this.reader.readUnsignedByte();
+        }
+        reapeatCounts[runIndex] = repeatCount;
       }
+      int valueBitOffset = 0;
 
-      // Extract the data value in a way that depends on the number
-      // of bits in it.
-      int nDataValue = 0;
+      for (int repeatCount : reapeatCounts) {
+        // Extract the data value in a way that depends on the number
+        // of bits in it.
+        int dataValue = 0;
+        byte bitFlags = 0;
+        if (bitCount == 0) {
+          // dataValue = 0;
+        } else if (bitCount == 1) {
+          if (valueBitOffset % 8 == 0) {
+            bitFlags = this.reader.readByte();
+            valueBitOffset = 0;
+          }
+          dataValue = bitFlags >> valueBitOffset & 0x1;
+          valueBitOffset++;
+        } else if (bitCount == 2) {
+          if (valueBitOffset % 8 == 0) {
+            bitFlags = this.reader.readByte();
+            valueBitOffset = 0;
+          }
+          dataValue = bitFlags >> valueBitOffset & 0x3;
+          valueBitOffset++;
+        } else if (bitCount == 4) {
+          dataValue = bitFlags >> valueBitOffset & 0xf;
+          valueBitOffset++;
+        } else if (bitCount == 8) {
+          dataValue = this.reader.readUnsignedByte();
+        } else if (bitCount == 16) {
+          dataValue = 256 * this.reader.readUnsignedByte();
+          dataValue += this.reader.readUnsignedByte();
+        } else if (bitCount == 32) {
+          final short b1 = this.reader.readUnsignedByte();
+          final short b2 = this.reader.readUnsignedByte();
+          final short b3 = this.reader.readUnsignedByte();
+          final short b4 = this.reader.readUnsignedByte();
+          dataValue = b1 & 0x3f;
+          dataValue = dataValue * 256 + b2;
+          dataValue = dataValue * 256 + b3;
+          dataValue = dataValue * 256 + b4;
 
-      if (nNumBits == 0) {
-        // nDataValue = 0;
-      } else if (nNumBits == 1) {
-        // nDataValue = pabyValues[nValueBitOffset >> 3] >> (nValueBitOffset & 7) & 0x1;
-        // nValueBitOffset++;
-        throw new RuntimeException();
-      } else if (nNumBits == 2) {
-        // nDataValue = pabyValues[nValueBitOffset >> 3] >> (nValueBitOffset & 7) & 0x3;
-        // nValueBitOffset += 2;
-        throw new RuntimeException();
-      } else if (nNumBits == 4) {
-        // nDataValue = pabyValues[nValueBitOffset >> 3] >> (nValueBitOffset & 7) & 0xf;
-        // nValueBitOffset += 4;
-        throw new RuntimeException();
-      } else if (nNumBits == 8) {
-        nDataValue = this.reader.readUnsignedByte();
-      } else if (nNumBits == 16) {
-        nDataValue = 256 * this.reader.readUnsignedByte();
-        nDataValue += this.reader.readUnsignedByte();
-      } else if (nNumBits == 32) {
-        nDataValue = this.reader.readUnsignedByte() & 0x3f;
-        nDataValue = nDataValue * 256 + this.reader.readUnsignedByte();
-        nDataValue = nDataValue * 256 + this.reader.readUnsignedByte();
-        nDataValue = nDataValue * 256 + this.reader.readUnsignedByte();
+        } else {
+          throw new RuntimeException("nNumBits = " + bitCount);
+        }
 
-      } else {
-        throw new RuntimeException("nNumBits = " + nNumBits);
-      }
+        // Offset by the minimum value.
+        dataValue += minValue;
 
-      // Offset by the minimum value.
-      nDataValue += minValue;
+        // Now apply to the output buffer in a type specific way.
+        if (repeatCount > Integer.MAX_VALUE - cellIndex || cellIndex + repeatCount > blockLength) {
+          repeatCount = blockLength - cellIndex;
+        }
 
-      // Now apply to the output buffer in a type specific way.
-      if (nRepeatCount > Integer.MAX_VALUE - nPixelsOutput
-        || nPixelsOutput + nRepeatCount > nMaxPixels) {
-        nRepeatCount = nMaxPixels - nPixelsOutput;
-      }
+        final float floatValue = Float.intBitsToFloat(dataValue);
 
-      final float fDataValue = Float.intBitsToFloat(nDataValue);
-
-      for (int i = 0; i < nRepeatCount; i++) {
-        block[nPixelsOutput++] = fDataValue;
+        Arrays.fill(block, cellIndex, cellIndex += repeatCount, floatValue);
       }
     }
   }

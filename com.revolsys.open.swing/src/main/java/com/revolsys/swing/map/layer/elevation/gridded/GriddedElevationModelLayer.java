@@ -21,6 +21,7 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.swing.Borders;
 import com.revolsys.swing.RsSwingServiceInitializer;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -228,6 +229,31 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
       final LayerStylePanel stylePanel = new LayerStylePanel(this);
       propertiesPanel.addTab("Style", "palette", stylePanel);
     }
+  }
+
+  @Override
+  protected BasePanel newPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
+    final BasePanel generalPanel = super.newPropertiesTabGeneral(tabPanel);
+    newPropertiesTabGeneralPanelMetaData(generalPanel);
+    return generalPanel;
+  }
+
+  private ValueField newPropertiesTabGeneralPanelMetaData(final BasePanel parent) {
+    final ValueField panel = new ValueField(this);
+    Borders.titled(panel, "Grid");
+    if (this.elevationModel != null && isExists()) {
+      parent.add(panel);
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Grid Width",
+        this.elevationModel.getGridWidth());
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Grid Height",
+        this.elevationModel.getGridHeight());
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Grid Cell Width",
+        this.elevationModel.getGridCellWidth());
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Grid Cell Height",
+        this.elevationModel.getGridCellHeight());
+      GroupLayouts.makeColumns(panel, 2, true);
+    }
+    return panel;
   }
 
   @Override

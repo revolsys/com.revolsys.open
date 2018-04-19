@@ -7,7 +7,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class FloatArrayGrid extends AbstractGrid {
-  protected static final float NULL_VALUE = -Float.MAX_VALUE;
+  public static final float NULL_VALUE = -Float.MAX_VALUE;
 
   protected final float[] cells;
 

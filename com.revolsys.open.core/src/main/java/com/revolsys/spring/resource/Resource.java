@@ -191,6 +191,12 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
+  default boolean copyFrom(final Object source) {
+    final Resource resource = getResource(source);
+    return copyFrom(resource);
+
+  }
+
   default boolean copyFrom(final Resource source) {
     if (source == null) {
       return false;

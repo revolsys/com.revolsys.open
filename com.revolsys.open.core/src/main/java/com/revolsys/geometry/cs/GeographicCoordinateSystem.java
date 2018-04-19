@@ -13,7 +13,7 @@ import javax.measure.quantity.Length;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.epsg.CoordinateOperation;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.gridshift.GridHorizontalShiftOperation;
+import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
@@ -141,7 +141,7 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
   }
 
   public synchronized void addGridShiftOperation(final GeographicCoordinateSystem coordinateSystem,
-    final GridHorizontalShiftOperation operation) {
+    final HorizontalShiftOperation operation) {
     if (this.gridShiftOperationsByCoordinateSystem == null) {
       this.gridShiftOperationsByCoordinateSystem = new HashMap<>();
     }
@@ -282,7 +282,7 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
   }
 
   public synchronized void removeGridShiftOperation(
-    final GeographicCoordinateSystem coordinateSystem, final GridHorizontalShiftOperation operation) {
+    final GeographicCoordinateSystem coordinateSystem, final HorizontalShiftOperation operation) {
     if (this.gridShiftOperationsByCoordinateSystem != null) {
       final GeographicCoordinateSystemGridShiftOperation operations = this.gridShiftOperationsByCoordinateSystem
         .get(coordinateSystem);

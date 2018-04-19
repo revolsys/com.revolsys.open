@@ -12,7 +12,7 @@ import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.gridshift.GridHorizontalShiftOperation;
+import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.record.io.RecordWriter;
@@ -57,9 +57,9 @@ public class GsbGridShiftFile {
 
   private GeographicCoordinateSystem toCoordinateSystem;
 
-  private final GridHorizontalShiftOperation forwardOperation = new GsbGridShiftOperation(this);
+  private final HorizontalShiftOperation forwardOperation = new GsbGridShiftOperation(this);
 
-  private final GridHorizontalShiftOperation inverseOperation = new GsbGridShiftInverseOperation(this);
+  private final HorizontalShiftOperation inverseOperation = new GsbGridShiftInverseOperation(this);
 
   private final Resource resource;
 
@@ -162,7 +162,7 @@ public class GsbGridShiftFile {
     }
   }
 
-  public GridHorizontalShiftOperation getForwardOperation() {
+  public HorizontalShiftOperation getForwardOperation() {
     return this.forwardOperation;
   }
 
@@ -181,7 +181,7 @@ public class GsbGridShiftFile {
     return null;
   }
 
-  public GridHorizontalShiftOperation getInverseOperation() {
+  public HorizontalShiftOperation getInverseOperation() {
     return this.inverseOperation;
   }
 

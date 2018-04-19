@@ -79,7 +79,10 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   @Override
   public void close() {
-    this.channel.close();
+    if (this.channel != null) {
+      this.channel.close();
+      this.channel = null;
+    }
   }
 
   protected HfaType findType(final String typeName) {
@@ -133,6 +136,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   @Override
   public GeometryFactory getGeometryFactory() {
+    init();
     return this.geometryFactory;
   }
 
@@ -179,7 +183,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
       return null;
     } else {
 
-      final HfaEntry poXForm0 = this.bands.get(0).poNode.GetNamedChild("MapToPixelXForm.XForm0");
+      final HfaEntry poXForm0 = this.bands.get(0).node.GetNamedChild("MapToPixelXForm.XForm0");
 
       if (poXForm0 == null) {
         return null;
@@ -191,7 +195,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
       }
 
       // Verify that there aren't any further xform steps.
-      if (this.bands.get(0).poNode.GetNamedChild("MapToPixelXForm.XForm1") != null) {
+      if (this.bands.get(0).node.GetNamedChild("MapToPixelXForm.XForm1") != null) {
         return null;
       }
 
@@ -252,9 +256,9 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
   private boolean loadMapInfo() {
     if (!this.bands.isEmpty()) {
       final HfaBand firstBand = this.bands.get(0);
-      HfaEntry mapInfoEntry = firstBand.poNode.GetNamedChild("Map_Info");
+      HfaEntry mapInfoEntry = firstBand.node.GetNamedChild("Map_Info");
       if (mapInfoEntry == null) {
-        for (HfaEntry child = firstBand.poNode.GetChild(); child != null
+        for (HfaEntry child = firstBand.node.GetChild(); child != null
           && mapInfoEntry == null; child = child.getNext()) {
           if (child.equalsType("Eprj_MapInfo")) {
             mapInfoEntry = child;
@@ -443,7 +447,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     } else if (this.proParameters == null) {
       this.proParameters = new LinkedHashMapEx();
 
-      final HfaEntry projectionEntry = this.bands.get(0).poNode.GetNamedChild("Projection");
+      final HfaEntry projectionEntry = this.bands.get(0).node.GetNamedChild("Projection");
       if (projectionEntry != null) {
         final HfaEntry datumEntry = projectionEntry.GetNamedChild("Datum");
         if (datumEntry != null) {

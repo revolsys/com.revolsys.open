@@ -10,6 +10,9 @@ public interface Readers {
     int digitCount = 0;
     long number = 0;
     boolean negative = false;
+    boolean exponent = false;
+    boolean exponentNegative = false;
+    long exponentValue = 0;
     double decimalDivisor = -1;
     for (int character = reader.read(); character != -1; character = reader.read()) {
       if (Character.isWhitespace(character)) {
@@ -23,21 +26,30 @@ public interface Readers {
           throw new IllegalStateException("Cannot have two '.' characters in a number");
         }
       } else if (character == '-') {
-        if (digitCount == 0 && !negative) {
+        if (exponent) {
+          exponentNegative = true;
+        } else if (digitCount == 0 && !negative) {
           negative = true;
         } else {
           throw new IllegalStateException("Cannot have two '-' characters in a number");
         }
       } else if (character >= '0' && character <= '9') {
-        digitCount++;
-        if (digitCount < 19) {
-          number = number * 10 + character - '0';
-          if (decimalDivisor != -1) {
-            decimalDivisor *= 10;
+        if (exponent) {
+          exponentValue = exponentValue * 10 + character - '0';
+        } else {
+          digitCount++;
+          if (digitCount < 19) {
+            number = number * 10 + character - '0';
+            if (decimalDivisor != -1) {
+              decimalDivisor *= 10;
+            }
           }
         }
+      } else if (character == 'e') {
+        exponent = true;
       } else {
-        throw new IllegalStateException("Cannot have a '" + character + "' character in a number");
+        throw new IllegalStateException(
+          "Cannot have a '" + (char)character + "' character in a number");
       }
     }
     if (digitCount == 0) {
@@ -48,6 +60,12 @@ public interface Readers {
         doubleNumber = number / decimalDivisor;
       } else {
         doubleNumber = number;
+      }
+      if (exponent) {
+        if (exponentNegative) {
+          exponentValue = -exponentValue;
+        }
+        doubleNumber *= Math.pow(10, exponentValue);
       }
       if (negative) {
         return -doubleNumber;

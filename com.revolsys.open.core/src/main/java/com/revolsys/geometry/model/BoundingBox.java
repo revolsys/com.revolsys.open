@@ -368,17 +368,18 @@ public interface BoundingBox
    *@param  other the <code>BoundingBox</code> to check
    *@return true if this <code>BoundingBox</code> covers the <code>other</code>
    */
-  default boolean covers(BoundingBox other) {
+  default boolean covers(final BoundingBox other) {
     if (other == null || isEmpty() || other.isEmpty()) {
       return false;
     } else {
-      other = other.convert(getGeometryFactory());
+      final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
+      final BoundingBox convertedBoundingBox = other.toCoordinateSystem(coordinateSystem, 2);
       final double minX = getMinX();
       final double minY = getMinY();
       final double maxX = getMaxX();
       final double maxY = getMaxY();
 
-      return other.coveredBy(minX, minY, maxX, maxY);
+      return convertedBoundingBox.coveredBy(minX, minY, maxX, maxY);
     }
   }
 

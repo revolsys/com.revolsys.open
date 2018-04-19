@@ -1,9 +1,9 @@
 package com.revolsys.geometry.cs.gridshift.gsb;
 
-import com.revolsys.geometry.cs.gridshift.GridHorizontalShiftOperation;
+import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
-public class GsbGridShiftInverseOperation implements GridHorizontalShiftOperation {
+public class GsbGridShiftInverseOperation implements HorizontalShiftOperation {
 
   private final GsbGridShiftFile file;
 

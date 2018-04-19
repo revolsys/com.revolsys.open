@@ -1,10 +1,10 @@
 package com.revolsys.geometry.cs;
 
-import com.revolsys.geometry.cs.gridshift.GridHorizontalShiftOperation;
+import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
 
 public interface HorizontalCoordinateSystemProxy {
   default void addGridShiftOperation(final HorizontalCoordinateSystemProxy coordinateSystem,
-    final GridHorizontalShiftOperation operation) {
+    final HorizontalShiftOperation operation) {
     final GeographicCoordinateSystem sourceCs = getHorizontalCoordinateSystem();
     final GeographicCoordinateSystem targetCs = coordinateSystem.getHorizontalCoordinateSystem();
     if (sourceCs == null) {
@@ -28,7 +28,7 @@ public interface HorizontalCoordinateSystemProxy {
   }
 
   default void removeGridShiftOperation(final HorizontalCoordinateSystemProxy coordinateSystem,
-    final GridHorizontalShiftOperation operation) {
+    final HorizontalShiftOperation operation) {
     final GeographicCoordinateSystem sourceCs = getHorizontalCoordinateSystem();
     final GeographicCoordinateSystem targetCs = coordinateSystem.getHorizontalCoordinateSystem();
     if (sourceCs == null) {

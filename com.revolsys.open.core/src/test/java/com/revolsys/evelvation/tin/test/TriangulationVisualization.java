@@ -209,7 +209,7 @@ public class TriangulationVisualization {
   //
   // final Map<String, Object> properties = new HashMap<>();
   // properties.put(GriddedElevationModel.GEOMETRY_FACTORY, geometryFactory);
-  // properties.put(EsriAsciiGriddedElevation.PROPERTY_READ_DATA, !processAll);
+  // properties.put(EsriFloatGridGriddedElevation.PROPERTY_READ_DATA, !processAll);
   //
   // final GriddedElevationModel sourceModel = GriddedElevationModel
   // .newGriddedElevationModel(demFile, properties);

@@ -15,6 +15,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Exceptions;
 
 public class ZipUtil {
   /**
@@ -87,17 +88,25 @@ public class ZipUtil {
   public static List<String> unzipFile(final File file, final File outputDirectory)
     throws IOException {
     final List<String> entryNames = new ArrayList<>();
-    final ZipFile zipFile = new ZipFile(file);
-    for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
-      .hasMoreElements();) {
-      final ZipEntry entry = entries.nextElement();
-      final String entryName = entry.getName();
-      final File outputFile = new File(outputDirectory, entryName);
-      outputFile.getParentFile().mkdirs();
-      FileUtil.copy(zipFile.getInputStream(entry), outputFile, entry.getSize());
-      entryNames.add(entryName);
+    try (
+      final ZipFile zipFile = new ZipFile(file)) {
+      for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
+        .hasMoreElements();) {
+        final ZipEntry entry = entries.nextElement();
+        if (!entry.isDirectory()) {
+          final String entryName = entry.getName();
+          final File outputFile = new File(outputDirectory, entryName);
+          outputFile.getParentFile().mkdirs();
+          try (
+            InputStream entryIn = zipFile.getInputStream(entry)) {
+            FileUtil.copy(entryIn, outputFile, entry.getSize());
+          }
+          entryNames.add(entryName);
+        }
+      }
+    } catch (final IOException e) {
+      Exceptions.wrap("Error extracting: " + file, e);
     }
-    zipFile.close();
     return entryNames;
   }
 
@@ -107,6 +116,12 @@ public class ZipUtil {
       filename += "x";
     }
     final File directory = FileUtil.newTempDirectory(filename, ".zip");
+    unzipFile(resource, directory);
+    return directory;
+  }
+
+  public static boolean unzipFile(final Resource resource, final File directory)
+    throws IOException {
     final InputStream in = resource.getInputStream();
     final ZipInputStream zipIn = new ZipInputStream(in);
     try {
@@ -123,8 +138,7 @@ public class ZipUtil {
         zipIn.closeEntry();
       }
       FileUtil.closeSilent(zipIn);
-      return directory;
-
+      return true;
     } catch (final IOException e) {
       FileUtil.closeSilent(zipIn);
       FileUtil.deleteDirectory(directory);

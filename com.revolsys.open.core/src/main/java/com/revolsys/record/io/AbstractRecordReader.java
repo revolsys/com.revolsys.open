@@ -201,6 +201,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     }
     final PathName pathName = PathName.newPathName(typePath);
     this.recordDefinition = new RecordDefinitionImpl(schema, pathName, getProperties(), fields);
+    this.recordDefinition.setGeometryFactory(this.geometryFactory);
     return this.recordDefinition;
   }
 

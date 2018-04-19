@@ -3,10 +3,10 @@ package com.revolsys.geometry.cs.gridshift.nadcon5;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.cs.gridshift.GridHorizontalShiftOperation;
+import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
-public class Nadcon5GridShiftOperation implements GridHorizontalShiftOperation {
+public class Nadcon5GridShiftOperation implements HorizontalShiftOperation {
 
   private final String sourceDatumName;
 

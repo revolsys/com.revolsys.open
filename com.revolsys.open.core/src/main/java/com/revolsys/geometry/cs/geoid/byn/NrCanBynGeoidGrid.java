@@ -4,52 +4,21 @@ import java.nio.ByteOrder;
 import java.nio.channels.ClosedByInterruptException;
 
 import com.revolsys.geometry.cs.epsg.EpsgId;
-import com.revolsys.geometry.cs.gridshift.GridVerticalShiftOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
-import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.cs.geoid.AbstractGeoidGrid;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.grid.IntArrayScaleGrid;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class NrCanBynVerticalShiftGrid {
+public class NrCanBynGeoidGrid extends AbstractGeoidGrid {
 
-  private final Resource resource;
-
-  private GeometryFactory geometryFactory;
-
-  private BoundingBox boundingBox;
-
-  private double gridCellWidth;
-
-  private int gridWidth;
-
-  private int gridHeight;
-
-  private double gridCellHeight;
-
-  private IntArrayScaleGrid grid;
-
-  public NrCanBynVerticalShiftGrid(final Object source) {
-    this.resource = Resource.getResource(source);
-    read();
+  public NrCanBynGeoidGrid(final Object source) {
+    super(source);
   }
 
-  public GridVerticalShiftOperation getForwardOperation() {
-    return this::shiftForwards;
-  }
-
-  public GridVerticalShiftOperation getInverseOperation() {
-    return this::shiftInverse;
-  }
-
-  public double getShift(final double x, final double y) {
-    return this.grid.getValueBicubic(x, y);
-  }
-
-  private void read() {
+  @Override
+  protected void read() {
     try (
       ChannelReader reader = IoFactory.newChannelReader(this.resource, 8192)) {
       if (reader != null) {
@@ -138,30 +107,6 @@ public class NrCanBynVerticalShiftGrid {
     this.boundingBox = this.geometryFactory.newBoundingBox(2, minX, minY, maxX, maxY);
     if (byteOrder == 0) {
       reader.setByteOrder(ByteOrder.BIG_ENDIAN);
-    }
-  }
-
-  public boolean shiftForwards(final CoordinatesOperationPoint point) {
-    final double x = point.x;
-    final double y = point.y;
-    final double z = this.grid.getValueBicubic(x, y);
-    if (Double.isFinite(z)) {
-      point.z += z;
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  public boolean shiftInverse(final CoordinatesOperationPoint point) {
-    final double x = point.x;
-    final double y = point.y;
-    final double z = this.grid.getValueBicubic(x, y);
-    if (Double.isFinite(z)) {
-      point.z += z;
-      return true;
-    } else {
-      return false;
     }
   }
 
