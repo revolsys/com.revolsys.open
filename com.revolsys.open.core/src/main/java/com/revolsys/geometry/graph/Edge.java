@@ -20,6 +20,8 @@ import java.util.function.Predicate;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.geometry.model.Direction;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -28,7 +30,7 @@ import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.util.Property;
 
-public class Edge<T> implements LineString, ObjectWithProperties, Externalizable {
+public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperties, Externalizable {
 
   public static <T> void addEdgeToEdgesByLine(final Map<LineString, Set<Edge<T>>> lineEdgeMap,
     final Edge<T> edge) {
@@ -323,6 +325,16 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
     return line.getCoordinates();
   }
 
+  public Direction getDirection(final Point point) {
+    if (getFromPoint().equals(point)) {
+      return Direction.FORWARDS;
+    } else if (getToPoint().equals(point)) {
+      return Direction.BACKWARDS;
+    } else {
+      return Direction.NONE;
+    }
+  }
+
   public List<Edge<T>> getEdgesToNextJunctionNode(final Node<T> node) {
     final List<Edge<T>> edges = new ArrayList<>();
     edges.add(this);
@@ -385,6 +397,10 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   public LineString getLine() {
+    return this.graph.getEdgeLine(this.id);
+  }
+
+  public LineString getLineString() {
     return this.graph.getEdgeLine(this.id);
   }
 

@@ -5,7 +5,7 @@ import java.util.List;
 import com.revolsys.collection.list.Lists;
 
 public enum Direction {
-  BACKWARDS, FORWARDS;
+  BACKWARDS, FORWARDS, NONE;
 
   public static List<Direction> VALUES = Lists.newArray(FORWARDS, BACKWARDS);
 
@@ -35,8 +35,12 @@ public enum Direction {
     return this == FORWARDS;
   }
 
+  public boolean isNone() {
+    return this == NONE;
+  }
+
   public boolean isOpposite(final Direction direction) {
-    if (direction == null) {
+    if (direction == null || direction.isNone()) {
       return false;
     } else {
       return isForwards() != direction.isForwards();
@@ -46,8 +50,10 @@ public enum Direction {
   public Direction opposite() {
     if (isForwards()) {
       return BACKWARDS;
-    } else {
+    } else if (isBackwards()) {
       return FORWARDS;
+    } else {
+      return NONE;
     }
   }
 }

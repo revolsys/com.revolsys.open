@@ -41,6 +41,7 @@ import com.revolsys.geometry.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -55,12 +56,13 @@ import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
 import com.revolsys.predicate.PredicateProxy;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.util.ExitLoopException;
 import com.revolsys.util.MathUtil;
 import com.revolsys.visitor.CreateListVisitor;
 
-public class Graph<T> implements GeometryFactoryProxy {
+public class Graph<T> extends BaseObjectWithProperties implements GeometryFactoryProxy {
 
   private static final AtomicInteger GRAPH_IDS = new AtomicInteger();
 
@@ -214,6 +216,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     }
   }
 
+  @Override
   @PreDestroy
   public void close() {
     this.edgePropertiesById.clear();
@@ -367,6 +370,12 @@ public class Graph<T> implements GeometryFactoryProxy {
       }
     }
     return nodesFound;
+  }
+
+  public void forEachEdge(final BoundingBoxProxy boundingBox,
+    final Predicate<? super Edge<T>> filter, final Consumer<Edge<T>> visitor) {
+    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
+    edgeIndex.forEach(boundingBox.getBoundingBox(), filter, visitor);
   }
 
   @SuppressWarnings("unchecked")
@@ -592,6 +601,11 @@ public class Graph<T> implements GeometryFactoryProxy {
     return new EdgeList<>(this, edgeIds);
   }
 
+  public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy,
+    final Predicate<? super Edge<T>> filter) {
+    return BoundingBox.newArraySorted(this::forEachEdge, boundingBoxProxy, filter);
+  }
+
   public List<Edge<T>> getEdges(final Comparator<Edge<T>> comparator) {
     final List<Edge<T>> targetEdges = getEdges();
     if (comparator != null) {
@@ -626,6 +640,28 @@ public class Graph<T> implements GeometryFactoryProxy {
       }
     }
     return edges;
+  }
+
+  public List<Edge<T>> getEdges(final Point point, final double maxDistance) {
+    if (point == null) {
+      return Collections.emptyList();
+    } else {
+      BoundingBox boundingBox = point.getBoundingBox();
+      boundingBox = boundingBox.expand(maxDistance);
+      final double x = point.getX();
+      final double y = point.getY();
+      final Predicate<Edge<T>> filter = (edge) -> {
+        final LineString line = edge.getLineString();
+        final double distance = line.distance(x, y);
+        if (distance <= maxDistance) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+      return BoundingBox.newArraySorted(this::forEachEdge, boundingBox, filter);
+    }
+
   }
 
   public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter) {
@@ -743,12 +779,49 @@ public class Graph<T> implements GeometryFactoryProxy {
     return new NodeList<>(this, nodeIds);
   }
 
+  public List<Node<T>> getNodes(final BoundingBox boundingBox, final Predicate<Node<T>> filter) {
+    return getNodes(boundingBox, filter, null);
+  }
+
+  public List<Node<T>> getNodes(final BoundingBox boundingBox, final Predicate<Node<T>> filter,
+    final Comparator<Node<T>> comparator) {
+    final CreateListVisitor<Node<T>> results = new CreateListVisitor<>(filter);
+    final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
+    nodeIndex.forEach(boundingBox, results);
+    final List<Node<T>> nodes = results.getList();
+    if (comparator == null) {
+      Collections.sort(nodes);
+    } else {
+      Collections.sort(nodes, comparator);
+    }
+    return nodes;
+
+  }
+
   public List<Node<T>> getNodes(final Comparator<Node<T>> comparator) {
     final List<Node<T>> targetNodes = getNodes();
     if (comparator != null) {
       Collections.sort(targetNodes, comparator);
     }
     return targetNodes;
+  }
+
+  /**
+   * Find the nodes <= the distance of the specified geometry.
+   *
+   * @param geometry The geometry.
+   * @param maxDistance The maximum distance.
+   * @return The list of nodes.
+   */
+  public List<Node<T>> getNodes(final Geometry geometry, final double maxDistance) {
+    BoundingBox boundingBox = geometry.getBoundingBox();
+    boundingBox = boundingBox.expand(maxDistance);
+    final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
+    final Predicate<? super Node<T>> filter = (node) -> {
+      final double distance = geometry.distancePoint(node);
+      return distance <= maxDistance;
+    };
+    return BoundingBox.newArraySorted(nodeIndex::forEach, boundingBox, filter);
   }
 
   public List<Node<T>> getNodes(final List<Integer> nodeIds) {

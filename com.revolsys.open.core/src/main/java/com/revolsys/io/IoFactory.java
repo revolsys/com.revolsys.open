@@ -168,6 +168,11 @@ public interface IoFactory extends Available {
     return new FileNameExtensionFilter(description, array);
   }
 
+  public static FileNameExtensionFilter newFileFilter(final String description,
+    final String fileExtension) {
+    return new FileNameExtensionFilter(description, fileExtension);
+  }
+
   public static List<FileNameExtensionFilter> newFileFilters(final Set<String> allExtensions,
     final Class<? extends IoFactory> factoryClass) {
     final List<FileNameExtensionFilter> filters = new ArrayList<>();
@@ -213,5 +218,20 @@ public interface IoFactory extends Available {
   String getName();
 
   default void init() {
+  }
+
+  default FileNameExtensionFilter newFileFilter() {
+    final List<String> fileExtensions = getFileExtensions();
+    String description = getName();
+    final String fileExtension = fileExtensions.get(0);
+    description += " (" + fileExtension + ")";
+    return newFileFilter(description, fileExtension);
+  }
+
+  default FileNameExtensionFilter newFileFilterAllExtensions() {
+    final List<String> fileExtensions = getFileExtensions();
+    String description = getName();
+    description += " (" + Strings.toString(fileExtensions) + ")";
+    return newFileFilter(description, fileExtensions);
   }
 }

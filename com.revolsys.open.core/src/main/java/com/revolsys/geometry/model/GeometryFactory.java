@@ -57,9 +57,9 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
 import com.revolsys.geometry.model.impl.MultiLineStringImpl;
@@ -94,6 +94,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * The default GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a floating precision model.
    */
   public static final GeometryFactory DEFAULT = fixed(0, 0.0, 0.0);
+
+  public static final GeometryFactory DEFAULT_2D = fixed(0, 0.0, 0.0);
 
   public static final GeometryFactory DEFAULT_3D = fixed(0, 0.0, 0.0);
 
@@ -368,6 +370,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     final double scaleXY = Maps.getDouble(properties, "scaleXy", 0.0);
     final double scaleZ = Maps.getDouble(properties, "scaleZ", 0.0);
     return GeometryFactory.fixed(coordinateSystemId, axisCount, scaleXY, scaleZ);
+  }
+
+  public static double[] newScalesFixed(final int axisCount, final double scale) {
+    return getScales(axisCount, scale);
   }
 
   public static GeometryFactory wgs84() {
@@ -1423,8 +1429,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return new BoundingBoxDoubleGf(this);
   }
 
-  public LineStringDoubleBuilder newLineStringBuilder() {
-    return new LineStringDoubleBuilder(this);
+  public LineStringEditor newLineStringBuilder() {
+    return new LineStringEditor(this);
+  }
+
+  public LineStringEditor newLineStringBuilder(final int vertexCapacity) {
+    return new LineStringEditor(this, vertexCapacity);
   }
 
   /**

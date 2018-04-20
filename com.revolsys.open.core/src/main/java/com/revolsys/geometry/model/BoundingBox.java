@@ -3,6 +3,12 @@ package com.revolsys.geometry.model;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.measure.Measurable;
 import javax.measure.Measure;
@@ -18,13 +24,62 @@ import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.Consumer3;
 
-public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
+public interface BoundingBox extends Emptyable, BoundingBoxProxy {
 
   BoundingBox EMPTY = new BoundingBoxDoubleGf();
 
   static BoundingBox empty() {
     return EMPTY;
+  }
+
+  static <V> List<V> newArray(final BiConsumer<BoundingBoxProxy, Consumer<V>> forEachFunction,
+    final BoundingBoxProxy boundingBoxProxy) {
+    final List<V> values = new ArrayList<>();
+    if (boundingBoxProxy != null) {
+      final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+      forEachFunction.accept(boundingBox, values::add);
+    }
+    return values;
+  }
+
+  static <V> List<V> newArray(
+    final Consumer3<BoundingBoxProxy, Predicate<? super V>, Consumer<V>> forEachFunction,
+    final BoundingBoxProxy boundingBoxProxy, final Predicate<? super V> filter) {
+    final List<V> values = new ArrayList<>();
+    if (boundingBoxProxy != null) {
+      final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+      forEachFunction.accept(boundingBox, filter, values::add);
+    }
+    return values;
+  }
+
+  static <V> List<V> newArraySorted(final BiConsumer<BoundingBoxProxy, Consumer<V>> forEachFunction,
+    final BoundingBoxProxy boundingBoxProxy) {
+    return newArraySorted(forEachFunction, boundingBoxProxy, null);
+  }
+
+  static <V> List<V> newArraySorted(final BiConsumer<BoundingBoxProxy, Consumer<V>> forEachFunction,
+    final BoundingBoxProxy boundingBoxProxy, final Comparator<V> comparator) {
+    final List<V> values = newArray(forEachFunction, boundingBoxProxy);
+    values.sort(comparator);
+    return values;
+  }
+
+  static <V> List<V> newArraySorted(
+    final Consumer3<BoundingBoxProxy, Predicate<? super V>, Consumer<V>> forEachFunction,
+    final BoundingBoxProxy boundingBoxProxy, final Predicate<? super V> filter) {
+    return newArraySorted(forEachFunction, boundingBoxProxy, filter, null);
+  }
+
+  static <V> List<V> newArraySorted(
+    final Consumer3<BoundingBoxProxy, Predicate<? super V>, Consumer<V>> forEachFunction,
+    final BoundingBoxProxy boundingBoxProxy, final Predicate<? super V> filter,
+    final Comparator<V> comparator) {
+    final List<V> values = newArray(forEachFunction, boundingBoxProxy, filter);
+    values.sort(comparator);
+    return values;
   }
 
   static BoundingBox newBoundingBox(final Object value) {
@@ -166,6 +221,11 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
   double getAspectRatio();
 
   int getAxisCount();
+
+  @Override
+  default BoundingBox getBoundingBox() {
+    return this;
+  }
 
   double[] getBounds();
 

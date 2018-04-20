@@ -323,6 +323,35 @@ public interface LineString extends Lineal {
     }
   }
 
+  default double distance(final double x, final double y) {
+    return distance(x, y, 0);
+  }
+
+  default double distance(final double x, final double y, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      double minDistance = Double.POSITIVE_INFINITY;
+      double x1 = getX(0);
+      double y1 = getY(0);
+      final int vertexCount = getVertexCount();
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = getX(vertexIndex);
+        final double y2 = getY(vertexIndex);
+        final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (minDistance == terminateDistance) {
+            return minDistance;
+          }
+        }
+        x1 = x2;
+        y1 = y2;
+      }
+      return minDistance;
+    }
+  }
+
   @Override
   default double distance(final Geometry geometry, final double terminateDistance) {
     if (geometry instanceof Point) {

@@ -160,7 +160,9 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
         this.serviceUrl = wmsClient.getServiceUrl().toString();
       }
       final String layerTitle = wmsLayerDefinition.getTitle();
-      setName(layerTitle);
+      if (getName() == null) {
+        setName(layerTitle);
+      }
       this.layerName = wmsLayerDefinition.getName();
       final long minimumScale = (long)wmsLayerDefinition.getMinimumScale();
       super.setMinimumScale(minimumScale);
