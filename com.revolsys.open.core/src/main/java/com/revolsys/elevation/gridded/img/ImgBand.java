@@ -6,35 +6,23 @@ import java.util.List;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.grid.FloatArrayGrid;
 
-public class HfaBand {
+class ImgBand {
 
-  public static final HfaBand newBand(final ImgGriddedElevationReader reader, final int bandNumber,
-    final HfaEntry node) {
-    return new HfaBand(reader, bandNumber, node);
+  public static final ImgBand newBand(final ImgGriddedElevationReader reader, final int bandNumber,
+    final ImgEntry node) {
+    return new ImgBand(reader, bandNumber, node);
   }
-
-  int nBlocks;
-
-  // Used for spill-file modification.
-  int nLayerStackCount;
-
-  int nLayerStackIndex;
-
-  int nPCTColors = -1;
-
-  double[] apadfPCT = new double[4];
-
-  double padfPCTBins;
 
   private final ImgGriddedElevationReader reader;
 
   private final String dataType;
 
-  HfaEntry node;
+  private final ImgEntry node;
 
   private final int blockWidth;
 
@@ -48,15 +36,7 @@ public class HfaBand {
 
   private final int blockColumnCount;
 
-  private boolean bNoDataSet;
-
   private double nullValue;
-
-  private final boolean bOverviewsPending = true;
-
-  private int nOverviews;
-
-  private HfaBand papoOverviews;
 
   private final int bandNumber;
 
@@ -64,8 +44,10 @@ public class HfaBand {
 
   private GriddedElevationModel elevationModel;
 
-  public HfaBand(final ImgGriddedElevationReader reader, final int bandNumber,
-    final HfaEntry node) {
+  private GeometryFactory geometryFactory;
+
+  public ImgBand(final ImgGriddedElevationReader reader, final int bandNumber,
+    final ImgEntry node) {
     this.reader = reader;
     this.bandNumber = bandNumber;
     this.node = node;
@@ -78,15 +60,13 @@ public class HfaBand {
     this.blockRowCount = (this.gridWidth + this.blockWidth - 1) / this.blockWidth;
     this.blockColumnCount = (this.gridHeight + this.blockHeight - 1) / this.blockHeight;
 
-    this.nBlocks = this.blockColumnCount * this.blockColumnCount;
-
-    final HfaEntry noDataNode = this.node.GetNamedChild("Eimg_NonInitializedValue");
+    final ImgEntry noDataNode = this.node.GetNamedChild("Eimg_NonInitializedValue");
     if (noDataNode != null) {
       final Object nullValue = noDataNode.getValue("valueBD");
       if (nullValue instanceof Double) {
         this.nullValue = (Double)nullValue;
-      } else if (nullValue instanceof HfaBinaryData) {
-        final HfaBinaryData nullData = (HfaBinaryData)nullValue;
+      } else if (nullValue instanceof ImgGridData) {
+        final ImgGridData nullData = (ImgGridData)nullValue;
         this.nullValue = ((double[])nullData.getData())[0];
       }
     }
@@ -99,6 +79,75 @@ public class HfaBand {
     } else {
       return "Layer_" + this.bandNumber;
     }
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    if (this.geometryFactory == null) {
+
+      final ImgEntry projectionEntry = this.node.GetNamedChild("Projection");
+      if (projectionEntry == null) {
+        this.geometryFactory = GeometryFactory.DEFAULT_3D;
+      } else {
+        final ImgEntry datumEntry = projectionEntry.GetNamedChild("Datum");
+        if (datumEntry == null) {
+          this.geometryFactory = GeometryFactory.DEFAULT_3D;
+        } else {
+          final String datumName = datumEntry.getString("datumname");
+          // Fetch the fields.
+          // final String proType = projectionEntry.getString("proType");
+          final int proNumber = projectionEntry.getInteger("proNumber");
+          // final String proExeName = projectionEntry.getString("proExeName");
+          final String proName = projectionEntry.getString("proName");
+          final int proZone = projectionEntry.getInteger("proZone");
+
+          // for( int i = 0; i < 15; i++ )
+          // {
+          // final char szFieldName[40] = {};
+          //
+          // snprintf(szFieldName, sizeof(szFieldName), "proParams[%d]", i);
+          // psProParms.proParams[i] = projectionEntry.GetDoubleField(szFieldName);
+          // }
+
+          // final MapEx spheroidEntry = projectionEntry.getValue("proSpheroid");
+          // final String sphereName = spheroidEntry.getString("sphereName");
+          // double a = spheroidEntry.getDouble("a");
+          // if (a == 0) {
+          // a = 6378137.0;
+          // }
+          // double b = spheroidEntry.getDouble("b");
+          // if (b == 0) {
+          // b = 6356752.3;
+          // }
+          // final double eSquared = spheroidEntry.getDouble("eSquared");
+          // final double radius = spheroidEntry.getDouble("radius");
+
+          if (proNumber == 0) {
+            if ("NAD83".equals(datumName)) {
+              this.geometryFactory = GeometryFactory.nad83();
+            } else {
+              throw new RuntimeException(
+                "Only NAD83 is supported, contact developer for assistance");
+            }
+          } else if (proNumber == 1) {
+            if ("NAD83".equals(datumName)) {
+              if ("UTM".equals(proName)) {
+                this.geometryFactory = GeometryFactory.floating3d(EpsgId.nad83Utm(proZone));
+              } else {
+                throw new RuntimeException(
+                  "Only UTM is supported, contact developer for assistance");
+              }
+            } else {
+              throw new RuntimeException(
+                "Only NAD83 is supported, contact developer for assistance");
+            }
+          } else {
+            throw new RuntimeException(
+              "Only geographic coordinate systems are supported, contact developer for assistance");
+          }
+        }
+      }
+    }
+    return this.geometryFactory;
   }
 
   public GriddedElevationModel getGriddedElevationModel() {
@@ -185,13 +234,26 @@ public class HfaBand {
     return this.elevationModel;
   }
 
+  public ImgEntry getMapInfo() {
+    ImgEntry mapInfoEntry = this.node.GetNamedChild("Map_Info");
+    if (mapInfoEntry == null) {
+      for (ImgEntry child = this.node.GetChild(); child != null
+        && mapInfoEntry == null; child = child.getNext()) {
+        if (child.equalsType("Eprj_MapInfo")) {
+          mapInfoEntry = child;
+        }
+      }
+    }
+    return mapInfoEntry;
+  }
+
   public int getWidth() {
     return this.gridWidth;
   }
 
   public void loadBlockInfo() {
     if (this.blockInfoList == null) {
-      final HfaEntry rasterDMSEntry = this.node.GetNamedChild("RasterDMS");
+      final ImgEntry rasterDMSEntry = this.node.GetNamedChild("RasterDMS");
       if (rasterDMSEntry == null) {
         if (this.node.GetNamedChild("ExternalRasterDMS") != null) {
           throw new IllegalArgumentException("ExternalRasterDMS is not supporte");
@@ -210,11 +272,10 @@ public class HfaBand {
     return getBandName();
   }
 
-  void uncompressBlock(final float[] block) {
+  private void uncompressBlock(final float[] block) {
     final int blockLength = block.length;
 
     final int minValue = this.reader.readInt();
-    final float minFloat = Float.intBitsToFloat(minValue);
     final int runCount = this.reader.readInt();
     final int offset = this.reader.readInt();
     final int bitCount = this.reader.readByte();
