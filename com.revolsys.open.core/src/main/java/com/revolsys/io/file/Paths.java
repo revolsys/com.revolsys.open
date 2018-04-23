@@ -328,6 +328,17 @@ public interface Paths {
     }
   }
 
+  static List<Path> getPathsTree(final Path path, final String... fileExtensions) {
+    final List<Path> paths = new ArrayList<>();
+    final Consumer<Path> action2 = (childPath) -> {
+      if (hasFileNameExtension(childPath, fileExtensions)) {
+        paths.add(childPath);
+      }
+    };
+    forEachTree(path, action2);
+    return paths;
+  }
+
   static boolean hasFileNameExtension(final Path path, final String... fileExtensions) {
     final String fileName = getFileName(path);
     for (final String fileNameExtension : FileNames.getFileNameExtensions(fileName)) {
