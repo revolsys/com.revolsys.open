@@ -60,7 +60,7 @@ class ImgBand {
     this.blockRowCount = (this.gridWidth + this.blockWidth - 1) / this.blockWidth;
     this.blockColumnCount = (this.gridHeight + this.blockHeight - 1) / this.blockHeight;
 
-    final ImgEntry noDataNode = this.node.GetNamedChild("Eimg_NonInitializedValue");
+    final ImgEntry noDataNode = this.node.getNamedChild("Eimg_NonInitializedValue");
     if (noDataNode != null) {
       final Object nullValue = noDataNode.getValue("valueBD");
       if (nullValue instanceof Double) {
@@ -84,11 +84,11 @@ class ImgBand {
   public GeometryFactory getGeometryFactory() {
     if (this.geometryFactory == null) {
 
-      final ImgEntry projectionEntry = this.node.GetNamedChild("Projection");
+      final ImgEntry projectionEntry = this.node.getNamedChild("Projection");
       if (projectionEntry == null) {
         this.geometryFactory = GeometryFactory.DEFAULT_3D;
       } else {
-        final ImgEntry datumEntry = projectionEntry.GetNamedChild("Datum");
+        final ImgEntry datumEntry = projectionEntry.getNamedChild("Datum");
         if (datumEntry == null) {
           this.geometryFactory = GeometryFactory.DEFAULT_3D;
         } else {
@@ -235,9 +235,9 @@ class ImgBand {
   }
 
   public ImgEntry getMapInfo() {
-    ImgEntry mapInfoEntry = this.node.GetNamedChild("Map_Info");
+    ImgEntry mapInfoEntry = this.node.getNamedChild("Map_Info");
     if (mapInfoEntry == null) {
-      for (ImgEntry child = this.node.GetChild(); child != null
+      for (ImgEntry child = this.node.getChild(); child != null
         && mapInfoEntry == null; child = child.getNext()) {
         if (child.equalsType("Eprj_MapInfo")) {
           mapInfoEntry = child;
@@ -253,9 +253,9 @@ class ImgBand {
 
   public void loadBlockInfo() {
     if (this.blockInfoList == null) {
-      final ImgEntry rasterDMSEntry = this.node.GetNamedChild("RasterDMS");
+      final ImgEntry rasterDMSEntry = this.node.getNamedChild("RasterDMS");
       if (rasterDMSEntry == null) {
-        if (this.node.GetNamedChild("ExternalRasterDMS") != null) {
+        if (this.node.getNamedChild("ExternalRasterDMS") != null) {
           throw new IllegalArgumentException("ExternalRasterDMS is not supporte");
         } else {
           throw new IllegalArgumentException(

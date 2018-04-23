@@ -1,10 +1,14 @@
 package com.revolsys.elevation.gridded.img;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.io.map.MapSerializer;
 
-class ImgEntry implements MapEx {
+class ImgEntry implements MapEx, MapSerializer {
 
   private final long filePosition;
 
@@ -70,16 +74,12 @@ class ImgEntry implements MapEx {
     return typeName.equals(this.typeName);
   }
 
-  public ImgEntry GetChild() {
+  public ImgEntry getChild() {
     if (this.child == null && this.childPosition != 0) {
       this.child = new ImgEntry(this.reader, this.childPosition, this, null);
     }
 
     return this.child;
-  }
-
-  public double GetDoubleField(final String fieldPath) {
-    return getDouble(fieldPath);
   }
 
   private MapEx getFieldValues() {
@@ -108,42 +108,16 @@ class ImgEntry implements MapEx {
     return this.name;
   }
 
-  public ImgEntry GetNamedChild(final String pszName) {
-    for (ImgEntry poEntry = GetChild(); poEntry != null; poEntry = poEntry.GetNext()) {
-      if (poEntry.equalsName(pszName)) {
-        return poEntry;
+  public ImgEntry getNamedChild(final String pszName) {
+    for (ImgEntry entry = getChild(); entry != null; entry = entry.getNext()) {
+      if (entry.equalsName(pszName)) {
+        return entry;
       }
     }
     return null;
   }
 
-  ImgEntry getNext() {
-    // Do we need to create the next node?
-    if (this.next == null && this.nextPos != 0) {
-      // Check if we have a loop on the next node in this sibling chain.
-      ImgEntry past;
-
-      for (past = this; past != null && past.filePosition != this.nextPos; past = past.previous) {
-      }
-
-      if (past != null) {
-        System.err
-          .println(String.format("Corrupt (looping) entry in %s, ignoring some entries after %s.",
-            this.reader, this.name));
-        this.nextPos = 0;
-        return null;
-      }
-
-      this.next = new ImgEntry(this.reader, this.nextPos, this.parent, this);
-      if (this.next == null) {
-        this.nextPos = 0;
-      }
-    }
-
-    return this.next;
-  }
-
-  public ImgEntry GetNext() {
+  public ImgEntry getNext() {
     if (this.next == null && this.nextPos != 0) {
       ImgEntry past;
 
@@ -160,10 +134,6 @@ class ImgEntry implements MapEx {
     }
 
     return this.next;
-  }
-
-  public String GetStringField(final String fieldPath) {
-    return getString(fieldPath);
   }
 
   // ImgEntry( String dictionary,
@@ -201,6 +171,25 @@ class ImgEntry implements MapEx {
   public <T> T getValue(final CharSequence name) {
     final MapEx fieldValues = getFieldValues();
     return fieldValues.getValue(name);
+  }
+
+  @Override
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
+    map.add("name", this.name);
+    map.add("fieldType", this.typeName);
+    final MapEx values = getFieldValues();
+    if (!values.isEmpty()) {
+      addToMap(map, "values", values);
+    }
+    final List<MapEx> children = new ArrayList<>();
+    for (ImgEntry entry = getChild(); entry != null; entry = entry.getNext()) {
+      children.add(entry.toMap());
+    }
+    if (!children.isEmpty()) {
+      addToMap(map, "children", children);
+    }
+    return map;
   }
 
   @Override

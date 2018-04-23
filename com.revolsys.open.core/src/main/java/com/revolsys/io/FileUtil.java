@@ -1128,7 +1128,13 @@ public final class FileUtil {
     }
   }
 
-  public static File newTempFile(final String prefix, final String suffix) {
+  public static File newTempFile(String prefix, String suffix) {
+    if (prefix == null) {
+      prefix = "abc";
+    }
+    if (suffix == null) {
+      suffix = "def";
+    }
     try {
       final File file = File.createTempFile(prefix, suffix);
       return file;

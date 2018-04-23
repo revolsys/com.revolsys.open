@@ -136,97 +136,101 @@ class ImgField {
         return reader.readDouble();
 
       case 'b': {
-        final int height = reader.readInt();
-        final int width = reader.readInt();
-        final int cellCount = width * height;
-        final short baseItemType = reader.readShort();
-        reader.readShort(); // We ignore the 2 byte objecttype value.
-        if (baseItemType == BIT) {
-          Debug.noOp();
-          throw new RuntimeException("EPT_1 field type not supported");
-
-          //
-          // if( pabyData[nIndexValue >> 3] & 1 << (nIndexValue & 0x7) )
-          // {
-          // dfDoubleRet = 1;
-          // nIntRet = 1;
-          // }
-          // else
-          // {
-          // dfDoubleRet = 0.0;
-          // nIntRet = 0;
-          // }
-        } else if (baseItemType == BIT2) {
-          throw new RuntimeException("EPT_2 field type not supported");
-          // const final int nBitOffset = nIndexValue & 0x3;
-          // const final int nByteOffset = nIndexValue >> 2;
-          //
-
-          //
-          // const final int nMask = 0x3;
-          // nIntRet = pabyData[nByteOffset] >> nBitOffset & nMask;
-          // dfDoubleRet = nIntRet;
-        } else if (baseItemType == NIBBLE) {
-          throw new RuntimeException("NIBBLE field type not supported");
-          // const final int nBitOffset = nIndexValue & 0x7;
-          // const final int nByteOffset = nIndexValue >> 3;
-          //
-
-          //
-          // const final int nMask = 0x7;
-          // nIntRet = pabyData[nByteOffset] >> nBitOffset & nMask;
-          // dfDoubleRet = nIntRet;
-        } else if (baseItemType == BYTE_UNSIGNED) {
-          final short[] cells = new short[cellCount];
-          for (int i = 0; i < cellCount; i++) {
-            cells[i] = reader.readUnsignedByte();
-          }
-          return new ImgGridData(width, height, baseItemType, cells);
-        } else if (baseItemType == BYTE) {
-          final byte[] cells = new byte[cellCount];
-          for (int i = 0; i < cellCount; i++) {
-            cells[i] = reader.readByte();
-          }
-          return new ImgGridData(width, height, baseItemType, cells);
-
-        } else if (baseItemType == SHORT) {
-          final short[] cells = new short[cellCount];
-          for (int i = 0; i < cellCount; i++) {
-            cells[i] = reader.readShort();
-          }
-          return new ImgGridData(width, height, baseItemType, cells);
-        } else if (baseItemType == SHORT_UNSIGNED) {
-          final int[] cells = new int[cellCount];
-          for (int i = 0; i < cellCount; i++) {
-            cells[i] = reader.readUnsignedShort();
-          }
-          return new ImgGridData(width, height, baseItemType, cells);
-        } else if (baseItemType == INT) {
-          final int[] cells = new int[cellCount];
-          for (int i = 0; i < cellCount; i++) {
-            cells[i] = reader.readInt();
-          }
-          return new ImgGridData(width, height, baseItemType, cells);
-        } else if (baseItemType == INT_UNSIGNED) {
-          final long[] cells = new long[cellCount];
-          for (int i = 0; i < cellCount; i++) {
-            cells[i] = reader.readUnsignedInt();
-          }
-          return new ImgGridData(width, height, baseItemType, cells);
-        } else if (baseItemType == FLOAT) {
-          final float[] cells = new float[cellCount];
-          for (int i = 0; i < cellCount; i++) {
-            cells[i] = reader.readFloat();
-          }
-          return new ImgGridData(width, height, baseItemType, cells);
-        } else if (baseItemType == DOUBLE) {
-          final double[] cells = new double[cellCount];
-          for (int i = 0; i < cellCount; i++) {
-            cells[i] = reader.readDouble();
-          }
-          return new ImgGridData(width, height, baseItemType, cells);
+        if (pointerSize == 0) {
+          return null;
         } else {
-          throw new IllegalArgumentException("Unknown base item type: " + baseItemType);
+          final int height = reader.readInt();
+          final int width = reader.readInt();
+          final int cellCount = width * height;
+          final short baseItemType = reader.readShort();
+          reader.readShort(); // We ignore the 2 byte objecttype value.
+          if (baseItemType == BIT) {
+            Debug.noOp();
+            throw new RuntimeException("EPT_1 field type not supported");
+
+            //
+            // if( pabyData[nIndexValue >> 3] & 1 << (nIndexValue & 0x7) )
+            // {
+            // dfDoubleRet = 1;
+            // nIntRet = 1;
+            // }
+            // else
+            // {
+            // dfDoubleRet = 0.0;
+            // nIntRet = 0;
+            // }
+          } else if (baseItemType == BIT2) {
+            throw new RuntimeException("EPT_2 field type not supported");
+            // const final int nBitOffset = nIndexValue & 0x3;
+            // const final int nByteOffset = nIndexValue >> 2;
+            //
+
+            //
+            // const final int nMask = 0x3;
+            // nIntRet = pabyData[nByteOffset] >> nBitOffset & nMask;
+            // dfDoubleRet = nIntRet;
+          } else if (baseItemType == NIBBLE) {
+            throw new RuntimeException("NIBBLE field type not supported");
+            // const final int nBitOffset = nIndexValue & 0x7;
+            // const final int nByteOffset = nIndexValue >> 3;
+            //
+
+            //
+            // const final int nMask = 0x7;
+            // nIntRet = pabyData[nByteOffset] >> nBitOffset & nMask;
+            // dfDoubleRet = nIntRet;
+          } else if (baseItemType == BYTE_UNSIGNED) {
+            final short[] cells = new short[cellCount];
+            for (int i = 0; i < cellCount; i++) {
+              cells[i] = reader.readUnsignedByte();
+            }
+            return new ImgGridData(width, height, baseItemType, cells);
+          } else if (baseItemType == BYTE) {
+            final byte[] cells = new byte[cellCount];
+            for (int i = 0; i < cellCount; i++) {
+              cells[i] = reader.readByte();
+            }
+            return new ImgGridData(width, height, baseItemType, cells);
+
+          } else if (baseItemType == SHORT) {
+            final short[] cells = new short[cellCount];
+            for (int i = 0; i < cellCount; i++) {
+              cells[i] = reader.readShort();
+            }
+            return new ImgGridData(width, height, baseItemType, cells);
+          } else if (baseItemType == SHORT_UNSIGNED) {
+            final int[] cells = new int[cellCount];
+            for (int i = 0; i < cellCount; i++) {
+              cells[i] = reader.readUnsignedShort();
+            }
+            return new ImgGridData(width, height, baseItemType, cells);
+          } else if (baseItemType == INT) {
+            final int[] cells = new int[cellCount];
+            for (int i = 0; i < cellCount; i++) {
+              cells[i] = reader.readInt();
+            }
+            return new ImgGridData(width, height, baseItemType, cells);
+          } else if (baseItemType == INT_UNSIGNED) {
+            final long[] cells = new long[cellCount];
+            for (int i = 0; i < cellCount; i++) {
+              cells[i] = reader.readUnsignedInt();
+            }
+            return new ImgGridData(width, height, baseItemType, cells);
+          } else if (baseItemType == FLOAT) {
+            final float[] cells = new float[cellCount];
+            for (int i = 0; i < cellCount; i++) {
+              cells[i] = reader.readFloat();
+            }
+            return new ImgGridData(width, height, baseItemType, cells);
+          } else if (baseItemType == DOUBLE) {
+            final double[] cells = new double[cellCount];
+            for (int i = 0; i < cellCount; i++) {
+              cells[i] = reader.readDouble();
+            }
+            return new ImgGridData(width, height, baseItemType, cells);
+          } else {
+            throw new IllegalArgumentException("Unknown base item type: " + baseItemType);
+          }
         }
       }
 

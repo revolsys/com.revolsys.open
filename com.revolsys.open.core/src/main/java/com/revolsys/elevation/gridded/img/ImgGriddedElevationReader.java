@@ -29,7 +29,7 @@ import com.revolsys.util.Exceptions;
 class ImgGriddedElevationReader extends BaseObjectWithProperties
   implements GriddedElevationModelReader {
 
-  private BoundingBox boundingBox = BoundingBox.empty();
+  private BoundingBox boundingBox;
 
   private GeometryFactory geometryFactory;
 
@@ -248,7 +248,7 @@ class ImgGriddedElevationReader extends BaseObjectWithProperties
           this.gridCellHeight = pixelSize.getDouble("y");
         }
 
-        this.units = mapInfoEntry.GetStringField("units");
+        this.units = mapInfoEntry.getString("units");
         return true;
       }
     }
@@ -257,7 +257,7 @@ class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   private void parseBandInfo() {
     // Find the first band node.
-    ImgEntry node = this.root.GetChild();
+    ImgEntry node = this.root.getChild();
     while (node != null) {
       if (node.equalsType("Eimg_Layer")) {
         final int width = node.getInteger("width");
@@ -392,6 +392,7 @@ class ImgGriddedElevationReader extends BaseObjectWithProperties
       while (readDictionary()) {
       }
       this.root = new ImgEntry(this, rootPosition);
+      // System.out.println(Json.toString(this.root.toMap(), true));
       parseBandInfo();
       getGeoTransform();
     } else {
