@@ -314,13 +314,14 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   public static String getCrsName(final CoordinateSystem coordinateSystem) {
     final Authority authority = coordinateSystem.getAuthority();
-    final String name = authority.getName();
-    final String code = authority.getCode();
-    if (name.equals("EPSG")) {
-      return name + ":" + code;
-    } else {
-      return null;
+    if (authority != null) {
+      final String name = authority.getName();
+      final String code = authority.getCode();
+      if (name.equals("EPSG")) {
+        return name + ":" + code;
+      }
     }
+    return null;
   }
 
   @SuppressWarnings("unchecked")

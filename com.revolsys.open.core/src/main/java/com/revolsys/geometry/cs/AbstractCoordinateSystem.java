@@ -55,7 +55,11 @@ public abstract class AbstractCoordinateSystem implements CoordinateSystem {
     }
     this.area = area;
     this.deprecated = deprecated;
-    this.authority = new EpsgAuthority(id);
+    if (id > 0) {
+      this.authority = new EpsgAuthority(id);
+    } else {
+      this.authority = null;
+    }
   }
 
   public AbstractCoordinateSystem(final int id, final String name, final List<Axis> axis,
