@@ -13,11 +13,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
@@ -28,7 +26,7 @@ import com.revolsys.spring.resource.NoSuchResourceException;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class ImgGriddedElevationReader extends BaseObjectWithProperties
+class ImgGriddedElevationReader extends BaseObjectWithProperties
   implements GriddedElevationModelReader {
 
   private BoundingBox boundingBox = BoundingBox.empty();
@@ -41,9 +39,9 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   ChannelReader channel;
 
-  private HfaEntry root;
+  private ImgEntry root;
 
-  private HfaDictionary dictionary;
+  private ImgFieldTypeDictionary dictionary;
 
   private int xSize;
 
@@ -51,7 +49,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   private char c;
 
-  private final List<HfaBand> bands = new ArrayList<>();
+  private final List<ImgBand> bands = new ArrayList<>();
 
   private final StringBuilder stringBuilder = new StringBuilder();
 
@@ -69,8 +67,6 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   private String units;
 
-  private MapEx proParameters;
-
   public ImgGriddedElevationReader(final Resource resource,
     final Map<String, ? extends Object> properties) {
     this.resource = resource;
@@ -85,13 +81,20 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     }
   }
 
-  protected HfaType findType(final String typeName) {
-    return this.dictionary.findType(typeName);
+  protected ImgFieldType findType(final String typeName) {
+    return this.dictionary.getFieldType(typeName);
   }
 
   @Override
   public BoundingBox getBoundingBox() {
-    init();
+    if (this.boundingBox == null) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      this.boundingBox = geometryFactory.newBoundingBox(
+        this.upperLeftCenterX - this.gridCellWidth / 2,
+        this.lowerRightCenterY - this.gridCellHeight / 2,
+        this.lowerRightCenterX + this.gridCellWidth / 2,
+        this.upperLeftCenterY + this.gridCellHeight / 2);
+    }
     return this.boundingBox;
   }
 
@@ -136,7 +139,14 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    init();
+    if (this.geometryFactory == null) {
+      init();
+      if (this.bands.size() == 0) {
+        this.geometryFactory = GeometryFactory.DEFAULT_3D;
+      } else {
+        this.geometryFactory = this.bands.get(0).getGeometryFactory();
+      }
+    }
     return this.geometryFactory;
   }
 
@@ -182,48 +192,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     } else if (this.bands.size() == 0) {
       return null;
     } else {
-
-      final HfaEntry poXForm0 = this.bands.get(0).node.GetNamedChild("MapToPixelXForm.XForm0");
-
-      if (poXForm0 == null) {
-        return null;
-      }
-
-      if (poXForm0.getInteger("order") != 1 || poXForm0.getInteger("numdimtransform") != 2
-        || poXForm0.getInteger("numdimpolynomial") != 2 || poXForm0.getInteger("termcount") != 3) {
-        return null;
-      }
-
-      // Verify that there aren't any further xform steps.
-      if (this.bands.get(0).node.GetNamedChild("MapToPixelXForm.XForm1") != null) {
-        return null;
-      }
-
-      // We should check that the exponent list is 0 0 1 0 0 1, but
-      // we don't because we are lazy.
-
-      // Fetch geotransform values.
-      @SuppressWarnings("unused")
-      final double adfXForm[] = {
-        poXForm0.GetDoubleField("polycoefvector[0]"), poXForm0.GetDoubleField("polycoefmtx[0]"),
-        poXForm0.GetDoubleField("polycoefmtx[2]"), poXForm0.GetDoubleField("polycoefvector[1]"),
-        poXForm0.GetDoubleField("polycoefmtx[1]"), poXForm0.GetDoubleField("polycoefmtx[3]")
-      };
-
-      // TODO Invert.
-
-      // if( !HFAInvGeoTransform(adfXForm, padfGeoTransform) ) {
-      // memset(padfGeoTransform, 0, 6 * sizeof(double));
-      // }
-
-      // Adjust origin from center of top left pixel to top left corner
-      // of top left pixel.
-      padfGeoTransform[0] -= padfGeoTransform[1] * 0.5;
-      padfGeoTransform[0] -= padfGeoTransform[2] * 0.5;
-      padfGeoTransform[3] -= padfGeoTransform[4] * 0.5;
-      padfGeoTransform[3] -= padfGeoTransform[5] * 0.5;
-
-      return padfGeoTransform;
+      throw new RuntimeException("Transform not supported");
     }
   }
 
@@ -246,7 +215,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
       } else {
         this.channel.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         readHeader();
-        for (final HfaBand band : this.bands) {
+        for (final ImgBand band : this.bands) {
           band.loadBlockInfo();
         }
       }
@@ -255,16 +224,8 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   private boolean loadMapInfo() {
     if (!this.bands.isEmpty()) {
-      final HfaBand firstBand = this.bands.get(0);
-      HfaEntry mapInfoEntry = firstBand.node.GetNamedChild("Map_Info");
-      if (mapInfoEntry == null) {
-        for (HfaEntry child = firstBand.node.GetChild(); child != null
-          && mapInfoEntry == null; child = child.getNext()) {
-          if (child.equalsType("Eprj_MapInfo")) {
-            mapInfoEntry = child;
-          }
-        }
-      }
+      final ImgBand firstBand = this.bands.get(0);
+      final ImgEntry mapInfoEntry = firstBand.getMapInfo();
 
       if (mapInfoEntry != null) {
         @SuppressWarnings("unused")
@@ -296,7 +257,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   private void parseBandInfo() {
     // Find the first band node.
-    HfaEntry node = this.root.GetChild();
+    ImgEntry node = this.root.GetChild();
     while (node != null) {
       if (node.equalsType("Eimg_Layer")) {
         final int width = node.getInteger("width");
@@ -310,7 +271,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
           }
 
           final int bandNumber = this.bands.size() + 1;
-          final HfaBand band = HfaBand.newBand(this, bandNumber, node);
+          final ImgBand band = ImgBand.newBand(this, bandNumber, node);
           this.bands.add(band);
         }
       }
@@ -322,7 +283,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
   @Override
   public final GriddedElevationModel read() {
     init();
-    for (final HfaBand band : this.bands) {
+    for (final ImgBand band : this.bands) {
       band.loadBlockInfo();
       return band.getGriddedElevationModel();
     }
@@ -339,25 +300,25 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
   }
 
   private boolean readDictionary() {
-    final List<HfaType> types = new ArrayList<>();
+    final List<ImgFieldType> types = new ArrayList<>();
     for (readChar(); this.c != '.'; readChar()) {
       if (this.c == '{') {
         readChar();
-        final List<HfaField> fields = readFields();
+        final List<ImgField> fields = readFields();
         this.stringBuilder.setLength(0);
         for (readChar(); this.c != ',' && this.c != '.'; readChar()) {
           this.stringBuilder.append(this.c);
         }
 
         final String typeName = this.stringBuilder.toString();
-        final HfaType type = new HfaType(typeName, fields);
+        final ImgFieldType type = new ImgFieldType(typeName, fields);
         types.add(type);
 
       } else {
         throw new IllegalArgumentException();
       }
     }
-    this.dictionary = new HfaDictionary(types);
+    this.dictionary = new ImgFieldTypeDictionary(types);
 
     return false;
   }
@@ -366,9 +327,10 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     return this.channel.getDouble();
   }
 
-  private List<HfaField> readFields() {
-    final List<HfaField> fields = new ArrayList<>();
+  private List<ImgField> readFields() {
+    final List<ImgField> fields = new ArrayList<>();
     do {
+      @SuppressWarnings("unused")
       final int itemCount = Integer.parseInt(readStringCurrent(':'));
 
       char itemType = readChar();
@@ -379,15 +341,15 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
         itemType = readChar();
       }
       List<String> enumValues = Collections.emptyList();
-      HfaType fieldType = null;
+      ImgFieldType fieldType = null;
       if ('o' == itemType) {
         fieldTypeName = readString();
       } else if ('x' == itemType) {
         if (readChar() == '{') {
           readChar();
-          final List<HfaField> subFields = readFields();
+          final List<ImgField> subFields = readFields();
           final String typeName = readString();
-          fieldType = new HfaType(typeName, subFields);
+          fieldType = new ImgFieldType(typeName, subFields);
         }
       } else {
         if (itemType == 'e') {
@@ -401,7 +363,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
       }
 
       final String fieldName = readString();
-      final HfaField field = new HfaField(itemCount, pointerType, itemType, fieldName, fieldType,
+      final ImgField field = new ImgField(pointerType, itemType, fieldName, fieldType,
         fieldTypeName, enumValues);
       fields.add(field);
       readChar();
@@ -429,10 +391,9 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
       seek(dictionaryPosition);
       while (readDictionary()) {
       }
-      this.root = new HfaEntry(this, rootPosition);
+      this.root = new ImgEntry(this, rootPosition);
       parseBandInfo();
       getGeoTransform();
-      readProjection();
     } else {
       throw new IllegalArgumentException(this.resource + " is not a valid IMG file");
     }
@@ -440,78 +401,6 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   protected int readInt() {
     return this.channel.getInt();
-  }
-
-  private void readProjection() {
-    if (this.bands.size() < 1) {
-    } else if (this.proParameters == null) {
-      this.proParameters = new LinkedHashMapEx();
-
-      final HfaEntry projectionEntry = this.bands.get(0).node.GetNamedChild("Projection");
-      if (projectionEntry != null) {
-        final HfaEntry datumEntry = projectionEntry.GetNamedChild("Datum");
-        if (datumEntry != null) {
-          final String datumName = datumEntry.getString("datumname");
-          // Fetch the fields.
-          // final String proType = projectionEntry.getString("proType");
-          final int proNumber = projectionEntry.getInteger("proNumber");
-          // final String proExeName = projectionEntry.getString("proExeName");
-          final String proName = projectionEntry.getString("proName");
-          final int proZone = projectionEntry.getInteger("proZone");
-
-          // for( int i = 0; i < 15; i++ )
-          // {
-          // final char szFieldName[40] = {};
-          //
-          // snprintf(szFieldName, sizeof(szFieldName), "proParams[%d]", i);
-          // psProParms.proParams[i] = projectionEntry.GetDoubleField(szFieldName);
-          // }
-
-          // final MapEx spheroidEntry = projectionEntry.getValue("proSpheroid");
-          // final String sphereName = spheroidEntry.getString("sphereName");
-          // double a = spheroidEntry.getDouble("a");
-          // if (a == 0) {
-          // a = 6378137.0;
-          // }
-          // double b = spheroidEntry.getDouble("b");
-          // if (b == 0) {
-          // b = 6356752.3;
-          // }
-          // final double eSquared = spheroidEntry.getDouble("eSquared");
-          // final double radius = spheroidEntry.getDouble("radius");
-
-          if (proNumber == 0) {
-            if ("NAD83".equals(datumName)) {
-              this.geometryFactory = GeometryFactory.nad83();
-            } else {
-              throw new RuntimeException(
-                "Only NAD83 is supported, contact developer for assistance");
-            }
-          } else if (proNumber == 1) {
-            if ("NAD83".equals(datumName)) {
-              if ("UTM".equals(proName)) {
-                this.geometryFactory = GeometryFactory.floating3d(EpsgId.nad83Utm(proZone));
-              } else {
-                throw new RuntimeException(
-                  "Only UTM is supported, contact developer for assistance");
-              }
-            } else {
-              throw new RuntimeException(
-                "Only NAD83 is supported, contact developer for assistance");
-            }
-          } else {
-            throw new RuntimeException(
-              "Only geographic coordinate systems are supported, contact developer for assistance");
-          }
-          this.boundingBox = this.geometryFactory.newBoundingBox(
-            this.upperLeftCenterX - this.gridCellWidth / 2,
-            this.lowerRightCenterY - this.gridCellHeight / 2,
-            this.lowerRightCenterX + this.gridCellWidth / 2,
-            this.upperLeftCenterY + this.gridCellHeight / 2);
-
-        }
-      }
-    }
   }
 
   protected short readShort() {
