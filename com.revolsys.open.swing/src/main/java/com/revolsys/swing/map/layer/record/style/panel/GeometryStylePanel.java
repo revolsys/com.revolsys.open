@@ -12,47 +12,30 @@ import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.field.Field;
-import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.util.Property;
 
 public class GeometryStylePanel extends BaseStylePanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private DataType geometryDataType;
+  private final DataType geometryDataType;
 
   private final GeometryStyle geometryStyle;
 
-  private final GeometryStyleRenderer geometryStyleRenderer;
+  private final GeometryStyleLayerRenderer<?> renderer;
 
   private JPanel previews;
 
-  public GeometryStylePanel(final GeometryStyleRenderer geometryStyleRenderer) {
-    super(geometryStyleRenderer, true);
+  public GeometryStylePanel(final GeometryStyleLayerRenderer<?> renderer) {
+    super(renderer, true);
 
-    this.geometryStyleRenderer = geometryStyleRenderer;
-    this.geometryStyle = geometryStyleRenderer.getStyle();
-    final AbstractRecordLayer layer = geometryStyleRenderer.getLayer();
-    final RecordDefinition recordDefinition = layer.getRecordDefinition();
-    final FieldDefinition geometryField = recordDefinition.getGeometryField();
-
-    if (geometryField != null) {
-      this.geometryDataType = geometryField.getDataType();
-      if (DataTypes.GEOMETRY_COLLECTION.equals(this.geometryDataType)) {
-        this.geometryDataType = DataTypes.GEOMETRY;
-      } else if (DataTypes.MULTI_POINT.equals(this.geometryDataType)) {
-        this.geometryDataType = DataTypes.POINT;
-      } else if (DataTypes.MULTI_LINE_STRING.equals(this.geometryDataType)) {
-        this.geometryDataType = DataTypes.LINE_STRING;
-      } else if (DataTypes.MULTI_POLYGON.equals(this.geometryDataType)) {
-        this.geometryDataType = DataTypes.POLYGON;
-      }
-
+    this.renderer = renderer;
+    this.geometryStyle = renderer.getStyle();
+    this.geometryDataType = renderer.getGeometryType();
+    if (this.geometryDataType != null) {
       final JPanel panel = new JPanel(new BorderLayout());
       add(panel, 1);
       final JPanel stylePanels = new JPanel(new VerticalLayout(5));
@@ -116,6 +99,6 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
   @Override
   public void save() {
     super.save();
-    this.geometryStyleRenderer.setStyle(this.geometryStyle);
+    this.renderer.setStyle(this.geometryStyle);
   }
 }

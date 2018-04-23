@@ -60,6 +60,9 @@ public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
 
   Form newStylePanel();
 
+  default void refresh() {
+  }
+
   default void render(final Viewport2D viewport) {
     render(viewport, () -> {
       return false;
@@ -71,6 +74,8 @@ public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
   void setEditing(boolean editing);
 
   void setLayer(T layer);
+
+  void setName(String name);
 
   void setOpen(boolean open);
 

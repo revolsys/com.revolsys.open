@@ -53,6 +53,7 @@ public abstract class AbstractGriddedElevationModelLayerRenderer
     return getIcon();
   }
 
+  @Override
   public void refresh() {
   }
 

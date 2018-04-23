@@ -106,7 +106,7 @@ import com.revolsys.swing.map.layer.record.component.MergeRecordsDialog;
 import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MultipleRecordRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
@@ -326,7 +326,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     setReadOnly(false);
     setSelectSupported(true);
     setQuerySupported(true);
-    setRenderer(new GeometryStyleRenderer(this));
+    setRenderer(new GeometryStyleRecordLayerRenderer(this));
   }
 
   private void actionFlipFields(final LayerRecord record) {
@@ -2772,7 +2772,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     if (!properties.containsKey("style")) {
-      final GeometryStyleRenderer renderer = getRenderer();
+      final GeometryStyleRecordLayerRenderer renderer = getRenderer();
       if (renderer != null) {
         renderer.setStyle(GeometryStyle.newStyle());
       }

@@ -23,6 +23,8 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -33,7 +35,8 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePreview;
 
-public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
+public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRenderer
+  implements GeometryStyleLayerRenderer<AbstractRecordLayer> {
 
   private static final Icon ICON = Icons.getIcon("style_geometry");
 
@@ -149,39 +152,62 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
   private GeometryStyle style = new GeometryStyle();
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer) {
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer) {
     this(layer, new GeometryStyle());
   }
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer, final GeometryStyle style) {
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer,
+    final GeometryStyle style) {
     this(layer, null, style);
   }
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer,
+    final LayerRenderer<?> parent) {
     super("geometryStyle", "Geometry Style", layer, parent);
     setIcon(ICON);
   }
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
-    final GeometryStyle style) {
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer,
+    final LayerRenderer<?> parent, final GeometryStyle style) {
     super("geometryStyle", "Geometry Style", layer, parent);
     setStyle(style);
     setIcon(ICON);
   }
 
-  public GeometryStyleRenderer(final Map<String, ? extends Object> properties) {
+  public GeometryStyleRecordLayerRenderer(final Map<String, ? extends Object> properties) {
     super("geometryStyle", "Geometry Style");
     setIcon(ICON);
     setProperties(properties);
   }
 
   @Override
-  public GeometryStyleRenderer clone() {
-    final GeometryStyleRenderer clone = (GeometryStyleRenderer)super.clone();
+  public GeometryStyleRecordLayerRenderer clone() {
+    final GeometryStyleRecordLayerRenderer clone = (GeometryStyleRecordLayerRenderer)super.clone();
     if (this.style != null) {
       clone.setStyle(this.style.clone());
     }
     return clone;
+  }
+
+  @Override
+  public DataType getGeometryType() {
+    final AbstractRecordLayer layer = getLayer();
+    final RecordDefinition recordDefinition = layer.getRecordDefinition();
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+
+    if (geometryField != null) {
+      final DataType geometryDataType = geometryField.getDataType();
+      if (DataTypes.GEOMETRY_COLLECTION.equals(geometryDataType)) {
+        return DataTypes.GEOMETRY;
+      } else if (DataTypes.MULTI_POINT.equals(geometryDataType)) {
+        return DataTypes.POINT;
+      } else if (DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+        return DataTypes.LINE_STRING;
+      } else if (DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+        return DataTypes.POLYGON;
+      }
+    }
+    return null;
   }
 
   @Override
@@ -194,6 +220,11 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     return icon;
   }
 
+  /*
+   * (non-Javadoc)
+   * @see com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#getStyle()
+   */
+  @Override
   public GeometryStyle getStyle() {
     return this.style;
   }
@@ -268,6 +299,13 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * @see
+   * com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#setStyle(com.revolsys.
+   * swing.map.layer.record.style.GeometryStyle)
+   */
+  @Override
   public void setStyle(final GeometryStyle style) {
     if (this.style != null) {
       this.style.removePropertyChangeListener(this);

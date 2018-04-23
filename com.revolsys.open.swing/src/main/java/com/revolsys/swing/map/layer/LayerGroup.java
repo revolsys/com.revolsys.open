@@ -49,7 +49,7 @@ import com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLa
 import com.revolsys.swing.map.layer.pointcloud.PointCloudLayer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
@@ -812,7 +812,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layer = new PointCloudLayer(properties);
     } else if (factoryClass == RecordReaderFactory.class) {
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
-      final GeometryStyleRenderer renderer = recordLayer.getRenderer();
+      final GeometryStyleRecordLayerRenderer renderer = recordLayer.getRenderer();
       renderer.setStyle(GeometryStyle.newStyle());
       layer = recordLayer;
     } else {
@@ -873,7 +873,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layer = new PointCloudLayer(properties);
     } else if (IoFactory.hasFactory(RecordReaderFactory.class, url)) {
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
-      final GeometryStyleRenderer renderer = recordLayer.getRenderer();
+      final GeometryStyleRecordLayerRenderer renderer = recordLayer.getRenderer();
       renderer.setStyle(GeometryStyle.newStyle());
       layer = recordLayer;
     } else {

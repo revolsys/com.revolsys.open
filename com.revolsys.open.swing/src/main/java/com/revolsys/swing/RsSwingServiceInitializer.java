@@ -25,7 +25,7 @@ import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
 import com.revolsys.swing.map.layer.record.renderer.FilterMultipleRenderer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MultipleRecordRenderer;
 import com.revolsys.swing.map.layer.record.renderer.ScaleMultipleRenderer;
@@ -61,7 +61,7 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
   }
 
   private void layerRenderers() {
-    MapObjectFactoryRegistry.newFactory("geometryStyle", GeometryStyleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("geometryStyle", GeometryStyleRecordLayerRenderer::new);
     MapObjectFactoryRegistry.newFactory("textStyle", TextStyleRenderer::new);
     MapObjectFactoryRegistry.newFactory("markerStyle", MarkerStyleRenderer::new);
     MapObjectFactoryRegistry.newFactory("multipleStyle", MultipleRecordRenderer::new);

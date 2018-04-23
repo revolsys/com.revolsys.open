@@ -36,7 +36,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
@@ -213,13 +213,13 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   public void drawGeometry(final Geometry geometry, final GeometryStyle style) {
     final Graphics2D graphics = getGraphics();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    GeometryStyleRenderer.renderGeometry(this, graphics, geometry, style);
+    GeometryStyleRecordLayerRenderer.renderGeometry(this, graphics, geometry, style);
   }
 
   public void drawGeometryOutline(final Geometry geometry, final GeometryStyle style) {
     final Graphics2D graphics = getGraphics();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    GeometryStyleRenderer.renderGeometryOutline(this, graphics, geometry, style);
+    GeometryStyleRecordLayerRenderer.renderGeometryOutline(this, graphics, geometry, style);
   }
 
   public void drawText(final Record record, final Geometry geometry, final TextStyle style) {

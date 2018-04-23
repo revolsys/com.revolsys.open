@@ -29,7 +29,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.FilterMultipleRenderer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MultipleRecordRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
@@ -344,12 +344,12 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     final Color fillColor = getColor(symbol);
     style.setPolygonFill(fillColor);
 
-    return new GeometryStyleRenderer(this, style);
+    return new GeometryStyleRecordLayerRenderer(this, style);
   }
 
   private AbstractRecordLayerRenderer newSimpleLineRenderer(final MapEx symbol) {
     final GeometryStyle style = newSimpleLineStyle(symbol);
-    return new GeometryStyleRenderer(this, style);
+    return new GeometryStyleRecordLayerRenderer(this, style);
   }
 
   private GeometryStyle newSimpleLineStyle(final MapEx symbol) {
@@ -404,7 +404,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
         // TODO PMS
         // TODO PFS
         Logs.error(this, "Unsupported symbol=" + symbolType + "\n" + symbolType);
-        return new GeometryStyleRenderer(this);
+        return new GeometryStyleRecordLayerRenderer(this);
       }
     }
   }

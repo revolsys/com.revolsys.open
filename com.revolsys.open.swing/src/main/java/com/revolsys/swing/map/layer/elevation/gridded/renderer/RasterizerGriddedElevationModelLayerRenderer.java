@@ -35,14 +35,14 @@ public class RasterizerGriddedElevationModelLayerRenderer
   }
 
   private static void addAddMenuItem(final MenuFactory menu, final String type,
-    final BiFunction<ElevationModelLayer, IMultipleGriddedElevationModelLayerRenderer, RasterizerGriddedElevationModelLayerRenderer> rendererFactory) {
+    final BiFunction<ElevationModelLayer, IMultipleGriddedElevationModelLayerRenderer, AbstractGriddedElevationModelLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type.replace(' ', '_') + ":add").toLowerCase();
     final String name = "Add " + type + " Style";
     Menus.addMenuItem(menu, "add", name, iconName,
       (final IMultipleGriddedElevationModelLayerRenderer parentRenderer) -> {
         final ElevationModelLayer layer = parentRenderer.getLayer();
-        final RasterizerGriddedElevationModelLayerRenderer newRenderer = rendererFactory
-          .apply(layer, parentRenderer);
+        final AbstractGriddedElevationModelLayerRenderer newRenderer = rendererFactory.apply(layer,
+          parentRenderer);
         parentRenderer.addRendererEdit(newRenderer);
       }, false);
   }
@@ -54,10 +54,13 @@ public class RasterizerGriddedElevationModelLayerRenderer
       RasterizerGriddedElevationModelLayerRenderer::newColorGradient);
 
     addAddMenuItem(menu, "Hillshade", RasterizerGriddedElevationModelLayerRenderer::newHillshade);
+
+    addAddMenuItem(menu, "Outline", BoundingBoxGriddedElevationModelLayerRenderer::new);
+
   }
 
-  public static RasterizerGriddedElevationModelLayerRenderer newColor(
-    final ElevationModelLayer layer, final IMultipleGriddedElevationModelLayerRenderer parent) {
+  public static AbstractGriddedElevationModelLayerRenderer newColor(final ElevationModelLayer layer,
+    final IMultipleGriddedElevationModelLayerRenderer parent) {
     final ColorGriddedElevationModelRasterizer rasterizer = new ColorGriddedElevationModelRasterizer();
     return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
   }
@@ -92,12 +95,12 @@ public class RasterizerGriddedElevationModelLayerRenderer
   }
 
   public RasterizerGriddedElevationModelLayerRenderer(final ElevationModelLayer layer,
-    final MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> parent) {
+    final MultipleLayerRenderer<ElevationModelLayer, AbstractGriddedElevationModelLayerRenderer> parent) {
     this(layer, parent, null);
   }
 
   public RasterizerGriddedElevationModelLayerRenderer(final ElevationModelLayer layer,
-    final MultipleLayerRenderer<ElevationModelLayer, RasterizerGriddedElevationModelLayerRenderer> parent,
+    final MultipleLayerRenderer<ElevationModelLayer, AbstractGriddedElevationModelLayerRenderer> parent,
     final GriddedElevationModelRasterizer rasterizer) {
     this();
     setLayer(layer);
@@ -129,7 +132,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
   public void delete() {
     final LayerRenderer<?> parent = getParent();
     if (parent instanceof MultipleLayerRenderer) {
-      final MultipleLayerRenderer<ElevationModelLayer, LayerRenderer<ElevationModelLayer>> multiple = (MultipleLayerRenderer<ElevationModelLayer, LayerRenderer<ElevationModelLayer>>)parent;
+      final MultipleLayerRenderer<ElevationModelLayer, AbstractGriddedElevationModelLayerRenderer> multiple = (MultipleLayerRenderer<ElevationModelLayer, AbstractGriddedElevationModelLayerRenderer>)parent;
       multiple.removeRenderer(this);
     }
   }

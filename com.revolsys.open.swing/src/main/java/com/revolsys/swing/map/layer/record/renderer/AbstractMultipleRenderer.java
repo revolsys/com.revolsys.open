@@ -25,7 +25,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   static {
     MenuFactory.addMenuInitializer(AbstractMultipleRenderer.class, menu -> {
 
-      addAddMenuItem(menu, "Geometry", GeometryStyleRenderer::new);
+      addAddMenuItem(menu, "Geometry", GeometryStyleRecordLayerRenderer::new);
       addAddMenuItem(menu, "Text", TextStyleRenderer::new);
       addAddMenuItem(menu, "Marker", MarkerStyleRenderer::new);
       addAddMenuItem(menu, "Multiple", MultipleRecordRenderer::new);

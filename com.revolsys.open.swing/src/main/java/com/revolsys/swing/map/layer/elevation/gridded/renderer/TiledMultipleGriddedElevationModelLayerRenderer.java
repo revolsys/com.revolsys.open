@@ -53,7 +53,7 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
 
   }
 
-  private List<RasterizerGriddedElevationModelLayerRenderer> renderers = new ArrayList<>();
+  private List<AbstractGriddedElevationModelLayerRenderer> renderers = new ArrayList<>();
 
   private double minZ = 0;
 
@@ -85,14 +85,19 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
 
   public TiledMultipleGriddedElevationModelLayerRenderer(
     final TiledGriddedElevationModelLayer layer,
-    final RasterizerGriddedElevationModelLayerRenderer renderer) {
+    final AbstractGriddedElevationModelLayerRenderer renderer) {
     this();
     setLayer(layer);
     addRenderer(renderer);
   }
 
   @Override
-  public int addRenderer(int index, final RasterizerGriddedElevationModelLayerRenderer renderer) {
+  public int addRenderer(final AbstractGriddedElevationModelLayerRenderer renderer) {
+    return addRenderer(-1, renderer);
+  }
+
+  @Override
+  public int addRenderer(int index, final AbstractGriddedElevationModelLayerRenderer renderer) {
     if (renderer == null) {
       return -1;
     } else {
@@ -117,20 +122,15 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public int addRenderer(final RasterizerGriddedElevationModelLayerRenderer renderer) {
-    return addRenderer(-1, renderer);
-  }
-
-  @Override
   public boolean canAddChild(final Object object) {
-    return object instanceof RasterizerGriddedElevationModelLayerRenderer;
+    return object instanceof AbstractGriddedElevationModelLayerRenderer;
   }
 
   @Override
   public TiledMultipleGriddedElevationModelLayerRenderer clone() {
     final TiledMultipleGriddedElevationModelLayerRenderer clone = (TiledMultipleGriddedElevationModelLayerRenderer)super.clone();
     clone.renderers = JavaBeanUtil.clone(this.renderers);
-    for (final RasterizerGriddedElevationModelLayerRenderer renderer : clone.renderers) {
+    for (final AbstractGriddedElevationModelLayerRenderer renderer : clone.renderers) {
       renderer.setParent(clone);
     }
     return clone;
@@ -152,7 +152,7 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public List<RasterizerGriddedElevationModelLayerRenderer> getRenderers() {
+  public List<AbstractGriddedElevationModelLayerRenderer> getRenderers() {
     synchronized (this.renderers) {
       return new ArrayList<>(this.renderers);
     }
@@ -160,7 +160,7 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
 
   @Override
   public boolean hasRendererWithSameName(final LayerRenderer<?> renderer, final String name) {
-    for (final RasterizerGriddedElevationModelLayerRenderer otherRenderer : this.renderers) {
+    for (final AbstractGriddedElevationModelLayerRenderer otherRenderer : this.renderers) {
       if (renderer != otherRenderer) {
         final String layerName = otherRenderer.getName();
         if (name.equals(layerName)) {
@@ -185,14 +185,15 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
     return new TiledMultipleGriddedElevationModelStylePanel(this);
   }
 
+  @Override
   public void refresh() {
-    for (final RasterizerGriddedElevationModelLayerRenderer renderer : this.renderers) {
+    for (final AbstractGriddedElevationModelLayerRenderer renderer : this.renderers) {
       renderer.refresh();
     }
   }
 
   @Override
-  public int removeRenderer(final RasterizerGriddedElevationModelLayerRenderer renderer) {
+  public int removeRenderer(final AbstractGriddedElevationModelLayerRenderer renderer) {
     boolean removed = false;
     synchronized (this.renderers) {
       final int index = this.renderers.indexOf(renderer);
@@ -217,8 +218,8 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
       final GriddedElevationModel elevationModel = tile.getElevationModel();
       if (elevationModel != null) {
         final TiledGriddedElevationModelLayer layer = getLayer();
-        final List<RasterizerGriddedElevationModelLayerRenderer> renderers = getRenderers();
-        for (final RasterizerGriddedElevationModelLayerRenderer renderer : cancellable
+        final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
+        for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
           .cancellable(renderers)) {
           final long scaleForVisible = (long)viewport.getScaleForVisible();
           if (renderer.isVisible(scaleForVisible)) {
@@ -248,18 +249,18 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   }
 
   public void setRenderers(
-    final List<? extends RasterizerGriddedElevationModelLayerRenderer> renderers) {
-    List<RasterizerGriddedElevationModelLayerRenderer> oldValue;
+    final List<? extends AbstractGriddedElevationModelLayerRenderer> renderers) {
+    List<AbstractGriddedElevationModelLayerRenderer> oldValue;
     synchronized (this.renderers) {
       oldValue = Lists.toArray(this.renderers);
-      for (final RasterizerGriddedElevationModelLayerRenderer renderer : this.renderers) {
+      for (final AbstractGriddedElevationModelLayerRenderer renderer : this.renderers) {
         renderer.setParent(null);
       }
       if (renderers == null) {
         this.renderers.clear();
       }
       this.renderers = new ArrayList<>(renderers);
-      for (final RasterizerGriddedElevationModelLayerRenderer renderer : this.renderers) {
+      for (final AbstractGriddedElevationModelLayerRenderer renderer : this.renderers) {
         renderer.setParent(this);
       }
     }
@@ -268,10 +269,10 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
 
   public void setStyles(final List<?> styles) {
     if (Property.hasValue(styles)) {
-      final List<RasterizerGriddedElevationModelLayerRenderer> renderers = new ArrayList<>();
+      final List<AbstractGriddedElevationModelLayerRenderer> renderers = new ArrayList<>();
       for (final Object childStyle : styles) {
-        if (childStyle instanceof RasterizerGriddedElevationModelLayerRenderer) {
-          final RasterizerGriddedElevationModelLayerRenderer renderer = (RasterizerGriddedElevationModelLayerRenderer)childStyle;
+        if (childStyle instanceof AbstractGriddedElevationModelLayerRenderer) {
+          final AbstractGriddedElevationModelLayerRenderer renderer = (AbstractGriddedElevationModelLayerRenderer)childStyle;
           renderers.add(renderer);
         } else {
           Logs.error(this, "Cannot create renderer for: " + childStyle);
@@ -284,10 +285,10 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
-    final List<RasterizerGriddedElevationModelLayerRenderer> renderers = getRenderers();
+    final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
     if (!renderers.isEmpty()) {
       final List<Map<String, Object>> rendererMaps = new ArrayList<>();
-      for (final RasterizerGriddedElevationModelLayerRenderer renderer : renderers) {
+      for (final AbstractGriddedElevationModelLayerRenderer renderer : renderers) {
         rendererMaps.add(renderer.toMap());
       }
       addToMap(map, "styles", rendererMaps);

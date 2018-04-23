@@ -51,7 +51,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.Booleans;
@@ -266,7 +266,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
           try (
             BaseCloseable transformCloseable = this.viewport.setUseModelCoordinates(graphics,
               true)) {
-            GeometryStyleRenderer.renderGeometry(this.viewport, graphics, geometry, XOR_LINE_STYLE);
+            GeometryStyleRecordLayerRenderer.renderGeometry(this.viewport, graphics, geometry, XOR_LINE_STYLE);
           }
         }
       } finally {
