@@ -76,10 +76,12 @@ public interface IoFactory extends Available {
   @SuppressWarnings("unchecked")
   static <F extends IoFactory> F factoryByFileExtension(final Class<F> factoryClass,
     String fileExtension) {
-    fileExtension = fileExtension.toLowerCase();
-    if (Property.hasValue(fileExtension)) {
-      return (F)Maps.getMap(IoFactoryRegistry.factoryByClassAndFileExtension, factoryClass,
-        fileExtension);
+    if (fileExtension != null) {
+      fileExtension = fileExtension.toLowerCase();
+      if (Property.hasValue(fileExtension)) {
+        return (F)Maps.getMap(IoFactoryRegistry.factoryByClassAndFileExtension, factoryClass,
+          fileExtension);
+      }
     }
     return null;
   }

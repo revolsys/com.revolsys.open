@@ -75,4 +75,10 @@ public class GeometryRecordReader extends AbstractRecordReader {
     setRecordDefinition(recordDefinition);
   }
 
+  @Override
+  public void setProperty(final String name, final Object value) {
+    super.setProperty(name, value);
+    this.geometryReader.setProperty(name, value);
+  }
+
 }

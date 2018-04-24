@@ -358,4 +358,8 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   public void remove() {
     throw new UnsupportedOperationException();
   }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
 }
