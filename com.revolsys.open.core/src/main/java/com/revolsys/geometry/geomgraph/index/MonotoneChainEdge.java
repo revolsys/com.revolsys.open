@@ -66,43 +66,21 @@ public class MonotoneChainEdge {
     this.startIndex = mcb.getChainStartIndices(edge);
   }
 
-  public void computeIntersects(final MonotoneChainEdge mce, final SegmentIntersector si) {
-    final int length1 = this.startIndex.length;
-    final int length2 = mce.startIndex.length;
-    for (int i = 0; i < length1 - 1; i++) {
-      for (int j = 0; j < length2 - 1; j++) {
-        computeIntersectsForChain(i, mce, j, si);
-      }
-    }
-  }
-
-  private void computeIntersectsForChain(final Edge edge1, final LineString line1, final int start0,
-    final int end0, final Edge edge2, final LineString line2, final int start1, final int end1,
-    final SegmentIntersector ei) {
-
+  private void computeIntersections(final LineString line1, final int fromIndex1,
+    final double fromX1, final double fromY1, final int toIndex1, final double toX1,
+    final double toY1, final Edge edge2, final LineString line2, final int fromIndex2,
+    final double fromX2, final double fromY2, final int toIndex2, final double toX2,
+    final double toY2, final SegmentIntersector ei) {
     // terminating condition for the recursion
-    if (end0 - start0 == 1 && end1 - start1 == 1) {
-      ei.addIntersections(edge1, line1, start0, edge2, line2, start1);
+    if (toIndex1 - fromIndex1 == 1 && toIndex2 - fromIndex2 == 1) {
+      ei.addIntersections(this.edge, line1, fromIndex1, fromX1, fromY1, toX1, toY1, edge2,
+        fromIndex2, fromX2, fromY2, toX2, toY2);
     } else {
-      double minX1 = line1.getX(start0);
-      double minY1 = line1.getY(start0);
-      double maxX1 = line1.getX(end0);
-      double maxY1 = line1.getY(end0);
-      if (minX1 > maxX1) {
-        final double t = minX1;
-        minX1 = maxX1;
-        maxX1 = t;
-      }
-      if (minY1 > maxY1) {
-        final double t = minY1;
-        minY1 = maxY1;
-        maxY1 = t;
-      }
 
-      double minX2 = line2.getX(start1);
-      double minY2 = line2.getY(start1);
-      double maxX2 = line2.getX(end1);
-      double maxY2 = line2.getY(end1);
+      double minX2 = fromX2;
+      double minY2 = fromY2;
+      double maxX2 = toX2;
+      double maxY2 = toY2;
       if (minX2 > maxX2) {
         final double t = minX2;
         minX2 = maxX2;
@@ -114,45 +92,84 @@ public class MonotoneChainEdge {
         maxY2 = t;
       }
 
-      // nothing to do if the envelopes of these chains don't overlap
-      if (minX2 > maxX1 || maxX2 < minX1 || minY2 > maxY1 || maxY2 < minY1) {
-        return;
+      double minX1 = fromX1;
+      double minY1 = fromY1;
+      double maxX1 = toX1;
+      double maxY1 = toY1;
+      if (minX1 > maxX1) {
+        final double t = minX1;
+        minX1 = maxX1;
+        maxX1 = t;
+      }
+      if (minY1 > maxY1) {
+        final double t = minY1;
+        minY1 = maxY1;
+        maxY1 = t;
       }
 
-      // the chains overlap, so split each in half and iterate (binary search)
-      final int mid0 = (start0 + end0) / 2;
-      final int mid1 = (start1 + end1) / 2;
+      // Envelopes intersect
+      if (!(minX2 > maxX1 || maxX2 < minX1 || minY2 > maxY1 || maxY2 < minY1)) {
+        // the chains overlap, so split each in half and iterate (binary search)
+        final int midIndex1 = (fromIndex1 + toIndex1) / 2;
+        final double midX1 = line1.getX(midIndex1);
+        final double midY1 = line1.getY(midIndex1);
+        final int midIndex2 = (fromIndex2 + toIndex2) / 2;
+        final double midX2 = line2.getX(midIndex2);
+        final double midY2 = line2.getY(midIndex2);
 
-      // Assert: mid != start or end (since we checked above for end - start <= 1)
-      // check terminating conditions before recursing
-      if (start0 < mid0) {
-        if (start1 < mid1) {
-          computeIntersectsForChain(edge1, line1, start0, mid0, edge2, line2, start1, mid1, ei);
+        // Assert: mid != start or end (since we checked above for end - start <= 1)
+        // check terminating conditions before recursing
+        // Reuse the sub-chain. Resetting after each operation
+        if (fromIndex1 < midIndex1) {
+          if (fromIndex2 < midIndex2) {
+            computeIntersections(line1, fromIndex1, fromX1, fromY1, midIndex1, midX1, midY1, edge2,
+              line2, fromIndex2, fromX2, fromY2, midIndex2, midX2, midY2, ei);
+          }
+          if (midIndex2 < toIndex2) {
+            computeIntersections(line1, fromIndex1, fromX1, fromY1, midIndex1, midX1, midY1, edge2,
+              line2, midIndex2, midX2, midY2, toIndex2, toX2, toY2, ei);
+          }
         }
-        if (mid1 < end1) {
-          computeIntersectsForChain(edge1, line1, start0, mid0, edge2, line2, mid1, end1, ei);
-        }
-      }
-      if (mid0 < end0) {
-        if (start1 < mid1) {
-          computeIntersectsForChain(edge1, line1, mid0, end0, edge2, line2, start1, mid1, ei);
-        }
-        if (mid1 < end1) {
-          computeIntersectsForChain(edge1, line1, mid0, end0, edge2, line2, mid1, end1, ei);
+        if (midIndex1 < toIndex1) {
+          if (fromIndex2 < midIndex2) {
+            computeIntersections(line1, midIndex1, midX1, midY1, toIndex1, toX1, toY1, edge2, line2,
+              fromIndex2, fromX2, fromY2, midIndex2, midX2, midY2, ei);
+          }
+          if (midIndex2 < toIndex2) {
+            computeIntersections(line1, midIndex1, midX1, midY1, toIndex1, toX1, toY1, edge2, line2,
+              midIndex2, midX2, midY2, toIndex2, toX2, toY2, ei);
+          }
         }
       }
     }
   }
 
-  public void computeIntersectsForChain(final int chainIndex0, final MonotoneChainEdge mce,
-    final int chainIndex1, final SegmentIntersector si) {
+  public void computeIntersectsForChain(final int chainIndex1, final MonotoneChainEdge mce,
+    final int chainIndex2, final SegmentIntersector si) {
     final Edge edge1 = this.edge;
-    final Edge edge2 = mce.edge;
     final LineString line1 = edge1.getLineString();
+    final int fromIndex1 = this.startIndex[chainIndex1];
+    final double fromX1 = line1.getX(fromIndex1);
+    final double fromY1 = line1.getY(fromIndex1);
+    final int toIndex1 = this.startIndex[chainIndex1 + 1];
+    final double toX1 = line1.getX(toIndex1);
+    final double toY1 = line1.getY(toIndex1);
+
+    final Edge edge2 = mce.edge;
     final LineString line2 = edge2.getLineString();
-    computeIntersectsForChain(edge1, line1, this.startIndex[chainIndex0],
-      this.startIndex[chainIndex0 + 1], edge2, line2, mce.startIndex[chainIndex1],
-      mce.startIndex[chainIndex1 + 1], si);
+    final int fromIndex2 = mce.startIndex[chainIndex2];
+    final double fromX2 = line2.getX(fromIndex2);
+    final double fromY2 = line2.getY(fromIndex2);
+    final int toIndex2 = mce.startIndex[chainIndex2 + 1];
+    final double toX2 = line2.getX(toIndex2);
+    final double toY2 = line2.getY(toIndex2);
+
+    computeIntersections(line1, fromIndex1, fromX1, fromY1, toIndex1, toX1, toY1, edge2, line2,
+      fromIndex2, fromX2, fromY2, toIndex2, toX2, toY2, si);
+  }
+
+  public Edge getEdge() {
+    return this.edge;
   }
 
   public int getStartIndexCount() {

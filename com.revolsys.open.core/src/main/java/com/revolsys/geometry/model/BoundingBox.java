@@ -552,17 +552,21 @@ public interface BoundingBox
       return boundingBox.isEmpty();
     } else if (boundingBox.isEmpty()) {
       return false;
-    } else if (getHorizontalCoordinateSystemId() == boundingBox.getHorizontalCoordinateSystemId()) {
-      if (getMaxX() == boundingBox.getMaxX()) {
-        if (getMaxY() == boundingBox.getMaxY()) {
-          if (getMinX() == boundingBox.getMinX()) {
-            if (getMinY() == boundingBox.getMinY()) {
-              return true;
+    } else {
+      final int csId1 = getHorizontalCoordinateSystemId();
+      final int csId2 = boundingBox.getHorizontalCoordinateSystemId();
+      if (csId1 == csId2 || csId1 < 1 || csId2 < 1) {
+        if (getMaxX() == boundingBox.getMaxX()) {
+          if (getMaxY() == boundingBox.getMaxY()) {
+            if (getMinX() == boundingBox.getMinX()) {
+              if (getMinY() == boundingBox.getMinY()) {
+                return true;
+              }
             }
           }
         }
-      }
 
+      }
     }
     return false;
   }

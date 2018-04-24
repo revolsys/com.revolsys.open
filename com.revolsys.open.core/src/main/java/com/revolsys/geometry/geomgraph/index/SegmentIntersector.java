@@ -84,6 +84,63 @@ public class SegmentIntersector {
     this.recordIsolated = recordIsolated;
   }
 
+  public void addIntersections(final Edge edge1, final LineString line1, final int fromIndex1,
+    final double fromX1, final double fromY1, final double toX1, final double toY1,
+    final Edge edge2, final int fromIndex2, final double fromX2, final double fromY2,
+    final double toX2, final double toY2) {
+    if (edge1 == edge2 && fromIndex1 == fromIndex2) {
+      return;
+    } else {
+      this.numTests++;
+
+      final LineIntersector lineIntersector = this.lineIntersector;
+      lineIntersector.computeIntersection(fromX1, fromY1, toX1, toY1, fromX2, fromY2, toX2, toY2);
+      /**
+       *  Always record any non-proper intersections.
+       *  If includeProper is true, record any proper intersections as well.
+       */
+      if (lineIntersector.hasIntersection()) {
+        if (this.recordIsolated) {
+          edge1.setIsolated(false);
+          edge2.setIsolated(false);
+        }
+        // if the segments are adjacent they have at least one trivial
+        // intersection,
+        // the shared endpoint. Don't bother adding it if it is the
+        // only intersection.
+        boolean trivialIntersection = false;
+        if (edge1 == edge2) {
+          if (lineIntersector.getIntersectionCount() == 1) {
+            if (Math.abs(fromIndex1 - fromIndex2) == 1) {
+              trivialIntersection = true;
+            } else if (line1.isClosed()) {
+              final int maxSegIndex = line1.getVertexCount() - 1;
+              if (fromIndex1 == 0 && fromIndex2 == maxSegIndex
+                || fromIndex2 == 0 && fromIndex1 == maxSegIndex) {
+                trivialIntersection = true;
+              }
+            }
+          }
+        }
+
+        if (!trivialIntersection) {
+          this.hasIntersection = true;
+          if (this.includeProper || !lineIntersector.isProper()) {
+            edge1.addIntersections(lineIntersector, fromIndex1, 0);
+            edge2.addIntersections(lineIntersector, fromIndex2, 1);
+          }
+          if (lineIntersector.isProper()) {
+            this.properIntersectionPoint = lineIntersector.getIntersection(0);
+            this.hasProper = true;
+            if (!isBoundaryPoint()) {
+              this.hasProperInterior = true;
+            }
+          }
+        }
+      }
+    }
+  }
+
   /**
    * This method is called by clients of the EdgeIntersector class to test for and add
    * intersections for two segments of the edges being intersected.

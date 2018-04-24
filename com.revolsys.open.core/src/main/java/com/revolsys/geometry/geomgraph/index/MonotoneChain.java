@@ -43,11 +43,6 @@ public class MonotoneChain {
     this.chainIndex = chainIndex;
   }
 
-  public void computeIntersections(final MonotoneChain chain,
-    final SegmentIntersector intersector) {
-    this.edge.computeIntersectsForChain(this.chainIndex, chain.edge, chain.chainIndex, intersector);
-  }
-
   public int getChainIndex() {
     return this.chainIndex;
   }

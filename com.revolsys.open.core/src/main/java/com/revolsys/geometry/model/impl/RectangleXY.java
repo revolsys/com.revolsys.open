@@ -344,23 +344,24 @@ public class RectangleXY extends AbstractPolygon {
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
-    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
-    this.ring.forEachVertex(coordinatesOperation, point, action);
-  }
-
-  @Override
-  public void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
-    this.ring.forEachVertex(coordinates, action);
-  }
-
-  @Override
   public void forEachVertex(final Consumer3Double action) {
     action.accept(this.minX, this.minY, Double.NaN);
     action.accept(this.maxX, this.minY, Double.NaN);
     action.accept(this.maxX, this.maxY, Double.NaN);
     action.accept(this.minX, this.maxY, Double.NaN);
     action.accept(this.minX, this.minY, Double.NaN);
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    this.ring.forEachVertex(coordinatesOperation, point, action);
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
+    this.ring.forEachVertex(coordinates, action);
   }
 
   @Override
@@ -489,7 +490,7 @@ public class RectangleXY extends AbstractPolygon {
 
   @Override
   public BoundingBox newBoundingBox() {
-    return new BoundingBoxDoubleXY(this.geometryFactory, this.minY, this.minX, this.maxY,
-      this.maxX);
+    return new BoundingBoxDoubleXY(this.geometryFactory, this.minX, this.minY, this.maxX,
+      this.maxY);
   }
 }
