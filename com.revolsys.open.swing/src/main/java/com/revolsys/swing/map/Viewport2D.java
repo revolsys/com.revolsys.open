@@ -660,9 +660,6 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
         }
         final double pixelSizeMetres = QuantityType
           .doubleValue(Quantities.getQuantity(1, getScreenUnit()), Units.METRE);
-        if (this instanceof ComponentViewport2D) {
-          System.out.println(oldUnitsPerPixel + "\t" + unitsPerPixel);
-        }
         this.unitsPerPixel = unitsPerPixel;
         setModelToScreenTransform(
           newModelToScreenTransform(boundingBox, viewWidthPixels, viewHeightPixels));
