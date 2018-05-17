@@ -75,6 +75,18 @@ public interface Polygonal extends Geometry {
     return false;
   }
 
+  default Polygonal differencePolygonal(final Geometry geometry) {
+    final Geometry difference = difference(geometry);
+    if (difference instanceof Polygonal) {
+      return (Polygonal)difference;
+    } else {
+      final List<Polygon> polygons = new ArrayList<>();
+      difference.forEachPolygon(polygons::add);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.polygonal(polygons);
+    }
+  }
+
   @Override
   void forEachPolygon(Consumer<Polygon> action);
 
