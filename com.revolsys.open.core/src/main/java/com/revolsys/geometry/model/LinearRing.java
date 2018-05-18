@@ -173,15 +173,7 @@ public interface LinearRing extends LineString {
           final boolean inside2 = y2 <= maxY;
           if (inside1 != inside2) {
             if (y1 != maxY && y2 != maxY) {
-              double newX;
-
-              final double deltaX = x1 - x2;
-              if (deltaX == 0) {
-                newX = x1;
-              } else {
-                final double deltaY = y1 - y2;
-                newX = x1 + (maxY - y1) * (deltaX / deltaY);
-              }
+              final double newX = x1 + (x2 - x1) * (maxY - y1) / (y2 - y1);
               newLine.appendVertex(newX, maxY);
             }
           }
@@ -220,15 +212,7 @@ public interface LinearRing extends LineString {
           final boolean inside2 = y2 >= minY;
           if (inside1 != inside2) {
             if (y1 != minY && y2 != minY) {
-              double newX;
-
-              final double deltaX = x1 - x2;
-              if (deltaX == 0) {
-                newX = x1;
-              } else {
-                final double deltaY = y1 - y2;
-                newX = x1 + (minY - y1) * (deltaX / deltaY);
-              }
+              final double newX = x1 + (x2 - x1) * (minY - y1) / (y2 - y1);
               newLine.appendVertex(newX, minY);
             }
           }
@@ -268,15 +252,7 @@ public interface LinearRing extends LineString {
           final boolean inside2 = x2 >= minX;
           if (inside1 != inside2) {
             if (x1 != minX && x2 != minX) {
-              double newY;
-
-              final double deltaY = y1 - y2;
-              if (deltaY == 0) {
-                newY = y1;
-              } else {
-                final double deltaX = x1 - x2;
-                newY = y1 + (minY - y1) * (deltaX / deltaY);
-              }
+              final double newY = y1 + (y2 - y1) * (minX - x1) / (x2 - x1);
               newLine.appendVertex(minX, newY);
             }
           }
@@ -316,15 +292,7 @@ public interface LinearRing extends LineString {
           final boolean inside2 = x2 <= maxX;
           if (inside1 != inside2) {
             if (x1 != maxX && x2 != maxX) {
-              double newY;
-
-              final double deltaY = y1 - y2;
-              if (deltaY == 0) {
-                newY = y1;
-              } else {
-                final double deltaX = x1 - x2;
-                newY = y1 + (minY - y1) * (deltaX / deltaY);
-              }
+              final double newY = y1 + (y2 - y1) * (maxX - x1) / (x2 - x1);
               newLine.appendVertex(maxX, newY);
             }
           }

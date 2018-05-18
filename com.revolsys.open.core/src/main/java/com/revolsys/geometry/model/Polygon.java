@@ -144,7 +144,7 @@ public interface Polygon extends Polygonal {
           rings.add(clippedRing);
         }
       }
-      return geometryFactory.polygonal(rings);
+      return geometryFactory.polygon(rings);
     } else {
       return geometryFactory.polygon();
     }

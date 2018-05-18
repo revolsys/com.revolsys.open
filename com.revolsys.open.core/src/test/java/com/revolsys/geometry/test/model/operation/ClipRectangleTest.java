@@ -23,9 +23,6 @@ public class ClipRectangleTest {
     final Polygon polygonM = GEOMETRY_FACTORY.polygon(2, 0, 0, 1, 0, 1, 3, 2, 2, 3, 3, 3, 0, 4, 0,
       4, 4, 3, 4, 2, 3, 1, 4, 0, 4, 0, 0);
 
-    final Polygon hexagon = GEOMETRY_FACTORY.polygon(2, 0, 2, 2, 0, 4, 0, 6, 2, 6, 4, 4, 6, 2, 6, 0,
-      4, 0, 2);
-
     assertClip("Same", polygonM, 0, 0, 4, 4, polygonM);
     assertClip("Larger", polygonM, -1, -1, 5, 5, polygonM);
     assertClip("Disjoint", polygonM, -2, -2, -1, -1, polygonEmpty);
@@ -50,7 +47,18 @@ public class ClipRectangleTest {
       2, 3, 1, 3, 1, 1);
     assertClip("All", polygonM, 1, 1, 3, 3, polygonClipAll);
 
+    final Polygon hexagon = GEOMETRY_FACTORY.polygon(2, 0, 2, 2, 0, 4, 0, 6, 2, 6, 4, 4, 6, 2, 6, 0,
+      4, 0, 2);
+
     final Polygon polygonClipContained = GEOMETRY_FACTORY.polygon(2, 1, 1, 5, 1, 5, 5, 1, 5, 1, 1);
-    assertClip("Contained Hexagon", hexagon, 1, 1, 5, 5, polygonClipContained);
+    assertClip("Hexagon Contained", hexagon, 1, 1, 5, 5, polygonClipContained);
+
+    final Polygon hexagonLeftRight = GEOMETRY_FACTORY.polygon(2, 1, 1, 2, 0, 4, 0, 5, 1, 5, 5, 4, 6,
+      2, 6, 1, 5, 1, 1);
+    assertClip("Hexagon Left/Right", hexagon, 1, 0, 5, 6, hexagonLeftRight);
+
+    final Polygon polygonClipTopBottom = GEOMETRY_FACTORY.polygon(2, 0, 2, 1, 1, 5, 1, 6, 2, 6, 4,
+      5, 5, 1, 5, 0, 4, 0, 2);
+    assertClip("Hexagon Top/Bottom", hexagon, 0, 1, 6, 5, polygonClipTopBottom);
   }
 }
