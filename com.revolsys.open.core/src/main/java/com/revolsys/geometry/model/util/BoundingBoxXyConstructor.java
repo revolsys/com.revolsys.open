@@ -5,7 +5,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.util.function.BiConsumerDouble;
 
-public class BoundingBoxXyContructor implements BiConsumerDouble {
+public class BoundingBoxXyConstructor implements BiConsumerDouble {
 
   private double minX = Double.POSITIVE_INFINITY;
 
@@ -17,7 +17,7 @@ public class BoundingBoxXyContructor implements BiConsumerDouble {
 
   private final GeometryFactory geometryFactory;
 
-  public BoundingBoxXyContructor(final GeometryFactory geometryFactory) {
+  public BoundingBoxXyConstructor(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
