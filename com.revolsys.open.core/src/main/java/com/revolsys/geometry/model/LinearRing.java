@@ -136,6 +136,218 @@ public interface LinearRing extends LineString {
     return geometryFactory.linearRing(axisCount, coordinates);
   }
 
+  default LinearRing clipRectangle(double minX, double minY, double maxX, double maxY) {
+    if (minX > maxX) {
+      final double t = minX;
+      minX = maxX;
+      maxX = t;
+    }
+    if (minY > maxY) {
+      final double t = minY;
+      minY = maxY;
+      maxY = t;
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (getBoundingBox().intersects(minX, minY, maxX, maxY)) {
+      final int axisCount = getAxisCount();
+      LineStringEditor newLine = new LineStringEditor(geometryFactory);
+
+      // Clip top
+      {
+        final LineString line = this;
+        final int vertexCount = line.getVertexCount();
+        newLine = new LineStringEditor(geometryFactory);
+        double x1 = line.getX(0);
+        double y1 = line.getY(0);
+        boolean inside1 = y1 < maxY;
+        if (inside1) {
+          newLine.appendVertex(x1, y1);
+          for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+            final double coordinate = line.getCoordinate(0, axisIndex);
+            newLine.setCoordinate(0, axisIndex, coordinate);
+          }
+        }
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = line.getX(vertexIndex);
+          final double y2 = line.getY(vertexIndex);
+          final boolean inside2 = y2 <= maxY;
+          if (inside1 != inside2) {
+            if (y1 != maxY && y2 != maxY) {
+              double newX;
+
+              final double deltaX = x1 - x2;
+              if (deltaX == 0) {
+                newX = x1;
+              } else {
+                final double deltaY = y1 - y2;
+                newX = x1 + (maxY - y1) * (deltaX / deltaY);
+              }
+              newLine.appendVertex(newX, maxY);
+            }
+          }
+          if (inside2) {
+            newLine.appendVertex(x2, y2);
+            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+              final double coordinate = line.getCoordinate(vertexIndex, axisIndex);
+              newLine.setCoordinate(vertexIndex, axisIndex, coordinate);
+            }
+          }
+          inside1 = inside2;
+          x1 = x2;
+          y1 = y2;
+        }
+        newLine.closeRing();
+      }
+
+      // Clip bottom
+      {
+        final LineString line = newLine;
+        final int vertexCount = line.getVertexCount();
+        newLine = new LineStringEditor(geometryFactory);
+        double x1 = line.getX(0);
+        double y1 = line.getY(0);
+        boolean inside1 = y1 >= minY;
+        if (inside1) {
+          newLine.appendVertex(x1, y1);
+          for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+            final double coordinate = line.getCoordinate(0, axisIndex);
+            newLine.setCoordinate(0, axisIndex, coordinate);
+          }
+        }
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = line.getX(vertexIndex);
+          final double y2 = line.getY(vertexIndex);
+          final boolean inside2 = y2 >= minY;
+          if (inside1 != inside2) {
+            if (y1 != minY && y2 != minY) {
+              double newX;
+
+              final double deltaX = x1 - x2;
+              if (deltaX == 0) {
+                newX = x1;
+              } else {
+                final double deltaY = y1 - y2;
+                newX = x1 + (minY - y1) * (deltaX / deltaY);
+              }
+              newLine.appendVertex(newX, minY);
+            }
+          }
+          if (inside2) {
+            newLine.appendVertex(x2, y2);
+            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+              final double coordinate = line.getCoordinate(vertexIndex, axisIndex);
+              newLine.setCoordinate(vertexIndex, axisIndex, coordinate);
+            }
+          }
+
+          inside1 = inside2;
+          x1 = x2;
+          y1 = y2;
+        }
+        newLine.closeRing();
+      }
+
+      // Clip left
+      {
+        final LineString line = newLine;
+        final int vertexCount = line.getVertexCount();
+        newLine = new LineStringEditor(geometryFactory);
+        double x1 = line.getX(0);
+        double y1 = line.getY(0);
+        boolean inside1 = x1 >= minX;
+        if (inside1) {
+          newLine.appendVertex(x1, y1);
+          for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+            final double coordinate = line.getCoordinate(0, axisIndex);
+            newLine.setCoordinate(0, axisIndex, coordinate);
+          }
+        }
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = line.getX(vertexIndex);
+          final double y2 = line.getY(vertexIndex);
+          final boolean inside2 = x2 >= minX;
+          if (inside1 != inside2) {
+            if (x1 != minX && x2 != minX) {
+              double newY;
+
+              final double deltaY = y1 - y2;
+              if (deltaY == 0) {
+                newY = y1;
+              } else {
+                final double deltaX = x1 - x2;
+                newY = y1 + (minY - y1) * (deltaX / deltaY);
+              }
+              newLine.appendVertex(minX, newY);
+            }
+          }
+          if (inside2) {
+            newLine.appendVertex(x2, y2);
+            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+              final double coordinate = line.getCoordinate(vertexIndex, axisIndex);
+              newLine.setCoordinate(vertexIndex, axisIndex, coordinate);
+            }
+          }
+
+          inside1 = inside2;
+          x1 = x2;
+          y1 = y2;
+        }
+        newLine.closeRing();
+      }
+
+      // Clip right
+      {
+        final LineString line = newLine;
+        final int vertexCount = line.getVertexCount();
+        newLine = new LineStringEditor(geometryFactory);
+        double x1 = line.getX(0);
+        double y1 = line.getY(0);
+        boolean inside1 = x1 <= maxX;
+        if (inside1) {
+          newLine.appendVertex(x1, y1);
+          for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+            final double coordinate = line.getCoordinate(0, axisIndex);
+            newLine.setCoordinate(0, axisIndex, coordinate);
+          }
+        }
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = line.getX(vertexIndex);
+          final double y2 = line.getY(vertexIndex);
+          final boolean inside2 = x2 <= maxX;
+          if (inside1 != inside2) {
+            if (x1 != maxX && x2 != maxX) {
+              double newY;
+
+              final double deltaY = y1 - y2;
+              if (deltaY == 0) {
+                newY = y1;
+              } else {
+                final double deltaX = x1 - x2;
+                newY = y1 + (minY - y1) * (deltaX / deltaY);
+              }
+              newLine.appendVertex(maxX, newY);
+            }
+          }
+          if (inside2) {
+            newLine.appendVertex(x2, y2);
+            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+              final double coordinate = line.getCoordinate(vertexIndex, axisIndex);
+              newLine.setCoordinate(vertexIndex, axisIndex, coordinate);
+            }
+          }
+
+          inside1 = inside2;
+          x1 = x2;
+          y1 = y2;
+        }
+        newLine.closeRing();
+      }
+      return newLine.newLinearRing();
+    } else {
+      return geometryFactory.linearRing();
+    }
+  }
+
   @Override
   LinearRing clone();
 

@@ -215,6 +215,13 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     return clone;
   }
 
+  public void closeRing() {
+    final int lastVertexIndex = getLastVertexIndex();
+    if (!equalsVertex(2, 0, lastVertexIndex)) {
+      appendVertex(getPoint(0));
+    }
+  }
+
   public void deleteVertex(final int vertexIndex) {
     if (!isEmpty()) {
       final int vertexCount = getVertexCount();
