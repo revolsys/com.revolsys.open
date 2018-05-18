@@ -1,7 +1,6 @@
 package com.revolsys.geometry.index.rtree;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -136,17 +135,14 @@ public class RTreeBranch<T> extends RTreeNode<T> {
   }
 
   @Override
-  public boolean remove(final LinkedList<RTreeNode<T>> path, final double minX, final double minY,
-    final double maxX, final double maxY, final T object) {
+  public boolean remove(final double minX, final double minY, final double maxX,
+    final double maxY, final T object) {
     final int childCount = this.size;
     final RTreeNode<T>[] childNodes = this.nodes;
     for (int i = 0; i < childCount; i++) {
       final RTreeNode<T> childNode = childNodes[i];
       if (childNode.covers(minX, minY, maxX, maxY)) {
-        if (childNode.remove(path, minX, minY, maxX, maxY, object)) {
-          if (path != null) {
-            path.addFirst(this);
-          }
+        if (childNode.remove(minX, minY, maxX, maxY, object)) {
           updateEnvelope();
           return true;
         }

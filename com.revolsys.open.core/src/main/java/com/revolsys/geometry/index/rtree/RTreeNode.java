@@ -1,6 +1,5 @@
 package com.revolsys.geometry.index.rtree;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -64,8 +63,8 @@ public abstract class RTreeNode<T> extends BoundingBoxNode {
     return areaExpansion;
   }
 
-  public abstract boolean remove(LinkedList<RTreeNode<T>> path, final double minX,
-    final double minY, final double maxX, final double maxY, T object);
+  public abstract boolean remove(final double minX, final double minY,
+    final double maxX, final double maxY, T object);
 
   protected abstract void updateEnvelope();
 }

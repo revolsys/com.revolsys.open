@@ -102,7 +102,7 @@ public class RTree<T> implements SpatialIndex<T> {
     final double minY = boundingBox.getMinY();
     final double maxX = boundingBox.getMaxX();
     final double maxY = boundingBox.getMaxY();
-    if (this.root.remove(null, minX, minY, maxX, maxY, object)) {
+    if (this.root.remove(minX, minY, maxX, maxY, object)) {
       this.size--;
       return true;
     } else {

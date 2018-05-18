@@ -43,7 +43,6 @@ import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.number.Doubles;
 
 import systems.uom.common.USCustomary;
 import tec.uom.se.quantity.Quantities;
@@ -254,6 +253,17 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final int x = event.getX();
     final int y = event.getY();
     return getBoundingBox(geometryFactory, x, y, pixels);
+  }
+
+  public double getClosestUnitsPerPixel(final double unitsPerPixel) {
+    final List<Double> values = this.unitsPerPixelList;
+    for (int i = values.size() - 1; i >= 0; i--) {
+      final double nextValue = values.get(i);
+      if (nextValue > unitsPerPixel || Math.abs(1 - unitsPerPixel / nextValue) < 0.1) {
+        return nextValue;
+      }
+    }
+    return this.maxUnitsPerPixel;
   }
 
   public Geometry getGeometry(final Geometry geometry) {
@@ -618,9 +628,12 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
               newBoundingBox = newBoundingBox.expand(0, expandY);
             }
           }
-          unitsPerPixel = Doubles.makePrecise(10000000, width / viewWidthPixels);
-          if (!this.unitsPerPixelList.isEmpty() && viewWidthPixels > 0 && viewHeightPixels > 0) {
-            if (unitsPerPixel < this.minUnitsPerPixel) {
+          unitsPerPixel = width / viewWidthPixels;
+          if (!this.unitsPerPixelList.isEmpty() && viewHeightPixels > 0) {
+            if (this.zoomByUnitsPerPixel) {
+              // TODO have to adjust bounding box
+              unitsPerPixel = getClosestUnitsPerPixel(unitsPerPixel);
+            } else if (unitsPerPixel < this.minUnitsPerPixel) {
               unitsPerPixel = this.minUnitsPerPixel;
             } else if (unitsPerPixel > this.maxUnitsPerPixel) {
               unitsPerPixel = this.maxUnitsPerPixel;
@@ -829,7 +842,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   }
 
   public void setUnitsPerPixel(final double unitsPerPixel) {
-    double unitsPerPixel2 = getUnitsPerPixel();
+    final double unitsPerPixel2 = getUnitsPerPixel();
     if (isChanged(unitsPerPixel, unitsPerPixel2)) {
       setZoomByUnitsPerPixel(true);
 
