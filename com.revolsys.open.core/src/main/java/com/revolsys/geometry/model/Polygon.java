@@ -121,6 +121,7 @@ public interface Polygon extends Polygonal {
     return this;
   }
 
+  @Override
   default Polygonal clipRectangle(double x1, double y1, double x2, double y2) {
     if (x1 > x2) {
       final double t = x1;

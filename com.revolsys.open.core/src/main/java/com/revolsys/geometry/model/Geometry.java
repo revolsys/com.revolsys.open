@@ -65,7 +65,7 @@ import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.geometry.model.util.BoundingBoxXyContructor;
+import com.revolsys.geometry.model.util.BoundingBoxXyConstructor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
@@ -2115,7 +2115,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (isEmpty()) {
       return geometryFactory.newBoundingBoxEmpty();
     } else {
-      final BoundingBoxXyContructor boundingBox = new BoundingBoxXyContructor(geometryFactory);
+      final BoundingBoxXyConstructor boundingBox = new BoundingBoxXyConstructor(geometryFactory);
       forEachVertex(boundingBox);
       return boundingBox.newBoundingBox();
     }

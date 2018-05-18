@@ -39,6 +39,7 @@ import com.revolsys.geometry.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -271,6 +272,12 @@ public class PreparedMultiPolygon extends MultiPolygonImpl implements PreparedPo
     } else {
       return false;
     }
+  }
+
+  @Override
+  public Location locate(final double x, final double y) {
+    final PointOnGeometryLocator pointLocator = getPointLocator();
+    return pointLocator.locate(x, y);
   }
 
   @Override
