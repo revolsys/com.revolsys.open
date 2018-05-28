@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -467,7 +468,12 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
   // TODO make this work with cached nodes
   public void forEachNode(final Consumer<Node<T>> action, final Predicate<Node<T>> filter,
     final Comparator<Node<T>> comparator) {
-    final List<Node<T>> nodes = new LinkedList<>();
+    final Set<Node<T>> nodes;
+    if (comparator == null) {
+      nodes = new HashSet<>();
+    } else {
+      nodes = new TreeSet<>(comparator);
+    }
     if (filter == null) {
       nodes.addAll(getNodes());
     } else {
@@ -476,9 +482,6 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
           nodes.add(node);
         }
       }
-    }
-    if (comparator != null) {
-      Collections.sort(nodes, comparator);
     }
 
     final NodeEventListener<T> listener = new NodeEventListener<T>() {
@@ -490,9 +493,6 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
           if (filter == null || filter.test(node)) {
             nodes.add(node);
           }
-          if (comparator != null) {
-            Collections.sort(nodes, comparator);
-          }
         } else if (action.equals(NodeEvent.NODE_REMOVED)) {
           nodes.remove(node);
         }
@@ -501,7 +501,9 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     this.nodeListeners.add(listener);
     try {
       while (!nodes.isEmpty()) {
-        final Node<T> node = nodes.remove(0);
+        final Iterator<Node<T>> iterator = nodes.iterator();
+        final Node<T> node = iterator.next();
+        iterator.remove();
         if (!node.isRemoved()) {
           action.accept(node);
         }

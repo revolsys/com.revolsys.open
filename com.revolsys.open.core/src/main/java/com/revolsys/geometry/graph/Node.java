@@ -352,6 +352,11 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return this.id;
   }
 
+  public Edge<T> getInEdge(final int i) {
+    final int edgeId = this.inEdgeIds[i];
+    return this.graph.getEdge(edgeId);
+  }
+
   public int getInEdgeIndex(final Edge<T> edge) {
     return getInEdges().indexOf(edge);
   }
@@ -359,6 +364,10 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
   public List<Edge<T>> getInEdges() {
     final Graph<T> graph = getGraph();
     return graph.getEdges(this.inEdgeIds);
+  }
+
+  public int getIntEdgeCount() {
+    return this.inEdgeIds.length;
   }
 
   public Edge<T> getNextEdge(final Edge<T> edge) {
@@ -378,6 +387,15 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     final int nextIndex = (index + 1) % this.outEdgeIds.length;
     final Graph<T> graph = getGraph();
     return graph.getEdge(this.outEdgeIds[nextIndex]);
+  }
+
+  public Edge<T> getOutEdge(final int i) {
+    final int edgeId = this.outEdgeIds[i];
+    return this.graph.getEdge(edgeId);
+  }
+
+  public int getOutEdgeCount() {
+    return this.outEdgeIds.length;
   }
 
   public int getOutEdgeIndex(final Edge<T> edge) {

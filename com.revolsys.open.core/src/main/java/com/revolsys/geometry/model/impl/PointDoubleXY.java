@@ -30,6 +30,11 @@ public class PointDoubleXY extends AbstractPoint {
   }
 
   @Override
+  public int getAxisCount() {
+    return 2;
+  }
+
+  @Override
   public double getCoordinate(final int index) {
     switch (index) {
       case 0:
@@ -43,7 +48,7 @@ public class PointDoubleXY extends AbstractPoint {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.floating(0, 2);
+    return GeometryFactory.DEFAULT_2D;
   }
 
   @Override

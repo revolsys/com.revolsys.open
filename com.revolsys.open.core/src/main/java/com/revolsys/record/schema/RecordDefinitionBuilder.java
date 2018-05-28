@@ -68,4 +68,8 @@ public class RecordDefinitionBuilder {
     this.recordDefinition.setGeometryFactory(geometryFactory);
     return this;
   }
+
+  public void setIdFieldName(final String name) {
+    this.recordDefinition.setIdFieldName(name);
+  }
 }
