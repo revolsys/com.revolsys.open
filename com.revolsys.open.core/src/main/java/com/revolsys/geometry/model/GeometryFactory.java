@@ -512,7 +512,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     final double offsetX, final double scaleX, final double offsetY, final double scaleY,
     final double offsetZ, final double scaleZ) {
     if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
-      return coordinateSystem.getGeometryFactoryFixed(3, scaleX, scaleY, scaleZ);
+      if (coordinateSystem == null) {
+        return fixed3d(0, scaleX, scaleY, scaleZ);
+      } else {
+        return coordinateSystem.getGeometryFactoryFixed(3, scaleX, scaleY, scaleZ);
+      }
     } else {
       return new GeometryFactoryWithOffsets(coordinateSystem, offsetX, scaleX, offsetY, scaleY,
         offsetZ, scaleZ);
