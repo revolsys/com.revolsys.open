@@ -37,4 +37,23 @@ public class CollectionDataType extends SimpleDataType {
   public DataType getContentType() {
     return this.contentType;
   }
+
+  @Override
+  protected Object toObjectDo(final Object value) {
+    if (value instanceof Collection) {
+      try {
+        final Collection<?> collection = (Collection<?>)value;
+        @SuppressWarnings({
+          "unchecked", "rawtypes"
+        })
+        final Collection<Object> newCollection = (Collection)getJavaClass().newInstance();
+        newCollection.addAll(collection);
+        return newCollection;
+      } catch (InstantiationException | IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
+    } else {
+      return super.toObjectDo(value);
+    }
+  }
 }
