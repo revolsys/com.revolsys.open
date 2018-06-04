@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
@@ -66,8 +67,29 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
     }
   }
 
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof OgcWmsImageLayer) {
+      final OgcWmsImageLayer layer = (OgcWmsImageLayer)other;
+      if (DataType.equal(layer.getServiceUrl(), getServiceUrl())) {
+        if (DataType.equal(layer.getLayerName(), getLayerName())) {
+          if (DataType.equal(layer.getConnectionName(), getConnectionName())) {
+            if (DataType.equal(layer.getName(), getName())) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   public String getConnectionName() {
     return this.connectionName;
+  }
+
+  public String getLayerName() {
+    return this.layerName;
   }
 
   public String getServiceUrl() {
