@@ -7,6 +7,7 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.FileUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -132,7 +133,7 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
     try {
       this.connectionFile = resource.getPath();
     } catch (final Throwable e) {
-
+      Logs.debug(this, "Error writing:" + resource, e);
     }
     Connection.super.writeToFile(resource);
   }

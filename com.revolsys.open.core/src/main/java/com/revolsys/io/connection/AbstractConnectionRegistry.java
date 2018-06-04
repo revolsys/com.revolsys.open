@@ -311,6 +311,7 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
   }
 
   public void saveAs(final Resource directory) {
+    this.readOnly = false;
     setDirectory(directory);
     saveDo(false);
   }
@@ -360,7 +361,7 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
           readOnly = true;
         }
       }
-      setReadOnly(readOnly);
+      this.readOnly = readOnly;
       this.directory = directory;
     } else {
       setReadOnly(true);
