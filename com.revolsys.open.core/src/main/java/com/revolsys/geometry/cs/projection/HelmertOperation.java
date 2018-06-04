@@ -7,9 +7,9 @@ public class HelmertOperation {
   };
 
   class pj_opaque_helmert {
-    CoordinatesOperationPoint xyz;
+    CoordinatesOperationPoint point;
 
-    CoordinatesOperationPoint xyz_0;
+    CoordinatesOperationPoint point_0;
 
     CoordinatesOperationPoint dxyz;
 
@@ -136,8 +136,8 @@ public class HelmertOperation {
     final double x = point.x;
     final double y = point.y;
 
-    point.x = cr * x + sr * y + this.Q.xyz_0.x;
-    point.y = -sr * x + cr * y + this.Q.xyz_0.y;
+    point.x = cr * x + sr * y + this.Q.point_0.x;
+    point.y = -sr * x + cr * y + this.Q.point_0.y;
   }
 
   public void helmertForward3d(final CoordinatesOperationPoint point) {
@@ -145,9 +145,9 @@ public class HelmertOperation {
       helmertForward(point);
       return;
     } else if (this.Q.no_rotation) {
-      point.x = point.x + this.Q.xyz.x;
-      point.y = point.y + this.Q.xyz.y;
-      point.z = point.z + this.Q.xyz.z;
+      point.x = point.x + this.Q.point.x;
+      point.y = point.y + this.Q.point.y;
+      point.z = point.z + this.Q.point.z;
       return;
     } else {
       final double scale = 1 + this.Q.scale * 1e-6;
@@ -160,17 +160,17 @@ public class HelmertOperation {
       point.y = scale * (this.r10 * X + this.r11 * Y + this.r12 * Z);
       point.z = scale * (this.r20 * X + this.r21 * Y + this.r22 * Z);
 
-      point.x += this.Q.xyz.x;
-      point.y += this.Q.xyz.y;
-      point.z += this.Q.xyz.z;
+      point.x += this.Q.point.x;
+      point.y += this.Q.point.y;
+      point.z += this.Q.point.z;
     }
   }
 
   public void helmertReverse(final CoordinatesOperationPoint point) {
     final double cr = Math.cos(this.Q.theta) / this.Q.scale;
     final double sr = Math.sin(this.Q.theta) / this.Q.scale;
-    final double x = point.x - this.Q.xyz_0.x;
-    final double y = point.y - this.Q.xyz_0.y;
+    final double x = point.x - this.Q.point_0.x;
+    final double y = point.y - this.Q.point_0.y;
 
     point.x = x * cr - y * sr;
     point.y = x * sr + y * cr;
@@ -180,16 +180,16 @@ public class HelmertOperation {
     if (this.Q.fourparam) {
       helmertReverse(point);
     } else if (this.Q.no_rotation) {
-      point.x = point.x - this.Q.xyz.x;
-      point.y = point.y - this.Q.xyz.y;
-      point.z = point.z - this.Q.xyz.z;
+      point.x = point.x - this.Q.point.x;
+      point.y = point.y - this.Q.point.y;
+      point.z = point.z - this.Q.point.z;
     } else {
 
       final double scale = 1 + this.Q.scale * 1e-6;
 
-      final double X = (point.x - this.Q.xyz.x) / scale;
-      final double Y = (point.y - this.Q.xyz.y) / scale;
-      final double Z = (point.z - this.Q.xyz.z) / scale;
+      final double X = (point.x - this.Q.point.x) / scale;
+      final double Y = (point.y - this.Q.point.y) / scale;
+      final double Z = (point.z - this.Q.point.z) / scale;
 
       point.x = this.r00 * X + this.r10 * Y + this.r20 * Z;
       point.y = this.r01 * X + this.r11 * Y + this.r21 * Z;
@@ -203,9 +203,9 @@ public class HelmertOperation {
     final pj_opaque_helmert Q = P.opaque;
     final double dt = Q.t_obs - Q.t_epoch;
 
-    Q.xyz.x = Q.xyz_0.x + Q.dxyz.x * dt;
-    Q.xyz.y = Q.xyz_0.y + Q.dxyz.y * dt;
-    Q.xyz.z = Q.xyz_0.z + Q.dxyz.z * dt;
+    Q.point.x = Q.point_0.x + Q.dxyz.x * dt;
+    Q.point.y = Q.point_0.y + Q.dxyz.y * dt;
+    Q.point.z = Q.point_0.z + Q.dxyz.z * dt;
 
     Q.opk.o = Q.dopk.o * dt;
     Q.opk.p = Q.dopk.p * dt;

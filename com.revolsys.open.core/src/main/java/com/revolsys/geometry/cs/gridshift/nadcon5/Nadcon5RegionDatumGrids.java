@@ -64,8 +64,8 @@ public class Nadcon5RegionDatumGrids {
 
   public boolean shiftForward(final CoordinatesOperationPoint point) {
     final double x = point.x;
-    final double y = point.x;
-    final double z = point.x;
+    final double y = point.y;
+    final double z = point.z;
     final double xShift = this.lonShifts.getValueBiquadratic(x, y);
     final double yShift = this.latShifts.getValueBiquadratic(x, y);
     final double zShift = this.ehtShifts.getValueBiquadratic(x, y);
@@ -82,8 +82,8 @@ public class Nadcon5RegionDatumGrids {
 
   public boolean shiftInverse(final CoordinatesOperationPoint point) {
     final double x = point.x;
-    final double y = point.x;
-    final double z = point.x;
+    final double y = point.y;
+    final double z = point.z;
     final double xShift = this.lonShifts.getValueBiquadratic(x, y);
     final double yShift = this.latShifts.getValueBiquadratic(x, y);
     final double zShift = this.ehtShifts.getValueBiquadratic(x, y);

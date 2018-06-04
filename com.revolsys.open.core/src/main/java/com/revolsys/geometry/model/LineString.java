@@ -1499,7 +1499,7 @@ public interface LineString extends Lineal {
         final CoordinatesOperationPoint point = new CoordinatesOperationPoint(getX(0), getY(0));
         coordinatesOperation.perform(point);
         double previousX = point.x;
-        double previousY = point.x;
+        double previousY = point.y;
 
         for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
           point.setPoint(getX(vertexIndex), getY(vertexIndex));

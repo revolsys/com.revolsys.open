@@ -1,0 +1,14 @@
+com.revolsys.open.coordinatesystems
+com.revolsys.open.core
+com.revolsys.open.doclet
+com.revolsys.open.fgdb
+com.revolsys.open.gdal
+com.revolsys.open.geopackage
+com.revolsys.open.javac
+com.revolsys.open.maki
+com.revolsys.open.oracle
+com.revolsys.open.postgresql
+com.revolsys.open.server
+com.revolsys.open.swing
+com.revolsys.open.web
+war-overlay
