@@ -442,14 +442,17 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     return this.hasFile;
   }
 
-  public boolean isReadable(final Class<? extends IoFactory> factoryClass) {
+  public <F extends IoFactory> boolean isReadable(final Class<F> factoryClass) {
     if (isExists()) {
       final Path path = getPath();
       if (!this.hasFile) {
         return false;
       } else {
-        if (IoFactory.hasFactory(factoryClass, path)) {
-          return true;
+        final F factory = IoFactory.factory(factoryClass, path);
+        if (factory != null) {
+          if (factory.isReadFromDirectorySupported() || !Files.isDirectory(path)) {
+            return true;
+          }
         }
       }
     }

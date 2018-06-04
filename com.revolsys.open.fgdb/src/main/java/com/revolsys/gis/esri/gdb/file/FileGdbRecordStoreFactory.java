@@ -136,6 +136,11 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
   }
 
   @Override
+  public boolean isReadFromDirectorySupported() {
+    return true;
+  }
+
+  @Override
   public FileGdbRecordStore newRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
     final Map<String, Object> properties = new LinkedHashMap<>(connectionProperties);

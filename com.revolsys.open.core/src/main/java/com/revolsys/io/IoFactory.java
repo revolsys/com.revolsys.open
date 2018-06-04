@@ -338,6 +338,10 @@ public interface IoFactory extends Available {
   default void init() {
   }
 
+  default boolean isReadFromDirectorySupported() {
+    return false;
+  }
+
   default boolean isReadFromZipFileSupported() {
     return false;
   }
