@@ -6,6 +6,7 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.UrlResource;
+import com.revolsys.util.Debug;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 
@@ -82,8 +83,10 @@ public abstract class AbstractWebService<V> extends BaseObjectWithProperties
 
   public void setPassword(final String password) {
     this.password = PasswordUtil.decrypt(password);
+    Debug.noOp();
     final UrlResource serviceUrl = this.serviceUrl;
     if (serviceUrl != null) {
+
       String username = this.username;
       if (username == null) {
         username = serviceUrl.getUsername();

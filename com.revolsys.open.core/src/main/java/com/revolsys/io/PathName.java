@@ -67,6 +67,16 @@ public class PathName implements Comparable<PathName>, CharSequence {
     }
   }
 
+  public boolean equalsPath(final String path) {
+    if (path == null) {
+      return false;
+    } else {
+      final String upperPath = getUpperPath();
+      final String upperPath2 = path.toUpperCase();
+      return upperPath.equals(upperPath2);
+    }
+  }
+
   /**
    * If this path is an ancestor of the other path return the path that is a direct child of this path.
    * Returns null if this path is not an ancestor of the current path.

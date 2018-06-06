@@ -19,7 +19,6 @@ import com.revolsys.record.io.format.esri.rest.map.FeatureService;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.record.query.Query;
 import com.revolsys.spring.resource.UrlResource;
-import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.SupplierWithProperties;
 import com.revolsys.webservice.WebServiceResource;
@@ -89,10 +88,6 @@ public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
 
   private List<CatalogElement> children = Collections.emptyList();
 
-  private String username;
-
-  private String password;
-
   private ArcGisRestCatalog(final ArcGisRestCatalog parent, final String path) {
     super(parent, path);
   }
@@ -135,7 +130,7 @@ public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
     String name = super.getName();
     if (name == null) {
       final PathName pathName = getPathName();
-      if (pathName == null || pathName.equals("/")) {
+      if (pathName == null || pathName.equalsPath("/")) {
         final UrlResource resourceUrl = getServiceUrl();
         try {
           final URI uri = resourceUrl.getUri();
@@ -149,11 +144,6 @@ public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
       }
     }
     return name;
-  }
-
-  @Override
-  public String getPassword() {
-    return this.password;
   }
 
   @Override
@@ -174,11 +164,6 @@ public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
       }
     }
     return null;
-  }
-
-  @Override
-  public String getUsername() {
-    return this.username;
   }
 
   @Override
@@ -234,40 +219,6 @@ public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
   @Override
   protected UrlResource newServiceUrlResource(final Map<String, Object> parameters) {
     return getServiceUrl().newUrlResource(parameters);
-  }
-
-  @Override
-  public void setPassword(final String password) {
-    this.password = password;
-    final UrlResource serviceUrl = getServiceUrl();
-    if (serviceUrl != null) {
-      setServiceUrl(serviceUrl.newUrlResourceAuthorization(this.username, this.password));
-    }
-  }
-
-  @Override
-  public void setServiceUrl(final UrlResource serviceUrl) {
-    super.setServiceUrl(serviceUrl.newUrlResourceAuthorization(this.username, this.password));
-  }
-
-  @Override
-  public void setUsername(final String username) {
-    this.username = username;
-    final UrlResource serviceUrl = getServiceUrl();
-    if (serviceUrl != null) {
-      setServiceUrl(serviceUrl.newUrlResourceAuthorization(this.username, this.password));
-    }
-  }
-
-  @Override
-  public MapEx toMap() {
-    final MapEx map = newTypeMap(J_TYPE);
-    final String name = getName();
-    addToMap(map, "name", name);
-    map.put("serviceUrl", getServiceUrl());
-    addToMap(map, "username", this.username, "");
-    addToMap(map, "password", PasswordUtil.encrypt(this.password), "");
-    return map;
   }
 
   @Override

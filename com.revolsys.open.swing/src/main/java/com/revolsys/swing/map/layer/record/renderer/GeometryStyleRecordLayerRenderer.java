@@ -205,6 +205,8 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
         return DataTypes.LINE_STRING;
       } else if (DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         return DataTypes.POLYGON;
+      } else {
+        return geometryDataType;
       }
     }
     return null;
@@ -222,7 +224,9 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
 
   /*
    * (non-Javadoc)
-   * @see com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#getStyle()
+   * @see
+   * com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#
+   * getStyle()
    */
   @Override
   public GeometryStyle getStyle() {
@@ -302,8 +306,8 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
   /*
    * (non-Javadoc)
    * @see
-   * com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#setStyle(com.revolsys.
-   * swing.map.layer.record.style.GeometryStyle)
+   * com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#
+   * setStyle(com.revolsys. swing.map.layer.record.style.GeometryStyle)
    */
   @Override
   public void setStyle(final GeometryStyle style) {

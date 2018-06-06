@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import com.revolsys.collection.ValueHolder;
@@ -394,6 +395,29 @@ public interface Paths {
       return new java.sql.Date(Files.getLastModifiedTime(path).toMillis());
     } catch (final IOException e) {
       return new java.sql.Date(0);
+    }
+  }
+
+  static List<Path> listFiles(final Path path, final String regEx) {
+    if (exists(path)) {
+      final Pattern pattern = Pattern.compile(regEx);
+      final List<Path> paths = new ArrayList<>();
+      try (
+        final Stream<Path> pathStream = Files.list(path)) {
+        pathStream.forEach(childPath -> {
+          final String fileName = getFileName(childPath);
+          if (pattern.matcher(fileName).matches()) {
+            paths.add(childPath);
+          }
+        });
+        return paths;
+      } catch (final NoSuchFileException e) {
+        return Collections.emptyList();
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    } else {
+      return Collections.emptyList();
     }
   }
 

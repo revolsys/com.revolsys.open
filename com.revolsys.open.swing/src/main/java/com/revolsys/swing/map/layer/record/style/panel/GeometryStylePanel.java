@@ -91,8 +91,10 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
       final Object value = event.getNewValue();
       setFieldValue(name, value);
     }
-    for (final Component preview : this.previews.getComponents()) {
-      preview.repaint();
+    if (this.previews != null) {
+      for (final Component preview : this.previews.getComponents()) {
+        preview.repaint();
+      }
     }
   }
 
