@@ -71,6 +71,7 @@
           <source>1.8</source>
           <target>1.8</target>
           <debug>true</debug>
+          <parameters>true</parameters>
           <compilerArgument>-parameters</compilerArgument>
           <testCompilerArgument>-parameters</testCompilerArgument>
         </configuration>

@@ -60,27 +60,42 @@ public class ListRecordLayer extends AbstractRecordLayer {
     setEditable(true);
   }
 
+  public void addNewRecordPersisted(final Map<String, Object> values) {
+    final LayerRecord record = newRecordPersisted(values);
+    addRecord(record);
+  }
+
   protected void addRecord(final LayerRecord record) {
+    addRecordDo(record);
+    fireRecordsChanged();
+  }
+
+  protected void addRecordDo(final LayerRecord record) {
     synchronized (this.records) {
       this.records.add(record);
       expandBoundingBox(record);
     }
     addToIndex(record);
-    fireEmpty();
-    fireRecordsChanged();
   }
 
   protected void addRecords(final List<? extends LayerRecord> records) {
     for (final LayerRecord record : records) {
-      addRecord(record);
+      addRecordDo(record);
     }
+    fireRecordsChanged();
   }
 
-  protected void clearRecords() {
+  public void clearRecords() {
+    clearRecordsDo();
+    fireRecordsChanged();
+  }
+
+  protected void clearRecordsDo() {
     this.clearSelectedRecords();
-    this.records.clear();
+    synchronized (this.records) {
+      this.records.clear();
+    }
     cleanCachedRecords();
-    fireEmpty();
   }
 
   @Override
@@ -215,7 +230,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
     return record;
   }
 
-  protected void newRecordInternal(final Map<String, Object> values) {
+  public LayerRecord newRecordPersisted(final Map<String, Object> values) {
     final LayerRecord record = newLayerRecord(getRecordDefinition());
     record.setState(RecordState.INITIALIZING);
     try {
@@ -223,7 +238,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
     } finally {
       record.setState(RecordState.PERSISTED);
     }
-    addRecord(record);
+    return record;
   }
 
   @Override
@@ -263,5 +278,13 @@ public class ListRecordLayer extends AbstractRecordLayer {
     } else {
       return super.saveChangesDo(errors, record);
     }
+  }
+
+  public void setRecords(final List<? extends LayerRecord> records) {
+    clearRecordsDo();
+    for (final LayerRecord record : records) {
+      addRecordDo(record);
+    }
+    fireRecordsChanged();
   }
 }

@@ -121,7 +121,7 @@ public class FileRecordLayer extends ListRecordLayer {
                     }
                   }
 
-                  newRecordInternal(record);
+                  addNewRecordPersisted(record);
                 }
               }
             }
