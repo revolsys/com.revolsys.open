@@ -710,7 +710,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
           "AXIS", "MIN", "MAX"
         }, 0);
         boundingBoxTableModel.addRow(new Object[] {
-          "X", boundingBox.getMinX(), boundingBox.getMaxY()
+          "X", boundingBox.getMinX(), boundingBox.getMaxX()
         });
         boundingBoxTableModel.addRow(new Object[] {
           "Y", boundingBox.getMinY(), boundingBox.getMaxY()

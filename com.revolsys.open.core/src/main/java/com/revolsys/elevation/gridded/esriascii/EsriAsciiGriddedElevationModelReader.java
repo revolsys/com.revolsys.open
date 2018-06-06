@@ -30,7 +30,7 @@ import com.revolsys.util.number.Doubles;
 public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point>
   implements GriddedElevationModelReader, PointReader {
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
+  private GeometryFactory geometryFactory;
 
   private final Resource resource;
 
@@ -57,6 +57,7 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
   public EsriAsciiGriddedElevationModelReader(final Resource resource,
     final Map<String, ? extends Object> properties) {
     this.resource = resource;
+    this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
     setProperties(properties);
   }
 
@@ -105,14 +106,11 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
         }
         throw new IllegalArgumentException("Cannot find " + fileName + " in " + this.resource);
       } else if (fileExtension.equals("gz")) {
-        final String baseName = this.resource.getBaseName();
-        setGeometryFactory(this.resource.getParent().newChildResource(baseName));
         final InputStream in = this.resource.newBufferedInputStream();
         final GZIPInputStream gzIn = new GZIPInputStream(in);
         this.reader = new BufferedReader(new InputStreamReader(gzIn, StandardCharsets.UTF_8));
         return this.reader;
       } else {
-        setGeometryFactory(this.resource);
         this.reader = this.resource.newBufferedReader();
         return this.reader;
       }
@@ -294,13 +292,6 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
       this.geometryFactory = GeometryFactory.DEFAULT_3D;
     } else {
       this.geometryFactory = geometryFactory;
-    }
-  }
-
-  private void setGeometryFactory(final Resource resource) {
-    final GeometryFactory geometryFactory = GeometryFactory.floating3d(resource);
-    if (geometryFactory != null) {
-      setGeometryFactory(geometryFactory);
     }
   }
 

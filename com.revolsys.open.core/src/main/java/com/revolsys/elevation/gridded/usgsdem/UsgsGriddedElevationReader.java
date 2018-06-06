@@ -53,7 +53,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
 
   private final double[] cornersY = new double[4];
 
-  private GeometryFactory geometryFactory = GeometryFactory.wgs84();
+  private GeometryFactory geometryFactory;
 
   private int gridHeight;
 
@@ -72,6 +72,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   public UsgsGriddedElevationReader(final Resource resource,
     final Map<String, ? extends Object> properties) {
     this.resource = resource;
+    this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.wgs84());
     setProperties(properties);
   }
 
@@ -132,13 +133,10 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         }
         throw new IllegalArgumentException("Cannot find " + fileName + " in " + this.resource);
       } else if (fileExtension.equals("gz")) {
-        final String baseName = this.resource.getBaseName();
-        setGeometryFactory(this.resource.getParent().newChildResource(baseName));
         final InputStream in = this.resource.newBufferedInputStream();
         final GZIPInputStream gzIn = new GZIPInputStream(in);
         return new InputStreamResource(gzIn).newReadableByteChannel();
       } else {
-        setGeometryFactory(this.resource);
         return this.resource.newReadableByteChannel();
       }
     } catch (final IOException e) {
@@ -158,10 +156,10 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     }
   }
 
-  private Double getDoubleSci(final int length) {
+  private double getDoubleSci(final int length) {
     String string = getString(length);
     if (string.isEmpty()) {
-      return null;
+      return 0;
     } else {
       string = string.replace('D', 'E');
       return Double.valueOf(string);
@@ -255,6 +253,8 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
     final boolean metres = verticalUom instanceof Metre;
     final int verticalDatum = getInteger(2);
     switch (verticalDatum) {
+      case 0:
+        return null;
       case 1: // Mean Sea Level
         if (metres) {
           return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.MSL_HEIGHT_METRE);
@@ -484,7 +484,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
               throw new IllegalArgumentException("UTM horizontalDatum=" + horizontalDatum
                 + " not currently supported for USGS DEM: " + this.resource);
           }
-
+          this.gridHeight = (int)((maxY - minY) / resolutionY);
         } else if (2 == planimetricReferenceSystem) {
           throw new IllegalArgumentException(
             "planimetricReferenceSystem=" + planimetricReferenceSystem
@@ -528,14 +528,18 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         if (horizontalCoordinateSystem == null) {
           throw new IllegalArgumentException("No coordinate system found: " + this.resource);
         } else {
-          final int verticalCoordinateSystemId = verticalCoordinateSystem.getCoordinateSystemId();
           CoordinateSystem coordinateSystem;
-          if (horizontalCoordinateSystemId > 0 && verticalCoordinateSystemId > 0) {
-            coordinateSystem = EpsgCoordinateSystems.getCompound(horizontalCoordinateSystemId,
-              verticalCoordinateSystemId);
+          if (verticalCoordinateSystem == null) {
+            coordinateSystem = horizontalCoordinateSystem;
           } else {
-            coordinateSystem = new CompoundCoordinateSystem(horizontalCoordinateSystem,
-              verticalCoordinateSystem);
+            final int verticalCoordinateSystemId = verticalCoordinateSystem.getCoordinateSystemId();
+            if (horizontalCoordinateSystemId > 0 && verticalCoordinateSystemId > 0) {
+              coordinateSystem = EpsgCoordinateSystems.getCompound(horizontalCoordinateSystemId,
+                verticalCoordinateSystemId);
+            } else {
+              coordinateSystem = new CompoundCoordinateSystem(horizontalCoordinateSystem,
+                verticalCoordinateSystem);
+            }
           }
           this.geometryFactory = coordinateSystem.getGeometryFactoryFixed(3, 0.0, 0.0, scaleZ);
         }
@@ -556,13 +560,6 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
       } catch (final Exception e1) {
       }
       throw Exceptions.wrap(e);
-    }
-  }
-
-  private void setGeometryFactory(final Resource resource) {
-    final GeometryFactory geometryFactory = GeometryFactory.floating3d(resource);
-    if (geometryFactory != null) {
-      this.geometryFactory = geometryFactory;
     }
   }
 

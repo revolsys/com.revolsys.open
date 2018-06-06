@@ -70,6 +70,7 @@ class ImgGriddedElevationReader extends BaseObjectWithProperties
   public ImgGriddedElevationReader(final Resource resource,
     final Map<String, ? extends Object> properties) {
     this.resource = resource;
+    this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
     setProperties(properties);
   }
 
@@ -123,13 +124,10 @@ class ImgGriddedElevationReader extends BaseObjectWithProperties
         }
         throw new IllegalArgumentException("Cannot find " + fileName + " in " + this.resource);
       } else if (fileExtension.equals("gz")) {
-        final String baseName = this.resource.getBaseName();
-        setGeometryFactory(this.resource.getParent().newChildResource(baseName));
         final InputStream in = this.resource.newBufferedInputStream();
         final GZIPInputStream gzIn = new GZIPInputStream(in);
         return new InputStreamResource(gzIn).newChannelReader();
       } else {
-        setGeometryFactory(this.resource);
         return this.resource.newChannelReader();
       }
     } catch (final IOException e) {
@@ -457,13 +455,6 @@ class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   protected void seek(final long position) {
     this.channel.seek(position);
-  }
-
-  private void setGeometryFactory(final Resource resource) {
-    final GeometryFactory geometryFactory = GeometryFactory.floating3d(resource);
-    if (geometryFactory != null) {
-      this.geometryFactory = geometryFactory;
-    }
   }
 
   @Override

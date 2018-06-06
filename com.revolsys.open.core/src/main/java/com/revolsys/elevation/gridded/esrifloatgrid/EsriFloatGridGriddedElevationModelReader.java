@@ -21,7 +21,7 @@ import com.revolsys.util.Exceptions;
 public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<Point>
   implements GriddedElevationModelReader, PointReader {
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
+  private GeometryFactory geometryFactory;
 
   private final Resource resource;
 
@@ -50,6 +50,7 @@ public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<P
   public EsriFloatGridGriddedElevationModelReader(final Resource resource,
     final Map<String, ? extends Object> properties) {
     this.resource = resource;
+    this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
     setProperties(properties);
   }
 
@@ -76,7 +77,6 @@ public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<P
   protected ChannelReader getChannel() {
     final Resource headerResource = this.resource.newResourceChangeExtension("hdr");
     readHeader(headerResource);
-    setGeometryFactory(this.resource);
     this.reader = this.resource.newChannelReader();
     if ("LSBFIRST".equals(this.byteorder)) {
       this.reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
@@ -256,13 +256,6 @@ public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<P
       this.geometryFactory = GeometryFactory.DEFAULT_3D;
     } else {
       this.geometryFactory = geometryFactory;
-    }
-  }
-
-  private void setGeometryFactory(final Resource resource) {
-    final GeometryFactory geometryFactory = GeometryFactory.floating3d(resource);
-    if (geometryFactory != null) {
-      setGeometryFactory(geometryFactory);
     }
   }
 

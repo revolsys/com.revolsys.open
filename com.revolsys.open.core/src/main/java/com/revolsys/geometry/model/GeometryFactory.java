@@ -413,6 +413,21 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return floating(resource, 3);
   }
 
+  public static GeometryFactory floating3d(Resource resource, final GeometryFactory defaultValue) {
+    final String filenameExtension = resource.getFileNameExtension();
+    if (filenameExtension.equals("gz") || filenameExtension.equals("zip")) {
+      final String baseName = resource.getBaseName();
+      final Resource parentResource = resource.getParent();
+      resource = parentResource.newChildResource(baseName);
+    }
+    final GeometryFactory geometryFactory = floating3d(resource);
+    if (geometryFactory == null) {
+      return defaultValue;
+    } else {
+      return geometryFactory;
+    }
+  }
+
   public static GeometryFactory floating3d(final String wkt) {
     return floating(wkt, 3);
   }
