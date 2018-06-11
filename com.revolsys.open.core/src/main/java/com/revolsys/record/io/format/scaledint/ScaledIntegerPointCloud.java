@@ -16,12 +16,16 @@ public class ScaledIntegerPointCloud extends GeometryRecordReaderFactory
 
   public static final String FILE_EXTENSION = "sipc";
 
+  public static final String FILE_EXTENSION_GZ = FILE_EXTENSION + ".gz";
+
+  public static final String FILE_EXTENSION_ZIP = FILE_EXTENSION + ".zip";
+
   public static final String FILE_TYPE_HEADER = "SIPC";
 
   public static final byte[] FILE_TYPE_HEADER_BYTES = FILE_TYPE_HEADER
     .getBytes(StandardCharsets.UTF_8);
 
-  public static final int HEADER_SIZE = 64;
+  public static final int HEADER_SIZE = 60;
 
   public static final String MIME_TYPE = "application/x-revolsys-sipc";
 
@@ -32,7 +36,8 @@ public class ScaledIntegerPointCloud extends GeometryRecordReaderFactory
   public ScaledIntegerPointCloud() {
     super("Scaled Integer Point Cloud");
     addMediaTypeAndFileExtension(MIME_TYPE, FILE_EXTENSION);
-
+    addFileExtension(FILE_EXTENSION_ZIP);
+    addFileExtension(FILE_EXTENSION_GZ);
   }
 
   @Override

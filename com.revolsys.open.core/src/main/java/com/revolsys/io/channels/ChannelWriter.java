@@ -2,18 +2,59 @@ package com.revolsys.io.channels;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
 public class ChannelWriter extends AbstractChannelWriter implements BaseCloseable {
-
   public static ChannelWriter newChannelWriter(final Object source) {
     return Resource.getResource(source).newChannelWriter();
+  }
+
+  /**
+   * Create a new {@link ChannelWriter} for the {@link Resource} using the {@link ByteBuffer}.
+   * If the resource ends with .zip or .gz it will be wrapped in a zip on gz compressed file.
+   *
+   * @param resource The resource to write to.
+   * @param byteBuffer The byte buffer.
+   * @return The channel writer.
+   */
+  public static ChannelWriter newChannelWriterCompressed(final Resource resource,
+    final ByteBuffer byteBuffer) {
+    final String fileNameExtension = resource.getFileNameExtension();
+    if ("zip".equals(fileNameExtension)) {
+      try {
+        final OutputStream bufferedOut = resource.newBufferedOutputStream();
+        final String fileName = resource.getBaseName();
+        final ZipOutputStream zipOut = new ZipOutputStream(bufferedOut);
+        final ZipEntry zipEntry = new ZipEntry(fileName);
+        zipOut.putNextEntry(zipEntry);
+        final WritableByteChannel channel = Channels.newChannel(zipOut);
+        return new ChannelWriter(channel, true, byteBuffer);
+      } catch (final IOException e) {
+        throw Exceptions.wrap("Error creating: " + resource, e);
+      }
+    } else if ("gz".equals(fileNameExtension)) {
+      try {
+        final OutputStream bufferedOut = resource.newBufferedOutputStream();
+        final GZIPOutputStream zipOut = new GZIPOutputStream(bufferedOut);
+        final WritableByteChannel channel = Channels.newChannel(zipOut);
+        return new ChannelWriter(channel, true, byteBuffer);
+      } catch (final IOException e) {
+        throw Exceptions.wrap("Error creating: " + resource, e);
+      }
+    } else {
+      return resource.newChannelWriter(byteBuffer);
+    }
   }
 
   WritableByteChannel channel;

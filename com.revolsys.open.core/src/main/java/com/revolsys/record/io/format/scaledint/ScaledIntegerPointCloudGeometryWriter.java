@@ -47,7 +47,8 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
   private void initialize() throws IOException {
     if (!this.initialized) {
       this.initialized = true;
-      final ChannelWriter writer = this.resource.newChannelWriter(this.byteBuffer);
+      final ChannelWriter writer = ChannelWriter.newChannelWriterCompressed(this.resource,
+        this.byteBuffer);
       this.writer = writer;
       final GeometryFactory geometryFactory = this.geometryFactory;
       writer.putBytes(ScaledIntegerPointCloud.FILE_TYPE_HEADER_BYTES); // File

@@ -72,6 +72,7 @@ public class GeometryRecordReader extends AbstractRecordReader {
 
     final RecordDefinition recordDefinition = this.geometryReader
       .newRecordDefinition(this.baseName);
+    recordDefinition.setGeometryFactory(geometryFactory);
     setRecordDefinition(recordDefinition);
   }
 
