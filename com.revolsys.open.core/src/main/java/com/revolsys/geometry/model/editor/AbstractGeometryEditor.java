@@ -31,7 +31,7 @@ public abstract class AbstractGeometryEditor<GE extends GeometryEditor<?>>
     final GeometryFactory geometryFactory) {
     this.parentEditor = parentEditor;
     if (parentEditor == null) {
-      this.geometryFactory = geometryFactory;
+      setGeometryFactory(geometryFactory);
     } else {
       this.geometryFactory = parentEditor.getGeometryFactory();
     }
@@ -42,11 +42,7 @@ public abstract class AbstractGeometryEditor<GE extends GeometryEditor<?>>
   }
 
   public AbstractGeometryEditor(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.DEFAULT_2D;
-    } else {
-      this.geometryFactory = geometryFactory;
-    }
+    setGeometryFactory(geometryFactory);
   }
 
   /**
@@ -145,6 +141,18 @@ public abstract class AbstractGeometryEditor<GE extends GeometryEditor<?>>
       this.geometryFactory = this.geometryFactory.convertAxisCount(axisCount);
     }
     return this;
+  }
+
+  /**
+   * Does not project
+   * @param geometryFactory
+   */
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.DEFAULT_2D;
+    } else {
+      this.geometryFactory = geometryFactory;
+    }
   }
 
   @Override

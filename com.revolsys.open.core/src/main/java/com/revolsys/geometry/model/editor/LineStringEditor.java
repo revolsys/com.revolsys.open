@@ -222,6 +222,23 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     }
   }
 
+  public void convertGeometryFactory(final GeometryFactory geometryFactory) {
+    // Project points if required
+    final CoordinatesOperation projection = getCoordinatesOperation(geometryFactory);
+    if (projection != null) {
+      final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+      final double[] lineCoordinates = getCoordinatesModified();
+      final int axisCount = getAxisCount();
+      final int coordinateCount = this.vertexCount * axisCount;
+      for (int coordinateOffset = 0; coordinateOffset < coordinateCount; coordinateOffset += axisCount) {
+        point.setPoint(lineCoordinates, coordinateOffset, axisCount);
+        projection.perform(point);
+        point.copyCoordinatesTo(lineCoordinates, coordinateOffset, axisCount);
+      }
+    }
+    setGeometryFactory(geometryFactory);
+  }
+
   public void deleteVertex(final int vertexIndex) {
     if (!isEmpty()) {
       final int vertexCount = getVertexCount();

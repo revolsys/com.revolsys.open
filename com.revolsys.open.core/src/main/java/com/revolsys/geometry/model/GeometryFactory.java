@@ -1545,7 +1545,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     if (points.isEmpty()) {
       return linearRing();
     } else {
-      final LineStringEditor lineBuilder = newLineStringBuilder(points);
+      final LineStringEditor lineBuilder = newLineStringEditor(points);
       return lineBuilder.newLinearRing();
     }
   }
@@ -1608,7 +1608,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     if (points == null || points.isEmpty()) {
       return lineString();
     } else {
-      final LineStringEditor lineBuilder = newLineStringBuilder(points);
+      final LineStringEditor lineBuilder = newLineStringEditor(points);
       return lineBuilder.newLineString();
     }
   }
@@ -1859,11 +1859,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return RectangleUtil.newBounds(axisCount);
   }
 
-  public LineStringEditor newLineStringBuilder() {
+  public LineStringEditor newLineStringEditor() {
     return new LineStringEditor(this);
   }
 
-  private LineStringEditor newLineStringBuilder(final Collection<?> points) {
+  private LineStringEditor newLineStringEditor(final Collection<?> points) {
     final LineStringEditor lineBuilder = new LineStringEditor(this, points.size());
     for (final Object object : points) {
       if (object == null) {
@@ -1889,7 +1889,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return lineBuilder;
   }
 
-  public LineStringEditor newLineStringBuilder(final int vertexCapacity) {
+  public LineStringEditor newLineStringEditor(final int vertexCapacity) {
     return new LineStringEditor(this, vertexCapacity);
   }
 

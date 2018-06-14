@@ -175,6 +175,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
         addPathNode(children, path, showHidden);
       }
     }
+    Collections.sort(children);
     return children;
   }
 

@@ -255,7 +255,7 @@ public class WktParser {
 
   private LineStringEditor parseCoordinatesLineString(final GeometryFactory geometryFactory,
     final PushbackReader reader, final int axisCount) throws IOException {
-    final LineStringEditor line = geometryFactory.newLineStringBuilder();
+    final LineStringEditor line = geometryFactory.newLineStringEditor();
     skipWhitespace(reader);
     int character = reader.read();
     if (character == '(') {
