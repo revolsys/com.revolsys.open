@@ -28,6 +28,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.property.RecordDefinitionProperty;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 import com.revolsys.util.count.CategoryLabelCountMap;
@@ -91,6 +92,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     }
   }
 
+  @Override
   public void addCodeTable(final String fieldName, final CodeTable codeTable) {
     if (fieldName != null && !fieldName.equalsIgnoreCase("ID")) {
       this.codeTableByFieldName.put(fieldName.toUpperCase(), codeTable);
@@ -169,6 +171,9 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     if (fieldName == null) {
       return null;
     } else {
+      if ("CREATED_PARTNER_ORG_ID".equals(fieldName)) {
+        Debug.noOp();
+      }
       final CodeTable codeTable = this.codeTableByFieldName.get(fieldName.toString().toUpperCase());
       return codeTable;
     }

@@ -54,10 +54,8 @@ import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.logging.Logs;
-import com.revolsys.record.code.CodeTable;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.NoSuchResourceException;
 import com.revolsys.util.Dates;
@@ -65,7 +63,7 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
-public final class EpsgCoordinateSystems implements CodeTable {
+public final class EpsgCoordinateSystems {
 
   private static final IntHashMap<Area> AREA_BY_ID = new IntHashMap<>();
 
@@ -84,6 +82,8 @@ public final class EpsgCoordinateSystems implements CodeTable {
   private static Set<CoordinateSystem> coordinateSystems;
 
   private static final IntHashMap<Datum> DATUM_BY_ID = new IntHashMap<>();
+
+  private static final EpsgCoordinateSystems INSTANCE = new EpsgCoordinateSystems();
 
   private static boolean initialized = false;
 
@@ -341,6 +341,26 @@ public final class EpsgCoordinateSystems implements CodeTable {
     return coordinateSystems;
   }
 
+  public static HorizontalCoordinateSystem getHorizontalCoordinateSystem(final int crsId) {
+    final CoordinateSystem coordinateSystem = getCoordinateSystem(crsId);
+    if (coordinateSystem instanceof HorizontalCoordinateSystem) {
+      return (HorizontalCoordinateSystem)coordinateSystem;
+    } else {
+      return null;
+    }
+  }
+
+  public static List<HorizontalCoordinateSystem> getHorizontalCoordinateSystems() {
+    final List<HorizontalCoordinateSystem> coordinateSystems = new ArrayList<>();
+    for (final CoordinateSystem coordinateSystem : COORDINATE_SYSTEM_BY_NAME.values()) {
+      if (coordinateSystem instanceof HorizontalCoordinateSystem) {
+        final HorizontalCoordinateSystem projectedCoordinateSystem = (HorizontalCoordinateSystem)coordinateSystem;
+        coordinateSystems.add(projectedCoordinateSystem);
+      }
+    }
+    return coordinateSystems;
+  }
+
   @SuppressWarnings("unchecked")
   public static <U extends UnitOfMeasure> U getLinearUnit(final String name) {
     initialize();
@@ -362,6 +382,26 @@ public final class EpsgCoordinateSystems implements CodeTable {
   public static <U extends UnitOfMeasure> U getUnit(final int id) {
     initialize();
     return (U)UNIT_BY_ID.get(id);
+  }
+
+  public static VerticalCoordinateSystem getVerticalCoordinateSystem(final int crsId) {
+    final CoordinateSystem coordinateSystem = getCoordinateSystem(crsId);
+    if (coordinateSystem instanceof VerticalCoordinateSystem) {
+      return (VerticalCoordinateSystem)coordinateSystem;
+    } else {
+      return null;
+    }
+  }
+
+  public static List<VerticalCoordinateSystem> getVerticalCoordinateSystems() {
+    final List<VerticalCoordinateSystem> coordinateSystems = new ArrayList<>();
+    for (final CoordinateSystem coordinateSystem : COORDINATE_SYSTEM_BY_NAME.values()) {
+      if (coordinateSystem instanceof VerticalCoordinateSystem) {
+        final VerticalCoordinateSystem projectedCoordinateSystem = (VerticalCoordinateSystem)coordinateSystem;
+        coordinateSystems.add(projectedCoordinateSystem);
+      }
+    }
+    return coordinateSystems;
   }
 
   public synchronized static void initialize() {
@@ -958,63 +998,5 @@ public final class EpsgCoordinateSystems implements CodeTable {
 
   public static GeographicCoordinateSystem wgs84() {
     return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.WGS84);
-  }
-
-  private Map<Identifier, List<Object>> codes;
-
-  private List<Identifier> identifiers;
-
-  private EpsgCoordinateSystems() {
-  }
-
-  @Override
-  public Map<Identifier, List<Object>> getCodes() {
-    if (this.codes == null) {
-      final Map<Identifier, List<Object>> codesById = new HashMap<>();
-      for (final CoordinateSystem coordinateSystem : coordinateSystems) {
-        final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-        final Identifier id = Identifier.newIdentifier(coordinateSystemId);
-        final List<Object> code = Collections.singletonList(coordinateSystem);
-        codesById.put(id, code);
-      }
-      this.codes = codesById;
-    }
-    return this.codes;
-  }
-
-  @Override
-  public List<Identifier> getIdentifiers() {
-    if (this.identifiers == null) {
-      final List<Identifier> identifiers = new ArrayList<>();
-      for (final CoordinateSystem coordinateSystem : coordinateSystems) {
-        final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-        final Identifier id = Identifier.newIdentifier(coordinateSystemId);
-        identifiers.add(id);
-      }
-      this.identifiers = Collections.unmodifiableList(identifiers);
-    }
-    return this.identifiers;
-  }
-
-  @Override
-  public String getIdFieldName() {
-    return "coordinateSystemId";
-  }
-
-  @Override
-  public String getName() {
-    return "EPSG Units";
-  }
-
-  @Override
-  public <V> V getValue(final Identifier id) {
-    final int coordinateSystemId = id.getInteger(0);
-    return getCoordinateSystem(coordinateSystemId);
-  }
-
-  @Override
-  public List<Object> getValues(final Identifier id) {
-
-    return CodeTable.super.getValues(id);
   }
 }
