@@ -1429,11 +1429,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return new BoundingBoxDoubleGf(this);
   }
 
-  public LineStringEditor newLineStringBuilder() {
+  public LineStringEditor newLineStringEditor() {
     return new LineStringEditor(this);
   }
 
-  public LineStringEditor newLineStringBuilder(final int vertexCapacity) {
+  public LineStringEditor newLineStringEditor(final int vertexCapacity) {
     return new LineStringEditor(this, vertexCapacity);
   }
 
