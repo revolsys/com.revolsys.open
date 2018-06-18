@@ -243,6 +243,16 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   protected void actionAddOk() {
     final AbstractRecordLayer layer = getLayer();
     final LayerRecord record = getRecord();
+    if (layer.isNew(record)) {
+      final List<String> idFieldNames = this.recordDefinition.getIdFieldNames();
+      Identifier identifier = record.getIdentifier();
+      if (identifier == null && !idFieldNames.isEmpty()) {
+        identifier = this.recordStore.newPrimaryIdentifier(layer.getPathName());
+        if (identifier != null) {
+          identifier.setIdentifier(record, idFieldNames);
+        }
+      }
+    }
     layer.saveChanges(record);
     layer.setSelectedRecords(record);
     layer.showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
@@ -1446,8 +1456,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   public boolean showAddDialog() {
     final String title = "Add New " + getName();
-    final Window window = SwingUtil.getActiveWindow();
-    final JDialog dialog = new JDialog(window, title, ModalityType.APPLICATION_MODAL);
+    final Window activeWindow = SwingUtil.getActiveWindow();
+    final JDialog dialog = new JDialog(activeWindow, title, ModalityType.APPLICATION_MODAL);
     dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
 
@@ -1460,7 +1470,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     buttons.add(this.addOkButton);
 
     dialog.pack();
-    dialog.setLocation(50, 50);
+    SwingUtil.setLocationOffset(dialog, 50, 50);
     dialog.addWindowListener(this);
     dialog.setVisible(true);
     SwingUtil.dispose(dialog);

@@ -30,6 +30,10 @@ public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
     return new ComboBoxCellEditor(comboBox);
   }
 
+  public static ComboBox<Identifier> newComboBox(final CodeTable codeTable) {
+    return newComboBox(codeTable.getName(), codeTable, false, false);
+  }
+
   public static ComboBox<Identifier> newComboBox(final String fieldName, final CodeTable codeTable,
     final boolean allowNull, final boolean idSuffix) {
     final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable, allowNull);

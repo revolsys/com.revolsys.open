@@ -907,7 +907,6 @@ public interface SwingUtil {
     y += bounds.y;
 
     window.setLocation(x, y);
-
   }
 
   static void setMaximumWidth(final JComponent component, final int width) {

@@ -29,6 +29,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.FieldSupport;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
@@ -70,6 +71,12 @@ public class ValueField extends JPanel implements Field {
 
   public ValueField(final String fieldName, final Object fieldValue) {
     this(new VerticalLayout(), fieldName, fieldValue);
+  }
+
+  public ValueField addLabelledComponent(final String label, final Component component) {
+    SwingUtil.addLabel(this, label);
+    add(component);
+    return this;
   }
 
   public final void cancel() {
@@ -114,6 +121,11 @@ public class ValueField extends JPanel implements Field {
 
   public boolean isSaved() {
     return this.saved;
+  }
+
+  public ValueField makeColumns(final int columnCount) {
+    GroupLayouts.makeColumns(this, columnCount, true, true);
+    return this;
   }
 
   public void save() {
@@ -169,20 +181,24 @@ public class ValueField extends JPanel implements Field {
     setToolTipText(toolTip);
   }
 
-  public void setIconImage(final Image icon) {
+  public ValueField setIconImage(final Image icon) {
     this.iconImage = icon;
+    return this;
   }
 
-  public void setIconImage(final String iconName) {
+  public ValueField setIconImage(final String iconName) {
     this.iconImage = Icons.getImage(iconName);
+    return this;
   }
 
-  public void setSaveAction(final Runnable saveAction) {
+  public ValueField setSaveAction(final Runnable saveAction) {
     this.saveAction = saveAction;
+    return this;
   }
 
-  public void setTitle(final String title) {
+  public ValueField setTitle(final String title) {
     this.title = title;
+    return this;
   }
 
   @Override
