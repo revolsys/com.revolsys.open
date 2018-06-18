@@ -29,6 +29,11 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   }
 
   @Override
+  public void clear() {
+    this.index.clear();
+  }
+
+  @Override
   public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
     this.index.forEach((id) -> {
       final T object = getObject(id);

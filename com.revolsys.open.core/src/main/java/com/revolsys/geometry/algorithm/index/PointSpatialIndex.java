@@ -7,6 +7,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 
 public interface PointSpatialIndex<T> extends Iterable<T> {
+  void clear();
+
   List<T> find(BoundingBox envelope);
 
   List<T> findAll();

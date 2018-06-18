@@ -482,8 +482,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.sql = sql;
   }
 
-  public void setStatistics(final LabelCountMap labelCountMap) {
+  public Query setStatistics(final LabelCountMap labelCountMap) {
     this.labelCountMap = labelCountMap;
+    return this;
   }
 
   public void setTypeName(final String typeName) {

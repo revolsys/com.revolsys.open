@@ -74,10 +74,30 @@ public class ProcessNetwork
     this(Arrays.asList(processes));
   }
 
-  public void addProcess(final Process process) {
+  public <V> ProcessNetwork addProcess(final InProcess<V> process, final OutProcess<V> inProcess) {
+    process.setIn(inProcess);
+    addProcess(process);
+    return this;
+  }
+
+  public <I, O> ProcessNetwork addProcess(final OutProcess<I> inProcess,
+    final InOutProcess<I, O> process, final InProcess<O> outProcess) {
+    process.setIn(inProcess);
+    process.setOut(outProcess);
+    addProcess(process);
+    return this;
+  }
+
+  public <V> ProcessNetwork addProcess(final OutProcess<V> process, final InProcess<V> outProcess) {
+    process.setOut(outProcess);
+    addProcess(process);
+    return this;
+  }
+
+  public ProcessNetwork addProcess(final Process process) {
     synchronized (this.sync) {
       if (this.stopping) {
-        return;
+        return this;
       } else {
         if (!this.stopping) {
           if (this.processes != null && !this.processes.containsKey(process)) {
@@ -94,20 +114,23 @@ public class ProcessNetwork
     } else {
       this.parent.addProcess(process);
     }
+    return this;
   }
 
-  public void addProcess(final Runnable runnable) {
+  public ProcessNetwork addProcess(final Runnable runnable) {
     if (runnable != null) {
       final RunnableProcess process = new RunnableProcess(runnable);
       addProcess(process);
     }
+    return this;
   }
 
-  public void addProcess(final String processName, final Runnable runnable) {
+  public ProcessNetwork addProcess(final String processName, final Runnable runnable) {
     if (runnable != null) {
       final RunnableProcess process = new RunnableProcess(processName, runnable);
       addProcess(process);
     }
+    return this;
   }
 
   private void finishRunning() {

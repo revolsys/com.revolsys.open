@@ -26,6 +26,11 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpat
   }
 
   @Override
+  public void clear() {
+    this.index.clear();
+  }
+
+  @Override
   public void forEach(final Consumer<? super T> action) {
     this.index.forEach((id) -> {
       final T object = getObject(id);
