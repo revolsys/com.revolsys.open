@@ -201,7 +201,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
 
   default void refreshIfNeeded() {
     synchronized (this) {
-      if (!isLoaded()) {
+      if (!isLoaded() && !isLoading()) {
         refresh();
       }
     }

@@ -14,8 +14,10 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.Pair;
 
 public class ZipUtil {
   /**
@@ -82,6 +84,48 @@ public class ZipUtil {
         FileUtil.copy(in, zipOut);
         in.close();
       }
+    }
+  }
+
+  public static Pair<Resource, GeometryFactory> getZipResourceAndGeometryFactory(
+    final Resource resource, final String fileType, final GeometryFactory defaultGeometryFactory) {
+    String baseName = resource.getBaseName();
+    if (baseName.endsWith(fileType)) {
+      baseName = baseName.replace(fileType, "");
+    }
+    final String fileName = baseName + fileType;
+
+    final ZipFile zipFile = resource.getOrDownloadFile(file -> {
+      try {
+        return new ZipFile(file);
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    });
+    ZipEntry zipEntry = zipFile.getEntry(fileName);
+    if (zipEntry == null) {
+      for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
+        .hasMoreElements();) {
+        final ZipEntry fileEntry = entries.nextElement();
+        final String entryName = fileEntry.getName();
+        if (entryName.endsWith(fileType)) {
+          if (zipEntry == null) {
+            zipEntry = fileEntry;
+          } else {
+            throw new IllegalArgumentException(
+              resource + "contains multiple " + fileType + " files");
+          }
+        }
+      }
+
+    }
+    if (zipEntry == null) {
+      throw new IllegalArgumentException(resource + " does not contain a " + fileType + " file");
+    } else {
+      final Resource zipEntryResource = Resource.newResource(zipFile, zipEntry);
+      final GeometryFactory geometryFactory = GeometryFactory.floating3d(zipFile, zipEntry,
+        defaultGeometryFactory);
+      return new Pair<>(zipEntryResource, geometryFactory);
     }
   }
 

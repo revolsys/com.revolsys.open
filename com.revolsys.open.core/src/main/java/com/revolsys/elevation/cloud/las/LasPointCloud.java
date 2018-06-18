@@ -1,16 +1,11 @@
 package com.revolsys.elevation.cloud.las;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -33,14 +28,13 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.io.ZipUtil;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
-import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.UrlResource;
-import com.revolsys.util.Exceptions;
+import com.revolsys.util.Pair;
 
 public class LasPointCloud extends BaseObjectWithProperties
   implements PointCloud<LasPoint>, BaseCloseable, MapSerializer {
@@ -62,8 +56,6 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   private Resource resource;
 
-  private ZipInputStream zipIn;
-
   private boolean exists;
 
   private ByteBuffer byteBuffer;
@@ -77,43 +69,10 @@ public class LasPointCloud extends BaseObjectWithProperties
     this.resource = resource;
     Resource fileResource = resource;
     if (resource.getFileNameExtension().equals("zip")) {
-      boolean found = false;
-      String baseName = resource.getBaseName();
-      if (baseName.endsWith("las")) {
-        baseName = baseName.replace(".las", "");
-      }
-      final String fileName = baseName + ".las";
-
-      this.zipIn = this.resource.newBufferedInputStream(ZipInputStream::new);
-      try {
-        for (ZipEntry zipEntry = this.zipIn.getNextEntry(); zipEntry != null; zipEntry = this.zipIn
-          .getNextEntry()) {
-          final String name = zipEntry.getName();
-          if (name.equalsIgnoreCase(fileName)) {
-            fileResource = new InputStreamResource(this.zipIn);
-            found = true;
-            break;
-          }
-        }
-      } catch (final IOException e) {
-        throw Exceptions.wrap("Error reading: " + resource, e);
-      }
-      if (found) {
-        try {
-          final URI prjUrl = new URI("jar", resource.getUri() + "!/" + baseName + ".prj", null);
-          final Resource prjResource = new UrlResource(prjUrl);
-          final GeometryFactory geometryFactoryFromPrj = GeometryFactory.floating3d(prjResource);
-
-          if (geometryFactoryFromPrj != null) {
-            this.geometryFactory = geometryFactoryFromPrj;
-          }
-        } catch (final URISyntaxException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      } else {
-        throw new IllegalArgumentException("Cannot find file: " + resource + "!" + fileName);
-      }
+      final Pair<Resource, GeometryFactory> result = ZipUtil
+        .getZipResourceAndGeometryFactory(resource, ".las", this.geometryFactory);
+      fileResource = result.getValue1();
+      this.geometryFactory = result.getValue2();
     }
 
     this.reader = fileResource.newChannelReader(this.byteBuffer);
@@ -151,14 +110,6 @@ public class LasPointCloud extends BaseObjectWithProperties
     this.reader = null;
     if (reader != null) {
       reader.close();
-    }
-    if (this.zipIn != null) {
-      try {
-        this.zipIn.close();
-      } catch (final IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
     }
   }
 
@@ -206,6 +157,7 @@ public class LasPointCloud extends BaseObjectWithProperties
   private void forEachPointLazChunked(final ArithmeticDecoder decoder,
     final LazDecompress[] pointDecompressors, final Consumer<? super LasPoint> action) {
     final ChannelReader reader = this.reader;
+    @SuppressWarnings("unused")
     final long chunkTableOffset = reader.getLong();
     final long chunkSize = getLasZipHeader().getChunkSize();
     long chunkReadCount = chunkSize;

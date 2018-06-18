@@ -277,13 +277,13 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
             Collections.sort(codes, new RecordFieldComparator(this.orderBy));
             addValues(codes);
           }
-          Property.firePropertyChange(this, "valuesChanged", false, true);
         } finally {
           this.loading = false;
           this.loaded = true;
           this.threadLoading.set(null);
           this.notifyAll();
         }
+        Property.firePropertyChange(this, "valuesChanged", false, true);
       }
     }
     Dates.debugEllapsedTime(this, "Load All: " + getTypePath(), time);

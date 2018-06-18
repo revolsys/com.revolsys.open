@@ -104,7 +104,8 @@ public interface MapObjectFactory {
           object = (V)objectFactory.mapToObject(objectMap);
         }
       }
-      // Dates.debugEllapsedTime(MapObjectFactory.class, map.toString(), startTime);
+      // Dates.debugEllapsedTime(MapObjectFactory.class, map.toString(),
+      // startTime);
       return object;
     }
   }
@@ -165,8 +166,12 @@ public interface MapObjectFactory {
       final MapEx resourceProperties = Json.toMap(resource);
       resourceProperties.putAll(properties);
       return toObject(resourceProperties);
-    } catch (final Throwable t) {
-      errorHandler.accept(resource, t);
+    } catch (final Throwable e) {
+      if (errorHandler == null) {
+        Logs.error(MapObjectFactory.class, e);
+      } else {
+        errorHandler.accept(resource, e);
+      }
       return null;
     } finally {
       Resource.setBaseResource(oldResource);

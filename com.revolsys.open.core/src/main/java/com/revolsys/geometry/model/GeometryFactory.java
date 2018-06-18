@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.IntHashMap;
@@ -2401,6 +2403,21 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       }
       return true;
     }
+  }
+
+  public static GeometryFactory floating3d(final ZipFile zipFile, final ZipEntry zipEntry,
+    final GeometryFactory defaultValue) {
+    final String entryName = zipEntry.getName();
+    final String prjFileName = entryName.replaceAll(".las$", ".prj");
+    final ZipEntry prjZipEntry = zipFile.getEntry(prjFileName);
+    if (prjZipEntry != null) {
+      final GeometryFactory geometryFactoryFromPrj = floating3d(Resource.newResource(zipFile, prjZipEntry));
+  
+      if (geometryFactoryFromPrj != null) {
+        return geometryFactoryFromPrj;
+      }
+    }
+    return defaultValue;
   }
 
 }

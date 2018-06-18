@@ -160,6 +160,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   @Override
   public List<Identifier> getIdentifiers() {
+    refreshIfNeeded();
     return Collections.unmodifiableList(this.identifiers);
   }
 

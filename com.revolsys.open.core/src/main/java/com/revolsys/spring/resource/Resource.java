@@ -28,6 +28,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataTypes;
@@ -323,6 +325,31 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
+  default File getOrDownloadFile() {
+    try {
+      return getFile();
+    } catch (final Throwable e) {
+      if (exists()) {
+        final String baseName = getBaseName();
+        final String fileNameExtension = getFileNameExtension();
+        final File file = FileUtil.newTempFile(baseName, fileNameExtension);
+        FileUtil.copy(getInputStream(), file);
+        return file;
+      } else {
+        throw new IllegalArgumentException("Cannot get File for resource " + this, e);
+      }
+    }
+  }
+
+  default <R> R getOrDownloadFile(final Function<File, R> factory) {
+    final File file = getOrDownloadFile();
+    if (file == null) {
+      return null;
+    } else {
+      return factory.apply(file);
+    }
+  }
+
   default Resource getParent() {
     return null;
   }
@@ -547,6 +574,15 @@ public interface Resource extends org.springframework.core.io.Resource {
       }
     } else {
       return null;
+    }
+  }
+
+  static Resource newResource(final ZipFile zipFile, final ZipEntry zipEntry) {
+    try {
+      final InputStream inputStream = zipFile.getInputStream(zipEntry);
+      return new InputStreamResource(inputStream);
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Cannot open " + zipFile + "!" + zipEntry, e);
     }
   }
 }
