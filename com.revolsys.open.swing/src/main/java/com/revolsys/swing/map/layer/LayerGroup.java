@@ -965,12 +965,27 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
   }
 
-  public boolean removeLayer(final String layerName) {
+  public Layer removeLayer(final String layerName) {
+    final Layer layer = getLayer(layerName);
+    if (layer == null) {
+      return null;
+    } else {
+      removeLayer(layer);
+      return layer;
+    }
+  }
+
+  public boolean removeLayer(final String layerName, final boolean delete) {
     final Layer layer = getLayer(layerName);
     if (layer == null) {
       return false;
     } else {
-      return removeLayer(layer);
+      if (delete) {
+        layer.delete();
+      } else {
+        removeLayer(layer);
+      }
+      return true;
     }
   }
 

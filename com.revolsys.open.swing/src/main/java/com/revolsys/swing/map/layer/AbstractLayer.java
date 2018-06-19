@@ -272,12 +272,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   @Override
   public void delete() {
     this.deleted = true;
-    setExists(false);
-    this.beanPropertyListener = null;
     final ProjectFrame projectFrame = ProjectFrame.get(this);
     if (projectFrame != null) {
       projectFrame.removeBottomTab(this);
     }
+    setExists(false);
+    this.beanPropertyListener = null;
+
     firePropertyChange("deleted", false, true);
     final LayerGroup layerGroup = getLayerGroup();
     if (layerGroup != null) {
@@ -981,12 +982,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   public void setLayerGroup(final LayerGroup layerGroup) {
     final LayerGroup old = getLayerGroup();
     if (old != layerGroup) {
+      final String oldPath = getPath();
       if (old != null) {
         Property.removeListener(this, old);
       }
       this.layerGroup = new WeakReference<>(layerGroup);
       Property.addListener(this, layerGroup);
-      firePropertyChange("layerGroup", old, layerGroup);
+      try (
+        final BaseCloseable eventsEnabled = eventsEnabled()) {
+        firePropertyChange("layerGroup", old, layerGroup);
+        firePropertyChange("path", oldPath, getPath());
+      }
     }
   }
 
@@ -1012,6 +1018,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   @Override
   public void setName(final String name) {
+    final String oldPath = getPath();
     final Object oldValue = this.name;
     final LayerGroup layerGroup = getLayerGroup();
     String newName = name;
@@ -1026,6 +1033,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     try (
       final BaseCloseable eventsEnabled = eventsEnabled()) {
       firePropertyChange("name", oldValue, this.name);
+      firePropertyChange("path", oldPath, getPath());
     }
   }
 

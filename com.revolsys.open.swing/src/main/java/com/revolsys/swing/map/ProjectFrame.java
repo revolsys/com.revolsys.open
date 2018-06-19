@@ -550,6 +550,19 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected final void loadProject() {
+    Property.addListener(this.project, "name", e -> {
+      final Object source = e.getSource();
+      if (source instanceof Layer) {
+        final Layer layer = (Layer)source;
+        final String oldPath = (String)e.getOldValue();
+        synchronized (this.bottomTabLayerPaths) {
+          if (this.bottomTabLayerPaths.remove(oldPath)) {
+            final String newPath = layer.getPath();
+            this.bottomTabLayerPaths.add(newPath);
+          }
+        }
+      }
+    });
     final Path projectPath = getProjectPath();
     if (projectPath == null) {
       getMapPanel().setInitializing(false);
