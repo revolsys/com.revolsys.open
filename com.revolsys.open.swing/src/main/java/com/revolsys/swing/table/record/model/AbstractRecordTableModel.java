@@ -86,7 +86,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
   public abstract boolean isSelected(boolean selected, int rowIndex, int columnIndex);
 
   public void loadCodeTable(final CodeTable codeTable) {
-    if (!codeTable.isLoaded()) {
+    if (codeTable.isLoadAll() && !codeTable.isLoaded()) {
       codeTable.getCodes();
       fireTableDataChanged();
     }
@@ -134,7 +134,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
       if (codeTable == null) {
         text = DataTypes.toString(objectValue);
       } else {
-        if (codeTable.isLoaded()) {
+        if (!codeTable.isLoadAll() || codeTable.isLoaded()) {
           final List<Object> values = codeTable.getValues(Identifier.newIdentifier(objectValue));
           if (values == null || values.isEmpty()) {
             text = DataTypes.toString(objectValue);

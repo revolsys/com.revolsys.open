@@ -409,6 +409,13 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     }
   }
 
+  @Override
+  public void refreshIfNeeded() {
+    if (this.loadAll) {
+      super.refreshIfNeeded();
+    }
+  }
+
   public void setAllowNullValues(final boolean allowNullValues) {
     this.allowNullValues = allowNullValues;
   }

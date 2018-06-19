@@ -188,6 +188,10 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return false;
   }
 
+  default boolean isLoadAll() {
+    return true;
+  }
+
   default boolean isLoaded() {
     return true;
   }
