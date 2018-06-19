@@ -15,6 +15,13 @@ import com.revolsys.util.CaseConverter;
 
 public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchemaElement,
   MapSerializer, RecordDefinitionProxy, RecordFactory<Record> {
+  default void addCodeTable(final String fieldName, final CodeTable codeTable) {
+    final FieldDefinition field = getField(fieldName);
+    if (field != null) {
+      field.setCodeTable(codeTable);
+    }
+  }
+
   void addDefaultValue(String fieldName, Object defaultValue);
 
   void deleteRecord(Record record);

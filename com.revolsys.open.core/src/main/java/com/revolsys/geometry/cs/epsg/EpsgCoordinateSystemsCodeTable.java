@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.HorizontalCoordinateSystem;
 import com.revolsys.geometry.cs.VerticalCoordinateSystem;
@@ -76,15 +77,31 @@ public class EpsgCoordinateSystemsCodeTable implements CodeTable {
   public Identifier getIdentifier(final Object... values) {
     if (values.length == 1) {
       final Object value = values[0];
-      final Identifier id = Identifier.newIdentifier(value);
-      if (this.codes.containsKey(id)) {
-        return id;
+      CoordinateSystem coordinateSystem = null;
+      if (value instanceof CoordinateSystem) {
+        coordinateSystem = (CoordinateSystem)value;
       } else {
-        return CodeTable.super.getIdentifier(values);
+        try {
+          final Integer intValue = DataTypes.INT.toObject(value);
+          final Identifier id = Identifier.newIdentifier(intValue);
+          if (this.codes.containsKey(id)) {
+            return id;
+          }
+        } catch (final Exception e) {
+          coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(value.toString());
+        }
       }
-    } else {
-      return CodeTable.super.getIdentifier(values);
+      if (coordinateSystem != null) {
+        final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+        final Identifier id = Identifier.newIdentifier(coordinateSystemId);
+        if (this.codes.containsKey(id)) {
+          return id;
+        } else {
+          return null;
+        }
+      }
     }
+    return null;
   }
 
   @Override

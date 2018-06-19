@@ -1059,7 +1059,9 @@ public interface Property {
         }
         try {
           writeMethod.invoke(object, convertedValue);
-        } catch (IllegalAccessException | IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
+          throw Exceptions.wrap("Invalid value: " + propertyName + "=" + convertedValue, e);
+        } catch (final IllegalAccessException e) {
           Exceptions.throwUncheckedException(e);
         } catch (final InvocationTargetException e) {
           final Throwable targetException = e.getTargetException();

@@ -1241,8 +1241,10 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
       for (final FieldDefinition fieldDefintion : fields) {
         if (!idFields.contains(fieldDefintion)) {
           final String name = fieldDefintion.getName();
-          final Object value = record.getValue(name);
-          fieldDefintion.setValue(this, value);
+          if (record.hasField(name)) {
+            final Object value = record.getValue(name);
+            fieldDefintion.setValue(this, value);
+          }
         }
       }
     }
