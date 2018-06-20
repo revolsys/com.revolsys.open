@@ -654,6 +654,13 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     return new ListResultPager<>(list);
   }
 
+  default void refreshCodeTable(final PathName pathName) {
+    final CodeTable codeTable = getCodeTable(pathName);
+    if (codeTable != null) {
+      codeTable.refresh();
+    }
+  }
+
   void setLabel(String label);
 
   void setLoadFullSchema(boolean loadFullSchema);
