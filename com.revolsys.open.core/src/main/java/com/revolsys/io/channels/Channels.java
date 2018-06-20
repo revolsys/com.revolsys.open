@@ -27,10 +27,24 @@ public class Channels {
         }
         buffer.clear();
       }
-    } else {
+    } else if (in instanceof FileChannel) {
       long count = 0;
       while (count < size) {
         count += out.transferFrom(in, count, size - count);
+      }
+    } else {
+      long ofset = 0;
+      int blockSize = 8196;
+      while (ofset < size) {
+        long remaining = size - ofset;
+        long readCount;
+        if (remaining < blockSize) {
+          readCount = out.transferFrom(in, ofset, remaining);
+        } else {
+          readCount = out.transferFrom(in, ofset, blockSize);
+        }
+        remaining -= readCount;
+        ofset += readCount;
       }
     }
   }
