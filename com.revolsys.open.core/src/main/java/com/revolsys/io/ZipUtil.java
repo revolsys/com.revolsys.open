@@ -132,8 +132,7 @@ public class ZipUtil {
     }
   }
 
-  public static List<String> unzipFile(final File file, final File outputDirectory)
-    throws IOException {
+  public static List<String> unzipFile(final File file, final File outputDirectory) {
     final List<String> entryNames = new ArrayList<>();
     try (
       final ZipFile zipFile = new ZipFile(file)) {
@@ -155,6 +154,10 @@ public class ZipUtil {
       throw Exceptions.wrap("Error extracting: " + file, e);
     }
     return entryNames;
+  }
+
+  public static List<String> unzipFile(final Path zip, final Path outputDirectory) {
+    return unzipFile(zip.toFile(), outputDirectory.toFile());
   }
 
   public static File unzipFile(final Resource resource) throws IOException {
@@ -191,6 +194,12 @@ public class ZipUtil {
       FileUtil.deleteDirectory(directory);
       throw e;
     }
+  }
+
+  public static boolean unzipFile(final Resource resource, final Path directory)
+    throws IOException {
+    final File file = directory.toFile();
+    return unzipFile(resource, file);
   }
 
   public static void unzipSingleFile(final Path zipPath, final Path targetFile,
