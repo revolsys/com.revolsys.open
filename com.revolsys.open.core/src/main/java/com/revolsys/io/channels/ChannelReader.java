@@ -279,7 +279,7 @@ public class ChannelReader implements BaseCloseable {
         throw new IllegalArgumentException("Not supported");
       }
     } catch (final IOException e) {
-      Exceptions.wrap(e);
+      throw Exceptions.wrap(e);
     }
   }
 

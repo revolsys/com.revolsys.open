@@ -153,7 +153,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       return null;
     } else {
       final String wkt = getSingleThreadResult(() -> {
-        return EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getHorizontalCoordinateSystemId());
+        return EsriFileGdb
+          .getSpatialReferenceWkt(geometryFactory.getHorizontalCoordinateSystemId());
       });
       final SpatialReference spatialReference = SpatialReference.get(geometryFactory, wkt);
       return spatialReference;
@@ -1678,7 +1679,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               logQuery.append(" WHERE ");
               logQuery.append(whereClause);
             }
-            Exceptions.wrap(logQuery.toString(), e);
+            throw Exceptions.wrap(logQuery.toString(), e);
           }
 
         }
@@ -1716,7 +1717,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               logQuery.append(" ");
               logQuery.append(boundingBox.getYMax());
               logQuery.append(")");
-              Exceptions.wrap(logQuery.toString(), e);
+              throw Exceptions.wrap(logQuery.toString(), e);
             }
           }
         }

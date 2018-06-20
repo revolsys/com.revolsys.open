@@ -88,7 +88,7 @@ public class Nadcon5FileGrid {
       try {
         this.channel.close();
       } catch (final IOException e) {
-        Exceptions.wrap(e);
+        throw Exceptions.wrap(e);
       }
       this.channel = null;
     }
@@ -248,7 +248,7 @@ public class Nadcon5FileGrid {
           this.channel = channel;
           return channel;
         } catch (final IOException e) {
-          Exceptions.wrap("Cannot open file:" + fileName, e);
+          throw Exceptions.wrap("Cannot open file:" + fileName, e);
         }
       } else {
         return this.channel;

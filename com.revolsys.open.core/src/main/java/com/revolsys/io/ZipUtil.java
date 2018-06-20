@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -149,7 +152,7 @@ public class ZipUtil {
         }
       }
     } catch (final IOException e) {
-      Exceptions.wrap("Error extracting: " + file, e);
+      throw Exceptions.wrap("Error extracting: " + file, e);
     }
     return entryNames;
   }
@@ -187,6 +190,41 @@ public class ZipUtil {
       FileUtil.closeSilent(zipIn);
       FileUtil.deleteDirectory(directory);
       throw e;
+    }
+  }
+
+  public static void unzipSingleFile(final Path zipPath, final Path targetFile,
+    final String fileExtension) {
+    boolean hasMatch = false;
+    try (
+      final ZipFile zipFile = new ZipFile(zipPath.toFile())) {
+      for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
+        .hasMoreElements();) {
+        final ZipEntry entry = entries.nextElement();
+        if (!entry.isDirectory()) {
+          final String name = entry.getName();
+          if (name.endsWith("." + fileExtension)) {
+            if (hasMatch) {
+              throw new IllegalArgumentException(
+                "Zip file cannot have more than one *." + fileExtension + " files: " + zipPath);
+            } else {
+              hasMatch = true;
+              try (
+                InputStream in = zipFile.getInputStream(entry)) {
+                final Resource targetResource = Resource.getResource(targetFile);
+                final Resource tempResource = targetResource.newResourceAddExtension("copy");
+                tempResource.copyFrom(in);
+                Files.move(tempResource.getPath(), targetFile, StandardCopyOption.ATOMIC_MOVE);
+              } catch (final Exception e) {
+                throw Exceptions.wrap("Error copying " + zipPath + "!" + name + " to " + targetFile,
+                  e);
+              }
+            }
+          }
+        }
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Error extracting: " + zipPath, e);
     }
   }
 
