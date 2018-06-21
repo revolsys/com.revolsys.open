@@ -43,6 +43,7 @@ import javax.swing.tree.TreePath;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
@@ -565,6 +566,12 @@ public class ProjectFrame extends BaseFrame {
     });
     final Path projectPath = getProjectPath();
     if (projectPath == null) {
+      final Viewport2D viewport = this.mapPanel.getViewport();
+      final GeometryFactory geometryFactory = GeometryFactory.worldMercator();
+      final BoundingBox initialBoundingBox = geometryFactory.getAreaBoundingBox();
+      this.project.setViewBoundingBoxAndGeometryFactory(initialBoundingBox);
+      viewport.setBoundingBoxAndGeometryFactory(initialBoundingBox);
+      viewport.setInitialized(true);
       getMapPanel().setInitializing(false);
     } else {
       Invoke.background("Load Project: " + projectPath, () -> {
