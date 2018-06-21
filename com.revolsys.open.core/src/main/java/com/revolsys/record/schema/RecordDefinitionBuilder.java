@@ -84,4 +84,9 @@ public class RecordDefinitionBuilder {
     this.recordDefinition.setGeometryFieldName(fieldName);
     return this;
   }
+
+  public RecordDefinitionBuilder setPathName(final String path) {
+    this.recordDefinition.setPathName(path);
+    return this;
+  }
 }

@@ -16,7 +16,6 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
@@ -241,8 +240,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   default List<Triangle> getTriangles(final double x, final double y) {
     final List<Triangle> triangles = new ArrayList<>();
     final Predicate<Triangle> filter = triangle -> triangle.containsPoint(x, y);
-    final BoundingBox boundingBox = new BoundingBoxDoubleXY(x, y);
-    forEachTriangle(boundingBox, filter, triangles::add);
+    forEachTriangle(x, y, filter, triangles::add);
     return triangles;
   }
 
