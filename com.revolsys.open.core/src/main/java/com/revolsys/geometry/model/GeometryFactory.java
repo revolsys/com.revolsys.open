@@ -67,6 +67,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.AbstractPoint;
+import com.revolsys.geometry.model.impl.AbstractPolygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxEmpty;
@@ -172,6 +173,86 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
 
     @Override
     public double getZ() {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return toEwkt();
+    }
+  }
+
+  private class EmptyPolygon extends AbstractPolygon {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Polygon clone() {
+      return this;
+    }
+
+    @Override
+    public int getAxisCount() {
+      return GeometryFactory.this.axisCount;
+    }
+
+    @Override
+    public double getCoordinate(final int ringIndex, final int vertexIndex, final int axisIndex) {
+      return Double.NaN;
+    }
+
+    @Override
+    public double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+      final int axisIndex) {
+      return Double.NaN;
+    }
+
+    @Override
+    public GeometryFactory getGeometryFactory() {
+      return GeometryFactory.this;
+    }
+
+    @Override
+    public double getM(final int ringIndex, final int vertexIndex) {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getM(final int partIndex, final int ringIndex, final int vertexIndex) {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getX(final int ringIndex, final int vertexIndex) {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getX(final int partIndex, final int ringIndex, final int vertexIndex) {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getY(final int ringIndex, final int vertexIndex) {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getY(final int partIndex, final int ringIndex, final int vertexIndex) {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getZ(final int ringIndex, final int vertexIndex) {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getZ(final int partIndex, final int ringIndex, final int vertexIndex) {
       return java.lang.Double.NaN;
     }
 
@@ -434,6 +515,22 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return floating(wkt, 3);
   }
 
+  public static GeometryFactory floating3d(final ZipFile zipFile, final ZipEntry zipEntry,
+    final GeometryFactory defaultValue) {
+    final String entryName = zipEntry.getName();
+    final String prjFileName = entryName.replaceAll(".las$", ".prj");
+    final ZipEntry prjZipEntry = zipFile.getEntry(prjFileName);
+    if (prjZipEntry != null) {
+      final GeometryFactory geometryFactoryFromPrj = floating3d(
+        Resource.newResource(zipFile, prjZipEntry));
+
+      if (geometryFactoryFromPrj != null) {
+        return geometryFactoryFromPrj;
+      }
+    }
+    return defaultValue;
+  }
+
   public static GeometryFactory get(final Object factory) {
     if (factory instanceof GeometryFactory) {
       return (GeometryFactory)factory;
@@ -596,6 +693,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   protected final int coordinateSystemId;
 
   private final EmptyPoint emptyPoint = new EmptyPoint();
+
+  private final EmptyPolygon emptyPolygon = new EmptyPolygon();
 
   private transient final WktParser parser = new WktParser(this);
 
@@ -2043,8 +2142,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
   }
 
-  public PolygonImpl polygon() {
-    return new PolygonImpl(this);
+  public Polygon polygon() {
+    return this.emptyPolygon;
   }
 
   public Polygon polygon(final Geometry... rings) {
@@ -2403,21 +2502,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       }
       return true;
     }
-  }
-
-  public static GeometryFactory floating3d(final ZipFile zipFile, final ZipEntry zipEntry,
-    final GeometryFactory defaultValue) {
-    final String entryName = zipEntry.getName();
-    final String prjFileName = entryName.replaceAll(".las$", ".prj");
-    final ZipEntry prjZipEntry = zipFile.getEntry(prjFileName);
-    if (prjZipEntry != null) {
-      final GeometryFactory geometryFactoryFromPrj = floating3d(Resource.newResource(zipFile, prjZipEntry));
-  
-      if (geometryFactoryFromPrj != null) {
-        return geometryFactoryFromPrj;
-      }
-    }
-    return defaultValue;
   }
 
 }

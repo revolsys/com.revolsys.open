@@ -254,6 +254,12 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
   }
 
   @Override
+  public void revertChanges() {
+    this.coordinates = null;
+    setModified(false);
+  }
+
+  @Override
   public GeometryEditor<?> setAxisCount(final int axisCount) {
     final int oldAxisCount = getAxisCount();
     if (oldAxisCount != axisCount) {

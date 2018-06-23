@@ -179,6 +179,13 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
   }
 
   @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      editor.forEachVertex(action);
+    }
+  }
+
+  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.editors) {
@@ -187,16 +194,10 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.editors) {
       geometry.forEachVertex(coordinates, action);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final Consumer3Double action) {
-    for (final GeometryEditor<?> editor : this.editors) {
-      editor.forEachVertex(action);
     }
   }
 
@@ -331,6 +332,14 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
     } else {
       return this.geometry;
     }
+  }
+
+  @Override
+  public void revertChanges() {
+    for (final GeometryEditor<?> editor : this.editors) {
+      editor.revertChanges();
+    }
+    setModified(false);
   }
 
   @Override

@@ -526,7 +526,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     }
   }
 
-  private double[] getCoordinatesModified() {
+  protected double[] getCoordinatesModified() {
     if (this.coordinates == null) {
       setModified(true);
 
@@ -809,6 +809,59 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     final LinearRing ring = newLinearRing();
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.polygon(ring);
+  }
+
+  @Override
+  public LineStringEditor removeDuplicatePoints() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final int vertexCount = getVertexCount();
+      final int axisCount = getAxisCount();
+      final int axisCountExtra = axisCount - 2;
+      final double[] coordinates = getCoordinatesModified();
+      double previousX = coordinates[0];
+      double previousY = coordinates[1];
+
+      int targetVertexIndex = 1;
+      int sourceAxisIndex = axisCount;
+      int targetAxisIndex = axisCount;
+      for (int sourceVertexIndex = 1; sourceVertexIndex < vertexCount; sourceVertexIndex++) {
+        final double x = coordinates[sourceAxisIndex++];
+        final double y = coordinates[sourceAxisIndex++];
+        if (x == previousX && y == previousY) {
+          sourceAxisIndex += axisCountExtra;
+        } else {
+          if (sourceVertexIndex != targetVertexIndex) {
+            coordinates[targetAxisIndex++] = x;
+            coordinates[targetAxisIndex++] = y;
+            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+              coordinates[targetAxisIndex++] = coordinates[sourceAxisIndex++];
+            }
+          } else {
+            sourceAxisIndex += axisCountExtra;
+            targetAxisIndex += axisCount;
+          }
+          targetVertexIndex++;
+        }
+        previousX = x;
+        previousY = y;
+      }
+      setVertexCount(targetVertexIndex);
+      return this;
+    }
+  }
+
+  @Override
+  public void revertChanges() {
+    if (this.line == null) {
+      this.coordinates = new double[0];
+      this.vertexCount = 0;
+    } else {
+      this.coordinates = null;
+      this.vertexCount = this.line.getVertexCount();
+    }
+    setModified(false);
   }
 
   @Override

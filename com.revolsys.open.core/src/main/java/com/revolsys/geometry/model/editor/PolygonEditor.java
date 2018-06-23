@@ -32,10 +32,7 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
     final Polygon polygon) {
     super(parentEditor, polygon);
     this.polygon = polygon;
-    for (final LinearRing ring : polygon.rings()) {
-      final LinearRingEditor editor = new LinearRingEditor(this, ring);
-      this.editors.add(editor);
-    }
+    revertChanges();
   }
 
   public PolygonEditor(final GeometryFactory geometryFactory) {
@@ -182,6 +179,13 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   }
 
   @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final GeometryEditor<?> editor : this.editors) {
+      editor.forEachVertex(action);
+    }
+  }
+
+  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.editors) {
@@ -190,16 +194,10 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.editors) {
       geometry.forEachVertex(coordinates, action);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final Consumer3Double action) {
-    for (final GeometryEditor<?> editor : this.editors) {
-      editor.forEachVertex(action);
     }
   }
 
@@ -340,13 +338,28 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
     return this.polygon.newPolygon(geometryFactory, rings);
   }
 
+  @Override
+  public Iterable<PolygonEditor> polygonEditors() {
+    return Collections.singletonList(this);
+  }
+
   public void removeRing(final int index) {
     this.editors.remove(index);
     setModified(true);
   }
 
+  @Override
+  public void revertChanges() {
+    this.editors.clear();
+    for (final LinearRing ring : this.polygon.rings()) {
+      final LinearRingEditor editor = new LinearRingEditor(this, ring);
+      this.editors.add(editor);
+    }
+    setModified(false);
+  }
+
   public Iterable<LinearRingEditor> ringEditors() {
-    return Collections.unmodifiableList(this.editors);
+    return Lists.toArray(this.editors);
   }
 
   @Override

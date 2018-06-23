@@ -501,12 +501,18 @@ public interface Polygon extends Polygonal {
     }
   }
 
-  LinearRing getRing(int ringIndex);
+  default LinearRing getRing(final int ringIndex) {
+    return null;
+  }
 
-  int getRingCount();
+  default int getRingCount() {
+    return 0;
+  }
 
   @Override
-  List<LinearRing> getRings();
+  default List<LinearRing> getRings() {
+    return Collections.emptyList();
+  }
 
   @Override
   default Segment getSegment(final int... segmentId) {

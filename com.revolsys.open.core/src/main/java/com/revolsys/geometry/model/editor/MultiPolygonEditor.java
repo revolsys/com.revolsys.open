@@ -86,6 +86,11 @@ public class MultiPolygonEditor
   }
 
   @Override
+  public Iterable<PolygonEditor> polygonEditors() {
+    return this.editors;
+  }
+
+  @Override
   public double setCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
     final int axisIndex, final double coordinate) {
     final PolygonEditor editor = getEditor(partIndex);

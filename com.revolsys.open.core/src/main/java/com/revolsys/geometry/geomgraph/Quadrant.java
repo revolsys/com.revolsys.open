@@ -144,7 +144,7 @@ public class Quadrant {
   public static int quadrant(final double x1, final double y1, final double x2, final double y2) {
     if (x2 == x1 && y2 == y1) {
       throw new IllegalArgumentException(
-        "Cannot compute the quadrant for two identical points POINT(" + x1 + " " + x2 + ")");
+        "Cannot compute the quadrant for two identical points POINT(" + x1 + " " + y1 + ")");
     } else if (x2 >= x1) {
       if (y2 >= y1) {
         return NE;

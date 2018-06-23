@@ -12,6 +12,6 @@ public class CompoundCoorindateSystemTest {
   public void testStandard() {
     final CompoundCoordinateSystem compoundCoordinateSystem = EpsgCoordinateSystems
       .getCompound(EpsgId.NAD83, 5703);
-    Assert.assertEquals(5498, compoundCoordinateSystem.getHorizontalCoordinateSystemId());
+    Assert.assertEquals(5498, compoundCoordinateSystem.getCoordinateSystemId());
   }
 }

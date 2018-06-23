@@ -96,6 +96,8 @@ public interface GeometryEditor<GE extends GeometryEditor<?>> extends Geometry {
 
   Geometry newGeometry();
 
+  void revertChanges();
+
   GeometryEditor<?> setAxisCount(int axisCount);
 
   GeometryEditor<?> setCoordinate(int[] vertexId, int axisIndex, double coordinate);

@@ -442,12 +442,12 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * @see #buffer(double, int, int)
    */
 
-  default Geometry buffer(final double distance) {
+  default Polygonal buffer(final double distance) {
     return buffer(distance, BufferParameters.DEFAULT_QUADRANT_SEGMENTS, LineCap.ROUND,
       LineJoin.ROUND, BufferParameters.DEFAULT_MITRE_LIMIT);
   }
 
-  default <G extends Geometry> G buffer(final double distance, final BufferParameters parameters) {
+  default <G extends Polygonal> G buffer(final double distance, final BufferParameters parameters) {
     return Buffer.buffer(this, distance, parameters);
   }
 
@@ -481,7 +481,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * @see #buffer(double, int, int)
    */
 
-  default Geometry buffer(final double distance, final int quadrantSegments) {
+  default Polygonal buffer(final double distance, final int quadrantSegments) {
     return buffer(distance, quadrantSegments, LineCap.ROUND, LineJoin.ROUND,
       BufferParameters.DEFAULT_MITRE_LIMIT);
   }
@@ -520,13 +520,13 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * @see #buffer(double, int)
    */
 
-  default Geometry buffer(final double distance, final int quadrantSegments,
+  default Polygonal buffer(final double distance, final int quadrantSegments,
     final LineCap endCapStyle) {
     return buffer(distance, quadrantSegments, endCapStyle, LineJoin.ROUND,
       BufferParameters.DEFAULT_MITRE_LIMIT);
   }
 
-  default <G extends Geometry> G buffer(final double distance, final int quadrantSegments,
+  default <G extends Polygonal> G buffer(final double distance, final int quadrantSegments,
     final LineCap endCapStyle, final LineJoin joinStyle, final double mitreLimit) {
     final BufferParameters parameters = new BufferParameters(quadrantSegments, endCapStyle,
       joinStyle, mitreLimit);
@@ -1348,7 +1348,9 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
-  <R> R findSegment(Function4Double<R> action);
+  default <R> R findSegment(final Function4Double<R> action) {
+    return null;
+  }
 
   /**
    * Iterate through all the vertices of the geometry and call the supplied action.
@@ -1357,7 +1359,9 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     * @param action
    * @return The first non-null result
    */
-  <R> R findVertex(BiFunctionDouble<R> action);
+  default <R> R findVertex(final BiFunctionDouble<R> action) {
+    return null;
+  }
 
   default void forEachGeometry(final Consumer<Geometry> action) {
     action.accept(this);
@@ -1366,9 +1370,11 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   default void forEachPolygon(final Consumer<Polygon> action) {
   }
 
-  void forEachSegment(Consumer4Double action);
+  default void forEachSegment(final Consumer4Double action) {
+  }
 
-  void forEachVertex(BiConsumerDouble action);
+  default void forEachVertex(final BiConsumerDouble action) {
+  }
 
   default void forEachVertex(final Consumer<CoordinatesOperationPoint> action) {
     if (!isEmpty()) {
@@ -1377,13 +1383,16 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
-  void forEachVertex(Consumer3Double action);
+  default void forEachVertex(final Consumer3Double action) {
+  }
 
-  void forEachVertex(CoordinatesOperation coordinatesOperation, CoordinatesOperationPoint point,
-    Consumer<CoordinatesOperationPoint> action);
+  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+  }
 
-  void forEachVertex(CoordinatesOperationPoint coordinates,
-    Consumer<CoordinatesOperationPoint> action);
+  default void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
+  }
 
   default void forEachVertex(final GeometryFactory geometryFactory,
     final Consumer<CoordinatesOperationPoint> action) {

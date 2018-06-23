@@ -30,6 +30,25 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
   }
 
   @Override
+  public void deleteVertex(final int vertexIndex) {
+    final int lastVertexIndex = getLastVertexIndex();
+    if (isClosed() && (vertexIndex == 0 || vertexIndex == lastVertexIndex)) {
+      getCoordinatesModified();
+      if (vertexIndex == 0) {
+        System.arraycopy(this.coordinates, this.axisCount, this.coordinates,
+          lastVertexIndex * this.axisCount, this.axisCount);
+      } else if (vertexIndex == lastVertexIndex) {
+        System.arraycopy(this.coordinates, (lastVertexIndex - 1) * this.axisCount, this.coordinates,
+          0, this.axisCount);
+      }
+      super.deleteVertex(vertexIndex);
+
+    } else {
+      super.deleteVertex(vertexIndex);
+    }
+  }
+
+  @Override
   public Geometry getCurrentGeometry() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int vertexCount = getVertexCount();
@@ -71,6 +90,11 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
   }
 
   @Override
+  public LinearRingEditor removeDuplicatePoints() {
+    return (LinearRingEditor)super.removeDuplicatePoints();
+  }
+
+  @Override
   public double setCoordinate(final int vertexIndex, final int axisIndex, final double coordinate) {
     final int lastVertexIndex = getLastVertexIndex();
     if (vertexIndex == 0 || vertexIndex == lastVertexIndex) {
@@ -79,6 +103,54 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
       return super.setCoordinate(lastVertexIndex, axisIndex, coordinate);
     } else {
       return super.setCoordinate(vertexIndex, axisIndex, coordinate);
+    }
+  }
+
+  @Override
+  public double setM(final int vertexIndex, final double m) {
+    final int lastVertexIndex = getLastVertexIndex();
+    if (vertexIndex == 0 || vertexIndex == lastVertexIndex) {
+      // Ensure valid loop
+      super.setM(0, m);
+      return super.setM(lastVertexIndex, m);
+    } else {
+      return super.setM(vertexIndex, m);
+    }
+  }
+
+  @Override
+  public double setX(final int vertexIndex, final double x) {
+    final int lastVertexIndex = getLastVertexIndex();
+    if (vertexIndex == 0 || vertexIndex == lastVertexIndex) {
+      // Ensure valid loop
+      super.setX(0, x);
+      return super.setX(lastVertexIndex, x);
+    } else {
+      return super.setX(vertexIndex, x);
+    }
+  }
+
+  @Override
+  public double setY(final int vertexIndex, final double y) {
+    final int lastVertexIndex = getLastVertexIndex();
+    if (vertexIndex == 0 || vertexIndex == lastVertexIndex) {
+      // Ensure valid loop
+      super.setY(0, y);
+      return super.setY(lastVertexIndex, y);
+    } else {
+      return super.setY(vertexIndex, y);
+    }
+  }
+
+  @Override
+  public double setZ(final int vertexIndex, final double m) {
+    final int lastVertexIndex = getLastVertexIndex();
+    if (vertexIndex == 0 || vertexIndex == lastVertexIndex) {
+      // Ensure valid loop
+      super.setZ(0, m);
+      return super.setZ(lastVertexIndex, m);
+    } else {
+      return super.setZ(vertexIndex, m);
     }
   }
 
