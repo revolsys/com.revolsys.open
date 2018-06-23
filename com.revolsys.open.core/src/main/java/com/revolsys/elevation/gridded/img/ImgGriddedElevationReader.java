@@ -70,7 +70,7 @@ class ImgGriddedElevationReader extends BaseObjectWithProperties
   public ImgGriddedElevationReader(final Resource resource,
     final Map<String, ? extends Object> properties) {
     this.resource = resource;
-    this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
+    this.geometryFactory = GeometryFactory.floating3d(resource, null);
     setProperties(properties);
   }
 
@@ -89,6 +89,7 @@ class ImgGriddedElevationReader extends BaseObjectWithProperties
   @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
+      init();
       final GeometryFactory geometryFactory = getGeometryFactory();
       this.boundingBox = geometryFactory.newBoundingBox(
         this.upperLeftCenterX - this.gridCellWidth / 2,
