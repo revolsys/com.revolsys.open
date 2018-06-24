@@ -61,6 +61,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
     this.identifiers.add(id);
     this.idValueCache.put(id, values);
     this.idIdCache.put(id, id);
+
     addValueId(id, values);
     String lowerId = id.toString();
     if (!this.caseSensitive) {
@@ -242,7 +243,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
       if (values == null) {
         synchronized (this) {
           values = loadValues(id);
-          if (values != null) {
+          if (values != null && !isLoadAll()) {
             addValue(id, values);
           }
         }
