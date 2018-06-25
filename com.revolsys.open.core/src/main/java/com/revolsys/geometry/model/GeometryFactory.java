@@ -85,6 +85,7 @@ import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
+import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.StringWriter;
 import com.revolsys.io.channels.ChannelReader;
@@ -2455,6 +2456,15 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       StringWriter stringWriter = new StringWriter()) {
       writeWktCs(stringWriter, 0);
       return stringWriter.toString();
+    }
+  }
+
+  public Polygonal union(final List<Polygon> polygons) {
+    final Polygonal polygonal = CascadedPolygonUnion.union(polygons);
+    if (polygonal == null) {
+      return polygon();
+    } else {
+      return polygonal;
     }
   }
 
