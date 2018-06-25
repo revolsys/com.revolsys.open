@@ -2261,6 +2261,12 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
   }
 
+  public Polygon polygonRectangle(final double x1, final double y1, final double x2,
+    final double y2) {
+    final LinearRing ring = linearRing(this.axisCount, x1, y1, x2, y1, x2, y2, x1, y2, x1, y1);
+    return new PolygonImpl(this, ring);
+  }
+
   /**
    * Project the geometry if it is in a different coordinate system
    *

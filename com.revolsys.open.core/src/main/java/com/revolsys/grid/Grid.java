@@ -15,7 +15,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
@@ -246,43 +245,49 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
   double getMinValue();
 
   default Polygonal getNotNullPolygonal() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final List<Polygon> nullPolygons = new ArrayList<>();
+    final GeometryFactory geometryFactory = getGeometryFactory().convertAxisCount(2);
+    final BoundingBox boundingBox = getBoundingBox();
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final List<Polygon> notNullPolygons = new ArrayList<>();
     final double gridCellWidth = getGridCellWidth();
     final double gridCellHeight = getGridCellHeight();
     final int gridHeight = getGridHeight();
     final int gridWidth = getGridWidth();
+    double nextY = minY;
     for (int gridY = 0; gridY < gridHeight; gridY++) {
-      int firstNullGridX = -1;
-      boolean lastWasNull = false;
+      final double y = nextY;
+      nextY = minY + (gridY + 1) * gridCellHeight;
+      int firstNotNullGridX = -1;
+      boolean lastWasNotNull = false;
       for (int gridX = 0; gridX < gridWidth; gridX++) {
         final double value = getValue(gridX, gridY);
-        if (Double.isNaN(value)) {
-          if (!lastWasNull) {
-            firstNullGridX = gridX;
+        if (Double.isFinite(value)) {
+          if (!lastWasNotNull) {
+            firstNotNullGridX = gridX;
           }
-          lastWasNull = true;
+          lastWasNotNull = true;
         } else {
-          if (lastWasNull) {
-            geometryFactory.newRectangle(firstNullGridX * gridX, gridY * gridCellHeight,
-              (gridX - firstNullGridX) * gridCellWidth, gridCellHeight);
+          if (lastWasNotNull) {
+            final double x1 = minX + firstNotNullGridX * gridCellWidth;
+            final double x2 = minX + gridX * gridCellWidth;
+
+            final Polygon nullRectangle = geometryFactory.polygonRectangle(x1, y, x2, nextY);
+            notNullPolygons.add(nullRectangle);
+            lastWasNotNull = false;
+            firstNotNullGridX = -1;
           }
-          lastWasNull = false;
         }
       }
-      if (lastWasNull) {
-        geometryFactory.newRectangle(firstNullGridX * gridWidth, gridY * gridCellHeight,
-          (gridWidth - firstNullGridX) * gridCellWidth, gridCellHeight);
+      if (lastWasNotNull) {
+        final double x1 = minX + firstNotNullGridX * gridCellWidth;
+        final double x2 = minX + gridWidth * gridCellWidth;
+        final Polygon nullRectangle = geometryFactory.polygonRectangle(x1, y, x2, nextY);
+        notNullPolygons.add(nullRectangle);
       }
     }
-    final Polygonal nullPolygonal = geometryFactory.union(nullPolygons);
-
-    final Polygon boundary = getBoundingBox().toRectangle();
-    if (nullPolygonal.isEmpty()) {
-      return boundary;
-    } else {
-      return boundary.differencePolygonal(nullPolygonal);
-    }
+    final Polygonal notNullPolygonal = geometryFactory.union(notNullPolygons);
+    return notNullPolygonal;
   }
 
   Resource getResource();
