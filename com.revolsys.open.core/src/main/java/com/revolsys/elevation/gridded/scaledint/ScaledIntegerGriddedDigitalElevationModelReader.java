@@ -171,17 +171,10 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
     final double maxX = this.reader.getDouble();
     final double maxY = this.reader.getDouble();
     final double maxZ = this.reader.getDouble();
-    if (version == 1) {
-      this.gridCellWidth = this.reader.getInt();
-      this.gridCellHeight = this.gridCellWidth;
-      this.gridWidth = this.reader.getInt();
-      this.gridHeight = this.reader.getInt();
-    } else {
-      this.gridWidth = this.reader.getInt();
-      this.gridHeight = this.reader.getInt();
-      this.gridCellWidth = this.reader.getDouble();
-      this.gridCellHeight = this.reader.getDouble();
-    }
+    this.gridWidth = this.reader.getInt();
+    this.gridHeight = this.reader.getInt();
+    this.gridCellWidth = this.reader.getDouble();
+    this.gridCellHeight = this.reader.getDouble();
 
     this.boundingBox = geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY, maxZ);
   }

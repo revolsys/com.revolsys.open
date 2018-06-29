@@ -40,7 +40,7 @@ public class ScaledIntegerGriddedDigitalElevation extends AbstractIoFactoryWithC
 
   public static final byte[] FILE_FORMAT_BYTES = "SIGDEM".getBytes(StandardCharsets.UTF_8);
 
-  public static final int HEADER_SIZE = 128;
+  public static final int HEADER_SIZE = 132;
 
   public static final int RECORD_SIZE = 4;
 
