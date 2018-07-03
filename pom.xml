@@ -526,7 +526,7 @@
 
   <profiles>
     <profile>
-      <id>sun-tools</id>
+      <id>sun-tools-win</id>
       <activation>
         <file>
           <exists>C:\Program Files\Java\jdk1.8.0\lib\tools.jar</exists>
@@ -537,7 +537,7 @@
       </properties>
     </profile>
     <profile>
-      <id>sun-tools</id>
+      <id>sun-tools-mac</id>
       <activation>
         <file>
           <exists>/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/lib/tools.jar</exists>
