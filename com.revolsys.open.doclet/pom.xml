@@ -23,18 +23,4 @@
 			<systemPath>${com.sun.tools.path}</systemPath>
 		</dependency>
 	</dependencies>
-	<profiles>
-		<profile>
-			<id>sun-tools</id>
-			<activation>
-			<file><exists>C:\Program Files\Java\jdk1.8.0\lib\tools.jar</exists></file>
-			</activation>
-			<properties>
-				<com.sun.tools.path>C:\Program Files\Java\jdk1.8.0\lib\tools.jar</com.sun.tools.path>
-			</properties>
-		</profile>
-	</profiles>
-	<properties>
-		<com.sun.tools.path>${java.home}/../lib/tools.jar</com.sun.tools.path>
-	</properties>
 </project>

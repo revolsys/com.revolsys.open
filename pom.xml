@@ -548,6 +548,31 @@
     </site>
   </distributionManagement>
 
+  <profiles>
+    <profile>
+      <id>sun-tools-win</id>
+      <activation>
+        <file>
+          <exists>C:\Program Files\Java\jdk1.8.0\lib\tools.jar</exists>
+        </file>
+      </activation>
+      <properties>
+        <com.sun.tools.path>C:\Program Files\Java\jdk1.8.0\lib\tools.jar</com.sun.tools.path>
+      </properties>
+    </profile>
+    <profile>
+      <id>sun-tools-mac</id>
+      <activation>
+        <file>
+          <exists>/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/lib/tools.jar</exists>
+        </file>
+      </activation>
+      <properties>
+        <com.sun.tools.path>/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/lib/tools.jar</com.sun.tools.path>
+      </properties>
+    </profile>
+  </profiles>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <org.slf4j.version>1.7.21</org.slf4j.version>
