@@ -11,7 +11,7 @@ import com.revolsys.geometry.algorithm.linematch.LineMatchGraph;
 import com.revolsys.geometry.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.geometry.filter.LineIntersectsFilter;
 import com.revolsys.geometry.index.PointRecordMap;
-import com.revolsys.geometry.index.quadtree.RecordQuadTree;
+import com.revolsys.geometry.index.RecordSpatialIndex;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -53,7 +53,7 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   private LabelCountMap notEqualSourceStatistics = new LabelCountMap("Not Equal Source");
 
-  private RecordQuadTree<Record> otherIndex;
+  private RecordSpatialIndex<Record> otherIndex;
 
   private PointRecordMap otherPointMap = new PointRecordMap();
 
@@ -148,7 +148,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   @Override
   protected void init(final RecordDefinition recordDefinition) {
     super.init(recordDefinition);
-    this.otherIndex = new RecordQuadTree<>(recordDefinition.getGeometryFactory());
+    this.otherIndex = RecordSpatialIndex.quadTree(recordDefinition.getGeometryFactory());
   }
 
   public boolean isLogNotEqualSource() {
@@ -221,7 +221,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   @Override
   protected void processObjects(final RecordDefinition recordDefinition,
     final Channel<Record> out) {
-    if (this.otherIndex.size() + this.otherPointMap.size() == 0) {
+    if (this.otherIndex.getSize() + this.otherPointMap.size() == 0) {
       if (this.logNotEqualSource) {
         for (final Record object : this.sourceObjects) {
           logError(object, "Source missing in Other", true);
@@ -232,7 +232,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       processExactLineMatches();
       processPartialMatches();
     }
-    for (final Record object : this.otherIndex.getAll()) {
+    for (final Record object : this.otherIndex.getItems()) {
       logError(object, "Other missing in Source", false);
     }
     for (final Record record : this.otherPointMap.getAll()) {

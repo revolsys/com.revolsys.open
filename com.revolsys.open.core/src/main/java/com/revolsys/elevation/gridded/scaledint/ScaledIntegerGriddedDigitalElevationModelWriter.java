@@ -26,18 +26,9 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter
     final GeometryFactory geometryFactory, final int gridWidth, final int gridHeight,
     final double gridCellWidth, final double gridCellHeight) throws IOException {
     final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
-    double scaleXY = geometryFactory.getScaleXY();
-    if (scaleXY <= 0) {
-      scaleXY = 1000;
-    }
-    double scaleZ = geometryFactory.getScaleZ();
-    if (scaleZ <= 0) {
-      scaleZ = 1000;
-    }
-    writer.putBytes(ScaledIntegerGriddedDigitalElevation.FILE_FORMAT_BYTES); // File //
-    // type
-    writer.putShort(ScaledIntegerGriddedDigitalElevation.VERSION); // version
-    writer.putInt(coordinateSystemId); // Coordinate System ID
+    writer.putBytes(ScaledIntegerGriddedDigitalElevation.FILE_FORMAT_BYTES);
+    writer.putShort(ScaledIntegerGriddedDigitalElevation.VERSION);
+    writer.putInt(coordinateSystemId);
 
     for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
       final double offset = geometryFactory.getOffset(axisIndex);

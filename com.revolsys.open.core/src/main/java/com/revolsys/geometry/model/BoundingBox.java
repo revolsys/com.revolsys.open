@@ -35,6 +35,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.function.BiConsumerDouble;
@@ -547,6 +548,23 @@ public interface BoundingBox
     }
   }
 
+  default double distanceFromCenter(final BoundingBox boundingBox) {
+    final double x1 = getCentreX();
+    final double y1 = getCentreY();
+    final double x2 = boundingBox.getCentreX();
+    final double y2 = boundingBox.getCentreY();
+    return MathUtil.distance(x1, y1, x2, y2);
+  }
+
+  default double edgeDeltas() {
+    double distance = 0;
+    for (int axis = 0; axis < getAxisCount(); axis++) {
+      distance += getMax(axis) - getMin(axis);
+    }
+
+    return distance;
+  }
+
   default boolean equals(final BoundingBox boundingBox) {
     if (isEmpty()) {
       return boundingBox.isEmpty();
@@ -671,6 +689,15 @@ public interface BoundingBox
         final double maxY = Math.max(getMaxY(), convertedOther.getMaxY());
         return newBoundingBox(minX, minY, maxX, maxY);
       }
+    }
+  }
+
+  default BoundingBox expandToInclude(final BoundingBoxProxy other) {
+    if (other == null) {
+      return this;
+    } else {
+      final BoundingBox boundingBox = other.getBoundingBox();
+      return expandToInclude(boundingBox);
     }
   }
 
@@ -1284,6 +1311,15 @@ public interface BoundingBox
           out2 = getOutcode(x2, y2);
         }
       }
+    }
+  }
+
+  default double overlappingArea(final BoundingBox bb) {
+    final BoundingBox intersection = intersection(bb);
+    if (intersection.isEmpty()) {
+      return 0;
+    } else {
+      return intersection.getArea();
     }
   }
 

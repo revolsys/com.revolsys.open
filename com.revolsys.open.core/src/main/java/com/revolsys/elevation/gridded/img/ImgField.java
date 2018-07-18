@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.util.Debug;
 
 class ImgField {
   private static final int BIT = 0;
@@ -145,7 +144,6 @@ class ImgField {
           final short baseItemType = reader.readShort();
           reader.readShort(); // We ignore the 2 byte objecttype value.
           if (baseItemType == BIT) {
-            Debug.noOp();
             throw new RuntimeException("EPT_1 field type not supported");
 
             //

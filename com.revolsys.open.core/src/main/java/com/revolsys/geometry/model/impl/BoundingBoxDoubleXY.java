@@ -33,6 +33,7 @@
 package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.RectangleUtil;
@@ -249,6 +250,19 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     } else {
       return false;
     }
+  }
+
+  protected void expand(final BoundingBox boundingBox) {
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    expand(minX, minY, maxX, maxY);
+  }
+
+  protected void expand(final BoundingBoxProxy boundingBoxProxy) {
+    final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+    expand(boundingBox);
   }
 
   /**

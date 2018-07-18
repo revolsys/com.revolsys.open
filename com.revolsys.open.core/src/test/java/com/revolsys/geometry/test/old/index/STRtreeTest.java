@@ -46,7 +46,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.test.old.util.SerializationUtil;
 
 import junit.framework.TestCase;
 
@@ -160,23 +159,6 @@ public class STRtreeTest extends TestCase {
       STRtreeDemo.printLevels(t, System.out);
       throw x;
     }
-  }
-
-  public void testSerialization() throws Exception {
-    final SpatialIndexTester tester = new SpatialIndexTester();
-    tester.setSpatialIndex(new StrTree(4));
-    tester.init();
-
-    StrTree tree = (StrTree)tester.getSpatialIndex();
-    // create the index before serialization
-    tree.getItems(BoundingBox.empty());
-
-    final byte[] data = SerializationUtil.serialize(tree);
-    tree = (StrTree)SerializationUtil.deserialize(data);
-
-    tester.setSpatialIndex(tree);
-    tester.run();
-    assertTrue(tester.isSuccess());
   }
 
   public void testSpatialIndex() throws Exception {

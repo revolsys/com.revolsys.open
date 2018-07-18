@@ -68,7 +68,7 @@ public interface Lineal extends Geometry {
       if (segment.getLength() == 0) {
         errors.add(new DuplicateVertexError(segment.getGeometryVertex(0)));
       } else {
-        final List<LineSegment> segments = index.queryBoundingBox(segment);
+        final List<LineSegment> segments = index.getItems(segment);
         for (final LineSegment lineSegment : segments) {
           final Segment segment2 = (Segment)lineSegment;
           final int partIndex2 = segment2.getPartIndex();

@@ -38,10 +38,13 @@ import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.util.function.Consumer3;
 import com.revolsys.visitor.CreateListVisitor;
+import com.revolsys.visitor.SingleObjectVisitor;
 
 /**
  * The basic operations supported by classes
@@ -54,10 +57,10 @@ import com.revolsys.visitor.CreateListVisitor;
  *
  * @version 1.7
  */
-public interface SpatialIndex<V> extends GeometryFactoryProxy {
+public interface SpatialIndex<T> extends GeometryFactoryProxy {
 
   default boolean forEach(final BoundingBoxProxy boundingBoxProxy,
-    final Consumer<? super V> action) {
+    final Consumer<? super T> action) {
     final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();
@@ -67,7 +70,7 @@ public interface SpatialIndex<V> extends GeometryFactoryProxy {
   }
 
   default boolean forEach(final BoundingBoxProxy boundingBoxProxy,
-    final Predicate<? super V> filter, final Consumer<? super V> action) {
+    final Predicate<? super T> filter, final Consumer<? super T> action) {
     final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();
@@ -76,31 +79,46 @@ public interface SpatialIndex<V> extends GeometryFactoryProxy {
     return forEach(minX, minY, maxX, maxY, filter, action);
   }
 
-  boolean forEach(final Consumer<? super V> action);
+  boolean forEach(final Consumer<? super T> action);
 
-  boolean forEach(double x, double y, Consumer<? super V> action);
+  boolean forEach(double x, double y, Consumer<? super T> action);
 
-  boolean forEach(double minX, double minY, double maxX, double maxY, Consumer<? super V> action);
+  boolean forEach(double minX, double minY, double maxX, double maxY, Consumer<? super T> action);
 
   default boolean forEach(final double minX, final double minY, final double maxX,
-    final double maxY, final Predicate<? super V> filter, final Consumer<? super V> action) {
-    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+    final double maxY, final Predicate<? super T> filter, final Consumer<? super T> action) {
+    final Consumer<? super T> filteredAction = Predicates.newConsumer(filter, action);
     return forEach(minX, minY, maxX, maxY, filteredAction);
   }
 
-  default boolean forEach(final double x, final double y, final Predicate<? super V> filter,
-    final Consumer<? super V> action) {
-    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+  default boolean forEach(final double x, final double y, final Predicate<? super T> filter,
+    final Consumer<? super T> action) {
+    final Consumer<? super T> filteredAction = Predicates.newConsumer(filter, action);
     return forEach(x, y, filteredAction);
   }
 
-  default boolean forEach(final Predicate<? super V> filter, final Consumer<? super V> action) {
-    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+  default boolean forEach(final Predicate<? super T> filter, final Consumer<? super T> action) {
+    final Consumer<? super T> filteredAction = Predicates.newConsumer(filter, action);
     return forEach(filteredAction);
   }
 
-  default List<V> getItems() {
-    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
+  default T getFirst(final BoundingBox boundingBox, final Predicate<T> filter) {
+    final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<>(filter);
+    forEach(boundingBox, visitor);
+    return visitor.getObject();
+  }
+
+  default T getFirstBoundingBox(final Geometry geometry, final Predicate<T> filter) {
+    if (geometry == null) {
+      return null;
+    } else {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      return getFirst(boundingBox, filter);
+    }
+  }
+
+  default List<T> getItems() {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(visitor);
     return visitor.getList();
   }
@@ -113,30 +131,30 @@ public interface SpatialIndex<V> extends GeometryFactoryProxy {
    * @param boundingBox the envelope to query for
    * @return a list of the items found by the query
    */
-  default List<V> getItems(final BoundingBoxProxy boundingBox) {
+  default List<T> getItems(final BoundingBoxProxy boundingBox) {
     return BoundingBox.newArray(this::forEach, boundingBox);
   }
 
-  default List<V> getItems(final BoundingBoxProxy boundingBox, final Predicate<? super V> filter) {
-    final Consumer3<BoundingBoxProxy, Predicate<? super V>, Consumer<V>> forEachFunction = this::forEach;
-    return BoundingBox.<V> newArray(forEachFunction, boundingBox, filter);
+  default List<T> getItems(final BoundingBoxProxy boundingBox, final Predicate<? super T> filter) {
+    final Consumer3<BoundingBoxProxy, Predicate<? super T>, Consumer<T>> forEachFunction = this::forEach;
+    return BoundingBox.<T> newArray(forEachFunction, boundingBox, filter);
   }
 
-  default List<V> getItems(final double x, final double y) {
-    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
+  default List<T> getItems(final double x, final double y) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(x, y, visitor);
     return visitor.getList();
   }
 
-  default List<V> getItems(final double minX, final double minY, final double maxX,
-    final double maxY, final Predicate<? super V> filter) {
-    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
+  default List<T> getItems(final double minX, final double minY, final double maxX,
+    final double maxY, final Predicate<? super T> filter) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(minX, minY, maxX, maxY, filter, visitor);
     return visitor.getList();
   }
 
-  default List<V> getItems(final double x, final double y, final Predicate<? super V> filter) {
-    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
+  default List<T> getItems(final double x, final double y, final Predicate<? super T> filter) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(x, y, filter, visitor);
     return visitor.getList();
   }
@@ -146,9 +164,9 @@ public interface SpatialIndex<V> extends GeometryFactoryProxy {
   /**
    * Adds a spatial item with an extent specified by the given {@link BoundingBox} to the index
    */
-  void insertItem(BoundingBox boundingBox, V item);
+  void insertItem(BoundingBox boundingBox, T item);
 
-  default void insertItem(final BoundingBoxProxy boundingBoxProxy, final V item) {
+  default void insertItem(final BoundingBoxProxy boundingBoxProxy, final T item) {
     final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
     insertItem(boundingBox, item);
   }
@@ -160,6 +178,9 @@ public interface SpatialIndex<V> extends GeometryFactoryProxy {
    * @param item the item to remove
    * @return <code>true</code> if the item was found
    */
-  boolean removeItem(BoundingBox getItems, V item);
+  boolean removeItem(BoundingBox getItems, T item);
+
+  default void setGeometryFactory(final GeometryFactory geometryFactory) {
+  }
 
 }

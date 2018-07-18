@@ -1,4 +1,4 @@
-package com.revolsys.geometry.index.quadtree;
+package com.revolsys.geometry.index;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
@@ -18,20 +19,21 @@ import com.revolsys.record.Records;
 import com.revolsys.record.filter.RecordEqualsFilter;
 import com.revolsys.visitor.CreateListVisitor;
 
-public class RecordQuadTree<R extends Record> extends QuadTree<R> {
-  private static final long serialVersionUID = 1L;
+public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
 
-  public RecordQuadTree(final GeometryFactory geometryFactory) {
-    super(geometryFactory);
+  public static <R2 extends Record> RecordSpatialIndex<R2> quadTree(
+    final GeometryFactory geometryFactory) {
+    final QuadTree<R2> spatialIndex = new QuadTree<>(geometryFactory);
+    return new RecordSpatialIndex<>(spatialIndex);
   }
 
-  public RecordQuadTree(final GeometryFactory geometryFactory,
-    final Iterable<? extends R> records) {
-    super(geometryFactory);
-    addRecords(records);
+  private final SpatialIndex<R> spatialIndex;
+
+  public RecordSpatialIndex(final SpatialIndex<R> spatialIndex) {
+    this.spatialIndex = spatialIndex;
   }
 
-  public void addRecord(final R record) {
+  public RecordSpatialIndex<R> addRecord(final R record) {
     if (record != null) {
       final Geometry geometry = record.getGeometry();
       if (geometry != null && !geometry.isEmpty()) {
@@ -39,20 +41,43 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
         insertItem(boundingBox, record);
       }
     }
+    return this;
   }
 
-  public void addRecords(final Iterable<? extends R> records) {
+  public RecordSpatialIndex<R> addRecords(final Iterable<? extends R> records) {
     if (records != null) {
       for (final R record : records) {
         addRecord(record);
       }
     }
+    return this;
+  }
+
+  @Override
+  public boolean forEach(final Consumer<? super R> action) {
+    return this.spatialIndex.forEach(action);
+  }
+
+  @Override
+  public boolean forEach(final double x, final double y, final Consumer<? super R> action) {
+    return this.spatialIndex.forEach(x, y, action);
+  }
+
+  @Override
+  public boolean forEach(final double minX, final double minY, final double maxX, final double maxY,
+    final Consumer<? super R> action) {
+    return this.spatialIndex.forEach(minX, minY, maxX, maxY, action);
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.spatialIndex.getGeometryFactory();
   }
 
   @Override
   public List<R> getItems(final BoundingBoxProxy boundingBoxProxy) {
     final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
-    final List<R> results = super.getItems(boundingBoxProxy);
+    final List<R> results = this.spatialIndex.getItems(boundingBoxProxy);
     for (final Iterator<R> iterator = results.iterator(); iterator.hasNext();) {
       final R record = iterator.next();
       final Geometry geometry = record.getGeometry();
@@ -79,6 +104,16 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
     }
   }
 
+  @Override
+  public int getSize() {
+    return this.spatialIndex.getSize();
+  }
+
+  @Override
+  public void insertItem(final BoundingBox boundingBox, final R item) {
+    this.spatialIndex.insertItem(boundingBox, item);
+  }
+
   public void query(final Geometry geometry, final Consumer<R> visitor) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
     forEach(boundingBox, visitor);
@@ -89,7 +124,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
       return Collections.emptyList();
     } else {
       final Geometry geometry = record.getGeometry();
-      return queryBoundingBox(geometry);
+      return getItems(geometry);
     }
   }
 
@@ -163,12 +198,17 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
     return queryList(geometry, filter);
   }
 
+  @Override
+  public boolean removeItem(final BoundingBox getItems, final R item) {
+    return this.spatialIndex.removeItem(getItems, item);
+  }
+
   public boolean removeRecord(final R record) {
     if (record != null) {
       final Geometry geometry = record.getGeometry();
       if (geometry != null) {
         final BoundingBox boundinBox = geometry.getBoundingBox();
-        return super.removeItem(boundinBox, record);
+        return this.spatialIndex.removeItem(boundinBox, record);
       }
     }
     return false;
@@ -180,5 +220,9 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
         removeRecord(record);
       }
     }
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.spatialIndex.setGeometryFactory(geometryFactory);
   }
 }

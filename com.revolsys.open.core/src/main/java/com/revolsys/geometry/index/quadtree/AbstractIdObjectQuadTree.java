@@ -73,7 +73,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   }
 
   public List<T> queryAll() {
-    final List<Integer> ids = this.index.getAll();
+    final List<Integer> ids = this.index.getItems();
     return getObjects(ids);
   }
 

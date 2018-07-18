@@ -36,25 +36,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.geometry.index.quadtree.QuadTree;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.test.old.util.SerializationUtil;
 
 public class QuadtreeTest {
-
-  @Test
-  public void testSerialization() throws Exception {
-    final SpatialIndexTester tester = new SpatialIndexTester();
-    QuadTree<BoundingBox> tree = new QuadTree<>(GeometryFactory.DEFAULT_3D);
-    tester.setSpatialIndex(tree);
-    tester.init();
-    Assert.assertSame(tree, tester.getSpatialIndex());
-    final byte[] data = SerializationUtil.serialize(tree);
-    tree = (QuadTree<BoundingBox>)SerializationUtil.deserialize(data);
-    tester.setSpatialIndex(tree);
-    tester.run();
-    Assert.assertTrue(tester.isSuccess());
-  }
 
   @Test
   public void testSpatialIndex() throws Exception {

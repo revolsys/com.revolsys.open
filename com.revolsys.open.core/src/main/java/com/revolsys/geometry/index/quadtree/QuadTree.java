@@ -1,17 +1,12 @@
 package com.revolsys.geometry.index.quadtree;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.ExitLoopException;
-import com.revolsys.visitor.CreateListVisitor;
-import com.revolsys.visitor.SingleObjectVisitor;
 
 public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   private static final long serialVersionUID = 1L;
@@ -128,27 +123,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  public List<T> getAll() {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
-    forEach(visitor);
-    return visitor.getList();
-  }
-
-  public T getFirst(final BoundingBox boundingBox, final Predicate<T> filter) {
-    final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<>(filter);
-    forEach(boundingBox, visitor);
-    return visitor.getObject();
-  }
-
-  public T getFirstBoundingBox(final Geometry geometry, final Predicate<T> filter) {
-    if (geometry == null) {
-      return null;
-    } else {
-      final BoundingBox boundingBox = geometry.getBoundingBox();
-      return getFirst(boundingBox, filter);
-    }
-  }
-
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
@@ -211,10 +185,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     insertItem(x, y, x, y, item);
   }
 
-  public List<T> queryBoundingBox(final Geometry geometry) {
-    return getItems(geometry);
-  }
-
   @Override
   public boolean removeItem(BoundingBox boundingBox, final T item) {
     boundingBox = convertBoundingBox(boundingBox);
@@ -239,6 +209,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return removed;
   }
 
+  @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
