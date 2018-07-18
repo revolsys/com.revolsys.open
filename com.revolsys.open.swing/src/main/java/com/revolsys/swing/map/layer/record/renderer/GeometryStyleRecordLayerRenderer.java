@@ -27,13 +27,13 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePreview;
+import com.revolsys.util.Cancellable;
 
 public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRenderer
   implements GeometryStyleLayerRenderer<AbstractRecordLayer> {
@@ -289,8 +289,8 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
   }
 
   @Override
-  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
-    final AbstractLayer layer, final LayerRecord record) {
+  public void renderRecord(final Viewport2D viewport, Cancellable cancellable,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer, final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
     viewport.drawGeometry(geometry, this.style);
   }

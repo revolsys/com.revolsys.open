@@ -12,7 +12,6 @@ import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -55,20 +54,21 @@ public class MultipleRecordRenderer extends AbstractMultipleRenderer {
   }
 
   public void addStyle(final GeometryStyle style) {
-    final GeometryStyleRecordLayerRenderer renderer = new GeometryStyleRecordLayerRenderer(getLayer(), this, style);
+    final GeometryStyleRecordLayerRenderer renderer = new GeometryStyleRecordLayerRenderer(
+      getLayer(), this, style);
     addRenderer(renderer);
   }
 
   // Needed for filter styles
   @Override
-  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
-    final AbstractLayer layer, final LayerRecord record) {
+  public void renderRecord(final Viewport2D viewport, final Cancellable cancellable,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer, final LayerRecord record) {
     if (isVisible(record)) {
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
         final long scaleForVisible = (long)viewport.getScaleForVisible();
         if (renderer.isVisible(scaleForVisible)) {
           try {
-            renderer.renderRecord(viewport, visibleArea, layer, record);
+            renderer.renderRecord(viewport, cancellable, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
             Logs.error(this, "Unabled to render " + layer.getName() + " #" + record.getIdentifier(),
@@ -101,14 +101,14 @@ public class MultipleRecordRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public void renderSelectedRecord(final Viewport2D viewport, final AbstractLayer layer,
-    final LayerRecord record) {
+  public void renderSelectedRecord(final Viewport2D viewport, final Cancellable cancellable,
+    final AbstractRecordLayer layer, final LayerRecord record) {
     if (isVisible(record)) {
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
         final long scaleForVisible = (long)viewport.getScaleForVisible();
         if (renderer.isVisible(scaleForVisible)) {
           try {
-            renderer.renderSelectedRecord(viewport, layer, record);
+            renderer.renderSelectedRecord(viewport, cancellable, layer, record);
           } catch (final Throwable e) {
             Logs.error(this, "Unabled to render " + layer.getName() + " #" + record.getIdentifier(),
               e);

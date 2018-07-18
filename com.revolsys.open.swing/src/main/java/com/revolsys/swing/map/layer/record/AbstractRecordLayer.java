@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -46,6 +47,9 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.index.RecordSpatialIndex;
+import com.revolsys.geometry.index.SpatialIndex;
+import com.revolsys.geometry.index.rstartree.RStarTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -297,7 +301,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private List<Window> formWindows = new LinkedList<>();
 
-  private LayerRecordQuadTree index = new LayerRecordQuadTree();
+  private RecordSpatialIndex<LayerRecord> index = newSpatialIndex();
 
   private final Map<Identifier, ShortCounter> proxiedRecordIdentifiers = new HashMap<>();
 
@@ -311,7 +315,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private Map<Label, Collection<LayerRecord>> recordsByCacheId = new HashMap<>();
 
-  private LayerRecordQuadTree selectedRecordsIndex;
+  private RecordSpatialIndex<LayerRecord> selectedRecordsIndex;
 
   private boolean snapToAllLayers = true;
 
@@ -628,7 +632,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     clone.formRecords = new LinkedList<>();
     clone.formComponents = new LinkedList<>();
     clone.formWindows = new LinkedList<>();
-    clone.index = new LayerRecordQuadTree(getGeometryFactory());
+    clone.index = LayerRecordQuadTree.newIndex(getGeometryFactory());
     clone.selectedRecordsIndex = null;
     clone.proxiedRecords = new HashSet<>();
     clone.filter = this.filter.clone();
@@ -689,7 +693,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.formRecords.clear();
     this.formComponents.clear();
     this.formWindows.clear();
-    this.index = new LayerRecordQuadTree(getGeometryFactory());
+    this.index = newSpatialIndex();
     this.recordsByCacheId.clear();
     this.selectedRecordsIndex = null;
   }
@@ -1528,15 +1532,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    final LayerRecordQuadTree index = getSelectedRecordsIndex();
+    final RecordSpatialIndex<LayerRecord> index = getSelectedRecordsIndex();
     return index.queryIntersects(boundingBox);
   }
 
-  protected LayerRecordQuadTree getSelectedRecordsIndex() {
+  protected RecordSpatialIndex<LayerRecord> getSelectedRecordsIndex() {
     if (this.selectedRecordsIndex == null) {
       final List<LayerRecord> selectedRecords = getSelectedRecords();
-      final LayerRecordQuadTree index = new LayerRecordQuadTree(getProject().getGeometryFactory(),
-        selectedRecords);
+      final RecordSpatialIndex<LayerRecord> index = newSpatialIndex(getProject())
+        .addRecords(selectedRecords);
       this.selectedRecordsIndex = index;
     }
     return this.selectedRecordsIndex;
@@ -2137,6 +2141,20 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public UndoableEdit newSetFieldUndo(final LayerRecord record, final String fieldName,
     final Object oldValue, final Object newValue) {
     return new SetRecordFieldValueUndo(record, fieldName, oldValue, newValue);
+  }
+
+  protected RecordSpatialIndex<LayerRecord> newSpatialIndex() {
+    return newSpatialIndex(this);
+  }
+
+  protected RecordSpatialIndex<LayerRecord> newSpatialIndex(final Layer layer) {
+    final GeometryFactory geometryFactory = layer.getGeometryFactory();
+
+    final BiPredicate<LayerRecord, LayerRecord> equalsItemFunction = LayerRecord::isSame;
+    final SpatialIndex<LayerRecord> spatialIndex = //
+        new RStarTree<LayerRecord>().setEqualsItemFunction(equalsItemFunction);
+    // new LayerRecordQuadTree(geometryFactory);
+    return new RecordSpatialIndex<>(spatialIndex);
   }
 
   protected Map<String, Object> newSplitValues(final LayerRecord oldRecord,
@@ -2750,7 +2768,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     synchronized (getSync()) {
       if (hasGeometryField()) {
         final GeometryFactory geometryFactory = getGeometryFactory();
-        final LayerRecordQuadTree index = new LayerRecordQuadTree(geometryFactory);
+        final RecordSpatialIndex<LayerRecord> index = newSpatialIndex();
         final Label cacheIdIndex = getCacheIdIndex();
         clearCachedRecords(cacheIdIndex);
         if (records != null) {

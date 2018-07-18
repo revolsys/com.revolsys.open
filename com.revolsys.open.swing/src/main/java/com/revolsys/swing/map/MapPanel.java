@@ -39,6 +39,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.index.RecordSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
@@ -227,7 +228,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private int zoomHistoryIndex = -1;
 
-  private LayerRecordQuadTree selectedRecordsIndex;
+  private RecordSpatialIndex<LayerRecord> selectedRecordsIndex;
 
   private List<LayerRecord> closeSelectedRecords = Collections.emptyList();
 
@@ -245,7 +246,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     super(new BorderLayout());
     this.preferences = preferences;
     this.project = project;
-    this.selectedRecordsIndex = new LayerRecordQuadTree(project.getGeometryFactory());
+    this.selectedRecordsIndex = LayerRecordQuadTree.newIndex(project.getGeometryFactory());
 
     this.baseMapLayers = project.getBaseMapLayers();
     project.setProperty(MAP_PANEL, this);
@@ -1045,7 +1046,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private void setGeometryFactory(final GeometryFactory oldGeometryFactory,
     final GeometryFactory newGeometryFactory) {
-    final LayerRecordQuadTree selectedRecordsIndex = new LayerRecordQuadTree(newGeometryFactory);
+    final RecordSpatialIndex<LayerRecord> selectedRecordsIndex = LayerRecordQuadTree
+      .newIndex(newGeometryFactory);
     AbstractRecordLayer.forEachSelectedRecords(this.project, selectedRecordsIndex::addRecords);
     this.selectedRecordsIndex = selectedRecordsIndex;
 

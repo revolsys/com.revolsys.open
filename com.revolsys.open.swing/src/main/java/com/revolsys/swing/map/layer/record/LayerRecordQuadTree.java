@@ -1,26 +1,26 @@
 package com.revolsys.swing.map.layer.record;
 
-import com.revolsys.geometry.index.quadtree.RecordQuadTree;
+import com.revolsys.geometry.index.RecordSpatialIndex;
+import com.revolsys.geometry.index.SpatialIndex;
+import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.swing.map.layer.Layer;
 
-public class LayerRecordQuadTree extends RecordQuadTree<LayerRecord> {
+public class LayerRecordQuadTree extends QuadTree<LayerRecord> {
   private static final long serialVersionUID = 1L;
 
-  protected LayerRecordQuadTree() {
-    this(GeometryFactory.DEFAULT_3D);
+  public static RecordSpatialIndex<LayerRecord> newIndex(final GeometryFactory geometryFactory) {
+    final SpatialIndex<LayerRecord> spatialIndex = new LayerRecordQuadTree(geometryFactory);
+    return new RecordSpatialIndex<>(spatialIndex);
   }
 
-  public LayerRecordQuadTree(final AbstractRecordLayer layer) {
-    this(layer.getGeometryFactory());
+  public static RecordSpatialIndex<LayerRecord> newIndex(final Layer layer) {
+    final GeometryFactory geometryFactory = layer.getGeometryFactory();
+    return newIndex(geometryFactory);
   }
 
   public LayerRecordQuadTree(final GeometryFactory geometryFactory) {
     super(geometryFactory);
-  }
-
-  public LayerRecordQuadTree(final GeometryFactory geometryFactory,
-    final Iterable<? extends LayerRecord> records) {
-    super(geometryFactory, records);
   }
 
   @Override

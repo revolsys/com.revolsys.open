@@ -134,6 +134,10 @@ public interface LayerRecord extends Record {
     return false;
   }
 
+  default boolean isSame(final LayerRecord record) {
+    return isSame((Record)record);
+  }
+
   @Override
   default boolean isSame(Record record) {
     if (record == null) {

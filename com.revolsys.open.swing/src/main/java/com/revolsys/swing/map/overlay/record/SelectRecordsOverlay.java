@@ -343,7 +343,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           for (final LayerRecord record : selectedRecords) {
             if (record != null && recordLayer.isVisible(record)) {
               if (!recordLayer.isDeleted(record)) {
-                layerRenderer.renderSelectedRecord(viewport, recordLayer, record);
+                layerRenderer.renderSelectedRecord(viewport, () -> false, recordLayer, record);
               }
             }
           }

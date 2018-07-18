@@ -38,12 +38,12 @@ import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.layer.record.style.panel.TextStylePanel;
+import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
 import tec.uom.se.quantity.Quantities;
@@ -327,8 +327,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
-    final AbstractLayer layer, final LayerRecord record) {
+  public void renderRecord(final Viewport2D viewport, Cancellable cancellable,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer, final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
     if (Property.hasValue(geometry)) {
       try (

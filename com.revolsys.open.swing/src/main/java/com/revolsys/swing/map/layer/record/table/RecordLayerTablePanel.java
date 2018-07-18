@@ -88,6 +88,7 @@ public class RecordLayerTablePanel extends TablePanel
 
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+    MenuFactory.setMenuSource(table);
 
     final MenuFactory headerMenu = getHeaderMenu();
     SetRecordsFieldValue.addMenuItem(headerMenu);
@@ -108,8 +109,9 @@ public class RecordLayerTablePanel extends TablePanel
         this.tableModel.refresh();
       }
     };
-    MapPanel.getMapPanel(layer).getViewport().addPropertyChangeListener("boundingBox",
-      this.viewportListener);
+    MapPanel.getMapPanel(layer)
+      .getViewport()
+      .addPropertyChangeListener("boundingBox", this.viewportListener);
     this.tableModel.refresh();
   }
 
@@ -164,8 +166,8 @@ public class RecordLayerTablePanel extends TablePanel
       table.dispose();
     }
     if (this.layer != null) {
-      MapPanel.getMapPanel(this.layer).removePropertyChangeListener("boundingBox",
-        this.viewportListener);
+      MapPanel.getMapPanel(this.layer)
+        .removePropertyChangeListener("boundingBox", this.viewportListener);
       Property.removeListener(this.layer, this);
       this.layer.setPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW, toMap());
       this.layer = null;

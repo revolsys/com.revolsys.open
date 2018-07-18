@@ -22,13 +22,13 @@ import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.layer.record.style.panel.MarkerStylePanel;
+import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
 public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
@@ -246,8 +246,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
-    final AbstractLayer layer, final LayerRecord record) {
+  public void renderRecord(final Viewport2D viewport, Cancellable cancellable,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer, final LayerRecord record) {
     if (isVisible(record)) {
       final Geometry geometry = record.getGeometry();
       renderMarker(viewport, geometry, this.style);

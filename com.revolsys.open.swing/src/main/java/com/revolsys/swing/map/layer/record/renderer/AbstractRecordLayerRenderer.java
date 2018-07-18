@@ -297,6 +297,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
+  @Override
   public boolean isHasParent() {
     return getParent() != null;
   }
@@ -332,8 +333,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
-  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
-    final AbstractLayer layer, final LayerRecord record) {
+  public void renderRecord(final Viewport2D viewport, Cancellable cancellable,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer, final LayerRecord record) {
   }
 
   protected void renderRecords(final Viewport2D viewport, final Cancellable cancellable,
@@ -343,7 +344,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
       if (record != null) {
         if (isVisible(record) && !layer.isHidden(record)) {
           try {
-            renderRecord(viewport, visibleArea, layer, record);
+            renderRecord(viewport, cancellable, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
             if (!cancellable.isCancelled()) {
@@ -356,12 +357,12 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
-  public void renderSelectedRecord(final Viewport2D viewport, final AbstractLayer layer,
-    final LayerRecord record) {
+  public void renderSelectedRecord(final Viewport2D viewport, Cancellable cancellable,
+    final AbstractRecordLayer layer, final LayerRecord record) {
     final BoundingBox boundingBox = viewport.getBoundingBox();
     if (isVisible(record)) {
       try {
-        renderRecord(viewport, boundingBox, layer, record);
+        renderRecord(viewport, cancellable, boundingBox, layer, record);
       } catch (final TopologyException e) {
       }
     }
