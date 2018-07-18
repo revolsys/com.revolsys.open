@@ -8,6 +8,7 @@ import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.record.GeometryRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.schema.RecordDefinition;
@@ -46,9 +47,8 @@ public class GeometryRecordReader extends AbstractRecordReader {
   protected Record getNext() throws NoSuchElementException {
     if (this.geometryIterator.hasNext()) {
       final Geometry geometry = this.geometryIterator.next();
-      final Record record = newRecord();
-      record.setGeometryValue(geometry);
-      return record;
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      return new GeometryRecord(recordDefinition, geometry);
     } else {
       throw new NoSuchElementException();
     }

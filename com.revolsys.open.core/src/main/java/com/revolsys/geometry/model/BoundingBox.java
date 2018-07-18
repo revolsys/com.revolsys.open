@@ -1315,12 +1315,41 @@ public interface BoundingBox
   }
 
   default double overlappingArea(final BoundingBox bb) {
-    final BoundingBox intersection = intersection(bb);
-    if (intersection.isEmpty()) {
-      return 0;
-    } else {
-      return intersection.getArea();
+
+    double area = 1.0;
+    for (int axis = 0; axis < 2; axis++) {
+      final double min1 = getMin(axis);
+      final double max1 = getMax(axis);
+      final double min2 = bb.getMin(axis);
+      final double max2 = bb.getMax(axis);
+
+      // left edge outside left edge
+      if (min1 < min2) {
+        if (min2 < max1) { // and right edge inside left edge
+
+          if (max2 < max1) {// right edge outside right edge
+            area *= max2 - min2;
+          } else {
+            area *= max1 - min2;
+          }
+        } else {
+          return 0.0;
+        }
+      }
+
+      else if (min1 < max2) { // right edge inside left edge
+
+        if (max1 < max2) { // right edge outside right edge
+          area *= max1 - min1;
+        } else {
+          area *= max2 - min1;
+        }
+      } else {
+        return 0.0;
+      }
     }
+
+    return area;
   }
 
   default BoundingBox toCoordinateSystem(final CoordinateSystem coordinateSystem,

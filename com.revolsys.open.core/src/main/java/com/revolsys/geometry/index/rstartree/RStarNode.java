@@ -12,4 +12,6 @@ public interface RStarNode<T> extends BoundingBoxProxy {
 
   void forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super T> action);
+
+  double getArea();
 }

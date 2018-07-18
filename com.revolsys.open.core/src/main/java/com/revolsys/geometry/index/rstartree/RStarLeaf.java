@@ -36,6 +36,11 @@ public class RStarLeaf<T> implements RStarNode<T> {
   }
 
   @Override
+  public double getArea() {
+    return this.boundingBox.getArea();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
   }

@@ -831,6 +831,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return record;
   }
 
+  @Override
+  protected Collection<LayerRecord> newRecordCacheCollection() {
+    return new ArrayList<>();
+  }
+
   protected RecordReader newRecordStoreRecordReader(final Query query) {
     final RecordStore recordStore = getRecordStore();
     if (recordStore == null) {

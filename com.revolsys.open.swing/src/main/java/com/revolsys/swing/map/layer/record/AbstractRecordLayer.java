@@ -455,7 +455,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         synchronized (getSync()) {
           Collection<LayerRecord> cachedRecords = this.recordsByCacheId.get(cacheId);
           if (cachedRecords == null) {
-            cachedRecords = new ArrayList<>();
+            cachedRecords = newRecordCacheCollection();
             this.recordsByCacheId.put(cacheId, cachedRecords);
           }
           if (!cachedRecords.contains(record)) {
@@ -541,11 +541,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   private void addToIndexDo(final LayerRecord record) {
-    synchronized (getSync()) {
-      addRecordToCache(this.cacheIdIndex, record);
-      final LayerRecord recordProxy = record.newRecordProxy();
-      this.index.addRecord(recordProxy);
-    }
+    addRecordToCache(this.cacheIdIndex, record);
+    final LayerRecord recordProxy = record.newRecordProxy();
+    this.index.addRecord(recordProxy);
   }
 
   public void addUserReadOnlyFieldNames(final Collection<String> userReadOnlyFieldNames) {
@@ -2126,6 +2124,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public Query newQuery() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return new Query(recordDefinition);
+  }
+
+  protected Collection<LayerRecord> newRecordCacheCollection() {
+    return new HashSet<>();
   }
 
   public JComponent newSearchField(final FieldDefinition fieldDefinition,

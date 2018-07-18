@@ -16,20 +16,21 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
 
   boolean hasLeaves;
 
+  private double area = Double.NaN;
+
   public RStarBranch(final int capacity, final RStarBranch<T> item1, final RStarBranch<T> item2) {
     this.items = new ArrayList<>(capacity);
     this.hasLeaves = false;
     this.items.add(item1);
     this.items.add(item2);
-    expand(item1);
-    expand(item2);
+    recalculateBoundingBox();
   }
 
   public RStarBranch(final int capacity, final RStarLeaf<T> item) {
     super(item.getBoundingBox());
     this.items = new ArrayList<>(capacity);
     this.hasLeaves = true;
-    this.items.add(item);
+    recalculateBoundingBox();
   }
 
   public RStarBranch(final RStarBranch<T> node, final int startIndex) {
@@ -39,8 +40,8 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
     for (int i = startIndex; i < nodeItemCount; i++) {
       final RStarNode<T> item = node.items.get(i);
       this.items.add(item);
-      expand(item);
     }
+    recalculateBoundingBox();
   }
 
   @SuppressWarnings("unchecked")
@@ -61,6 +62,7 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
 
   public void expandBoundingBox(final RStarLeaf<T> leaf) {
     expand(leaf);
+    this.area = Double.NaN;
   }
 
   @Override
@@ -109,7 +111,15 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
     }
   }
 
-  public RStarBranch<T> getMinimum(final Comparator<BoundingBoxProxy> comparator) {
+  @Override
+  public double getArea() {
+    if (!Double.isFinite(this.area)) {
+      this.area = super.getArea();
+    }
+    return this.area;
+  }
+
+  public RStarBranch<T> getMinimum(final Comparator<RStarNode<T>> comparator) {
     RStarBranch<T> minItem = null;
     for (final BoundingBoxProxy boundable : this.items) {
       @SuppressWarnings("unchecked")
@@ -124,8 +134,7 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
     return minItem;
   }
 
-  public RStarBranch<T> getMinimum(final Comparator<BoundingBoxProxy> comparator,
-    final int maxCount) {
+  public RStarBranch<T> getMinimum(final Comparator<RStarNode<T>> comparator, final int maxCount) {
     RStarBranch<T> minItem = null;
     int count = 0;
     for (final BoundingBoxProxy boundable : this.items) {
@@ -237,9 +246,10 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
       itemCount--;
       this.items.remove(itemCount);
     }
+    recalculateBoundingBox();
   }
 
-  public void sortItems(final Comparator<BoundingBoxProxy> comparator) {
+  public void sortItems(final Comparator<RStarNode<T>> comparator) {
     this.items.sort(comparator);
   }
 }
