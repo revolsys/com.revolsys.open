@@ -162,11 +162,11 @@ public class QuadEdgeConformingDelaunayTinBuilder {
     }
     final List<Point> points = this.sitePoints;
 
-    final BoundingBox siteBoundingBox = BoundingBoxDoubleXY.newBoundingBox(points);
+    BoundingBox siteBoundingBox = BoundingBoxDoubleXY.newBoundingBox(points);
 
     List<LineSegmentDoubleData> segments = new ArrayList<>();
     if (this.constraintLines != null) {
-      siteBoundingBox.expandToInclude(this.constraintLines.getBoundingBox());
+      siteBoundingBox = siteBoundingBox.expandToInclude(this.constraintLines.getBoundingBox());
       initVertices(this.constraintLines);
       segments = newConstraintSegments(this.constraintLines);
     }

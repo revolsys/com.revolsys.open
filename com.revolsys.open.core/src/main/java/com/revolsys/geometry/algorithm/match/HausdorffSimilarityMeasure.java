@@ -53,8 +53,9 @@ import com.revolsys.geometry.model.Geometry;
  */
 public class HausdorffSimilarityMeasure implements SimilarityMeasure {
   /*
-   * public static double measure(Geometry a, Geometry b) { HausdorffSimilarityMeasure gv = new
-   * HausdorffSimilarityMeasure(a, b); return gv.measure(); }
+   * public static double measure(Geometry a, Geometry b) {
+   * HausdorffSimilarityMeasure gv = new HausdorffSimilarityMeasure(a, b);
+   * return gv.measure(); }
    */
 
   /*
@@ -85,8 +86,6 @@ public class HausdorffSimilarityMeasure implements SimilarityMeasure {
     // normalize so that more similarity produces a measure closer to 1
     final double measure = 1 - distance / envSize;
 
-    // System.out.println("Hausdorff distance = " + distance + ", measure = " +
-    // measure);
     return measure;
   }
 }

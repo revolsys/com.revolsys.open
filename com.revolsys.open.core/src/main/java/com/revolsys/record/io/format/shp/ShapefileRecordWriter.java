@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.util.BoundingBoxXyConstructor;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.ResourceEndianOutput;
@@ -47,7 +47,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
 
-  private BoundingBox envelope = BoundingBox.empty();
+  private final BoundingBoxXyConstructor boundingBox = new BoundingBoxXyConstructor();
 
   private DataType geometryDataType;
 
@@ -184,14 +184,14 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
       out.writeInt(sizeInShorts);
       out.seek(32);
       out.writeLEInt(this.shapeType);
-      doubleNotNaN(out, this.envelope.getMinX());
-      doubleNotNaN(out, this.envelope.getMinY());
-      doubleNotNaN(out, this.envelope.getMaxX());
-      doubleNotNaN(out, this.envelope.getMaxY());
-      doubleNotNaN(out, this.envelope.getMin(2));
-      doubleNotNaN(out, this.envelope.getMax(2));
-      doubleNotNaN(out, this.envelope.getMin(3));
-      doubleNotNaN(out, this.envelope.getMax(3));
+      doubleNotNaN(out, this.boundingBox.getMinX());
+      doubleNotNaN(out, this.boundingBox.getMinY());
+      doubleNotNaN(out, this.boundingBox.getMaxX());
+      doubleNotNaN(out, this.boundingBox.getMaxY());
+      doubleNotNaN(out, this.boundingBox.getMin(2));
+      doubleNotNaN(out, this.boundingBox.getMax(2));
+      doubleNotNaN(out, this.boundingBox.getMin(3));
+      doubleNotNaN(out, this.boundingBox.getMax(3));
       out.close();
     }
   }
@@ -209,7 +209,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
       if (geometry == null || geometry.isEmpty()) {
         writeNull(this.out);
       } else {
-        this.envelope = this.envelope.expandToInclude(geometry.getBoundingBox());
+        this.boundingBox.expand(geometry.getBoundingBox());
         SHP_WRITER.write(this.geometryWriteMethod, this.out, geometry);
       }
       if (this.indexOut != null) {

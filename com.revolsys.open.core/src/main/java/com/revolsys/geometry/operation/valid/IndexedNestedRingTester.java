@@ -52,13 +52,11 @@ import com.revolsys.geometry.model.Point;
 public class IndexedNestedRingTester {
   private final GeometryGraph graph; // used to find non-node vertices
 
-  private SpatialIndex index;
+  private SpatialIndex<LinearRing> index;
 
   private Point nestedPt;
 
-  private final List rings = new ArrayList();
-
-  private final BoundingBox totalEnv = BoundingBox.empty();
+  private final List<LinearRing> rings = new ArrayList<>();
 
   public IndexedNestedRingTester(final GeometryGraph graph) {
     this.graph = graph;
@@ -66,14 +64,12 @@ public class IndexedNestedRingTester {
 
   public void add(final LinearRing ring) {
     this.rings.add(ring);
-    this.totalEnv.expandToInclude(ring.getBoundingBox());
   }
 
   private void buildIndex() {
-    this.index = new StrTree();
+    this.index = new StrTree<>();
 
-    for (int i = 0; i < this.rings.size(); i++) {
-      final LinearRing ring = (LinearRing)this.rings.get(i);
+    for (final LinearRing ring : this.rings) {
       final BoundingBox env = ring.getBoundingBox();
       this.index.insertItem(env, ring);
     }
@@ -86,42 +82,32 @@ public class IndexedNestedRingTester {
   public boolean isNonNested() {
     buildIndex();
 
-    for (int i = 0; i < this.rings.size(); i++) {
-      final LinearRing innerRing = (LinearRing)this.rings.get(i);
+    for (final LinearRing innerRing : this.rings) {
 
-      final List results = this.index.getItems(innerRing.getBoundingBox());
-      // System.out.println(results.size());
-      for (int j = 0; j < results.size(); j++) {
-        final LinearRing searchRing = (LinearRing)results.get(j);
+      final List<LinearRing> results = this.index.getItems(innerRing.getBoundingBox());
 
+      for (final LinearRing searchRing : results) {
         if (innerRing == searchRing) {
-          continue;
-        }
+        } else if (innerRing.getBoundingBox().intersects(searchRing.getBoundingBox())) {
+          final Point innerRingPt = IsValidOp.findPtNotNode(innerRing, searchRing, this.graph);
 
-        if (!innerRing.getBoundingBox().intersects(searchRing.getBoundingBox())) {
-          continue;
-        }
-
-        final Point innerRingPt = IsValidOp.findPtNotNode(innerRing, searchRing, this.graph);
-
-        /**
-         * If no non-node pts can be found, this means
-         * that the searchRing touches ALL of the innerRing vertices.
-         * This indicates an invalid polygon, since either
-         * the two holes Construct a new disconnected interior,
-         * or they touch in an infinite number of points
-         * (i.e. along a line segment).
-         * Both of these cases are caught by other tests,
-         * so it is safe to simply skip this situation here.
-         */
-        if (innerRingPt == null) {
-          continue;
-        }
-
-        final boolean isInside = searchRing.isPointInRing(innerRingPt);
-        if (isInside) {
-          this.nestedPt = innerRingPt;
-          return false;
+          /**
+           * If no non-node pts can be found, this means
+           * that the searchRing touches ALL of the innerRing vertices.
+           * This indicates an invalid polygon, since either
+           * the two holes Construct a new disconnected interior,
+           * or they touch in an infinite number of points
+           * (i.e. along a line segment).
+           * Both of these cases are caught by other tests,
+           * so it is safe to simply skip this situation here.
+           */
+          if (innerRingPt != null) {
+            final boolean isInside = searchRing.isPointInRing(innerRingPt);
+            if (isInside) {
+              this.nestedPt = innerRingPt;
+              return false;
+            }
+          }
         }
       }
     }

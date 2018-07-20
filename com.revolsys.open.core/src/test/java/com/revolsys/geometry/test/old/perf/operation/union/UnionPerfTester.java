@@ -3,7 +3,6 @@ package com.revolsys.geometry.test.old.perf.operation.union;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
@@ -40,19 +39,6 @@ public class UnionPerfTester {
 
   public UnionPerfTester(final List polys) {
     this.polys = polys;
-  }
-
-  void printItemEnvelopes(final List tree) {
-    final BoundingBox itemEnv = BoundingBox.empty();
-    for (final Iterator i = tree.iterator(); i.hasNext();) {
-      final Object o = i.next();
-      if (o instanceof List) {
-        printItemEnvelopes((List)o);
-      } else if (o instanceof Geometry) {
-        itemEnv.expandToInclude(((Geometry)o).getBoundingBox());
-      }
-    }
-    // System.out.println(this.factory.toGeometry(itemEnv));
   }
 
   public void run(final String testName, final int testType) {
@@ -119,7 +105,8 @@ public class UnionPerfTester {
   }
 
   /*
-   * public Geometry unionAllOrdered(List geoms) { // return OrderedUnion.union(geoms); }
+   * public Geometry unionAllOrdered(List geoms) { // return
+   * OrderedUnion.union(geoms); }
    */
 
   public Geometry unionCascaded(final List geoms) {
