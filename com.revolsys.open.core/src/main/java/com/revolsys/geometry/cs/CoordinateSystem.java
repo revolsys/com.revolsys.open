@@ -46,6 +46,7 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
 
   CoordinatesOperation getCoordinatesOperation(CoordinateSystem coordinateSystem);
 
+  @Override
   int getCoordinateSystemId();
 
   String getCoordinateSystemType();
@@ -85,6 +86,8 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
   <Q extends Quantity<Q>> Unit<Q> getUnit();
 
   boolean isDeprecated();
+
+  boolean isSame(CoordinateSystem coordinateSystem);
 
   default byte[] md5Digest() {
     final MessageDigest digest = Md5.getMessageDigest();

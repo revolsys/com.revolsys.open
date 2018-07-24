@@ -1,6 +1,9 @@
 package com.revolsys.geometry.cs;
 
 import java.math.BigDecimal;
+import java.security.MessageDigest;
+
+import com.revolsys.util.Md5;
 
 public class ParameterValueBigDecimal extends Number implements ParameterValue {
   private final BigDecimal unitValue;
@@ -48,6 +51,15 @@ public class ParameterValueBigDecimal extends Number implements ParameterValue {
   }
 
   @Override
+  public boolean isSame(final ParameterValue parameterValue) {
+    if (parameterValue instanceof ParameterValueBigDecimal) {
+      final ParameterValueBigDecimal numberValue = (ParameterValueBigDecimal)parameterValue;
+      return this.value == numberValue.value;
+    }
+    return false;
+  }
+
+  @Override
   public long longValue() {
     return (long)this.value;
   }
@@ -55,5 +67,10 @@ public class ParameterValueBigDecimal extends Number implements ParameterValue {
   @Override
   public String toString() {
     return this.unitValue.toString();
+  }
+
+  @Override
+  public void updateDigest(final MessageDigest digest) {
+    Md5.update(digest, Math.floor(1e6 * this.value));
   }
 }

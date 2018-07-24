@@ -70,6 +70,14 @@ public class Datum {
     return this.deprecated;
   }
 
+  public boolean isSame(final Datum datum) {
+    if (datum == null) {
+      return false;
+    } else {
+      return this.name.equalsIgnoreCase(datum.name);
+    }
+  }
+
   @Override
   public String toString() {
     return this.name;

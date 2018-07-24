@@ -135,6 +135,24 @@ public class GeocentricCoordinateSystem extends AbstractHorizontalCoordinateSyst
   }
 
   @Override
+  public boolean isSame(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof GeocentricCoordinateSystem) {
+      return isSame((GeocentricCoordinateSystem)coordinateSystem);
+    } else {
+      return false;
+    }
+  }
+
+  public boolean isSame(final GeocentricCoordinateSystem coordinateSystem) {
+    if (this.geodeticDatum.isSame(coordinateSystem.geodeticDatum)) {
+      if (this.linearUnit.isSame(coordinateSystem.linearUnit)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   protected BoundingBox newAreaBoundingBox() {
     final Area area = getArea();
     final GeometryFactory geometryFactory = getGeometryFactory();

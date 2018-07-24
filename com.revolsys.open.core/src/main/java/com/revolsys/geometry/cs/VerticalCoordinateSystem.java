@@ -157,6 +157,24 @@ public class VerticalCoordinateSystem extends AbstractCoordinateSystem {
   }
 
   @Override
+  public boolean isSame(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof VerticalCoordinateSystem) {
+      return isSame((VerticalCoordinateSystem)coordinateSystem);
+    } else {
+      return false;
+    }
+  }
+
+  public boolean isSame(final VerticalCoordinateSystem coordinateSystem) {
+    if (this.verticalDatum.isSame(coordinateSystem.verticalDatum)) {
+      if (this.linearUnit.isSame(coordinateSystem.linearUnit)) {
+        return this.parameterValues.equals(coordinateSystem.parameterValues);
+      }
+    }
+    return false;
+  }
+
+  @Override
   protected BoundingBox newAreaBoundingBox() {
     final Area area = getArea();
     final GeometryFactory geometryFactory = getGeometryFactory();

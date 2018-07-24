@@ -61,9 +61,9 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
 
   private boolean initialized;
 
-  private int resolutionX;
+  private double resolutionX;
 
-  private int resolutionY;
+  private double resolutionY;
 
   private double resolutionZ;
 
@@ -86,8 +86,8 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   }
 
   private ParameterValue fromDms(final double value) {
-    final double degrees = Math.floor(value / 10000);
-    final double minutes = Math.floor(Math.abs(value) % 10000 / 100);
+    final double degrees = Math.floor(value / 1000000);
+    final double minutes = Math.floor(Math.abs(value) % 100000 / 1000);
     final double seconds = Math.abs(value) % 100;
     final double decimal = degrees + minutes / 60 + seconds / 3600;
     return new ParameterValueNumber(decimal);
@@ -294,13 +294,14 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   @Override
   public final GriddedElevationModel read() {
     init();
-    final int resolutionY = this.resolutionY;
+    final double resolutionY = this.resolutionY;
     final double resolutionZ = this.resolutionZ;
     final double scaleY = 1 / resolutionY;
     final double scaleZ = 1 / resolutionZ;
     try {
       final UsgsGriddedElevationModel elevationModel = new UsgsGriddedElevationModel(
-        this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight, this.resolutionX);
+        this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight, this.resolutionX,
+        resolutionY);
 
       final double minY = this.boundingBox.getMinY();
       int gridHeight = 0;
@@ -423,18 +424,8 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
             "Angle=" + angle + " not currently supported for USGS DEM: " + this.resource);
         }
         final int verticalAccuracy = getInteger(6);
-        final double resolutionX = getDoubleSci(12);
-        final double resolutionY = getDoubleSci(12);
-        if (resolutionX != resolutionY) {
-          throw new IllegalArgumentException("resolutionX " + resolutionX + " != " + resolutionY
-            + " resolutionY for USGS DEM: " + this.resource);
-        }
-        this.resolutionX = (int)resolutionX;
-        this.resolutionY = (int)resolutionY;
-        if (resolutionX != this.resolutionX) {
-          throw new IllegalArgumentException("resolutionX " + resolutionX
-            + " must currently be an integer for USGS DEM: " + this.resource);
-        }
+        this.resolutionX = getDoubleSci(12);
+        this.resolutionY = getDoubleSci(12);
         this.resolutionZ = getDoubleSci(12);
         final int rasterRowCount = getInteger(6);
         this.gridWidth = getInteger(6);
@@ -484,7 +475,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
               throw new IllegalArgumentException("UTM horizontalDatum=" + horizontalDatum
                 + " not currently supported for USGS DEM: " + this.resource);
           }
-          this.gridHeight = (int)((maxY - minY) / resolutionY);
+          this.gridHeight = (int)((maxY - minY) / this.resolutionY);
         } else if (2 == planimetricReferenceSystem) {
           throw new IllegalArgumentException(
             "planimetricReferenceSystem=" + planimetricReferenceSystem
@@ -545,11 +536,11 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
         }
         if (horizontalDatum == 3 || horizontalDatum == 4) {
         } else {
-          minX = Math.floor(minX / resolutionX) * resolutionX + resolutionX / 2;
-          maxX = Math.ceil(maxX / resolutionX) * resolutionX - resolutionX / 2;
-          minY = Math.floor(minY / resolutionY) * resolutionY - resolutionY / 2;
-          maxY = Math.ceil(maxY / resolutionY) * resolutionY + resolutionY / 2;
-          this.gridHeight = (int)((maxY - minY) / resolutionY);
+          minX = Math.floor(minX / this.resolutionX) * this.resolutionX + this.resolutionX / 2;
+          maxX = Math.ceil(maxX / this.resolutionX) * this.resolutionX - this.resolutionX / 2;
+          minY = Math.floor(minY / this.resolutionY) * this.resolutionY - this.resolutionY / 2;
+          maxY = Math.ceil(maxY / this.resolutionY) * this.resolutionY + this.resolutionY / 2;
+          this.gridHeight = (int)((maxY - minY) / this.resolutionY);
         }
         this.boundingBox = this.geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY,
           maxZ);

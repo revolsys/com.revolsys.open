@@ -79,6 +79,25 @@ public class GeodeticDatum extends Datum {
     }
   }
 
+  @Override
+  public boolean isSame(final Datum datum) {
+    if (datum instanceof GeodeticDatum) {
+      return isSame((GeodeticDatum)datum);
+    }
+    return false;
+  }
+
+  public boolean isSame(final GeodeticDatum datum) {
+    if (this.primeMeridian != null && !this.primeMeridian.isSame(datum.primeMeridian)) {
+      return false;
+    }
+
+    if (this.ellipsoid.isSame(datum.ellipsoid)) {
+      return true;
+    }
+    return false;
+  }
+
   public void updateDigest(final MessageDigest digest) {
     this.ellipsoid.updateDigest(digest);
   }

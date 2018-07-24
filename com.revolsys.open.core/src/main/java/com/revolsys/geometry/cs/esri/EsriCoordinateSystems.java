@@ -159,17 +159,25 @@ public class EsriCoordinateSystems {
       } else if (ids.size() == 1) {
         return ids.get(0);
       } else {
+        final List<CoordinateSystem> coordinateSystems = new ArrayList<>();
         for (final int coordinateSystemId : ids) {
           final CoordinateSystem coordinateSystem2 = getCoordinateSystem(coordinateSystemId);
           if (coordinateSystem2 != null) {
             if (coordinateSystem.getCoordinateSystemName()
               .equalsIgnoreCase(coordinateSystem2.getCoordinateSystemName())) {
               return coordinateSystemId;
+            } else {
+              coordinateSystems.add(coordinateSystem2);
             }
           }
         }
+        for (final CoordinateSystem coordinateSystem2 : coordinateSystems) {
+          if (coordinateSystem.isSame(coordinateSystem2)) {
+            return coordinateSystem2.getCoordinateSystemId();
+          }
+        }
         // Match base on names etc
-        return 0;
+        return ids.get(0);
       }
     }
   }

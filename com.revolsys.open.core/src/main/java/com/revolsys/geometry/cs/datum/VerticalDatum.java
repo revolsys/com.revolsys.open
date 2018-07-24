@@ -19,4 +19,23 @@ public class VerticalDatum extends Datum {
   public int getDatumType() {
     return this.datumType;
   }
+
+  @Override
+  public boolean isSame(final Datum datum) {
+    if (datum instanceof VerticalDatum) {
+      return isSame((VerticalDatum)datum);
+    }
+    return false;
+  }
+
+  public boolean isSame(final VerticalDatum verticalDatum) {
+    if (verticalDatum == null) {
+      return false;
+    } else {
+      if (this.datumType == verticalDatum.datumType) {
+        return super.isSame(verticalDatum);
+      }
+      return false;
+    }
+  }
 }

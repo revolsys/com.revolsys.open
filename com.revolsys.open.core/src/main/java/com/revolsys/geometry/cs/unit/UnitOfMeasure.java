@@ -8,6 +8,10 @@ public interface UnitOfMeasure {
 
   UnitOfMeasureType getType();
 
+  default boolean isSame(final UnitOfMeasure unit) {
+    return equals(unit);
+  }
+
   @SuppressWarnings("unchecked")
   default <U extends UnitOfMeasure> ValueWithUnit<U> newValue(final double value) {
     return (ValueWithUnit<U>)new ValueWithUnit<>(this, value);

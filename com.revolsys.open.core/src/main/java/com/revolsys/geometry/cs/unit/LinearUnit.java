@@ -2,6 +2,7 @@ package com.revolsys.geometry.cs.unit;
 
 import static tec.uom.se.AbstractUnit.ONE;
 
+import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
+import com.revolsys.util.Md5;
 import com.revolsys.util.number.Doubles;
 
 import systems.uom.common.USCustomary;
@@ -234,5 +236,9 @@ public class LinearUnit implements UnitOfMeasure {
   @Override
   public String toString() {
     return this.name;
+  }
+
+  public void updateDigest(final MessageDigest digest) {
+    Md5.update(digest, this.name.toLowerCase());
   }
 }

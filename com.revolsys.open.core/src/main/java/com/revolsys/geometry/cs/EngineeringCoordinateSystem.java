@@ -125,6 +125,24 @@ public class EngineeringCoordinateSystem extends AbstractHorizontalCoordinateSys
   }
 
   @Override
+  public boolean isSame(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof EngineeringCoordinateSystem) {
+      return isSame((EngineeringCoordinateSystem)coordinateSystem);
+    } else {
+      return false;
+    }
+  }
+
+  public boolean isSame(final EngineeringCoordinateSystem coordinateSystem) {
+    if (this.engineeringDatum.isSame(coordinateSystem.engineeringDatum)) {
+      if (this.unit.isSame(coordinateSystem.unit)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   protected BoundingBox newAreaBoundingBox() {
     final Area area = getArea();
     final GeometryFactory geometryFactory = getGeometryFactory();

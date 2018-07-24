@@ -82,7 +82,7 @@ public class SingleParameterName implements ParameterName {
 
   @Override
   public int hashCode() {
-    return this.name.hashCode();
+    return this.name.toLowerCase().hashCode();
   }
 
   @Override

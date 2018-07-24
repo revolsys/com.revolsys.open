@@ -1,6 +1,7 @@
 package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.cs.projection.TransverseMercatorUsgs;
 import com.revolsys.geometry.cs.projection.WebMercator;
 import com.revolsys.util.Equals;
+import com.revolsys.util.Md5;
 import com.revolsys.util.Property;
 
 public class CoordinateOperationMethod
@@ -235,6 +237,14 @@ public class CoordinateOperationMethod
     return this.reverse;
   }
 
+  public boolean isSame(final CoordinateOperationMethod coordinateOperationMethod) {
+    if (coordinateOperationMethod == null) {
+      return false;
+    } else {
+      return this.normalizedName.equals(coordinateOperationMethod.normalizedName);
+    }
+  }
+
   public synchronized CoordinatesProjection newCoordinatesProjection(
     final ProjectedCoordinateSystem coordinateSystem) {
     if (this.coordinatesProjectionFactory == null) {
@@ -263,5 +273,9 @@ public class CoordinateOperationMethod
   @Override
   public String toString() {
     return getNormalizedName();
+  }
+
+  public void updateDigest(final MessageDigest digest) {
+    Md5.update(digest, this.normalizedName);
   }
 }

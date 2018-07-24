@@ -145,6 +145,38 @@ public class CompoundCoordinateSystem extends AbstractCoordinateSystem {
     return result;
   }
 
+  public boolean isSame(final CompoundCoordinateSystem coordinateSystem) {
+    if (coordinateSystem == null) {
+      return false;
+    } else {
+      if (this.horizontalCoordinateSystem == null) {
+        if (coordinateSystem.horizontalCoordinateSystem != null) {
+          return false;
+        }
+      } else if (!this.horizontalCoordinateSystem
+        .isSame(coordinateSystem.horizontalCoordinateSystem)) {
+        return false;
+      }
+      if (this.verticalCoordinateSystem == null) {
+        if (coordinateSystem.verticalCoordinateSystem != null) {
+          return false;
+        }
+      } else if (!this.verticalCoordinateSystem.isSame(coordinateSystem.verticalCoordinateSystem)) {
+        return false;
+      }
+      return true;
+    }
+  }
+
+  @Override
+  public boolean isSame(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof CompoundCoordinateSystem) {
+      return isSame((CompoundCoordinateSystem)coordinateSystem);
+    } else {
+      return false;
+    }
+  }
+
   @Override
   protected BoundingBox newAreaBoundingBox() {
     final Area area = getArea();

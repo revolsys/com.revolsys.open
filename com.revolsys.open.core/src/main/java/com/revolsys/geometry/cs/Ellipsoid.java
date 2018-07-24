@@ -609,6 +609,18 @@ public class Ellipsoid implements Serializable {
     return this.deprecated;
   }
 
+  public boolean isSame(final Ellipsoid ellipsoid) {
+    if (ellipsoid == null) {
+      return false;
+    } else if (Math.floor(1000000.0 * this.inverseFlattening) != Math
+      .floor(1000000.0 * ellipsoid.inverseFlattening)) {
+      return false;
+    } else if (this.semiMajorAxis != ellipsoid.semiMajorAxis) {
+      return false;
+    }
+    return true;
+  }
+
   public double meridianRadiusOfCurvature(final double latitude) {
     final double er = 1.0 - this.eccentricitySquared * Math.sin(latitude) * Math.sin(latitude);
     final double el = Math.pow(er, 1.5);
@@ -797,8 +809,8 @@ public class Ellipsoid implements Serializable {
   }
 
   public void updateDigest(final MessageDigest digest) {
-    Md5.update(digest, Doubles.makePrecise(10, this.semiMajorAxis));
-    Md5.update(digest, Doubles.makePrecise(1e6, this.inverseFlattening));
+    Md5.update(digest, Math.floor(10 * this.semiMajorAxis));
+    Md5.update(digest, Math.floor(1e6 * this.inverseFlattening));
   }
 
 }

@@ -12,8 +12,8 @@ public class UsgsGriddedElevationModel extends AbstractGrid implements GriddedEl
 
   public UsgsGriddedElevationModel(final GeometryFactory geometryFactory,
     final BoundingBox boundingBox, final int gridWidth, final int gridHeight,
-    final int gridCellSize) {
-    super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellSize);
+    final double gridCellWidth, final double gridCellHeight) {
+    super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
     this.columns = new UsgsGriddedElevationModelColumn[gridWidth];
   }
 

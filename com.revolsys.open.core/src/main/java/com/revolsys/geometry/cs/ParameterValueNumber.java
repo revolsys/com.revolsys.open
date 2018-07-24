@@ -1,6 +1,10 @@
 package com.revolsys.geometry.cs;
 
+import java.security.MessageDigest;
+
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
+import com.revolsys.util.Debug;
+import com.revolsys.util.Md5;
 import com.revolsys.util.number.Doubles;
 
 public class ParameterValueNumber extends Number implements ParameterValue {
@@ -21,6 +25,9 @@ public class ParameterValueNumber extends Number implements ParameterValue {
       this.value = unitValue;
     } else {
       this.value = unit.toNormal(unitValue);
+    }
+    if (this.value == -12600) {
+      Debug.noOp();
     }
   }
 
@@ -60,6 +67,15 @@ public class ParameterValueNumber extends Number implements ParameterValue {
   }
 
   @Override
+  public boolean isSame(final ParameterValue parameterValue) {
+    if (parameterValue instanceof ParameterValueNumber) {
+      final ParameterValueNumber numberValue = (ParameterValueNumber)parameterValue;
+      return this.value == numberValue.value;
+    }
+    return false;
+  }
+
+  @Override
   public long longValue() {
     return (long)this.value;
   }
@@ -67,5 +83,10 @@ public class ParameterValueNumber extends Number implements ParameterValue {
   @Override
   public String toString() {
     return Doubles.toString(this.value);
+  }
+
+  @Override
+  public void updateDigest(final MessageDigest digest) {
+    Md5.update(digest, Math.floor(1e6 * this.value));
   }
 }

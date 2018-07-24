@@ -1,10 +1,13 @@
 package com.revolsys.geometry.cs;
 
+import java.security.MessageDigest;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
@@ -283,6 +286,42 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
   }
 
   @Override
+  public boolean isSame(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+      return isSame((ProjectedCoordinateSystem)coordinateSystem);
+    } else {
+      return false;
+    }
+  }
+
+  public boolean isSame(final ProjectedCoordinateSystem coordinateSystem) {
+    if (this.coordinateOperationMethod.isSame(coordinateSystem.coordinateOperationMethod)) {
+      if (this.geographicCoordinateSystem.isSame(coordinateSystem.geographicCoordinateSystem)) {
+        if (this.linearUnit.isSame(coordinateSystem.linearUnit)) {
+          final Set<ParameterName> parameterNames = this.parameterValues.keySet();
+          final Set<ParameterName> parameterNames2 = coordinateSystem.parameterValues.keySet();
+          if (parameterNames.equals(parameterNames2)) {
+            for (final ParameterName parameterName : parameterNames) {
+              final ParameterValue parameterValue1 = this.parameterValues.get(parameterName);
+              final ParameterValue parameterValue2 = coordinateSystem.parameterValues
+                .get(parameterName);
+              if (parameterValue1 == null) {
+                if (parameterValue2 != null) {
+                  return false;
+                }
+              } else if (!parameterValue1.isSame(parameterValue2)) {
+                return false;
+              }
+            }
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  @Override
   protected BoundingBox newAreaBoundingBox() {
     final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
       .getGeometryFactory();
@@ -296,5 +335,25 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
     return boundingBox.convert(geometryFactory);
+  }
+
+  @Override
+  public void updateDigest(final MessageDigest digest) {
+    if (this.geographicCoordinateSystem != null) {
+      this.geographicCoordinateSystem.updateDigest(digest);
+    }
+    if (this.coordinateOperationMethod != null) {
+      this.coordinateOperationMethod.updateDigest(digest);
+    }
+    if (this.linearUnit != null) {
+      this.linearUnit.updateDigest(digest);
+    }
+    final Map<ParameterName, ParameterValue> params = new TreeMap<>(this.parameterValues);
+    for (final Entry<ParameterName, ParameterValue> entry : params.entrySet()) {
+      final ParameterName name = entry.getKey();
+      name.updateDigest(digest);
+      final ParameterValue value = entry.getValue();
+      value.updateDigest(digest);
+    }
   }
 }

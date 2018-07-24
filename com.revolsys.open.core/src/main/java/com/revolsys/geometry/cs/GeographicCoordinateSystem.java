@@ -271,6 +271,32 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
   }
 
   @Override
+  public boolean isSame(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof GeographicCoordinateSystem) {
+      return isSame((GeographicCoordinateSystem)coordinateSystem);
+    } else {
+      return false;
+    }
+  }
+
+  public boolean isSame(final GeographicCoordinateSystem coordinateSystem) {
+    if (this.primeMeridian == null) {
+      if (coordinateSystem.primeMeridian != null) {
+        return false;
+      }
+    } else if (!this.primeMeridian.isSame(coordinateSystem.primeMeridian)) {
+      return false;
+    }
+
+    if (this.geodeticDatum.isSame(coordinateSystem.geodeticDatum)) {
+      if (this.angularUnit.isSame(coordinateSystem.angularUnit)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   public BoundingBox newAreaBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Area area = getArea();

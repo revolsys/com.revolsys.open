@@ -85,6 +85,14 @@ public class PrimeMeridian implements Serializable {
     return this.deprecated;
   }
 
+  public boolean isSame(final PrimeMeridian primeMeridian) {
+    if (primeMeridian == null) {
+      return false;
+    } else {
+      return this.longitude == primeMeridian.longitude;
+    }
+  }
+
   @Override
   public String toString() {
     return this.name;

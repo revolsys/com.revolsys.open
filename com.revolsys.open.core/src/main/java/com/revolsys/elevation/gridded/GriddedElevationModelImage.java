@@ -59,29 +59,31 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
       if (this.imageBuffer == null) {
         final int width = this.elevationModel.getGridWidth();
         final int height = this.elevationModel.getGridHeight();
-        final ColorModel colorModel = ColorModel.getRGBdefault();
-        final DataBuffer imageBuffer;
-        if (this.cached) {
-          imageBuffer = new TempFileMappedIntDataBuffer(width, height);
-        } else {
-          imageBuffer = new GriddedElevationModelRasterizerDataBuffer(this.rasterizer);
-        }
-        final SampleModel sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_INT, width,
-          height, new int[] { //
-            0x00ff0000, // Red
-            0x0000ff00, // Green
-            0x000000ff, // Blue
-            0xff000000 // Alpha
-          });
+        if (width > 0 && height > 0) {
+          final ColorModel colorModel = ColorModel.getRGBdefault();
+          final DataBuffer imageBuffer;
+          if (this.cached) {
+            imageBuffer = new TempFileMappedIntDataBuffer(width, height);
+          } else {
+            imageBuffer = new GriddedElevationModelRasterizerDataBuffer(this.rasterizer);
+          }
+          final SampleModel sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_INT,
+            width, height, new int[] { //
+              0x00ff0000, // Red
+              0x0000ff00, // Green
+              0x000000ff, // Blue
+              0xff000000 // Alpha
+            });
 
-        final WritableRaster raster = new IntegerRaster(sampleModel, imageBuffer);
-        final BufferedImage image = new BufferedImage(colorModel, raster, false, null);
+          final WritableRaster raster = new IntegerRaster(sampleModel, imageBuffer);
+          final BufferedImage image = new BufferedImage(colorModel, raster, false, null);
 
-        if (this.cached) {
-          this.rasterizer.rasterize(imageBuffer);
+          if (this.cached) {
+            this.rasterizer.rasterize(imageBuffer);
+          }
+          setRenderedImage(image);
+          this.imageBuffer = imageBuffer;
         }
-        setRenderedImage(image);
-        this.imageBuffer = imageBuffer;
       } else {
         if (this.cached) {
           this.rasterizer.rasterize(this.imageBuffer);
