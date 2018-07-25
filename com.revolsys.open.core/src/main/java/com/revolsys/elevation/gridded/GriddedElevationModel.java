@@ -295,7 +295,7 @@ public interface GriddedElevationModel extends Grid {
             final double lambda2 = (y3y1 * xx3 + x1x3 * yy3) / det;
             if (0 <= lambda2 && lambda2 <= 1) {
               final double lambda3 = 1.0 - lambda1 - lambda2;
-              if (0 < lambda3 && lambda3 < 1) {
+              if (-1e-15 < lambda3 && lambda3 <= 1) {
                 final double elevation = lambda1 * z1 + lambda2 * z2 + lambda3 * z3;
                 if (Double.isFinite(elevation)) {
                   setValue(x, y, elevation);
