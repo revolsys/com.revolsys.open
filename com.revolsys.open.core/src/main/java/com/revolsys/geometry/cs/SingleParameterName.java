@@ -1,15 +1,18 @@
 package com.revolsys.geometry.cs;
 
-import java.util.Collection;
+import java.security.MessageDigest;
 import java.util.Map;
 
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
+import com.revolsys.util.Md5;
 
 public class SingleParameterName implements ParameterName {
 
   private final int id;
 
   private final String name;
+
+  private String normalizedName;
 
   private final UnitOfMeasure unitOfMeasure;
 
@@ -21,6 +24,10 @@ public class SingleParameterName implements ParameterName {
     this.id = id;
     this.name = name;
     this.unitOfMeasure = unitOfMeasure;
+    this.normalizedName = ParameterNames.normalizeName(name);
+    if (!ParameterNames._PARAMETER_BY_ID.containsKey(id)) {
+      ParameterNames._PARAMETER_BY_ID.put(id, this);
+    }
     if (ParameterNames._PARAMETER_BY_NAME.containsKey(name)) {
       final ParameterName oldName = ParameterNames._PARAMETER_BY_NAME.get(name);
       if (oldName.getId() == 0) {
@@ -40,11 +47,6 @@ public class SingleParameterName implements ParameterName {
   }
 
   @Override
-  public void addNames(final Collection<ParameterName> names) {
-    names.add(this);
-  }
-
-  @Override
   public boolean equals(final Object object) {
     if (object == this) {
       return true;
@@ -53,6 +55,8 @@ public class SingleParameterName implements ParameterName {
       if (this.id == name.id) {
         return true;
       } else if (this.name.equalsIgnoreCase(name.name)) {
+        return true;
+      } else if (this.normalizedName.equalsIgnoreCase(name.normalizedName)) {
         return true;
       }
     }
@@ -70,6 +74,11 @@ public class SingleParameterName implements ParameterName {
   }
 
   @Override
+  public String getNormalizedName() {
+    return this.normalizedName;
+  }
+
+  @Override
   public UnitOfMeasure getUnitOfMeasure() {
     return this.unitOfMeasure;
   }
@@ -82,11 +91,21 @@ public class SingleParameterName implements ParameterName {
 
   @Override
   public int hashCode() {
-    return this.name.toLowerCase().hashCode();
+    return this.normalizedName.hashCode();
+  }
+
+  void setNormalizedName(final String normalizedName) {
+    this.normalizedName = normalizedName;
   }
 
   @Override
   public String toString() {
     return this.name;
   }
+
+  @Override
+  public void updateDigest(final MessageDigest digest) {
+    Md5.update(digest, this.normalizedName);
+  }
+
 }

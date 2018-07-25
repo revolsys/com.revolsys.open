@@ -41,6 +41,7 @@ import com.revolsys.geometry.cs.datum.Datum;
 import com.revolsys.geometry.cs.datum.EngineeringDatum;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.datum.VerticalDatum;
+import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.Degree;
 import com.revolsys.geometry.cs.unit.DegreeSexagesimalDMS;
@@ -183,20 +184,25 @@ public final class EpsgCoordinateSystems {
           .get(coordinateSystem.getCoordinateSystemName());
         if (matchedCoordinateSystem == null) {
           final int hashCode = coordinateSystem.hashCode();
-          int matchCoordinateSystemId = 0;
-          final List<CoordinateSystem> coordinateSystems = COORDINATE_SYSTEMS_BY_HASH_CODE
-            .get(hashCode);
-          if (coordinateSystems != null) {
-            for (final CoordinateSystem coordinateSystem3 : coordinateSystems) {
-              if (coordinateSystem3.equals(coordinateSystem)) {
-                final int srid3 = coordinateSystem3.getCoordinateSystemId();
-                if (matchedCoordinateSystem == null) {
-                  matchedCoordinateSystem = coordinateSystem3;
-                  matchCoordinateSystemId = srid3;
-                } else if (srid3 < matchCoordinateSystemId) {
-                  if (!coordinateSystem3.isDeprecated() || matchedCoordinateSystem.isDeprecated()) {
+          int matchCoordinateSystemId = EsriCoordinateSystems.getIdUsingDigest(coordinateSystem);
+          if (matchCoordinateSystemId > 0) {
+            matchedCoordinateSystem = getCoordinateSystem(matchCoordinateSystemId);
+          } else {
+            final List<CoordinateSystem> coordinateSystems = COORDINATE_SYSTEMS_BY_HASH_CODE
+              .get(hashCode);
+            if (coordinateSystems != null) {
+              for (final CoordinateSystem coordinateSystem3 : coordinateSystems) {
+                if (coordinateSystem3.equals(coordinateSystem)) {
+                  final int srid3 = coordinateSystem3.getCoordinateSystemId();
+                  if (matchedCoordinateSystem == null) {
                     matchedCoordinateSystem = coordinateSystem3;
                     matchCoordinateSystemId = srid3;
+                  } else if (srid3 < matchCoordinateSystemId) {
+                    if (!coordinateSystem3.isDeprecated()
+                      || matchedCoordinateSystem.isDeprecated()) {
+                      matchedCoordinateSystem = coordinateSystem3;
+                      matchCoordinateSystemId = srid3;
+                    }
                   }
                 }
               }
@@ -363,7 +369,7 @@ public final class EpsgCoordinateSystems {
 
   @SuppressWarnings("unchecked")
   public static <U extends UnitOfMeasure> U getLinearUnit(final String name) {
-    initialize();
+    loadUnitOfMeasure();
     return (U)UNIT_BY_NAME.get(name);
   }
 
@@ -380,7 +386,7 @@ public final class EpsgCoordinateSystems {
 
   @SuppressWarnings("unchecked")
   public static <U extends UnitOfMeasure> U getUnit(final int id) {
-    initialize();
+    loadUnitOfMeasure();
     return (U)UNIT_BY_ID.get(id);
   }
 
@@ -865,83 +871,85 @@ public final class EpsgCoordinateSystems {
   }
 
   private static void loadUnitOfMeasure() {
-    try (
-      ChannelReader reader = newChannelReader("unitOfMeasure")) {
-      if (reader != null) {
-        while (true) {
-          final int id = reader.getInt();
-          final byte type = reader.getByte();
-          final int baseId = reader.getInt();
-          final boolean deprecated = readBoolean(reader);
-          final double conversionFactorB = reader.getDouble();
-          final double conversionFactorC = reader.getDouble();
-          double conversionFactor;
-          if (Double.isFinite(conversionFactorB)) {
-            if (Double.isFinite(conversionFactorC)) {
-              conversionFactor = conversionFactorB / conversionFactorC;
+    if (UNIT_BY_ID.isEmpty()) {
+      try (
+        ChannelReader reader = newChannelReader("unitOfMeasure")) {
+        if (reader != null) {
+          while (true) {
+            final int id = reader.getInt();
+            final byte type = reader.getByte();
+            final int baseId = reader.getInt();
+            final boolean deprecated = readBoolean(reader);
+            final double conversionFactorB = reader.getDouble();
+            final double conversionFactorC = reader.getDouble();
+            double conversionFactor;
+            if (Double.isFinite(conversionFactorB)) {
+              if (Double.isFinite(conversionFactorC)) {
+                conversionFactor = conversionFactorB / conversionFactorC;
+              } else {
+                conversionFactor = conversionFactorB;
+              }
             } else {
-              conversionFactor = conversionFactorB;
+              conversionFactor = conversionFactorC;
             }
-          } else {
-            conversionFactor = conversionFactorC;
+
+            final String name = reader.getStringUtf8ByteCount();
+            final EpsgAuthority authority = new EpsgAuthority(id);
+
+            UnitOfMeasure unit;
+            switch (type) {
+              case 0:
+                final ScaleUnit baseScaleUnit = (ScaleUnit)UNIT_BY_ID.get(baseId);
+                unit = new ScaleUnit(name, baseScaleUnit, conversionFactor, authority, deprecated);
+              break;
+              case 1:
+                final LinearUnit baseLinearUnit = (LinearUnit)UNIT_BY_ID.get(baseId);
+                if (id == 9001) {
+                  unit = new Metre(name, baseLinearUnit, conversionFactor, authority, deprecated);
+                } else {
+                  unit = new LinearUnit(name, baseLinearUnit, conversionFactor, authority,
+                    deprecated);
+                }
+              break;
+              case 2:
+                final AngularUnit baseAngularUnit = (AngularUnit)UNIT_BY_ID.get(baseId);
+                if (id == 9101) {
+                  unit = new Radian(name, baseAngularUnit, conversionFactor, authority, deprecated);
+                } else if (id == 9102) {
+                  unit = new Degree(name, baseAngularUnit, conversionFactor, authority, deprecated);
+                  SYSTEM_OF_UNITS.addUnit(unit, "Degree", "deg");
+                } else if (id == 9105) {
+                  unit = new Grad(name, baseAngularUnit, conversionFactor, authority, deprecated);
+                } else if (id == 9110) {
+                  unit = new DegreeSexagesimalDMS(name, baseAngularUnit, conversionFactor,
+                    authority, deprecated);
+                } else if (id == 9122) {
+                  unit = new Degree(name, baseAngularUnit, conversionFactor, authority, deprecated);
+                } else {
+                  unit = new AngularUnit(name, baseAngularUnit, conversionFactor, authority,
+                    deprecated);
+                }
+              break;
+              case 3:
+                final TimeUnit baseTimeUnit = (TimeUnit)UNIT_BY_ID.get(baseId);
+                unit = new TimeUnit(name, baseTimeUnit, conversionFactor, authority, deprecated);
+
+              break;
+
+              default:
+                throw new IllegalArgumentException("Invalid unitId=" + id);
+            }
+            UNIT_BY_NAME.put(name, unit);
+            UNIT_BY_ID.put(id, unit);
+
           }
-
-          final String name = reader.getStringUtf8ByteCount();
-          final EpsgAuthority authority = new EpsgAuthority(id);
-
-          UnitOfMeasure unit;
-          switch (type) {
-            case 0:
-              final ScaleUnit baseScaleUnit = (ScaleUnit)UNIT_BY_ID.get(baseId);
-              unit = new ScaleUnit(name, baseScaleUnit, conversionFactor, authority, deprecated);
-            break;
-            case 1:
-              final LinearUnit baseLinearUnit = (LinearUnit)UNIT_BY_ID.get(baseId);
-              if (id == 9001) {
-                unit = new Metre(name, baseLinearUnit, conversionFactor, authority, deprecated);
-              } else {
-                unit = new LinearUnit(name, baseLinearUnit, conversionFactor, authority,
-                  deprecated);
-              }
-            break;
-            case 2:
-              final AngularUnit baseAngularUnit = (AngularUnit)UNIT_BY_ID.get(baseId);
-              if (id == 9101) {
-                unit = new Radian(name, baseAngularUnit, conversionFactor, authority, deprecated);
-              } else if (id == 9102) {
-                unit = new Degree(name, baseAngularUnit, conversionFactor, authority, deprecated);
-                SYSTEM_OF_UNITS.addUnit(unit, "Degree", "deg");
-              } else if (id == 9105) {
-                unit = new Grad(name, baseAngularUnit, conversionFactor, authority, deprecated);
-              } else if (id == 9110) {
-                unit = new DegreeSexagesimalDMS(name, baseAngularUnit, conversionFactor, authority,
-                  deprecated);
-              } else if (id == 9122) {
-                unit = new Degree(name, baseAngularUnit, conversionFactor, authority, deprecated);
-              } else {
-                unit = new AngularUnit(name, baseAngularUnit, conversionFactor, authority,
-                  deprecated);
-              }
-            break;
-            case 3:
-              final TimeUnit baseTimeUnit = (TimeUnit)UNIT_BY_ID.get(baseId);
-              unit = new TimeUnit(name, baseTimeUnit, conversionFactor, authority, deprecated);
-
-            break;
-
-            default:
-              throw new IllegalArgumentException("Invalid unitId=" + id);
-          }
-          UNIT_BY_NAME.put(name, unit);
-          UNIT_BY_ID.put(id, unit);
-
         }
-      }
-    } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
+      } catch (final NoSuchResourceException e) {
+      } catch (final WrappedException e) {
+        if (Exceptions.isException(e, EOFException.class)) {
+        } else {
+          throw e;
+        }
       }
     }
   }

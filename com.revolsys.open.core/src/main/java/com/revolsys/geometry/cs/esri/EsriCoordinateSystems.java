@@ -148,7 +148,7 @@ public class EsriCoordinateSystems {
     return coordinateSystem;
   }
 
-  private static int getIdUsingDigest(final CoordinateSystem coordinateSystem) {
+  public static int getIdUsingDigest(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
       return 0;
     } else {
@@ -297,7 +297,7 @@ public class EsriCoordinateSystems {
       return null;
     } else {
       int id = coordinateSystem.getCoordinateSystemId();
-      if (id == 0) {
+      if (id <= 0) {
         id = getIdUsingDigest(coordinateSystem);
       }
       if (id > 0) {

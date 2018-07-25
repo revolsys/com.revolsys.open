@@ -239,6 +239,10 @@ public class LinearUnit implements UnitOfMeasure {
   }
 
   public void updateDigest(final MessageDigest digest) {
-    Md5.update(digest, this.name.toLowerCase());
+    if ("Meter".equals(this.name)) {
+      Md5.update(digest, "metre");
+    } else {
+      Md5.update(digest, this.name.toLowerCase());
+    }
   }
 }

@@ -20,7 +20,7 @@ public interface NormalizedParameterNames {
 
   ParameterName LATITUDE_OF_ORIGIN = new MultiParameterName(ParameterNames.LATITUDE_OF_ORIGIN,
     ParameterNames.LATITUDE_OF_NATURAL_ORIGIN, ParameterNames.LATITUDE_OF_CENTRE,
-    ParameterNames.LATITUDE_OF_FALSE_ORIGIN, ParameterNames.STANDARD_PARALLEL_1);
+    ParameterNames.LATITUDE_OF_FALSE_ORIGIN);
 
   ParameterName LONGITUDE_OF_CENTRE = new MultiParameterName(ParameterNames.LONGITUDE_OF_CENTRE,
     ParameterNames.LONGITUDE_OF_PROJECTION_CENTRE, ParameterNames.LONGITUDE_OF_ORIGIN);
@@ -33,9 +33,11 @@ public interface NormalizedParameterNames {
     ParameterNames.SCALE_FACTOR_ON_PSEUDO_STANDARD_PARALLEL);
 
   ParameterName STANDARD_PARALLEL_1 = new MultiParameterName(ParameterNames.STANDARD_PARALLEL_1,
-    ParameterNames.LATITUDE_OF_1ST_STANDARD_PARALLEL, ParameterNames.LATITUDE_OF_STANDARD_PARALLEL,
-    ParameterNames.LATITUDE_OF_NATURAL_ORIGIN);
+    ParameterNames.LATITUDE_OF_1ST_STANDARD_PARALLEL);
 
   ParameterName STANDARD_PARALLEL_2 = new MultiParameterName(ParameterNames.STANDARD_PARALLEL_2,
     ParameterNames.LATITUDE_OF_2ND_STANDARD_PARALLEL);
+
+  static void init() {
+  }
 }

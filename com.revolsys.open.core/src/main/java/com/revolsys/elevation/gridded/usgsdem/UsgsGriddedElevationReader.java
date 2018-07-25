@@ -507,6 +507,8 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
             horizontalCoordinateSystemId = projectedCoordinateSystem2
               .getHorizontalCoordinateSystemId();
           }
+          this.gridHeight = (int)((maxY - minY) / this.resolutionY);
+
         } else {
           throw new IllegalArgumentException(
             "planimetricReferenceSystem=" + planimetricReferenceSystem

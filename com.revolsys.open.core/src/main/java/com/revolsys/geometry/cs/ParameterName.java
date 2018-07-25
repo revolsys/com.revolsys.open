@@ -1,18 +1,17 @@
 package com.revolsys.geometry.cs;
 
 import java.security.MessageDigest;
-import java.util.Collection;
 import java.util.Map;
 
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.util.Md5;
 
 public interface ParameterName extends Comparable<ParameterName> {
-  void addNames(Collection<ParameterName> names);
-
   @Override
   default int compareTo(final ParameterName parameterName) {
-    return this.getName().compareTo(parameterName.getName());
+    final String normalizedName1 = getNormalizedName();
+    final String normalizedName2 = parameterName.getNormalizedName();
+    return normalizedName1.compareTo(normalizedName2);
   }
 
   default ParameterValue getDefaultValue() {
@@ -22,6 +21,11 @@ public interface ParameterName extends Comparable<ParameterName> {
   int getId();
 
   String getName();
+
+  default String getNormalizedName() {
+    final String name = getName();
+    return ParameterNames.normalizeName(name);
+  }
 
   UnitOfMeasure getUnitOfMeasure();
 

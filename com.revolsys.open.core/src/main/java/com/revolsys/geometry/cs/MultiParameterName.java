@@ -1,6 +1,5 @@
 package com.revolsys.geometry.cs;
 
-import java.util.Collection;
 import java.util.Map;
 
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
@@ -11,19 +10,24 @@ public class MultiParameterName implements ParameterName {
 
   private Double defaultValue;
 
+  private final String name;
+
+  private final String normalizedName;
+
   public MultiParameterName(final Double defaultValue, final ParameterName... parameterNames) {
+    this(parameterNames);
     this.defaultValue = defaultValue;
-    this.parameterNames = parameterNames;
   }
 
   public MultiParameterName(final ParameterName... parameterNames) {
     this.parameterNames = parameterNames;
-  }
-
-  @Override
-  public void addNames(final Collection<ParameterName> names) {
-    for (final ParameterName parameterName : this.parameterNames) {
-      parameterName.addNames(names);
+    this.name = parameterNames[0].getName();
+    this.normalizedName = parameterNames[0].getNormalizedName();
+    for (final ParameterName parameterName : parameterNames) {
+      if (parameterName instanceof SingleParameterName) {
+        final SingleParameterName singleName = (SingleParameterName)parameterName;
+        singleName.setNormalizedName(this.normalizedName);
+      }
     }
   }
 
@@ -64,7 +68,12 @@ public class MultiParameterName implements ParameterName {
 
   @Override
   public String getName() {
-    return this.parameterNames[0].getName();
+    return this.name;
+  }
+
+  @Override
+  public String getNormalizedName() {
+    return this.normalizedName;
   }
 
   @Override
@@ -86,11 +95,11 @@ public class MultiParameterName implements ParameterName {
 
   @Override
   public int hashCode() {
-    return getName().hashCode();
+    return this.normalizedName.hashCode();
   }
 
   @Override
   public String toString() {
-    return getName();
+    return this.name;
   }
 }

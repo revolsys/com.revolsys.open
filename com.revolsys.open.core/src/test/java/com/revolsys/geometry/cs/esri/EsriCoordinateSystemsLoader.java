@@ -92,7 +92,8 @@ public class EsriCoordinateSystemsLoader {
         final String wkt = record.getString("WKT");
         final ProjectedCoordinateSystem coordinateSystem = WktCsParser.read(wkt);
         final byte[] digest = coordinateSystem.md5Digest();
-        Maps.addToMap(Maps::newTree, csBymd5, new ByteArray(digest), id, coordinateSystem);
+        final ByteArray digestArray = new ByteArray(digest);
+        Maps.addToMap(Maps::newTree, csBymd5, digestArray, id, coordinateSystem);
 
         final String csName = coordinateSystem.getCoordinateSystemName();
         final GeographicCoordinateSystem geographicCoordinateSystem = coordinateSystem
