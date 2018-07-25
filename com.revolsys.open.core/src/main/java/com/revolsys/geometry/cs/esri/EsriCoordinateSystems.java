@@ -11,6 +11,7 @@ import java.util.TreeMap;
 
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.BaseAuthority;
+import com.revolsys.geometry.cs.CompoundCoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
@@ -64,31 +65,35 @@ public class EsriCoordinateSystems {
       final byte[] bytes = new byte[16];
       final ByteArray newDigest = new ByteArray(bytes);
       final String type = coordinateSystem.getCoordinateSystemType();
-      try (
-        ChannelReader reader = ChannelReader
-          .newChannelReader("classpath:CoordinateSystems/esri/" + type + ".digest")) {
-        while (true) {
-          reader.getBytes(bytes);
-          final short count = reader.getShort();
-          if (digest.equals(newDigest)) {
-            ids = new ArrayList<>();
-            for (int i = 0; i < count; i++) {
-              final int csId = reader.getInt();
-              ids.add(csId);
-            }
-            COORDINATE_SYSTEM_IDS_BY_DIGEST.put(digest, ids);
-            return ids;
-          } else {
-            for (int i = 0; i < count; i++) {
-              reader.getInt();
+      if (coordinateSystem instanceof CompoundCoordinateSystem) {
+        return Collections.emptyList();
+      } else {
+        try (
+          ChannelReader reader = ChannelReader
+            .newChannelReader("classpath:CoordinateSystems/esri/" + type + ".digest")) {
+          while (true) {
+            reader.getBytes(bytes);
+            final short count = reader.getShort();
+            if (digest.equals(newDigest)) {
+              ids = new ArrayList<>();
+              for (int i = 0; i < count; i++) {
+                final int csId = reader.getInt();
+                ids.add(csId);
+              }
+              COORDINATE_SYSTEM_IDS_BY_DIGEST.put(digest, ids);
+              return ids;
+            } else {
+              for (int i = 0; i < count; i++) {
+                reader.getInt();
+              }
             }
           }
-        }
-      } catch (final WrappedException e) {
-        if (Exceptions.isException(e, EOFException.class)) {
-          return Collections.emptyList();
-        } else {
-          throw e;
+        } catch (final WrappedException e) {
+          if (Exceptions.isException(e, EOFException.class)) {
+            return Collections.emptyList();
+          } else {
+            throw e;
+          }
         }
       }
     } else {

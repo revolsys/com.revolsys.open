@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.util.BoundingBoxXyConstructor;
 import com.revolsys.util.ExitLoopException;
 
@@ -28,7 +29,13 @@ public class RStarTree<T> implements SpatialIndex<T> {
 
   private BiPredicate<T, T> equalsItemFunction = (item1, item2) -> item1 == item2;
 
+  private GeometryFactory geometryFactory;
+
   public RStarTree() {
+  }
+
+  public RStarTree(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   // choose subtree: only pass this items that do not have leaves
@@ -102,6 +109,11 @@ public class RStarTree<T> implements SpatialIndex<T> {
       }
     }
     return true;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   int getNodeMaxItemCount() {
@@ -251,6 +263,11 @@ public class RStarTree<T> implements SpatialIndex<T> {
     return this;
   }
 
+  @Override
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
+
   public RStarTree<T> setNodeMaxItemCount(final int nodeMaxItemCount) {
     if (this.size == 0) {
       this.nodeMaxItemCount = nodeMaxItemCount;
@@ -267,6 +284,22 @@ public class RStarTree<T> implements SpatialIndex<T> {
       throw new IllegalStateException("Cannot set nodeMinItemCount after items have been added");
     }
     return this;
+  }
+
+  Comparator<RStarNode<T>> sortBoundingBoxByMax(final int axis) {
+    return (bi1, bi2) -> {
+      final double value1 = bi1.getBoundingBox().getMax(axis);
+      final double value2 = bi2.getBoundingBox().getMax(axis);
+      return Double.compare(value1, value2);
+    };
+  }
+
+  Comparator<RStarNode<T>> sortBoundingBoxByMin(final int axis) {
+    return (bi1, bi2) -> {
+      final double value1 = bi1.getBoundingBox().getMin(axis);
+      final double value2 = bi2.getBoundingBox().getMin(axis);
+      return Double.compare(value1, value2);
+    };
   }
 
   Comparator<RStarNode<T>> sortBoundingBoxProxysByAreaEnlargement(final BoundingBox boundingBox) {
@@ -287,27 +320,11 @@ public class RStarTree<T> implements SpatialIndex<T> {
     };
   }
 
-  Comparator<RStarNode<T>> sortBoundingBoxByMin(final int axis) {
-    return (bi1, bi2) -> {
-      final double value1 = bi1.getBoundingBox().getMin(axis);
-      final double value2 = bi2.getBoundingBox().getMin(axis);
-      return Double.compare(value1, value2);
-    };
-  }
-
   Comparator<RStarNode<T>> sortBoundingBoxProxysByOverlapEnlargement(
     final BoundingBox boundingBox) {
     return (bi1, bi2) -> {
       final double value1 = bi1.getBoundingBox().overlappingArea(boundingBox);
       final double value2 = bi2.getBoundingBox().overlappingArea(boundingBox);
-      return Double.compare(value1, value2);
-    };
-  }
-
-  Comparator<RStarNode<T>> sortBoundingBoxByMax(final int axis) {
-    return (bi1, bi2) -> {
-      final double value1 = bi1.getBoundingBox().getMax(axis);
-      final double value2 = bi2.getBoundingBox().getMax(axis);
       return Double.compare(value1, value2);
     };
   }
@@ -422,7 +439,7 @@ public class RStarTree<T> implements SpatialIndex<T> {
     }
     // distribute the end of the array to the new node, then erase them from the
     // original node
-    final RStarBranch<T> newNode = new RStarBranch<T>(node, splitIndex);
+    final RStarBranch<T> newNode = new RStarBranch<>(node, splitIndex);
 
     node.setSize(splitIndex);
 

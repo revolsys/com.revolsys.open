@@ -203,6 +203,15 @@ public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
     return this.spatialIndex.removeItem(getItems, item);
   }
 
+  public boolean removeRecord(final BoundingBox boundinBox, final R record) {
+    if (record != null) {
+      if (boundinBox != null) {
+        return this.spatialIndex.removeItem(boundinBox, record);
+      }
+    }
+    return false;
+  }
+
   public boolean removeRecord(final R record) {
     if (record != null) {
       final Geometry geometry = record.getGeometry();
@@ -222,6 +231,7 @@ public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
     }
   }
 
+  @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.spatialIndex.setGeometryFactory(geometryFactory);
   }

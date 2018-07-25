@@ -301,7 +301,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private List<Window> formWindows = new LinkedList<>();
 
-  private RecordSpatialIndex<LayerRecord> index = newSpatialIndex();
+  private RecordSpatialIndex<LayerRecord> index;
 
   private final Map<Identifier, ShortCounter> proxiedRecordIdentifiers = new HashMap<>();
 
@@ -543,6 +543,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private void addToIndexDo(final LayerRecord record) {
     addRecordToCache(this.cacheIdIndex, record);
     final LayerRecord recordProxy = record.newRecordProxy();
+    if (this.index == null) {
+      this.index = newSpatialIndex();
+    }
     this.index.addRecord(recordProxy);
   }
 
@@ -630,7 +633,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     clone.formRecords = new LinkedList<>();
     clone.formComponents = new LinkedList<>();
     clone.formWindows = new LinkedList<>();
-    clone.index = LayerRecordQuadTree.newIndex(getGeometryFactory());
+    clone.index = null;
     clone.selectedRecordsIndex = null;
     clone.proxiedRecords = new HashSet<>();
     clone.filter = this.filter.clone();
@@ -691,7 +694,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.formRecords.clear();
     this.formComponents.clear();
     this.formWindows.clear();
-    this.index = newSpatialIndex();
+    this.index = null;
     this.recordsByCacheId.clear();
     this.selectedRecordsIndex = null;
   }
@@ -1470,6 +1473,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   })
   protected <R extends LayerRecord> List<R> getRecordsIndex(final BoundingBox boundingBox) {
     synchronized (getSync()) {
+      if (this.index == null) {
+        return Collections.emptyList();
+      }
       final List<R> records = (List)this.index.queryIntersects(boundingBox);
       return records;
     }
@@ -1481,6 +1487,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected <R extends LayerRecord> List<R> getRecordsIndex(final Geometry geometry,
     final double distance) {
     synchronized (getSync()) {
+      if (this.index == null) {
+        return Collections.emptyList();
+      }
       return (List)this.index.getRecordsDistance(geometry, distance);
     }
   }
@@ -2154,7 +2163,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     final BiPredicate<LayerRecord, LayerRecord> equalsItemFunction = LayerRecord::isSame;
     final SpatialIndex<LayerRecord> spatialIndex = //
-        new RStarTree<LayerRecord>().setEqualsItemFunction(equalsItemFunction);
+        new RStarTree<LayerRecord>(geometryFactory).setEqualsItemFunction(equalsItemFunction);
     // new LayerRecordQuadTree(geometryFactory);
     return new RecordSpatialIndex<>(spatialIndex);
   }
@@ -2393,9 +2402,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public boolean removeFromIndex(final BoundingBox boundingBox, final LayerRecord record) {
     synchronized (getSync()) {
-      // Sync before to avoid deadlock if record calls layer.getSync() during
-      // remove
-      return this.index.removeRecord(record);
+      if (this.index == null) {
+        return false;
+      } else {
+        // Sync before to avoid deadlock if record calls layer.getSync() during
+        // remove
+        return this.index.removeRecord(boundingBox, record);
+      }
     }
   }
 
@@ -2755,7 +2768,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   protected GeometryFactory setGeometryFactoryDo(final GeometryFactory geometryFactory) {
-    this.index.setGeometryFactory(geometryFactory);
+    if (this.index != null) {
+      this.index.setGeometryFactory(geometryFactory);
+    }
     return super.setGeometryFactoryDo(geometryFactory);
   }
 
@@ -2769,7 +2784,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void setIndexRecords(final List<LayerRecord> records) {
     synchronized (getSync()) {
       if (hasGeometryField()) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
         final RecordSpatialIndex<LayerRecord> index = newSpatialIndex();
         final Label cacheIdIndex = getCacheIdIndex();
         clearCachedRecords(cacheIdIndex);
