@@ -29,6 +29,7 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
   public RStarBranch(final int capacity, final RStarLeaf<T> item) {
     super(item.getBoundingBox());
     this.items = new ArrayList<>(capacity);
+    this.items.add(item);
     this.hasLeaves = true;
     recalculateBoundingBox();
   }
