@@ -45,7 +45,7 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
+import com.revolsys.geometry.model.coordinates.comparator.PointDistanceComparator;
 import com.revolsys.geometry.model.coordinates.comparator.PointComparators;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
@@ -1278,7 +1278,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
         if (splitNodes == null) {
           final double x = points.getX(index);
           final double y = points.getY(index);
-          splitNodes = new TreeSet<>(new CoordinatesDistanceComparator(x, y));
+          splitNodes = new TreeSet<>(new PointDistanceComparator(x, y));
           segmentSplitNodes.put(index, splitNodes);
           splitIndexes.add(index);
         }

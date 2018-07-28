@@ -15,6 +15,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
@@ -287,7 +288,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
       }
     }
     final Polygonal notNullPolygonal = geometryFactory.union(notNullPolygons);
-    return notNullPolygonal;
+    return (Polygonal)DouglasPeuckerSimplifier.simplify(notNullPolygonal, 0);
   }
 
   Resource getResource();

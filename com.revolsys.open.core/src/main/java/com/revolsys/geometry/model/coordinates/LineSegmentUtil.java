@@ -9,7 +9,7 @@ import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
+import com.revolsys.geometry.model.coordinates.comparator.PointDistanceComparator;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -438,7 +438,7 @@ public class LineSegmentUtil {
     line2End = line2End.convertGeometry(geometryFactory);
     if (RectangleUtil.intersects(line1Start, line1End, line2Start, line2End)) {
       final Set<Point> intersections = new TreeSet<>(
-        new CoordinatesDistanceComparator(line1Start.getX(), line1Start.getY()));
+        new PointDistanceComparator(line1Start.getX(), line1Start.getY()));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End, line1Start)) {
         intersections.add(line1Start);
       }

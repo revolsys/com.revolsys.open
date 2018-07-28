@@ -29,7 +29,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
+import com.revolsys.geometry.model.coordinates.comparator.PointDistanceComparator;
 import com.revolsys.geometry.model.coordinates.filter.CrossingLineSegmentFilter;
 import com.revolsys.geometry.model.coordinates.filter.PointOnLineSegment;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -441,7 +441,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     if (!edge.isRemoved()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
       final Node<LineSegment> toNode = edge.getToNode();
-      final CoordinatesDistanceComparator comparator = new CoordinatesDistanceComparator(
+      final PointDistanceComparator comparator = new PointDistanceComparator(
         fromNode.getX(), toNode.getY());
       final Set<Point> newPoints = new TreeSet<>(comparator);
       for (final Point point : nodes) {

@@ -147,6 +147,13 @@ public interface SpatialIndex<T> extends GeometryFactoryProxy {
   }
 
   default List<T> getItems(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
+    forEach(minX, minY, maxX, maxY, visitor);
+    return visitor.getList();
+  }
+
+  default List<T> getItems(final double minX, final double minY, final double maxX,
     final double maxY, final Predicate<? super T> filter) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(minX, minY, maxX, maxY, filter, visitor);
@@ -178,7 +185,7 @@ public interface SpatialIndex<T> extends GeometryFactoryProxy {
    * @param item the item to remove
    * @return <code>true</code> if the item was found
    */
-  boolean removeItem(BoundingBox getItems, T item);
+  boolean removeItem(BoundingBox boundingBox, T item);
 
   default void setGeometryFactory(final GeometryFactory geometryFactory) {
   }
