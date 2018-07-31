@@ -1055,6 +1055,49 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     return Double.NaN;
   }
 
+  public void simplifyStraightLines() {
+    if (this.vertexCount > 2) {
+      final double[] coordinates = getCoordinatesModified();
+
+      final int axisCount = this.axisCount;
+      int coordinateIndex = (this.vertexCount - 1) * axisCount;
+      double x2 = coordinates[coordinateIndex];
+      double y2 = coordinates[coordinateIndex + 1];
+      coordinateIndex -= axisCount;
+      double x1;
+      double y1;
+      do {
+        x1 = coordinates[coordinateIndex];
+        y1 = coordinates[coordinateIndex + 1];
+        if (x1 == x2 && y1 == y2) {
+          this.vertexCount--;
+        }
+        coordinateIndex -= axisCount;
+      } while (x1 == x2 && y1 == y2);
+      for (int vertexIndex = this.vertexCount - 3; vertexIndex >= 0; vertexIndex--) {
+        final double x = coordinates[coordinateIndex];
+        final double y = coordinates[coordinateIndex + 1];
+        boolean remove = false;
+        if (x1 == x) {
+          if (y1 == y || x == x2) {
+            remove = true;
+          }
+        } else if (y1 == y && y == y2) {
+          remove = true;
+        }
+        if (remove) {
+          deleteVertex(vertexIndex + 1);
+        } else {
+          x2 = x1;
+          y2 = y1;
+        }
+        x1 = x;
+        y1 = y;
+        coordinateIndex -= axisCount;
+      }
+    }
+  }
+
   protected void throwNegativeVertexIndex() {
     throw new IllegalArgumentException("Vertex index must be >=0");
   }

@@ -343,6 +343,12 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
     return Collections.singletonList(this);
   }
 
+  public void removeHoles() {
+    while (this.editors.size() > 1) {
+      this.editors.remove(this.editors.size() - 1);
+    }
+  }
+
   public void removeRing(final int index) {
     this.editors.remove(index);
     setModified(true);
@@ -406,5 +412,12 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
       setCoordinate(ringIndex, vertexIndex, axisIndex, coordinate);
     }
     return this;
+  }
+
+  @Override
+  public void simplifyStraightLines() {
+    for (final LinearRingEditor ringEditor : ringEditors()) {
+      ringEditor.simplifyStraightLines();
+    }
   }
 }

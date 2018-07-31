@@ -111,7 +111,8 @@ public class FileRecordLayer extends ListRecordLayer {
                 for (final Record record : reader) {
                   final Geometry geometry = record.getGeometry();
                   if (geometry != null) {
-                    if (geometryFactory == null || !geometryFactory.isHasHorizontalCoordinateSystem()) {
+                    if (geometryFactory == null
+                      || !geometryFactory.isHasHorizontalCoordinateSystem()) {
                       final GeometryFactory geometryFactory2 = geometry.getGeometryFactory();
                       if (geometryFactory2.isHasHorizontalCoordinateSystem()) {
                         setGeometryFactory(geometryFactory2);
@@ -120,8 +121,11 @@ public class FileRecordLayer extends ListRecordLayer {
                       }
                     }
                   }
-
-                  addNewRecordPersisted(record);
+                  if (isDeleted()) {
+                    return false;
+                  } else {
+                    addNewRecordPersisted(record);
+                  }
                 }
               }
             }

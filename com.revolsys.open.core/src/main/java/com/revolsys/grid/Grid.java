@@ -1,7 +1,7 @@
 package com.revolsys.grid;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
@@ -25,6 +25,23 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
   String GEOMETRY_FACTORY = "geometryFactory";
 
   int NULL_COLOUR = WebColors.colorToRGB(0, 0, 0, 0);
+
+  static void addRectangle(final GeometryFactory geometryFactory,
+    final LinkedList<Polygon> polygons, final double minX, final double minY, final double maxX,
+    final double maxY) {
+    Polygon notNullRectangle = geometryFactory.polygonRectangle(maxX, minY, maxY, minX);
+    for (final Iterator<Polygon> iterator = polygons.iterator(); iterator.hasNext();) {
+      final Polygon polygon = iterator.next();
+      if (polygon.intersects(notNullRectangle.getBoundingBox())) {
+        final Geometry union = notNullRectangle.union(polygon);
+        if (union instanceof Polygon) {
+          notNullRectangle = (Polygon)union;
+          iterator.remove();
+        }
+      }
+    }
+    polygons.add(notNullRectangle);
+  }
 
   static int getGridCellX(final double minX, final double gridCellSize, final double x) {
     final double deltaX = x - minX;
@@ -250,7 +267,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     final BoundingBox boundingBox = getBoundingBox();
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();
-    final List<Polygon> notNullPolygons = new ArrayList<>();
+    final LinkedList<Polygon> notNullPolygons = new LinkedList<>();
     final double gridCellWidth = getGridCellWidth();
     final double gridCellHeight = getGridCellHeight();
     final int gridHeight = getGridHeight();
@@ -273,8 +290,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
             final double x1 = minX + firstNotNullGridX * gridCellWidth;
             final double x2 = minX + gridX * gridCellWidth;
 
-            final Polygon nullRectangle = geometryFactory.polygonRectangle(x1, y, x2, nextY);
-            notNullPolygons.add(nullRectangle);
+            Grid.addRectangle(geometryFactory, notNullPolygons, x1, y, x2, nextY);
             lastWasNotNull = false;
             firstNotNullGridX = -1;
           }
@@ -283,8 +299,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
       if (lastWasNotNull) {
         final double x1 = minX + firstNotNullGridX * gridCellWidth;
         final double x2 = minX + gridWidth * gridCellWidth;
-        final Polygon nullRectangle = geometryFactory.polygonRectangle(x1, y, x2, nextY);
-        notNullPolygons.add(nullRectangle);
+        Grid.addRectangle(geometryFactory, notNullPolygons, x1, y, x2, nextY);
       }
     }
     final Polygonal notNullPolygonal = geometryFactory.union(notNullPolygons);
@@ -465,6 +480,12 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     final double maxY = getGridMinY();
     final double gridCellHeight = getGridCellHeight();
     return maxY + i * gridCellHeight;
+  }
+
+  default boolean hasValue(final double x, final double y) {
+    final int gridX = getGridCellX(x);
+    final int gridY = getGridCellY(y);
+    return hasValue(gridX, gridY);
   }
 
   default boolean hasValue(final int gridX, final int gridY) {

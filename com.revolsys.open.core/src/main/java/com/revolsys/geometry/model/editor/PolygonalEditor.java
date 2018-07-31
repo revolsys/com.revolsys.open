@@ -7,4 +7,10 @@ public interface PolygonalEditor extends GeometryEditor<PolygonEditor>, Polygona
   Polygonal newGeometry();
 
   Iterable<PolygonEditor> polygonEditors();
+
+  default void simplifyStraightLines() {
+    for (final PolygonEditor polygonEditor : polygonEditors()) {
+      polygonEditor.simplifyStraightLines();
+    }
+  }
 }

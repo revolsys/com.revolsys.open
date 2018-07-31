@@ -158,4 +158,5 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
   public String toString() {
     return toEwkt();
   }
+
 }

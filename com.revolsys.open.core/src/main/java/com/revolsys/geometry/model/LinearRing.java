@@ -394,7 +394,7 @@ public interface LinearRing extends LineString {
 
   @Override
   default LinearRing newGeometry(final GeometryFactory geometryFactory) {
-    return geometryFactory.linearRing(this);
+    return (LinearRing)LineString.super.newGeometry(geometryFactory);
   }
 
   @Override
