@@ -18,7 +18,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.test.model.GeometryTestUtil;
-import com.revolsys.geometry.test.model.TestUtil;
+import com.revolsys.geometry.test.model.GeometryAssertUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
@@ -174,7 +174,7 @@ public class RecordIoTestSuite {
         // Allow for conversion of multi part to single part
         if (expectedGeometry.getGeometryCount() != 1
           || !actualGeometry.equals(axisCount, expectedGeometry.getGeometry(0))) {
-          TestUtil.failNotEquals("Geometry Equal Exact", expectedGeometry, actualGeometry);
+          GeometryAssertUtil.failNotEquals("Geometry Equal Exact", expectedGeometry, actualGeometry);
         }
       }
     }

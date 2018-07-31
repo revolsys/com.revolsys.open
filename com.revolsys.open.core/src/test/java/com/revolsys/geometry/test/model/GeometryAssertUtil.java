@@ -12,7 +12,7 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.Resource;
 
-public class TestUtil {
+public class GeometryAssertUtil {
 
   public static boolean assertEqualsExact(final int axisCount, final Geometry expectedGeometry,
     final Geometry actualGeometry) {

@@ -41,7 +41,7 @@ public class PointTest implements TestConstants {
       final double value = point.getCoordinate(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {
         if (!Double.isNaN(value)) {
-          TestUtil.failNotEquals("Value NaN", Double.NaN, value);
+          GeometryAssertUtil.failNotEquals("Value NaN", Double.NaN, value);
         }
       } else {
         Assert.assertEquals("Coordinate Value", coordinates[axisIndex], value, 0);
@@ -58,7 +58,7 @@ public class PointTest implements TestConstants {
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
       final double value = point.getCoordinate(axisIndex);
       if (!Double.isNaN(value)) {
-        TestUtil.failNotEquals("Value NaN", Double.NaN, value);
+        GeometryAssertUtil.failNotEquals("Value NaN", Double.NaN, value);
       }
     }
   }
@@ -239,7 +239,7 @@ public class PointTest implements TestConstants {
 
   @Test
   public void testFromFile() {
-    TestUtil.doTestGeometry(getClass(), "Point.csv");
+    GeometryAssertUtil.doTestGeometry(getClass(), "Point.csv");
   }
 
   @Test

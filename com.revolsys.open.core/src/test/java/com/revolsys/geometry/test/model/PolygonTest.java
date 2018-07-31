@@ -32,7 +32,7 @@ public class PolygonTest {
 
   @Test
   public void testFromFile() {
-    TestUtil.doTestGeometry(getClass(), "Polygon.csv");
+    GeometryAssertUtil.doTestGeometry(getClass(), "Polygon.csv");
   }
 
   @Test

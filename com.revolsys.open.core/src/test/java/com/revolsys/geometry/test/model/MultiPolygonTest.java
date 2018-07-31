@@ -6,6 +6,6 @@ public class MultiPolygonTest {
 
   @Test
   public void testFromFile() {
-    TestUtil.doTestGeometry(getClass(), "MultiPolygon.csv");
+    GeometryAssertUtil.doTestGeometry(getClass(), "MultiPolygon.csv");
   }
 }

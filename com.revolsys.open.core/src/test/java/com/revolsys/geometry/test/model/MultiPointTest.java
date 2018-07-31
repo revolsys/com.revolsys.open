@@ -6,6 +6,6 @@ public class MultiPointTest {
 
   @Test
   public void testFromFile() {
-    TestUtil.doTestGeometry(getClass(), "MultiPoint.csv");
+    GeometryAssertUtil.doTestGeometry(getClass(), "MultiPoint.csv");
   }
 }

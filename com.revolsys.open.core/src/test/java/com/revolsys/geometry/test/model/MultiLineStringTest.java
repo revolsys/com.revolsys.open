@@ -6,6 +6,6 @@ public class MultiLineStringTest {
 
   @Test
   public void testFromFile() {
-    TestUtil.doTestGeometry(getClass(), "MultiLineString.csv");
+    GeometryAssertUtil.doTestGeometry(getClass(), "MultiLineString.csv");
   }
 }

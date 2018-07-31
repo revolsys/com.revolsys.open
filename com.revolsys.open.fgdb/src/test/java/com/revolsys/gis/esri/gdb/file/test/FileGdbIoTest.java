@@ -11,7 +11,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.test.model.TestUtil;
+import com.revolsys.geometry.test.model.GeometryAssertUtil;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.io.FileUtil;
@@ -84,7 +84,7 @@ public class FileGdbIoTest {
             // Allow for conversion of multi part to single part
             if (geometry.getGeometryCount() != 1
               || !actual.equals(geometryAxisCount, geometry.getGeometry(0))) {
-              TestUtil.failNotEquals("Geometry Equal Exact", geometry, actual);
+              GeometryAssertUtil.failNotEquals("Geometry Equal Exact", geometry, actual);
             }
           }
         }

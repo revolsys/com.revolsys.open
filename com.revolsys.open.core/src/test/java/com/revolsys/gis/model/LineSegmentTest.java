@@ -11,7 +11,7 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
-import com.revolsys.geometry.test.model.TestUtil;
+import com.revolsys.geometry.test.model.GeometryAssertUtil;
 
 public class LineSegmentTest {
   private static final GeometryFactory GEOMETRY_FACTORY_2D = GeometryFactory.fixed2d(3005, 1000.0,
@@ -44,8 +44,8 @@ public class LineSegmentTest {
     final LineSegment line2 = new LineSegmentDoubleGF(GEOMETRY_FACTORY_3D, line2Start, line2End);
 
     final Geometry intersection = line1.getIntersection(line2);
-    if (!TestUtil.equalsExact(3, intersection, expectedIntersection)) {
-      TestUtil.failNotEquals("Equals Exact", expectedIntersection, intersection);
+    if (!GeometryAssertUtil.equalsExact(3, intersection, expectedIntersection)) {
+      GeometryAssertUtil.failNotEquals("Equals Exact", expectedIntersection, intersection);
     }
   }
 
@@ -59,7 +59,7 @@ public class LineSegmentTest {
     final LineSegment line = new LineSegmentDoubleGF(GEOMETRY_FACTORY_2D, 2, lx1, ly1, lx2, ly2);
 
     final Geometry intersection = line1.getIntersection(line2);
-    TestUtil.equalsExact(2, intersection, line);
+    GeometryAssertUtil.equalsExact(2, intersection, line);
   }
 
   @Test

@@ -19,6 +19,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -301,14 +302,12 @@ public class BoundingBoxTest implements TestConstants {
         final BoundingBox noGeometryFactory = noGf.newBoundingBox(axisCount, points);
         assertBoundingBox(null, noGeometryFactory, noGf, false, axisCount, bounds);
 
-        final GeometryFactory gfFloating = GeometryFactory.floating(EpsgId.WGS84,
-          axisCount);
+        final GeometryFactory gfFloating = GeometryFactory.floating(EpsgId.WGS84, axisCount);
         assertBoundingBox(null, gfFloating.newBoundingBox(axisCount, points), gfFloating, false,
           axisCount, bounds);
 
         final double[] scales = GeometryFactory.newScalesFixed(axisCount, 10.0);
-        final GeometryFactory gfFixed = GeometryFactory.fixed(EpsgId.WGS84,
-          axisCount, scales);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(EpsgId.WGS84, axisCount, scales);
 
         points = gfFixed.getPrecise(points);
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
@@ -377,14 +376,12 @@ public class BoundingBoxTest implements TestConstants {
         final BoundingBox noGeometryFactory = noGf.newBoundingBox(axisCount, points);
         assertBoundingBox(null, noGeometryFactory, noGf, false, axisCount, bounds);
 
-        final GeometryFactory gfFloating = GeometryFactory.floating(EpsgId.WGS84,
-          axisCount);
+        final GeometryFactory gfFloating = GeometryFactory.floating(EpsgId.WGS84, axisCount);
         assertBoundingBox(null, gfFloating.newBoundingBox(axisCount, points), gfFloating, false,
           axisCount, bounds);
 
         final double[] scales = GeometryFactory.newScalesFixed(axisCount, 10.0);
-        final GeometryFactory gfFixed = GeometryFactory.fixed(EpsgId.WGS84,
-          axisCount, scales);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(EpsgId.WGS84, axisCount, scales);
 
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
         assertBoundingBox(null, gfFixed.newBoundingBox(axisCount, points), gfFixed, false,
@@ -483,5 +480,21 @@ public class BoundingBoxTest implements TestConstants {
       final BoundingBox boundingBox10 = geometry1.getBoundingBox();
       assertBoundingBox(geometry1, boundingBox10, geometryFactory, false, 2, 1.0, 2.0, 1.0, 2.0);
     }
+  }
+
+  @Test
+  public void testToPolygon() {
+    final BoundingBox boundingBox = GeometryFactory.DEFAULT_2D.newBoundingBox(0, 0, 7, 7);
+    final Polygon expectedPolygon2 = GeometryFactory.DEFAULT_2D.polygon(2, 0, 0, 3.5, 0, 7, 0, 7,
+      3.5, 7, 7, 3.5, 7, 0, 7, 0, 3.5, 0, 0);
+    final Polygon actualPolygon2 = boundingBox.toPolygon(2);
+    GeometryAssertUtil.assertEqualsExact(2, expectedPolygon2, actualPolygon2);
+
+    final Polygon expectedPolygon3 = GeometryFactory.DEFAULT_2D.polygon(2, 0, 0, 2.3333333333333335,
+      0, 4.666666666666667, 0, 7, 0, 7, 2.3333333333333335, 7, 4.666666666666667, 7, 7,
+      4.666666666666667, 7, 2.3333333333333335, 7, 0, 7, 0, 4.666666666666667, 0,
+      2.3333333333333335, 0, 0);
+    final Polygon actualPolygon3 = boundingBox.toPolygon(3);
+    GeometryAssertUtil.assertEqualsExact(2, expectedPolygon3, actualPolygon3);
   }
 }

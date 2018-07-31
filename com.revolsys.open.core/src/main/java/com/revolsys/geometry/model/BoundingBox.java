@@ -1494,39 +1494,39 @@ public interface BoundingBox
         final double[] coordinates = new double[coordinateCount * 2];
         int i = 0;
 
-        coordinates[i++] = maxX;
+        coordinates[i++] = minX;
         coordinates[i++] = minY;
-        for (int j = 0; j < numX - 1; j++) {
-          final double x = maxX - j * xStep;
+        for (int j = 1; j < numX; j++) {
+          final double x = minX + j * xStep;
           coordinates[i++] = x;
           coordinates[i++] = minY;
         }
-        coordinates[i++] = minX;
+        coordinates[i++] = maxX;
         coordinates[i++] = minY;
 
-        for (int j = 0; j < numY - 1; j++) {
+        for (int j = 1; j < numY; j++) {
           final double y = minY + j * yStep;
-          coordinates[i++] = minX;
+          coordinates[i++] = maxX;
           coordinates[i++] = y;
         }
-        coordinates[i++] = minX;
+        coordinates[i++] = maxX;
         coordinates[i++] = maxY;
 
-        for (int j = 0; j < numX - 1; j++) {
+        for (int j = numX - 1; j > 0; j--) {
           final double x = minX + j * xStep;
           coordinates[i++] = x;
           coordinates[i++] = maxY;
         }
 
-        coordinates[i++] = maxX;
+        coordinates[i++] = minX;
         coordinates[i++] = maxY;
 
-        for (int j = 0; j < numY - 1; j++) {
-          final double y = minY + (numY - j) * yStep;
-          coordinates[i++] = maxX;
+        for (int j = numY - 1; j > 0; j--) {
+          final double y = minY + j * yStep;
+          coordinates[i++] = minX;
           coordinates[i++] = y;
         }
-        coordinates[i++] = maxX;
+        coordinates[i++] = minX;
         coordinates[i++] = minY;
 
         final LinearRing ring = factory.linearRing(2, coordinates);

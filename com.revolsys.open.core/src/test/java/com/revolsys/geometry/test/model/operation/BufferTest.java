@@ -15,7 +15,7 @@ import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
-import com.revolsys.geometry.test.model.TestUtil;
+import com.revolsys.geometry.test.model.GeometryAssertUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.spring.resource.ClassPathResource;
@@ -174,7 +174,7 @@ public class BufferTest extends TestCase {
     }
     if (this.expected != null) {
       if (!actual.equals(2, this.expected)) {
-        TestUtil.failNotEquals(message("Geometry Equal", actual), this.expected, actual);
+        GeometryAssertUtil.failNotEquals(message("Geometry Equal", actual), this.expected, actual);
       }
     }
     if (this.expectedContains != null) {
