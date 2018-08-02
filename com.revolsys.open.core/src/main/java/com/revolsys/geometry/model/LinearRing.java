@@ -459,7 +459,7 @@ public interface LinearRing extends LineString {
     }
   }
 
-  default LinearRing normalize(final boolean clockwise) {
+  default LinearRing normalize(final ClockDirection clockDirection) {
     if (isEmpty()) {
       return this;
     } else {
@@ -468,10 +468,10 @@ public interface LinearRing extends LineString {
       if (index > 0) {
         ring = scroll(ring, index);
       }
-      if (ring.isCounterClockwise() == clockwise) {
-        return ring.reverse();
-      } else {
+      if (ring.getClockDirection() == clockDirection) {
         return ring;
+      } else {
+        return ring.reverse();
       }
     }
   }

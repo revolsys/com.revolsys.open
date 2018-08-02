@@ -29,7 +29,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
   static void addRectangle(final GeometryFactory geometryFactory,
     final LinkedList<Polygon> polygons, final double minX, final double minY, final double maxX,
     final double maxY) {
-    Polygon notNullRectangle = geometryFactory.polygonRectangle(maxX, minY, maxY, minX);
+    Polygon notNullRectangle = geometryFactory.newRectangleCorners(minX, minY, maxX, maxY);
     for (final Iterator<Polygon> iterator = polygons.iterator(); iterator.hasNext();) {
       final Polygon polygon = iterator.next();
       if (polygon.intersects(notNullRectangle.getBoundingBox())) {

@@ -8,6 +8,14 @@ import com.revolsys.geometry.model.LinearRing;
 public class LinearRingEditor extends LineStringEditor implements LinearRing {
   private static final long serialVersionUID = 1L;
 
+  public static LinearRingEditor getEditor(final LinearRing ring) {
+    if (ring instanceof LinearRingEditor) {
+      return (LinearRingEditor)ring;
+    } else {
+      return new LinearRingEditor(ring);
+    }
+  }
+
   public LinearRingEditor(final AbstractGeometryEditor<?> parentEditor) {
     this(parentEditor, parentEditor.getGeometryFactory().linearRing());
   }
@@ -151,6 +159,33 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
       return super.setZ(lastVertexIndex, m);
     } else {
       return super.setZ(vertexIndex, m);
+    }
+  }
+
+  @Override
+  public void simplifyStraightLines() {
+    super.simplifyStraightLines();
+    if (this.vertexCount > 2) {
+      final int previousCoordinateIndex = (this.vertexCount - 1) * this.axisCount;
+      final double x1 = this.coordinates[previousCoordinateIndex];
+      final double y1 = this.coordinates[previousCoordinateIndex + 1];
+      final double x = this.coordinates[0];
+      final double y = this.coordinates[1];
+      final int nextCoordinateIndex = this.axisCount;
+      final double x2 = this.coordinates[nextCoordinateIndex];
+      final double y2 = this.coordinates[nextCoordinateIndex + 1];
+
+      boolean remove = false;
+      if (x1 == x) {
+        if (y1 == y || x == x2) {
+          remove = true;
+        }
+      } else if (y1 == y && y == y2) {
+        remove = true;
+      }
+      if (remove) {
+        deleteVertex(0);
+      }
     }
   }
 

@@ -842,10 +842,11 @@ public interface Polygon extends Polygonal {
     if (isEmpty()) {
       return this;
     } else {
-      final LinearRing exteriorRing = getShell().normalize(true);
+      final LinearRing shell = getShell();
+      final LinearRing exteriorRing = shell.normalize(ClockDirection.COUNTER_CLOCKWISE);
       final List<LinearRing> rings = new ArrayList<>();
       for (final LinearRing hole : holes()) {
-        final LinearRing normalizedHole = hole.normalize(false);
+        final LinearRing normalizedHole = hole.normalize(ClockDirection.CLOCKWISE);
         rings.add(normalizedHole);
       }
       Collections.sort(rings);
@@ -878,6 +879,16 @@ public interface Polygon extends Polygonal {
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
       return geometryFactory.polygon(rings);
+    }
+  }
+
+  default Polygon removeHoles() {
+    if (getHoleCount() == 0) {
+      return this;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final LinearRing shell = getShell();
+      return geometryFactory.polygon(shell);
     }
   }
 

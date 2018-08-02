@@ -29,6 +29,12 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   private final List<LinearRingEditor> editors = new ArrayList<>();
 
   public PolygonEditor(final AbstractGeometryCollectionEditor<?, ?, ?> parentEditor,
+    final LinearRingEditor linearRingEditor) {
+    super(parentEditor);
+    this.editors.add(linearRingEditor);
+  }
+
+  public PolygonEditor(final AbstractGeometryCollectionEditor<?, ?, ?> parentEditor,
     final Polygon polygon) {
     super(parentEditor, polygon);
     this.polygon = polygon;
@@ -343,10 +349,12 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
     return Collections.singletonList(this);
   }
 
-  public void removeHoles() {
+  @Override
+  public Polygon removeHoles() {
     while (this.editors.size() > 1) {
       this.editors.remove(this.editors.size() - 1);
     }
+    return this;
   }
 
   public void removeRing(final int index) {

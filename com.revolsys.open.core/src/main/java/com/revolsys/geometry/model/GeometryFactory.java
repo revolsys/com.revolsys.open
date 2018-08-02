@@ -2000,6 +2000,20 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return new RectangleXY(this, x, y, width, height);
   }
 
+  public RectangleXY newRectangleCorners(double x1, double y1, double x2, double y2) {
+    if (x1 > x2) {
+      final double t = x1;
+      x1 = x2;
+      x2 = t;
+    }
+    if (y1 > y2) {
+      final double t = y1;
+      y1 = y2;
+      y2 = t;
+    }
+    return new RectangleXY(this, x1, y1, x2 - x1, y2 - y1);
+  }
+
   public double[] newScales(final int axisCount) {
     return new double[axisCount];
   }
@@ -2259,12 +2273,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     } else {
       return new MultiPolygonImpl(this, polygons);
     }
-  }
-
-  public Polygon polygonRectangle(final double x1, final double y1, final double x2,
-    final double y2) {
-    final LinearRing ring = linearRing(this.axisCount, x1, y1, x2, y1, x2, y2, x1, y2, x1, y1);
-    return new PolygonImpl(this, ring);
   }
 
   /**

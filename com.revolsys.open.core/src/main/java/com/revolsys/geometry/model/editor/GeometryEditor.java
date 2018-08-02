@@ -3,10 +3,47 @@ package com.revolsys.geometry.model.editor;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.vertex.Vertex;
 
 public interface GeometryEditor<GE extends GeometryEditor<?>> extends Geometry {
+
+  static LinearRingEditor newLinearRing(final GeometryFactoryProxy factory) {
+    final GeometryFactory geometryFactory = factory.getGeometryFactory();
+    return new LinearRingEditor(geometryFactory);
+  }
+
+  static LineStringEditor newLineString(final GeometryFactoryProxy factory) {
+    final GeometryFactory geometryFactory = factory.getGeometryFactory();
+    return new LineStringEditor(geometryFactory);
+  }
+
+  static MultiLineStringEditor newMultiLineString(final GeometryFactoryProxy factory) {
+    final GeometryFactory geometryFactory = factory.getGeometryFactory();
+    return new MultiLineStringEditor(geometryFactory);
+  }
+
+  static MultiPointEditor newMultiPoint(final GeometryFactoryProxy factory) {
+    final GeometryFactory geometryFactory = factory.getGeometryFactory();
+    return new MultiPointEditor(geometryFactory);
+  }
+
+  static MultiPolygonEditor newMultiPolygon(final GeometryFactoryProxy factory) {
+    final GeometryFactory geometryFactory = factory.getGeometryFactory();
+    return new MultiPolygonEditor(geometryFactory);
+  }
+
+  static PointEditor newPoint(final GeometryFactoryProxy factory) {
+    final GeometryFactory geometryFactory = factory.getGeometryFactory();
+    return new PointEditor(geometryFactory);
+  }
+
+  static PolygonEditor newPolygon(final GeometryFactoryProxy factory) {
+    final GeometryFactory geometryFactory = factory.getGeometryFactory();
+    return new PolygonEditor(geometryFactory);
+  }
+
   default GeometryEditor<?> appendVertex(final int[] geometryId,
     final GeometryDataType<?, ?> partDataType, final Point point) {
     return appendVertex(geometryId, point);

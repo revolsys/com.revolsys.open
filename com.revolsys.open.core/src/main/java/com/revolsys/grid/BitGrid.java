@@ -240,4 +240,16 @@ public class BitGrid extends AbstractGrid {
       this.words[wordIndex] &= ~(1L << bitIndex);
     }
   }
+
+  public void setXFlags(final int minGridX, final int maxGridX, final int gridY) {
+    for (int gridX = minGridX + 1; gridX < maxGridX; gridX++) {
+      setFlag(gridX, gridY);
+    }
+  }
+
+  public void setYFlags(final int gridX, final int minGridY, final int maxGridY) {
+    for (int gridY = minGridY + 1; gridY < maxGridY; gridY++) {
+      setFlag(gridX, gridY);
+    }
+  }
 }
