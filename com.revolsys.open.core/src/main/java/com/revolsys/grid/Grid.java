@@ -511,6 +511,23 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     return Double.isNaN(elevation);
   }
 
+  default BitGrid newBitGrid() {
+    final BoundingBox boundingBox = getBoundingBox();
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
+    final BitGrid bitGrid = BitGrid.newBitGrid(boundingBox, gridCellWidth, gridCellHeight);
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      for (int gridX = 0; gridX < gridWidth; gridX++) {
+        if (hasValue(gridX, gridY)) {
+          bitGrid.setFlag(gridX, gridY);
+        }
+      }
+    }
+    return bitGrid;
+  }
+
   default Grid newGrid(final BoundingBox boundingBox, final double gridCellSize) {
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
     final int minX = (int)boundingBox.getMinX();
