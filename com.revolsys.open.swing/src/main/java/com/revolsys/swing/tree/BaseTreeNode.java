@@ -191,8 +191,8 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
 
   @Override
   public int compareTo(final BaseTreeNode other) {
-    final String name1 = getName();
-    final String name2 = other.getName();
+    final String name1 = getName().toLowerCase();
+    final String name2 = other.getName().toLowerCase();
     return name1.compareTo(name2);
   }
 
