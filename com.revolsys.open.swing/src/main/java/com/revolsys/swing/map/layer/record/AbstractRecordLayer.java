@@ -608,6 +608,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     fireHighlighted();
   }
 
+  protected void clearIndex() {
+    this.index = null;
+  }
+
   public void clearSelectedRecords() {
     final List<LayerRecord> selectedRecords = getSelectedRecords();
     synchronized (getSync()) {

@@ -95,6 +95,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
     synchronized (this.records) {
       this.records.clear();
     }
+    clearIndex();
     cleanCachedRecords();
   }
 
