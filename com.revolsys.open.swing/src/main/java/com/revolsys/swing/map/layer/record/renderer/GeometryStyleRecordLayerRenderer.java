@@ -143,7 +143,9 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
         style.setFillStyle(viewport, graphics);
         graphics.fill(polygon);
         style.setLineStyle(viewport, graphics);
-        graphics.draw(polygon);
+        for (final LinearRing ring : polygon.getRings()) {
+          graphics.draw(ring);
+        }
       } finally {
         graphics.setPaint(paint);
       }
@@ -289,7 +291,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
   }
 
   @Override
-  public void renderRecord(final Viewport2D viewport, Cancellable cancellable,
+  public void renderRecord(final Viewport2D viewport, final Cancellable cancellable,
     final BoundingBox visibleArea, final AbstractRecordLayer layer, final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
     viewport.drawGeometry(geometry, this.style);

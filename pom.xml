@@ -110,7 +110,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
+        <version>3.0.1</version>
         <configuration>
           <failOnError>false</failOnError>
           <quiet>yes</quiet>
@@ -132,7 +132,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.6</version>
+        <version>3.2.2</version>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
@@ -288,7 +288,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
+        <version>3.0.1</version>
         <configuration>
           <detectLinks>true</detectLinks>
           <detectJavaApiLink>true</detectJavaApiLink>
@@ -554,8 +554,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <com.sun.tools.path>${java.home}/../lib/tools.jar</com.sun.tools.path>
     <org.slf4j.version>1.7.21</org.slf4j.version>
-    <org.springframework.version>4.1.9.RELEASE</org.springframework.version>
-    <org.springframework.security.version>4.0.2.RELEASE</org.springframework.security.version>
+    <org.springframework.version>4.2.5.RELEASE</org.springframework.version>
+    <org.springframework.security.version>4.0.4.RELEASE</org.springframework.security.version>
     <org.codehaus.groovy.version>2.4.5</org.codehaus.groovy.version>
     <gpg.skip>true</gpg.skip>
     <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
