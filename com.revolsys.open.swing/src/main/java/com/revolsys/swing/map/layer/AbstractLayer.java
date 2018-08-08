@@ -559,7 +559,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   @Override
   public boolean isEditable(final double scale) {
-    return isVisible(scale) && isEditable();
+    return isVisible(scale) && isEditable() && !isReadOnly();
   }
 
   public boolean isEventsEnabled() {

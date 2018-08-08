@@ -2,7 +2,6 @@ package com.revolsys.geometry.model.editor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -122,7 +121,7 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
 
   @Override
   public Iterable<GE> editors() {
-    return Collections.unmodifiableList(this.editors);
+    return this.editors;
   }
 
   @Override

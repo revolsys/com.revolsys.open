@@ -164,9 +164,10 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
 
   @Override
   public void simplifyStraightLines() {
+
     super.simplifyStraightLines();
     if (this.vertexCount > 2) {
-      final int previousCoordinateIndex = (this.vertexCount - 1) * this.axisCount;
+      final int previousCoordinateIndex = (this.vertexCount - 2) * this.axisCount;
       final double x1 = this.coordinates[previousCoordinateIndex];
       final double y1 = this.coordinates[previousCoordinateIndex + 1];
       final double x = this.coordinates[0];
