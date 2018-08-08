@@ -36,21 +36,33 @@ public class BaseMain implements UncaughtExceptionHandler {
   }
 
   protected static void setMacDockIcon(final Image image) {
-    try {
-      final Class<?> clazz = Class.forName("com.apple.eawt.Application");
-      final Method appMethod = clazz.getMethod("getApplication");
-      final Object application = appMethod.invoke(clazz);
-      if (image != null) {
-        MethodUtils.invokeMethod(application, "setDockIconImage", image);
+    final String version = System.getProperty("java.version");
+    if (version.startsWith("1.8")) {
+      try {
+        final Class<?> clazz = Class.forName("com.apple.eawt.Application");
+        final Method appMethod = clazz.getMethod("getApplication");
+        final Object application = appMethod.invoke(clazz);
+        if (image != null) {
+          MethodUtils.invokeMethod(application, "setDockIconImage", image);
+        }
+        final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
+        final Object closeAllWindows = quitStrategyClass.getField("CLOSE_ALL_WINDOWS")
+          .get(quitStrategyClass);
+        MethodUtils.invokeExactMethod(application, "setQuitStrategy", closeAllWindows);
+        MacApplicationListenerHandler.init(application);
+      } catch (final ClassNotFoundException t) {
+      } catch (final Throwable t) {
+        t.printStackTrace();
       }
-      final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
-      final Object closeAllWindows = quitStrategyClass.getField("CLOSE_ALL_WINDOWS")
-        .get(quitStrategyClass);
-      MethodUtils.invokeExactMethod(application, "setQuitStrategy", closeAllWindows);
-      MacApplicationListenerHandler.init(application);
-    } catch (final ClassNotFoundException t) {
-    } catch (final Throwable t) {
-      t.printStackTrace();
+    } else {
+      try {
+        final Class<?> clazz = Class.forName("com.revolsys.swing.desktop.DesktopInitializer");
+        final Method initializeMethod = clazz.getMethod("initialize", Image.class);
+        initializeMethod.invoke(clazz, image);
+      } catch (final ClassNotFoundException t) {
+      } catch (final Throwable t) {
+        t.printStackTrace();
+      }
     }
   }
 

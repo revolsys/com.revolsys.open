@@ -5,6 +5,7 @@ com.revolsys.open.fgdb
 com.revolsys.open.gdal
 com.revolsys.open.geopackage
 com.revolsys.open.javac
+com.revolsys.open.java10
 com.revolsys.open.maki
 com.revolsys.open.oracle
 com.revolsys.open.postgresql

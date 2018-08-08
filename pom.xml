@@ -59,6 +59,7 @@
     <module>com.revolsys.open.web</module>
     <module>war-overlay</module>
     <module>com.revolsys.open.coordinatesystems</module>
+ <!--   <module>com.revolsys.open.java10</module> -->
   </modules>
 
   <build>
@@ -66,7 +67,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version>
+        <version>3.8.0</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
