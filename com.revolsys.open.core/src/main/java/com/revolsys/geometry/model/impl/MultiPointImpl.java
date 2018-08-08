@@ -59,8 +59,6 @@ import com.revolsys.util.function.Consumer3Double;
 public class MultiPointImpl implements MultiPoint {
   private static final long serialVersionUID = -8048474874175355449L;
 
-  private static final Point[] EMPTY_POINTS = new Point[0];
-
   /**
    *  The bounding box of this <code>Geometry</code>.
    */
@@ -73,7 +71,7 @@ public class MultiPointImpl implements MultiPoint {
   public MultiPointImpl(final GeometryFactory geometryFactory, final Point... points) {
     this.geometryFactory = geometryFactory;
     if (points == null || points.length == 0) {
-      this.points = EMPTY_POINTS;
+      throw new IllegalArgumentException("MultiLineString must not be empty");
     } else if (Geometry.hasNullElements(points)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -163,6 +161,13 @@ public class MultiPointImpl implements MultiPoint {
   }
 
   @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final Geometry geometry : this.points) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.points) {
@@ -171,16 +176,10 @@ public class MultiPointImpl implements MultiPoint {
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.points) {
       geometry.forEachVertex(coordinates, action);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final Consumer3Double action) {
-    for (final Geometry geometry : this.points) {
-      geometry.forEachVertex(action);
     }
   }
 
@@ -232,7 +231,7 @@ public class MultiPointImpl implements MultiPoint {
 
   @Override
   public boolean isEmpty() {
-    return this.points.length == 0;
+    return false;
   }
 
   @Override

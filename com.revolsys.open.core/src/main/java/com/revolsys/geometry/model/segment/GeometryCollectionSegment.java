@@ -5,10 +5,9 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.AbstractLineString;
 import com.revolsys.geometry.model.vertex.Vertex;
 
-public class GeometryCollectionSegment extends AbstractLineString implements Segment {
+public class GeometryCollectionSegment extends AbstractLineSegment implements Segment {
   private static final long serialVersionUID = 1L;
 
   private final Geometry geometryCollection;

@@ -66,8 +66,6 @@ import com.revolsys.util.function.Function4Double;
 public class MultiPolygonImpl implements MultiPolygon {
   private static final long serialVersionUID = 8166665132445433741L;
 
-  private static final Polygon[] EMPTY_POLYGONS = new Polygon[0];
-
   private BoundingBox boundingBox;
 
   private final GeometryFactory geometryFactory;
@@ -77,7 +75,7 @@ public class MultiPolygonImpl implements MultiPolygon {
   public MultiPolygonImpl(final GeometryFactory geometryFactory, final Polygon... polygons) {
     this.geometryFactory = geometryFactory;
     if (polygons == null || polygons.length == 0) {
-      this.polygons = EMPTY_POLYGONS;
+      throw new IllegalArgumentException("MultiPolygon must not be empty");
     } else if (Geometry.hasNullElements(polygons)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -194,6 +192,13 @@ public class MultiPolygonImpl implements MultiPolygon {
   }
 
   @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final Geometry geometry : this.polygons) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.polygons) {
@@ -202,16 +207,10 @@ public class MultiPolygonImpl implements MultiPolygon {
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.polygons) {
       geometry.forEachVertex(coordinates, action);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final Consumer3Double action) {
-    for (final Geometry geometry : this.polygons) {
-      geometry.forEachVertex(action);
     }
   }
 
@@ -267,7 +266,7 @@ public class MultiPolygonImpl implements MultiPolygon {
 
   @Override
   public boolean isEmpty() {
-    return this.polygons.length == 0;
+    return false;
   }
 
   @Override

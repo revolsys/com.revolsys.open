@@ -7,10 +7,9 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
-import com.revolsys.geometry.model.impl.AbstractLineString;
 import com.revolsys.geometry.model.vertex.Vertex;
 
-public class MultiLineStringSegment extends AbstractLineString
+public class MultiLineStringSegment extends AbstractLineSegment
   implements Iterator<Segment>, Segment {
   private static final long serialVersionUID = 1L;
 

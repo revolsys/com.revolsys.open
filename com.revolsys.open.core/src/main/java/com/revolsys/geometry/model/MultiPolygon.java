@@ -39,6 +39,7 @@ import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.MultiPolygonEditor;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 import com.revolsys.geometry.model.segment.MultiPolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
@@ -78,6 +79,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
     return this;
   }
 
+  @Override
   default Polygonal clipRectangle(double x1, double y1, double x2, double y2) {
     if (x1 > x2) {
       final double t = x1;
@@ -246,6 +248,25 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
       }
     }
     return false;
+  }
+
+  @Override
+  default Geometry intersectionRectangle(final RectangleXY rectangle) {
+    boolean modified = false;
+    final List<Geometry> parts = new ArrayList<>();
+    for (final Geometry part : getPolygons()) {
+      final Geometry partIntersection = part.intersectionRectangle(rectangle);
+      if (partIntersection != part) {
+        modified = true;
+      }
+      parts.add(part);
+    }
+    if (modified) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.geometry(parts);
+    } else {
+      return this;
+    }
   }
 
   @Override

@@ -83,7 +83,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
   private FastSegmentSetIntersectionFinder segIntFinder = null;
 
   public PreparedPolygon(final Polygon polygon) {
-    super(polygon.getGeometryFactory(), prepareRings(polygon));
+    super(polygon.getGeometryFactory(), prepareRings(polygon), polygon.getRingCount());
     this.isRectangle = polygon.isRectangle();
   }
 

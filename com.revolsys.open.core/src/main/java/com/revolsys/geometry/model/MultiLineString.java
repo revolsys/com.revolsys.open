@@ -44,6 +44,7 @@ import javax.measure.quantity.Area;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.MultiLineStringEditor;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.prep.PreparedMultiLineString;
 import com.revolsys.geometry.model.segment.MultiLineStringSegment;
 import com.revolsys.geometry.model.segment.Segment;
@@ -251,6 +252,25 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       }
     }
     return false;
+  }
+
+  @Override
+  default Geometry intersectionRectangle(final RectangleXY rectangle) {
+    boolean modified = false;
+    final List<Geometry> parts = new ArrayList<>();
+    for (final Geometry part : getLineStrings()) {
+      final Geometry partIntersection = part.intersectionRectangle(rectangle);
+      if (partIntersection != part) {
+        modified = true;
+      }
+      parts.add(part);
+    }
+    if (modified) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.geometry(parts);
+    } else {
+      return this;
+    }
   }
 
   @Override

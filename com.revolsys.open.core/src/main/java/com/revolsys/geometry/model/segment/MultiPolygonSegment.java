@@ -9,10 +9,9 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.impl.AbstractLineString;
 import com.revolsys.geometry.model.vertex.Vertex;
 
-public class MultiPolygonSegment extends AbstractLineString implements Iterator<Segment>, Segment {
+public class MultiPolygonSegment extends AbstractLineSegment implements Iterator<Segment>, Segment {
   private static final long serialVersionUID = 1L;
 
   private int partIndex;

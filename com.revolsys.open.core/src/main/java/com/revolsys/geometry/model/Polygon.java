@@ -48,6 +48,7 @@ import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PolygonEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
@@ -55,6 +56,8 @@ import com.revolsys.geometry.model.segment.PolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PolygonVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.operation.overlay.OverlayOp;
+import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
 import com.revolsys.geometry.operation.polygonize.Polygonizer;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.util.Property;
@@ -627,6 +630,11 @@ public interface Polygon extends Polygonal {
       }
       return holes;
     }
+  }
+
+  @Override
+  default Geometry intersectionRectangle(final RectangleXY rectangle) {
+    return SnapIfNeededOverlayOp.overlayOp(this, rectangle, OverlayOp.INTERSECTION);
   }
 
   @Override

@@ -78,8 +78,6 @@ import com.revolsys.util.function.Function4Double;
 public class PolygonImpl extends AbstractPolygon {
   private static final long serialVersionUID = 1L;
 
-  private static final LinearRing[] EMPTY_RINGS = new LinearRing[0];
-
   private BoundingBox boundingBox;
 
   /**
@@ -89,9 +87,15 @@ public class PolygonImpl extends AbstractPolygon {
 
   private LinearRing[] rings;
 
-  public PolygonImpl(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-    this.rings = EMPTY_RINGS;
+  public PolygonImpl(final GeometryFactory factory, final LinearRing ring) {
+    this.geometryFactory = factory;
+    if (ring == null || ring.isEmpty()) {
+      throw new IllegalArgumentException("Polygon ring must not be empty");
+    } else {
+      this.rings = new LinearRing[] {
+        ring
+      };
+    }
   }
 
   /**
@@ -105,23 +109,15 @@ public class PolygonImpl extends AbstractPolygon {
    *      , or <code>null</code> or empty <code>LinearRing</code>s if the empty
    *      geometry is to be created.
    */
-  public PolygonImpl(final GeometryFactory factory, final LinearRing... rings) {
+  public PolygonImpl(final GeometryFactory factory, final LinearRing[] rings, final int ringCount) {
     this.geometryFactory = factory;
-    if (rings == null || rings.length == 0) {
-      this.rings = EMPTY_RINGS;
-    } else if (Geometry.hasNullElements(rings)) {
-      throw new IllegalArgumentException("rings must not contain null elements");
+    if (rings == null || ringCount == 0) {
+      throw new IllegalArgumentException("Polygon must not be empty");
     } else {
-      if (rings[0].isEmpty()) {
-        for (int i = 1; i < rings.length; i++) {
-          final LinearRing ring = rings[i];
-          if (!ring.isEmpty()) {
-            throw new IllegalArgumentException("shell is empty but hole " + (i - 1) + " is not");
-          }
-        }
-        this.rings = EMPTY_RINGS;
-      } else {
-        this.rings = rings;
+      this.rings = new LinearRing[ringCount];
+      for (int i = 0; i < rings.length; i++) {
+        final LinearRing ring = rings[i];
+        this.rings[i] = ring;
       }
     }
   }
@@ -186,6 +182,13 @@ public class PolygonImpl extends AbstractPolygon {
   }
 
   @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final Geometry geometry : this.rings) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.rings) {
@@ -194,16 +197,10 @@ public class PolygonImpl extends AbstractPolygon {
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.rings) {
       geometry.forEachVertex(coordinates, action);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final Consumer3Double action) {
-    for (final Geometry geometry : this.rings) {
-      geometry.forEachVertex(action);
     }
   }
 
@@ -256,6 +253,6 @@ public class PolygonImpl extends AbstractPolygon {
 
   @Override
   public boolean isEmpty() {
-    return this.rings.length == 0;
+    return false;
   }
 }

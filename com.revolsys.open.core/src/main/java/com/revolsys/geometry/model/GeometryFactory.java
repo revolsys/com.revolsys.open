@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,7 @@ import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.AbstractPoint;
@@ -112,6 +114,133 @@ import com.revolsys.util.function.Consumer3Double;
  * @version 1.7
  */
 public abstract class GeometryFactory implements GeometryFactoryProxy, Serializable, MapSerializer {
+  private class EmptyGeometryCollection implements GeometryCollection {
+    private static final long serialVersionUID = -5694727726395021467L;
+
+    /**
+     * Creates and returns a full copy of this  object.
+     * (including all coordinates contained by it).
+     *
+     * @return a clone of this instance
+     */
+    @Override
+    public GeometryCollection clone() {
+      return this;
+    }
+
+    /**
+     * Tests whether this geometry is structurally and numerically equal
+     * to a given <code>Object</code>.
+     * If the argument <code>Object</code> is not a <code>Geometry</code>,
+     * the result is <code>false</code>.
+     * Otherwise, the result is computed using
+     * {@link #equals(2,Geometry)}.
+     * <p>
+     * This method is provided to fulfill the Java contract
+     * for value-based object equality.
+     * In conjunction with {@link #hashCode()}
+     * it provides semantics which are most useful
+     * for using
+     * <code>Geometry</code>s as keys and values in Java collections.
+     * <p>
+     * Note that to produce the expected result the input geometries
+     * should be in normal form.  It is the caller's
+     * responsibility to perform this where required
+     * (using {@link Geometry#norm()
+     * or {@link #normalize()} as appropriate).
+     *
+     * @param other the Object to compare
+     * @return true if this geometry is exactly equal to the argument
+     *
+     * @see #equals(2,Geometry)
+     * @see #hashCode()
+     * @see #norm()
+     * @see #normalize()
+     */
+    @Override
+    public boolean equals(final Object other) {
+      if (other instanceof Geometry) {
+        final Geometry geometry = (Geometry)other;
+        return geometry.isEmpty();
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public void forEachGeometry(final Consumer<Geometry> action) {
+    }
+
+    @Override
+    public void forEachVertex(final Consumer<CoordinatesOperationPoint> action) {
+    }
+
+    @Override
+    public int getAxisCount() {
+      return GeometryFactory.this.axisCount;
+    }
+
+    @Override
+    public GeometryDataType<?, ?> getDataType() {
+      return DataTypes.GEOMETRY_COLLECTION;
+    }
+
+    @Override
+    public int getDimension() {
+      return Dimension.FALSE;
+    }
+
+    @Override
+    public <V extends Geometry> List<V> getGeometries() {
+      return Collections.emptyList();
+    }
+
+    @Override
+    public <V extends Geometry> V getGeometry(final int n) {
+      return null;
+    }
+
+    @Override
+    public int getGeometryCount() {
+      return 0;
+    }
+
+    @Override
+    public GeometryFactory getGeometryFactory() {
+      return GeometryFactory.this;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    @Override
+    public Geometry intersectionRectangle(final RectangleXY rectangle) {
+      return this;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return true;
+    }
+
+    @Override
+    public boolean isHomogeneousGeometryCollection() {
+      return false;
+    }
+
+    @Override
+    public Geometry prepare() {
+      return this;
+    }
+
+    @Override
+    public String toString() {
+      return toEwkt();
+    }
+  }
+
   private class EmptyPoint extends AbstractPoint {
     private static final long serialVersionUID = 1L;
 
@@ -175,6 +304,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     @Override
     public double getZ() {
       return java.lang.Double.NaN;
+    }
+
+    @Override
+    public Point intersectionRectangle(final RectangleXY rectangle) {
+      return this;
     }
 
     @Override
@@ -255,6 +389,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     @Override
     public double getZ(final int partIndex, final int ringIndex, final int vertexIndex) {
       return java.lang.Double.NaN;
+    }
+
+    @Override
+    public Polygon intersectionRectangle(final RectangleXY rectangle) {
+      return this;
     }
 
     @Override
@@ -695,6 +834,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
 
   private final EmptyPoint emptyPoint = new EmptyPoint();
 
+  private final EmptyGeometryCollection emptyGeometryCollection = new EmptyGeometryCollection();
+
   private final EmptyPolygon emptyPolygon = new EmptyPolygon();
 
   private transient final WktParser parser = new WktParser(this);
@@ -1090,7 +1231,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public Geometry geometryCollection() {
-    return new GeometryCollectionImpl(this);
+    return this.emptyGeometryCollection;
   }
 
   /**
@@ -1228,8 +1369,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return (C)this.horizontalCoordinateSystem;
   }
 
-  private LinearRing getLinearRing(final List<?> rings, final int index) {
-    final Object ring = rings.get(index);
+  private LinearRing getLinearRing(final Object ring) {
     if (ring instanceof LinearRing) {
       return (LinearRing)ring;
     } else if (ring instanceof LineString) {
@@ -2166,28 +2306,35 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public Polygon polygon(final int axisCount, final double... ringCoordinates) {
-    if (ringCoordinates == null) {
-      return polygon();
-    } else {
-      final LinearRing[] rings = {
-        linearRing(axisCount, ringCoordinates)
-      };
-      return new PolygonImpl(this, rings);
+    if (ringCoordinates != null) {
+      final LinearRing ring = linearRing(axisCount, ringCoordinates);
+      if (!ring.isEmpty()) {
+        return new PolygonImpl(this, ring);
+      }
     }
+    return polygon();
   }
 
   public Polygon polygon(final int axisCount, final double[]... ringsCoordinates) {
-    if (ringsCoordinates == null) {
-      return polygon();
-    } else {
-      final int ringCount = ringsCoordinates.length;
-      final LinearRing[] rings = new LinearRing[ringCount];
-      for (int i = 0; i < ringCount; i++) {
+    if (ringsCoordinates != null) {
+      final int ringCordinatesCount = ringsCoordinates.length;
+      final LinearRing[] rings = new LinearRing[ringCordinatesCount];
+      int ringCount = 0;
+      for (int i = 0; i < ringCordinatesCount; i++) {
         final double[] ringCoordinates = ringsCoordinates[i];
-        rings[i] = linearRing(axisCount, ringCoordinates);
+        final LinearRing ring = linearRing(axisCount, ringCoordinates);
+        if (!ring.isEmpty()) {
+          if (i > 0 && ringCount == 0) {
+            throw new IllegalArgumentException("shell is empty but hole " + (i - 1) + " is not");
+          }
+          rings[ringCount++] = ring;
+        }
       }
-      return new PolygonImpl(this, rings);
+      if (ringCount > 0) {
+        return new PolygonImpl(this, rings, ringCount);
+      }
     }
+    return polygon();
   }
 
   /**
@@ -2200,7 +2347,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
    * @throws IllegalArgumentException if the boundary ring is invalid
    */
   public Polygon polygon(final LinearRing shell) {
-    return new PolygonImpl(this, shell);
+    if (shell == null || shell.isEmpty()) {
+      return polygon();
+    } else {
+      return new PolygonImpl(this, shell);
+    }
   }
 
   public Polygon polygon(final LineString... rings) {
@@ -2209,15 +2360,25 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public Polygon polygon(final List<?> rings) {
-    if (rings.size() == 0) {
-      return polygon();
-    } else {
+    if (rings != null) {
       final LinearRing[] linearRings = new LinearRing[rings.size()];
-      for (int i = 0; i < rings.size(); i++) {
-        linearRings[i] = getLinearRing(rings, i);
+      int ringCount = 0;
+      int i = 0;
+      for (final Object ringObject : rings) {
+        final LinearRing ring = getLinearRing(ringObject);
+        if (!ring.isEmpty()) {
+          if (i > 0 && ringCount == 0) {
+            throw new IllegalArgumentException("shell is empty but hole " + (i - 1) + " is not");
+          }
+          linearRings[ringCount++] = ring;
+        }
+        i++;
       }
-      return new PolygonImpl(this, linearRings);
+      if (ringCount > 0) {
+        return new PolygonImpl(this, linearRings, ringCount);
+      }
     }
+    return polygon();
   }
 
   public Polygon polygon(final Polygon polygon) {

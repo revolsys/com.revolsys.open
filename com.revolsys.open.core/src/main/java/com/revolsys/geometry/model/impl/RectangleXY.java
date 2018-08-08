@@ -445,12 +445,55 @@ public class RectangleXY extends AbstractPolygon {
   }
 
   @Override
+  public Geometry intersection(final Geometry geometry) {
+    final Geometry convertedGeometry = geometry.convertGeometry(this.geometryFactory);
+    return convertedGeometry.intersectionRectangle(this);
+  }
+
+  @Override
+  public Geometry intersectionRectangle(final RectangleXY rectangle) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final double minX = rectangle.minX;
+    final double minY = rectangle.minY;
+    final double maxX = rectangle.maxX;
+    final double maxY = rectangle.maxY;
+    if (intersects(minX, minY, maxX, maxY)) {
+      final double intMinX = Math.max(this.minX, minX);
+      final double intMinY = Math.max(this.minY, minY);
+      final double intMaxX = Math.min(this.maxX, maxX);
+      final double intMaxY = Math.min(this.maxY, maxY);
+      return geometryFactory.newRectangleCorners(intMinX, intMinY, intMaxX, intMaxY);
+    } else {
+      return geometryFactory.polygon();
+    }
+  }
+
+  @Override
   public boolean intersects(final double x, final double y) {
     if (x < this.minX || this.maxX < x || y < this.minY || this.maxY < y) {
       return false;
     } else {
       return true;
     }
+  }
+
+  @Override
+  public boolean intersects(double x1, double y1, double x2, double y2) {
+    if (x1 > x2) {
+      final double t = x1;
+      x1 = x2;
+      x2 = t;
+    }
+    if (y1 > y2) {
+      final double t = y1;
+      y1 = y2;
+      y2 = t;
+    }
+    return !(x1 > this.maxX || x2 < this.minX || y1 > this.maxY || y2 < this.minY);
+  }
+
+  public boolean intersects(final RectangleXY rectangle) {
+    return intersects(rectangle.minX, rectangle.minY, rectangle.maxX, rectangle.maxY);
   }
 
   @Override

@@ -44,6 +44,7 @@ import javax.measure.quantity.Length;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.MultiPointEditor;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -245,6 +246,25 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       }
     }
     return false;
+  }
+
+  @Override
+  default Geometry intersectionRectangle(final RectangleXY rectangle) {
+    boolean modified = false;
+    final List<Geometry> parts = new ArrayList<>();
+    for (final Geometry part : getPoints()) {
+      final Geometry partIntersection = part.intersectionRectangle(rectangle);
+      if (partIntersection != part) {
+        modified = true;
+      }
+      parts.add(part);
+    }
+    if (modified) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.geometry(parts);
+    } else {
+      return this;
+    }
   }
 
   @Override

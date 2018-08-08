@@ -64,6 +64,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.util.BoundingBoxXyConstructor;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -235,18 +236,18 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   }
 
   /**
-   *  Returns the first non-zero result of <code>compareTo</code> encountered as
-   *  the two <code>Collection</code>s are iterated over. If, by the time one of
-   *  the iterations is complete, no non-zero result has been encountered,
-   *  returns 0 if the other iteration is also complete. If <code>b</code>
-   *  completes before <code>a</code>, a positive number is returned; if a
-   *  before b, a negative number.
-   *
-   *@param  a  a <code>Collection</code> of <code>Comparable</code>s
-   *@param  b  a <code>Collection</code> of <code>Comparable</code>s
-   *@return    the first non-zero <code>compareTo</code> result, if any;
-   *      otherwise, zero
-   */
+  *  Returns the first non-zero result of <code>compareTo</code> encountered as
+  *  the two <code>Collection</code>s are iterated over. If, by the time one of
+  *  the iterations is complete, no non-zero result has been encountered,
+  *  returns 0 if the other iteration is also complete. If <code>b</code>
+  *  completes before <code>a</code>, a positive number is returned; if a
+  *  before b, a negative number.
+  *
+  *@param  a  a <code>Collection</code> of <code>Comparable</code>s
+  *@param  b  a <code>Collection</code> of <code>Comparable</code>s
+  *@return    the first non-zero <code>compareTo</code> result, if any;
+  *      otherwise, zero
+  */
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
@@ -1880,6 +1881,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return SnapIfNeededOverlayOp.overlayOp(this, geometry, OverlayOp.INTERSECTION);
     }
   }
+
+  Geometry intersectionRectangle(RectangleXY rectangle);
 
   boolean intersects(BoundingBox boundingBox);
 

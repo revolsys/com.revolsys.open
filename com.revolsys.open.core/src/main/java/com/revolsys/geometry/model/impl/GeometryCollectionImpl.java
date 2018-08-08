@@ -32,6 +32,7 @@
  */
 package com.revolsys.geometry.model.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -65,8 +66,6 @@ import com.revolsys.util.function.Function4Double;
 public class GeometryCollectionImpl implements GeometryCollection {
   private static final long serialVersionUID = -5694727726395021467L;
 
-  private static final Geometry[] EMPTY_GEOMETRIES = new Geometry[0];
-
   /**
    *  The bounding box of this <code>Geometry</code>.
    */
@@ -82,11 +81,6 @@ public class GeometryCollectionImpl implements GeometryCollection {
    */
   private final GeometryFactory geometryFactory;
 
-  public GeometryCollectionImpl(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-    this.geometries = EMPTY_GEOMETRIES;
-  }
-
   /**
    * @param geometries
    *            the <code>Geometry</code>s for this <code>GeometryCollection</code>,
@@ -98,7 +92,7 @@ public class GeometryCollectionImpl implements GeometryCollection {
     final Geometry[] geometries) {
     this.geometryFactory = geometryFactory;
     if (geometries == null || geometries.length == 0) {
-      this.geometries = EMPTY_GEOMETRIES;
+      throw new IllegalArgumentException("GeometryCollection must not be empty");
     } else if (Geometry.hasNullElements(geometries)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -225,6 +219,13 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final Geometry editor : this.geometries) {
+      editor.forEachVertex(action);
+    }
+  }
+
+  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.geometries) {
@@ -233,16 +234,10 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.geometries) {
       geometry.forEachVertex(coordinates, action);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final Consumer3Double action) {
-    for (final Geometry editor : this.geometries) {
-      editor.forEachVertex(action);
     }
   }
 
@@ -307,8 +302,24 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
+  public Geometry intersectionRectangle(final RectangleXY rectangle) {
+    final List<Geometry> parts = new ArrayList<>();
+    for (final Geometry part : this.geometries) {
+      final Geometry partIntersection = part.intersectionRectangle(rectangle);
+      if (!partIntersection.isEmpty()) {
+        parts.add(part);
+      }
+    }
+    if (parts.size() == this.geometries.length) {
+      return this;
+    } else {
+      return this.geometryFactory.geometry(parts);
+    }
+  }
+
+  @Override
   public boolean isEmpty() {
-    return this.geometries.length == 0;
+    return false;
   }
 
   @Override

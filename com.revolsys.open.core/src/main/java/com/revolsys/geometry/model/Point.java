@@ -46,6 +46,7 @@ import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PointEditor;
 import com.revolsys.geometry.model.impl.BaseBoundingBox;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -750,6 +751,16 @@ public interface Point extends Punctual, Serializable {
       return true;
     }
     return false;
+  }
+
+  @Override
+  default Geometry intersectionRectangle(final RectangleXY rectangle) {
+    if (rectangle.intersects(this)) {
+      return this;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.point();
+    }
   }
 
   @Override

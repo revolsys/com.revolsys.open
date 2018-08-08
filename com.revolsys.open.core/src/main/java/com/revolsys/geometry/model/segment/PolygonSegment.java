@@ -8,10 +8,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.AbstractLineString;
 import com.revolsys.geometry.model.vertex.Vertex;
 
-public class PolygonSegment extends AbstractLineString implements Iterator<Segment>, Segment {
+public class PolygonSegment extends AbstractLineSegment implements Iterator<Segment>, Segment {
   private static final long serialVersionUID = 1L;
 
   private int ringIndex;

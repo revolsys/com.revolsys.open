@@ -61,8 +61,6 @@ import com.revolsys.util.function.Function4Double;
 public class MultiLineStringImpl implements MultiLineString {
   private static final long serialVersionUID = 8166665132445433741L;
 
-  private static final LineString[] EMPTY_LINES = new LineString[0];
-
   /**
    *  The bounding box of this <code>Geometry</code>.
    */
@@ -75,7 +73,7 @@ public class MultiLineStringImpl implements MultiLineString {
   public MultiLineStringImpl(final GeometryFactory geometryFactory, final LineString... lines) {
     this.geometryFactory = geometryFactory;
     if (lines == null || lines.length == 0) {
-      this.lines = EMPTY_LINES;
+      throw new IllegalArgumentException("MultiLineString must not be empty");
     } else if (Geometry.hasNullElements(lines)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -187,6 +185,13 @@ public class MultiLineStringImpl implements MultiLineString {
   }
 
   @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final Geometry geometry : this.lines) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.lines) {
@@ -195,16 +200,10 @@ public class MultiLineStringImpl implements MultiLineString {
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
     for (final Geometry geometry : this.lines) {
       geometry.forEachVertex(coordinates, action);
-    }
-  }
-
-  @Override
-  public void forEachVertex(final Consumer3Double action) {
-    for (final Geometry geometry : this.lines) {
-      geometry.forEachVertex(action);
     }
   }
 
@@ -261,7 +260,7 @@ public class MultiLineStringImpl implements MultiLineString {
 
   @Override
   public boolean isEmpty() {
-    return this.lines.length == 0;
+    return false;
   }
 
   @Override

@@ -47,6 +47,7 @@ import javax.measure.quantity.Length;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.editor.GeometryEditor;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.GeometryCollectionSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.GeometryCollectionVertex;
@@ -387,6 +388,25 @@ public interface GeometryCollection extends Geometry {
       }
     }
     return false;
+  }
+
+  @Override
+  default Geometry intersectionRectangle(final RectangleXY rectangle) {
+    boolean modified = false;
+    final List<Geometry> parts = new ArrayList<>();
+    for (final Geometry part : geometries()) {
+      final Geometry partIntersection = part.intersectionRectangle(rectangle);
+      if (partIntersection != part) {
+        modified = true;
+      }
+      parts.add(part);
+    }
+    if (modified) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.geometry(parts);
+    } else {
+      return this;
+    }
   }
 
   @Override
