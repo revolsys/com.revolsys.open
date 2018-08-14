@@ -144,6 +144,13 @@ public class MultiLineStringEditor
     return DataTypes.LINE_STRING;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <GE extends Geometry> GE newGeometryEmpty() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (GE)geometryFactory.lineString();
+  }
+
   @Override
   public Lineal newLineal(final GeometryFactory geometryFactory, final LineString... lines) {
     return this.lineal.newLineal(geometryFactory, lines);

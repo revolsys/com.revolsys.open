@@ -140,7 +140,7 @@ public class GeometryFactoryWktTest extends TestCase {
     final Geometry geometry = this.geometryFactory.geometry(
       "MULTIPOLYGON(((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))");
     final String ewkt = geometry.toEwkt();
-    assertEquals("MULTIPOLYGON(((10 10,20 15,20 20,10 20,10 10)),((60 60,80 60,70 70,60 60)))",
+    assertEquals("MULTIPOLYGON(((10 10,10 20,20 20,20 15,10 10)),((60 60,70 70,80 60,60 60)))",
       ewkt);
 
     assertEquals("POLYGON EMPTY", this.geometryFactory.geometry("MULTIPOLYGON EMPTY").toEwkt());
@@ -166,7 +166,7 @@ public class GeometryFactoryWktTest extends TestCase {
     final Geometry geometry = this.geometryFactory
       .geometry("POLYGON((10 10,10 20,20 20,20 15,10 10))");
     final String ewkt = geometry.toEwkt();
-    assertEquals("POLYGON((10 10,20 15,20 20,10 20,10 10))", ewkt);
+    assertEquals("POLYGON((10 10,10 20,20 20,20 15,10 10))", ewkt);
 
     assertEquals("POLYGON EMPTY", this.geometryFactory.geometry("POLYGON EMPTY").toEwkt());
   }

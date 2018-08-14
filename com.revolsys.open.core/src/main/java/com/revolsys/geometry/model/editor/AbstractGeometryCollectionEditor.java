@@ -364,7 +364,7 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
 
   @Override
   @SuppressWarnings("unchecked")
-  public GC newGeometryAny() {
+  public <GA extends Geometry> GA newGeometryAny() {
     if (isModified() || this.geometry == null) {
       final List<G> geometries = new ArrayList<>();
       for (final GE editor : this.editors) {
@@ -373,12 +373,18 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
           geometries.add(newGeometry);
         }
       }
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.geometry(geometries);
+      if (geometries.isEmpty()) {
+        return newGeometryEmpty();
+      } else {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.geometry(geometries);
+      }
     } else {
-      return this.geometry;
+      return (GA)this.geometry;
     }
   }
+
+  public abstract <NGE extends Geometry> NGE newGeometryEmpty();
 
   @Override
   public void revertChanges() {

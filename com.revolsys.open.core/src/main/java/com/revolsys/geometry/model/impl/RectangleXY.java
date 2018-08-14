@@ -292,6 +292,14 @@ public class RectangleXY extends AbstractPolygon {
     }
   }
 
+  public boolean covers(final BoundingBox boundingBox) {
+    if (boundingBox == null || isEmpty() || boundingBox.isEmpty()) {
+      return false;
+    } else {
+      return boundingBox.coveredBy(this.minX, this.minY, this.maxX, this.maxY);
+    }
+  }
+
   @Override
   public <R> R findSegment(final Function4Double<R> action) {
     R result = action.accept(this.minX, this.minY, this.maxX, this.minY);
@@ -495,19 +503,23 @@ public class RectangleXY extends AbstractPolygon {
 
   @Override
   public Geometry intersectionRectangle(final RectangleXY rectangle) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final double minX = rectangle.minX;
-    final double minY = rectangle.minY;
-    final double maxX = rectangle.maxX;
-    final double maxY = rectangle.maxY;
-    if (intersects(minX, minY, maxX, maxY)) {
-      final double intMinX = Math.max(this.minX, minX);
-      final double intMinY = Math.max(this.minY, minY);
-      final double intMaxX = Math.min(this.maxX, maxX);
-      final double intMaxY = Math.min(this.maxY, maxY);
-      return geometryFactory.newRectangleCorners(intMinX, intMinY, intMaxX, intMaxY);
+    if (coveredByRectangle(rectangle)) {
+      return this;
     } else {
-      return geometryFactory.polygon();
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final double minX = rectangle.minX;
+      final double minY = rectangle.minY;
+      final double maxX = rectangle.maxX;
+      final double maxY = rectangle.maxY;
+      if (intersects(minX, minY, maxX, maxY)) {
+        final double intMinX = Math.max(this.minX, minX);
+        final double intMinY = Math.max(this.minY, minY);
+        final double intMaxX = Math.min(this.maxX, maxX);
+        final double intMaxY = Math.min(this.maxY, maxY);
+        return geometryFactory.newRectangleCorners(intMinX, intMinY, intMaxX, intMaxY);
+      } else {
+        return geometryFactory.polygon();
+      }
     }
   }
 

@@ -634,7 +634,11 @@ public interface Polygon extends Polygonal {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    return SnapIfNeededOverlayOp.overlayOp(this, rectangle, OverlayOp.INTERSECTION);
+    if (coveredByRectangle(rectangle)) {
+      return this;
+    } else {
+      return SnapIfNeededOverlayOp.overlayOp(this, rectangle, OverlayOp.INTERSECTION);
+    }
   }
 
   @Override

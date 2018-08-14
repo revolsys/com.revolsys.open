@@ -248,9 +248,10 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Geometry newGeometryAny() {
-    return newGeometry();
+  public <GA extends Geometry> GA newGeometryAny() {
+    return (GA)newGeometry();
   }
 
   @Override

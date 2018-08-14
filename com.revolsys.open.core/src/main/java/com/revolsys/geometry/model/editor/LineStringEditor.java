@@ -790,25 +790,26 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Geometry newGeometryAny() {
+  public <GA extends Geometry> GA newGeometryAny() {
     if (this.coordinates == null) {
       if (this.line == null) {
         final GeometryFactory geometryFactory = getGeometryFactory();
-        return geometryFactory.lineString();
+        return (GA)geometryFactory.lineString();
       } else {
-        return this.line.newLineString();
+        return (GA)this.line.newLineString();
       }
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final int axisCount = geometryFactory.getAxisCount();
       final int vertexCount = this.vertexCount;
       if (vertexCount == 0) {
-        return geometryFactory.lineString();
+        return (GA)geometryFactory.lineString();
       } else if (vertexCount == 1) {
-        return geometryFactory.point(this.coordinates);
+        return (GA)geometryFactory.point(this.coordinates);
       } else {
-        return newLineString(geometryFactory, axisCount, this.vertexCount, this.coordinates);
+        return (GA)newLineString(geometryFactory, axisCount, this.vertexCount, this.coordinates);
       }
     }
   }

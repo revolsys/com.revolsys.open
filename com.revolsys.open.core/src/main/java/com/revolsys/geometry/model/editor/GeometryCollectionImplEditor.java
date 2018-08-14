@@ -70,6 +70,13 @@ public class GeometryCollectionImplEditor
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <GE extends Geometry> GE newGeometryEmpty() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (GE)geometryFactory.geometry();
+  }
+
   @Override
   public Geometry prepare() {
     return this;

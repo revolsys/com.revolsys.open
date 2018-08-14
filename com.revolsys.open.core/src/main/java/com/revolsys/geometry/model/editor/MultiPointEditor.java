@@ -109,6 +109,13 @@ public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual,
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <GE extends Geometry> GE newGeometryEmpty() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (GE)geometryFactory.point();
+  }
+
   @Override
   public Punctual newPunctual(final GeometryFactory geometryFactory, final Point... points) {
     if (this.punctual == null) {

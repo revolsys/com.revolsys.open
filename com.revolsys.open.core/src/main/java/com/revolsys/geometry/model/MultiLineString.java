@@ -256,20 +256,24 @@ public interface MultiLineString extends GeometryCollection, Lineal {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    boolean modified = false;
-    final List<Geometry> parts = new ArrayList<>();
-    for (final Geometry part : getLineStrings()) {
-      final Geometry partIntersection = part.intersectionRectangle(rectangle);
-      if (partIntersection != part) {
-        modified = true;
-      }
-      parts.add(part);
-    }
-    if (modified) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.geometry(parts);
-    } else {
+    if (coveredByRectangle(rectangle)) {
       return this;
+    } else {
+      boolean modified = false;
+      final List<Geometry> parts = new ArrayList<>();
+      for (final Geometry part : getLineStrings()) {
+        final Geometry partIntersection = part.intersectionRectangle(rectangle);
+        if (partIntersection != part) {
+          modified = true;
+        }
+        parts.add(part);
+      }
+      if (modified) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.geometry(parts);
+      } else {
+        return this;
+      }
     }
   }
 

@@ -139,7 +139,7 @@ public interface GeometryEditor<GE extends GeometryEditor<?>> extends Geometry {
    * @author Paul Austin <paul.austin@revolsys.com>
    * @return
    */
-  Geometry newGeometryAny();
+  <GA extends Geometry> GA newGeometryAny();
 
   void revertChanges();
 

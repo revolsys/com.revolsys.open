@@ -755,7 +755,7 @@ public interface Point extends Punctual, Serializable {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    if (rectangle.intersects(this)) {
+    if (coveredByRectangle(rectangle)) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();

@@ -804,6 +804,15 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return g.covers(this);
   }
 
+  default boolean coveredByRectangle(final RectangleXY rectangle) {
+    if (rectangle == null) {
+      return false;
+    } else {
+      final BoundingBox boundingBox = getBoundingBox();
+      return rectangle.covers(boundingBox);
+    }
+  }
+
   /**
    * Tests whether this geometry covers the
    * argument geometry.
