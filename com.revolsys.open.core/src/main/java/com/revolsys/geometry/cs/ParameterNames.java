@@ -46,7 +46,7 @@ public class ParameterNames {
   public static ParameterName LATITUDE_OF_2ND_STANDARD_PARALLEL = new SingleParameterName(8824,
     "latitude_of_2nd_standard_parallel", UnitsOfMeasure.DEGREE);
 
-  public static final ParameterName LATITUDE_OF_CENTRE = new SingleParameterName(
+  public static final ParameterName LATITUDE_OF_CENTER = new SingleParameterName(
     "latitude_of_center", UnitsOfMeasure.DEGREE);
 
   public static final ParameterName LATITUDE_OF_FALSE_ORIGIN = new SingleParameterName(8821,
@@ -67,7 +67,7 @@ public class ParameterNames {
   public static ParameterName LATITUDE_OF_STANDARD_PARALLEL = new SingleParameterName(8832,
     "latitude_of_standard_parallel", UnitsOfMeasure.DEGREE);
 
-  public static final ParameterName LONGITUDE_OF_CENTRE = new SingleParameterName(
+  public static final ParameterName LONGITUDE_OF_CENTER = new SingleParameterName(
     "longitude_of_center", UnitsOfMeasure.DEGREE);
 
   public static final ParameterName LONGITUDE_OF_FALSE_ORIGIN = new SingleParameterName(8822,

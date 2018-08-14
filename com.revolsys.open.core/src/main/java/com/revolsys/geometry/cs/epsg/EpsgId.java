@@ -2,23 +2,25 @@ package com.revolsys.geometry.cs.epsg;
 
 public class EpsgId {
 
-  public static final int NAD27 = 4267;
-
-  public static final int NAD83 = 4269;
-
-  public static final int WGS84 = 4326;
-
   public static final int MSL_HEIGHT_FOOT = 8050;
 
   public static final int MSL_HEIGHT_METRE = 5714;
 
-  public static final int NAVD88_HEIGHT_METRE = 5703;
+  public static final int NAD27 = 4267;
+
+  public static final int NAD83 = 4269;
 
   public static final int NAVD88_HEIGHT_FOOT = 8228;
+
+  public static final int NAVD88_HEIGHT_METRE = 5703;
 
   public static final int NGVD29_HEIGHT_FOOT_US = 5702;
 
   public static final int NGVD29_HEIGHT_METRE = 7968;
+
+  public static final int WGS72 = 4322;
+
+  public static final int WGS84 = 4326;
 
   public static final int nad27Utm(final int zone) {
     if (zone >= 1 && zone <= 22) {

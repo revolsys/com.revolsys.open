@@ -11,12 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.datum.VerticalDatum;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.epsg.EpsgId;
+import com.revolsys.geometry.cs.esri.EsriCsGridParser;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.logging.Logs;
@@ -39,52 +36,8 @@ public class WktCsParser {
           try {
             return read(wkt);
           } catch (final StringIndexOutOfBoundsException e) {
-            final String[] lines = wkt.split("[\\n\\r]+");
-            final MapEx properties = new LinkedHashMapEx();
-            final List<String> projectionParameters = new ArrayList<>();
-            final boolean inParameters = false;
-            for (final String line : lines) {
-              if (inParameters) {
-
-              } else {
-                final String[] parts = line.split("\\s+");
-                if (parts.length == 2) {
-                  final String name = parts[0].toLowerCase();
-                  final String value = parts[1];
-                  properties.put(name, value);
-                }
-              }
-            }
-            final String projection = properties.getString("projection", "");
-            final String datum = properties.getString("datum", "");
-            final int zone = properties.getInteger("zone", -1);
-
-            int coordinateSystemId = -1;
-            if ("GEOGRAPHIC".equalsIgnoreCase(projection)) {
-              if ("NAD83".equals(datum)) {
-                coordinateSystemId = EpsgId.NAD83;
-              } else if ("NAD27".equals(datum)) {
-                coordinateSystemId = EpsgId.NAD27;
-              }
-            } else if ("UTM".equalsIgnoreCase(projection)) {
-              if ("NAD83".equalsIgnoreCase(datum)) {
-                coordinateSystemId = EpsgId.nad83Utm(zone);
-              } else if ("NAD27".equalsIgnoreCase(datum)) {
-                coordinateSystemId = EpsgId.nad27Utm(zone);
-              } else if ("WGS84".equalsIgnoreCase(datum)) {
-                coordinateSystemId = EpsgId.wgs84Utm(zone);
-              }
-            }
-            final C coordinateSystem = EpsgCoordinateSystems
-              .getCoordinateSystem(coordinateSystemId);
-
-            if (coordinateSystem == null) {
-              throw new IllegalArgumentException("Projection not supported: " + wkt);
-            } else {
-              return coordinateSystem;
-            }
+            return EsriCsGridParser.parse(wkt);
           }
-
         } catch (final WrappedException e) {
           final Throwable cause = e.getCause();
           if (cause instanceof FileNotFoundException) {
