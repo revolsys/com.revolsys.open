@@ -5,30 +5,22 @@
   xmlns:log4j="http://jakarta.apache.org/log4j/"
   debug="false"
 >
-  <appender
-    name="ConsoleLog"
-    class="org.apache.log4j.ConsoleAppender"
-  >
-    <layout
-      class="org.apache.log4j.PatternLayout"
-    >
-      <param
-        name="ConversionPattern"
-        value="%p\t%c\t%m%n" />
+ <appender name="ConsoleLog" class="org.apache.log4j.ConsoleAppender">
+    <param name="threshold" value="INFO" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%p\t%c\t%m%n"/>
     </layout>
   </appender>
 
   <logger
-    name="com.revolsys.gis.esri.gdb.file"
+    name="com.revolsys.core.test.gis.esri.gdb.file"
   >
     <level
       value="DEBUG" />
   </logger>
-
-  <root>
-    <level
-      value="ERROR" />
-    <appender-ref
-      ref="ConsoleLog" />
+  
+  <root >
+    <level value="ERROR" />
+    <appender-ref ref="ConsoleLog"/>
   </root>
 </log4j:configuration>

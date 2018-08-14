@@ -18,19 +18,6 @@
       <groupId>com.revolsys.open</groupId>
       <artifactId>com.revolsys.open.core</artifactId>
       <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.core</artifactId>
-      <version>${project.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

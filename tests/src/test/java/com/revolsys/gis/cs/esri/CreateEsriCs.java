@@ -1,7 +1,6 @@
 package com.revolsys.gis.cs.esri;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,23 +14,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.revolsys.gis.cs.AngularUnit;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.Datum;
-import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.LinearUnit;
-import com.revolsys.gis.cs.PrimeMeridian;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.cs.Projection;
-import com.revolsys.gis.cs.Spheroid;
-import com.revolsys.gis.cs.WktCsParser;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.Ellipsoid;
+import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ParameterName;
+import com.revolsys.geometry.cs.PrimeMeridian;
+import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.cs.WktCsParser;
+import com.revolsys.geometry.cs.datum.GeodeticDatum;
+import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.projection.CoordinatesProjection;
+import com.revolsys.geometry.cs.unit.AngularUnit;
+import com.revolsys.geometry.cs.unit.LinearUnit;
+import com.revolsys.spring.resource.PathResource;
 
 public class CreateEsriCs {
-  public static void copy(
-    final InputStream in,
-    final OutputStream out)
-    throws IOException {
+  public static void copy(final InputStream in, final OutputStream out) throws IOException {
     final byte[] buffer = new byte[4906];
     int count;
     while ((count = in.read(buffer)) > -1) {
@@ -39,8 +37,7 @@ public class CreateEsriCs {
     }
   }
 
-  public static void main(
-    final String[] args) {
+  public static void main(final String[] args) {
     new CreateEsriCs().run();
   }
 
@@ -52,30 +49,27 @@ public class CreateEsriCs {
 
   private PrintWriter projCsOut;
 
-  private final Map<String, Set<String>> projectionParameterNames = new HashMap<String, Set<String>>();
+  private final Map<String, Set<ParameterName>> projectionParameterNames = new HashMap<>();
 
   public CreateEsriCs() {
     try {
-      geoCsOut = new PrintWriter(
-        new FileWriter(
-          "src/main/resources/com/revolsys/gis/cs/esri/geographicCoordinateSystem.txt"));
-      projCsOut = new PrintWriter(
-        new FileWriter(
-          "src/main/resources/com/revolsys/gis/cs/esri/projectedCoordinateSystem.txt"));
+      this.geoCsOut = new PrintWriter(new FileWriter(
+        "src/main/resources/com/revolsys/gis/cs/esri/geographicCoordinateSystem.txt"));
+      this.projCsOut = new PrintWriter(new FileWriter(
+        "src/main/resources/com/revolsys/gis/cs/esri/projectedCoordinateSystem.txt"));
     } catch (final IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
 
-  private <T extends CoordinateSystem> T getEsriCs(
-    final Integer id) {
+  private <T extends CoordinateSystem> T getEsriCs(final Integer id) {
     try {
       final File file = new File("c:/exports/data/esri/" + id + ".txt");
       if (!file.exists()) {
 
-        final InputStream in = new URL("http://spatialreference.org/ref/epsg/"
-          + id + "/esriwkt/").openStream();
+        final InputStream in = new URL("http://spatialreference.org/ref/epsg/" + id + "/esriwkt/")
+          .openStream();
         final OutputStream out = new FileOutputStream(file);
         try {
           copy(in, out);
@@ -86,18 +80,8 @@ public class CreateEsriCs {
 
       }
       if (file.length() > 0) {
-        final InputStream in = new FileInputStream(file);
-        try {
-          final CoordinateSystem cs = new WktCsParser(in).parse();
-          return (T)cs;
-        } finally {
-          try {
-            in.close();
-          } catch (final IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          }
-        }
+        final CoordinateSystem cs = WktCsParser.read(new PathResource(file));
+        return (T)cs;
       }
     } catch (final IOException e) {
       e.printStackTrace();
@@ -107,15 +91,16 @@ public class CreateEsriCs {
   }
 
   public void run() {
-    final Map<Integer, CoordinateSystem> epsgCoordinateSystems = EpsgCoordinateSystems.getCoordinateSystemsById();
+    final Map<Integer, CoordinateSystem> epsgCoordinateSystems = EpsgCoordinateSystems
+      .getCoordinateSystemsById();
     for (final Entry<Integer, CoordinateSystem> entry : epsgCoordinateSystems.entrySet()) {
       final Integer id = entry.getKey();
       if (entry.getValue() instanceof GeographicCoordinateSystem) {
         try {
           final GeographicCoordinateSystem cs = getEsriCs(id);
           if (cs != null) {
-            csById.put(id, cs);
-            idByCs.put(cs, id);
+            this.csById.put(id, cs);
+            this.idByCs.put(cs, id);
             writeCs(id, cs);
           }
         } catch (final Throwable e) {
@@ -129,8 +114,8 @@ public class CreateEsriCs {
         try {
           final ProjectedCoordinateSystem cs = getEsriCs(id);
           if (cs != null) {
-            csById.put(id, cs);
-            idByCs.put(cs, id);
+            this.csById.put(id, cs);
+            this.idByCs.put(cs, id);
             writeCs(id, cs);
           }
         } catch (final Throwable e) {
@@ -139,75 +124,71 @@ public class CreateEsriCs {
       }
     }
 
-    geoCsOut.close();
-    projCsOut.close();
+    this.geoCsOut.close();
+    this.projCsOut.close();
 
   }
 
-  private void writeCs(
-    final Integer id,
-    final GeographicCoordinateSystem cs) {
-    geoCsOut.print(id);
-    geoCsOut.print('\t');
-    geoCsOut.print(cs.getName());
-    geoCsOut.print('\t');
-    final Datum datum = cs.getDatum();
-    geoCsOut.print(datum.getName());
-    geoCsOut.print('\t');
-    final Spheroid spheroid = datum.getSpheroid();
-    geoCsOut.print(spheroid.getName());
-    geoCsOut.print('\t');
-    geoCsOut.print(spheroid.getSemiMajorAxis());
-    geoCsOut.print('\t');
-    geoCsOut.print(spheroid.getInverseFlattening());
-    geoCsOut.print('\t');
+  private void writeCs(final Integer id, final GeographicCoordinateSystem cs) {
+    this.geoCsOut.print(id);
+    this.geoCsOut.print('\t');
+    this.geoCsOut.print(cs.getCoordinateSystemName());
+    this.geoCsOut.print('\t');
+    final GeodeticDatum datum = cs.getDatum();
+    this.geoCsOut.print(datum.getName());
+    this.geoCsOut.print('\t');
+    final Ellipsoid spheroid = datum.getEllipsoid();
+    this.geoCsOut.print(spheroid.getName());
+    this.geoCsOut.print('\t');
+    this.geoCsOut.print(spheroid.getSemiMajorAxis());
+    this.geoCsOut.print('\t');
+    this.geoCsOut.print(spheroid.getInverseFlattening());
+    this.geoCsOut.print('\t');
     final PrimeMeridian primeMeridian = cs.getPrimeMeridian();
-    geoCsOut.print(primeMeridian.getName());
-    geoCsOut.print('\t');
-    geoCsOut.print(primeMeridian.getLongitude());
-    geoCsOut.print('\t');
+    this.geoCsOut.print(primeMeridian.getName());
+    this.geoCsOut.print('\t');
+    this.geoCsOut.print(primeMeridian.getLongitude());
+    this.geoCsOut.print('\t');
     final AngularUnit angularUnit = cs.getAngularUnit();
-    geoCsOut.print(angularUnit.getName());
-    geoCsOut.print('\t');
-    geoCsOut.println(angularUnit.getConversionFactor());
+    this.geoCsOut.print(angularUnit.getName());
+    this.geoCsOut.print('\t');
+    this.geoCsOut.println(angularUnit.getConversionFactor());
   }
 
-  private void writeCs(
-    final Integer id,
-    final ProjectedCoordinateSystem cs) {
+  private void writeCs(final Integer id, final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geoCs = cs.getGeographicCoordinateSystem();
-    final Integer geoCsId = idByCs.get(geoCs);
+    final Integer geoCsId = this.idByCs.get(geoCs);
     if (geoCsId != null) {
-      projCsOut.print(id);
-      projCsOut.print('\t');
-      projCsOut.print(cs.getName());
-      projCsOut.print('\t');
-      projCsOut.print(geoCsId);
-      final Projection projection = cs.getProjection();
-      projCsOut.print('\t');
+      this.projCsOut.print(id);
+      this.projCsOut.print('\t');
+      this.projCsOut.print(cs.getCoordinateSystemName());
+      this.projCsOut.print('\t');
+      this.projCsOut.print(geoCsId);
+      final CoordinatesProjection projection = cs.getCoordinatesProjection();
+      this.projCsOut.print('\t');
       if (projection != null) {
-        final String projectionName = projection.getName();
-        projCsOut.print(projectionName);
-        final Set<String> parameterNames = projectionParameterNames.get(projectionName);
-        final Set<String> currentParamNames = cs.getParameters().keySet();
+        final String projectionName = projection.toString();
+        this.projCsOut.print(projectionName);
+        final Set<ParameterName> parameterNames = this.projectionParameterNames.get(projectionName);
+        final Set<ParameterName> currentParamNames = cs.getParameters().keySet();
         if (parameterNames == null) {
-          projectionParameterNames.put(projectionName, currentParamNames);
+          this.projectionParameterNames.put(projectionName, currentParamNames);
         } else {
           if (!currentParamNames.equals(parameterNames)) {
-            final Set<String> n = new HashSet<String>(currentParamNames);
+            final Set<ParameterName> n = new HashSet<>(currentParamNames);
             n.retainAll(parameterNames);
             System.out.println(projectionName + ":" + n);
           }
         }
 
       }
-      projCsOut.print('\t');
-      projCsOut.print(cs.getParameters());
+      this.projCsOut.print('\t');
+      this.projCsOut.print(cs.getParameters());
       final LinearUnit unit = cs.getLinearUnit();
-      projCsOut.print('\t');
-      projCsOut.print(unit.getName());
-      projCsOut.print('\t');
-      projCsOut.println(unit.getConversionFactor());
+      this.projCsOut.print('\t');
+      this.projCsOut.print(unit.getName());
+      this.projCsOut.print('\t');
+      this.projCsOut.println(unit.getConversionFactor());
     } else {
       System.err.println(id);
     }

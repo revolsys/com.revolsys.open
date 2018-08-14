@@ -48,6 +48,7 @@
   <modules>
     <module>com.revolsys.open.javac</module>
     <module>com.revolsys.open.core</module>
+    <module>com.revolsys.open.testapi</module>
     <module>com.revolsys.open.doclet</module>
     <module>com.revolsys.open.fgdb</module>
     <module>com.revolsys.open.gdal</module>
