@@ -178,9 +178,13 @@ public class MultipleGriddedElevationModelLayerRenderer
     final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
     for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
       .cancellable(renderers)) {
-      final long scaleForVisible = (long)viewport.getScaleForVisible();
-      if (renderer.isVisible(scaleForVisible)) {
-        renderer.render(viewport, cancellable, layer);
+      try {
+        final long scaleForVisible = (long)viewport.getScaleForVisible();
+        if (renderer.isVisible(scaleForVisible)) {
+          renderer.render(viewport, cancellable, layer);
+        }
+      } catch (final Exception e) {
+        Logs.error(this, "Unable to render:" + renderer, e);
       }
     }
   }
