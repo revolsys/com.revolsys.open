@@ -3,14 +3,27 @@ package com.revolsys.swing.map.component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.function.Consumer;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.HorizontalCoordinateSystem;
+import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.swing.component.BasePanel;
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ArrayListComboBoxModel;
 import com.revolsys.swing.field.BaseComboBox;
+import com.revolsys.swing.layout.GroupLayouts;
+import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.parallel.Invoke;
 
 public class CoordinateSystemField extends BaseComboBox<Integer> implements ItemListener {
   private static final long serialVersionUID = 1L;
@@ -64,6 +77,67 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
       EpsgId.WGS84, EpsgId.NAD83, EpsgId.NAD27);
   }
 
+  /**
+   * Prompt for a coordinate system if the geometry factory does not have a coordinate system.
+   */
+  public static <GFP extends GeometryFactoryProxy> void promptCoordinateSystem(final String title,
+    final GFP geometryFactoryProxy, final Consumer<GeometryFactory> action) {
+    if (geometryFactoryProxy.isHasHorizontalCoordinateSystem()) {
+      final GeometryFactory geometryFactory = geometryFactoryProxy.getGeometryFactory();
+      action.accept(geometryFactory);
+    } else {
+      selectGeometryFactory(title, action);
+    }
+  }
+
+  public static void selectGeometryFactory(final String title,
+    final Consumer<GeometryFactory> action) {
+    selectGeometryFactory(title, null, action);
+  }
+
+  public static void selectGeometryFactory(final String title,
+    final HorizontalCoordinateSystemProxy defaultCoordinateSystem,
+    final Consumer<GeometryFactory> action) {
+    selectHorizontalCoordinateSystem(title, defaultCoordinateSystem, coordinateSystem -> {
+      final GeometryFactory geometryFactory = coordinateSystem.getGeometryFactory();
+      action.accept(geometryFactory);
+    });
+  }
+
+  public static void selectHorizontalCoordinateSystem(final String title,
+    final HorizontalCoordinateSystemProxy defaultCoordinateSystem,
+    final Consumer<HorizontalCoordinateSystem> action) {
+    Invoke.later(() -> {
+      final Project project = Project.get();
+      final MapPanel mapPanel = project.getMapPanel();
+      int coordinateSystemId = -1;
+      if (defaultCoordinateSystem != null) {
+        coordinateSystemId = defaultCoordinateSystem.getHorizontalCoordinateSystemId();
+      }
+      if (coordinateSystemId <= 0) {
+        coordinateSystemId = mapPanel.getHorizontalCoordinateSystemId();
+      }
+      final CoordinateSystemField coordinateSystemField = new CoordinateSystemField(
+        "coordinateSystem");
+      if (coordinateSystemId > 0) {
+        coordinateSystemField.setSelectedItem(coordinateSystemId);
+      }
+      final JPanel fieldPanel = new BasePanel(new JLabel("Coordinate System"),
+        coordinateSystemField);
+      GroupLayouts.makeColumns(fieldPanel, 2, true);
+      final ValueField valueField = new ValueField(fieldPanel);
+      valueField.add(fieldPanel);
+      valueField.showDialog();
+      if (valueField.isSaved()) {
+        final HorizontalCoordinateSystem coordinateSystem = coordinateSystemField
+          .getHorizontalCoordinateSystem();
+        if (coordinateSystem != null) {
+          Invoke.background(title, () -> action.accept(coordinateSystem));
+        }
+      }
+    });
+  }
+
   public CoordinateSystemField(final String fieldName) {
     super("fieldName", newModel(), CoordinateSystemField::formatCoordinateSystem);
 
@@ -92,6 +166,15 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
   public GeometryFactory getGeometryFactory() {
     final Integer coordinateSystemId = getSelectedItem();
     return GeometryFactory.floating2d(coordinateSystemId);
+  }
+
+  public HorizontalCoordinateSystem getHorizontalCoordinateSystem() {
+    final Integer coordinateSystemId = getSelectedItem();
+    if (coordinateSystemId > 0) {
+      return EpsgCoordinateSystems.getHorizontalCoordinateSystem(coordinateSystemId);
+    } else {
+      return null;
+    }
   }
 
   @Override

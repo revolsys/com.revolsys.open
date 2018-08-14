@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -56,9 +55,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
-import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.BaseComboBox;
-import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.ConsumerSelectedItemListener;
 import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
@@ -119,44 +116,9 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
   }
 
-  /**
-   * Prompt for a coordinate system if the geometry factory does not have a coordinate system.
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @param geometryFactoryProxy
-   * @param action
-   */
-  public static <GFP extends GeometryFactoryProxy> void promptCoordinateSystem(final String title,
-    final GFP geometryFactoryProxy, final Consumer<GeometryFactory> action) {
-    if (geometryFactoryProxy.isHasHorizontalCoordinateSystem()) {
-      final GeometryFactory geometryFactory = geometryFactoryProxy.getGeometryFactory();
-      action.accept(geometryFactory);
-    } else {
-      Invoke.later(() -> {
-        final Project project = Project.get();
-        final MapPanel mapPanel = project.getMapPanel();
-        final int mapCoordinateSystemId = mapPanel.getHorizontalCoordinateSystemId();
-        final CoordinateSystemField coordinateSystemField = new CoordinateSystemField(
-          "coordinateSystem");
-        coordinateSystemField.setSelectedItem(mapCoordinateSystemId);
-        final JPanel fieldPanel = new BasePanel(new JLabel("Coordinate System"),
-          coordinateSystemField);
-        GroupLayouts.makeColumns(fieldPanel, 2, true);
-        final ValueField valueField = new ValueField(fieldPanel);
-        valueField.add(fieldPanel);
-        valueField.showDialog();
-        if (valueField.isSaved()) {
-          final GeometryFactory geometryFactory = coordinateSystemField.getGeometryFactory();
-          if (geometryFactory.isHasHorizontalCoordinateSystem()) {
-            Invoke.background(title, () -> action.accept(geometryFactory));
-          }
-        }
-      });
-    }
-  }
-
   public static void zoomToBoundingBox(final String baseName,
     final BoundingBoxProxy boundingBoxProxy) {
-    promptCoordinateSystem(baseName, boundingBoxProxy, geometryFactory -> {
+    CoordinateSystemField.promptCoordinateSystem(baseName, boundingBoxProxy, geometryFactory -> {
       final Project project = Project.get();
       final MapPanel mapPanel = project.getMapPanel();
       BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();

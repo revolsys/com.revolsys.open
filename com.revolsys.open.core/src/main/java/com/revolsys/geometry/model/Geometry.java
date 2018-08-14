@@ -1097,7 +1097,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
 
   default boolean equals(final Geometry geometry) {
-    if (geometry == null) {
+    if (geometry == null || geometry.isEmpty()) {
       return false;
     } else {
       return equalsTopo(geometry);

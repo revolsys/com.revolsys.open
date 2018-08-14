@@ -168,6 +168,12 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     appendVertex(point);
   }
 
+  public void appendVertex(final LineString line, final int vertexIndex,
+    final boolean allowRepeated) {
+    final Point point = line.getPoint(vertexIndex);
+    appendVertex(point, allowRepeated);
+  }
+
   public LineStringEditor appendVertex(final Point point) {
     if (point == null || point.isEmpty()) {
       return this;
@@ -785,6 +791,29 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   }
 
   @Override
+  public Geometry newGeometryAny() {
+    if (this.coordinates == null) {
+      if (this.line == null) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.lineString();
+      } else {
+        return this.line.newLineString();
+      }
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final int axisCount = geometryFactory.getAxisCount();
+      final int vertexCount = this.vertexCount;
+      if (vertexCount == 0) {
+        return geometryFactory.lineString();
+      } else if (vertexCount == 1) {
+        return geometryFactory.point(this.coordinates);
+      } else {
+        return newLineString(geometryFactory, axisCount, this.vertexCount, this.coordinates);
+      }
+    }
+  }
+
+  @Override
   public LinearRing newLinearRing() {
     final int coordinateCount = this.vertexCount * this.axisCount;
     final double[] coordinates = new double[coordinateCount];
@@ -954,8 +983,10 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       final double[] lineCoordinates = getCoordinatesModified();
       final int axisCount = getAxisCount();
       int offset = vertexIndex * axisCount;
-      lineCoordinates[offset++] = geometryFactory.makeXPrecise(x);
-      lineCoordinates[offset++] = geometryFactory.makeYPrecise(y);
+      final double newX = geometryFactory.makeXPrecise(x);
+      final double newY = geometryFactory.makeYPrecise(y);
+      lineCoordinates[offset++] = newX;
+      lineCoordinates[offset++] = newY;
       if (axisCount > 2) {
         setCoordinatesNaN(offset, axisCount);
       }
@@ -973,8 +1004,10 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       final double[] lineCoordinates = getCoordinatesModified();
       final int axisCount = getAxisCount();
       int offset = vertexIndex * axisCount;
-      lineCoordinates[offset++] = geometryFactory.makeXPrecise(x);
-      lineCoordinates[offset++] = geometryFactory.makeYPrecise(y);
+      final double newX = geometryFactory.makeXPrecise(x);
+      final double newY = geometryFactory.makeYPrecise(y);
+      lineCoordinates[offset++] = newX;
+      lineCoordinates[offset++] = newY;
       if (this.axisCount > 2) {
         lineCoordinates[offset++] = geometryFactory.makeZPrecise(z);
         if (axisCount > 3) {
@@ -996,8 +1029,10 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
       int offset = vertexIndex * axisCount;
       final GeometryFactory geometryFactory = getGeometryFactory();
       final Point convertPoint2d = point.convertPoint2d(geometryFactory);
-      lineCoordinates[offset++] = geometryFactory.makeXPrecise(convertPoint2d.getX());
-      lineCoordinates[offset++] = geometryFactory.makeYPrecise(convertPoint2d.getY());
+      final double newX = geometryFactory.makeXPrecise(convertPoint2d.getX());
+      final double newY = geometryFactory.makeYPrecise(convertPoint2d.getY());
+      lineCoordinates[offset++] = newX;
+      lineCoordinates[offset++] = newY;
       for (int axisIndex = 2; axisIndex < pointAxisCount && axisIndex < axisCount; axisIndex++) {
         final double coordinate = point.getCoordinate(axisIndex);
         lineCoordinates[offset++] = geometryFactory.makePrecise(axisIndex, coordinate);

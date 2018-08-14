@@ -133,6 +133,14 @@ public interface GeometryEditor<GE extends GeometryEditor<?>> extends Geometry {
 
   Geometry newGeometry();
 
+  /**
+   * Construct a new geometry from the geometry editor. The result may be any geometry.
+   * For example a {@link LineStringEditor} with vertexCount == 1 would return a Point.
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @return
+   */
+  Geometry newGeometryAny();
+
   void revertChanges();
 
   GeometryEditor<?> setAxisCount(int axisCount);

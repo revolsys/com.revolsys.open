@@ -40,11 +40,13 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.util.OutCode;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer3Double;
@@ -159,6 +161,16 @@ public class RectangleXY extends AbstractPolygon {
     @Override
     public int getAxisCount() {
       return 2;
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
+      return RectangleXY.this.getBoundingBox();
+    }
+
+    @Override
+    public ClockDirection getClockDirection() {
+      return ClockDirection.COUNTER_CLOCKWISE;
     }
 
     @Override
@@ -411,6 +423,37 @@ public class RectangleXY extends AbstractPolygon {
     return 0;
   }
 
+  public double getMaxX() {
+    return this.maxX;
+  }
+
+  public double getMaxY() {
+    return this.maxY;
+  }
+
+  public double getMinX() {
+    return this.minX;
+  }
+
+  public double getMinY() {
+    return this.minY;
+  }
+
+  public int getOutcode(final double x, final double y) {
+    int out = 0;
+    if (x < this.minX) {
+      out = OutCode.OUT_LEFT;
+    } else if (x > this.maxX) {
+      out = OutCode.OUT_RIGHT;
+    }
+    if (y < this.minY) {
+      out |= OutCode.OUT_BOTTOM;
+    } else if (y > this.maxY) {
+      out |= OutCode.OUT_TOP;
+    }
+    return out;
+  }
+
   @Override
   public LinearRing getRing(final int ringIndex) {
     if (ringIndex == 0) {
@@ -535,5 +578,35 @@ public class RectangleXY extends AbstractPolygon {
   public BoundingBox newBoundingBox() {
     return new BoundingBoxDoubleXY(this.geometryFactory, this.minX, this.minY, this.maxX,
       this.maxY);
+  }
+
+  public OutCode outcode(final double x, final double y) {
+    if (x < this.minX) {
+      if (y < this.minY) {
+        return OutCode.LEFT_BOTTOM;
+      } else if (y > this.maxY) {
+        return OutCode.LEFT_TOP;
+      } else {
+        return OutCode.LEFT;
+      }
+    } else if (x > this.maxX) {
+      if (y < this.minY) {
+        return OutCode.RIGHT_BOTTOM;
+      } else if (y > this.maxY) {
+        return OutCode.RIGHT_TOP;
+      } else {
+        return OutCode.RIGHT;
+      }
+
+    } else {
+      if (y < this.minY) {
+        return OutCode.BOTTOM;
+      } else if (y > this.maxY) {
+        return OutCode.TOP;
+      } else {
+        return OutCode.INSIDE;
+      }
+
+    }
   }
 }

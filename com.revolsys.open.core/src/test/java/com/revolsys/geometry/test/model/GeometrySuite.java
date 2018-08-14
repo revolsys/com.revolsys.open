@@ -11,7 +11,7 @@ import com.revolsys.gis.model.LineSegmentTest;
 @SuiteClasses({
   CoordinatesTest.class, BoundingBoxTest.class, PointTest.class, LineStringTest.class,
   PolygonTest.class, MultiPointTest.class, MultiLineStringTest.class, MultiPolygonTest.class,
-  LineSegmentTest.class, ClipRectangleTest.class
+  LineSegmentTest.class, ClipRectangleTest.class, RectangleTest.class
 })
 public class GeometrySuite {
 }

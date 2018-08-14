@@ -3,7 +3,7 @@
 
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
  <appender name="ConsoleLog" class="org.apache.log4j.ConsoleAppender">
-    <param name="threshold" value="ERROR" />
+    <param name="threshold" value="INFO" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%p\t%c\t%m%n"/>
     </layout>

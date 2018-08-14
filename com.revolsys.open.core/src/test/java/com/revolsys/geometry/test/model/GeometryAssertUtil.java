@@ -16,11 +16,31 @@ public class GeometryAssertUtil {
 
   public static boolean assertEqualsExact(final int axisCount, final Geometry expectedGeometry,
     final Geometry actualGeometry) {
+    return assertEqualsExact("Equals Exact", axisCount, expectedGeometry, actualGeometry);
+  }
+
+  public static boolean assertEqualsExact(final String message, final int axisCount,
+    final Geometry expectedGeometry, final Geometry actualGeometry) {
     if (actualGeometry.equals(axisCount, expectedGeometry)) {
       return true;
     } else {
-      failNotEquals("Equals Exact", expectedGeometry, actualGeometry);
+      failNotEquals(message, expectedGeometry, actualGeometry);
       return false;
+    }
+  }
+
+  public static boolean assertEqualsGeometry(final String message, final Geometry expectedGeometry,
+    final Geometry actualGeometry) {
+    if (expectedGeometry.isEmpty()) {
+      if (actualGeometry.isEmpty()) {
+        return true;
+      } else {
+        return failNotEquals(message, expectedGeometry, actualGeometry);
+      }
+    } else if (actualGeometry.equals(expectedGeometry)) {
+      return true;
+    } else {
+      return failNotEquals(message, expectedGeometry, actualGeometry);
     }
   }
 
@@ -95,9 +115,10 @@ public class GeometryAssertUtil {
     return equalsExpectedGeometry(i, actualGeometry, expectedGeometry);
   }
 
-  public static void failNotEquals(final String message, final Object expected,
+  public static boolean failNotEquals(final String message, final Object expected,
     final Object actual) {
     Assert.fail(format(message, expected, actual));
+    return false;
   }
 
   public static String format(final String message, final Object expected, final Object actual) {

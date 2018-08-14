@@ -340,6 +340,11 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   }
 
   @Override
+  public Geometry newGeometryAny() {
+    return newGeometry();
+  }
+
+  @Override
   public Polygon newPolygon(final GeometryFactory geometryFactory, final LinearRing... rings) {
     return this.polygon.newPolygon(geometryFactory, rings);
   }

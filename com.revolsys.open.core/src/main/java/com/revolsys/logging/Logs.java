@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -15,6 +16,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public class Logs {
+
   public static void debug(final Class<?> clazz, final String message) {
     final String name = clazz.getName();
     debug(name, message);
@@ -203,6 +205,17 @@ public class Logs {
   public static boolean isDebugEnabled(final Object logCateogory) {
     final Class<?> logClass = logCateogory.getClass();
     return isDebugEnabled(logClass);
+  }
+
+  public static void setLevel(final String name, final String level) {
+    org.apache.log4j.Logger logger;
+    if (name == null) {
+      logger = org.apache.log4j.Logger.getRootLogger();
+    } else {
+      logger = org.apache.log4j.Logger.getLogger(name);
+    }
+    final Level level2 = Level.toLevel(level.toUpperCase());
+    logger.setLevel(level2);
   }
 
   public static void warn(final Class<?> clazz, final String message) {

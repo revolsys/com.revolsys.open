@@ -155,11 +155,14 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   private String name;
 
+  private String iconName;
+
   public MenuFactory() {
   }
 
   public MenuFactory(final MenuFactory menuFactory) {
-    this(null, menuFactory);
+    this(menuFactory.name, menuFactory);
+    this.iconName = menuFactory.iconName;
   }
 
   public MenuFactory(final String name) {
@@ -303,9 +306,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   @Override
   public MenuFactory clone() {
-    final MenuFactory clone = new MenuFactory(this);
-
-    return clone;
+    return new MenuFactory(this);
   }
 
   @Override
@@ -429,12 +430,17 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   }
 
   public JMenu newJMenu(final boolean forceEnable) {
-    final String name = this.name;
-    return newJMenu(name, forceEnable);
+    return newJMenu(this.name, forceEnable);
   }
 
   public JMenu newJMenu(final String name, final boolean forceEnable) {
     final JMenu menu = new JMenu(name);
+    if (this.iconName != null) {
+      final Icon icon = Icons.getIcon(this.iconName);
+      menu.setIcon(icon);
+      final Icon disabledIcon = Icons.getDisabledIcon(this.iconName);
+      menu.setDisabledIcon(disabledIcon);
+    }
     if (this.enableCheck != null) {
       final boolean enabled = this.enableCheck.isEnabled();
       menu.setEnabled(enabled);
@@ -507,6 +513,10 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   public void setEnableCheck(final EnableCheck enableCheck) {
     this.enableCheck = enableCheck;
+  }
+
+  public void setIconName(final String iconName) {
+    this.iconName = iconName;
   }
 
   public void setName(final String name) {

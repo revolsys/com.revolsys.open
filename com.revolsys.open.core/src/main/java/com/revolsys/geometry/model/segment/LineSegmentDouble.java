@@ -32,6 +32,8 @@
  */
 package com.revolsys.geometry.model.segment;
 
+import java.util.Arrays;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -55,7 +57,7 @@ import com.revolsys.util.function.BiConsumerDouble;
 public class LineSegmentDouble extends AbstractLineSegment {
   private static final long serialVersionUID = 1L;
 
-  private double[] coordinates;
+  protected double[] coordinates;
 
   public LineSegmentDouble() {
     this.coordinates = null;
@@ -93,6 +95,11 @@ public class LineSegmentDouble extends AbstractLineSegment {
     this.coordinates = new double[axisCount * 2];
     CoordinatesListUtil.setCoordinates(geometryFactory, this.coordinates, axisCount, 0, point1);
     CoordinatesListUtil.setCoordinates(geometryFactory, this.coordinates, axisCount, 1, point2);
+  }
+
+  public LineSegmentDouble(final int axisCount) {
+    this.coordinates = new double[axisCount * 2];
+    Arrays.fill(this.coordinates, Double.NaN);
   }
 
   public LineSegmentDouble(final int axisCount, final double... coordinates) {

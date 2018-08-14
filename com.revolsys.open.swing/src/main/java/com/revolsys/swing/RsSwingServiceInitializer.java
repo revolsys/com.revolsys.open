@@ -24,6 +24,7 @@ import com.revolsys.swing.map.layer.pointcloud.PointCloudLayer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
+import com.revolsys.swing.map.layer.record.ScratchRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.FilterMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
@@ -76,7 +77,11 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("baseMapLayerGroup", "Base Map Layer Group",
       BaseMapLayerGroup::newLayer);
 
-    AbstractLayer.menuItemPathAddLayer("record", "Add Record Layer", "map", RecordReaderFactory.class);
+    AbstractLayer.menuItemPathAddLayer("record", "Add Record Layer", "map",
+      RecordReaderFactory.class);
+
+    MapObjectFactoryRegistry.newFactory(ScratchRecordLayer.TYPE_NAME, "File",
+      ScratchRecordLayer::newLayer);
 
     MapObjectFactoryRegistry.newFactory("recordFileLayer", "File", FileRecordLayer::newLayer);
 
