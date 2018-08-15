@@ -3,8 +3,8 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
+import com.revolsys.esri.filegdb.jni.EnumRows;
+import com.revolsys.esri.filegdb.jni.Row;
 
 public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
 

@@ -3,10 +3,10 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.esri.filegdb.jni.Row;
+import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
 import com.revolsys.logging.Logs;
@@ -215,7 +215,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
           if (boundingBox.getHeight() == 0) {
             boundingBox = boundingBox.expand(0, 1);
           }
-          final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter
+          final com.revolsys.esri.filegdb.jni.Envelope envelope = GeometryConverter
             .toEsri(boundingBox);
           String sql = this.sql;
           if ("1 = 1".equals(sql)) {

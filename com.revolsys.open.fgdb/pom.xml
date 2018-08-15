@@ -19,6 +19,11 @@
       <artifactId>com.revolsys.open.core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.revolsys.esri</groupId>
+      <artifactId>filegdb-jni</artifactId>
+      <version>1.5.1-1</version>
+    </dependency>
   </dependencies>
 </project>
 
