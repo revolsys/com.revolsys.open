@@ -8,24 +8,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.geometry.cs.CoordinateOperationMethod;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateSystemType;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.ParameterName;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.logging.Logs;
@@ -38,8 +28,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.UrlResource;
-import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
 /**
@@ -646,47 +634,6 @@ public final class EpsgCoordinateSystemsLoader {
 
   private ChannelWriter newWriter(final String name) {
     return this.baseResource.newChildResource(name + ".bin").newChannelWriter();
-  }
-
-  private void validateEsri() {
-    EsriCoordinateSystems.getCoordinateSystem(0);
-    for (final CoordinateSystem coordinateSytstem : EpsgCoordinateSystems.getCoordinateSystems()) {
-      if (coordinateSytstem instanceof GeographicCoordinateSystem) {
-        final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSytstem;
-        final int id = coordinateSytstem.getHorizontalCoordinateSystemId();
-        final GeographicCoordinateSystem esri = EsriCoordinateSystems.getCoordinateSystem(id);
-        if (esri != null && !geoCs.equalsExact(esri)) {
-          // System.out.println(id + coordinateSytstem.getCoordinateSystemName());
-        }
-      } else if (coordinateSytstem instanceof ProjectedCoordinateSystem) {
-        final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSytstem;
-        final int id = coordinateSytstem.getHorizontalCoordinateSystemId();
-        final String wkt = new UrlResource(
-          "http://spatialreference.org/ref/epsg/" + id + "/esriwkt/").contentsAsString();
-        final ProjectedCoordinateSystem esri = GeometryFactory.floating2d(wkt)
-          .getHorizontalCoordinateSystem();
-        final CoordinateOperationMethod coordinateOperationMethod = esri
-          .getCoordinateOperationMethod();
-        if (esri != null && !projectedCs.equals(esri) && coordinateOperationMethod != null
-          && Property.hasValue(coordinateOperationMethod.getName())
-          && !projectedCs.isDeprecated()) {
-          final Map<ParameterName, Object> p1 = projectedCs.getParameters();
-          final Map<ParameterName, Object> p2 = esri.getParameters();
-          final Set<ParameterName> n1 = p1.keySet();
-          final Set<ParameterName> n2 = p2.keySet();
-          if (!n1.equals(n2)) {
-
-            final TreeSet<ParameterName> nm1 = new TreeSet<>(n1);
-            nm1.removeAll(n2);
-            final TreeSet<ParameterName> nm2 = new TreeSet<>(n2);
-            nm2.removeAll(n1);
-            final String m = id + "\t" + coordinateSytstem.getCoordinateSystemName() + "\t" + nm1
-              + "\t" + nm2;
-            // System.out.println(m);
-          }
-        }
-      }
-    }
   }
 
   private void writeByte(final ChannelWriter writer, final Record record, final String fieldName) {

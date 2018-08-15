@@ -1,4 +1,4 @@
-package com.revolsys.core.test.geometry.cs.esri;
+package com.revolsys.core.init;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

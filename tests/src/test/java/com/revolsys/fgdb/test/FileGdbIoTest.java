@@ -20,7 +20,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.testapi.GeometryAssertUtil;
+import com.revolsys.testapi.GeometryAssert;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -84,7 +84,7 @@ public class FileGdbIoTest {
             // Allow for conversion of multi part to single part
             if (geometry.getGeometryCount() != 1
               || !actual.equals(geometryAxisCount, geometry.getGeometry(0))) {
-              GeometryAssertUtil.failNotEquals("Geometry Equal Exact", geometry, actual);
+              GeometryAssert.failNotEquals("Geometry Equal Exact", geometry, actual);
             }
           }
         }

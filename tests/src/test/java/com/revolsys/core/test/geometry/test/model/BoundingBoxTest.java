@@ -25,7 +25,7 @@ import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.RectangleUtil;
-import com.revolsys.testapi.GeometryAssertUtil;
+import com.revolsys.testapi.GeometryAssert;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.number.Doubles;
 
@@ -489,13 +489,13 @@ public class BoundingBoxTest implements TestConstants {
     final Polygon expectedPolygon2 = GeometryFactory.DEFAULT_2D.polygon(2, 0, 0, 3.5, 0, 7, 0, 7,
       3.5, 7, 7, 3.5, 7, 0, 7, 0, 3.5, 0, 0);
     final Polygon actualPolygon2 = boundingBox.toPolygon(2);
-    GeometryAssertUtil.assertEqualsExact(2, expectedPolygon2, actualPolygon2);
+    GeometryAssert.assertEqualsExact(2, expectedPolygon2, actualPolygon2);
 
     final Polygon expectedPolygon3 = GeometryFactory.DEFAULT_2D.polygon(2, 0, 0, 2.3333333333333335,
       0, 4.666666666666667, 0, 7, 0, 7, 2.3333333333333335, 7, 4.666666666666667, 7, 7,
       4.666666666666667, 7, 2.3333333333333335, 7, 0, 7, 0, 4.666666666666667, 0,
       2.3333333333333335, 0, 0);
     final Polygon actualPolygon3 = boundingBox.toPolygon(3);
-    GeometryAssertUtil.assertEqualsExact(2, expectedPolygon3, actualPolygon3);
+    GeometryAssert.assertEqualsExact(2, expectedPolygon3, actualPolygon3);
   }
 }

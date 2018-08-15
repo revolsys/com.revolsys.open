@@ -34,7 +34,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.PathResource;
-import com.revolsys.testapi.GeometryAssertUtil;
+import com.revolsys.testapi.GeometryAssert;
 import com.revolsys.testapi.RunnableTestCase;
 
 import junit.framework.TestCase;
@@ -174,7 +174,7 @@ public class RecordIoTestSuite {
         // Allow for conversion of multi part to single part
         if (expectedGeometry.getGeometryCount() != 1
           || !actualGeometry.equals(axisCount, expectedGeometry.getGeometry(0))) {
-          GeometryAssertUtil.failNotEquals("Geometry Equal Exact", expectedGeometry, actualGeometry);
+          GeometryAssert.failNotEquals("Geometry Equal Exact", expectedGeometry, actualGeometry);
         }
       }
     }

@@ -2,12 +2,12 @@ package com.revolsys.core.test.geometry.test.model;
 
 import org.junit.Test;
 
-import com.revolsys.testapi.GeometryAssertUtil;
+import com.revolsys.testapi.GeometryAssert;
 
 public class MultiLineStringTest {
 
   @Test
   public void testFromFile() {
-    GeometryAssertUtil.doTestGeometry(getClass(), "MultiLineString.csv");
+    GeometryAssert.doTestGeometry(getClass(), "MultiLineString.csv");
   }
 }

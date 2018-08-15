@@ -40,9 +40,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.wkb.ParseException;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * @version 1.7
@@ -50,14 +48,6 @@ import junit.framework.TestSuite;
 public class GeometryImplTest extends TestCase {
   private interface CollectionFactory {
     Geometry newCollection(Geometry... geometries);
-  }
-
-  public static void main(final String[] args) throws Exception {
-    junit.textui.TestRunner.run(suite());
-  }
-
-  public static Test suite() {
-    return new TestSuite(GeometryImplTest.class);
   }
 
   private final GeometryFactory geometryFactory = GeometryFactory.fixed3d(0, 1.0, 1.0, 1.0);

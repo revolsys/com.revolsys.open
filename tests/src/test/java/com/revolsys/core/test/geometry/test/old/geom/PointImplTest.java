@@ -36,10 +36,7 @@ package com.revolsys.core.test.geometry.test.old.geom;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 /**
  * Test for com.revolsys.core.test.geometry.testold.geom.impl.PointImpl.
@@ -47,14 +44,6 @@ import junit.textui.TestRunner;
  * @version 1.7
  */
 public class PointImplTest extends TestCase {
-
-  public static void main(final String args[]) {
-    TestRunner.run(suite());
-  }
-
-  public static Test suite() {
-    return new TestSuite(PointImplTest.class);
-  }
 
   private final GeometryFactory albers2d = GeometryFactory.fixed2d(3005, 1000.0, 1000.0);
 

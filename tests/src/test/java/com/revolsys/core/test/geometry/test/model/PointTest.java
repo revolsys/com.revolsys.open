@@ -11,7 +11,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.SortedPointList;
-import com.revolsys.testapi.GeometryAssertUtil;
+import com.revolsys.testapi.GeometryAssert;
 
 public class PointTest implements TestConstants {
 
@@ -42,7 +42,7 @@ public class PointTest implements TestConstants {
       final double value = point.getCoordinate(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {
         if (!Double.isNaN(value)) {
-          GeometryAssertUtil.failNotEquals("Value NaN", Double.NaN, value);
+          GeometryAssert.failNotEquals("Value NaN", Double.NaN, value);
         }
       } else {
         Assert.assertEquals("Coordinate Value", coordinates[axisIndex], value, 0);
@@ -59,7 +59,7 @@ public class PointTest implements TestConstants {
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
       final double value = point.getCoordinate(axisIndex);
       if (!Double.isNaN(value)) {
-        GeometryAssertUtil.failNotEquals("Value NaN", Double.NaN, value);
+        GeometryAssert.failNotEquals("Value NaN", Double.NaN, value);
       }
     }
   }
@@ -240,7 +240,7 @@ public class PointTest implements TestConstants {
 
   @Test
   public void testFromFile() {
-    GeometryAssertUtil.doTestGeometry(getClass(), "Point.csv");
+    GeometryAssert.doTestGeometry(getClass(), "Point.csv");
   }
 
   @Test

@@ -19,7 +19,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.PathResource;
-import com.revolsys.testapi.GeometryAssertUtil;
+import com.revolsys.testapi.GeometryAssert;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -174,7 +174,7 @@ public class BufferTest extends TestCase {
     }
     if (this.expected != null) {
       if (!actual.equals(2, this.expected)) {
-        GeometryAssertUtil.failNotEquals(message("Geometry Equal", actual), this.expected, actual);
+        GeometryAssert.failNotEquals(message("Geometry Equal", actual), this.expected, actual);
       }
     }
     if (this.expectedContains != null) {

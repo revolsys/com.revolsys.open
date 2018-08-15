@@ -36,10 +36,7 @@ package com.revolsys.core.test.geometry.test.old.geom;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 /**
  * Test for com.revolsys.core.test.geometry.testold.geom.GeometryCollectionImpl.
@@ -47,14 +44,6 @@ import junit.textui.TestRunner;
  * @version 1.7
  */
 public class GeometryCollectionImplTest extends TestCase {
-
-  public static void main(final String args[]) {
-    TestRunner.run(suite());
-  }
-
-  public static Test suite() {
-    return new TestSuite(GeometryCollectionImplTest.class);
-  }
 
   private final GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1000.0, 1000.0);
 

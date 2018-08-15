@@ -40,10 +40,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 /**
  * Test for com.revolsys.core.test.geometry.testold.geom.impl.MultiPointImpl.
@@ -51,14 +48,6 @@ import junit.textui.TestRunner;
  * @version 1.7
  */
 public class MultiPointImplTest extends TestCase {
-
-  public static void main(final String args[]) {
-    TestRunner.run(suite());
-  }
-
-  public static Test suite() {
-    return new TestSuite(MultiPointImplTest.class);
-  }
 
   private final GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1000.0, 1000.0);
 

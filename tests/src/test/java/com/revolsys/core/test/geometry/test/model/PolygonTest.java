@@ -13,7 +13,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.testapi.GeometryAssertUtil;
+import com.revolsys.testapi.GeometryAssert;
 
 public class PolygonTest {
 
@@ -33,7 +33,7 @@ public class PolygonTest {
 
   @Test
   public void testFromFile() {
-    GeometryAssertUtil.doTestGeometry(getClass(), "Polygon.csv");
+    GeometryAssert.doTestGeometry(getClass(), "Polygon.csv");
   }
 
   @Test

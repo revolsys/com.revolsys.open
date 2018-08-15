@@ -36,9 +36,7 @@ package com.revolsys.core.test.geometry.test.old.geom;
 import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.IntersectionMatrix;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * @version 1.7
@@ -50,10 +48,6 @@ public class IntersectionMatrixTest extends TestCase {
   private static int L = Dimension.L;
 
   private static int P = Dimension.P;
-
-  public static Test suite() {
-    return new TestSuite(IntersectionMatrixTest.class);
-  }
 
   public IntersectionMatrixTest(final String name) {
     super(name);

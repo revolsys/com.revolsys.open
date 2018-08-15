@@ -2,12 +2,12 @@ package com.revolsys.core.test.geometry.test.model;
 
 import org.junit.Test;
 
-import com.revolsys.testapi.GeometryAssertUtil;
+import com.revolsys.testapi.GeometryAssert;
 
 public class MultiPointTest {
 
   @Test
   public void testFromFile() {
-    GeometryAssertUtil.doTestGeometry(getClass(), "MultiPoint.csv");
+    GeometryAssert.doTestGeometry(getClass(), "MultiPoint.csv");
   }
 }

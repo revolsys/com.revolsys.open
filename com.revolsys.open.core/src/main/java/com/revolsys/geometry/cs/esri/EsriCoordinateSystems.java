@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.revolsys.geometry.cs.Authority;
@@ -42,6 +43,20 @@ public class EsriCoordinateSystems {
   private static final Map<String, AngularUnit> ANGULAR_UNITS_BY_NAME = new TreeMap<>();
 
   private static final Map<String, LinearUnit> LINEAR_UNITS_BY_NAME = new TreeMap<>();
+
+  private static Map<ParameterName, ParameterValue> convertParameters(
+    final Map<String, String> parameters) {
+    final Map<ParameterName, ParameterValue> parameterValues = new LinkedHashMap<>();
+    for (final Entry<String, String> parameter : parameters.entrySet()) {
+      final String name = parameter.getKey();
+
+      final String value = parameter.getValue();
+      final ParameterName parameterName = new SingleParameterName(name);
+      final ParameterValue parameterValue = new ParameterValueBigDecimal(value);
+      parameterValues.put(parameterName, parameterValue);
+    }
+    return parameterValues;
+  }
 
   @SuppressWarnings("unchecked")
   public static <C extends CoordinateSystem> C getCoordinateSystem(final int crsId) {
@@ -200,7 +215,7 @@ public class EsriCoordinateSystems {
 
           final int geographicCoordinateSystemId = reader.getInt();
           final String projectionName = reader.getStringUtf8ByteCount();
-          final Map<ParameterName, ParameterValue> parameters = readParameters(reader);
+          final Map<String, String> parameters = readParameters(reader);
           final String unitName = reader.getStringUtf8ByteCount();
           final double conversionFactor = reader.getDouble();
 
@@ -213,8 +228,10 @@ public class EsriCoordinateSystems {
             final Authority authority = new BaseAuthority("ESRI", coordinateSystemId);
             final GeographicCoordinateSystem geographicCoordinateSystem = getGeographicCoordinateSystem(
               geographicCoordinateSystemId);
+            final Map<ParameterName, ParameterValue> parameterValues = convertParameters(
+              parameters);
             coordinateSystem = new ProjectedCoordinateSystem(coordinateSystemId, csName,
-              geographicCoordinateSystem, projectionName, parameters, linearUnit, authority);
+              geographicCoordinateSystem, projectionName, parameterValues, linearUnit, authority);
             COORDINATE_SYSTEM_BY_ID.put(id, coordinateSystem);
             return coordinateSystem;
           }
@@ -242,7 +259,7 @@ public class EsriCoordinateSystems {
           final int coordinateSystemId = reader.getInt();
           final String csName = reader.getStringUtf8ByteCount();
           final String datumName = reader.getStringUtf8ByteCount();
-          final Map<ParameterName, ParameterValue> parameters = readParameters(reader);
+          final Map<String, String> parameters = readParameters(reader);
           final String linearUnitName = reader.getStringUtf8ByteCount();
           final double conversionFactor = reader.getDouble();
 
@@ -256,8 +273,11 @@ public class EsriCoordinateSystems {
             }
 
             final Authority authority = new BaseAuthority("ESRI", coordinateSystemId);
+            final Map<ParameterName, ParameterValue> parameterValues = convertParameters(
+              parameters);
+
             coordinateSystem = new VerticalCoordinateSystem(authority, csName, verticalDatum,
-              parameters, linearUnit, Collections.emptyList());
+              parameterValues, linearUnit, Collections.emptyList());
             COORDINATE_SYSTEM_BY_ID.put(id, coordinateSystem);
             return coordinateSystem;
           }
@@ -320,15 +340,13 @@ public class EsriCoordinateSystems {
     }
   }
 
-  private static Map<ParameterName, ParameterValue> readParameters(final ChannelReader reader) {
+  private static Map<String, String> readParameters(final ChannelReader reader) {
     final byte parameterCount = reader.getByte();
-    final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
+    final Map<String, String> parameters = new LinkedHashMap<>();
     for (int i = 0; i < parameterCount; i++) {
       final String name = reader.getStringUtf8ByteCount();
       final String value = reader.getStringUtf8ByteCount();
-      final ParameterName parameterName = new SingleParameterName(name);
-      final ParameterValue parameterValue = new ParameterValueBigDecimal(value);
-      parameters.put(parameterName, parameterValue);
+      parameters.put(name, value);
     }
     return parameters;
   }

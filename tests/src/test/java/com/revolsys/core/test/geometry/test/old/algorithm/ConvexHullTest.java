@@ -44,10 +44,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 /**
  * Test for {@link ConvexHull}.
@@ -57,14 +54,6 @@ import junit.textui.TestRunner;
 public class ConvexHullTest extends TestCase {
 
   private static final GeometryFactory GEOMETRY_FACTORY_1M = GeometryFactory.fixed2d(0, 1.0, 1.0);
-
-  public static void main(final String args[]) {
-    TestRunner.run(suite());
-  }
-
-  public static Test suite() {
-    return new TestSuite(ConvexHullTest.class);
-  }
 
   GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1000.0, 1000.0);
 

@@ -41,10 +41,7 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 /**
  * Test for {@link WKTReader}
@@ -52,14 +49,6 @@ import junit.textui.TestRunner;
  * @version 1.7
  */
 public class WKTReaderTest extends TestCase {
-
-  public static void main(final String args[]) {
-    TestRunner.run(suite());
-  }
-
-  public static Test suite() {
-    return new TestSuite(WKTReaderTest.class);
-  }
 
   private final GeometryFactory geometryFactory = GeometryFactory.fixed2d(0, 1.0, 1.0);
 

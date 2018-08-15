@@ -15,7 +15,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
-import com.revolsys.testapi.GeometryAssertUtil;
+import com.revolsys.testapi.GeometryAssert;
 
 public class LineStringTest {
 
@@ -32,7 +32,7 @@ public class LineStringTest {
       final double value = point.getCoordinate(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {
         if (!Double.isNaN(value)) {
-          GeometryAssertUtil.failNotEquals("Value NaN", Double.NaN, value);
+          GeometryAssert.failNotEquals("Value NaN", Double.NaN, value);
         }
       } else {
         Assert.assertEquals("Coordinate Value", coordinates[axisIndex], value, 0);
@@ -74,7 +74,7 @@ public class LineStringTest {
     for (int axisIndex = -1; axisIndex < line.getAxisCount() + 1; axisIndex++) {
       final double value = line.getCoordinate(0, axisIndex);
       if (!Double.isNaN(value)) {
-        GeometryAssertUtil.failNotEquals("Value NaN", Double.NaN, value);
+        GeometryAssert.failNotEquals("Value NaN", Double.NaN, value);
       }
     }
   }
@@ -138,11 +138,11 @@ public class LineStringTest {
     final Point mergePoint = geometryFactory.point(mergeX, mergeY);
 
     final LineString mergedLine = line1.merge(mergePoint, line2);
-    GeometryAssertUtil.assertEqualsExact(axisCount, expectedMergedLine, mergedLine);
+    GeometryAssert.assertEqualsExact(axisCount, expectedMergedLine, mergedLine);
 
     if (!loop) {
       final LineString mergedLine2 = line1.merge(line2);
-      GeometryAssertUtil.assertEqualsExact(axisCount, expectedMergedLine, mergedLine2);
+      GeometryAssert.assertEqualsExact(axisCount, expectedMergedLine, mergedLine2);
     }
   }
 
@@ -159,7 +159,7 @@ public class LineStringTest {
       for (int i = 0; i < splitLines.length; i++) {
         final LineString expectedSplitLine = splitLines[i];
         final LineString actualSplitLine = actualSplitLines.get(i);
-        GeometryAssertUtil.assertEqualsExact(axisCount, expectedSplitLine, actualSplitLine);
+        GeometryAssert.assertEqualsExact(axisCount, expectedSplitLine, actualSplitLine);
       }
     }
     if (testLineStringLocation) {
@@ -173,7 +173,7 @@ public class LineStringTest {
       for (int i = 0; i < splitLines.length; i++) {
         final LineString expectedSplitLine = splitLines[i];
         final LineString actualSplitLine = actualSplitLines.get(i);
-        GeometryAssertUtil.assertEqualsExact(axisCount, expectedSplitLine, actualSplitLine);
+        GeometryAssert.assertEqualsExact(axisCount, expectedSplitLine, actualSplitLine);
       }
     }
   }
@@ -352,7 +352,7 @@ public class LineStringTest {
 
   @Test
   public void testFromFile() {
-    GeometryAssertUtil.doTestGeometry(getClass(), "LineString.csv");
+    GeometryAssert.doTestGeometry(getClass(), "LineString.csv");
   }
 
   @Test
@@ -471,10 +471,10 @@ public class LineStringTest {
     final LineString line = geometryFactory.lineString(2, 0.0, 0, 2, 2, 3, 3, 4, 4, 5, 5);
     assertEmpty(line.subLine(0));
 
-    GeometryAssertUtil.equalsExact(2, line.subLine(2), geometryFactory.lineString(2, 0.0, 0, 2, 2));
-    GeometryAssertUtil.equalsExact(2, line.subLine(2, geometryFactory.point(10, 10)),
+    GeometryAssert.equalsExact(2, line.subLine(2), geometryFactory.lineString(2, 0.0, 0, 2, 2));
+    GeometryAssert.equalsExact(2, line.subLine(2, geometryFactory.point(10, 10)),
       geometryFactory.lineString(2, 0.0, 0, 2, 2, 10, 10));
-    GeometryAssertUtil.equalsExact(2,
+    GeometryAssert.equalsExact(2,
       line.subLine(geometryFactory.point(-1, -1), 0, 2, geometryFactory.point(10, 10)),
       geometryFactory.lineString(2, -1.0, -1.0, 0.0, 0, 2, 2, 10, 10));
 
@@ -482,7 +482,7 @@ public class LineStringTest {
       geometryFactory.point(10, 10));
     final LineString expectedFromToIndexMaxLength = geometryFactory.lineString(2, -1.0, -1.0, 4, 4,
       5, 5, 10, 10);
-    GeometryAssertUtil.equalsExact(2, actualFromToIndexMaxLength, expectedFromToIndexMaxLength);
+    GeometryAssert.equalsExact(2, actualFromToIndexMaxLength, expectedFromToIndexMaxLength);
   }
 
   @Test
@@ -490,23 +490,23 @@ public class LineStringTest {
     final GeometryFactory geometryFactory = GeometryFactory.wgs84();
     final LineString line = geometryFactory.lineString(2, 0.0, 0, 2, 2, 3, 3, 4, 4, 5, 5);
 
-    GeometryAssertUtil.equalsExact(//
+    GeometryAssert.equalsExact(//
       2, //
       line.subLine(null, null), //
       line//
     );
 
-    GeometryAssertUtil.equalsExact(2, //
+    GeometryAssert.equalsExact(2, //
       line.subLine(null, line.getLineStringLocation(2, 2)), //
       geometryFactory.lineString(2, 0.0, 0, 2, 2)//
     );
 
-    GeometryAssertUtil.equalsExact(2, //
+    GeometryAssert.equalsExact(2, //
       line.subLine(line.getLineStringLocation(2, 2), null), //
       geometryFactory.lineString(2, 2.0, 2, 3, 3, 4, 4, 5, 5)//
     );
 
-    GeometryAssertUtil.equalsExact(2, //
+    GeometryAssert.equalsExact(2, //
       line.subLine(//
         line.getLineStringLocation(2, 2), //
         line.getLineStringLocation(3, 3)//
@@ -514,7 +514,7 @@ public class LineStringTest {
       geometryFactory.lineString(2, 2.0, 2, 3, 3)//
     );
 
-    GeometryAssertUtil.equalsExact(2, //
+    GeometryAssert.equalsExact(2, //
       line.subLine(//
         line.getLineStringLocation(1, 1), //
         line.getLineStringLocation(3, 3)//
@@ -522,7 +522,7 @@ public class LineStringTest {
       geometryFactory.lineString(2, 1.0, 1, 2, 2, 3, 3)//
     );
 
-    GeometryAssertUtil.equalsExact(2, //
+    GeometryAssert.equalsExact(2, //
       line.subLine(//
         line.getLineStringLocation(1, 1), //
         line.getLineStringLocation(3.5, 3.5)//
@@ -530,7 +530,7 @@ public class LineStringTest {
       geometryFactory.lineString(2, 1.0, 1, 2, 2, 3, 3, 3.5, 3.5)//
     );
 
-    GeometryAssertUtil.equalsExact(2, //
+    GeometryAssert.equalsExact(2, //
       line.subLine(//
         line.getLineStringLocation(2, 2), //
         line.getLineStringLocation(2, 2)), //
