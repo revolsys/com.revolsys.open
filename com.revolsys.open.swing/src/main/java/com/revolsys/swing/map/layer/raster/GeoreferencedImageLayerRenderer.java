@@ -4,6 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.Arrays;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
@@ -20,7 +21,8 @@ public class GeoreferencedImageLayerRenderer
   extends AbstractLayerRenderer<GeoreferencedImageLayer> {
 
   private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle
-    .line(WebColors.Red, 4);
+    .line(WebColors.Red, 1)
+    .setLineDashArray(Arrays.asList(10));;
 
   public static void render(final Viewport2D viewport, final Graphics2D graphics,
     final GeoreferencedImage image, final boolean useTransform) {
@@ -39,7 +41,8 @@ public class GeoreferencedImageLayerRenderer
   }
 
   public static void renderAlpha(final Viewport2D viewport, final Graphics2D graphics,
-    final GeoreferencedImage image, final boolean useTransform, final double alpha, Object interpolationMethod) {
+    final GeoreferencedImage image, final boolean useTransform, final double alpha,
+    final Object interpolationMethod) {
     final Composite composite = graphics.getComposite();
     try (
       BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, false)) {
@@ -48,7 +51,7 @@ public class GeoreferencedImageLayerRenderer
         alphaComposite = alphaComposite.derive((float)alpha);
       }
       graphics.setComposite(alphaComposite);
-      render(viewport, graphics, image, useTransform,interpolationMethod);
+      render(viewport, graphics, image, useTransform, interpolationMethod);
     } finally {
       graphics.setComposite(composite);
     }
@@ -84,7 +87,8 @@ public class GeoreferencedImageLayerRenderer
           final Graphics2D graphics = viewport.getGraphics();
           if (graphics != null) {
             if (!cancellable.isCancelled()) {
-              renderAlpha(viewport, graphics, image, true, layer.getOpacity() / 255.0, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+              renderAlpha(viewport, graphics, image, true, layer.getOpacity() / 255.0,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             }
             if (!cancellable.isCancelled()) {
               renderDifferentCoordinateSystem(viewport, graphics, boundingBox);

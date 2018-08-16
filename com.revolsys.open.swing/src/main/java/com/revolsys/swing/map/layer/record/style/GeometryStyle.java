@@ -317,9 +317,10 @@ public class GeometryStyle extends MarkerStyle {
     return this.polygonClip;
   }
 
-  public void setFill(final Color fill) {
+  public GeometryStyle setFill(final Color fill) {
     setPolygonFill(fill);
     setMarkerFill(fill);
+    return this;
   }
 
   public void setFillStyle(final Viewport2D viewport, final Graphics2D graphics) {
@@ -343,19 +344,21 @@ public class GeometryStyle extends MarkerStyle {
     // }
   }
 
-  public void setLineCap(final LineCap lineCap) {
+  public GeometryStyle setLineCap(final LineCap lineCap) {
     final Object oldValue = this.lineCap;
     this.lineCap = lineCap;
     firePropertyChange("lineCap", oldValue, this.lineCap);
+    return this;
   }
 
-  public void setLineClip(final boolean lineClip) {
+  public GeometryStyle setLineClip(final boolean lineClip) {
     final Object oldValue = this.lineClip;
     this.lineClip = lineClip;
     firePropertyChange("lineClip", oldValue, this.lineClip);
+    return this;
   }
 
-  public void setLineColor(final Color lineColor) {
+  public GeometryStyle setLineColor(final Color lineColor) {
     final Object oldLineColor = this.lineColor;
     final Object oldLineOpacity = this.lineOpacity;
     if (lineColor == null) {
@@ -366,15 +369,17 @@ public class GeometryStyle extends MarkerStyle {
     }
     firePropertyChange("lineColor", oldLineColor, this.lineColor);
     firePropertyChange("lineOpacity", oldLineOpacity, this.lineOpacity);
+    return this;
   }
 
-  public void setLineCompOp(final CompositionOperation lineCompOp) {
+  public GeometryStyle setLineCompOp(final CompositionOperation lineCompOp) {
     final Object oldValue = this.lineCompOp;
     this.lineCompOp = getWithDefault(lineCompOp, CompositionOperation.src_over);
     firePropertyChange("lineCompOp", oldValue, this.lineCompOp);
+    return this;
   }
 
-  public void setLineDashArray(final List<?> lineDashArray) {
+  public GeometryStyle setLineDashArray(final List<?> lineDashArray) {
     final Object oldValue = this.lineDashArray;
     final List<Double> dashArray = new ArrayList<>();
     if (lineDashArray != null) {
@@ -389,47 +394,54 @@ public class GeometryStyle extends MarkerStyle {
     }
     this.lineDashArray = Collections.unmodifiableList(dashArray);
     firePropertyChange("lineDashArray", oldValue, this.lineDashArray);
+    return this;
   }
 
-  public void setLineDashOffset(final double lineDashOffset) {
+  public GeometryStyle setLineDashOffset(final double lineDashOffset) {
     final Object oldValue = this.lineDashOffset;
     this.lineDashOffset = lineDashOffset;
     firePropertyChange("lineDashOffset", oldValue, this.lineDashOffset);
+    return this;
   }
 
-  public void setLineGamma(final double gamma) {
+  public GeometryStyle setLineGamma(final double gamma) {
     final Object oldValue = this.lineGamma;
     this.lineGamma = gamma;
     firePropertyChange("lineGamma", oldValue, this.lineGamma);
+    return this;
   }
 
-  public void setLineGammaMethod(final GammaMethod gammaMethod) {
+  public GeometryStyle setLineGammaMethod(final GammaMethod gammaMethod) {
     final Object oldValue = this.lineGammaMethod;
     this.lineGammaMethod = getWithDefault(gammaMethod, GammaMethod.power);
     firePropertyChange("lineGammaMethod", oldValue, this.lineGammaMethod);
+    return this;
   }
 
-  public void setLineJoin(final LineJoin lineJoin) {
+  public GeometryStyle setLineJoin(final LineJoin lineJoin) {
     final Object oldValue = this.lineJoin;
     this.lineJoin = lineJoin;
     firePropertyChange("lineJoin", oldValue, this.lineJoin);
+    return this;
   }
 
-  public void setLineMiterlimit(final float lineMiterlimit) {
+  public GeometryStyle setLineMiterlimit(final float lineMiterlimit) {
     final Object oldValue = this.lineMiterlimit;
     this.lineMiterlimit = lineMiterlimit;
     firePropertyChange("lineMiterlimit", oldValue, this.lineMiterlimit);
+    return this;
   }
 
-  public void setLineOpacity(final double lineOpacity) {
+  public GeometryStyle setLineOpacity(final double lineOpacity) {
     if (lineOpacity < 0 || lineOpacity > 1) {
       throw new IllegalArgumentException("Line opacity must be between 0.0 - 1.0");
     } else {
       setLineOpacity((int)(255 * lineOpacity));
     }
+    return this;
   }
 
-  public void setLineOpacity(final int lineOpacity) {
+  public GeometryStyle setLineOpacity(final int lineOpacity) {
     if (lineOpacity < 0 || lineOpacity > 255) {
       throw new IllegalArgumentException("Line opacity must be between 0 - 255");
     } else {
@@ -440,12 +452,14 @@ public class GeometryStyle extends MarkerStyle {
       firePropertyChange("lineOpacity", oldLineOpacity, this.lineOpacity);
       firePropertyChange("lineColor", oldLineColor, this.lineColor);
     }
+    return this;
   }
 
-  public void setLineSmooth(final double smooth) {
+  public GeometryStyle setLineSmooth(final double smooth) {
     final Object oldValue = this.lineSmooth;
     this.lineSmooth = smooth;
     firePropertyChange("lineSmooth", oldValue, this.lineSmooth);
+    return this;
   }
 
   public void setLineStyle(final Viewport2D viewport, final Graphics2D graphics) {
@@ -478,25 +492,28 @@ public class GeometryStyle extends MarkerStyle {
     graphics.setStroke(basicStroke);
   }
 
-  public void setLineWidth(final Quantity<Length> lineWidth) {
+  public GeometryStyle setLineWidth(final Quantity<Length> lineWidth) {
     final Object oldValue = this.lineWidth;
     this.lineWidth = getWithDefault(lineWidth, ZERO_PIXEL);
     firePropertyChange("lineWidth", oldValue, this.lineWidth);
+    return this;
   }
 
-  public void setPolygonClip(final boolean polygonClip) {
+  public GeometryStyle setPolygonClip(final boolean polygonClip) {
     final Object oldValue = this.polygonClip;
     this.polygonClip = polygonClip;
     firePropertyChange("polygonClip", oldValue, this.polygonClip);
+    return this;
   }
 
-  public void setPolygonCompOp(final CompositionOperation polygonCompOp) {
+  public GeometryStyle setPolygonCompOp(final CompositionOperation polygonCompOp) {
     final Object oldValue = this.polygonCompOp;
     this.polygonCompOp = getWithDefault(polygonCompOp, CompositionOperation.src_over);
     firePropertyChange("polygonCompOp", oldValue, this.polygonCompOp);
+    return this;
   }
 
-  public void setPolygonFill(final Color fill) {
+  public GeometryStyle setPolygonFill(final Color fill) {
     final Object oldPolygonFill = this.polygonFill;
     final Object oldPolygonFillOpacity = this.polygonFillOpacity;
     if (fill == null) {
@@ -507,17 +524,19 @@ public class GeometryStyle extends MarkerStyle {
     }
     firePropertyChange("polygonFill", oldPolygonFill, this.polygonFill);
     firePropertyChange("polygonFillOpacity", oldPolygonFillOpacity, this.polygonFillOpacity);
+    return this;
   }
 
-  public void setPolygonFillOpacity(final double polygonFillOpacity) {
+  public GeometryStyle setPolygonFillOpacity(final double polygonFillOpacity) {
     if (polygonFillOpacity < 0 || polygonFillOpacity > 1) {
       throw new IllegalArgumentException("Polygon fill opacity must be between 0.0 - 1.0");
     } else {
       setPolygonFillOpacity((int)(255 * polygonFillOpacity));
     }
+    return this;
   }
 
-  public void setPolygonFillOpacity(final int polygonFillOpacity) {
+  public GeometryStyle setPolygonFillOpacity(final int polygonFillOpacity) {
     final Object oldPolygonFill = this.polygonFill;
     final Object oldPolygonFillOpacity = this.polygonFillOpacity;
     if (polygonFillOpacity < 0 || polygonFillOpacity > 255) {
@@ -528,23 +547,27 @@ public class GeometryStyle extends MarkerStyle {
     }
     firePropertyChange("polygonFill", oldPolygonFill, this.polygonFill);
     firePropertyChange("polygonFillOpacity", oldPolygonFillOpacity, this.polygonFillOpacity);
+    return this;
   }
 
-  public void setPolygonGamma(final double polygonGamma) {
+  public GeometryStyle setPolygonGamma(final double polygonGamma) {
     final Object oldValue = this.polygonGamma;
     this.polygonGamma = polygonGamma;
     firePropertyChange("polygonGamma", oldValue, this.polygonGamma);
+    return this;
   }
 
-  public void setPolygonGammaMethod(final GammaMethod polygonGammaMethod) {
+  public GeometryStyle setPolygonGammaMethod(final GammaMethod polygonGammaMethod) {
     final Object oldValue = this.polygonGammaMethod;
     this.polygonGammaMethod = getWithDefault(polygonGammaMethod, GammaMethod.power);
     firePropertyChange("polygonGammaMethod", oldValue, this.polygonGammaMethod);
+    return this;
   }
 
-  public void setPolygonSmooth(final double polygonSmooth) {
+  public GeometryStyle setPolygonSmooth(final double polygonSmooth) {
     final Object oldValue = this.polygonSmooth;
     this.polygonSmooth = polygonSmooth;
     firePropertyChange("polygonSmooth", oldValue, this.polygonSmooth);
+    return this;
   }
 }

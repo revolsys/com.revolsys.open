@@ -9,6 +9,7 @@ import java.awt.image.RenderedImage;
 import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -16,6 +17,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
@@ -131,7 +133,8 @@ public interface GeoreferencedImage
       final int imageHeight = renderedImage.getHeight();
       if (imageWidth > 0 && imageHeight > 0) {
 
-        imageBoundingBox = imageBoundingBox.convert(viewBoundingBox.getGeometryFactory());
+        final GeometryFactory viewGeometryFactory = viewBoundingBox.getGeometryFactory();
+        imageBoundingBox = imageBoundingBox.convert(viewGeometryFactory);
         final AffineTransform transform = graphics.getTransform();
         try {
           final double scaleFactor = viewWidth / viewBoundingBox.getWidth();
@@ -196,6 +199,26 @@ public interface GeoreferencedImage
 
   default AffineTransform getAffineTransformation(final BoundingBox boundingBox) {
     final List<MappedLocation> mappings = new ArrayList<>(getTiePoints());
+    if (mappings.isEmpty()) {
+      if (!isSameCoordinateSystem(boundingBox)) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        final BoundingBox imageBoundingBox = getBoundingBox();
+        double sourceY = 0;
+        for (final double y : Arrays.asList(imageBoundingBox.getMinY(),
+          imageBoundingBox.getMaxY())) {
+          double sourceX = 0;
+          for (final double x : Arrays.asList(imageBoundingBox.getMinX(),
+            imageBoundingBox.getMaxX())) {
+            final Point pixel = new PointDoubleXY(sourceX, sourceY);
+            final Point targetPoint = geometryFactory.point(x, y);
+            final MappedLocation location = new MappedLocation(pixel, targetPoint);
+            mappings.add(location);
+            sourceX = getImageWidth() - 1;
+          }
+          sourceY = getImageHeight() - 1;
+        }
+      }
+    }
     final int count = mappings.size();
     final int imageWidth = getImageWidth();
     final int imageHeight = getImageHeight();
