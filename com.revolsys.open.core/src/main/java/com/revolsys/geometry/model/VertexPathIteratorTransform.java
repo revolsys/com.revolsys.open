@@ -17,23 +17,29 @@ public class VertexPathIteratorTransform extends VertexPathIterator {
 
   @Override
   public int currentSegment(final double[] coordinates) {
-    final double x = this.vertex.getX();
-    final double y = this.vertex.getY();
-    this.currentCoordinates[0] = x;
-    this.currentCoordinates[1] = y;
-    this.transform.transform(this.currentCoordinates, 0, coordinates, 0, 1);
-    return this.vertex.getAwtType();
+    final int awtType = this.vertex.getAwtType();
+    if (awtType != SEG_CLOSE) {
+      final double x = this.vertex.getX();
+      final double y = this.vertex.getY();
+      this.currentCoordinates[0] = x;
+      this.currentCoordinates[1] = y;
+      this.transform.transform(this.currentCoordinates, 0, coordinates, 0, 1);
+    }
+    return awtType;
   }
 
   @Override
   public int currentSegment(final float[] coordinates) {
-    // Uses a double[] to avoid rounding errors in transform
-    final double x = this.vertex.getX();
-    final double y = this.vertex.getY();
-    this.currentCoordinates[0] = x;
-    this.currentCoordinates[1] = y;
+    final int awtType = this.vertex.getAwtType();
+    if (awtType != SEG_CLOSE) {
+      // Uses a double[] to avoid rounding errors in transform
+      final double x = this.vertex.getX();
+      final double y = this.vertex.getY();
+      this.currentCoordinates[0] = x;
+      this.currentCoordinates[1] = y;
 
-    this.transform.transform(this.currentCoordinates, 0, coordinates, 0, 1);
-    return this.vertex.getAwtType();
+      this.transform.transform(this.currentCoordinates, 0, coordinates, 0, 1);
+    }
+    return awtType;
   }
 }

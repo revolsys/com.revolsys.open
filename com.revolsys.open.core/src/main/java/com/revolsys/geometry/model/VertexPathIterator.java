@@ -16,20 +16,26 @@ public class VertexPathIterator implements PathIterator {
 
   @Override
   public int currentSegment(final double[] coordinates) {
-    final double x = this.vertex.getX();
-    final double y = this.vertex.getY();
-    coordinates[0] = x;
-    coordinates[1] = y;
-    return this.vertex.getAwtType();
+    final int awtType = this.vertex.getAwtType();
+    if (awtType != SEG_CLOSE) {
+      final double x = this.vertex.getX();
+      final double y = this.vertex.getY();
+      coordinates[0] = x;
+      coordinates[1] = y;
+    }
+    return awtType;
   }
 
   @Override
   public int currentSegment(final float[] coordinates) {
-    final double x = this.vertex.getX();
-    final double y = this.vertex.getY();
-    coordinates[0] = (float)x;
-    coordinates[1] = (float)y;
-    return this.vertex.getAwtType();
+    final int awtType = this.vertex.getAwtType();
+    if (awtType != SEG_CLOSE) {
+      final double x = this.vertex.getX();
+      final double y = this.vertex.getY();
+      coordinates[0] = (float)x;
+      coordinates[1] = (float)y;
+    }
+    return awtType;
   }
 
   public Vertex getVertex() {

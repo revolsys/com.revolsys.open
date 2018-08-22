@@ -18,7 +18,7 @@ public class ImageViewport extends GraphicsViewport2D {
   public ImageViewport(final Project project, final int width, final int height,
     final BoundingBox boundingBox, final int imageType) {
     super(project, width, height, boundingBox);
-    this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
+    this.image = new BufferedImage(width, height, imageType);
     setGraphics((Graphics2D)this.image.getGraphics());
   }
 

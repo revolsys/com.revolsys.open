@@ -2,7 +2,6 @@ package com.revolsys.swing.map.layer.record.renderer;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
@@ -123,13 +122,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
     final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
     line = line.convertGeometry(viewGeometryFactory);
     if (!line.isEmpty()) {
-      final Paint paint = graphics.getPaint();
-      try {
-        style.setLineStyle(viewport, graphics);
-        graphics.draw(line);
-      } finally {
-        graphics.setPaint(paint);
-      }
+      style.shapeDraw(viewport, graphics, line);
     }
   }
 
@@ -138,17 +131,8 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
     final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
     polygon = polygon.convertGeometry(viewGeometryFactory, 2);
     if (!polygon.isEmpty()) {
-      final Paint paint = graphics.getPaint();
-      try {
-        style.setFillStyle(viewport, graphics);
-        graphics.fill(polygon);
-        style.setLineStyle(viewport, graphics);
-        for (final LinearRing ring : polygon.getRings()) {
-          graphics.draw(ring);
-        }
-      } finally {
-        graphics.setPaint(paint);
-      }
+      style.shapeFill(viewport, graphics, polygon);
+      style.shapeDraw(viewport, graphics, polygon.getRings());
     }
   }
 
@@ -226,9 +210,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
 
   /*
    * (non-Javadoc)
-   * @see
-   * com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#
-   * getStyle()
+   * @see com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer# getStyle()
    */
   @Override
   public GeometryStyle getStyle() {
@@ -307,8 +289,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
 
   /*
    * (non-Javadoc)
-   * @see
-   * com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#
+   * @see com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#
    * setStyle(com.revolsys. swing.map.layer.record.style.GeometryStyle)
    */
   @Override

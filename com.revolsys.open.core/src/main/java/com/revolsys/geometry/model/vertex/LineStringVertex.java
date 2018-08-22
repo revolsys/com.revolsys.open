@@ -7,7 +7,7 @@ import com.revolsys.geometry.model.LineString;
 public class LineStringVertex extends AbstractVertex {
   private static final long serialVersionUID = 1L;
 
-  private int vertexIndex;
+  protected int vertexIndex;
 
   public LineStringVertex(final LineString line, final int... vertexId) {
     super(line);

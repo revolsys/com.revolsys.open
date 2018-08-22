@@ -3,6 +3,9 @@ package com.revolsys.swing.map.layer.record.style;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -232,6 +235,36 @@ public class GeometryStyle extends MarkerStyle {
     setProperties(style);
   }
 
+  private void applyLineStyle(final Viewport2D viewport, final Graphics2D graphics) {
+    final Color color = getLineColor();
+    graphics.setColor(color);
+    final Unit<Length> unit = this.lineWidth.getUnit();
+    final float width = (float)Viewport2D.toModelValue(viewport, this.lineWidth);
+
+    final float dashOffset = (float)Viewport2D.toModelValue(viewport,
+      Quantities.getQuantity(this.lineDashOffset, unit));
+
+    final float[] dashArray;
+    final int dashArraySize = this.lineDashArray.size();
+    if (dashArraySize == 0) {
+      dashArray = null;
+    } else {
+      dashArray = new float[dashArraySize];
+      for (int i = 0; i < dashArray.length; i++) {
+        final Double dashDouble = this.lineDashArray.get(i);
+        final float dashFloat = (float)Viewport2D.toModelValue(viewport,
+          Quantities.getQuantity(dashDouble, unit));
+        dashArray[i] = dashFloat;
+      }
+    }
+
+    final int lineCap = this.lineCap.getAwtValue();
+    final int lineJoin = this.lineJoin.getAwtValue();
+    final BasicStroke basicStroke = new BasicStroke(width, lineCap, lineJoin, this.lineMiterlimit,
+      dashArray, dashOffset);
+    graphics.setStroke(basicStroke);
+  }
+
   @Override
   public GeometryStyle clone() {
     return (GeometryStyle)super.clone();
@@ -321,27 +354,6 @@ public class GeometryStyle extends MarkerStyle {
     setPolygonFill(fill);
     setMarkerFill(fill);
     return this;
-  }
-
-  public void setFillStyle(final Viewport2D viewport, final Graphics2D graphics) {
-    graphics.setPaint(this.polygonFill);
-    // final Graphic fillPattern = fill.getPattern();
-    // if (fillPattern != null) {
-    // TODO fillPattern
-    // double width = fillPattern.getWidth();
-    // double height = fillPattern.getHeight();
-    // Rectangle2D.Double patternRect;
-    // // TODO units
-    // // if (isUseModelUnits()) {
-    // // patternRect = new Rectangle2D.Double(0, 0, width
-    // // * viewport.getModelUnitsPerViewUnit(), height
-    // // * viewport.getModelUnitsPerViewUnit());
-    // // } else {
-    // patternRect = new Rectangle2D.Double(0, 0, width, height);
-    // // }
-    // graphics.setPaint(new TexturePaint(fillPattern, patternRect));
-
-    // }
   }
 
   public GeometryStyle setLineCap(final LineCap lineCap) {
@@ -462,36 +474,6 @@ public class GeometryStyle extends MarkerStyle {
     return this;
   }
 
-  public void setLineStyle(final Viewport2D viewport, final Graphics2D graphics) {
-    final Color color = getLineColor();
-    graphics.setColor(color);
-    final Unit<Length> unit = this.lineWidth.getUnit();
-    final float width = (float)Viewport2D.toModelValue(viewport, this.lineWidth);
-
-    final float dashOffset = (float)Viewport2D.toModelValue(viewport,
-      Quantities.getQuantity(this.lineDashOffset, unit));
-
-    final float[] dashArray;
-    final int dashArraySize = this.lineDashArray.size();
-    if (dashArraySize == 0) {
-      dashArray = null;
-    } else {
-      dashArray = new float[dashArraySize];
-      for (int i = 0; i < dashArray.length; i++) {
-        final Double dashDouble = this.lineDashArray.get(i);
-        final float dashFloat = (float)Viewport2D.toModelValue(viewport,
-          Quantities.getQuantity(dashDouble, unit));
-        dashArray[i] = dashFloat;
-      }
-    }
-
-    final int lineCap = this.lineCap.getAwtValue();
-    final int lineJoin = this.lineJoin.getAwtValue();
-    final BasicStroke basicStroke = new BasicStroke(width, lineCap, lineJoin, this.lineMiterlimit,
-      dashArray, dashOffset);
-    graphics.setStroke(basicStroke);
-  }
-
   public GeometryStyle setLineWidth(final Quantity<Length> lineWidth) {
     final Object oldValue = this.lineWidth;
     this.lineWidth = getWithDefault(lineWidth, ZERO_PIXEL);
@@ -569,5 +551,65 @@ public class GeometryStyle extends MarkerStyle {
     this.polygonSmooth = polygonSmooth;
     firePropertyChange("polygonSmooth", oldValue, this.polygonSmooth);
     return this;
+  }
+
+  public void shapeDraw(final Viewport2D viewport, final Graphics2D graphics,
+    final Iterable<? extends Shape> shapes) {
+    if (this.lineOpacity > 0) {
+      final Color color = graphics.getColor();
+      final Stroke stroke = graphics.getStroke();
+      try {
+        applyLineStyle(viewport, graphics);
+        for (final Shape shape : shapes) {
+          graphics.draw(shape);
+        }
+      } finally {
+        graphics.setColor(color);
+        graphics.setStroke(stroke);
+      }
+    }
+  }
+
+  public void shapeDraw(final Viewport2D viewport, final Graphics2D graphics, final Shape shape) {
+    if (this.lineOpacity > 0) {
+      final Color color = graphics.getColor();
+      final Stroke stroke = graphics.getStroke();
+      try {
+        applyLineStyle(viewport, graphics);
+        graphics.draw(shape);
+      } finally {
+        graphics.setColor(color);
+        graphics.setStroke(stroke);
+      }
+    }
+  }
+
+  public void shapeFill(final Viewport2D viewport, final Graphics2D graphics, final Shape shape) {
+    if (this.polygonFillOpacity > 0) {
+      final Paint paint = graphics.getPaint();
+      try {
+        graphics.setPaint(this.polygonFill);
+        // final Graphic fillPattern = fill.getPattern();
+        // if (fillPattern != null) {
+        // TODO fillPattern
+        // double width = fillPattern.getWidth();
+        // double height = fillPattern.getHeight();
+        // Rectangle2D.Double patternRect;
+        // // TODO units
+        // // if (isUseModelUnits()) {
+        // // patternRect = new Rectangle2D.Double(0, 0, width
+        // // * viewport.getModelUnitsPerViewUnit(), height
+        // // * viewport.getModelUnitsPerViewUnit());
+        // // } else {
+        // patternRect = new Rectangle2D.Double(0, 0, width, height);
+        // // }
+        // graphics.setPaint(new TexturePaint(fillPattern, patternRect));
+
+        // }
+        graphics.fill(shape);
+      } finally {
+        graphics.setPaint(paint);
+      }
+    }
   }
 }

@@ -81,10 +81,9 @@ public class GeometryStylePreview extends JPanel {
       graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
       if (DataTypes.POLYGON.equals(this.geometryDataType)) {
-        this.geometryStyle.setFillStyle(null, graphics);
-        graphics.fill(this.shape);
+        this.geometryStyle.shapeFill(null, graphics, this.shape);
       }
-      this.geometryStyle.setLineStyle(null, graphics);
+      this.geometryStyle.shapeDraw(null, graphics, this.shape);
       graphics.draw(this.shape);
     } finally {
       graphics.setPaint(paint);

@@ -46,6 +46,7 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.editor.LinearRingEditor;
 import com.revolsys.geometry.model.prep.PreparedLinearRing;
+import com.revolsys.geometry.model.vertex.LinearRingVertex;
 import com.revolsys.util.QuantityType;
 
 import tec.uom.se.quantity.Quantities;
@@ -388,6 +389,29 @@ public interface LinearRing extends LineString {
   }
 
   @Override
+  default LinearRingVertex getToVertex(int vertexIndex) {
+    final int vertexCount = getVertexCount();
+    vertexIndex = vertexCount - vertexIndex - 1;
+    if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+      return new LinearRingVertex(this, vertexIndex);
+    }
+    return null;
+  }
+
+  @Override
+  default LinearRingVertex getVertex(int vertexIndex) {
+    final int vertexCount = getVertexCount();
+    if (vertexIndex < vertexCount) {
+      while (vertexIndex < 0) {
+        vertexIndex += vertexCount;
+      }
+      return new LinearRingVertex(this, vertexIndex);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
   default boolean isValid() {
     return LineString.super.isValid();
   }
@@ -527,5 +551,10 @@ public interface LinearRing extends LineString {
   @Override
   default LinearRing reverse() {
     return (LinearRing)LineString.super.reverse();
+  }
+
+  @Override
+  default LinearRingVertex vertices() {
+    return new LinearRingVertex(this, -1);
   }
 }
