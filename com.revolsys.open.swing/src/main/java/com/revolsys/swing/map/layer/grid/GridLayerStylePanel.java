@@ -2,7 +2,6 @@ package com.revolsys.swing.map.layer.grid;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -12,6 +11,8 @@ import javax.swing.JPanel;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
@@ -45,7 +46,7 @@ public class GridLayerStylePanel extends BaseStylePanel implements PropertyChang
 
     this.previews = Panels.titledTransparentVerticalLayout("Preview", 5);
     final GeometryStylePreview geometryPreview = new GeometryStylePreview(this.geometryStyle,
-      DataTypes.POLYGON, new Rectangle2D.Double(19, 19, 60, 60));
+      DataTypes.POLYGON, new RectangleXY(GeometryFactory.DEFAULT_2D, 19, 19, 60, 60));
     this.previews.add(geometryPreview);
     this.previews.add(new TextStylePreview(this.textStyle));
 

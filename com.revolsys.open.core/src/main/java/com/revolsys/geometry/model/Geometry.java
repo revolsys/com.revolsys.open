@@ -32,12 +32,6 @@
  */
 package com.revolsys.geometry.model;
 
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,8 +56,6 @@ import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
-import com.revolsys.geometry.model.awtshape.VertexPathIterator;
-import com.revolsys.geometry.model.awtshape.VertexPathIteratorTransform;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.impl.RectangleXY;
@@ -208,7 +200,7 @@ import com.revolsys.util.number.Doubles;
  *@version 1.7
  */
 public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object>, Emptyable,
-  GeometryFactoryProxy, Serializable, DataTypeProxy, Shape {
+  GeometryFactoryProxy, Serializable, DataTypeProxy {
   List<String> SORTED_GEOMETRY_TYPES = Arrays.asList("Point", "MultiPoint", "LineString",
     "LinearRing", "MultiLineString", "Polygon", "MultiPolygon", "GeometryCollection");
 
@@ -601,16 +593,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
   int compareToSameClass(Geometry o);
 
-  /**
-   * In OGC terms this would be covers
-   */
-  @Override
   default boolean contains(final double x, final double y) {
-    return false;
-  }
-
-  @Override
-  default boolean contains(final double x, final double y, final double w, final double h) {
     return false;
   }
 
@@ -650,22 +633,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     } else {
       return false;
     }
-  }
-
-  @Override
-  default boolean contains(final Point2D point) {
-    final double x = point.getX();
-    final double y = point.getY();
-    return contains(x, y);
-  }
-
-  @Override
-  default boolean contains(final Rectangle2D rectangle) {
-    final double x = rectangle.getX();
-    final double y = rectangle.getY();
-    final double width = rectangle.getWidth();
-    final double height = rectangle.getHeight();
-    return contains(x, y, width, height);
   }
 
   default boolean containsProperly(final Geometry geometry) {
@@ -1509,30 +1476,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return newBoundingBox();
   }
 
-  @Override
-  default Rectangle getBounds() {
-    final Rectangle2D bounds2d = getBounds2D();
-    if (bounds2d == null) {
-      return null;
-    } else {
-      return bounds2d.getBounds();
-    }
-  }
-
-  @Override
-  default Rectangle2D getBounds2D() {
-    final BoundingBox boundingBox = getBoundingBox();
-    if (boundingBox.isEmpty()) {
-      return null;
-    } else {
-      final double x = boundingBox.getMinX();
-      final double y = boundingBox.getMinY();
-      final double width = boundingBox.getWidth();
-      final double height = boundingBox.getHeight();
-      return new Rectangle2D.Double(x, y, width, height);
-    }
-  }
-
   /**
    * Computes the centroid of this <code>Geometry</code>.
    * The centroid
@@ -1770,21 +1713,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
-  @Override
-  default PathIterator getPathIterator(final AffineTransform transform) {
-    final Vertex vertex = vertices();
-    if (transform == null) {
-      return new VertexPathIterator(vertex);
-    } else {
-      return new VertexPathIteratorTransform(vertex, transform);
-    }
-  }
-
-  @Override
-  default PathIterator getPathIterator(final AffineTransform transform, final double flatness) {
-    return getPathIterator(transform);
-  }
-
   /**
    *  Returns a vertex of this <code>Geometry</code>
    *  (usually, but not necessarily, the first one).
@@ -1898,14 +1826,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return locate(x, y) != Location.EXTERIOR;
   }
 
-  @Override
-  default boolean intersects(final double x, final double y, final double width,
-    final double height) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox boundingBox = geometryFactory.newBoundingBox(x, y, x + width, y + height);
-    return intersects(boundingBox);
-  }
-
   /**
    * Tests whether this geometry intersects the argument geometry.
    * <p>
@@ -1971,13 +1891,10 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return intersects(x, y);
   }
 
-  @Override
-  default boolean intersects(final Rectangle2D rectangle) {
-    final double x = rectangle.getX();
-    final double y = rectangle.getY();
-    final double width = rectangle.getWidth();
-    final double height = rectangle.getHeight();
-    return intersects(x, y, width, height);
+  default boolean intersectsRectangle(final double x1, final double y1, final double x2,
+    final double y2) {
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.intersects(x1, y1, x2, y2);
   }
 
   boolean isContainedInBoundary(final BoundingBox boundingBox);

@@ -525,7 +525,7 @@ public class RectangleXY extends AbstractPolygon {
       final double minY = rectangle.minY;
       final double maxX = rectangle.maxX;
       final double maxY = rectangle.maxY;
-      if (intersects(minX, minY, maxX, maxY)) {
+      if (intersectsRectangle(minX, minY, maxX, maxY)) {
         final double intMinX = Math.max(this.minX, minX);
         final double intMinY = Math.max(this.minY, minY);
         final double intMaxX = Math.min(this.maxX, maxX);
@@ -546,8 +546,12 @@ public class RectangleXY extends AbstractPolygon {
     }
   }
 
+  public boolean intersects(final RectangleXY rectangle) {
+    return intersectsRectangle(rectangle.minX, rectangle.minY, rectangle.maxX, rectangle.maxY);
+  }
+
   @Override
-  public boolean intersects(double x1, double y1, double x2, double y2) {
+  public boolean intersectsRectangle(double x1, double y1, double x2, double y2) {
     if (x1 > x2) {
       final double t = x1;
       x1 = x2;
@@ -559,10 +563,6 @@ public class RectangleXY extends AbstractPolygon {
       y2 = t;
     }
     return !(x1 > this.maxX || x2 < this.minX || y1 > this.maxY || y2 < this.minY);
-  }
-
-  public boolean intersects(final RectangleXY rectangle) {
-    return intersects(rectangle.minX, rectangle.minY, rectangle.maxX, rectangle.maxY);
   }
 
   @Override

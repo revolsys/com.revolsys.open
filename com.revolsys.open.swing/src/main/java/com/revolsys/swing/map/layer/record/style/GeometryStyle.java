@@ -4,7 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +19,10 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.awtshape.LineStringShape;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -268,6 +271,39 @@ public class GeometryStyle extends MarkerStyle {
   @Override
   public GeometryStyle clone() {
     return (GeometryStyle)super.clone();
+  }
+
+  public void drawLineString(final Viewport2D viewport, final Graphics2D graphics,
+    final LineString line) {
+    if (this.lineOpacity > 0 && !line.isEmpty()) {
+      final Color color = graphics.getColor();
+      final Stroke stroke = graphics.getStroke();
+      try {
+        applyLineStyle(viewport, graphics);
+        graphics.draw(line.toShape());
+      } finally {
+        graphics.setColor(color);
+        graphics.setStroke(stroke);
+      }
+    }
+  }
+
+  public void drawPolygon(final Viewport2D viewport, final Graphics2D graphics,
+    final Polygon polygon) {
+    if (this.lineOpacity > 0) {
+      final Color color = graphics.getColor();
+      final Stroke stroke = graphics.getStroke();
+      try {
+        applyLineStyle(viewport, graphics);
+        for (final LinearRing ring : polygon.rings()) {
+          final LineStringShape shape = ring.toShape();
+          graphics.draw(shape);
+        }
+      } finally {
+        graphics.setColor(color);
+        graphics.setStroke(stroke);
+      }
+    }
   }
 
   public LineCap getLineCap() {
@@ -553,38 +589,8 @@ public class GeometryStyle extends MarkerStyle {
     return this;
   }
 
-  public void shapeDraw(final Viewport2D viewport, final Graphics2D graphics,
-    final Iterable<? extends Shape> shapes) {
-    if (this.lineOpacity > 0) {
-      final Color color = graphics.getColor();
-      final Stroke stroke = graphics.getStroke();
-      try {
-        applyLineStyle(viewport, graphics);
-        for (final Shape shape : shapes) {
-          graphics.draw(shape);
-        }
-      } finally {
-        graphics.setColor(color);
-        graphics.setStroke(stroke);
-      }
-    }
-  }
-
-  public void shapeDraw(final Viewport2D viewport, final Graphics2D graphics, final Shape shape) {
-    if (this.lineOpacity > 0) {
-      final Color color = graphics.getColor();
-      final Stroke stroke = graphics.getStroke();
-      try {
-        applyLineStyle(viewport, graphics);
-        graphics.draw(shape);
-      } finally {
-        graphics.setColor(color);
-        graphics.setStroke(stroke);
-      }
-    }
-  }
-
-  public void shapeFill(final Viewport2D viewport, final Graphics2D graphics, final Shape shape) {
+  public void fillPolygon(final Viewport2D viewport, final Graphics2D graphics,
+    final Polygon polygon) {
     if (this.polygonFillOpacity > 0) {
       final Paint paint = graphics.getPaint();
       try {
@@ -606,7 +612,7 @@ public class GeometryStyle extends MarkerStyle {
         // graphics.setPaint(new TexturePaint(fillPattern, patternRect));
 
         // }
-        graphics.fill(shape);
+        graphics.fill(polygon.toShape());
       } finally {
         graphics.setPaint(paint);
       }

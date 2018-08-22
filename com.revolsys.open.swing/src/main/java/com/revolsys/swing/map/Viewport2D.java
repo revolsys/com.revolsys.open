@@ -28,7 +28,9 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.layer.Layer;
@@ -36,7 +38,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
+import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
@@ -211,14 +213,69 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public void drawGeometry(final Geometry geometry, final GeometryStyle style) {
     final Graphics2D graphics = getGraphics();
+    drawGeometry(graphics, geometry, style);
+  }
+
+  public void drawGeometry(final Graphics2D graphics, final Geometry geometry,
+    final GeometryStyle style) {
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    GeometryStyleRecordLayerRenderer.renderGeometry(this, graphics, geometry, style);
+    if (geometry != null) {
+      final BoundingBox viewExtent = getBoundingBox();
+      if (!viewExtent.isEmpty()) {
+        final GeometryFactory viewGeometryFactory = getGeometryFactory2dFloating();
+        for (int i = 0; i < geometry.getGeometryCount(); i++) {
+          final Geometry part = geometry.getGeometry(i);
+          final BoundingBox partExtent = part.getBoundingBox();
+          if (partExtent.intersects(viewExtent)) {
+            final Geometry convertedPart = part.as2d(viewGeometryFactory);
+            if (convertedPart instanceof Point) {
+              final Point point = (Point)convertedPart;
+              MarkerStyleRenderer.renderMarker(this, graphics, point, style, 0);
+            } else if (convertedPart instanceof LineString) {
+              final LineString line = (LineString)convertedPart;
+              style.drawLineString(this, graphics, line);
+            } else if (convertedPart instanceof Polygon) {
+              final Polygon polygon = (Polygon)convertedPart;
+              style.fillPolygon(this, graphics, polygon);
+              style.drawPolygon(this, graphics, polygon);
+            }
+          }
+        }
+      }
+    }
   }
 
   public void drawGeometryOutline(final Geometry geometry, final GeometryStyle style) {
     final Graphics2D graphics = getGraphics();
+    drawGeometryOutline(graphics, geometry, style);
+  }
+
+  public void drawGeometryOutline(final Graphics2D graphics, final Geometry geometry,
+    final GeometryStyle style) {
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    GeometryStyleRecordLayerRenderer.renderGeometryOutline(this, graphics, geometry, style);
+    if (geometry != null) {
+      final BoundingBox viewExtent = getBoundingBox();
+      if (!viewExtent.isEmpty()) {
+        final GeometryFactory viewGeometryFactory = getGeometryFactory2dFloating();
+        for (int i = 0; i < geometry.getGeometryCount(); i++) {
+          final Geometry part = geometry.getGeometry(i);
+          final BoundingBox partExtent = part.getBoundingBox();
+          if (partExtent.intersects(viewExtent)) {
+            final Geometry convertedPart = part.as2d(viewGeometryFactory);
+            if (convertedPart instanceof Point) {
+              final Point point = (Point)convertedPart;
+              MarkerStyleRenderer.renderMarker(this, graphics, point, style, 0);
+            } else if (convertedPart instanceof LineString) {
+              final LineString line = (LineString)convertedPart;
+              style.drawLineString(this, graphics, line);
+            } else if (convertedPart instanceof Polygon) {
+              final Polygon polygon = (Polygon)convertedPart;
+              style.drawPolygon(this, graphics, polygon);
+            }
+          }
+        }
+      }
+    }
   }
 
   public void drawText(final Record record, final Geometry geometry, final TextStyle style) {

@@ -57,6 +57,7 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.awtshape.LineStringShape;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
@@ -298,6 +299,14 @@ public interface LineString extends Lineal {
         }
       }
       return destOffset;
+    }
+  }
+
+  default void copyPoint(final int vertexIndex, final int axisCount, final double[] coordinates) {
+    if (vertexIndex < getVertexCount()) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
+      }
     }
   }
 
@@ -2312,6 +2321,10 @@ public interface LineString extends Lineal {
     } else {
       return (G)this;
     }
+  }
+
+  default LineStringShape toShape() {
+    return new LineStringShape(this);
   }
 
   /**

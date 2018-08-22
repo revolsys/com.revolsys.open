@@ -8,7 +8,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.util.Property;
 
@@ -30,9 +29,9 @@ public class SelectedRecordsRenderer {
     final GeometryFactory viewportGeometryFactory, Geometry geometry) {
     geometry = viewport.getGeometry(geometry);
     if (Property.hasValue(geometry)) {
-      GeometryStyleRecordLayerRenderer.renderGeometry(viewport, graphics, geometry, this.highlightStyle);
+      viewport.drawGeometry(graphics, geometry, this.highlightStyle);
       if (!(geometry instanceof Punctual)) {
-        GeometryStyleRecordLayerRenderer.renderGeometryOutline(viewport, graphics, geometry, this.lineStyle);
+        viewport.drawGeometryOutline(graphics, geometry, this.lineStyle);
       }
     }
   }

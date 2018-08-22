@@ -72,11 +72,6 @@ public interface Polygonal extends Geometry {
     return locate(x, y) != Location.EXTERIOR;
   }
 
-  @Override
-  default boolean contains(final double x, final double y, final double w, final double h) {
-    return false;
-  }
-
   default Polygonal differencePolygonal(final Geometry geometry) {
     final Geometry difference = difference(geometry);
     if (difference instanceof Polygonal) {
