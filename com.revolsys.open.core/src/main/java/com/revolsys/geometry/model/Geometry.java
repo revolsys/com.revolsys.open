@@ -62,6 +62,8 @@ import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.awtshape.VertexPathIterator;
+import com.revolsys.geometry.model.awtshape.VertexPathIteratorTransform;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.impl.RectangleXY;
@@ -805,12 +807,9 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   }
 
   default boolean coveredByRectangle(final RectangleXY rectangle) {
-    if (rectangle == null) {
-      return false;
-    } else {
-      final BoundingBox boundingBox = getBoundingBox();
-      return rectangle.covers(boundingBox);
-    }
+    RectangleXY.notNullSameCs(this, rectangle);
+    final BoundingBox boundingBox = getBoundingBox();
+    return rectangle.covers(boundingBox);
   }
 
   /**

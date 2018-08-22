@@ -43,6 +43,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Polygon;
@@ -54,7 +55,20 @@ import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
 public class RectangleXY extends AbstractPolygon {
+
   private static final long serialVersionUID = 1L;
+
+  public static void notNullSameCs(final GeometryFactoryProxy geometryFactory,
+    final RectangleXY rectangle) {
+    if (rectangle == null) {
+      throw new NullPointerException("Agrument rectangle cannot be null");
+    } else if (!geometryFactory.isSameCoordinateSystem(rectangle)) {
+      throw new NullPointerException(
+        "Rectangle operations require the same coordinate system this != rectangle\n  "
+          + geometryFactory.getHorizontalCoordinateSystem() + "\n  "
+          + rectangle.getHorizontalCoordinateSystem());
+    }
+  }
 
   private BoundingBox boundingBox;
 

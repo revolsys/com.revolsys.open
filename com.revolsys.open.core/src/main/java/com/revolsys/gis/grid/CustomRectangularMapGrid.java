@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -202,6 +203,12 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   @Override
   public double getTileHeight() {
     return this.tileHeight;
+  }
+
+  public RectangleXY getTileRectangleByLocation(final double x, final double y) {
+    final int tileX = getTileX(x);
+    final int tileY = getTileY(y);
+    return getGeometryFactory().newRectangle(tileX, tileY, this.tileWidth, this.tileHeight);
   }
 
   @Override

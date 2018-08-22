@@ -1,4 +1,4 @@
-package com.revolsys.geometry.model;
+package com.revolsys.geometry.model.awtshape;
 
 import java.awt.geom.PathIterator;
 

@@ -1450,95 +1450,99 @@ public interface BoundingBox
           geometryFactory = factory;
         }
       }
-      try {
-        double minStep = 0.00001;
-        final CoordinateSystem coordinateSystem = factory.getHorizontalCoordinateSystem();
-        if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-          minStep = 1;
-        } else {
-          minStep = 0.00001;
-        }
-
-        double xStep;
-        final double width = getWidth();
-        if (!Double.isFinite(width)) {
-          return geometryFactory.polygon();
-        } else if (numX <= 1) {
-          numX = 1;
-          xStep = width;
-        } else {
-          xStep = width / numX;
-          if (xStep < minStep) {
-            xStep = minStep;
+      if (numX == 0 && numY == 0) {
+        return toRectangle();
+      } else {
+        try {
+          double minStep = 0.00001;
+          final CoordinateSystem coordinateSystem = factory.getHorizontalCoordinateSystem();
+          if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+            minStep = 1;
+          } else {
+            minStep = 0.00001;
           }
-          numX = Math.max(1, (int)Math.ceil(width / xStep));
-        }
 
-        double yStep;
-        if (numY <= 1) {
-          numY = 1;
-          yStep = getHeight();
-        } else {
-          yStep = getHeight() / numY;
-          if (yStep < minStep) {
-            yStep = minStep;
+          double xStep;
+          final double width = getWidth();
+          if (!Double.isFinite(width)) {
+            return geometryFactory.polygon();
+          } else if (numX <= 1) {
+            numX = 1;
+            xStep = width;
+          } else {
+            xStep = width / numX;
+            if (xStep < minStep) {
+              xStep = minStep;
+            }
+            numX = Math.max(1, (int)Math.ceil(width / xStep));
           }
-          numY = Math.max(1, (int)Math.ceil(getHeight() / yStep));
-        }
 
-        final double minX = getMinX();
-        final double maxX = getMaxX();
-        final double minY = getMinY();
-        final double maxY = getMaxY();
-        final int coordinateCount = 1 + 2 * (numX + numY);
-        final double[] coordinates = new double[coordinateCount * 2];
-        int i = 0;
+          double yStep;
+          if (numY <= 1) {
+            numY = 1;
+            yStep = getHeight();
+          } else {
+            yStep = getHeight() / numY;
+            if (yStep < minStep) {
+              yStep = minStep;
+            }
+            numY = Math.max(1, (int)Math.ceil(getHeight() / yStep));
+          }
 
-        coordinates[i++] = minX;
-        coordinates[i++] = minY;
-        for (int j = 1; j < numX; j++) {
-          final double x = minX + j * xStep;
-          coordinates[i++] = x;
-          coordinates[i++] = minY;
-        }
-        coordinates[i++] = maxX;
-        coordinates[i++] = minY;
+          final double minX = getMinX();
+          final double maxX = getMaxX();
+          final double minY = getMinY();
+          final double maxY = getMaxY();
+          final int coordinateCount = 1 + 2 * (numX + numY);
+          final double[] coordinates = new double[coordinateCount * 2];
+          int i = 0;
 
-        for (int j = 1; j < numY; j++) {
-          final double y = minY + j * yStep;
-          coordinates[i++] = maxX;
-          coordinates[i++] = y;
-        }
-        coordinates[i++] = maxX;
-        coordinates[i++] = maxY;
-
-        for (int j = numX - 1; j > 0; j--) {
-          final double x = minX + j * xStep;
-          coordinates[i++] = x;
-          coordinates[i++] = maxY;
-        }
-
-        coordinates[i++] = minX;
-        coordinates[i++] = maxY;
-
-        for (int j = numY - 1; j > 0; j--) {
-          final double y = minY + j * yStep;
           coordinates[i++] = minX;
-          coordinates[i++] = y;
-        }
-        coordinates[i++] = minX;
-        coordinates[i++] = minY;
+          coordinates[i++] = minY;
+          for (int j = 1; j < numX; j++) {
+            final double x = minX + j * xStep;
+            coordinates[i++] = x;
+            coordinates[i++] = minY;
+          }
+          coordinates[i++] = maxX;
+          coordinates[i++] = minY;
 
-        final LinearRing ring = factory.linearRing(2, coordinates);
-        final Polygon polygon = factory.polygon(ring);
-        if (geometryFactory == null) {
-          return polygon;
-        } else {
-          return (Polygon)polygon.convertGeometry(geometryFactory);
+          for (int j = 1; j < numY; j++) {
+            final double y = minY + j * yStep;
+            coordinates[i++] = maxX;
+            coordinates[i++] = y;
+          }
+          coordinates[i++] = maxX;
+          coordinates[i++] = maxY;
+
+          for (int j = numX - 1; j > 0; j--) {
+            final double x = minX + j * xStep;
+            coordinates[i++] = x;
+            coordinates[i++] = maxY;
+          }
+
+          coordinates[i++] = minX;
+          coordinates[i++] = maxY;
+
+          for (int j = numY - 1; j > 0; j--) {
+            final double y = minY + j * yStep;
+            coordinates[i++] = minX;
+            coordinates[i++] = y;
+          }
+          coordinates[i++] = minX;
+          coordinates[i++] = minY;
+
+          final LinearRing ring = factory.linearRing(2, coordinates);
+          final Polygon polygon = factory.polygon(ring);
+          if (geometryFactory == null) {
+            return polygon;
+          } else {
+            return (Polygon)polygon.convertGeometry(geometryFactory);
+          }
+        } catch (final IllegalArgumentException e) {
+          Logs.error(this, "Unable to convert to polygon: " + this, e);
+          return geometryFactory.polygon();
         }
-      } catch (final IllegalArgumentException e) {
-        Logs.error(this, "Unable to convert to polygon: " + this, e);
-        return geometryFactory.polygon();
       }
     }
   }
