@@ -22,13 +22,13 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.gridded.renderer.RasterizerGriddedElevationModelLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.gridded.renderer.TiledMultipleGriddedElevationModelLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -111,7 +111,7 @@ public class TiledGriddedElevationModelLayer
 
   @Override
   public List<TiledGriddedElevationModelLayerTile> getOverlappingMapTiles(
-    final Viewport2D viewport) {
+    final ViewRenderer viewport) {
     final List<TiledGriddedElevationModelLayerTile> tiles = new ArrayList<>();
     try {
       final int resolution = (int)getResolution(viewport);
@@ -148,7 +148,7 @@ public class TiledGriddedElevationModelLayer
   }
 
   @Override
-  public double getResolution(final Viewport2D viewport) {
+  public double getResolution(final ViewRenderer viewport) {
     final double metresPerPixel = viewport.getMetresPerPixel();
     final int count = this.resolutions.size();
     for (int i = 0; i < count - 1; i++) {

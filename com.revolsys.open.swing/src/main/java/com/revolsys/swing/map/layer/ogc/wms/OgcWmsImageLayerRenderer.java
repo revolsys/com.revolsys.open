@@ -1,17 +1,14 @@
 package com.revolsys.swing.map.layer.ogc.wms;
 
-import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
-import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
 public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageLayer>
@@ -34,8 +31,7 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final OgcWmsImageLayer layer) {
+  public void render(final ViewRenderer viewport, final OgcWmsImageLayer layer) {
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
@@ -59,8 +55,8 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
         if (reload) {
           final int imageWidth = viewport.getViewWidthPixels();
           final int imageHeight = viewport.getViewHeightPixels();
-          final OgcWmsImageLayerSwingWorker worker = new OgcWmsImageLayerSwingWorker(this,
-            cancellable, queryBoundingBox, imageWidth, imageHeight);
+          final OgcWmsImageLayerSwingWorker worker = new OgcWmsImageLayerSwingWorker(this, viewport,
+            queryBoundingBox, imageWidth, imageHeight);
           synchronized (this) {
             if (this.worker != null) {
               this.worker.cancel(true);
@@ -69,11 +65,8 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
           }
           Invoke.worker(worker);
 
-        } else if (this.image != null) {
-          final Graphics2D graphics = viewport.getGraphics();
-          if (graphics != null) {
-            GeoreferencedImageLayerRenderer.render(viewport, graphics, this.image, false);
-          }
+        } else {
+          viewport.drawImage(this.image, false);
         }
       }
     }

@@ -8,7 +8,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -21,10 +20,12 @@ import javax.measure.quantity.Length;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.io.BaseCloseable;
+import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.symbol.Symbol;
 import com.revolsys.swing.map.symbol.SymbolLibrary;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 
 public class ShapeMarker extends AbstractMarker {
   private static final Map<String, Shape> SHAPES = new TreeMap<>();
@@ -244,18 +245,21 @@ public class ShapeMarker extends AbstractMarker {
     final Shape shape = getShape();
     final AffineTransform shapeTransform = AffineTransform.getScaleInstance(15, 15);
 
-    final BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-    final Graphics2D graphics = image.createGraphics();
-    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
-    if (style.setMarkerFillStyle(null, graphics)) {
-      graphics.fill(newShape);
+    try (
+      final ImageViewport viewport = new ImageViewport(16, 16)) {
+      final Graphics2DViewRender view = viewport.newViewRenderer();
+      final Graphics2D graphics = view.getGraphics();
+      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
+      if (style.setMarkerFillStyle(view, graphics)) {
+        graphics.fill(newShape);
+      }
+      if (style.setMarkerLineStyle(view, graphics)) {
+        graphics.draw(newShape);
+      }
+      graphics.dispose();
+      return new ImageIcon(viewport.getImage());
     }
-    if (style.setMarkerLineStyle(null, graphics)) {
-      graphics.draw(newShape);
-    }
-    graphics.dispose();
-    return new ImageIcon(image);
   }
 
   @Override
@@ -265,33 +269,30 @@ public class ShapeMarker extends AbstractMarker {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Graphics2D graphics, final MarkerStyle style,
-    final double modelX, final double modelY, double orientation) {
+  public void render(final Graphics2DViewRender view, final Graphics2D graphics,
+    final MarkerStyle style, final double modelX, final double modelY, double orientation) {
 
-    final AffineTransform savedTransform = graphics.getTransform();
-    try {
+    try (
+      BaseCloseable closable = view.useViewCoordinates()) {
       final Quantity<Length> markerWidth = style.getMarkerWidth();
-      final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
+      final double mapWidth = view.toDisplayValue(markerWidth);
       final Quantity<Length> markerHeight = style.getMarkerHeight();
-      final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
+      final double mapHeight = view.toDisplayValue(markerHeight);
       final String orientationType = style.getMarkerOrientationType();
       if ("none".equals(orientationType)) {
         orientation = 0;
       }
 
-      translateMarker(viewport, graphics, style, modelX, modelY, mapWidth, mapHeight, orientation);
+      translateMarker(view, graphics, style, modelX, modelY, mapWidth, mapHeight, orientation);
 
       final AffineTransform shapeTransform = AffineTransform.getScaleInstance(mapWidth, mapHeight);
-      final Shape newShape = new GeneralPath(this.getShape())
-        .createTransformedShape(shapeTransform);
-      if (style.setMarkerFillStyle(viewport, graphics)) {
+      final Shape newShape = new GeneralPath(getShape()).createTransformedShape(shapeTransform);
+      if (style.setMarkerFillStyle(view, graphics)) {
         graphics.fill(newShape);
       }
-      if (style.setMarkerLineStyle(viewport, graphics)) {
+      if (style.setMarkerLineStyle(view, graphics)) {
         graphics.draw(newShape);
       }
-    } finally {
-      graphics.setTransform(savedTransform);
     }
   }
 

@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.elevation.gridded.renderer;
 
-import java.awt.Graphics2D;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -13,16 +12,14 @@ import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.component.Form;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelStylePanel;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelZRange;
-import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
-import com.revolsys.util.Cancellable;
 
 public class RasterizerGriddedElevationModelLayerRenderer
   extends AbstractGriddedElevationModelLayerRenderer {
@@ -156,8 +153,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final ElevationModelLayer layer) {
+  public void render(final ViewRenderer viewport, final ElevationModelLayer layer) {
     // TODO cancel
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
@@ -187,14 +183,9 @@ public class RasterizerGriddedElevationModelLayerRenderer
 
           if (this.image.hasImage() && !(this.image.isCached() && this.redraw)) {
             final BoundingBox boundingBox = layer.getBoundingBox();
-            final Graphics2D graphics = viewport.getGraphics();
-            if (graphics != null) {
-              final Object interpolationMethod = null;
-              GeoreferencedImageLayerRenderer.renderAlpha(viewport, graphics, this.image, true,
-                this.opacity, interpolationMethod);
-              GeoreferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, graphics,
-                boundingBox);
-            }
+            final Object interpolationMethod = null;
+            viewport.drawImage(this.image, true, this.opacity, interpolationMethod);
+            viewport.drawDifferentCoordinateSystem(boundingBox);
           } else {
             synchronized (this) {
               if (this.redraw && this.worker == null) {

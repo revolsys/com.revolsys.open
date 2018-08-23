@@ -1,14 +1,13 @@
 package com.revolsys.swing.map.overlay.record;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 
 public class SelectedRecordsRenderer {
@@ -25,13 +24,13 @@ public class SelectedRecordsRenderer {
     setStyleColor(color);
   }
 
-  public void paintSelected(final Viewport2D viewport, final Graphics2D graphics,
+  public void paintSelected(final ViewRenderer viewport,
     final GeometryFactory viewportGeometryFactory, Geometry geometry) {
     geometry = viewport.getGeometry(geometry);
     if (Property.hasValue(geometry)) {
-      viewport.drawGeometry(graphics, geometry, this.highlightStyle);
+      viewport.drawGeometry(geometry, this.highlightStyle);
       if (!(geometry instanceof Punctual)) {
-        viewport.drawGeometryOutline(graphics, geometry, this.lineStyle);
+        viewport.drawGeometryOutline(geometry, this.lineStyle);
       }
     }
   }

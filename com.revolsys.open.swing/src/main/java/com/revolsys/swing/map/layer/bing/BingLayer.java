@@ -11,8 +11,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ExecutorServiceFactory;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 
 public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
@@ -69,7 +69,7 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
   }
 
   @Override
-  public List<BingMapTile> getOverlappingMapTiles(final Viewport2D viewport) {
+  public List<BingMapTile> getOverlappingMapTiles(final ViewRenderer viewport) {
     final List<BingMapTile> tiles = new ArrayList<>();
     try {
       final double metresPerPixel = viewport.getMetresPerPixel();
@@ -103,7 +103,7 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
   }
 
   @Override
-  public double getResolution(final Viewport2D viewport) {
+  public double getResolution(final ViewRenderer viewport) {
     final double metresPerPixel = viewport.getMetresPerPixel();
     final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
     return this.client.getResolution(zoomLevel);

@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.grid;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -22,16 +21,15 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
-import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
+import com.revolsys.swing.map.view.TextStyleViewRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
-import com.revolsys.util.Cancellable;
 
 import tec.uom.se.quantity.Quantities;
 
@@ -153,35 +151,24 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final GridLayer layer) {
+  public void render(final ViewRenderer view, final GridLayer layer) {
     try {
-      final double scaleForVisible = viewport.getScaleForVisible();
+      final double scaleForVisible = view.getScaleForVisible();
       if (layer.isVisible(scaleForVisible)) {
-        final BoundingBox boundingBox = viewport.getBoundingBox();
+        final TextStyleViewRenderer textStyle = view.newTextStyleViewRenderer(this.textStyle);
+        final BoundingBox boundingBox = view.getBoundingBox();
         final RectangularMapGrid grid = layer.getGrid();
         final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
-        final Graphics2D graphics = viewport.getGraphics();
-        if (graphics != null) {
-          final Font font = graphics.getFont();
-          for (final RectangularMapTile tile : cancellable.cancellable(tiles)) {
-            final BoundingBox tileBoundingBox = tile.getBoundingBox();
-            final BoundingBox intersectBoundingBox = boundingBox.intersection(tileBoundingBox);
-            if (!intersectBoundingBox.isEmpty()) {
+        for (final RectangularMapTile tile : view.cancellable(tiles)) {
+          final BoundingBox tileBoundingBox = tile.getBoundingBox();
+          final BoundingBox intersectBoundingBox = boundingBox.intersection(tileBoundingBox);
+          if (!intersectBoundingBox.isEmpty()) {
 
-              final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-              final Polygon polygon = tile.getPolygon(geometryFactory, 50);
-              try (
-                BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics,
-                  true)) {
-                viewport.drawGeometryOutline(polygon, this.geometryStyle);
-              }
-              try (
-                BaseCloseable transformClosable = viewport.setUseModelCoordinates(false)) {
-                viewport.drawText(tile, polygon, this.textStyle);
-              }
-            }
-            graphics.setFont(font);
+            final GeometryFactory geometryFactory = view.getGeometryFactory();
+            final Polygon polygon = tile.getPolygon(geometryFactory, 50);
+            view.drawGeometryOutline(polygon, this.geometryStyle);
+            final String label = tile.getFormattedName();
+            textStyle.drawText(label, polygon);
           }
         }
       }

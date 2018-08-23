@@ -1,17 +1,13 @@
 package com.revolsys.swing.map.layer.pointcloud;
 
-import java.awt.Graphics2D;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.io.BaseCloseable;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class PointCloudLayerRenderer extends AbstractLayerRenderer<PointCloudLayer> {
 
@@ -22,8 +18,7 @@ public class PointCloudLayerRenderer extends AbstractLayerRenderer<PointCloudLay
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final PointCloudLayer layer) {
+  public void render(final ViewRenderer viewport, final PointCloudLayer layer) {
     // TODO cancellable
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
@@ -31,14 +26,8 @@ public class PointCloudLayerRenderer extends AbstractLayerRenderer<PointCloudLay
         final PointCloud<?> pointCloud = layer.getPointCloud();
         if (pointCloud != null) {
           final BoundingBox boundingBox = layer.getBoundingBox();
-          final Graphics2D graphics = viewport.getGraphics();
-          if (graphics != null) {
-            try (
-              BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
-              final Polygon polygon = boundingBox.toPolygon(0);
-              viewport.drawGeometryOutline(polygon, STYLE_BOUNDING_BOX);
-            }
-          }
+          final Polygon polygon = boundingBox.toPolygon(0);
+          viewport.drawGeometryOutline(polygon, STYLE_BOUNDING_BOX);
         }
       }
     }

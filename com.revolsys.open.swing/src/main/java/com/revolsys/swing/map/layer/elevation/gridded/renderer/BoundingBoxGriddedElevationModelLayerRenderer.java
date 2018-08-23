@@ -15,16 +15,14 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class BoundingBoxGriddedElevationModelLayerRenderer
   extends AbstractGriddedElevationModelLayerRenderer
@@ -123,14 +121,10 @@ public class BoundingBoxGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final ElevationModelLayer layer) {
-    if (!cancellable.isCancelled()) {
+  public void render(final ViewRenderer viewport, final ElevationModelLayer layer) {
+    if (!viewport.isCancelled()) {
       final Polygon boundary = getLayer().getBoundingBox().toPolygon(10);
-      try (
-        BaseCloseable closeable = viewport.setUseModelCoordinates(true)) {
-        viewport.drawGeometry(boundary, this.style);
-      }
+      viewport.drawGeometry(boundary, this.style);
     }
   }
 

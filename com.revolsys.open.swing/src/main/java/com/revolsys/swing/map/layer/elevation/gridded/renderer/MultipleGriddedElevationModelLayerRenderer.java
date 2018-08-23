@@ -10,13 +10,12 @@ import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.Cancellable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -173,15 +172,14 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final ElevationModelLayer layer) {
+  public void render(final ViewRenderer viewport, final ElevationModelLayer layer) {
     final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
-    for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
+    for (final AbstractGriddedElevationModelLayerRenderer renderer : viewport
       .cancellable(renderers)) {
       try {
         final long scaleForVisible = (long)viewport.getScaleForVisible();
         if (renderer.isVisible(scaleForVisible)) {
-          renderer.render(viewport, cancellable, layer);
+          renderer.render(viewport, layer);
         }
       } catch (final Exception e) {
         Logs.error(this, "Unable to render:" + renderer, e);

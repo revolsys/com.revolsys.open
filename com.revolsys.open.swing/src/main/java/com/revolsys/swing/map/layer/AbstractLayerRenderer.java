@@ -13,9 +13,8 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.panel.BaseStylePanel;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
@@ -186,17 +185,17 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   }
 
   @Override
-  public final void render(final Viewport2D viewport, final Cancellable cancellable) {
+  public final void render(final ViewRenderer viewport) {
     final T layer = getLayer();
     if (layer != null) {
       final double scaleForVisible = viewport.getScaleForVisible();
       if (isVisible(scaleForVisible)) {
-        render(viewport, cancellable, layer);
+        render(viewport, layer);
       }
     }
   }
 
-  public abstract void render(Viewport2D viewport, Cancellable cancellable, T layer);
+  public abstract void render(ViewRenderer viewport, T layer);
 
   @Override
   public void setEditing(final boolean editing) {

@@ -1,4 +1,4 @@
-package com.revolsys.swing.pdf;
+package com.revolsys.swing.map.view.pdf;
 
 import java.io.File;
 
@@ -42,7 +42,7 @@ public class SaveAsPdf {
         PdfViewport pdfViewport = new PdfViewport(document, page, project, width, height,
           boundingBox)) {
         final LayerRenderer<? extends Layer> renderer = project.getRenderer();
-        renderer.render(pdfViewport);
+        renderer.render(pdfViewport.newViewRenderer());
       }
       document.addPage(page);
 

@@ -9,11 +9,10 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 /**
  * Use the first renderer which is visible at the current scale, ignore all
@@ -45,7 +44,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
     return clone;
   }
 
-  private AbstractRecordLayerRenderer getRenderer(final Viewport2D viewport) {
+  private AbstractRecordLayerRenderer getRenderer(final ViewRenderer viewport) {
     final long scaleForVisible = (long)viewport.getScaleForVisible();
     if (scaleForVisible == this.lastScale && this.renderer != null) {
       if (this.renderer.isVisible(scaleForVisible)) {
@@ -76,25 +75,24 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final AbstractRecordLayer layer) {
+  public void render(final ViewRenderer viewport, final AbstractRecordLayer layer) {
     if (layer.hasGeometryField()) {
       final AbstractRecordLayerRenderer renderer = getRenderer(viewport);
       if (renderer != null) {
-        renderer.render(viewport, cancellable, layer);
+        renderer.render(viewport, layer);
       }
     }
   }
 
   // NOTE: Needed for filter styles
   @Override
-  public void renderRecord(final Viewport2D viewport, Cancellable cancellable,
-    final BoundingBox visibleArea, final AbstractRecordLayer layer, final LayerRecord record) {
+  public void renderRecord(final ViewRenderer viewport, final BoundingBox visibleArea,
+    final AbstractRecordLayer layer, final LayerRecord record) {
     final AbstractRecordLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       if (isVisible(record)) {
         try {
-          renderer.renderRecord(viewport, cancellable, visibleArea, layer, record);
+          renderer.renderRecord(viewport, visibleArea, layer, record);
         } catch (final TopologyException e) {
         } catch (final Throwable e) {
           Logs.error(this, "Unabled to render " + layer.getName() + " #" + record.getIdentifier(),
@@ -106,15 +104,15 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   // NOTE: Needed for multiple styles
-  protected void renderRecords(final Viewport2D viewport, final Cancellable cancellable,
+  protected void renderRecords(final ViewRenderer viewport,
     final AbstractRecordLayer layer, final List<LayerRecord> records) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     final AbstractRecordLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
-      for (final LayerRecord record : cancellable.cancellable(records)) {
+      for (final LayerRecord record : viewport.cancellable(records)) {
         if (isVisible(record)) {
           try {
-            renderer.renderRecord(viewport, cancellable, visibleArea, layer, record);
+            renderer.renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           }
         }
@@ -123,13 +121,13 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public void renderSelectedRecord(final Viewport2D viewport, Cancellable cancellable,
+  public void renderSelectedRecord(final ViewRenderer viewport,
     final AbstractRecordLayer layer, final LayerRecord object) {
     final AbstractRecordLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       if (isVisible(object)) {
         try {
-          renderer.renderSelectedRecord(viewport, cancellable, layer, object);
+          renderer.renderSelectedRecord(viewport, layer, object);
         } catch (final Throwable e) {
           Logs.error(this, "Unabled to render " + layer.getName() + " #" + object.getIdentifier(),
             e);

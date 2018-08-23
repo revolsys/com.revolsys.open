@@ -10,10 +10,9 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class SelectedRecordsVertexRenderer {
 
@@ -84,7 +83,7 @@ public class SelectedRecordsVertexRenderer {
     this.lastVertexStyle.setMarkerHorizontalAlignment("right");
   }
 
-  public void paintSelected(final Viewport2D viewport, final Graphics2D graphics,
+  public void paintSelected(final ViewRenderer viewport, final Graphics2D graphics,
     final GeometryFactory viewportGeometryFactory, Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = viewport.getGeometry(geometry);
@@ -94,8 +93,7 @@ public class SelectedRecordsVertexRenderer {
       if (!geometry.isEmpty()) {
         final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
         for (final LineString line : lines) {
-          MarkerStyleRenderer.renderMarkers(viewport, graphics, line, this.firstVertexStyle,
-            this.lastVertexStyle, this.vertexStyle);
+          viewport.drawMarkers(line, this.firstVertexStyle, this.lastVertexStyle, this.vertexStyle);
         }
       }
     }

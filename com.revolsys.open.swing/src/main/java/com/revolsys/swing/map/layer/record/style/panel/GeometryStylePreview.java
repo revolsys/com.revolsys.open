@@ -4,9 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -19,6 +16,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 
 public class GeometryStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -82,18 +80,11 @@ public class GeometryStylePreview extends JPanel {
   protected void paintComponent(final Graphics g) {
     super.paintComponent(g);
     final Graphics2D graphics = (Graphics2D)g;
-    final Paint paint = graphics.getPaint();
-    final Stroke stroke = graphics.getStroke();
-    try {
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-      if (DataTypes.POLYGON.equals(this.geometryDataType)) {
-        this.geometryStyle.fillPolygon(null, graphics, this.polygon);
-      }
-      this.geometryStyle.drawLineString(null, graphics, this.line);
-    } finally {
-      graphics.setPaint(paint);
-      graphics.setStroke(stroke);
+    final Graphics2DViewRender view = new Graphics2DViewRender(graphics, 100, 100);
+    if (DataTypes.POLYGON.equals(this.geometryDataType)) {
+      view.drawGeometry(this.polygon, this.geometryStyle);
+    } else {
+      view.drawGeometry(this.line, this.geometryStyle);
     }
   }
 }

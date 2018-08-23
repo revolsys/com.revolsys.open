@@ -16,6 +16,7 @@ import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.QuantityType;
 
 import systems.uom.common.USCustomary;
@@ -66,8 +67,8 @@ public class MapPrintable implements Printable {
   private void drawFooter(final Graphics2D graphics2d) {
     graphics2d.setFont(new Font("Arial", Font.PLAIN, 12));
     final String sheetName = (char)('A' + this.column) + "" + this.row;
-    final String text = this.boundingBox.getHorizontalCoordinateSystem().getCoordinateSystemName() + " - 1:"
-      + this.scale + " - " + sheetName;
+    final String text = this.boundingBox.getHorizontalCoordinateSystem().getCoordinateSystemName()
+      + " - 1:" + this.scale + " - " + sheetName;
 
     graphics2d.drawString(text, 0, (float)(this.contentRect.getMaxY() + this.rulerSizePixels * 2));
   }
@@ -184,6 +185,8 @@ public class MapPrintable implements Printable {
     final Graphics2D graphics2d = (Graphics2D)graphics;
     final PrintViewport2D viewport = new PrintViewport2D(this.map, graphics2d, pageFormat,
       this.boundingBox, this.contentRect, this.dpi);
+
+    final ViewRenderer viewRenderer = viewport.newViewRenderer();
     graphics2d.translate(pageFormat.getImageableX() * this.dpi / 72.0,
       pageFormat.getImageableX() * this.dpi / 72.0);
     drawFooter(graphics2d);
@@ -195,7 +198,7 @@ public class MapPrintable implements Printable {
 
     final LayerGroup map = viewport.getProject();
 
-    map.getRenderer().render(viewport);
+    map.getRenderer().render(viewRenderer);
 
     final double unit = viewport.getModelUnitsPerViewUnit();
     final float lineWidth = (float)(unit * this.millimetre / 5);

@@ -21,8 +21,8 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -157,7 +157,9 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
   }
 
   private void render(final Graphics2D graphics) {
-    GeoreferencedImageLayerRenderer.render(this.viewport, graphics, this.image, false);
+    final Graphics2DViewRender viewportRenderContext = new Graphics2DViewRender(
+      this.viewport, graphics);
+    viewportRenderContext.drawImage(this.image, false);
   }
 
   public void setImage(final LayerRendererOverlaySwingWorker imageWorker) {

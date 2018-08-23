@@ -1,4 +1,4 @@
-package com.revolsys.swing.pdf;
+package com.revolsys.swing.map.view.pdf;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -8,12 +8,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import javax.measure.Quantity;
@@ -21,134 +18,48 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
 import org.apache.pdfbox.cos.COSArray;
-import org.apache.pdfbox.cos.COSDictionary;
-import org.apache.pdfbox.cos.COSName;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
 import org.apache.pdfbox.pdmodel.graphics.PDExtendedGraphicsState;
 import org.apache.pdfbox.pdmodel.graphics.PDLineDashPattern;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
-import com.revolsys.io.BaseCloseable;
-import com.revolsys.raster.io.format.pdf.PdfUtil;
+import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
-import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.util.Exceptions;
+import com.revolsys.swing.map.view.TextStyleViewRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 
 import tec.uom.se.quantity.Quantities;
 
-public class PdfViewport extends Viewport2D implements BaseCloseable {
-
-  private final Set<Float> alphaSet = new HashSet<>();
-
-  private final Canvas canvas = new Canvas();
+public class PdfViewRenderer extends ViewRenderer {
 
   private final PDPageContentStream contentStream;
 
-  private final PDDocument document;
-
-  private final Map<String, PDFont> fonts = new HashMap<>();
-
-  private final PDPage page;
+  private final Canvas canvas = new Canvas();
 
   private int styleId = 0;
 
   private final Map<GeometryStyle, String> styleNames = new HashMap<>();
 
-  public PdfViewport(final PDDocument document, final PDPage page, final Project project,
-    final int width, final int height, final BoundingBox boundingBox) throws IOException {
-    super(project, width, height, boundingBox);
-    this.document = document;
-    this.page = page;
-    this.contentStream = new PDPageContentStream(document, page);
-    final COSDictionary pageDictionary = page.getCOSDictionary();
-    final COSArray viewports = PdfUtil.getArray(pageDictionary, "VP");
+  private final PDPage page;
 
-    final COSDictionary viewport = new COSDictionary();
-    viewports.add(viewport);
-    viewport.setName(COSName.TYPE, "Viewport");
-
-    final COSArray bbox = PdfUtil.intArray(0, 0, width, height);
-    viewport.setItem(COSName.BBOX, bbox);
-
-    viewport.setString(COSName.NAME, "Main Map");
-
-    final COSDictionary measure = PdfUtil.getDictionary(viewport, "Measure");
-    measure.setName(COSName.TYPE, "Measure");
-    measure.setName(COSName.SUBTYPE, "GEO");
-
-    final COSArray bounds = PdfUtil.intArray(0, 0, 0, 1, 1, 1, 1, 0);
-    measure.setItem("Bounds", bounds);
-
-    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-
-    final double minX = boundingBox.getMinX();
-    final double maxX = boundingBox.getMaxX();
-    final double minY = boundingBox.getMinY();
-    final double maxY = boundingBox.getMaxY();
-    final COSArray geoPoints = new COSArray();
-    addPoint(geoPoints, geometryFactory, minX, minY);
-    addPoint(geoPoints, geometryFactory, minX, maxY);
-    addPoint(geoPoints, geometryFactory, maxX, maxY);
-    addPoint(geoPoints, geometryFactory, maxX, minY);
-    measure.setItem("GPTS", geoPoints);
-
-    final COSArray lpts = PdfUtil.intArray(0, 0, 0, 1, 1, 1, 1, 0);
-    measure.setItem("LPTS", lpts);
-
-    final COSDictionary gcs = PdfUtil.getDictionary(measure, "GCS");
-    if (geometryFactory.isProjected()) {
-      gcs.setName(COSName.TYPE, "PROJCS");
-    } else {
-      gcs.setName(COSName.TYPE, "GEOGCS");
-    }
-    final int srid = geometryFactory.getHorizontalCoordinateSystemId();
-    gcs.setInt("EPSG", srid);
-    String wkt = geometryFactory.toWktCs();
-    wkt = wkt.replaceAll("false_easting", "False_Easting");
-    wkt = wkt.replaceAll("false_northing", "False_Northing");
-    wkt = wkt.replaceAll("Popular_Visualisation_Pseudo_Mercator", "Mercator");
-    gcs.setString("WKT", wkt);
-  }
-
-  private void addPoint(final COSArray geoPoints, final GeometryFactory geometryFactory,
-    final double x, final double y) {
-    final Point point = geometryFactory.point(x, y);
-    final GeometryFactory geographicGeometryFactory = geometryFactory
-      .getGeographicGeometryFactory();
-    final Point geoPoint = point.convertGeometry(geographicGeometryFactory);
-    final double lon = geoPoint.getX();
-    final double lat = geoPoint.getY();
-    PdfUtil.addFloat(geoPoints, lat);
-    PdfUtil.addFloat(geoPoints, lon);
-  }
-
-  @Override
-  public void close() {
-    try {
-      this.contentStream.close();
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
-    }
+  public PdfViewRenderer(final PdfViewport viewport, final PDPageContentStream contentStream) {
+    super(viewport);
+    this.contentStream = contentStream;
+    this.page = viewport.getPage();
+    updateFields();
   }
 
   @Override
@@ -205,6 +116,76 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     }
   }
 
+  @Override
+  public void drawGeometryOutline(final Geometry geometry, final GeometryStyle style) {
+    try {
+      this.contentStream.saveGraphicsState();
+      setGeometryStyle(style);
+      this.contentStream.setNonStrokingColor(style.getPolygonFill());
+      this.contentStream.setStrokingColor(style.getLineColor());
+
+      for (Geometry part : geometry.geometries()) {
+        part = part.convertGeometry(getGeometryFactory());
+        if (part instanceof LineString) {
+          final LineString line = (LineString)part;
+
+          drawLine(line);
+          this.contentStream.stroke();
+        } else if (part instanceof Polygon) {
+          final Polygon polygon = (Polygon)part;
+
+          int i = 0;
+          for (final LinearRing ring : polygon.rings()) {
+            if (i == 0) {
+              if (ring.isClockwise()) {
+                drawLineReverse(ring);
+              } else {
+                drawLine(ring);
+              }
+            } else {
+              if (ring.isCounterClockwise()) {
+                drawLineReverse(ring);
+              } else {
+                drawLine(ring);
+              }
+            }
+            this.contentStream.closeSubPath();
+            i++;
+          }
+          for (final LinearRing ring : polygon.rings()) {
+
+            drawLine(ring);
+            this.contentStream.stroke();
+          }
+        }
+      }
+
+    } catch (final IOException e) {
+    } finally {
+      try {
+        this.contentStream.restoreGraphicsState();
+      } catch (final IOException e) {
+      }
+    }
+  }
+
+  @Override
+  public void drawImage(final GeoreferencedImage image, final boolean useTransform) {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void drawImage(final GeoreferencedImage image, final boolean useTransform,
+    final double alpha, final Object interpolationMethod) {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void drawImage(final GeoreferencedImage image, final boolean useTransform,
+    final Object interpolationMethod) {
+    // TODO Auto-generated method stub
+  }
+
   private void drawLine(final LineString line) throws IOException {
     for (int i = 0; i < line.getVertexCount(); i++) {
       final double modelX = line.getX(i);
@@ -237,9 +218,14 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
   }
 
   @Override
+  public void drawMarker(final Point point, final MarkerStyle style, final double orientation) {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
   public void drawText(final Record record, final Geometry geometry, final TextStyle style) {
     try {
-      final String label = TextStyleRenderer.getLabel(record, style);
+      final String label = style.getLabel(record);
       if (Property.hasValue(label) && geometry != null) {
         final String textPlacementType = style.getTextPlacementType();
         final PointDoubleXYOrientation point = AbstractRecordLayerRenderer
@@ -258,10 +244,10 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
             // style.setTextStyle(viewport, graphics);
 
             final Quantity<Length> textDx = style.getTextDx();
-            double dx = Viewport2D.toDisplayValue(this, textDx);
+            double dx = this.toDisplayValue(textDx);
 
             final Quantity<Length> textDy = style.getTextDy();
-            double dy = -Viewport2D.toDisplayValue(this, textDy);
+            double dy = -this.toDisplayValue(textDy);
             final Font font = style.getFont(this);
             final FontMetrics fontMetrics = this.canvas.getFontMetrics(font);
 
@@ -366,7 +352,8 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
               this.contentStream.setNonStrokingColor(style.getTextFill());
 
               this.contentStream.beginText();
-              final PDFont pdfFont = getFont("/org/apache/pdfbox/resources/ttf/ArialMT.ttf");
+              final PDFont pdfFont = getViewport()
+                .getFont("/org/apache/pdfbox/resources/ttf/ArialMT.ttf");
 
               this.contentStream.setFont(pdfFont, font.getSize2D());
               this.contentStream.setTextMatrix(transform);
@@ -387,20 +374,22 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     }
   }
 
-  private PDFont getFont(final String path) throws IOException {
-    PDFont font = this.fonts.get(path);
-    if (font == null) {
-      final InputStream fontStream = PDDocument.class
-        .getResourceAsStream("/org/apache/pdfbox/resources/ttf/ArialMT.ttf");
-      font = PDTrueTypeFont.loadTTF(this.document, fontStream);
-      this.fonts.put("/org/apache/pdfbox/resources/ttf/ArialMT.ttf", font);
-    }
-    return font;
+  public Canvas getCanvas() {
+    return this.canvas;
+  }
+
+  public PDPageContentStream getContentStream() {
+    return this.contentStream;
   }
 
   @Override
-  public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
-    return false;
+  public PdfViewport getViewport() {
+    return (PdfViewport)super.getViewport();
+  }
+
+  @Override
+  public TextStyleViewRenderer newTextStyleViewRenderer(final TextStyle textStyle) {
+    return new PdfTextStyleRenderer(this, textStyle);
   }
 
   private void setGeometryStyle(final GeometryStyle style) throws IOException {
@@ -485,4 +474,5 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     }
     this.contentStream.appendRawCommands("/" + styleName + " gs\n");
   }
+
 }

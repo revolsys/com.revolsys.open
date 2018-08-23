@@ -5,11 +5,9 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Triangle;
-import com.revolsys.io.BaseCloseable;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class TriangulatedIrregularNetworkLayerRenderer
   extends AbstractLayerRenderer<TriangulatedIrregularNetworkLayer> {
@@ -22,20 +20,16 @@ public class TriangulatedIrregularNetworkLayerRenderer
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final TriangulatedIrregularNetworkLayer layer) {
-    final double scaleForVisible = viewport.getScaleForVisible();
+  public void render(final ViewRenderer view, final TriangulatedIrregularNetworkLayer layer) {
+    final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
         final TriangulatedIrregularNetwork tin = layer.getTin();
         if (tin != null) {
-          try (
-            BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
-            for (final Triangle triangle : cancellable
-              .cancellable(tin.getTriangles(viewport.getBoundingBox()))) {
-              final Geometry convertedTriangle = tin.convertGeometry(triangle);
-              viewport.drawGeometry(convertedTriangle, this.style);
-            }
+          for (final Triangle triangle : view
+            .cancellable(tin.getTriangles(view.getBoundingBox()))) {
+            final Geometry convertedTriangle = tin.convertGeometry(triangle);
+            view.drawGeometry(convertedTriangle, this.style);
           }
         }
       }

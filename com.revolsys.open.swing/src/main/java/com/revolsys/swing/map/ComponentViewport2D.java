@@ -1,12 +1,10 @@
 package com.revolsys.swing.map;
 
 import java.awt.Cursor;
-import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -15,13 +13,13 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 import javax.swing.JComponent;
 
-import com.revolsys.awt.CloseableAffineTransform;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
@@ -34,12 +32,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   private int maxDecimalDigits;
 
   private int maxIntegerDigits;
-
-  private final ThreadLocal<Graphics2D> graphics = new ThreadLocal<>();
-
-  private final ThreadLocal<AffineTransform> graphicsTransform = new ThreadLocal<>();
-
-  private final ThreadLocal<AffineTransform> graphicsModelTransform = new ThreadLocal<>();
 
   private final GlobalBooleanValue componentResizing = new GlobalBooleanValue(false);
 
@@ -83,58 +75,12 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     return boundingBox;
   }
 
-  /**
-   * Get the bounding box in model units for the pair of coordinates in view
-   * units. The bounding box will be clipped to the model's bounding box.
-   *
-   * @param x1 The first x value.
-   * @param y1 The first y value.
-   * @param x2 The second x value.
-   * @param y2 The second y value.
-   * @return The bounding box.
-   */
-  public BoundingBox getBoundingBox(final double x1, final double y1, final double x2,
-    final double y2) {
-    final double[] c1 = toModelCoordinates(x1, y1);
-    final double[] c2 = toModelCoordinates(x2, y2);
-    final BoundingBox boundingBox = getGeometryFactory().newBoundingBox(c1[0], c1[1], c2[0], c2[1]);
-
-    // Clip the bounding box with the map's visible area
-    BoundingBox intersection = boundingBox.intersection(boundingBox);
-    // If the clipped bounding box is null then move the map to the new BBOX
-    if (intersection.isEmpty()) {
-      intersection = boundingBox;
-    }
-    return intersection;
-  }
-
-  /**
-   * Get the bounding box for the dimensions of the viewport at the specified
-   * scale, centred at the x, y view coordinates.
-   *
-   * @param x The view x coordinate.
-   * @param y The view y coordinate.
-   * @param scale The scale.
-   * @return The bounding box.
-   */
-  public BoundingBox getBoundingBox(final int x, final int y, final double scale) {
-    final double[] ordinates = toModelCoordinates(x, y);
-    final double mapX = ordinates[0];
-    final double mapY = ordinates[1];
-    return getBoundingBox(mapX, mapY, scale);
-  }
-
   public Cursor getCursor() {
     if (this.component == null) {
       return null;
     } else {
       return this.component.getCursor();
     }
-  }
-
-  @Override
-  public Graphics2D getGraphics() {
-    return this.graphics.get();
   }
 
   public double getMaxScale() {
@@ -196,7 +142,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   }
 
   public Unit<Length> getScaleUnit(final double scale) {
-    final Unit<Length> lengthUnit = getGeometryFactory().getHorizontalCoordinateSystem().getLengthUnit();
+    final Unit<Length> lengthUnit = getGeometryFactory().getHorizontalCoordinateSystem()
+      .getLengthUnit();
     final Unit<Length> scaleUnit = lengthUnit.divide(scale);
     return scaleUnit;
   }
@@ -242,6 +189,11 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
   public boolean isComponentResizing() {
     return this.componentResizing.isTrue();
+  }
+
+  @Override
+  public ViewRenderer newViewRenderer() {
+    throw new UnsupportedOperationException("Graphics must be specified");
   }
 
   @Override
@@ -296,54 +248,12 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     }
   }
 
-  public void setGraphics(final Graphics2D graphics) {
-    if (graphics == null) {
-      this.graphics.remove();
-    } else {
-      this.graphics.set(graphics);
-      this.graphicsTransform.set(graphics.getTransform());
-    }
-    updateGraphicsTransform();
-  }
-
   @Override
   public void setInitialized(final boolean initialized) {
     if (initialized && !isInitialized()) {
       updateCachedFields();
     }
     super.setInitialized(initialized);
-  }
-
-  @Override
-  protected void setModelToScreenTransform(final AffineTransform modelToScreenTransform) {
-    super.setModelToScreenTransform(modelToScreenTransform);
-    updateGraphicsTransform();
-  }
-
-  @Override
-  public BaseCloseable setUseModelCoordinates(final boolean useModelCoordinates) {
-    final Graphics2D graphics = getGraphics();
-    return setUseModelCoordinates(graphics, useModelCoordinates);
-  }
-
-  @Override
-  public BaseCloseable setUseModelCoordinates(final Graphics2D graphics,
-    final boolean useModelCoordinates) {
-    if (graphics == null) {
-      return null;
-    } else {
-      AffineTransform newTransform;
-      if (useModelCoordinates) {
-        newTransform = this.graphicsModelTransform.get();
-      } else {
-        newTransform = this.graphicsTransform.get();
-      }
-      if (newTransform == null) {
-        return new CloseableAffineTransform(graphics);
-      } else {
-        return new CloseableAffineTransform(graphics, newTransform);
-      }
-    }
   }
 
   public void translate(final double dx, final double dy) {
@@ -377,20 +287,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
       setBoundingBox(getBoundingBox());
 
       this.component.repaint();
-    }
-  }
-
-  private void updateGraphicsTransform() {
-    if (this.graphicsTransform != null) {
-      final AffineTransform modelToScreenTransform = getModelToScreenTransform();
-      final AffineTransform graphicsTransform = this.graphicsTransform.get();
-      if (modelToScreenTransform == null || graphicsTransform == null) {
-        this.graphicsModelTransform.remove();
-      } else {
-        final AffineTransform transform = (AffineTransform)graphicsTransform.clone();
-        transform.concatenate(modelToScreenTransform);
-        this.graphicsModelTransform.set(transform);
-      }
     }
   }
 

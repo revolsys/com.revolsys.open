@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.print;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
 import java.awt.print.Pageable;
 import java.awt.print.Paper;
@@ -15,16 +14,18 @@ import javax.print.attribute.PrintRequestAttributeSet;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.logging.Logs;
-import com.revolsys.swing.map.GraphicsViewport2D;
+import com.revolsys.swing.map.Graphics2DViewport;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 import com.revolsys.swing.parallel.Invoke;
 
-public class SinglePage extends GraphicsViewport2D implements Pageable, Printable {
+public class SinglePage extends Graphics2DViewport implements Pageable, Printable {
 
   public static void print() {
     final Project project = Project.get();
@@ -133,19 +134,31 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
   public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex)
     throws PrinterException {
     if (pageIndex == 0) {
-      setGraphics((Graphics2D)graphics);
+      final Graphics2DViewRender viewportRenderContext = newViewportRenderContext(
+        graphics);
+
       final int translateX = (int)pageFormat.getImageableX();
       final int translateY = (int)pageFormat.getImageableY();
       graphics.translate(translateX - 1, translateY - 1);
       final Project project = getProject();
       final MapPanel mapPanel = project.getMapPanel();
       final Layer baseMapLayer = mapPanel.getBaseMapLayer();
-      render(baseMapLayer);
+      render(viewportRenderContext, baseMapLayer);
 
-      render(project);
+      render(viewportRenderContext, project);
       return PAGE_EXISTS;
     } else {
       return NO_SUCH_PAGE;
+    }
+  }
+
+  private void render(final Graphics2DViewRender viewportRenderContext,
+    final Layer layer) {
+    if (layer != null && layer.isExists() && layer.isVisible()) {
+      final LayerRenderer<Layer> renderer = layer.getRenderer();
+      if (renderer != null) {
+        renderer.render(viewportRenderContext);
+      }
     }
   }
 

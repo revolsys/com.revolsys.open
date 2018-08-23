@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
@@ -26,11 +28,13 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
+import com.revolsys.record.Record;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.Strings;
@@ -43,6 +47,8 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
   private static final String AUTO = "auto";
 
   private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<>();
+
+  private static final Pattern FIELD_PATTERN = Pattern.compile("\\[([\\w.]+)\\]");
 
   private static final Set<String> PROPERTY_NAMES = new HashSet<>();
 
@@ -213,7 +219,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       graphics.setStroke(outlineStroke);
       final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
       final TextLayout textLayout = new TextLayout(text, font, fontRenderContext);
-      final Shape outlineShape = textLayout.getOutline(TextStyleRenderer.NOOP_TRANSFORM);
+      final Shape outlineShape = textLayout.getOutline(ViewRenderer.IDENTITY_TRANSFORM);
       graphics.draw(outlineShape);
       graphics.setStroke(savedStroke);
     }
@@ -230,16 +236,42 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
   }
 
-  public Font getFont(final Viewport2D viewport) {
+  public Font getFont(final ViewRenderer viewport) {
     final int style = 0;
+    final Quantity<Length> measure = this.textSize;
     // if (textStyle.getFontWeight() == FontWeight.BOLD) {
     // style += Font.BOLD;
     // }
     // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
     // style += Font.ITALIC;
     // }
-    final double fontSize = Viewport2D.toDisplayValue(viewport, this.textSize);
+    final double fontSize = viewport.toDisplayValue(measure);
     return new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
+  }
+
+  public String getLabel(final Record record) {
+    if (record == null) {
+      return "Text";
+    } else {
+      final StringBuffer label = new StringBuffer();
+      final String labelPattern = getTextName();
+      final Matcher matcher = FIELD_PATTERN.matcher(labelPattern);
+      while (matcher.find()) {
+        final String propertyName = matcher.group(1);
+        String text = "";
+        try {
+          final Object value = record.getValueByPath(propertyName);
+          if (value != null) {
+            text = DataTypes.toString(value);
+          }
+        } catch (final Throwable e) {
+        }
+        matcher.appendReplacement(label, text);
+      }
+      matcher.appendTail(label);
+
+      return label.toString().trim();
+    }
   }
 
   public Color getTextBoxColor() {
@@ -491,7 +523,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     return this;
   }
 
-  public synchronized void setTextStyle(final Viewport2D viewport, final Graphics2D graphics) {
+  public synchronized void setTextStyle(final ViewRenderer viewport, final Graphics2D graphics) {
     if (viewport == null) {
       final Font font = new Font(this.textFaceName, 0, this.textSize.getValue().intValue());
       graphics.setFont(font);
@@ -500,13 +532,14 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       if (this.font == null || this.lastScale != scale) {
         this.lastScale = scale;
         final int style = 0;
+        final Quantity<Length> measure = this.textSize;
         // if (textStyle.getFontWeight() == FontWeight.BOLD) {
         // style += Font.BOLD;
         // }
         // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
         // style += Font.ITALIC;
         // }
-        final double fontSize = Viewport2D.toDisplayValue(viewport, this.textSize);
+        final double fontSize = viewport.toDisplayValue(measure);
         this.font = new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
       }
       graphics.setFont(this.font);

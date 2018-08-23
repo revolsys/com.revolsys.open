@@ -38,14 +38,12 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.MapPanel;
-import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
@@ -488,16 +486,13 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   @Override
-  protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
+  protected void paintComponent(final Graphics2DViewRender view, final Graphics2D graphics) {
     if (!this.measureGeometry.isEmpty()) {
       final GeometryFactory geometryFactory = getGeometryFactory2d();
-      try (
-        BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
-        MEASURE_RENDERER.paintSelected(viewport, graphics, geometryFactory, this.measureGeometry);
-        if (this.measureGeometry instanceof Polygon) {
-          final Polygon polygon = (Polygon)this.measureGeometry;
-          viewport.drawGeometry(graphics, polygon, POLYGON_STYLE);
-        }
+      MEASURE_RENDERER.paintSelected(view, graphics, geometryFactory, this.measureGeometry);
+      if (this.measureGeometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)this.measureGeometry;
+        view.drawGeometry(polygon, POLYGON_STYLE);
       }
 
       if (!(this.measureGeometry instanceof Punctual)) {
@@ -520,8 +515,8 @@ public class MeasureOverlay extends AbstractOverlay {
           measureTextStyle.setTextVerticalAlignment("top");
           textPoint = this.measureGeometry.getToVertex(0);
         }
-        TextStyleRenderer.renderText(viewport, graphics, this.measureLabel, textPoint,
-          measureTextStyle);
+        view.newTextStyleViewRenderer(measureTextStyle)//
+          .drawText(this.measureLabel, textPoint);
       }
     }
     drawXorGeometry(graphics);

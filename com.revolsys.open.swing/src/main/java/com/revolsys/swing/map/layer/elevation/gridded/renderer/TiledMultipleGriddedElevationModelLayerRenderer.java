@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.elevation.gridded.renderer;
 
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelZRange;
@@ -24,6 +22,7 @@ import com.revolsys.swing.map.layer.elevation.gridded.TiledMultipleGriddedElevat
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Cancellable;
@@ -211,21 +210,18 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  protected void renderTile(final Viewport2D viewport, final Cancellable cancellable,
+  protected void renderTile(final ViewRenderer viewport, final Cancellable cancellable,
     final TiledGriddedElevationModelLayerTile tile) {
-    final Graphics2D graphics = viewport.getGraphics();
-    if (graphics != null) {
-      final GriddedElevationModel elevationModel = tile.getElevationModel();
-      if (elevationModel != null) {
-        final TiledGriddedElevationModelLayer layer = getLayer();
-        final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
-        for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
-          .cancellable(renderers)) {
-          final long scaleForVisible = (long)viewport.getScaleForVisible();
-          if (renderer.isVisible(scaleForVisible)) {
-            renderer.setElevationModel(elevationModel);
-            renderer.render(viewport, cancellable, layer);
-          }
+    final GriddedElevationModel elevationModel = tile.getElevationModel();
+    if (elevationModel != null) {
+      final TiledGriddedElevationModelLayer layer = getLayer();
+      final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
+      for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
+        .cancellable(renderers)) {
+        final long scaleForVisible = (long)viewport.getScaleForVisible();
+        if (renderer.isVisible(scaleForVisible)) {
+          renderer.setElevationModel(elevationModel);
+          renderer.render(viewport, layer);
         }
       }
     }
