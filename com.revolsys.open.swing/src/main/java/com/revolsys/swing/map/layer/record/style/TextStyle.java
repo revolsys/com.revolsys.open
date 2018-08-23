@@ -68,7 +68,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     addStyleProperty("textHaloRadius", 0);
     addStyleProperty("textHorizontalAlignment", AUTO);
     // addProperty("text-label-position-tolerance",DataTypes.);
-    // addProperty("text-line-spacing",DataTypes.);
+    // addProperty("text-ring-spacing",DataTypes.);
     // addProperty("text-max-char-angle-delta",DataTypes.);
     // addProperty("text-min-distance",DataTypes.);
     // addProperty("text-min-padding",DataTypes.);

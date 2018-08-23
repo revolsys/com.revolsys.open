@@ -100,7 +100,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   private double modelUnitsPerViewUnit;
 
-  private BoundingBox boundingBox = BoundingBox.empty();
+  protected BoundingBox boundingBox = BoundingBox.empty();
 
   public ViewRenderer(final Viewport2D viewport) {
     this.viewport = viewport;

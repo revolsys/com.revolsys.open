@@ -501,7 +501,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return modelToScreenTransform;
   }
 
-  public Graphics2DViewRender newViewportRenderContext(final Graphics graphics) {
+  public Graphics2DViewRender newViewRenderer(final Graphics graphics) {
     return new Graphics2DViewRender(this, (Graphics2D)graphics);
   }
 

@@ -98,12 +98,14 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   private ComponentViewport2D viewport;
 
+  private Graphics2DViewRender view;
+
   private Geometry xorGeometry;
 
   protected AbstractOverlay(final MapPanel map) {
     this.map = map;
     this.viewport = map.getViewport();
-
+    this.view = this.viewport.newViewRenderer();
     map.addMapOverlay(this);
   }
 
@@ -240,7 +242,23 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     this.snapPoint = null;
     this.snapPointLocationMap.clear();
     this.viewport = null;
+    this.view = null;
     this.xorGeometry = null;
+  }
+
+  protected void drawBox(final Graphics2D graphics, final int x1, final int y1, final int x2,
+    final int y2, final Color color, final BasicStroke stroke, final Color fillColor) {
+    if (x1 != -1) {
+      graphics.setColor(color);
+      graphics.setStroke(stroke);
+      final int boxX = Math.min(x1, x2);
+      final int boxY = Math.min(y1, y2);
+      final int width = Math.abs(x2 - x1);
+      final int height = Math.abs(y2 - y1);
+      graphics.drawRect(boxX, boxY, width, height);
+      graphics.setPaint(fillColor);
+      graphics.fillRect(boxX, boxY, width, height);
+    }
   }
 
   protected void drawXorGeometry(final Graphics2D graphics) {
@@ -263,8 +281,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
           graphics.fill(shape);
         } else {
           XOR_LINE_STYLE.setLineCap(LineCap.BUTT);
-          this.viewport.newViewportRenderContext(graphics) //
-            .drawGeometry(geometry, XOR_LINE_STYLE);
+          this.view.drawGeometry(geometry, XOR_LINE_STYLE);
         }
       } finally {
         graphics.setPaint(paint);
@@ -536,6 +553,24 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   public void mouseWheelMoved(final MouseWheelEvent e) {
   }
 
+  protected BoundingBox newBoundingBox(final Viewport2D viewport, final int x1, final int y1,
+    final int x2, final int y2) {
+    // Convert first point to envelope top left in map coords.
+    final int minX = Math.min(x1, x2);
+    final int minY = Math.min(y1, y2);
+    final Point topLeft = viewport.toModelPoint(minX, minY);
+
+    // Convert second point to envelope bottom right in map coords.
+    final int maxX = Math.max(x1, x2);
+    final int maxY = Math.max(y1, y2);
+    final Point bottomRight = viewport.toModelPoint(maxX, maxY);
+
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final BoundingBox boundingBox = geometryFactory.newBoundingBox(topLeft.getX(), topLeft.getY(),
+      bottomRight.getX(), bottomRight.getY());
+    return boundingBox;
+  }
+
   protected void newPropertyUndo(final Object object, final String propertyName,
     final Object oldValue, final Object newValue) {
     final SetObjectProperty edit = new SetObjectProperty(object, propertyName, oldValue, newValue);
@@ -558,10 +593,10 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   }
 
   @Override
-  protected final void paintComponent(final Graphics graphics) {
-    final Graphics2DViewRender viewportRenderContext = this.viewport
-      .newViewportRenderContext(graphics);
-    paintComponent(viewportRenderContext, (Graphics2D)graphics);
+  protected final void paintComponent(final Graphics g) {
+    final Graphics2D graphics = (Graphics2D)g;
+    this.view.setGraphics(graphics);
+    paintComponent(this.view, graphics);
   }
 
   protected void paintComponent(final Graphics2DViewRender viewport, final Graphics2D graphics) {
@@ -741,37 +776,4 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     this.xorGeometry = xorGeometry;
     repaint();
   }
-
-  protected void drawBox(Graphics2D graphics, int x1, int y1, int x2, int y2,
-    Color color, BasicStroke stroke, Color fillColor) {
-      if (x1 != -1) {
-        graphics.setColor(color);
-        graphics.setStroke(stroke);
-        final int boxX = Math.min(x1, x2);
-        final int boxY = Math.min(y1, y2);
-        final int width = Math.abs(x2 - x1);
-        final int height = Math.abs(y2 - y1);
-        graphics.drawRect(boxX, boxY, width, height);
-        graphics.setPaint(fillColor);
-        graphics.fillRect(boxX, boxY, width, height);
-      }
-    }
-
-  protected BoundingBox newBoundingBox(final Viewport2D viewport, int x1, int y1, int x2,
-    int y2) {
-      // Convert first point to envelope top left in map coords.
-        final int minX = Math.min(x1, x2);
-      final int minY = Math.min(y1, y2);
-      final Point topLeft = viewport.toModelPoint(minX, minY);
-    
-      // Convert second point to envelope bottom right in map coords.
-      final int maxX = Math.max(x1, x2);
-      final int maxY = Math.max(y1, y2);
-      final Point bottomRight = viewport.toModelPoint(maxX, maxY);
-    
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final BoundingBox boundingBox = geometryFactory.newBoundingBox(topLeft.getX(), topLeft.getY(),
-        bottomRight.getX(), bottomRight.getY());
-      return boundingBox;
-    }
 }

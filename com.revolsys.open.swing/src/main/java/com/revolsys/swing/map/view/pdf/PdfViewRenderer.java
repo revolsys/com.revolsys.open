@@ -333,7 +333,7 @@ public class PdfViewRenderer extends ViewRenderer {
                * (float)textHaloRadius, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
                * graphics.setColor(style.getTextHaloFill()); graphics.setStroke(outlineStroke);
                * final Font font = graphics.getFont(); final FontRenderContext fontRenderContext =
-               * graphics.getFontRenderContext(); final TextLayout textLayout = new TextLayout(line,
+               * graphics.getFontRenderContext(); final TextLayout textLayout = new TextLayout(ring,
                * font, fontRenderContext); final Shape outlineShape =
                * textLayout.getOutline(TextStyleRenderer.NOOP_TRANSFORM);
                * graphics.draw(outlineShape); graphics.setStroke(savedStroke); }

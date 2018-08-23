@@ -1152,6 +1152,23 @@ public interface BoundingBox
     return intersects(minX, minY, maxX, maxY);
   }
 
+  default boolean intersectsFast(final BoundingBoxProxy proxy) {
+    if (proxy == null || isEmpty()) {
+      return false;
+    } else {
+      final BoundingBox boundingBox = proxy.getBoundingBox();
+      if (boundingBox.isEmpty()) {
+        return false;
+      } else {
+        final double minX = boundingBox.getMinX();
+        final double minY = boundingBox.getMinY();
+        final double maxX = boundingBox.getMaxX();
+        final double maxY = boundingBox.getMaxY();
+        return intersects(minX, minY, maxX, maxY);
+      }
+    }
+  }
+
   default boolean isWithinDistance(final BoundingBox boundingBox, final double maxDistance) {
     final double distance = boundingBox.distance(boundingBox);
     if (distance < maxDistance) {

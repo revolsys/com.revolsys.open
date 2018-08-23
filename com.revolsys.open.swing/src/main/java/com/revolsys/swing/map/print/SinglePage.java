@@ -134,8 +134,7 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
   public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex)
     throws PrinterException {
     if (pageIndex == 0) {
-      final Graphics2DViewRender viewportRenderContext = newViewportRenderContext(
-        graphics);
+      final Graphics2DViewRender view = newViewRenderer(graphics);
 
       final int translateX = (int)pageFormat.getImageableX();
       final int translateY = (int)pageFormat.getImageableY();
@@ -143,21 +142,20 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
       final Project project = getProject();
       final MapPanel mapPanel = project.getMapPanel();
       final Layer baseMapLayer = mapPanel.getBaseMapLayer();
-      render(viewportRenderContext, baseMapLayer);
+      render(view, baseMapLayer);
 
-      render(viewportRenderContext, project);
+      render(view, project);
       return PAGE_EXISTS;
     } else {
       return NO_SUCH_PAGE;
     }
   }
 
-  private void render(final Graphics2DViewRender viewportRenderContext,
-    final Layer layer) {
+  private void render(final Graphics2DViewRender view, final Layer layer) {
     if (layer != null && layer.isExists() && layer.isVisible()) {
       final LayerRenderer<Layer> renderer = layer.getRenderer();
       if (renderer != null) {
-        renderer.render(viewportRenderContext);
+        renderer.render(view);
       }
     }
   }

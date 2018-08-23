@@ -1,17 +1,17 @@
 package com.revolsys.geometry.model.awtshape;
 
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.vertex.Vertex;
 
 public class PolygonShape extends AbstractGeometryShape<Polygon> {
+
+  public PolygonShape() {
+  }
 
   public PolygonShape(final Polygon polygon) {
     super(polygon);
@@ -45,42 +45,11 @@ public class PolygonShape extends AbstractGeometryShape<Polygon> {
   }
 
   @Override
-  public Rectangle getBounds() {
-    final Rectangle2D bounds2d = getBounds2D();
-    if (bounds2d == null) {
-      return null;
-    } else {
-      return bounds2d.getBounds();
-    }
-  }
-
-  @Override
-  public Rectangle2D getBounds2D() {
-    final BoundingBox boundingBox = this.geometry.getBoundingBox();
-    if (boundingBox.isEmpty()) {
-      return null;
-    } else {
-      final double x = boundingBox.getMinX();
-      final double y = boundingBox.getMinY();
-      final double width = boundingBox.getWidth();
-      final double height = boundingBox.getHeight();
-      return new Rectangle2D.Double(x, y, width, height);
-    }
-  }
-
-  @Override
   public PathIterator getPathIterator(final AffineTransform transform) {
-    final Vertex vertex = this.geometry.vertices();
     if (transform == null) {
-      return new VertexPathIterator(vertex);
+      return new PolygonPathIterator(this.geometry);
     } else {
-      return new VertexPathIteratorTransform(vertex, transform);
+      return new PolygonPathIteratorTransform(this.geometry, transform);
     }
   }
-
-  @Override
-  public PathIterator getPathIterator(final AffineTransform transform, final double flatness) {
-    return getPathIterator(transform);
-  }
-
 }

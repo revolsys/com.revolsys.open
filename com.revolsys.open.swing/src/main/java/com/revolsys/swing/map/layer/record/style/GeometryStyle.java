@@ -3,8 +3,6 @@ package com.revolsys.swing.map.layer.record.style;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,12 +17,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
-import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.awtshape.LineStringShape;
 import com.revolsys.swing.map.view.ViewRenderer;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -239,7 +232,7 @@ public class GeometryStyle extends MarkerStyle {
     setProperties(style);
   }
 
-  private void applyLineStyle(final ViewRenderer view, final Graphics2D graphics) {
+  public void applyLineStyle(final ViewRenderer view, final Graphics2D graphics) {
     final Color color = getLineColor();
     graphics.setColor(color);
     final Unit<Length> unit = this.lineWidth.getUnit();
@@ -271,69 +264,6 @@ public class GeometryStyle extends MarkerStyle {
   @Override
   public GeometryStyle clone() {
     return (GeometryStyle)super.clone();
-  }
-
-  public void drawLineString(final Graphics2DViewRender viewport, final Graphics2D graphics,
-    final LineString line) {
-    if (this.lineOpacity > 0 && !line.isEmpty()) {
-      final Color color = graphics.getColor();
-      final Stroke stroke = graphics.getStroke();
-      try {
-        applyLineStyle(viewport, graphics);
-        graphics.draw(line.toShape());
-      } finally {
-        graphics.setColor(color);
-        graphics.setStroke(stroke);
-      }
-    }
-  }
-
-  public void drawPolygon(final Graphics2DViewRender viewport, final Graphics2D graphics,
-    final Polygon polygon) {
-    if (this.lineOpacity > 0) {
-      final Color color = graphics.getColor();
-      final Stroke stroke = graphics.getStroke();
-      try {
-        applyLineStyle(viewport, graphics);
-        for (final LinearRing ring : polygon.rings()) {
-          final LineStringShape shape = ring.toShape();
-          graphics.draw(shape);
-        }
-      } finally {
-        graphics.setColor(color);
-        graphics.setStroke(stroke);
-      }
-    }
-  }
-
-  public void fillPolygon(final Graphics2DViewRender view, final Graphics2D graphics,
-    final Polygon polygon) {
-    if (this.polygonFillOpacity > 0) {
-      final Paint paint = graphics.getPaint();
-      try {
-        graphics.setPaint(this.polygonFill);
-        // final Graphic fillPattern = fill.getPattern();
-        // if (fillPattern != null) {
-        // TODO fillPattern
-        // double width = fillPattern.getWidth();
-        // double height = fillPattern.getHeight();
-        // Rectangle2D.Double patternRect;
-        // // TODO units
-        // // if (isUseModelUnits()) {
-        // // patternRect = new Rectangle2D.Double(0, 0, width
-        // // * viewport.getModelUnitsPerViewUnit(), height
-        // // * viewport.getModelUnitsPerViewUnit());
-        // // } else {
-        // patternRect = new Rectangle2D.Double(0, 0, width, height);
-        // // }
-        // graphics.setPaint(new TexturePaint(fillPattern, patternRect));
-
-        // }
-        graphics.fill(polygon.toShape());
-      } finally {
-        graphics.setPaint(paint);
-      }
-    }
   }
 
   public LineCap getLineCap() {

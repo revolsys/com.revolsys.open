@@ -8,14 +8,22 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 
-public class AbstractGeometryShape<G extends Geometry> implements Shape {
+public abstract class AbstractGeometryShape<G extends Geometry> implements Shape {
 
   protected G geometry;
 
+  public AbstractGeometryShape() {
+  }
+
   public AbstractGeometryShape(final G geometry) {
     setGeometry(geometry);
+  }
+
+  public void clearGeometry() {
+    this.geometry = null;
   }
 
   @Override
@@ -40,20 +48,26 @@ public class AbstractGeometryShape<G extends Geometry> implements Shape {
 
   @Override
   public Rectangle getBounds() {
-    // TODO Auto-generated method stub
-    return null;
+    final Rectangle2D bounds2d = getBounds2D();
+    if (bounds2d == null) {
+      return null;
+    } else {
+      return bounds2d.getBounds();
+    }
   }
 
   @Override
   public Rectangle2D getBounds2D() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public PathIterator getPathIterator(final AffineTransform at) {
-    // TODO Auto-generated method stub
-    return null;
+    final BoundingBox boundingBox = this.geometry.getBoundingBox();
+    if (boundingBox.isEmpty()) {
+      return null;
+    } else {
+      final double x = boundingBox.getMinX();
+      final double y = boundingBox.getMinY();
+      final double width = boundingBox.getWidth();
+      final double height = boundingBox.getHeight();
+      return new Rectangle2D.Double(x, y, width, height);
+    }
   }
 
   @Override

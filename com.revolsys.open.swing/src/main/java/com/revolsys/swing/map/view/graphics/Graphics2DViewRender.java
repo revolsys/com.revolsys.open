@@ -28,6 +28,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.awtshape.LineStringShape;
+import com.revolsys.geometry.model.awtshape.PolygonShape;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.logging.Logs;
@@ -54,6 +56,10 @@ public class Graphics2DViewRender extends ViewRenderer {
 
   private ResetAffineTransform useViewTransform;
 
+  private final LineStringShape lineStringShape = new LineStringShape();
+
+  private final PolygonShape polygonShape = new PolygonShape();
+
   public Graphics2DViewRender(final Graphics2D graphics, final int width, final int height) {
     super(null);
     this.geometryFactory = GeometryFactory.DEFAULT_2D;
@@ -73,34 +79,35 @@ public class Graphics2DViewRender extends ViewRenderer {
 
   @Override
   public void drawGeometry(final Geometry geometry, final GeometryStyle style) {
-    if (geometry != null) {
-      this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
-      final BoundingBox viewExtent = getBoundingBox();
-      if (!viewExtent.isEmpty()) {
-        final GeometryFactory viewGeometryFactory = this.geometryFactory;
+    if (this.boundingBox.intersectsFast(geometry)) {
+      if (geometry.isGeometryCollection()) {
         for (int i = 0; i < geometry.getGeometryCount(); i++) {
           final Geometry part = geometry.getGeometry(i);
-          final BoundingBox partExtent = part.getBoundingBox();
-          if (partExtent.intersects(viewExtent)) {
-            final Geometry convertedPart = part.as2d(viewGeometryFactory);
-            if (convertedPart instanceof Point) {
-              final Point point = (Point)convertedPart;
-              drawMarker(point, style, 0);
-            } else if (convertedPart instanceof LineString) {
-              final LineString line = (LineString)convertedPart;
-              try (
-                BaseCloseable transformCloseable = useModelCoordinates()) {
-                style.drawLineString(this, this.graphics, line);
-              }
-            } else if (convertedPart instanceof Polygon) {
-              try (
-                BaseCloseable transformCloseable = useModelCoordinates()) {
-                final Polygon polygon = (Polygon)convertedPart;
-                style.fillPolygon(this, this.graphics, polygon);
-                style.drawPolygon(this, this.graphics, polygon);
-              }
-            }
+          drawGeometry(part, style);
+        }
+      } else {
+        this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+          RenderingHints.VALUE_ANTIALIAS_ON);
+        final GeometryFactory viewGeometryFactory = this.geometryFactory;
+        final Geometry convertedGeometry = geometry.as2d(viewGeometryFactory);
+        if (convertedGeometry instanceof Point) {
+          final Point point = (Point)convertedGeometry;
+          drawMarker(point, style, 0);
+        } else if (convertedGeometry instanceof LineString) {
+          final LineString line = (LineString)convertedGeometry;
+          final LineStringShape shape = this.lineStringShape;
+          shape.setGeometry(line);
+          drawShape(shape, style);
+          shape.clearGeometry();
+        } else if (convertedGeometry instanceof Polygon) {
+          try (
+            BaseCloseable transformCloseable = useModelCoordinates()) {
+            final Polygon polygon = (Polygon)convertedGeometry;
+            final PolygonShape shape = this.polygonShape;
+            shape.setGeometry(polygon);
+            fillShape(shape, style);
+            drawShape(shape, style);
+            shape.clearGeometry();
           }
         }
       }
@@ -109,33 +116,34 @@ public class Graphics2DViewRender extends ViewRenderer {
 
   @Override
   public void drawGeometryOutline(final Geometry geometry, final GeometryStyle style) {
-    if (geometry != null) {
-      final BoundingBox viewExtent = getBoundingBox();
-      if (!viewExtent.isEmpty()) {
+    if (this.boundingBox.intersectsFast(geometry)) {
+      if (geometry.isGeometryCollection()) {
+        for (int i = 0; i < geometry.getGeometryCount(); i++) {
+          final Geometry part = geometry.getGeometry(i);
+          drawGeometryOutline(part, style);
+        }
+      } else {
         this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_ON);
         final GeometryFactory viewGeometryFactory = this.geometryFactory;
-        for (int i = 0; i < geometry.getGeometryCount(); i++) {
-          final Geometry part = geometry.getGeometry(i);
-          final BoundingBox partExtent = part.getBoundingBox();
-          if (partExtent.intersects(viewExtent)) {
-            final Geometry convertedPart = part.as2d(viewGeometryFactory);
-            if (convertedPart instanceof Point) {
-              final Point point = (Point)convertedPart;
-              drawMarker(point, style, 0);
-            } else if (convertedPart instanceof LineString) {
-              final LineString line = (LineString)convertedPart;
-              try (
-                BaseCloseable transformCloseable = useModelCoordinates()) {
-                style.drawLineString(this, this.graphics, line);
-              }
-            } else if (convertedPart instanceof Polygon) {
-              final Polygon polygon = (Polygon)convertedPart;
-              try (
-                BaseCloseable transformCloseable = useModelCoordinates()) {
-                style.drawPolygon(this, this.graphics, polygon);
-              }
-            }
+        final Geometry convertedGeometry = geometry.as2d(viewGeometryFactory);
+        if (convertedGeometry instanceof Point) {
+          final Point point = (Point)convertedGeometry;
+          drawMarker(point, style, 0);
+        } else if (convertedGeometry instanceof LineString) {
+          final LineString line = (LineString)convertedGeometry;
+          final LineStringShape shape = this.lineStringShape;
+          shape.setGeometry(line);
+          drawShape(shape, style);
+          shape.clearGeometry();
+        } else if (convertedGeometry instanceof Polygon) {
+          try (
+            BaseCloseable transformCloseable = useModelCoordinates()) {
+            final Polygon polygon = (Polygon)convertedGeometry;
+            final PolygonShape shape = this.polygonShape;
+            shape.setGeometry(polygon);
+            drawShape(shape, style);
+            shape.clearGeometry();
           }
         }
       }
@@ -201,6 +209,22 @@ public class Graphics2DViewRender extends ViewRenderer {
         Logs.debug(MarkerStyleRenderer.class, "Unable to render marker: " + style, e);
       } finally {
         this.graphics.setPaint(paint);
+      }
+    }
+  }
+
+  private void drawShape(final Shape shape, final GeometryStyle style) {
+    if (style.getLineOpacity() > 0) {
+      final Graphics2D graphics = this.graphics;
+      final Color color = graphics.getColor();
+      final Stroke stroke = graphics.getStroke();
+      try (
+        BaseCloseable transformCloseable = useModelCoordinates()) {
+        style.applyLineStyle(this, graphics);
+        graphics.draw(shape);
+      } finally {
+        graphics.setColor(color);
+        graphics.setStroke(stroke);
       }
     }
   }
@@ -377,6 +401,36 @@ public class Graphics2DViewRender extends ViewRenderer {
     }
   }
 
+  private void fillShape(final Shape shape, final GeometryStyle style) {
+    final Graphics2D graphics = this.graphics;
+    if (style.getPolygonFillOpacity() > 0) {
+      final Paint paint = graphics.getPaint();
+      try {
+        graphics.setPaint(style.getPolygonFill());
+        // final Graphic fillPattern = fill.getPattern();
+        // if (fillPattern != null) {
+        // TODO fillPattern
+        // double width = fillPattern.getWidth();
+        // double height = fillPattern.getHeight();
+        // Rectangle2D.Double patternRect;
+        // // TODO units
+        // // if (isUseModelUnits()) {
+        // // patternRect = new Rectangle2D.Double(0, 0, width
+        // // * viewport.getModelUnitsPerViewUnit(), height
+        // // * viewport.getModelUnitsPerViewUnit());
+        // // } else {
+        // patternRect = new Rectangle2D.Double(0, 0, width, height);
+        // // }
+        // graphics.setPaint(new TexturePaint(fillPattern, patternRect));
+
+        // }
+        graphics.fill(shape);
+      } finally {
+        graphics.setPaint(paint);
+      }
+    }
+  }
+
   public Graphics2D getGraphics() {
     return this.graphics;
   }
@@ -400,9 +454,13 @@ public class Graphics2DViewRender extends ViewRenderer {
 
   @Override
   protected void updateFields() {
-    this.canvasOriginalTransform = this.graphics.getTransform();
-    if (this.canvasOriginalTransform == null) {
+    if (this.graphics == null) {
       this.canvasOriginalTransform = IDENTITY_TRANSFORM;
+    } else {
+      this.canvasOriginalTransform = this.graphics.getTransform();
+      if (this.canvasOriginalTransform == null) {
+        this.canvasOriginalTransform = IDENTITY_TRANSFORM;
+      }
     }
     super.updateFields();
     this.useModelTransform = new ResetAffineTransform(this.graphics, this.canvasOriginalTransform,

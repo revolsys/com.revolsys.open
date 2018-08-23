@@ -77,9 +77,9 @@ public class TriangulationVisualization {
             g2.setStroke(new BasicStroke((float)(1 / pixelsPerXUnit)));
             tin.forEachTriangle((triangle) -> {
               g2.setPaint(WebColors.newAlpha(WebColors.Aqua, 25));
-              g2.fill(triangle);
+              g2.fill(triangle.toShape());
               g2.setColor(WebColors.Black);
-              g2.draw(triangle);
+              g2.draw(triangle.toShape());
             });
             if (showCircumcircle) {
               tin.forEachTriangle((triangle) -> {

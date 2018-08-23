@@ -19,7 +19,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
@@ -192,8 +192,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   }
 
   @Override
-  public ViewRenderer newViewRenderer() {
-    throw new UnsupportedOperationException("Graphics must be specified");
+  public Graphics2DViewRender newViewRenderer() {
+    return new Graphics2DViewRender(this);
   }
 
   @Override

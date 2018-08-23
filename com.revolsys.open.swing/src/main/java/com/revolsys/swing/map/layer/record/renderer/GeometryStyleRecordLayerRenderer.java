@@ -17,10 +17,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
@@ -196,10 +192,10 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
   }
 
   @Override
-  public void renderRecord(final ViewRenderer viewport, final BoundingBox visibleArea,
+  public void renderRecord(final ViewRenderer view, final BoundingBox visibleArea,
     final AbstractRecordLayer layer, final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
-    viewport.drawGeometry(geometry, this.style);
+    view.drawGeometry(geometry, this.style);
   }
 
   @Override
