@@ -286,6 +286,21 @@ public class RectangleXY extends AbstractPolygon {
     this.maxY = y + height;
   }
 
+  @Override
+  public boolean bboxIntersects(double x1, double y1, double x2, double y2) {
+    if (x1 > x2) {
+      final double t = x1;
+      x1 = x2;
+      x2 = t;
+    }
+    if (y1 > y2) {
+      final double t = y1;
+      y1 = y2;
+      y2 = t;
+    }
+    return !(x1 > this.maxX || x2 < this.minX || y1 > this.maxY || y2 < this.minY);
+  }
+
   /**
    * Creates and returns a full copy of this {@link Polygon} object.
    * (including all coordinates contained by it).
@@ -517,7 +532,8 @@ public class RectangleXY extends AbstractPolygon {
 
   @Override
   public Geometry intersectionRectangle(final RectangleXY rectangle) {
-    if (coveredByRectangle(rectangle)) {
+    RectangleXY.notNullSameCs(this, rectangle);
+    if (bboxCoveredBy(rectangle)) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -525,7 +541,7 @@ public class RectangleXY extends AbstractPolygon {
       final double minY = rectangle.minY;
       final double maxX = rectangle.maxX;
       final double maxY = rectangle.maxY;
-      if (intersectsRectangle(minX, minY, maxX, maxY)) {
+      if (bboxIntersects(minX, minY, maxX, maxY)) {
         final double intMinX = Math.max(this.minX, minX);
         final double intMinY = Math.max(this.minY, minY);
         final double intMaxX = Math.min(this.maxX, maxX);
@@ -547,22 +563,7 @@ public class RectangleXY extends AbstractPolygon {
   }
 
   public boolean intersects(final RectangleXY rectangle) {
-    return intersectsRectangle(rectangle.minX, rectangle.minY, rectangle.maxX, rectangle.maxY);
-  }
-
-  @Override
-  public boolean intersectsRectangle(double x1, double y1, double x2, double y2) {
-    if (x1 > x2) {
-      final double t = x1;
-      x1 = x2;
-      x2 = t;
-    }
-    if (y1 > y2) {
-      final double t = y1;
-      y1 = y2;
-      y2 = t;
-    }
-    return !(x1 > this.maxX || x2 < this.minX || y1 > this.maxY || y2 < this.minY);
+    return bboxIntersects(rectangle.minX, rectangle.minY, rectangle.maxX, rectangle.maxY);
   }
 
   @Override

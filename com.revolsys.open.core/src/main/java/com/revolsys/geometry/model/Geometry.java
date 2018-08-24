@@ -626,9 +626,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
 
   default boolean contains(final Geometry geometry) {
-    final BoundingBox boundingBox = getBoundingBox();
-    final BoundingBox otherBoundingBox = geometry.getBoundingBox();
-    if (boundingBox.covers(otherBoundingBox)) {
+    if (bboxCovers(geometry)) {
       return relate(geometry).isContains();
     } else {
       return false;
@@ -636,7 +634,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   }
 
   default boolean containsProperly(final Geometry geometry) {
-    if (getBoundingBox().covers(geometry.getBoundingBox())) {
+    if (bboxCovers(geometry)) {
       return relate(geometry, "T**FF*FF*");
     } else {
       return false;
@@ -773,12 +771,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return g.covers(this);
   }
 
-  default boolean coveredByRectangle(final RectangleXY rectangle) {
-    RectangleXY.notNullSameCs(this, rectangle);
-    final BoundingBox boundingBox = getBoundingBox();
-    return rectangle.covers(boundingBox);
-  }
-
   /**
    * Tests whether this geometry covers the
    * argument geometry.
@@ -807,16 +799,16 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * As an added benefit, <code>covers</code> is more amenable to optimization,
    * and hence should be more performant.
    *
-   *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@param  geometry  the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return        <code>true</code> if this <code>Geometry</code> covers <code>g</code>
    *
    * @see Geometry#contains
    * @see Geometry#coveredBy
    */
 
-  default boolean covers(final Geometry g) {
+  default boolean covers(final Geometry geometry) {
     // short-circuit test
-    if (!getBoundingBox().covers(g.getBoundingBox())) {
+    if (!bboxCovers(geometry)) {
       return false;
     }
     // optimization for rectangle arguments
@@ -824,7 +816,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       // since we have already tested that the test boundingBox is covered
       return true;
     }
-    return relate(g).isCovers();
+    return relate(geometry).isCovers();
   }
 
   default boolean covers(final Point point) {
@@ -854,16 +846,19 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * In order to make the relation symmetric,
    * JTS extends the definition to apply to L/P, A/P and A/L situations as well.
    *
-   *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@param  geometry  the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return        <code>true</code> if the two <code>Geometry</code>s cross.
    */
 
-  default boolean crosses(final Geometry g) {
-    // short-circuit test
-    if (!getBoundingBox().intersects(g.getBoundingBox())) {
+  default boolean crosses(final Geometry geometry) {
+    if (bboxIntersects(geometry)) {
+      final IntersectionMatrix matrix = relate(geometry);
+      final int dimension1 = getDimension();
+      final int dimension2 = geometry.getDimension();
+      return matrix.isCrosses(dimension1, dimension2);
+    } else {
       return false;
     }
-    return relate(g).isCrosses(getDimension(), g.getDimension());
   }
 
   /**
@@ -1029,22 +1024,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
-  default boolean envelopeCovers(final Geometry geometry) {
-    if (getBoundingBox().covers(geometry.getBoundingBox())) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  default boolean envelopesIntersect(final Geometry geometry) {
-    if (getBoundingBox().intersects(geometry.getBoundingBox())) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   default boolean equal(final Point a, final Point b, final double tolerance) {
     if (tolerance == 0) {
       return a.equals(b);
@@ -1178,18 +1157,22 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * <b>Note</b> that this method computes <b>topologically equality</b>.
    * For structural equality, see {@link #equals(2,Geometry)}.
    *
-   *@param g the <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@param geometry the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return <code>true</code> if the two <code>Geometry</code>s are topologically equal
    *
    *@see #equals(2,Geometry)
    */
 
-  default boolean equalsTopo(final Geometry g) {
+  default boolean equalsTopo(final Geometry geometry) {
     // short-circuit test
-    if (!getBoundingBox().equals(g.getBoundingBox())) {
+    if (bboxEquals(geometry)) {
+      final IntersectionMatrix relate = relate(geometry);
+      final int dimension1 = getDimension();
+      final int dimension2 = geometry.getDimension();
+      return relate.isEquals(dimension1, dimension2);
+    } else {
       return false;
     }
-    return relate(g).isEquals(getDimension(), g.getDimension());
   }
 
   default Pair<GeometryComponent, Double> findClosestGeometryComponent(final double x,
@@ -1844,16 +1827,16 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * <br>(<code>intersects</code> is the inverse of <code>disjoint</code>)
    * </ul>
    *
-   *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@param  geometry  the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return        <code>true</code> if the two <code>Geometry</code>s intersect
    *
    * @see Geometry#disjoint
    */
 
-  default boolean intersects(final Geometry g) {
+  default boolean intersects(final Geometry geometry) {
 
     // short-circuit boundingBox test
-    if (!getBoundingBox().intersects(g.getBoundingBox())) {
+    if (!bboxIntersects(geometry)) {
       return false;
     }
 
@@ -1875,13 +1858,13 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
     // optimization for rectangle arguments
     if (isRectangle()) {
-      return RectangleIntersects.rectangleIntersects((Polygon)this, g);
+      return RectangleIntersects.rectangleIntersects((Polygon)this, geometry);
     }
-    if (g.isRectangle()) {
-      return RectangleIntersects.rectangleIntersects((Polygon)g, this);
+    if (geometry.isRectangle()) {
+      return RectangleIntersects.rectangleIntersects((Polygon)geometry, this);
     }
     // general case
-    return relate(g).isIntersects();
+    return relate(geometry).isIntersects();
   }
 
   default boolean intersects(Point point) {
@@ -1889,12 +1872,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     final double x = point.getX();
     final double y = point.getY();
     return intersects(x, y);
-  }
-
-  default boolean intersectsRectangle(final double x1, final double y1, final double x2,
-    final double y2) {
-    final BoundingBox boundingBox = getBoundingBox();
-    return boundingBox.intersects(x1, y1, x2, y2);
   }
 
   boolean isContainedInBoundary(final BoundingBox boundingBox);
@@ -1951,9 +1928,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
   default boolean isLessThanDistance(Geometry geometry, final double distance) {
     geometry = geometry.as2d(this);
-    final BoundingBox boundingBox = getBoundingBox();
-    final BoundingBox boundingBox2 = geometry.getBoundingBox();
-    final double bboxDistance = boundingBox.distance(boundingBox2);
+    final double bboxDistance = bboxDistance(geometry);
     if (bboxDistance > distance) {
       return false;
     } else {
@@ -2021,9 +1996,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
   default boolean isWithinDistance(Geometry geometry, final double distance) {
     geometry = geometry.as2d(this);
-    final BoundingBox boundingBox = getBoundingBox();
-    final BoundingBox boundingBox2 = geometry.getBoundingBox();
-    final double bboxDistance = boundingBox.distance(boundingBox2);
+    final double bboxDistance = bboxDistance(geometry);
     if (bboxDistance > distance) {
       return false;
     } else {
@@ -2146,16 +2119,20 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * If the geometries are of different dimension this predicate returns <code>false</code>.
    * This predicate is symmetric.
    *
-   *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@param  geometry  the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return        <code>true</code> if the two <code>Geometry</code>s overlap.
    */
 
-  default boolean overlaps(final Geometry g) {
+  default boolean overlaps(final Geometry geometry) {
     // short-circuit test
-    if (!getBoundingBox().intersects(g.getBoundingBox())) {
+    if (bboxIntersects(geometry)) {
+      final IntersectionMatrix relate = relate(geometry);
+      final int dimension1 = getDimension();
+      final int dimension2 = geometry.getDimension();
+      return relate.isOverlaps(dimension1, dimension2);
+    } else {
       return false;
     }
-    return relate(g).isOverlaps(getDimension(), g.getDimension());
   }
 
   /**
@@ -2321,17 +2298,21 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * This predicate is symmetric.
    *
    *
-   *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@param  geometry  the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return        <code>true</code> if the two <code>Geometry</code>s touch;
    *      Returns <code>false</code> if both <code>Geometry</code>s are points
    */
 
-  default boolean touches(final Geometry g) {
+  default boolean touches(final Geometry geometry) {
     // short-circuit test
-    if (!getBoundingBox().intersects(g.getBoundingBox())) {
+    if (bboxIntersects(geometry)) {
+      final IntersectionMatrix relate = relate(geometry);
+      final int dimension1 = getDimension();
+      final int dimension2 = geometry.getDimension();
+      return relate.isTouches(dimension1, dimension2);
+    } else {
       return false;
     }
-    return relate(g).isTouches(getDimension(), g.getDimension());
   }
 
   /**

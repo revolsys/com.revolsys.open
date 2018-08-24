@@ -89,7 +89,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
 
   @Override
   public boolean contains(final Geometry g) {
-    if (envelopeCovers(g)) {
+    if (bboxCovers(g)) {
       if (this.isRectangle) {
         final BoundingBox boundingBox = getBoundingBox();
         return boundingBox.containsSFS(g);
@@ -105,7 +105,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
   @Override
   public boolean containsProperly(final Geometry geometry) {
     // short-circuit test
-    if (envelopeCovers(geometry)) {
+    if (bboxCovers(geometry)) {
       /**
        * Do point-in-poly tests first, since they are cheaper and may result
        * in a quick negative result.
@@ -149,7 +149,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
 
   @Override
   public boolean covers(final Geometry geometry) {
-    if (!envelopeCovers(geometry)) {
+    if (!bboxCovers(geometry)) {
       return false;
     } else if (this.isRectangle) {
       return true;
@@ -204,7 +204,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
 
   @Override
   public boolean intersects(final Geometry geometry) {
-    if (envelopesIntersect(geometry)) {
+    if (bboxIntersects(geometry)) {
       if (this.isRectangle) {
         return RectangleIntersects.rectangleIntersects(this, geometry);
       } else {

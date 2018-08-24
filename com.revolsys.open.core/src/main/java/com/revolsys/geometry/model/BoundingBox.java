@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -211,6 +212,19 @@ public interface BoundingBox
     return s.toString();
   }
 
+  @Override
+  default <R> R bboxWith(final BoundingBoxProxy boundingBox,
+    final BiFunction<BoundingBox, BoundingBox, R> action) {
+    BoundingBox boundingBox2;
+    if (boundingBox == null) {
+      boundingBox2 = BoundingBox.empty();
+    } else {
+      boundingBox2 = boundingBox.getBoundingBox();
+    }
+    return action.apply(this, boundingBox2);
+
+  }
+
   /**
    * If the coordinate system is a projected coordinate system then clip to the {@link CoordinateSystem#getAreaBoundingBox()}.
    */
@@ -235,8 +249,7 @@ public interface BoundingBox
    * is the case the geometry is NOT contained.
    */
   default boolean containsSFS(final Geometry geometry) {
-    final BoundingBox boundingBox2 = geometry.getBoundingBox();
-    if (covers(boundingBox2)) {
+    if (bboxCovers(geometry)) {
       if (geometry.isContainedInBoundary(this)) {
         return false;
       } else {
@@ -350,16 +363,28 @@ public interface BoundingBox
     }
   }
 
+  default boolean coveredBy(final BoundingBox boundingBox) {
+    if (boundingBox == null) {
+      return false;
+    } else {
+      return boundingBox.covers(this);
+    }
+  }
+
   default boolean coveredBy(final double... bounds) {
     final double minX1 = bounds[0];
     final double minY1 = bounds[1];
     final double maxX1 = bounds[2];
     final double maxY1 = bounds[3];
+    return coveredBy(minX1, minY1, maxX1, maxY1);
+  }
+
+  default boolean coveredBy(final double x1, final double y1, final double x2, final double y2) {
     final double minX2 = getMinX();
     final double minY2 = getMinY();
     final double maxX2 = getMaxX();
     final double maxY2 = getMaxY();
-    return RectangleUtil.covers(minX1, minY1, maxX1, maxY1, minX2, minY2, maxX2, maxY2);
+    return RectangleUtil.covers(x1, y1, x2, y2, minX2, minY2, maxX2, maxY2);
   }
 
   /**
@@ -404,15 +429,6 @@ public interface BoundingBox
       final double maxY = getMaxY();
 
       return x >= minX && x <= maxX && y >= minY && y <= maxY;
-    }
-  }
-
-  default boolean covers(final Geometry geometry) {
-    if (geometry == null) {
-      return false;
-    } else {
-      final BoundingBox boundingBox = geometry.getBoundingBox();
-      return covers(boundingBox);
     }
   }
 
@@ -496,11 +512,6 @@ public interface BoundingBox
         return Math.sqrt(dx * dx + dy * dy);
       }
     }
-  }
-
-  default double distance(final Geometry geometry) {
-    final BoundingBox boundingBox = geometry.getBoundingBox();
-    return distance(boundingBox);
   }
 
   /**
@@ -1178,11 +1189,6 @@ public interface BoundingBox
     }
   }
 
-  default boolean isWithinDistance(final Geometry geometry, final double maxDistance) {
-    final BoundingBox boundingBox = geometry.getBoundingBox();
-    return isWithinDistance(boundingBox, maxDistance);
-  }
-
   /**
    * <p>Construct a new new BoundingBox by moving the min/max x coordinates by xDisplacement and
    * the min/max y coordinates by yDisplacement. If the bounding box is null or the xDisplacement
@@ -1436,8 +1442,7 @@ public interface BoundingBox
       } else if (width == 0 || height == 0) {
         return geometryFactory.lineString(2, minX, minY, maxX, maxY);
       } else {
-        return geometryFactory.polygon(geometryFactory.linearRing(2, minX, minY, minX, maxY, maxX,
-          maxY, maxX, minY, minX, minY));
+        return toRectangle();
       }
     }
   }

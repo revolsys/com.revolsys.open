@@ -79,14 +79,14 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
 
   @Override
   protected void visit(final Geometry element) {
-    final BoundingBox elementEnv = element.getBoundingBox();
+    final BoundingBox boundingBox = element.getBoundingBox();
 
     // disjoint => no intersection
-    if (!this.rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.intersects(boundingBox)) {
       return;
     }
     // rectangle contains target env => must intersect
-    if (this.rectEnv.covers(elementEnv)) {
+    if (this.rectEnv.covers(boundingBox)) {
       this.intersects = true;
       return;
     }
@@ -99,13 +99,13 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
      * completely bisected. In this case it is not possible to make a conclusion
      * about the presence of an intersection.
      */
-    if (elementEnv.getMinX() >= this.rectEnv.getMinX()
-      && elementEnv.getMaxX() <= this.rectEnv.getMaxX()) {
+    if (boundingBox.getMinX() >= this.rectEnv.getMinX()
+      && boundingBox.getMaxX() <= this.rectEnv.getMaxX()) {
       this.intersects = true;
       return;
     }
-    if (elementEnv.getMinY() >= this.rectEnv.getMinY()
-      && elementEnv.getMaxY() <= this.rectEnv.getMaxY()) {
+    if (boundingBox.getMinY() >= this.rectEnv.getMinY()
+      && boundingBox.getMaxY() <= this.rectEnv.getMaxY()) {
       this.intersects = true;
       return;
     }

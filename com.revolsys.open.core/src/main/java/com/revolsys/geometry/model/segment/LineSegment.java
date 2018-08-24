@@ -662,7 +662,8 @@ public interface LineSegment extends LineString {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    if (coveredByRectangle(rectangle)) {
+    RectangleXY.notNullSameCs(this, rectangle);
+    if (bboxCoveredBy(rectangle)) {
       return this;
     } else {
       // TODO optimize

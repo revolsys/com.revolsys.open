@@ -127,6 +127,16 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     this(null, line);
   }
 
+  public LineStringEditor appendVertex(final boolean allowRepeated, final double... coordinates) {
+    if (coordinates == null) {
+      return this;
+    } else if (allowRepeated || !equalsVertex(2, getLastVertexIndex(), coordinates)) {
+      return appendVertex(coordinates);
+    } else {
+      return this;
+    }
+  }
+
   public LineStringEditor appendVertex(final double... coordinates) {
     final int vertexIndex = getVertexCount();
     setVertexCount(vertexIndex + 1);

@@ -79,7 +79,7 @@ public abstract class AbstractGeometryShape<G extends Geometry> implements Shape
   @Override
   public boolean intersects(final double x, final double y, final double width,
     final double height) {
-    return this.geometry.intersectsRectangle(x, y, x + width, y + height);
+    return this.geometry.bboxIntersects(x, y, x + width, y + height);
   }
 
   @Override
@@ -88,7 +88,7 @@ public abstract class AbstractGeometryShape<G extends Geometry> implements Shape
     final double y = r.getY();
     final double width = r.getWidth();
     final double height = r.getHeight();
-    return this.geometry.intersectsRectangle(x, y, x + width, y + height);
+    return this.geometry.bboxIntersects(x, y, x + width, y + height);
   }
 
   public void setGeometry(final G geometry) {

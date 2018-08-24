@@ -392,7 +392,8 @@ public interface GeometryCollection extends Geometry {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    if (coveredByRectangle(rectangle)) {
+    RectangleXY.notNullSameCs(this, rectangle);
+    if (bboxCoveredBy(rectangle)) {
       return this;
     } else {
       boolean modified = false;

@@ -34,6 +34,13 @@ public class MultiLineStringEditor
     this(null, lineal);
   }
 
+  public MultiLineStringEditor appendVertex(final int lineIndex, final boolean allowRepeated,
+    final double... coordinates) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertex(allowRepeated, coordinates);
+    return this;
+  }
+
   public MultiLineStringEditor appendVertex(final int lineIndex, final double... coordinates) {
     final LineStringEditor editor = getEditor(lineIndex);
     editor.appendVertex(coordinates);

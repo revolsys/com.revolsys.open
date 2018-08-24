@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -48,7 +49,7 @@ import com.revolsys.geometry.model.editor.LineStringEditor;
 /**
  * @version 1.7
  */
-public abstract class EdgeRing {
+public abstract class EdgeRing implements BoundingBoxProxy {
 
   private final List<DirectedEdge> edges = new ArrayList<>(); // the
 
@@ -190,6 +191,11 @@ public abstract class EdgeRing {
       }
     }
     return true;
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    return this.ring.getBoundingBox();
   }
 
   /**

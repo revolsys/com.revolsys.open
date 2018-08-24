@@ -635,7 +635,8 @@ public interface Polygon extends Polygonal {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    if (coveredByRectangle(rectangle)) {
+    RectangleXY.notNullSameCs(this, rectangle);
+    if (bboxCoveredBy(rectangle)) {
       return this;
     } else {
       return SnapIfNeededOverlayOp.overlayOp(this, rectangle, OverlayOp.INTERSECTION);

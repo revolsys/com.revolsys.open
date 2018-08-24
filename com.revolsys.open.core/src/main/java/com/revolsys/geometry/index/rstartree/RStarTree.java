@@ -252,8 +252,8 @@ public class RStarTree<T> implements SpatialIndex<T> {
   public void removeItems(final BoundingBox boundingBox) {
     if (this.root != null) {
       final List<RStarLeaf<T>> itemsToReinsert = new ArrayList<>();
-      this.root.remove(this, boundingBox, leaf -> boundingBox.covers(leaf.getBoundingBox()),
-        itemsToReinsert, true);
+      this.root.remove(this, boundingBox, leaf -> boundingBox.bboxCovers(leaf), itemsToReinsert,
+        true);
       insertLeaves(itemsToReinsert);
     }
   }

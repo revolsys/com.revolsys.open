@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -52,7 +53,7 @@ import com.revolsys.geometry.planargraph.DirectedEdge;
  *
  * @version 1.7
  */
-class EdgeRing {
+class EdgeRing implements BoundingBoxProxy {
 
   private static void addEdge(final LineString coords, final boolean isForward,
     final PointList coordList) {
@@ -84,23 +85,20 @@ class EdgeRing {
   public static EdgeRing findEdgeRingContaining(final EdgeRing testEr,
     final List<EdgeRing> shellList) {
     final LinearRing testRing = testEr.getRing();
-    final BoundingBox testEnv = testRing.getBoundingBox();
     Point testPt = testRing.getPoint(0);
     if (testPt == null) {
       return null;
     } else {
       EdgeRing minShell = null;
-      BoundingBox minShellEnv = null;
       for (final EdgeRing tryShell : shellList) {
         final LinearRing tryShellRing = tryShell.getRing();
-        final BoundingBox tryShellEnv = tryShellRing.getBoundingBox();
         // the hole envelope cannot equal the shell envelope
         // (also guards against testing rings against themselves)
-        if (tryShellEnv.equals(testEnv)) {
+        if (tryShell.bboxEquals(testRing)) {
           continue;
         }
         // hole must be contained in shell
-        if (!tryShellEnv.covers(testEnv)) {
+        if (!tryShell.bboxCovers(testRing)) {
           continue;
         }
 
@@ -113,9 +111,8 @@ class EdgeRing {
         // check if this new containing ring is smaller than the current minimum
         // ring
         if (isContained) {
-          if (minShell == null || minShellEnv.covers(tryShellEnv)) {
+          if (minShell == null || minShell.bboxCovers(tryShellRing)) {
             minShell = tryShell;
-            minShellEnv = minShell.getRing().getBoundingBox();
           }
         }
       }
@@ -195,6 +192,11 @@ class EdgeRing {
       this.holes = new ArrayList<>();
     }
     this.holes.add(hole);
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    return this.ring.getBoundingBox();
   }
 
   /**

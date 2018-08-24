@@ -96,7 +96,7 @@ public class PreparedMultiLineString extends MultiLineStringImpl {
 
   @Override
   public boolean intersects(final Geometry geometry) {
-    if (envelopesIntersect(geometry)) {
+    if (bboxIntersects(geometry)) {
       /**
        * If any segments intersect, obviously intersects = true
        */

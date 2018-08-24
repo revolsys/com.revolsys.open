@@ -62,9 +62,7 @@ import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
-import com.revolsys.geometry.model.editor.LineSegmentEditor;
 import com.revolsys.geometry.model.editor.LineStringEditor;
-import com.revolsys.geometry.model.editor.MultiLineStringEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
@@ -76,6 +74,7 @@ import com.revolsys.geometry.model.vertex.AbstractVertex;
 import com.revolsys.geometry.model.vertex.LineStringVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
+import com.revolsys.geometry.operation.RectangleIntersection;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
 import com.revolsys.geometry.util.RectangleUtil;
@@ -577,6 +576,22 @@ public interface LineString extends Lineal {
       }
     }
     return false;
+  }
+
+  default boolean equalsVertex(final int axisCount, final int vertexIndex,
+    final double... coordinates) {
+    if (isEmpty() || coordinates == null || coordinates.length < axisCount) {
+      return false;
+    } else {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double coordinate = coordinates[axisIndex];
+        final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
+        if (!Doubles.equal(coordinate, matchCoordinate)) {
+          return false;
+        }
+      }
+      return true;
+    }
   }
 
   default boolean equalsVertex(final int axisCount, final int vertexIndex1,
@@ -1485,7 +1500,8 @@ public interface LineString extends Lineal {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    if (coveredByRectangle(rectangle)) {
+    RectangleXY.notNullSameCs(this, rectangle);
+    if (bboxCoveredBy(rectangle)) {
       return this;
     } else {
       if (isEmpty()) {
@@ -1493,27 +1509,8 @@ public interface LineString extends Lineal {
       } else if (this instanceof LinearRing) {
         return SnapIfNeededOverlayOp.overlayOp(this, rectangle, OverlayOp.INTERSECTION);
       } else {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        final MultiLineStringEditor lines = new MultiLineStringEditor(geometryFactory);
-        final LineSegmentEditor lineSegment = new LineSegmentEditor(geometryFactory);
-        int lineIndex = 0;
-        final int vertexCount = getVertexCount();
-        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
-          lineSegment.setFromVertex(this, vertexIndex - 1);
-          lineSegment.setToVertex(this, vertexIndex);
-          if (lineSegment.clipToRectangle(rectangle)) {
-            if (vertexIndex > 1) {
-              if (!equalsVertex(2, vertexIndex - 1, lineSegment, 0)) {
-                lines.appendEditor();
-                lineIndex++;
-              }
-            }
-            lines.appendVertex(lineIndex, lineSegment, 0, false);
-            lines.appendVertex(lineIndex, lineSegment, 1, false);
-          }
-        }
-        final Geometry clip = lines.newGeometryAny();
-        return clip;
+        final RectangleIntersection rectangleIntersection = new RectangleIntersection();
+        return rectangleIntersection.intersectionLine(this, rectangle);
       }
     }
   }
