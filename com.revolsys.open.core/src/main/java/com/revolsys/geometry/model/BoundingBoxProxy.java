@@ -4,23 +4,34 @@ import java.util.function.BiFunction;
 
 public interface BoundingBoxProxy extends GeometryFactoryProxy {
   default boolean bboxCoveredBy(final BoundingBoxProxy boundingBox) {
-    return bboxWith(boundingBox, BoundingBox::coveredBy);
+    final BoundingBoxFunction<Boolean> action = BoundingBox::coveredBy;
+    return bboxWith(boundingBox, action, false);
   }
 
   default boolean bboxCovers(final BoundingBoxProxy boundingBox) {
-    return bboxWith(boundingBox, BoundingBox::covers);
+    final BoundingBoxFunction<Boolean> action = BoundingBox::covers;
+    return bboxWith(boundingBox, action, false);
   }
 
   default double bboxDistance(final BoundingBoxProxy boundingBox) {
-    return bboxWith(boundingBox, BoundingBox::distance);
+    final BoundingBoxFunction<Double> action = BoundingBox::bboxDistance;
+    return bboxWith(boundingBox, action, Double.POSITIVE_INFINITY);
+  }
+
+  default double bboxDistance(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.bboxDistance(minX, minY, maxX, maxY);
   }
 
   default boolean bboxEquals(final BoundingBoxProxy boundingBox) {
-    return bboxWith(boundingBox, BoundingBox::equals);
+    final BiFunction<BoundingBox, BoundingBox, Boolean> action = BoundingBox::equals;
+    return bboxWith(boundingBox, action, false);
   }
 
   default boolean bboxIntersects(final BoundingBoxProxy boundingBox) {
-    return bboxWith(boundingBox, BoundingBox::intersects);
+    final BiFunction<BoundingBox, BoundingBox, Boolean> action = BoundingBox::intersects;
+    return bboxWith(boundingBox, action, false);
   }
 
   default boolean bboxIntersects(final double x1, final double y1, final double x2,
@@ -30,19 +41,28 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
   }
 
   default boolean bboxIntersectsFast(final BoundingBoxProxy boundingBox) {
-    return bboxWith(boundingBox, BoundingBox::intersectsFast);
+    return bboxWith(boundingBox, BoundingBox::intersectsFast, false);
   }
 
   default <R> R bboxWith(final BoundingBoxProxy boundingBox,
-    final BiFunction<BoundingBox, BoundingBox, R> action) {
+    final BiFunction<BoundingBox, BoundingBox, R> action, final R emptyValue) {
     final BoundingBox boundingBox1 = getBoundingBox();
-    BoundingBox boundingBox2;
-    if (boundingBox == null) {
-      boundingBox2 = BoundingBox.empty();
+    return boundingBox1.bboxWith(boundingBox, action, emptyValue);
+  }
+
+  default <R> R bboxWith(final BoundingBoxProxy boundingBox, final BoundingBoxFunction<R> action,
+    final R emptyResult) {
+    final BoundingBox boundingBox1 = getBoundingBox();
+    return boundingBox1.bboxWith(boundingBox, action, emptyResult);
+  }
+
+  default boolean bboxWithinDistance(final BoundingBoxProxy boundingBox, final double maxDistance) {
+    final double distance = bboxDistance(boundingBox);
+    if (distance < maxDistance) {
+      return true;
     } else {
-      boundingBox2 = boundingBox.getBoundingBox();
+      return false;
     }
-    return action.apply(boundingBox1, boundingBox2);
   }
 
   /**
@@ -61,5 +81,10 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
     } else {
       return GeometryFactoryProxy.super.getGeometryFactory();
     }
+  }
+
+  default boolean isBboxEmpty() {
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox == null || boundingBox.isEmpty();
   }
 }

@@ -42,7 +42,7 @@ public class BoundingBoxNode {
 
   public boolean covers(final double minX, final double minY, final double maxX,
     final double maxY) {
-    return minX >= this.minX && maxX <= this.maxX && minY >= this.minY && maxY <= this.maxY;
+    return this.minX <= minX && maxX <= this.maxX && this.minY <= minY && maxY <= this.maxY;
   }
 
   protected void expandBoundingBox(final BoundingBox boundingBox) {

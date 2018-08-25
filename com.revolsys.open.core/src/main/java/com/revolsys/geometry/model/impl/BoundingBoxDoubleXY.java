@@ -36,7 +36,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.MathUtil;
 
 public class BoundingBoxDoubleXY extends BaseBoundingBox {
@@ -237,9 +236,10 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
   }
 
-  public boolean covers(final double minX, final double maxX, final double minY,
+  @Override
+  public boolean covers(final double minX, final double minY, final double maxX,
     final double maxY) {
-    return RectangleUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX, maxY);
+    return super.covers(minX, minY, maxX, maxY);
   }
 
   @Override

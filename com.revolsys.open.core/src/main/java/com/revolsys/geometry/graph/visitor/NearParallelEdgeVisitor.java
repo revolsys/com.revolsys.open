@@ -35,7 +35,7 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
   }
 
   private boolean isAlmostParallel(final LineString matchLine) {
-    if (this.line.getBoundingBox().distance(matchLine.getBoundingBox()) > this.maxDistance) {
+    if (this.line.bboxDistance(matchLine) > this.maxDistance) {
       return false;
     }
     final LineString coords = this.line;

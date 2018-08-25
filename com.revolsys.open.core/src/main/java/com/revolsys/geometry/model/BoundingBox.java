@@ -212,9 +212,60 @@ public interface BoundingBox
     return s.toString();
   }
 
+  /**
+   * Computes the distance between this and another
+   * <code>BoundingBox</code>.
+   * The distance between overlapping Envelopes is 0.  Otherwise, the
+   * distance is the Euclidean distance between the closest points.
+   */
+  @Override
+  default double bboxDistance(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double minXThis = getMinX();
+    final double minYThis = getMinY();
+    final double maxXThis = getMaxX();
+    final double maxYThis = getMaxY();
+
+    if (isEmpty(minXThis, maxXThis) || isEmpty(minX, maxX)) {
+      // Empty
+      return Double.MAX_VALUE;
+    } else if (!(minX > maxXThis || maxX < minXThis || minY > maxYThis || maxY < minYThis)) {
+      // Intersects
+      return 0;
+    } else {
+      double dx;
+      if (maxXThis < minX) {
+        dx = minX - maxXThis;
+      } else {
+        if (minXThis > maxX) {
+          dx = minXThis - maxX;
+        } else {
+          dx = 0;
+        }
+      }
+
+      double dy;
+      if (maxYThis < minY) {
+        dy = minY - maxYThis;
+      } else if (minYThis > maxY) {
+        dy = minYThis - maxY;
+      } else {
+        dy = 0;
+      }
+
+      if (dx == 0.0) {
+        return dy;
+      } else if (dy == 0.0) {
+        return dx;
+      } else {
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+    }
+  }
+
   @Override
   default <R> R bboxWith(final BoundingBoxProxy boundingBox,
-    final BiFunction<BoundingBox, BoundingBox, R> action) {
+    final BiFunction<BoundingBox, BoundingBox, R> action, final R emptyValue) {
     BoundingBox boundingBox2;
     if (boundingBox == null) {
       boundingBox2 = BoundingBox.empty();
@@ -223,6 +274,27 @@ public interface BoundingBox
     }
     return action.apply(this, boundingBox2);
 
+  }
+
+  @Override
+  default <R> R bboxWith(final BoundingBoxProxy boundingBox, final BoundingBoxFunction<R> action,
+    final R emptyResult) {
+    if (boundingBox != null && !isEmpty()) {
+      BoundingBox boundingBox2 = boundingBox.getBoundingBox();
+      if (isProjectionRequired(boundingBox2)) {
+        // TODO just convert points
+        boundingBox2 = boundingBox2.convert(getGeometryFactory());
+      }
+      if (!boundingBox2.isEmpty()) {
+        final double minX = boundingBox2.getMinX();
+        final double minY = boundingBox2.getMinY();
+        final double maxX = boundingBox2.getMaxX();
+        final double maxY = boundingBox2.getMaxY();
+        return action.accept(this, minX, minY, maxX, maxY);
+      }
+
+    }
+    return emptyResult;
   }
 
   /**
@@ -363,50 +435,13 @@ public interface BoundingBox
     }
   }
 
-  default boolean coveredBy(final BoundingBox boundingBox) {
-    if (boundingBox == null) {
-      return false;
-    } else {
-      return boundingBox.covers(this);
-    }
-  }
-
-  default boolean coveredBy(final double... bounds) {
-    final double minX1 = bounds[0];
-    final double minY1 = bounds[1];
-    final double maxX1 = bounds[2];
-    final double maxY1 = bounds[3];
-    return coveredBy(minX1, minY1, maxX1, maxY1);
-  }
-
-  default boolean coveredBy(final double x1, final double y1, final double x2, final double y2) {
+  default boolean coveredBy(final double minX, final double minY, final double maxX,
+    final double maxY) {
     final double minX2 = getMinX();
     final double minY2 = getMinY();
     final double maxX2 = getMaxX();
     final double maxY2 = getMaxY();
-    return RectangleUtil.covers(x1, y1, x2, y2, minX2, minY2, maxX2, maxY2);
-  }
-
-  /**
-   * Tests if the <code>BoundingBox other</code>
-   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
-   *
-   *@param  other the <code>BoundingBox</code> to check
-   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
-   */
-  default boolean covers(final BoundingBox other) {
-    if (other == null || isEmpty() || other.isEmpty()) {
-      return false;
-    } else {
-      final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-      final BoundingBox convertedBoundingBox = other.toCoordinateSystem(coordinateSystem, 2);
-      final double minX = getMinX();
-      final double minY = getMinY();
-      final double maxX = getMaxX();
-      final double maxY = getMaxY();
-
-      return convertedBoundingBox.coveredBy(minX, minY, maxX, maxY);
-    }
+    return minX <= minX2 && maxX2 <= maxX && minY <= minY2 && maxY2 <= maxY;
   }
 
   /**
@@ -433,6 +468,22 @@ public interface BoundingBox
   }
 
   /**
+   * Tests if the <code>BoundingBox other</code>
+   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
+   *
+   *@param  other the <code>BoundingBox</code> to check
+   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
+   */
+  default boolean covers(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double minX2 = getMinX();
+    final double minY2 = getMinY();
+    final double maxX2 = getMaxX();
+    final double maxY2 = getMaxY();
+    return minX2 <= minX && maxX <= maxX2 && minY2 <= minY && maxY <= maxY2;
+  }
+
+  /**
    * Tests if the given point lies in or on the envelope.
    *
    *@param  p  the point which this <code>BoundingBox</code> is
@@ -449,68 +500,6 @@ public interface BoundingBox
       final double x = projectedPoint.getX();
       final double y = projectedPoint.getY();
       return covers(x, y);
-    }
-  }
-
-  /**
-   * Computes the distance between this and another
-   * <code>BoundingBox</code>.
-   * The distance between overlapping Envelopes is 0.  Otherwise, the
-   * distance is the Euclidean distance between the closest points.
-   */
-  default double distance(BoundingBox boundingBox) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    boundingBox = boundingBox.convert(geometryFactory);
-
-    final double minX = boundingBox.getMinX();
-    final double minY = boundingBox.getMinY();
-    final double maxX = boundingBox.getMaxX();
-    final double maxY = boundingBox.getMaxY();
-
-    return distance(minX, minY, maxX, maxY);
-  }
-
-  default double distance(final double minX, final double minY, final double maxX,
-    final double maxY) {
-    final double minXThis = getMinX();
-    final double minYThis = getMinY();
-    final double maxXThis = getMaxX();
-    final double maxYThis = getMaxY();
-
-    if (isEmpty(minXThis, maxXThis) || isEmpty(minX, maxX)) {
-      // Empty
-      return Double.MAX_VALUE;
-    } else if (!(minX > maxXThis || maxX < minXThis || minY > maxYThis || maxY < minYThis)) {
-      // Intersects
-      return 0;
-    } else {
-      double dx;
-      if (maxXThis < minX) {
-        dx = minX - maxXThis;
-      } else {
-        if (minXThis > maxX) {
-          dx = minXThis - maxX;
-        } else {
-          dx = 0;
-        }
-      }
-
-      double dy;
-      if (maxYThis < minY) {
-        dy = minY - maxYThis;
-      } else if (minYThis > maxY) {
-        dy = minYThis - maxY;
-      } else {
-        dy = 0;
-      }
-
-      if (dx == 0.0) {
-        return dy;
-      } else if (dy == 0.0) {
-        return dx;
-      } else {
-        return Math.sqrt(dx * dx + dy * dy);
-      }
     }
   }
 
@@ -691,7 +680,7 @@ public interface BoundingBox
       final BoundingBox convertedOther = other.convert(geometryFactory);
       if (isEmpty()) {
         return convertedOther;
-      } else if (covers(convertedOther)) {
+      } else if (bboxCovers(convertedOther)) {
         return this;
       } else {
         final double minX = Math.min(getMinX(), convertedOther.getMinX());
@@ -871,21 +860,6 @@ public interface BoundingBox
       return Quantities.getQuantity(height, Units.METRE);
     } else {
       return Quantities.getQuantity(height, coordinateSystem.getLengthUnit());
-    }
-  }
-
-  /**
-   * Get the geometry factory.
-   *
-   * @return The geometry factory.
-   */
-  @Override
-  default CoordinateSystem getHorizontalCoordinateSystem() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (geometryFactory == null) {
-      return null;
-    } else {
-      return geometryFactory.getHorizontalCoordinateSystem();
     }
   }
 
@@ -1180,13 +1154,9 @@ public interface BoundingBox
     }
   }
 
-  default boolean isWithinDistance(final BoundingBox boundingBox, final double maxDistance) {
-    final double distance = boundingBox.distance(boundingBox);
-    if (distance < maxDistance) {
-      return true;
-    } else {
-      return false;
-    }
+  @Override
+  default boolean isBboxEmpty() {
+    return isEmpty();
   }
 
   /**

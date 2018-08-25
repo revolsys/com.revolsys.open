@@ -126,36 +126,6 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default Polygonal clipRectangle(double x1, double y1, double x2, double y2) {
-    if (x1 > x2) {
-      final double t = x1;
-      x1 = x2;
-      x2 = t;
-    }
-    if (y1 > y2) {
-      final double t = y1;
-      y1 = y2;
-      y2 = t;
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox boundingBox = getBoundingBox();
-    if (boundingBox.coveredBy(x1, y1, x2, y2)) {
-      return this;
-    } else if (boundingBox.intersects(x1, y1, x2, y2)) {
-      final List<LinearRing> rings = new ArrayList<>();
-      for (final LinearRing ring : rings()) {
-        final LinearRing clippedRing = ring.clipRectangle(x1, y1, x2, y2);
-        if (!clippedRing.isEmpty()) {
-          rings.add(clippedRing);
-        }
-      }
-      return geometryFactory.polygon(rings);
-    } else {
-      return geometryFactory.polygon();
-    }
-  }
-
-  @Override
   Polygon clone();
 
   @Override
@@ -171,7 +141,7 @@ public interface Polygon extends Polygonal {
     // short-circuit test
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox otherBoundingBox = geometry.getBoundingBox();
-    if (!boundingBox.covers(otherBoundingBox)) {
+    if (!boundingBox.bboxCovers(otherBoundingBox)) {
       return false;
     }
     // optimization for rectangle arguments

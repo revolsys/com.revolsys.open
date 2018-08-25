@@ -161,7 +161,7 @@ public class RectangleUtil {
   public static boolean covers(final double minX1, final double minY1, final double maxX1,
     final double maxY1, final double minX2, final double minY2, final double maxX2,
     final double maxY2) {
-    return minX2 >= minX1 && maxX2 <= maxX1 && minY2 >= minY1 && maxY2 <= maxY1;
+    return minX1 <= minX2 && maxX2 <= maxX1 && minY1 <= minY2 && maxY2 <= maxY1;
   }
 
   public static void expand(final double[] bounds, final int axisCount,

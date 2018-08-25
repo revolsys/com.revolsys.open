@@ -86,7 +86,7 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
       return;
     }
     // rectangle contains target env => must intersect
-    if (this.rectEnv.covers(boundingBox)) {
+    if (this.rectEnv.bboxCovers(boundingBox)) {
       this.intersects = true;
       return;
     }

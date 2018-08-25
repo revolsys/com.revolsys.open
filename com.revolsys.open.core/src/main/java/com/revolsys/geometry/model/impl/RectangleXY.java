@@ -321,14 +321,6 @@ public class RectangleXY extends AbstractPolygon {
     }
   }
 
-  public boolean covers(final BoundingBox boundingBox) {
-    if (boundingBox == null || isEmpty() || boundingBox.isEmpty()) {
-      return false;
-    } else {
-      return boundingBox.coveredBy(this.minX, this.minY, this.maxX, this.maxY);
-    }
-  }
-
   @Override
   public <R> R findSegment(final Function4Double<R> action) {
     R result = action.accept(this.minX, this.minY, this.maxX, this.minY);
@@ -580,7 +572,8 @@ public class RectangleXY extends AbstractPolygon {
   public boolean isWithinDistance(Geometry geometry, final double distance) {
     geometry = geometry.as2d(this);
     final BoundingBox boundingBox2 = geometry.getBoundingBox();
-    final double bboxDistance = boundingBox2.distance(this.minX, this.minY, this.maxX, this.maxY);
+    final double bboxDistance = boundingBox2.bboxDistance(this.minX, this.minY, this.maxX,
+      this.maxY);
     if (bboxDistance > distance) {
       return false;
     } else {
