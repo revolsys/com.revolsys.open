@@ -232,14 +232,14 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
   }
 
   @Override
-  public boolean covers(final double x, final double y) {
+  public boolean bboxCovers(final double x, final double y) {
     return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
   }
 
   @Override
-  public boolean covers(final double minX, final double minY, final double maxX,
+  public boolean bbxCovers(final double minX, final double minY, final double maxX,
     final double maxY) {
-    return super.covers(minX, minY, maxX, maxY);
+    return this.minX <= minX && maxX <= this.maxX && this.minY <= minY && maxY <= this.maxY;
   }
 
   @Override

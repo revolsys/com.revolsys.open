@@ -1734,7 +1734,7 @@ public interface LineString extends Lineal {
   default Location locate(final double x, final double y) {
     // bounding-box check
     final BoundingBox boundingBox = getBoundingBox();
-    if (boundingBox.covers(x, y)) {
+    if (boundingBox.bboxCovers(x, y)) {
       if (!isClosed()) {
         if (equalsVertex2d(0, x, y) || equalsVertex2d(getLastVertexIndex(), x, y)) {
           return Location.BOUNDARY;

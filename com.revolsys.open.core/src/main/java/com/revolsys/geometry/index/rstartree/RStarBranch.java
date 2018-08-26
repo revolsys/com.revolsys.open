@@ -75,7 +75,7 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
 
   @Override
   public void forEach(final double x, final double y, final Consumer<? super T> action) {
-    if (covers(x, y)) {
+    if (bboxCovers(x, y)) {
       for (final RStarNode<T> item : this.items) {
         item.forEach(x, y, action);
       }

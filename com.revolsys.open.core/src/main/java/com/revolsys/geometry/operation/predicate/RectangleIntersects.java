@@ -164,7 +164,7 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
     // test each corner of rectangle for inclusion
     for (int i = 0; i < 4; i++) {
       final Point rectPt = this.rectSeq.getPoint(i);
-      if (!elementEnv.covers(rectPt)) {
+      if (!elementEnv.bboxCovers(rectPt)) {
         continue;
       }
       // check rect point in poly (rect is known not to touch polygon at this

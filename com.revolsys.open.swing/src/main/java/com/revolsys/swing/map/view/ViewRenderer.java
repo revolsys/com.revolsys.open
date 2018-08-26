@@ -309,7 +309,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
             } else {
               PointDoubleXYOrientation pointDoubleXYOrientation = getPointWithOrientationCentre(
                 viewportGeometryFactory2d, geometry);
-              if (!this.boundingBox.covers(pointDoubleXYOrientation)) {
+              if (!this.boundingBox.bboxCovers(pointDoubleXYOrientation)) {
                 try {
                   final Geometry clippedGeometry = this.boundingBox.toPolygon()
                     .intersection(geometry);
@@ -350,7 +350,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
           }
         }
         if (Property.hasValue(point)) {
-          if (this.boundingBox.covers(point)) {
+          if (this.boundingBox.bboxCovers(point)) {
             point = point.convertPoint2d(viewportGeometryFactory2d);
             return new PointDoubleXYOrientation(point, orientation);
           }

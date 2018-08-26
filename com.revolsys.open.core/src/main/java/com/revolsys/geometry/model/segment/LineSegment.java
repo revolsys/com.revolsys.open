@@ -470,8 +470,8 @@ public interface LineSegment extends LineString {
     boundingBox = boundingBox.convert(geometryFactory);
     final Point lineStart = getPoint(0);
     final Point lineEnd = getPoint(1);
-    final boolean contains1 = boundingBox.covers(lineStart);
-    final boolean contains2 = boundingBox.covers(lineEnd);
+    final boolean contains1 = boundingBox.bboxCovers(lineStart);
+    final boolean contains2 = boundingBox.bboxCovers(lineEnd);
     if (contains1) {
       if (contains2) {
         return this;

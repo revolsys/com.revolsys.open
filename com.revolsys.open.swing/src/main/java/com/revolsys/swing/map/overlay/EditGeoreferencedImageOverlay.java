@@ -424,7 +424,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
     final Point point = getPoint(event);
     final double distance = getDistance(event);
 
-    return imageBoundingBox.distance(point) < distance * 2;
+    return imageBoundingBox.bboxDistance(point) < distance * 2;
   }
 
   public boolean isEditing() {
@@ -450,7 +450,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
       return false;
     } else {
       final BoundingBox imageBoundingBox = getImageBoundingBox();
-      final boolean inImage = imageBoundingBox.covers(mousePoint);
+      final boolean inImage = imageBoundingBox.bboxCovers(mousePoint);
       return inImage;
     }
   }
@@ -879,14 +879,14 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         boolean hasSource = false;
         for (final MappedLocation tiePoint : tiePoints) {
           final Point sourcePoint = this.layer.sourcePixelToTargetPoint(tiePoint);
-          if (hotSpot.covers(sourcePoint)) {
+          if (hotSpot.bboxCovers(sourcePoint)) {
             closeSourcePixelIndexes.add(i);
             hasMove = true;
             hasSource = true;
           }
 
           final Point targetPoint = tiePoint.getTargetPoint();
-          if (hotSpot.covers(targetPoint)) {
+          if (hotSpot.bboxCovers(targetPoint)) {
             closeTargetPointIndexes.add(i);
             hasMove = true;
           }

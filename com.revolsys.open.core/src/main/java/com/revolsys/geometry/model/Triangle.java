@@ -278,7 +278,7 @@ public interface Triangle extends Polygon {
       return distanceFromCentre < circumcircleRadius + 0.0001;
 
     } catch (final NotRepresentableException e) {
-      return getBoundingBox().covers(x, y);
+      return getBoundingBox().bboxCovers(x, y);
     }
   }
 

@@ -240,7 +240,7 @@ public class DistanceWithPoints {
 
   private boolean computeLinePoint(final LineString line, final Point point) {
     if (this.minDistance == Double.MAX_VALUE
-      || line.getBoundingBox().distance(point) <= this.minDistance) {
+      || line.getBoundingBox().bboxDistance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
         final double distance = segment.distancePoint(point);
         if (distance < this.minDistance) {
@@ -281,7 +281,7 @@ public class DistanceWithPoints {
 
   private boolean computePointLine(final Point point, final LineString line) {
     final BoundingBox boundingBox = line.getBoundingBox();
-    if (this.minDistance == Double.MAX_VALUE || boundingBox.distance(point) <= this.minDistance) {
+    if (this.minDistance == Double.MAX_VALUE || boundingBox.bboxDistance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
         final double distance = segment.distancePoint(point);
         if (distance < this.minDistance) {

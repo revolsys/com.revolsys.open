@@ -4,13 +4,26 @@ import java.util.function.BiFunction;
 
 public interface BoundingBoxProxy extends GeometryFactoryProxy {
   default boolean bboxCoveredBy(final BoundingBoxProxy boundingBox) {
-    final BoundingBoxFunction<Boolean> action = BoundingBox::coveredBy;
+    final BoundingBoxFunction<Boolean> action = BoundingBox::bboxCoveredBy;
     return bboxWith(boundingBox, action, false);
   }
 
   default boolean bboxCovers(final BoundingBoxProxy boundingBox) {
-    final BoundingBoxFunction<Boolean> action = BoundingBox::covers;
+    final BoundingBoxFunction<Boolean> action = BoundingBox::bbxCovers;
     return bboxWith(boundingBox, action, false);
+  }
+
+  /**
+   * Tests if the given point lies in or on the envelope.
+   *
+   *@param  p  the point which this <code>BoundingBox</code> is
+   *      being checked for containing
+   *@return    <code>true</code> if the point lies in the interior or
+   *      on the boundary of this <code>BoundingBox</code>.
+   */
+  default boolean bboxCovers(final Point point) {
+    final BoundingBoxPointFunction<Boolean> action = BoundingBox::bboxCovers;
+    return bboxWith(point, action, false);
   }
 
   default double bboxDistance(final BoundingBoxProxy boundingBox) {
@@ -22,6 +35,17 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
     final double maxY) {
     final BoundingBox boundingBox = getBoundingBox();
     return boundingBox.bboxDistance(minX, minY, maxX, maxY);
+  }
+
+  /**
+   * Computes the distance between this and another
+   * <code>BoundingBox</code>.
+   * The distance between overlapping Envelopes is 0.  Otherwise, the
+   * distance is the Euclidean distance between the closest points.
+   */
+  default double bboxDistance(final Point point) {
+    final BoundingBoxPointFunction<Double> action = BoundingBox::bboxDistance;
+    return bboxWith(point, action, Double.POSITIVE_INFINITY);
   }
 
   default boolean bboxEquals(final BoundingBoxProxy boundingBox) {
@@ -54,6 +78,12 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
     final R emptyResult) {
     final BoundingBox boundingBox1 = getBoundingBox();
     return boundingBox1.bboxWith(boundingBox, action, emptyResult);
+  }
+
+  default <R> R bboxWith(final Point point, final BoundingBoxPointFunction<R> action,
+    final R emptyResult) {
+    final BoundingBox boundingBox1 = getBoundingBox();
+    return boundingBox1.bboxWith(point, action, emptyResult);
   }
 
   default boolean bboxWithinDistance(final BoundingBoxProxy boundingBox, final double maxDistance) {

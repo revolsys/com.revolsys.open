@@ -31,7 +31,7 @@ public class NodeWithinBoundingBoxVisitor<T> implements Consumer<Node<T>> {
 
   @Override
   public void accept(final Node<T> node) {
-    if (this.boundingBox.covers(node)) {
+    if (this.boundingBox.bboxCovers(node)) {
       this.matchVisitor.accept(node);
     }
   }

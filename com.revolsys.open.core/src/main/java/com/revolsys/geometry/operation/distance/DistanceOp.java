@@ -175,7 +175,7 @@ public class DistanceOp {
 
   private boolean computeLinePoint(final LineString line, final Point point) {
     if (this.minDistance == Double.MAX_VALUE
-      || line.getBoundingBox().distance(point) <= this.minDistance) {
+      || line.getBoundingBox().bboxDistance(point) <= this.minDistance) {
       final double distance = line.distance(point, this.terminateDistance);
       if (distance < this.minDistance) {
         this.minDistance = distance;

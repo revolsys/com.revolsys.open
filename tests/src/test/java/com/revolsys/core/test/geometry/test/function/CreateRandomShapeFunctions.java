@@ -46,7 +46,7 @@ public class CreateRandomShapeFunctions {
       final double x = baseX + env.getWidth() * haltonOrdinate(i + 1, basei);
       final double y = baseY + env.getHeight() * haltonOrdinate(i + 1, basej);
       final Point p = new PointDoubleXY(x, y);
-      if (!env.covers(p)) {
+      if (!env.bboxCovers(p)) {
         continue;
       }
       pts[i++] = p;

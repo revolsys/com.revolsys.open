@@ -91,7 +91,7 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
     if (this.extentLocator != null) {
       return this.extentLocator.locate(p) != Location.EXTERIOR;
     }
-    return getExtent().covers(p);
+    return getExtent().bboxCovers(p);
   }
 
   @Override

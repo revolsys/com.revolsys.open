@@ -212,6 +212,74 @@ public interface BoundingBox
     return s.toString();
   }
 
+  default boolean bboxCoveredBy(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double minX2 = getMinX();
+    final double minY2 = getMinY();
+    final double maxX2 = getMaxX();
+    final double maxY2 = getMaxY();
+    return minX <= minX2 && maxX2 <= maxX && minY <= minY2 && maxY2 <= maxY;
+  }
+
+  /**
+   * Tests if the given point lies in or on the envelope.
+   *
+   *@param  x  the x-coordinate of the point which this <code>BoundingBox</code> is
+   *      being checked for containing
+   *@param  y  the y-coordinate of the point which this <code>BoundingBox</code> is
+   *      being checked for containing
+   *@return    <code>true</code> if <code>(x, y)</code> lies in the interior or
+   *      on the boundary of this <code>BoundingBox</code>.
+   */
+  default boolean bboxCovers(final double x, final double y) {
+    if (isEmpty()) {
+      return false;
+    } else {
+      final double minX = getMinX();
+      final double minY = getMinY();
+      final double maxX = getMaxX();
+      final double maxY = getMaxY();
+
+      return x >= minX && x <= maxX && y >= minY && y <= maxY;
+    }
+  }
+
+  default double bboxDistance(final double x, final double y) {
+    if (intersects(x, y)) {
+      return 0;
+    } else {
+
+      final double minX = getMinX();
+      final double minY = getMinY();
+      final double maxX = getMaxX();
+      final double maxY = getMaxY();
+
+      double dx = 0.0;
+      if (maxX < x) {
+        dx = x - maxX;
+      } else if (minX > x) {
+        dx = minX - x;
+      }
+
+      double dy = 0.0;
+      if (maxY < y) {
+        dy = y - maxY;
+      } else if (minY > y) {
+        dy = minY - y;
+      }
+
+      // if either is zero, the envelopes overlap either vertically or
+      // horizontally
+      if (dx == 0.0) {
+        return dy;
+      }
+      if (dy == 0.0) {
+        return dx;
+      }
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+  }
+
   /**
    * Computes the distance between this and another
    * <code>BoundingBox</code>.
@@ -295,6 +363,38 @@ public interface BoundingBox
 
     }
     return emptyResult;
+  }
+
+  @Override
+  default <R> R bboxWith(Point point, final BoundingBoxPointFunction<R> action,
+    final R emptyResult) {
+    if (point != null && !isEmpty()) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.as2d(geometryFactory);
+      if (!point.isEmpty()) {
+        final double x = point.getX();
+        final double y = point.getY();
+        return action.accept(this, x, y);
+      }
+
+    }
+    return emptyResult;
+  }
+
+  /**
+   * Tests if the <code>BoundingBox other</code>
+   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
+   *
+   *@param  other the <code>BoundingBox</code> to check
+   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
+   */
+  default boolean bbxCovers(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double minX2 = getMinX();
+    final double minY2 = getMinY();
+    final double maxX2 = getMaxX();
+    final double maxY2 = getMaxY();
+    return minX2 <= minX && maxX <= maxX2 && minY2 <= minY && maxY <= maxY2;
   }
 
   /**
@@ -432,119 +532,6 @@ public interface BoundingBox
       } else {
         return this;
       }
-    }
-  }
-
-  default boolean coveredBy(final double minX, final double minY, final double maxX,
-    final double maxY) {
-    final double minX2 = getMinX();
-    final double minY2 = getMinY();
-    final double maxX2 = getMaxX();
-    final double maxY2 = getMaxY();
-    return minX <= minX2 && maxX2 <= maxX && minY <= minY2 && maxY2 <= maxY;
-  }
-
-  /**
-   * Tests if the given point lies in or on the envelope.
-   *
-   *@param  x  the x-coordinate of the point which this <code>BoundingBox</code> is
-   *      being checked for containing
-   *@param  y  the y-coordinate of the point which this <code>BoundingBox</code> is
-   *      being checked for containing
-   *@return    <code>true</code> if <code>(x, y)</code> lies in the interior or
-   *      on the boundary of this <code>BoundingBox</code>.
-   */
-  default boolean covers(final double x, final double y) {
-    if (isEmpty()) {
-      return false;
-    } else {
-      final double minX = getMinX();
-      final double minY = getMinY();
-      final double maxX = getMaxX();
-      final double maxY = getMaxY();
-
-      return x >= minX && x <= maxX && y >= minY && y <= maxY;
-    }
-  }
-
-  /**
-   * Tests if the <code>BoundingBox other</code>
-   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
-   *
-   *@param  other the <code>BoundingBox</code> to check
-   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
-   */
-  default boolean covers(final double minX, final double minY, final double maxX,
-    final double maxY) {
-    final double minX2 = getMinX();
-    final double minY2 = getMinY();
-    final double maxX2 = getMaxX();
-    final double maxY2 = getMaxY();
-    return minX2 <= minX && maxX <= maxX2 && minY2 <= minY && maxY <= maxY2;
-  }
-
-  /**
-   * Tests if the given point lies in or on the envelope.
-   *
-   *@param  p  the point which this <code>BoundingBox</code> is
-   *      being checked for containing
-   *@return    <code>true</code> if the point lies in the interior or
-   *      on the boundary of this <code>BoundingBox</code>.
-   */
-  default boolean covers(final Point point) {
-    if (point == null || point.isEmpty()) {
-      return false;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point projectedPoint = point.convertGeometry(geometryFactory);
-      final double x = projectedPoint.getX();
-      final double y = projectedPoint.getY();
-      return covers(x, y);
-    }
-  }
-
-  /**
-   * Computes the distance between this and another
-   * <code>BoundingBox</code>.
-   * The distance between overlapping Envelopes is 0.  Otherwise, the
-   * distance is the Euclidean distance between the closest points.
-   */
-  default double distance(Point point) {
-    point = point.convertGeometry(getGeometryFactory());
-    final double x = point.getX();
-    final double y = point.getY();
-    if (intersects(x, y)) {
-      return 0;
-    } else {
-
-      final double minX = getMinX();
-      final double minY = getMinY();
-      final double maxX = getMaxX();
-      final double maxY = getMaxY();
-
-      double dx = 0.0;
-      if (maxX < x) {
-        dx = x - maxX;
-      } else if (minX > x) {
-        dx = minX - x;
-      }
-
-      double dy = 0.0;
-      if (maxY < y) {
-        dy = y - maxY;
-      } else if (minY > y) {
-        dy = minY - y;
-      }
-
-      // if either is zero, the envelopes overlap either vertically or
-      // horizontally
-      if (dx == 0.0) {
-        return dy;
-      }
-      if (dy == 0.0) {
-        return dx;
-      }
-      return Math.sqrt(dx * dx + dy * dy);
     }
   }
 

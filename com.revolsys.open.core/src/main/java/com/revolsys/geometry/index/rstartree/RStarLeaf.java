@@ -22,7 +22,7 @@ public class RStarLeaf<T> implements RStarNode<T> {
 
   @Override
   public void forEach(final double x, final double y, final Consumer<? super T> action) {
-    if (this.boundingBox.covers(x, y)) {
+    if (this.boundingBox.bboxCovers(x, y)) {
       action.accept(this.item);
     }
   }
