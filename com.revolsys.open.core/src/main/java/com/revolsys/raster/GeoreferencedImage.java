@@ -118,7 +118,7 @@ public interface GeoreferencedImage
     final int viewWidth, final int viewHeight, final boolean useTransform,
     final Object interpolationMethod) {
     final BoundingBox imageBoundingBox = getBoundingBox();
-    if (viewBoundingBox.intersects(imageBoundingBox) && viewWidth > 0 && viewHeight > 0) {
+    if (viewBoundingBox.bboxIntersects(imageBoundingBox) && viewWidth > 0 && viewHeight > 0) {
       final RenderedImage renderedImage = getRenderedImage();
       drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth, viewHeight,
         useTransform, interpolationMethod);

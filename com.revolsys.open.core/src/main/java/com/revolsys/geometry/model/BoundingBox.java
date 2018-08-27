@@ -39,9 +39,7 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.Consumer3;
-import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
@@ -245,7 +243,7 @@ public interface BoundingBox
   }
 
   default double bboxDistance(final double x, final double y) {
-    if (intersects(x, y)) {
+    if (bboxIntersects(x, y)) {
       return 0;
     } else {
 
@@ -329,6 +327,45 @@ public interface BoundingBox
         return Math.sqrt(dx * dx + dy * dy);
       }
     }
+  }
+
+  /**
+   *  Check if the point <code>(x, y)</code>
+   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
+   *
+   *@param  x  the x-ordinate of the point
+   *@param  y  the y-ordinate of the point
+   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
+   */
+  default boolean bboxIntersects(final double x, final double y) {
+    if (isEmpty()) {
+      return false;
+    } else {
+      final double minX = getMinX();
+      final double minY = getMinY();
+      final double maxX = getMaxX();
+      final double maxY = getMaxY();
+      return !(x > maxX || x < minX || y > maxY || y < minY);
+    }
+  }
+
+  @Override
+  default boolean bboxIntersects(double x1, double y1, double x2, double y2) {
+    final double minX = getMinX();
+    final double minY = getMinY();
+    final double maxX = getMaxX();
+    final double maxY = getMaxY();
+    if (x1 > x2) {
+      final double t = x1;
+      x1 = x2;
+      x2 = t;
+    }
+    if (y1 > y2) {
+      final double t = y1;
+      y1 = y2;
+      y2 = t;
+    }
+    return !(x1 > maxX || x2 < minX || y1 > maxY || y2 < minY);
   }
 
   @Override
@@ -1043,7 +1080,7 @@ public interface BoundingBox
   default BoundingBox intersection(final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-    if (isEmpty() || convertedBoundingBox.isEmpty() || !intersects(convertedBoundingBox)) {
+    if (isEmpty() || convertedBoundingBox.isEmpty() || !bboxIntersects(convertedBoundingBox)) {
       return newBoundingBoxEmpty();
     } else {
       final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
@@ -1051,93 +1088,6 @@ public interface BoundingBox
       final double intMaxX = Math.min(getMaxX(), convertedBoundingBox.getMaxX());
       final double intMaxY = Math.min(getMaxY(), convertedBoundingBox.getMaxY());
       return newBoundingBox(intMinX, intMinY, intMaxX, intMaxY);
-    }
-  }
-
-  /**
-   *  Check if the region defined by <code>other</code>
-   *  overlaps (intersects) the region of this <code>BoundingBox</code>.
-   *
-   *@param  other  the <code>BoundingBox</code> which this <code>BoundingBox</code> is
-   *          being checked for overlapping
-   *@return        <code>true</code> if the <code>BoundingBox</code>s overlap
-   */
-  default boolean intersects(final BoundingBox other) {
-    if (isEmpty() || other.isEmpty()) {
-      return false;
-    } else {
-      final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-      final BoundingBox convertedBoundingBox = other.toCoordinateSystem(coordinateSystem, 2);
-      return intersectsFast(convertedBoundingBox);
-    }
-  }
-
-  /**
-   *  Check if the point <code>(x, y)</code>
-   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
-   *
-   *@param  x  the x-ordinate of the point
-   *@param  y  the y-ordinate of the point
-   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
-   */
-  default boolean intersects(final double x, final double y) {
-    if (isEmpty()) {
-      return false;
-    } else {
-      final double minX = getMinX();
-      final double minY = getMinY();
-      final double maxX = getMaxX();
-      final double maxY = getMaxY();
-      return !(x > maxX || x < minX || y > maxY || y < minY);
-    }
-  }
-
-  default boolean intersects(double x1, double y1, double x2, double y2) {
-    final double minX = getMinX();
-    final double minY = getMinY();
-    final double maxX = getMaxX();
-    final double maxY = getMaxY();
-    if (x1 > x2) {
-      final double t = x1;
-      x1 = x2;
-      x2 = t;
-    }
-    if (y1 > y2) {
-      final double t = y1;
-      y1 = y2;
-      y2 = t;
-    }
-    return !(x1 > maxX || x2 < minX || y1 > maxY || y2 < minY);
-  }
-
-  /**
-   * Fast version of intersects that assumes it's in the same coordinate system.
-   *
-   * @param boundingBox
-   * @return
-   */
-  default boolean intersectsFast(final BoundingBox boundingBox) {
-    final double minX = boundingBox.getMinX();
-    final double minY = boundingBox.getMinY();
-    final double maxX = boundingBox.getMaxX();
-    final double maxY = boundingBox.getMaxY();
-    return intersects(minX, minY, maxX, maxY);
-  }
-
-  default boolean intersectsFast(final BoundingBoxProxy proxy) {
-    if (proxy == null || isEmpty()) {
-      return false;
-    } else {
-      final BoundingBox boundingBox = proxy.getBoundingBox();
-      if (boundingBox.isEmpty()) {
-        return false;
-      } else {
-        final double minX = boundingBox.getMinX();
-        final double minY = boundingBox.getMinY();
-        final double maxX = boundingBox.getMaxX();
-        final double maxY = boundingBox.getMaxY();
-        return intersects(minX, minY, maxX, maxY);
-      }
     }
   }
 
@@ -1205,95 +1155,6 @@ public interface BoundingBox
     return BoundingBoxDoubleXY.EMPTY;
   }
 
-  /**
-   * The outcode must be outside the rectangle and opposing outcode must be inside the rectangle
-   */
-  default void outCodeIntersection(final int outCode, final double x1, final double y1,
-    final double x2, final double y2, final BiConsumerDouble action) {
-    double x;
-    double y;
-    final double deltaX = x2 - x1;
-    final double deltaY = y2 - y1;
-    if (OutCode.isTop(outCode)) {
-      final double maxY = getMaxY();
-      final double ratio = (maxY - y1) / deltaY;
-      x = x1 + deltaX * ratio;
-      y = maxY;
-    } else if (OutCode.isBottom(outCode)) {
-      final double minY = getMinY();
-      final double ratio = (minY - y1) / deltaY;
-      x = x2 + deltaX * ratio;
-      y = minY;
-    } else if (OutCode.isRight(outCode)) {
-      final double maxX = getMaxX();
-      final double ratio = (maxX - x1) / deltaX;
-      y = y1 + deltaY * ratio;
-      x = maxX;
-    } else if (OutCode.isLeft(outCode)) {
-      final double minX = getMinX();
-      final double ratio = (minX - x1) / deltaX;
-      y = y1 + deltaY * ratio;
-      x = minX;
-    } else {
-      throw new IllegalArgumentException("Outcode " + outCode);
-    }
-    action.accept(x, y);
-  }
-
-  default void outCodeIntersection(int out1, int out2, double x1, double y1, double x2, double y2,
-    final Consumer4Double action) {
-    final double minX = getMinX();
-    final double minY = getMinY();
-    final double maxX = getMaxX();
-    final double maxY = getMaxY();
-
-    while (true) {
-      if ((out1 | out2) == 0) {
-        action.accept(x1, y1, x2, y2);
-        return;
-      } else if ((out1 & out2) != 0) {
-        return;
-      } else {
-        double x;
-        double y;
-
-        final int outcodeOut = out1 != 0 ? out1 : out2;
-
-        final double deltaY = y2 - y1;
-        final double deltaX = x2 - x1;
-        if (OutCode.isTop(outcodeOut)) {
-          final double ratio = (maxY - y1) / deltaY;
-          x = x1 + deltaX * ratio;
-          y = maxY;
-        } else if (OutCode.isBottom(outcodeOut)) {
-          final double ratio = (minY - y1) / deltaY;
-          x = x2 + deltaX * ratio;
-          y = minY;
-        } else if (OutCode.isRight(outcodeOut)) {
-          final double ratio = (maxX - x1) / deltaX;
-          x = maxX;
-          y = y1 + deltaY * ratio;
-        } else if (OutCode.isLeft(outcodeOut)) {
-          final double ratio = (minX - x1) / deltaX;
-          x = minX;
-          y = y1 + deltaY * ratio;
-        } else {
-          throw new IllegalStateException("Cannot clip as both points are inside the rectangle");
-        }
-
-        if (outcodeOut == out1) {
-          x1 = x;
-          y1 = y;
-          out1 = getOutcode(x1, y1);
-        } else {
-          x2 = x;
-          y2 = y;
-          out2 = getOutcode(x2, y2);
-        }
-      }
-    }
-  }
-
   default double overlappingArea(final BoundingBox bb) {
 
     double area = 1.0;
@@ -1330,34 +1191,6 @@ public interface BoundingBox
     }
 
     return area;
-  }
-
-  default BoundingBox toCoordinateSystem(final CoordinateSystem coordinateSystem,
-    final int minAxisCount) {
-    final CoordinateSystem coordinateSystemThis = getHorizontalCoordinateSystem();
-    if (coordinateSystem == null || coordinateSystemThis == null) {
-      return this;
-    } else {
-      if (coordinateSystemThis == coordinateSystem || coordinateSystemThis
-        .getHorizontalCoordinateSystemId() == coordinateSystem.getHorizontalCoordinateSystemId()) {
-        return this;
-      } else {
-        final GeometryFactory geometryFactory = getGeometryFactory()
-          .convertCoordinateSystem(coordinateSystem)
-          .convertAxisCount(minAxisCount);
-        return convert(geometryFactory);
-      }
-    }
-  }
-
-  default BoundingBox toCoordinateSystem(final GeometryFactory geometryFactory,
-    final int minAxisCount) {
-    if (geometryFactory == null) {
-      return this;
-    } else {
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      return toCoordinateSystem(coordinateSystem, minAxisCount);
-    }
   }
 
   /**

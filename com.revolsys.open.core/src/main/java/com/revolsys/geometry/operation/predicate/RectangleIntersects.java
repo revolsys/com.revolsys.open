@@ -82,7 +82,7 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
     final BoundingBox boundingBox = element.getBoundingBox();
 
     // disjoint => no intersection
-    if (!this.rectEnv.intersects(boundingBox)) {
+    if (!this.rectEnv.bboxIntersects(boundingBox)) {
       return;
     }
     // rectangle contains target env => must intersect
@@ -157,7 +157,7 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
 
     // skip if envelopes do not intersect
     final BoundingBox elementEnv = geom.getBoundingBox();
-    if (!this.rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.bboxIntersects(elementEnv)) {
       return;
     }
 
@@ -203,7 +203,7 @@ public class RectangleIntersects {
    */
   public static boolean rectangleIntersects(final Polygon rectangle, final Geometry geom) {
     final BoundingBox boundingBox = rectangle.getBoundingBox();
-    if (boundingBox.intersects(geom.getBoundingBox())) {
+    if (boundingBox.bboxIntersects(geom.getBoundingBox())) {
 
       /**
        * Test if rectangle envelope intersects any component envelope.
@@ -310,7 +310,7 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
      * so it is worth checking this simple condition.
      */
     final BoundingBox elementEnv = geom.getBoundingBox();
-    if (!this.rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.bboxIntersects(elementEnv)) {
       return;
     }
 

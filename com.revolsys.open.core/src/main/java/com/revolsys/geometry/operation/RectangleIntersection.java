@@ -154,7 +154,7 @@ public class RectangleIntersection {
       return line;
     } else {
       final GeometryFactory geometryFactory = line.getGeometryFactory();
-      if (line.bboxIntersectsFast(rectangle)) {
+      if (line.bboxIntersects(rectangle)) {
         setRectangle(rectangle);
         this.axisCount = geometryFactory.getAxisCount();
         final MultiLineStringEditor lines = new MultiLineStringEditor(geometryFactory);

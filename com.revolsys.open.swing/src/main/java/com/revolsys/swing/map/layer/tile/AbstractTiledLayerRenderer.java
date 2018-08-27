@@ -74,7 +74,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
           final BoundingBox boundingBox = mapTile.getBoundingBox();
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           if (!geometryFactory.equals(newGeometryFactory)
-            || !newBoundingBox.intersects(boundingBox)) {
+            || !newBoundingBox.bboxIntersects(boundingBox)) {
             this.cachedTiles.remove(mapTile);
           }
         }

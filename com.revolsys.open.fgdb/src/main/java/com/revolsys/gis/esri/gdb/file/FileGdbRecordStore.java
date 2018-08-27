@@ -711,7 +711,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                     final Geometry geometry = (Geometry)geometryField.getValue(row);
                     if (geometry != null) {
                       final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
-                      if (geometryBoundingBox.intersects(boundingBox)) {
+                      if (geometryBoundingBox.bboxIntersects(boundingBox)) {
                         count++;
                       }
                     }

@@ -79,7 +79,7 @@ public class Graphics2DViewRender extends ViewRenderer {
 
   @Override
   public void drawGeometry(final Geometry geometry, final GeometryStyle style) {
-    if (this.boundingBox.intersectsFast(geometry)) {
+    if (this.boundingBox.bboxIntersects(geometry)) {
       if (geometry.isGeometryCollection()) {
         for (int i = 0; i < geometry.getGeometryCount(); i++) {
           final Geometry part = geometry.getGeometry(i);
@@ -116,7 +116,7 @@ public class Graphics2DViewRender extends ViewRenderer {
 
   @Override
   public void drawGeometryOutline(final Geometry geometry, final GeometryStyle style) {
-    if (this.boundingBox.intersectsFast(geometry)) {
+    if (this.boundingBox.bboxIntersects(geometry)) {
       if (geometry.isGeometryCollection()) {
         for (int i = 0; i < geometry.getGeometryCount(); i++) {
           final Geometry part = geometry.getGeometry(i);

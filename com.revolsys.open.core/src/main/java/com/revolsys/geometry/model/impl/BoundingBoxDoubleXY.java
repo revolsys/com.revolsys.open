@@ -388,12 +388,12 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
   }
 
   @Override
-  public boolean intersects(final double x, final double y) {
+  public boolean bboxIntersects(final double x, final double y) {
     return !(x > this.maxX || x < this.minX || y > this.maxY || y < this.minY);
   }
 
   @Override
-  public boolean intersects(double x1, double y1, double x2, double y2) {
+  public boolean bboxIntersects(double x1, double y1, double x2, double y2) {
     if (x1 > x2) {
       final double t = x1;
       x1 = x2;

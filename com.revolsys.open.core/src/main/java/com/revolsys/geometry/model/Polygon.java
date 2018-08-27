@@ -619,7 +619,7 @@ public interface Polygon extends Polygonal {
       return false;
     } else {
       final BoundingBox thisBoundingBox = getBoundingBox();
-      if (thisBoundingBox.intersects(boundingBox)) {
+      if (thisBoundingBox.bboxIntersects(boundingBox)) {
 
         final GeometryFactory geometryFactory = getGeometryFactory();
         if (boundingBox.isProjectionRequired(this)) {

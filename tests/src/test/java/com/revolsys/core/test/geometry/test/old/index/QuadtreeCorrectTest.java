@@ -80,7 +80,7 @@ public class QuadtreeCorrectTest {
     final List result = new ArrayList();
     for (int i = 0; i < items.size(); i++) {
       final BoundingBox env = (BoundingBox)items.get(i);
-      if (env.intersects(searchEnv)) {
+      if (env.bboxIntersects(searchEnv)) {
         result.add(env);
       }
     }

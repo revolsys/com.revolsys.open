@@ -232,7 +232,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     if (geometry != null) {
       if (!viewExtent.isEmpty()) {
         final BoundingBox geometryExtent = geometry.getBoundingBox();
-        if (geometryExtent.intersects(viewExtent)) {
+        if (geometryExtent.bboxIntersects(viewExtent)) {
           return geometry.convertGeometry(this.geometryFactory);
         }
       }

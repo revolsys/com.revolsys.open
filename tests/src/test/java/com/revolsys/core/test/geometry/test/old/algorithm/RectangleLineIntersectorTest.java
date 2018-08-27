@@ -172,7 +172,7 @@ class SimpleRectangleIntersector {
     final double y1 = p0.getY();
     final double x2 = p1.getX();
     final double y2 = p1.getY();
-    if (!this.rectEnv.intersects(x1, y1, x2, y2)) {
+    if (!this.rectEnv.bboxIntersects(x1, y1, x2, y2)) {
       return false;
     }
 

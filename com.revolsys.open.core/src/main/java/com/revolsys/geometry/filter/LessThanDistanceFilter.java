@@ -84,7 +84,7 @@ public class LessThanDistanceFilter implements Predicate<Geometry> {
   @Override
   public boolean test(final Geometry geometry) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
-    if (boundingBox.intersects(this.envelope)) {
+    if (boundingBox.bboxIntersects(this.envelope)) {
       return geometry.isLessThanDistance(geometry, this.distance);
     } else {
       return false;

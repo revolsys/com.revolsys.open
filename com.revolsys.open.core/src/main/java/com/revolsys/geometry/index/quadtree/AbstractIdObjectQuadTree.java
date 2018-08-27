@@ -41,7 +41,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
     this.index.forEach(boundingBox, (id) -> {
       final T object = getObject(id);
       final BoundingBox e = getBoundingBox(object);
-      if (e.intersects(boundingBox)) {
+      if (e.bboxIntersects(boundingBox)) {
         action.accept(object);
       }
     });
@@ -54,7 +54,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
     this.index.forEach(boundingBox, (id) -> {
       final T object = getObject(id);
       final BoundingBox e = getBoundingBox(object);
-      if (e.intersects(boundingBox) && filter.test(object)) {
+      if (e.bboxIntersects(boundingBox) && filter.test(object)) {
         action.accept(object);
       }
     });

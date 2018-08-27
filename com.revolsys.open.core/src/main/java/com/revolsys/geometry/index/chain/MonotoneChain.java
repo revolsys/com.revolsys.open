@@ -196,7 +196,7 @@ public class MonotoneChain {
     // terminating condition for the recursion
     if (end0 - start0 == 1) {
       mcs.select(this, start0);
-    } else if (searchEnv.intersects(x1, y1, x2, y2)) {
+    } else if (searchEnv.bboxIntersects(x1, y1, x2, y2)) {
       // the chains overlap, so split each in half and iterate (binary search)
       final int mid = (start0 + end0) / 2;
 

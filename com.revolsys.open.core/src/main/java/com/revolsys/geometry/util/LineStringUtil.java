@@ -207,7 +207,7 @@ public final class LineStringUtil {
   }
 
   public static boolean intersects(final LineString line1, final LineString line2) {
-    if (line1.getBoundingBox().intersects(line2.getBoundingBox())) {
+    if (line1.getBoundingBox().bboxIntersects(line2.getBoundingBox())) {
       final LineMatchGraph<LineString> graph = new LineMatchGraph<>(line2);
       for (final LineString line : line1.segments()) {
         if (graph.add(line)) {

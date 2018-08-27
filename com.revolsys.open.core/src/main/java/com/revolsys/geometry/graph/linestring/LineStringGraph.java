@@ -267,7 +267,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       maxDistance = 1 / scaleXY;
     }
     envelope = envelope.expand(maxDistance);
-    if (envelope.intersects(this.envelope)) {
+    if (envelope.bboxIntersects(this.envelope)) {
       final LineString points = line;
       final int numPoints = points.getVertexCount();
       final Point fromPoint = points.getPoint(0);

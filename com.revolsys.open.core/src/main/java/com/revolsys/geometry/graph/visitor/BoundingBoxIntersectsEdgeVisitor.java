@@ -40,7 +40,7 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<
   @Override
   public void accept(final Edge<T> edge) {
     final com.revolsys.geometry.model.BoundingBox envelope = edge.getBoundingBox();
-    if (this.boundingBox.intersects(envelope)) {
+    if (this.boundingBox.bboxIntersects(envelope)) {
       super.accept(edge);
     }
   }

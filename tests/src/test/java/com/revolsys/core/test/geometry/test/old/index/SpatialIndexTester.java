@@ -142,7 +142,7 @@ public class SpatialIndexTester {
     final List<BoundingBox> envelopes) {
     final List<BoundingBox> intersectingEnvelopes = new ArrayList<>();
     for (final BoundingBox candidate : envelopes) {
-      if (candidate.intersects(queryEnvelope)) {
+      if (candidate.bboxIntersects(queryEnvelope)) {
         intersectingEnvelopes.add(candidate);
       }
     }

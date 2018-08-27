@@ -85,7 +85,7 @@ public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
         iterator.remove();
       } else {
         final BoundingBox recordBoundingBox = geometry.getBoundingBox();
-        if (!boundingBox.intersects(recordBoundingBox)) {
+        if (!boundingBox.bboxIntersects(recordBoundingBox)) {
           iterator.remove();
         }
       }

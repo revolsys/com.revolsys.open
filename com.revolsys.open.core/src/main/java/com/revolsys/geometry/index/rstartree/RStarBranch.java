@@ -85,7 +85,7 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
   @Override
   public void forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super T> action) {
-    if (intersects(minX, minY, maxX, maxY)) {
+    if (bboxIntersects(minX, minY, maxX, maxY)) {
       for (final RStarNode<T> item : this.items) {
         item.forEach(minX, minY, maxX, maxY, action);
       }
@@ -167,12 +167,12 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
     final Predicate<RStarLeaf<T>> leafRemoveFilter, final List<RStarLeaf<T>> itemsToReinsert,
     final boolean isRoot) {
 
-    if (intersects(boundingBox)) {
+    if (bboxIntersects(boundingBox)) {
       // this is the easy part: remove nodes if they need to be removed
 
       for (final Iterator<RStarNode<T>> iterator = this.items.iterator(); iterator.hasNext();) {
         final RStarNode<T> item = iterator.next();
-        if (boundingBox.intersects(boundingBox)) {
+        if (boundingBox.bboxIntersects(boundingBox)) {
           if (this.hasLeaves) {
             final RStarLeaf<T> leaf = (RStarLeaf<T>)item;
             if (leafRemoveFilter.test(leaf)) {

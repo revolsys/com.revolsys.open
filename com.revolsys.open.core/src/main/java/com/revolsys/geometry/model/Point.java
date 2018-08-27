@@ -774,7 +774,7 @@ public interface Point extends Punctual, Serializable {
       final double x = convertedPoint.getX();
       final double y = convertedPoint.getY();
 
-      return boundingBox.intersects(x, y);
+      return boundingBox.bboxIntersects(x, y);
     }
   }
 

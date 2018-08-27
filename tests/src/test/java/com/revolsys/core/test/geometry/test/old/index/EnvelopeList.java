@@ -53,7 +53,7 @@ public class EnvelopeList {
   public List<BoundingBox> query(final BoundingBox searchEnv) {
     final List<BoundingBox> result = new ArrayList<>();
     for (final BoundingBox boundingBox : this.boundingBoxes) {
-      if (boundingBox.intersects(searchEnv)) {
+      if (boundingBox.bboxIntersects(searchEnv)) {
         result.add(boundingBox);
       }
     }

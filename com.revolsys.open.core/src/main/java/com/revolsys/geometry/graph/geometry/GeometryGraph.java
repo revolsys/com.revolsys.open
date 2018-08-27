@@ -128,7 +128,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     final List<LineString> lineIntersections = new ArrayList<>();
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = getBoundingBox(line);
-    if (boundingBox.intersects(this.boundingBox)) {
+    if (boundingBox.bboxIntersects(this.boundingBox)) {
       final LineString points = line;
       final int vertexCount = points.getVertexCount();
       final Point fromPoint = points.getPoint(0);
@@ -306,7 +306,7 @@ public class GeometryGraph extends Graph<LineSegment> {
       maxDistance = 1 / scaleXY;
     }
     boundingBox = boundingBox.expand(maxDistance);
-    if (boundingBox.intersects(this.boundingBox)) {
+    if (boundingBox.bboxIntersects(this.boundingBox)) {
       final LineString points = line;
       final int numPoints = points.getVertexCount();
       final Point fromPoint = points.getPoint(0);

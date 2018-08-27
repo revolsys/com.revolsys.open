@@ -53,19 +53,28 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
     return bboxWith(boundingBox, action, false);
   }
 
+  /**
+   *  Check if the region defined by <code>other</code>
+   *  overlaps (intersects) the region of this <code>BoundingBox</code>.
+   *
+   *@param  other  the <code>BoundingBox</code> which this <code>BoundingBox</code> is
+   *          being checked for overlapping
+   *@return        <code>true</code> if the <code>BoundingBox</code>s overlap
+   */
   default boolean bboxIntersects(final BoundingBoxProxy boundingBox) {
-    final BiFunction<BoundingBox, BoundingBox, Boolean> action = BoundingBox::intersects;
+    final BoundingBoxFunction<Boolean> action = BoundingBox::bboxIntersects;
     return bboxWith(boundingBox, action, false);
   }
 
   default boolean bboxIntersects(final double x1, final double y1, final double x2,
     final double y2) {
     final BoundingBox boundingBox = getBoundingBox();
-    return boundingBox.intersects(x1, y1, x2, y2);
+    return boundingBox.bboxIntersects(x1, y1, x2, y2);
   }
 
-  default boolean bboxIntersectsFast(final BoundingBoxProxy boundingBox) {
-    return bboxWith(boundingBox, BoundingBox::intersectsFast, false);
+  default boolean bboxIntersects(final Point point) {
+    final BoundingBoxPointFunction<Boolean> action = BoundingBox::bboxIntersects;
+    return bboxWith(point, action, false);
   }
 
   default <R> R bboxWith(final BoundingBoxProxy boundingBox,

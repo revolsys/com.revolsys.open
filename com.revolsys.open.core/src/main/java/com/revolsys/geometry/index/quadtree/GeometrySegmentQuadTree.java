@@ -66,7 +66,7 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
   protected boolean intersectsBounds(final Object id, final double x, final double y) {
     final Segment segment = getItem(id);
     final BoundingBox boundingBox = segment.getBoundingBox();
-    return boundingBox.intersects(x, y, x, y);
+    return boundingBox.bboxIntersects(x, y, x, y);
   }
 
   @Override
@@ -74,7 +74,7 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
     final double maxX, final double maxY) {
     final Segment segment = getItem(id);
     final BoundingBox boundingBox = segment.getBoundingBox();
-    return boundingBox.intersects(minX, minY, maxX, maxY);
+    return boundingBox.bboxIntersects(minX, minY, maxX, maxY);
   }
 
 }

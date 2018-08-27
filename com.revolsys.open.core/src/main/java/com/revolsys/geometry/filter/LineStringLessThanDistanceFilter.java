@@ -92,7 +92,7 @@ public class LineStringLessThanDistanceFilter implements Predicate<LineString> {
 
   @Override
   public boolean test(final LineString line) {
-    if (line.getBoundingBox().intersects(this.envelope)) {
+    if (line.getBoundingBox().bboxIntersects(this.envelope)) {
       return line.isLessThanDistance(this.geometry, this.distance);
     } else {
       return false;

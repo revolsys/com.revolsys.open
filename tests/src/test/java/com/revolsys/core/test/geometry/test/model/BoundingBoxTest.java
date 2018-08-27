@@ -253,13 +253,13 @@ public class BoundingBoxTest implements TestConstants {
     {
       final BoundingBox boundingBox1 = new BoundingBoxDoubleXY(minX1, minY1, maxX1, maxY1);
       final BoundingBox boundingBox2 = new BoundingBoxDoubleXY(minX2, minY2, maxX2, maxY2);
-      final boolean intersectsActual = boundingBox1.intersects(boundingBox2);
+      final boolean intersectsActual = boundingBox1.bboxIntersects(boundingBox2);
       Assert.assertEquals("Intersects", intersectsExpected, intersectsActual);
     }
     {
       final BoundingBox boundingBox1 = new BoundingBoxDoubleXY(minX1, minY1, maxX1, maxY1);
       final BoundingBox boundingBox2 = new BoundingBoxDoubleXY(minX2, minY2, maxX2, maxY2);
-      final boolean intersectsActual = boundingBox1.intersects(boundingBox2);
+      final boolean intersectsActual = boundingBox1.bboxIntersects(boundingBox2);
       Assert.assertEquals("Intersects", intersectsExpected, intersectsActual);
     }
   }

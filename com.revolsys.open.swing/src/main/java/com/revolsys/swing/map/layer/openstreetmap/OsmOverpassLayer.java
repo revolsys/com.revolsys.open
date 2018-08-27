@@ -65,7 +65,7 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
           for (final OsmElement record : document.getRecords()) {
             final Geometry geometry = record.getGeometry();
             if (geometry != null && !geometry.isEmpty()) {
-              if (boundingBox.intersects(geometry.getBoundingBox())) {
+              if (boundingBox.bboxIntersects(geometry.getBoundingBox())) {
                 final Identifier identifier = record.getIdentifier();
                 // final OsmProxyLayerRecord layerRecord = new
                 // OsmProxyLayerRecord(

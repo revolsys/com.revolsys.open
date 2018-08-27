@@ -94,7 +94,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
    * @return true if the point lies inside the ring
    */
   private static boolean isPointInRing(final LinearRing ring, final double x, final double y) {
-    if (ring.getBoundingBox().intersects(x, y)) {
+    if (ring.getBoundingBox().bboxIntersects(x, y)) {
       return ring.isPointInRing(x, y);
     } else {
       return false;
