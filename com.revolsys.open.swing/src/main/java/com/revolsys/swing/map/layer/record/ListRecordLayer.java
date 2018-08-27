@@ -103,15 +103,10 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void expandBoundingBox(final LayerRecord record) {
-    if (record != null) {
-      BoundingBox boundingBox = getBoundingBox();
-      if (boundingBox.isEmpty()) {
-        boundingBox = Records.boundingBox(record);
-      } else {
-        boundingBox = boundingBox.expandToInclude(record);
-      }
-      setBoundingBox(boundingBox);
-    }
+    final BoundingBox boundingBox = getBoundingBox().bboxEdit(editor -> {
+      editor.addBbox(record);
+    });
+    setBoundingBox(boundingBox);
   }
 
   public void fireEmpty() {
@@ -227,10 +222,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   protected void refreshBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
-      BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
-      for (final LayerRecord record : getRecords()) {
-        boundingBox = boundingBox.expandToInclude(record);
-      }
+      final BoundingBox boundingBox = BoundingBox.bboxNew(geometryFactory, this.records);
       setBoundingBox(boundingBox);
     }
   }

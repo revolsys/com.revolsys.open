@@ -28,6 +28,7 @@ import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
@@ -386,6 +387,15 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     path.add(this);
   }
 
+  @Override
+  public void addVisibleBbox(final BoundingBoxEditor boundingBox) {
+    if (isExists() && isVisible()) {
+      for (final Layer layer : this) {
+        layer.addVisibleBbox(boundingBox);
+      }
+    }
+  }
+
   protected <V extends Layer> void addVisibleDescendants(final List<V> layers,
     final Class<V> layerClass, final double scale) {
     if (isVisible(scale)) {
@@ -441,32 +451,19 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @Override
   public BoundingBox getBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
-    for (final Layer layer : this) {
-      final BoundingBox layerBoundingBox = layer.getBoundingBox();
-      if (!layerBoundingBox.isEmpty()) {
-        boundingBox = boundingBox.expandToInclude(layerBoundingBox);
-      }
-    }
-    return boundingBox;
+    return BoundingBox.bboxNew(this, this.layers);
   }
 
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boudingBox = geometryFactory.newBoundingBoxEmpty();
-    if (isExists() && (!visibleLayersOnly || isVisible())) {
-      for (final Layer layer : this) {
-        if (layer.isExists() && (!visibleLayersOnly || layer.isVisible())) {
-          final BoundingBox layerBoundingBox = layer.getBoundingBox(visibleLayersOnly);
-          if (!layerBoundingBox.isEmpty()) {
-            boudingBox = boudingBox.expandToInclude(layerBoundingBox);
-          }
-        }
-      }
+    if (visibleLayersOnly) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final BoundingBoxEditor boundingBox = geometryFactory.bboxEditor();
+      addVisibleBbox(boundingBox);
+      return boundingBox.newBoundingBox();
+    } else {
+      return getBoundingBox();
     }
-    return boudingBox;
   }
 
   @Override
@@ -598,14 +595,14 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @Override
   public BoundingBox getSelectedBoundingBox() {
-    BoundingBox boundingBox = super.getSelectedBoundingBox();
+    final BoundingBoxEditor boundingBox = getGeometryFactory().bboxEditor();
     if (isExists() && isVisible()) {
       for (final Layer layer : this) {
         final BoundingBox layerBoundingBox = layer.getSelectedBoundingBox();
-        boundingBox = boundingBox.expandToInclude(layerBoundingBox);
+        boundingBox.addBbox(layerBoundingBox);
       }
     }
-    return boundingBox;
+    return boundingBox.newBoundingBox();
   }
 
   @Override

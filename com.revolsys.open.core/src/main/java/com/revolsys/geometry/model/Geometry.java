@@ -60,7 +60,7 @@ import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.geometry.model.util.BoundingBoxXyConstructor;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
@@ -2025,7 +2025,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (isEmpty()) {
       return geometryFactory.newBoundingBoxEmpty();
     } else {
-      final BoundingBoxXyConstructor boundingBox = new BoundingBoxXyConstructor(geometryFactory);
+      final BoundingBoxEditor boundingBox = new BoundingBoxEditor(geometryFactory);
       forEachVertex(boundingBox);
       return boundingBox.newBoundingBox();
     }

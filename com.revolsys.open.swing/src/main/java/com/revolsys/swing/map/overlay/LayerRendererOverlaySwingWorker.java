@@ -61,8 +61,11 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
             if (this.overlay.isShowAreaBoundingBox()) {
               final BoundingBox areaBoundingBox = boundingBox.getAreaBoundingBox();
               if (!areaBoundingBox.isEmpty()) {
-                final Polygon viewportPolygon = boundingBox.expandPercent(0.1).toPolygon(0);
-                final Polygon areaPolygon = areaBoundingBox.expand(viewport.getUnitsPerPixel())
+                final Polygon viewportPolygon = boundingBox
+                  .bboxEdit(editor -> editor.expandPercent(0.1))
+                  .toPolygon(0);
+                final Polygon areaPolygon = areaBoundingBox
+                  .bboxEdit(editor -> editor.expandDelta(viewport.getUnitsPerPixel()))
                   .toPolygon(0);
                 final Geometry drawPolygon = viewportPolygon.difference(areaPolygon);
                 view.drawGeometry(drawPolygon, STYLE_AREA);

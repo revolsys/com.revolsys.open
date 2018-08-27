@@ -136,7 +136,7 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
   @Override
   public double getMax(final int axisIndex) {
     if (this.bounds == null || axisIndex >= getAxisCount()) {
-      return Double.NaN;
+      return Double.NEGATIVE_INFINITY;
     } else {
       return RectangleUtil.getMax(this.bounds, axisIndex);
     }
@@ -145,7 +145,7 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
   @Override
   public double getMin(final int axisIndex) {
     if (this.bounds == null) {
-      return Double.NaN;
+      return Double.POSITIVE_INFINITY;
     } else {
       return RectangleUtil.getMin(this.bounds, axisIndex);
     }

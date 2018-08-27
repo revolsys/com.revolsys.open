@@ -38,11 +38,11 @@ public class PrintViewport2D extends Viewport2D {
         final double newWidth = height * viewAspectRatio;
         final double deltaX = (newWidth - width) / 2;
 
-        newBoundingBox = newBoundingBox.expand(deltaX, 0);
+        newBoundingBox = newBoundingBox.bboxEdit(editor -> editor.expandDeltaX(deltaX));
       } else if (viewAspectRatio < modelAspectRatio) {
         final double newHeight = width / viewAspectRatio;
         final double deltaY = (newHeight - height) / 2;
-        newBoundingBox = newBoundingBox.expand(0, deltaY);
+        newBoundingBox = newBoundingBox.bboxEdit(editor -> editor.expandDeltaY(deltaY));
       }
     }
 

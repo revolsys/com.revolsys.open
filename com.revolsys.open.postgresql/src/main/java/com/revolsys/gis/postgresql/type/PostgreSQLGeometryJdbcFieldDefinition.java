@@ -50,7 +50,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       return new PostgreSQLGeometryWrapper(dataType, this.geometryFactory, geometry);
     } else if (value instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)value;
-      boundingBox = boundingBox.convert(this.geometryFactory);
+      boundingBox = boundingBox.toCs(this.geometryFactory);
       return new PostgreSQLBoundingBoxWrapper(boundingBox);
     } else if (Property.hasValue(value)) {
       return value;
@@ -120,7 +120,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       }
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
-      boundingBox = boundingBox.convert(this.geometryFactory);
+      boundingBox = boundingBox.toCs(this.geometryFactory);
       return new PostgreSQLBoundingBoxWrapper(boundingBox);
     } else {
       return object;

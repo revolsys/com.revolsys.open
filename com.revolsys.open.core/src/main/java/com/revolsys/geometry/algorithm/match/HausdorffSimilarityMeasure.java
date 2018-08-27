@@ -53,9 +53,8 @@ import com.revolsys.geometry.model.Geometry;
  */
 public class HausdorffSimilarityMeasure implements SimilarityMeasure {
   /*
-   * public static double measure(Geometry a, Geometry b) {
-   * HausdorffSimilarityMeasure gv = new HausdorffSimilarityMeasure(a, b);
-   * return gv.measure(); }
+   * public static double measure(Geometry a, Geometry b) { HausdorffSimilarityMeasure gv = new
+   * HausdorffSimilarityMeasure(a, b); return gv.measure(); }
    */
 
   /*
@@ -80,9 +79,8 @@ public class HausdorffSimilarityMeasure implements SimilarityMeasure {
   public double measure(final Geometry g1, final Geometry g2) {
     final double distance = DiscreteHausdorffDistance.distance(g1, g2, DENSIFY_FRACTION);
 
-    BoundingBox env = g1.getBoundingBox();
-    env = env.expandToInclude(g2.getBoundingBox());
-    final double envSize = diagonalSize(env);
+    final BoundingBox boundingBox = BoundingBox.bboxNew(g1, g2);
+    final double envSize = diagonalSize(boundingBox);
     // normalize so that more similarity produces a measure closer to 1
     final double measure = 1 - distance / envSize;
 

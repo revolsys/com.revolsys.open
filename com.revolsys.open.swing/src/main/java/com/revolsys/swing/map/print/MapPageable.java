@@ -102,14 +102,14 @@ public class MapPageable implements Pageable {
     final double totalModelWidth = this.numXPages * this.coreCellsPerWidth
       * this.modelGridSizeMetres;
     if (this.mapBoundingBox.getWidth() < totalModelWidth) {
-      final double expandDistance = (totalModelWidth - this.mapBoundingBox.getWidth()) / 2;
-      this.mapBoundingBox = this.mapBoundingBox.expand(expandDistance, 0);
+      final double deltaX = (totalModelWidth - this.mapBoundingBox.getWidth()) / 2;
+      this.mapBoundingBox = this.mapBoundingBox.bboxEdit(editor -> editor.expandDeltaX(deltaX));
     }
     final double totalModelHeight = this.numYPages * this.coreCellsPerHeight
       * this.modelGridSizeMetres;
     if (this.mapBoundingBox.getHeight() < totalModelHeight) {
-      final double expandDistance = (totalModelHeight - this.mapBoundingBox.getHeight()) / 2;
-      this.mapBoundingBox = this.mapBoundingBox.expand(0, expandDistance);
+      final double deltaY = (totalModelHeight - this.mapBoundingBox.getHeight()) / 2;
+      this.mapBoundingBox = this.mapBoundingBox.bboxEdit(editor -> editor.expandDeltaY(deltaY));
     }
 
     this.numPages = this.numXPages * this.numYPages;

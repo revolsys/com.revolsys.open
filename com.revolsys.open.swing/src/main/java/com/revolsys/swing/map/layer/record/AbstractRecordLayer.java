@@ -1042,12 +1042,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (geometryFactory == null) {
       return BoundingBox.empty();
     } else {
-      BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
-      for (final Record record : getHighlightedRecords()) {
-        final Geometry geometry = record.getGeometry();
-        boundingBox = boundingBox.expandToInclude(geometry);
-      }
-      return boundingBox;
+      final Collection<LayerRecord> records = getHighlightedRecords();
+      return BoundingBox.bboxNew(records);
     }
   }
 
@@ -1543,12 +1539,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   public BoundingBox getSelectedBoundingBox() {
-    BoundingBox boundingBox = super.getSelectedBoundingBox();
-    for (final Record record : getSelectedRecords()) {
-      final Geometry geometry = record.getGeometry();
-      boundingBox = boundingBox.expandToInclude(geometry);
-    }
-    return boundingBox;
+    final BoundingBox boundingBox = super.getSelectedBoundingBox();
+    final List<LayerRecord> records = getSelectedRecords();
+    return boundingBox.bboxEdit(editor -> editor.addAllBbox(records));
   }
 
   public List<LayerRecord> getSelectedRecords() {
@@ -3294,8 +3287,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (!RectangleUtil.isEmpty(boundingBox)) {
       final Project project = getProject();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
-      boundingBox = boundingBox.convert(geometryFactory);
-      boundingBox = boundingBox.expandPercent(0.1);
+      boundingBox = boundingBox //
+        .bboxEditor() //
+        .setGeometryFactory(geometryFactory) //
+        .expandPercent(0.1) //
+        .newBoundingBox();
       project.setViewBoundingBox(boundingBox);
     }
   }
@@ -3320,10 +3316,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void zoomToRecords(final List<? extends LayerRecord> records) {
-    BoundingBox boundingBox = BoundingBox.empty();
-    for (final Record record : records) {
-      boundingBox = boundingBox.expandToInclude(record);
-    }
+    final BoundingBox boundingBox = BoundingBox.bboxNew(this, records);
     zoomToBoundingBox(boundingBox);
   }
 

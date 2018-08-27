@@ -72,7 +72,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public void forEachTile(final BoundingBox boundingBox,
     final Consumer<RectangularMapTile> action) {
-    final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
+    final BoundingBox convertedBoundingBox = boundingBox.toCs(getGeometryFactory());
 
     final int minX = getGridFloor(this.originX, this.tileWidth, convertedBoundingBox.getMinX());
     final int minY = getGridFloor(this.originY, this.tileHeight, convertedBoundingBox.getMinY());
@@ -213,7 +213,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
-    final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
+    final BoundingBox envelope = boundingBox.toCs(getGeometryFactory());
 
     final List<RectangularMapTile> tiles = new ArrayList<>();
     final int minX = getGridFloor(this.originX, this.tileWidth, envelope.getMinX());

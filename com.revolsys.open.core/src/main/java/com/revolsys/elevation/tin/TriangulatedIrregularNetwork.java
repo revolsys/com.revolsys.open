@@ -231,7 +231,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   }
 
   default List<Triangle> getTriangles(BoundingBox boundingBox) {
-    boundingBox = boundingBox.convert(getGeometryFactory());
+    boundingBox = boundingBox.bboxEdit(editor -> editor.setGeometryFactory(getGeometryFactory()));
     final List<Triangle> triangles = new ArrayList<>();
     forEachTriangle(boundingBox, triangles::add);
     return triangles;

@@ -42,6 +42,7 @@ import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.listener.BaseMouseListener;
 import com.revolsys.swing.listener.BaseMouseMotionListener;
@@ -553,8 +554,8 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   public void mouseWheelMoved(final MouseWheelEvent e) {
   }
 
-  protected BoundingBox newBoundingBox(final Viewport2D viewport, final int x1, final int y1,
-    final int x2, final int y2) {
+  protected BoundingBoxEditor newBoundingBox(final Viewport2D viewport, final int x1,
+    final int y1, final int x2, final int y2) {
     // Convert first point to envelope top left in map coords.
     final int minX = Math.min(x1, x2);
     final int minY = Math.min(y1, y2);
@@ -566,9 +567,9 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     final Point bottomRight = viewport.toModelPoint(maxX, maxY);
 
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox boundingBox = geometryFactory.newBoundingBox(topLeft.getX(), topLeft.getY(),
-      bottomRight.getX(), bottomRight.getY());
-    return boundingBox;
+    return geometryFactory.bboxEditor() //
+      .addPoint(topLeft.getX(), topLeft.getY()) //
+      .addPoint(bottomRight.getX(), bottomRight.getY());
   }
 
   protected void newPropertyUndo(final Object object, final String propertyName,

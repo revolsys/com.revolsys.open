@@ -2,6 +2,7 @@ package com.revolsys.geometry.cs.projection;
 
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.number.Doubles;
 
 public class CoordinatesOperationPoint {
@@ -43,6 +44,10 @@ public class CoordinatesOperationPoint {
     this.y = point.getY();
     this.z = point.getZ();
     this.m = point.getM();
+  }
+
+  public void apply2d(final BiConsumerDouble action) {
+    action.accept(this.x, this.y);
   }
 
   public void copyCoordinatesTo(final double[] coordinates) {

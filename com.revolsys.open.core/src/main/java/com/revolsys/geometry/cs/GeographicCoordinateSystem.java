@@ -301,7 +301,7 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Area area = getArea();
     if (area != null) {
-      return area.getLatLonBounds().convert(geometryFactory);
+      return area.getLatLonBounds().bboxEdit(editor -> editor.setGeometryFactory(geometryFactory));
     } else {
       return geometryFactory.newBoundingBox(-180, -90, 180, 90);
     }

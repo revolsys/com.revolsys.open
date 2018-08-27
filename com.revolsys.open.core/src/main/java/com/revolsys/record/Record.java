@@ -17,7 +17,10 @@ import com.revolsys.collection.list.ListByIndexIterator;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.identifier.Identifiable;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.ListIdentifier;
@@ -32,7 +35,8 @@ import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordDefinitionProxy {
+public interface Record
+  extends MapEx, Comparable<Object>, Identifiable, RecordDefinitionProxy, BoundingBoxProxy {
   String EVENT_RECORD_CHANGED = "_recordChanged";
 
   String EXCLUDE_GEOMETRY = Record.class.getName() + ".excludeGeometry";
@@ -393,6 +397,16 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
   }
 
   @Override
+  default BoundingBox getBoundingBox() {
+    final Geometry geometry = getGeometry();
+    if (geometry == null) {
+      return null;
+    } else {
+      return geometry.getBoundingBox();
+    }
+  }
+
+  @Override
   default Byte getByte(final CharSequence name) {
     final Object value = getValue(name);
     if (Property.hasValue(value)) {
@@ -540,6 +554,11 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
       final int index = recordDefinition.getGeometryFieldIndex();
       return (T)getValue(index);
     }
+  }
+
+  @Override
+  default GeometryFactory getGeometryFactory() {
+    return RecordDefinitionProxy.super.getGeometryFactory();
   }
 
   @Override

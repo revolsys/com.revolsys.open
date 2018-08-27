@@ -62,7 +62,7 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
   }
 
   public void expandBoundingBox(final RStarLeaf<T> leaf) {
-    expand(leaf);
+    expandBbox(leaf);
     this.area = Double.NaN;
   }
 
@@ -160,7 +160,7 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
 
   public void recalculateBoundingBox() {
     clear();
-    this.items.forEach(this::expand);
+    this.items.forEach(this::expandBbox);
   }
 
   public boolean remove(final RStarTree<T> tree, final BoundingBox boundingBox,

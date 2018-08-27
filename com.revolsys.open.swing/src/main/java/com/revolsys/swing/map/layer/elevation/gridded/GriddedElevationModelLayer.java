@@ -393,9 +393,11 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
     final Project project = getProject();
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
-    final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)//
+    final BoundingBox boundingBox = layerBoundingBox.bboxEditor() //
+      .setGeometryFactory(geometryFactory) //
       .expandPercent(0.1)//
-      .clipToCoordinateSystem();
+      .clipToCoordinateSystem() //
+      .newBoundingBox();
 
     project.setViewBoundingBox(boundingBox);
   }

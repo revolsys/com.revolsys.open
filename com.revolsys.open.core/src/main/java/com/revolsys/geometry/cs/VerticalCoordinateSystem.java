@@ -179,7 +179,7 @@ public class VerticalCoordinateSystem extends AbstractCoordinateSystem {
     final Area area = getArea();
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (area != null) {
-      return area.getLatLonBounds().convert(geometryFactory);
+      return area.getLatLonBounds().bboxEdit(editor -> editor.setGeometryFactory(geometryFactory));
     } else {
       return geometryFactory.newBoundingBox(-180, -90, 180, 90);
     }

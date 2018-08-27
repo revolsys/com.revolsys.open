@@ -210,7 +210,12 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     BoundingBox boundingBox = layerBoundingBox;
-    boundingBox = boundingBox.convert(geometryFactory).expandPercent(0.1).clipToCoordinateSystem();
+    boundingBox = boundingBox //
+      .bboxEditor() //
+      .setGeometryFactory(geometryFactory) //
+      .expandPercent(0.1) //
+      .clipToCoordinateSystem() //
+      .newBoundingBox();
 
     project.setViewBoundingBox(boundingBox);
   }

@@ -164,8 +164,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
      * If the new bounding box has a zero width and height, expand it by 50 view units.
      */
     if (modelWidth == 0 && modelHeight == 0) {
-      validBoundingBox = validBoundingBox.expand(getModelUnitsPerViewUnit() * 50,
-        getModelUnitsPerViewUnit() * 50);
+      final double delta = getModelUnitsPerViewUnit() * 50;
+      validBoundingBox = validBoundingBox.bboxEdit(editor -> editor.expandDelta(delta));
       modelWidth = validBoundingBox.getWidth();
       modelHeight = validBoundingBox.getHeight();
     }
@@ -181,8 +181,9 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
       modelUnitsPerViewUnit = 2 * Math.pow(10, -this.maxDecimalDigits);
       final double minModelWidth = getViewWidthPixels() * modelUnitsPerViewUnit;
       final double minModelHeight = getViewHeightPixels() * modelUnitsPerViewUnit;
-      validBoundingBox = validBoundingBox.expand((minModelWidth - modelWidth) / 2,
-        (minModelHeight - modelHeight) / 2);
+      final double deltaX = (minModelWidth - modelWidth) / 2;
+      final double deltaY = (minModelHeight - modelHeight) / 2;
+      validBoundingBox = validBoundingBox.bboxEdit(editor -> editor.expandDelta(deltaX, deltaY));
     }
     return validBoundingBox;
   }
@@ -237,7 +238,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
       final BoundingBox boundingBox = getBoundingBox();
       if (Property.hasValue(boundingBox)) {
-        final BoundingBox newBoundingBox = boundingBox.convert(geometryFactory);
+        final BoundingBox newBoundingBox = boundingBox.toCs(geometryFactory);
         BoundingBox intersection = newBoundingBox.intersection(areaBoundingBox);
         if (intersection.isEmpty()) {
           intersection = areaBoundingBox;

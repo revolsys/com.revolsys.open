@@ -887,8 +887,13 @@ public interface Point extends Punctual, Serializable {
         }
 
         @Override
-        public double getMax(final int axisIndes) {
-          return getCoordinate(axisIndes);
+        public double getMax(final int axisIndex) {
+          final double coordinate = getCoordinate(axisIndex);
+          if (Double.isFinite(coordinate)) {
+            return coordinate;
+          } else {
+            return Double.NEGATIVE_INFINITY;
+          }
         }
 
         @Override
@@ -902,8 +907,13 @@ public interface Point extends Punctual, Serializable {
         }
 
         @Override
-        public double getMin(final int axisIndes) {
-          return getCoordinate(axisIndes);
+        public double getMin(final int axisIndex) {
+          final double coordinate = getCoordinate(axisIndex);
+          if (Double.isFinite(coordinate)) {
+            return coordinate;
+          } else {
+            return Double.POSITIVE_INFINITY;
+          }
         }
 
         @Override

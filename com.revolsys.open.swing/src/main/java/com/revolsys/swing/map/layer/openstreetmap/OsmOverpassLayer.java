@@ -96,7 +96,7 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
   }
 
   public List<BoundingBox> getTileBoundingBoxes(BoundingBox boundingBox) {
-    boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
+    boundingBox = boundingBox.toCs(OsmConstants.WGS84_2D);
     final List<BoundingBox> boundingBoxes = new ArrayList<>();
     final double minX = Math.floor(boundingBox.getMinX() * TILE_SCALE_X) / TILE_SCALE_X;
     final double minY = Math.floor(boundingBox.getMinY() * TILE_SCALE_Y) / TILE_SCALE_Y;

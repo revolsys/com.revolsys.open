@@ -25,10 +25,11 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 
 public class GeometryGraph extends Graph<LineSegment> {
 
-  private BoundingBox boundingBox;
+  private final BoundingBoxEditor boundingBox;
 
   private final List<Geometry> geometries = new ArrayList<>();
 
@@ -46,7 +47,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   public GeometryGraph(final GeometryFactory geometryFactory) {
     super(false);
     setGeometryFactory(geometryFactory);
-    this.boundingBox = geometryFactory.newBoundingBoxEmpty();
+    this.boundingBox = geometryFactory.bboxEditor();
     final double scaleXY = getGeometryFactory().getScaleXY();
     if (scaleXY > 0) {
       this.maxDistance = 1 / scaleXY;
@@ -109,7 +110,7 @@ public class GeometryGraph extends Graph<LineSegment> {
       }
     }
 
-    this.boundingBox = this.boundingBox.expandToInclude(geometry);
+    this.boundingBox.addBbox(geometry);
   }
 
   @Override

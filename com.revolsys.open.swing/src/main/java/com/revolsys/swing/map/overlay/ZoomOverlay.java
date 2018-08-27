@@ -357,7 +357,7 @@ public class ZoomOverlay extends AbstractOverlay {
       final Viewport2D viewport = getViewport();
 
       final BoundingBox boundingBox = newBoundingBox(viewport, this.zoomBoxX1, this.zoomBoxY1,
-        this.zoomBoxX2, this.zoomBoxY2);
+        this.zoomBoxX2, this.zoomBoxY2).newBoundingBox();
 
       if (boundingBox.isEmpty()) {
         Toolkit.getDefaultToolkit().beep();

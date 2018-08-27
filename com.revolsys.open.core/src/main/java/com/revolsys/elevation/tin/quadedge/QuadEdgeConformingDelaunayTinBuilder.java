@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -47,7 +46,6 @@ import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 /**
  * A utility class which creates Conforming Delaunay Trianglulations
@@ -160,13 +158,10 @@ public class QuadEdgeConformingDelaunayTinBuilder {
     if (this.subdivision != null) {
       return;
     }
-    final List<Point> points = this.sitePoints;
-
-    BoundingBox siteBoundingBox = BoundingBoxDoubleXY.newBoundingBox(points);
 
     List<LineSegmentDoubleData> segments = new ArrayList<>();
     if (this.constraintLines != null) {
-      siteBoundingBox = siteBoundingBox.expandToInclude(this.constraintLines.getBoundingBox());
+
       initVertices(this.constraintLines);
       segments = newConstraintSegments(this.constraintLines);
     }

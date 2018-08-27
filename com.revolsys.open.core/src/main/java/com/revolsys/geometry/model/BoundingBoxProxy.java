@@ -2,6 +2,8 @@ package com.revolsys.geometry.model;
 
 import java.util.function.BiFunction;
 
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
+
 public interface BoundingBoxProxy extends GeometryFactoryProxy {
   default boolean bboxCoveredBy(final BoundingBoxProxy boundingBox) {
     final BoundingBoxFunction<Boolean> action = BoundingBox::bboxCoveredBy;
@@ -46,6 +48,10 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
   default double bboxDistance(final Point point) {
     final BoundingBoxPointFunction<Double> action = BoundingBox::bboxDistance;
     return bboxWith(point, action, Double.POSITIVE_INFINITY);
+  }
+
+  default BoundingBoxEditor bboxEditor() {
+    return new BoundingBoxEditor(this);
   }
 
   default boolean bboxEquals(final BoundingBoxProxy boundingBox) {

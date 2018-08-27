@@ -19,7 +19,7 @@ public class OsmDocument implements OsmConstants {
 
   public static OsmDocument newDocument(final String serverUrl, BoundingBox boundingBox) {
     if (boundingBox != null) {
-      boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
+      boundingBox = boundingBox.toCs(OsmConstants.WGS84_2D);
       if (!boundingBox.isEmpty()) {
         final StringBuilder url = new StringBuilder(serverUrl);
         url.append("map?bbox=");

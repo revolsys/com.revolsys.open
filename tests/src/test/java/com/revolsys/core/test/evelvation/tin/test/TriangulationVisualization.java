@@ -36,10 +36,12 @@ public class TriangulationVisualization {
     double mapWidth = boundingBox.getWidth() + 4;
     double mapHeight = boundingBox.getHeight() + 4;
     if (mapHeight > mapWidth) {
-      boundingBox = boundingBox.expand((mapHeight - mapWidth) / 2, 0);
+      final double deltaX = (mapHeight - mapWidth) / 2;
+      boundingBox = boundingBox.bboxEdit(editor -> editor.expandDeltaX(deltaX));
       mapWidth = boundingBox.getWidth();
     } else if (mapHeight < mapWidth) {
-      boundingBox = boundingBox.expand(0, (mapWidth - mapHeight) / 2);
+      final double deltaY = (mapWidth - mapHeight) / 2;
+      boundingBox = boundingBox.bboxEdit(editor -> editor.expandDeltaY(deltaY));
       mapHeight = boundingBox.getHeight();
     }
 

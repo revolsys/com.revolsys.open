@@ -958,7 +958,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       } else if (this.boundingBox != null
         && !this.boundingBox.getGeometryFactory().isHasHorizontalCoordinateSystem()
         && geometryFactory.isHasHorizontalCoordinateSystem()) {
-        this.boundingBox = this.boundingBox.convert(geometryFactory);
+        this.boundingBox = this.boundingBox.toCs(geometryFactory);
       }
       return geometryFactory;
     }
@@ -1251,9 +1251,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     if (project != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox layerBoundingBox = getBoundingBox();
-      final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-        .clipToCoordinateSystem()
-        .expandPercent(0.1);
+      final BoundingBox boundingBox = layerBoundingBox.bboxEditor() //
+        .setGeometryFactory(geometryFactory) //
+        .clipToCoordinateSystem() //
+        .expandPercent(0.1) //
+        .newBoundingBox();
       project.setViewBoundingBox(boundingBox);
     }
   }

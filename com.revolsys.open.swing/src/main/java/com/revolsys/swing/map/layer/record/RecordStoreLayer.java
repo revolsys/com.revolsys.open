@@ -569,7 +569,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
         synchronized (getSync()) {
-          final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
+          final BoundingBox loadBoundingBox = boundingBox
+            .bboxEdit(editor -> editor.expandPercent(0.2));
           if (!this.loadedBoundingBox.bboxCovers(boundingBox)
             && !this.loadingBoundingBox.bboxCovers(boundingBox)) {
             if (this.loadingWorker != null) {

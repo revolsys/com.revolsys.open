@@ -501,16 +501,16 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return modelToScreenTransform;
   }
 
+  public abstract ViewRenderer newViewRenderer();
+
   public Graphics2DViewRender newViewRenderer(final Graphics graphics) {
     return new Graphics2DViewRender(this, (Graphics2D)graphics);
   }
 
-  public abstract ViewRenderer newViewRenderer();
-
   public BoundingBox setBoundingBox(BoundingBox boundingBox) {
     if (boundingBox != null && !boundingBox.isEmpty()) {
       final GeometryFactory geometryFactory = getGeometryFactory2dFloating();
-      boundingBox = boundingBox.convert(geometryFactory);
+      boundingBox = boundingBox.toCs(geometryFactory);
       if (!boundingBox.isEmpty()) {
         BoundingBox newBoundingBox = boundingBox;
         double width = newBoundingBox.getWidth();
@@ -526,12 +526,12 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
             if (aspectRatio < viewAspectRatio) {
               final double newWidth = height * viewAspectRatio;
               final double expandX = (newWidth - width) / 2;
-              newBoundingBox = newBoundingBox.expand(expandX, 0);
+              newBoundingBox = newBoundingBox.bboxEdit(editor -> editor.expandDeltaX(expandX));
               width = newBoundingBox.getWidth();
             } else if (aspectRatio > viewAspectRatio) {
               final double newHeight = width / viewAspectRatio;
               final double expandY = (newHeight - height) / 2;
-              newBoundingBox = newBoundingBox.expand(0, expandY);
+              newBoundingBox = newBoundingBox.bboxEdit(editor -> editor.expandDeltaY(expandY));
             }
           }
           unitsPerPixel = width / viewWidthPixels;

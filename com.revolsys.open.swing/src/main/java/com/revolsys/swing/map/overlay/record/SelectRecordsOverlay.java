@@ -21,6 +21,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
@@ -398,23 +399,24 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       if (clearOverlayAction(ACTION_SELECT_RECORDS)) {
         final Viewport2D viewport = getViewport();
 
-        BoundingBox boundingBox = newBoundingBox(viewport, this.selectBoxX1, this.selectBoxY1,
-          this.selectBoxX2, this.selectBoxY2);
+        final BoundingBoxEditor boundingBox = newBoundingBox(viewport, this.selectBoxX1,
+          this.selectBoxY1, this.selectBoxX2, this.selectBoxY2);
 
         final double minSize = viewport.getModelUnitsPerViewUnit() * 10;
         final double width = boundingBox.getWidth();
         double deltaX = 0;
         if (width < minSize) {
           deltaX = (minSize - width) / 2;
+          boundingBox.expandDeltaX(deltaX);
         }
         final double height = boundingBox.getWidth();
         double deltaY = 0;
         if (height < minSize) {
           deltaY = (minSize - height) / 2;
+          boundingBox.expandDeltaY(deltaY);
         }
-        boundingBox = boundingBox.expand(deltaX, deltaY);
         if (!boundingBox.isEmpty()) {
-          doSelectRecords(event, boundingBox);
+          doSelectRecords(event, boundingBox.newBoundingBox());
         }
         selectBoxClear();
         if (isMouseInMap()) {

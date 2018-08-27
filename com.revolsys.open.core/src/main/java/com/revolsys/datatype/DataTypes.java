@@ -81,7 +81,7 @@ public final class DataTypes {
     Booleans::valueOf);
 
   public static final DataType BOUNDING_BOX = new FunctionDataType("boolean", BoundingBox.class,
-    BoundingBox::newBoundingBox);
+    BoundingBox::bboxGet);
 
   public static final DataType BYTE = new Bytes();
 

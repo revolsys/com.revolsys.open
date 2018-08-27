@@ -18,21 +18,17 @@ import javax.measure.quantity.Length;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.RectangleXY;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.geometry.util.OutCode;
-import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.logging.Logs;
-import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Exceptions;
@@ -47,6 +43,36 @@ import tec.uom.se.unit.Units;
 
 public interface BoundingBox
   extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
+  static BoundingBox bboxGet(final Object value) {
+    if (value == null) {
+      return empty();
+    } else if (value instanceof BoundingBoxProxy) {
+      return ((BoundingBoxProxy)value).getBoundingBox();
+    } else {
+      final String string = DataTypes.toString(value);
+      return BoundingBox.newBoundingBox(string);
+    }
+  }
+
+  public static BoundingBox bboxNew(final BoundingBoxProxy... boundingBoxes) {
+    return new BoundingBoxEditor() //
+      .addAllBbox(boundingBoxes) //
+      .newBoundingBox();
+  }
+
+  public static BoundingBox bboxNew(final GeometryFactoryProxy geometryFactory,
+    final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
+    return new BoundingBoxEditor(geometryFactory) //
+      .addAllBbox(boundingBoxes) //
+      .newBoundingBox();
+  }
+
+  public static BoundingBox bboxNew(final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
+    return new BoundingBoxEditor() //
+      .addAllBbox(boundingBoxes) //
+      .newBoundingBox();
+  }
+
   static BoundingBox empty() {
     return GeometryFactory.DEFAULT_3D.newBoundingBoxEmpty();
   }
@@ -107,20 +133,6 @@ public interface BoundingBox
     final List<V> values = newArray(forEachFunction, boundingBoxProxy, filter);
     values.sort(comparator);
     return values;
-  }
-
-  static BoundingBox newBoundingBox(final Object value) {
-    if (value == null) {
-      return empty();
-    } else if (value instanceof BoundingBox) {
-      return (BoundingBox)value;
-    } else if (value instanceof Geometry) {
-      final Geometry geometry = (Geometry)value;
-      return geometry.getBoundingBox();
-    } else {
-      final String string = DataTypes.toString(value);
-      return BoundingBox.newBoundingBox(string);
-    }
   }
 
   static BoundingBox newBoundingBox(final String wkt) {
@@ -329,6 +341,11 @@ public interface BoundingBox
     }
   }
 
+  default BoundingBox bboxEdit(final Consumer<BoundingBoxEditor> action) {
+    return new BoundingBoxEditor(this) //
+      .newBoundingBox();
+  }
+
   /**
    *  Check if the point <code>(x, y)</code>
    *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
@@ -388,7 +405,7 @@ public interface BoundingBox
       BoundingBox boundingBox2 = boundingBox.getBoundingBox();
       if (isProjectionRequired(boundingBox2)) {
         // TODO just convert points
-        boundingBox2 = boundingBox2.convert(getGeometryFactory());
+        boundingBox2 = boundingBox2.toCs(getGeometryFactory());
       }
       if (!boundingBox2.isEmpty()) {
         final double minX = boundingBox2.getMinX();
@@ -434,20 +451,6 @@ public interface BoundingBox
     return minX2 <= minX && maxX <= maxX2 && minY2 <= minY && maxY <= maxY2;
   }
 
-  /**
-   * If the coordinate system is a projected coordinate system then clip to the {@link CoordinateSystem#getAreaBoundingBox()}.
-   */
-  default BoundingBox clipToCoordinateSystem() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-    if (coordinateSystem == null || coordinateSystem instanceof GeographicCoordinateSystem) {
-      return this;
-    } else {
-      final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
-      return intersection(areaBoundingBox);
-    }
-  }
-
   default BoundingBox clone() {
     return this;
   }
@@ -466,109 +469,6 @@ public interface BoundingBox
       }
     } else {
       return false;
-    }
-  }
-
-  default BoundingBox convert(final GeometryFactory geometryFactory) {
-    final GeometryFactory factory = getGeometryFactory();
-    if (isEmpty()) {
-      return geometryFactory.newBoundingBoxEmpty();
-    } else if (geometryFactory == null) {
-      return this;
-    } else if (factory == geometryFactory) {
-      return this;
-    } else {
-      if (factory == null || factory.getHorizontalCoordinateSystem() == null) {
-        final int axisCount = Math.min(geometryFactory.getAxisCount(), getAxisCount());
-        final double[] minMaxValues = getMinMaxValues(axisCount);
-        return geometryFactory.newBoundingBox(axisCount, minMaxValues);
-      } else if (isEmpty()) {
-        return newBoundingBoxEmpty();
-      } else {
-        final CoordinatesOperation operation = factory.getCoordinatesOperation(geometryFactory);
-        if (operation != null) {
-
-          double xStep = getWidth() / 10;
-          double yStep = getHeight() / 10;
-          final double scaleXY = geometryFactory.getScaleXY();
-          if (scaleXY > 0) {
-            if (xStep < 1 / scaleXY) {
-              xStep = 1 / scaleXY;
-            }
-            if (yStep < 1 / scaleXY) {
-              yStep = 1 / scaleXY;
-            }
-          }
-
-          final double minX = getMinX();
-          final double maxX = getMaxX();
-          final double minY = getMinY();
-          final double maxY = getMaxY();
-
-          final double[] bounds = getMinMaxValues(2);
-          bounds[0] = Double.NaN;
-          bounds[1] = Double.NaN;
-          bounds[2] = Double.NaN;
-          bounds[3] = Double.NaN;
-
-          final CoordinatesOperationPoint to = new CoordinatesOperationPoint();
-          expand(geometryFactory, bounds, operation, to, minX, minY);
-          expand(geometryFactory, bounds, operation, to, minX, maxY);
-          expand(geometryFactory, bounds, operation, to, minX, minY);
-          expand(geometryFactory, bounds, operation, to, maxX, minY);
-
-          if (xStep != 0) {
-            for (double x = minX + xStep; x < maxX; x += xStep) {
-              expand(geometryFactory, bounds, operation, to, x, minY);
-              expand(geometryFactory, bounds, operation, to, x, maxY);
-            }
-          }
-          if (yStep != 0) {
-            for (double y = minY + yStep; y < maxY; y += yStep) {
-              expand(geometryFactory, bounds, operation, to, minX, y);
-              expand(geometryFactory, bounds, operation, to, maxX, y);
-            }
-          }
-          return geometryFactory.newBoundingBox(2, bounds);
-        } else {
-          return this;
-        }
-      }
-    }
-  }
-
-  default BoundingBox convert(GeometryFactory geometryFactory, final int axisCount) {
-    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (geometryFactory == null || sourceGeometryFactory == null) {
-      return this;
-    } else {
-      geometryFactory = geometryFactory.convertAxisCount(axisCount);
-      boolean copy = false;
-      if (geometryFactory != null && sourceGeometryFactory != geometryFactory) {
-        final int srid = getHorizontalCoordinateSystemId();
-        final int srid2 = geometryFactory.getHorizontalCoordinateSystemId();
-        if (srid <= 0) {
-          if (srid2 > 0) {
-            copy = true;
-          }
-        } else if (srid != srid2) {
-          copy = true;
-        }
-        if (!copy) {
-          for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-            final double scale = sourceGeometryFactory.getScale(axisIndex);
-            final double scale1 = geometryFactory.getScale(axisIndex);
-            if (!Doubles.equal(scale, scale1)) {
-              copy = true;
-            }
-          }
-        }
-      }
-      if (copy) {
-        return convert(geometryFactory);
-      } else {
-        return this;
-      }
     }
   }
 
@@ -644,124 +544,6 @@ public interface BoundingBox
         return newBoundingBox(x1, y1, x2, y2);
       }
     }
-  }
-
-  default void expand(final GeometryFactory geometryFactory, final double[] bounds,
-    final CoordinatesOperation operation, final CoordinatesOperationPoint point, final double x,
-    final double y) {
-    point.setPoint(x, y);
-    operation.perform(point);
-    RectangleUtil.expand(geometryFactory, bounds, point.x, point.y);
-  }
-
-  default BoundingBox expand(final Point point) {
-    if (isEmpty()) {
-      return point.newBoundingBox();
-    } else {
-      final double x = point.getX();
-      final double y = point.getY();
-
-      double minX = getMinX();
-      double maxX = getMaxX();
-      double minY = getMinY();
-      double maxY = getMaxY();
-
-      if (x < minX) {
-        minX = x;
-      }
-      if (x > maxX) {
-        maxX = x;
-      }
-      if (y < minY) {
-        minY = y;
-      }
-      if (y > maxY) {
-        maxY = y;
-      }
-      return newBoundingBox(minX, minY, maxX, maxY);
-    }
-  }
-
-  default BoundingBox expandPercent(final double factor) {
-    return expandPercent(factor, factor);
-  }
-
-  default BoundingBox expandPercent(final double factorX, final double factorY) {
-    if (isEmpty()) {
-      return this;
-    } else {
-      final double deltaX = getWidth() * factorX / 2;
-      final double deltaY = getHeight() * factorY / 2;
-      return expand(deltaX, deltaY);
-    }
-  }
-
-  default BoundingBox expandToInclude(final BoundingBox other) {
-    if (other == null || other.isEmpty()) {
-      return this;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final BoundingBox convertedOther = other.convert(geometryFactory);
-      if (isEmpty()) {
-        return convertedOther;
-      } else if (bboxCovers(convertedOther)) {
-        return this;
-      } else {
-        final double minX = Math.min(getMinX(), convertedOther.getMinX());
-        final double maxX = Math.max(getMaxX(), convertedOther.getMaxX());
-        final double minY = Math.min(getMinY(), convertedOther.getMinY());
-        final double maxY = Math.max(getMaxY(), convertedOther.getMaxY());
-        return newBoundingBox(minX, minY, maxX, maxY);
-      }
-    }
-  }
-
-  default BoundingBox expandToInclude(final BoundingBoxProxy other) {
-    if (other == null) {
-      return this;
-    } else {
-      final BoundingBox boundingBox = other.getBoundingBox();
-      return expandToInclude(boundingBox);
-    }
-  }
-
-  default BoundingBox expandToInclude(final double... coordinates) {
-    if (coordinates == null || coordinates.length < 2) {
-      return this;
-    } else {
-      final double[] bounds;
-      final int axisCount = getAxisCount();
-      if (isEmpty()) {
-        bounds = RectangleUtil.newBounds(axisCount);
-      } else {
-        bounds = getMinMaxValues();
-      }
-      RectangleUtil.expand(bounds, axisCount, coordinates);
-      return newBoundingBox(axisCount, bounds);
-    }
-  }
-
-  default BoundingBox expandToInclude(final Geometry geometry) {
-    if (geometry == null || geometry.isEmpty()) {
-      return this;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Geometry convertedGeometry = geometry.convertGeometry(geometryFactory);
-      final BoundingBox box = convertedGeometry.getBoundingBox();
-      return expandToInclude(box);
-    }
-  }
-
-  default BoundingBox expandToInclude(final Point point) {
-    return expandToInclude((Geometry)point);
-  }
-
-  default BoundingBox expandToInclude(final Record object) {
-    if (object != null) {
-      final Geometry geometry = object.getGeometry();
-      return expandToInclude(geometry);
-    }
-    return this;
   }
 
   /**
@@ -888,7 +670,7 @@ public interface BoundingBox
   }
 
   default double getMax(final int i) {
-    return Double.NaN;
+    return Double.NEGATIVE_INFINITY;
   }
 
   default <Q extends Quantity<Q>> Quantity<Q> getMaximum(final int axisIndex) {
@@ -930,7 +712,7 @@ public interface BoundingBox
   }
 
   default double getMin(final int i) {
-    return Double.NaN;
+    return Double.POSITIVE_INFINITY;
   }
 
   default <Q extends Quantity<Q>> Quantity<Q> getMinimum(final int axisIndex) {
@@ -1079,7 +861,7 @@ public interface BoundingBox
    */
   default BoundingBox intersection(final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
+    final BoundingBox convertedBoundingBox = boundingBox.toCs(geometryFactory);
     if (isEmpty() || convertedBoundingBox.isEmpty() || !bboxIntersects(convertedBoundingBox)) {
       return newBoundingBoxEmpty();
     } else {
@@ -1191,6 +973,16 @@ public interface BoundingBox
     }
 
     return area;
+  }
+
+  default BoundingBox toCs(final GeometryFactoryProxy geometryFactory) {
+    if (!isEmpty() || isProjectionRequired(geometryFactory)) {
+      return bboxEditor() //
+        .setGeometryFactory(geometryFactory) //
+        .newBoundingBox();
+    } else {
+      return this;
+    }
   }
 
   /**

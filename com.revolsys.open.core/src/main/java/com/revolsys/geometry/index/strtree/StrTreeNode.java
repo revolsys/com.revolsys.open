@@ -67,7 +67,7 @@ public class StrTreeNode<I> extends BoundingBoxDoubleXY
       final double minY = child.getMinY();
       final double maxX = child.getMaxX();
       final double maxY = child.getMaxY();
-      expand(minX, minY, maxX, maxY);
+      expandBbox(minX, minY, maxX, maxY);
     }
   }
 

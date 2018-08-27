@@ -87,6 +87,7 @@ import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.StringWriter;
@@ -114,6 +115,7 @@ import com.revolsys.util.function.Consumer3Double;
  * @version 1.7
  */
 public abstract class GeometryFactory implements GeometryFactoryProxy, Serializable, MapSerializer {
+
   private class EmptyGeometryCollection implements GeometryCollection {
     private static final long serialVersionUID = -5694727726395021467L;
 
@@ -886,6 +888,10 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
         }
       }
     }
+  }
+
+  public BoundingBoxEditor bboxEditor() {
+    return new BoundingBoxEditor(this);
   }
 
   /**

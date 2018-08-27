@@ -118,8 +118,8 @@ public class BoundingBoxTest implements TestConstants {
       }
     }
     wkt.append("BBOX");
-    assertMinMax(boundingBox, -1, Double.NaN, Double.NaN);
-    assertMinMax(boundingBox, axisCount + 1, Double.NaN, Double.NaN);
+    assertMinMax(boundingBox, -1, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
+    assertMinMax(boundingBox, axisCount + 1, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
     double width = 0;
     double height = 0;
 
@@ -179,8 +179,16 @@ public class BoundingBoxTest implements TestConstants {
           0);
       }
     }
-    Assert.assertEquals("MinX", minX, boundingBox.getMinX(), 0);
-    Assert.assertEquals("MaxX", maxX, boundingBox.getMaxX(), 0);
+    if (Double.isNaN(minX)) {
+      Assert.assertEquals("MinX", Double.POSITIVE_INFINITY, boundingBox.getMinX(), 0);
+    } else {
+      Assert.assertEquals("MinX", minX, boundingBox.getMinX(), 0);
+    }
+    if (Double.isNaN(maxX)) {
+      Assert.assertEquals("MaxX", Double.NEGATIVE_INFINITY, boundingBox.getMaxX(), 0);
+    } else {
+      Assert.assertEquals("MaxX", maxX, boundingBox.getMaxX(), 0);
+    }
 
     if (!boundingBox.isEmpty()) {
       Assert.assertEquals("MinimumX", Quantities.getQuantity(minX, unit),
@@ -199,8 +207,16 @@ public class BoundingBoxTest implements TestConstants {
       Assert.assertEquals("MinimumY", minY, boundingBox.getMinimum(1, unit), 0);
       Assert.assertEquals("MaximumY", maxY, boundingBox.getMaximum(1, unit), 0);
     }
-    Assert.assertEquals("MinY", minY, boundingBox.getMinY(), 0);
-    Assert.assertEquals("MaxY", maxY, boundingBox.getMaxY(), 0);
+    if (Double.isNaN(minY)) {
+      Assert.assertEquals("MinY", Double.POSITIVE_INFINITY, boundingBox.getMinY(), 0);
+    } else {
+      Assert.assertEquals("MinY", minY, boundingBox.getMinY(), 0);
+    }
+    if (Double.isNaN(maxX)) {
+      Assert.assertEquals("MaxY", Double.NEGATIVE_INFINITY, boundingBox.getMaxY(), 0);
+    } else {
+      Assert.assertEquals("MaxY", maxY, boundingBox.getMaxY(), 0);
+    }
 
     Assert.assertEquals("WKT", wkt.toString(), boundingBox.toString());
     Assert.assertEquals("Area", area, boundingBox.getArea(), 0);
@@ -275,7 +291,7 @@ public class BoundingBoxTest implements TestConstants {
   @Test
   public void testConstructorCoordinatesArray() {
 
-    final BoundingBox emptyList = BoundingBoxDoubleXY.newBoundingBox(new Point[0]);
+    final BoundingBox emptyList = BoundingBox.bboxNew(new Point[0]);
     assertBoundingBox(null, emptyList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     // Different number of axis and values
@@ -333,23 +349,20 @@ public class BoundingBoxTest implements TestConstants {
 
   @Test
   public void testConstructorIterable() {
-    final BoundingBox emptyNull = BoundingBoxDoubleXY.newBoundingBox((Iterable<Point>)null);
+    final BoundingBox emptyNull = BoundingBox.bboxNew((Iterable<Point>)null);
     assertBoundingBox(null, emptyNull, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
-    final BoundingBox emptyList = BoundingBoxDoubleXY.newBoundingBox(new ArrayList<Point>());
+    final BoundingBox emptyList = BoundingBox.bboxNew(new ArrayList<Point>());
     assertBoundingBox(null, emptyList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
-    final BoundingBox emptyListWithNulls = BoundingBoxDoubleXY
-      .newBoundingBox(Collections.<Point> singleton(null));
+    final BoundingBox emptyListWithNulls = BoundingBox.bboxNew(Collections.<Point> singleton(null));
     assertBoundingBox(null, emptyListWithNulls, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
-    final BoundingBox emptyNullCoordinatesList = BoundingBoxDoubleXY
-      .newBoundingBox((Iterable<Point>)null);
+    final BoundingBox emptyNullCoordinatesList = BoundingBox.bboxNew((Iterable<Point>)null);
     assertBoundingBox(null, emptyNullCoordinatesList, GeometryFactory.DEFAULT_3D, true, 2,
       NULL_BOUNDS);
 
-    final BoundingBox emptyCoordinatesList = BoundingBoxDoubleXY
-      .newBoundingBox(new ArrayList<Point>());
+    final BoundingBox emptyCoordinatesList = BoundingBox.bboxNew(new ArrayList<Point>());
     assertBoundingBox(null, emptyCoordinatesList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     // Different number of axis and values

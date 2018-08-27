@@ -148,7 +148,7 @@ public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
 
   public List<R> queryIntersects(final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
+    final BoundingBox convertedBoundingBox = boundingBox.toCs(geometryFactory);
     if (convertedBoundingBox.isEmpty()) {
       return Arrays.asList();
     } else {

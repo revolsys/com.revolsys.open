@@ -121,8 +121,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     CoordinateSystemField.promptCoordinateSystem(baseName, boundingBoxProxy, geometryFactory -> {
       final Project project = Project.get();
       final MapPanel mapPanel = project.getMapPanel();
-      BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
-      boundingBox = boundingBox.convert(geometryFactory);
+      final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox() //
+        .bboxEdit(editor -> editor.setGeometryFactory(geometryFactory));
       mapPanel.zoomToBoundingBox(boundingBox);
     });
   }
@@ -816,7 +816,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public void panToBoundingBox(BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    boundingBox = boundingBox.convert(geometryFactory);
+    boundingBox = boundingBox.toCs(geometryFactory);
     final Viewport2D viewport = getViewport();
     if (!RectangleUtil.isEmpty(boundingBox)) {
       final Point centre = boundingBox.getCentre();
@@ -1254,7 +1254,12 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
    */
   public void zoomToBoundingBox(BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    boundingBox = boundingBox.convert(geometryFactory).expandPercent(0.1);
+    boundingBox = boundingBox //
+      .bboxEditor() //
+      .setGeometryFactory(geometryFactory) //
+      .expandPercent(0.1) //
+      .newBoundingBox() //
+    ;
     setBoundingBox(boundingBox);
   }
 

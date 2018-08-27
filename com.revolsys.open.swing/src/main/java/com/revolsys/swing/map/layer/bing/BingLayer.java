@@ -76,7 +76,7 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
-        .convert(GEOMETRY_FACTORY)
+        .toCs(GEOMETRY_FACTORY)
         .intersection(MAX_BOUNDING_BOX);
       final double minX = geographicBoundingBox.getMinX();
       final double minY = geographicBoundingBox.getMinY();

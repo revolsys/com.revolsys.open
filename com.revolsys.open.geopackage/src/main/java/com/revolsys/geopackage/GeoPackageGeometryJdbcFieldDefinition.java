@@ -363,7 +363,7 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       }
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
-      boundingBox = boundingBox.convert(this.geometryFactory);
+      boundingBox = boundingBox.toCs(this.geometryFactory);
       // TODO
       return null;
     } else {

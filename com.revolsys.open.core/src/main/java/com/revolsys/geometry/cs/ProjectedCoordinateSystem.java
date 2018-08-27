@@ -331,10 +331,11 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
       boundingBox = geographicGeometryFactory.newBoundingBox(-180, -90, 180, 90);
     } else {
       final BoundingBox latLonBounds = area.getLatLonBounds();
-      boundingBox = latLonBounds.convert(geographicGeometryFactory);
+      boundingBox = latLonBounds
+        .bboxEdit(editor -> editor.setGeometryFactory(geographicGeometryFactory));
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return boundingBox.convert(geometryFactory);
+    return boundingBox.bboxEdit(editor -> editor.setGeometryFactory(geometryFactory));
   }
 
   @Override

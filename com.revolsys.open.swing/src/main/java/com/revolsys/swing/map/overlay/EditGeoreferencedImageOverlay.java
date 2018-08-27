@@ -348,7 +348,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
   }
 
   private GeoreferencedImage getCachedImage(BoundingBox boundingBox) {
-    boundingBox = boundingBox.convert(getViewportGeometryFactory());
+    boundingBox = boundingBox.toCs(getViewportGeometryFactory());
     final Viewport2D viewport = getViewport();
     final BoundingBox viewBoundingBox = viewport.getBoundingBox();
     if (this.cachedImage == null || !this.cachedImage.getBoundingBox().equals(viewBoundingBox)) {
@@ -653,7 +653,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         int closestIndex = -1;
         BoundingBox imageBoundingBox = getImageBoundingBox();
         if (!imageBoundingBox.isEmpty()) {
-          imageBoundingBox = imageBoundingBox.convert(viewportGeometryFactory);
+          imageBoundingBox = imageBoundingBox.toCs(viewportGeometryFactory);
           for (int i = 0; i < 4; i++) {
             final Point point = imageBoundingBox.getCornerPoint(i);
             final Point mapPoint = point.convertPoint2d(viewportGeometryFactory);
@@ -977,7 +977,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
       view.drawDifferentCoordinateSystem(imageBoundingBox);
 
       if (outlineBoundingBox != null && !outlineBoundingBox.isEmpty()) {
-        final Polygon imageBoundary = outlineBoundingBox.convert(getViewportGeometryFactory())
+        final Polygon imageBoundary = outlineBoundingBox.toCs(getViewportGeometryFactory())
           .toPolygon(1);
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_OFF);

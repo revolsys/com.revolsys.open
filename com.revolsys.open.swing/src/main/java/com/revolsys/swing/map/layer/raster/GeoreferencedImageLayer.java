@@ -15,6 +15,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.logging.Logs;
@@ -135,9 +136,11 @@ public class GeoreferencedImageLayer extends AbstractLayer {
         final double imageRatio = this.image.getImageAspectRatio();
         BoundingBox boundingBox;
         if (viewRatio > imageRatio) {
-          boundingBox = viewBoundingBox.expandPercent(-1 + imageRatio / viewRatio, 0.0);
+          boundingBox = viewBoundingBox
+            .bboxEdit(editor -> editor.expandPercent(-1 + imageRatio / viewRatio, 0.0));
         } else if (viewRatio < imageRatio) {
-          boundingBox = viewBoundingBox.expandPercent(0.0, -1 + viewRatio / imageRatio);
+          boundingBox = viewBoundingBox
+            .bboxEdit(editor -> editor.expandPercent(0.0, -1 + viewRatio / imageRatio));
         } else {
           boundingBox = viewBoundingBox;
         }
@@ -339,7 +342,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     if (image == null) {
       setExists(false);
     } else {
-      GeometryFactory geometryFactory = image.getGeometryFactory();
+      final GeometryFactory geometryFactory = image.getGeometryFactory();
       setGeometryFactory(geometryFactory);
       setExists(true);
       Property.addListener(image, this);
@@ -463,7 +466,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     final Project project = getProject();
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
-    BoundingBox boundingBox = layerBoundingBox;
+    final BoundingBoxEditor boundingBox = layerBoundingBox.bboxEditor();
     final AffineTransform transform = this.image.getAffineTransformation(layerBoundingBox);
     if (!transform.isIdentity()) {
       final GeoreferencedImage image = getImage();
@@ -474,10 +477,13 @@ public class GeoreferencedImageLayer extends AbstractLayer {
         true, 0, height, width, height, width, 0, 0, 0, 0, height);
       final LineString line = layerBoundingBox.getGeometryFactory().lineString(2,
         targetCoordinates);
-      boundingBox = boundingBox.expandToInclude(line);
+      boundingBox.addGeometry(line);
     }
-    boundingBox = boundingBox.convert(geometryFactory).expandPercent(0.1).clipToCoordinateSystem();
-
-    project.setViewBoundingBox(boundingBox);
+    final BoundingBox boundingBox1 = boundingBox //
+      .setGeometryFactory(geometryFactory) //
+      .expandPercent(0.1) //
+      .clipToCoordinateSystem() //
+      .newBoundingBox();
+    project.setViewBoundingBox(boundingBox1);
   }
 }

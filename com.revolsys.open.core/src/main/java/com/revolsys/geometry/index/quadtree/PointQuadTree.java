@@ -81,7 +81,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public List<T> findWithin(BoundingBox boundingBox) {
     if (this.geometryFactory != null) {
-      boundingBox = boundingBox.convert(this.geometryFactory);
+      boundingBox = boundingBox.toCs(this.geometryFactory);
     }
     final List<T> results = new ArrayList<>();
     if (this.root != null) {
