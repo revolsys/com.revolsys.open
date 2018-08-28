@@ -314,7 +314,7 @@ public class RectangleXY extends AbstractPolygon {
 
   @Override
   public boolean contains(final double x, final double y) {
-    if (x < this.minX || this.maxX < x || y < this.minY || this.maxY < y) {
+    if (x <= this.minX || this.maxX <= x || y <= this.minY || this.maxY <= y) {
       return false;
     } else {
       return true;

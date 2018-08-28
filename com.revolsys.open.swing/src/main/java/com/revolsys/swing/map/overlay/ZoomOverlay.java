@@ -274,11 +274,11 @@ public class ZoomOverlay extends AbstractOverlay {
           final double deltaX = fromPoint.getX() - toPoint.getX();
           final double deltaY = fromPoint.getY() - toPoint.getY();
 
-          final BoundingBox boundingBox = viewport.getBoundingBox();
-          final BoundingBox newBoundingBox = boundingBox.move(deltaX, deltaY);
+          final BoundingBox boundingBox = viewport.getBoundingBox() //
+            .bboxEdit(editor -> editor.move(deltaX, deltaY));
 
           final MapPanel map = getMap();
-          map.setBoundingBox(newBoundingBox);
+          map.setBoundingBox(boundingBox);
         }
         panClear();
         repaint();

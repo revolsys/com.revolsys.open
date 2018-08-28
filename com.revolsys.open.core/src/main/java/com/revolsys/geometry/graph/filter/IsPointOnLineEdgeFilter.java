@@ -12,15 +12,16 @@ public class IsPointOnLineEdgeFilter<T> implements Predicate<Node<T>> {
 
   private final Edge<T> edge;
 
-  private BoundingBox boundingBox;
+  private final BoundingBox boundingBox;
 
   private final double maxDistance;
 
   public IsPointOnLineEdgeFilter(final Edge<T> edge, final double maxDistance) {
     this.edge = edge;
     this.maxDistance = maxDistance;
-    this.boundingBox = edge.getBoundingBox();
-    this.boundingBox = this.boundingBox.expand(maxDistance);
+    this.boundingBox = edge.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
   }
 
   public com.revolsys.geometry.model.BoundingBox getEnvelope() {

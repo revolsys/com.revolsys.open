@@ -56,7 +56,7 @@ public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
 
   private final LineSegmentMatch edgeMatch;
 
-  private BoundingBox envelope;
+  private final BoundingBox envelope;
 
   private final Node<LineSegmentMatch> fromNode;
 
@@ -72,8 +72,9 @@ public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
     this.index = index;
     this.tolerance = tolerance;
 
-    this.envelope = edge.getBoundingBox();
-    this.envelope = this.envelope.expand(tolerance);
+    this.envelope = edge.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(tolerance);
 
     this.edgeMatch = edge.getObject();
     this.fromNode = edge.getFromNode();

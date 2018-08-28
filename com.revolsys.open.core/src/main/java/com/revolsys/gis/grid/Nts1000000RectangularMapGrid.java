@@ -147,7 +147,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
-    final BoundingBox envelope = boundingBox.toCs(getGeometryFactory());
+    final BoundingBox envelope = boundingBox.bboxToCs(getGeometryFactory());
     final List<RectangularMapTile> tiles = new ArrayList<>();
     final int minXCeil = (int)Math.ceil(envelope.getMinX() / this.tileWidth);
     final double minX = minXCeil * this.tileWidth;

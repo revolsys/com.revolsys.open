@@ -426,14 +426,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
 
   private static final long serialVersionUID = 4328651897279304108L;
 
-  public static final BoundingBox boundingBox(final Geometry geometry) {
-    if (geometry == null) {
-      return DEFAULT_3D.newBoundingBoxEmpty();
-    } else {
-      return geometry.getBoundingBox();
-    }
-  }
-
   public static void clear() {
     factoryFloatingBySridAndAxisCount.clear();
     factoriesBySrid.clear();

@@ -43,6 +43,29 @@ import tec.uom.se.unit.Units;
 
 public interface BoundingBox
   extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
+  public static BoundingBoxEditor bboxEditor(final BoundingBoxProxy... boundingBoxes) {
+    return new BoundingBoxEditor() //
+      .addAllBbox(boundingBoxes);
+  }
+
+  public static BoundingBoxEditor bboxEditor(final GeometryFactoryProxy geometryFactory,
+    final BoundingBoxProxy... boundingBoxes) {
+    return new BoundingBoxEditor(geometryFactory) //
+      .addAllBbox(boundingBoxes);
+  }
+
+  public static BoundingBoxEditor bboxEditor(final GeometryFactoryProxy geometryFactory,
+    final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
+    return new BoundingBoxEditor(geometryFactory) //
+      .addAllBbox(boundingBoxes);
+  }
+
+  public static BoundingBoxEditor bboxEditor(
+    final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
+    return new BoundingBoxEditor() //
+      .addAllBbox(boundingBoxes);
+  }
+
   static BoundingBox bboxGet(final Object value) {
     if (value == null) {
       return empty();
@@ -55,8 +78,7 @@ public interface BoundingBox
   }
 
   public static BoundingBox bboxNew(final BoundingBoxProxy... boundingBoxes) {
-    return new BoundingBoxEditor() //
-      .addAllBbox(boundingBoxes) //
+    return bboxEditor(boundingBoxes) //
       .newBoundingBox();
   }
 
@@ -206,14 +228,14 @@ public interface BoundingBox
       s.append("(");
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         if (axisIndex > 0) {
-          s.append(',');
+          s.append(' ');
         }
         s.append(Doubles.toString(boundingBox.getMin(axisIndex)));
       }
-      s.append(' ');
+      s.append(',');
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         if (axisIndex > 0) {
-          s.append(',');
+          s.append(' ');
         }
         s.append(Doubles.toString(boundingBox.getMax(axisIndex)));
       }
@@ -342,8 +364,40 @@ public interface BoundingBox
   }
 
   default BoundingBox bboxEdit(final Consumer<BoundingBoxEditor> action) {
-    return new BoundingBoxEditor(this) //
-      .newBoundingBox();
+    final BoundingBoxEditor editor = new BoundingBoxEditor(this);
+    action.accept(editor);
+    return editor.newBoundingBox();
+  }
+
+  /**
+   * Computes the intersection of two {@link BoundingBox}s.
+   *
+   * @param env the envelope to intersect with
+   * @return a new BoundingBox representing the intersection of the envelopes (this will be
+   * the null envelope if either argument is null, or they do not intersect
+   */
+  default BoundingBox bboxIntersection(final BoundingBoxProxy boundingBox) {
+    final BoundingBoxFunction<BoundingBox> action = BoundingBox::bboxIntersection;
+    final BoundingBox empty = newBoundingBoxEmpty();
+    return bboxWith(boundingBox, action, empty);
+  }
+
+  /**
+   * Computes the intersection of this and another bounding box.
+   *
+   * @return The intersection.
+   */
+  default BoundingBox bboxIntersection(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final double intMinX = Math.max(getMinX(), minX);
+      final double intMinY = Math.max(getMinY(), minY);
+      final double intMaxX = Math.min(getMaxX(), maxX);
+      final double intMaxY = Math.min(getMaxY(), maxY);
+      return newBoundingBox(intMinX, intMinY, intMaxX, intMaxY);
+    }
   }
 
   /**
@@ -385,6 +439,21 @@ public interface BoundingBox
     return !(x1 > maxX || x2 < minX || y1 > maxY || y2 < minY);
   }
 
+  default BoundingBox bboxToCs(final GeometryFactoryProxy geometryFactory) {
+    if (geometryFactory == null || isEmpty()) {
+      return this;
+    } else if (isHasHorizontalCoordinateSystem()) {
+      if (!isProjectionRequired(geometryFactory)) {
+        return this;
+      }
+    } else if (!geometryFactory.isHasHorizontalCoordinateSystem()) {
+      return this;
+    }
+    return bboxEditor() //
+      .setGeometryFactory(geometryFactory) //
+      .newBoundingBox();
+  }
+
   @Override
   default <R> R bboxWith(final BoundingBoxProxy boundingBox,
     final BiFunction<BoundingBox, BoundingBox, R> action, final R emptyValue) {
@@ -405,7 +474,7 @@ public interface BoundingBox
       BoundingBox boundingBox2 = boundingBox.getBoundingBox();
       if (isProjectionRequired(boundingBox2)) {
         // TODO just convert points
-        boundingBox2 = boundingBox2.toCs(getGeometryFactory());
+        boundingBox2 = boundingBox2.bboxToCs(getGeometryFactory());
       }
       if (!boundingBox2.isEmpty()) {
         final double minX = boundingBox2.getMinX();
@@ -455,11 +524,6 @@ public interface BoundingBox
     return this;
   }
 
-  /**
-   * Check that geom is not contained entirely in the rectangle boundary.
-   * According to the somewhat odd spec of the SFS, if this
-   * is the case the geometry is NOT contained.
-   */
   default boolean containsSFS(final Geometry geometry) {
     if (bboxCovers(geometry)) {
       if (geometry.isContainedInBoundary(this)) {
@@ -482,8 +546,8 @@ public interface BoundingBox
 
   default double edgeDeltas() {
     double distance = 0;
-    for (int axis = 0; axis < getAxisCount(); axis++) {
-      distance += getMax(axis) - getMin(axis);
+    for (int axiIndex = 0; axiIndex < getAxisCount(); axiIndex++) {
+      distance += getMax(axiIndex) - getMin(axiIndex);
     }
 
     return distance;
@@ -511,39 +575,6 @@ public interface BoundingBox
       }
     }
     return false;
-  }
-
-  /**
-   * Return a new bounding box expanded by delta.
-   *
-   * @param delta
-   * @return
-   */
-  default BoundingBox expand(final double delta) {
-    return expand(delta, delta);
-  }
-
-  /**
-   * Return a new bounding box expanded by deltaX, deltaY.
-   *
-   * @param delta
-   * @return
-   */
-  default BoundingBox expand(final double deltaX, final double deltaY) {
-    if (isEmpty() || deltaX == 0 && deltaY == 0) {
-      return this;
-    } else {
-      final double x1 = getMinX() - deltaX;
-      final double x2 = getMaxX() + deltaX;
-      final double y1 = getMinY() - deltaY;
-      final double y2 = getMaxY() + deltaY;
-
-      if (x1 > x2 || y1 > y2) {
-        return newBoundingBoxEmpty();
-      } else {
-        return newBoundingBox(x1, y1, x2, y2);
-      }
-    }
   }
 
   /**
@@ -852,55 +883,9 @@ public interface BoundingBox
     }
   }
 
-  /**
-   * Computes the intersection of two {@link BoundingBox}s.
-   *
-   * @param env the envelope to intersect with
-   * @return a new BoundingBox representing the intersection of the envelopes (this will be
-   * the null envelope if either argument is null, or they do not intersect
-   */
-  default BoundingBox intersection(final BoundingBox boundingBox) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox convertedBoundingBox = boundingBox.toCs(geometryFactory);
-    if (isEmpty() || convertedBoundingBox.isEmpty() || !bboxIntersects(convertedBoundingBox)) {
-      return newBoundingBoxEmpty();
-    } else {
-      final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
-      final double intMinY = Math.max(getMinY(), convertedBoundingBox.getMinY());
-      final double intMaxX = Math.min(getMaxX(), convertedBoundingBox.getMaxX());
-      final double intMaxY = Math.min(getMaxY(), convertedBoundingBox.getMaxY());
-      return newBoundingBox(intMinX, intMinY, intMaxX, intMaxY);
-    }
-  }
-
   @Override
   default boolean isBboxEmpty() {
     return isEmpty();
-  }
-
-  /**
-   * <p>Construct a new new BoundingBox by moving the min/max x coordinates by xDisplacement and
-   * the min/max y coordinates by yDisplacement. If the bounding box is null or the xDisplacement
-   * and yDisplacement are 0 then this bounding box will be returned.</p>
-   *
-   * @param xDisplacement The distance to move the min/max x coordinates.
-   * @param yDisplacement The distance to move the min/max y coordinates.
-   * @return The moved bounding box.
-   */
-  default BoundingBox move(final double xDisplacement, final double yDisplacement) {
-    if (isEmpty() || xDisplacement == 0 && yDisplacement == 0) {
-      return this;
-    } else {
-      final double x1 = getMinX() + xDisplacement;
-      final double x2 = getMaxX() + xDisplacement;
-      final double y1 = getMinY() + yDisplacement;
-      final double y2 = getMaxY() + yDisplacement;
-      return newBoundingBox(x1, y1, x2, y2);
-    }
-  }
-
-  default BoundingBox newBoundingBox(final double x, final double y) {
-    return new BoundingBoxDoubleXY(x, y);
   }
 
   default BoundingBox newBoundingBox(final double x1, final double y1, final double x2,
@@ -925,12 +910,6 @@ public interface BoundingBox
     final double maxX = bounds[axisCount];
     final double maxY = bounds[axisCount + 1];
     return newBoundingBox(minX, minY, maxX, maxY);
-  }
-
-  default BoundingBox newBoundingBox(final Point point) {
-    final double x = point.getX();
-    final double y = point.getY();
-    return newBoundingBox(x, y);
   }
 
   default BoundingBox newBoundingBoxEmpty() {
@@ -975,16 +954,6 @@ public interface BoundingBox
     return area;
   }
 
-  default BoundingBox toCs(final GeometryFactoryProxy geometryFactory) {
-    if (!isEmpty() || isProjectionRequired(geometryFactory)) {
-      return bboxEditor() //
-        .setGeometryFactory(geometryFactory) //
-        .newBoundingBox();
-    } else {
-      return this;
-    }
-  }
-
   /**
    * Creates a {@link Geometry} with the same extent as the given envelope.
    * The Geometry returned is guaranteed to be valid.
@@ -1027,11 +996,6 @@ public interface BoundingBox
         return toRectangle();
       }
     }
-  }
-
-  default Polygon toPolygon() {
-    return toPolygon(100, 100);
-
   }
 
   default Polygon toPolygon(final GeometryFactory factory) {

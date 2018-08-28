@@ -120,8 +120,8 @@ public class TiledGriddedElevationModelLayer
         final BoundingBox viewBoundingBox = viewport.getBoundingBox();
         final BoundingBox maxBoundingBox = getBoundingBox();
         final GeometryFactory geometryFactory = getGeometryFactory();
-        final BoundingBox boundingBox = viewBoundingBox.toCs(geometryFactory)
-          .intersection(maxBoundingBox);
+        final BoundingBox boundingBox = viewBoundingBox.bboxToCs(geometryFactory)
+          .bboxIntersection(maxBoundingBox);
         final double minX = boundingBox.getMinX();
         final double minY = boundingBox.getMinY();
         final double maxX = boundingBox.getMaxX();

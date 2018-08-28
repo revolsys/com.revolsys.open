@@ -55,8 +55,9 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
   }
 
   public List<Segment> getWithinDistance(final Point point, final double maxDistance) {
-    BoundingBox boundingBox = point.getBoundingBox();
-    boundingBox = boundingBox.expand(maxDistance);
+    final BoundingBox boundingBox = point.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final LineSegmentCoordinateDistanceFilter filter = new LineSegmentCoordinateDistanceFilter(
       point, maxDistance);
     return getItems(boundingBox, filter);

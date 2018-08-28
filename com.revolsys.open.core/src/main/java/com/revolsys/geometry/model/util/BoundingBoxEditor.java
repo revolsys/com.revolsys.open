@@ -80,20 +80,20 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
     if (boundingBoxProxy != null) {
       BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
       if (boundingBox != null && !boundingBox.isEmpty()) {
-        if (this.geometryFactory == null && boundingBox.isHasHorizontalCoordinateSystem()) {
+        if (!isHasHorizontalCoordinateSystem() && boundingBox.isHasHorizontalCoordinateSystem()) {
           this.geometryFactory = boundingBox.getGeometryFactory();
         }
-        if (boundingBox.isProjectionRequired(this)) {
-          if (isProjectionRequired(boundingBox)) {
-            // TODO just convert points
-            boundingBox = boundingBox.toCs(getGeometryFactory());
-          }
+        if (isProjectionRequired(boundingBox)) {
+          // TODO just convert points
+          boundingBox = boundingBox.bboxToCs(getGeometryFactory());
         }
-        final double minX = boundingBox.getMinX();
-        final double minY = boundingBox.getMinY();
-        final double maxX = boundingBox.getMaxX();
-        final double maxY = boundingBox.getMaxY();
-        addBbox(minX, minY, maxX, maxY);
+        if (!boundingBox.isEmpty()) {
+          final double minX = boundingBox.getMinX();
+          final double minY = boundingBox.getMinY();
+          final double maxX = boundingBox.getMaxX();
+          final double maxY = boundingBox.getMaxY();
+          addBbox(minX, minY, maxX, maxY);
+        }
       }
     }
     return this;
@@ -248,6 +248,24 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
     }
   }
 
+  /**
+   * <p>CMoving the min/max x coordinates by xDisplacement and
+   * the min/max y coordinates by yDisplacement.</p>
+   *
+   * @param xDisplacement The distance to move the min/max x coordinates.
+   * @param yDisplacement The distance to move the min/max y coordinates.
+   */
+  public BoundingBoxEditor move(final double xDisplacement, final double yDisplacement) {
+    if (isEmpty() || xDisplacement == 0 && yDisplacement == 0) {
+    } else {
+      this.minX = +xDisplacement;
+      this.maxX = +xDisplacement;
+      this.minY = +xDisplacement;
+      this.maxY = +xDisplacement;
+    }
+    return this;
+  }
+
   public BoundingBox newBoundingBox() {
     if (isEmpty()) {
       if (this.geometryFactory == null) {
@@ -266,54 +284,57 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
   }
 
   public BoundingBoxEditor setGeometryFactory(final GeometryFactoryProxy geometryFactory) {
-    if (geometryFactory != null && isProjectionRequired(geometryFactory)) {
-      final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
-      if (coordinatesOperation != null) {
-        final double minX = this.minX;
-        final double minY = this.minY;
-        final double maxX = this.maxX;
-        final double maxY = this.maxY;
-        clear();
-        final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
-        this.geometryFactory = geometryFactory.getGeometryFactory();
-        for (final double y : Arrays.asList(minY, maxY)) {
-          for (final double x : Arrays.asList(minX, maxX)) {
-            coordinatesOperation.perform2d(point, x, y, this::addPoint);
+    if (geometryFactory != null) {
+      if (isProjectionRequired(geometryFactory)) {
+        final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
+        if (coordinatesOperation != null) {
+          final double minX = this.minX;
+          final double minY = this.minY;
+          final double maxX = this.maxX;
+          final double maxY = this.maxY;
+          clear();
+          final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+          this.geometryFactory = geometryFactory.getGeometryFactory();
+          for (final double y : Arrays.asList(minY, maxY)) {
+            for (final double x : Arrays.asList(minX, maxX)) {
+              coordinatesOperation.perform2d(point, x, y, this::addPoint);
+            }
           }
-        }
 
-        double xStep = getWidth() / 10;
-        double yStep = getHeight() / 10;
-        final double scaleX = this.geometryFactory.getScaleX();
-        if (scaleX > 0) {
-          if (xStep < 1 / scaleX) {
-            xStep = 1 / scaleX;
+          double xStep = getWidth() / 10;
+          double yStep = getHeight() / 10;
+          final double scaleX = this.geometryFactory.getScaleX();
+          if (scaleX > 0) {
+            if (xStep < 1 / scaleX) {
+              xStep = 1 / scaleX;
+            }
           }
-        }
-        final double scaleY = this.geometryFactory.getScaleY();
-        if (scaleY > 0) {
-          if (yStep < 1 / scaleY) {
-            yStep = 1 / scaleY;
+          final double scaleY = this.geometryFactory.getScaleY();
+          if (scaleY > 0) {
+            if (yStep < 1 / scaleY) {
+              yStep = 1 / scaleY;
+            }
           }
-        }
-        coordinatesOperation.perform2d(point, minX, minY, this::addPoint);
-        coordinatesOperation.perform2d(point, minX, maxY, this::addPoint);
-        coordinatesOperation.perform2d(point, maxX, minY, this::addPoint);
-        coordinatesOperation.perform2d(point, maxX, maxY, this::addPoint);
+          coordinatesOperation.perform2d(point, minX, minY, this::addPoint);
+          coordinatesOperation.perform2d(point, minX, maxY, this::addPoint);
+          coordinatesOperation.perform2d(point, maxX, minY, this::addPoint);
+          coordinatesOperation.perform2d(point, maxX, maxY, this::addPoint);
 
-        if (xStep != 0) {
-          for (double x = minX + xStep; x < maxX; x += xStep) {
-            coordinatesOperation.perform2d(point, x, minY, this::addPoint);
-            coordinatesOperation.perform2d(point, x, maxY, this::addPoint);
+          if (xStep != 0) {
+            for (double x = minX + xStep; x < maxX; x += xStep) {
+              coordinatesOperation.perform2d(point, x, minY, this::addPoint);
+              coordinatesOperation.perform2d(point, x, maxY, this::addPoint);
+            }
           }
-        }
-        if (yStep != 0) {
-          for (double y = minY + yStep; y < maxY; y += yStep) {
-            coordinatesOperation.perform2d(point, minX, y, this::addPoint);
-            coordinatesOperation.perform2d(point, maxX, y, this::addPoint);
+          if (yStep != 0) {
+            for (double y = minY + yStep; y < maxY; y += yStep) {
+              coordinatesOperation.perform2d(point, minX, y, this::addPoint);
+              coordinatesOperation.perform2d(point, maxX, y, this::addPoint);
+            }
           }
         }
       }
+      this.geometryFactory = geometryFactory.getGeometryFactory();
     }
     return this;
   }

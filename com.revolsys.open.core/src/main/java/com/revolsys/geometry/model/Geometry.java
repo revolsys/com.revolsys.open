@@ -593,6 +593,23 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
   int compareToSameClass(Geometry o);
 
+  /**
+   * Check that geom is not contained entirely in the rectangle boundary.
+   * According to the somewhat odd spec of the SFS, if this
+   * is the case the geometry is NOT contained.
+   */
+  default boolean containedBy(final BoundingBox boundingBox) {
+    if (boundingBox.bboxCovers(this)) {
+      if (isContainedInBoundary(boundingBox)) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
+
   default boolean contains(final double x, final double y) {
     return false;
   }

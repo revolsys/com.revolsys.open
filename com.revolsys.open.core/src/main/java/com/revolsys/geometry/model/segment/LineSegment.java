@@ -467,7 +467,7 @@ public interface LineSegment extends LineString {
 
   default LineSegment getIntersection(BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    boundingBox = boundingBox.toCs(geometryFactory);
+    boundingBox = boundingBox.bboxToCs(geometryFactory);
     final Point lineStart = getPoint(0);
     final Point lineEnd = getPoint(1);
     final boolean contains1 = boundingBox.bboxCovers(lineStart);

@@ -29,8 +29,9 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
 
   @Override
   public BoundingBox getEnvelope() {
-    BoundingBox envelope = this.line.getBoundingBox();
-    envelope = envelope.expand(this.maxDistance);
+    final BoundingBox envelope = this.line.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(this.maxDistance);
     return envelope;
   }
 

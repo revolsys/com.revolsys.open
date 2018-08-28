@@ -138,18 +138,15 @@ public interface Polygon extends Polygonal {
 
   @Override
   default boolean contains(final Geometry geometry) {
-    // short-circuit test
-    final BoundingBox boundingBox = getBoundingBox();
-    final BoundingBox otherBoundingBox = geometry.getBoundingBox();
-    if (!boundingBox.bboxCovers(otherBoundingBox)) {
-      return false;
-    }
-    // optimization for rectangle arguments
-    if (isRectangle()) {
-      return boundingBox.containsSFS(geometry);
+    if (bboxCovers(geometry)) {
+      if (isRectangle()) {
+        final BoundingBox boundingBox = getBoundingBox();
+        return boundingBox.containsSFS(geometry);
+      } else {
+        return relate(geometry).isContains();
+      }
     } else {
-      // general case
-      return relate(geometry).isContains();
+      return false;
     }
   }
 

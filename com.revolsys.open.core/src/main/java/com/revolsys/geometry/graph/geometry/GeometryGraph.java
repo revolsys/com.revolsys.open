@@ -221,8 +221,10 @@ public class GeometryGraph extends Graph<LineSegment> {
     if (geometry == null) {
       return BoundingBox.empty();
     } else {
-      BoundingBox boundingBox = geometry.getBoundingBox();
-      boundingBox = boundingBox.expand(this.maxDistance);
+      final BoundingBox boundingBox = geometry.getBoundingBox() //
+        .bboxEditor() //
+        .expandDelta(this.maxDistance)//
+        .newBoundingBox();
       return boundingBox;
     }
   }
@@ -306,7 +308,9 @@ public class GeometryGraph extends Graph<LineSegment> {
     if (scaleXY > 0) {
       maxDistance = 1 / scaleXY;
     }
-    boundingBox = boundingBox.expand(maxDistance);
+    boundingBox = boundingBox //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     if (boundingBox.bboxIntersects(this.boundingBox)) {
       final LineString points = line;
       final int numPoints = points.getVertexCount();

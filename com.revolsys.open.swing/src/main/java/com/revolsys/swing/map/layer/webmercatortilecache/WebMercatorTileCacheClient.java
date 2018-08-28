@@ -34,7 +34,7 @@ public class WebMercatorTileCacheClient {
     final double lat1 = getLatitude(zoomLevel, tileY);
     final double lon2 = getLongitude(zoomLevel, tileX + 1);
     final double lat2 = getLatitude(zoomLevel, tileY + 1);
-    return GeometryFactory.wgs84().newBoundingBox(lon1, lat1, lon2, lat2).toCs(
+    return GeometryFactory.wgs84().newBoundingBox(lon1, lat1, lon2, lat2).bboxToCs(
       GeometryFactory.worldMercator());
   }
 

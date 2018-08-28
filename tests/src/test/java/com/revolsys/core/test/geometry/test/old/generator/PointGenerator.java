@@ -57,7 +57,7 @@ public class PointGenerator extends GeometryGenerator {
       throw new NullPointerException("Bounding Box is not declared");
     } else {
 
-      final Point point = this.boundingBox.toGeometry().getCentroid();
+      final Point point = this.boundingBox.getCentre();
       return point.convertGeometry(this.geometryFactory);
     }
   }

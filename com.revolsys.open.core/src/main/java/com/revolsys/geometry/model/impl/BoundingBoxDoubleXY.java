@@ -35,6 +35,7 @@ package com.revolsys.geometry.model.impl;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.util.Debug;
 import com.revolsys.util.MathUtil;
 
 public class BoundingBoxDoubleXY extends BaseBoundingBox {
@@ -79,6 +80,9 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.minY = boundingBox.getMinY();
     this.maxX = boundingBox.getMaxX();
     this.maxY = boundingBox.getMaxY();
+    if (this.minX == -180 && this.maxX > 180) {
+      Debug.noOp();
+    }
   }
 
   public BoundingBoxDoubleXY(final double... bounds) {
@@ -90,6 +94,9 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.minY = y;
     this.maxX = x;
     this.maxY = y;
+    if (this.minX == -180 && this.maxX > 180) {
+      Debug.noOp();
+    }
   }
 
   public BoundingBoxDoubleXY(final double x1, final double y1, final double x2, final double y2) {
@@ -119,6 +126,9 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
       this.minY = y2;
       this.maxY = y1;
     }
+    if (this.minX == -180 && this.maxX > 180) {
+      Debug.noOp();
+    }
   }
 
   public BoundingBoxDoubleXY(final GeometryFactory geometryFactory, final double x,
@@ -128,6 +138,9 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.maxX = geometryFactory.makeXPreciseCeil(this.maxX);
     this.minY = geometryFactory.makeYPreciseFloor(this.minY);
     this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
+    if (this.minX == -180 && this.maxX > 180) {
+      Debug.noOp();
+    }
   }
 
   public BoundingBoxDoubleXY(final GeometryFactory geometryFactory, final double x1,
@@ -137,6 +150,9 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.maxX = geometryFactory.makeXPreciseCeil(this.maxX);
     this.minY = geometryFactory.makeYPreciseFloor(this.minY);
     this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
+    if (this.minX == -180 && this.maxX > 180) {
+      Debug.noOp();
+    }
   }
 
   @Override
@@ -335,11 +351,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     } else {
       return true;
     }
-  }
-
-  @Override
-  public BoundingBox newBoundingBox(final double x, final double y) {
-    return new BoundingBoxDoubleXY(x, y);
   }
 
   @Override

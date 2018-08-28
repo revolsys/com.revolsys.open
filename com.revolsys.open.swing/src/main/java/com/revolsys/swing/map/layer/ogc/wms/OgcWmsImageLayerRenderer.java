@@ -37,7 +37,7 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
       if (!layer.isEditable()) {
         final BoundingBox viewportBoundingBox = viewport.getBoundingBox();
         final BoundingBox queryBoundingBox = viewportBoundingBox
-          .intersection(layer.getWmsLayerDefinition().getLatLonBoundingBox());
+          .bboxIntersection(layer.getWmsLayerDefinition().getLatLonBoundingBox());
 
         boolean reload = false;
         if (this.image == null) {

@@ -83,7 +83,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     final CoordinatesOperation projection = geometryFactory
       .getCoordinatesOperation(targetGeometryFactory);
 
-    final BoundingBox convertexBoundingBox = boundingBox.toCs(geometryFactory);
+    final BoundingBox convertexBoundingBox = boundingBox.bboxToCs(geometryFactory);
     final double gridCellWidth = getGridCellWidth();
     final double gridCellHeight = getGridCellHeight();
     final double minY = getGridMinY();

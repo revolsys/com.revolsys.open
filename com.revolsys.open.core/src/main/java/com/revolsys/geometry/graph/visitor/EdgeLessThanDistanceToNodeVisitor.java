@@ -16,15 +16,16 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final Point point = node;
-    BoundingBox env = point.getBoundingBox();
-    env = env.expand(maxDistance);
+    final BoundingBox env = point.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     graph.getEdgeIndex().forEach(env,
       new EdgeLessThanDistanceToNodeVisitor<>(node, maxDistance, results));
     return results.getList();
 
   }
 
-  private BoundingBox boundingBox;
+  private final BoundingBox boundingBox;
 
   private final double maxDistance;
 
@@ -36,8 +37,9 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
     this.node = node;
     this.maxDistance = maxDistance;
     final Point point = node;
-    this.boundingBox = point.getBoundingBox();
-    this.boundingBox = this.boundingBox.expand(maxDistance);
+    this.boundingBox = point.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
   }
 
   @Override

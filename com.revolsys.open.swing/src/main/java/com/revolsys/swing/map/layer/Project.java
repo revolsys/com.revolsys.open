@@ -724,7 +724,7 @@ public class Project extends LayerGroup {
         if (coordinateSystem != null) {
           defaultBoundingBox = coordinateSystem.getAreaBoundingBox();
         }
-        boundingBox = boundingBox.toCs(geometryFactory);
+        boundingBox = boundingBox.bboxToCs(geometryFactory);
       }
       addToMap(map, "viewBoundingBox", boundingBox, defaultBoundingBox);
       final Map<String, BoundingBox> zoomBookmarks = getZoomBookmarks();

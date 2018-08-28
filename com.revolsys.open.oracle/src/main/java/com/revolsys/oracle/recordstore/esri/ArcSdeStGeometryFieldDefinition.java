@@ -169,7 +169,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
     if (value instanceof BoundingBox) {
       final BoundingBox boundingBox = (BoundingBox)value;
-      value = boundingBox.toCs(this.geometryFactory).toPolygon(1);
+      value = boundingBox.bboxToCs(this.geometryFactory).toPolygon(1);
     }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;

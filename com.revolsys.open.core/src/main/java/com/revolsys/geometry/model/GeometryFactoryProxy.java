@@ -13,7 +13,7 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
 
         final GeometryFactory geometryFactory = getGeometryFactory();
         if (geometryFactory != null) {
-          return boundingBox.toCs(geometryFactory);
+          return boundingBox.bboxToCs(geometryFactory);
         }
       }
       return boundingBox;

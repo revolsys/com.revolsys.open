@@ -110,9 +110,7 @@ public class RelateComputer {
     im.set(Location.EXTERIOR, Location.EXTERIOR, 2);
 
     // if the Geometries don't overlap there is nothing to do
-    if (!this.arg[0].getGeometry()
-      .getBoundingBox()
-      .bboxIntersects(this.arg[1].getGeometry().getBoundingBox())) {
+    if (!this.arg[0].getGeometry().bboxIntersects(this.arg[1].getGeometry())) {
       computeDisjointIM(im);
       return im;
     }
@@ -248,14 +246,12 @@ public class RelateComputer {
       }
     }
     /*
-     * If edges of LineStrings properly intersect *in an interior point*, all we
-     * can deduce is that the interiors intersect. (We can NOT deduce that the
-     * exteriors intersect, since some other segments in the geometries might
-     * cover the points in the neighbourhood of the intersection.) It is
-     * important that the point be known to be an interior point of both
-     * Geometries, since it is possible in a self-intersecting geometry to have
-     * a proper intersection on one segment that is also a boundary point of
-     * another segment.
+     * If edges of LineStrings properly intersect *in an interior point*, all we can deduce is that
+     * the interiors intersect. (We can NOT deduce that the exteriors intersect, since some other
+     * segments in the geometries might cover the points in the neighbourhood of the intersection.)
+     * It is important that the point be known to be an interior point of both Geometries, since it
+     * is possible in a self-intersecting geometry to have a proper intersection on one segment that
+     * is also a boundary point of another segment.
      */
     else if (dimA == 1 && dimB == 1) {
       if (hasProperInterior) {

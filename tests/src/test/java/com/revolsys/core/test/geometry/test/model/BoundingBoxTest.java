@@ -154,14 +154,14 @@ public class BoundingBoxTest implements TestConstants {
       wkt.append("(");
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         if (axisIndex > 0) {
-          wkt.append(',');
+          wkt.append(' ');
         }
         wkt.append(Doubles.toString(bounds[axisIndex]));
       }
-      wkt.append(' ');
+      wkt.append(',');
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         if (axisIndex > 0) {
-          wkt.append(',');
+          wkt.append(' ');
         }
         wkt.append(Doubles.toString(bounds[axisCount + axisIndex]));
       }
@@ -243,21 +243,21 @@ public class BoundingBoxTest implements TestConstants {
 
         // Test outside
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(-100, -100)));
+          geometry.intersects(boundingBox.bboxEditor().move(-100, -100)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(-100, 0)));
+          geometry.intersects(boundingBox.bboxEditor().move(-100, 0)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(-100, 100)));
+          geometry.intersects(boundingBox.bboxEditor().move(-100, 100)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(0, -100)));
+          geometry.intersects(boundingBox.bboxEditor().move(0, -100)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(0, 100)));
+          geometry.intersects(boundingBox.bboxEditor().move(0, 100)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(100, -100)));
+          geometry.intersects(boundingBox.bboxEditor().move(100, -100)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(100, 0)));
+          geometry.intersects(boundingBox.bboxEditor().move(100, 0)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(100, 100)));
+          geometry.intersects(boundingBox.bboxEditor().move(100, 100)));
 
       }
     }

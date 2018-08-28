@@ -238,8 +238,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
       final BoundingBox boundingBox = getBoundingBox();
       if (Property.hasValue(boundingBox)) {
-        final BoundingBox newBoundingBox = boundingBox.toCs(geometryFactory);
-        BoundingBox intersection = newBoundingBox.intersection(areaBoundingBox);
+        final BoundingBox newBoundingBox = boundingBox.bboxToCs(geometryFactory);
+        BoundingBox intersection = newBoundingBox.bboxIntersection(areaBoundingBox);
         if (intersection.isEmpty()) {
           intersection = areaBoundingBox;
         }

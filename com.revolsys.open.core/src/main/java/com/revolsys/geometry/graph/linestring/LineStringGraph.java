@@ -266,7 +266,9 @@ public class LineStringGraph extends Graph<LineSegment> {
     if (scaleXY > 0) {
       maxDistance = 1 / scaleXY;
     }
-    envelope = envelope.expand(maxDistance);
+    envelope = envelope //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     if (envelope.bboxIntersects(this.envelope)) {
       final LineString points = line;
       final int numPoints = points.getVertexCount();
@@ -441,8 +443,8 @@ public class LineStringGraph extends Graph<LineSegment> {
     if (!edge.isRemoved()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
       final Node<LineSegment> toNode = edge.getToNode();
-      final PointDistanceComparator comparator = new PointDistanceComparator(
-        fromNode.getX(), toNode.getY());
+      final PointDistanceComparator comparator = new PointDistanceComparator(fromNode.getX(),
+        toNode.getY());
       final Set<Point> newPoints = new TreeSet<>(comparator);
       for (final Point point : nodes) {
         newPoints.add(point);

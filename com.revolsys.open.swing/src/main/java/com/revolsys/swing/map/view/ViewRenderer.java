@@ -24,6 +24,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -311,8 +312,8 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
                 viewportGeometryFactory2d, geometry);
               if (!this.boundingBox.bboxCovers(pointDoubleXYOrientation)) {
                 try {
-                  final Geometry clippedGeometry = this.boundingBox.toPolygon()
-                    .intersection(geometry);
+                  final RectangleXY rectangle = this.boundingBox.toRectangle();
+                  final Geometry clippedGeometry = geometry.intersectionRectangle(rectangle);
                   if (!clippedGeometry.isEmpty()) {
                     double maxArea = 0;
                     double maxLength = 0;

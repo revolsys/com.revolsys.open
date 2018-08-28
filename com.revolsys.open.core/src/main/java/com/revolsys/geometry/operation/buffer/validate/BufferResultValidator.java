@@ -34,7 +34,6 @@ package com.revolsys.geometry.operation.buffer.validate;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 
@@ -147,14 +146,17 @@ public class BufferResultValidator {
       padding = 0.001;
     }
 
-    final BoundingBox expectedEnv = this.input.getBoundingBox().expand(this.distance);
+    final BoundingBox expectedEnv = this.input.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(this.distance);
 
-    final BoundingBox bufEnv = this.result.getBoundingBox().expand(padding);
+    final BoundingBox bufEnv = this.result.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(padding);
 
     if (!bufEnv.bboxCovers(expectedEnv)) {
       this.isValid = false;
       this.errorMsg = "Buffer envelope is incorrect";
-      final GeometryFactory r = this.input.getGeometryFactory();
       this.errorIndicator = bufEnv.toGeometry();
     }
     report("Envelope");

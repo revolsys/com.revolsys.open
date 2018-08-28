@@ -20,8 +20,9 @@ public class OnLineNodeVisitor<T> implements Consumer<Node<T>> {
       return Collections.emptyList();
     } else {
       final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
-      BoundingBox env = line.getBoundingBox();
-      env = env.expand(maxDistance);
+      final BoundingBox env = line.getBoundingBox() //
+        .bboxEditor() //
+        .expandDelta(maxDistance);
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
       final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<>(line, results);
       index.forEach(env, visitor);

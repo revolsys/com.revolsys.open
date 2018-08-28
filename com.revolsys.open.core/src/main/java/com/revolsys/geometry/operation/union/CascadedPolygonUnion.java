@@ -321,7 +321,7 @@ public class CascadedPolygonUnion {
     } else if (polygonal1.getGeometryCount() <= 1 && polygonal2.getGeometryCount() <= 1) {
       return unionActual(polygonal1, polygonal2);
     } else {
-      final BoundingBox boundingBoxIntersection = boundingBox1.intersection(boundingBox2);
+      final BoundingBox boundingBoxIntersection = boundingBox1.bboxIntersection(boundingBox2);
       return unionUsingEnvelopeIntersection(polygonal1, polygonal2, boundingBoxIntersection);
     }
   }
