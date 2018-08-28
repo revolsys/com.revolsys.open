@@ -2,24 +2,21 @@ package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
-public class Area implements Serializable {
+public class Area extends BoundingBoxDoubleXY implements Serializable {
   private static final long serialVersionUID = 2662773652065582230L;
 
   private final Authority authority;
 
   private final boolean deprecated;
 
-  private final BoundingBox latLonBounds;
-
   private final String name;
 
-  public Area(final String name, final BoundingBox latLonBounds, final Authority authority,
-    final boolean deprecated) {
+  public Area(final String name, final double minX, final double minY, final double maxX,
+    final double maxY, final Authority authority, final boolean deprecated) {
+    super(minX, minY, maxX, maxY);
     this.name = name;
-    this.latLonBounds = latLonBounds;
     this.authority = authority;
     this.deprecated = deprecated;
   }
@@ -28,7 +25,7 @@ public class Area implements Serializable {
   public boolean equals(final Object obj) {
     if (obj instanceof Area) {
       final Area area = (Area)obj;
-      if (!DataType.equal(this.latLonBounds, area.latLonBounds)) {
+      if (super.equals(area)) {
         return false;
       } else {
         return true;
@@ -42,17 +39,8 @@ public class Area implements Serializable {
     return this.authority;
   }
 
-  public BoundingBox getLatLonBounds() {
-    return this.latLonBounds;
-  }
-
   public String getName() {
     return this.name;
-  }
-
-  @Override
-  public int hashCode() {
-    return this.latLonBounds.hashCode();
   }
 
   public boolean isDeprecated() {

@@ -49,8 +49,9 @@ public class LineSegmentIndex extends QuadTree<LineSegment> {
   }
 
   public boolean isWithinDistance(final Point point) {
-    BoundingBox envelope = point.getBoundingBox();
-    envelope = envelope.expand(1);
+    final BoundingBox envelope = point.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(1);
     final List<LineSegment> lines = getItems(envelope);
     for (final LineSegment line : lines) {
       if (line.distancePoint(point) <= 1) {

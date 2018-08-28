@@ -89,8 +89,9 @@ public class BoundingBoxTest implements TestConstants {
   private void assertBoundingBox(final Geometry geometry, final BoundingBox boundingBox,
     final GeometryFactory geometryFactory, final boolean empty, final int axisCount,
     final double... bounds) {
-    Assert.assertEquals("Geometry Factory", geometryFactory, boundingBox.getGeometryFactory());
     Assert.assertEquals("Empty", empty, boundingBox.isEmpty());
+
+    Assert.assertEquals("Geometry Factory", geometryFactory, boundingBox.getGeometryFactory());
     Assert.assertEquals("Axis Count", axisCount, boundingBox.getAxisCount());
     Assert.assertEquals("Bounds", Lists.newArray(bounds),
       Lists.newArray(boundingBox.getMinMaxValues()));
@@ -154,14 +155,14 @@ public class BoundingBoxTest implements TestConstants {
       wkt.append("(");
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         if (axisIndex > 0) {
-          wkt.append(',');
+          wkt.append(' ');
         }
         wkt.append(Doubles.toString(bounds[axisIndex]));
       }
-      wkt.append(' ');
+      wkt.append(',');
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         if (axisIndex > 0) {
-          wkt.append(',');
+          wkt.append(' ');
         }
         wkt.append(Doubles.toString(bounds[axisCount + axisIndex]));
       }
@@ -218,7 +219,7 @@ public class BoundingBoxTest implements TestConstants {
       Assert.assertEquals("MaxY", maxY, boundingBox.getMaxY(), 0);
     }
 
-    Assert.assertEquals("WKT", wkt.toString(), boundingBox.toString());
+    Assert.assertEquals("WKT", wkt.toString(), boundingBox.bboxToEWkt());
     Assert.assertEquals("Area", area, boundingBox.getArea(), 0);
     Assert.assertEquals("Width", width, boundingBox.getWidth(), 0);
     Assert.assertEquals("Width", width,
@@ -243,21 +244,21 @@ public class BoundingBoxTest implements TestConstants {
 
         // Test outside
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(-100, -100)));
+          geometry.intersects(boundingBox.bboxEditor().move(-100, -100)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(-100, 0)));
+          geometry.intersects(boundingBox.bboxEditor().move(-100, 0)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(-100, 100)));
+          geometry.intersects(boundingBox.bboxEditor().move(-100, 100)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(0, -100)));
+          geometry.intersects(boundingBox.bboxEditor().move(0, -100)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(0, 100)));
+          geometry.intersects(boundingBox.bboxEditor().move(0, 100)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(100, -100)));
+          geometry.intersects(boundingBox.bboxEditor().move(100, -100)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(100, 0)));
+          geometry.intersects(boundingBox.bboxEditor().move(100, 0)));
         Assert.assertFalse("Bounding Box Intersects",
-          geometry.intersects(boundingBox.move(100, 100)));
+          geometry.intersects(boundingBox.bboxEditor().move(100, 100)));
 
       }
     }
@@ -343,7 +344,7 @@ public class BoundingBoxTest implements TestConstants {
     assertBoundingBox(null, emptyNullGeometryFactory, GeometryFactory.DEFAULT_3D, true, 2,
       NULL_BOUNDS);
 
-    final BoundingBox emptyWithGeometryFactory = UTM10_GF_2_FLOATING.newBoundingBoxEmpty();
+    final BoundingBox emptyWithGeometryFactory = UTM10_GF_2_FLOATING.bboxEmpty();
     assertBoundingBox(null, emptyWithGeometryFactory, UTM10_GF_2_FLOATING, true, 2, NULL_BOUNDS);
   }
 

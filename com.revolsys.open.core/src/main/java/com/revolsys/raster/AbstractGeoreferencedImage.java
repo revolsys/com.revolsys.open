@@ -360,7 +360,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
         }
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {
-          final BoundingBox boundingBox = BoundingBox.newBoundingBox(boundingBoxWkt);
+          final BoundingBox boundingBox = BoundingBox.bboxNew(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
             setBoundingBox(boundingBox);
           }
@@ -490,7 +490,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory.convertAxisCount(2);
-      this.boundingBox = this.boundingBox.toCs(this.geometryFactory);
+      this.boundingBox = this.boundingBox.bboxToCs(this.geometryFactory);
       for (final MappedLocation mappedLocation : this.tiePoints) {
         mappedLocation.setGeometryFactory(geometryFactory);
       }

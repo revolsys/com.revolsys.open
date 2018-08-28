@@ -53,7 +53,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.util.RectangleUtil;
+import com.revolsys.util.function.BiConsumerDouble;
 
 //import debug.*;
 
@@ -69,10 +69,8 @@ import com.revolsys.geometry.util.RectangleUtil;
  *
  * @version 1.7
  */
-class BufferSubgraph implements Comparable {
+class BufferSubgraph extends BoundingBoxDoubleXY implements Comparable {
   private final List<DirectedEdge> dirEdgeList = new ArrayList<>();
-
-  private BoundingBox env = null;
 
   private final RightmostEdgeFinder finder;
 
@@ -280,24 +278,16 @@ class BufferSubgraph implements Comparable {
    *
    * @return the envelope of the graph.
    */
-  public BoundingBox getEnvelope() {
-    if (this.env == null) {
-      double[] bounds = null;
+  public BoundingBox getBoundingBox() {
+    if (isEmpty()) {
       for (final DirectedEdge dirEdge : this.dirEdgeList) {
         final Edge edge = dirEdge.getEdge();
         final LineString points = edge.getLineString();
-        for (int i = 0; i < points.getVertexCount(); i++) {
-          final Point point = points.getPoint(i);
-          if (bounds == null) {
-            bounds = RectangleUtil.newBounds(2, point);
-          } else {
-            RectangleUtil.expand(bounds, 2, point);
-          }
-        }
+        final BiConsumerDouble action = this::expandBbox;
+        points.forEachVertex(action);
       }
-      this.env = new BoundingBoxDoubleXY(bounds);
     }
-    return this.env;
+    return this;
   }
 
   public List<Node> getNodes() {

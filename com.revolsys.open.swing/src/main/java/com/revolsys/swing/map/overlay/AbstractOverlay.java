@@ -488,7 +488,8 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     final double snapCentreX = this.snapCentre.getX();
     final double snapCentreY = this.snapCentre.getY();
     final double maxDistance = this.viewport.getHotspotMapUnits();
-    final BoundingBox boundingBox = this.snapCentre.getBoundingBox().expand(maxDistance);
+    final BoundingBox boundingBox = this.snapCentre.bboxEditor() //
+      .expandDelta(maxDistance);
 
     final GeometryFactory geometryFactory = getViewportGeometryFactory2d();
     final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<>();
@@ -554,8 +555,8 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   public void mouseWheelMoved(final MouseWheelEvent e) {
   }
 
-  protected BoundingBoxEditor newBoundingBox(final Viewport2D viewport, final int x1,
-    final int y1, final int x2, final int y2) {
+  protected BoundingBoxEditor newBoundingBox(final Viewport2D viewport, final int x1, final int y1,
+    final int x2, final int y2) {
     // Convert first point to envelope top left in map coords.
     final int minX = Math.min(x1, x2);
     final int minY = Math.min(y1, y2);

@@ -176,7 +176,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
-      return getGeometryFactory().newBoundingBoxEmpty();
+      return getGeometryFactory().bboxEmpty();
     }
   }
 
@@ -475,8 +475,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       final double height = image.getImageHeight() - 1;
       final double[] targetCoordinates = MappedLocation.toModelCoordinates(image, layerBoundingBox,
         true, 0, height, width, height, width, 0, 0, 0, 0, height);
-      final LineString line = layerBoundingBox.getGeometryFactory().lineString(2,
-        targetCoordinates);
+      final LineString line = layerBoundingBox.getGeometryFactory()
+        .lineString(2, targetCoordinates);
       boundingBox.addGeometry(line);
     }
     final BoundingBox boundingBox1 = boundingBox //

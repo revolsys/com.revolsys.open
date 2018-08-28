@@ -1020,7 +1020,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     } else if (SwingUtil.isLeftButtonAndNoModifiers(event) && event.getClickCount() == 2) {
       final List<LayerRecord> records = new ArrayList<>();
       final BoundingBox boundingBox = getHotspotBoundingBox();
-      final Geometry boundary = boundingBox.toPolygon().prepare();
+      final Geometry boundary = boundingBox.toRectangle().prepare();
       addRecords(records, getProject(), boundary);
 
       final int size = records.size();

@@ -1,6 +1,5 @@
 package com.revolsys.geometry.model.impl;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
@@ -9,16 +8,11 @@ public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
 
   private final GeometryFactory geometryFactory;
 
-  public BoundingBoxDoubleXYGeometryFactory(final GeometryFactory geometryFactory, final double x,
-    final double y) {
-    super(x, y);
-    this.geometryFactory = geometryFactory;
-  }
-
   public BoundingBoxDoubleXYGeometryFactory(final GeometryFactory geometryFactory, final double x1,
     final double y1, final double x2, final double y2) {
-    super(geometryFactory, x1, y1, x2, y2);
+    super(x1, y1, x2, y2);
     this.geometryFactory = geometryFactory;
+    makePrecise();
   }
 
   @Override
@@ -26,21 +20,15 @@ public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
     return this.geometryFactory;
   }
 
-  @Override
-  public BoundingBox newBoundingBox(final double x, final double y) {
-    return new BoundingBoxDoubleXYGeometryFactory(this.geometryFactory, x, y);
-  }
-
-  @Override
-  public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
-    final double maxY) {
-    return new BoundingBoxDoubleXYGeometryFactory(this.geometryFactory, minX, minY, maxX, maxY);
+  private void makePrecise() {
+    this.minX = this.geometryFactory.makeXPreciseFloor(this.minX);
+    this.maxX = this.geometryFactory.makeXPreciseCeil(this.maxX);
+    this.minY = this.geometryFactory.makeYPreciseFloor(this.minY);
+    this.maxY = this.geometryFactory.makeYPreciseCeil(this.maxY);
   }
 
   @Override
   public RectangleXY toRectangle() {
-    final double width = getWidth();
-    final double height = getHeight();
-    return this.geometryFactory.newRectangle(this.minX, this.minY, width, height);
+    return this.geometryFactory.newRectangleCorners(this.minX, this.minY, this.maxX, this.maxY);
   }
 }

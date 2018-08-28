@@ -14,7 +14,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.util.ExitLoopException;
 import com.revolsys.util.Property;
@@ -81,7 +80,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public List<T> findWithin(BoundingBox boundingBox) {
     if (this.geometryFactory != null) {
-      boundingBox = boundingBox.toCs(this.geometryFactory);
+      boundingBox = boundingBox.bboxToCs(this.geometryFactory);
     }
     final List<T> results = new ArrayList<>();
     if (this.root != null) {
@@ -93,11 +92,10 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   public List<T> findWithinDistance(final Point point, final double maxDistance) {
     final double x = point.getX();
     final double y = point.getY();
-    BoundingBox envelope = new BoundingBoxDoubleXY(x, y);
-    envelope = envelope.expand(maxDistance);
+    final BoundingBox boundingBox = BoundingBox.bboxNewDelta(x, y, maxDistance);
     final List<T> results = new ArrayList<>();
     if (this.root != null) {
-      this.root.findWithin(results, x, y, maxDistance, envelope);
+      this.root.findWithin(results, x, y, maxDistance, boundingBox);
     }
     return results;
   }

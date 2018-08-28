@@ -1708,14 +1708,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 logQuery.append(whereClause);
                 logQuery.append(" AND");
               }
-              logQuery.append("GEOMETRY intersects BBOX(");
-              logQuery.append(boundingBox.getXMin());
-              logQuery.append(" ");
-              logQuery.append(boundingBox.getXMax());
-              logQuery.append(",");
-              logQuery.append(boundingBox.getYMin());
-              logQuery.append(" ");
-              logQuery.append(boundingBox.getYMax());
+              logQuery.append("GEOMETRY intersects ");
+              logQuery.append(BoundingBox.bboxToWkt(//
+                boundingBox.getXMin(), //
+                boundingBox.getYMin(), //
+                boundingBox.getXMax(), //
+                boundingBox.getYMax()//
+              ));
               logQuery.append(")");
               throw Exceptions.wrap(logQuery.toString(), e);
             }

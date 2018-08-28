@@ -33,6 +33,7 @@
 
 package com.revolsys.geometry.planargraph;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.Consumer3Double;
@@ -84,6 +85,19 @@ public class Node extends GraphComponent implements Point {
     coordinates[Y] = this.y;
     for (int i = 3; i < coordinates.length; i++) {
       coordinates[i] = Double.NaN;
+    }
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof Point) {
+      final Point point = (Point)other;
+      return equals(point);
+    } else if (other instanceof BoundingBox) {
+      final BoundingBox boundingBox = (BoundingBox)other;
+      return bboxEquals(boundingBox);
+    } else {
+      return false;
     }
   }
 

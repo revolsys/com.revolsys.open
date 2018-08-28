@@ -33,8 +33,7 @@
 package com.revolsys.core.test.geometry.test.testrunner;
 
 import com.revolsys.geometry.model.Geometry;
-
-import junit.framework.Assert;
+import com.revolsys.testapi.GeometryAssert;
 
 /**
  * A {@link ResultMatcher} which compares result for equality,
@@ -43,7 +42,6 @@ import junit.framework.Assert;
  * @author mbdavis
  *
  */
-@SuppressWarnings("deprecation")
 public class EqualityResultMatcher implements ResultMatcher {
   /**
    * Tests whether the two results are equal within the given
@@ -56,7 +54,7 @@ public class EqualityResultMatcher implements ResultMatcher {
     final Result actualResult, final Result expectedResult, final double tolerance) {
     final boolean equals = actualResult.equals(expectedResult, tolerance);
     if (!equals) {
-      Assert.failNotEquals(opName, expectedResult.getResult(), actualResult.getResult());
+      GeometryAssert.failNotEquals(opName, expectedResult.getResult(), actualResult.getResult());
     }
     return equals;
   }

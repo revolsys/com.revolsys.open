@@ -134,7 +134,7 @@ public interface GeoreferencedImage
       if (imageWidth > 0 && imageHeight > 0) {
 
         final GeometryFactory viewGeometryFactory = viewBoundingBox.getGeometryFactory();
-        imageBoundingBox = imageBoundingBox.toCs(viewGeometryFactory);
+        imageBoundingBox = imageBoundingBox.bboxToCs(viewGeometryFactory);
         final AffineTransform transform = graphics.getTransform();
         try {
           final double scaleFactor = viewWidth / viewBoundingBox.getWidth();

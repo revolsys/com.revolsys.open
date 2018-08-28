@@ -171,7 +171,7 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
       return getBoundingBox();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.newBoundingBoxEmpty();
+      return geometryFactory.bboxEmpty();
     }
   }
 

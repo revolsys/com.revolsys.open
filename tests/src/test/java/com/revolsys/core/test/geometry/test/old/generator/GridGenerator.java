@@ -36,7 +36,6 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 /**
@@ -141,8 +140,7 @@ public class GridGenerator extends GeometryGenerator {
    */
   @Override
   public Geometry newGeometry() {
-    final GeometryFactory r = this.geometryFactory;
-    return newBoundingBox().toGeometry();
+    return newBoundingBox().toRectangle();
   }
 
   /**

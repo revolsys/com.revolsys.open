@@ -52,9 +52,7 @@ import com.revolsys.geometry.cs.unit.Radian;
 import com.revolsys.geometry.cs.unit.ScaleUnit;
 import com.revolsys.geometry.cs.unit.TimeUnit;
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.ClassPathResource;
@@ -463,14 +461,7 @@ public final class EpsgCoordinateSystems {
             minX -= 360;
           }
         }
-        BoundingBox boundingBox;
-        if (Double.isFinite(minX) || Double.isFinite(minX) || Double.isFinite(minX)
-          || Double.isFinite(minX)) {
-          boundingBox = new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
-        } else {
-          boundingBox = BoundingBox.empty();
-        }
-        final Area area = new Area(name, boundingBox, authority, deprecated);
+        final Area area = new Area(name, minX, minY, maxX, maxY, authority, deprecated);
         AREA_BY_ID.put(code, area);
       }
     } catch (final NoSuchResourceException e) {

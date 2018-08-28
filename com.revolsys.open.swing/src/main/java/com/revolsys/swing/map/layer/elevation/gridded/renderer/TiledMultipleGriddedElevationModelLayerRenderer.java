@@ -10,6 +10,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
@@ -302,8 +303,9 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
       final double minY = boundingBox.getMinY();
       final double maxX = boundingBox.getMaxX();
       final double maxY = boundingBox.getMaxY();
-      final BoundingBox newBoundingBox = boundingBox.newBoundingBox(minX, minY, this.minZ, maxX,
-        maxY, this.maxZ);
+      final GeometryFactory geometryFactory = layer.getGeometryFactory();
+      final BoundingBox newBoundingBox = geometryFactory.newBoundingBox(3, minX, minY, this.minZ,
+        maxX, maxY, this.maxZ);
       layer.setBoundingBox(newBoundingBox);
     }
   }

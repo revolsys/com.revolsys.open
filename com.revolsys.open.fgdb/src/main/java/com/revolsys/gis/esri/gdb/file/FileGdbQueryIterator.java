@@ -241,7 +241,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
           final GeometryFactory geometryFactory = geometryField
             .getProperty(FieldProperties.GEOMETRY_FACTORY);
           if (geometryFactory != null) {
-            this.boundingBox = boundingBox.toCs(geometryFactory);
+            this.boundingBox = boundingBox.bboxToCs(geometryFactory);
           }
         }
       }

@@ -85,11 +85,12 @@ public interface QueryValue extends Cloneable {
           final WithinDistance withinDistance = (WithinDistance)childValue;
           final BoundingBox boundingBox1 = getBoundingBox(withinDistance.getGeometry1Value());
           final BoundingBox boundingBox2 = getBoundingBox(withinDistance.getGeometry2Value());
-          final BoundingBox withinBoundingBox = BoundingBox.bboxNew(boundingBox1, boundingBox2);
+          final BoundingBoxEditor withinBoundingBox = BoundingBox.bboxEditor(boundingBox1,
+            boundingBox2);
           final double distance = ((Number)((Value)withinDistance.getDistanceValue()).getValue())
             .doubleValue();
 
-          boundingBox.addBbox(withinBoundingBox.expand(distance));
+          boundingBox.addBbox(withinBoundingBox.expandDelta(distance));
         } else if (childValue instanceof Value) {
           final Value valueContainer = (Value)childValue;
           final Object value = valueContainer.getValue();

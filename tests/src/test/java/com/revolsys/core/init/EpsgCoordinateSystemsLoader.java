@@ -16,6 +16,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.CoordinateSystemType;
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.PathName;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.logging.Logs;
@@ -164,7 +165,7 @@ public final class EpsgCoordinateSystemsLoader {
         final double maxX = writeDouble(writer, record, "area_east_bound_lon");
         final double maxY = writeDouble(writer, record, "area_north_bound_lat");
         writeDeprecated(writer, record);
-        final String bbox = "BBOX(" + minX + " " + minY + "," + maxX + " " + maxY + ")";
+        final String bbox = BoundingBox.bboxToWkt(minX, minY, maxX, maxY);
         this.areaById.put(id, new LinkedHashMapEx() //
           .add("id", id) //
           .add("name", name) //

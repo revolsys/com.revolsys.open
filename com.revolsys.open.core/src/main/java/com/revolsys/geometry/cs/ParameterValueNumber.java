@@ -3,7 +3,6 @@ package com.revolsys.geometry.cs;
 import java.security.MessageDigest;
 
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Md5;
 import com.revolsys.util.number.Doubles;
 
@@ -25,9 +24,6 @@ public class ParameterValueNumber extends Number implements ParameterValue {
       this.value = unitValue;
     } else {
       this.value = unit.toNormal(unitValue);
-    }
-    if (this.value == -12600) {
-      Debug.noOp();
     }
   }
 

@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -76,6 +77,9 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
     if (other instanceof Point) {
       final Point point = (Point)other;
       return equals(point);
+    } else if (other instanceof BoundingBox) {
+      final BoundingBox boundingBox = (BoundingBox)other;
+      return bboxEquals(boundingBox);
     } else {
       return false;
     }

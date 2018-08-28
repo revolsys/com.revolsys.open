@@ -54,7 +54,7 @@ public class BingClient {
     final double y2 = getLatitude(zoomLevel, tileY + 1);
     final double x1 = getLongitude(zoomLevel, tileX);
     final double x2 = getLongitude(zoomLevel, tileX + 1);
-    return GeometryFactory.wgs84().newBoundingBox(x1, y1, x2, y2).toCs(
+    return GeometryFactory.wgs84().newBoundingBox(x1, y1, x2, y2).bboxToCs(
       GeometryFactory.worldMercator());
   }
 

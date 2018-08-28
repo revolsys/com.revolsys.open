@@ -115,11 +115,11 @@ public class PointQuadTreeNode<T> {
   }
 
   public void findWithin(final List<T> results, final double x, final double y,
-    final double maxDistance, final BoundingBox envelope) {
-    final double minX = envelope.getMinX();
-    final double maxX = envelope.getMaxX();
-    final double minY = envelope.getMinY();
-    final double maxY = envelope.getMaxY();
+    final double maxDistance, final BoundingBox boundingBox) {
+    final double minX = boundingBox.getMinX();
+    final double maxX = boundingBox.getMaxX();
+    final double minY = boundingBox.getMinY();
+    final double maxY = boundingBox.getMaxY();
     final double distance = MathUtil.distance(x, y, this.x, this.y);
     if (distance < maxDistance) {
       results.add(this.value);
@@ -129,16 +129,16 @@ public class PointQuadTreeNode<T> {
     final boolean minYLess = isLessThanY(minY);
     final boolean maxYLess = isLessThanY(maxY);
     if (this.southWest != null && minXLess && minYLess) {
-      this.southWest.findWithin(results, x, y, maxDistance, envelope);
+      this.southWest.findWithin(results, x, y, maxDistance, boundingBox);
     }
     if (this.northWest != null && minXLess && !maxYLess) {
-      this.northWest.findWithin(results, x, y, maxDistance, envelope);
+      this.northWest.findWithin(results, x, y, maxDistance, boundingBox);
     }
     if (this.southEast != null && !maxXLess && minYLess) {
-      this.southEast.findWithin(results, x, y, maxDistance, envelope);
+      this.southEast.findWithin(results, x, y, maxDistance, boundingBox);
     }
     if (this.northEast != null && !maxXLess && !maxYLess) {
-      this.northEast.findWithin(results, x, y, maxDistance, envelope);
+      this.northEast.findWithin(results, x, y, maxDistance, boundingBox);
     }
   }
 

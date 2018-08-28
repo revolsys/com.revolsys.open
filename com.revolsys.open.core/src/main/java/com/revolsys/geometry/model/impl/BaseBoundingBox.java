@@ -1,6 +1,7 @@
 package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.MathUtil;
 
 public abstract class BaseBoundingBox implements BoundingBox {
@@ -31,6 +32,11 @@ public abstract class BaseBoundingBox implements BoundingBox {
   }
 
   @Override
+  public GeometryFactory getGeometryFactory() {
+    return GeometryFactory.DEFAULT_2D;
+  }
+
+  @Override
   public int hashCode() {
     if (isEmpty()) {
       return 0;
@@ -50,6 +56,6 @@ public abstract class BaseBoundingBox implements BoundingBox {
 
   @Override
   public String toString() {
-    return BoundingBox.toString(this);
+    return bboxToEWkt();
   }
 }

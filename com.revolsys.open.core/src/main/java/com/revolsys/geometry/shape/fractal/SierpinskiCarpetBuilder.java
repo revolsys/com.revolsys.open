@@ -40,8 +40,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.PointList;
-import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.shape.GeometricShapeBuilder;
 
@@ -51,8 +50,6 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
     final double exp = Math.log(pow4) / Math.log(4);
     return (int)exp;
   }
-
-  private final PointList coordList = new PointList();
 
   public SierpinskiCarpetBuilder(final GeometryFactory geomFactory) {
     super(geomFactory);
@@ -86,10 +83,18 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
     final LineSegment baseLine = getSquareBaseLine();
     final Point origin = baseLine.getPoint(0);
     final List<LinearRing> rings = new ArrayList<>();
-    final LinearRing shell = ((Polygon)getSquareExtent().toGeometry()).getShell();
+    final LinearRing shell = getSquareExtent().getShell();
     rings.add(shell);
     addHoles(level, origin.getX(), origin.getY(), getDiameter(), rings);
     return this.geometryFactory.polygon(shell);
+  }
+
+  private RectangleXY getSquareExtent() {
+    final double radius = getRadius();
+
+    final Point centre = getCentre();
+    return this.geometryFactory.newRectangleCorners(centre.getX() - radius, centre.getY() - radius,
+      centre.getX() + radius, centre.getY() + radius);
   }
 
   private LinearRing newSquareHole(final double x, final double y, final double width) {

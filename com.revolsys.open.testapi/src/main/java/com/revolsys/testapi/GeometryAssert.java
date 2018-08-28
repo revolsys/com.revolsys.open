@@ -117,7 +117,8 @@ public class GeometryAssert {
 
   public static boolean failNotEquals(final String message, final Object expected,
     final Object actual) {
-    Assert.fail(format(message, expected, actual));
+    final String text = format(message, expected, actual);
+    Assert.fail(text);
     return false;
   }
 

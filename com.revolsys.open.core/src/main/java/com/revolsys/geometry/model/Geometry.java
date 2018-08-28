@@ -593,6 +593,23 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
   int compareToSameClass(Geometry o);
 
+  /**
+   * Check that geom is not contained entirely in the rectangle boundary.
+   * According to the somewhat odd spec of the SFS, if this
+   * is the case the geometry is NOT contained.
+   */
+  default boolean containedBy(final BoundingBox boundingBox) {
+    if (boundingBox.bboxCovers(this)) {
+      if (isContainedInBoundary(boundingBox)) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
+
   default boolean contains(final double x, final double y) {
     return false;
   }
@@ -1414,8 +1431,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return 0.0;
   }
 
-  int getAxisCount();
-
   /**
    * Returns the boundary, or an empty geometry of appropriate dimension
    * if this <code>Geometry</code>  is empty.
@@ -1446,10 +1461,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * If the geometry is empty, an empty <code>BoundingBox</code>
    * is returned.
    * <p>
-   * The returned object is a copy of the one maintained internally,
-   * to avoid aliasing issues.
-   * For best performance, clients which access this
-   * boundingBox frequently should cache the return value.
    *
    *@return the boundingBox of this <code>Geometry</code>.
    *@return an empty BoundingBox if this Geometry is empty
@@ -2023,7 +2034,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   default BoundingBox newBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return geometryFactory.newBoundingBoxEmpty();
+      return geometryFactory.bboxEmpty();
     } else {
       final BoundingBoxEditor boundingBox = new BoundingBoxEditor(geometryFactory);
       forEachVertex(boundingBox);

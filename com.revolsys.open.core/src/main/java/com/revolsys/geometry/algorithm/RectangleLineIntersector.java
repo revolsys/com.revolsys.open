@@ -63,27 +63,27 @@ public class RectangleLineIntersector {
   // for intersection testing, don't need to set precision model
   private final LineIntersector li = new RobustLineIntersector();
 
-  private final BoundingBox rectEnv;
+  private final BoundingBox boundingBox;
 
   /**
    * Creates a new intersector for the given query rectangle,
    * specified as an {@link BoundingBox}.
    *
    *
-   * @param rectEnv the query rectangle, specified as an BoundingBox
+   * @param boundingBox the query rectangle, specified as an BoundingBox
    */
-  public RectangleLineIntersector(final BoundingBox rectEnv) {
-    this.rectEnv = rectEnv;
+  public RectangleLineIntersector(final BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
 
     /**
      * Up and Down are the diagonal orientations
      * relative to the Left side of the rectangle.
      * Index 0 is the left side, 1 is the right side.
      */
-    this.diagUp0 = new PointDoubleXY(rectEnv.getMinX(), rectEnv.getMinY());
-    this.diagUp1 = new PointDoubleXY(rectEnv.getMaxX(), rectEnv.getMaxY());
-    this.diagDown0 = new PointDoubleXY(rectEnv.getMinX(), rectEnv.getMaxY());
-    this.diagDown1 = new PointDoubleXY(rectEnv.getMaxX(), rectEnv.getMinY());
+    this.diagUp0 = new PointDoubleXY(boundingBox.getMinX(), boundingBox.getMinY());
+    this.diagUp1 = new PointDoubleXY(boundingBox.getMaxX(), boundingBox.getMaxY());
+    this.diagDown0 = new PointDoubleXY(boundingBox.getMinX(), boundingBox.getMaxY());
+    this.diagDown1 = new PointDoubleXY(boundingBox.getMaxX(), boundingBox.getMinY());
   }
 
   /**
@@ -95,79 +95,71 @@ public class RectangleLineIntersector {
    * @return true if the rectangle intersects the segment
    */
   public boolean intersects(Point p0, Point p1) {
-    // TODO: confirm that checking envelopes first is faster
+    final double x1 = p0.getX();
+    final double y1 = p0.getY();
+    final double x2 = p1.getX();
+    final double y2 = p1.getY();
 
     /**
      * If the segment envelope is disjoint from the
      * rectangle envelope, there is no intersection
      */
-    final BoundingBox segEnv = this.rectEnv.newBoundingBox(p0.getX(), p0.getY(), p1.getX(),
-      p1.getY());
-    if (!this.rectEnv.bboxIntersects(segEnv)) {
-      return false;
-    }
-
-    /**
-     * If either segment endpoint lies in the rectangle,
-     * there is an intersection.
-     */
-    if (p0.intersects(this.rectEnv)) {
+    if (this.boundingBox.bboxIntersects(x1, y1)) {
       return true;
-    }
-    if (p1.intersects(this.rectEnv)) {
+    } else if (this.boundingBox.bboxIntersects(x2, y2)) {
       return true;
-    }
+    } else if (this.boundingBox.bboxIntersects(x1, y1, x2, y2)) {
+      /**
+       * Compute angle of segment.
+       * Since the segment is normalized to run left to right,
+       * it is sufficient to simply test the Y ordinate.
+       * "Upwards" means relative to the left end of the segment.
+       */
+      boolean isSegUpwards;
 
-    /**
-     * Normalize segment.
-     * This makes p0 less than p1,
-     * so that the segment runs to the right,
-     * or vertically upwards.
-     */
-    if (p0.compareTo(p1) > 0) {
-      final Point tmp = p0;
-      p0 = p1;
-      p1 = tmp;
-    }
-    /**
-     * Compute angle of segment.
-     * Since the segment is normalized to run left to right,
-     * it is sufficient to simply test the Y ordinate.
-     * "Upwards" means relative to the left end of the segment.
-     */
-    boolean isSegUpwards = false;
-    if (p1.getY() > p0.getY()) {
-      isSegUpwards = true;
-    }
+      /**
+       * Normalize segment.
+       * This makes p0 less than p1,
+       * so that the segment runs to the right,
+       * or vertically upwards.
+       */
+      if (p0.compareTo(p1) > 0) {
+        final Point tmp = p0;
+        p0 = p1;
+        p1 = tmp;
+        isSegUpwards = y1 > y2;
+      } else {
+        isSegUpwards = y2 > y1;
+      }
 
-    /**
-     * Since we now know that neither segment endpoint
-     * lies in the rectangle, there are two possible
-     * situations:
-     * 1) the segment is disjoint to the rectangle
-     * 2) the segment crosses the rectangle completely.
-     *
-     * In the case of a crossing, the segment must intersect
-     * a diagonal of the rectangle.
-     *
-     * To distinguish these two cases, it is sufficient
-     * to test intersection with
-     * a single diagonal of the rectangle,
-     * namely the one with slope "opposite" to the slope
-     * of the segment.
-     * (Note that if the segment is axis-parallel,
-     * it must intersect both diagonals, so this is
-     * still sufficient.)
-     */
-    if (isSegUpwards) {
-      this.li.computeIntersectionPoints(p0, p1, this.diagDown0, this.diagDown1);
-    } else {
-      this.li.computeIntersectionPoints(p0, p1, this.diagUp0, this.diagUp1);
-    }
-    if (this.li.hasIntersection()) {
-      return true;
+      /**
+       * Since we now know that neither segment endpoint
+       * lies in the rectangle, there are two possible
+       * situations:
+       * 1) the segment is disjoint to the rectangle
+       * 2) the segment crosses the rectangle completely.
+       *
+       * In the case of a crossing, the segment must intersect
+       * a diagonal of the rectangle.
+       *
+       * To distinguish these two cases, it is sufficient
+       * to test intersection with
+       * a single diagonal of the rectangle,
+       * namely the one with slope "opposite" to the slope
+       * of the segment.
+       * (Note that if the segment is axis-parallel,
+       * it must intersect both diagonals, so this is
+       * still sufficient.)
+       */
+      if (isSegUpwards) {
+        this.li.computeIntersectionPoints(p0, p1, this.diagDown0, this.diagDown1);
+      } else {
+        this.li.computeIntersectionPoints(p0, p1, this.diagUp0, this.diagUp1);
+      }
+      if (this.li.hasIntersection()) {
+        return true;
+      }
     }
     return false;
-
   }
 }

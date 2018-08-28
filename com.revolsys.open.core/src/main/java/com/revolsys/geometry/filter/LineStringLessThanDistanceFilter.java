@@ -86,8 +86,9 @@ public class LineStringLessThanDistanceFilter implements Predicate<LineString> {
 
   public void setGeometry(final LineString geometry) {
     this.geometry = geometry;
-    this.envelope = geometry.getBoundingBox();
-    this.envelope = this.envelope.expand(this.distance);
+    this.envelope = geometry.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(this.distance);
   }
 
   @Override

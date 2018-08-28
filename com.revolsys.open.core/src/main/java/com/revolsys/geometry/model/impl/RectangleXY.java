@@ -314,7 +314,7 @@ public class RectangleXY extends AbstractPolygon {
 
   @Override
   public boolean contains(final double x, final double y) {
-    if (x < this.minX || this.maxX < x || y < this.minY || this.maxY < y) {
+    if (x <= this.minX || this.maxX <= x || y <= this.minY || this.maxY <= y) {
       return false;
     } else {
       return true;
@@ -596,8 +596,7 @@ public class RectangleXY extends AbstractPolygon {
 
   @Override
   public BoundingBox newBoundingBox() {
-    return new BoundingBoxDoubleXY(this.geometryFactory, this.minX, this.minY, this.maxX,
-      this.maxY);
+    return this.geometryFactory.newBoundingBox(this.minX, this.minY, this.maxX, this.maxY);
   }
 
   public OutCode outcode(final double x, final double y) {

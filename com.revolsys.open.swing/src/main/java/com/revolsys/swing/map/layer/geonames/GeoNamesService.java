@@ -89,7 +89,7 @@ public class GeoNamesService {
     final GeometryFactory geometryFactory = GeometryFactory.floating3d(EpsgId.WGS84);
     final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)geometryFactory
       .getHorizontalCoordinateSystem();
-    final BoundingBox geographicBoundingBox = boundingBox.toCs(geometryFactory);
+    final BoundingBox geographicBoundingBox = boundingBox.bboxToCs(geometryFactory);
     final Map<String, Object> params = new HashMap<>();
 
     final double radius = cs.getDatum().getEllipsoid().getSemiMajorAxis();
@@ -114,7 +114,7 @@ public class GeoNamesService {
   }
 
   public List<Record> getWikipediaArticles(final BoundingBox boundingBox) {
-    final BoundingBox geographicBoundingBox = boundingBox.toCs(GeometryFactory.floating3d(EpsgId.WGS84));
+    final BoundingBox geographicBoundingBox = boundingBox.bboxToCs(GeometryFactory.floating3d(EpsgId.WGS84));
     final Map<String, Object> params = new HashMap<>();
 
     params.put("north", geographicBoundingBox.getMaxY());

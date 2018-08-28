@@ -35,6 +35,7 @@ package com.revolsys.geometry.geomgraph;
 import java.io.PrintStream;
 import java.util.Iterator;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
@@ -94,6 +95,19 @@ public class Node extends GraphComponent implements Point {
       }
     }
     return loc;
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof Point) {
+      final Point point = (Point)other;
+      return equals(point);
+    } else if (other instanceof BoundingBox) {
+      final BoundingBox boundingBox = (BoundingBox)other;
+      return bboxEquals(boundingBox);
+    } else {
+      return false;
+    }
   }
 
   @Override

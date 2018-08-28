@@ -681,7 +681,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       final double maxDistance = this.viewport.getHotspotMapUnits();
       final GeometryFactory geometryFactory = this.viewport.getGeometryFactory2dFloating();
 
-      final BoundingBox boundingBox = point.newBoundingBox().expand(maxDistance);
+      final BoundingBox boundingBox = point.bboxEditor() //
+        .expandDelta(maxDistance);
       final List<LayerRecord> closeRecords = new ArrayList<>();
       final List<CloseLocation> closeLocations = new ArrayList<>();
       for (final LayerRecord closeRecord : getSelectedRecords(boundingBox)) {
@@ -816,7 +817,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public void panToBoundingBox(BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    boundingBox = boundingBox.toCs(geometryFactory);
+    boundingBox = boundingBox.bboxToCs(geometryFactory);
     final Viewport2D viewport = getViewport();
     if (!RectangleUtil.isEmpty(boundingBox)) {
       final Point centre = boundingBox.getCentre();

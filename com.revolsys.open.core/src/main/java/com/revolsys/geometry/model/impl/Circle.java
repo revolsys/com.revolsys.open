@@ -8,7 +8,7 @@ public class Circle extends PointDoubleXY {
 
   private static final long serialVersionUID = 1L;
 
-  private BoundingBox boundingBox;
+  private final BoundingBox boundingBox;
 
   private final double radius;
 
@@ -17,8 +17,9 @@ public class Circle extends PointDoubleXY {
   public Circle(final Point centre, final double radius) {
     super(centre);
     this.radius = radius;
-    this.boundingBox = new BoundingBoxDoubleXY(getX(), getY());
-    this.boundingBox = this.boundingBox.expand(radius);
+    final double x = getX();
+    final double y = getY();
+    this.boundingBox = new BoundingBoxDoubleXY(x - radius, y - radius, x + radius, y + radius);
   }
 
   public boolean contains(final Point point) {

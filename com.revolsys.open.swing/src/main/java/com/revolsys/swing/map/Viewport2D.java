@@ -510,7 +510,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   public BoundingBox setBoundingBox(BoundingBox boundingBox) {
     if (boundingBox != null && !boundingBox.isEmpty()) {
       final GeometryFactory geometryFactory = getGeometryFactory2dFloating();
-      boundingBox = boundingBox.toCs(geometryFactory);
+      boundingBox = boundingBox.bboxToCs(geometryFactory);
       if (!boundingBox.isEmpty()) {
         BoundingBox newBoundingBox = boundingBox;
         double width = newBoundingBox.getWidth();

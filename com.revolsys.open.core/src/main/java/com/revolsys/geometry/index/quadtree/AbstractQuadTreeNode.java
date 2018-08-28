@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.DoubleBits;
 import com.revolsys.geometry.index.IntervalSize;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Emptyable;
@@ -48,8 +49,7 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
 
   private boolean coversBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
-    return RectangleUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX,
-      maxY);
+    return RectangleUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX, maxY);
   }
 
   public int depth() {
@@ -410,7 +410,7 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
 
   @Override
   public String toString() {
-    return this.level + " BBOX(" + this.minX + " " + this.minY + "," + this.maxX + " " + this.maxY
-      + ") " + getItemCount();
+    return this.level + " " + BoundingBox.bboxToWkt(this.minX, this.minY, this.maxX, this.maxY)
+      + " " + getItemCount();
   }
 }

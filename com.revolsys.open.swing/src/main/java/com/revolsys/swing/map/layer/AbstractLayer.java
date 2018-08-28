@@ -356,7 +356,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       return getBoundingBox();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.newBoundingBoxEmpty();
+      return geometryFactory.bboxEmpty();
     }
   }
 
@@ -478,7 +478,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     if (geometryFactory == null) {
       return BoundingBox.empty();
     } else {
-      return geometryFactory.newBoundingBoxEmpty();
+      return geometryFactory.bboxEmpty();
     }
   }
 
@@ -950,15 +950,15 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       return null;
     } else {
       this.geometryFactory = geometryFactory;
-      if (Property.isEmpty(this.boundingBox)) {
+      final BoundingBox boundingBox = getBoundingBox();
+      if (Property.isEmpty(boundingBox)) {
         final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
         if (coordinateSystem != null) {
-          this.boundingBox = coordinateSystem.getAreaBoundingBox();
+          setBoundingBox(coordinateSystem.getAreaBoundingBox());
         }
-      } else if (this.boundingBox != null
-        && !this.boundingBox.getGeometryFactory().isHasHorizontalCoordinateSystem()
+      } else if (!boundingBox.getGeometryFactory().isHasHorizontalCoordinateSystem()
         && geometryFactory.isHasHorizontalCoordinateSystem()) {
-        this.boundingBox = this.boundingBox.toCs(geometryFactory);
+        setBoundingBox(boundingBox.bboxToCs(geometryFactory));
       }
       return geometryFactory;
     }

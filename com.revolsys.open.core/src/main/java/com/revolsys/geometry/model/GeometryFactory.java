@@ -71,6 +71,7 @@ import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.model.impl.AbstractPolygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxEmpty;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
@@ -425,14 +426,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   public static final GeometryFactory DEFAULT_3D = floating(0, 3);
 
   private static final long serialVersionUID = 4328651897279304108L;
-
-  public static final BoundingBox boundingBox(final Geometry geometry) {
-    if (geometry == null) {
-      return DEFAULT_3D.newBoundingBoxEmpty();
-    } else {
-      return geometry.getBoundingBox();
-    }
-  }
 
   public static void clear() {
     factoryFloatingBySridAndAxisCount.clear();
@@ -894,6 +887,10 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return new BoundingBoxEditor(this);
   }
 
+  public BoundingBox bboxEmpty() {
+    return this.boundingBoxEmpty;
+  }
+
   /**
    *  Build an appropriate <code>Geometry</code>, <code>MultiGeometry</code>, or
    *  <code>GeometryCollection</code> to contain the <code>Geometry</code>s in
@@ -1301,6 +1298,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
   }
 
+  @Override
   public final int getAxisCount() {
     return this.axisCount;
   }
@@ -1985,12 +1983,17 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public BoundingBox newBoundingBox(final double x, final double y) {
-    return new BoundingBoxDoubleXYGeometryFactory(this, x, y);
+    return newBoundingBox(x, y, x, y);
   }
 
   public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
-    return new BoundingBoxDoubleXYGeometryFactory(this, minX, minY, maxX, maxY);
+    if (isHasHorizontalCoordinateSystem()) {
+      final GeometryFactory geometryFactory = convertAxisCount(2);
+      return new BoundingBoxDoubleXYGeometryFactory(geometryFactory, minX, minY, maxX, maxY);
+    } else {
+      return new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
+    }
   }
 
   public BoundingBox newBoundingBox(final int axisCount) {
@@ -2097,10 +2100,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     final double x = point.getX();
     final double y = point.getY();
     return newBoundingBox(x, y);
-  }
-
-  public BoundingBox newBoundingBoxEmpty() {
-    return this.boundingBoxEmpty;
   }
 
   public double[] newBounds(final int axisCount) {

@@ -348,7 +348,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
   }
 
   private GeoreferencedImage getCachedImage(BoundingBox boundingBox) {
-    boundingBox = boundingBox.toCs(getViewportGeometryFactory());
+    boundingBox = boundingBox.bboxToCs(getViewportGeometryFactory());
     final Viewport2D viewport = getViewport();
     final BoundingBox viewBoundingBox = viewport.getBoundingBox();
     if (this.cachedImage == null || !this.cachedImage.getBoundingBox().equals(viewBoundingBox)) {
@@ -397,7 +397,8 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
     final double deltaX = imagePoint.getX() - this.moveImageFirstPoint.getX();
     final double deltaY = imagePoint.getY() - this.moveImageFirstPoint.getY();
-    boundingBox = boundingBox.move(deltaX, deltaY);
+    boundingBox = boundingBox //
+      .bboxEdit(editor -> editor.move(deltaX, deltaY));
     return boundingBox;
   }
 
@@ -653,7 +654,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         int closestIndex = -1;
         BoundingBox imageBoundingBox = getImageBoundingBox();
         if (!imageBoundingBox.isEmpty()) {
-          imageBoundingBox = imageBoundingBox.toCs(viewportGeometryFactory);
+          imageBoundingBox = imageBoundingBox.bboxToCs(viewportGeometryFactory);
           for (int i = 0; i < 4; i++) {
             final Point point = imageBoundingBox.getCornerPoint(i);
             final Point mapPoint = point.convertPoint2d(viewportGeometryFactory);
@@ -977,7 +978,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
       view.drawDifferentCoordinateSystem(imageBoundingBox);
 
       if (outlineBoundingBox != null && !outlineBoundingBox.isEmpty()) {
-        final Polygon imageBoundary = outlineBoundingBox.toCs(getViewportGeometryFactory())
+        final Polygon imageBoundary = outlineBoundingBox.bboxToCs(getViewportGeometryFactory())
           .toPolygon(1);
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -1071,7 +1072,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
   public void setImageBoundingBox(BoundingBox boundingBox) {
     if (boundingBox == null) {
       final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
-      boundingBox = viewportGeometryFactory.newBoundingBoxEmpty();
+      boundingBox = viewportGeometryFactory.bboxEmpty();
     }
     setGeometryFactory(boundingBox.getGeometryFactory());
     if (this.image != null) {

@@ -34,6 +34,7 @@ package com.revolsys.geometry.model.impl;
 
 import java.awt.geom.Point2D;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 
 /**
@@ -66,6 +67,9 @@ public abstract class AbstractPoint extends Point2D implements Point {
     if (other instanceof Point) {
       final Point point = (Point)other;
       return equals(point);
+    } else if (other instanceof BoundingBox) {
+      final BoundingBox boundingBox = (BoundingBox)other;
+      return bboxEquals(boundingBox);
     } else {
       return false;
     }

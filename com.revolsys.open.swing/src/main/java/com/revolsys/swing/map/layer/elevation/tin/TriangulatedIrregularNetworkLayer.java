@@ -71,7 +71,7 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
-      return getGeometryFactory().newBoundingBoxEmpty();
+      return getGeometryFactory().bboxEmpty();
     }
   }
 

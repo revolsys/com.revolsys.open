@@ -13,7 +13,7 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
 
         final GeometryFactory geometryFactory = getGeometryFactory();
         if (geometryFactory != null) {
-          return boundingBox.toCs(geometryFactory);
+          return boundingBox.bboxToCs(geometryFactory);
         }
       }
       return boundingBox;
@@ -47,6 +47,15 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
       return geometryFactory.getAreaBoundingBox();
     }
     return BoundingBox.empty();
+  }
+
+  default int getAxisCount() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      return 2;
+    } else {
+      return geometryFactory.getAxisCount();
+    }
   }
 
   default CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {

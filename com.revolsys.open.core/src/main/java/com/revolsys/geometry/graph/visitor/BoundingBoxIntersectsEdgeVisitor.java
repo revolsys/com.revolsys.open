@@ -17,8 +17,9 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
 
     final LineString line = edge.getLineString();
-    BoundingBox boundingBox = line.getBoundingBox();
-    boundingBox = boundingBox.expand(maxDistance);
+    final BoundingBox boundingBox = line.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final BoundingBoxIntersectsEdgeVisitor<T> visitor = new BoundingBoxIntersectsEdgeVisitor<>(
       boundingBox, results);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();

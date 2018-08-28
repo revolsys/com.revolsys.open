@@ -3,7 +3,6 @@ package com.revolsys.geometry.model.vertex;
 import java.awt.geom.PathIterator;
 import java.util.Iterator;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryComponent;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -28,11 +27,6 @@ public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, Geome
   default int getAxisCount() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return (byte)geometryFactory.getAxisCount();
-  }
-
-  @Override
-  default BoundingBox getBoundingBox() {
-    return newBoundingBox();
   }
 
   @Override

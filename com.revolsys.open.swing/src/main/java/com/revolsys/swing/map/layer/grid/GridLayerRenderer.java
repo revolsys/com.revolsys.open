@@ -161,7 +161,7 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
         final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
         for (final RectangularMapTile tile : view.cancellable(tiles)) {
           final BoundingBox tileBoundingBox = tile.getBoundingBox();
-          final BoundingBox intersectBoundingBox = boundingBox.intersection(tileBoundingBox);
+          final BoundingBox intersectBoundingBox = boundingBox.bboxIntersection(tileBoundingBox);
           if (!intersectBoundingBox.isEmpty()) {
 
             final GeometryFactory geometryFactory = view.getGeometryFactory();

@@ -46,7 +46,8 @@ public class PointCloudLayer extends AbstractLayer {
       PointCloudLayer::new);
 
     // TODO Need to handle memory and rendering better
-    // addIoFactoryMenuItem("pointCloud", "Add Point Cloud Layer", "point_cloud",
+    // addIoFactoryMenuItem("pointCloud", "Add Point Cloud Layer",
+    // "point_cloud",
     // PointCloudReadFactory.class);
 
     final EnableCheck enableCheck = RsSwingServiceInitializer
@@ -113,7 +114,7 @@ public class PointCloudLayer extends AbstractLayer {
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
-      return getGeometryFactory().newBoundingBoxEmpty();
+      return getGeometryFactory().bboxEmpty();
     }
   }
 
@@ -158,9 +159,11 @@ public class PointCloudLayer extends AbstractLayer {
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
       // final PointCloud factory = IoFactory
-      // .factoryByFileExtension(PointCloudReadFactory.class, fileNameExtension);
+      // .factoryByFileExtension(PointCloudReadFactory.class,
+      // fileNameExtension);
       // if (factory != null) {
-      // SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
+      // SwingUtil.addLabelledReadOnlyTextField(panel, "File Type",
+      // factory.getName());
       // }
     }
     GroupLayouts.makeColumns(panel, 2, true);

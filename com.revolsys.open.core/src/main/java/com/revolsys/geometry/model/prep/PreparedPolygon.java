@@ -88,14 +88,14 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
   }
 
   @Override
-  public boolean contains(final Geometry g) {
-    if (bboxCovers(g)) {
+  public boolean contains(final Geometry geometry) {
+    if (bboxCovers(geometry)) {
       if (this.isRectangle) {
         final BoundingBox boundingBox = getBoundingBox();
-        return boundingBox.containsSFS(g);
+        return boundingBox.containsSFS(geometry);
       } else {
         final PreparedPolygonContains contains = new PreparedPolygonContains(this);
-        return contains.contains(g);
+        return contains.contains(geometry);
       }
     } else {
       return false;

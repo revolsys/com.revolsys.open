@@ -265,7 +265,7 @@ public class Buffer {
     final Point stabbingRayLeftPt) {
     final List<DepthSegment> segments = new ArrayList<>();
     for (final BufferSubgraph graph : graphs) {
-      final BoundingBox env = graph.getEnvelope();
+      final BoundingBox env = graph.getBoundingBox();
       if (stabbingRayLeftPt.getY() >= env.getMinY() && stabbingRayLeftPt.getY() <= env.getMaxY()) {
         final List<DirectedEdge> edges = graph.getDirectedEdges();
         for (final DirectedEdge edge : edges) {

@@ -19,8 +19,9 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
   public static List<Edge<LineSegment>> getEdges(final Graph<LineSegment> graph,
     final LineSegment lineSegment, final double maxDistance) {
     final CreateListVisitor<Edge<LineSegment>> results = new CreateListVisitor<>();
-    BoundingBox envelope = lineSegment.getBoundingBox();
-    envelope = envelope.expand(maxDistance);
+    final BoundingBox envelope = lineSegment.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final IdObjectIndex<Edge<LineSegment>> edgeIndex = graph.getEdgeIndex();
     edgeIndex.forEach(envelope, new EdgeLessThanDistance(lineSegment, maxDistance, results));
     return results.getList();

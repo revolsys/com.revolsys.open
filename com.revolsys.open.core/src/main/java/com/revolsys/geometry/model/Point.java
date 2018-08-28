@@ -44,7 +44,6 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PointEditor;
-import com.revolsys.geometry.model.impl.BaseBoundingBox;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.Segment;
@@ -70,7 +69,7 @@ import com.revolsys.util.number.Doubles;
  *
  *@version 1.7
  */
-public interface Point extends Punctual, Serializable {
+public interface Point extends Punctual, Serializable, BoundingBox {
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G newPoint(final Object value) {
     if (value == null) {
@@ -594,6 +593,11 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
+  @Override
+  default double getArea() {
+    return 0.0;
+  }
+
   /**
    * Gets the boundary of this geometry.
    * Zero-dimensional geometries have no boundary by definition,
@@ -610,6 +614,11 @@ public interface Point extends Punctual, Serializable {
   @Override
   default int getBoundaryDimension() {
     return Dimension.FALSE;
+  }
+
+  @Override
+  default BoundingBox getBoundingBox() {
+    return this;
   }
 
   @Override
@@ -667,6 +676,26 @@ public interface Point extends Punctual, Serializable {
 
   default double getM() {
     return getCoordinate(3);
+  }
+
+  @Override
+  default double getMax(final int axisIndex) {
+    final double coordinate = getCoordinate(axisIndex);
+    if (Double.isFinite(coordinate)) {
+      return coordinate;
+    } else {
+      return Double.NEGATIVE_INFINITY;
+    }
+  }
+
+  @Override
+  default double getMin(final int axisIndex) {
+    final double coordinate = getCoordinate(axisIndex);
+    if (Double.isFinite(coordinate)) {
+      return coordinate;
+    } else {
+      return Double.POSITIVE_INFINITY;
+    }
   }
 
   @Override
@@ -868,70 +897,7 @@ public interface Point extends Punctual, Serializable {
 
   @Override
   default BoundingBox newBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (isEmpty()) {
-      return geometryFactory.newBoundingBoxEmpty();
-    } else {
-      return new BaseBoundingBox() {
-
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public int getAxisCount() {
-          return Point.this.getAxisCount();
-        }
-
-        @Override
-        public GeometryFactory getGeometryFactory() {
-          return Point.this.getGeometryFactory();
-        }
-
-        @Override
-        public double getMax(final int axisIndex) {
-          final double coordinate = getCoordinate(axisIndex);
-          if (Double.isFinite(coordinate)) {
-            return coordinate;
-          } else {
-            return Double.NEGATIVE_INFINITY;
-          }
-        }
-
-        @Override
-        public double getMaxX() {
-          return getX();
-        }
-
-        @Override
-        public double getMaxY() {
-          return getY();
-        }
-
-        @Override
-        public double getMin(final int axisIndex) {
-          final double coordinate = getCoordinate(axisIndex);
-          if (Double.isFinite(coordinate)) {
-            return coordinate;
-          } else {
-            return Double.POSITIVE_INFINITY;
-          }
-        }
-
-        @Override
-        public double getMinX() {
-          return getX();
-        }
-
-        @Override
-        public double getMinY() {
-          return getY();
-        }
-
-        @Override
-        public boolean isEmpty() {
-          return Point.this.isEmpty();
-        }
-      };
-    }
+    return this;
   }
 
   @Override
