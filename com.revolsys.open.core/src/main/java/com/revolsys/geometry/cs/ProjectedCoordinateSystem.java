@@ -331,8 +331,7 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
     if (area == null) {
       boundingBox.addBbox(-180, -90, 180, 90);
     } else {
-      final BoundingBox latLonBounds = area.getLatLonBounds();
-      boundingBox.addBbox(latLonBounds);
+      boundingBox.addBbox(area);
     }
     return boundingBox.setGeometryFactory(this) //
       .newBoundingBox();

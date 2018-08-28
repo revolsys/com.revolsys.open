@@ -258,10 +258,10 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
   public BoundingBoxEditor move(final double xDisplacement, final double yDisplacement) {
     if (isEmpty() || xDisplacement == 0 && yDisplacement == 0) {
     } else {
-      this.minX = +xDisplacement;
-      this.maxX = +xDisplacement;
-      this.minY = +xDisplacement;
-      this.maxY = +xDisplacement;
+      this.minX += xDisplacement;
+      this.maxX += xDisplacement;
+      this.minY += yDisplacement;
+      this.maxY += yDisplacement;
     }
     return this;
   }

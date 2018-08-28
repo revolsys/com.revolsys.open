@@ -35,7 +35,6 @@ package com.revolsys.geometry.model.impl;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.util.Debug;
 import com.revolsys.util.MathUtil;
 
 public class BoundingBoxDoubleXY extends BaseBoundingBox {
@@ -80,9 +79,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.minY = boundingBox.getMinY();
     this.maxX = boundingBox.getMaxX();
     this.maxY = boundingBox.getMaxY();
-    if (this.minX == -180 && this.maxX > 180) {
-      Debug.noOp();
-    }
   }
 
   public BoundingBoxDoubleXY(final double... bounds) {
@@ -94,40 +90,48 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.minY = y;
     this.maxX = x;
     this.maxY = y;
-    if (this.minX == -180 && this.maxX > 180) {
-      Debug.noOp();
-    }
   }
 
   public BoundingBoxDoubleXY(final double x1, final double y1, final double x2, final double y2) {
-    if (!Double.isFinite(x1)) {
+    if (Double.isFinite(x1)) {
+      if (Double.isFinite(x2)) {
+        if (x1 <= x2) {
+          this.minX = x1;
+          this.maxX = x2;
+        } else {
+          this.minX = x2;
+          this.maxX = x1;
+        }
+      } else {
+        this.minX = x1;
+        this.maxX = x1;
+      }
+    } else if (Double.isFinite(x2)) {
       this.minX = x2;
       this.maxX = x2;
-    } else if (!Double.isFinite(x2)) {
-      this.minX = x1;
-      this.maxX = x1;
-    } else if (x1 <= x2) {
-      this.minX = x1;
-      this.maxX = x2;
     } else {
-      this.minX = x2;
-      this.maxX = x1;
+      this.minX = Double.POSITIVE_INFINITY;
+      this.maxX = Double.NEGATIVE_INFINITY;
     }
-    if (!Double.isFinite(y1)) {
+    if (Double.isFinite(y1)) {
+      if (Double.isFinite(y2)) {
+        if (y1 <= y2) {
+          this.minY = y1;
+          this.maxY = y2;
+        } else {
+          this.minY = y2;
+          this.maxY = y1;
+        }
+      } else {
+        this.minY = y1;
+        this.maxY = y1;
+      }
+    } else if (Double.isFinite(y2)) {
       this.minY = y2;
-      this.maxY = y2;
-    } else if (!Double.isFinite(y2)) {
-      this.minY = y2;
-      this.maxY = y2;
-    } else if (y1 <= y2) {
-      this.minY = y1;
       this.maxY = y2;
     } else {
-      this.minY = y2;
-      this.maxY = y1;
-    }
-    if (this.minX == -180 && this.maxX > 180) {
-      Debug.noOp();
+      this.minY = Double.POSITIVE_INFINITY;
+      this.maxY = Double.NEGATIVE_INFINITY;
     }
   }
 
@@ -138,9 +142,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.maxX = geometryFactory.makeXPreciseCeil(this.maxX);
     this.minY = geometryFactory.makeYPreciseFloor(this.minY);
     this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
-    if (this.minX == -180 && this.maxX > 180) {
-      Debug.noOp();
-    }
   }
 
   public BoundingBoxDoubleXY(final GeometryFactory geometryFactory, final double x1,
@@ -150,9 +151,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.maxX = geometryFactory.makeXPreciseCeil(this.maxX);
     this.minY = geometryFactory.makeYPreciseFloor(this.minY);
     this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
-    if (this.minX == -180 && this.maxX > 180) {
-      Debug.noOp();
-    }
   }
 
   @Override
@@ -206,7 +204,7 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
   protected void expandBbox(final BoundingBoxProxy boundingBoxProxy) {
     if (boundingBoxProxy != null) {
       final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
-      if (boundingBox != null && boundingBox.isEmpty()) {
+      if (boundingBox != null && !boundingBox.isEmpty()) {
         final double minX = boundingBox.getMinX();
         final double minY = boundingBox.getMinY();
         final double maxX = boundingBox.getMaxX();

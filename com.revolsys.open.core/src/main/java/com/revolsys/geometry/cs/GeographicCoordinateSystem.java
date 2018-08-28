@@ -303,9 +303,8 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
     if (area == null) {
       return geometryFactory.newBoundingBox(-180, -90, 180, 90);
     } else {
-      final BoundingBox latLonBounds = area.getLatLonBounds();
       return geometryFactory.bboxEditor() //
-        .addBbox(latLonBounds) //
+        .addBbox(area) //
         .newBoundingBox();
     }
   }
