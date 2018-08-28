@@ -216,15 +216,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
   }
 
-  public BoundingBoxDoubleXY(final GeometryFactory geometryFactory, final double x1,
-    final double y1, final double x2, final double y2) {
-    this(x1, y1, x2, y2);
-    this.minX = geometryFactory.makeXPreciseFloor(this.minX);
-    this.maxX = geometryFactory.makeXPreciseCeil(this.maxX);
-    this.minY = geometryFactory.makeYPreciseFloor(this.minY);
-    this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
-  }
-
   protected void clear() {
     this.minX = Double.POSITIVE_INFINITY;
     this.maxX = Double.NEGATIVE_INFINITY;

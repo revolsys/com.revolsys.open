@@ -17,8 +17,13 @@ public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
 
   public BoundingBoxDoubleXYGeometryFactory(final GeometryFactory geometryFactory, final double x1,
     final double y1, final double x2, final double y2) {
-    super(geometryFactory, x1, y1, x2, y2);
+    super(x1, y1, x2, y2);
     this.geometryFactory = geometryFactory;
+    this.minX = geometryFactory.makeXPreciseFloor(this.minX);
+    this.maxX = geometryFactory.makeXPreciseCeil(this.maxX);
+    this.minY = geometryFactory.makeYPreciseFloor(this.minY);
+    this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
+
   }
 
   @Override
@@ -39,8 +44,6 @@ public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
 
   @Override
   public RectangleXY toRectangle() {
-    final double width = getWidth();
-    final double height = getHeight();
-    return this.geometryFactory.newRectangle(this.minX, this.minY, width, height);
+    return this.geometryFactory.newRectangleCorners(this.minX, this.minY, this.maxX, this.maxY);
   }
 }
