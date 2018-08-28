@@ -69,7 +69,7 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
           if (paramObject instanceof BoundingBox) {
             return paramObject;
           } else {
-            return BoundingBox.newBoundingBox(paramObject.toString());
+            return BoundingBox.bboxNew(paramObject.toString());
           }
         }
         return null;
@@ -185,25 +185,6 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
       }
     }
     return true;
-  }
-
-  @Override
-  public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
-    final double maxY) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
-  }
-
-  @Override
-  public BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBoxDoubleGf(geometryFactory, axisCount, bounds);
-  }
-
-  @Override
-  public BoundingBox newBoundingBoxEmpty() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.newBoundingBoxEmpty();
   }
 
   @Override

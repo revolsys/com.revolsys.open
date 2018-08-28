@@ -19,15 +19,12 @@ import javax.measure.quantity.Length;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.geometry.util.OutCode;
-import com.revolsys.io.FileUtil;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
@@ -73,7 +70,7 @@ public interface BoundingBox
       return ((BoundingBoxProxy)value).getBoundingBox();
     } else {
       final String string = DataTypes.toString(value);
-      return BoundingBox.newBoundingBox(string);
+      return BoundingBox.bboxNew(string);
     }
   }
 
@@ -95,8 +92,92 @@ public interface BoundingBox
       .newBoundingBox();
   }
 
+  static BoundingBox bboxNew(final String wkt) {
+    if (Property.hasValue(wkt)) {
+      try {
+        int coordinateSystemId = 0;
+        final PushbackReader reader = new PushbackReader(new StringReader(wkt), 20);
+        WktParser.skipWhitespace(reader);
+        if (WktParser.hasText(reader, "SRID=")) {
+          final Integer srid = WktParser.parseInteger(reader);
+          if (srid != null) {
+            coordinateSystemId = srid;
+          }
+          WktParser.hasChar(reader, ';');
+        }
+        if (WktParser.hasText(reader, "BBOX")) {
+          int axisCount = 2;
+          if (WktParser.hasChar(reader, ' ')) {
+            if (WktParser.hasChar(reader, 'Z')) {
+              axisCount = 3;
+            } else if (WktParser.hasChar(reader, 'M')) {
+              axisCount = 4;
+            } else {
+              reader.unread(' ');
+            }
+          }
+          final GeometryFactory geometryFactory = GeometryFactory.floating(coordinateSystemId,
+            axisCount);
+
+          if (WktParser.hasText(reader, "(")) {
+            final double[] bounds = new double[axisCount * 2];
+            for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+              if (axisIndex > 0) {
+                WktParser.skipWhitespace(reader);
+              }
+              bounds[axisIndex] = WktParser.parseDouble(reader);
+            }
+            if (WktParser.hasChar(reader, ',')) {
+              for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+                if (axisIndex > 0) {
+                  WktParser.skipWhitespace(reader);
+                }
+                bounds[axisCount + axisIndex] = WktParser.parseDouble(reader);
+              }
+              if (WktParser.hasChar(reader, ')')) {
+                return geometryFactory.newBoundingBox(axisCount, bounds);
+              }
+            }
+          } else if (WktParser.hasText(reader, " EMPTY")) {
+            return geometryFactory.bboxEmpty();
+          }
+        }
+        throw new IllegalArgumentException("Invalid BBOX " + wkt);
+      } catch (final IOException e) {
+        throw Exceptions.wrap("Error reading WKT:" + wkt, e);
+      }
+    }
+
+    return
+
+    empty();
+  }
+
+  public static BoundingBox bboxNewDelta(final double x, final double y, final double delta) {
+    return new BoundingBoxDoubleXY(x - delta, y - delta, x + delta, y + delta);
+  }
+
+  static String bboxToWkt(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    if (minX > maxX) {
+      return "BBOX EMPTY";
+    } else {
+      final StringBuilder s = new StringBuilder();
+      s.append("BBOX(");
+      s.append(Doubles.toString(minX));
+      s.append(' ');
+      s.append(Doubles.toString(minY));
+      s.append(',');
+      s.append(Doubles.toString(maxX));
+      s.append(' ');
+      s.append(Doubles.toString(maxY));
+      s.append(')');
+      return s.toString();
+    }
+  }
+
   static BoundingBox empty() {
-    return GeometryFactory.DEFAULT_3D.newBoundingBoxEmpty();
+    return GeometryFactory.DEFAULT_3D.bboxEmpty();
   }
 
   static boolean isEmpty(final double minX, final double maxX) {
@@ -155,53 +236,6 @@ public interface BoundingBox
     final List<V> values = newArray(forEachFunction, boundingBoxProxy, filter);
     values.sort(comparator);
     return values;
-  }
-
-  static BoundingBox newBoundingBox(final String wkt) {
-    if (Property.hasValue(wkt)) {
-      try {
-        GeometryFactory geometryFactory = null;
-        final PushbackReader reader = new PushbackReader(new StringReader(wkt), 20);
-        WktParser.skipWhitespace(reader);
-        if (WktParser.hasText(reader, "SRID=")) {
-          final Integer srid = WktParser.parseInteger(reader);
-          if (srid != null) {
-            geometryFactory = GeometryFactory.floating2d(srid);
-          }
-          WktParser.hasText(reader, ";");
-        }
-        if (WktParser.hasText(reader, "BBOX(")) {
-          final double x1 = WktParser.parseDouble(reader);
-          if (WktParser.hasText(reader, ",")) {
-            WktParser.skipWhitespace(reader);
-            final double y1 = WktParser.parseDouble(reader);
-            WktParser.skipWhitespace(reader);
-            final double x2 = WktParser.parseDouble(reader);
-            if (WktParser.hasText(reader, ",")) {
-              WktParser.skipWhitespace(reader);
-              final double y2 = WktParser.parseDouble(reader);
-              return geometryFactory.newBoundingBox(x1, y1, x2, y2);
-            } else {
-              throw new IllegalArgumentException(
-                "Expecting a ',' not " + FileUtil.getString(reader, 50));
-            }
-
-          } else {
-            throw new IllegalArgumentException("Expecting a ',' not " + FileUtil.getString(reader));
-          }
-        } else if (WktParser.hasText(reader, "BBOX EMPTY")) {
-          if (geometryFactory == null) {
-            return BoundingBox.empty();
-          } else {
-            return geometryFactory.newBoundingBoxEmpty();
-          }
-        }
-      } catch (final IOException e) {
-        throw Exceptions.wrap("Error reading WKT:" + wkt, e);
-      }
-    }
-
-    return empty();
   }
 
   static String toString(final BoundingBox boundingBox) {
@@ -378,7 +412,8 @@ public interface BoundingBox
    */
   default BoundingBox bboxIntersection(final BoundingBoxProxy boundingBox) {
     final BoundingBoxFunction<BoundingBox> action = BoundingBox::bboxIntersection;
-    final BoundingBox empty = newBoundingBoxEmpty();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final BoundingBox empty = geometryFactory.bboxEmpty();
     return bboxWith(boundingBox, action, empty);
   }
 
@@ -392,11 +427,16 @@ public interface BoundingBox
     if (isEmpty()) {
       return this;
     } else {
-      final double intMinX = Math.max(getMinX(), minX);
-      final double intMinY = Math.max(getMinY(), minY);
-      final double intMaxX = Math.min(getMaxX(), maxX);
-      final double intMaxY = Math.min(getMaxY(), maxY);
-      return newBoundingBox(intMinX, intMinY, intMaxX, intMaxY);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (bboxIntersects(minX, minY, maxX, maxY)) {
+        final double intMinX = Math.max(getMinX(), minX);
+        final double intMinY = Math.max(getMinY(), minY);
+        final double intMaxX = Math.min(getMaxX(), maxX);
+        final double intMaxY = Math.min(getMaxY(), maxY);
+        return geometryFactory.newBoundingBox(intMinX, intMinY, intMaxX, intMaxY);
+      } else {
+        return geometryFactory.bboxEmpty();
+      }
     }
   }
 
@@ -452,6 +492,64 @@ public interface BoundingBox
     return bboxEditor() //
       .setGeometryFactory(geometryFactory) //
       .newBoundingBox();
+  }
+
+  default String bboxToEWkt() {
+    final StringBuilder s = new StringBuilder();
+    final int srid = getHorizontalCoordinateSystemId();
+    if (srid > 0) {
+      s.append("SRID=");
+      s.append(srid);
+      s.append(";");
+    }
+    if (isEmpty()) {
+      s.append("BBOX EMPTY");
+    } else {
+      s.append("BBOX");
+      final int axisCount = getAxisCount();
+      if (axisCount == 3) {
+        s.append(" Z");
+      } else if (axisCount == 4) {
+        s.append(" ZM");
+      } else if (axisCount != 2) {
+        s.append(" ");
+        s.append(axisCount);
+      }
+      s.append("(");
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        if (axisIndex > 0) {
+          s.append(' ');
+        }
+        s.append(Doubles.toString(getMin(axisIndex)));
+      }
+      s.append(',');
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        if (axisIndex > 0) {
+          s.append(' ');
+        }
+        s.append(Doubles.toString(getMax(axisIndex)));
+      }
+      s.append(')');
+    }
+    return s.toString();
+  }
+
+  default String bboxToWkt() {
+    if (isEmpty()) {
+      return "BBOX EMPTY";
+    } else {
+      final StringBuilder s = new StringBuilder();
+      s.append("BBOX(");
+      s.append(Doubles.toString(getMinX()));
+      s.append(' ');
+      s.append(Doubles.toString(getMinY()));
+      s.append(',');
+      s.append(Doubles.toString(getMaxX()));
+      s.append(' ');
+      s.append(Doubles.toString(getMaxY()));
+      s.append(')');
+      return s.toString();
+    }
   }
 
   @Override
@@ -605,6 +703,7 @@ public interface BoundingBox
     return aspectRatio;
   }
 
+  @Override
   default int getAxisCount() {
     return 2;
   }
@@ -865,34 +964,6 @@ public interface BoundingBox
   @Override
   default boolean isBboxEmpty() {
     return isEmpty();
-  }
-
-  default BoundingBox newBoundingBox(final double x1, final double y1, final double x2,
-    final double y2) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (geometryFactory == GeometryFactory.DEFAULT_3D) {
-      return new BoundingBoxDoubleXY(x1, y1, x2, y2);
-    } else {
-      return new BoundingBoxDoubleXYGeometryFactory(geometryFactory, x1, y1, x2, y2);
-    }
-  }
-
-  default BoundingBox newBoundingBox(final double x1, final double y1, final double z1,
-    final double x2, final double y2, final double z2) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBoxDoubleGf(geometryFactory.convertAxisCount(3), 3, x1, y1, z1, x2, y2, z2);
-  }
-
-  default BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
-    final double minX = bounds[0];
-    final double minY = bounds[1];
-    final double maxX = bounds[axisCount];
-    final double maxY = bounds[axisCount + 1];
-    return newBoundingBox(minX, minY, maxX, maxY);
-  }
-
-  default BoundingBox newBoundingBoxEmpty() {
-    return BoundingBoxDoubleXY.EMPTY;
   }
 
   default OutCode outcode(final double x, final double y) {

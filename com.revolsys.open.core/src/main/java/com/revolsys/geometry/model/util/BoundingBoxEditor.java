@@ -11,7 +11,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.util.function.BiConsumerDouble;
 
 public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumerDouble {
@@ -271,14 +270,13 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
       if (this.geometryFactory == null) {
         return BoundingBox.empty();
       } else {
-        return this.geometryFactory.newBoundingBoxEmpty();
+        return this.geometryFactory.bboxEmpty();
       }
     } else {
       if (this.geometryFactory == null) {
         return new BoundingBoxDoubleXY(this.minX, this.minY, this.maxX, this.maxY);
       } else {
-        return new BoundingBoxDoubleXYGeometryFactory(this.geometryFactory, this.minX, this.minY,
-          this.maxX, this.maxY);
+        return this.geometryFactory.newBoundingBox(this.minX, this.minY, this.maxX, this.maxY);
       }
     }
   }

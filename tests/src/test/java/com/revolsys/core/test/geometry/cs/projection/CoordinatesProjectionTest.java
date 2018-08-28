@@ -50,8 +50,8 @@ public class CoordinatesProjectionTest {
 
   private static void assertLatLon(final String prefix, final double lon, final double lat,
     final double lonActual, final double latActual) {
-    Assert.assertEquals(prefix + "lon", lon, lonActual, 1e-20);
-    Assert.assertEquals(prefix + "lat", lat, latActual, 1e-20);
+    Assert.assertEquals(prefix + "lon", lon, lonActual, 2e-14);
+    Assert.assertEquals(prefix + "lat", lat, latActual, 2e-14);
   }
 
   private static void assertPoint(final String prefix, final GeometryFactory geometryFactory,

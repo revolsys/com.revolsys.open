@@ -161,20 +161,6 @@ public class BoundingBoxNode {
 
   @Override
   public String toString() {
-    final StringBuilder s = new StringBuilder();
-    if (Double.isNaN(this.minX)) {
-      s.append("BBOX EMPTY");
-    } else {
-      s.append("BBOX(");
-      s.append(this.minX);
-      s.append(',');
-      s.append(this.minY);
-      s.append(' ');
-      s.append(this.maxX);
-      s.append(',');
-      s.append(this.maxY);
-      s.append(')');
-    }
-    return s.toString();
+    return BoundingBox.bboxToWkt(this.minX, this.minY, this.maxX, this.maxY);
   }
 }

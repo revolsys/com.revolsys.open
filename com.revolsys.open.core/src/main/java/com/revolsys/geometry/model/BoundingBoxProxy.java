@@ -124,7 +124,7 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
     if (boundingBox == null) {
       return GeometryFactory.DEFAULT_2D;
     } else {
-      return GeometryFactoryProxy.super.getGeometryFactory();
+      return boundingBox.getGeometryFactory();
     }
   }
 

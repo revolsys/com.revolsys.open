@@ -2,7 +2,6 @@ package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 public class Area extends BoundingBoxDoubleXY implements Serializable {

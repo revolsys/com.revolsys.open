@@ -49,6 +49,15 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
     return BoundingBox.empty();
   }
 
+  default int getAxisCount() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      return 2;
+    } else {
+      return geometryFactory.getAxisCount();
+    }
+  }
+
   default CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       return null;

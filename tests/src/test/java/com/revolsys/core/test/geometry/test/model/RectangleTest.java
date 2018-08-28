@@ -10,7 +10,6 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.testapi.GeometryAssert;
 import com.revolsys.testapi.RunnableTestCase;
-import com.revolsys.util.Debug;
 
 import junit.framework.TestSuite;
 
@@ -42,9 +41,9 @@ public class RectangleTest {
     if (normalize) {
       expected = expected.normalize();
     }
-    if ("LineString_on top to right".equals(message)) {
-      Debug.noOp();
-    }
+    // if ("LineString_on top to right".equals(message)) {
+    // Debug.noOp();
+    // }
 
     Geometry actualIntersectsRectangle = geometry.intersectionRectangle(rectangle);
     if (normalize) {

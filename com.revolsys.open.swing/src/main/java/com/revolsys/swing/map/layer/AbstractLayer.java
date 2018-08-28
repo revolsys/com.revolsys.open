@@ -78,7 +78,6 @@ import com.revolsys.swing.table.NumberTableCellRenderer;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.Debug;
 import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
@@ -357,7 +356,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       return getBoundingBox();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.newBoundingBoxEmpty();
+      return geometryFactory.bboxEmpty();
     }
   }
 
@@ -479,7 +478,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     if (geometryFactory == null) {
       return BoundingBox.empty();
     } else {
-      return geometryFactory.newBoundingBoxEmpty();
+      return geometryFactory.bboxEmpty();
     }
   }
 
@@ -918,9 +917,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   protected void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
-    if (boundingBox.getCoordinateSystemId() == 3005 && boundingBox.getMinX() == -180) {
-      Debug.noOp();
-    }
   }
 
   @Override

@@ -360,7 +360,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
         }
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {
-          final BoundingBox boundingBox = BoundingBox.newBoundingBox(boundingBoxWkt);
+          final BoundingBox boundingBox = BoundingBox.bboxNew(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
             setBoundingBox(boundingBox);
           }

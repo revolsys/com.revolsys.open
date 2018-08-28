@@ -614,7 +614,7 @@ public class Project extends LayerGroup {
       }
     } else if ("viewBoundingBox".equals(name)) {
       if (value != null) {
-        final BoundingBox viewBoundingBox = BoundingBox.newBoundingBox(value.toString());
+        final BoundingBox viewBoundingBox = BoundingBox.bboxNew(value.toString());
         if (!RectangleUtil.isEmpty(viewBoundingBox)) {
           this.initialBoundingBox = viewBoundingBox;
           setViewBoundingBoxAndGeometryFactory(viewBoundingBox);
@@ -697,7 +697,7 @@ public class Project extends LayerGroup {
               boundingBox = geometry.getBoundingBox();
             } else if (object != null) {
               final String wkt = object.toString();
-              boundingBox = BoundingBox.newBoundingBox(wkt);
+              boundingBox = BoundingBox.bboxNew(wkt);
             }
             if (boundingBox != null) {
               bookmarks.put(name, boundingBox);

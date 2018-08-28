@@ -472,7 +472,7 @@ public class Gdal implements ServiceInitializer {
         final Map<String, Object> settings = Json.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {
-          final BoundingBox boundingBox = BoundingBox.newBoundingBox(boundingBoxWkt);
+          final BoundingBox boundingBox = BoundingBox.bboxNew(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
             setSpatialReference(dataset, boundingBox.getGeometryFactory());
             final double x = boundingBox.getMinX();

@@ -41,9 +41,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
   private static final long serialVersionUID = 1L;
 
-  public static BoundingBox EMPTY = new BoundingBoxDoubleXY(Double.POSITIVE_INFINITY,
-    Double.NEGATIVE_INFINITY);
-
   public static BoundingBox newBoundingBoxDoubleXY(double minX, double minY, double maxX,
     double maxY) {
     if (minX > maxX) {
@@ -69,8 +66,8 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
   protected BoundingBoxDoubleXY() {
     this.minX = Double.POSITIVE_INFINITY;
-    this.maxX = Double.NEGATIVE_INFINITY;
     this.minY = Double.POSITIVE_INFINITY;
+    this.maxX = Double.NEGATIVE_INFINITY;
     this.maxY = Double.NEGATIVE_INFINITY;
   }
 
@@ -79,17 +76,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     this.minY = boundingBox.getMinY();
     this.maxX = boundingBox.getMaxX();
     this.maxY = boundingBox.getMaxY();
-  }
-
-  public BoundingBoxDoubleXY(final double... bounds) {
-    this(bounds[0], bounds[1], bounds[2], bounds[3]);
-  }
-
-  public BoundingBoxDoubleXY(final double x, final double y) {
-    this.minX = x;
-    this.minY = y;
-    this.maxX = x;
-    this.maxY = y;
   }
 
   public BoundingBoxDoubleXY(final double x1, final double y1, final double x2, final double y2) {
@@ -133,15 +119,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
       this.minY = Double.POSITIVE_INFINITY;
       this.maxY = Double.NEGATIVE_INFINITY;
     }
-  }
-
-  public BoundingBoxDoubleXY(final GeometryFactory geometryFactory, final double x,
-    final double y) {
-    this(x, y);
-    this.minX = geometryFactory.makeXPreciseFloor(this.minX);
-    this.maxX = geometryFactory.makeXPreciseCeil(this.maxX);
-    this.minY = geometryFactory.makeYPreciseFloor(this.minY);
-    this.maxY = geometryFactory.makeYPreciseCeil(this.maxY);
   }
 
   @Override
@@ -202,6 +179,21 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
         final double maxY = boundingBox.getMaxY();
         expandBbox(minX, minY, maxX, maxY);
       }
+    }
+  }
+
+  protected void expandBbox(final double x, final double y) {
+    if (x < this.minX) {
+      this.minX = x;
+    }
+    if (y < this.minY) {
+      this.minY = y;
+    }
+    if (x > this.maxX) {
+      this.maxX = x;
+    }
+    if (y > this.maxY) {
+      this.maxY = y;
     }
   }
 
@@ -340,17 +332,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     } else {
       return true;
     }
-  }
-
-  @Override
-  public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
-    final double maxY) {
-    return new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
-  }
-
-  @Override
-  public BoundingBox newBoundingBoxEmpty() {
-    return EMPTY;
   }
 
   protected void setMaxX(final double maxX) {

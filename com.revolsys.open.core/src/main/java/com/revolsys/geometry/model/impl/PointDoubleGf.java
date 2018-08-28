@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 
@@ -49,11 +48,6 @@ import com.revolsys.geometry.model.Point;
  */
 public class PointDoubleGf extends PointDouble {
   private static final long serialVersionUID = 4902022702746614570L;
-
-  /**
-   *  The bounding box of this <code>Geometry</code>.
-   */
-  private BoundingBox boundingBox;
 
   /**
    * The {@link GeometryFactory} used to create this Geometry
@@ -75,25 +69,13 @@ public class PointDoubleGf extends PointDouble {
   }
 
   @Override
-  public BoundingBox getBoundingBox() {
-    if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = getGeometryFactory().newBoundingBoxEmpty();
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
-    }
-    return this.boundingBox;
-  }
-
-  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
 
   @Override
   public Point newPoint(final double x, final double y) {
-    final GeometryFactory geometryFactory2 = getGeometryFactory();
-    return geometryFactory2.point(x, y);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.point(x, y);
   }
 }
