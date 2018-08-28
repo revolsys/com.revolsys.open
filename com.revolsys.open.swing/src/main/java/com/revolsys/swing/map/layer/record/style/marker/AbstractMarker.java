@@ -13,13 +13,14 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 import com.revolsys.util.Property;
 
 public abstract class AbstractMarker extends BaseObjectWithPropertiesAndChange implements Marker {
-  public static void translateMarker(final Viewport2D viewport, final Graphics2D graphics,
+  public static void translateMarker(final Graphics2DViewRender view, final Graphics2D graphics,
     final MarkerStyle style, final double x, final double y, final double width,
     final double height, double orientation) {
-    Viewport2D.translateModelToViewCoordinates(viewport, graphics, x, y);
+    view.translateModelToViewCoordinates(x, y);
     final double markerOrientation = style.getMarkerOrientation();
     orientation = -orientation + markerOrientation;
     if (orientation != 0) {
@@ -28,8 +29,8 @@ public abstract class AbstractMarker extends BaseObjectWithPropertiesAndChange i
 
     final Quantity<Length> deltaX = style.getMarkerDx();
     final Quantity<Length> deltaY = style.getMarkerDy();
-    double dx = Viewport2D.toDisplayValue(viewport, deltaX);
-    double dy = Viewport2D.toDisplayValue(viewport, deltaY);
+    double dx = view.toDisplayValue(deltaX);
+    double dy = view.toDisplayValue(deltaY);
     final String verticalAlignment = style.getMarkerVerticalAlignment();
     if ("bottom".equals(verticalAlignment)) {
       dy -= height;

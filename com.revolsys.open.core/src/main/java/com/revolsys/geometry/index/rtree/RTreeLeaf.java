@@ -41,7 +41,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
   public void forEach(final double x, final double y, final Consumer<? super T> action) {
     for (int i = 0; i < this.size; i++) {
       final BoundingBox objectBounds = this.objectBoundingBoxes[i];
-      if (objectBounds.intersects(x, y)) {
+      if (objectBounds.bboxIntersects(x, y)) {
         final T object = this.objects[i];
         action.accept(object);
       }
@@ -53,7 +53,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
     final Consumer<? super T> action) {
     for (int i = 0; i < this.size; i++) {
       final BoundingBox objectBounds = this.objectBoundingBoxes[i];
-      if (objectBounds.intersects(minX, minY, maxX, maxY)) {
+      if (objectBounds.bboxIntersects(minX, minY, maxX, maxY)) {
         final T object = this.objects[i];
         action.accept(object);
       }
@@ -65,7 +65,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
     final Predicate<? super T> filter, final Consumer<? super T> action) {
     for (int i = 0; i < this.size; i++) {
       final BoundingBox objectBounds = this.objectBoundingBoxes[i];
-      if (objectBounds.intersects(minX, minY, maxX, maxY)) {
+      if (objectBounds.bboxIntersects(minX, minY, maxX, maxY)) {
         final T object = this.objects[i];
         if (filter.test(object)) {
           action.accept(object);

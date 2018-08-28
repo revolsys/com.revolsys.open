@@ -45,8 +45,8 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.coordinates.comparator.PointDistanceComparator;
 import com.revolsys.geometry.model.coordinates.comparator.PointComparators;
+import com.revolsys.geometry.model.coordinates.comparator.PointDistanceComparator;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
@@ -281,7 +281,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
   }
 
   public List<Node<T>> findNodes(BoundingBox boundingBox) {
-    boundingBox = boundingBox.convert(getGeometryFactory());
+    boundingBox = boundingBox.bboxEdit(editor -> editor.setGeometryFactory(getGeometryFactory()));
     return NodeWithinBoundingBoxVisitor.getNodes(this, boundingBox);
   }
 
@@ -499,7 +499,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     return closestDistance;
   }
 
-   public Edge<T> getEdge(final int edgeId) {
+  public Edge<T> getEdge(final int edgeId) {
     return this.edgesById.get(edgeId);
   }
 
@@ -606,8 +606,9 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     if (geometry == null) {
       return Collections.emptyList();
     } else {
-      BoundingBox boundingBox = geometry.getBoundingBox();
-      boundingBox = boundingBox.expand(maxDistance);
+      final BoundingBox boundingBox = geometry.getBoundingBox() //
+        .bboxEditor() //
+        .expandDelta(maxDistance);
       final Predicate<Edge<T>> filter = (edge) -> {
         final LineString line = edge.getLineString();
         final double distance = line.distance(geometry);
@@ -648,8 +649,9 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     if (point == null) {
       return Collections.emptyList();
     } else {
-      BoundingBox boundingBox = point.getBoundingBox();
-      boundingBox = boundingBox.expand(maxDistance);
+      final BoundingBox boundingBox = point.getBoundingBox() //
+        .bboxEditor() //
+        .expandDelta(maxDistance);
       final double x = point.getX();
       final double y = point.getY();
       final Predicate<Edge<T>> filter = (edge) -> {
@@ -805,8 +807,9 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
    * @return The list of nodes.
    */
   public List<Node<T>> getNodes(final Geometry geometry, final double maxDistance) {
-    BoundingBox boundingBox = geometry.getBoundingBox();
-    boundingBox = boundingBox.expand(maxDistance);
+    final BoundingBox boundingBox = geometry.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
     final Predicate<? super Node<T>> filter = (node) -> {
       final double distance = geometry.distancePoint(node);
@@ -847,7 +850,9 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   public List<Node<T>> getNodes(final Predicate<Node<T>> filter, final Geometry geometry,
     final double maxDistance) {
-    final BoundingBox boundingBox = geometry.getBoundingBox().expand(maxDistance);
+    final BoundingBox boundingBox = geometry.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final Predicate<Node<T>> distanceFilter = (node) -> {
       return filter.test(node) && node.distance(geometry) <= maxDistance;
     };

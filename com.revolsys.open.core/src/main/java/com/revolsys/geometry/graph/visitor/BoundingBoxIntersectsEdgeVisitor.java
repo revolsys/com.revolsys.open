@@ -17,8 +17,9 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
 
     final LineString line = edge.getLineString();
-    BoundingBox boundingBox = line.getBoundingBox();
-    boundingBox = boundingBox.expand(maxDistance);
+    final BoundingBox boundingBox = line.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final BoundingBoxIntersectsEdgeVisitor<T> visitor = new BoundingBoxIntersectsEdgeVisitor<>(
       boundingBox, results);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
@@ -40,7 +41,7 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<
   @Override
   public void accept(final Edge<T> edge) {
     final com.revolsys.geometry.model.BoundingBox envelope = edge.getBoundingBox();
-    if (this.boundingBox.intersects(envelope)) {
+    if (this.boundingBox.bboxIntersects(envelope)) {
       super.accept(edge);
     }
   }

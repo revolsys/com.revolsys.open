@@ -72,7 +72,7 @@ public class WktRecordWriter extends AbstractRecordWriter {
         this.out.write(Integer.toString(srid));
         this.out.write(';');
       }
-      EWktWriter.write(this.out, geometry);
+      EWktWriter.writeCCW(this.out, geometry);
       this.out.write('\n');
     } catch (final IOException e) {
       throw Exceptions.wrap(e);

@@ -20,6 +20,7 @@ import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.cs.unit.Radian;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 
 public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSystem {
   private static final long serialVersionUID = 1902383026085071877L;
@@ -325,16 +326,15 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
   protected BoundingBox newAreaBoundingBox() {
     final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
       .getGeometryFactory();
-    BoundingBox boundingBox;
+    final BoundingBoxEditor boundingBox = geographicGeometryFactory.bboxEditor();
     final Area area = getArea();
     if (area == null) {
-      boundingBox = geographicGeometryFactory.newBoundingBox(-180, -90, 180, 90);
+      boundingBox.addBbox(-180, -90, 180, 90);
     } else {
-      final BoundingBox latLonBounds = area.getLatLonBounds();
-      boundingBox = latLonBounds.convert(geographicGeometryFactory);
+      boundingBox.addBbox(area);
     }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return boundingBox.convert(geometryFactory);
+    return boundingBox.setGeometryFactory(this) //
+      .newBoundingBox();
   }
 
   @Override

@@ -449,7 +449,8 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       }
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
-      boundingBox = boundingBox.convert(this.geometryFactory, 2);
+      boundingBox = boundingBox.bboxEditor() //
+        .setGeometryFactory(this.geometryFactory);
       final double minX = boundingBox.getMinX();
       final double minY = boundingBox.getMinY();
       final double maxX = boundingBox.getMaxX();

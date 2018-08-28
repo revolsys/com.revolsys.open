@@ -2,7 +2,6 @@ package com.revolsys.swing.map.layer.record.renderer;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
@@ -18,22 +17,16 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePreview;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRenderer
   implements GeometryStyleLayerRenderer<AbstractRecordLayer> {
@@ -60,96 +53,6 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
     path.lineTo(0, 0);
     path.closePath();
     return path;
-  }
-
-  public static final void renderGeometry(final Viewport2D viewport, final Graphics2D graphics,
-    final Geometry geometry, final GeometryStyle style) {
-    if (geometry != null) {
-      final BoundingBox viewExtent = viewport.getBoundingBox();
-      if (!viewExtent.isEmpty()) {
-        final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
-        for (int i = 0; i < geometry.getGeometryCount(); i++) {
-          final Geometry part = geometry.getGeometry(i);
-          final BoundingBox partExtent = part.getBoundingBox();
-          if (partExtent.intersects(viewExtent)) {
-            final Geometry convertedPart = part.convertGeometry(viewGeometryFactory);
-            if (convertedPart instanceof Point) {
-              final Point point = (Point)convertedPart;
-              MarkerStyleRenderer.renderMarker(viewport, graphics, point, style, 0);
-            } else if (convertedPart instanceof LineString) {
-              final LineString lineString = (LineString)convertedPart;
-              renderLineString(viewport, graphics, lineString, style);
-            } else if (convertedPart instanceof Polygon) {
-              final Polygon polygon = (Polygon)convertedPart;
-              renderPolygon(viewport, graphics, polygon, style);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  public static final void renderGeometryOutline(final Viewport2D viewport,
-    final Graphics2D graphics, final Geometry geometry, final GeometryStyle style) {
-    if (geometry != null) {
-      final BoundingBox viewExtent = viewport.getBoundingBox();
-      if (!viewExtent.isEmpty()) {
-        final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
-        for (int i = 0; i < geometry.getGeometryCount(); i++) {
-          final Geometry part = geometry.getGeometry(i);
-          final BoundingBox partExtent = part.getBoundingBox();
-          if (partExtent.intersects(viewExtent)) {
-            final Geometry convertedPart = part.convertGeometry(viewGeometryFactory);
-            if (convertedPart instanceof Point) {
-              final Point point = (Point)convertedPart;
-              MarkerStyleRenderer.renderMarker(viewport, graphics, point, style, 0);
-            } else if (convertedPart instanceof LineString) {
-              final LineString lineString = (LineString)convertedPart;
-              renderLineString(viewport, graphics, lineString, style);
-            } else if (convertedPart instanceof Polygon) {
-              final Polygon polygon = (Polygon)convertedPart;
-              for (final LinearRing ring : polygon.rings()) {
-                renderLineString(viewport, graphics, ring, style);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  public static final void renderLineString(final Viewport2D viewport, final Graphics2D graphics,
-    LineString line, final GeometryStyle style) {
-    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
-    line = line.convertGeometry(viewGeometryFactory);
-    if (!line.isEmpty()) {
-      final Paint paint = graphics.getPaint();
-      try {
-        style.setLineStyle(viewport, graphics);
-        graphics.draw(line);
-      } finally {
-        graphics.setPaint(paint);
-      }
-    }
-  }
-
-  public static final void renderPolygon(final Viewport2D viewport, final Graphics2D graphics,
-    Polygon polygon, final GeometryStyle style) {
-    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
-    polygon = polygon.convertGeometry(viewGeometryFactory, 2);
-    if (!polygon.isEmpty()) {
-      final Paint paint = graphics.getPaint();
-      try {
-        style.setFillStyle(viewport, graphics);
-        graphics.fill(polygon);
-        style.setLineStyle(viewport, graphics);
-        for (final LinearRing ring : polygon.getRings()) {
-          graphics.draw(ring);
-        }
-      } finally {
-        graphics.setPaint(paint);
-      }
-    }
   }
 
   private GeometryStyle style = new GeometryStyle();
@@ -226,9 +129,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
 
   /*
    * (non-Javadoc)
-   * @see
-   * com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#
-   * getStyle()
+   * @see com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer# getStyle()
    */
   @Override
   public GeometryStyle getStyle() {
@@ -249,7 +150,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
         return this.style.getMarker().newIcon(geometryStyle);
       } else if (DataTypes.LINE_STRING.equals(geometryDataType)
         || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
-        shape = GeometryStylePreview.getLineShape(16);
+        shape = GeometryStylePreview.getLineString(16).toShape();
       } else if (DataTypes.POLYGON.equals(geometryDataType)
         || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         shape = getPolygonShape();
@@ -291,10 +192,10 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
   }
 
   @Override
-  public void renderRecord(final Viewport2D viewport, final Cancellable cancellable,
-    final BoundingBox visibleArea, final AbstractRecordLayer layer, final LayerRecord record) {
+  public void renderRecord(final ViewRenderer view, final BoundingBox visibleArea,
+    final AbstractRecordLayer layer, final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
-    viewport.drawGeometry(geometry, this.style);
+    view.drawGeometry(geometry, this.style);
   }
 
   @Override
@@ -307,8 +208,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
 
   /*
    * (non-Javadoc)
-   * @see
-   * com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#
+   * @see com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#
    * setStyle(com.revolsys. swing.map.layer.record.style.GeometryStyle)
    */
   @Override

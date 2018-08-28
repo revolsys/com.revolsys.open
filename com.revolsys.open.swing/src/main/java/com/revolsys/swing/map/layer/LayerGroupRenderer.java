@@ -6,8 +6,7 @@ import java.util.List;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.logging.Logs;
-import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
   public LayerGroupRenderer(final LayerGroup layer) {
@@ -15,22 +14,21 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final LayerGroup layer) {
+  public void render(final ViewRenderer viewport, final LayerGroup layer) {
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       final List<Layer> layers = new ArrayList<>(layer.getLayers());
       Collections.reverse(layers);
 
-      for (final Layer childLayer : cancellable.cancellable(layers)) {
+      for (final Layer childLayer : viewport.cancellable(layers)) {
         if (childLayer.isVisible(scaleForVisible)) {
           try {
             final LayerRenderer<Layer> renderer = childLayer.getRenderer();
             if (renderer != null) {
-              renderer.render(viewport, cancellable);
+              renderer.render(viewport);
             }
           } catch (final Throwable e) {
-            if (!cancellable.isCancelled()) {
+            if (!viewport.isCancelled()) {
               Logs.error(this, "Error rendering layer: " + childLayer, e);
             }
           }

@@ -10,7 +10,7 @@ import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.util.BoundingBoxXyConstructor;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.util.ExitLoopException;
 
 public class RStarTree<T> implements SpatialIndex<T> {
@@ -252,8 +252,8 @@ public class RStarTree<T> implements SpatialIndex<T> {
   public void removeItems(final BoundingBox boundingBox) {
     if (this.root != null) {
       final List<RStarLeaf<T>> itemsToReinsert = new ArrayList<>();
-      this.root.remove(this, boundingBox, leaf -> boundingBox.covers(leaf.getBoundingBox()),
-        itemsToReinsert, true);
+      this.root.remove(this, boundingBox, leaf -> boundingBox.bboxCovers(leaf), itemsToReinsert,
+        true);
       insertLeaves(itemsToReinsert);
     }
   }
@@ -384,15 +384,15 @@ public class RStarTree<T> implements SpatialIndex<T> {
         for (int k = 0; k < distribution_count; k++) {
           double area = 0;
 
-          final BoundingBoxXyConstructor R1 = new BoundingBoxXyConstructor();
-          final BoundingBoxXyConstructor R2 = new BoundingBoxXyConstructor();
+          final BoundingBoxEditor R1 = new BoundingBoxEditor();
+          final BoundingBoxEditor R2 = new BoundingBoxEditor();
 
           int i = 0;
           for (final BoundingBoxProxy boundable : node.items) {
             if (i <= this.nodeMinItemCount + k) {
-              R1.expand(boundable);
+              R1.addBbox(boundable);
             } else {
-              R2.expand(boundable);
+              R2.addBbox(boundable);
             }
             i++;
           }

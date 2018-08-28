@@ -14,6 +14,7 @@ import javax.swing.JComponent;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
@@ -21,8 +22,8 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -45,9 +46,11 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
 
   private final Object loadSync = new Object();
 
-  private Viewport2D viewport;
+  private ComponentViewport2D viewport;
 
   private boolean showAreaBoundingBox = false;
+
+  private Graphics2DViewRender view;
 
   public LayerRendererOverlay(final MapPanel mapPanel) {
     this(mapPanel, null);
@@ -55,6 +58,8 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
 
   public LayerRendererOverlay(final MapPanel mapPanel, final Layer layer) {
     this.viewport = mapPanel.getViewport();
+    this.view = this.viewport.newViewRenderer();
+
     setLayer(layer);
     Property.addListener(this.viewport, this);
     Property.addListener(this, mapPanel);
@@ -69,6 +74,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
     this.image = null;
     this.imageWorker = null;
     this.viewport = null;
+    this.view = null;
   }
 
   public Layer getLayer() {
@@ -105,7 +111,9 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
         }
       }
       if (image != null) {
-        render((Graphics2D)g);
+        final Graphics2D graphics = (Graphics2D)g;
+        this.view.setGraphics(graphics);
+        this.view.drawImage(this.image, false);
       }
     }
   }
@@ -154,10 +162,6 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
     if (this.layer != null) {
       this.layer.refresh();
     }
-  }
-
-  private void render(final Graphics2D graphics) {
-    GeoreferencedImageLayerRenderer.render(this.viewport, graphics, this.image, false);
   }
 
   public void setImage(final LayerRendererOverlaySwingWorker imageWorker) {

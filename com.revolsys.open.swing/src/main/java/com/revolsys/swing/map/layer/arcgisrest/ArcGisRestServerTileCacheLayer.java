@@ -19,8 +19,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.PasswordUtil;
@@ -96,7 +96,7 @@ public class ArcGisRestServerTileCacheLayer
   }
 
   @Override
-  public List<ArcGisRestServerTileCacheMapTile> getOverlappingMapTiles(final Viewport2D viewport) {
+  public List<ArcGisRestServerTileCacheMapTile> getOverlappingMapTiles(final ViewRenderer viewport) {
     final List<ArcGisRestServerTileCacheMapTile> tiles = new ArrayList<>();
     final MapService mapService = getMapService();
     if (mapService != null) {
@@ -108,8 +108,8 @@ public class ArcGisRestServerTileCacheLayer
           if (resolution > 0) {
             final BoundingBox viewBoundingBox = viewport.getBoundingBox();
             final BoundingBox maxBoundingBox = getBoundingBox();
-            final BoundingBox boundingBox = viewBoundingBox.convert(this.geometryFactory)
-              .intersection(maxBoundingBox);
+            final BoundingBox boundingBox = viewBoundingBox.bboxToCs(this.geometryFactory)
+              .bboxIntersection(maxBoundingBox);
             final double minX = boundingBox.getMinX();
             final double minY = boundingBox.getMinY();
             final double maxX = boundingBox.getMaxX();
@@ -138,7 +138,7 @@ public class ArcGisRestServerTileCacheLayer
   }
 
   @Override
-  public double getResolution(final Viewport2D viewport) {
+  public double getResolution(final ViewRenderer viewport) {
     final MapService mapService = getMapService();
     if (mapService == null) {
       return 0;

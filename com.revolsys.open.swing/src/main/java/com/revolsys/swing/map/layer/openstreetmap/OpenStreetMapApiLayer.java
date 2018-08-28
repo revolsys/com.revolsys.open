@@ -66,7 +66,7 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
           for (final OsmElement record : document.getRecords()) {
             final Geometry geometry = record.getGeometry();
             if (geometry != null && !geometry.isEmpty()) {
-              if (boundingBox.intersects(geometry.getBoundingBox())) {
+              if (boundingBox.bboxIntersects(geometry.getBoundingBox())) {
                 final Identifier identifier = record.getIdentifier();
                 final OsmProxyLayerRecord layerRecord = new OsmProxyLayerRecord(this, document,
                   identifier);
@@ -96,7 +96,7 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
   }
 
   public List<BoundingBox> getTileBoundingBoxes(BoundingBox boundingBox) {
-    boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
+    boundingBox = boundingBox.bboxToCs(OsmConstants.WGS84_2D);
     final List<BoundingBox> boundingBoxes = new ArrayList<>();
     final double minX = Math.floor(boundingBox.getMinX() * TILE_SCALE_X) / TILE_SCALE_X;
     final double minY = Math.floor(boundingBox.getMinY() * TILE_SCALE_Y) / TILE_SCALE_Y;

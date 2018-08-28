@@ -49,7 +49,7 @@ public class GdalImage extends AbstractGeoreferencedImage {
       final Dataset dataset = getDataset();
 
       final BoundingBox imageBoundingBox = getBoundingBox();
-      final BoundingBox clipBoundingBox = viewBoundingBox.intersection(imageBoundingBox);
+      final BoundingBox clipBoundingBox = viewBoundingBox.bboxIntersection(imageBoundingBox);
       final double scaleFactor = viewWidth / viewBoundingBox.getWidth();
 
       final double clipModelWidth = clipBoundingBox.getWidth();

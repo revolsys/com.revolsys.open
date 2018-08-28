@@ -44,7 +44,7 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Consumer<Edge<T>> {
       final LineString line2 = edge2.getLineString();
       final BoundingBox envelope1 = line1.getBoundingBox();
       final BoundingBox envelope2 = line2.getBoundingBox();
-      if (envelope1.intersects(envelope2)) {
+      if (envelope1.bboxIntersects(envelope2)) {
         final IntersectionMatrix relate = line1.relate(line2);
         if (relate.get(0, 0) == Dimension.L) {
           this.matchVisitor.accept(edge2);

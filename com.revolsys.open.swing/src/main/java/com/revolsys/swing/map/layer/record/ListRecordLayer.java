@@ -6,10 +6,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
@@ -17,7 +15,6 @@ import com.revolsys.record.Records;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.ListRecordLayerTableModel;
@@ -25,28 +22,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 
 public class ListRecordLayer extends AbstractRecordLayer {
 
-  public static ListRecordLayer newLayer(final String name, final GeometryFactory geometryFactory,
-    final DataType geometryType) {
-    final RecordDefinitionImpl recordDefinition = newRecordDefinition(name, geometryFactory,
-      geometryType);
-    return new ListRecordLayer(recordDefinition);
-  }
-
-  public static RecordDefinitionImpl newRecordDefinition(final String name,
-    final GeometryFactory geometryFactory, final DataType geometryType) {
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-      PathName.newPathName(name));
-    recordDefinition.addField("GEOMETRY", geometryType, true);
-    recordDefinition.setGeometryFactory(geometryFactory);
-    return recordDefinition;
-  }
-
   private List<LayerRecord> records = new ArrayList<>();
-
-  public ListRecordLayer(final Map<String, ? extends Object> properties) {
-    this("recordListLayer");
-    setProperties(properties);
-  }
 
   public ListRecordLayer(final RecordDefinition recordDefinition) {
     this("listRecordLayer");
@@ -127,15 +103,10 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void expandBoundingBox(final LayerRecord record) {
-    if (record != null) {
-      BoundingBox boundingBox = getBoundingBox();
-      if (boundingBox.isEmpty()) {
-        boundingBox = Records.boundingBox(record);
-      } else {
-        boundingBox = boundingBox.expandToInclude(record);
-      }
-      setBoundingBox(boundingBox);
-    }
+    final BoundingBox boundingBox = getBoundingBox().bboxEdit(editor -> {
+      editor.addBbox(record);
+    });
+    setBoundingBox(boundingBox);
   }
 
   public void fireEmpty() {
@@ -251,10 +222,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   protected void refreshBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
-      BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
-      for (final LayerRecord record : getRecords()) {
-        boundingBox = boundingBox.expandToInclude(record);
-      }
+      final BoundingBox boundingBox = BoundingBox.bboxNew(geometryFactory, this.records);
       setBoundingBox(boundingBox);
     }
   }

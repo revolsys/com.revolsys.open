@@ -21,18 +21,18 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.esri.filegdb.jni.EnumRows;
+import com.revolsys.esri.filegdb.jni.Envelope;
+import com.revolsys.esri.filegdb.jni.EsriFileGdb;
+import com.revolsys.esri.filegdb.jni.Geodatabase;
+import com.revolsys.esri.filegdb.jni.Row;
+import com.revolsys.esri.filegdb.jni.Table;
+import com.revolsys.esri.filegdb.jni.VectorOfWString;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.esri.gdb.file.capi.FileGdbDomainCodeTable;
-import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Envelope;
-import com.revolsys.gis.esri.gdb.file.capi.swig.EsriFileGdb;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Geodatabase;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
-import com.revolsys.gis.esri.gdb.file.capi.swig.VectorOfWString;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.AreaFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.BinaryFieldDefinition;
@@ -711,7 +711,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                     final Geometry geometry = (Geometry)geometryField.getValue(row);
                     if (geometry != null) {
                       final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
-                      if (geometryBoundingBox.intersects(boundingBox)) {
+                      if (geometryBoundingBox.bboxIntersects(boundingBox)) {
                         count++;
                       }
                     }

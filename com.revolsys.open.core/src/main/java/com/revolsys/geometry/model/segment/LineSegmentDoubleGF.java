@@ -13,6 +13,11 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
   public LineSegmentDoubleGF() {
   }
 
+  public LineSegmentDoubleGF(final GeometryFactory geometryFactory) {
+    super(geometryFactory.getAxisCount());
+    setGeometryFactory(geometryFactory);
+  }
+
   public LineSegmentDoubleGF(final GeometryFactory geometryFactory, final int axisCount,
     final double... coordinates) {
     super(geometryFactory, axisCount, coordinates);

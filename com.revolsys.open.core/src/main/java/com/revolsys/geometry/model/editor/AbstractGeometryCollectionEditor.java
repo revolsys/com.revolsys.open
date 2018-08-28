@@ -67,6 +67,18 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
   }
 
   @SuppressWarnings("unchecked")
+  public GE appendEditor() {
+    final GeometryDataType<?, ?> partDataType = getPartDataType();
+    if (partDataType == null) {
+      throw new IllegalArgumentException("Part data type not specified");
+    } else {
+      final GE editor = (GE)partDataType.newGeometryEditor(getGeometryFactory());
+      addEditor(editor);
+      return editor;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   @Override
   public GeometryEditor<?> appendVertex(final int[] geometryId,
     final GeometryDataType<?, ?> partDataType, final Point point) {
@@ -76,7 +88,9 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
       GE editor = getEditor(partIndex);
       if (editor == null && partIndex == this.editors.size()) {
         final GeometryDataType<?, ?> thisPartDataType = getPartDataType();
-        if (thisPartDataType == null || thisPartDataType.equals(partDataType)) {
+        if (thisPartDataType == null) {
+          throw new IllegalArgumentException("Part data type not specified");
+        } else if (thisPartDataType.equals(partDataType)) {
           editor = (GE)partDataType.newGeometryEditor(getGeometryFactory());
           addEditor(editor);
         }
@@ -212,10 +226,15 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
   }
 
   public GE getEditor(final int partIndex) {
-    if (0 <= partIndex && partIndex < this.editors.size()) {
+    final int editorCount = this.editors.size();
+    if (partIndex < 0) {
+      throw new ArrayIndexOutOfBoundsException(partIndex);
+    } else if (partIndex < editorCount) {
       return this.editors.get(partIndex);
+    } else if (partIndex == editorCount) {
+      return appendEditor();
     } else {
-      return null;
+      throw new ArrayIndexOutOfBoundsException(partIndex);
     }
   }
 
@@ -259,6 +278,14 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
       }
     }
     return null;
+  }
+
+  public GE getLastEditor() {
+    if (this.editors.isEmpty()) {
+      return appendEditor();
+    } else {
+      return this.editors.get(this.editors.size() - 1);
+    }
   }
 
   @Override
@@ -324,7 +351,9 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
       final List<G> geometries = new ArrayList<>();
       for (final GE editor : this.editors) {
         final G newGeometry = (G)editor.newGeometry();
-        geometries.add(newGeometry);
+        if (!newGeometry.isEmpty()) {
+          geometries.add(newGeometry);
+        }
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
       return geometryFactory.geometry(geometries);
@@ -332,6 +361,30 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
       return this.geometry;
     }
   }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <GA extends Geometry> GA newGeometryAny() {
+    if (isModified() || this.geometry == null) {
+      final List<G> geometries = new ArrayList<>();
+      for (final GE editor : this.editors) {
+        final G newGeometry = (G)editor.newGeometryAny();
+        if (!newGeometry.isEmpty()) {
+          geometries.add(newGeometry);
+        }
+      }
+      if (geometries.isEmpty()) {
+        return newGeometryEmpty();
+      } else {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.geometry(geometries);
+      }
+    } else {
+      return (GA)this.geometry;
+    }
+  }
+
+  public abstract <NGE extends Geometry> NGE newGeometryEmpty();
 
   @Override
   public void revertChanges() {

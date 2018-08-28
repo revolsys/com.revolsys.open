@@ -79,14 +79,14 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
 
   @Override
   protected void visit(final Geometry element) {
-    final BoundingBox elementEnv = element.getBoundingBox();
+    final BoundingBox boundingBox = element.getBoundingBox();
 
     // disjoint => no intersection
-    if (!this.rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.bboxIntersects(boundingBox)) {
       return;
     }
     // rectangle contains target env => must intersect
-    if (this.rectEnv.covers(elementEnv)) {
+    if (this.rectEnv.bboxCovers(boundingBox)) {
       this.intersects = true;
       return;
     }
@@ -99,13 +99,13 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
      * completely bisected. In this case it is not possible to make a conclusion
      * about the presence of an intersection.
      */
-    if (elementEnv.getMinX() >= this.rectEnv.getMinX()
-      && elementEnv.getMaxX() <= this.rectEnv.getMaxX()) {
+    if (boundingBox.getMinX() >= this.rectEnv.getMinX()
+      && boundingBox.getMaxX() <= this.rectEnv.getMaxX()) {
       this.intersects = true;
       return;
     }
-    if (elementEnv.getMinY() >= this.rectEnv.getMinY()
-      && elementEnv.getMaxY() <= this.rectEnv.getMaxY()) {
+    if (boundingBox.getMinY() >= this.rectEnv.getMinY()
+      && boundingBox.getMaxY() <= this.rectEnv.getMaxY()) {
       this.intersects = true;
       return;
     }
@@ -157,14 +157,14 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
 
     // skip if envelopes do not intersect
     final BoundingBox elementEnv = geom.getBoundingBox();
-    if (!this.rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.bboxIntersects(elementEnv)) {
       return;
     }
 
     // test each corner of rectangle for inclusion
     for (int i = 0; i < 4; i++) {
       final Point rectPt = this.rectSeq.getPoint(i);
-      if (!elementEnv.covers(rectPt)) {
+      if (!elementEnv.bboxCovers(rectPt)) {
         continue;
       }
       // check rect point in poly (rect is known not to touch polygon at this
@@ -203,7 +203,7 @@ public class RectangleIntersects {
    */
   public static boolean rectangleIntersects(final Polygon rectangle, final Geometry geom) {
     final BoundingBox boundingBox = rectangle.getBoundingBox();
-    if (boundingBox.intersects(geom.getBoundingBox())) {
+    if (boundingBox.bboxIntersects(geom.getBoundingBox())) {
 
       /**
        * Test if rectangle envelope intersects any component envelope.
@@ -310,7 +310,7 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
      * so it is worth checking this simple condition.
      */
     final BoundingBox elementEnv = geom.getBoundingBox();
-    if (!this.rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.bboxIntersects(elementEnv)) {
       return;
     }
 

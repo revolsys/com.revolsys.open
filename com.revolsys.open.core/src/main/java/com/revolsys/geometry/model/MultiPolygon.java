@@ -80,36 +80,6 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
-  default Polygonal clipRectangle(double x1, double y1, double x2, double y2) {
-    if (x1 > x2) {
-      final double t = x1;
-      x1 = x2;
-      x2 = t;
-    }
-    if (y1 > y2) {
-      final double t = y1;
-      y1 = y2;
-      y2 = t;
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox boundingBox = getBoundingBox();
-    if (boundingBox.coveredBy(x1, y1, x2, y2)) {
-      return this;
-    } else if (boundingBox.intersects(x1, y1, x2, y2)) {
-      final List<Polygon> polygons = new ArrayList<>();
-      for (final Polygon polygon : polygons()) {
-        final Polygonal clippedPolygon = polygon.clipRectangle(x1, y1, x2, y2);
-        if (!clippedPolygon.isEmpty()) {
-          clippedPolygon.forEachPolygon(polygons::add);
-        }
-      }
-      return geometryFactory.polygonal(polygons);
-    } else {
-      return geometryFactory.polygon();
-    }
-  }
-
-  @Override
   Polygonal clone();
 
   @Override
@@ -252,20 +222,25 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    boolean modified = false;
-    final List<Geometry> parts = new ArrayList<>();
-    for (final Geometry part : getPolygons()) {
-      final Geometry partIntersection = part.intersectionRectangle(rectangle);
-      if (partIntersection != part) {
-        modified = true;
-      }
-      parts.add(part);
-    }
-    if (modified) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.geometry(parts);
-    } else {
+    RectangleXY.notNullSameCs(this, rectangle);
+    if (bboxCoveredBy(rectangle)) {
       return this;
+    } else {
+      boolean modified = false;
+      final List<Geometry> parts = new ArrayList<>();
+      for (final Geometry part : getPolygons()) {
+        final Geometry partIntersection = part.intersectionRectangle(rectangle);
+        if (partIntersection != part) {
+          modified = true;
+        }
+        parts.add(part);
+      }
+      if (modified) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.geometry(parts);
+      } else {
+        return this;
+      }
     }
   }
 

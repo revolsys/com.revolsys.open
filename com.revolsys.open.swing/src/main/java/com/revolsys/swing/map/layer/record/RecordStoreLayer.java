@@ -535,7 +535,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
           final BoundingBox queryBoundingBox = convertBoundingBox(boundingBox);
           boolean covers;
           synchronized (getSync()) {
-            covers = this.loadedBoundingBox.covers(queryBoundingBox);
+            covers = this.loadedBoundingBox.bboxCovers(queryBoundingBox);
           }
           if (covers) {
             return getRecordsIndex(queryBoundingBox);
@@ -569,9 +569,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
         synchronized (getSync()) {
-          final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
-          if (!this.loadedBoundingBox.covers(boundingBox)
-            && !this.loadingBoundingBox.covers(boundingBox)) {
+          final BoundingBox loadBoundingBox = boundingBox
+            .bboxEdit(editor -> editor.expandPercent(0.2));
+          if (!this.loadedBoundingBox.bboxCovers(boundingBox)
+            && !this.loadingBoundingBox.bboxCovers(boundingBox)) {
             if (this.loadingWorker != null) {
               this.loadingWorker.cancel(true);
             }

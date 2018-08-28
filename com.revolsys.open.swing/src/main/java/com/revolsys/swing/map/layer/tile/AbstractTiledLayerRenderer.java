@@ -9,9 +9,9 @@ import java.util.Map;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.parallel.RunnableSwingWorkerManager;
 import com.revolsys.util.BooleanCancellable;
 import com.revolsys.util.Cancellable;
@@ -74,7 +74,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
           final BoundingBox boundingBox = mapTile.getBoundingBox();
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           if (!geometryFactory.equals(newGeometryFactory)
-            || !newBoundingBox.intersects(boundingBox)) {
+            || !newBoundingBox.bboxIntersects(boundingBox)) {
             this.cachedTiles.remove(mapTile);
           }
         }
@@ -88,8 +88,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final AbstractTiledLayer<D, T> layer) {
+  public void render(final ViewRenderer viewport, final AbstractTiledLayer<D, T> layer) {
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     final double layerResolution = layer.getResolution(viewport);
     synchronized (this.cachedTiles) {
@@ -126,7 +125,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     }
   }
 
-  protected abstract void renderTile(final Viewport2D viewport, final Cancellable cancellable,
+  protected abstract void renderTile(final ViewRenderer viewport, final Cancellable cancellable,
     final T tile);
 
   public void setLoaded(final TileLoadTask<D, T> tileLoadTask) {

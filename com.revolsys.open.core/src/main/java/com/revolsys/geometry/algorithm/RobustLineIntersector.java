@@ -354,7 +354,7 @@ public class RobustLineIntersector extends LineIntersector {
       this.line1x2, this.line1y2);
     final BoundingBox env1 = BoundingBoxDoubleXY.newBoundingBoxDoubleXY(this.line2x1, this.line2y1,
       this.line2x2, this.line2y2);
-    return env0.covers(intPt) && env1.covers(intPt);
+    return env0.bboxCovers(intPt) && env1.bboxCovers(intPt);
   }
 
   /**

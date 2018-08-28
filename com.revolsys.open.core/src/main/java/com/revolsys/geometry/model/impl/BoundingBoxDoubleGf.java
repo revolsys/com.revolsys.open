@@ -38,7 +38,6 @@ import org.apache.commons.beanutils.Converter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.MathUtil;
 
@@ -136,7 +135,7 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
   @Override
   public double getMax(final int axisIndex) {
     if (this.bounds == null || axisIndex >= getAxisCount()) {
-      return Double.NaN;
+      return Double.NEGATIVE_INFINITY;
     } else {
       return RectangleUtil.getMax(this.bounds, axisIndex);
     }
@@ -145,7 +144,7 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
   @Override
   public double getMin(final int axisIndex) {
     if (this.bounds == null) {
-      return Double.NaN;
+      return Double.POSITIVE_INFINITY;
     } else {
       return RectangleUtil.getMin(this.bounds, axisIndex);
     }
@@ -189,12 +188,6 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
   }
 
   @Override
-  public BoundingBox newBoundingBox(final double x, final double y) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.newBoundingBox(x, y);
-  }
-
-  @Override
   public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
     final GeometryFactory geometryFactory = getGeometryFactory();
@@ -205,12 +198,6 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
   public BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return new BoundingBoxDoubleGf(geometryFactory, axisCount, bounds);
-  }
-
-  @Override
-  public BoundingBox newBoundingBox(final Point point) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.newBoundingBox(point);
   }
 
   @Override

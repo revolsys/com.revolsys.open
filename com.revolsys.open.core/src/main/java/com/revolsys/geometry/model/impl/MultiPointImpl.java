@@ -44,7 +44,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer3Double;
@@ -87,11 +86,8 @@ public class MultiPointImpl implements MultiPoint {
    */
   @Override
   public Punctual clone() {
-    try {
-      return (Punctual)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      throw Exceptions.wrap(e);
-    }
+    final Point[] newPoints = this.points.clone();
+    return newPunctual(this.geometryFactory, newPoints);
   }
 
   /**

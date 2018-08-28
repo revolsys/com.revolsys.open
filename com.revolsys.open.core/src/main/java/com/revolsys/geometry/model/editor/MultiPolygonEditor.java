@@ -87,6 +87,13 @@ public class MultiPolygonEditor
     return DataTypes.POLYGON;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <GE extends Geometry> GE newGeometryEmpty() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (GE)geometryFactory.polygon();
+  }
+
   @Override
   public Polygonal newPolygonal(final GeometryFactory geometryFactory, final Polygon... polygons) {
     return this.polygonal.newPolygonal(geometryFactory, polygons);

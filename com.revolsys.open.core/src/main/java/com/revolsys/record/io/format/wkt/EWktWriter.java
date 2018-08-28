@@ -345,7 +345,7 @@ public class EWktWriter {
     if (polygon.isEmpty()) {
       out.write(" EMPTY");
     } else {
-      writePolygon(out, polygon, axisCount);
+      writePolygonRings(out, polygon, axisCount);
     }
   }
 
@@ -367,11 +367,11 @@ public class EWktWriter {
       out.write("(");
 
       Polygon polygon = (Polygon)polygonal.getGeometry(0);
-      writePolygon(out, polygon, axisCount);
+      writePolygonRings(out, polygon, axisCount);
       for (int i = 1; i < polygonal.getGeometryCount(); i++) {
         out.write(",");
         polygon = (Polygon)polygonal.getGeometry(i);
-        writePolygon(out, polygon, axisCount);
+        writePolygonRings(out, polygon, axisCount);
       }
       out.write(")");
     }
@@ -410,6 +410,156 @@ public class EWktWriter {
     } else if (axisCount > 2) {
       out.write(" Z");
     }
+  }
+
+  public static void writeCCW(final Writer out, final Geometry geometry) {
+    if (geometry != null) {
+      if (geometry instanceof Point) {
+        final Point point = (Point)geometry;
+        write(out, point);
+      } else if (geometry instanceof Punctual) {
+        final Punctual punctual = (Punctual)geometry;
+        write(out, punctual);
+      } else if (geometry instanceof LinearRing) {
+        final LinearRing line = (LinearRing)geometry;
+        write(out, line);
+      } else if (geometry instanceof LineString) {
+        final LineString line = (LineString)geometry;
+        write(out, line);
+      } else if (geometry instanceof Lineal) {
+        final Lineal lineal = (Lineal)geometry;
+        write(out, lineal);
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        writeCCWPolygon(out, polygon);
+      } else if (geometry instanceof Polygonal) {
+        final Polygonal polygonal = (Polygonal)geometry;
+        writeCCWPolygonal(out, polygonal);
+      } else if (geometry.isGeometryCollection()) {
+        writeCCWGeometryCollection(out, geometry);
+      } else {
+        throw new IllegalArgumentException("Unknown geometry type" + geometry.getClass());
+      }
+    }
+  }
+
+  private static void writeCCW(final Writer out, final Geometry geometry, final int axisCount)
+    throws IOException {
+    if (geometry != null) {
+      if (geometry instanceof Point) {
+        final Point point = (Point)geometry;
+        write(out, point, axisCount);
+      } else if (geometry instanceof Punctual) {
+        final Punctual punctual = (Punctual)geometry;
+        write(out, punctual, axisCount);
+      } else if (geometry instanceof LinearRing) {
+        final LinearRing line = (LinearRing)geometry;
+        write(out, line, axisCount);
+      } else if (geometry instanceof LineString) {
+        final LineString line = (LineString)geometry;
+        write(out, line, axisCount);
+      } else if (geometry instanceof Lineal) {
+        final Lineal lineal = (Lineal)geometry;
+        write(out, lineal, axisCount);
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        writeCCWPolygon(out, polygon, axisCount);
+      } else if (geometry instanceof Polygonal) {
+        final Polygonal polygonal = (Polygonal)geometry;
+        writeCCWPolygonal(out, polygonal, axisCount);
+      } else if (geometry.isGeometryCollection()) {
+        writeCCWGeometryCollection(out, geometry, axisCount);
+      } else {
+        throw new IllegalArgumentException("Unknown geometry type" + geometry.getClass());
+      }
+    }
+  }
+
+  private static void writeCCWGeometryCollection(final Writer out, final Geometry multiGeometry) {
+    final int axisCount = Math.min(multiGeometry.getAxisCount(), 4);
+    try {
+      writeCCWGeometryCollection(out, multiGeometry, axisCount);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  private static void writeCCWGeometryCollection(final Writer out, final Geometry multiGeometry,
+    final int axisCount) throws IOException {
+    writeGeometryType(out, "GEOMETRYCOLLECTION", axisCount);
+    if (multiGeometry.isEmpty()) {
+      out.write(" EMPTY");
+    } else {
+      out.write("(");
+      Geometry geometry = multiGeometry.getGeometry(0);
+      writeCCW(out, geometry, axisCount);
+      for (int i = 1; i < multiGeometry.getGeometryCount(); i++) {
+        out.write(',');
+        geometry = multiGeometry.getGeometry(i);
+        writeCCW(out, geometry, axisCount);
+      }
+      out.write(')');
+    }
+  }
+
+  private static void writeCCWPolygon(final Writer out, final Polygon polygon) {
+    final int axisCount = Math.min(polygon.getAxisCount(), 4);
+    try {
+      writeCCWPolygon(out, polygon, axisCount);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  private static void writeCCWPolygon(final Writer out, final Polygon polygon, final int axisCount)
+    throws IOException {
+    writeGeometryType(out, "POLYGON", axisCount);
+    if (polygon.isEmpty()) {
+      out.write(" EMPTY");
+    } else {
+      writeCCWPolygonRings(out, polygon, axisCount);
+    }
+  }
+
+  private static void writeCCWPolygonal(final Writer out, final Polygonal polygonal) {
+    final int axisCount = Math.min(polygonal.getAxisCount(), 4);
+    try {
+      writeCCWPolygonal(out, polygonal, axisCount);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  private static void writeCCWPolygonal(final Writer out, final Polygonal polygonal,
+    final int axisCount) throws IOException {
+    writeGeometryType(out, "MULTIPOLYGON", axisCount);
+    if (polygonal.isEmpty()) {
+      out.write(" EMPTY");
+    } else {
+      out.write("(");
+
+      Polygon polygon = (Polygon)polygonal.getGeometry(0);
+      writeCCWPolygonRings(out, polygon, axisCount);
+      for (int i = 1; i < polygonal.getGeometryCount(); i++) {
+        out.write(",");
+        polygon = (Polygon)polygonal.getGeometry(i);
+        writeCCWPolygonRings(out, polygon, axisCount);
+      }
+      out.write(")");
+    }
+  }
+
+  private static void writeCCWPolygonRings(final Writer out, final Polygon polygon,
+    final int axisCount) throws IOException {
+    out.write('(');
+    final LinearRing shell = polygon.getShell().toCounterClockwise();
+    writeCoordinates(out, shell, axisCount);
+    for (final LinearRing hole : polygon.holes()) {
+      out.write(',');
+      final LinearRing clockwiseHole = hole.toClockwise();
+      writeCoordinates(out, clockwiseHole, axisCount);
+    }
+    out.write(')');
   }
 
   private static void writeCoordinate(final Writer out, final LineString coordinates,
@@ -486,15 +636,14 @@ public class EWktWriter {
     writeAxis(out, axisCount);
   }
 
-  private static void writePolygon(final Writer out, final Polygon polygon, final int axisCount)
-    throws IOException {
+  private static void writePolygonRings(final Writer out, final Polygon polygon,
+    final int axisCount) throws IOException {
     out.write('(');
-    final LinearRing shell = polygon.getShell().toCounterClockwise();
+    final LinearRing shell = polygon.getShell();
     writeCoordinates(out, shell, axisCount);
     for (final LinearRing hole : polygon.holes()) {
       out.write(',');
-      final LinearRing clockwiseHole = hole.toClockwise();
-      writeCoordinates(out, clockwiseHole, axisCount);
+      writeCoordinates(out, hole, axisCount);
     }
     out.write(')');
   }

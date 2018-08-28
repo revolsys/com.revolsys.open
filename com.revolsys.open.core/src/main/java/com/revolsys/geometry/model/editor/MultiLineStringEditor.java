@@ -9,6 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Function4Double;
 
@@ -31,6 +32,79 @@ public class MultiLineStringEditor
 
   public MultiLineStringEditor(final Lineal lineal) {
     this(null, lineal);
+  }
+
+  public MultiLineStringEditor appendVertex(final int lineIndex, final boolean allowRepeated,
+    final double... coordinates) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertex(allowRepeated, coordinates);
+    return this;
+  }
+
+  public MultiLineStringEditor appendVertex(final int lineIndex, final double... coordinates) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertex(coordinates);
+    return this;
+  }
+
+  public MultiLineStringEditor appendVertex(final int lineIndex, final double x, final double y) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertex(x, y);
+    return this;
+  }
+
+  public MultiLineStringEditor appendVertex(final int lineIndex, final double x, final double y,
+    final boolean allowRepeated) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertex(x, y, allowRepeated);
+    return this;
+  }
+
+  public MultiLineStringEditor appendVertex(final int lineIndex, final double x, final double y,
+    final double z) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertex(x, y, z);
+    return this;
+  }
+
+  public MultiLineStringEditor appendVertex(final int lineIndex, final LineString line,
+    final int vertexIndex) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertex(line, vertexIndex);
+    return this;
+  }
+
+  public MultiLineStringEditor appendVertex(final int lineIndex, final LineString line,
+    final int vertexIndex, final boolean allowRepeated) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertex(line, vertexIndex, allowRepeated);
+    return this;
+  }
+
+  public MultiLineStringEditor appendVertex(final int lineIndex, final Point point) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertex(point);
+    return this;
+  }
+
+  public MultiLineStringEditor appendVertex(final int lineIndex, final Point point,
+    final boolean allowRepeated) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertex(point, allowRepeated);
+    return this;
+  }
+
+  public MultiLineStringEditor appendVertices(final int lineIndex, final Geometry points) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertices(points);
+    return this;
+  }
+
+  public MultiLineStringEditor appendVertices(final int lineIndex,
+    final Iterable<? extends Point> points) {
+    final LineStringEditor editor = getEditor(lineIndex);
+    editor.appendVertices(points);
+    return this;
   }
 
   @Override
@@ -75,6 +149,13 @@ public class MultiLineStringEditor
   @Override
   public GeometryDataType<LineString, LineStringEditor> getPartDataType() {
     return DataTypes.LINE_STRING;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <GE extends Geometry> GE newGeometryEmpty() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (GE)geometryFactory.lineString();
   }
 
   @Override

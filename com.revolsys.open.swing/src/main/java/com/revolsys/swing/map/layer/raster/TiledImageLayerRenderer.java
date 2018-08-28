@@ -1,13 +1,12 @@
 package com.revolsys.swing.map.layer.raster;
 
-import java.awt.Graphics2D;
 import java.beans.PropertyChangeListener;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Cancellable;
 
 public class TiledImageLayerRenderer<T extends GeoreferencedImageMapTile>
@@ -22,15 +21,12 @@ public class TiledImageLayerRenderer<T extends GeoreferencedImageMapTile>
   }
 
   @Override
-  protected void renderTile(final Viewport2D viewport, final Cancellable cancellable,
+  protected void renderTile(final ViewRenderer viewport, final Cancellable cancellable,
     final T tile) {
-    final Graphics2D graphics = viewport.getGraphics();
-    if (graphics != null) {
-      final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-      final GeoreferencedImage image = tile.getImage(viewportGeometryFactory);
-      if (image != null) {
-        GeoreferencedImageLayerRenderer.render(viewport, graphics, image, false);
-      }
+    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+    final GeoreferencedImage image = tile.getImage(viewportGeometryFactory);
+    if (image != null) {
+      viewport.drawImage(image, false);
     }
   }
 

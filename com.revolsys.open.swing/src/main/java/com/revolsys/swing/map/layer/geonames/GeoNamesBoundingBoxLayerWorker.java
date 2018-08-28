@@ -60,7 +60,7 @@ public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<Lay
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
       final GeographicCoordinateSystem geoCs = projCs.getGeographicCoordinateSystem();
       geometryFactory = geoCs.getGeometryFactory();
-      boundingBox = boundingBox.convert(geometryFactory);
+      boundingBox = boundingBox.bboxToCs(geometryFactory);
     }
     final List<LayerRecord> results = (List)this.geoNamesService.getNames(boundingBox);
     for (final Record record : results) {

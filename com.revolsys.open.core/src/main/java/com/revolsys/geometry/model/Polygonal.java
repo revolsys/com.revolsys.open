@@ -65,16 +65,9 @@ public interface Polygonal extends Geometry {
 
   Polygonal applyPolygonal(Function<Polygon, Polygon> function);
 
-  Polygonal clipRectangle(double x1, double y1, double x2, double y2);
-
   @Override
   default boolean contains(final double x, final double y) {
     return locate(x, y) != Location.EXTERIOR;
-  }
-
-  @Override
-  default boolean contains(final double x, final double y, final double w, final double h) {
-    return false;
   }
 
   default Polygonal differencePolygonal(final Geometry geometry) {

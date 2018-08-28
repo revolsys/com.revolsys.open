@@ -60,7 +60,7 @@ public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<La
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
       geometryFactory = projCs.getGeographicCoordinateSystem().getGeometryFactory();
-      boundingBox = boundingBox.convert(geometryFactory);
+      boundingBox = boundingBox.bboxToCs(geometryFactory);
     }
     final List<LayerRecord> results = (List)this.geoNamesService.getWikipediaArticles(boundingBox);
     for (final Record record : results) {

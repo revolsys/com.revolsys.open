@@ -10,6 +10,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -71,7 +72,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public void forEachTile(final BoundingBox boundingBox,
     final Consumer<RectangularMapTile> action) {
-    final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
+    final BoundingBox convertedBoundingBox = boundingBox.bboxToCs(getGeometryFactory());
 
     final int minX = getGridFloor(this.originX, this.tileWidth, convertedBoundingBox.getMinX());
     final int minY = getGridFloor(this.originY, this.tileHeight, convertedBoundingBox.getMinY());
@@ -204,9 +205,15 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return this.tileHeight;
   }
 
+  public RectangleXY getTileRectangleByLocation(final double x, final double y) {
+    final int tileX = getTileX(x);
+    final int tileY = getTileY(y);
+    return getGeometryFactory().newRectangle(tileX, tileY, this.tileWidth, this.tileHeight);
+  }
+
   @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
-    final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
+    final BoundingBox envelope = boundingBox.bboxToCs(getGeometryFactory());
 
     final List<RectangularMapTile> tiles = new ArrayList<>();
     final int minX = getGridFloor(this.originX, this.tileWidth, envelope.getMinX());

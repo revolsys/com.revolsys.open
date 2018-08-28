@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -17,30 +18,24 @@ import javax.measure.quantity.Length;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.RectangleXY;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.geometry.util.OutCode;
-import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.logging.Logs;
-import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.Consumer3;
-import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
@@ -48,6 +43,58 @@ import tec.uom.se.unit.Units;
 
 public interface BoundingBox
   extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
+  public static BoundingBoxEditor bboxEditor(final BoundingBoxProxy... boundingBoxes) {
+    return new BoundingBoxEditor() //
+      .addAllBbox(boundingBoxes);
+  }
+
+  public static BoundingBoxEditor bboxEditor(final GeometryFactoryProxy geometryFactory,
+    final BoundingBoxProxy... boundingBoxes) {
+    return new BoundingBoxEditor(geometryFactory) //
+      .addAllBbox(boundingBoxes);
+  }
+
+  public static BoundingBoxEditor bboxEditor(final GeometryFactoryProxy geometryFactory,
+    final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
+    return new BoundingBoxEditor(geometryFactory) //
+      .addAllBbox(boundingBoxes);
+  }
+
+  public static BoundingBoxEditor bboxEditor(
+    final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
+    return new BoundingBoxEditor() //
+      .addAllBbox(boundingBoxes);
+  }
+
+  static BoundingBox bboxGet(final Object value) {
+    if (value == null) {
+      return empty();
+    } else if (value instanceof BoundingBoxProxy) {
+      return ((BoundingBoxProxy)value).getBoundingBox();
+    } else {
+      final String string = DataTypes.toString(value);
+      return BoundingBox.newBoundingBox(string);
+    }
+  }
+
+  public static BoundingBox bboxNew(final BoundingBoxProxy... boundingBoxes) {
+    return bboxEditor(boundingBoxes) //
+      .newBoundingBox();
+  }
+
+  public static BoundingBox bboxNew(final GeometryFactoryProxy geometryFactory,
+    final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
+    return new BoundingBoxEditor(geometryFactory) //
+      .addAllBbox(boundingBoxes) //
+      .newBoundingBox();
+  }
+
+  public static BoundingBox bboxNew(final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
+    return new BoundingBoxEditor() //
+      .addAllBbox(boundingBoxes) //
+      .newBoundingBox();
+  }
+
   static BoundingBox empty() {
     return GeometryFactory.DEFAULT_3D.newBoundingBoxEmpty();
   }
@@ -108,20 +155,6 @@ public interface BoundingBox
     final List<V> values = newArray(forEachFunction, boundingBoxProxy, filter);
     values.sort(comparator);
     return values;
-  }
-
-  static BoundingBox newBoundingBox(final Object value) {
-    if (value == null) {
-      return empty();
-    } else if (value instanceof BoundingBox) {
-      return (BoundingBox)value;
-    } else if (value instanceof Geometry) {
-      final Geometry geometry = (Geometry)value;
-      return geometry.getBoundingBox();
-    } else {
-      final String string = DataTypes.toString(value);
-      return BoundingBox.newBoundingBox(string);
-    }
   }
 
   static BoundingBox newBoundingBox(final String wkt) {
@@ -195,14 +228,14 @@ public interface BoundingBox
       s.append("(");
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         if (axisIndex > 0) {
-          s.append(',');
+          s.append(' ');
         }
         s.append(Doubles.toString(boundingBox.getMin(axisIndex)));
       }
-      s.append(' ');
+      s.append(',');
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         if (axisIndex > 0) {
-          s.append(',');
+          s.append(' ');
         }
         s.append(Doubles.toString(boundingBox.getMax(axisIndex)));
       }
@@ -211,177 +244,13 @@ public interface BoundingBox
     return s.toString();
   }
 
-  /**
-   * If the coordinate system is a projected coordinate system then clip to the {@link CoordinateSystem#getAreaBoundingBox()}.
-   */
-  default BoundingBox clipToCoordinateSystem() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-    if (coordinateSystem == null || coordinateSystem instanceof GeographicCoordinateSystem) {
-      return this;
-    } else {
-      final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
-      return intersection(areaBoundingBox);
-    }
-  }
-
-  default BoundingBox clone() {
-    return this;
-  }
-
-  /**
-   * Check that geom is not contained entirely in the rectangle boundary.
-   * According to the somewhat odd spec of the SFS, if this
-   * is the case the geometry is NOT contained.
-   */
-  default boolean containsSFS(final Geometry geometry) {
-    final BoundingBox boundingBox2 = geometry.getBoundingBox();
-    if (covers(boundingBox2)) {
-      if (geometry.isContainedInBoundary(this)) {
-        return false;
-      } else {
-        return true;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  default BoundingBox convert(final GeometryFactory geometryFactory) {
-    final GeometryFactory factory = getGeometryFactory();
-    if (isEmpty()) {
-      return geometryFactory.newBoundingBoxEmpty();
-    } else if (geometryFactory == null) {
-      return this;
-    } else if (factory == geometryFactory) {
-      return this;
-    } else {
-      if (factory == null || factory.getHorizontalCoordinateSystem() == null) {
-        final int axisCount = Math.min(geometryFactory.getAxisCount(), getAxisCount());
-        final double[] minMaxValues = getMinMaxValues(axisCount);
-        return geometryFactory.newBoundingBox(axisCount, minMaxValues);
-      } else if (isEmpty()) {
-        return newBoundingBoxEmpty();
-      } else {
-        final CoordinatesOperation operation = factory.getCoordinatesOperation(geometryFactory);
-        if (operation != null) {
-
-          double xStep = getWidth() / 10;
-          double yStep = getHeight() / 10;
-          final double scaleXY = geometryFactory.getScaleXY();
-          if (scaleXY > 0) {
-            if (xStep < 1 / scaleXY) {
-              xStep = 1 / scaleXY;
-            }
-            if (yStep < 1 / scaleXY) {
-              yStep = 1 / scaleXY;
-            }
-          }
-
-          final double minX = getMinX();
-          final double maxX = getMaxX();
-          final double minY = getMinY();
-          final double maxY = getMaxY();
-
-          final double[] bounds = getMinMaxValues(2);
-          bounds[0] = Double.NaN;
-          bounds[1] = Double.NaN;
-          bounds[2] = Double.NaN;
-          bounds[3] = Double.NaN;
-
-          final CoordinatesOperationPoint to = new CoordinatesOperationPoint();
-          expand(geometryFactory, bounds, operation, to, minX, minY);
-          expand(geometryFactory, bounds, operation, to, minX, maxY);
-          expand(geometryFactory, bounds, operation, to, minX, minY);
-          expand(geometryFactory, bounds, operation, to, maxX, minY);
-
-          if (xStep != 0) {
-            for (double x = minX + xStep; x < maxX; x += xStep) {
-              expand(geometryFactory, bounds, operation, to, x, minY);
-              expand(geometryFactory, bounds, operation, to, x, maxY);
-            }
-          }
-          if (yStep != 0) {
-            for (double y = minY + yStep; y < maxY; y += yStep) {
-              expand(geometryFactory, bounds, operation, to, minX, y);
-              expand(geometryFactory, bounds, operation, to, maxX, y);
-            }
-          }
-          return geometryFactory.newBoundingBox(2, bounds);
-        } else {
-          return this;
-        }
-      }
-    }
-  }
-
-  default BoundingBox convert(GeometryFactory geometryFactory, final int axisCount) {
-    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (geometryFactory == null || sourceGeometryFactory == null) {
-      return this;
-    } else {
-      geometryFactory = geometryFactory.convertAxisCount(axisCount);
-      boolean copy = false;
-      if (geometryFactory != null && sourceGeometryFactory != geometryFactory) {
-        final int srid = getHorizontalCoordinateSystemId();
-        final int srid2 = geometryFactory.getHorizontalCoordinateSystemId();
-        if (srid <= 0) {
-          if (srid2 > 0) {
-            copy = true;
-          }
-        } else if (srid != srid2) {
-          copy = true;
-        }
-        if (!copy) {
-          for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-            final double scale = sourceGeometryFactory.getScale(axisIndex);
-            final double scale1 = geometryFactory.getScale(axisIndex);
-            if (!Doubles.equal(scale, scale1)) {
-              copy = true;
-            }
-          }
-        }
-      }
-      if (copy) {
-        return convert(geometryFactory);
-      } else {
-        return this;
-      }
-    }
-  }
-
-  default boolean coveredBy(final double... bounds) {
-    final double minX1 = bounds[0];
-    final double minY1 = bounds[1];
-    final double maxX1 = bounds[2];
-    final double maxY1 = bounds[3];
+  default boolean bboxCoveredBy(final double minX, final double minY, final double maxX,
+    final double maxY) {
     final double minX2 = getMinX();
     final double minY2 = getMinY();
     final double maxX2 = getMaxX();
     final double maxY2 = getMaxY();
-    return RectangleUtil.covers(minX1, minY1, maxX1, maxY1, minX2, minY2, maxX2, maxY2);
-  }
-
-  /**
-   * Tests if the <code>BoundingBox other</code>
-   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
-   *
-   *@param  other the <code>BoundingBox</code> to check
-   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
-   */
-  default boolean covers(final BoundingBox other) {
-    if (other == null || isEmpty() || other.isEmpty()) {
-      return false;
-    } else {
-      final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-      final BoundingBox convertedBoundingBox = other.toCoordinateSystem(coordinateSystem, 2);
-      final double minX = getMinX();
-      final double minY = getMinY();
-      final double maxX = getMaxX();
-      final double maxY = getMaxY();
-
-      return convertedBoundingBox.coveredBy(minX, minY, maxX, maxY);
-    }
+    return minX <= minX2 && maxX2 <= maxX && minY <= minY2 && maxY2 <= maxY;
   }
 
   /**
@@ -394,7 +263,7 @@ public interface BoundingBox
    *@return    <code>true</code> if <code>(x, y)</code> lies in the interior or
    *      on the boundary of this <code>BoundingBox</code>.
    */
-  default boolean covers(final double x, final double y) {
+  default boolean bboxCovers(final double x, final double y) {
     if (isEmpty()) {
       return false;
     } else {
@@ -407,32 +276,39 @@ public interface BoundingBox
     }
   }
 
-  default boolean covers(final Geometry geometry) {
-    if (geometry == null) {
-      return false;
+  default double bboxDistance(final double x, final double y) {
+    if (bboxIntersects(x, y)) {
+      return 0;
     } else {
-      final BoundingBox boundingBox = geometry.getBoundingBox();
-      return covers(boundingBox);
-    }
-  }
 
-  /**
-   * Tests if the given point lies in or on the envelope.
-   *
-   *@param  p  the point which this <code>BoundingBox</code> is
-   *      being checked for containing
-   *@return    <code>true</code> if the point lies in the interior or
-   *      on the boundary of this <code>BoundingBox</code>.
-   */
-  default boolean covers(final Point point) {
-    if (point == null || point.isEmpty()) {
-      return false;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point projectedPoint = point.convertGeometry(geometryFactory);
-      final double x = projectedPoint.getX();
-      final double y = projectedPoint.getY();
-      return covers(x, y);
+      final double minX = getMinX();
+      final double minY = getMinY();
+      final double maxX = getMaxX();
+      final double maxY = getMaxY();
+
+      double dx = 0.0;
+      if (maxX < x) {
+        dx = x - maxX;
+      } else if (minX > x) {
+        dx = minX - x;
+      }
+
+      double dy = 0.0;
+      if (maxY < y) {
+        dy = y - maxY;
+      } else if (minY > y) {
+        dy = minY - y;
+      }
+
+      // if either is zero, the envelopes overlap either vertically or
+      // horizontally
+      if (dx == 0.0) {
+        return dy;
+      }
+      if (dy == 0.0) {
+        return dx;
+      }
+      return Math.sqrt(dx * dx + dy * dy);
     }
   }
 
@@ -442,19 +318,8 @@ public interface BoundingBox
    * The distance between overlapping Envelopes is 0.  Otherwise, the
    * distance is the Euclidean distance between the closest points.
    */
-  default double distance(BoundingBox boundingBox) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    boundingBox = boundingBox.convert(geometryFactory);
-
-    final double minX = boundingBox.getMinX();
-    final double minY = boundingBox.getMinY();
-    final double maxX = boundingBox.getMaxX();
-    final double maxY = boundingBox.getMaxY();
-
-    return distance(minX, minY, maxX, maxY);
-  }
-
-  default double distance(final double minX, final double minY, final double maxX,
+  @Override
+  default double bboxDistance(final double minX, final double minY, final double maxX,
     final double maxY) {
     final double minXThis = getMinX();
     final double minYThis = getMinY();
@@ -498,53 +363,176 @@ public interface BoundingBox
     }
   }
 
-  default double distance(final Geometry geometry) {
-    final BoundingBox boundingBox = geometry.getBoundingBox();
-    return distance(boundingBox);
+  default BoundingBox bboxEdit(final Consumer<BoundingBoxEditor> action) {
+    final BoundingBoxEditor editor = new BoundingBoxEditor(this);
+    action.accept(editor);
+    return editor.newBoundingBox();
   }
 
   /**
-   * Computes the distance between this and another
-   * <code>BoundingBox</code>.
-   * The distance between overlapping Envelopes is 0.  Otherwise, the
-   * distance is the Euclidean distance between the closest points.
+   * Computes the intersection of two {@link BoundingBox}s.
+   *
+   * @param env the envelope to intersect with
+   * @return a new BoundingBox representing the intersection of the envelopes (this will be
+   * the null envelope if either argument is null, or they do not intersect
    */
-  default double distance(Point point) {
-    point = point.convertGeometry(getGeometryFactory());
-    final double x = point.getX();
-    final double y = point.getY();
-    if (intersects(x, y)) {
-      return 0;
-    } else {
+  default BoundingBox bboxIntersection(final BoundingBoxProxy boundingBox) {
+    final BoundingBoxFunction<BoundingBox> action = BoundingBox::bboxIntersection;
+    final BoundingBox empty = newBoundingBoxEmpty();
+    return bboxWith(boundingBox, action, empty);
+  }
 
+  /**
+   * Computes the intersection of this and another bounding box.
+   *
+   * @return The intersection.
+   */
+  default BoundingBox bboxIntersection(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final double intMinX = Math.max(getMinX(), minX);
+      final double intMinY = Math.max(getMinY(), minY);
+      final double intMaxX = Math.min(getMaxX(), maxX);
+      final double intMaxY = Math.min(getMaxY(), maxY);
+      return newBoundingBox(intMinX, intMinY, intMaxX, intMaxY);
+    }
+  }
+
+  /**
+   *  Check if the point <code>(x, y)</code>
+   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
+   *
+   *@param  x  the x-ordinate of the point
+   *@param  y  the y-ordinate of the point
+   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
+   */
+  default boolean bboxIntersects(final double x, final double y) {
+    if (isEmpty()) {
+      return false;
+    } else {
       final double minX = getMinX();
       final double minY = getMinY();
       final double maxX = getMaxX();
       final double maxY = getMaxY();
+      return !(x > maxX || x < minX || y > maxY || y < minY);
+    }
+  }
 
-      double dx = 0.0;
-      if (maxX < x) {
-        dx = x - maxX;
-      } else if (minX > x) {
-        dx = minX - x;
+  @Override
+  default boolean bboxIntersects(double x1, double y1, double x2, double y2) {
+    final double minX = getMinX();
+    final double minY = getMinY();
+    final double maxX = getMaxX();
+    final double maxY = getMaxY();
+    if (x1 > x2) {
+      final double t = x1;
+      x1 = x2;
+      x2 = t;
+    }
+    if (y1 > y2) {
+      final double t = y1;
+      y1 = y2;
+      y2 = t;
+    }
+    return !(x1 > maxX || x2 < minX || y1 > maxY || y2 < minY);
+  }
+
+  default BoundingBox bboxToCs(final GeometryFactoryProxy geometryFactory) {
+    if (geometryFactory == null || isEmpty()) {
+      return this;
+    } else if (isHasHorizontalCoordinateSystem()) {
+      if (!isProjectionRequired(geometryFactory)) {
+        return this;
+      }
+    } else if (!geometryFactory.isHasHorizontalCoordinateSystem()) {
+      return this;
+    }
+    return bboxEditor() //
+      .setGeometryFactory(geometryFactory) //
+      .newBoundingBox();
+  }
+
+  @Override
+  default <R> R bboxWith(final BoundingBoxProxy boundingBox,
+    final BiFunction<BoundingBox, BoundingBox, R> action, final R emptyValue) {
+    BoundingBox boundingBox2;
+    if (boundingBox == null) {
+      boundingBox2 = BoundingBox.empty();
+    } else {
+      boundingBox2 = boundingBox.getBoundingBox();
+    }
+    return action.apply(this, boundingBox2);
+
+  }
+
+  @Override
+  default <R> R bboxWith(final BoundingBoxProxy boundingBox, final BoundingBoxFunction<R> action,
+    final R emptyResult) {
+    if (boundingBox != null && !isEmpty()) {
+      BoundingBox boundingBox2 = boundingBox.getBoundingBox();
+      if (isProjectionRequired(boundingBox2)) {
+        // TODO just convert points
+        boundingBox2 = boundingBox2.bboxToCs(getGeometryFactory());
+      }
+      if (!boundingBox2.isEmpty()) {
+        final double minX = boundingBox2.getMinX();
+        final double minY = boundingBox2.getMinY();
+        final double maxX = boundingBox2.getMaxX();
+        final double maxY = boundingBox2.getMaxY();
+        return action.accept(this, minX, minY, maxX, maxY);
       }
 
-      double dy = 0.0;
-      if (maxY < y) {
-        dy = y - maxY;
-      } else if (minY > y) {
-        dy = minY - y;
+    }
+    return emptyResult;
+  }
+
+  @Override
+  default <R> R bboxWith(Point point, final BoundingBoxPointFunction<R> action,
+    final R emptyResult) {
+    if (point != null && !isEmpty()) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.as2d(geometryFactory);
+      if (!point.isEmpty()) {
+        final double x = point.getX();
+        final double y = point.getY();
+        return action.accept(this, x, y);
       }
 
-      // if either is zero, the envelopes overlap either vertically or
-      // horizontally
-      if (dx == 0.0) {
-        return dy;
+    }
+    return emptyResult;
+  }
+
+  /**
+   * Tests if the <code>BoundingBox other</code>
+   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
+   *
+   *@param  other the <code>BoundingBox</code> to check
+   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
+   */
+  default boolean bbxCovers(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double minX2 = getMinX();
+    final double minY2 = getMinY();
+    final double maxX2 = getMaxX();
+    final double maxY2 = getMaxY();
+    return minX2 <= minX && maxX <= maxX2 && minY2 <= minY && maxY <= maxY2;
+  }
+
+  default BoundingBox clone() {
+    return this;
+  }
+
+  default boolean containsSFS(final Geometry geometry) {
+    if (bboxCovers(geometry)) {
+      if (geometry.isContainedInBoundary(this)) {
+        return false;
+      } else {
+        return true;
       }
-      if (dy == 0.0) {
-        return dx;
-      }
-      return Math.sqrt(dx * dx + dy * dy);
+    } else {
+      return false;
     }
   }
 
@@ -558,8 +546,8 @@ public interface BoundingBox
 
   default double edgeDeltas() {
     double distance = 0;
-    for (int axis = 0; axis < getAxisCount(); axis++) {
-      distance += getMax(axis) - getMin(axis);
+    for (int axiIndex = 0; axiIndex < getAxisCount(); axiIndex++) {
+      distance += getMax(axiIndex) - getMin(axiIndex);
     }
 
     return distance;
@@ -587,157 +575,6 @@ public interface BoundingBox
       }
     }
     return false;
-  }
-
-  /**
-   * Return a new bounding box expanded by delta.
-   *
-   * @param delta
-   * @return
-   */
-  default BoundingBox expand(final double delta) {
-    return expand(delta, delta);
-  }
-
-  /**
-   * Return a new bounding box expanded by deltaX, deltaY.
-   *
-   * @param delta
-   * @return
-   */
-  default BoundingBox expand(final double deltaX, final double deltaY) {
-    if (isEmpty() || deltaX == 0 && deltaY == 0) {
-      return this;
-    } else {
-      final double x1 = getMinX() - deltaX;
-      final double x2 = getMaxX() + deltaX;
-      final double y1 = getMinY() - deltaY;
-      final double y2 = getMaxY() + deltaY;
-
-      if (x1 > x2 || y1 > y2) {
-        return newBoundingBoxEmpty();
-      } else {
-        return newBoundingBox(x1, y1, x2, y2);
-      }
-    }
-  }
-
-  default void expand(final GeometryFactory geometryFactory, final double[] bounds,
-    final CoordinatesOperation operation, final CoordinatesOperationPoint point, final double x,
-    final double y) {
-    point.setPoint(x, y);
-    operation.perform(point);
-    RectangleUtil.expand(geometryFactory, bounds, point.x, point.y);
-  }
-
-  default BoundingBox expand(final Point point) {
-    if (isEmpty()) {
-      return point.newBoundingBox();
-    } else {
-      final double x = point.getX();
-      final double y = point.getY();
-
-      double minX = getMinX();
-      double maxX = getMaxX();
-      double minY = getMinY();
-      double maxY = getMaxY();
-
-      if (x < minX) {
-        minX = x;
-      }
-      if (x > maxX) {
-        maxX = x;
-      }
-      if (y < minY) {
-        minY = y;
-      }
-      if (y > maxY) {
-        maxY = y;
-      }
-      return newBoundingBox(minX, minY, maxX, maxY);
-    }
-  }
-
-  default BoundingBox expandPercent(final double factor) {
-    return expandPercent(factor, factor);
-  }
-
-  default BoundingBox expandPercent(final double factorX, final double factorY) {
-    if (isEmpty()) {
-      return this;
-    } else {
-      final double deltaX = getWidth() * factorX / 2;
-      final double deltaY = getHeight() * factorY / 2;
-      return expand(deltaX, deltaY);
-    }
-  }
-
-  default BoundingBox expandToInclude(final BoundingBox other) {
-    if (other == null || other.isEmpty()) {
-      return this;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final BoundingBox convertedOther = other.convert(geometryFactory);
-      if (isEmpty()) {
-        return convertedOther;
-      } else if (covers(convertedOther)) {
-        return this;
-      } else {
-        final double minX = Math.min(getMinX(), convertedOther.getMinX());
-        final double maxX = Math.max(getMaxX(), convertedOther.getMaxX());
-        final double minY = Math.min(getMinY(), convertedOther.getMinY());
-        final double maxY = Math.max(getMaxY(), convertedOther.getMaxY());
-        return newBoundingBox(minX, minY, maxX, maxY);
-      }
-    }
-  }
-
-  default BoundingBox expandToInclude(final BoundingBoxProxy other) {
-    if (other == null) {
-      return this;
-    } else {
-      final BoundingBox boundingBox = other.getBoundingBox();
-      return expandToInclude(boundingBox);
-    }
-  }
-
-  default BoundingBox expandToInclude(final double... coordinates) {
-    if (coordinates == null || coordinates.length < 2) {
-      return this;
-    } else {
-      final double[] bounds;
-      final int axisCount = getAxisCount();
-      if (isEmpty()) {
-        bounds = RectangleUtil.newBounds(axisCount);
-      } else {
-        bounds = getMinMaxValues();
-      }
-      RectangleUtil.expand(bounds, axisCount, coordinates);
-      return newBoundingBox(axisCount, bounds);
-    }
-  }
-
-  default BoundingBox expandToInclude(final Geometry geometry) {
-    if (geometry == null || geometry.isEmpty()) {
-      return this;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Geometry convertedGeometry = geometry.convertGeometry(geometryFactory);
-      final BoundingBox box = convertedGeometry.getBoundingBox();
-      return expandToInclude(box);
-    }
-  }
-
-  default BoundingBox expandToInclude(final Point point) {
-    return expandToInclude((Geometry)point);
-  }
-
-  default BoundingBox expandToInclude(final Record object) {
-    if (object != null) {
-      final Geometry geometry = object.getGeometry();
-      return expandToInclude(geometry);
-    }
-    return this;
   }
 
   /**
@@ -863,23 +700,8 @@ public interface BoundingBox
     }
   }
 
-  /**
-   * Get the geometry factory.
-   *
-   * @return The geometry factory.
-   */
-  @Override
-  default CoordinateSystem getHorizontalCoordinateSystem() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (geometryFactory == null) {
-      return null;
-    } else {
-      return geometryFactory.getHorizontalCoordinateSystem();
-    }
-  }
-
   default double getMax(final int i) {
-    return Double.NaN;
+    return Double.NEGATIVE_INFINITY;
   }
 
   default <Q extends Quantity<Q>> Quantity<Q> getMaximum(final int axisIndex) {
@@ -921,7 +743,7 @@ public interface BoundingBox
   }
 
   default double getMin(final int i) {
-    return Double.NaN;
+    return Double.POSITIVE_INFINITY;
   }
 
   default <Q extends Quantity<Q>> Quantity<Q> getMinimum(final int axisIndex) {
@@ -987,27 +809,6 @@ public interface BoundingBox
     return getMin(2);
   }
 
-  default int getOutcode(final double x, final double y) {
-    int out;
-    final double minX = getMinX();
-    final double maxX = getMaxX();
-    if (x < minX) {
-      out = OutCode.OUT_LEFT;
-    } else if (x > maxX) {
-      out = OutCode.OUT_RIGHT;
-    } else {
-      out = 0;
-    }
-    final double minY = getMinY();
-    final double maxY = getMaxY();
-    if (y < minY) {
-      out |= OutCode.OUT_BOTTOM;
-    } else if (y > maxY) {
-      out |= OutCode.OUT_TOP;
-    }
-    return out;
-  }
-
   default Point getRandomPointWithin() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final double x = getMinX() + getWidth() * Math.random();
@@ -1061,134 +862,9 @@ public interface BoundingBox
     }
   }
 
-  /**
-   * Computes the intersection of two {@link BoundingBox}s.
-   *
-   * @param env the envelope to intersect with
-   * @return a new BoundingBox representing the intersection of the envelopes (this will be
-   * the null envelope if either argument is null, or they do not intersect
-   */
-  default BoundingBox intersection(final BoundingBox boundingBox) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-    if (isEmpty() || convertedBoundingBox.isEmpty() || !intersects(convertedBoundingBox)) {
-      return newBoundingBoxEmpty();
-    } else {
-      final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
-      final double intMinY = Math.max(getMinY(), convertedBoundingBox.getMinY());
-      final double intMaxX = Math.min(getMaxX(), convertedBoundingBox.getMaxX());
-      final double intMaxY = Math.min(getMaxY(), convertedBoundingBox.getMaxY());
-      return newBoundingBox(intMinX, intMinY, intMaxX, intMaxY);
-    }
-  }
-
-  /**
-   *  Check if the region defined by <code>other</code>
-   *  overlaps (intersects) the region of this <code>BoundingBox</code>.
-   *
-   *@param  other  the <code>BoundingBox</code> which this <code>BoundingBox</code> is
-   *          being checked for overlapping
-   *@return        <code>true</code> if the <code>BoundingBox</code>s overlap
-   */
-  default boolean intersects(final BoundingBox other) {
-    if (isEmpty() || other.isEmpty()) {
-      return false;
-    } else {
-      final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-      final BoundingBox convertedBoundingBox = other.toCoordinateSystem(coordinateSystem, 2);
-      return intersectsFast(convertedBoundingBox);
-    }
-  }
-
-  /**
-   *  Check if the point <code>(x, y)</code>
-   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
-   *
-   *@param  x  the x-ordinate of the point
-   *@param  y  the y-ordinate of the point
-   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
-   */
-  default boolean intersects(final double x, final double y) {
-    if (isEmpty()) {
-      return false;
-    } else {
-      final double minX = getMinX();
-      final double minY = getMinY();
-      final double maxX = getMaxX();
-      final double maxY = getMaxY();
-      return !(x > maxX || x < minX || y > maxY || y < minY);
-    }
-  }
-
-  default boolean intersects(double x1, double y1, double x2, double y2) {
-    final double minX = getMinX();
-    final double minY = getMinY();
-    final double maxX = getMaxX();
-    final double maxY = getMaxY();
-    if (x1 > x2) {
-      final double t = x1;
-      x1 = x2;
-      x2 = t;
-    }
-    if (y1 > y2) {
-      final double t = y1;
-      y1 = y2;
-      y2 = t;
-    }
-    return !(x1 > maxX || x2 < minX || y1 > maxY || y2 < minY);
-  }
-
-  /**
-   * Fast version of intersects that assumes it's in the same coordinate system.
-   *
-   * @param boundingBox
-   * @return
-   */
-  default boolean intersectsFast(final BoundingBox boundingBox) {
-    final double minX = boundingBox.getMinX();
-    final double minY = boundingBox.getMinY();
-    final double maxX = boundingBox.getMaxX();
-    final double maxY = boundingBox.getMaxY();
-    return intersects(minX, minY, maxX, maxY);
-  }
-
-  default boolean isWithinDistance(final BoundingBox boundingBox, final double maxDistance) {
-    final double distance = boundingBox.distance(boundingBox);
-    if (distance < maxDistance) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  default boolean isWithinDistance(final Geometry geometry, final double maxDistance) {
-    final BoundingBox boundingBox = geometry.getBoundingBox();
-    return isWithinDistance(boundingBox, maxDistance);
-  }
-
-  /**
-   * <p>Construct a new new BoundingBox by moving the min/max x coordinates by xDisplacement and
-   * the min/max y coordinates by yDisplacement. If the bounding box is null or the xDisplacement
-   * and yDisplacement are 0 then this bounding box will be returned.</p>
-   *
-   * @param xDisplacement The distance to move the min/max x coordinates.
-   * @param yDisplacement The distance to move the min/max y coordinates.
-   * @return The moved bounding box.
-   */
-  default BoundingBox move(final double xDisplacement, final double yDisplacement) {
-    if (isEmpty() || xDisplacement == 0 && yDisplacement == 0) {
-      return this;
-    } else {
-      final double x1 = getMinX() + xDisplacement;
-      final double x2 = getMaxX() + xDisplacement;
-      final double y1 = getMinY() + yDisplacement;
-      final double y2 = getMaxY() + yDisplacement;
-      return newBoundingBox(x1, y1, x2, y2);
-    }
-  }
-
-  default BoundingBox newBoundingBox(final double x, final double y) {
-    return new BoundingBoxDoubleXY(x, y);
+  @Override
+  default boolean isBboxEmpty() {
+    return isEmpty();
   }
 
   default BoundingBox newBoundingBox(final double x1, final double y1, final double x2,
@@ -1215,102 +891,41 @@ public interface BoundingBox
     return newBoundingBox(minX, minY, maxX, maxY);
   }
 
-  default BoundingBox newBoundingBox(final Point point) {
-    final double x = point.getX();
-    final double y = point.getY();
-    return newBoundingBox(x, y);
-  }
-
   default BoundingBox newBoundingBoxEmpty() {
     return BoundingBoxDoubleXY.EMPTY;
   }
 
-  /**
-   * The outcode must be outside the rectangle and opposing outcode must be inside the rectangle
-   */
-  default void outCodeIntersection(final int outCode, final double x1, final double y1,
-    final double x2, final double y2, final BiConsumerDouble action) {
-    double x;
-    double y;
-    final double deltaX = x2 - x1;
-    final double deltaY = y2 - y1;
-    if (OutCode.isTop(outCode)) {
-      final double maxY = getMaxY();
-      final double ratio = (maxY - y1) / deltaY;
-      x = x1 + deltaX * ratio;
-      y = maxY;
-    } else if (OutCode.isBottom(outCode)) {
-      final double minY = getMinY();
-      final double ratio = (minY - y1) / deltaY;
-      x = x2 + deltaX * ratio;
-      y = minY;
-    } else if (OutCode.isRight(outCode)) {
-      final double maxX = getMaxX();
-      final double ratio = (maxX - x1) / deltaX;
-      y = y1 + deltaY * ratio;
-      x = maxX;
-    } else if (OutCode.isLeft(outCode)) {
-      final double minX = getMinX();
-      final double ratio = (minX - x1) / deltaX;
-      y = y1 + deltaY * ratio;
-      x = minX;
-    } else {
-      throw new IllegalArgumentException("Outcode " + outCode);
-    }
-    action.accept(x, y);
-  }
-
-  default void outCodeIntersection(int out1, int out2, double x1, double y1, double x2, double y2,
-    final Consumer4Double action) {
+  default OutCode outcode(final double x, final double y) {
     final double minX = getMinX();
     final double minY = getMinY();
     final double maxX = getMaxX();
     final double maxY = getMaxY();
-
-    while (true) {
-      if ((out1 | out2) == 0) {
-        action.accept(x1, y1, x2, y2);
-        return;
-      } else if ((out1 & out2) != 0) {
-        return;
+    if (x < minX) {
+      if (y < minY) {
+        return OutCode.LEFT_BOTTOM;
+      } else if (y > maxY) {
+        return OutCode.LEFT_TOP;
       } else {
-        double x;
-        double y;
-
-        final int outcodeOut = out1 != 0 ? out1 : out2;
-
-        final double deltaY = y2 - y1;
-        final double deltaX = x2 - x1;
-        if (OutCode.isTop(outcodeOut)) {
-          final double ratio = (maxY - y1) / deltaY;
-          x = x1 + deltaX * ratio;
-          y = maxY;
-        } else if (OutCode.isBottom(outcodeOut)) {
-          final double ratio = (minY - y1) / deltaY;
-          x = x2 + deltaX * ratio;
-          y = minY;
-        } else if (OutCode.isRight(outcodeOut)) {
-          final double ratio = (maxX - x1) / deltaX;
-          x = maxX;
-          y = y1 + deltaY * ratio;
-        } else if (OutCode.isLeft(outcodeOut)) {
-          final double ratio = (minX - x1) / deltaX;
-          x = minX;
-          y = y1 + deltaY * ratio;
-        } else {
-          throw new IllegalStateException("Cannot clip as both points are inside the rectangle");
-        }
-
-        if (outcodeOut == out1) {
-          x1 = x;
-          y1 = y;
-          out1 = getOutcode(x1, y1);
-        } else {
-          x2 = x;
-          y2 = y;
-          out2 = getOutcode(x2, y2);
-        }
+        return OutCode.LEFT;
       }
+    } else if (x > maxX) {
+      if (y < minY) {
+        return OutCode.RIGHT_BOTTOM;
+      } else if (y > maxY) {
+        return OutCode.RIGHT_TOP;
+      } else {
+        return OutCode.RIGHT;
+      }
+
+    } else {
+      if (y < minY) {
+        return OutCode.BOTTOM;
+      } else if (y > maxY) {
+        return OutCode.TOP;
+      } else {
+        return OutCode.INSIDE;
+      }
+
     }
   }
 
@@ -1352,34 +967,6 @@ public interface BoundingBox
     return area;
   }
 
-  default BoundingBox toCoordinateSystem(final CoordinateSystem coordinateSystem,
-    final int minAxisCount) {
-    final CoordinateSystem coordinateSystemThis = getHorizontalCoordinateSystem();
-    if (coordinateSystem == null || coordinateSystemThis == null) {
-      return this;
-    } else {
-      if (coordinateSystemThis == coordinateSystem || coordinateSystemThis
-        .getHorizontalCoordinateSystemId() == coordinateSystem.getHorizontalCoordinateSystemId()) {
-        return this;
-      } else {
-        final GeometryFactory geometryFactory = getGeometryFactory()
-          .convertCoordinateSystem(coordinateSystem)
-          .convertAxisCount(minAxisCount);
-        return convert(geometryFactory);
-      }
-    }
-  }
-
-  default BoundingBox toCoordinateSystem(final GeometryFactory geometryFactory,
-    final int minAxisCount) {
-    if (geometryFactory == null) {
-      return this;
-    } else {
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      return toCoordinateSystem(coordinateSystem, minAxisCount);
-    }
-  }
-
   /**
    * Creates a {@link Geometry} with the same extent as the given envelope.
    * The Geometry returned is guaranteed to be valid.
@@ -1419,15 +1006,9 @@ public interface BoundingBox
       } else if (width == 0 || height == 0) {
         return geometryFactory.lineString(2, minX, minY, maxX, maxY);
       } else {
-        return geometryFactory.polygon(geometryFactory.linearRing(2, minX, minY, minX, maxY, maxX,
-          maxY, maxX, minY, minX, minY));
+        return toRectangle();
       }
     }
-  }
-
-  default Polygon toPolygon() {
-    return toPolygon(100, 100);
-
   }
 
   default Polygon toPolygon(final GeometryFactory factory) {
@@ -1450,95 +1031,99 @@ public interface BoundingBox
           geometryFactory = factory;
         }
       }
-      try {
-        double minStep = 0.00001;
-        final CoordinateSystem coordinateSystem = factory.getHorizontalCoordinateSystem();
-        if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-          minStep = 1;
-        } else {
-          minStep = 0.00001;
-        }
-
-        double xStep;
-        final double width = getWidth();
-        if (!Double.isFinite(width)) {
-          return geometryFactory.polygon();
-        } else if (numX <= 1) {
-          numX = 1;
-          xStep = width;
-        } else {
-          xStep = width / numX;
-          if (xStep < minStep) {
-            xStep = minStep;
+      if (numX == 0 && numY == 0) {
+        return toRectangle();
+      } else {
+        try {
+          double minStep = 0.00001;
+          final CoordinateSystem coordinateSystem = factory.getHorizontalCoordinateSystem();
+          if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+            minStep = 1;
+          } else {
+            minStep = 0.00001;
           }
-          numX = Math.max(1, (int)Math.ceil(width / xStep));
-        }
 
-        double yStep;
-        if (numY <= 1) {
-          numY = 1;
-          yStep = getHeight();
-        } else {
-          yStep = getHeight() / numY;
-          if (yStep < minStep) {
-            yStep = minStep;
+          double xStep;
+          final double width = getWidth();
+          if (!Double.isFinite(width)) {
+            return geometryFactory.polygon();
+          } else if (numX <= 1) {
+            numX = 1;
+            xStep = width;
+          } else {
+            xStep = width / numX;
+            if (xStep < minStep) {
+              xStep = minStep;
+            }
+            numX = Math.max(1, (int)Math.ceil(width / xStep));
           }
-          numY = Math.max(1, (int)Math.ceil(getHeight() / yStep));
-        }
 
-        final double minX = getMinX();
-        final double maxX = getMaxX();
-        final double minY = getMinY();
-        final double maxY = getMaxY();
-        final int coordinateCount = 1 + 2 * (numX + numY);
-        final double[] coordinates = new double[coordinateCount * 2];
-        int i = 0;
+          double yStep;
+          if (numY <= 1) {
+            numY = 1;
+            yStep = getHeight();
+          } else {
+            yStep = getHeight() / numY;
+            if (yStep < minStep) {
+              yStep = minStep;
+            }
+            numY = Math.max(1, (int)Math.ceil(getHeight() / yStep));
+          }
 
-        coordinates[i++] = minX;
-        coordinates[i++] = minY;
-        for (int j = 1; j < numX; j++) {
-          final double x = minX + j * xStep;
-          coordinates[i++] = x;
-          coordinates[i++] = minY;
-        }
-        coordinates[i++] = maxX;
-        coordinates[i++] = minY;
+          final double minX = getMinX();
+          final double maxX = getMaxX();
+          final double minY = getMinY();
+          final double maxY = getMaxY();
+          final int coordinateCount = 1 + 2 * (numX + numY);
+          final double[] coordinates = new double[coordinateCount * 2];
+          int i = 0;
 
-        for (int j = 1; j < numY; j++) {
-          final double y = minY + j * yStep;
-          coordinates[i++] = maxX;
-          coordinates[i++] = y;
-        }
-        coordinates[i++] = maxX;
-        coordinates[i++] = maxY;
-
-        for (int j = numX - 1; j > 0; j--) {
-          final double x = minX + j * xStep;
-          coordinates[i++] = x;
-          coordinates[i++] = maxY;
-        }
-
-        coordinates[i++] = minX;
-        coordinates[i++] = maxY;
-
-        for (int j = numY - 1; j > 0; j--) {
-          final double y = minY + j * yStep;
           coordinates[i++] = minX;
-          coordinates[i++] = y;
-        }
-        coordinates[i++] = minX;
-        coordinates[i++] = minY;
+          coordinates[i++] = minY;
+          for (int j = 1; j < numX; j++) {
+            final double x = minX + j * xStep;
+            coordinates[i++] = x;
+            coordinates[i++] = minY;
+          }
+          coordinates[i++] = maxX;
+          coordinates[i++] = minY;
 
-        final LinearRing ring = factory.linearRing(2, coordinates);
-        final Polygon polygon = factory.polygon(ring);
-        if (geometryFactory == null) {
-          return polygon;
-        } else {
-          return (Polygon)polygon.convertGeometry(geometryFactory);
+          for (int j = 1; j < numY; j++) {
+            final double y = minY + j * yStep;
+            coordinates[i++] = maxX;
+            coordinates[i++] = y;
+          }
+          coordinates[i++] = maxX;
+          coordinates[i++] = maxY;
+
+          for (int j = numX - 1; j > 0; j--) {
+            final double x = minX + j * xStep;
+            coordinates[i++] = x;
+            coordinates[i++] = maxY;
+          }
+
+          coordinates[i++] = minX;
+          coordinates[i++] = maxY;
+
+          for (int j = numY - 1; j > 0; j--) {
+            final double y = minY + j * yStep;
+            coordinates[i++] = minX;
+            coordinates[i++] = y;
+          }
+          coordinates[i++] = minX;
+          coordinates[i++] = minY;
+
+          final LinearRing ring = factory.linearRing(2, coordinates);
+          final Polygon polygon = factory.polygon(ring);
+          if (geometryFactory == null) {
+            return polygon;
+          } else {
+            return (Polygon)polygon.convertGeometry(geometryFactory);
+          }
+        } catch (final IllegalArgumentException e) {
+          Logs.error(this, "Unable to convert to polygon: " + this, e);
+          return geometryFactory.polygon();
         }
-      } catch (final IllegalArgumentException e) {
-        Logs.error(this, "Unable to convert to polygon: " + this, e);
-        return geometryFactory.polygon();
       }
     }
   }

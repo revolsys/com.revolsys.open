@@ -19,12 +19,12 @@ import javax.swing.JComponent;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.PreferenceKey;
@@ -221,18 +221,9 @@ public class ZoomOverlay extends AbstractOverlay {
   }
 
   @Override
-  protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
-    if (this.zoomBoxX1 != -1) {
-      graphics.setColor(Color.DARK_GRAY);
-      graphics.setStroke(ZOOM_BOX_STROKE);
-      final int boxX = Math.min(this.zoomBoxX1, this.zoomBoxX2);
-      final int boxY = Math.min(this.zoomBoxY1, this.zoomBoxY2);
-      final int width = Math.abs(this.zoomBoxX2 - this.zoomBoxX1);
-      final int height = Math.abs(this.zoomBoxY2 - this.zoomBoxY1);
-      graphics.drawRect(boxX, boxY, width, height);
-      graphics.setPaint(TRANS_BG);
-      graphics.fillRect(boxX, boxY, width, height);
-    }
+  protected void paintComponent(final Graphics2DViewRender viewport, final Graphics2D graphics) {
+    drawBox(graphics, this.zoomBoxX1, this.zoomBoxY1, this.zoomBoxX2, this.zoomBoxY2,
+      Color.DARK_GRAY, ZOOM_BOX_STROKE, TRANS_BG);
     if (this.panX1 != -1 && this.panImage != null) {
       final int dx = this.panX2 - this.panX1;
       final int dy = this.panY2 - this.panY1;
@@ -283,11 +274,11 @@ public class ZoomOverlay extends AbstractOverlay {
           final double deltaX = fromPoint.getX() - toPoint.getX();
           final double deltaY = fromPoint.getY() - toPoint.getY();
 
-          final BoundingBox boundingBox = viewport.getBoundingBox();
-          final BoundingBox newBoundingBox = boundingBox.move(deltaX, deltaY);
+          final BoundingBox boundingBox = viewport.getBoundingBox() //
+            .bboxEdit(editor -> editor.move(deltaX, deltaY));
 
           final MapPanel map = getMap();
-          map.setBoundingBox(newBoundingBox);
+          map.setBoundingBox(boundingBox);
         }
         panClear();
         repaint();
@@ -365,24 +356,13 @@ public class ZoomOverlay extends AbstractOverlay {
     if (event.getButton() == MouseEvent.BUTTON1 && clearOverlayAction(ACTION_ZOOM_BOX)) {
       final Viewport2D viewport = getViewport();
 
-      // Convert first point to envelope top left in map coords.
-      final int minX = Math.min(this.zoomBoxX1, this.zoomBoxX2);
-      final int minY = Math.min(this.zoomBoxY1, this.zoomBoxY2);
-      final Point topLeft = viewport.toModelPoint(minX, minY);
-
-      // Convert second point to envelope bottom right in map coords.
-      final int maxX = Math.max(this.zoomBoxX1, this.zoomBoxX2);
-      final int maxY = Math.max(this.zoomBoxY1, this.zoomBoxY2);
-      final Point bottomRight = viewport.toModelPoint(maxX, maxY);
-
-      final MapPanel map = getMap();
-      final GeometryFactory geometryFactory = map.getGeometryFactory();
-      final BoundingBox boundingBox = geometryFactory.newBoundingBox(topLeft.getX(), topLeft.getY(),
-        bottomRight.getX(), bottomRight.getY());
+      final BoundingBox boundingBox = newBoundingBox(viewport, this.zoomBoxX1, this.zoomBoxY1,
+        this.zoomBoxX2, this.zoomBoxY2).newBoundingBox();
 
       if (boundingBox.isEmpty()) {
         Toolkit.getDefaultToolkit().beep();
       } else {
+        final MapPanel map = getMap();
         map.setBoundingBox(boundingBox);
       }
       zoomBoxClear();

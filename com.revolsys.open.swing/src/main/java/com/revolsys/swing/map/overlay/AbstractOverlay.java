@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.overlay;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -41,7 +42,7 @@ import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.io.BaseCloseable;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.listener.BaseMouseListener;
 import com.revolsys.swing.listener.BaseMouseMotionListener;
@@ -51,8 +52,8 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
@@ -98,12 +99,14 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   private ComponentViewport2D viewport;
 
+  private Graphics2DViewRender view;
+
   private Geometry xorGeometry;
 
   protected AbstractOverlay(final MapPanel map) {
     this.map = map;
     this.viewport = map.getViewport();
-
+    this.view = this.viewport.newViewRenderer();
     map.addMapOverlay(this);
   }
 
@@ -240,7 +243,23 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     this.snapPoint = null;
     this.snapPointLocationMap.clear();
     this.viewport = null;
+    this.view = null;
     this.xorGeometry = null;
+  }
+
+  protected void drawBox(final Graphics2D graphics, final int x1, final int y1, final int x2,
+    final int y2, final Color color, final BasicStroke stroke, final Color fillColor) {
+    if (x1 != -1) {
+      graphics.setColor(color);
+      graphics.setStroke(stroke);
+      final int boxX = Math.min(x1, x2);
+      final int boxY = Math.min(y1, y2);
+      final int width = Math.abs(x2 - x1);
+      final int height = Math.abs(y2 - y1);
+      graphics.drawRect(boxX, boxY, width, height);
+      graphics.setPaint(fillColor);
+      graphics.fillRect(boxX, boxY, width, height);
+    }
   }
 
   protected void drawXorGeometry(final Graphics2D graphics) {
@@ -263,11 +282,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
           graphics.fill(shape);
         } else {
           XOR_LINE_STYLE.setLineCap(LineCap.BUTT);
-          try (
-            BaseCloseable transformCloseable = this.viewport.setUseModelCoordinates(graphics,
-              true)) {
-            GeometryStyleRecordLayerRenderer.renderGeometry(this.viewport, graphics, geometry, XOR_LINE_STYLE);
-          }
+          this.view.drawGeometry(geometry, XOR_LINE_STYLE);
         }
       } finally {
         graphics.setPaint(paint);
@@ -448,11 +463,6 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     }
   }
 
-  protected Point getViewportPoint(final java.awt.Point eventPoint) {
-    final Point point = this.viewport.toModelPoint(eventPoint);
-    return point;
-  }
-
   public double getViewportScale() {
     final Viewport2D viewport = getViewport();
     return viewport.getScale();
@@ -478,7 +488,8 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     final double snapCentreX = this.snapCentre.getX();
     final double snapCentreY = this.snapCentre.getY();
     final double maxDistance = this.viewport.getHotspotMapUnits();
-    final BoundingBox boundingBox = this.snapCentre.getBoundingBox().expand(maxDistance);
+    final BoundingBox boundingBox = this.snapCentre.bboxEditor() //
+      .expandDelta(maxDistance);
 
     final GeometryFactory geometryFactory = getViewportGeometryFactory2d();
     final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<>();
@@ -544,6 +555,24 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   public void mouseWheelMoved(final MouseWheelEvent e) {
   }
 
+  protected BoundingBoxEditor newBoundingBox(final Viewport2D viewport, final int x1, final int y1,
+    final int x2, final int y2) {
+    // Convert first point to envelope top left in map coords.
+    final int minX = Math.min(x1, x2);
+    final int minY = Math.min(y1, y2);
+    final Point topLeft = viewport.toModelPoint(minX, minY);
+
+    // Convert second point to envelope bottom right in map coords.
+    final int maxX = Math.max(x1, x2);
+    final int maxY = Math.max(y1, y2);
+    final Point bottomRight = viewport.toModelPoint(maxX, maxY);
+
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.bboxEditor() //
+      .addPoint(topLeft.getX(), topLeft.getY()) //
+      .addPoint(bottomRight.getX(), bottomRight.getY());
+  }
+
   protected void newPropertyUndo(final Object object, final String propertyName,
     final Object oldValue, final Object newValue) {
     final SetObjectProperty edit = new SetObjectProperty(object, propertyName, oldValue, newValue);
@@ -566,17 +595,13 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   }
 
   @Override
-  protected final void paintComponent(final Graphics graphics) {
-    final Graphics2D graphics2d = (Graphics2D)graphics;
-    this.viewport.setGraphics(graphics2d);
-    try {
-      paintComponent(this.viewport, graphics2d);
-    } finally {
-      this.viewport.setGraphics(null);
-    }
+  protected final void paintComponent(final Graphics g) {
+    final Graphics2D graphics = (Graphics2D)g;
+    this.view.setGraphics(graphics);
+    paintComponent(this.view, graphics);
   }
 
-  protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
+  protected void paintComponent(final Graphics2DViewRender viewport, final Graphics2D graphics) {
     super.paintComponent(graphics);
   }
 

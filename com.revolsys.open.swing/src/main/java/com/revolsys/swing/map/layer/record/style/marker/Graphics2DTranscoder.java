@@ -35,11 +35,11 @@ public class Graphics2DTranscoder extends SVGAbstractTranscoder {
 
     final AffineTransform t = this.graphics.getTransform();
     final Shape clip = this.graphics.getClip();
-    if (this.curTxf != null) {
-      this.graphics.transform(this.curTxf);
-    }
 
     try {
+      if (this.curTxf != null) {
+        this.graphics.transform(this.curTxf);
+      }
       this.root.paint(this.graphics);
     } catch (final Exception e) {
       Logs.error(this, e);

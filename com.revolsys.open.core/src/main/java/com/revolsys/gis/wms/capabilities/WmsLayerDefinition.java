@@ -286,7 +286,7 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, WebServic
 
   public GeoreferencedImage getMapImage(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight) {
-    final BoundingBox queryBoundingBox = boundingBox.intersection(getLatLonBoundingBox());
+    final BoundingBox queryBoundingBox = boundingBox.bboxIntersection(getLatLonBoundingBox());
     final String srs = "EPSG:" + queryBoundingBox.getHorizontalCoordinateSystemId();
     final WmsClient wmsClient = getWmsClient();
     return wmsClient.getMapImage(this.name, getDefaultStyleName(), srs, queryBoundingBox,

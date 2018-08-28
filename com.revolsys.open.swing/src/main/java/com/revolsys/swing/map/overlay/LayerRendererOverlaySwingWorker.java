@@ -6,7 +6,6 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.io.BaseCloseable;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.ImageViewport;
@@ -14,6 +13,7 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.revolsys.util.Cancellable;
 
@@ -50,24 +50,25 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
           try (
             final ImageViewport viewport = new ImageViewport(project, imageWidth, imageHeight,
               boundingBox)) {
-
+            final ViewRenderer view = viewport.newViewRenderer();
+            view.setCancellable(this);
             if (layer != null && layer.isExists() && layer.isVisible()) {
               final LayerRenderer<Layer> renderer = layer.getRenderer();
               if (renderer != null) {
-                renderer.render(viewport, this);
+                renderer.render(view);
               }
             }
             if (this.overlay.isShowAreaBoundingBox()) {
               final BoundingBox areaBoundingBox = boundingBox.getAreaBoundingBox();
               if (!areaBoundingBox.isEmpty()) {
-                final Polygon viewportPolygon = boundingBox.expandPercent(0.1).toPolygon(0);
-                final Polygon areaPolygon = areaBoundingBox.expand(viewport.getUnitsPerPixel())
+                final Polygon viewportPolygon = boundingBox
+                  .bboxEdit(editor -> editor.expandPercent(0.1))
+                  .toPolygon(0);
+                final Polygon areaPolygon = areaBoundingBox
+                  .bboxEdit(editor -> editor.expandDelta(viewport.getUnitsPerPixel()))
                   .toPolygon(0);
                 final Geometry drawPolygon = viewportPolygon.difference(areaPolygon);
-                try (
-                  BaseCloseable closeable = viewport.setUseModelCoordinates(true)) {
-                  viewport.drawGeometry(drawPolygon, STYLE_AREA);
-                }
+                view.drawGeometry(drawPolygon, STYLE_AREA);
               }
             }
             if (!isCancelled()) {

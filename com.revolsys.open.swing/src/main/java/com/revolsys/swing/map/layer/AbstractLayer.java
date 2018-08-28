@@ -78,10 +78,12 @@ import com.revolsys.swing.table.NumberTableCellRenderer;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.Debug;
 import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
 import com.revolsys.util.ToolTipProxy;
+import com.revolsys.util.number.Doubles;
 import com.revolsys.value.ThreadBooleanValue;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties implements Layer,
@@ -694,14 +696,18 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
         extentPanel.add(new JLabel("Unknown"), BorderLayout.CENTER);
 
       } else {
+        final double minX = boundingBox.getMinX();
+        final double minY = boundingBox.getMinY();
+        final double maxX = boundingBox.getMaxX();
+        final double maxY = boundingBox.getMaxY();
+        final String units = " " + boundingBox.getUnit().toString();
         final JLabel extentLabel = new JLabel("<html><table cellspacing=\"3\" style=\"margin:0px\">"
           + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-          + DataTypes.toString(boundingBox.getMaximum(1)) + "</td><td>&nbsp;</td></tr><tr>"
-          + "<td><b>Left</b>: " + DataTypes.toString(boundingBox.getMinimum(0))
-          + "</td><td>&nbsp;</td><td>&nbsp;</td>" + "<td><b>Right</b>: "
-          + DataTypes.toString(boundingBox.getMaximum(0)) + "</td></tr>"
+          + Doubles.toString(maxY) + units + "</td><td>&nbsp;</td></tr><tr>" + "<td><b>Left</b>: "
+          + Doubles.toString(minX) + units + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+          + "<td><b>Right</b>: " + Doubles.toString(maxX) + units + "</td></tr>"
           + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-          + DataTypes.toString(boundingBox.getMinimum(1)) + "</td><td>&nbsp;</td></tr><tr>"
+          + Doubles.toString(minY) + units + "</td><td>&nbsp;</td></tr><tr>"
           + "</tr></table></html>");
         extentLabel.setFont(SwingUtil.FONT);
         extentPanel.add(extentLabel, BorderLayout.CENTER);
@@ -711,10 +717,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
           "AXIS", "MIN", "MAX"
         }, 0);
         boundingBoxTableModel.addRow(new Object[] {
-          "X", boundingBox.getMinX(), boundingBox.getMaxX()
+          "X", minX, maxX
         });
         boundingBoxTableModel.addRow(new Object[] {
-          "Y", boundingBox.getMinY(), boundingBox.getMaxY()
+          "Y", minY, maxY
         });
         if (boundingBoxAxisCount > 2) {
           boundingBoxTableModel.addRow(new Object[] {
@@ -912,6 +918,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   protected void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
+    if (boundingBox.getCoordinateSystemId() == 3005 && boundingBox.getMinX() == -180) {
+      Debug.noOp();
+    }
   }
 
   @Override
@@ -953,7 +962,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       } else if (this.boundingBox != null
         && !this.boundingBox.getGeometryFactory().isHasHorizontalCoordinateSystem()
         && geometryFactory.isHasHorizontalCoordinateSystem()) {
-        this.boundingBox = this.boundingBox.convert(geometryFactory);
+        this.boundingBox = this.boundingBox.bboxToCs(geometryFactory);
       }
       return geometryFactory;
     }
@@ -1246,9 +1255,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     if (project != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox layerBoundingBox = getBoundingBox();
-      final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-        .clipToCoordinateSystem()
-        .expandPercent(0.1);
+      final BoundingBox boundingBox = layerBoundingBox.bboxEditor() //
+        .setGeometryFactory(geometryFactory) //
+        .clipToCoordinateSystem() //
+        .expandPercent(0.1) //
+        .newBoundingBox();
       project.setViewBoundingBox(boundingBox);
     }
   }

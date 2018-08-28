@@ -74,7 +74,7 @@ public class PreparedLineString extends AbstractDelegatingLineString {
 
   @Override
   public boolean intersects(final Geometry geometry) {
-    if (envelopesIntersect(geometry)) {
+    if (bboxIntersects(geometry)) {
       /**
        * If any segments intersect, obviously intersects = true
        */

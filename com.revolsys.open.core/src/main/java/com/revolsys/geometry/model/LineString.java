@@ -57,6 +57,7 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.awtshape.LineStringShape;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
@@ -73,6 +74,7 @@ import com.revolsys.geometry.model.vertex.AbstractVertex;
 import com.revolsys.geometry.model.vertex.LineStringVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
+import com.revolsys.geometry.operation.RectangleIntersection;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
 import com.revolsys.geometry.util.RectangleUtil;
@@ -296,6 +298,14 @@ public interface LineString extends Lineal {
         }
       }
       return destOffset;
+    }
+  }
+
+  default void copyPoint(final int vertexIndex, final int axisCount, final double[] coordinates) {
+    if (vertexIndex < getVertexCount()) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
+      }
     }
   }
 
@@ -566,6 +576,22 @@ public interface LineString extends Lineal {
       }
     }
     return false;
+  }
+
+  default boolean equalsVertex(final int axisCount, final int vertexIndex,
+    final double... coordinates) {
+    if (isEmpty() || coordinates == null || coordinates.length < axisCount) {
+      return false;
+    } else {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double coordinate = coordinates[axisIndex];
+        final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
+        if (!Doubles.equal(coordinate, matchCoordinate)) {
+          return false;
+        }
+      }
+      return true;
+    }
   }
 
   default boolean equalsVertex(final int axisCount, final int vertexIndex1,
@@ -1474,7 +1500,19 @@ public interface LineString extends Lineal {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    return SnapIfNeededOverlayOp.overlayOp(this, rectangle, OverlayOp.INTERSECTION);
+    RectangleXY.notNullSameCs(this, rectangle);
+    if (bboxCoveredBy(rectangle)) {
+      return this;
+    } else {
+      if (isEmpty()) {
+        return this;
+      } else if (this instanceof LinearRing) {
+        return SnapIfNeededOverlayOp.overlayOp(this, rectangle, OverlayOp.INTERSECTION);
+      } else {
+        final RectangleIntersection rectangleIntersection = new RectangleIntersection();
+        return rectangleIntersection.intersectionLine(this, rectangle);
+      }
+    }
   }
 
   @Override
@@ -1696,7 +1734,7 @@ public interface LineString extends Lineal {
   default Location locate(final double x, final double y) {
     // bounding-box check
     final BoundingBox boundingBox = getBoundingBox();
-    if (boundingBox.covers(x, y)) {
+    if (boundingBox.bboxCovers(x, y)) {
       if (!isClosed()) {
         if (equalsVertex2d(0, x, y) || equalsVertex2d(getLastVertexIndex(), x, y)) {
           return Location.BOUNDARY;
@@ -2280,6 +2318,10 @@ public interface LineString extends Lineal {
     } else {
       return (G)this;
     }
+  }
+
+  default LineStringShape toShape() {
+    return new LineStringShape(this);
   }
 
   /**

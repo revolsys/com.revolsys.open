@@ -11,6 +11,10 @@ import org.springframework.util.StringUtils;
 
 public class ClassPathResource extends AbstractResource {
 
+  public static ClassPathResource newInPackage(final Class<?> clazz, final String name) {
+    return new ClassPathResource(name, clazz);
+  }
+
   private ClassLoader classLoader;
 
   private Class<?> clazz;

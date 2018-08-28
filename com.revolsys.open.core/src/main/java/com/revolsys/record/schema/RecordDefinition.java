@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.ClockDirection;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.Record;
@@ -15,6 +16,17 @@ import com.revolsys.util.CaseConverter;
 
 public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchemaElement,
   MapSerializer, RecordDefinitionProxy, RecordFactory<Record> {
+
+  static RecordDefinition newRecordDefinition(final GeometryFactory geometryFactory,
+    final DataType dataType) {
+    final String name = dataType.getName();
+    return new RecordDefinitionBuilder(name) //
+      .addField(dataType) //
+      .setGeometryFactory(geometryFactory) //
+      .getRecordDefinition() //
+    ;
+  }
+
   default void addCodeTable(final String fieldName, final CodeTable codeTable) {
     final FieldDefinition field = getField(fieldName);
     if (field != null) {

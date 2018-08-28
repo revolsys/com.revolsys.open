@@ -300,10 +300,12 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
   public BoundingBox newAreaBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Area area = getArea();
-    if (area != null) {
-      return area.getLatLonBounds().convert(geometryFactory);
-    } else {
+    if (area == null) {
       return geometryFactory.newBoundingBox(-180, -90, 180, 90);
+    } else {
+      return geometryFactory.bboxEditor() //
+        .addBbox(area) //
+        .newBoundingBox();
     }
   }
 

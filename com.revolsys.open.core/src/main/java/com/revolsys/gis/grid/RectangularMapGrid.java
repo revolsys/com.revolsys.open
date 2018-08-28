@@ -84,7 +84,7 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
     final GeometryFactory geometryFactory = GeometryFactory.floating3d(srid);
     final RectangularMapTile mapTile = getTileByName(mapTileName);
     final BoundingBox boundingBox = mapTile.getBoundingBox();
-    return boundingBox.convert(geometryFactory);
+    return boundingBox.bboxToCs(geometryFactory);
   }
 
   String getFormattedMapTileName(String name);

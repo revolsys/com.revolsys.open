@@ -77,14 +77,15 @@ public class LessThanDistanceFilter implements Predicate<Geometry> {
 
   public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
-    this.envelope = geometry.getBoundingBox();
-    this.envelope = this.envelope.expand(this.distance);
+    this.envelope = geometry.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(this.distance);
   }
 
   @Override
   public boolean test(final Geometry geometry) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
-    if (boundingBox.intersects(this.envelope)) {
+    if (boundingBox.bboxIntersects(this.envelope)) {
       return geometry.isLessThanDistance(geometry, this.distance);
     } else {
       return false;

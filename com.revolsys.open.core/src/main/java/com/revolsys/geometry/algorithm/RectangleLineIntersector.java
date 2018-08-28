@@ -103,7 +103,7 @@ public class RectangleLineIntersector {
      */
     final BoundingBox segEnv = this.rectEnv.newBoundingBox(p0.getX(), p0.getY(), p1.getX(),
       p1.getY());
-    if (!this.rectEnv.intersects(segEnv)) {
+    if (!this.rectEnv.bboxIntersects(segEnv)) {
       return false;
     }
 

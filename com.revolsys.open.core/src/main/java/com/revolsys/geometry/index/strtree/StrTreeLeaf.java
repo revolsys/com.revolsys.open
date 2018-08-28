@@ -70,7 +70,7 @@ public class StrTreeLeaf<I> extends BoundingBoxDoubleXY implements Boundable<I>,
   @Override
   public void query(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super I> action) {
-    if (intersects(minX, minY, maxX, maxY)) {
+    if (bboxIntersects(minX, minY, maxX, maxY)) {
       action.accept(this.item);
     }
   }

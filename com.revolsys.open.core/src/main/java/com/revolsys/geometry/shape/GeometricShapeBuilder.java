@@ -80,14 +80,6 @@ public abstract class GeometricShapeBuilder {
     return new LineSegmentDouble(2, x1, y1, x2, y1);
   }
 
-  public BoundingBox getSquareExtent() {
-    final double radius = getRadius();
-
-    final Point centre = getCentre();
-    return new BoundingBoxDoubleXY(centre.getX() - radius, centre.getY() - radius,
-      centre.getX() + radius, centre.getY() + radius);
-  }
-
   protected Point newPoint(final double x, final double y) {
     return this.geometryFactory.point(x, y);
   }

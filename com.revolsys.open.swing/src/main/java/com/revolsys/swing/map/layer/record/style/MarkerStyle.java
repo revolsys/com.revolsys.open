@@ -25,12 +25,12 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.marker.AbstractMarker;
 import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
 import com.revolsys.swing.map.symbol.SymbolLibrary;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -413,7 +413,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     }
   }
 
-  public boolean setMarkerFillStyle(final Viewport2D viewport, final Graphics2D graphics) {
+  public boolean setMarkerFillStyle(final ViewRenderer viewport, final Graphics2D graphics) {
     if (this.markerFill.getAlpha() == 0) {
       return false;
     } else {
@@ -479,13 +479,14 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     }
   }
 
-  public boolean setMarkerLineStyle(final Viewport2D viewport, final Graphics2D graphics) {
+  public boolean setMarkerLineStyle(final ViewRenderer view, final Graphics2D graphics) {
     final Color color = getMarkerLineColor();
     if (color.getAlpha() == 0) {
       return false;
     } else {
       graphics.setColor(color);
-      final float width = (float)Viewport2D.toDisplayValue(viewport, this.markerLineWidth);
+      final Quantity<Length> measure = this.markerLineWidth;
+      final float width = (float)view.toDisplayValue(measure);
       final BasicStroke basicStroke = new BasicStroke(width);
       graphics.setStroke(basicStroke);
       return true;

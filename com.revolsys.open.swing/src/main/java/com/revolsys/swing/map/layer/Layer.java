@@ -13,7 +13,9 @@ import javax.swing.SwingUtilities;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.Child;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -22,9 +24,15 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.util.Booleans;
 
-public interface Layer
-  extends GeometryFactoryProxy, PropertyChangeSupportProxy, ObjectWithProperties,
-  PropertyChangeListener, Comparable<Layer>, MapSerializer, Child<LayerGroup>, Cloneable {
+public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
+  ObjectWithProperties, PropertyChangeListener, Comparable<Layer>, MapSerializer, Child<LayerGroup>,
+  Cloneable, BoundingBoxProxy {
+
+  default void addVisibleBbox(final BoundingBoxEditor boundingBox) {
+    if (isExists() && isVisible()) {
+      boundingBox.addBbox(this);
+    }
+  }
 
   default boolean checkShowProperties() {
     boolean show = true;
@@ -39,8 +47,6 @@ public interface Layer
   }
 
   void delete();
-
-  BoundingBox getBoundingBox();
 
   BoundingBox getBoundingBox(boolean visibleLayersOnly);
 

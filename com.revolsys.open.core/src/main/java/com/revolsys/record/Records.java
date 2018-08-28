@@ -41,16 +41,6 @@ import com.revolsys.util.Strings;
 
 public interface Records {
 
-  static BoundingBox boundingBox(final Record record) {
-    if (record != null) {
-      final Geometry geometry = record.getGeometry();
-      if (geometry != null) {
-        return geometry.getBoundingBox();
-      }
-    }
-    return BoundingBox.empty();
-  }
-
   static int compareNullFirst(final Record record1, final Record record2, final String fieldName) {
     final Object value1 = getValue(record1, fieldName);
     final Object value2 = getValue(record2, fieldName);

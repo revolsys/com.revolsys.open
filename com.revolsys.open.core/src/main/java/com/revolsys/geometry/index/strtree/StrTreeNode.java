@@ -67,7 +67,7 @@ public class StrTreeNode<I> extends BoundingBoxDoubleXY
       final double minY = child.getMinY();
       final double maxX = child.getMaxX();
       final double maxY = child.getMaxY();
-      expand(minX, minY, maxX, maxY);
+      expandBbox(minX, minY, maxX, maxY);
     }
   }
 
@@ -139,7 +139,7 @@ public class StrTreeNode<I> extends BoundingBoxDoubleXY
   @Override
   public void query(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super I> action) {
-    if (intersects(minX, minY, maxX, maxY)) {
+    if (bboxIntersects(minX, minY, maxX, maxY)) {
       final int childCount = this.childCount;
       final Boundable<I>[] children = this.children;
       for (int i = 0; i < childCount; i++) {

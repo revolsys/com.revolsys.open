@@ -147,7 +147,7 @@ public class EngineeringCoordinateSystem extends AbstractHorizontalCoordinateSys
     final Area area = getArea();
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (area != null) {
-      return area.getLatLonBounds().convert(geometryFactory);
+      return area.bboxEdit(editor -> editor.setGeometryFactory(geometryFactory));
     } else {
       return geometryFactory.newBoundingBox(-180, -90, 180, 90);
     }

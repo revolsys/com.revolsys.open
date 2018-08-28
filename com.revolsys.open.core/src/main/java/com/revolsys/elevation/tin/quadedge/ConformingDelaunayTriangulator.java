@@ -267,7 +267,9 @@ public class ConformingDelaunayTriangulator extends QuadEdgeDelaunayTinBuilder {
     final double segRadius = p.distancePoint(midPt);
 
     // compute envelope of circumcircle
-    final BoundingBox env = midPt.getBoundingBox().expand(segRadius);
+    final BoundingBox env = midPt.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(segRadius);
     // Find all points in envelope
     final List result = this.pointIndex.getItems(env);
 

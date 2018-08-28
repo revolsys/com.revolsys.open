@@ -70,11 +70,11 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.print.SinglePage;
+import com.revolsys.swing.map.view.pdf.SaveAsPdf;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.BackgroundTaskTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
-import com.revolsys.swing.pdf.SaveAsPdf;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.scripting.ScriptRunner;
 import com.revolsys.swing.tree.BaseTree;
@@ -227,7 +227,9 @@ public class ProjectFrame extends BaseFrame {
       fileChooser.setAcceptAllFileFilterUsed(true);
       fileChooser.addChoosableFileFilter(filter);
       fileChooser.setFileFilter(filter);
-      if (!OS.isMac()) {
+      if (OS.isMac()) {
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+      } else {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       }
       final int returnVal = fileChooser.showOpenDialog(this);

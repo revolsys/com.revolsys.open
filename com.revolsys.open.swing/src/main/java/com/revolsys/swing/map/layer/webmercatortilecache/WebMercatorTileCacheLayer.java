@@ -14,8 +14,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
@@ -60,15 +60,15 @@ public class WebMercatorTileCacheLayer
   }
 
   @Override
-  public List<WebMercatorTileCacheMapTile> getOverlappingMapTiles(final Viewport2D viewport) {
+  public List<WebMercatorTileCacheMapTile> getOverlappingMapTiles(final ViewRenderer viewport) {
     final List<WebMercatorTileCacheMapTile> tiles = new ArrayList<>();
     try {
       final double metresPerPixel = viewport.getMetresPerPixel();
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
-        .convert(GEOMETRY_FACTORY)
-        .intersection(MAX_BOUNDING_BOX);
+        .bboxToCs(GEOMETRY_FACTORY)
+        .bboxIntersection(MAX_BOUNDING_BOX);
       final double minX = geographicBoundingBox.getMinX();
       final double minY = geographicBoundingBox.getMinY();
       final double maxX = geographicBoundingBox.getMaxX();
@@ -95,7 +95,7 @@ public class WebMercatorTileCacheLayer
   }
 
   @Override
-  public double getResolution(final Viewport2D viewport) {
+  public double getResolution(final ViewRenderer viewport) {
     final double metresPerPixel = viewport.getMetresPerPixel();
     final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
     return this.client.getResolution(zoomLevel);

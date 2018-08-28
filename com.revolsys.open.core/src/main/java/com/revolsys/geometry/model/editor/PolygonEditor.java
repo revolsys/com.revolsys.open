@@ -339,6 +339,12 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <GA extends Geometry> GA newGeometryAny() {
+    return (GA)newGeometry();
+  }
+
   @Override
   public Polygon newPolygon(final GeometryFactory geometryFactory, final LinearRing... rings) {
     return this.polygon.newPolygon(geometryFactory, rings);

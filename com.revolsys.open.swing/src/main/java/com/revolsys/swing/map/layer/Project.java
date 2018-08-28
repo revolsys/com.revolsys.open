@@ -25,6 +25,7 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
@@ -664,14 +665,16 @@ public class Project extends LayerGroup {
       } else {
         minDimension = 0.5;
       }
+      final BoundingBoxEditor bboxEditor = viewBoundingBox.bboxEditor();
       final double width = viewBoundingBox.getWidth();
       if (width < minDimension) {
-        viewBoundingBox = viewBoundingBox.expand((minDimension - width) / 2, 0);
+        bboxEditor.expandDeltaX((minDimension - width) / 2);
       }
       final double height = viewBoundingBox.getHeight();
       if (height < minDimension) {
-        viewBoundingBox = viewBoundingBox.expand(0, (minDimension - height) / 2);
+        bboxEditor.expandDeltaY((minDimension - height) / 2);
       }
+      viewBoundingBox = bboxEditor.newBoundingBox();
       final BoundingBox oldBoundingBox = this.viewBoundingBox;
       this.viewBoundingBox = viewBoundingBox;
       return !viewBoundingBox.equals(oldBoundingBox);
@@ -721,7 +724,7 @@ public class Project extends LayerGroup {
         if (coordinateSystem != null) {
           defaultBoundingBox = coordinateSystem.getAreaBoundingBox();
         }
-        boundingBox = boundingBox.convert(geometryFactory);
+        boundingBox = boundingBox.bboxToCs(geometryFactory);
       }
       addToMap(map, "viewBoundingBox", boundingBox, defaultBoundingBox);
       final Map<String, BoundingBox> zoomBookmarks = getZoomBookmarks();

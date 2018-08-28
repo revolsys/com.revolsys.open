@@ -4,24 +4,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
-import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
@@ -29,7 +19,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.filter.MultipleAttributeValuesFilter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -37,19 +26,14 @@ import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.RecordDefinitionSqlFilter;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
-import com.revolsys.util.Cancellable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<AbstractRecordLayer>
   implements RecordDefinitionProxy {
-  public static final Pattern PATTERN_INDEX_FROM_END = Pattern.compile("n(?:\\s*-\\s*(\\d+)\\s*)?");
-
-  public static final Pattern PATTERN_SEGMENT_INDEX = Pattern.compile("segment\\((.*)\\)");
-
-  public static final Pattern PATTERN_VERTEX_INDEX = Pattern.compile("vertex\\((.*)\\)");
 
   static {
     MenuFactory.addMenuInitializer(AbstractRecordLayerRenderer.class, (menu) -> {
@@ -112,136 +96,13 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     return Predicates.all();
   }
 
-  protected static int getIndex(final Matcher matcher) {
-    int index;
-    final String argument = matcher.group(1);
-    if (PATTERN_INDEX_FROM_END.matcher(argument).matches()) {
-      final String indexString = argument.replaceAll("[^0-9\\-]+", "");
-      if (indexString.isEmpty()) {
-        index = -1;
-      } else {
-        index = Integer.parseInt(indexString) - 1;
-      }
-    } else {
-      index = Integer.parseInt(argument);
-    }
-    return index;
-  }
-
-  public static PointDoubleXYOrientation getPointWithOrientation(final Viewport2D viewport,
+  public static PointDoubleXYOrientation getPointWithOrientation(final ViewRenderer viewport,
     final Geometry geometry, final String placementType) {
     if (viewport == null) {
       return new PointDoubleXYOrientation(0.0, 0.0, 0);
     } else {
-      final GeometryFactory viewportGeometryFactory2d = viewport.getGeometryFactory2dFloating();
-      if (viewportGeometryFactory2d != null && geometry != null && !geometry.isEmpty()) {
-        Point point = null;
-        double orientation = 0;
-        if (geometry instanceof Point) {
-          point = (Point)geometry;
-        } else {
-          final Matcher vertexIndexMatcher = PATTERN_VERTEX_INDEX.matcher(placementType);
-          if (vertexIndexMatcher.matches()) {
-            final int vertexCount = geometry.getVertexCount();
-            final int vertexIndex = getIndex(vertexIndexMatcher);
-            if (vertexIndex >= -vertexCount && vertexIndex < vertexCount) {
-              final Vertex vertex = geometry.getVertex(vertexIndex);
-              orientation = vertex.getOrientaton(viewportGeometryFactory2d);
-              point = vertex.convertGeometry(viewportGeometryFactory2d);
-            }
-          } else {
-            final Matcher segmentIndexMatcher = PATTERN_SEGMENT_INDEX.matcher(placementType);
-            if (segmentIndexMatcher.matches()) {
-              final int segmentCount = geometry.getSegmentCount();
-              if (segmentCount > 0) {
-                final int index = getIndex(segmentIndexMatcher);
-                LineSegment segment = geometry.getSegment(index);
-                segment = segment.convertGeometry(viewportGeometryFactory2d);
-                if (segment != null) {
-                  point = segment.midPoint();
-                  orientation = segment.getOrientaton();
-                }
-              }
-            } else {
-              PointDoubleXYOrientation pointDoubleXYOrientation = getPointWithOrientationCentre(
-                viewportGeometryFactory2d, geometry);
-              if (!viewport.getBoundingBox().covers(pointDoubleXYOrientation)) {
-                try {
-                  final Geometry clippedGeometry = viewport.getBoundingBox()
-                    .toPolygon()
-                    .intersection(geometry);
-                  if (!clippedGeometry.isEmpty()) {
-                    double maxArea = 0;
-                    double maxLength = 0;
-                    for (int i = 0; i < clippedGeometry.getGeometryCount(); i++) {
-                      final Geometry part = clippedGeometry.getGeometry(i);
-                      if (part instanceof Polygon) {
-                        final double area = part.getArea();
-                        if (area > maxArea) {
-                          maxArea = area;
-                          pointDoubleXYOrientation = getPointWithOrientationCentre(
-                            viewportGeometryFactory2d, part);
-                        }
-                      } else if (part instanceof LineString) {
-                        if (maxArea == 0 && "auto".equals(placementType)) {
-                          final double length = part.getLength();
-                          if (length > maxLength) {
-                            maxLength = length;
-                            pointDoubleXYOrientation = getPointWithOrientationCentre(
-                              viewportGeometryFactory2d, part);
-                          }
-                        }
-                      } else if (part instanceof Point) {
-                        if (maxArea == 0 && maxLength == 0 && "auto".equals(placementType)) {
-                          pointDoubleXYOrientation = getPointWithOrientationCentre(
-                            viewportGeometryFactory2d, part);
-                        }
-                      }
-                    }
-                  }
-                } catch (final Throwable t) {
-                }
-              }
-              return pointDoubleXYOrientation;
-            }
-          }
-        }
-        if (Property.hasValue(point)) {
-          if (viewport.getBoundingBox().covers(point)) {
-            point = point.convertPoint2d(viewportGeometryFactory2d);
-            return new PointDoubleXYOrientation(point, orientation);
-          }
-        }
-      }
-      return null;
+      return viewport.getPointWithOrientation(geometry, placementType);
     }
-  }
-
-  private static PointDoubleXYOrientation getPointWithOrientationCentre(
-    final GeometryFactory geometryFactory2dFloating, final Geometry geometry) {
-    double orientation = 0;
-    Point point = null;
-    if (geometry instanceof LineString) {
-      final LineString line = geometry.convertGeometry(geometryFactory2dFloating, 2);
-
-      final double totalLength = line.getLength();
-      final double centreLength = totalLength / 2;
-      double currentLength = 0;
-      for (final Segment segment : line.segments()) {
-        final double segmentLength = segment.getLength();
-        currentLength += segmentLength;
-        if (currentLength >= centreLength) {
-          final double segmentFraction = 1 - (currentLength - centreLength) / segmentLength;
-          point = segment.pointAlong(segmentFraction);
-          orientation = segment.getOrientaton();
-          break;
-        }
-      }
-    } else {
-      point = geometry.getPointWithin();
-      point = point.convertPoint2d(geometryFactory2dFloating);
-    }
-    return new PointDoubleXYOrientation(point, orientation);
   }
 
   private Predicate<Record> filter = Predicates.all();
@@ -321,33 +182,29 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final AbstractRecordLayer layer) {
+  public void render(final ViewRenderer viewport, final AbstractRecordLayer layer) {
     if (layer.hasGeometryField()) {
       final BoundingBox boundingBox = viewport.getBoundingBox();
       final List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
-      try (
-        BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
-        renderRecords(viewport, cancellable, layer, records);
-      }
+      renderRecords(viewport, layer, records);
     }
   }
 
-  public void renderRecord(final Viewport2D viewport, Cancellable cancellable,
-    final BoundingBox visibleArea, final AbstractRecordLayer layer, final LayerRecord record) {
+  public void renderRecord(final ViewRenderer viewport, final BoundingBox visibleArea,
+    final AbstractRecordLayer layer, final LayerRecord record) {
   }
 
-  protected void renderRecords(final Viewport2D viewport, final Cancellable cancellable,
-    final AbstractRecordLayer layer, final List<LayerRecord> records) {
+  protected void renderRecords(final ViewRenderer viewport, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
-    for (final LayerRecord record : cancellable.cancellable(records)) {
+    for (final LayerRecord record : viewport.cancellable(records)) {
       if (record != null) {
         if (isVisible(record) && !layer.isHidden(record)) {
           try {
-            renderRecord(viewport, cancellable, visibleArea, layer, record);
+            renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            if (!cancellable.isCancelled()) {
+            if (!viewport.isCancelled()) {
               Logs.error(this,
                 "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
             }
@@ -357,12 +214,12 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
-  public void renderSelectedRecord(final Viewport2D viewport, Cancellable cancellable,
-    final AbstractRecordLayer layer, final LayerRecord record) {
+  public void renderSelectedRecord(final ViewRenderer viewport, final AbstractRecordLayer layer,
+    final LayerRecord record) {
     final BoundingBox boundingBox = viewport.getBoundingBox();
     if (isVisible(record)) {
       try {
-        renderRecord(viewport, cancellable, boundingBox, layer, record);
+        renderRecord(viewport, boundingBox, layer, record);
       } catch (final TopologyException e) {
       }
     }

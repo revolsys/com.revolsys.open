@@ -22,7 +22,7 @@ public class RStarLeaf<T> implements RStarNode<T> {
 
   @Override
   public void forEach(final double x, final double y, final Consumer<? super T> action) {
-    if (this.boundingBox.covers(x, y)) {
+    if (this.boundingBox.bboxCovers(x, y)) {
       action.accept(this.item);
     }
   }
@@ -30,7 +30,7 @@ public class RStarLeaf<T> implements RStarNode<T> {
   @Override
   public void forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super T> action) {
-    if (this.boundingBox.intersects(minX, minY, maxX, maxY)) {
+    if (this.boundingBox.bboxIntersects(minX, minY, maxX, maxY)) {
       action.accept(this.item);
     }
   }

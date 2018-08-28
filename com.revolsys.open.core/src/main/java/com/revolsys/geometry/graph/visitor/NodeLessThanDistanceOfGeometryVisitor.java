@@ -19,8 +19,9 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements Consumer<Node<T
       return Collections.emptyList();
     } else {
       final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
-      BoundingBox env = geometry.getBoundingBox();
-      env = env.expand(maxDistance);
+      final BoundingBox env = geometry.getBoundingBox() //
+        .bboxEditor() //
+        .expandDelta(maxDistance);
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
       final NodeLessThanDistanceOfGeometryVisitor<T> visitor = new NodeLessThanDistanceOfGeometryVisitor<>(
         geometry, maxDistance, results);

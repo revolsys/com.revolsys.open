@@ -30,7 +30,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.util.BoundingBoxXyConstructor;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.ResourceEndianOutput;
@@ -47,7 +47,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
 
-  private final BoundingBoxXyConstructor boundingBox = new BoundingBoxXyConstructor();
+  private final BoundingBoxEditor boundingBox = new BoundingBoxEditor();
 
   private DataType geometryDataType;
 
@@ -209,7 +209,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
       if (geometry == null || geometry.isEmpty()) {
         writeNull(this.out);
       } else {
-        this.boundingBox.expand(geometry.getBoundingBox());
+        this.boundingBox.addBbox(geometry);
         SHP_WRITER.write(this.geometryWriteMethod, this.out, geometry);
       }
       if (this.indexOut != null) {

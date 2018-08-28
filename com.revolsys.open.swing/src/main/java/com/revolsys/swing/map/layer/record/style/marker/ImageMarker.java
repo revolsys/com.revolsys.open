@@ -10,10 +10,11 @@ import javax.imageio.ImageIO;
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 
 public class ImageMarker extends AbstractMarker {
 
@@ -35,25 +36,26 @@ public class ImageMarker extends AbstractMarker {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Graphics2D graphics, final MarkerStyle style,
-    final double modelX, final double modelY, double orientation) {
+  public void render(final Graphics2DViewRender view, final Graphics2D graphics,
+    final MarkerStyle style, final double modelX, final double modelY, double orientation) {
     if (this.image != null) {
-      final AffineTransform savedTransform = graphics.getTransform();
-      final Quantity<Length> markerWidth = style.getMarkerWidth();
-      final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
-      final Quantity<Length> markerHeight = style.getMarkerHeight();
-      final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
+      try (
+        BaseCloseable closable = view.useViewCoordinates()) {
+        final Quantity<Length> markerWidth = style.getMarkerWidth();
+        final double mapWidth = view.toDisplayValue(markerWidth);
+        final Quantity<Length> markerHeight = style.getMarkerHeight();
+        final double mapHeight = view.toDisplayValue(markerHeight);
 
-      final String orientationType = style.getMarkerOrientationType();
-      if ("none".equals(orientationType)) {
-        orientation = 0;
+        final String orientationType = style.getMarkerOrientationType();
+        if ("none".equals(orientationType)) {
+          orientation = 0;
+        }
+        translateMarker(view, graphics, style, modelX, modelY, mapWidth, mapHeight, orientation);
+
+        final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
+          mapWidth / this.image.getWidth(null), mapHeight / this.image.getHeight(null));
+        graphics.drawImage(this.image, shapeTransform, null);
       }
-      translateMarker(viewport, graphics, style, modelX, modelY, mapWidth, mapHeight, orientation);
-
-      final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
-        mapWidth / this.image.getWidth(null), mapHeight / this.image.getHeight(null));
-      graphics.drawImage(this.image, shapeTransform, null);
-      graphics.setTransform(savedTransform);
     }
   }
 }

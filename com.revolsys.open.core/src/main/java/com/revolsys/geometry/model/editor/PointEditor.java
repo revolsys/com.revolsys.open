@@ -248,6 +248,12 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <GA extends Geometry> GA newGeometryAny() {
+    return (GA)newGeometry();
+  }
+
   @Override
   public Point newPoint(final GeometryFactory geometryFactory, final double... coordinates) {
     return geometryFactory.point(coordinates);

@@ -83,7 +83,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     final CoordinatesOperation projection = geometryFactory
       .getCoordinatesOperation(targetGeometryFactory);
 
-    final BoundingBox convertexBoundingBox = boundingBox.convert(geometryFactory);
+    final BoundingBox convertexBoundingBox = boundingBox.bboxToCs(geometryFactory);
     final double gridCellWidth = getGridCellWidth();
     final double gridCellHeight = getGridCellHeight();
     final double minY = getGridMinY();
@@ -116,7 +116,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
           final double x = minX + gridX * gridCellWidth;
           final double value = getValueFast(gridX, gridY);
           if (Double.isFinite(value)) {
-            if (boundingBox.covers(x, y)) {
+            if (boundingBox.bboxCovers(x, y)) {
               final Point point = targetGeometryFactory.point(x, y, value);
               action.accept(point);
             }
@@ -136,7 +136,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
             final double targetX = point.x;
             final double targetY = point.y;
             final double targetZ = point.z;
-            if (boundingBox.covers(targetX, targetY)) {
+            if (boundingBox.bboxCovers(targetX, targetY)) {
               final Point targetPoint = targetGeometryFactory.point(targetX, targetY, targetZ);
               action.accept(targetPoint);
             }

@@ -6,10 +6,9 @@ import java.awt.Graphics2D;
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 
 public class VertexStyleRenderer {
@@ -37,7 +36,7 @@ public class VertexStyleRenderer {
     this.toVertexStyle.setMarkerHorizontalAlignment("right");
   }
 
-  public void paintSelected(final Viewport2D viewport, final Graphics2D graphics,
+  public void paintSelected(final ViewRenderer viewport, final Graphics2D graphics,
     final GeometryFactory viewportGeometryFactory, final Vertex vertex) {
     if (Property.hasValue(vertex)) {
       MarkerStyle style;
@@ -49,7 +48,7 @@ public class VertexStyleRenderer {
         style = this.vertexStyle;
       }
       final double orientation = vertex.getOrientaton();
-      MarkerStyleRenderer.renderMarker(viewport, graphics, vertex, style, orientation);
+      viewport.drawMarker(vertex, style, orientation);
     }
   }
 }

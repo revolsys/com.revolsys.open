@@ -160,6 +160,15 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   @Override
+  public void copyPoint(final int vertexIndex, final int axisCount, final double[] coordinates) {
+    if (vertexIndex < this.vertexCount) {
+      System.arraycopy(this.coordinates, vertexIndex * this.axisCount, coordinates, 0, axisCount);
+    } else {
+      Arrays.fill(coordinates, 0, axisCount, Double.NaN);
+    }
+  }
+
+  @Override
   public <R> R findSegment(final Function4Double<R> action) {
     final int vertexCount = this.vertexCount;
     final int axisCount = this.axisCount;

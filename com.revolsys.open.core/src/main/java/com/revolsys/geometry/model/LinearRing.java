@@ -46,6 +46,7 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.editor.LinearRingEditor;
 import com.revolsys.geometry.model.prep.PreparedLinearRing;
+import com.revolsys.geometry.model.vertex.LinearRingVertex;
 import com.revolsys.util.QuantityType;
 
 import tec.uom.se.quantity.Quantities;
@@ -136,186 +137,6 @@ public interface LinearRing extends LineString {
     return geometryFactory.linearRing(axisCount, coordinates);
   }
 
-  default LinearRing clipRectangle(double minX, double minY, double maxX, double maxY) {
-    if (minX > maxX) {
-      final double t = minX;
-      minX = maxX;
-      maxX = t;
-    }
-    if (minY > maxY) {
-      final double t = minY;
-      minY = maxY;
-      maxY = t;
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (getBoundingBox().intersects(minX, minY, maxX, maxY)) {
-      final int axisCount = getAxisCount();
-      LineStringEditor newLine = new LineStringEditor(geometryFactory);
-
-      // Clip top
-      {
-        final LineString line = this;
-        final int vertexCount = line.getVertexCount();
-        newLine = new LineStringEditor(geometryFactory);
-        double x1 = line.getX(0);
-        double y1 = line.getY(0);
-        boolean inside1 = y1 < maxY;
-        if (inside1) {
-          newLine.appendVertex(x1, y1);
-          for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-            final double coordinate = line.getCoordinate(0, axisIndex);
-            newLine.setCoordinate(0, axisIndex, coordinate);
-          }
-        }
-        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
-          final double x2 = line.getX(vertexIndex);
-          final double y2 = line.getY(vertexIndex);
-          final boolean inside2 = y2 <= maxY;
-          if (inside1 != inside2) {
-            if (y1 != maxY && y2 != maxY) {
-              final double newX = x1 + (x2 - x1) * (maxY - y1) / (y2 - y1);
-              newLine.appendVertex(newX, maxY);
-            }
-          }
-          if (inside2) {
-            newLine.appendVertex(x2, y2);
-            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-              final double coordinate = line.getCoordinate(vertexIndex, axisIndex);
-              newLine.setCoordinate(vertexIndex, axisIndex, coordinate);
-            }
-          }
-          inside1 = inside2;
-          x1 = x2;
-          y1 = y2;
-        }
-        newLine.closeRing();
-      }
-
-      // Clip bottom
-      {
-        final LineString line = newLine;
-        final int vertexCount = line.getVertexCount();
-        newLine = new LineStringEditor(geometryFactory);
-        double x1 = line.getX(0);
-        double y1 = line.getY(0);
-        boolean inside1 = y1 >= minY;
-        if (inside1) {
-          newLine.appendVertex(x1, y1);
-          for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-            final double coordinate = line.getCoordinate(0, axisIndex);
-            newLine.setCoordinate(0, axisIndex, coordinate);
-          }
-        }
-        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
-          final double x2 = line.getX(vertexIndex);
-          final double y2 = line.getY(vertexIndex);
-          final boolean inside2 = y2 >= minY;
-          if (inside1 != inside2) {
-            if (y1 != minY && y2 != minY) {
-              final double newX = x1 + (x2 - x1) * (minY - y1) / (y2 - y1);
-              newLine.appendVertex(newX, minY);
-            }
-          }
-          if (inside2) {
-            newLine.appendVertex(x2, y2);
-            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-              final double coordinate = line.getCoordinate(vertexIndex, axisIndex);
-              newLine.setCoordinate(vertexIndex, axisIndex, coordinate);
-            }
-          }
-
-          inside1 = inside2;
-          x1 = x2;
-          y1 = y2;
-        }
-        newLine.closeRing();
-      }
-
-      // Clip left
-      {
-        final LineString line = newLine;
-        final int vertexCount = line.getVertexCount();
-        newLine = new LineStringEditor(geometryFactory);
-        double x1 = line.getX(0);
-        double y1 = line.getY(0);
-        boolean inside1 = x1 >= minX;
-        if (inside1) {
-          newLine.appendVertex(x1, y1);
-          for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-            final double coordinate = line.getCoordinate(0, axisIndex);
-            newLine.setCoordinate(0, axisIndex, coordinate);
-          }
-        }
-        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
-          final double x2 = line.getX(vertexIndex);
-          final double y2 = line.getY(vertexIndex);
-          final boolean inside2 = x2 >= minX;
-          if (inside1 != inside2) {
-            if (x1 != minX && x2 != minX) {
-              final double newY = y1 + (y2 - y1) * (minX - x1) / (x2 - x1);
-              newLine.appendVertex(minX, newY);
-            }
-          }
-          if (inside2) {
-            newLine.appendVertex(x2, y2);
-            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-              final double coordinate = line.getCoordinate(vertexIndex, axisIndex);
-              newLine.setCoordinate(vertexIndex, axisIndex, coordinate);
-            }
-          }
-
-          inside1 = inside2;
-          x1 = x2;
-          y1 = y2;
-        }
-        newLine.closeRing();
-      }
-
-      // Clip right
-      {
-        final LineString line = newLine;
-        final int vertexCount = line.getVertexCount();
-        newLine = new LineStringEditor(geometryFactory);
-        double x1 = line.getX(0);
-        double y1 = line.getY(0);
-        boolean inside1 = x1 <= maxX;
-        if (inside1) {
-          newLine.appendVertex(x1, y1);
-          for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-            final double coordinate = line.getCoordinate(0, axisIndex);
-            newLine.setCoordinate(0, axisIndex, coordinate);
-          }
-        }
-        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
-          final double x2 = line.getX(vertexIndex);
-          final double y2 = line.getY(vertexIndex);
-          final boolean inside2 = x2 <= maxX;
-          if (inside1 != inside2) {
-            if (x1 != maxX && x2 != maxX) {
-              final double newY = y1 + (y2 - y1) * (maxX - x1) / (x2 - x1);
-              newLine.appendVertex(maxX, newY);
-            }
-          }
-          if (inside2) {
-            newLine.appendVertex(x2, y2);
-            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-              final double coordinate = line.getCoordinate(vertexIndex, axisIndex);
-              newLine.setCoordinate(vertexIndex, axisIndex, coordinate);
-            }
-          }
-
-          inside1 = inside2;
-          x1 = x2;
-          y1 = y2;
-        }
-        newLine.closeRing();
-      }
-      return newLine.newLinearRing();
-    } else {
-      return geometryFactory.linearRing();
-    }
-  }
-
   @Override
   LinearRing clone();
 
@@ -385,6 +206,29 @@ public interface LinearRing extends LineString {
       area = getPolygonArea();
     }
     return area;
+  }
+
+  @Override
+  default LinearRingVertex getToVertex(int vertexIndex) {
+    final int vertexCount = getVertexCount();
+    vertexIndex = vertexCount - vertexIndex - 1;
+    if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+      return new LinearRingVertex(this, vertexIndex);
+    }
+    return null;
+  }
+
+  @Override
+  default LinearRingVertex getVertex(int vertexIndex) {
+    final int vertexCount = getVertexCount();
+    if (vertexIndex < vertexCount) {
+      while (vertexIndex < 0) {
+        vertexIndex += vertexCount;
+      }
+      return new LinearRingVertex(this, vertexIndex);
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -527,5 +371,10 @@ public interface LinearRing extends LineString {
   @Override
   default LinearRing reverse() {
     return (LinearRing)LineString.super.reverse();
+  }
+
+  @Override
+  default LinearRingVertex vertices() {
+    return new LinearRingVertex(this, -1);
   }
 }

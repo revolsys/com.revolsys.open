@@ -32,11 +32,6 @@ public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
   }
 
   @Override
-  public BoundingBox newBoundingBox(final double x, final double y) {
-    return new BoundingBoxDoubleXYGeometryFactory(this.geometryFactory, x, y);
-  }
-
-  @Override
   public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
     return new BoundingBoxDoubleXYGeometryFactory(this.geometryFactory, minX, minY, maxX, maxY);

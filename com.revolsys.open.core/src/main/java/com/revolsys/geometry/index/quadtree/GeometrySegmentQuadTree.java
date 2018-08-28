@@ -55,8 +55,9 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
   }
 
   public List<Segment> getWithinDistance(final Point point, final double maxDistance) {
-    BoundingBox boundingBox = point.getBoundingBox();
-    boundingBox = boundingBox.expand(maxDistance);
+    final BoundingBox boundingBox = point.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final LineSegmentCoordinateDistanceFilter filter = new LineSegmentCoordinateDistanceFilter(
       point, maxDistance);
     return getItems(boundingBox, filter);
@@ -66,7 +67,7 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
   protected boolean intersectsBounds(final Object id, final double x, final double y) {
     final Segment segment = getItem(id);
     final BoundingBox boundingBox = segment.getBoundingBox();
-    return boundingBox.intersects(x, y, x, y);
+    return boundingBox.bboxIntersects(x, y, x, y);
   }
 
   @Override
@@ -74,7 +75,7 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
     final double maxX, final double maxY) {
     final Segment segment = getItem(id);
     final BoundingBox boundingBox = segment.getBoundingBox();
-    return boundingBox.intersects(minX, minY, maxX, maxY);
+    return boundingBox.bboxIntersects(minX, minY, maxX, maxY);
   }
 
 }

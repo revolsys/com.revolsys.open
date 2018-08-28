@@ -35,7 +35,8 @@ import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
@@ -66,46 +67,35 @@ public interface QueryValue extends Cloneable {
     return clonedValues;
   }
 
-  static BoundingBox expand(final BoundingBox boundingBox, final BoundingBox newBoundingBox) {
-    if (boundingBox == null) {
-      return newBoundingBox;
-    } else if (newBoundingBox == null) {
-      return boundingBox;
-    } else {
-      return boundingBox.expandToInclude(newBoundingBox);
-    }
-  }
-
   static BoundingBox getBoundingBox(final Query query) {
     final Condition whereCondition = query.getWhereCondition();
     return getBoundingBox(whereCondition);
   }
 
   static BoundingBox getBoundingBox(final QueryValue queryValue) {
-    BoundingBox boundingBox = null;
+    final BoundingBoxEditor boundingBox = new BoundingBoxEditor();
     if (queryValue != null) {
       for (final QueryValue childValue : queryValue.getQueryValues()) {
         if (childValue instanceof EnvelopeIntersects) {
           final EnvelopeIntersects intersects = (EnvelopeIntersects)childValue;
-          boundingBox = expand(boundingBox, getBoundingBox(intersects.getBoundingBox1Value()));
-          boundingBox = expand(boundingBox, getBoundingBox(intersects.getBoundingBox2Value()));
+          final BoundingBox boundingBox1 = getBoundingBox(intersects.getBoundingBox1Value());
+          final BoundingBox boundingBox2 = getBoundingBox(intersects.getBoundingBox2Value());
+          boundingBox.addAllBbox(boundingBox1, boundingBox2);
         } else if (childValue instanceof WithinDistance) {
           final WithinDistance withinDistance = (WithinDistance)childValue;
-          BoundingBox withinBoundingBox = getBoundingBox(withinDistance.getGeometry1Value());
-          withinBoundingBox = expand(withinBoundingBox,
-            getBoundingBox(withinDistance.getGeometry2Value()));
+          final BoundingBox boundingBox1 = getBoundingBox(withinDistance.getGeometry1Value());
+          final BoundingBox boundingBox2 = getBoundingBox(withinDistance.getGeometry2Value());
+          final BoundingBoxEditor withinBoundingBox = BoundingBox.bboxEditor(boundingBox1,
+            boundingBox2);
           final double distance = ((Number)((Value)withinDistance.getDistanceValue()).getValue())
             .doubleValue();
 
-          boundingBox = expand(boundingBox, withinBoundingBox.expand(distance));
+          boundingBox.addBbox(withinBoundingBox.expandDelta(distance));
         } else if (childValue instanceof Value) {
           final Value valueContainer = (Value)childValue;
           final Object value = valueContainer.getValue();
-          if (value instanceof BoundingBox) {
-            boundingBox = expand(boundingBox, (BoundingBox)value);
-          } else if (value instanceof Geometry) {
-            final Geometry geometry = (Geometry)value;
-            boundingBox = expand(boundingBox, geometry.getBoundingBox());
+          if (value instanceof BoundingBoxProxy) {
+            boundingBox.addBbox((BoundingBox)value);
           }
         }
       }

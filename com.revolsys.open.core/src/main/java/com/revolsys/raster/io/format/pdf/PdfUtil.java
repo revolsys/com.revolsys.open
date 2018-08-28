@@ -15,9 +15,11 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.cos.COSObject;
 
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.util.Property;
 
 public class PdfUtil {
@@ -167,16 +169,30 @@ public class PdfUtil {
             final GeometryFactory geoGeometryFactory = geometryFactory
               .getGeographicGeometryFactory();
 
-            BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
+            final BoundingBoxEditor boundingBox = geometryFactory.bboxEditor();
             final COSArray geoPoints = PdfUtil.findArray(measure, "GPTS");
 
-            for (int i = 0; i < geoPoints.size(); i++) {
-              final float lat = PdfUtil.getFloat(geoPoints, i++);
-              final float lon = PdfUtil.getFloat(geoPoints, i);
-              final Point geoPoint = geoGeometryFactory.point(lon, lat);
-              boundingBox = boundingBox.expandToInclude(geoPoint);
+            if (geometryFactory.isProjected()) {
+              final CoordinatesOperation projection = geometryFactory
+                .getCoordinatesOperation(geoGeometryFactory);
+              final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+              for (int i = 0; i < geoPoints.size(); i++) {
+                final float lon = PdfUtil.getFloat(geoPoints, i);
+                final float lat = PdfUtil.getFloat(geoPoints, i++);
+                point.setPoint(lon, lat);
+                projection.perform(point);
+                final double x = point.x;
+                final double y = point.y;
+                boundingBox.addPoint(x, y);
+              }
+            } else {
+              for (int i = 0; i < geoPoints.size(); i++) {
+                final float lon = PdfUtil.getFloat(geoPoints, i);
+                final float lat = PdfUtil.getFloat(geoPoints, i++);
+                boundingBox.addPoint(lon, lat);
+              }
             }
-            return boundingBox;
+            return boundingBox.newBoundingBox();
           }
         }
       }

@@ -21,12 +21,14 @@ import javax.swing.filechooser.FileFilter;
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
@@ -44,11 +46,13 @@ import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.map.component.CoordinateSystemField;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLayer;
 import com.revolsys.swing.map.layer.pointcloud.PointCloudLayer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
+import com.revolsys.swing.map.layer.record.ScratchRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
@@ -64,17 +68,43 @@ import com.revolsys.util.UrlUtil;
 public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable<Layer> {
 
   static {
-    MenuFactory.addMenuInitializer(LayerGroup.class, (menu) -> {
+    MenuFactory.addMenuInitializer(LayerGroup.class, menu -> {
       menu.addGroup(0, "group");
       Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
         Icons.getIconWithBadge(PathTreeNode.getIconFolder(), "add"),
         LayerGroup::actionAddLayerGroup, false);
+
+      final MenuFactory scratchMenu = new MenuFactory("Add Scratch Layer");
+      scratchMenu.setIconName("map:add");
+
+      for (final DataType dataType : Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING,
+        DataTypes.POLYGON, DataTypes.MULTI_POINT, DataTypes.MULTI_LINE_STRING,
+        DataTypes.MULTI_POLYGON, DataTypes.GEOMETRY, DataTypes.GEOMETRY_COLLECTION)) {
+        String iconName;
+        if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
+          iconName = "table_geometry";
+        } else {
+          iconName = "table_" + dataType.toString().toLowerCase();
+        }
+        Menus.<LayerGroup> addMenuItem(scratchMenu, "layer", "Add " + dataType + " Layer", iconName,
+          layerGroup -> {
+            CoordinateSystemField.selectHorizontalCoordinateSystem(
+              "Select coordinate system for layer", layerGroup, coordinateSystem -> {
+                final GeometryFactory geometryFactory = coordinateSystem.getGeometryFactory();
+                final Layer layer = new ScratchRecordLayer(geometryFactory, dataType);
+                layerGroup.addLayer(layer);
+              });
+          }, false);
+
+      }
+      menu.addComponentFactory("group", scratchMenu);
 
       Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer...", "page:add",
         LayerGroup::actionOpenFileLayer, false);
 
       Menus.<LayerGroup> addMenuItem(menu, "group", "Import Project...", "map:import",
         LayerGroup::actionImportProject, false);
+
     });
   }
 
@@ -357,6 +387,15 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     path.add(this);
   }
 
+  @Override
+  public void addVisibleBbox(final BoundingBoxEditor boundingBox) {
+    if (isExists() && isVisible()) {
+      for (final Layer layer : this) {
+        layer.addVisibleBbox(boundingBox);
+      }
+    }
+  }
+
   protected <V extends Layer> void addVisibleDescendants(final List<V> layers,
     final Class<V> layerClass, final double scale) {
     if (isVisible(scale)) {
@@ -412,32 +451,19 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @Override
   public BoundingBox getBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
-    for (final Layer layer : this) {
-      final BoundingBox layerBoundingBox = layer.getBoundingBox();
-      if (!layerBoundingBox.isEmpty()) {
-        boundingBox = boundingBox.expandToInclude(layerBoundingBox);
-      }
-    }
-    return boundingBox;
+    return BoundingBox.bboxNew(this, this.layers);
   }
 
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boudingBox = geometryFactory.newBoundingBoxEmpty();
-    if (isExists() && (!visibleLayersOnly || isVisible())) {
-      for (final Layer layer : this) {
-        if (layer.isExists() && (!visibleLayersOnly || layer.isVisible())) {
-          final BoundingBox layerBoundingBox = layer.getBoundingBox(visibleLayersOnly);
-          if (!layerBoundingBox.isEmpty()) {
-            boudingBox = boudingBox.expandToInclude(layerBoundingBox);
-          }
-        }
-      }
+    if (visibleLayersOnly) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final BoundingBoxEditor boundingBox = geometryFactory.bboxEditor();
+      addVisibleBbox(boundingBox);
+      return boundingBox.newBoundingBox();
+    } else {
+      return getBoundingBox();
     }
-    return boudingBox;
   }
 
   @Override
@@ -569,14 +595,14 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @Override
   public BoundingBox getSelectedBoundingBox() {
-    BoundingBox boundingBox = super.getSelectedBoundingBox();
+    final BoundingBoxEditor boundingBox = getGeometryFactory().bboxEditor();
     if (isExists() && isVisible()) {
       for (final Layer layer : this) {
         final BoundingBox layerBoundingBox = layer.getSelectedBoundingBox();
-        boundingBox = boundingBox.expandToInclude(layerBoundingBox);
+        boundingBox.addBbox(layerBoundingBox);
       }
     }
-    return boundingBox;
+    return boundingBox.newBoundingBox();
   }
 
   @Override

@@ -81,7 +81,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public List<T> findWithin(BoundingBox boundingBox) {
     if (this.geometryFactory != null) {
-      boundingBox = boundingBox.convert(this.geometryFactory);
+      boundingBox = boundingBox.bboxToCs(this.geometryFactory);
     }
     final List<T> results = new ArrayList<>();
     if (this.root != null) {
@@ -93,8 +93,9 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   public List<T> findWithinDistance(final Point point, final double maxDistance) {
     final double x = point.getX();
     final double y = point.getY();
-    BoundingBox envelope = new BoundingBoxDoubleXY(x, y);
-    envelope = envelope.expand(maxDistance);
+    final BoundingBox envelope = new BoundingBoxDoubleXY(x, y) //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final List<T> results = new ArrayList<>();
     if (this.root != null) {
       this.root.findWithin(results, x, y, maxDistance, envelope);

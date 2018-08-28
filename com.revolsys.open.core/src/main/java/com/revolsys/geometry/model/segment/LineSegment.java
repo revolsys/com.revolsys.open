@@ -467,11 +467,11 @@ public interface LineSegment extends LineString {
 
   default LineSegment getIntersection(BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    boundingBox = boundingBox.convert(geometryFactory);
+    boundingBox = boundingBox.bboxToCs(geometryFactory);
     final Point lineStart = getPoint(0);
     final Point lineEnd = getPoint(1);
-    final boolean contains1 = boundingBox.covers(lineStart);
-    final boolean contains2 = boundingBox.covers(lineEnd);
+    final boolean contains1 = boundingBox.bboxCovers(lineStart);
+    final boolean contains2 = boundingBox.bboxCovers(lineEnd);
     if (contains1) {
       if (contains2) {
         return this;
@@ -662,31 +662,36 @@ public interface LineSegment extends LineString {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    // TODO optimize
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final double x1 = getX(0);
-    final double y1 = getY(0);
-    final double x2 = getX(1);
-    final double y2 = getY(1);
-    final Point lineStart = getPoint(0);
-    final Point lineEnd = getPoint(1);
-    final boolean contains1 = rectangle.intersects(x1, y1);
-    final boolean contains2 = rectangle.intersects(x2, y2);
-    if (contains1) {
-      if (contains2) {
-        return this;
-      } else {
-        final Point c2 = getCrossing(lineEnd, lineStart, rectangle);
-        return new LineSegmentDoubleGF(geometryFactory, lineStart, c2);
-      }
+    RectangleXY.notNullSameCs(this, rectangle);
+    if (bboxCoveredBy(rectangle)) {
+      return this;
     } else {
-      if (contains2) {
-        final Point c1 = getCrossing(lineStart, lineEnd, rectangle);
-        return new LineSegmentDoubleGF(geometryFactory, c1, lineEnd);
+      // TODO optimize
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      final double x2 = getX(1);
+      final double y2 = getY(1);
+      final Point lineStart = getPoint(0);
+      final Point lineEnd = getPoint(1);
+      final boolean contains1 = rectangle.intersects(x1, y1);
+      final boolean contains2 = rectangle.intersects(x2, y2);
+      if (contains1) {
+        if (contains2) {
+          return this;
+        } else {
+          final Point c2 = getCrossing(lineEnd, lineStart, rectangle);
+          return new LineSegmentDoubleGF(geometryFactory, lineStart, c2);
+        }
       } else {
-        final Point c1 = getCrossing(lineStart, lineEnd, rectangle);
-        final Point c2 = getCrossing(lineEnd, lineStart, rectangle);
-        return new LineSegmentDoubleGF(geometryFactory, c1, c2);
+        if (contains2) {
+          final Point c1 = getCrossing(lineStart, lineEnd, rectangle);
+          return new LineSegmentDoubleGF(geometryFactory, c1, lineEnd);
+        } else {
+          final Point c1 = getCrossing(lineStart, lineEnd, rectangle);
+          final Point c2 = getCrossing(lineEnd, lineStart, rectangle);
+          return new LineSegmentDoubleGF(geometryFactory, c1, c2);
+        }
       }
     }
   }

@@ -61,7 +61,7 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
   public static <ITEM> double distance(final ItemDistance<ITEM> itemDistance,
     final Boundable<ITEM> boundable1, final Boundable<ITEM> boundable2) {
     if (boundable1.isNode() || boundable2.isNode()) {
-      return boundable1.distance(boundable2);
+      return boundable1.bboxDistance(boundable2);
     } else {
       final StrTreeLeaf<ITEM> item1 = (StrTreeLeaf<ITEM>)boundable1;
       final StrTreeLeaf<ITEM> item2 = (StrTreeLeaf<ITEM>)boundable2;

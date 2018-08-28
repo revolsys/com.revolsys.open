@@ -17,12 +17,11 @@ import javax.measure.quantity.Length;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import com.revolsys.awt.CloseableAffineTransform;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Fonts;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 
 public class TextMarker extends AbstractMarker {
   private String text = "?";
@@ -119,13 +118,12 @@ public class TextMarker extends AbstractMarker {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Graphics2D graphics, final MarkerStyle style,
-    final double modelX, final double modelY, double orientation) {
+  public void render(final Graphics2DViewRender view, final Graphics2D graphics,
+    final MarkerStyle style, final double modelX, final double modelY, double orientation) {
     try (
-      BaseCloseable transformCloseable = new CloseableAffineTransform(graphics)) {
-      Viewport2D.setUseModelCoordinates(viewport, graphics, false);
+      BaseCloseable transformCloseable = view.useViewCoordinates()) {
       final Quantity<Length> markerHeight = style.getMarkerHeight();
-      final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
+      final double mapHeight = view.toDisplayValue(markerHeight);
       final String orientationType = style.getMarkerOrientationType();
       if ("none".equals(orientationType)) {
         orientation = 0;
@@ -143,7 +141,7 @@ public class TextMarker extends AbstractMarker {
       final double shapeWidth = bounds.getWidth();
       final double shapeHeight = bounds.getHeight();
 
-      Viewport2D.translateModelToViewCoordinates(viewport, graphics, modelX, modelY);
+      view.translateModelToViewCoordinates(modelX, modelY);
       final double markerOrientation = style.getMarkerOrientation();
       orientation = -orientation + markerOrientation;
       if (orientation != 0) {
@@ -152,8 +150,8 @@ public class TextMarker extends AbstractMarker {
 
       final Quantity<Length> deltaX = style.getMarkerDx();
       final Quantity<Length> deltaY = style.getMarkerDy();
-      double dx = Viewport2D.toDisplayValue(viewport, deltaX);
-      double dy = Viewport2D.toDisplayValue(viewport, deltaY);
+      double dx = view.toDisplayValue(deltaX);
+      double dy = view.toDisplayValue(deltaY);
       dy -= bounds.getY();
       final String verticalAlignment = style.getMarkerVerticalAlignment();
       if ("bottom".equals(verticalAlignment)) {
@@ -169,7 +167,7 @@ public class TextMarker extends AbstractMarker {
       }
       graphics.translate(dx, dy);
 
-      if (style.setMarkerFillStyle(viewport, graphics)) {
+      if (style.setMarkerFillStyle(view, graphics)) {
 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_ON);

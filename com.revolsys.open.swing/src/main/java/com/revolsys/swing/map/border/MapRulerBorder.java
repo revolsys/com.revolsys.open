@@ -370,29 +370,31 @@ public class MapRulerBorder extends AbstractBorder {
         this.rulerGeometryFactory = rulerGeometryFactory;
       }
       this.rulerCoordinateSystem = this.rulerGeometryFactory.getHorizontalCoordinateSystem();
-      this.baseUnit = this.rulerCoordinateSystem.getUnit();
-      this.unitLabel = this.baseUnit.getSymbol();
-      if (this.unitLabel == null) {
-        this.unitLabel = this.baseUnit.getName();
-      }
       this.steps = STEPS;
-      if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
-        final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)this.rulerCoordinateSystem;
-        if (geoCs.getAngularUnit() instanceof Degree) {
-          this.areaMinX = -180;
-          this.areaMaxX = 180;
-          this.areaMinY = -90;
-          this.areaMaxY = 90;
-          this.steps = GEOGRAPHICS_STEPS;
-          this.unitLabel = "°";
+      if (this.rulerCoordinateSystem != null) {
+        this.baseUnit = this.rulerCoordinateSystem.getUnit();
+        this.unitLabel = this.baseUnit.getSymbol();
+        if (this.unitLabel == null) {
+          this.unitLabel = this.baseUnit.getName();
         }
-      } else {
-        final BoundingBox areaBoundingBox = this.rulerCoordinateSystem.getAreaBoundingBox();
+        if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
+          final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)this.rulerCoordinateSystem;
+          if (geoCs.getAngularUnit() instanceof Degree) {
+            this.areaMinX = -180;
+            this.areaMaxX = 180;
+            this.areaMinY = -90;
+            this.areaMaxY = 90;
+            this.steps = GEOGRAPHICS_STEPS;
+            this.unitLabel = "°";
+          }
+        } else {
+          final BoundingBox areaBoundingBox = this.rulerCoordinateSystem.getAreaBoundingBox();
 
-        this.areaMinX = areaBoundingBox.getMinX();
-        this.areaMaxX = areaBoundingBox.getMaxX();
-        this.areaMinY = areaBoundingBox.getMinY();
-        this.areaMaxY = areaBoundingBox.getMaxY();
+          this.areaMinX = areaBoundingBox.getMinX();
+          this.areaMaxX = areaBoundingBox.getMaxX();
+          this.areaMinY = areaBoundingBox.getMinY();
+          this.areaMaxY = areaBoundingBox.getMaxY();
+        }
       }
     }
   }

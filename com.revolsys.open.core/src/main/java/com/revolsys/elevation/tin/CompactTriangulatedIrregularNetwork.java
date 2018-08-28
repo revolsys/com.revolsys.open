@@ -28,14 +28,14 @@ public class CompactTriangulatedIrregularNetwork extends BaseCompactTriangulated
       @Override
       protected boolean intersectsBounds(final Object id, final double x, final double y) {
         final Integer triangleIndex = (Integer)id;
-        return newTriangleBoundingBox(triangleIndex).intersects(x, y);
+        return newTriangleBoundingBox(triangleIndex).bboxIntersects(x, y);
       }
 
       @Override
       protected boolean intersectsBounds(final Object id, final double minX, final double minY,
         final double maxX, final double maxY) {
         final Integer triangleIndex = (Integer)id;
-        return newTriangleBoundingBox(triangleIndex).intersects(minX, minY, maxX, maxY);
+        return newTriangleBoundingBox(triangleIndex).bboxIntersects(minX, minY, maxX, maxY);
       }
     };
     this.triangleSpatialIndex.setUseEquals(true);

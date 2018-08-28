@@ -17,9 +17,9 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
@@ -222,17 +222,14 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       final Value distanceValue = (Value)withinDistance.getDistanceValue();
       final Number distance = (Number)distanceValue.getValue();
       final Object geometryObject = geometry2Value.getValue();
-      BoundingBox boundingBox;
-      if (geometryObject instanceof BoundingBox) {
-        boundingBox = (BoundingBox)geometryObject;
-      } else if (geometryObject instanceof Geometry) {
-        final Geometry geometry = (Geometry)geometryObject;
-        boundingBox = geometry.getBoundingBox();
+      BoundingBoxEditor boundingBox;
+      if (geometryObject instanceof BoundingBoxProxy) {
+        boundingBox = ((BoundingBoxProxy)geometryObject).bboxEditor();
       } else {
-        boundingBox = geometryFactory.newBoundingBoxEmpty();
+        boundingBox = geometryFactory.bboxEditor();
       }
-      boundingBox = boundingBox.expand(distance.doubleValue());
-      boundingBox = boundingBox.convert(geometryFactory);
+      boundingBox.expandDelta(distance.doubleValue());
+      boundingBox.setGeometryFactory(geometryFactory);
       sql.append("(SDE.ST_ENVINTERSECTS(");
       column.appendSql(query, this, sql);
       sql.append(",");

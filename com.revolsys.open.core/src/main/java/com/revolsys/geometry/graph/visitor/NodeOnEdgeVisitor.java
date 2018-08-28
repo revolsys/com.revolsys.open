@@ -20,8 +20,9 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final Point point = node;
-    BoundingBox boundingBox = point.getBoundingBox();
-    boundingBox = boundingBox.expand(maxDistance);
+    final BoundingBox boundingBox = point.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
     final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<>(node, boundingBox, maxDistance,
       results);
@@ -53,7 +54,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   public void accept(final Edge<T> edge) {
     if (!edge.hasNode(this.node)) {
       final LineString line = edge.getLineString();
-      if (line.getBoundingBox().intersects(this.boundingBox)) {
+      if (line.getBoundingBox().bboxIntersects(this.boundingBox)) {
         if (LineStringUtil.isPointOnLine(line, this.point, this.maxDistance)) {
           super.accept(edge);
         }

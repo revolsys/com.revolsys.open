@@ -210,7 +210,7 @@ public class CascadedPolygonUnion {
     final List<Polygon> intersectingGeoms = new ArrayList<>();
     for (final Polygon polygon : polygonal.polygons()) {
       final BoundingBox boundingBox = polygon.getBoundingBox();
-      if (boundingBox.intersects(envelope)) {
+      if (boundingBox.bboxIntersects(envelope)) {
         intersectingGeoms.add(polygon);
       } else {
         disjointGeoms.add(polygon);
@@ -315,13 +315,13 @@ public class CascadedPolygonUnion {
     final BoundingBox boundingBox1 = polygonal1.getBoundingBox();
     final BoundingBox boundingBox2 = polygonal2.getBoundingBox();
     // *
-    if (!boundingBox1.intersects(boundingBox2)) {
+    if (!boundingBox1.bboxIntersects(boundingBox2)) {
       final Polygonal polygonal = this.geometryFactory.geometry(polygonal1, polygonal2);
       return polygonal;
     } else if (polygonal1.getGeometryCount() <= 1 && polygonal2.getGeometryCount() <= 1) {
       return unionActual(polygonal1, polygonal2);
     } else {
-      final BoundingBox boundingBoxIntersection = boundingBox1.intersection(boundingBox2);
+      final BoundingBox boundingBoxIntersection = boundingBox1.bboxIntersection(boundingBox2);
       return unionUsingEnvelopeIntersection(polygonal1, polygonal2, boundingBoxIntersection);
     }
   }

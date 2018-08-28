@@ -9,9 +9,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.logging.Logs;
-import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 
 public class TextStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -38,7 +39,9 @@ public class TextStylePreview extends JPanel {
     graphics.drawLine(0, 50, 100, 50);
     graphics.translate(50, 50);
     try {
-      TextStyleRenderer.renderText(null, graphics, "Text", null, this.textStyle);
+      final Graphics2DViewRender view = new Graphics2DViewRender(graphics, 100, 100);
+      view.newTextStyleViewRenderer(this.textStyle)//
+        .drawText("Text", new PointDoubleXY(0, 0));
     } catch (final Throwable e) {
       Logs.error(this, e);
     }

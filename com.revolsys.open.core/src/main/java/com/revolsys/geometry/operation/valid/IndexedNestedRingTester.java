@@ -88,7 +88,7 @@ public class IndexedNestedRingTester {
 
       for (final LinearRing searchRing : results) {
         if (innerRing == searchRing) {
-        } else if (innerRing.getBoundingBox().intersects(searchRing.getBoundingBox())) {
+        } else if (innerRing.getBoundingBox().bboxIntersects(searchRing.getBoundingBox())) {
           final Point innerRingPt = IsValidOp.findPtNotNode(innerRing, searchRing, this.graph);
 
           /**

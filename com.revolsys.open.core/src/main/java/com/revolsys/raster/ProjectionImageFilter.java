@@ -30,7 +30,7 @@ public class ProjectionImageFilter extends WholeImageFilter {
   public ProjectionImageFilter(final BoundingBox sourceBoundingBox,
     final GeometryFactory destGeometryFactory, final double destPixelSize) {
     this.sourceBoundingBox = sourceBoundingBox;
-    this.destBoundingBox = sourceBoundingBox.convert(destGeometryFactory);
+    this.destBoundingBox = sourceBoundingBox.bboxToCs(destGeometryFactory);
     this.destPixelSize = destPixelSize;
     final double width = this.destBoundingBox.getWidth();
     this.destWidth = (int)(width / destPixelSize);

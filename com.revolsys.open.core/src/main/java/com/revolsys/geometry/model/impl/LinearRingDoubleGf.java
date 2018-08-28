@@ -77,6 +77,10 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
     validate();
   }
 
+  public LinearRingDoubleGf(final int axisCount, final double... coordinates) {
+    this(GeometryFactory.DEFAULT_2D, axisCount, coordinates.length / axisCount, coordinates);
+  }
+
   @Override
   public LinearRingDoubleGf clone() {
     return (LinearRingDoubleGf)super.clone();

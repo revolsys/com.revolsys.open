@@ -44,6 +44,7 @@ import javax.measure.quantity.Length;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.geometry.model.awtshape.PolygonShape;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PolygonEditor;
@@ -125,36 +126,6 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default Polygonal clipRectangle(double x1, double y1, double x2, double y2) {
-    if (x1 > x2) {
-      final double t = x1;
-      x1 = x2;
-      x2 = t;
-    }
-    if (y1 > y2) {
-      final double t = y1;
-      y1 = y2;
-      y2 = t;
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox boundingBox = getBoundingBox();
-    if (boundingBox.coveredBy(x1, y1, x2, y2)) {
-      return this;
-    } else if (boundingBox.intersects(x1, y1, x2, y2)) {
-      final List<LinearRing> rings = new ArrayList<>();
-      for (final LinearRing ring : rings()) {
-        final LinearRing clippedRing = ring.clipRectangle(x1, y1, x2, y2);
-        if (!clippedRing.isEmpty()) {
-          rings.add(clippedRing);
-        }
-      }
-      return geometryFactory.polygon(rings);
-    } else {
-      return geometryFactory.polygon();
-    }
-  }
-
-  @Override
   Polygon clone();
 
   @Override
@@ -167,18 +138,15 @@ public interface Polygon extends Polygonal {
 
   @Override
   default boolean contains(final Geometry geometry) {
-    // short-circuit test
-    final BoundingBox boundingBox = getBoundingBox();
-    final BoundingBox otherBoundingBox = geometry.getBoundingBox();
-    if (!boundingBox.covers(otherBoundingBox)) {
-      return false;
-    }
-    // optimization for rectangle arguments
-    if (isRectangle()) {
-      return boundingBox.containsSFS(geometry);
+    if (bboxCovers(geometry)) {
+      if (isRectangle()) {
+        final BoundingBox boundingBox = getBoundingBox();
+        return boundingBox.containsSFS(geometry);
+      } else {
+        return relate(geometry).isContains();
+      }
     } else {
-      // general case
-      return relate(geometry).isContains();
+      return false;
     }
   }
 
@@ -634,7 +602,12 @@ public interface Polygon extends Polygonal {
 
   @Override
   default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    return SnapIfNeededOverlayOp.overlayOp(this, rectangle, OverlayOp.INTERSECTION);
+    RectangleXY.notNullSameCs(this, rectangle);
+    if (bboxCoveredBy(rectangle)) {
+      return this;
+    } else {
+      return SnapIfNeededOverlayOp.overlayOp(this, rectangle, OverlayOp.INTERSECTION);
+    }
   }
 
   @Override
@@ -643,7 +616,7 @@ public interface Polygon extends Polygonal {
       return false;
     } else {
       final BoundingBox thisBoundingBox = getBoundingBox();
-      if (thisBoundingBox.intersects(boundingBox)) {
+      if (thisBoundingBox.bboxIntersects(boundingBox)) {
 
         final GeometryFactory geometryFactory = getGeometryFactory();
         if (boundingBox.isProjectionRequired(this)) {
@@ -999,6 +972,10 @@ public interface Polygon extends Polygonal {
       }
     }
     return (G)this;
+  }
+
+  default PolygonShape toShape() {
+    return new PolygonShape(this);
   }
 
   @Override

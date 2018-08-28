@@ -161,7 +161,7 @@ public class RectangleUtil {
   public static boolean covers(final double minX1, final double minY1, final double maxX1,
     final double maxY1, final double minX2, final double minY2, final double maxX2,
     final double maxY2) {
-    return minX2 >= minX1 && maxX2 <= maxX1 && minY2 >= minY1 && maxY2 <= maxY1;
+    return minX1 <= minX2 && maxX2 <= maxX1 && minY1 <= minY2 && maxY2 <= maxY1;
   }
 
   public static void expand(final double[] bounds, final int axisCount,
@@ -196,11 +196,11 @@ public class RectangleUtil {
     final double coordinate) {
     if (Double.isFinite(coordinate)) {
       final double min = bounds[axisIndex];
-      if (coordinate < min || Double.isNaN(min)) {
+      if (coordinate < min || !Double.isFinite(min)) {
         bounds[axisIndex] = coordinate;
       }
       final double max = bounds[axisCount + axisIndex];
-      if (coordinate > max || Double.isNaN(max)) {
+      if (coordinate > max || !Double.isFinite(max)) {
         bounds[axisCount + axisIndex] = coordinate;
       }
     }
@@ -231,11 +231,11 @@ public class RectangleUtil {
     if (Double.isFinite(coordinate)) {
       final int axisCount = bounds.length / 2;
       final double min = bounds[axisIndex];
-      if (coordinate < min || Double.isNaN(min)) {
+      if (coordinate < min || !Double.isFinite(min)) {
         bounds[axisIndex] = coordinate;
       }
       final double max = bounds[axisCount + axisIndex];
-      if (coordinate > max || Double.isNaN(max)) {
+      if (coordinate > max || !Double.isFinite(max)) {
         bounds[axisCount + axisIndex] = coordinate;
       }
     }
@@ -248,11 +248,11 @@ public class RectangleUtil {
     }
     if (Double.isFinite(coordinate)) {
       final double min = bounds[axisIndex];
-      if (coordinate < min || Double.isNaN(min)) {
+      if (coordinate < min || !Double.isFinite(min)) {
         bounds[axisIndex] = coordinate;
       }
       final double max = bounds[axisCount + axisIndex];
-      if (coordinate > max || Double.isNaN(max)) {
+      if (coordinate > max || !Double.isFinite(max)) {
         bounds[axisCount + axisIndex] = coordinate;
       }
     }
@@ -285,11 +285,11 @@ public class RectangleUtil {
 
   public static double getMax(final double[] bounds, final int axisIndex) {
     if (bounds == null) {
-      return Double.NaN;
+      return Double.NEGATIVE_INFINITY;
     } else {
       final int axisCount = bounds.length / 2;
       if (axisIndex < 0 || axisIndex > axisCount) {
-        return Double.NaN;
+        return Double.NEGATIVE_INFINITY;
       } else {
         final double max = bounds[axisCount + axisIndex];
         return max;
@@ -299,11 +299,11 @@ public class RectangleUtil {
 
   public static double getMin(final double[] bounds, final int axisIndex) {
     if (bounds == null) {
-      return Double.NaN;
+      return Double.POSITIVE_INFINITY;
     } else {
       final int axisCount = bounds.length / 2;
       if (axisIndex < 0 || axisIndex >= axisCount) {
-        return Double.NaN;
+        return Double.POSITIVE_INFINITY;
       } else {
         final double min = bounds[axisIndex];
         return min;
@@ -578,8 +578,9 @@ public class RectangleUtil {
 
   public static double[] newBounds(final int axisCount) {
     final double[] newBounds = new double[axisCount * 2];
-    for (int i = 0; i < newBounds.length; i++) {
-      newBounds[i] = Double.NaN;
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      newBounds[axisIndex] = Double.POSITIVE_INFINITY;
+      newBounds[axisCount + axisIndex] = Double.NEGATIVE_INFINITY;
     }
     return newBounds;
   }
@@ -603,7 +604,8 @@ public class RectangleUtil {
 
   public static double[] newBounds2d() {
     return new double[] {
-      Double.NaN, Double.NaN, Double.NaN, Double.NaN
+      Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
+      Double.NEGATIVE_INFINITY
     };
   }
 }

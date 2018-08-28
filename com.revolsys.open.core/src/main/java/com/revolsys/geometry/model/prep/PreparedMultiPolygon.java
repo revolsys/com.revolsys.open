@@ -101,7 +101,7 @@ public class PreparedMultiPolygon extends MultiPolygonImpl implements PreparedPo
 
   @Override
   public boolean contains(final Geometry geometry) {
-    if (envelopeCovers(geometry)) {
+    if (bboxCovers(geometry)) {
       if (this.isRectangle) {
         final BoundingBox boundingBox = getBoundingBox();
         return boundingBox.containsSFS(geometry);
@@ -117,7 +117,7 @@ public class PreparedMultiPolygon extends MultiPolygonImpl implements PreparedPo
   @Override
   public boolean containsProperly(final Geometry geometry) {
     // short-circuit test
-    if (envelopeCovers(geometry)) {
+    if (bboxCovers(geometry)) {
       /**
        * Do point-in-poly tests first, since they are cheaper and may result
        * in a quick negative result.
@@ -161,7 +161,7 @@ public class PreparedMultiPolygon extends MultiPolygonImpl implements PreparedPo
 
   @Override
   public boolean covers(final Geometry geometry) {
-    if (!envelopeCovers(geometry)) {
+    if (!bboxCovers(geometry)) {
       return false;
     } else if (this.isRectangle) {
       return true;
@@ -216,7 +216,7 @@ public class PreparedMultiPolygon extends MultiPolygonImpl implements PreparedPo
 
   @Override
   public boolean intersects(final Geometry geometry) {
-    if (envelopesIntersect(geometry)) {
+    if (bboxIntersects(geometry)) {
       if (this.isRectangle) {
         return RectangleIntersects.rectangleIntersects(getPolygon(0), geometry);
       } else {

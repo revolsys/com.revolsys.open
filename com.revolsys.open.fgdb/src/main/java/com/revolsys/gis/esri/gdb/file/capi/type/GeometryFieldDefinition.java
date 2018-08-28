@@ -10,9 +10,9 @@ import java.util.function.BiConsumer;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.record.Record;

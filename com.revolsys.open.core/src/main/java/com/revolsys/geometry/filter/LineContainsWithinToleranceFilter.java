@@ -27,7 +27,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 
 public class LineContainsWithinToleranceFilter implements Predicate<LineString> {
-  private BoundingBox envelope;
+  private final BoundingBox envelope;
 
   private boolean flip = false;
 
@@ -43,8 +43,9 @@ public class LineContainsWithinToleranceFilter implements Predicate<LineString> 
   public LineContainsWithinToleranceFilter(final LineString line, final double tolerance) {
     this.points = line;
     this.tolerance = tolerance;
-    this.envelope = line.getBoundingBox();
-    this.envelope = this.envelope.expand(tolerance);
+    this.envelope = line.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(tolerance);
   }
 
   public LineContainsWithinToleranceFilter(final LineString line, final double tolerance,
@@ -55,7 +56,7 @@ public class LineContainsWithinToleranceFilter implements Predicate<LineString> 
 
   @Override
   public boolean test(final LineString line) {
-    if (this.envelope.intersects(line.getBoundingBox())) {
+    if (this.envelope.bboxIntersects(line.getBoundingBox())) {
       final LineString points = line;
 
       final boolean contains;

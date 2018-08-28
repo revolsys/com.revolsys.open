@@ -13,8 +13,7 @@ import java.util.Stack;
 
 import com.revolsys.geometry.cs.datum.GeodeticDatum;
 import com.revolsys.geometry.cs.datum.VerticalDatum;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.epsg.EpsgId;
+import com.revolsys.geometry.cs.esri.EsriCsGridParser;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.logging.Logs;
@@ -37,30 +36,8 @@ public class WktCsParser {
           try {
             return read(wkt);
           } catch (final StringIndexOutOfBoundsException e) {
-            final String[] fields = wkt.split("\\s+");
-            String projection = null;
-            String datum = null;
-            // String spheroid = null;
-            for (int i = 0; i < fields.length; i += 2) {
-              final String key = fields[i];
-              if ("Projection".equalsIgnoreCase(key)) {
-                projection = fields[i + 1];
-              } else if ("Datum".equalsIgnoreCase(key)) {
-                datum = fields[i + 1];
-              } else if ("Spheroid".equalsIgnoreCase(key)) {
-                // spheroid = fields[i + 1];
-              }
-            }
-            if ("GEOGRAPHIC".equalsIgnoreCase(projection)) {
-              if ("NAD83".equals(datum)) {
-                return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.NAD83);
-              } else if ("NAD27".equals(datum)) {
-                return EpsgCoordinateSystems.getCoordinateSystem(EpsgId.NAD27);
-              }
-            }
-            throw new IllegalArgumentException("Projection not supported: " + wkt);
+            return EsriCsGridParser.parse(wkt);
           }
-
         } catch (final WrappedException e) {
           final Throwable cause = e.getCause();
           if (cause instanceof FileNotFoundException) {

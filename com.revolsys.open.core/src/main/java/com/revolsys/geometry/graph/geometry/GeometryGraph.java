@@ -25,10 +25,11 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
+import com.revolsys.geometry.model.util.BoundingBoxEditor;
 
 public class GeometryGraph extends Graph<LineSegment> {
 
-  private BoundingBox boundingBox;
+  private final BoundingBoxEditor boundingBox;
 
   private final List<Geometry> geometries = new ArrayList<>();
 
@@ -46,7 +47,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   public GeometryGraph(final GeometryFactory geometryFactory) {
     super(false);
     setGeometryFactory(geometryFactory);
-    this.boundingBox = geometryFactory.newBoundingBoxEmpty();
+    this.boundingBox = geometryFactory.bboxEditor();
     final double scaleXY = getGeometryFactory().getScaleXY();
     if (scaleXY > 0) {
       this.maxDistance = 1 / scaleXY;
@@ -109,7 +110,7 @@ public class GeometryGraph extends Graph<LineSegment> {
       }
     }
 
-    this.boundingBox = this.boundingBox.expandToInclude(geometry);
+    this.boundingBox.addBbox(geometry);
   }
 
   @Override
@@ -128,7 +129,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     final List<LineString> lineIntersections = new ArrayList<>();
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = getBoundingBox(line);
-    if (boundingBox.intersects(this.boundingBox)) {
+    if (boundingBox.bboxIntersects(this.boundingBox)) {
       final LineString points = line;
       final int vertexCount = points.getVertexCount();
       final Point fromPoint = points.getPoint(0);
@@ -220,8 +221,10 @@ public class GeometryGraph extends Graph<LineSegment> {
     if (geometry == null) {
       return BoundingBox.empty();
     } else {
-      BoundingBox boundingBox = geometry.getBoundingBox();
-      boundingBox = boundingBox.expand(this.maxDistance);
+      final BoundingBox boundingBox = geometry.getBoundingBox() //
+        .bboxEditor() //
+        .expandDelta(this.maxDistance)//
+        .newBoundingBox();
       return boundingBox;
     }
   }
@@ -305,8 +308,10 @@ public class GeometryGraph extends Graph<LineSegment> {
     if (scaleXY > 0) {
       maxDistance = 1 / scaleXY;
     }
-    boundingBox = boundingBox.expand(maxDistance);
-    if (boundingBox.intersects(this.boundingBox)) {
+    boundingBox = boundingBox //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
+    if (boundingBox.bboxIntersects(this.boundingBox)) {
       final LineString points = line;
       final int numPoints = points.getVertexCount();
       final Point fromPoint = points.getPoint(0);

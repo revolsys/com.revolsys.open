@@ -11,15 +11,14 @@ import javax.swing.Icon;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.w3c.dom.Document;
 
-import com.revolsys.awt.CloseableAffineTransform;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.symbol.Symbol;
 import com.revolsys.swing.map.symbol.SymbolLibrary;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 
 public class SvgMarker extends AbstractMarker {
 
@@ -88,24 +87,22 @@ public class SvgMarker extends AbstractMarker {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Graphics2D graphics, final MarkerStyle style,
-    final double modelX, final double modelY, double orientation) {
+  public void render(final Graphics2DViewRender view, final Graphics2D graphics,
+    final MarkerStyle style, final double modelX, final double modelY, double orientation) {
     final TranscoderInput transcoderInput = this.transcoderInput;
     if (transcoderInput != null) {
       try (
-        BaseCloseable transformCloseable = new CloseableAffineTransform(graphics)) {
-        Viewport2D.setUseModelCoordinates(viewport, graphics, false);
-
+        BaseCloseable closable = view.useViewCoordinates()) {
         final Quantity<Length> markerWidth = style.getMarkerWidth();
-        final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
+        final double mapWidth = view.toDisplayValue(markerWidth);
         final Quantity<Length> markerHeight = style.getMarkerHeight();
-        final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
+        final double mapHeight = view.toDisplayValue(markerHeight);
         final String orientationType = style.getMarkerOrientationType();
         if ("none".equals(orientationType)) {
           orientation = 0;
         }
 
-        Viewport2D.translateModelToViewCoordinates(viewport, graphics, modelX, modelY);
+        view.translateModelToViewCoordinates(modelX, modelY);
 
         final double markerOrientation = style.getMarkerOrientation();
         orientation = orientation + markerOrientation;
@@ -115,8 +112,8 @@ public class SvgMarker extends AbstractMarker {
 
         final Quantity<Length> deltaX = style.getMarkerDx();
         final Quantity<Length> deltaY = style.getMarkerDy();
-        double dx = Viewport2D.toDisplayValue(viewport, deltaX);
-        double dy = Viewport2D.toDisplayValue(viewport, deltaY);
+        double dx = view.toDisplayValue(deltaX);
+        double dy = view.toDisplayValue(deltaY);
 
         final String verticalAlignment = style.getMarkerVerticalAlignment();
         if ("bottom".equals(verticalAlignment)) {

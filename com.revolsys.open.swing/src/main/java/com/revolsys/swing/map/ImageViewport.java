@@ -4,11 +4,16 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.map.layer.Project;
 
-public class ImageViewport extends GraphicsViewport2D {
+public class ImageViewport extends Graphics2DViewport {
   private final BufferedImage image;
+
+  public ImageViewport(final int width, final int height) {
+    this(null, width, height, new BoundingBoxDoubleXY(0, 0, width, height));
+  }
 
   public ImageViewport(final Project project, final int width, final int height,
     final BoundingBox boundingBox) {
@@ -18,7 +23,7 @@ public class ImageViewport extends GraphicsViewport2D {
   public ImageViewport(final Project project, final int width, final int height,
     final BoundingBox boundingBox, final int imageType) {
     super(project, width, height, boundingBox);
-    this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
+    this.image = new BufferedImage(width, height, imageType);
     setGraphics((Graphics2D)this.image.getGraphics());
   }
 

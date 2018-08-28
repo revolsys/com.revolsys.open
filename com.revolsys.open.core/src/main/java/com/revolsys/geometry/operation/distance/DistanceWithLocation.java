@@ -231,8 +231,7 @@ public class DistanceWithLocation {
   }
 
   private boolean computeLineLine(final LineString line1, final LineString line2) {
-    if (this.minDistance == Double.MAX_VALUE
-      || line1.getBoundingBox().distance(line2.getBoundingBox()) <= this.minDistance) {
+    if (this.minDistance == Double.MAX_VALUE || line1.bboxDistance(line2) <= this.minDistance) {
       for (final Segment segment1 : line1.segments()) {
         for (final Segment segment2 : line2.segments()) {
           final double dist = segment1.distance(segment2);
@@ -255,7 +254,7 @@ public class DistanceWithLocation {
 
   private boolean computeLinePoint(final LineString line, final Point point) {
     if (this.minDistance == Double.MAX_VALUE
-      || line.getBoundingBox().distance(point) <= this.minDistance) {
+      || line.getBoundingBox().bboxDistance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
         final double distance = segment.distancePoint(point);
         if (distance < this.minDistance) {
@@ -297,7 +296,7 @@ public class DistanceWithLocation {
 
   private boolean computePointLine(final Point point, final LineString line) {
     final BoundingBox boundingBox = line.getBoundingBox();
-    if (this.minDistance == Double.MAX_VALUE || boundingBox.distance(point) <= this.minDistance) {
+    if (this.minDistance == Double.MAX_VALUE || boundingBox.bboxDistance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
         final double distance = segment.distancePoint(point);
         if (distance < this.minDistance) {

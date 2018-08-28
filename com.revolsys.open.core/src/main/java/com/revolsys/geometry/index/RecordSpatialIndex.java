@@ -85,7 +85,7 @@ public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
         iterator.remove();
       } else {
         final BoundingBox recordBoundingBox = geometry.getBoundingBox();
-        if (!boundingBox.intersects(recordBoundingBox)) {
+        if (!boundingBox.bboxIntersects(recordBoundingBox)) {
           iterator.remove();
         }
       }
@@ -97,8 +97,9 @@ public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
     if (geometry == null) {
       return Collections.emptyList();
     } else {
-      BoundingBox boundingBox = geometry.getBoundingBox();
-      boundingBox = boundingBox.expand(distance);
+      final BoundingBox boundingBox = geometry.getBoundingBox() //
+        .bboxEditor() //
+        .expandDelta(distance);
       final Predicate<R> filter = Records.newFilter(geometry, distance);
       return queryList(boundingBox, filter);
     }
@@ -148,7 +149,7 @@ public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
 
   public List<R> queryIntersects(final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
+    final BoundingBox convertedBoundingBox = boundingBox.bboxToCs(geometryFactory);
     if (convertedBoundingBox.isEmpty()) {
       return Arrays.asList();
     } else {

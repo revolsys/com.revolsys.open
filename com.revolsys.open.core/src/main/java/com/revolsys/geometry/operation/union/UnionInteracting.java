@@ -84,7 +84,7 @@ public class UnionInteracting {
     boolean interactsWithAny = false;
     for (int i = 0; i < this.g1.getGeometryCount(); i++) {
       final Geometry elem1 = this.g1.getGeometry(i);
-      final boolean interacts = elem1.getBoundingBox().intersects(elem0.getBoundingBox());
+      final boolean interacts = elem1.getBoundingBox().bboxIntersects(elem0.getBoundingBox());
       if (interacts) {
         this.interacts1[i] = true;
       }

@@ -88,14 +88,14 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
   }
 
   @Override
-  public boolean contains(final Geometry g) {
-    if (envelopeCovers(g)) {
+  public boolean contains(final Geometry geometry) {
+    if (bboxCovers(geometry)) {
       if (this.isRectangle) {
         final BoundingBox boundingBox = getBoundingBox();
-        return boundingBox.containsSFS(g);
+        return boundingBox.containsSFS(geometry);
       } else {
         final PreparedPolygonContains contains = new PreparedPolygonContains(this);
-        return contains.contains(g);
+        return contains.contains(geometry);
       }
     } else {
       return false;
@@ -105,7 +105,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
   @Override
   public boolean containsProperly(final Geometry geometry) {
     // short-circuit test
-    if (envelopeCovers(geometry)) {
+    if (bboxCovers(geometry)) {
       /**
        * Do point-in-poly tests first, since they are cheaper and may result
        * in a quick negative result.
@@ -149,7 +149,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
 
   @Override
   public boolean covers(final Geometry geometry) {
-    if (!envelopeCovers(geometry)) {
+    if (!bboxCovers(geometry)) {
       return false;
     } else if (this.isRectangle) {
       return true;
@@ -204,7 +204,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
 
   @Override
   public boolean intersects(final Geometry geometry) {
-    if (envelopesIntersect(geometry)) {
+    if (bboxIntersects(geometry)) {
       if (this.isRectangle) {
         return RectangleIntersects.rectangleIntersects(this, geometry);
       } else {

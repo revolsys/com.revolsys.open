@@ -48,6 +48,7 @@
   <modules>
     <module>com.revolsys.open.javac</module>
     <module>com.revolsys.open.core</module>
+    <module>com.revolsys.open.testapi</module>
     <module>com.revolsys.open.doclet</module>
     <module>com.revolsys.open.fgdb</module>
     <module>com.revolsys.open.gdal</module>
@@ -80,7 +81,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
+        <version>3.1.0</version>
         <configuration>
           <archive>
             <manifestEntries>
@@ -502,7 +503,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.11</version>
+        <version>${junit.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -557,6 +558,10 @@
     <org.springframework.version>4.2.5.RELEASE</org.springframework.version>
     <org.springframework.security.version>4.0.4.RELEASE</org.springframework.security.version>
     <org.codehaus.groovy.version>2.4.5</org.codehaus.groovy.version>
+    <junit.version>4.12</junit.version>
+    <junit.jupiter.version>5.2.0</junit.jupiter.version>
+    <junit.vintage.version>5.2.0</junit.vintage.version>
+    <junit.platform.version>1.2.0</junit.platform.version>
     <gpg.skip>true</gpg.skip>
     <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
     <github.global.server>github</github.global.server>

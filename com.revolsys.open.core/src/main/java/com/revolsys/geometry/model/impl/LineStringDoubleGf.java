@@ -62,7 +62,7 @@ public class LineStringDoubleGf extends LineStringDouble {
     final int axisCountThis = geometryFactory.getAxisCount();
     double[] newCoordinates;
     if (axisCount < 0 || axisCount == 1) {
-      throw new IllegalArgumentException("axisCount must 0 or > 1 not " + axisCount);
+      throw new IllegalArgumentException("axisCount must be 0 or > 1 not " + axisCount);
     } else {
       final int oldCoordinateCount = coordinates.length;
       if (coordinates == null || axisCount == 0 || vertexCount == 0 || oldCoordinateCount == 0) {
