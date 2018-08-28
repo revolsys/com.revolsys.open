@@ -950,15 +950,15 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       return null;
     } else {
       this.geometryFactory = geometryFactory;
-      if (Property.isEmpty(this.boundingBox)) {
+      final BoundingBox boundingBox = getBoundingBox();
+      if (Property.isEmpty(boundingBox)) {
         final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
         if (coordinateSystem != null) {
-          this.boundingBox = coordinateSystem.getAreaBoundingBox();
+          setBoundingBox(coordinateSystem.getAreaBoundingBox());
         }
-      } else if (this.boundingBox != null
-        && !this.boundingBox.getGeometryFactory().isHasHorizontalCoordinateSystem()
+      } else if (!boundingBox.getGeometryFactory().isHasHorizontalCoordinateSystem()
         && geometryFactory.isHasHorizontalCoordinateSystem()) {
-        this.boundingBox = this.boundingBox.bboxToCs(geometryFactory);
+        setBoundingBox(boundingBox.bboxToCs(geometryFactory));
       }
       return geometryFactory;
     }

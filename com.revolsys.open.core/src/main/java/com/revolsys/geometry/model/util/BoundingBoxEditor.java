@@ -162,7 +162,7 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
         this.minX = minX;
       }
       final double maxX = areaBoundingBox.getMaxX();
-      if (this.maxX < maxX) {
+      if (this.maxX > maxX) {
         this.maxX = maxX;
       }
       final double minY = areaBoundingBox.getMinY();
@@ -170,7 +170,7 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
         this.minY = minY;
       }
       final double maxY = areaBoundingBox.getMaxY();
-      if (this.maxY < maxY) {
+      if (this.maxY > maxY) {
         this.maxY = maxY;
       }
     }
