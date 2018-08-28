@@ -22,6 +22,9 @@ public class RecordReaderGeometryReader implements Iterator<Geometry>, GeometryR
 
   @Override
   public void close() {
+    if (this.reader != null) {
+      this.reader.close();
+    }
     this.reader = null;
     this.iterator = null;
   }

@@ -35,7 +35,7 @@ public class GmlRecordWriter extends AbstractRecordWriter {
 
   private boolean opened;
 
-  private final XmlWriter out;
+  private XmlWriter out;
 
   private QName qualifiedName;
 
@@ -66,12 +66,15 @@ public class GmlRecordWriter extends AbstractRecordWriter {
 
   @Override
   public void close() {
-    if (!this.opened) {
-      writeHeader();
-    }
+    if (this.out != null) {
+      if (!this.opened) {
+        writeHeader();
+      }
 
-    writeFooter();
-    this.out.close();
+      writeFooter();
+      this.out.close();
+      this.out = null;
+    }
   }
 
   @Override
@@ -145,7 +148,8 @@ public class GmlRecordWriter extends AbstractRecordWriter {
     this.out.startTag(Gml.FEATURE_COLLECTION);
     if (this.geometryFactory != null) {
       this.out.startTag(Gml.BOUNDED_BY);
-      box(this.geometryFactory, this.geometryFactory.getHorizontalCoordinateSystem().getAreaBoundingBox());
+      box(this.geometryFactory,
+        this.geometryFactory.getHorizontalCoordinateSystem().getAreaBoundingBox());
       this.out.endTag(Gml.BOUNDED_BY);
     }
   }

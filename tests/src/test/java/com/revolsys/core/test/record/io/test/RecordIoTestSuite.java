@@ -21,7 +21,6 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Writer;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -36,6 +35,7 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.testapi.GeometryAssert;
 import com.revolsys.testapi.RunnableTestCase;
+import com.revolsys.util.Debug;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -73,8 +73,8 @@ public class RecordIoTestSuite {
               maxRingCount = 0;
             }
             for (int ringCount = 0; ringCount <= maxRingCount; ringCount++) {
-              final GeometryFactory geometryFactory = GeometryFactory
-                .floating(EpsgId.WGS84, axisCount);
+              final GeometryFactory geometryFactory = GeometryFactory.floating(EpsgId.WGS84,
+                axisCount);
               double delta = 1.0;
               if (geometryFactory.isProjected()) {
                 delta = 1000.0;
@@ -102,11 +102,20 @@ public class RecordIoTestSuite {
     final String fileExtension) {
     addGeometryTestSuites(suite, prefix, (geometryFactory, geometry, geometryDataType) -> {
       final String geometryTypeString = geometryDataType.toString();
-      final File directory = new File("/tmp/revolsystest/io/" + fileExtension);
-      final File file = new File(directory, geometryTypeString + "_"
-        + geometryFactory.getAxisCount() + "_" + geometry.getVertexCount() + "." + fileExtension);
-      file.delete();
-      file.getParentFile().mkdirs();
+      final File tempDir = new File(System.getProperty("java.io.tmpdir"));
+      final File directory = new File(tempDir, "revolsystest/io/" + fileExtension);
+      directory.mkdirs();
+      final String fileName = geometryTypeString + "_" + geometryFactory.getAxisCount() + "_"
+        + geometry.getVertexCount() + "." + fileExtension;
+      if ("LineString_2_0.gml".equals(fileName)) {
+        Debug.noOp();
+      }
+      final File file = new File(directory, fileName);
+      if (!file.delete()) {
+        if (file.exists()) {
+          Logs.error(RecordIoTestSuite.class, "Unable to delete: " + file);
+        }
+      }
       final PathResource resource = new PathResource(file);
 
       final RecordWriterFactory recordWriterFactory = IoFactory.factory(RecordWriterFactory.class,
@@ -145,6 +154,20 @@ public class RecordIoTestSuite {
       doRecordReadTest(resource, record);
 
       doGeometryReadTest(resource, record);
+      if (!file.delete()) {
+        if (file.exists()) {
+          Logs.error(RecordIoTestSuite.class, "Unable to delete: " + file);
+        }
+      }
+      if ("dbf".equals(fileExtension)) {
+        resource.newResourceChangeExtension("cpg").delete();
+      }
+      if ("shp".equals(fileExtension)) {
+        resource.newResourceChangeExtension("cpg").delete();
+        resource.newResourceChangeExtension("shx").delete();
+        resource.newResourceChangeExtension("prj").delete();
+        resource.newResourceChangeExtension("dbf").delete();
+      }
     });
   }
 
@@ -237,7 +260,7 @@ public class RecordIoTestSuite {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
     try (
-      Writer<Record> writer = RecordWriter.newRecordWriter(record, resource)) {
+      RecordWriter writer = RecordWriter.newRecordWriter(record, resource)) {
       writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       final FieldDefinition geometryField = recordDefinition.getGeometryField();
       if (geometryField != null) {

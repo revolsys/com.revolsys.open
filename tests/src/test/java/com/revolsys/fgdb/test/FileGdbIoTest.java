@@ -38,14 +38,15 @@ public class FileGdbIoTest {
 
     geometry = geometry.convertGeometry(geometryFactory);
     final String geometryTypeString = dataType.toString();
-    String name = "/tmp/revolsystest/io/gdb/" + geometryTypeString + "_" + axisCount;
+    final File tempDir = new File(System.getProperty("java.io.tmpdir"));
+    String name = "revolsystest/io/gdb/" + geometryTypeString + "_" + axisCount;
     if (geometry.isGeometryCollection()) {
       name += "_" + geometry.getGeometryCount();
     }
     if (geometry instanceof Polygonal) {
       name += "_" + geometry.getGeometryComponents(LinearRing.class).size();
     }
-    final File file = new File(name + "_" + geometry.getVertexCount() + ".gdb");
+    final File file = new File(tempDir, name + "_" + geometry.getVertexCount() + ".gdb");
     FileUtil.deleteDirectory(file);
     file.getParentFile().mkdirs();
     try (
