@@ -84,6 +84,20 @@ public class UsgsGriddedElevationModel extends AbstractGrid implements GriddedEl
     super.setGeometryFactory(geometryFactory);
   }
 
+  @Override
+  public void setValue(final int gridX, final int gridY, final double elevation) {
+    final UsgsGriddedElevationModelColumn column = this.columns[gridX];
+    if (column != null) {
+      int elevationInt;
+      if (Double.isFinite(elevation)) {
+        elevationInt = toIntZ(elevation);
+      } else {
+        elevationInt = Integer.MIN_VALUE;
+      }
+      column.setValue(gridY, elevationInt);
+    }
+  }
+
   public void update(final double minX, final double minY, final double minZ, final Double maxZ,
     final int gridHeight) {
     this.gridHeight = gridHeight;

@@ -27,4 +27,11 @@ public class UsgsGriddedElevationModelColumn {
       return false;
     }
   }
+
+  public void setValue(final int gridY2, final int elevation) {
+    final int index = this.gridY - this.gridY;
+    if (index >= 0 && index < this.elevations.length) {
+      this.elevations[index] = elevation;
+    }
+  }
 }
