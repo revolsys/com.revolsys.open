@@ -54,7 +54,7 @@ import com.revolsys.util.MathUtil;
  *
  *@version 1.7
  */
-public class BoundingBoxDoubleGf extends BaseBoundingBox {
+public class BoundingBoxDoubleGeometryFactory extends BaseBoundingBox {
   private static final long serialVersionUID = 1L;
 
   static {
@@ -81,7 +81,7 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
 
   private final GeometryFactory geometryFactory;
 
-  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final int axisCount,
+  public BoundingBoxDoubleGeometryFactory(final GeometryFactory geometryFactory, final int axisCount,
     final double... bounds) {
     this.geometryFactory = geometryFactory;
     if (bounds == null || bounds.length == 0 || axisCount < 1) {

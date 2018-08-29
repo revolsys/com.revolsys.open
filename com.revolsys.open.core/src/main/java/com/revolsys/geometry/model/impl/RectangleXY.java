@@ -54,7 +54,7 @@ import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.function.Function4Double;
 
-public class RectangleXY extends AbstractPolygon {
+public class RectangleXY extends AbstractPolygon implements BoundingBox {
 
   private static final long serialVersionUID = 1L;
 
@@ -69,8 +69,6 @@ public class RectangleXY extends AbstractPolygon {
           + rectangle.getHorizontalCoordinateSystem());
     }
   }
-
-  private BoundingBox boundingBox;
 
   private final GeometryFactory geometryFactory;
 
@@ -314,11 +312,7 @@ public class RectangleXY extends AbstractPolygon {
 
   @Override
   public boolean contains(final double x, final double y) {
-    if (x <= this.minX || this.maxX <= x || y <= this.minY || this.maxY <= y) {
-      return false;
-    } else {
-      return true;
-    }
+    return !(x <= this.minX || this.maxX <= x || y <= this.minY || this.maxY <= y);
   }
 
   @Override
@@ -417,10 +411,7 @@ public class RectangleXY extends AbstractPolygon {
 
   @Override
   public BoundingBox getBoundingBox() {
-    if (this.boundingBox == null) {
-      this.boundingBox = newBoundingBox();
-    }
-    return this.boundingBox;
+    return this;
   }
 
   @Override
@@ -438,6 +429,7 @@ public class RectangleXY extends AbstractPolygon {
     return this.geometryFactory;
   }
 
+  @Override
   public double getHeight() {
     return this.maxY - this.minY;
   }
@@ -452,35 +444,24 @@ public class RectangleXY extends AbstractPolygon {
     return 0;
   }
 
+  @Override
   public double getMaxX() {
     return this.maxX;
   }
 
+  @Override
   public double getMaxY() {
     return this.maxY;
   }
 
+  @Override
   public double getMinX() {
     return this.minX;
   }
 
+  @Override
   public double getMinY() {
     return this.minY;
-  }
-
-  public int getOutcode(final double x, final double y) {
-    int out = 0;
-    if (x < this.minX) {
-      out = OutCode.OUT_LEFT;
-    } else if (x > this.maxX) {
-      out = OutCode.OUT_RIGHT;
-    }
-    if (y < this.minY) {
-      out |= OutCode.OUT_BOTTOM;
-    } else if (y > this.maxY) {
-      out |= OutCode.OUT_TOP;
-    }
-    return out;
   }
 
   @Override
@@ -507,6 +488,7 @@ public class RectangleXY extends AbstractPolygon {
     return this.ring;
   }
 
+  @Override
   public double getWidth() {
     return this.maxX - this.minX;
   }
@@ -596,9 +578,10 @@ public class RectangleXY extends AbstractPolygon {
 
   @Override
   public BoundingBox newBoundingBox() {
-    return this.geometryFactory.newBoundingBox(this.minX, this.minY, this.maxX, this.maxY);
+    throw new UnsupportedOperationException();
   }
 
+  @Override
   public OutCode outcode(final double x, final double y) {
     if (x < this.minX) {
       if (y < this.minY) {

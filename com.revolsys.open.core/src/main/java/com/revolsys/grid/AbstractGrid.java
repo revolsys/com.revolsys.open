@@ -3,7 +3,7 @@ package com.revolsys.grid;
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGeometryFactory;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
@@ -77,7 +77,7 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
       minX, minY, Double.NaN, minX + gridWidth * gridCellWidth, minY + gridHeight * gridCellHeight,
       Double.NaN
     };
-    this.boundingBox = new BoundingBoxDoubleGf(geometryFactory, 3, this.bounds);
+    this.boundingBox = new BoundingBoxDoubleGeometryFactory(geometryFactory, 3, this.bounds);
   }
 
   protected AbstractGrid(final GeometryFactory geometryFactory, final int gridWidth,
@@ -255,7 +255,7 @@ public abstract class AbstractGrid extends BaseObjectWithProperties implements G
       this.minColourMultiple = minZ * this.colourGreyMultiple;
       this.modified = false;
     }
-    this.boundingBox = new BoundingBoxDoubleGf(this.geometryFactory, 3, this.bounds);
+    this.boundingBox = new BoundingBoxDoubleGeometryFactory(this.geometryFactory, 3, this.bounds);
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {

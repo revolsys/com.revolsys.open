@@ -1,5 +1,6 @@
 package com.revolsys.websocket.json;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -17,7 +18,7 @@ import com.revolsys.util.Property;
 import com.revolsys.websocket.AsyncResult;
 
 public class JsonAsyncSender implements SendHandler {
-  private final Async async;
+  private Async async;
 
   private final Map<String, AsyncResult<MapEx>> messageCallbackById = new HashMap<>();
 
@@ -25,14 +26,30 @@ public class JsonAsyncSender implements SendHandler {
 
   private final LinkedList<MapEx> messages = new LinkedList<>();
 
-  private final Session session;
+  private Session session;
 
-  public JsonAsyncSender(final Session session) {
-    this.session = session;
-    this.async = session.getAsyncRemote();
+  private boolean open = true;
+
+  public JsonAsyncSender() {
+  }
+
+  public void clearSession() {
+    synchronized (this) {
+      this.session = null;
+      this.async = null;
+      this.notifyAll();
+    }
   }
 
   public void close() {
+    this.open = false;
+    if (this.session != null) {
+      try {
+        this.session.close();
+      } catch (final IOException e) {
+      }
+    }
+    clearSession();
     synchronized (this.messageCallbackById) {
       for (final AsyncResult<MapEx> messageProcessor : this.messageCallbackById.values()) {
         synchronized (messageProcessor) {
@@ -44,13 +61,32 @@ public class JsonAsyncSender implements SendHandler {
   }
 
   private void doSendMessage(final MapEx message) {
-    this.async.sendObject(message, this);
+    if (this.open) {
+      Async async = this.async;
+      while (async == null) {
+        synchronized (this) {
+          try {
+            this.wait(1000);
+          } catch (final InterruptedException e) {
+          }
+          async = this.async;
+          if (!this.open) {
+            return;
+          }
+        }
+      }
+      async.sendObject(message, this);
+    }
+  }
+
+  public boolean isSession(final Session session) {
+    return this.session == session;
   }
 
   @Override
   public void onResult(final SendResult result) {
     synchronized (this.messages) {
-      if (this.session.isOpen()) {
+      if (this.open) {
         if (!result.isOK()) {
           Logs.error(this, "Error sending message", result.getException());
         }
@@ -92,7 +128,7 @@ public class JsonAsyncSender implements SendHandler {
 
   public synchronized void sendMessage(final MapEx message) {
     final boolean hasMessage = !this.messages.isEmpty();
-    if (this.session.isOpen()) {
+    if (this.open) {
       this.messages.addLast(message);
       if (!hasMessage) {
         doSendMessage(message);
@@ -101,7 +137,7 @@ public class JsonAsyncSender implements SendHandler {
   }
 
   public boolean setResult(final MapEx message) {
-    if (this.session.isOpen()) {
+    if (this.open) {
       final String messageId = Maps.getString(message, "messageId");
       if (Property.hasValue(messageId)) {
         synchronized (this.messageCallbackById) {
@@ -117,5 +153,17 @@ public class JsonAsyncSender implements SendHandler {
       }
     }
     return false;
+  }
+
+  public void setSession(final Session session) {
+    synchronized (this) {
+      if (this.open) {
+        if (session != this.session) {
+          this.session = session;
+          this.async = this.session.getAsyncRemote();
+        }
+      }
+      this.notifyAll();
+    }
   }
 }

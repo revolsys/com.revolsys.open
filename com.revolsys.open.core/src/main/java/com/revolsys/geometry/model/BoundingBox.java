@@ -1211,9 +1211,9 @@ public interface BoundingBox
   default RectangleXY toRectangle() {
     final double minX = getMinX();
     final double minY = getMinY();
-    final double width = getWidth();
-    final double height = getHeight();
+    final double maxX = getMaxX();
+    final double maxY = getMaxY();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.newRectangle(minX, minY, width, height);
+    return geometryFactory.newRectangleCorners(minX, minY, maxX, maxY);
   }
 }

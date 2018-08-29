@@ -70,7 +70,7 @@ import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.model.impl.AbstractPolygon;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleGeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxEmpty;
@@ -1989,15 +1989,14 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
     if (isHasHorizontalCoordinateSystem()) {
-      final GeometryFactory geometryFactory = convertAxisCount(2);
-      return new BoundingBoxDoubleXYGeometryFactory(geometryFactory, minX, minY, maxX, maxY);
+      return new BoundingBoxDoubleXYGeometryFactory(this, minX, minY, maxX, maxY);
     } else {
       return new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
     }
   }
 
   public BoundingBox newBoundingBox(final int axisCount) {
-    return new BoundingBoxDoubleGf(this, axisCount);
+    return new BoundingBoxDoubleGeometryFactory(this, axisCount);
   }
 
   public BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
@@ -2006,9 +2005,9 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       final double y1 = bounds[1];
       final double x2 = bounds[2];
       final double y2 = bounds[3];
-      return new BoundingBoxDoubleXYGeometryFactory(this, x1, y1, x2, y2);
+      return newBoundingBox(x1, y1, x2, y2);
     } else {
-      return new BoundingBoxDoubleGf(this, axisCount, bounds);
+      return new BoundingBoxDoubleGeometryFactory(this, axisCount, bounds);
     }
   }
 
@@ -2051,48 +2050,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
       return this.boundingBoxEmpty;
     } else {
       return newBoundingBox(axisCount, bounds);
-    }
-  }
-
-  public BoundingBox newBoundingBox(final Iterable<? extends Point> points) {
-    double minX = Double.POSITIVE_INFINITY;
-    double maxX = Double.NEGATIVE_INFINITY;
-    double minY = Double.POSITIVE_INFINITY;
-    double maxY = Double.NEGATIVE_INFINITY;
-
-    for (final Point point : points) {
-      final double x = point.getX();
-      final double y = point.getY();
-      if (x < minX) {
-        minX = x;
-      }
-      if (y < minY) {
-        minY = y;
-      }
-
-      if (x > maxX) {
-        maxX = x;
-      }
-      if (y > maxY) {
-        maxY = y;
-      }
-    }
-    final boolean nullX = minX > maxX;
-    final boolean nullY = minY > maxY;
-    if (nullX) {
-      if (nullY) {
-        return this.boundingBoxEmpty;
-      } else {
-        return new BoundingBoxDoubleXYGeometryFactory(this, Double.NEGATIVE_INFINITY, minY,
-          Double.POSITIVE_INFINITY, maxY);
-      }
-    } else {
-      if (nullY) {
-        return new BoundingBoxDoubleXYGeometryFactory(this, minX, Double.NEGATIVE_INFINITY, maxX,
-          Double.POSITIVE_INFINITY);
-      } else {
-        return new BoundingBoxDoubleXYGeometryFactory(this, minX, minY, maxX, maxY);
-      }
     }
   }
 

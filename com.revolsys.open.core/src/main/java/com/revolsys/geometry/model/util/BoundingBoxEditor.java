@@ -15,7 +15,7 @@ import com.revolsys.util.function.BiConsumerDouble;
 
 public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumerDouble {
 
-  private GeometryFactory geometryFactory = null;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_2D;
 
   public BoundingBoxEditor() {
   }
@@ -240,11 +240,7 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    if (this.geometryFactory == null) {
-      return GeometryFactory.DEFAULT_2D;
-    } else {
-      return this.geometryFactory;
-    }
+    return this.geometryFactory;
   }
 
   /**
@@ -267,16 +263,12 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
 
   public BoundingBox newBoundingBox() {
     if (isEmpty()) {
-      if (this.geometryFactory == null) {
-        return BoundingBox.empty();
-      } else {
-        return this.geometryFactory.bboxEmpty();
-      }
+      return this.geometryFactory.bboxEmpty();
     } else {
-      if (this.geometryFactory == null) {
-        return new BoundingBoxDoubleXY(this.minX, this.minY, this.maxX, this.maxY);
-      } else {
+      if (this.geometryFactory.isHasHorizontalCoordinateSystem()) {
         return this.geometryFactory.newBoundingBox(this.minX, this.minY, this.maxX, this.maxY);
+      } else {
+        return new BoundingBoxDoubleXY(this.minX, this.minY, this.maxX, this.maxY);
       }
     }
   }
@@ -293,9 +285,10 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
           clear();
           final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
           this.geometryFactory = geometryFactory.getGeometryFactory();
+          final BiConsumerDouble action = this::addPoint;
           for (final double y : Arrays.asList(minY, maxY)) {
             for (final double x : Arrays.asList(minX, maxX)) {
-              coordinatesOperation.perform2d(point, x, y, this::addPoint);
+              coordinatesOperation.perform2d(point, x, y, action);
             }
           }
 
@@ -313,21 +306,21 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
               yStep = 1 / scaleY;
             }
           }
-          coordinatesOperation.perform2d(point, minX, minY, this::addPoint);
-          coordinatesOperation.perform2d(point, minX, maxY, this::addPoint);
-          coordinatesOperation.perform2d(point, maxX, minY, this::addPoint);
-          coordinatesOperation.perform2d(point, maxX, maxY, this::addPoint);
+          coordinatesOperation.perform2d(point, minX, minY, action);
+          coordinatesOperation.perform2d(point, minX, maxY, action);
+          coordinatesOperation.perform2d(point, maxX, minY, action);
+          coordinatesOperation.perform2d(point, maxX, maxY, action);
 
           if (xStep != 0) {
             for (double x = minX + xStep; x < maxX; x += xStep) {
-              coordinatesOperation.perform2d(point, x, minY, this::addPoint);
-              coordinatesOperation.perform2d(point, x, maxY, this::addPoint);
+              coordinatesOperation.perform2d(point, x, minY, action);
+              coordinatesOperation.perform2d(point, x, maxY, action);
             }
           }
           if (yStep != 0) {
             for (double y = minY + yStep; y < maxY; y += yStep) {
-              coordinatesOperation.perform2d(point, minX, y, this::addPoint);
-              coordinatesOperation.perform2d(point, maxX, y, this::addPoint);
+              coordinatesOperation.perform2d(point, minX, y, action);
+              coordinatesOperation.perform2d(point, maxX, y, action);
             }
           }
         }

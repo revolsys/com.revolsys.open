@@ -352,10 +352,8 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
   @Override
   public RectangleXY toRectangle() {
-    final double width = getWidth();
-    final double height = getHeight();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.newRectangle(this.minX, this.minY, width, height);
+    return geometryFactory.newRectangleCorners(this.minX, this.minY, this.maxX, this.maxY);
   }
 
   @Override
