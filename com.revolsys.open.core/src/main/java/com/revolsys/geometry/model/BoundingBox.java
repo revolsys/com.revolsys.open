@@ -40,25 +40,24 @@ import tec.uom.se.unit.Units;
 
 public interface BoundingBox
   extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
-  public static BoundingBoxEditor bboxEditor(final BoundingBoxProxy... boundingBoxes) {
+  static BoundingBoxEditor bboxEditor(final BoundingBoxProxy... boundingBoxes) {
     return new BoundingBoxEditor() //
       .addAllBbox(boundingBoxes);
   }
 
-  public static BoundingBoxEditor bboxEditor(final GeometryFactoryProxy geometryFactory,
+  static BoundingBoxEditor bboxEditor(final GeometryFactoryProxy geometryFactory,
     final BoundingBoxProxy... boundingBoxes) {
     return new BoundingBoxEditor(geometryFactory) //
       .addAllBbox(boundingBoxes);
   }
 
-  public static BoundingBoxEditor bboxEditor(final GeometryFactoryProxy geometryFactory,
+  static BoundingBoxEditor bboxEditor(final GeometryFactoryProxy geometryFactory,
     final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
     return new BoundingBoxEditor(geometryFactory) //
       .addAllBbox(boundingBoxes);
   }
 
-  public static BoundingBoxEditor bboxEditor(
-    final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
+  static BoundingBoxEditor bboxEditor(final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
     return new BoundingBoxEditor() //
       .addAllBbox(boundingBoxes);
   }
@@ -74,19 +73,19 @@ public interface BoundingBox
     }
   }
 
-  public static BoundingBox bboxNew(final BoundingBoxProxy... boundingBoxes) {
+  static BoundingBox bboxNew(final BoundingBoxProxy... boundingBoxes) {
     return bboxEditor(boundingBoxes) //
       .newBoundingBox();
   }
 
-  public static BoundingBox bboxNew(final GeometryFactoryProxy geometryFactory,
+  static BoundingBox bboxNew(final GeometryFactoryProxy geometryFactory,
     final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
     return new BoundingBoxEditor(geometryFactory) //
       .addAllBbox(boundingBoxes) //
       .newBoundingBox();
   }
 
-  public static BoundingBox bboxNew(final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
+  static BoundingBox bboxNew(final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
     return new BoundingBoxEditor() //
       .addAllBbox(boundingBoxes) //
       .newBoundingBox();
@@ -156,7 +155,7 @@ public interface BoundingBox
     }
   }
 
-  public static BoundingBox bboxNewDelta(final double x, final double y, final double delta) {
+  static BoundingBox bboxNewDelta(final double x, final double y, final double delta) {
     return new BoundingBoxDoubleXY(x - delta, y - delta, x + delta, y + delta);
   }
 
@@ -181,6 +180,27 @@ public interface BoundingBox
 
   static BoundingBox empty() {
     return GeometryFactory.DEFAULT_3D.bboxEmpty();
+  }
+
+  static int hashCode(final BoundingBox boundingBox) {
+    if (boundingBox.isEmpty()) {
+      return 0;
+    } else {
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
+      long bits = 17;
+      bits ^= java.lang.Double.doubleToLongBits(minX) * 37;
+      bits ^= java.lang.Double.doubleToLongBits(minY) * 37;
+      if (minX != maxX) {
+        bits ^= java.lang.Double.doubleToLongBits(maxX) * 37;
+      }
+      if (minY != maxY) {
+        bits ^= java.lang.Double.doubleToLongBits(maxX) * 37;
+      }
+      return (int)bits ^ (int)(bits >> 32);
+    }
   }
 
   static boolean isEmpty(final double minX, final double maxX) {

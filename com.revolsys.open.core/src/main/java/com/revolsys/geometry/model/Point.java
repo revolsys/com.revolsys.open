@@ -70,6 +70,16 @@ import com.revolsys.util.number.Doubles;
  *@version 1.7
  */
 public interface Point extends Punctual, Serializable, BoundingBox {
+
+  static int hashCode(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    long bits = 17;
+    bits ^= java.lang.Double.doubleToLongBits(x) * 37;
+    bits ^= java.lang.Double.doubleToLongBits(y) * 37;
+    return (int)bits ^ (int)(bits >> 32);
+  }
+
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G newPoint(final Object value) {
     if (value == null) {

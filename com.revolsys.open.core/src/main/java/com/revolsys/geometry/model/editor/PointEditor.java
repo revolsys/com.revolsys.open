@@ -193,11 +193,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
 
   @Override
   public int hashCode() {
-    final double x = getX();
-    final double y = getY();
-    long bits = java.lang.Double.doubleToLongBits(x);
-    bits ^= java.lang.Double.doubleToLongBits(y) * 31;
-    return (int)bits ^ (int)(bits >> 32);
+    return Point.hashCode(this);
   }
 
   @Override

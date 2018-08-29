@@ -160,6 +160,11 @@ public class Node extends GraphComponent implements Point {
   }
 
   @Override
+  public int hashCode() {
+    return Point.hashCode(this);
+  }
+
+  @Override
   public boolean isEmpty() {
     return false;
   }

@@ -494,6 +494,11 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
   }
 
   @Override
+  public int hashCode() {
+    return BoundingBox.hashCode(this);
+  }
+
+  @Override
   public Iterable<LinearRing> holes() {
     return Collections.emptyList();
   }
