@@ -1,5 +1,7 @@
 package com.revolsys.record.io.format.gml;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -92,9 +94,12 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
 
   private StaxReader in;
 
+  private Reader reader;
+
   public GmlGeometryReader(final Resource resource, final MapEx properties) {
     try {
-      this.in = StaxReader.newXmlReader(resource);
+      this.reader = resource.newReader();
+      this.in = StaxReader.newXmlReader(this.reader);
     } catch (final Exception e) {
       throw new IllegalArgumentException("Unable to open resource " + resource);
     }
@@ -106,8 +111,15 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     if (this.in != null) {
       this.in.close();
     }
+    if (this.reader != null) {
+      try {
+        this.reader.close();
+      } catch (final IOException e) {
+      }
+    }
     this.geometryFactory = null;
     this.in = null;
+    this.reader = null;
   }
 
   @Override
