@@ -62,7 +62,12 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
         final int zInt = reader.getInt();
         final double x = this.geometryFactory.toDoubleX(xInt);
         final double y = this.geometryFactory.toDoubleY(yInt);
-        final double z = this.geometryFactory.toDoubleZ(zInt);
+        final double z;
+        if (zInt == Integer.MIN_VALUE) {
+          z = Double.NaN;
+        } else {
+          z = this.geometryFactory.toDoubleZ(zInt);
+        }
         return (G)this.geometryFactory.point(x, y, z);
       } catch (final WrappedException e) {
         if (e.getCause() instanceof EOFException) {
