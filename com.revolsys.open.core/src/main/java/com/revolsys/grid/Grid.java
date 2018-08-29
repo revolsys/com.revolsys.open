@@ -77,7 +77,8 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
   }
 
   default void forEachPointFinite(final BoundingBox boundingBox, final Consumer<Point> action) {
-    final GeometryFactory targetGeometryFactory = boundingBox.getGeometryFactory();
+    final GeometryFactory targetGeometryFactory = boundingBox.getGeometryFactory()
+      .convertAxisCount(3);
     final GeometryFactory geometryFactory = getGeometryFactory();
 
     final CoordinatesOperation projection = geometryFactory

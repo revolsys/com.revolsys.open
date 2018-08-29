@@ -107,7 +107,7 @@ public interface BoundingBox
         }
         if (WktParser.hasText(reader, "BBOX")) {
           int axisCount = 2;
-          if (WktParser.hasChar(reader, ' ')) {
+          if (WktParser.hasSpace(reader)) {
             if (WktParser.hasChar(reader, 'Z')) {
               axisCount = 3;
             } else if (WktParser.hasChar(reader, 'M')) {
@@ -124,13 +124,16 @@ public interface BoundingBox
             for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
               if (axisIndex > 0) {
                 WktParser.skipWhitespace(reader);
+                WktParser.hasChar(reader, ','); // Remove later old format BBOX
               }
               bounds[axisIndex] = WktParser.parseDouble(reader);
             }
-            if (WktParser.hasChar(reader, ',')) {
+            if (WktParser.hasSpace(reader) || WktParser.hasChar(reader, ',')) {
               for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
                 if (axisIndex > 0) {
                   WktParser.skipWhitespace(reader);
+                  WktParser.hasChar(reader, ','); // Remove later old format
+                                                  // BBOX
                 }
                 bounds[axisCount + axisIndex] = WktParser.parseDouble(reader);
               }
@@ -142,15 +145,15 @@ public interface BoundingBox
             return geometryFactory.bboxEmpty();
           }
         }
-        throw new IllegalArgumentException("Invalid BBOX " + wkt);
+      } catch (final IllegalArgumentException e) {
+        throw new IllegalArgumentException("Invalid BBOX " + wkt, e);
       } catch (final IOException e) {
         throw Exceptions.wrap("Error reading WKT:" + wkt, e);
       }
+      throw new IllegalArgumentException("Invalid BBOX " + wkt);
+    } else {
+      return empty();
     }
-
-    return
-
-    empty();
   }
 
   public static BoundingBox bboxNewDelta(final double x, final double y, final double delta) {
