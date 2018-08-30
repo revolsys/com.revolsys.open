@@ -793,9 +793,9 @@ public interface Point extends Punctual, Serializable, BoundingBox {
   }
 
   @Override
-  default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    RectangleXY.notNullSameCs(this, rectangle);
-    if (bboxCoveredBy(rectangle)) {
+  default Geometry intersectionBbox(final BoundingBox boundingBox) {
+    notNullSameCs( boundingBox);
+    if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();

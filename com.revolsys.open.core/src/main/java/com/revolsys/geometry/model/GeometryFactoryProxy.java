@@ -6,6 +6,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 
 public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
+
   default BoundingBox convertBoundingBox(final BoundingBoxProxy boundingBoxProxy) {
     if (boundingBoxProxy != null) {
       final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
@@ -187,6 +188,16 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
     } else {
       final GeometryFactory geometryFactory = proxy.getGeometryFactory();
       return isSameCoordinateSystem(geometryFactory);
+    }
+  }
+
+  default void notNullSameCs(final GeometryFactoryProxy value) {
+    if (value == null) {
+      throw new NullPointerException("Argument rectangle cannot be null");
+    } else if (!isSameCoordinateSystem(value)) {
+      throw new NullPointerException(
+        "Rectangle operations require the same coordinate system this != rectangle\n  "
+          + getHorizontalCoordinateSystem() + "\n  " + value.getHorizontalCoordinateSystem());
     }
   }
 

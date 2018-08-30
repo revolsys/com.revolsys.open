@@ -293,7 +293,7 @@ public class BoundingBoxTest implements TestConstants {
   public void testConstructorCoordinatesArray() {
 
     final BoundingBox emptyList = BoundingBox.bboxNew(new Point[0]);
-    assertBoundingBox(null, emptyList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(null, emptyList, GeometryFactory.DEFAULT_2D, true, 2, NULL_BOUNDS);
 
     // Different number of axis and values
     for (int axisCount = 2; axisCount < 5; axisCount++) {
@@ -351,20 +351,20 @@ public class BoundingBoxTest implements TestConstants {
   @Test
   public void testConstructorIterable() {
     final BoundingBox emptyNull = BoundingBox.bboxNew((Iterable<Point>)null);
-    assertBoundingBox(null, emptyNull, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(null, emptyNull, GeometryFactory.DEFAULT_2D, true, 2, NULL_BOUNDS);
 
     final BoundingBox emptyList = BoundingBox.bboxNew(new ArrayList<Point>());
-    assertBoundingBox(null, emptyList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(null, emptyList, GeometryFactory.DEFAULT_2D, true, 2, NULL_BOUNDS);
 
     final BoundingBox emptyListWithNulls = BoundingBox.bboxNew(Collections.<Point> singleton(null));
-    assertBoundingBox(null, emptyListWithNulls, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(null, emptyListWithNulls, GeometryFactory.DEFAULT_2D, true, 2, NULL_BOUNDS);
 
     final BoundingBox emptyNullCoordinatesList = BoundingBox.bboxNew((Iterable<Point>)null);
-    assertBoundingBox(null, emptyNullCoordinatesList, GeometryFactory.DEFAULT_3D, true, 2,
+    assertBoundingBox(null, emptyNullCoordinatesList, GeometryFactory.DEFAULT_2D, true, 2,
       NULL_BOUNDS);
 
     final BoundingBox emptyCoordinatesList = BoundingBox.bboxNew(new ArrayList<Point>());
-    assertBoundingBox(null, emptyCoordinatesList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(null, emptyCoordinatesList, GeometryFactory.DEFAULT_2D, true, 2, NULL_BOUNDS);
 
     // Different number of axis and values
     for (int axisCount = 2; axisCount < 5; axisCount++) {

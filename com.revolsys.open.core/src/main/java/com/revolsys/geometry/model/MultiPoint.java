@@ -249,15 +249,15 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   }
 
   @Override
-  default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    RectangleXY.notNullSameCs(this, rectangle);
-    if (bboxCoveredBy(rectangle)) {
+  default Geometry intersectionBbox(final BoundingBox boundingBox) {
+    notNullSameCs( boundingBox);
+    if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {
       boolean modified = false;
       final List<Geometry> parts = new ArrayList<>();
       for (final Geometry part : getPoints()) {
-        final Geometry partIntersection = part.intersectionRectangle(rectangle);
+        final Geometry partIntersection = part.intersectionBbox(boundingBox);
         if (partIntersection != part) {
           modified = true;
         }

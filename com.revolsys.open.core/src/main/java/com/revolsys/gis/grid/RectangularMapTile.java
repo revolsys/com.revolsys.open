@@ -4,7 +4,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 
@@ -46,10 +45,5 @@ public interface RectangularMapTile extends BoundingBoxProxy, Record {
   default RecordDefinition getRecordDefinition() {
     final RectangularMapGrid grid = getGrid();
     return grid.getRecordDefinition();
-  }
-
-  default RectangleXY toRectangle() {
-    final BoundingBox boundingBox = getBoundingBox();
-    return boundingBox.toRectangle();
   }
 }

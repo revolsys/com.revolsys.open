@@ -45,7 +45,7 @@ public class RectangleTest {
     // Debug.noOp();
     // }
 
-    Geometry actualIntersectsRectangle = geometry.intersectionRectangle(rectangle);
+    Geometry actualIntersectsRectangle = geometry.intersectionBbox(rectangle);
     if (normalize) {
       actualIntersectsRectangle = actualIntersectsRectangle.normalize();
     }

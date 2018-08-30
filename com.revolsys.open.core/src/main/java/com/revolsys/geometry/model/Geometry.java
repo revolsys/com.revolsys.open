@@ -58,7 +58,6 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryEditor;
-import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -1812,7 +1811,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
-  Geometry intersectionRectangle(RectangleXY rectangle);
+  Geometry intersectionBbox(BoundingBox boundingBox);
 
   boolean intersects(BoundingBox boundingBox);
 

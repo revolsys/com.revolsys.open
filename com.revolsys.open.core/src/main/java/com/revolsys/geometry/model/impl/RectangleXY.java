@@ -59,9 +59,9 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
   private static final long serialVersionUID = 1L;
 
   public static void notNullSameCs(final GeometryFactoryProxy geometryFactory,
-    final RectangleXY rectangle) {
+    final BoundingBox rectangle) {
     if (rectangle == null) {
-      throw new NullPointerException("Agrument rectangle cannot be null");
+      throw new NullPointerException("Argument rectangle cannot be null");
     } else if (!geometryFactory.isSameCoordinateSystem(rectangle)) {
       throw new NullPointerException(
         "Rectangle operations require the same coordinate system this != rectangle\n  "
@@ -98,76 +98,88 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
 
     @Override
     public <R> R findSegment(final Function4Double<R> action) {
-      R result = action.accept(RectangleXY.this.minX, RectangleXY.this.minY, RectangleXY.this.maxX,
-        RectangleXY.this.minY);
+      final double minX = RectangleXY.this.minX;
+      final double minY = RectangleXY.this.minY;
+      final double maxX = RectangleXY.this.maxX;
+      final double maxY = RectangleXY.this.maxY;
+      R result = action.accept(minX, minY, maxX, minY);
       if (result != null) {
         return result;
       }
-      result = action.accept(RectangleXY.this.maxX, RectangleXY.this.minY, RectangleXY.this.maxX,
-        RectangleXY.this.maxY);
+      result = action.accept(maxX, minY, maxX, maxY);
       if (result != null) {
         return result;
       }
-      result = action.accept(RectangleXY.this.maxX, RectangleXY.this.maxY, RectangleXY.this.minX,
-        RectangleXY.this.maxY);
+      result = action.accept(maxX, maxY, minX, maxY);
       if (result != null) {
         return result;
       }
-      result = action.accept(RectangleXY.this.minX, RectangleXY.this.maxY, RectangleXY.this.minX,
-        RectangleXY.this.minY);
+      result = action.accept(minX, maxY, minX, minY);
       return result;
     }
 
     @Override
     public <R> R findVertex(final BiFunctionDouble<R> action) {
-      R result = action.accept(RectangleXY.this.minX, RectangleXY.this.minY);
+      final double minX = RectangleXY.this.minX;
+      final double minY = RectangleXY.this.minY;
+      final double maxX = RectangleXY.this.maxX;
+      final double maxY = RectangleXY.this.maxY;
+      R result = action.accept(minX, minY);
       if (result != null) {
         return result;
       }
-      result = action.accept(RectangleXY.this.maxX, RectangleXY.this.minY);
+      result = action.accept(maxX, minY);
       if (result != null) {
         return result;
       }
-      result = action.accept(RectangleXY.this.maxX, RectangleXY.this.maxY);
+      result = action.accept(maxX, maxY);
       if (result != null) {
         return result;
       }
-      result = action.accept(RectangleXY.this.minX, RectangleXY.this.maxY);
+      result = action.accept(minX, maxY);
       if (result != null) {
         return result;
       }
-      result = action.accept(RectangleXY.this.minX, RectangleXY.this.minY);
+      result = action.accept(minX, minY);
       return result;
     }
 
     @Override
     public void forEachSegment(final Consumer4Double action) {
-      action.accept(RectangleXY.this.minX, RectangleXY.this.minY, RectangleXY.this.maxX,
-        RectangleXY.this.minY);
-      action.accept(RectangleXY.this.maxX, RectangleXY.this.minY, RectangleXY.this.maxX,
-        RectangleXY.this.maxY);
-      action.accept(RectangleXY.this.maxX, RectangleXY.this.maxY, RectangleXY.this.minX,
-        RectangleXY.this.maxY);
-      action.accept(RectangleXY.this.minX, RectangleXY.this.maxY, RectangleXY.this.minX,
-        RectangleXY.this.minY);
+      final double minX = RectangleXY.this.minX;
+      final double minY = RectangleXY.this.minY;
+      final double maxX = RectangleXY.this.maxX;
+      final double maxY = RectangleXY.this.maxY;
+      action.accept(minX, minY, maxX, minY);
+      action.accept(maxX, minY, maxX, maxY);
+      action.accept(maxX, maxY, minX, maxY);
+      action.accept(minX, maxY, minX, minY);
     }
 
     @Override
     public void forEachVertex(final BiConsumerDouble action) {
-      action.accept(RectangleXY.this.minX, RectangleXY.this.minY);
-      action.accept(RectangleXY.this.maxX, RectangleXY.this.minY);
-      action.accept(RectangleXY.this.maxX, RectangleXY.this.maxY);
-      action.accept(RectangleXY.this.minX, RectangleXY.this.maxY);
-      action.accept(RectangleXY.this.minX, RectangleXY.this.minY);
+      final double minX = RectangleXY.this.minX;
+      final double minY = RectangleXY.this.minY;
+      final double maxX = RectangleXY.this.maxX;
+      final double maxY = RectangleXY.this.maxY;
+      action.accept(minX, minY);
+      action.accept(maxX, minY);
+      action.accept(maxX, maxY);
+      action.accept(minX, maxY);
+      action.accept(minX, minY);
     }
 
     @Override
     public void forEachVertex(final Consumer3Double action) {
-      action.accept(RectangleXY.this.minX, RectangleXY.this.minY, Double.NaN);
-      action.accept(RectangleXY.this.maxX, RectangleXY.this.minY, Double.NaN);
-      action.accept(RectangleXY.this.maxX, RectangleXY.this.maxY, Double.NaN);
-      action.accept(RectangleXY.this.minX, RectangleXY.this.maxY, Double.NaN);
-      action.accept(RectangleXY.this.minX, RectangleXY.this.minY, Double.NaN);
+      final double minX = RectangleXY.this.minX;
+      final double minY = RectangleXY.this.minY;
+      final double maxX = RectangleXY.this.maxX;
+      final double maxY = RectangleXY.this.maxY;
+      action.accept(minX, minY, Double.NaN);
+      action.accept(maxX, minY, Double.NaN);
+      action.accept(maxX, maxY, Double.NaN);
+      action.accept(minX, maxY, Double.NaN);
+      action.accept(minX, minY, Double.NaN);
     }
 
     @Override
@@ -198,12 +210,16 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
 
     @Override
     public double[] getCoordinates() {
+      final double minX = RectangleXY.this.minX;
+      final double minY = RectangleXY.this.minY;
+      final double maxX = RectangleXY.this.maxX;
+      final double maxY = RectangleXY.this.maxY;
       return new double[] {
-        RectangleXY.this.minX, RectangleXY.this.minY, //
-        RectangleXY.this.maxX, RectangleXY.this.minY, //
-        RectangleXY.this.maxX, RectangleXY.this.maxY, //
-        RectangleXY.this.minX, RectangleXY.this.maxY, //
-        RectangleXY.this.minX, RectangleXY.this.minY //
+        minX, minY, //
+        maxX, minY, //
+        maxX, maxY, //
+        minX, maxY, //
+        minX, minY //
       };
     }
 
@@ -506,20 +522,20 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
   @Override
   public Geometry intersection(final Geometry geometry) {
     final Geometry convertedGeometry = geometry.convertGeometry(this.geometryFactory);
-    return convertedGeometry.intersectionRectangle(this);
+    return convertedGeometry.intersectionBbox(this);
   }
 
   @Override
-  public Geometry intersectionRectangle(final RectangleXY rectangle) {
-    RectangleXY.notNullSameCs(this, rectangle);
-    if (bboxCoveredBy(rectangle)) {
+  public Geometry intersectionBbox(final BoundingBox boundingBox) {
+    notNullSameCs(boundingBox);
+    if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final double minX = rectangle.minX;
-      final double minY = rectangle.minY;
-      final double maxX = rectangle.maxX;
-      final double maxY = rectangle.maxY;
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
       if (bboxIntersects(minX, minY, maxX, maxY)) {
         final double intMinX = Math.max(this.minX, minX);
         final double intMinY = Math.max(this.minY, minY);
@@ -539,10 +555,6 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
     } else {
       return true;
     }
-  }
-
-  public boolean intersects(final RectangleXY rectangle) {
-    return bboxIntersects(rectangle.minX, rectangle.minY, rectangle.maxX, rectangle.maxY);
   }
 
   @Override
@@ -615,5 +627,10 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
       }
 
     }
+  }
+
+  @Override
+  public RectangleXY toRectangle() {
+    return this;
   }
 }

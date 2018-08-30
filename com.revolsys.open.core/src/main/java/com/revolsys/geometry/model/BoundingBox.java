@@ -197,7 +197,7 @@ public interface BoundingBox
         bits ^= java.lang.Double.doubleToLongBits(maxX) * 37;
       }
       if (minY != maxY) {
-        bits ^= java.lang.Double.doubleToLongBits(maxX) * 37;
+        bits ^= java.lang.Double.doubleToLongBits(maxY) * 37;
       }
       return (int)bits ^ (int)(bits >> 32);
     }

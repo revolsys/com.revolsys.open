@@ -2,9 +2,9 @@ package com.revolsys.geometry.model.editor;
 
 import java.util.Arrays;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 
 public class LineSegmentEditor extends LineSegmentDoubleGF {
@@ -47,11 +47,11 @@ public class LineSegmentEditor extends LineSegmentDoubleGF {
     }
   }
 
-  public boolean clipToRectangle(final RectangleXY rectangle) {
-    final double minX = rectangle.getMinX();
-    final double minY = rectangle.getMinY();
-    final double maxX = rectangle.getMaxX();
-    final double maxY = rectangle.getMaxY();
+  public boolean clipToBbox(final BoundingBox boundingBox) {
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
     final double[] coordinates = this.coordinates;
     final int axisCount = this.axisCount;
     final int x2Index = axisCount;

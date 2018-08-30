@@ -32,6 +32,8 @@
  */
 package com.revolsys.core.test.geometry.test.old.geom;
 
+import org.junit.Assert;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -60,10 +62,10 @@ public class GeometryImplTest extends TestCase {
 
   private void doTestEquals(final Geometry a, final Geometry b, final boolean equalsGeometry,
     final boolean equalsObject, final boolean equalsExact, final boolean equalsHash) {
-    assertEquals(equalsGeometry, a.equals(b));
-    assertEquals(equalsObject, a.equals((Object)b));
-    assertEquals(equalsExact, a.equals(2, b));
-    assertEquals(equalsHash, a.hashCode() == b.hashCode());
+    Assert.assertEquals("equals(geometry)", equalsGeometry, a.equals(b));
+    Assert.assertEquals("equals(object)", equalsObject, a.equals((Object)b));
+    Assert.assertEquals("equals(axisCount,geometry)", equalsExact, a.equals(2, b));
+    Assert.assertEquals("hashCode == hashCode", equalsHash, a.hashCode() == b.hashCode());
   }
 
   private void doTestEqualsExact(final Geometry x, final Geometry somethingExactlyEqual,

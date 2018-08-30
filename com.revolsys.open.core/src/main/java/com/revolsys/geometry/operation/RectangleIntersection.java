@@ -1,11 +1,11 @@
 package com.revolsys.geometry.operation;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.editor.MultiLineStringEditor;
-import com.revolsys.geometry.model.impl.RectangleXY;
 
 public class RectangleIntersection {
 
@@ -149,7 +149,7 @@ public class RectangleIntersection {
     return true;
   }
 
-  public Geometry intersectionLine(final LineString line, final RectangleXY rectangle) {
+  public Geometry intersectionLine(final LineString line, final BoundingBox rectangle) {
     if (line == null || rectangle.bboxCovers(line)) {
       return line;
     } else {
@@ -189,7 +189,8 @@ public class RectangleIntersection {
    * @param line The line.
    */
   public void setNextLine(final LineString line) {
-    // toCoordinates is correct as it get's switched on the first call to setNextSegment
+    // toCoordinates is correct as it get's switched on the first call to
+    // setNextSegment
     line.copyPoint(0, this.axisCount, this.toCoordinates);
   }
 
@@ -209,11 +210,11 @@ public class RectangleIntersection {
     this.fromClipped = false;
   }
 
-  public void setRectangle(final RectangleXY rectangle) {
-    this.minX = rectangle.getMinX();
-    this.minY = rectangle.getMinY();
-    this.maxX = rectangle.getMaxX();
-    this.maxY = rectangle.getMaxY();
+  public void setRectangle(final BoundingBox boundingBox) {
+    this.minX = boundingBox.getMinX();
+    this.minY = boundingBox.getMinY();
+    this.maxX = boundingBox.getMaxX();
+    this.maxY = boundingBox.getMaxY();
   }
 
 }

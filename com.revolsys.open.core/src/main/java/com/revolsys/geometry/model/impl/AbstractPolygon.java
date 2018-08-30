@@ -32,6 +32,7 @@
  */
 package com.revolsys.geometry.model.impl;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
@@ -131,7 +132,8 @@ public abstract class AbstractPolygon implements Polygon {
 
   @Override
   public int hashCode() {
-    return getBoundingBox().hashCode();
+    BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.hashCode();
   }
 
   @Override

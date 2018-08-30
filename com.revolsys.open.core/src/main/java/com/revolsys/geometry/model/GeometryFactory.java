@@ -219,7 +219,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
 
     @Override
-    public Geometry intersectionRectangle(final RectangleXY rectangle) {
+    public Geometry intersectionBbox(final BoundingBox boundingBox) {
       return this;
     }
 
@@ -310,7 +310,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
 
     @Override
-    public Point intersectionRectangle(final RectangleXY rectangle) {
+    public Point intersectionBbox(final BoundingBox boundingBox) {
       return this;
     }
 
@@ -395,7 +395,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     }
 
     @Override
-    public Polygon intersectionRectangle(final RectangleXY rectangle) {
+    public Polygon intersectionBbox(final BoundingBox boundingBox) {
       return this;
     }
 

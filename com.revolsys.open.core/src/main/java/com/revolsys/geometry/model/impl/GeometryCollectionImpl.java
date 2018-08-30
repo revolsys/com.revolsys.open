@@ -302,14 +302,14 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
-  public Geometry intersectionRectangle(final RectangleXY rectangle) {
-    RectangleXY.notNullSameCs(this, rectangle);
-    if (bboxCoveredBy(rectangle)) {
+  public Geometry intersectionBbox(final BoundingBox boundingBox) {
+    notNullSameCs( boundingBox);
+    if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {
       final List<Geometry> parts = new ArrayList<>();
       for (final Geometry part : this.geometries) {
-        final Geometry partIntersection = part.intersectionRectangle(rectangle);
+        final Geometry partIntersection = part.intersectionBbox(boundingBox);
         if (!partIntersection.isEmpty()) {
           parts.add(part);
         }

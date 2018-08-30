@@ -1499,18 +1499,19 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default Geometry intersectionRectangle(final RectangleXY rectangle) {
-    RectangleXY.notNullSameCs(this, rectangle);
-    if (bboxCoveredBy(rectangle)) {
+  default Geometry intersectionBbox(final BoundingBox boundingBox) {
+    notNullSameCs( boundingBox);
+    if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {
       if (isEmpty()) {
         return this;
       } else if (this instanceof LinearRing) {
-        return SnapIfNeededOverlayOp.overlayOp(this, rectangle, OverlayOp.INTERSECTION);
+        return SnapIfNeededOverlayOp.overlayOp(this, boundingBox.toRectangle(),
+          OverlayOp.INTERSECTION);
       } else {
         final RectangleIntersection rectangleIntersection = new RectangleIntersection();
-        return rectangleIntersection.intersectionLine(this, rectangle);
+        return rectangleIntersection.intersectionLine(this, boundingBox);
       }
     }
   }
