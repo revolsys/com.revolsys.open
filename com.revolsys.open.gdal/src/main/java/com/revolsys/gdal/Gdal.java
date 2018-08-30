@@ -47,7 +47,8 @@ public class Gdal implements ServiceInitializer {
   static {
     try {
 
-      gdal.SetConfigOption("CPL_TMPDIR", System.getProperty("java.io.tmpdir"));
+      final String tempDir = System.getProperty("java.io.tmpdir");
+      gdal.SetConfigOption("CPL_TMPDIR", tempDir);
 
       osr.UseExceptions();
       ogr.UseExceptions();
