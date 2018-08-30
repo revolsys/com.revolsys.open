@@ -177,14 +177,6 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
     return false;
   }
 
-  protected void setXDo(final double x) {
-    this.x = x;
-  }
-
-  protected void setYDo(final double y) {
-    this.y = y;
-  }
-
   @Override
   public String toString() {
     return toEwkt();

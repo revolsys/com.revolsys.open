@@ -19,14 +19,14 @@ public class PointDoubleXYBuilder extends PointDoubleXY {
   @Override
   public double setX(final double x) {
     final double oldValue = getX();
-    super.setXDo(x);
+    this.x = x;
     return oldValue;
   }
 
   @Override
   public double setY(final double y) {
     final double oldValue = getY();
-    super.setYDo(y);
+    this.y = y;
     return oldValue;
   }
 }
