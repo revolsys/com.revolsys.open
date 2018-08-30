@@ -32,10 +32,9 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.awt.geom.Point2D;
-
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.util.Exceptions;
 
 /**
  * Represents a single point.
@@ -48,7 +47,7 @@ import com.revolsys.geometry.model.Point;
  *
  *@version 1.7
  */
-public abstract class AbstractPoint extends Point2D implements Point {
+public abstract class AbstractPoint implements Point {
   private static final long serialVersionUID = 4902022702746614570L;
 
   /**
@@ -59,7 +58,11 @@ public abstract class AbstractPoint extends Point2D implements Point {
    */
   @Override
   public Point clone() {
-    return (Point)super.clone();
+    try {
+      return (Point)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override
@@ -78,11 +81,6 @@ public abstract class AbstractPoint extends Point2D implements Point {
   @Override
   public int hashCode() {
     return Point.hashCode(this);
-  }
-
-  @Override
-  public void setLocation(final double x, final double y) {
-    throw new UnsupportedOperationException();
   }
 
   @Override

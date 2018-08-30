@@ -169,11 +169,6 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
   }
 
   @Override
-  public void setLocation(final double x, final double y) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public void setXYZ(final int x, final int y, final int z) {
     this.x = x;
     this.y = y;
