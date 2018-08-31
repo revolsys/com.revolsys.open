@@ -1,9 +1,12 @@
 package com.revolsys.swing.parallel;
 
 import java.awt.Image;
+import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -35,36 +38,7 @@ public class BaseMain implements UncaughtExceptionHandler {
     }
   }
 
-  protected static void setMacDockIcon(final Image image) {
-    final String version = System.getProperty("java.version");
-    if (version.startsWith("1.8")) {
-      try {
-        final Class<?> clazz = Class.forName("com.apple.eawt.Application");
-        final Method appMethod = clazz.getMethod("getApplication");
-        final Object application = appMethod.invoke(clazz);
-        if (image != null) {
-          MethodUtils.invokeMethod(application, "setDockIconImage", image);
-        }
-        final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
-        final Object closeAllWindows = quitStrategyClass.getField("CLOSE_ALL_WINDOWS")
-          .get(quitStrategyClass);
-        MethodUtils.invokeExactMethod(application, "setQuitStrategy", closeAllWindows);
-        MacApplicationListenerHandler.init(application);
-      } catch (final ClassNotFoundException t) {
-      } catch (final Throwable t) {
-        t.printStackTrace();
-      }
-    } else {
-      try {
-        final Class<?> clazz = Class.forName("com.revolsys.swing.desktop.DesktopInitializer");
-        final Method initializeMethod = clazz.getMethod("initialize", Image.class);
-        initializeMethod.invoke(clazz, image);
-      } catch (final ClassNotFoundException t) {
-      } catch (final Throwable t) {
-        t.printStackTrace();
-      }
-    }
-  }
+  protected Set<File> initialFiles = new LinkedHashSet<>();
 
   private String lookAndFeelName;
 
@@ -136,6 +110,37 @@ public class BaseMain implements UncaughtExceptionHandler {
 
   public void setLookAndFeelName(final String lookAndFeelName) {
     this.lookAndFeelName = lookAndFeelName;
+  }
+
+  protected void setMacDockIcon(final Image image) {
+    final String version = System.getProperty("java.version");
+    if (version.startsWith("1.8")) {
+      try {
+        final Class<?> clazz = Class.forName("com.apple.eawt.Application");
+        final Method appMethod = clazz.getMethod("getApplication");
+        final Object application = appMethod.invoke(clazz);
+        if (image != null) {
+          MethodUtils.invokeMethod(application, "setDockIconImage", image);
+        }
+        final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
+        final Object closeAllWindows = quitStrategyClass.getField("CLOSE_ALL_WINDOWS")
+          .get(quitStrategyClass);
+        MethodUtils.invokeExactMethod(application, "setQuitStrategy", closeAllWindows);
+        MacApplicationListenerHandler.init(application, this.initialFiles);
+      } catch (final ClassNotFoundException t) {
+      } catch (final Throwable t) {
+        t.printStackTrace();
+      }
+    } else {
+      try {
+        final Class<?> clazz = Class.forName("com.revolsys.swing.desktop.DesktopInitializer");
+        final Method initializeMethod = clazz.getMethod("initialize", Image.class);
+        initializeMethod.invoke(clazz, image);
+      } catch (final ClassNotFoundException t) {
+      } catch (final Throwable t) {
+        t.printStackTrace();
+      }
+    }
   }
 
   @Override

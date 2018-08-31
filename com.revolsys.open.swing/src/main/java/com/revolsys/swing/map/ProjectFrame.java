@@ -182,6 +182,8 @@ public class ProjectFrame extends BaseFrame {
 
   private Preferences preferences = new Preferences(this.applicationId);
 
+  private final List<File> initialFiles = new ArrayList<>();
+
   public ProjectFrame(final String title, final Path projectPath) {
     this(title, projectPath, true);
   }
@@ -195,6 +197,14 @@ public class ProjectFrame extends BaseFrame {
       initUi();
       loadProject();
     }
+  }
+
+  public ProjectFrame(final String title, final Path projectPath,
+    final Collection<File> initialFiles) {
+    this(title, projectPath, false);
+    this.initialFiles.addAll(initialFiles);
+    initUi();
+    loadProject();
   }
 
   public ProjectFrame(final String applicationId, final String title) {
@@ -578,6 +588,7 @@ public class ProjectFrame extends BaseFrame {
     } else {
       Invoke.background("Load Project: " + projectPath, () -> {
         loadProject(projectPath);
+        this.project.openFiles(this.initialFiles);
         getMapPanel().setInitializing(false);
         loadProjectAfter();
       });

@@ -1,9 +1,7 @@
 
-<project
-  xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
->
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.parent</artifactId>
@@ -60,7 +58,7 @@
     <module>com.revolsys.open.web</module>
     <module>war-overlay</module>
     <module>com.revolsys.open.coordinatesystems</module>
- <!--   <module>com.revolsys.open.java10</module> -->
+    <!-- <module>com.revolsys.open.java10</module> -->
   </modules>
 
   <build>
@@ -123,7 +121,7 @@
             <id>attach-javadocs</id>
             <configuration>
               <skip>${maven.javadoc.skip}</skip>
-            </configuration> 
+            </configuration>
             <goals>
               <goal>jar</goal>
             </goals>
@@ -176,57 +174,32 @@
         <artifactId>maven-deploy-plugin</artifactId>
         <version>2.8.2</version>
       </plugin>
-<!--    <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.3</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>sonatype-nexus-staging</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
-        </configuration>
-      </plugin> -->
+      <!-- <plugin> <groupId>org.sonatype.plugins</groupId> <artifactId>nexus-staging-maven-plugin</artifactId> 
+        <version>1.6.3</version> <extensions>true</extensions> <configuration> <serverId>sonatype-nexus-staging</serverId> 
+        <nexusUrl>https://oss.sonatype.org/</nexusUrl> <autoReleaseAfterClose>true</autoReleaseAfterClose> 
+        </configuration> </plugin> -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <version>1.8</version>
-    <!--   <executions>
-          <execution>
-            <id>aggregate-add-third-party</id>
-            <inherited>true</inherited>
-            <phase>install</phase>
-            <configuration>
-              <force>true</force>
-              <outputDirectory>src/license/</outputDirectory>
-              <useMissingFile>true</useMissingFile>
-              <licenseMerges>
-                <licenseMerge>apache_2_0|apache_v2</licenseMerge>
-                <licenseMerge>apache_2_0|The Apache Software License, Version 2.0</licenseMerge>
-                <licenseMerge>apache_2_0|Apache License, Version 2.0</licenseMerge>
-                <licenseMerge>apache_2_0|Apache License 2.0</licenseMerge>
-                <licenseMerge>apache_2_0|Apache License</licenseMerge>
-                <licenseMerge>apache_2_0|Apache 2.0 License</licenseMerge>
-                <licenseMerge>apache_2_0|Apache 2</licenseMerge>
-                <licenseMerge>apache_2_0|ASF 2.0</licenseMerge>
-                <licenseMerge>bsd_2|The BSD License</licenseMerge>
-                <licenseMerge>bsd_2|BSD License</licenseMerge>
-                <licenseMerge>bsd_2|BSD</licenseMerge>
-                <licenseMerge>cddl_1_0|Common Development and Distribution License (CDDL) v1.0</licenseMerge>
-                <licenseMerge>cddl_1_0|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</licenseMerge>
-                <licenseMerge>epl_1|Eclipse Public License - v 1.0</licenseMerge>
-                <licenseMerge>lgpl_2_1|LGPL 2.1</licenseMerge>
-                <licenseMerge>lgpl_2_1|GNU Lesser General Public License</licenseMerge>
-                <licenseMerge>lgpl_2_1|Lesser General Public License (LGPL)</licenseMerge>
-                <licenseMerge>mit|MIT License</licenseMerge>
-                <licenseMerge>mpl_1_1|MPL 1.1</licenseMerge>
-              </licenseMerges>
-            </configuration>
-            <goals>
-              <goal>aggregate-add-third-party</goal>
-            </goals>
-          </execution>
-        </executions> -->
+        <!-- <executions> <execution> <id>aggregate-add-third-party</id> 
+          <inherited>true</inherited> <phase>install</phase> <configuration> <force>true</force> 
+          <outputDirectory>src/license/</outputDirectory> <useMissingFile>true</useMissingFile> 
+          <licenseMerges> <licenseMerge>apache_2_0|apache_v2</licenseMerge> <licenseMerge>apache_2_0|The 
+          Apache Software License, Version 2.0</licenseMerge> <licenseMerge>apache_2_0|Apache 
+          License, Version 2.0</licenseMerge> <licenseMerge>apache_2_0|Apache License 
+          2.0</licenseMerge> <licenseMerge>apache_2_0|Apache License</licenseMerge> 
+          <licenseMerge>apache_2_0|Apache 2.0 License</licenseMerge> <licenseMerge>apache_2_0|Apache 
+          2</licenseMerge> <licenseMerge>apache_2_0|ASF 2.0</licenseMerge> <licenseMerge>bsd_2|The 
+          BSD License</licenseMerge> <licenseMerge>bsd_2|BSD License</licenseMerge> 
+          <licenseMerge>bsd_2|BSD</licenseMerge> <licenseMerge>cddl_1_0|Common Development 
+          and Distribution License (CDDL) v1.0</licenseMerge> <licenseMerge>cddl_1_0|COMMON 
+          DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</licenseMerge> <licenseMerge>epl_1|Eclipse 
+          Public License - v 1.0</licenseMerge> <licenseMerge>lgpl_2_1|LGPL 2.1</licenseMerge> 
+          <licenseMerge>lgpl_2_1|GNU Lesser General Public License</licenseMerge> <licenseMerge>lgpl_2_1|Lesser 
+          General Public License (LGPL)</licenseMerge> <licenseMerge>mit|MIT License</licenseMerge> 
+          <licenseMerge>mpl_1_1|MPL 1.1</licenseMerge> </licenseMerges> </configuration> 
+          <goals> <goal>aggregate-add-third-party</goal> </goals> </execution> </executions> -->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -264,15 +237,9 @@
         </dependencies>
       </plugin>
     </plugins>
-<!--
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh-external</artifactId>
-        <version>2.10</version>
-      </extension>
-    </extensions>
--->
+    <!-- <extensions> <extension> <groupId>org.apache.maven.wagon</groupId> 
+      <artifactId>wagon-ssh-external</artifactId> <version>2.10</version> </extension> 
+      </extensions> -->
   </build>
 
   <reporting>
@@ -550,10 +517,11 @@
       </properties>
     </profile>
   </profiles>
- 
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <com.sun.tools.path>${java.home}/../lib/tools.jar</com.sun.tools.path>
+    <org.gdal.version>2.3.1-1</org.gdal.version>
     <org.slf4j.version>1.7.21</org.slf4j.version>
     <org.springframework.version>4.2.5.RELEASE</org.springframework.version>
     <org.springframework.security.version>4.0.4.RELEASE</org.springframework.security.version>

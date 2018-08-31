@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.beanutils.MethodUtils;
@@ -15,9 +16,9 @@ import com.revolsys.util.Property;
 
 public class MacApplicationListenerHandler implements InvocationHandler {
 
-  public static void init(final Object application) {
+  public static void init(final Object application, final Collection<File> initialFiles) {
     try {
-      final InvocationHandler handler = new MacApplicationListenerHandler();
+      final InvocationHandler handler = new MacApplicationListenerHandler(initialFiles);
       final Class<?> openFileHandlerClass = Class.forName("com.apple.eawt.OpenFilesHandler");
       final Class<?> openUriHandler = Class.forName("com.apple.eawt.OpenURIHandler");
       final Class<?> preferencesHandler = Class.forName("com.apple.eawt.PreferencesHandler");
@@ -32,6 +33,12 @@ public class MacApplicationListenerHandler implements InvocationHandler {
     } catch (final Exception e) {
       e.printStackTrace(System.out);
     }
+  }
+
+  private final Collection<File> initialFiles;
+
+  public MacApplicationListenerHandler(final Collection<File> initialFiles) {
+    this.initialFiles = initialFiles;
   }
 
   @Override
@@ -50,7 +57,9 @@ public class MacApplicationListenerHandler implements InvocationHandler {
   private void openFiles(final Object event) {
     final List<File> files = Property.getSimple(event, "files");
     final LayerGroup layerGroup = Project.get();
-    if (layerGroup != null) {
+    if (layerGroup == null) {
+      this.initialFiles.addAll(files);
+    } else {
       layerGroup.openFiles(files);
     }
   }
