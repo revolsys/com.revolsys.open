@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -199,22 +200,35 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  public ProjectFrame(final String title, final Path projectPath,
-    final Collection<File> initialFiles) {
-    this(title, projectPath, false);
-    this.initialFiles.addAll(initialFiles);
-    initUi();
-    loadProject();
+  public ProjectFrame(final String applicationId, final String title) {
+    this(applicationId, title, Collections.emptyList());
   }
 
-  public ProjectFrame(final String applicationId, final String title) {
+  public ProjectFrame(final String applicationId, final String title,
+    final Collection<File> initialFiles) {
     super(title, false);
     this.frameTitle = title;
     this.applicationId = applicationId;
     this.preferences.setApplicationId(applicationId);
 
-    final String recentProjectPath = this.preferences.getValue(PREFERENCE_RECENT_PROJECT);
-    this.projectPath = Paths.getPath(recentProjectPath);
+    File initialProjectFile = null;
+    if (initialFiles.size() == 1) {
+      final File initialFile = initialFiles.iterator().next();
+      if (FileUtil.getFileNameExtension(initialFile).equals("rgmap")) {
+        if (initialFile.exists()) {
+          initialProjectFile = initialFile;
+        }
+      }
+    }
+    this.initialFiles.addAll(initialFiles);
+
+    if (initialProjectFile == null) {
+      final String recentProjectPath = this.preferences.getValue(PREFERENCE_RECENT_PROJECT);
+      this.projectPath = Paths.getPath(recentProjectPath);
+    } else {
+      this.projectPath = initialProjectFile.toPath();
+      this.preferences.setValue(PREFERENCE_RECENT_PROJECT, this.projectPath);
+    }
     initUi();
     loadProject();
   }
