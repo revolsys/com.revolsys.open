@@ -38,12 +38,12 @@
     <url>http://www.revolsys.com/</url>
   </organization>
 
+  
+
   <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/revolsys/com.revolsys.open/issues</url>
-  </issueManagement>
-
-  <modules>
+  </issueManagement><modules>
     <module>com.revolsys.open.javac</module>
     <module>com.revolsys.open.core</module>
     <module>com.revolsys.open.testapi</module>
@@ -77,6 +77,23 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>2.2.5</version>
+        <executions>
+          <execution>
+            <id>get-the-git-infos</id>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.1.0</version>
@@ -89,6 +106,7 @@
               <Implementation-Title>${project.name}</Implementation-Title>
               <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
               <Implementation-Version>${project.version}</Implementation-Version>
+              <SCM-Commit>${git.branch}-${git.commit.id}-${git.dirty}</SCM-Commit>
             </manifestEntries>
           </archive>
         </configuration>
