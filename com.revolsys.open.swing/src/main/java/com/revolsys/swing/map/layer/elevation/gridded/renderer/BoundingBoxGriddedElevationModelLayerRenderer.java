@@ -121,10 +121,10 @@ public class BoundingBoxGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final ViewRenderer viewport, final ElevationModelLayer layer) {
-    if (!viewport.isCancelled()) {
+  public void render(final ViewRenderer view, final ElevationModelLayer layer) {
+    if (!view.isCancelled()) {
       final Polygon boundary = getLayer().getBoundingBox().toPolygon(10);
-      viewport.drawGeometry(boundary, this.style);
+      view.drawGeometry(boundary, this.style);
     }
   }
 

@@ -73,13 +73,15 @@ public class TiledGriddedElevationModelLayer
         return Double.NaN;
       } else {
         final double elevation = elevationModel.getValue(x, y);
-        // System.out.println(elevation + "\t" + elevationModel.getElevationBilinear(x, y) + "\t"
+        // System.out.println(elevation + "\t" +
+        // elevationModel.getElevationBilinear(x, y) + "\t"
         // + elevationModel.getElevationBicubic(x, y));
         return elevation;
       }
     } else {
       final double elevation = this.elevationModel.getValue(x, y);
-      // System.out.println(elevation + "\t" + this.elevationModel.getElevationBilinear(x, y) + "\t"
+      // System.out.println(elevation + "\t" +
+      // this.elevationModel.getElevationBilinear(x, y) + "\t"
       // + this.elevationModel.getElevationBicubic(x, y));
       return elevation;
     }
@@ -110,14 +112,13 @@ public class TiledGriddedElevationModelLayer
   }
 
   @Override
-  public List<TiledGriddedElevationModelLayerTile> getOverlappingMapTiles(
-    final ViewRenderer viewport) {
+  public List<TiledGriddedElevationModelLayerTile> getOverlappingMapTiles(final ViewRenderer view) {
     final List<TiledGriddedElevationModelLayerTile> tiles = new ArrayList<>();
     try {
-      final int resolution = (int)getResolution(viewport);
+      final int resolution = (int)getResolution(view);
       if (resolution > 0) {
         final int tileSize = resolution * this.tileSizePixels;
-        final BoundingBox viewBoundingBox = viewport.getBoundingBox();
+        final BoundingBox viewBoundingBox = view.getBoundingBox();
         final BoundingBox maxBoundingBox = getBoundingBox();
         final GeometryFactory geometryFactory = getGeometryFactory();
         final BoundingBox boundingBox = viewBoundingBox.bboxToCs(geometryFactory)
@@ -148,8 +149,8 @@ public class TiledGriddedElevationModelLayer
   }
 
   @Override
-  public double getResolution(final ViewRenderer viewport) {
-    final double metresPerPixel = viewport.getMetresPerPixel();
+  public double getResolution(final ViewRenderer view) {
+    final double metresPerPixel = view.getMetresPerPixel();
     final int count = this.resolutions.size();
     for (int i = 0; i < count - 1; i++) {
       final double resolution1 = this.resolutions.get(i);
@@ -202,8 +203,8 @@ public class TiledGriddedElevationModelLayer
 
   public GriddedElevationModel newGriddedElevationModel(final int tileSize, final int tileX,
     final int tileY) {
-    final String fileName = Strings.toString("_", this.filePrefix, getHorizontalCoordinateSystemId(),
-      tileSize, tileX, tileY) + "." + this.fileExtension;
+    final String fileName = Strings.toString("_", this.filePrefix,
+      getHorizontalCoordinateSystemId(), tileSize, tileX, tileY) + "." + this.fileExtension;
     final Resource path = this.baseResource //
       .createRelative(this.fileExtension) //
       .createRelative(getHorizontalCoordinateSystemId()) //

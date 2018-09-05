@@ -33,7 +33,6 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.record.Record;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
@@ -236,7 +235,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
   }
 
-  public Font getFont(final ViewRenderer viewport) {
+  public Font getFont(final ViewRenderer view) {
     final int style = 0;
     final Quantity<Length> measure = this.textSize;
     // if (textStyle.getFontWeight() == FontWeight.BOLD) {
@@ -245,7 +244,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
     // style += Font.ITALIC;
     // }
-    final double fontSize = viewport.toDisplayValue(measure);
+    final double fontSize = view.toDisplayValue(measure);
     return new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
   }
 
@@ -523,12 +522,12 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     return this;
   }
 
-  public synchronized void setTextStyle(final ViewRenderer viewport, final Graphics2D graphics) {
-    if (viewport == null) {
+  public synchronized void setTextStyle(final ViewRenderer view, final Graphics2D graphics) {
+    if (view == null) {
       final Font font = new Font(this.textFaceName, 0, this.textSize.getValue().intValue());
       graphics.setFont(font);
     } else {
-      final long scale = (long)viewport.getScale();
+      final long scale = (long)view.getScale();
       if (this.font == null || this.lastScale != scale) {
         this.lastScale = scale;
         final int style = 0;
@@ -539,7 +538,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
         // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
         // style += Font.ITALIC;
         // }
-        final double fontSize = viewport.toDisplayValue(measure);
+        final double fontSize = view.toDisplayValue(measure);
         this.font = new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
       }
       graphics.setFont(this.font);

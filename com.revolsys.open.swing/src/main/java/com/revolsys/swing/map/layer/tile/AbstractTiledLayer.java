@@ -21,9 +21,9 @@ public abstract class AbstractTiledLayer<D, T extends AbstractMapTile<D>> extend
     setRenderer(newRenderer());
   }
 
-  public abstract List<T> getOverlappingMapTiles(final ViewRenderer viewport);
+  public abstract List<T> getOverlappingMapTiles(final ViewRenderer view);
 
-  public abstract double getResolution(final ViewRenderer viewport);
+  public abstract double getResolution(final ViewRenderer view);
 
   public boolean isHasError() {
     return this.hasError;

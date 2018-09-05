@@ -56,16 +56,19 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
 
   public void redraw() {
     synchronized (this) {
-      if (this.imageBuffer == null) {
-        final int width = this.elevationModel.getGridWidth();
-        final int height = this.elevationModel.getGridHeight();
+      DataBuffer imageBuffer = this.imageBuffer;
+      final GriddedElevationModelRasterizer rasterizer = this.rasterizer;
+      final boolean cached = this.cached;
+      if (imageBuffer == null) {
+        final GriddedElevationModel elevationModel = this.elevationModel;
+        final int width = elevationModel.getGridWidth();
+        final int height = elevationModel.getGridHeight();
         if (width > 0 && height > 0) {
           final ColorModel colorModel = ColorModel.getRGBdefault();
-          final DataBuffer imageBuffer;
-          if (this.cached) {
+          if (cached) {
             imageBuffer = new TempFileMappedIntDataBuffer(width, height);
           } else {
-            imageBuffer = new GriddedElevationModelRasterizerDataBuffer(this.rasterizer);
+            imageBuffer = new GriddedElevationModelRasterizerDataBuffer(rasterizer);
           }
           final SampleModel sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_INT,
             width, height, new int[] { //
@@ -78,16 +81,14 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
           final WritableRaster raster = new IntegerRaster(sampleModel, imageBuffer);
           final BufferedImage image = new BufferedImage(colorModel, raster, false, null);
 
-          if (this.cached) {
-            this.rasterizer.rasterize(imageBuffer);
-          }
           setRenderedImage(image);
           this.imageBuffer = imageBuffer;
+          if (cached) {
+            rasterizer.rasterize(imageBuffer);
+          }
         }
-      } else {
-        if (this.cached) {
-          this.rasterizer.rasterize(this.imageBuffer);
-        }
+      } else if (cached) {
+        rasterizer.rasterize(imageBuffer);
       }
     }
   }

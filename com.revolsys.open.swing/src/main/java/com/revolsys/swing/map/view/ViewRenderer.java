@@ -103,7 +103,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
   protected BoundingBox boundingBox = BoundingBox.empty();
 
   public ViewRenderer(final Viewport2D viewport) {
-    this.viewport = viewport;
+    setViewport(viewport);
   }
 
   public void drawDifferentCoordinateSystem(final BoundingBox boundingBox) {

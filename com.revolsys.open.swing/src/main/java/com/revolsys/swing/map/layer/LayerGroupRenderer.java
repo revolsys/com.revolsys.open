@@ -14,21 +14,21 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
   }
 
   @Override
-  public void render(final ViewRenderer viewport, final LayerGroup layer) {
-    final double scaleForVisible = viewport.getScaleForVisible();
+  public void render(final ViewRenderer view, final LayerGroup layer) {
+    final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       final List<Layer> layers = new ArrayList<>(layer.getLayers());
       Collections.reverse(layers);
 
-      for (final Layer childLayer : viewport.cancellable(layers)) {
+      for (final Layer childLayer : view.cancellable(layers)) {
         if (childLayer.isVisible(scaleForVisible)) {
           try {
             final LayerRenderer<Layer> renderer = childLayer.getRenderer();
             if (renderer != null) {
-              renderer.render(viewport);
+              renderer.render(view);
             }
           } catch (final Throwable e) {
-            if (!viewport.isCancelled()) {
+            if (!view.isCancelled()) {
               Logs.error(this, "Error rendering layer: " + childLayer, e);
             }
           }

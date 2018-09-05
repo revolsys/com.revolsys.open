@@ -44,8 +44,8 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
     return clone;
   }
 
-  private AbstractRecordLayerRenderer getRenderer(final ViewRenderer viewport) {
-    final long scaleForVisible = (long)viewport.getScaleForVisible();
+  private AbstractRecordLayerRenderer getRenderer(final ViewRenderer view) {
+    final long scaleForVisible = (long)view.getScaleForVisible();
     if (scaleForVisible == this.lastScale && this.renderer != null) {
       if (this.renderer.isVisible(scaleForVisible)) {
         return this.renderer;
@@ -75,24 +75,24 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public void render(final ViewRenderer viewport, final AbstractRecordLayer layer) {
+  public void render(final ViewRenderer view, final AbstractRecordLayer layer) {
     if (layer.hasGeometryField()) {
-      final AbstractRecordLayerRenderer renderer = getRenderer(viewport);
+      final AbstractRecordLayerRenderer renderer = getRenderer(view);
       if (renderer != null) {
-        renderer.render(viewport, layer);
+        renderer.render(view, layer);
       }
     }
   }
 
   // NOTE: Needed for filter styles
   @Override
-  public void renderRecord(final ViewRenderer viewport, final BoundingBox visibleArea,
+  public void renderRecord(final ViewRenderer view, final BoundingBox visibleArea,
     final AbstractRecordLayer layer, final LayerRecord record) {
-    final AbstractRecordLayerRenderer renderer = getRenderer(viewport);
+    final AbstractRecordLayerRenderer renderer = getRenderer(view);
     if (renderer != null) {
       if (isVisible(record)) {
         try {
-          renderer.renderRecord(viewport, visibleArea, layer, record);
+          renderer.renderRecord(view, visibleArea, layer, record);
         } catch (final TopologyException e) {
         } catch (final Throwable e) {
           Logs.error(this, "Unabled to render " + layer.getName() + " #" + record.getIdentifier(),
@@ -104,15 +104,15 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   // NOTE: Needed for multiple styles
-  protected void renderRecords(final ViewRenderer viewport,
-    final AbstractRecordLayer layer, final List<LayerRecord> records) {
-    final BoundingBox visibleArea = viewport.getBoundingBox();
-    final AbstractRecordLayerRenderer renderer = getRenderer(viewport);
+  protected void renderRecords(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
+    final BoundingBox visibleArea = view.getBoundingBox();
+    final AbstractRecordLayerRenderer renderer = getRenderer(view);
     if (renderer != null) {
-      for (final LayerRecord record : viewport.cancellable(records)) {
+      for (final LayerRecord record : view.cancellable(records)) {
         if (isVisible(record)) {
           try {
-            renderer.renderRecord(viewport, visibleArea, layer, record);
+            renderer.renderRecord(view, visibleArea, layer, record);
           } catch (final TopologyException e) {
           }
         }
@@ -121,13 +121,13 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public void renderSelectedRecord(final ViewRenderer viewport,
-    final AbstractRecordLayer layer, final LayerRecord object) {
-    final AbstractRecordLayerRenderer renderer = getRenderer(viewport);
+  public void renderSelectedRecord(final ViewRenderer view, final AbstractRecordLayer layer,
+    final LayerRecord object) {
+    final AbstractRecordLayerRenderer renderer = getRenderer(view);
     if (renderer != null) {
       if (isVisible(object)) {
         try {
-          renderer.renderSelectedRecord(viewport, layer, object);
+          renderer.renderSelectedRecord(view, layer, object);
         } catch (final Throwable e) {
           Logs.error(this, "Unabled to render " + layer.getName() + " #" + object.getIdentifier(),
             e);

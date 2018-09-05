@@ -834,19 +834,19 @@ public class ProjectFrame extends BaseFrame {
             int width = frameBoundsList.get(2).intValue();
             int height = frameBoundsList.get(3).intValue();
 
-            final Rectangle screenBounds = SwingUtil.getScreenBounds(x, y);
+            final Rectangle screenBounds = SwingUtil.getScreenBounds(x, y, width, height);
 
             width = Math.min(width, screenBounds.width);
             height = Math.min(height, screenBounds.height);
             setSize(width, height);
 
             if (x < screenBounds.x || x > screenBounds.x + screenBounds.width) {
-              x = 0;
+              x = screenBounds.x;
             } else {
               x = Math.min(x, screenBounds.x + screenBounds.width - width);
             }
             if (y < screenBounds.y || x > screenBounds.y + screenBounds.height) {
-              y = 0;
+              y = screenBounds.y;
             } else {
               y = Math.min(y, screenBounds.y + screenBounds.height - height);
             }

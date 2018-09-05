@@ -31,11 +31,11 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
   }
 
   @Override
-  public void render(final ViewRenderer viewport, final OgcWmsImageLayer layer) {
-    final double scaleForVisible = viewport.getScaleForVisible();
+  public void render(final ViewRenderer view, final OgcWmsImageLayer layer) {
+    final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
-        final BoundingBox viewportBoundingBox = viewport.getBoundingBox();
+        final BoundingBox viewportBoundingBox = view.getBoundingBox();
         final BoundingBox queryBoundingBox = viewportBoundingBox
           .bboxIntersection(layer.getWmsLayerDefinition().getLatLonBoundingBox());
 
@@ -53,9 +53,9 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
           }
         }
         if (reload) {
-          final int imageWidth = viewport.getViewWidthPixels();
-          final int imageHeight = viewport.getViewHeightPixels();
-          final OgcWmsImageLayerSwingWorker worker = new OgcWmsImageLayerSwingWorker(this, viewport,
+          final int imageWidth = view.getViewWidthPixels();
+          final int imageHeight = view.getViewHeightPixels();
+          final OgcWmsImageLayerSwingWorker worker = new OgcWmsImageLayerSwingWorker(this, view,
             queryBoundingBox, imageWidth, imageHeight);
           synchronized (this) {
             if (this.worker != null) {
@@ -66,7 +66,7 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
           Invoke.worker(worker);
 
         } else {
-          viewport.drawImage(this.image, false);
+          view.drawImage(this.image, false);
         }
       }
     }

@@ -185,17 +185,17 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   }
 
   @Override
-  public final void render(final ViewRenderer viewport) {
+  public final void render(final ViewRenderer view) {
     final T layer = getLayer();
     if (layer != null) {
-      final double scaleForVisible = viewport.getScaleForVisible();
+      final double scaleForVisible = view.getScaleForVisible();
       if (isVisible(scaleForVisible)) {
-        render(viewport, layer);
+        render(view, layer);
       }
     }
   }
 
-  public abstract void render(ViewRenderer viewport, T layer);
+  public abstract void render(ViewRenderer view, T layer);
 
   @Override
   public void setEditing(final boolean editing) {
@@ -244,6 +244,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     firePropertyChange("minimumScale", oldValue, minimumScale);
   }
 
+  @Override
   public void setName(final String name) {
     final String oldName = getName();
     if (Property.hasValue(name)) {

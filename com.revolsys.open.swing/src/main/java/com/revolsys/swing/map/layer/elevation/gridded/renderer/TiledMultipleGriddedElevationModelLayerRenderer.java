@@ -26,6 +26,7 @@ import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.util.BooleanCancellable;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -211,7 +212,7 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  protected void renderTile(final ViewRenderer viewport, final Cancellable cancellable,
+  protected void renderTile(final ViewRenderer view, final Cancellable cancellable,
     final TiledGriddedElevationModelLayerTile tile) {
     final GriddedElevationModel elevationModel = tile.getElevationModel();
     if (elevationModel != null) {
@@ -219,10 +220,32 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
       final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
       for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
         .cancellable(renderers)) {
-        final long scaleForVisible = (long)viewport.getScaleForVisible();
+        final long scaleForVisible = (long)view.getScaleForVisible();
         if (renderer.isVisible(scaleForVisible)) {
           renderer.setElevationModel(elevationModel);
-          renderer.render(viewport, layer);
+          renderer.render(view, layer);
+        }
+      }
+    }
+  }
+
+  @Override
+  protected void renderTiles(final ViewRenderer view, final BooleanCancellable cancellable,
+    final List<TiledGriddedElevationModelLayerTile> mapTiles) {
+    final TiledGriddedElevationModelLayer layer = getLayer();
+    final long scaleForVisible = (long)view.getScaleForVisible();
+    final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
+    for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
+      .cancellable(renderers)) {
+      if (renderer.isVisible(scaleForVisible)) {
+        for (final TiledGriddedElevationModelLayerTile tile : cancellable.cancellable(mapTiles)) {
+          final GriddedElevationModel elevationModel = tile.getElevationModel();
+          if (elevationModel != null) {
+            synchronized (renderer) {
+              renderer.setElevationModel(elevationModel);
+              renderer.render(view, layer);
+            }
+          }
         }
       }
     }
@@ -232,6 +255,9 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   public void setLayer(
     final AbstractTiledLayer<GriddedElevationModel, TiledGriddedElevationModelLayerTile> layer) {
     super.setLayer(layer);
+    for (final AbstractGriddedElevationModelLayerRenderer renderer : this.renderers) {
+      renderer.setLayer((TiledGriddedElevationModelLayer)layer);
+    }
     updateBoundingBox();
   }
 
@@ -259,6 +285,7 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
       this.renderers = new ArrayList<>(renderers);
       for (final AbstractGriddedElevationModelLayerRenderer renderer : this.renderers) {
         renderer.setParent(this);
+        renderer.setLayer(getLayer());
       }
     }
     firePropertyChange("renderers", oldValue, this.renderers);

@@ -18,16 +18,16 @@ public class PointCloudLayerRenderer extends AbstractLayerRenderer<PointCloudLay
   }
 
   @Override
-  public void render(final ViewRenderer viewport, final PointCloudLayer layer) {
+  public void render(final ViewRenderer view, final PointCloudLayer layer) {
     // TODO cancellable
-    final double scaleForVisible = viewport.getScaleForVisible();
+    final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
         final PointCloud<?> pointCloud = layer.getPointCloud();
         if (pointCloud != null) {
           final BoundingBox boundingBox = layer.getBoundingBox();
           final Polygon polygon = boundingBox.toPolygon(0);
-          viewport.drawGeometryOutline(polygon, STYLE_BOUNDING_BOX);
+          view.drawGeometryOutline(polygon, STYLE_BOUNDING_BOX);
         }
       }
     }

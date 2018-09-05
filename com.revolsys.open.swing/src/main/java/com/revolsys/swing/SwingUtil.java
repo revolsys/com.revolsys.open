@@ -298,6 +298,32 @@ public interface SwingUtil {
     return getScreenBounds(new Point(x, y));
   }
 
+  static Rectangle getScreenBounds(final int x, final int y, final int width, final int height) {
+    final Rectangle newBounds = new Rectangle(x, y, width, height);
+    Rectangle firstBounds = null;
+    final GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment
+      .getLocalGraphicsEnvironment();
+    for (final GraphicsDevice device : graphicsEnvironment.getScreenDevices()) {
+      for (final GraphicsConfiguration config : device.getConfigurations()) {
+        final Rectangle bounds = config.getBounds();
+        final Rectangle intersection = bounds.intersection(newBounds);
+        if (intersection.getWidth() > 100 && intersection.getHeight() > 100) {
+          final Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(config);
+          return applyInsets(bounds, insets);
+        } else if (firstBounds == null) {
+          firstBounds = bounds;
+        }
+      }
+    }
+    final GraphicsDevice defaultScreenDevice = graphicsEnvironment.getDefaultScreenDevice();
+    for (final GraphicsConfiguration config : defaultScreenDevice.getConfigurations()) {
+      final Rectangle bounds = config.getBounds();
+      final Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(config);
+      return applyInsets(bounds, insets);
+    }
+    return firstBounds;
+  }
+
   /**
    * Get the screen rectangle in which the mouse is in. If the mouse is outside all bounds return the current screen.
    *
