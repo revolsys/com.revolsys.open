@@ -544,6 +544,7 @@
     <org.springframework.version>4.2.5.RELEASE</org.springframework.version>
     <org.springframework.security.version>4.0.4.RELEASE</org.springframework.security.version>
     <org.codehaus.groovy.version>2.4.5</org.codehaus.groovy.version>
+    <org.docx4java.version>6.0.1</org.docx4java.version>
     <junit.version>4.12</junit.version>
     <junit.jupiter.version>5.2.0</junit.jupiter.version>
     <junit.vintage.version>5.2.0</junit.vintage.version>

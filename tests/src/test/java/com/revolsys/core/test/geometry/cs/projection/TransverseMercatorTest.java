@@ -115,7 +115,8 @@ public class TransverseMercatorTest {
           projectionById.put(utmReferenceMeridian, mercator);
         }
 
-        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(x, y);
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(Math.toRadians(lon),
+          Math.toRadians(lat));
 
         mercator.project(point);
 
@@ -126,8 +127,8 @@ public class TransverseMercatorTest {
 
         mercator.inverse(point);
 
-        final double lonActual = point.x;
-        final double latActual = point.y;
+        final double lonActual = Math.toDegrees(point.x);
+        final double latActual = Math.toDegrees(point.y);
         assertDms(monumentId + "\tlon", longitudeDegrees, longitudeMinutes, longitudeSeconds,
           lonActual, DP_5);
         assertDms(monumentId + "\tlat", latitudeDegrees, latitudeMinutes, latitudeSeconds,
@@ -184,7 +185,8 @@ public class TransverseMercatorTest {
           projectionById.put(utmReferenceMeridian, mercator);
         }
 
-        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(x, y);
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(Math.toRadians(lon),
+          Math.toRadians(lat));
 
         mercator.project(point);
 
@@ -195,8 +197,8 @@ public class TransverseMercatorTest {
 
         mercator.inverse(point);
 
-        final double lonActual = point.x;
-        final double latActual = point.y;
+        final double lonActual = Math.toDegrees(point.x);
+        final double latActual = Math.toDegrees(point.y);
         assertDms(monumentId + "\tlon", longitudeDegrees, longitudeMinutes, longitudeSeconds,
           lonActual, DP_4);
         assertDms(monumentId + "\tlat", latitudeDegrees, latitudeMinutes, latitudeSeconds,

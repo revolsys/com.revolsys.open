@@ -50,10 +50,10 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
 
   default int getFieldIndex(final CharSequence fieldName) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition == null) {
+    if (recordDefinition == null || fieldName == null) {
       return -1;
     } else {
-      return recordDefinition.getFieldIndex(fieldName);
+      return recordDefinition.getFieldIndex(fieldName.toString());
     }
   }
 

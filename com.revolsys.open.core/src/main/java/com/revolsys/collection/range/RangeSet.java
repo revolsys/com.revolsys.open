@@ -277,6 +277,28 @@ public class RangeSet extends AbstractSet<Object>
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  public <V> V getFrom() {
+    if (size() == 0) {
+      return null;
+    } else {
+      final AbstractRange<?> range = this.ranges.get(0);
+      final Object value = range.getFrom();
+      return (V)value;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V> V getTo() {
+    if (size() == 0) {
+      return null;
+    } else {
+      final AbstractRange<?> range = this.ranges.get(this.ranges.size() - 1);
+      final Object to = range.getTo();
+      return (V)to;
+    }
+  }
+
   public List<AbstractRange<?>> getRanges() {
     return new ArrayList<>(this.ranges);
   }

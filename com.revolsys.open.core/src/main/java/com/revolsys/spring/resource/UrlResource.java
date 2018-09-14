@@ -199,7 +199,8 @@ public class UrlResource extends AbstractResource {
           final URLConnection con = url.openConnection();
           customizeConnection(con);
           final HttpURLConnection httpCon = con instanceof HttpURLConnection
-            ? (HttpURLConnection)con : null;
+            ? (HttpURLConnection)con
+            : null;
           if (httpCon != null) {
             final int code = httpCon.getResponseCode();
             if (code == HttpURLConnection.HTTP_OK) {
@@ -340,12 +341,30 @@ public class UrlResource extends AbstractResource {
         final File file = getFile();
         return new FileInputStream(file);
       } else {
-        final URLConnection con = this.url.openConnection();
-        con.addRequestProperty("User-Agent",
-          "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2");
-        if (con instanceof HttpURLConnection) {
-          final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
-          setAuthorization(this.url, httpUrlConnection);
+        final URLConnection con;
+        if ("ftp".equals(this.url.getProtocol()) && this.username != null) {
+          final String protocol = this.url.getProtocol();
+          final String host = this.url.getHost();
+          final int port = this.url.getPort();
+          final String path = this.url.getPath();
+          final String query = this.url.getQuery();
+          final String fragment = this.url.getRef();
+          try {
+            final String userInfo = this.username.replace(":", "%3A") + ":"
+              + this.password.replace(":", "%3A");
+            final URI uri = new URI(protocol, userInfo, host, port, path, query, fragment);
+            con = uri.toURL().openConnection();
+          } catch (final Exception e) {
+            throw Exceptions.wrap("Error opening file: " + toString(), e);
+          }
+        } else {
+          con = this.url.openConnection();
+          con.addRequestProperty("User-Agent",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2");
+          if (con instanceof HttpURLConnection) {
+            final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
+            setAuthorization(this.url, httpUrlConnection);
+          }
         }
         // ResourceUtils.useCachesIfNecessary(con);
         try {

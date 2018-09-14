@@ -231,6 +231,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return this.createMissingCodes;
   }
 
+  @Override
   public boolean isLoadAll() {
     return this.loadAll;
   }
@@ -343,7 +344,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   protected List<Object> loadValues(final Object id) {
     if (this.loadAll && !isLoaded()) {
       loadAll();
-    } else {
+    } else if (!this.loadAll || this.loadMissingCodes) {
       try {
         final Record code;
         if (id instanceof Identifier) {

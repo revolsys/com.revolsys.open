@@ -69,8 +69,7 @@ public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchem
    * @param name The field name.
    * @return The index.
    */
-  @Override
-  int getFieldIndex(CharSequence name);
+  int getFieldIndex(String name);
 
   /**
    * Get the maximum length of the field.

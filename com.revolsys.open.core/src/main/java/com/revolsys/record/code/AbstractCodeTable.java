@@ -144,7 +144,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
           } else {
             final Identifier identifier = Identifier.newIdentifier(id);
             final Object value = getValue(identifier);
-            if (value != id) {
+            if (value != null && value != id) {
               return this.stringIdMap.get(lowerId);
             }
           }

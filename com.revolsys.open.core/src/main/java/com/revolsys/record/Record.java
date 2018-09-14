@@ -746,15 +746,12 @@ public interface Record
    */
 
   @Override
-  @SuppressWarnings("unchecked")
   default <T extends Object> T getValue(final CharSequence name) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    try {
-      final int index = recordDefinition.getFieldIndex(name);
-      return (T)getValue(index);
-    } catch (final NullPointerException e) {
-      Logs.warn(this, "Field " + recordDefinition.getPath() + "." + name + " does not exist", e);
+    if (name == null) {
       return null;
+    } else {
+      final String nameString = name.toString();
+      return getValue(nameString);
     }
   }
 
@@ -778,6 +775,25 @@ public interface Record
   default <T extends Object> T getValue(final int index, final DataType dataType) {
     final Object value = getValue(index);
     return dataType.toObject(value);
+  }
+
+  /**
+   * Get the value of the field with the specified name.
+   *
+   * @param name The name of the field.
+   * @return The field value.
+   */
+
+  @SuppressWarnings("unchecked")
+  default <T extends Object> T getValue(final String name) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    try {
+      final int index = recordDefinition.getFieldIndex(name);
+      return (T)getValue(index);
+    } catch (final NullPointerException e) {
+      Logs.warn(this, "Field " + recordDefinition.getPath() + "." + name + " does not exist", e);
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")
