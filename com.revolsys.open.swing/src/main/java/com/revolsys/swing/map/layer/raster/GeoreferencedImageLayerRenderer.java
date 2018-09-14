@@ -16,8 +16,8 @@ public class GeoreferencedImageLayerRenderer
   }
 
   @Override
-  public void render(final ViewRenderer viewport, final GeoreferencedImageLayer layer) {
-    final double scaleForVisible = viewport.getScaleForVisible();
+  public void render(final ViewRenderer view, final GeoreferencedImageLayer layer) {
+    final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
         final GeoreferencedImage image = layer.getImage();
@@ -26,12 +26,12 @@ public class GeoreferencedImageLayerRenderer
           if (boundingBox == null || boundingBox.isEmpty()) {
             boundingBox = layer.fitToViewport();
           }
-          if (!viewport.isCancelled()) {
-            viewport.drawImage(image, true, layer.getOpacity() / 255.0,
+          if (!view.isCancelled()) {
+            view.drawImage(image, true, layer.getOpacity() / 255.0,
               RenderingHints.VALUE_INTERPOLATION_BILINEAR);
           }
-          if (!viewport.isCancelled()) {
-            viewport.drawDifferentCoordinateSystem(boundingBox);
+          if (!view.isCancelled()) {
+            view.drawDifferentCoordinateSystem(boundingBox);
           }
         }
       }

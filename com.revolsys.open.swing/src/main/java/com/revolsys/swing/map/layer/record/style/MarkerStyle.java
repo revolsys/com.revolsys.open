@@ -413,7 +413,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     }
   }
 
-  public boolean setMarkerFillStyle(final ViewRenderer viewport, final Graphics2D graphics) {
+  public boolean setMarkerFillStyle(final ViewRenderer view, final Graphics2D graphics) {
     if (this.markerFill.getAlpha() == 0) {
       return false;
     } else {

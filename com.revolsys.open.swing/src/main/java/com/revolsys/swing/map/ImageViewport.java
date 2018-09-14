@@ -28,8 +28,7 @@ public class ImageViewport extends Graphics2DViewport {
   }
 
   public ImageViewport(final Viewport2D parentViewport) {
-    this(parentViewport.getProject(), parentViewport.getViewWidthPixels(),
-      parentViewport.getViewHeightPixels(), parentViewport.getBoundingBox());
+    this(parentViewport, BufferedImage.TYPE_INT_ARGB_PRE);
   }
 
   public ImageViewport(final Viewport2D parentViewport, final int imageType) {

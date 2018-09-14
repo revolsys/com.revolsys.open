@@ -96,17 +96,17 @@ public class ArcGisRestServerTileCacheLayer
   }
 
   @Override
-  public List<ArcGisRestServerTileCacheMapTile> getOverlappingMapTiles(final ViewRenderer viewport) {
+  public List<ArcGisRestServerTileCacheMapTile> getOverlappingMapTiles(final ViewRenderer view) {
     final List<ArcGisRestServerTileCacheMapTile> tiles = new ArrayList<>();
     final MapService mapService = getMapService();
     if (mapService != null) {
       if (!isHasError()) {
         try {
-          final double metresPerPixel = viewport.getMetresPerPixel();
+          final double metresPerPixel = view.getMetresPerPixel();
           final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
-          final double resolution = getResolution(viewport);
+          final double resolution = getResolution(view);
           if (resolution > 0) {
-            final BoundingBox viewBoundingBox = viewport.getBoundingBox();
+            final BoundingBox viewBoundingBox = view.getBoundingBox();
             final BoundingBox maxBoundingBox = getBoundingBox();
             final BoundingBox boundingBox = viewBoundingBox.bboxToCs(this.geometryFactory)
               .bboxIntersection(maxBoundingBox);
@@ -138,12 +138,12 @@ public class ArcGisRestServerTileCacheLayer
   }
 
   @Override
-  public double getResolution(final ViewRenderer viewport) {
+  public double getResolution(final ViewRenderer view) {
     final MapService mapService = getMapService();
     if (mapService == null) {
       return 0;
     } else {
-      final double metresPerPixel = viewport.getMetresPerPixel();
+      final double metresPerPixel = view.getMetresPerPixel();
       final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
       return mapService.getResolution(zoomLevel);
     }

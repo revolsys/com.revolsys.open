@@ -17,6 +17,7 @@ import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelStylePanel;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelZRange;
+import com.revolsys.swing.map.layer.elevation.gridded.TiledGriddedElevationModelLayer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
@@ -87,6 +88,8 @@ public class RasterizerGriddedElevationModelLayerRenderer
 
   private float opacity = 1;
 
+  private boolean redrawInBackground = false;
+
   private RasterizerGriddedElevationModelLayerRenderer() {
     super("rasterizerGriddedElevationModelLayerRenderer", "DEM Style");
   }
@@ -153,9 +156,9 @@ public class RasterizerGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final ViewRenderer viewport, final ElevationModelLayer layer) {
+  public void render(final ViewRenderer view, final ElevationModelLayer layer) {
     // TODO cancel
-    final double scaleForVisible = viewport.getScaleForVisible();
+    final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
         final GriddedElevationModel elevationModel = getElevationModel();
@@ -180,12 +183,14 @@ public class RasterizerGriddedElevationModelLayerRenderer
               this.redraw = true;
             }
           }
-
-          if (this.image.hasImage() && !(this.image.isCached() && this.redraw)) {
+          if (!this.redrawInBackground) {
+            this.image.redraw();
+          }
+          if (!this.redrawInBackground
+            || this.image.hasImage() && !(this.image.isCached() && this.redraw)) {
             final BoundingBox boundingBox = layer.getBoundingBox();
-            final Object interpolationMethod = null;
-            viewport.drawImage(this.image, true, this.opacity, interpolationMethod);
-            viewport.drawDifferentCoordinateSystem(boundingBox);
+            view.drawImage(this.image, true, this.opacity, null);
+            view.drawDifferentCoordinateSystem(boundingBox);
           } else {
             synchronized (this) {
               if (this.redraw && this.worker == null) {
@@ -218,6 +223,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
 
   @Override
   public void setLayer(final ElevationModelLayer layer) {
+    this.redrawInBackground = !(layer instanceof TiledGriddedElevationModelLayer);
     super.setLayer(layer);
     if (this.rasterizer != null) {
       this.rasterizer.updateValues();

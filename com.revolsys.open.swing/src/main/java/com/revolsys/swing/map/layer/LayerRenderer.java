@@ -62,7 +62,7 @@ public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
   default void refresh() {
   }
 
-  void render(ViewRenderer viewport);
+  void render(ViewRenderer view);
 
   void setEditing(boolean editing);
 

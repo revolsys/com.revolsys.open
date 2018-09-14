@@ -81,11 +81,11 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public void renderRecord(final ViewRenderer viewport, final BoundingBox visibleArea,
+  public void renderRecord(final ViewRenderer view, final BoundingBox visibleArea,
     final AbstractRecordLayer layer, final LayerRecord record) {
     if (isVisible(record)) {
       final Geometry geometry = record.getGeometry();
-      viewport.drawMarker(geometry, this.style);
+      view.drawMarker(geometry, this.style);
     }
   }
 

@@ -60,13 +60,13 @@ public class WebMercatorTileCacheLayer
   }
 
   @Override
-  public List<WebMercatorTileCacheMapTile> getOverlappingMapTiles(final ViewRenderer viewport) {
+  public List<WebMercatorTileCacheMapTile> getOverlappingMapTiles(final ViewRenderer view) {
     final List<WebMercatorTileCacheMapTile> tiles = new ArrayList<>();
     try {
-      final double metresPerPixel = viewport.getMetresPerPixel();
+      final double metresPerPixel = view.getMetresPerPixel();
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
-      final double resolution = getResolution(viewport);
-      final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
+      final double resolution = getResolution(view);
+      final BoundingBox geographicBoundingBox = view.getBoundingBox()
         .bboxToCs(GEOMETRY_FACTORY)
         .bboxIntersection(MAX_BOUNDING_BOX);
       final double minX = geographicBoundingBox.getMinX();
@@ -95,8 +95,8 @@ public class WebMercatorTileCacheLayer
   }
 
   @Override
-  public double getResolution(final ViewRenderer viewport) {
-    final double metresPerPixel = viewport.getMetresPerPixel();
+  public double getResolution(final ViewRenderer view) {
+    final double metresPerPixel = view.getMetresPerPixel();
     final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
     return this.client.getResolution(zoomLevel);
   }

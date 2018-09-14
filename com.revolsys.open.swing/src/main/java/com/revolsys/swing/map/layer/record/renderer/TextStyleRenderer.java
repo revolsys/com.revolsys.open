@@ -89,10 +89,10 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public void renderRecord(final ViewRenderer viewport, final BoundingBox visibleArea,
+  public void renderRecord(final ViewRenderer view, final BoundingBox visibleArea,
     final AbstractRecordLayer layer, final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
-    viewport.drawText(record, geometry, this.style);
+    view.drawText(record, geometry, this.style);
   }
 
   @Override

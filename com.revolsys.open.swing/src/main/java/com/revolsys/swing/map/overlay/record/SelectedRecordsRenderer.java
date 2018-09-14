@@ -24,13 +24,13 @@ public class SelectedRecordsRenderer {
     setStyleColor(color);
   }
 
-  public void paintSelected(final ViewRenderer viewport,
-    final GeometryFactory viewportGeometryFactory, Geometry geometry) {
-    geometry = viewport.getGeometry(geometry);
+  public void paintSelected(final ViewRenderer view, final GeometryFactory viewportGeometryFactory,
+    Geometry geometry) {
+    geometry = view.getGeometry(geometry);
     if (Property.hasValue(geometry)) {
-      viewport.drawGeometry(geometry, this.highlightStyle);
+      view.drawGeometry(geometry, this.highlightStyle);
       if (!(geometry instanceof Punctual)) {
-        viewport.drawGeometryOutline(geometry, this.lineStyle);
+        view.drawGeometryOutline(geometry, this.lineStyle);
       }
     }
   }

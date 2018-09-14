@@ -172,14 +172,13 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final ViewRenderer viewport, final ElevationModelLayer layer) {
+  public void render(final ViewRenderer view, final ElevationModelLayer layer) {
     final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
-    for (final AbstractGriddedElevationModelLayerRenderer renderer : viewport
-      .cancellable(renderers)) {
+    for (final AbstractGriddedElevationModelLayerRenderer renderer : view.cancellable(renderers)) {
       try {
-        final long scaleForVisible = (long)viewport.getScaleForVisible();
+        final long scaleForVisible = (long)view.getScaleForVisible();
         if (renderer.isVisible(scaleForVisible)) {
-          renderer.render(viewport, layer);
+          renderer.render(view, layer);
         }
       } catch (final Exception e) {
         Logs.error(this, "Unable to render:" + renderer, e);

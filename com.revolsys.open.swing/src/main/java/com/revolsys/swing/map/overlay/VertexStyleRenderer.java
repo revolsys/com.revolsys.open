@@ -36,7 +36,7 @@ public class VertexStyleRenderer {
     this.toVertexStyle.setMarkerHorizontalAlignment("right");
   }
 
-  public void paintSelected(final ViewRenderer viewport, final Graphics2D graphics,
+  public void paintSelected(final ViewRenderer view, final Graphics2D graphics,
     final GeometryFactory viewportGeometryFactory, final Vertex vertex) {
     if (Property.hasValue(vertex)) {
       MarkerStyle style;
@@ -48,7 +48,7 @@ public class VertexStyleRenderer {
         style = this.vertexStyle;
       }
       final double orientation = vertex.getOrientaton();
-      viewport.drawMarker(vertex, style, orientation);
+      view.drawMarker(vertex, style, orientation);
     }
   }
 }

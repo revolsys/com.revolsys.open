@@ -83,17 +83,17 @@ public class SelectedRecordsVertexRenderer {
     this.lastVertexStyle.setMarkerHorizontalAlignment("right");
   }
 
-  public void paintSelected(final ViewRenderer viewport, final Graphics2D graphics,
+  public void paintSelected(final ViewRenderer view, final Graphics2D graphics,
     final GeometryFactory viewportGeometryFactory, Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
-      geometry = viewport.getGeometry(geometry);
+      geometry = view.getGeometry(geometry);
 
-      viewport.drawGeometryOutline(geometry, this.highlightStyle);
+      view.drawGeometryOutline(geometry, this.highlightStyle);
 
       if (!geometry.isEmpty()) {
         final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
         for (final LineString line : lines) {
-          viewport.drawMarkers(line, this.firstVertexStyle, this.lastVertexStyle, this.vertexStyle);
+          view.drawMarkers(line, this.firstVertexStyle, this.lastVertexStyle, this.vertexStyle);
         }
       }
     }

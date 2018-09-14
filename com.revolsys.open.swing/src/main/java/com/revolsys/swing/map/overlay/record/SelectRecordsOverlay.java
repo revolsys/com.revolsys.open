@@ -48,6 +48,7 @@ import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 import com.revolsys.value.ThreadBooleanValue;
 
@@ -300,11 +301,11 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     repaint();
   }
 
-  private void refreshImageRenderer(final ViewRenderer viewport, final LayerGroup layerGroup) {
+  private void refreshImageRenderer(final ViewRenderer view, final LayerGroup layerGroup) {
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        refreshImageRenderer(viewport, childGroup);
+        refreshImageRenderer(view, childGroup);
       } else if (layer instanceof AbstractRecordLayer) {
         final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
         final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
@@ -313,7 +314,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           for (final LayerRecord record : selectedRecords) {
             if (record != null && recordLayer.isVisible(record)) {
               if (!recordLayer.isDeleted(record)) {
-                layerRenderer.renderSelectedRecord(viewport, recordLayer, record);
+                layerRenderer.renderSelectedRecord(view, recordLayer, record);
               }
             }
           }
@@ -322,7 +323,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
-  private GeoreferencedImage refreshImageSelected() {
+  private GeoreferencedImage refreshImageSelected(final Cancellable cancellable) {
     final Viewport2D viewport = getViewport();
     if (viewport != null) {
       final int width = viewport.getViewWidthPixels();
@@ -342,14 +343,14 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     return null;
   }
 
-  private void refreshImageSelectedAndHighlighted(final ViewRenderer viewport,
+  private void refreshImageSelectedAndHighlighted(final ViewRenderer view,
     final LayerGroup layerGroup) {
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();
     final List<Geometry> highlightedGeometries = new ArrayList<>();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        refreshImageSelectedAndHighlighted(viewport, childGroup);
+        refreshImageSelectedAndHighlighted(view, childGroup);
       } else if (layer instanceof AbstractRecordLayer) {
         final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
         if (recordLayer.isSelectable()) {
@@ -361,7 +362,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
                 if (recordLayer.isHighlighted(record)) {
                   highlightedGeometries.add(geometry);
                 } else {
-                  this.selectRenderer.paintSelected(viewport, viewportGeometryFactory, geometry);
+                  this.selectRenderer.paintSelected(view, viewportGeometryFactory, geometry);
                 }
               }
             }
@@ -370,7 +371,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       }
     }
     for (final Geometry geometry : highlightedGeometries) {
-      this.highlightRenderer.paintSelected(viewport, viewportGeometryFactory, geometry);
+      this.highlightRenderer.paintSelected(view, viewportGeometryFactory, geometry);
     }
   }
 
