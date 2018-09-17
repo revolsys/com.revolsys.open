@@ -398,7 +398,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   public long getZoomInScale(final double scale, final int steps) {
     final List<Long> values = this.scales;
-    final long scaleCeil = (long)Math.floor(scale);
+    final long scaleCeil = Math.round(scale);
     for (int i = 0; i < values.size(); i++) {
       long nextScale = values.get(i);
       if (nextScale < scaleCeil) {
@@ -439,7 +439,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   public long getZoomOutScale(final double scale, final int steps) {
-    final long scaleCeil = (long)Math.floor(scale);
+    final long scaleCeil = Math.round(scale);
     for (int i = this.scales.size() - 1; i >= 0; i--) {
       long nextScale = this.scales.get(i);
       if (nextScale > scaleCeil) {
