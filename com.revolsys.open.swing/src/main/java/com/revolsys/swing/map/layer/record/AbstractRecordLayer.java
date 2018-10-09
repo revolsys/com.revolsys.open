@@ -1854,7 +1854,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               if (getRecordDefinition().hasField(fieldName)) {
                 return true;
               }
-            } else if (canPasteGeometry()) {
+            }
+            if (canPasteGeometry()) {
               return true;
             }
           }
