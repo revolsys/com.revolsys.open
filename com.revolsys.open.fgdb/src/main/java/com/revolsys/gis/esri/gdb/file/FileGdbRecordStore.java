@@ -1360,8 +1360,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                       geodatabase.createFeatureDataset(datasetDefinition);
                     } catch (final Throwable t) {
                       Logs.debug(this, datasetDefinition);
-                      throw new RuntimeException(
-                        "Unable to create feature dataset " + childCatalogPath, t);
+                      throw Exceptions.wrap("Unable to create feature dataset " + childCatalogPath,
+                        t);
                     }
                   }
                 }

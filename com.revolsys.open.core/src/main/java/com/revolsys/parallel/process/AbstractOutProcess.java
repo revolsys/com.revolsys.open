@@ -80,14 +80,15 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements O
    * @param out the out to set
    */
   @Override
-  public void setOut(final Channel<T> out) {
+  public AbstractOutProcess<T> setOut(final Channel<T> out) {
     this.out = out;
     out.writeConnect();
-
+    return this;
   }
 
-  public void setOutBufferSize(final int outBufferSize) {
+  public AbstractOutProcess<T> setOutBufferSize(final int outBufferSize) {
     this.outBufferSize = outBufferSize;
+    return this;
   }
 
 }

@@ -658,14 +658,6 @@ public interface Property {
     return false;
   }
 
-  static boolean hasValue(final Collection<?> collection) {
-    if (collection == null || collection.isEmpty()) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
   static boolean hasValue(final Emptyable value) {
     if (value == null) {
       return false;

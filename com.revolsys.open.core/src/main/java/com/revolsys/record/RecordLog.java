@@ -1,5 +1,6 @@
 package com.revolsys.record;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,9 +13,11 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.logging.Logs;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class RecordLog implements BaseCloseable {
   private static final String LOG_MESSAGE = "LOG_MESSAGE";
@@ -62,6 +65,13 @@ public class RecordLog implements BaseCloseable {
     this.usesLocality = usesLocality;
   }
 
+  public RecordLog(final Path path, final RecordDefinitionProxy recordDefinition,
+    final boolean usesLocality) {
+    this.usesLocality = usesLocality;
+    final RecordDefinition logRecordDefinition = getLogRecordDefinition(recordDefinition);
+    this.writer = RecordWriter.newRecordWriter(logRecordDefinition, path);
+  }
+
   public RecordLog(final Writer<Record> writer) {
     this.writer = writer;
   }
@@ -101,10 +111,11 @@ public class RecordLog implements BaseCloseable {
     return logRecordDefinition;
   }
 
-  public RecordDefinition getLogRecordDefinition(final RecordDefinition recordDefinition) {
-    RecordDefinitionImpl logRecordDefinition = this.logRecordDefinitionMap.get(recordDefinition);
+  public RecordDefinition getLogRecordDefinition(final RecordDefinitionProxy recordDefinition) {
+    final RecordDefinition recordDefinition2 = recordDefinition.getRecordDefinition();
+    RecordDefinitionImpl logRecordDefinition = this.logRecordDefinitionMap.get(recordDefinition2);
     if (logRecordDefinition == null) {
-      final String path = recordDefinition.getPath();
+      final String path = recordDefinition2.getPath();
       final String parentPath = PathUtil.getPath(path);
       final String tableName = PathUtil.getName(path);
       final String logTableName;
@@ -119,17 +130,17 @@ public class RecordLog implements BaseCloseable {
         logRecordDefinition.addField(LOG_LOCALITY, DataTypes.STRING, 255, false);
       }
       logRecordDefinition.addField(LOG_MESSAGE, DataTypes.STRING, 255, true);
-      for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+      for (final FieldDefinition fieldDefinition : recordDefinition2.getFields()) {
         final FieldDefinition logFieldDefinition = new FieldDefinition(fieldDefinition);
         final DataType dataType = logFieldDefinition.getDataType();
-        if (recordDefinition.getGeometryField() == fieldDefinition) {
+        if (recordDefinition2.getGeometryField() == fieldDefinition) {
           logRecordDefinition.addField("GEOMETRY", dataType);
         } else {
           logRecordDefinition.addField(new FieldDefinition(fieldDefinition));
         }
       }
-      logRecordDefinition.setGeometryFactory(recordDefinition.getGeometryFactory());
-      this.logRecordDefinitionMap.put(recordDefinition, logRecordDefinition);
+      logRecordDefinition.setGeometryFactory(recordDefinition2.getGeometryFactory());
+      this.logRecordDefinitionMap.put(recordDefinition2, logRecordDefinition);
     }
     return logRecordDefinition;
   }

@@ -158,6 +158,10 @@ public class LabelCountMap {
     return this.message;
   }
 
+  public boolean isEmpty() {
+    return this.counterByLabel.isEmpty();
+  }
+
   public boolean isLogCounts() {
     return this.logCounts;
   }

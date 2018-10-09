@@ -175,6 +175,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
     return !DataType.equal(originalValue, value);
   }
 
+  @Override
   public TablePanel newTablePanel() {
     final LayerRecordForm form = this.form.get();
     final BaseJTable table = AbstractSingleRecordTableModel.newTable(this);
@@ -196,7 +197,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
 
     toolBar.addComponent("default", this.fieldNamesSetNamesField);
 
-    toolBar.addButtonTitleIcon("default", "Edit Field Sets", "fields_filter_edit", () -> {
+    toolBar.addButtonTitleIcon("default", "Edit Field Sets", "fields_filter:edit", () -> {
       final String fieldNamesSetName = FieldNamesSetPanel.showDialog(this.layer);
       if (Property.hasValue(fieldNamesSetName)) {
         this.fieldNamesSetNamesField.setFieldValue(fieldNamesSetName);

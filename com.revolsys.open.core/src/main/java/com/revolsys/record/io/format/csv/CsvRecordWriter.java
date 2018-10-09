@@ -23,7 +23,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private final RecordDefinition recordDefinition;
 
-  private final boolean useQuotes;
+  private boolean useQuotes;
 
   private boolean paused = false;
 
@@ -119,6 +119,10 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     }
   }
 
+  public void setUseQuotes(final boolean useQuotes) {
+    this.useQuotes = useQuotes;
+  }
+
   private void string(final Object value) throws IOException {
     final Writer out = this.out;
     if (out != null) {
@@ -177,7 +181,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
           } else if (value != null) {
             final DataType dataType = field.getDataType();
             final String stringValue = dataType.toString(value);
-            if (dataType.isRequiresQuotes()) {
+            if (this.useQuotes && dataType.isRequiresQuotes()) {
               string(stringValue);
             } else {
               out.write(stringValue, 0, stringValue.length());

@@ -7,7 +7,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 
 public class LabelCountWriter extends AbstractRecordWriter {
-  private LabelCountMap labelCountMap;
+  private LabelCountMap counts;
 
   private Writer<Record> writer;
 
@@ -21,7 +21,7 @@ public class LabelCountWriter extends AbstractRecordWriter {
   @Override
   public void close() {
     this.writer.close();
-    this.labelCountMap.disconnect();
+    this.counts.disconnect();
   }
 
   @Override
@@ -30,10 +30,10 @@ public class LabelCountWriter extends AbstractRecordWriter {
   }
 
   /**
-   * @return the labelCountMap
+   * @return the counts
    */
-  public LabelCountMap getLabelCountMap() {
-    return this.labelCountMap;
+  public LabelCountMap getCounts() {
+    return this.counts;
   }
 
   public Writer<Record> getWriter() {
@@ -42,21 +42,23 @@ public class LabelCountWriter extends AbstractRecordWriter {
 
   @PostConstruct
   public void init() {
-    if (this.labelCountMap == null) {
-      setLabelCountMap(new LabelCountMap("Write " + this.writer));
+    if (this.counts == null) {
+      setCounts(new LabelCountMap("Write " + this.writer));
     }
-    this.labelCountMap.connect();
+    this.counts.connect();
   }
 
   /**
    * @param labelCountMap the labelCountMap to set
    */
-  public void setLabelCountMap(final LabelCountMap labelCountMap) {
-    this.labelCountMap = labelCountMap;
+  public LabelCountWriter setCounts(final LabelCountMap labelCountMap) {
+    this.counts = labelCountMap;
+    return this;
   }
 
-  public void setWriter(final Writer<Record> writer) {
+  public LabelCountWriter setWriter(final Writer<Record> writer) {
     this.writer = writer;
+    return this;
   }
 
   @Override
@@ -68,7 +70,7 @@ public class LabelCountWriter extends AbstractRecordWriter {
   public void write(final Record object) {
     if (object != null) {
       this.writer.write(object);
-      this.labelCountMap.addCount(object);
+      this.counts.addCount(object);
     }
   }
 }

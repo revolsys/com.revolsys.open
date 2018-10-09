@@ -73,6 +73,7 @@ public interface QueryValue extends Cloneable {
   }
 
   static BoundingBox getBoundingBox(final QueryValue queryValue) {
+    boolean hasBbox = false;
     final BoundingBoxEditor boundingBox = new BoundingBoxEditor();
     if (queryValue != null) {
       for (final QueryValue childValue : queryValue.getQueryValues()) {
@@ -80,6 +81,7 @@ public interface QueryValue extends Cloneable {
           final EnvelopeIntersects intersects = (EnvelopeIntersects)childValue;
           final BoundingBox boundingBox1 = getBoundingBox(intersects.getBoundingBox1Value());
           final BoundingBox boundingBox2 = getBoundingBox(intersects.getBoundingBox2Value());
+          hasBbox = true;
           boundingBox.addAllBbox(boundingBox1, boundingBox2);
         } else if (childValue instanceof WithinDistance) {
           final WithinDistance withinDistance = (WithinDistance)childValue;
@@ -90,17 +92,23 @@ public interface QueryValue extends Cloneable {
           final double distance = ((Number)((Value)withinDistance.getDistanceValue()).getValue())
             .doubleValue();
 
+          hasBbox = true;
           boundingBox.addBbox(withinBoundingBox.expandDelta(distance));
         } else if (childValue instanceof Value) {
           final Value valueContainer = (Value)childValue;
           final Object value = valueContainer.getValue();
           if (value instanceof BoundingBoxProxy) {
+            hasBbox = true;
             boundingBox.addBbox((BoundingBox)value);
           }
         }
       }
     }
-    return boundingBox;
+    if (hasBbox) {
+      return boundingBox;
+    } else {
+      return null;
+    }
   }
 
   static Condition parseWhere(final RecordDefinition recordDefinition, final String whereClause) {

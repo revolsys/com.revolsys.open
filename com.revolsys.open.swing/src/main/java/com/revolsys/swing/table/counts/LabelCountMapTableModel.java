@@ -53,7 +53,7 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   }
 
   public void addCount(final CharSequence label, final CharSequence countName, final long count) {
-    if (label != null && countName != null) {
+    if (label != null && countName != null && count != 0) {
       final LabelCountMap labelCountMap = getLabelCountMap(label, countName);
       labelCountMap.addCount(label, count);
     }
@@ -150,6 +150,16 @@ public class LabelCountMapTableModel extends AbstractTableModel {
     return this.categoryLabelCountMap.getCount(countName, label);
   }
 
+  public Long getCount(final CharSequence label, final CharSequence countName,
+    final long defaultValue) {
+    final Long count = this.categoryLabelCountMap.getCount(countName, label);
+    if (count == null) {
+      return defaultValue;
+    } else {
+      return count;
+    }
+  }
+
   public Counter getCounter(final CharSequence label, final CharSequence countName) {
     final LabelCountMap labelCountMap = getLabelCountMap(label, countName);
     return labelCountMap.getCounter(label);
@@ -214,6 +224,7 @@ public class LabelCountMapTableModel extends AbstractTableModel {
     newTypePathRow(label);
   }
 
+  @Override
   public BaseJTable newTable() {
     final BaseJTable table = new BaseJTable(this);
     setTable(table);

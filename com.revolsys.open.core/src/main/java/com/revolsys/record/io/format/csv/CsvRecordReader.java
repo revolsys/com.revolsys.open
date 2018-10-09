@@ -12,6 +12,7 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordReader;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class CsvRecordReader extends AbstractRecordReader {
@@ -88,7 +89,9 @@ public class CsvRecordReader extends AbstractRecordReader {
       this.in = this.resource.newBufferedReader();
       final List<String> line = readNextRow();
       final String baseName = this.resource.getBaseName();
-      newRecordDefinition(baseName, line);
+      if (getRecordDefinition() == null) {
+        newRecordDefinition(baseName, line);
+      }
     } catch (final IOException e) {
       Logs.error(this, "Unable to open " + this.resource, e);
     } catch (final NoSuchElementException e) {
@@ -210,6 +213,11 @@ public class CsvRecordReader extends AbstractRecordReader {
       addValue(values, sb, hadQuotes);
     }
     return values;
+  }
+
+  @Override
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    super.setRecordDefinition(recordDefinition);
   }
 
 }

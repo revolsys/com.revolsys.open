@@ -15,11 +15,17 @@ import javax.annotation.PreDestroy;
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.Logs;
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
-import com.revolsys.parallel.ThreadUtil;
+import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.spring.TargetBeanProcess;
 
 public class ProcessNetwork {
+
+  private static ThreadLocal<ProcessNetwork> PROCESS_NETWORK = new ThreadLocal<>();
+
+  public static ProcessNetwork forThread() {
+    return PROCESS_NETWORK.get();
+  }
 
   public static void processTasks(final int processCount, final Channel<Runnable> tasks) {
     final ProcessNetwork processNetwork = new ProcessNetwork();
@@ -47,9 +53,16 @@ public class ProcessNetwork {
     processNetwork.startAndWait();
   }
 
-  public static void startAndWait(final Runnable... processes) {
-    final ProcessNetwork processNetwork = new ProcessNetwork(processes);
-    processNetwork.startAndWait();
+  public static void startAndWait(final Runnable initializer) {
+    final ProcessNetwork saved = PROCESS_NETWORK.get();
+    try {
+      final ProcessNetwork processNetwork = new ProcessNetwork();
+      PROCESS_NETWORK.set(processNetwork);
+      initializer.run();
+      processNetwork.startAndWait();
+    } finally {
+      PROCESS_NETWORK.set(saved);
+    }
   }
 
   private boolean autoStart;
@@ -237,9 +250,20 @@ public class ProcessNetwork {
           } else {
             runProcess = process;
           }
-          final Runnable runnable = new ProcessRunnable(this, runProcess);
           final String name = runProcess.toString();
-          final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(runnable);
+          final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(() -> {
+            try {
+              runProcess.run();
+            } catch (final Throwable e) {
+              Logs.error(this, e);
+            } finally {
+              try {
+                removeProcess(runProcess);
+              } finally {
+                runProcess.close();
+              }
+            }
+          });
           thread = new Thread(this.threadGroup, appenderRunnable, name);
           this.processes.put(runProcess, thread);
           if (!thread.isAlive()) {
@@ -319,7 +343,11 @@ public class ProcessNetwork {
       synchronized (this.sync) {
         try {
           while (!this.stopping && this.count > 0) {
-            ThreadUtil.pause(this.sync);
+            try {
+              this.sync.wait();
+            } catch (final InterruptedException e) {
+              throw new ThreadInterruptedException(e);
+            }
           }
         } finally {
           finishRunning();

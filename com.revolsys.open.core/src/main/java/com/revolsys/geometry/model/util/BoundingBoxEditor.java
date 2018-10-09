@@ -282,6 +282,10 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
           final double minY = this.minY;
           final double maxX = this.maxX;
           final double maxY = this.maxY;
+          final double width = getWidth();
+          final double height = getHeight();
+          final double scaleX = this.geometryFactory.getScaleX();
+          final double scaleY = this.geometryFactory.getScaleY();
           clear();
           final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
           this.geometryFactory = geometryFactory.getGeometryFactory();
@@ -292,15 +296,13 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
             }
           }
 
-          double xStep = getWidth() / 10;
-          double yStep = getHeight() / 10;
-          final double scaleX = this.geometryFactory.getScaleX();
+          double xStep = width / 10;
+          double yStep = height / 10;
           if (scaleX > 0) {
             if (xStep < 1 / scaleX) {
               xStep = 1 / scaleX;
             }
           }
-          final double scaleY = this.geometryFactory.getScaleY();
           if (scaleY > 0) {
             if (yStep < 1 / scaleY) {
               yStep = 1 / scaleY;

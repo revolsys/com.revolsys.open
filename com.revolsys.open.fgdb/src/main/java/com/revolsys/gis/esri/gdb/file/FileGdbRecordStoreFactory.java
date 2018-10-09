@@ -67,6 +67,12 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
     }
   }
 
+  public static FileGdbRecordStore newRecordStoreInitialized(final Path path) {
+    final FileGdbRecordStore recordStore = newRecordStore(path);
+    recordStore.initialize();
+    return recordStore;
+  }
+
   /**
    * Release the record store for the file. Decrements the count of references to the file. If
    * the count <=0 then the record store will be removed.

@@ -58,7 +58,7 @@ public class CharRange extends AbstractRange<Character> {
   public AbstractRange<?> expand(final Object value) {
     if (value instanceof Character) {
       final Character character = (Character)value;
-      return expand(character);
+      return super.expand(character);
     } else if (value instanceof String) {
       final String string = (String)value;
       if (string.length() == 1) {
