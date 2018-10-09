@@ -258,7 +258,12 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     } else {
       name = schemaName.substring(slashIndex + 1);
     }
-    dataset.setCatalogPath("\\" + schemaName);
+    if (schemaName.startsWith("\\")) {
+      dataset.setCatalogPath(schemaName);
+    } else {
+      dataset.setCatalogPath("\\" + schemaName);
+    }
+
     dataset.setName(name);
 
     final EnvelopeN envelope = new EnvelopeN(spatialReference);

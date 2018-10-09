@@ -6,16 +6,8 @@ public class ThreadUtil {
     return Thread.currentThread().isInterrupted();
   }
 
-  public static void pause() {
-    pause(new Object());
-  }
-
   public static void pause(final long milliSeconds) {
     pause(new Object(), milliSeconds);
-  }
-
-  public static void pause(final long milliSeconds, final int nanoSeconds) {
-    pause(new Object(), milliSeconds, nanoSeconds);
   }
 
   public static void pause(final Object object) {

@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +59,33 @@ public interface Record
       return identifier1.compareTo(identifier2);
     }
   };
+
+  static boolean equalsNotNull(final List<Record> records1, List<Record> records2,
+    final Collection<String> excludeFieldNames) {
+    if (records1 == null) {
+      return records2 == null;
+    } else if (records2 == null) {
+      return false;
+    } else if (records1.size() == records2.size()) {
+      records2 = new LinkedList<>(records2);
+      for (final Record record1 : records1) {
+        boolean recordEqual = false;
+        for (final Record record2 : records2) {
+          if (record1.equalValuesExclude(record2, excludeFieldNames)) {
+            recordEqual = true;
+            records2.remove(record2);
+            break;
+          }
+        }
+        if (!recordEqual) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @SuppressWarnings({
     "unchecked", "rawtypes"
@@ -245,9 +273,14 @@ public interface Record
     } else {
       final int fieldIndex = fieldDefinition.getIndex();
       final Object fieldValue = getValue(fieldIndex);
-      final CodeTable codeTable = fieldDefinition.getCodeTable();
-      if (codeTable != null) {
-        value = codeTable.getIdentifier(value);
+      if (fieldValue != null) {
+        final CodeTable codeTable = fieldDefinition.getCodeTable();
+        if (codeTable != null) {
+          final Object codeValue = codeTable.getIdentifier(value);
+          if (codeValue != null) {
+            value = codeValue;
+          }
+        }
       }
       return fieldDefinition.equals(fieldValue, value);
     }
@@ -598,6 +631,11 @@ public interface Record
   @Override
   default Identifier getIdentifier(final CharSequence fieldName) {
     final Object value = getValue(fieldName);
+    return Identifier.newIdentifier(value);
+  }
+
+  default Identifier getIdentifier(final CharSequence fieldName, final DataType dataType) {
+    final Object value = getValue(fieldName, dataType);
     return Identifier.newIdentifier(value);
   }
 
@@ -1076,6 +1114,14 @@ public interface Record
     return -1;
   }
 
+  @SuppressWarnings("unchecked")
+  default <V> V setCodeValue(final String fieldName, final Record record,
+    final String fromFieldName) {
+    final Object value = record.getCodeValue(fromFieldName);
+    setValue(fieldName, value);
+    return (V)value;
+  }
+
   /**
    * Set the value of the primary geometry field.
    *
@@ -1317,6 +1363,24 @@ public interface Record
       final String name = fieldDefintion.getName();
       final Object value = record.getValue(name);
       fieldDefintion.setValueClone(this, value);
+    }
+  }
+
+  default void setValuesNotNull(final Record record) {
+    if (record != null) {
+      final List<FieldDefinition> idFields = getRecordDefinition().getIdFields();
+      final List<FieldDefinition> fields = getFieldDefinitions();
+      for (final FieldDefinition fieldDefintion : fields) {
+        if (!idFields.contains(fieldDefintion)) {
+          final String name = fieldDefintion.getName();
+          if (record.hasField(name)) {
+            final Object value = record.getValue(name);
+            if (value != null) {
+              fieldDefintion.setValue(this, value);
+            }
+          }
+        }
+      }
     }
   }
 

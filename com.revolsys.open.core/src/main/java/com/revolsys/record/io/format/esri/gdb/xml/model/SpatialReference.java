@@ -2,7 +2,6 @@ package com.revolsys.record.io.format.esri.gdb.xml.model;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class SpatialReference {
@@ -63,10 +62,9 @@ public class SpatialReference {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       if (coordinateSystem != null) {
-        final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
         this.wkt = wkt;
-        this.xOrigin = areaBoundingBox.getMinX();
-        this.yOrigin = areaBoundingBox.getMinY();
+        this.xOrigin = 0;
+        this.yOrigin = 0;
         this.xYScale = geometryFactory.getScaleXY();
         if (this.xYScale == 0) {
           if (this instanceof EsriGdbProjectedCoordinateSystem) {

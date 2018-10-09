@@ -126,7 +126,7 @@ public class RecordLayerTablePanel extends TablePanel
     final JPopupMenu menu = new JPopupMenu();
 
     final JMenuItem editMenuItem = RunnableAction.newMenuItem("Edit Field Sets",
-      "fields_filter_edit", () -> {
+      "fields_filter:edit", () -> {
         final String fieldNamesSetName = FieldNamesSetPanel.showDialog(this.layer);
         if (Property.hasValue(fieldNamesSetName)) {
           this.tableModel.setFieldNamesSetName(fieldNamesSetName);

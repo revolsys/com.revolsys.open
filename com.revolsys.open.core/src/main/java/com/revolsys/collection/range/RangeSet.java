@@ -29,6 +29,12 @@ public class RangeSet extends AbstractSet<Object>
     }
   }
 
+  public static RangeSet newRangeSet(final int value) {
+    final RangeSet range = new RangeSet();
+    range.add(value);
+    return range;
+  }
+
   public static RangeSet newRangeSet(final int from, final int to) {
     final RangeSet range = new RangeSet();
     range.addRange(from, to);
@@ -288,6 +294,10 @@ public class RangeSet extends AbstractSet<Object>
     }
   }
 
+  public List<AbstractRange<?>> getRanges() {
+    return new ArrayList<>(this.ranges);
+  }
+
   @SuppressWarnings("unchecked")
   public <V> V getTo() {
     if (size() == 0) {
@@ -297,10 +307,6 @@ public class RangeSet extends AbstractSet<Object>
       final Object to = range.getTo();
       return (V)to;
     }
-  }
-
-  public List<AbstractRange<?>> getRanges() {
-    return new ArrayList<>(this.ranges);
   }
 
   @Override

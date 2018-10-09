@@ -381,7 +381,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   private void initSettings() {
-    setExcludeTablePatterns(".*\\$");
+    setExcludeTablePatterns(".*\\$.*");
     // setSqlPrefix("BEGIN ");
     // setSqlSuffix(";END;");
     setIteratorFactory(new RecordStoreIteratorFactory(this::newOracleIterator));
