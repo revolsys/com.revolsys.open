@@ -16,7 +16,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public class RangeSet extends AbstractSet<Object>
-  implements Iterable<Object>, Emptyable, Cloneable {
+  implements Iterable<Object>, Emptyable, Cloneable, Comparable<RangeSet> {
 
   private static void addPart(final RangeSet set, final List<AbstractRange<?>> crossProductRanges,
     final String fromValue, final String rangeSpec, final int partStart, final int partEnd) {
@@ -248,6 +248,34 @@ public class RangeSet extends AbstractSet<Object>
   @Override
   public RangeSet clone() {
     return new RangeSet(this);
+  }
+
+  @Override
+  public int compareTo(final RangeSet rangeSet) {
+    if (isEmpty()) {
+      if (rangeSet.isEmpty()) {
+        return 0;
+      } else {
+        return -1;
+      }
+    } else if (rangeSet.isEmpty()) {
+      return 1;
+    } else {
+      final Object from1 = getFrom();
+      final Object from2 = rangeSet.getFrom();
+      if (from1 instanceof Integer) {
+        if (from2 instanceof Integer) {
+          return ((Integer)from1).compareTo((Integer)from2);
+        } else {
+          return -1;
+        }
+
+      } else if (from2 instanceof Integer) {
+        return 1;
+      } else {
+        return from1.toString().compareTo(from2.toString());
+      }
+    }
   }
 
   @Override

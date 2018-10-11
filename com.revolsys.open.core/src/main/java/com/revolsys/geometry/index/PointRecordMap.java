@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.set.Sets;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.predicate.Predicates;
@@ -132,7 +133,7 @@ public class PointRecordMap {
   }
 
   public Set<Point> getKeys() {
-    return Collections.<Point> unmodifiableSet(this.recordMap.keySet());
+    return Sets.newLinkedHash(this.recordMap.keySet());
   }
 
   public List<Record> getMatches(final Record record, final Predicate<Record> predicate) {

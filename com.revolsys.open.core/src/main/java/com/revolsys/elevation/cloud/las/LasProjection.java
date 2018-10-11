@@ -22,10 +22,12 @@ import com.revolsys.geometry.cs.ParameterNames;
 import com.revolsys.geometry.cs.ParameterValue;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.io.Buffers;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
+import com.revolsys.logging.Logs;
 import com.revolsys.raster.io.format.tiff.TiffImage;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
@@ -143,10 +145,28 @@ public class LasProjection {
     }
   }
 
+  private static Object convertWktProjection(final LasPointCloudHeader header, final byte[] bytes) {
+    final String wkt = new String(bytes, StandardCharsets.UTF_8);
+    try {
+      final CoordinateSystem coordinateSystem = EsriCoordinateSystems.readCoordinateSystem(wkt);
+      if (coordinateSystem == null) {
+        Logs.error(LasProjection.class, "Unsupported coordinate system\n" + wkt);
+      } else {
+        header.setCoordinateSystemInternal(coordinateSystem);
+      }
+      return coordinateSystem;
+    } catch (final Exception e) {
+      Logs.error(LasProjection.class, "Invalid coordinate system\n" + wkt);
+      return null;
+    }
+  }
+
   public static void init(
     final Map<Pair<String, Integer>, BiFunction<LasPointCloudHeader, byte[], Object>> vlrfactory) {
     vlrfactory.put(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG),
       LasProjection::convertGeoTiffProjection);
+    vlrfactory.put(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_WKT_COORDINATE_SYSTEM),
+      LasProjection::convertWktProjection);
   }
 
   protected static void setCoordinateSystem(final LasPointCloudHeader header,
