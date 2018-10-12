@@ -1406,7 +1406,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 schemaCatalogPath = "\\";
                 deTable.setCatalogPath("\\" + deTable.getName());
               }
-            } else if (schemaPath.equals("")) {
+            } else if (schemaPath.length() <= 1) {
               schemaPath = this.defaultSchemaPath;
             }
             for (final Field field : deTable.getFields()) {

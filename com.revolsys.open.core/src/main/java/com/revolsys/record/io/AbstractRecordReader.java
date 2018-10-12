@@ -78,7 +78,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
   protected void initDo() {
     this.pointXFieldName = getProperty("pointXFieldName");
     this.pointYFieldName = getProperty("pointYFieldName");
-    this.geometryColumnName = getProperty("geometryColumnName", "GEOMETRY");
+    this.geometryColumnName = getProperty("geometryColumnName");
 
     this.geometryFactory = GeometryFactory.get(getProperty("geometryFactory"));
     if (this.geometryFactory == null || this.geometryFactory == GeometryFactory.DEFAULT_3D) {
@@ -113,9 +113,11 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
 
   protected RecordDefinition newRecordDefinition(final String baseName,
     final List<String> fieldNames) throws IOException {
+    String geometryColumnName = this.geometryColumnName;
     this.hasPointFields = Property.hasValue(this.pointXFieldName)
       && Property.hasValue(this.pointYFieldName);
     if (this.hasPointFields) {
+
       this.geometryType = DataTypes.POINT;
     } else {
       this.pointXFieldName = null;
@@ -128,7 +130,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
         DataType type;
         int length = 0;
         boolean isGeometryField = false;
-        if (fieldName.equalsIgnoreCase(this.geometryColumnName)) {
+        if (geometryColumnName != null && fieldName.equalsIgnoreCase(geometryColumnName)) {
           type = this.geometryType;
           isGeometryField = true;
         } else if ("GEOMETRY".equalsIgnoreCase(fieldName)) {
@@ -180,7 +182,10 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     }
     if (this.hasPointFields) {
       if (geometryField == null) {
-        geometryField = new FieldDefinition(this.geometryColumnName, this.geometryType, true);
+        if (geometryColumnName == null) {
+          geometryColumnName = this.geometryType.getName();
+        }
+        geometryField = new FieldDefinition(geometryColumnName, this.geometryType, true);
         fields.add(geometryField);
       }
     }

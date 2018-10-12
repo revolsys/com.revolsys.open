@@ -56,6 +56,10 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
     return newRecordReader(source, ArrayRecord.FACTORY, properties);
   }
 
+  static RecordReader newRecordReader(final Object source, final MapEx properties) {
+    return newRecordReader(source, ArrayRecord.FACTORY, properties);
+  }
+
   /**
    * Construct a new {@link RecordReader} for the given source. The source can be one of the following
    * classes.

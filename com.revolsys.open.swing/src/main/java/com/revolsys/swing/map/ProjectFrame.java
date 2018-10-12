@@ -798,27 +798,29 @@ public class ProjectFrame extends BaseFrame {
   }
 
   public void removeBottomTab(final ProjectFramePanel panel) {
-    final String layerPath = panel.getPath();
-    synchronized (this.bottomTabLayerPaths) {
-      this.bottomTabLayerPaths.remove(layerPath);
-    }
-    final List<PropertyChangeListener> listeners = panel.getProperty(BOTTOM_TAB_LISTENER);
-    if (listeners != null) {
-      for (final PropertyChangeListener listener : listeners) {
-        Property.removeListener(panel, listener);
+    Invoke.later(() -> {
+      final String layerPath = panel.getPath();
+      synchronized (this.bottomTabLayerPaths) {
+        this.bottomTabLayerPaths.remove(layerPath);
       }
-    }
+      final List<PropertyChangeListener> listeners = panel.getProperty(BOTTOM_TAB_LISTENER);
+      if (listeners != null) {
+        for (final PropertyChangeListener listener : listeners) {
+          Property.removeListener(panel, listener);
+        }
+      }
 
-    final Component component = panel.getProperty(BOTTOM_TAB);
-    if (component != null) {
-      final JTabbedPane tabs = getBottomTabs();
-      if (tabs != null) {
-        tabs.remove(component);
+      final Component component = panel.getProperty(BOTTOM_TAB);
+      if (component != null) {
+        final JTabbedPane tabs = getBottomTabs();
+        if (tabs != null) {
+          tabs.remove(component);
+        }
+        panel.deletePanelComponent(component);
       }
-      panel.deletePanelComponent(component);
-    }
-    panel.setProperty(BOTTOM_TAB, null);
-    panel.setProperty(BOTTOM_TAB_LISTENER, null);
+      panel.setProperty(BOTTOM_TAB, null);
+      panel.setProperty(BOTTOM_TAB_LISTENER, null);
+    });
   }
 
   public void setBounds(final Object frameBoundsObject, final boolean visible) {

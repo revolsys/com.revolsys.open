@@ -63,14 +63,19 @@ public class SpatialReference {
       final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       if (coordinateSystem != null) {
         this.wkt = wkt;
-        this.xOrigin = 0;
-        this.yOrigin = 0;
+        if (this instanceof EsriGdbGeographicCoordinateSystem) {
+          this.xOrigin = -180;
+          this.yOrigin = -90;
+        } else {
+          this.xOrigin = Integer.MIN_VALUE;
+          this.yOrigin = Integer.MIN_VALUE;
+        }
         this.xYScale = geometryFactory.getScaleXY();
         if (this.xYScale == 0) {
-          if (this instanceof EsriGdbProjectedCoordinateSystem) {
-            this.xYScale = 1000;
-          } else {
+          if (this instanceof EsriGdbGeographicCoordinateSystem) {
             this.xYScale = 10000000;
+          } else {
+            this.xYScale = 1000;
           }
         }
         this.zOrigin = -100000;
