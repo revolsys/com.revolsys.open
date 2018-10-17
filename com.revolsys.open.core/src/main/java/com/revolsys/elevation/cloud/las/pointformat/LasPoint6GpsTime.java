@@ -26,7 +26,7 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   private boolean overlap;
 
-  private byte classification;
+  private short classification;
 
   private short scanAngle;
 
@@ -51,7 +51,7 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   }
 
   @Override
-  public byte getClassification() {
+  public short getClassification() {
     return this.classification;
   }
 
@@ -159,6 +159,12 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
     this.returnByte = reader.getByte();
 
     final byte classificationByte = reader.getByte();
+    this.classification = reader.getUnsignedByte();
+    this.userData = reader.getUnsignedByte();
+    this.scanAngle = reader.getShort();
+    this.pointSourceID = reader.getUnsignedShort();
+    this.gpsTime = reader.getDouble();
+
     this.synthetic = (classificationByte & 0b1) == 1;
     this.keyPoint = (classificationByte >> 1 & 0b1) == 1;
     this.withheld = (classificationByte >> 2 & 0b1) == 1;
@@ -166,11 +172,7 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
     this.scannerChannel = (byte)(classificationByte >> 4 & 0b11);
     this.scanDirectionFlag = (classificationByte >> 6 & 0b1) == 1;
     this.edgeOfFlightLine = (classificationByte >> 7 & 0b1) == 1;
-    this.classification = reader.getByte();
-    this.scanAngle = reader.getShort();
-    this.userData = reader.getByte();
-    this.pointSourceID = reader.getUnsignedShort();
-    this.gpsTime = reader.getDouble();
+
   }
 
   @Override

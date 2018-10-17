@@ -32,7 +32,7 @@ public class LasPoint0Core extends BaseLasPoint {
   }
 
   @Override
-  public byte getClassification() {
+  public short getClassification() {
     return (byte)(this.classificationByte & 0b11111);
   }
 

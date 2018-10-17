@@ -213,7 +213,7 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   @Override
   public Predicate<Point> getDefaultFilter() {
-    return point -> LasClassification.GROUND.equals(((LasPoint)point).getClassification());
+    return point -> LasClassification.GROUND == ((LasPoint)point).getClassification();
   }
 
   @Override
