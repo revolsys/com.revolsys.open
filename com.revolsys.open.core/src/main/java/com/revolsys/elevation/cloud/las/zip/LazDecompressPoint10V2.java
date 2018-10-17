@@ -10,6 +10,8 @@
  */
 package com.revolsys.elevation.cloud.las.zip;
 
+import static com.revolsys.elevation.cloud.las.zip.Common_v2.number_return_level;
+import static com.revolsys.elevation.cloud.las.zip.Common_v2.number_return_map;
 import static com.revolsys.elevation.cloud.las.zip.StreamingMedian5.newStreamingMedian5;
 
 import com.revolsys.elevation.cloud.las.LasPointCloud;
@@ -21,7 +23,7 @@ public class LazDecompressPoint10V2 implements LazDecompress {
 
   protected final ArithmeticDecoder dec;
 
-  protected IntegerCompressor i_z;
+  protected IntegerCompressor ic_z;
 
   protected IntegerCompressor ic_dx;
 
@@ -81,7 +83,7 @@ public class LazDecompressPoint10V2 implements LazDecompress {
 
     this.ic_dx = new IntegerCompressor(decoder, 32, 2);
     this.ic_dy = new IntegerCompressor(decoder, 32, 22);
-    this.i_z = new IntegerCompressor(decoder, 32, 20);
+    this.ic_z = new IntegerCompressor(decoder, 32, 20);
     this.ic_intensity = new IntegerCompressor(decoder, 16, 4);
     this.ic_point_source_ID = new IntegerCompressor(decoder, 16);
   }
@@ -104,20 +106,20 @@ public class LazDecompressPoint10V2 implements LazDecompress {
     this.dec.initSymbolModel(this.m_scan_angle_rank_false);
     this.dec.initSymbolModel(this.m_scan_angle_rank_true);
     this.ic_point_source_ID.initDecompressor();
-    for (int i1 = 0; i1 < 256; i1++) {
-      if (this.m_bit_byte[i1] != null) {
-        this.dec.initSymbolModel(this.m_bit_byte[i1]);
+    for (i = 0; i < 256; i++) {
+      if (this.m_bit_byte[i] != null) {
+        this.dec.initSymbolModel(this.m_bit_byte[i]);
       }
-      if (this.m_classification[i1] != null) {
-        this.dec.initSymbolModel(this.m_classification[i1]);
+      if (this.m_classification[i] != null) {
+        this.dec.initSymbolModel(this.m_classification[i]);
       }
-      if (this.m_user_data[i1] != null) {
-        this.dec.initSymbolModel(this.m_user_data[i1]);
+      if (this.m_user_data[i] != null) {
+        this.dec.initSymbolModel(this.m_user_data[i]);
       }
     }
     this.ic_dx.initDecompressor();
     this.ic_dy.initDecompressor();
-    this.i_z.initDecompressor();
+    this.ic_z.initDecompressor();
 
     this.x = point.getXInt();
     this.y = point.getYInt();
@@ -162,15 +164,10 @@ public class LazDecompressPoint10V2 implements LazDecompress {
     System.out.println("changedValues");
     final int changedValues = this.dec.decodeSymbol(this.m_changed_values);
     final int m;
-    int returnNumber;
-    int returnCount;
+    int r;
+    int n;
     final int l;
-    if (changedValues == 0) {
-      returnNumber = this.returnByte & 0b111;
-      returnCount = this.returnByte >> 3 & 0b111;
-      m = Common_v2.NUMBER_RETURN_MAP[returnCount][returnNumber];
-      l = Common_v2.NUMBER_RETURN_LEVEL[returnCount][returnNumber];
-    } else {
+    if (changedValues != 0) {
       // decompress the edge_of_flight_line, scan_direction_flag, ... if it has
       // changed
       if ((changedValues & 32) != 0) {
@@ -178,10 +175,10 @@ public class LazDecompressPoint10V2 implements LazDecompress {
         this.returnByte = read(this.m_bit_byte, this.returnByte);
       }
 
-      returnNumber = this.returnByte & 0b111;
-      returnCount = this.returnByte >> 3 & 0b111;
-      m = Common_v2.NUMBER_RETURN_MAP[returnCount][returnNumber];
-      l = Common_v2.NUMBER_RETURN_LEVEL[returnCount][returnNumber];
+      r = this.returnByte & 0b111;
+      n = this.returnByte >> 3 & 0b111;
+      m = number_return_map[n][r];
+      l = number_return_level[n][r];
 
       // decompress the intensity if it has changed
       if ((changedValues & 16) != 0) {
@@ -220,12 +217,17 @@ public class LazDecompressPoint10V2 implements LazDecompress {
         System.out.println("pointSourceId");
         this.pointSourceId = this.ic_point_source_ID.decompress(this.pointSourceId);
       }
+    } else {
+      r = this.returnByte & 0b111;
+      n = this.returnByte >> 3 & 0b111;
+      m = number_return_map[n][r];
+      l = number_return_level[n][r];
     }
 
     // decompress x coordinate
     final int medianX = this.last_x_diff_median5[m].get();
     System.out.println("x");
-    final int diffX = this.ic_dx.decompress(medianX, returnCount == 1 ? 1 : 0);
+    final int diffX = this.ic_dx.decompress(medianX, n == 1 ? 1 : 0);
     this.x += diffX;
     this.last_x_diff_median5[m].add(diffX);
 
@@ -234,15 +236,15 @@ public class LazDecompressPoint10V2 implements LazDecompress {
     final int kBitsY = this.ic_dx.getK();
     System.out.println("y");
     final int diffY = this.ic_dy.decompress(medianY,
-      (returnCount == 1 ? 1 : 0) + (kBitsY < 20 ? MyDefs.U32_ZERO_BIT_0(kBitsY) : 20));
+      (n == 1 ? 1 : 0) + (kBitsY < 20 ? MyDefs.U32_ZERO_BIT_0(kBitsY) : 20));
     this.y += diffY;
     this.last_y_diff_median5[m].add(diffY);
 
     // decompress z coordinate
     System.out.println("z");
     final int kBitsZ = (this.ic_dx.getK() + this.ic_dy.getK()) / 2;
-    this.z = this.i_z.decompress(this.last_height[l],
-      (returnCount == 1 ? 1 : 0) + (kBitsZ < 18 ? MyDefs.U32_ZERO_BIT_0(kBitsZ) : 18));
+    this.z = this.ic_z.decompress(this.last_height[l],
+      (n == 1 ? 1 : 0) + (kBitsZ < 18 ? MyDefs.U32_ZERO_BIT_0(kBitsZ) : 18));
     this.last_height[l] = this.z;
 
     postRead(point);

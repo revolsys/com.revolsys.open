@@ -28,7 +28,7 @@ public interface Common_v2 {
   // counts n, or mix up the position of r and n. we therefore
   // "complete" the table to also map those "undesired" r & n
   // combinations to different contexts
-  static byte[][] NUMBER_RETURN_MAP = {
+  static byte[][] number_return_map = {
     {
       15, 14, 13, 12, 11, 10, 9, 8
     }, {
@@ -64,7 +64,7 @@ public interface Common_v2 {
   // counts n, or mix up the position of r and n. we therefore
   // "complete" the table to also map those "undesired" r & n
   // combinations to different contexts
-  static byte[][] NUMBER_RETURN_LEVEL = {
+  static byte[][] number_return_level = {
     {
       0, 1, 2, 3, 4, 5, 6, 7
     }, {
