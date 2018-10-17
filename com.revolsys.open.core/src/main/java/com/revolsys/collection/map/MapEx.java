@@ -178,7 +178,11 @@ public interface MapEx extends MapDefault<String, Object> {
    */
   @SuppressWarnings("unchecked")
   default <T extends Object> T getValue(final CharSequence name) {
-    return (T)get(name.toString());
+    if (name == null) {
+      return null;
+    } else {
+      return (T)get(name.toString());
+    }
   }
 
   default <T extends Object> T getValue(final CharSequence name, final DataType dataType) {
@@ -203,6 +207,11 @@ public interface MapEx extends MapDefault<String, Object> {
     } else {
       return value;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  default <T extends Object> T getValue(final String name) {
+    return (T)get(name);
   }
 
   default boolean hasValue(final CharSequence name) {

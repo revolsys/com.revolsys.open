@@ -14,7 +14,7 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.util.CaseConverter;
 
-public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchemaElement,
+public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, RecordStoreSchemaElement,
   MapSerializer, RecordDefinitionProxy, RecordFactory<Record> {
 
   static RecordDefinition newRecordDefinition(final GeometryFactory geometryFactory,

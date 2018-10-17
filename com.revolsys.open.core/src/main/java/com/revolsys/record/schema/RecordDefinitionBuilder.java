@@ -16,6 +16,16 @@ public class RecordDefinitionBuilder {
     this.recordDefinition = new RecordDefinitionImpl(pathName);
   }
 
+  public RecordDefinitionBuilder(final RecordDefinitionProxy recordDefinition) {
+    this(recordDefinition.getPathName());
+    for (final FieldDefinition fieldDefinition : recordDefinition.getFieldDefinitions()) {
+      addField(fieldDefinition);
+    }
+    this.recordDefinition.setIdFieldNames(recordDefinition.getIdFieldNames());
+    this.recordDefinition.setGeometryFieldName(recordDefinition.getGeometryFieldName());
+    this.recordDefinition.setGeometryFactory(recordDefinition.getGeometryFactory());
+  }
+
   public RecordDefinitionBuilder(final String pathName) {
     this(PathName.newPathName(pathName));
   }
