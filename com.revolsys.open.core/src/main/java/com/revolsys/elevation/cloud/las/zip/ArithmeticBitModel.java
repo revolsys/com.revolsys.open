@@ -47,57 +47,43 @@ package com.revolsys.elevation.cloud.las.zip;
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-public class ArithmeticBitModel implements ArithmeticConstants {
+public class ArithmeticBitModel {
 
-  int bit0Count = 1;
+    private static final int BM__LengthShift = 13;     // length bits discarded before mult.
+    private static final int BM__MaxCount    = 1 << BM__LengthShift;  // for adaptive models
 
-  int bit0Prob = 1 << BM_LENGTH_SHIFT - 1;
+    int u_update_cycle, u_bits_until_update;
+    int u_bit_0_prob, u_bit_0_count, u_bit_count;
 
-  int bitCount = 2;
-
-  int bitsUntilUpdate = 4;
-
-  int updateCycle = 4;
-
-  public ArithmeticBitModel() {
-  }
-
-  void init() {
-    // initialization to equiprobable model
-    this.bit0Count = 1;
-    this.bitCount = 2;
-    this.bit0Prob = 1 << BM_LENGTH_SHIFT - 1;
-    // start with frequent updates
-    this.updateCycle = 4;
-    this.bitsUntilUpdate = 4;
-  }
-
-  void update() {
-    // halve counts when a threshold is reached
-    if ((this.bitCount += this.updateCycle) > BM_MAX_COUNT) {
-      this.bitCount = this.bitCount + 1 >>> 1;
-      this.bit0Count = this.bit0Count + 1 >>> 1;
-      if (this.bit0Count == this.bitCount) {
-        ++this.bitCount;
-      }
+    public ArithmeticBitModel() {
+        init();
     }
 
-    // compute scaled bit 0 probability
-    final int scale = Integer.divideUnsigned(0x80000000, this.bitCount);
-    this.bit0Prob = this.bit0Count * scale >>> 31 - BM_LENGTH_SHIFT;
-
-    // set frequency of model updates
-    this.updateCycle = 5 * this.updateCycle >>> 2;
-    if (this.updateCycle > 64) {
-      this.updateCycle = 64;
+    void init() {
+        // initialization to equiprobable model
+        u_bit_0_count = 1;
+        u_bit_count = 2;
+        u_bit_0_prob = 1 << (BM__LengthShift - 1);
+        // start with frequent updates
+        u_update_cycle = u_bits_until_update = 4;
     }
-    this.bitsUntilUpdate = this.updateCycle;
-  }
 
-  void updateIfRequired() {
-    this.bitsUntilUpdate--;
-    if (this.bitsUntilUpdate <= 0) {
-      update();
+    void update() {
+        // halve counts when a threshold is reached
+        if ((u_bit_count += u_update_cycle) > BM__MaxCount)
+        {
+            u_bit_count = (u_bit_count + 1) >>> 1;
+            u_bit_0_count = (u_bit_0_count + 1) >>> 1;
+            if (u_bit_0_count == u_bit_count) ++u_bit_count;
+        }
+
+        // compute scaled bit 0 probability
+        int scale = Integer.divideUnsigned(0x80000000, u_bit_count);
+        u_bit_0_prob = (u_bit_0_count * scale) >>> (31 - BM__LengthShift);
+
+        // set frequency of model updates
+        u_update_cycle = (5 * u_update_cycle) >>> 2;
+        if (u_update_cycle > 64) u_update_cycle = 64;
+        u_bits_until_update = u_update_cycle;
     }
-  }
 }

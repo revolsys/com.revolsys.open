@@ -10,6 +10,11 @@
  */
 package com.revolsys.elevation.cloud.las.zip;
 
+import static com.revolsys.elevation.cloud.las.zip.ArithmeticModel.AC_BUFFER_SIZE;
+import static com.revolsys.elevation.cloud.las.zip.ArithmeticModel.AC__MaxLength;
+import static com.revolsys.elevation.cloud.las.zip.ArithmeticModel.AC__MinLength;
+import static com.revolsys.elevation.cloud.las.zip.ArithmeticModel.BM__LengthShift;
+import static com.revolsys.elevation.cloud.las.zip.ArithmeticModel.DM__LengthShift;
 import static java.lang.Integer.compareUnsigned;
 
 import com.revolsys.io.channels.ChannelWriter;
@@ -51,125 +56,136 @@ import com.revolsys.io.channels.ChannelWriter;
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-public class ArithmeticEncoder implements ArithmeticConstants {
+public class ArithmeticEncoder {
 
   private static final byte ZERO = 0;
 
-  private ChannelWriter out;
+  private ChannelWriter outstream;
 
-  private final byte[] outbuffer = new byte[AC_BUFFER_SIZE];
+  private final byte[] outbuffer;
 
-  private final int endbuffer = AC_BUFFER_SIZE;
+  private final int endbuffer;
 
   private int outbyte;
 
   private int endbyte;
 
-  private int base;
+  private int u_base, u_value, u_length;
 
-  private int length;
-
-  public ArithmeticEncoder(final ChannelWriter out) {
-    this.out = out;
+  public ArithmeticEncoder() {
+    this.outbuffer = new byte[AC_BUFFER_SIZE];
+    this.endbuffer = this.outbuffer.length;
   }
 
   public ArithmeticBitModel createBitModel() {
     return new ArithmeticBitModel();
   }
 
-  ArithmeticModel createSymbolModel(final int symbols) {
-    return new ArithmeticModel(symbols, true);
+  ArithmeticModel createSymbolModel(final int u_symbols) {
+    return new ArithmeticModel(u_symbols, true);
   }
 
   public void done() {
-    final int init_base = this.base; // done encoding: set final data bytes
+    final int u_init_base = this.u_base; // done encoding: set final data bytes
     boolean another_byte = true;
 
-    if (Integer.compareUnsigned(this.length, 2 * AC_MIN_LENGTH) > 0) {
-      this.base += AC_MIN_LENGTH; // base offset
-      this.length = AC_MIN_LENGTH >>> 1; // set new length for 1 more byte
+    if (Integer.compareUnsigned(this.u_length, 2 * AC__MinLength) > 0) {
+      this.u_base += AC__MinLength; // base offset
+      this.u_length = AC__MinLength >>> 1; // set new length for 1 more byte
     } else {
-      this.base += AC_MIN_LENGTH >>> 1; // base offset
-      this.length = AC_MIN_LENGTH >>> 9; // set new length for 2 more bytes
+      this.u_base += AC__MinLength >>> 1; // base offset
+      this.u_length = AC__MinLength >>> 9; // set new length for 2 more bytes
       another_byte = false;
     }
 
-    if (compareUnsigned(init_base, this.base) > 0) {
+    if (compareUnsigned(u_init_base, this.u_base) > 0) {
       propagate_carry(); // overflow = carry
     }
     renorm_enc_interval(); // renormalization = output last bytes
 
     /*
-     * TODO doesn't make sense. is this really needed? if (endbyte != endbuffer) { assert(outbyte <
-     * AC_BUFFER_SIZE); outstream.putBytes(outbuffer + AC_BUFFER_SIZE, AC_BUFFER_SIZE); }
+     * TODO doesn't make sense. is this really needed? if (endbyte != endbuffer)
+     * { assert(outbyte < AC_BUFFER_SIZE); outstream.putBytes(outbuffer +
+     * AC_BUFFER_SIZE, AC_BUFFER_SIZE); }
      */
     final int buffer_size = this.outbyte;
     if (buffer_size > 0) {
-      this.out.putBytes(this.outbuffer, buffer_size);
+      this.outstream.putBytes(this.outbuffer, buffer_size);
     }
 
     // write two or three zero bytes to be in sync with the decoder's byte reads
-    this.out.putByte(ZERO);
-    this.out.putByte(ZERO);
+    this.outstream.putByte(ZERO);
+    this.outstream.putByte(ZERO);
     if (another_byte) {
-      this.out.putByte(ZERO);
+      this.outstream.putByte(ZERO);
     }
 
-    this.out = null;
+    this.outstream = null;
   }
 
   void encodeBit(final ArithmeticBitModel m, final int sym) {
     assert m != null && sym <= 1;
 
-    final int x = m.bit0Prob * (this.length >>> BM_LENGTH_SHIFT); // product l x p0
+    final int u_x = m.u_bit_0_prob * (this.u_length >>> BM__LengthShift); // product
+                                                                          // l x
+                                                                          // p0
     // update interval
     if (sym == 0) {
-      this.length = x;
-      ++m.bit0Count;
+      this.u_length = u_x;
+      ++m.u_bit_0_count;
     } else {
-      final int init_base = this.base;
-      this.base += x;
-      this.length -= x;
-      if (compareUnsigned(init_base, this.base) > 0) {
+      final int u_init_base = this.u_base;
+      this.u_base += u_x;
+      this.u_length -= u_x;
+      if (compareUnsigned(u_init_base, this.u_base) > 0) {
         propagate_carry(); // overflow = carry
       }
     }
 
-    if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
+    if (compareUnsigned(this.u_length, AC__MinLength) < 0) {
       renorm_enc_interval(); // renormalization
     }
-    m.updateIfRequired();
+    if (--m.u_bits_until_update == 0) {
+      m.update(); // periodic model update
+    }
   }
 
-  void encodeSymbol(final ArithmeticModel m, final int sym) {
-    assert m != null && compareUnsigned(sym, m.lastSymbol) <= 0;
+  void encodeSymbol(final ArithmeticModel m, final int u_sym) {
+    assert m != null && compareUnsigned(u_sym, m.u_last_symbol) <= 0;
 
-    int x;
-    final int init_base = this.base;
+    int u_x;
+    final int u_init_base = this.u_base;
     // compute products
-    if (sym == m.lastSymbol) {
-      x = m.distribution[sym] * (this.length >>> DM_LENGTH_SHIFT);
-      this.base += x; // update interval
-      this.length -= x; // no product needed
+    if (u_sym == m.u_last_symbol) {
+      u_x = m.u_distribution[u_sym] * (this.u_length >>> DM__LengthShift);
+      this.u_base += u_x; // update interval
+      this.u_length -= u_x; // no product needed
     } else {
-      x = m.distribution[sym] * (this.length >>>= DM_LENGTH_SHIFT);
-      this.base += x; // update interval
-      this.length = m.distribution[sym + 1] * this.length - x;
+      u_x = m.u_distribution[u_sym] * (this.u_length >>>= DM__LengthShift);
+      this.u_base += u_x; // update interval
+      this.u_length = m.u_distribution[u_sym + 1] * this.u_length - u_x;
     }
 
-    if (compareUnsigned(init_base, this.base) > 0) {
+    if (compareUnsigned(u_init_base, this.u_base) > 0) {
       propagate_carry(); // overflow = carry
     }
-    if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
+    if (compareUnsigned(this.u_length, AC__MinLength) < 0) {
       renorm_enc_interval(); // renormalization
     }
 
-    m.update(sym);
+    ++m.u_symbol_count[u_sym];
+    if (--m.u_symbols_until_update == 0) {
+      m.update(); // periodic model update
+    }
   }
 
-  public boolean init() {
-    this.base = 0;
-    this.length = AC_MAX_LENGTH;
+  public boolean init(final ChannelWriter outstream) {
+    if (outstream == null) {
+      return false;
+    }
+    this.outstream = outstream;
+    this.u_base = 0;
+    this.u_length = AC__MaxLength;
     this.outbyte = 0;
     this.endbyte = this.endbuffer;
     return true;
@@ -183,15 +199,15 @@ public class ArithmeticEncoder implements ArithmeticConstants {
     initSymbolModel(m, null);
   }
 
-  void initSymbolModel(final ArithmeticModel m, final int[] table) {
-    m.init(table);
+  void initSymbolModel(final ArithmeticModel m, final int[] u_table) {
+    m.init(u_table);
   }
 
   private void manage_outbuffer() {
     if (this.outbyte == this.endbuffer) {
       this.outbyte = 0;
     }
-    this.out.putBytes(this.outbuffer, AC_BUFFER_SIZE);
+    this.outstream.putBytes(this.outbuffer, AC_BUFFER_SIZE);
     this.endbyte = this.outbyte + AC_BUFFER_SIZE;
     assert this.endbyte > this.outbyte;
     assert this.outbyte < this.endbuffer;
@@ -223,57 +239,60 @@ public class ArithmeticEncoder implements ArithmeticConstants {
       assert 0 <= this.outbyte;
       assert this.outbyte < this.endbuffer;
       assert this.outbyte < this.endbyte;
-      this.outbuffer[this.outbyte++] = (byte)(this.base >>> 24);
+      this.outbuffer[this.outbyte++] = (byte)(this.u_base >>> 24);
       if (this.outbyte == this.endbyte) {
         manage_outbuffer();
       }
-      this.base <<= 8;
-    } while (Integer.compareUnsigned(this.length <<= 8, AC_MIN_LENGTH) < 0); // length multiplied
-                                                                             // by 256
+      this.u_base <<= 8;
+    } while (Integer.compareUnsigned(this.u_length <<= 8, AC__MinLength) < 0); // length
+                                                                               // multiplied
+                                                                               // by
+                                                                               // 256
   }
 
   void writeBit(final int sym) {
     assert sym < 2;
 
-    final int init_base = this.base;
-    this.base += sym * (this.length >>>= 1); // new interval base and length
+    final int u_init_base = this.u_base;
+    this.u_base += sym * (this.u_length >>>= 1); // new interval base and length
 
-    if (compareUnsigned(init_base, this.base) > 0) {
+    if (compareUnsigned(u_init_base, this.u_base) > 0) {
       propagate_carry(); // overflow = carry
     }
-    if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
+    if (compareUnsigned(this.u_length, AC__MinLength) < 0) {
       renorm_enc_interval(); // renormalization
     }
   }
 
-  void writeBits(int bits, int sym) {
-    assert bits != 0 && bits <= 32 && sym < 1 << bits;
+  void writeBits(int bits, int u_sym) {
+    assert bits != 0 && bits <= 32 && u_sym < 1 << bits;
 
     if (bits > 19) {
-      writeShort((short)(sym & 0xFFFF));
-      sym = sym >>> 16;
+      writeShort((short)(u_sym & 0xFFFF));
+      u_sym = u_sym >>> 16;
       bits = bits - 16;
     }
 
-    final int init_base = this.base;
-    this.base += sym * (this.length >>>= bits); // new interval base and length
+    final int u_init_base = this.u_base;
+    this.u_base += u_sym * (this.u_length >>>= bits); // new interval base and
+                                                      // length
 
-    if (compareUnsigned(init_base, this.base) > 0) {
+    if (compareUnsigned(u_init_base, this.u_base) > 0) {
       propagate_carry(); // overflow = carry
     }
-    if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
+    if (compareUnsigned(this.u_length, AC__MinLength) < 0) {
       renorm_enc_interval(); // renormalization
     }
   }
 
   void writeByte(final byte sym) {
-    final int init_base = this.base;
-    this.base += sym * (this.length >>>= 8); // new interval base and length
+    final int u_init_base = this.u_base;
+    this.u_base += sym * (this.u_length >>>= 8); // new interval base and length
 
-    if (compareUnsigned(init_base, this.base) > 0) {
+    if (compareUnsigned(u_init_base, this.u_base) > 0) {
       propagate_carry(); // overflow = carry
     }
-    if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
+    if (compareUnsigned(this.u_length, AC__MinLength) < 0) {
       renorm_enc_interval(); // renormalization
     }
   }
@@ -288,24 +307,25 @@ public class ArithmeticEncoder implements ArithmeticConstants {
     writeInt(Float.floatToIntBits(sym));
   }
 
-  void writeInt(final int sym) {
-    writeShort((short)(sym & 0xFFFF)); // lower 16 bits
-    writeShort((short)(sym >>> 16)); // UPPER 16 bits
+  void writeInt(final int u_sym) {
+    writeShort((short)(u_sym & 0xFFFF)); // lower 16 bits
+    writeShort((short)(u_sym >>> 16)); // UPPER 16 bits
   }
 
-  void writeInt64(final long sym) {
-    writeInt((int)(sym & 0xFFFFFFFF)); // lower 32 bits
-    writeInt((int)(sym >>> 32)); // UPPER 32 bits
+  void writeInt64(final long u_sym) {
+    writeInt((int)(u_sym & 0xFFFFFFFF)); // lower 32 bits
+    writeInt((int)(u_sym >>> 32)); // UPPER 32 bits
   }
 
-  void writeShort(final short sym) {
-    final int init_base = this.base;
-    this.base += sym * (this.length >>>= 16); // new interval base and length
+  void writeShort(final short u_sym) {
+    final int u_init_base = this.u_base;
+    this.u_base += u_sym * (this.u_length >>>= 16); // new interval base and
+                                                    // length
 
-    if (compareUnsigned(init_base, this.base) > 0) {
+    if (compareUnsigned(u_init_base, this.u_base) > 0) {
       propagate_carry(); // overflow = carry
     }
-    if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
+    if (compareUnsigned(this.u_length, AC__MinLength) < 0) {
       renorm_enc_interval(); // renormalization
     }
   }

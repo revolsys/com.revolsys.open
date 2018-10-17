@@ -57,6 +57,12 @@ public interface LasPoint extends Point, MapSerializer {
 
   short getUserData();
 
+  int getXInt();
+
+  int getYInt();
+
+  int getZInt();
+
   boolean isEdgeOfFlightLine();
 
   boolean isKeyPoint();

@@ -18,7 +18,7 @@ public class LazDecompressRgb12V1 extends LazDecompressRgb12 {
 
   public LazDecompressRgb12V1(final ArithmeticDecoder decoder) {
     super(decoder);
-    this.byteUsed = ArithmeticDecoder.createSymbolModel(64);
+    this.byteUsed = decoder.createSymbolModel(64);
     this.intDecompressor = new IntegerCompressor(decoder, 8, 6);
   }
 
@@ -40,7 +40,7 @@ public class LazDecompressRgb12V1 extends LazDecompressRgb12 {
   @Override
   public void init(final LasPoint firstPoint) {
     super.init(firstPoint);
-    this.byteUsed.init();
+    this.decoder.initSymbolModel(this.byteUsed);
     this.intDecompressor.initDecompressor();
   }
 

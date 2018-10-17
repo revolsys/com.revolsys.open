@@ -69,7 +69,7 @@ public class Gdal implements ServiceInitializer {
       available = true;
     } catch (final UnsatisfiedLinkError e) {
     } catch (final Throwable e) {
-      Logs.debug(Gdal.class, e);
+      // Logs.debug(Gdal.class, e);
     }
   }
 

@@ -47,148 +47,116 @@ package com.revolsys.elevation.cloud.las.zip;
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-public class ArithmeticModel implements ArithmeticConstants {
+public class ArithmeticModel {
 
-  public static void initSymbolModel(final ArithmeticModel m) {
-    ArithmeticModel.initSymbolModel(m, null);
-  }
+  static final int AC_BUFFER_SIZE = 1024;
 
-  public static void initSymbolModel(final ArithmeticModel model, final int[] table) {
-    if (model != null) {
-      model.init(table);
-    }
-  }
+  static final int AC__MinLength = 0x01000000; // threshold for renormalization
 
-  public static void initSymbolModels(final ArithmeticModel... models) {
-    for (final ArithmeticModel model : models) {
-      if (model != null) {
-        model.init(null);
-      }
-    }
-  }
+  static final int AC__MaxLength = 0xFFFFFFFF; // maximum AC interval length
+
+  static final int BM__LengthShift = 13; // length bits discarded before mult.
+
+  static final int BM__MaxCount = 1 << BM__LengthShift; // for adaptive models
+
+  static final int DM__LengthShift = 15; // length bits discarded before mult.
+
+  static final int DM__MaxCount = 1 << DM__LengthShift; // for adaptive models
 
   private final boolean compress;
 
-  int[] distribution;
+  int[] u_distribution, u_symbol_count, u_decoder_table;
 
-  int[] symbolCount;
+  int u_total_count, u_update_cycle, u_symbols_until_update;
 
-  int[] decoderTable;
+  int u_symbols, u_last_symbol, u_table_size, u_table_shift;
 
-  int totalCount;
-
-  int updateCycle;
-
-  int symbolsUntilUpdate;
-
-  final int symbols;
-
-  int lastSymbol;
-
-  int tableSize;
-
-  int tableShift;
-
-  public ArithmeticModel(final int symbols, final boolean compress) {
-    this.symbols = symbols;
+  public ArithmeticModel(final int u_symbols, final boolean compress) {
+    this.u_symbols = u_symbols;
     this.compress = compress;
   }
 
-  public int init() {
-    return init(null);
-  }
-
-  public int init(final int[] table) {
-    if (this.distribution == null) {
-      if (this.symbols < 2 || this.symbols > 1 << 11) {
+  public int init(final int[] u_table) {
+    if (this.u_distribution == null) {
+      if (this.u_symbols < 2 || this.u_symbols > 1 << 11) {
         return -1; // invalid number of symbols
       }
-      this.lastSymbol = this.symbols - 1;
-      if (!this.compress && this.symbols > 16) {
+      this.u_last_symbol = this.u_symbols - 1;
+      if (!this.compress && this.u_symbols > 16) {
         int table_bits = 3;
-        while (this.symbols > 1 << table_bits + 2) {
+        while (this.u_symbols > 1 << table_bits + 2) {
           ++table_bits;
         }
-        this.tableSize = 1 << table_bits;
-        this.tableShift = DM_LENGTH_SHIFT - table_bits;
-        this.distribution = new int[this.symbols];
-        this.decoderTable = new int[this.tableSize + 2];
-      } else {
-        // small alphabet: no table needed
-        this.decoderTable = null;
-        this.tableSize = this.tableShift = 0;
-        this.distribution = new int[this.symbols];
+        this.u_table_size = 1 << table_bits;
+        this.u_table_shift = DM__LengthShift - table_bits;
+        this.u_distribution = new int[this.u_symbols];
+        this.u_decoder_table = new int[this.u_table_size + 2];
+      } else // small alphabet: no table needed
+      {
+        this.u_decoder_table = null;
+        this.u_table_size = this.u_table_shift = 0;
+        this.u_distribution = new int[this.u_symbols];
       }
-      this.symbolCount = new int[this.symbols];
+      this.u_symbol_count = new int[this.u_symbols];
     }
 
-    this.totalCount = 0;
-    this.updateCycle = this.symbols;
-    if (table != null) {
-      for (int k = 0; k < this.symbols; k++) {
-        this.symbolCount[k] = table[k];
+    this.u_total_count = 0;
+    this.u_update_cycle = this.u_symbols;
+    if (u_table != null) {
+      for (int k = 0; k < this.u_symbols; k++) {
+        this.u_symbol_count[k] = u_table[k];
       }
     } else {
-      for (int k = 0; k < this.symbols; k++) {
-        this.symbolCount[k] = 1;
+      for (int k = 0; k < this.u_symbols; k++) {
+        this.u_symbol_count[k] = 1;
       }
     }
 
     update();
-    this.symbolsUntilUpdate = this.updateCycle = this.symbols + 6 >>> 1;
+    this.u_symbols_until_update = this.u_update_cycle = this.u_symbols + 6 >>> 1;
 
     return 0;
   }
 
   void update() {
     // halve counts when a threshold is reached
-    final int[] symbolCount = this.symbolCount;
-    if ((this.totalCount += this.updateCycle) > DM_MAX_COUNT) {
-      this.totalCount = 0;
-      for (int n = 0; n < this.symbols; n++) {
-        this.totalCount += symbolCount[n] = symbolCount[n] + 1 >>> 1;
+    if ((this.u_total_count += this.u_update_cycle) > DM__MaxCount) {
+      this.u_total_count = 0;
+      for (int n = 0; n < this.u_symbols; n++) {
+        this.u_total_count += this.u_symbol_count[n] = this.u_symbol_count[n] + 1 >>> 1;
       }
     }
 
     // compute cumulative distribution, decoder table
     int k, sum = 0, s = 0;
-    final int scale = Integer.divideUnsigned(0x80000000, this.totalCount);
+    final int scale = Integer.divideUnsigned(0x80000000, this.u_total_count);
 
-    final int[] distribution = this.distribution;
-    if (this.compress || this.tableSize == 0) {
-      for (k = 0; k < this.symbols; k++) {
-        distribution[k] = scale * sum >>> 31 - DM_LENGTH_SHIFT;
-        sum += symbolCount[k];
+    if (this.compress || this.u_table_size == 0) {
+      for (k = 0; k < this.u_symbols; k++) {
+        this.u_distribution[k] = scale * sum >>> 31 - DM__LengthShift;
+        sum += this.u_symbol_count[k];
       }
     } else {
-      final int[] decoderTable2 = this.decoderTable;
-      for (k = 0; k < this.symbols; k++) {
-        distribution[k] = scale * sum >>> 31 - DM_LENGTH_SHIFT;
-        sum += symbolCount[k];
-        final int w = distribution[k] >>> this.tableShift;
+      for (k = 0; k < this.u_symbols; k++) {
+        this.u_distribution[k] = scale * sum >>> 31 - DM__LengthShift;
+        sum += this.u_symbol_count[k];
+        final int w = this.u_distribution[k] >>> this.u_table_shift;
         while (s < w) {
-          decoderTable2[++s] = k - 1;
+          this.u_decoder_table[++s] = k - 1;
         }
       }
-      decoderTable2[0] = 0;
-      while (s <= this.tableSize) {
-        decoderTable2[++s] = this.symbols - 1;
+      this.u_decoder_table[0] = 0;
+      while (s <= this.u_table_size) {
+        this.u_decoder_table[++s] = this.u_symbols - 1;
       }
     }
 
     // set frequency of model updates
-    this.updateCycle = 5 * this.updateCycle >>> 2;
-    final int max_cycle = this.symbols + 6 << 3;
-    if (Integer.compareUnsigned(this.updateCycle, max_cycle) > 0) {
-      this.updateCycle = max_cycle;
+    this.u_update_cycle = 5 * this.u_update_cycle >>> 2;
+    final int max_cycle = this.u_symbols + 6 << 3;
+    if (Integer.compareUnsigned(this.u_update_cycle, max_cycle) > 0) {
+      this.u_update_cycle = max_cycle;
     }
-    this.symbolsUntilUpdate = this.updateCycle;
-  }
-
-  void update(final int symbol) {
-    this.symbolCount[symbol]++;
-    if (--this.symbolsUntilUpdate == 0) {
-      update();
-    }
+    this.u_symbols_until_update = this.u_update_cycle;
   }
 }

@@ -39,8 +39,8 @@ public class LazDecompressGpsTime11V2 extends LazDecompressGpsTime11 implements 
 
   public LazDecompressGpsTime11V2(final ArithmeticDecoder decoder) {
     super(decoder);
-    this.gpsTimeMulti = ArithmeticDecoder.createSymbolModel(LASZIP_GPSTIME_MULTI_TOTAL);
-    this.gpsTime0Diff = ArithmeticDecoder.createSymbolModel(6);
+    this.gpsTimeMulti = decoder.createSymbolModel(LASZIP_GPSTIME_MULTI_TOTAL);
+    this.gpsTime0Diff = decoder.createSymbolModel(6);
     this.decompressGpsTime = new IntegerCompressor(decoder, 32, 9);
   }
 
@@ -86,7 +86,7 @@ public class LazDecompressGpsTime11V2 extends LazDecompressGpsTime11 implements 
       } else if (multi == 2) {// the difference is huge
         long gpsTime = decompressGpsTime.decompress((int)(lastGpsTime[last] >>> 32), 8);
         gpsTime <<= 32;
-        gpsTime |= Integer.toUnsignedLong(decoder.getInt());
+        gpsTime |= Integer.toUnsignedLong(decoder.readInt());
 
         next = this.next + 1;
         next &= 3;
@@ -155,7 +155,7 @@ public class LazDecompressGpsTime11V2 extends LazDecompressGpsTime11 implements 
         gpsTime >>= 32;
         gpsTime = decompressGpsTime.decompress((int)gpsTime, 8);
         gpsTime <<= 32;
-        gpsTime |= Integer.toUnsignedLong(decoder.getInt());
+        gpsTime |= Integer.toUnsignedLong(decoder.readInt());
         lastGpsTime[next] = gpsTime;
 
         last = next;

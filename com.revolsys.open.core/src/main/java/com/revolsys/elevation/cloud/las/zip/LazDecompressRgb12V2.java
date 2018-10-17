@@ -14,33 +14,39 @@ import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
 public class LazDecompressRgb12V2 extends LazDecompressRgb12 {
 
-  private final ArithmeticModel rgbDiff0 = ArithmeticDecoder.createSymbolModel(256);
+  private final ArithmeticModel rgbDiff0;
 
-  private final ArithmeticModel rgbDiff1 = ArithmeticDecoder.createSymbolModel(256);
+  private final ArithmeticModel rgbDiff1;
 
-  private final ArithmeticModel rgbDiff2 = ArithmeticDecoder.createSymbolModel(256);
+  private final ArithmeticModel rgbDiff2;
 
-  private final ArithmeticModel rgbDiff3 = ArithmeticDecoder.createSymbolModel(256);
+  private final ArithmeticModel rgbDiff3;
 
-  private final ArithmeticModel rgbDiff4 = ArithmeticDecoder.createSymbolModel(256);
+  private final ArithmeticModel rgbDiff4;
 
-  private final ArithmeticModel rgbDiff5 = ArithmeticDecoder.createSymbolModel(256);
+  private final ArithmeticModel rgbDiff5;
 
-  public LazDecompressRgb12V2(final ArithmeticDecoder dec) {
-    super(dec);
-    this.byteUsed = ArithmeticDecoder.createSymbolModel(128);
+  public LazDecompressRgb12V2(final ArithmeticDecoder decoder) {
+    super(decoder);
+    this.byteUsed = decoder.createSymbolModel(128);
+    this.rgbDiff0 = decoder.createSymbolModel(256);
+    this.rgbDiff1 = decoder.createSymbolModel(256);
+    this.rgbDiff2 = decoder.createSymbolModel(256);
+    this.rgbDiff3 = decoder.createSymbolModel(256);
+    this.rgbDiff4 = decoder.createSymbolModel(256);
+    this.rgbDiff5 = decoder.createSymbolModel(256);
   }
 
   @Override
   public void init(final LasPoint firstPoint) {
     super.init(firstPoint);
-    this.byteUsed.init();
-    this.rgbDiff0.init();
-    this.rgbDiff1.init();
-    this.rgbDiff2.init();
-    this.rgbDiff3.init();
-    this.rgbDiff4.init();
-    this.rgbDiff5.init();
+    this.decoder.initSymbolModel(this.byteUsed);
+    this.decoder.initSymbolModel(this.rgbDiff0);
+    this.decoder.initSymbolModel(this.rgbDiff1);
+    this.decoder.initSymbolModel(this.rgbDiff2);
+    this.decoder.initSymbolModel(this.rgbDiff3);
+    this.decoder.initSymbolModel(this.rgbDiff4);
+    this.decoder.initSymbolModel(this.rgbDiff5);
   }
 
   @Override

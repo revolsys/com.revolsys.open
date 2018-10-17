@@ -7,6 +7,14 @@ import java.util.function.BiFunction;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoder;
+import com.revolsys.elevation.cloud.las.zip.LazDecompress;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTime11V1;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTime11V2;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressPoint10V1;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressPoint10V2;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V1;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V2;
 import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.io.Buffers;
 import com.revolsys.io.map.MapSerializer;
@@ -131,6 +139,46 @@ public class LasZipHeader implements MapSerializer {
 
   public boolean isCompressor(final byte compressor) {
     return this.compressor == compressor;
+  }
+
+  public LazDecompress[] newLazDecompressors(final LasPointCloud pointCloud,
+    final ArithmeticDecoder decoder) {
+    final int numItems = this.getNumItems();
+    final LazDecompress[] pointDecompressors = new LazDecompress[numItems];
+    for (int i = 0; i < numItems; i++) {
+      final LazItemType type = this.getType(i);
+      final int version = this.getVersion(i);
+      if (version < 1 || version > 2) {
+        throw new RuntimeException(version + " not yet supported");
+      }
+      switch (type) {
+        case POINT10:
+          if (version == 1) {
+            pointDecompressors[i] = new LazDecompressPoint10V1(pointCloud, decoder);
+          } else {
+            pointDecompressors[i] = new LazDecompressPoint10V2(pointCloud, decoder);
+          }
+        break;
+        case GPSTIME11:
+          if (version == 1) {
+            pointDecompressors[i] = new LazDecompressGpsTime11V1(decoder);
+          } else {
+            pointDecompressors[i] = new LazDecompressGpsTime11V2(decoder);
+          }
+        break;
+        case RGB12:
+          if (version == 1) {
+            pointDecompressors[i] = new LazDecompressRgb12V1(decoder);
+          } else {
+            pointDecompressors[i] = new LazDecompressRgb12V2(decoder);
+          }
+        break;
+
+        default:
+          throw new RuntimeException(type + " not yet supported");
+      }
+    }
+    return pointDecompressors;
   }
 
   @Override

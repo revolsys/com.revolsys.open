@@ -3,6 +3,8 @@ package com.revolsys.elevation.cloud.las;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -13,15 +15,8 @@ import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint0Core;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
-import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoder;
-import com.revolsys.elevation.cloud.las.zip.LazDecompress;
-import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTime11V1;
-import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTime11V2;
-import com.revolsys.elevation.cloud.las.zip.LazDecompressPoint10V1;
-import com.revolsys.elevation.cloud.las.zip.LazDecompressPoint10V2;
-import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V1;
-import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V2;
-import com.revolsys.elevation.cloud.las.zip.LazItemType;
+import com.revolsys.elevation.cloud.las.zip.LazChunkedIterator;
+import com.revolsys.elevation.cloud.las.zip.LazPointwiseIterator;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.BoundingBox;
@@ -37,7 +32,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Pair;
 
 public class LasPointCloud extends BaseObjectWithProperties
-  implements PointCloud<LasPoint>, BaseCloseable, MapSerializer {
+  implements PointCloud<LasPoint>, BaseCloseable, MapSerializer, Iterable<LasPoint> {
 
   public static void forEachPoint(final Object source, final Consumer<? super LasPoint> action) {
     try (
@@ -115,94 +110,11 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   @Override
   public void forEachPoint(final Consumer<? super LasPoint> action) {
-    final long pointCount = getPointCount();
     try {
-      final ChannelReader reader = this.reader;
-      if (reader == null) {
-        this.points.forEach(action);
-      } else if (pointCount == 0) {
-        this.reader = null;
-      } else if (this.header.isLaszip()) {
-        forEachPointLaz(action);
-      } else {
-        try (
-          BaseCloseable closable = this) {
-          final LasPointFormat pointFormat = getPointFormat();
-          for (int i = 0; i < pointCount; i++) {
-            final LasPoint point = pointFormat.readLasPoint(this, reader);
-            action.accept(point);
-          }
-        }
-      }
+      final Iterable<LasPoint> iterable = iterable();
+      iterable.forEach(action);
     } finally {
       this.reader = null;
-    }
-  }
-
-  private void forEachPointLaz(final Consumer<? super LasPoint> action) {
-    try (
-      ArithmeticDecoder decoder = new ArithmeticDecoder(this.reader);
-      BaseCloseable closable = this;) {
-      final LasZipHeader lasZipHeader = getLasZipHeader();
-      final LazDecompress[] pointDecompressors = newLazDecompressors(lasZipHeader, decoder);
-
-      if (lasZipHeader.isCompressor(LasZipHeader.LASZIP_COMPRESSOR_POINTWISE)) {
-        forEachPointLazPointwise(decoder, pointDecompressors, action);
-      } else {
-        forEachPointLazChunked(decoder, pointDecompressors, action);
-      }
-    }
-  }
-
-  private void forEachPointLazChunked(final ArithmeticDecoder decoder,
-    final LazDecompress[] pointDecompressors, final Consumer<? super LasPoint> action) {
-    final ChannelReader reader = this.reader;
-    @SuppressWarnings("unused")
-    final long chunkTableOffset = reader.getLong();
-    final long chunkSize = getLasZipHeader().getChunkSize();
-    long chunkReadCount = chunkSize;
-    final long pointCount = getPointCount();
-    for (int i = 0; i < pointCount; i++) {
-      final LasPoint point;
-      final LasPointFormat pointFormat = getPointFormat();
-      if (chunkSize == chunkReadCount) {
-        point = pointFormat.readLasPoint(this, reader);
-        for (final LazDecompress pointDecompressor : pointDecompressors) {
-          pointDecompressor.init(point);
-        }
-        decoder.reset();
-        chunkReadCount = 0;
-      } else {
-        point = pointFormat.newLasPoint(this);
-        for (final LazDecompress pointDecompressor : pointDecompressors) {
-          pointDecompressor.read(point);
-        }
-      }
-      action.accept(point);
-      chunkReadCount++;
-    }
-  }
-
-  private void forEachPointLazPointwise(final ArithmeticDecoder decoder,
-    final LazDecompress[] pointDecompressors, final Consumer<? super LasPoint> action) {
-    final LasPointFormat pointFormat = getPointFormat();
-    {
-      final ChannelReader reader = this.reader;
-      final LasPoint point = pointFormat.readLasPoint(this, reader);
-      for (final LazDecompress pointDecompressor : pointDecompressors) {
-        pointDecompressor.init(point);
-      }
-      decoder.reset();
-
-      action.accept(point);
-    }
-    final long pointCount = getPointCount();
-    for (int i = 1; i < pointCount; i++) {
-      final LasPoint point = pointFormat.newLasPoint(this);
-      for (final LazDecompress pointDecompressor : pointDecompressors) {
-        pointDecompressor.read(point);
-      }
-      action.accept(point);
     }
   }
 
@@ -245,44 +157,30 @@ public class LasPointCloud extends BaseObjectWithProperties
     return this.exists;
   }
 
-  public LazDecompress[] newLazDecompressors(final LasZipHeader lasZipHeader,
-    final ArithmeticDecoder decoder) {
-    final int numItems = lasZipHeader.getNumItems();
-    final LazDecompress[] pointDecompressors = new LazDecompress[numItems];
-    for (int i = 0; i < numItems; i++) {
-      final LazItemType type = lasZipHeader.getType(i);
-      final int version = lasZipHeader.getVersion(i);
-      if (version < 1 || version > 2) {
-        throw new RuntimeException(version + " not yet supported");
+  public Iterable<LasPoint> iterable() {
+    final ChannelReader reader = this.reader;
+    final long pointCount = getPointCount();
+    if (pointCount == 0) {
+      this.reader = null;
+      return Collections.emptyList();
+    } else if (reader == null) {
+      return Collections.unmodifiableList(this.points);
+    } else if (this.header.isLaszip()) {
+      final LasZipHeader lasZipHeader = getLasZipHeader();
+      if (lasZipHeader.isCompressor(LasZipHeader.LASZIP_COMPRESSOR_POINTWISE)) {
+        return new LazPointwiseIterator(this, reader);
+      } else {
+        return new LazChunkedIterator(this, reader);
       }
-      switch (type) {
-        case POINT10:
-          if (version == 1) {
-            pointDecompressors[i] = new LazDecompressPoint10V1(this, decoder);
-          } else {
-            pointDecompressors[i] = new LazDecompressPoint10V2(this, decoder);
-          }
-        break;
-        case GPSTIME11:
-          if (version == 1) {
-            pointDecompressors[i] = new LazDecompressGpsTime11V1(decoder);
-          } else {
-            pointDecompressors[i] = new LazDecompressGpsTime11V2(decoder);
-          }
-        break;
-        case RGB12:
-          if (version == 1) {
-            pointDecompressors[i] = new LazDecompressRgb12V1(decoder);
-          } else {
-            pointDecompressors[i] = new LazDecompressRgb12V2(decoder);
-          }
-        break;
 
-        default:
-          throw new RuntimeException(type + " not yet supported");
-      }
+    } else {
+      return new LasPointCloudIterator(this, reader);
     }
-    return pointDecompressors;
+  }
+
+  @Override
+  public Iterator<LasPoint> iterator() {
+    return iterable().iterator();
   }
 
   @Override

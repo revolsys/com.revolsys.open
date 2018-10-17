@@ -24,8 +24,8 @@ public class LazDecompressGpsTime11V1 extends LazDecompressGpsTime11 {
 
   public LazDecompressGpsTime11V1(final ArithmeticDecoder dec) {
     super(dec);
-    this.gpsTimeMulti = ArithmeticDecoder.createSymbolModel(LASZIP_GPSTIME_MULTIMAX);
-    this.gpsTime0Diff = ArithmeticDecoder.createSymbolModel(3);
+    this.gpsTimeMulti = dec.createSymbolModel(LASZIP_GPSTIME_MULTIMAX);
+    this.gpsTime0Diff = dec.createSymbolModel(3);
     this.decompressGpsTime = new IntegerCompressor(dec, 32, 6);
   }
 
@@ -50,7 +50,7 @@ public class LazDecompressGpsTime11V1 extends LazDecompressGpsTime11 {
         this.gpsTime += this.gpstimeDiff;
       } else if (multi == 2) {
         // the difference is huge
-        this.gpsTime = this.decoder.getLong();
+        this.gpsTime = this.decoder.readInt64();
       }
     } else {
       multi = this.decoder.decodeSymbol(this.gpsTimeMulti);
@@ -84,7 +84,7 @@ public class LazDecompressGpsTime11V1 extends LazDecompressGpsTime11 {
         }
         this.gpsTime += gpstime_diff;
       } else if (multi < LASZIP_GPSTIME_MULTIMAX - 1) {
-        this.gpsTime = this.decoder.getLong();
+        this.gpsTime = this.decoder.readInt64();
       }
     }
     point.setGpsTime(Double.longBitsToDouble(this.gpsTime));

@@ -18,8 +18,8 @@ public abstract class LazDecompressGpsTime11 implements LazDecompress {
 
   @Override
   public void init(final LasPoint firstPoint) {
-    ArithmeticModel.initSymbolModel(this.gpsTimeMulti);
-    ArithmeticModel.initSymbolModel(this.gpsTime0Diff);
+    this.decoder.initSymbolModel(this.gpsTimeMulti);
+    this.decoder.initSymbolModel(this.gpsTime0Diff);
     this.decompressGpsTime.initDecompressor();
   }
 }
