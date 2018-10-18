@@ -3,6 +3,9 @@ package com.revolsys.swing.map.layer.pointcloud;
 import java.nio.file.Path;
 import java.util.Map;
 
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
@@ -13,10 +16,12 @@ import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.swing.Borders;
 import com.revolsys.swing.RsSwingServiceInitializer;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BasePanel;
+import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
@@ -30,15 +35,37 @@ public class PointCloudLayer extends AbstractLayer {
 
   public static final String J_TYPE = "pointCloudLayer";
 
-  private static void actionZoomTo(final PathTreeNode node) {
-    final Path file = node.getPath();
-    final String baseName = Paths.getBaseName(file);
-    Invoke.background("Zoom to Point Cloud: " + baseName, () -> {
-      try (
-        PointCloud<?> pointCloud = PointCloud.newPointCloud(file)) {
-        MapPanel.zoomToBoundingBox(baseName, pointCloud);
-      }
-    });
+  private static void addMenuPointCloudProperties(final EnableCheck enableCheck) {
+    TreeNodes.addMenuItem(PathTreeNode.MENU, "point_cloud", "Point Cloud Properties",
+      (final PathTreeNode node) -> {
+        final Path file = node.getPath();
+        final String baseName = Paths.getBaseName(file);
+        Invoke.background("Point Cloud Properties: " + baseName, () -> {
+          final Resource resource = Resource.getResource(file);
+          final PointCloudLayer layer = new PointCloudLayer(resource);
+          layer.initialize();
+          layer.showProperties();
+          layer.delete();
+        });
+      })
+      .setVisibleCheck(enableCheck) //
+      .setIconName("information");
+  }
+
+  private static void addMenuZoomToCloud(final EnableCheck enableCheck) {
+    TreeNodes.addMenuItem(PathTreeNode.MENU, "point_cloud", "Zoom to Point Cloud",
+      (final PathTreeNode node) -> {
+        final Path file = node.getPath();
+        final String baseName = Paths.getBaseName(file);
+        Invoke.background("Zoom to Point Cloud: " + baseName, () -> {
+          try (
+            PointCloud<?> pointCloud = PointCloud.newPointCloud(file)) {
+            MapPanel.zoomToBoundingBox(baseName, pointCloud);
+          }
+        });
+      })
+      .setVisibleCheck(enableCheck) //
+      .setIconName("point_cloud", "magnifier");
   }
 
   public static void factoryInit() {
@@ -52,11 +79,8 @@ public class PointCloudLayer extends AbstractLayer {
 
     final EnableCheck enableCheck = RsSwingServiceInitializer
       .enableCheck(PointCloudReadFactory.class);
-    TreeNodes
-      .addMenuItem(PathTreeNode.MENU, "point_cloud", "Zoom to Point Cloud",
-        (final PathTreeNode node) -> actionZoomTo(node))
-      .setVisibleCheck(enableCheck) //
-      .setIconName("point_cloud", "magnifier");
+    addMenuZoomToCloud(enableCheck);
+    addMenuPointCloudProperties(enableCheck);
 
   }
 
@@ -73,6 +97,17 @@ public class PointCloudLayer extends AbstractLayer {
     setQuerySupported(false);
     setRenderer(new PointCloudLayerRenderer(this));
     setIcon("point_cloud");
+  }
+
+  public PointCloudLayer(final Resource resource) {
+    super(J_TYPE);
+    setSelectSupported(false);
+    setQuerySupported(false);
+    setRenderer(new PointCloudLayerRenderer(this));
+    setIcon("point_cloud");
+    setResource(resource);
+    setName(resource.getBaseName());
+
   }
 
   public void cancelChanges() {
@@ -133,16 +168,27 @@ public class PointCloudLayer extends AbstractLayer {
 
   @Override
   protected boolean initializeDo() {
-    final String url = getProperty("url");
-    if (Property.hasValue(url)) {
-      this.url = url;
-      this.resource = Resource.getResource(url);
+    if (Property.hasValue(this.url)) {
       cancelChanges();
       return true;
     } else {
       Logs.error(this, "Layer definition does not contain a 'url' property");
       return false;
     }
+  }
+
+  @Override
+  protected BasePanel newPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
+    final BasePanel generalPanel = super.newPropertiesTabGeneral(tabPanel);
+
+    final ValueField propertiesPanel = new ValueField(this);
+    propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.PAGE_AXIS));
+    Borders.titled(propertiesPanel, "Properties");
+    generalPanel.add(propertiesPanel);
+    final String propertiesHtml = this.pointCloud.toHtml();
+    final JLabel label = new JLabel(propertiesHtml);
+    propertiesPanel.add(label);
+    return generalPanel;
   }
 
   @Override
@@ -158,13 +204,6 @@ public class PointCloudLayer extends AbstractLayer {
     final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
-      // final PointCloud factory = IoFactory
-      // .factoryByFileExtension(PointCloudReadFactory.class,
-      // fileNameExtension);
-      // if (factory != null) {
-      // SwingUtil.addLabelledReadOnlyTextField(panel, "File Type",
-      // factory.getName());
-      // }
     }
     GroupLayouts.makeColumns(panel, 2, true);
     return panel;
@@ -181,6 +220,20 @@ public class PointCloudLayer extends AbstractLayer {
       Property.addListener(pointCloud, this);
     }
     firePropertyChange("pointCloud", old, this.pointCloud);
+  }
+
+  public void setResource(final Resource resource) {
+    this.resource = resource;
+    if (resource == null) {
+      this.url = null;
+    } else {
+      this.url = resource.getUriString();
+    }
+  }
+
+  public void setUrl(final String url) {
+    this.url = url;
+    this.resource = Resource.getResource(url);
   }
 
   @Override

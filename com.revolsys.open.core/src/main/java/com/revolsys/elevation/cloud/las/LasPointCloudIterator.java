@@ -5,25 +5,39 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.channels.ChannelReader;
 
-public class LasPointCloudIterator implements Iterator<LasPoint>, Iterable<LasPoint> {
+public class LasPointCloudIterator
+  implements BaseCloseable, Iterator<LasPoint>, Iterable<LasPoint> {
 
-  private long index = 0;
+  protected long index = 0;
 
-  private long pointCount = 0;
+  protected long pointCount = 0;
 
-  private final LasPointFormat pointFormat;
+  protected final LasPointFormat pointFormat;
 
-  private final ChannelReader reader;
+  protected ChannelReader reader;
 
-  private final LasPointCloud pointCloud;
+  protected final LasPointCloud pointCloud;
 
   public LasPointCloudIterator(final LasPointCloud pointCloud, final ChannelReader reader) {
     this.pointCloud = pointCloud;
     this.reader = reader;
     this.pointCount = pointCloud.getPointCount();
     this.pointFormat = pointCloud.getPointFormat();
+  }
+
+  @Override
+  public void close() {
+    this.index = this.pointCount;
+    this.reader.close();
+    this.reader = null;
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    close();
   }
 
   @Override
@@ -39,12 +53,16 @@ public class LasPointCloudIterator implements Iterator<LasPoint>, Iterable<LasPo
   @Override
   public LasPoint next() {
     if (this.index < this.pointCount) {
-      final LasPoint point = this.pointFormat.readLasPoint(this.pointCloud, this.reader);
+      final LasPoint point = readNext();
       this.index++;
       return point;
     } else {
+      close();
       throw new NoSuchElementException();
     }
   }
 
+  protected LasPoint readNext() {
+    return this.pointFormat.readLasPoint(this.pointCloud, this.reader);
+  }
 }

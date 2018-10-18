@@ -176,7 +176,11 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   }
 
   @Override
-  public void setClassification(final byte classification) {
+  public void setClassification(final short classification) {
+    if (classification < 0 && classification > 256) {
+      throw new IllegalArgumentException("Invalid LAS classificaion " + classification
+        + " not in 0..255 for record format " + getPointFormatId());
+    }
     this.classification = classification;
   }
 

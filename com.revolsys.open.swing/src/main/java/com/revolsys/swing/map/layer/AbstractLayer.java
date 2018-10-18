@@ -1165,19 +1165,22 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   @Override
   public void showProperties(final String tabName) {
-    final MapPanel map = getMapPanel();
-    if (map != null) {
-      if (this.exists) {
-        if (checkShowProperties()) {
-          try {
-            final Window window = SwingUtilities.getWindowAncestor(map);
-            final TabbedValuePanel panel = newPropertiesPanel();
-            panel.setSelectdTab(tabName);
-            panel.showDialog(window);
-            refresh();
-          } finally {
-            removeProperty("INTERNAL_PROPERTIES_VISIBLE");
+    if (this.exists) {
+      if (checkShowProperties()) {
+        try {
+          final MapPanel map = getMapPanel();
+          final Window window;
+          if (map == null) {
+            window = SwingUtil.getActiveWindow();
+          } else {
+            window = SwingUtilities.getWindowAncestor(map);
           }
+          final TabbedValuePanel panel = newPropertiesPanel();
+          panel.setSelectdTab(tabName);
+          panel.showDialog(window);
+          refresh();
+        } finally {
+          removeProperty("INTERNAL_PROPERTIES_VISIBLE");
         }
       }
     }

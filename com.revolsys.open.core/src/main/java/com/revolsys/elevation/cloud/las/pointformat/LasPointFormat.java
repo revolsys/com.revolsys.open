@@ -205,4 +205,5 @@ public enum LasPointFormat implements Code {
     point.read(pointCloud, reader);
     return point;
   }
+
 }

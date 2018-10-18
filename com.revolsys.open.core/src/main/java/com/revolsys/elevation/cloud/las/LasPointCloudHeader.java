@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -27,6 +28,7 @@ import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.record.io.format.html.HtmlWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
@@ -77,7 +79,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   private LasPointFormat pointFormat = LasPointFormat.Core;
 
-  private final byte[] projectId = new byte[16];
+  private UUID projectId;
 
   private RecordDefinition recordDefinition;
 
@@ -107,11 +109,9 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
         this.fileSourceId = reader.getUnsignedShort();
         this.globalEncoding = reader.getUnsignedShort();
 
-        // final long guid1 = Buffers.getLEUnsignedInt(header);
-        // final int guid2 = Buffers.getLEUnsignedShort(header);
-        // final int guid3 = Buffers.getLEUnsignedShort(header);
-        // final byte[] guid4 = header.getBytes(8);
-        reader.getBytes(this.projectId);
+        final long uuidLeast = reader.getLong();
+        final long uuidMost = reader.getLong();
+        this.projectId = new UUID(uuidMost, uuidLeast);
 
         this.version = new Version(reader);
         this.systemIdentifier = reader.getUsAsciiString(32);
@@ -143,7 +143,8 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
         final double offsetY = reader.getDouble();
         final double offsetZ = reader.getDouble();
 
-        final CoordinateSystem coordinateSystem = this.geometryFactory.getHorizontalCoordinateSystem();
+        final CoordinateSystem coordinateSystem = this.geometryFactory
+          .getHorizontalCoordinateSystem();
         this.geometryFactory = GeometryFactory.newWithOffsets(coordinateSystem, offsetX, scaleX,
           offsetY, scaleY, offsetZ, scaleZ);
 
@@ -267,7 +268,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     return this.pointFormat.getId();
   }
 
-  public byte[] getProjectId() {
+  public UUID getProjectId() {
     return this.projectId;
   }
 
@@ -420,7 +421,8 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
         addToMap(map, "coordinateSystemId", coordinateSystemId);
       }
 
-      final CoordinateSystem coordinateSystem = this.geometryFactory.getHorizontalCoordinateSystem();
+      final CoordinateSystem coordinateSystem = this.geometryFactory
+        .getHorizontalCoordinateSystem();
       if (coordinateSystem != null) {
         addToMap(map, "coordinateSystemName", coordinateSystem.getCoordinateSystemName());
         addToMap(map, "coordinateSystem", coordinateSystem.toEsriWktCs());
@@ -454,8 +456,10 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     out.writeBytes("LASF");
     out.writeLEUnsignedShort(this.fileSourceId);
     out.writeLEUnsignedShort(this.globalEncoding);
-
-    out.write(this.projectId);
+    final long uuidLeast = this.projectId.getLeastSignificantBits();
+    final long uuidMost = this.projectId.getMostSignificantBits();
+    out.writeLELong(uuidLeast);
+    out.writeLELong(uuidMost);
 
     out.write((byte)this.version.getMajor());
     out.write((byte)this.version.getMinor());
@@ -549,5 +553,22 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
       final byte[] bytes = record.getBytes();
       out.write(bytes);
     }
+  }
+
+  public void writeHtml(final HtmlWriter writer) {
+    writer.table() //
+      .tableRowLabelValue("File Source ID", this.fileSourceId) //
+      // TODO Global endcoding
+      .tableRowLabelValue("Project ID", this.projectId) //
+      .tableRowLabelValue("Version", this.version) //
+      .tableRowLabelValue("System Identifier", this.systemIdentifier) //
+      .tableRowLabelValue("Generating Software", this.generatingSoftware) //
+      .tableRowLabelValue("Date", this.date) //
+      .tableRowLabelValue("Format", this.pointFormat.getId() + " " + this.pointFormat) //
+      .tableRowLabelValue("Record Length", this.recordLength) //
+      .tableRowLabelValue("Point Count", this.pointCount) //
+      .endTag()//
+    ;
+
   }
 }

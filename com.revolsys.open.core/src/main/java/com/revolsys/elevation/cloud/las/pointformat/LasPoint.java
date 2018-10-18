@@ -82,7 +82,7 @@ public interface LasPoint extends Point, MapSerializer {
   default void setBlue(final int blue) {
   }
 
-  void setClassification(byte classification);
+  void setClassification(short classification);
 
   void setClassificationByte(byte classificationByte);
 

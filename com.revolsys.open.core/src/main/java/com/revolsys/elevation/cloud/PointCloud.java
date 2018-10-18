@@ -86,4 +86,6 @@ public interface PointCloud<P extends Point>
     final TriangulatedIrregularNetwork tin = tinBuilder.newTriangulatedIrregularNetwork();
     return tin;
   }
+
+  String toHtml();
 }

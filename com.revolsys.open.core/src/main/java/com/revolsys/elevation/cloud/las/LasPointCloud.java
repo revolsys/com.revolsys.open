@@ -23,12 +23,15 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.io.StringWriter;
 import com.revolsys.io.ZipUtil;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.io.format.html.HtmlWriter;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Pair;
 
 public class LasPointCloud extends BaseObjectWithProperties
@@ -55,36 +58,37 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   private ByteBuffer byteBuffer;
 
+  private Resource lasResource;
+
+  private boolean allLoaded = false;
+
   public LasPointCloud(final LasPointFormat pointFormat, final GeometryFactory geometryFactory) {
-    this.setHeader(new LasPointCloudHeader(pointFormat, geometryFactory));
+    final LasPointCloudHeader header = new LasPointCloudHeader(pointFormat, geometryFactory);
+    this.header = header;
+    this.geometryFactory = header.getGeometryFactory();
   }
 
   public LasPointCloud(final Resource resource, final MapEx properties) {
     setProperties(properties);
     this.resource = resource;
-    Resource fileResource = resource;
+    this.lasResource = resource;
     if (resource.getFileNameExtension().equals("zip")) {
       final Pair<Resource, GeometryFactory> result = ZipUtil
         .getZipResourceAndGeometryFactory(resource, ".las", this.geometryFactory);
-      fileResource = result.getValue1();
-      this.geometryFactory = result.getValue2();
-    }
-
-    this.reader = fileResource.newChannelReader(this.byteBuffer);
-    if (this.reader == null) {
-      this.exists = false;
+      this.lasResource = result.getValue1();
+      if (this.geometryFactory == null) {
+        this.geometryFactory = result.getValue2();
+      }
     } else {
-      this.reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-      this.exists = true;
       if (this.geometryFactory == null || !this.geometryFactory.isHasHorizontalCoordinateSystem()) {
         final GeometryFactory geometryFactoryFromPrj = GeometryFactory.floating3d(resource);
         if (geometryFactoryFromPrj != null) {
           this.geometryFactory = geometryFactoryFromPrj;
         }
       }
-      final LasPointCloudHeader header = new LasPointCloudHeader(this.reader, this.geometryFactory);
-      this.setHeader(header);
     }
+
+    this.reader = open();
   }
 
   @SuppressWarnings("unchecked")
@@ -95,12 +99,17 @@ public class LasPointCloud extends BaseObjectWithProperties
   }
 
   public void clear() {
+    closeReader();
     this.header.clear();
-    this.points.clear();
+    this.points = new ArrayList<>();
   }
 
   @Override
   public void close() {
+    closeReader();
+  }
+
+  protected void closeReader() {
     final ChannelReader reader = this.reader;
     this.reader = null;
     if (reader != null) {
@@ -110,11 +119,14 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   @Override
   public void forEachPoint(final Consumer<? super LasPoint> action) {
+    final Iterable<LasPoint> iterable = iterable();
     try {
-      final Iterable<LasPoint> iterable = iterable();
       iterable.forEach(action);
-    } finally {
-      this.reader = null;
+    } catch (RuntimeException | Error e) {
+      if (iterable instanceof BaseCloseable) {
+        ((BaseCloseable)iterable).close();
+      }
+      throw e;
     }
   }
 
@@ -150,6 +162,7 @@ public class LasPointCloud extends BaseObjectWithProperties
   }
 
   public List<LasPoint> getPoints() {
+    loadAllPoints();
     return this.points;
   }
 
@@ -162,29 +175,52 @@ public class LasPointCloud extends BaseObjectWithProperties
   }
 
   public Iterable<LasPoint> iterable() {
-    final ChannelReader reader = this.reader;
     final long pointCount = getPointCount();
-    if (pointCount == 0) {
-      this.reader = null;
+    if (this.allLoaded) {
+      return this.points;
+    } else if (pointCount == 0) {
       return Collections.emptyList();
-    } else if (reader == null) {
-      return Collections.unmodifiableList(this.points);
-    } else if (this.header.isLaszip()) {
-      final LasZipHeader lasZipHeader = getLasZipHeader();
-      if (lasZipHeader.isCompressor(LasZipHeader.LASZIP_COMPRESSOR_POINTWISE)) {
-        return new LazPointwiseIterator(this, reader);
-      } else {
-        return new LazChunkedIterator(this, reader);
-      }
-
     } else {
-      return new LasPointCloudIterator(this, reader);
+      ChannelReader reader = this.reader;
+      this.reader = null;
+      if (reader == null) {
+        reader = open();
+      }
+      if (reader == null) {
+        return Collections.emptyList();
+      } else {
+        try {
+          if (this.header.isLaszip()) {
+            final LasZipHeader lasZipHeader = getLasZipHeader();
+            if (lasZipHeader.isCompressor(LasZipHeader.LASZIP_COMPRESSOR_POINTWISE)) {
+              return new LazPointwiseIterator(this, reader);
+            } else {
+              return new LazChunkedIterator(this, reader);
+            }
+
+          } else {
+            return new LasPointCloudIterator(this, reader);
+          }
+        } catch (RuntimeException | Error e) {
+          reader.close();
+          throw e;
+        }
+      }
     }
   }
 
   @Override
   public Iterator<LasPoint> iterator() {
     return iterable().iterator();
+  }
+
+  private synchronized void loadAllPoints() {
+    if (!this.allLoaded && this.lasResource != null) {
+      this.allLoaded = true;
+      final List<LasPoint> points = new ArrayList<>((int)getPointCount());
+      forEachPoint(points::add);
+      this.points = points;
+    }
   }
 
   @Override
@@ -212,24 +248,21 @@ public class LasPointCloud extends BaseObjectWithProperties
     return tin;
   }
 
-  public void read() {
-    if (this.reader != null) {
-      this.points = new ArrayList<>((int)getPointCount());
-      forEachPoint(this.points::add);
+  private ChannelReader open() {
+    final ChannelReader reader = this.lasResource.newChannelReader(this.byteBuffer);
+    if (reader == null) {
+      this.exists = false;
+    } else {
+      reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+      this.exists = true;
+      this.header = new LasPointCloudHeader(reader, this.geometryFactory);
+      this.geometryFactory = this.header.getGeometryFactory();
+      if (this.header.getPointCount() == 0) {
+        reader.close();
+        return null;
+      }
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  public <P extends Point> int read(final Predicate<P> filter) {
-    if (this.reader != null) {
-      this.points = new ArrayList<>((int)getPointCount());
-      forEachPoint((point) -> {
-        if (filter.test((P)point)) {
-          this.points.add(point);
-        }
-      });
-    }
-    return this.points.size();
+    return reader;
   }
 
   public void setByteBuffer(final ByteBuffer byteBuffer) {
@@ -238,12 +271,6 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
-  }
-
-  private void setHeader(final LasPointCloudHeader header) {
-    this.header = header;
-    this.geometryFactory = header.getGeometryFactory();
-
   }
 
   @Override
@@ -259,6 +286,16 @@ public class LasPointCloud extends BaseObjectWithProperties
   @Override
   public double toDoubleZ(final int z) {
     return this.geometryFactory.toDoubleZ(z);
+  }
+
+  @Override
+  public String toHtml() {
+    try (
+      final StringWriter out = new StringWriter();
+      HtmlWriter writer = new HtmlWriter(out, false)) {
+      writer.element(HtmlElem.HTML, this::writeHtml);
+      return out.toString();
+    }
   }
 
   @Override
@@ -282,6 +319,10 @@ public class LasPointCloud extends BaseObjectWithProperties
     addToMap(map, "url", this.resource.getUri());
     addToMap(map, "header", this.header);
     return map;
+  }
+
+  public void writeHtml(final HtmlWriter writer) {
+    writer.elementClass(HtmlElem.DIV, "las", this.header::writeHtml);
   }
 
   public void writePointCloud(final Object target) {

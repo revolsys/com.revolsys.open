@@ -1,30 +1,19 @@
 package com.revolsys.elevation.cloud.las.zip;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import com.revolsys.elevation.cloud.las.LasPointCloud;
+import com.revolsys.elevation.cloud.las.LasPointCloudIterator;
 import com.revolsys.elevation.cloud.las.LasZipHeader;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
-import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.util.Exceptions;
 
-public class LazChunkedIterator implements Iterator<LasPoint>, Iterable<LasPoint> {
-
-  private long index = 0;
-
-  private long pointCount = 0;
+public class LazChunkedIterator extends LasPointCloudIterator {
 
   private final ArithmeticDecoder decoder;
 
   private final LazDecompress[] pointDecompressors;
-
-  private final LasPointFormat pointFormat;
-
-  private final ChannelReader reader;
-
-  private final LasPointCloud pointCloud;
 
   private final long chunkTableOffset;
 
@@ -33,13 +22,10 @@ public class LazChunkedIterator implements Iterator<LasPoint>, Iterable<LasPoint
   private long chunkReadCount;
 
   public LazChunkedIterator(final LasPointCloud pointCloud, final ChannelReader reader) {
-    this.pointCloud = pointCloud;
-    this.reader = reader;
-    this.pointCount = pointCloud.getPointCount();
+    super(pointCloud, reader);
     this.decoder = new ArithmeticDecoder();
     final LasZipHeader lasZipHeader = pointCloud.getLasZipHeader();
     this.pointDecompressors = lasZipHeader.newLazDecompressors(pointCloud, this.decoder);
-    this.pointFormat = pointCloud.getPointFormat();
 
     this.chunkTableOffset = reader.getLong();
     this.chunkSize = lasZipHeader.getChunkSize();
@@ -57,31 +43,27 @@ public class LazChunkedIterator implements Iterator<LasPoint>, Iterable<LasPoint
   }
 
   @Override
-  public LasPoint next() {
-    if (this.index < this.pointCount) {
-      try {
-        LasPoint point;
-        if (this.chunkSize == this.chunkReadCount) {
-          point = this.pointFormat.readLasPoint(this.pointCloud, this.reader);
-          for (final LazDecompress pointDecompressor : this.pointDecompressors) {
-            pointDecompressor.init(point);
-          }
-          this.decoder.init(this.reader);
-          this.chunkReadCount = 0;
-        } else {
-          point = this.pointFormat.newLasPoint(this.pointCloud);
-          for (final LazDecompress pointDecompressor : this.pointDecompressors) {
-            pointDecompressor.read(point);
-          }
+  protected LasPoint readNext() {
+    try {
+      LasPoint point;
+      if (this.chunkSize == this.chunkReadCount) {
+        point = this.pointFormat.readLasPoint(this.pointCloud, this.reader);
+        for (final LazDecompress pointDecompressor : this.pointDecompressors) {
+          pointDecompressor.init(point);
         }
-        this.chunkReadCount++;
-        this.index++;
-        return point;
-      } catch (final Exception e) {
-        throw Exceptions.wrap("Error decompressing: " + this.pointCloud.getResource(), e);
+        this.decoder.init(this.reader);
+        this.chunkReadCount = 0;
+      } else {
+        point = this.pointFormat.newLasPoint(this.pointCloud);
+        for (final LazDecompress pointDecompressor : this.pointDecompressors) {
+          pointDecompressor.read(point);
+        }
       }
-    } else {
-      throw new NoSuchElementException();
+      this.chunkReadCount++;
+      return point;
+    } catch (final Exception e) {
+      close();
+      throw Exceptions.wrap("Error decompressing: " + this.pointCloud.getResource(), e);
     }
   }
 

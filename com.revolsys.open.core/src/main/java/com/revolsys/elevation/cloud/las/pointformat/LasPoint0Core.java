@@ -132,7 +132,11 @@ public class LasPoint0Core extends BaseLasPoint {
   }
 
   @Override
-  public void setClassification(final byte classification) {
+  public void setClassification(final short classification) {
+    if (classification < 0 && classification > 31) {
+      throw new IllegalArgumentException("Invalid LAS classificaion " + classification
+        + " not in 0..31 for record format " + getPointFormatId());
+    }
     byte newClassificationByte = this.classificationByte;
     newClassificationByte &= 0b11100000;
     newClassificationByte |= classification & 0b11111;
