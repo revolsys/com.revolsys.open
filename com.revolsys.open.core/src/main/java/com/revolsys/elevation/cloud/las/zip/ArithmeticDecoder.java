@@ -300,6 +300,5 @@ public class ArithmeticDecoder {
                                                                                // multiplied
                                                                                // by
                                                                                // 256
-    System.out.println(this.u_value + "\t" + this.u_length);
   }
 }

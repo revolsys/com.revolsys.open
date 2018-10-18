@@ -64,7 +64,7 @@ public class LazChunkedIterator implements Iterator<LasPoint>, Iterable<LasPoint
         for (final LazDecompress pointDecompressor : this.pointDecompressors) {
           pointDecompressor.init(point);
         }
-        this.decoder.reset();
+        this.decoder.init(this.reader);
         this.chunkReadCount = 0;
       } else {
         point = this.pointFormat.newLasPoint(this.pointCloud);

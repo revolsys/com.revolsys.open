@@ -12,80 +12,151 @@ package com.revolsys.elevation.cloud.las.zip;
 
 import static com.revolsys.elevation.cloud.las.zip.Common_v2.number_return_level;
 import static com.revolsys.elevation.cloud.las.zip.Common_v2.number_return_map;
+import static com.revolsys.elevation.cloud.las.zip.MyDefs.U32_ZERO_BIT_0;
+import static com.revolsys.elevation.cloud.las.zip.MyDefs.U8_FOLD;
 import static com.revolsys.elevation.cloud.las.zip.StreamingMedian5.newStreamingMedian5;
+
+import java.nio.ByteBuffer;
 
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
 public class LazDecompressPoint10V2 implements LazDecompress {
 
-  protected int classificationByte;
+  static class LASpoint10 {
+    static LASpoint10 wrap(final byte[] data) {
+      return new LASpoint10(ByteBuffer.wrap(data));
+    }
 
-  protected final ArithmeticDecoder dec;
+    private final ByteBuffer bb;
 
-  protected IntegerCompressor ic_z;
+    public LASpoint10() {
+      this(ByteBuffer.allocate(20));
+    }
 
-  protected IntegerCompressor ic_dx;
+    private LASpoint10(final ByteBuffer bb) {
+      this.bb = bb;
+    }
 
-  protected IntegerCompressor ic_dy;
+    char getIntensity() {
+      return this.bb.getChar(12);
+    }
 
-  protected IntegerCompressor ic_intensity;
+    int getNumber_of_returns_of_given_pulse() {
+      final byte b = this.bb.get(14);
+      return b >>> 3 & 0x7;
+    }
 
-  protected IntegerCompressor ic_point_source_ID;
+    char getPoint_source_ID() {
+      return this.bb.getChar(18);
+    }
 
-  protected int intensity = 0;
+    int getReturn_number() {
+      final byte b = this.bb.get(14);
+      return b & 0x7;
+    }
+
+    int getScan_direction_flag() {
+      final byte b = this.bb.get(14);
+      return b >>> 6 & 0x1;
+    }
+
+    int getX() {
+      return this.bb.getInt(0);
+    }
+
+    int getY() {
+      return this.bb.getInt(4);
+    }
+
+    int getZ() {
+      return this.bb.getInt(8);
+    }
+
+    void setIntensity(final char i) {
+      this.bb.putChar(12, i);
+    }
+
+    void setPoint_source_ID(final char id) {
+      this.bb.putChar(18, id);
+    }
+
+    void setX(final int x) {
+      this.bb.putInt(0, x);
+    }
+
+    void setY(final int y) {
+      this.bb.putInt(4, y);
+    }
+
+    void setZ(final int z) {
+      this.bb.putInt(8, z);
+    }
+
+    /*
+     * int x; // 0 int y; // 4 int z; // 8 char intensity; // 12 byte
+     * return_number : 3; // 14 byte number_of_returns_of_given_pulse : 3; // 14
+     * byte scan_direction_flag : 1; // 14 byte edge_of_flight_line : 1; // 14
+     * byte classification; // 15 byte scan_angle_rank; // 16 byte user_data; //
+     * 17 char point_source_ID; // 18
+     */
+  }
+
+  private final ArithmeticDecoder dec;
+
+  private final IntegerCompressor ic_z;
+
+  private final IntegerCompressor ic_dx;
+
+  private final IntegerCompressor ic_dy;
+
+  private final IntegerCompressor ic_intensity;
+
+  private final IntegerCompressor ic_point_source_ID;
 
   private final int[] last_height = new int[8]; // signed
 
-  private final int[] last_intensity = new int[16];
+  private final char[] last_intensity = new char[16];
 
   private final StreamingMedian5[] last_x_diff_median5 = newStreamingMedian5(16);
 
   private final StreamingMedian5[] last_y_diff_median5 = newStreamingMedian5(16);
 
-  protected final ArithmeticModel[] m_bit_byte = new ArithmeticModel[256];
+  private final ArithmeticModel[] m_bit_byte = new ArithmeticModel[256];
 
-  protected final ArithmeticModel m_changed_values;
+  private final ArithmeticModel m_changed_values;
 
-  protected final ArithmeticModel[] m_classification = new ArithmeticModel[256];
+  private final ArithmeticModel[] m_classification = new ArithmeticModel[256];
 
-  private final ArithmeticModel m_scan_angle_rank_false;
+  private final ArithmeticModel[] m_scan_angle_rank = new ArithmeticModel[2];
 
-  private final ArithmeticModel m_scan_angle_rank_true;
+  private final ArithmeticModel[] m_user_data = new ArithmeticModel[256];
 
-  protected final ArithmeticModel[] m_user_data = new ArithmeticModel[256];
+  private final byte[] last_item = new byte[20];
 
-  private final LasPointCloud pointCloud;
+  private final LASpoint10 lp = LASpoint10.wrap(this.last_item);
 
-  protected int pointSourceId;
+  public LazDecompressPoint10V2(final LasPointCloud pointCloud, final ArithmeticDecoder dec) {
+    int i; // unsigned
 
-  protected int returnByte;
+    /* set decoder */
+    assert dec != null;
+    this.dec = dec;
 
-  protected byte scanAngleRank;
-
-  protected boolean scanDirectionFlag;
-
-  protected int userData;
-
-  protected int x;
-
-  protected int y;
-
-  protected int z;
-
-  public LazDecompressPoint10V2(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
-    this.pointCloud = pointCloud;
-    this.dec = decoder;
-    this.m_changed_values = decoder.createSymbolModel(64);
-    this.m_scan_angle_rank_false = decoder.createSymbolModel(256);
-
-    this.m_scan_angle_rank_true = decoder.createSymbolModel(256);
-
-    this.ic_dx = new IntegerCompressor(decoder, 32, 2);
-    this.ic_dy = new IntegerCompressor(decoder, 32, 22);
-    this.ic_z = new IntegerCompressor(decoder, 32, 20);
-    this.ic_intensity = new IntegerCompressor(decoder, 16, 4);
-    this.ic_point_source_ID = new IntegerCompressor(decoder, 16);
+    /* create models and integer compressors */
+    this.m_changed_values = dec.createSymbolModel(64);
+    this.ic_intensity = new IntegerCompressor(dec, 16, 4);
+    this.m_scan_angle_rank[0] = dec.createSymbolModel(256);
+    this.m_scan_angle_rank[1] = dec.createSymbolModel(256);
+    this.ic_point_source_ID = new IntegerCompressor(dec, 16);
+    for (i = 0; i < 256; i++) {
+      this.m_bit_byte[i] = null;
+      this.m_classification[i] = null;
+      this.m_user_data[i] = null;
+    }
+    this.ic_dx = new IntegerCompressor(dec, 32, 2); // 32 bits, 2 context
+    this.ic_dy = new IntegerCompressor(dec, 32, 22); // 32 bits, 22 contexts
+    this.ic_z = new IntegerCompressor(dec, 32, 20); // 32 bits, 20 contexts
   }
 
   @Override
@@ -103,8 +174,8 @@ public class LazDecompressPoint10V2 implements LazDecompress {
     /* init models and integer compressors */
     this.dec.initSymbolModel(this.m_changed_values);
     this.ic_intensity.initDecompressor();
-    this.dec.initSymbolModel(this.m_scan_angle_rank_false);
-    this.dec.initSymbolModel(this.m_scan_angle_rank_true);
+    this.dec.initSymbolModel(this.m_scan_angle_rank[0]);
+    this.dec.initSymbolModel(this.m_scan_angle_rank[1]);
     this.ic_point_source_ID.initDecompressor();
     for (i = 0; i < 256; i++) {
       if (this.m_bit_byte[i] != null) {
@@ -121,134 +192,129 @@ public class LazDecompressPoint10V2 implements LazDecompress {
     this.ic_dy.initDecompressor();
     this.ic_z.initDecompressor();
 
-    this.x = point.getXInt();
-    this.y = point.getYInt();
-    this.z = point.getZInt();
+    this.lp.setX(point.getXInt()); // last_item[0]
+    this.lp.setY(point.getYInt()); // last_item[4]
+    this.lp.setZ(point.getZInt()); // last_item[8]
 
-    this.classificationByte = (short)Byte.toUnsignedInt(point.getClassificationByte());
-    this.returnByte = (short)Byte.toUnsignedInt(point.getReturnByte());
-    this.userData = point.getUserData();
-    this.scanDirectionFlag = point.isScanDirectionFlag();
-    this.scanAngleRank = point.getScanAngleRank();
-    this.pointSourceId = point.getPointSourceID();
-
-    this.intensity = 0;
+    /* but set intensity to zero */
+    this.last_item[12] = 0;
+    this.last_item[13] = 0;
+    this.last_item[14] = point.getReturnByte();
+    this.last_item[15] = point.getClassificationByte();
+    this.last_item[16] = point.getScanAngleRank();
+    this.last_item[17] = (byte)point.getUserData();
+    this.lp.setPoint_source_ID((char)point.getPointSourceID());
   }
 
-  protected void postRead(final LasPoint point) {
-    point.setXYZ(this.x, this.y, this.z);
-    point.setIntensity(this.intensity);
-    point.setReturnByte((byte)this.returnByte);
+  private void postRead(final LasPoint point) {
+    final int x = this.lp.getX();
+    final int y = this.lp.getY();
+    final int z = this.lp.getZ();
+    point.setXYZ(x, y, z);
+    point.setIntensity(this.lp.getIntensity());
+    point.setReturnByte(this.last_item[14]);
 
-    point.setClassificationByte((byte)this.classificationByte);
-    point.setScanAngleRank(this.scanAngleRank);
-    point.setUserData((short)this.userData);
-    point.setPointSourceID(this.pointSourceId);
-  }
-
-  protected int read(final ArithmeticModel[] models, final int lastValue) {
-    ArithmeticModel model = models[lastValue];
-    if (model == null) {
-      model = this.dec.createSymbolModel(256);
-      models[lastValue] = model;
-      this.dec.initSymbolModel(model);
-    }
-
-    final int newValue = this.dec.decodeSymbol(model);
-    return newValue;
+    point.setClassificationByte(this.last_item[15]);
+    point.setScanAngleRank(this.last_item[16]);
+    point.setUserData(this.last_item[17]);
+    point.setPointSourceID(this.lp.getPoint_source_ID());
   }
 
   @Override
   public void read(final LasPoint point) {
+    int r, n, m, l; // unsigned
+    int k_bits; // unsigned
+    int median, diff; // signed
 
-    System.out.println("changedValues");
-    final int changedValues = this.dec.decodeSymbol(this.m_changed_values);
-    final int m;
-    int r;
-    int n;
-    final int l;
-    if (changedValues != 0) {
+    // decompress which other values have changed
+    final int changed_values = this.dec.decodeSymbol(this.m_changed_values);
+
+    final LASpoint10 lp = this.lp;
+    if (changed_values != 0) {
       // decompress the edge_of_flight_line, scan_direction_flag, ... if it has
       // changed
-      if ((changedValues & 32) != 0) {
-        System.out.println("return");
-        this.returnByte = read(this.m_bit_byte, this.returnByte);
+      if ((changed_values & 32) != 0) {
+        if (this.m_bit_byte[Byte.toUnsignedInt(this.last_item[14])] == null) {
+          this.m_bit_byte[Byte.toUnsignedInt(this.last_item[14])] = this.dec.createSymbolModel(256);
+          this.dec.initSymbolModel(this.m_bit_byte[Byte.toUnsignedInt(this.last_item[14])]);
+        }
+        this.last_item[14] = (byte)this.dec
+          .decodeSymbol(this.m_bit_byte[Byte.toUnsignedInt(this.last_item[14])]);
       }
 
-      r = this.returnByte & 0b111;
-      n = this.returnByte >> 3 & 0b111;
+      r = lp.getReturn_number();
+      n = lp.getNumber_of_returns_of_given_pulse();
       m = number_return_map[n][r];
       l = number_return_level[n][r];
 
       // decompress the intensity if it has changed
-      if ((changedValues & 16) != 0) {
-        System.out.println("intensity");
-        this.intensity = this.ic_intensity.decompress(this.last_intensity[m], m < 3 ? m : 3);
-        this.last_intensity[m] = this.intensity;
+      if ((changed_values & 16) != 0) {
+        lp.setIntensity((char)this.ic_intensity.decompress(this.last_intensity[m], m < 3 ? m : 3));
+        this.last_intensity[m] = lp.getIntensity();
       } else {
-        this.intensity = this.last_intensity[m];
+        lp.setIntensity(this.last_intensity[m]);
       }
 
-      if ((changedValues & 8) != 0) {
-        System.out.println("classification");
-        this.classificationByte = read(this.m_classification, this.classificationByte);
+      // decompress the classification ... if it has changed
+      if ((changed_values & 8) != 0) {
+        if (this.m_classification[Byte.toUnsignedInt(this.last_item[15])] == null) {
+          this.m_classification[Byte.toUnsignedInt(this.last_item[15])] = this.dec
+            .createSymbolModel(256);
+          this.dec.initSymbolModel(this.m_classification[Byte.toUnsignedInt(this.last_item[15])]);
+        }
+        this.last_item[15] = (byte)this.dec
+          .decodeSymbol(this.m_classification[Byte.toUnsignedInt(this.last_item[15])]);
       }
 
       // decompress the scan_angle_rank ... if it has changed
-      if ((changedValues & 4) != 0) {
-        System.out.println("scan angle");
-        ArithmeticModel model;
-        if (this.scanDirectionFlag) {
-          model = this.m_scan_angle_rank_true;
-        } else {
-          model = this.m_scan_angle_rank_false;
-        }
-        final int val = this.dec.decodeSymbol(model);
-        this.scanAngleRank = (byte)Byte.toUnsignedInt(MyDefs.U8_FOLD(val + this.scanAngleRank));
+      if ((changed_values & 4) != 0) {
+        final int val = this.dec.decodeSymbol(this.m_scan_angle_rank[lp.getScan_direction_flag()]);
+        this.last_item[16] = U8_FOLD(val + this.last_item[16]);
       }
 
-      if ((changedValues & 2) != 0) {
-        System.out.println("user data");
-        this.userData = read(this.m_user_data, this.userData);
+      // decompress the user_data ... if it has changed
+      if ((changed_values & 2) != 0) {
+        if (this.m_user_data[Byte.toUnsignedInt(this.last_item[17])] == null) {
+          this.m_user_data[Byte.toUnsignedInt(this.last_item[17])] = this.dec
+            .createSymbolModel(256);
+          this.dec.initSymbolModel(this.m_user_data[Byte.toUnsignedInt(this.last_item[17])]);
+        }
+        this.last_item[17] = (byte)this.dec
+          .decodeSymbol(this.m_user_data[Byte.toUnsignedInt(this.last_item[17])]);
       }
 
       // decompress the point_source_ID ... if it has changed
-      if ((changedValues & 1) != 0) {
-        System.out.println("pointSourceId");
-        this.pointSourceId = this.ic_point_source_ID.decompress(this.pointSourceId);
+      if ((changed_values & 1) != 0) {
+        lp.setPoint_source_ID((char)this.ic_point_source_ID.decompress(lp.getPoint_source_ID()));
       }
     } else {
-      r = this.returnByte & 0b111;
-      n = this.returnByte >> 3 & 0b111;
+      r = lp.getReturn_number();
+      n = lp.getNumber_of_returns_of_given_pulse();
       m = number_return_map[n][r];
       l = number_return_level[n][r];
     }
 
     // decompress x coordinate
-    final int medianX = this.last_x_diff_median5[m].get();
-    System.out.println("x");
-    final int diffX = this.ic_dx.decompress(medianX, n == 1 ? 1 : 0);
-    this.x += diffX;
-    this.last_x_diff_median5[m].add(diffX);
+    median = this.last_x_diff_median5[m].get();
+    diff = this.ic_dx.decompress(median, n == 1 ? 1 : 0);
+    lp.setX(lp.getX() + diff);
+    this.last_x_diff_median5[m].add(diff);
 
     // decompress y coordinate
-    final int medianY = this.last_y_diff_median5[m].get();
-    final int kBitsY = this.ic_dx.getK();
-    System.out.println("y");
-    final int diffY = this.ic_dy.decompress(medianY,
-      (n == 1 ? 1 : 0) + (kBitsY < 20 ? MyDefs.U32_ZERO_BIT_0(kBitsY) : 20));
-    this.y += diffY;
-    this.last_y_diff_median5[m].add(diffY);
+    median = this.last_y_diff_median5[m].get();
+    k_bits = this.ic_dx.getK();
+    diff = this.ic_dy.decompress(median,
+      (n == 1 ? 1 : 0) + (k_bits < 20 ? U32_ZERO_BIT_0(k_bits) : 20));
+    lp.setY(lp.getY() + diff);
+    this.last_y_diff_median5[m].add(diff);
 
     // decompress z coordinate
-    System.out.println("z");
-    final int kBitsZ = (this.ic_dx.getK() + this.ic_dy.getK()) / 2;
-    this.z = this.ic_z.decompress(this.last_height[l],
-      (n == 1 ? 1 : 0) + (kBitsZ < 18 ? MyDefs.U32_ZERO_BIT_0(kBitsZ) : 18));
-    this.last_height[l] = this.z;
+    k_bits = (this.ic_dx.getK() + this.ic_dy.getK()) / 2;
+    lp.setZ(this.ic_z.decompress(this.last_height[l],
+      (n == 1 ? 1 : 0) + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18)));
+    this.last_height[l] = lp.getZ();
 
     postRead(point);
-    this.scanDirectionFlag = point.isScanDirectionFlag();
   }
 
 }

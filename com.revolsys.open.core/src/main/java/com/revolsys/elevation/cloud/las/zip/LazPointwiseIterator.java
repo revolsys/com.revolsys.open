@@ -55,7 +55,7 @@ public class LazPointwiseIterator implements Iterator<LasPoint>, Iterable<LasPoi
         for (final LazDecompress pointDecompressor : this.pointDecompressors) {
           pointDecompressor.init(point);
         }
-        this.decoder.reset();
+        this.decoder.init(reader);
       } else {
         point = this.pointFormat.newLasPoint(this.pointCloud);
         for (final LazDecompress pointDecompressor : this.pointDecompressors) {
