@@ -8,6 +8,7 @@ import com.revolsys.elevation.cloud.las.LasZipHeader;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.util.Exceptions;
 
 public class LazPointwiseIterator implements Iterator<LasPoint>, Iterable<LasPoint> {
 
@@ -48,22 +49,26 @@ public class LazPointwiseIterator implements Iterator<LasPoint>, Iterable<LasPoi
   @Override
   public LasPoint next() {
     if (this.index < this.pointCount) {
-      LasPoint point;
-      if (this.index == 0) {
-        final ChannelReader reader = this.reader;
-        point = this.pointFormat.readLasPoint(this.pointCloud, reader);
-        for (final LazDecompress pointDecompressor : this.pointDecompressors) {
-          pointDecompressor.init(point);
+      try {
+        LasPoint point;
+        if (this.index == 0) {
+          final ChannelReader reader = this.reader;
+          point = this.pointFormat.readLasPoint(this.pointCloud, reader);
+          for (final LazDecompress pointDecompressor : this.pointDecompressors) {
+            pointDecompressor.init(point);
+          }
+          this.decoder.init(reader);
+        } else {
+          point = this.pointFormat.newLasPoint(this.pointCloud);
+          for (final LazDecompress pointDecompressor : this.pointDecompressors) {
+            pointDecompressor.read(point);
+          }
         }
-        this.decoder.init(reader);
-      } else {
-        point = this.pointFormat.newLasPoint(this.pointCloud);
-        for (final LazDecompress pointDecompressor : this.pointDecompressors) {
-          pointDecompressor.read(point);
-        }
+        this.index++;
+        return point;
+      } catch (final Exception e) {
+        throw Exceptions.wrap("Error decompressing: " + this.pointCloud.getResource(), e);
       }
-      this.index++;
-      return point;
     } else {
       throw new NoSuchElementException();
     }

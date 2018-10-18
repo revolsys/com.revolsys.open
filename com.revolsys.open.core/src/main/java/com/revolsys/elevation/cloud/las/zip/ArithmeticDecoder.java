@@ -202,7 +202,7 @@ public class ArithmeticDecoder {
     }
 
     if (compareUnsigned(u_sym, 2) >= 0) {
-      throw new RuntimeException("4711");
+      throw new IllegalStateException("Error decompressing LAZ file");
     }
 
     return u_sym;
@@ -229,7 +229,7 @@ public class ArithmeticDecoder {
     }
 
     if (compareUnsigned(u_sym, 1 << u_bits) >= 0) {
-      throw new RuntimeException("4711");
+      throw new IllegalStateException("Error decompressing LAZ file");
     }
 
     return u_sym;
@@ -247,7 +247,7 @@ public class ArithmeticDecoder {
     }
 
     if (compareUnsigned(u_sym, 1 << 8) >= 0) {
-      throw new RuntimeException("4711");
+      throw new IllegalStateException("Error decompressing LAZ file");
     }
 
     return (byte)u_sym;
@@ -287,7 +287,7 @@ public class ArithmeticDecoder {
     }
 
     if (compareUnsigned(u_sym, 1 << 16) >= 0) {
-      throw new RuntimeException("4711");
+      throw new IllegalStateException("Error decompressing LAZ file");
     }
 
     return (char)u_sym;

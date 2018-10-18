@@ -8,6 +8,7 @@ import com.revolsys.elevation.cloud.las.LasZipHeader;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.util.Exceptions;
 
 public class LazChunkedIterator implements Iterator<LasPoint>, Iterable<LasPoint> {
 
@@ -58,23 +59,27 @@ public class LazChunkedIterator implements Iterator<LasPoint>, Iterable<LasPoint
   @Override
   public LasPoint next() {
     if (this.index < this.pointCount) {
-      LasPoint point;
-      if (this.chunkSize == this.chunkReadCount) {
-        point = this.pointFormat.readLasPoint(this.pointCloud, this.reader);
-        for (final LazDecompress pointDecompressor : this.pointDecompressors) {
-          pointDecompressor.init(point);
+      try {
+        LasPoint point;
+        if (this.chunkSize == this.chunkReadCount) {
+          point = this.pointFormat.readLasPoint(this.pointCloud, this.reader);
+          for (final LazDecompress pointDecompressor : this.pointDecompressors) {
+            pointDecompressor.init(point);
+          }
+          this.decoder.init(this.reader);
+          this.chunkReadCount = 0;
+        } else {
+          point = this.pointFormat.newLasPoint(this.pointCloud);
+          for (final LazDecompress pointDecompressor : this.pointDecompressors) {
+            pointDecompressor.read(point);
+          }
         }
-        this.decoder.init(this.reader);
-        this.chunkReadCount = 0;
-      } else {
-        point = this.pointFormat.newLasPoint(this.pointCloud);
-        for (final LazDecompress pointDecompressor : this.pointDecompressors) {
-          pointDecompressor.read(point);
-        }
+        this.chunkReadCount++;
+        this.index++;
+        return point;
+      } catch (final Exception e) {
+        throw Exceptions.wrap("Error decompressing: " + this.pointCloud.getResource(), e);
       }
-      this.chunkReadCount++;
-      this.index++;
-      return point;
     } else {
       throw new NoSuchElementException();
     }

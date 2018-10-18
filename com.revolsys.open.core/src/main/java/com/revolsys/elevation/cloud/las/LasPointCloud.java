@@ -153,6 +153,10 @@ public class LasPointCloud extends BaseObjectWithProperties
     return this.points;
   }
 
+  public Resource getResource() {
+    return this.resource;
+  }
+
   public boolean isExists() {
     return this.exists;
   }
