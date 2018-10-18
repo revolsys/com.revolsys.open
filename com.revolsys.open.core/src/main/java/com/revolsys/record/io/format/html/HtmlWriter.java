@@ -50,24 +50,26 @@ public class HtmlWriter extends XmlWriter implements HtmlElem, HtmlAttr {
     return this;
   }
 
+  public HtmlWriter h2(final String text) {
+    element(H2, text);
+    return this;
+  }
+
   public HtmlWriter table() {
     startTag(TABLE);
     return this;
   }
 
-  public HtmlWriter tableRowLabelValue(final String label, final Object value) {
-    startTag(TR);
-    startTag(TH);
-    attribute(HtmlAttr.STYLE, "text-align:left");
-    text(label);
-    endTag(TH);
+  public HtmlWriter tableRowLabelValue(final Object label, final Object value) {
+    tr();
+    thLabel(label);
     element(TD, value);
     endTag();
     return this;
   }
 
   public HtmlWriter tableRowTd(final Object... cells) {
-    startTag(TR);
+    tr();
     for (final Object cell : cells) {
       element(TD, cell);
     }
@@ -76,11 +78,30 @@ public class HtmlWriter extends XmlWriter implements HtmlElem, HtmlAttr {
   }
 
   public HtmlWriter tableRowTh(final Object... cells) {
-    startTag(TR);
+    tr();
     for (final Object cell : cells) {
       element(TH, cell);
     }
     endTag();
+    return this;
+  }
+
+  public HtmlWriter td() {
+    startTag(TD);
+    return this;
+  }
+
+  public HtmlWriter thLabel(final Object label) {
+    startTag(TH);
+    attribute("VALIGN", "top");
+    attribute(HtmlAttr.STYLE, "text-align:left; vertical-align:top");
+    text(label);
+    endTag(TH);
+    return this;
+  }
+
+  public HtmlWriter tr() {
+    startTag(TR);
     return this;
   }
 

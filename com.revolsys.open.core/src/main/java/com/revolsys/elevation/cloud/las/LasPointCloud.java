@@ -2,7 +2,9 @@ package com.revolsys.elevation.cloud.las;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -61,6 +63,10 @@ public class LasPointCloud extends BaseObjectWithProperties
   private Resource lasResource;
 
   private boolean allLoaded = false;
+
+  private final long[] classificationCounts = new long[256];
+
+  private boolean classificationsLoaded;
 
   public LasPointCloud(final LasPointFormat pointFormat, final GeometryFactory geometryFactory) {
     final LasPointCloudHeader header = new LasPointCloudHeader(pointFormat, geometryFactory);
@@ -133,6 +139,10 @@ public class LasPointCloud extends BaseObjectWithProperties
   @Override
   public BoundingBox getBoundingBox() {
     return this.header.getBoundingBox();
+  }
+
+  public long[] getClassificationCounts() {
+    return this.classificationCounts.clone();
   }
 
   @Override
@@ -265,6 +275,16 @@ public class LasPointCloud extends BaseObjectWithProperties
     return reader;
   }
 
+  @Override
+  public void refreshClassificationCounts() {
+    Arrays.fill(this.classificationCounts, 0);
+    forEachPoint(point -> {
+      final short classification = point.getClassification();
+      this.classificationCounts[classification]++;
+    });
+    this.classificationsLoaded = true;
+  }
+
   public void setByteBuffer(final ByteBuffer byteBuffer) {
     this.byteBuffer = byteBuffer;
   }
@@ -322,7 +342,25 @@ public class LasPointCloud extends BaseObjectWithProperties
   }
 
   public void writeHtml(final HtmlWriter writer) {
-    writer.elementClass(HtmlElem.DIV, "las", this.header::writeHtml);
+    writer.divClass("las");
+    writer.attribute(HtmlWriter.CLASS, "las");
+    this.header.writeHtml(writer);
+    if (this.classificationsLoaded) {
+      writer.h2("Classifications");
+      writer.table();
+      final DecimalFormat numberFormat = new DecimalFormat("#,###");
+      for (short classification = 0; classification < this.classificationCounts.length; classification++) {
+        final long count = this.classificationCounts[classification];
+        if (count > 0) {
+          final String lasClassification = LasClassification.CLASSIFICATIONS
+            .getOrDefault(classification, "Custom");
+          final String label = classification + " - " + lasClassification;
+          writer.tableRowLabelValue(label, numberFormat.format(count));
+        }
+      }
+      writer.endTag();
+    }
+    writer.endTag();
   }
 
   public void writePointCloud(final Object target) {

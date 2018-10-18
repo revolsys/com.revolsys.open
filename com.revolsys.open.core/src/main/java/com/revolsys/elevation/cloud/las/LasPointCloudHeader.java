@@ -2,6 +2,7 @@ package com.revolsys.elevation.cloud.las;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -556,6 +557,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
   }
 
   public void writeHtml(final HtmlWriter writer) {
+    final DecimalFormat numberFormat = new DecimalFormat("#,###");
     writer.table() //
       .tableRowLabelValue("File Source ID", this.fileSourceId) //
       // TODO Global endcoding
@@ -566,9 +568,23 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
       .tableRowLabelValue("Date", this.date) //
       .tableRowLabelValue("Format", this.pointFormat.getId() + " " + this.pointFormat) //
       .tableRowLabelValue("Record Length", this.recordLength) //
-      .tableRowLabelValue("Point Count", this.pointCount) //
-      .endTag()//
+      .tableRowLabelValue("Point Count", numberFormat.format(this.pointCount)) //
     ;
-
+    if (this.pointCount > 0) {
+      writer.tr() //
+        .thLabel("Point Count by Return") //
+        .td()//
+        .table();
+      for (int i = 0; i < this.pointCountByReturn.length; i++) {
+        final long pointCount = this.pointCountByReturn[i];
+        if (pointCount > 0) {
+          writer.tableRowLabelValue(i + 1, numberFormat.format(pointCount));
+        }
+      }
+      writer.endTag();
+      writer.endTag();
+      writer.endTag();
+    }
+    writer.endTag();
   }
 }

@@ -87,5 +87,7 @@ public interface PointCloud<P extends Point>
     return tin;
   }
 
+  void refreshClassificationCounts();
+
   String toHtml();
 }

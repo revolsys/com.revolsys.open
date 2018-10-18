@@ -1,11 +1,17 @@
 package com.revolsys.swing.map.layer.pointcloud;
 
+import java.awt.Dimension;
 import java.nio.file.Path;
 import java.util.Map;
 
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JEditorPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
+import org.jdesktop.swingx.VerticalLayout;
+
+import com.revolsys.collection.ValueHolder;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
@@ -19,6 +25,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.RsSwingServiceInitializer;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -39,8 +46,7 @@ public class PointCloudLayer extends AbstractLayer {
     TreeNodes.addMenuItem(PathTreeNode.MENU, "point_cloud", "Point Cloud Properties",
       (final PathTreeNode node) -> {
         final Path file = node.getPath();
-        final String baseName = Paths.getBaseName(file);
-        Invoke.background("Point Cloud Properties: " + baseName, () -> {
+        Invoke.later(() -> {
           final Resource resource = Resource.getResource(file);
           final PointCloudLayer layer = new PointCloudLayer(resource);
           layer.initialize();
@@ -182,12 +188,38 @@ public class PointCloudLayer extends AbstractLayer {
     final BasePanel generalPanel = super.newPropertiesTabGeneral(tabPanel);
 
     final ValueField propertiesPanel = new ValueField(this);
-    propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.PAGE_AXIS));
+    propertiesPanel.setLayout(new VerticalLayout(5));
     Borders.titled(propertiesPanel, "Properties");
     generalPanel.add(propertiesPanel);
     final String propertiesHtml = this.pointCloud.toHtml();
-    final JLabel label = new JLabel(propertiesHtml);
-    propertiesPanel.add(label);
+
+    final JTextPane propertiesPane = new JTextPane();
+    propertiesPane.setContentType("text/html");
+    propertiesPane.setFont(SwingUtil.FONT);
+    propertiesPane.setText(propertiesHtml);
+    propertiesPane.setEditable(false);
+    propertiesPane.setOpaque(false);
+    propertiesPane.setBorder(null);
+    propertiesPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+
+    final JScrollPane scrollPane = new JScrollPane(propertiesPane);
+    scrollPane.setMinimumSize(new Dimension(1000, 350));
+    scrollPane.setPreferredSize(new Dimension(1000, 350));
+    scrollPane.setMaximumSize(new Dimension(1000, 350));
+    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    propertiesPanel.add(scrollPane);
+    final ValueHolder<JButton> buttonHolder = new ValueHolder<>();
+    final JButton refreshButton = RunnableAction.newButton("Update Classification Counts", () -> {
+      buttonHolder.getValue().setEnabled(false);
+      Invoke.background("Classification Counts " + this.url, () -> {
+        this.pointCloud.refreshClassificationCounts();
+        return this.pointCloud.toHtml();
+      }, html -> {
+        propertiesPane.setText(html);
+      });
+    });
+    propertiesPanel.add(refreshButton);
+    buttonHolder.setValue(refreshButton);
     return generalPanel;
   }
 
