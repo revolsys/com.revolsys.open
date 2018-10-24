@@ -90,7 +90,7 @@ public class SelectedRecordsVertexRenderer {
 
       view.drawGeometryOutline(geometry, this.highlightStyle);
 
-      if (!geometry.isEmpty()) {
+      if (geometry != null && !geometry.isEmpty()) {
         final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
         for (final LineString line : lines) {
           view.drawMarkers(line, this.firstVertexStyle, this.lastVertexStyle, this.vertexStyle);
