@@ -90,6 +90,25 @@ public interface Strings {
     }
   }
 
+  static boolean containsWord(final String text, final String matchWord) {
+    if (text == null || matchWord == null) {
+      return false;
+    } else {
+      int startIndex = 0;
+      for (int endIndex = text.indexOf(' ', startIndex); endIndex != -1; endIndex = text
+        .indexOf(' ', startIndex)) {
+        if (equalSubstring(text, startIndex, endIndex, matchWord)) {
+          return true;
+        }
+        startIndex = endIndex++;
+        while (text.charAt(startIndex) == ' ') {
+          startIndex++;
+        }
+      }
+      return equalSubstring(text, startIndex, text.length(), matchWord);
+    }
+  }
+
   static boolean endsWith(final String text, final String suffix) {
     if (text != null && suffix != null) {
       return text.endsWith(suffix);
@@ -167,6 +186,16 @@ public interface Strings {
       return string1.equalsIgnoreCase(string2);
     } else {
       return Property.isEmpty(string2);
+    }
+  }
+
+  static boolean equalSubstring(final String text, final int startIndex, final int endIndex,
+    final String searchText) {
+    final int searchLength = searchText.length();
+    if (searchLength == endIndex - startIndex) {
+      return text.substring(startIndex, endIndex).equals(searchText);
+    } else {
+      return false;
     }
   }
 

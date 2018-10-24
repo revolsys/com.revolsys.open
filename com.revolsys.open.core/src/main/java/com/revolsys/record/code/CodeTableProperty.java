@@ -246,6 +246,11 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return this.loading;
   }
 
+  @Override
+  public boolean isLoadMissingCodes() {
+    return this.loadMissingCodes;
+  }
+
   public synchronized void loadAll() {
     final long time = System.currentTimeMillis();
     if (this.threadLoading.get() != Boolean.TRUE) {

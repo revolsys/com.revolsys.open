@@ -64,6 +64,12 @@ public interface Maps {
     return values.add(value);
   }
 
+  static <K1, K2, C extends Collection<V>, V> boolean addToCollection(final Supplier<C> factory,
+    final Map<K1, Map<K2, C>> map, final K1 key1, final K2 key2, final V value) {
+    final C values = getCollection(factory, map, key1, key2);
+    return values.add(value);
+  }
+
   static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1, final V value) {
     if (map != null && key1 != null) {
       final List<V> values = getList(map, key1);
@@ -380,6 +386,23 @@ public interface Maps {
     }
   }
 
+  static <K, C extends Collection<V>, V> C getCollection(final Supplier<C> factory,
+    final Map<K, C> map, final K key) {
+    C collection = map.get(key);
+    if (collection == null && factory != null) {
+      collection = factory.get();
+      map.put(key, collection);
+    }
+    return collection;
+  }
+
+  static <K1, K2, C extends Collection<V>, V> C getCollection(final Supplier<C> factory,
+    final Map<K1, Map<K2, C>> map, final K1 key1, final K2 key2) {
+    final Map<K2, C> map2 = getMap(map, key1);
+    final C collecion = getCollection(factory, map2, key2);
+    return collecion;
+  }
+
   static <T> Integer getCount(final Map<T, Integer> counts, final T key) {
     final Integer count = counts.get(key);
     if (count == null) {
@@ -646,6 +669,11 @@ public interface Maps {
       }
       return value;
     }
+  }
+
+  static <K1, K2, V> V getValue(final Map<K1, Map<K2, V>> map, final K1 key1, final K2 key2) {
+    final Map<K2, V> map2 = getMap(map, key1);
+    return map2.get(key2);
   }
 
   static <K> boolean hasValue(final Map<K, ?> map, final K key) {
