@@ -36,11 +36,12 @@ import java.util.function.Consumer;
 
 public abstract class IntervalRTreeNode<V> {
 
-  private double max = Double.NEGATIVE_INFINITY;
+  protected final double max;
 
-  private double min = Double.POSITIVE_INFINITY;
+  protected final double min;
 
   public IntervalRTreeNode() {
+    this(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
   }
 
   public IntervalRTreeNode(final double min, final double max) {
@@ -57,10 +58,7 @@ public abstract class IntervalRTreeNode<V> {
   }
 
   protected boolean intersects(final double queryMin, final double queryMax) {
-    if (getMin() > queryMax || getMax() < queryMin) {
-      return false;
-    }
-    return true;
+    return !(this.min > queryMax || this.max < queryMin);
   }
 
   public abstract void query(double queryMin, double queryMax, Consumer<? super V> visitor);

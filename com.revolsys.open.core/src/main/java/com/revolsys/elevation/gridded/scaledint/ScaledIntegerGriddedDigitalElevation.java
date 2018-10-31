@@ -1,12 +1,9 @@
 package com.revolsys.elevation.gridded.scaledint;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -48,51 +45,6 @@ public class ScaledIntegerGriddedDigitalElevation extends AbstractIoFactoryWithC
 
   public static int bufferSize(final int width, final int height) {
     return HEADER_SIZE + width * height * 4;
-  }
-
-  public static double getElevationInterpolated(final Resource baseResource,
-    final int coordinateSystemId, final int gridCellSize, final int gridSize,
-    final String fileExtension, final double x, final double y) {
-
-    final int gridTileSize = gridSize * gridCellSize;
-    final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, gridTileSize, x);
-    final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, gridTileSize, y);
-
-    final Resource resource = RectangularMapGrid.getTileResource(baseResource, "dem",
-      coordinateSystemId, Integer.toString(gridTileSize), tileX, tileY, fileExtension);
-    if (resource.exists()) {
-      try {
-        final int gridCellX = GriddedElevationModel.getGridCellX(tileX, gridCellSize, x);
-        final int gridCellY = GriddedElevationModel.getGridCellY(tileY, gridCellSize, y);
-        final int elevationByteSize = 4;
-        final int offset = HEADER_SIZE + (gridCellY * gridSize + gridCellX) * elevationByteSize;
-        int elevation;
-        if (resource.isFile()) {
-          final Path path = resource.toPath();
-          try (
-            SeekableByteChannel byteChannel = Files.newByteChannel(path, StandardOpenOption.READ)) {
-            byteChannel.position(offset);
-            final ByteBuffer bytes = ByteBuffer.allocate(4);
-            byteChannel.read(bytes);
-            elevation = bytes.getInt(0);
-          } catch (final IOException e) {
-            throw Exceptions.wrap("Unable to read: " + resource, e);
-          }
-        } else {
-          try (
-            DataInputStream in = resource.newBufferedInputStream(DataInputStream::new)) {
-            in.skip(offset);
-            elevation = in.readInt();
-          } catch (final IOException e) {
-            throw Exceptions.wrap("Unable to read: " + resource, e);
-          }
-        }
-        return elevation;
-      } catch (final ClassCastException e) {
-        throw new IllegalArgumentException(fileExtension + " not supported");
-      }
-    }
-    return Double.NaN;
   }
 
   public static double getElevationNearest(final Path baseDirectory, final int coordinateSystemId,

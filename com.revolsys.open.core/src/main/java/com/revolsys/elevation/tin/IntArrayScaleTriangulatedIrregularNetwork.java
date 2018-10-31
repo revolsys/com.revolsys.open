@@ -2,15 +2,14 @@ package com.revolsys.elevation.tin;
 
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.index.quadtree.IdObjectQuadTree;
-import com.revolsys.geometry.index.quadtree.QuadTree;
+import com.revolsys.geometry.index.SpatialIndex;
+import com.revolsys.geometry.index.rstartree.RStarTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.AbstractTriangle;
 import com.revolsys.geometry.model.impl.BaseBoundingBox;
-import com.revolsys.geometry.model.impl.TriangleDoubleXYZ;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
@@ -129,8 +128,6 @@ public class IntArrayScaleTriangulatedIrregularNetwork extends BaseObjectWithPro
     }
   }
 
-  private boolean spatialIndexUseTriangles = false;
-
   private final int[] triangleXCoordinates;
 
   private final int[] triangleYCoordinates;
@@ -141,9 +138,7 @@ public class IntArrayScaleTriangulatedIrregularNetwork extends BaseObjectWithPro
 
   protected final GeometryFactory geometryFactory;
 
-  private QuadTree<Integer> triangleIdSpatialIndex;
-
-  private QuadTree<Triangle> triangleSpatialIndex;
+  private SpatialIndex<Triangle> triangleSpatialIndex;
 
   private final BoundingBox boundingBox;
 
@@ -171,20 +166,10 @@ public class IntArrayScaleTriangulatedIrregularNetwork extends BaseObjectWithPro
   @Override
   public void forEachTriangle(final BoundingBox boundingBox,
     final Consumer<? super Triangle> action) {
-    if (this.spatialIndexUseTriangles) {
-      final QuadTree<Triangle> index = getTriangleSpatialIndex();
-      index.forEach(boundingBox, (triangle) -> {
-        action.accept(triangle);
-      });
-    } else {
-      final QuadTree<Integer> index = getTriangleIdSpatialIndex();
-      index.forEach(boundingBox, triangleIndex -> {
-        final Triangle triangle = newTriangle(triangleIndex);
-        if (triangle != null) {
-          action.accept(triangle);
-        }
-      });
-    }
+    final SpatialIndex<Triangle> index = getTriangleSpatialIndex();
+    index.forEach(boundingBox, (triangle) -> {
+      action.accept(triangle);
+    });
   }
 
   @Override
@@ -198,20 +183,10 @@ public class IntArrayScaleTriangulatedIrregularNetwork extends BaseObjectWithPro
   @Override
   public void forEachTriangle(final double x, final double y,
     final Consumer<? super Triangle> action) {
-    if (this.spatialIndexUseTriangles) {
-      final QuadTree<Triangle> index = getTriangleSpatialIndex();
-      index.forEach(x, y, triangle -> {
-        action.accept(triangle);
-      });
-    } else {
-      final QuadTree<Integer> index = getTriangleIdSpatialIndex();
-      index.forEach(x, y, triangleIndex -> {
-        final Triangle triangle = newTriangle(triangleIndex);
-        if (triangle != null) {
-          action.accept(triangle);
-        }
-      });
-    }
+    final SpatialIndex<Triangle> index = getTriangleSpatialIndex();
+    index.forEach(x, y, triangle -> {
+      action.accept(triangle);
+    });
   }
 
   @Override
@@ -240,22 +215,19 @@ public class IntArrayScaleTriangulatedIrregularNetwork extends BaseObjectWithPro
     return this.triangleCount;
   }
 
-  public QuadTree<Integer> getTriangleIdSpatialIndex() {
-    if (this.triangleIdSpatialIndex == null) {
-      this.triangleIdSpatialIndex = newIdSpatialIndex();
-    }
-    return this.triangleIdSpatialIndex;
-  }
-
-  public QuadTree<Triangle> getTriangleSpatialIndex() {
+  public SpatialIndex<Triangle> getTriangleSpatialIndex() {
     if (this.triangleSpatialIndex == null) {
-      final QuadTree<Triangle> index = new QuadTree<>(this.geometryFactory);
-      forEachTriangle((x1, y1, z1, x2, y2, z2, x3, y3, z3) -> {
-        final Triangle triangle = new TriangleDoubleXYZ(x1, y1, z1, x2, y2, z2, x3, y3, z3);
-        final BoundingBox boundingBox = triangle.getBoundingBox();
-        index.insertItem(boundingBox, triangle);
-      });
-      this.triangleSpatialIndex = index;
+      synchronized (this) {
+        if (this.triangleSpatialIndex == null) {
+          final SpatialIndex<Triangle> index = new RStarTree<>(this.geometryFactory);
+          for (int triangleIndex = 0; triangleIndex < this.triangleCount; triangleIndex++) {
+            final Triangle triangle = newTriangle(triangleIndex);
+            final BoundingBox boundingBox = triangle.getBoundingBox();
+            index.insertItem(boundingBox, triangle);
+          }
+          this.triangleSpatialIndex = index;
+        }
+      }
     }
     return this.triangleSpatialIndex;
   }
@@ -307,166 +279,6 @@ public class IntArrayScaleTriangulatedIrregularNetwork extends BaseObjectWithPro
     return 0;
   }
 
-  public boolean isSpatialIndexUseTriangles() {
-    return this.spatialIndexUseTriangles;
-  }
-
-  private QuadTree<Integer> newIdSpatialIndex() {
-    final QuadTree<Integer> triangleSpatialIndex = new IdObjectQuadTree<Integer>(
-      this.geometryFactory) {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      protected boolean intersectsBounds(final Object id, final double x, final double y) {
-        final Integer triangleIndex = (Integer)id;
-        final int[] triangleXCoordinates = IntArrayScaleTriangulatedIrregularNetwork.this.triangleXCoordinates;
-        final int[] triangleYCoordinates = IntArrayScaleTriangulatedIrregularNetwork.this.triangleYCoordinates;
-        final int triangleVertexIndex = triangleIndex * 3;
-
-        int minXInt = Integer.MAX_VALUE;
-        int maxXInt = Integer.MIN_VALUE;
-        int minYInt = Integer.MAX_VALUE;
-        int maxYInt = Integer.MIN_VALUE;
-
-        for (int vertexIndex = 0; vertexIndex < 3; vertexIndex++) {
-          final int vertexX = triangleXCoordinates[triangleVertexIndex + vertexIndex];
-          if (vertexX != Integer.MIN_VALUE) {
-            if (vertexX < minXInt) {
-              minXInt = vertexX;
-            }
-            if (vertexX > maxXInt) {
-              maxXInt = vertexX;
-            }
-          }
-
-          final int vertexY = triangleYCoordinates[triangleVertexIndex + vertexIndex];
-          if (vertexY != Integer.MIN_VALUE) {
-            if (vertexY < minYInt) {
-              minYInt = vertexY;
-            }
-            if (vertexY > maxYInt) {
-              maxYInt = vertexY;
-            }
-          }
-        }
-        if (x < minXInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleX) {
-          return false;
-        } else if (x > maxXInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleX) {
-          return false;
-        } else if (y < minYInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleY) {
-          return false;
-        } else if (y > maxYInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleY) {
-          return false;
-        } else {
-          return true;
-        }
-      }
-
-      @Override
-      protected boolean intersectsBounds(final Object id, double x1, double y1, double x2,
-        double y2) {
-        final Integer triangleIndex = (Integer)id;
-        final int[] triangleXCoordinates = IntArrayScaleTriangulatedIrregularNetwork.this.triangleXCoordinates;
-        final int[] triangleYCoordinates = IntArrayScaleTriangulatedIrregularNetwork.this.triangleYCoordinates;
-        final int triangleVertexIndex = triangleIndex * 3;
-
-        int minXInt = Integer.MAX_VALUE;
-        int maxXInt = Integer.MIN_VALUE;
-        int minYInt = Integer.MAX_VALUE;
-        int maxYInt = Integer.MIN_VALUE;
-
-        for (int vertexIndex = 0; vertexIndex < 3; vertexIndex++) {
-          final int vertexX = triangleXCoordinates[triangleVertexIndex + vertexIndex];
-          if (vertexX != Integer.MIN_VALUE) {
-            if (vertexX < minXInt) {
-              minXInt = vertexX;
-            }
-            if (vertexX > maxXInt) {
-              maxXInt = vertexX;
-            }
-          }
-
-          final int vertexY = triangleYCoordinates[triangleVertexIndex + vertexIndex];
-          if (vertexY != Integer.MIN_VALUE) {
-            if (vertexY < minYInt) {
-              minYInt = vertexY;
-            }
-            if (vertexY > maxYInt) {
-              maxYInt = vertexY;
-            }
-          }
-        }
-        if (x1 > x2) {
-          final double t = x1;
-          x1 = x2;
-          x2 = t;
-        }
-        if (y1 > y2) {
-          final double t = y1;
-          y1 = y2;
-          y2 = t;
-        }
-
-        if (x2 < minXInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleX) {
-          return false;
-        } else if (x1 > maxXInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleX) {
-          return false;
-        } else if (y2 < minYInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleY) {
-          return false;
-        } else if (y1 > maxYInt / IntArrayScaleTriangulatedIrregularNetwork.this.scaleY) {
-          return false;
-        } else {
-          return true;
-        }
-
-      }
-    };
-    triangleSpatialIndex.setUseEquals(true);
-
-    int triangleVertexIndex = 0;
-    final double scaleX = this.scaleX;
-    final double scaleY = this.scaleY;
-    final int[] triangleXCoordinates = this.triangleXCoordinates;
-    final int[] triangleYCoordinates = this.triangleYCoordinates;
-    final int triangleCount = this.triangleCount;
-    for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++) {
-      int minXInt = Integer.MAX_VALUE;
-      int maxXInt = Integer.MIN_VALUE;
-      int minYInt = Integer.MAX_VALUE;
-      int maxYInt = Integer.MIN_VALUE;
-
-      for (int vertexIndex = 0; vertexIndex < 3; vertexIndex++) {
-        final int vertexX = triangleXCoordinates[triangleVertexIndex + vertexIndex];
-        if (vertexX != Integer.MIN_VALUE) {
-          if (vertexX < minXInt) {
-            minXInt = vertexX;
-          }
-          if (vertexX > maxXInt) {
-            maxXInt = vertexX;
-          }
-        }
-
-        final int vertexY = triangleYCoordinates[triangleVertexIndex + vertexIndex];
-        if (vertexY != Integer.MIN_VALUE) {
-          if (vertexY < minYInt) {
-            minYInt = vertexY;
-          }
-          if (vertexY > maxYInt) {
-            maxYInt = vertexY;
-          }
-        }
-      }
-      final double minX = minXInt / scaleX;
-      final double minY = minYInt / scaleY;
-      final double maxX = maxXInt / scaleX;
-      final double maxY = maxYInt / scaleY;
-
-      triangleSpatialIndex.insertItem(minX, minY, maxX, maxY, triangleIndex);
-      triangleVertexIndex += 3;
-    }
-    return triangleSpatialIndex;
-  }
-
   public Triangle newTriangle(final int triangleIndex) {
     if (triangleIndex >= 0 && triangleIndex < this.triangleCount) {
       return new TinTriangle(triangleIndex);
@@ -478,9 +290,4 @@ public class IntArrayScaleTriangulatedIrregularNetwork extends BaseObjectWithPro
   public BoundingBox newTriangleBoundingBox(final int triangleIndex) {
     return new TinTriangleBoundingBox(triangleIndex);
   }
-
-  public void setSpatialIndexUseTriangles(final boolean spatialIndexUseTriangles) {
-    this.spatialIndexUseTriangles = spatialIndexUseTriangles;
-  }
-
 }

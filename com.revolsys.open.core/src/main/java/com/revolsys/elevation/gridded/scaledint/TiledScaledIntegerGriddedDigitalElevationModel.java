@@ -1,5 +1,6 @@
 package com.revolsys.elevation.gridded.scaledint;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 import com.revolsys.collection.map.LruMap;
@@ -9,106 +10,92 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.grid.AbstractGrid;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.IntPair;
+import com.revolsys.util.Strings;
 
 public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
   implements GriddedElevationModel {
 
-  private int gridTileWidth;
+  private int gridTileSize;
 
-  private int gridTileHeight;
-
-  private Resource baseResource;
-
-  private int coordinateSystemId;
+  private final int coordinateSystemId;
 
   private final Map<IntPair, DirectFileElevationModel> models = new LruMap<>(5000);
 
-  public TiledScaledIntegerGriddedDigitalElevationModel() {
+  private final Path baseDirectory;
+
+  private final IntPair getKey = new IntPair();
+
+  private final String filePrefix;
+
+  private final int gridCellSize;
+
+  private final String tileWidthString;
+
+  public TiledScaledIntegerGriddedDigitalElevationModel(final Path baseDirectory,
+    final String filePrefix, final GeometryFactory geometryFactory, final double minX,
+    final double minY, final int gridTileSize, final int gridCellSize) {
+    super(geometryFactory, minX, minY, Integer.MAX_VALUE, Integer.MAX_VALUE, gridCellSize);
+    this.filePrefix = filePrefix;
+    this.gridTileSize = gridTileSize;
+    this.gridCellSize = gridCellSize;
+    this.coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
+    this.tileWidthString = Integer.toString(gridCellSize * gridTileSize);
+    this.baseDirectory = baseDirectory//
+      .resolve(ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION)//
+      .resolve(Integer.toString(this.coordinateSystemId)) //
+      .resolve(this.tileWidthString)//
+    ;
   }
 
   public TiledScaledIntegerGriddedDigitalElevationModel(final Resource baseResource,
-    final String fileExtension, final GeometryFactory geometryFactory, final double minX,
-    final double minY, final int gridTileWidth, final int gridTileHeight, final int gridCellSize) {
-    super(geometryFactory, minX, minY, Integer.MAX_VALUE, Integer.MAX_VALUE, gridCellSize);
-    this.gridTileWidth = gridTileWidth;
-    this.gridTileHeight = gridTileHeight;
-    this.coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
-    final Resource fileExtensionDirectory = baseResource.createRelative("demcs");
-    final Resource coordinateSystemDirectory = fileExtensionDirectory
-      .createRelative(Integer.toString(this.coordinateSystemId));
-    final Resource resolutionDirectory = coordinateSystemDirectory
-      .createRelative(gridCellSize + "m");
-    this.baseResource = resolutionDirectory;
+    final String filePrefix, final GeometryFactory geometryFactory, final double minX,
+    final double minY, final int gridTileSize, final int gridCellSize) {
+    this(baseResource.toPath(), filePrefix, geometryFactory, minX, minY, gridTileSize,
+      gridCellSize);
   }
 
   @Override
   public void clear() {
   }
 
-  public int getGridTileHeight() {
-    return this.gridTileHeight;
-  }
-
-  public int getGridTileWidth() {
-    return this.gridTileWidth;
+  public int getGridTileSize() {
+    return this.gridTileSize;
   }
 
   @Override
   public double getValueFast(final int gridX, final int gridY) {
-    final double gridCellSize = getGridCellWidth();
-    final int tileMinGridX = Math.floorDiv(gridX, this.gridTileWidth) * this.gridTileWidth;
-    final int tileMinGridY = Math.floorDiv(gridY, this.gridTileHeight) * this.gridTileHeight;
+    DirectFileElevationModel model;
+    final Map<IntPair, DirectFileElevationModel> models = this.models;
+    final int tileSize = this.gridTileSize;
+    final int minGridX = Math.floorDiv(gridX, tileSize);
+    final int minGridY = Math.floorDiv(gridY, tileSize);
+    synchronized (models) {
+      final IntPair getKey = this.getKey;
+      getKey.setValues(minGridX, minGridY);
 
-    final IntPair key = new IntPair(tileMinGridX, tileMinGridY);
-    DirectFileElevationModel model = this.models.get(key);
-    if (model == null) {
+      model = models.get(getKey);
+      if (model == null) {
+        final int cellSize = this.gridCellSize;
+        final int tileX = minGridX * tileSize * cellSize;
+        final int tileY = minGridY * tileSize * cellSize;
+        final GeometryFactory geometryFactory = getGeometryFactory();
 
-      final int tileMinX = (int)(tileMinGridX * gridCellSize);
-      final int tileMinY = (int)(tileMinGridY * this.gridCellHeight);
-      model = new ScaledIntegerGriddedDigitalElevationModelFile(this.baseResource.toPath(),
-        getGeometryFactory(), tileMinX, tileMinY, this.gridTileWidth, this.gridTileHeight,
-        gridCellSize);
-      this.models.put(key, model);
+        final String fileName = Strings.toString("_", this.filePrefix,
+          getHorizontalCoordinateSystemId(), this.tileWidthString, tileX, tileY) + "."
+          + ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION;
+        final Path path = this.baseDirectory //
+          .resolve(Integer.toString(tileX)) //
+          .resolve(fileName);
+
+        model = new ScaledIntegerGriddedDigitalElevationModelFile(path, geometryFactory, tileX,
+          tileY, tileSize, tileSize, this.gridCellWidth);
+        models.put(getKey.clone(), model);
+      }
     }
-
-    final int gridCellX = gridX - tileMinGridX;
-    final int gridCellY = gridY - tileMinGridY;
+    final int gridCellX = gridX % tileSize;
+    final int gridCellY = gridY % tileSize;
 
     return model.getValue(gridCellX, gridCellY);
-    // final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
-    // + (gridCellY * this.gridSize + gridCellX) * this.elevationByteCount;
-    // double elevation;
-    // if (this.isPath) {
-    // final Path path = resource.toPath();
-    // try (
-    // SeekableByteChannel byteChannel = Files.newByteChannel(path,
-    // StandardOpenOption.READ)) {
-    // byteChannel.position(offset);
-    // if (this.floatingPoint) {
-    // final ByteBuffer bytes = ByteBuffer.allocate(4);
-    // byteChannel.read(bytes);
-    // elevation = bytes.getFloat(0);
-    // } else {
-    // final ByteBuffer bytes = ByteBuffer.allocate(2);
-    // byteChannel.read(bytes);
-    // elevation = bytes.getShort(0);
-    // }
-    // }
-    // } else {
-    // try (
-    // DataInputStream in =
-    // resource.newBufferedInputStream(DataInputStream::new)) {
-    // in.skip(offset);
-    // if (this.floatingPoint) {
-    // elevation = in.readFloat();
-    // } else {
-    // elevation = in.readShort();
-    // }
-    // } catch (final IOException e) {
-    // throw Exceptions.wrap("Unable to read: " + resource, e);
-    // }
-    // }
-    // return elevation;
   }
 
   @Override
@@ -127,12 +114,8 @@ public class TiledScaledIntegerGriddedDigitalElevationModel extends AbstractGrid
     throw new UnsupportedOperationException();
   }
 
-  public void setGridTileHeight(final int gridTileHeight) {
-    this.gridTileHeight = gridTileHeight;
-  }
-
-  public void setGridTileWidth(final int gridTileWidth) {
-    this.gridTileWidth = gridTileWidth;
+  public void setGridTileSize(final int gridTileSize) {
+    this.gridTileSize = gridTileSize;
   }
 
   @Override

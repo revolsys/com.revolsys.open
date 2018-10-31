@@ -7,6 +7,8 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.elevation.tin.compactbinary.ScaledIntegerTriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.tin.AsciiTin;
 import com.revolsys.geometry.model.BoundingBox;
@@ -265,6 +267,49 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
 
   default List<Point> getVertices() {
     return Lists.newArray(this::forEachVertex);
+  }
+
+  default GriddedElevationModel newGriddedElevationModel(final double minX, final double minY,
+    final double maxX, final double maxY, final int gridCellSize, final double scaleFactor) {
+    final int minXInt = (int)Math.floor(minX / gridCellSize) * gridCellSize;
+    final int minYInt = (int)Math.floor(minY / gridCellSize) * gridCellSize;
+    final int maxXInt = (int)Math.ceil(maxX / gridCellSize) * gridCellSize;
+    final int maxYInt = (int)Math.ceil(maxY / gridCellSize) * gridCellSize;
+
+    final int width = maxXInt - minXInt;
+    final int height = maxYInt - minYInt;
+
+    final int gridWidth = width / gridCellSize;
+    final int gridHeight = height / gridCellSize;
+
+    final GeometryFactory geometryFactory = getGeometryFactory()//
+      .convertAxisCountAndScales(3, scaleFactor, scaleFactor, scaleFactor);
+    final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
+      geometryFactory, minXInt, minYInt, gridWidth, gridHeight, gridCellSize);
+
+    forEachTriangle(elevationModel::setElevationsForTriangle);
+    return elevationModel;
+  }
+
+  /**
+   * Create a new {@link GriddedElevationModel} using this TIN's bounding box with the specified
+   * grid cell size and a 1mm precision model.
+   *
+   * @param gridCellSize
+   * @return
+   */
+  default GriddedElevationModel newGriddedElevationModel(final int gridCellSize) {
+    return newGriddedElevationModel(gridCellSize, 1000.0);
+  }
+
+  default GriddedElevationModel newGriddedElevationModel(final int gridCellSize,
+    final double scaleFactor) {
+    final BoundingBox boundingBox = getBoundingBox();
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    return newGriddedElevationModel(minX, minY, maxX, maxY, gridCellSize, scaleFactor);
   }
 
   default boolean writeTriangulatedIrregularNetwork() {

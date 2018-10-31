@@ -2,15 +2,31 @@ package com.revolsys.util;
 
 import java.util.List;
 
-public class IntPair implements Comparable<IntPair> {
+public class IntPair implements Cloneable, Comparable<IntPair> {
+
+  public static void add(final List<IntPair> list, final int value1, final int value2) {
+    list.add(new IntPair(value1, value2));
+  }
 
   private int value1;
 
   private int value2;
 
+  public IntPair() {
+  }
+
   public IntPair(final int value1, final int value2) {
     this.value1 = value1;
     this.value2 = value2;
+  }
+
+  @Override
+  public IntPair clone() {
+    try {
+      return (IntPair)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override
@@ -76,12 +92,13 @@ public class IntPair implements Comparable<IntPair> {
     this.value2 = value2;
   }
 
+  public void setValues(final int value1, final int value2) {
+    this.value1 = value1;
+    this.value2 = value2;
+  }
+
   @Override
   public String toString() {
     return this.value1 + ", " + this.value2;
-  }
-
-  public static void add(final List<IntPair> list, final int value1, final int value2) {
-    list.add(new IntPair(value1, value2));
   }
 }

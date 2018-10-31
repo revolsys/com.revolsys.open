@@ -157,25 +157,26 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
   }
 
   private void readHeader() {
-    final byte[] fileTypeBytes = new byte[6];
+    final byte[] fileTypeBytes = new byte[6]; // 0 offset
     this.reader.getBytes(fileTypeBytes);
     @SuppressWarnings("unused")
     final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8);
     @SuppressWarnings("unused")
-    final short version = this.reader.getShort();
-    final GeometryFactory geometryFactory = GeometryFactory.readOffsetScaled3d(this.reader);
+    final short version = this.reader.getShort(); // 6 offset
+    final GeometryFactory geometryFactory = GeometryFactory.readOffsetScaled3d(this.reader); // 8
+                                                                                             // offset
     this.geometryFactory = geometryFactory;
-    final double minX = this.reader.getDouble();
-    final double minY = this.reader.getDouble();
-    final double minZ = this.reader.getDouble();
-    final double maxX = this.reader.getDouble();
-    final double maxY = this.reader.getDouble();
-    final double maxZ = this.reader.getDouble();
-    this.gridWidth = this.reader.getInt();
-    this.gridHeight = this.reader.getInt();
-    this.gridCellWidth = this.reader.getDouble();
-    this.gridCellHeight = this.reader.getDouble();
-
+    final double minX = this.reader.getDouble(); // 60 offset
+    final double minY = this.reader.getDouble(); // 68 offset
+    final double minZ = this.reader.getDouble(); // 76 offset
+    final double maxX = this.reader.getDouble(); // 84 offset
+    final double maxY = this.reader.getDouble(); // 92 offset
+    final double maxZ = this.reader.getDouble(); // 100 offset
+    this.gridWidth = this.reader.getInt(); // 104 offset
+    this.gridHeight = this.reader.getInt(); // 108 offset
+    this.gridCellWidth = this.reader.getDouble(); // 116 offset
+    this.gridCellHeight = this.reader.getDouble(); // 124 offset
+    // 132 offset
     this.boundingBox = geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY, maxZ);
   }
 

@@ -55,7 +55,7 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
 
   private double scaleZ;
 
-  private boolean createMissing = false;
+  private final boolean createMissing = false;
 
   private boolean useLocks = false;
 
@@ -75,7 +75,6 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
     setModified(false);
     this.openOptions = Sets.newHash(StandardOpenOption.READ, StandardOpenOption.WRITE,
       StandardOpenOption.SYNC);
-    this.createMissing = true;
     this.path = path;
 
     this.scaleZ = geometryFactory.getScaleZ();

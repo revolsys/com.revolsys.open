@@ -33,6 +33,7 @@
 package com.revolsys.geometry.algorithm;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -337,6 +338,14 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     } else {
       return false;
     }
+  }
+
+  public boolean isIntersects(final double x, final double y, final List<LineSegment> segments) {
+    reset(x, y);
+    for (final LineSegment segment : segments) {
+      countSegment(segment);
+    }
+    return isIntersects();
   }
 
   /**

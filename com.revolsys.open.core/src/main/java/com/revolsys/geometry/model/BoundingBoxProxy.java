@@ -59,6 +59,11 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
     return bboxWith(boundingBox, action, false);
   }
 
+  default BoundingBox bboxIntersection(final BoundingBoxProxy boundingBox) {
+    final BoundingBoxFunction<BoundingBox> action = BoundingBox::bboxIntersection;
+    return bboxWith(boundingBox, action, BoundingBox.empty());
+  }
+
   /**
    *  Check if the region defined by <code>other</code>
    *  overlaps (intersects) the region of this <code>BoundingBox</code>.
