@@ -270,38 +270,40 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
 
   public boolean hasElevation(final double x, final double y) {
     final QuadEdgeSubdivision subdivision = getSubdivision();
-    final QuadEdge edge1 = subdivision.findQuadEdge(x, y);
-    if (edge1 != null) {
-      final Side side = edge1.getSide(x, y);
-      final Point p1 = edge1.getFromPoint();
-      final Point p2 = edge1.getToPoint();
-      final double z1 = p1.getZ();
-      final double z2 = p2.getZ();
-      if (Double.isFinite(z1)) {
-        if (Double.isFinite(z2)) {
-          if (side.isOn()) {
+    if (subdivision != null) {
+      final QuadEdge edge1 = subdivision.findQuadEdge(x, y);
+      if (edge1 != null) {
+        final Side side = edge1.getSide(x, y);
+        final Point p1 = edge1.getFromPoint();
+        final Point p2 = edge1.getToPoint();
+        final double z1 = p1.getZ();
+        final double z2 = p2.getZ();
+        if (Double.isFinite(z1)) {
+          if (Double.isFinite(z2)) {
+            if (side.isOn()) {
+              return true;
+            } else if (side.isLeft()) {
+              final QuadEdge edge2 = edge1.getLeftNext();
+              if (edge2 != null) {
+                final Point p3 = edge2.getToPoint();
+                final double z3 = p3.getZ();
+                return Double.isFinite(z3);
+              }
+            } else {
+              final QuadEdge edge2 = edge1.getRightNext();
+              if (edge2 != null) {
+                final Point p3 = edge2.getToPoint();
+                final double z3 = p3.getZ();
+                return Double.isFinite(z3);
+              }
+            }
+          } else if (p1.equalsVertex(x, y)) {
             return true;
-          } else if (side.isLeft()) {
-            final QuadEdge edge2 = edge1.getLeftNext();
-            if (edge2 != null) {
-              final Point p3 = edge2.getToPoint();
-              final double z3 = p3.getZ();
-              return Double.isFinite(z3);
-            }
-          } else {
-            final QuadEdge edge2 = edge1.getRightNext();
-            if (edge2 != null) {
-              final Point p3 = edge2.getToPoint();
-              final double z3 = p3.getZ();
-              return Double.isFinite(z3);
-            }
           }
-        } else if (p1.equalsVertex(x, y)) {
-          return true;
-        }
-      } else if (Double.isFinite(z2)) {
-        if (p2.equalsVertex(x, y)) {
-          return true;
+        } else if (Double.isFinite(z2)) {
+          if (p2.equalsVertex(x, y)) {
+            return true;
+          }
         }
       }
     }

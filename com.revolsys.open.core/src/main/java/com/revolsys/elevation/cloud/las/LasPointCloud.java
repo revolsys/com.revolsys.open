@@ -138,7 +138,11 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   @Override
   public BoundingBox getBoundingBox() {
-    return this.header.getBoundingBox();
+    if (this.header == null) {
+      return BoundingBox.empty();
+    } else {
+      return this.header.getBoundingBox();
+    }
   }
 
   public long[] getClassificationCounts() {
