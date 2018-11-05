@@ -39,7 +39,6 @@ import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.MultiPolygonEditor;
-import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 import com.revolsys.geometry.model.segment.MultiPolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
@@ -222,7 +221,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
 
   @Override
   default Geometry intersectionBbox(final BoundingBox boundingBox) {
-    notNullSameCs( boundingBox);
+    notNullSameCs(boundingBox);
     if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {
@@ -233,7 +232,9 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
         if (partIntersection != part) {
           modified = true;
         }
-        parts.add(part);
+        if (!partIntersection.isEmpty()) {
+          parts.add(partIntersection);
+        }
       }
       if (modified) {
         final GeometryFactory geometryFactory = getGeometryFactory();

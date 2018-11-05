@@ -44,7 +44,6 @@ import javax.measure.quantity.Area;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.MultiLineStringEditor;
-import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.prep.PreparedMultiLineString;
 import com.revolsys.geometry.model.segment.MultiLineStringSegment;
 import com.revolsys.geometry.model.segment.Segment;
@@ -256,7 +255,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
 
   @Override
   default Geometry intersectionBbox(final BoundingBox boundingBox) {
-    notNullSameCs( boundingBox);
+    notNullSameCs(boundingBox);
     if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {
@@ -267,7 +266,9 @@ public interface MultiLineString extends GeometryCollection, Lineal {
         if (partIntersection != part) {
           modified = true;
         }
-        parts.add(part);
+        if (!partIntersection.isEmpty()) {
+          parts.add(partIntersection);
+        }
       }
       if (modified) {
         final GeometryFactory geometryFactory = getGeometryFactory();
