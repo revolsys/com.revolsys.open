@@ -34,6 +34,10 @@ import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupport;
@@ -405,6 +409,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     return this.maximumScale;
   }
 
+  @Override
   public synchronized MenuFactory getMenu() {
     if (this.menu == null) {
       final Class<? extends AbstractLayer> clazz = getClass();
@@ -524,6 +529,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   }
 
   protected boolean initializeDo() {
+    initializeMenus();
     return true;
   }
 
@@ -544,6 +550,42 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     } finally {
       setInitialized(true);
     }
+  }
+
+  protected void initializeMenuExpressions(final List<String> menuInitializerExpressions) {
+    for (final String menuInitializerExpression : getProperty("menuInitializerExpressions",
+      Collections.<String> emptyList())) {
+      if (Property.hasValue(menuInitializerExpression)) {
+        if (!menuInitializerExpressions.contains(menuInitializerExpression)) {
+          menuInitializerExpressions.add(menuInitializerExpression);
+        }
+      }
+    }
+  }
+
+  protected void initializeMenus() {
+    final List<String> menuInitializerExpressions = new ArrayList<>();
+    initializeMenuExpressions(menuInitializerExpressions);
+
+    final EvaluationContext context = initializeMenusContext();
+
+    for (final String menuFactoryExpression : menuInitializerExpressions) {
+      try {
+        final SpelExpressionParser parser = new SpelExpressionParser();
+        final Expression expression = parser.parseExpression(menuFactoryExpression);
+
+        expression.getValue(context, Void.class);
+      } catch (final Throwable e) {
+        Logs.error(this, "Unable to create menu for " + this, e);
+      }
+    }
+  }
+
+  protected EvaluationContext initializeMenusContext() {
+    final EvaluationContext context = new StandardEvaluationContext(this);
+    final MenuFactory layerMenu = getMenu();
+    context.setVariable("layerMenu", layerMenu);
+    return context;
   }
 
   @Override

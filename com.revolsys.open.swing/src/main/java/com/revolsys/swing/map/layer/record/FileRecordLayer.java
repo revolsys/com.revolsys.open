@@ -130,7 +130,7 @@ public class FileRecordLayer extends ListRecordLayer {
               }
             }
             refreshBoundingBox();
-            initRecordMenu();
+            initializeMenus();
             setExists(true);
             return true;
           }

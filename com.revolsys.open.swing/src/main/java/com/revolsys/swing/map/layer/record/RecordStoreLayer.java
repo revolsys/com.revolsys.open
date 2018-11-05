@@ -669,8 +669,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         setRecordDefinition(recordDefinition);
       }
     }
-    initRecordMenu();
-    return true;
+    return super.initializeDo();
   }
 
   @Override

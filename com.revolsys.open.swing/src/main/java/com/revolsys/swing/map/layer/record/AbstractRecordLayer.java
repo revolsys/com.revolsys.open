@@ -1624,120 +1624,105 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   @Override
-  protected boolean initializeDo() {
-    initRecordMenu();
-    return super.initializeDo();
-  }
-
-  protected LayerRecordMenu initRecordMenu() {
-    final LayerRecordMenu recordMenu = new LayerRecordMenu(this);
-    this.recordMenu = recordMenu;
-    if (this.recordDefinition != null) {
-      initRecordMenu(recordMenu, this.recordDefinition);
-
-      final List<String> menuInitializerExpressions = new ArrayList<>();
-      for (final String menuInitializerExpression : this.recordDefinition
-        .getProperty("menuInitializerExpressions", Collections.<String> emptyList())) {
-        if (Property.hasValue(menuInitializerExpression)) {
-          if (!menuInitializerExpressions.contains(menuInitializerExpression)) {
-            menuInitializerExpressions.add(menuInitializerExpression);
-          }
-        }
-      }
-      for (final String menuInitializerExpression : getProperty("menuInitializerExpressions",
-        Collections.<String> emptyList())) {
-        if (Property.hasValue(menuInitializerExpression)) {
-          if (!menuInitializerExpressions.contains(menuInitializerExpression)) {
-            menuInitializerExpressions.add(menuInitializerExpression);
-          }
-        }
-      }
-      for (final String menuFactoryExpression : menuInitializerExpressions) {
-        try {
-          final SpelExpressionParser parser = new SpelExpressionParser();
-          final Expression expression = parser.parseExpression(menuFactoryExpression);
-          final EvaluationContext context = new StandardEvaluationContext(this);
-          context.setVariable("recordMenu", recordMenu);
-          final MenuFactory layerMenu = getMenu();
-          context.setVariable("layerMenu", layerMenu);
-          context.setVariable("recordDefinition", this.recordDefinition);
-          expression.getValue(context, Void.class);
-        } catch (final Throwable e) {
-          Logs.error(this, "Unable to create form for " + this, e);
+  protected void initializeMenuExpressions(final List<String> menuInitializerExpressions) {
+    for (final String menuInitializerExpression : this.recordDefinition
+      .getProperty("menuInitializerExpressions", Collections.<String> emptyList())) {
+      if (Property.hasValue(menuInitializerExpression)) {
+        if (!menuInitializerExpressions.contains(menuInitializerExpression)) {
+          menuInitializerExpressions.add(menuInitializerExpression);
         }
       }
     }
-    return recordMenu;
+    super.initializeMenuExpressions(menuInitializerExpressions);
+  }
+
+  @Override
+  protected void initializeMenus() {
+    final LayerRecordMenu recordMenu = new LayerRecordMenu(this);
+    this.recordMenu = recordMenu;
+    initRecordMenu(recordMenu, this.recordDefinition);
+    super.initializeMenus();
+  }
+
+  @Override
+  protected EvaluationContext initializeMenusContext() {
+    final EvaluationContext context = super.initializeMenusContext();
+    context.setVariable("recordMenu", this.recordMenu);
+    context.setVariable("recordDefinition", this.recordDefinition);
+    return context;
   }
 
   protected void initRecordMenu(final LayerRecordMenu menu,
     final RecordDefinition recordDefinition) {
-    final boolean hasGeometry = recordDefinition.hasGeometryField();
+    if (recordDefinition != null) {
+      final boolean hasGeometry = recordDefinition.hasGeometryField();
 
-    final Predicate<LayerRecord> modified = LayerRecord::isModified;
-    final Predicate<LayerRecord> notDeleted = ((Predicate<LayerRecord>)this::isDeleted).negate();
-    final Predicate<LayerRecord> modifiedOrDeleted = modified.or(LayerRecord::isDeleted);
+      final Predicate<LayerRecord> modified = LayerRecord::isModified;
+      final Predicate<LayerRecord> notDeleted = ((Predicate<LayerRecord>)this::isDeleted).negate();
+      final Predicate<LayerRecord> modifiedOrDeleted = modified.or(LayerRecord::isDeleted);
 
-    final EnableCheck editableEnableCheck = this::isEditable;
+      final EnableCheck editableEnableCheck = this::isEditable;
 
-    menu.addGroup(0, "default");
-    menu.addGroup(1, "record");
-    menu.addGroup(2, "dnd");
+      menu.addGroup(0, "default");
+      menu.addGroup(1, "record");
+      menu.addGroup(2, "dnd");
 
-    final MenuFactory layerMenuFactory = MenuFactory.findMenu(this);
-    if (layerMenuFactory != null) {
-      menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", layerMenuFactory));
-    }
-
-    menu.addMenuItem("record", "View/Edit Record", "table_edit", notDeleted, this::showForm);
-
-    if (hasGeometry) {
-      menu.addMenuItem("record", "Zoom to Record", "magnifier_zoom_selected", notDeleted,
-        this::zoomToRecord);
-      menu.addMenuItem("record", "Pan to Record", "pan_selected", notDeleted, (record) -> {
-        final MapPanel mapPanel = getMapPanel();
-        if (mapPanel != null) {
-          mapPanel.panToRecord(record);
-        }
-      });
-      final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
-      editMenu.setEnableCheck(LayerRecordMenu.enableCheck(notDeleted));
-      final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
-      if (geometryDataType == DataTypes.LINE_STRING
-        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-          LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_RECORD_NAME,
-            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck,
-            this::actionFlipRecordOrientation);
-
-          LayerRecordMenu.addMenuItem(editMenu, "geometry",
-            LayerRecordForm.FLIP_LINE_ORIENTATION_NAME, LayerRecordForm.FLIP_LINE_ORIENTATION_ICON,
-            editableEnableCheck, this::actionFlipLineOrientation);
-
-          LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_FIELDS_NAME,
-            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, this::actionFlipFields);
-        } else {
-          LayerRecordMenu.addMenuItem(editMenu, "geometry", "Flip Line Orientation", "flip_line",
-            editableEnableCheck, this::actionFlipLineOrientation);
-        }
+      final MenuFactory layerMenuFactory = MenuFactory.findMenu(this);
+      if (layerMenuFactory != null) {
+        menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", layerMenuFactory));
       }
-      menu.addComponentFactory("record", editMenu);
-    }
-    menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
-      this::deleteRecord);
 
-    menu.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
-      LayerRecord::revertChanges);
+      menu.addMenuItem("record", "View/Edit Record", "table_edit", notDeleted, this::showForm);
 
-    final Predicate<LayerRecord> hasModifiedEmptyFields = LayerRecord::isHasModifiedEmptyFields;
-    menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert", hasModifiedEmptyFields,
-      LayerRecord::revertEmptyFields);
+      if (hasGeometry) {
+        menu.addMenuItem("record", "Zoom to Record", "magnifier_zoom_selected", notDeleted,
+          this::zoomToRecord);
+        menu.addMenuItem("record", "Pan to Record", "pan_selected", notDeleted, (record) -> {
+          final MapPanel mapPanel = getMapPanel();
+          if (mapPanel != null) {
+            mapPanel.panToRecord(record);
+          }
+        });
+        final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
+        editMenu.setEnableCheck(LayerRecordMenu.enableCheck(notDeleted));
+        final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
+        if (geometryDataType == DataTypes.LINE_STRING
+          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+          if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
+            LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_RECORD_NAME,
+              LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck,
+              this::actionFlipRecordOrientation);
 
-    menu.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecordToClipboard);
+            LayerRecordMenu.addMenuItem(editMenu, "geometry",
+              LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
+              LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
+              this::actionFlipLineOrientation);
 
-    if (hasGeometry) {
-      menu.addMenuItem("dnd", "Paste Geometry", "geometry_paste", this::canPasteRecordGeometry,
-        this::pasteRecordGeometry);
+            LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_FIELDS_NAME,
+              LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, this::actionFlipFields);
+          } else {
+            LayerRecordMenu.addMenuItem(editMenu, "geometry", "Flip Line Orientation", "flip_line",
+              editableEnableCheck, this::actionFlipLineOrientation);
+          }
+        }
+        menu.addComponentFactory("record", editMenu);
+      }
+      menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
+        this::deleteRecord);
+
+      menu.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
+        LayerRecord::revertChanges);
+
+      final Predicate<LayerRecord> hasModifiedEmptyFields = LayerRecord::isHasModifiedEmptyFields;
+      menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert",
+        hasModifiedEmptyFields, LayerRecord::revertEmptyFields);
+
+      menu.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecordToClipboard);
+
+      if (hasGeometry) {
+        menu.addMenuItem("dnd", "Paste Geometry", "geometry_paste", this::canPasteRecordGeometry,
+          this::pasteRecordGeometry);
+      }
     }
   }
 
