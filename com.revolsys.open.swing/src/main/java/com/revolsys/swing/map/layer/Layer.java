@@ -22,6 +22,7 @@ import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Booleans;
 
 public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
@@ -68,6 +69,8 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
   }
 
   long getMaximumScale();
+
+  MenuFactory getMenu();
 
   long getMinimumScale();
 

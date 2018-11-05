@@ -197,6 +197,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   private String type;
 
+  private MenuFactory menu;
+
   private boolean visible = new Preferences("com.revolsys.gis")
     .getBoolean(PREFERENCE_NEW_LAYERS_VISIBLE, false);
 
@@ -401,6 +403,16 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   @Override
   public long getMaximumScale() {
     return this.maximumScale;
+  }
+
+  public synchronized MenuFactory getMenu() {
+    if (this.menu == null) {
+      final Class<? extends AbstractLayer> clazz = getClass();
+      final MenuFactory parentMenu = MenuFactory.getMenu(clazz);
+      final String name = getName();
+      this.menu = new MenuFactory(name, parentMenu);
+    }
+    return this.menu;
   }
 
   @Override

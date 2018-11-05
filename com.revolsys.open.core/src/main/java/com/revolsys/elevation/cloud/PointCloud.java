@@ -23,6 +23,16 @@ import com.revolsys.spring.resource.Resource;
 public interface PointCloud<P extends Point>
   extends BaseCloseable, GeometryFactoryProxy, BoundingBoxProxy {
 
+  static <P extends Point> void forEachPoint(final Object source,
+    final Consumer<? super P> action) {
+    try (
+      final PointCloud<P> pointCloud = PointCloud.newPointCloud(source)) {
+      if (pointCloud != null) {
+        pointCloud.forEachPoint(action);
+      }
+    }
+  }
+
   static <P extends Point, PC extends PointCloud<P>> PC newPointCloud(final Object source) {
     return newPointCloud(source, MapEx.EMPTY);
   }

@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -70,9 +71,10 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     setProperties(properties);
   }
 
-  public void forEachTile(final BoundingBox boundingBox,
+  public void forEachTile(final BoundingBoxProxy boundingBox,
     final Consumer<RectangularMapTile> action) {
-    final BoundingBox convertedBoundingBox = boundingBox.bboxToCs(getGeometryFactory());
+    final BoundingBox convertedBoundingBox = boundingBox.getBoundingBox()
+      .bboxToCs(getGeometryFactory());
 
     final int minX = getGridFloor(this.originX, this.tileWidth, convertedBoundingBox.getMinX());
     final int minY = getGridFloor(this.originY, this.tileHeight, convertedBoundingBox.getMinY());
@@ -118,7 +120,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   public BoundingBox getBoundingBox(final String name) {
-    final double[] coordinates = MathUtil.toDoubleArraySplit(name, "_");
+    final double[] coordinates = MathUtil.toDoubleArraySplit(name, "[_:,\\s|]+");
     if (coordinates.length == 2) {
       final double x1 = coordinates[0];
       final double y1 = coordinates[1];

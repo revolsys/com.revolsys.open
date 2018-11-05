@@ -1,5 +1,6 @@
 package com.revolsys.elevation.gridded;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 
@@ -29,6 +30,17 @@ import com.revolsys.spring.resource.Resource;
 
 public interface GriddedElevationModel extends Grid {
   String GEOMETRY_FACTORY = "geometryFactory";
+
+  static boolean copyGriddedElevationModel(final Object source, final Path target) {
+    final GriddedElevationModel griddedElevationModel = GriddedElevationModel
+      .newGriddedElevationModel(source);
+    if (griddedElevationModel == null) {
+      return false;
+    } else {
+      griddedElevationModel.writeGriddedElevationModel(target);
+      return true;
+    }
+  }
 
   static int getGridCellX(final double minX, final double gridCellSize, final double x) {
     final double deltaX = x - minX;
