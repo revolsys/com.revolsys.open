@@ -248,20 +248,6 @@ public class LasPointCloud extends BaseObjectWithProperties
     return tin;
   }
 
-  @Override
-  public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(
-    final Predicate<? super Point> filter) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final QuadEdgeDelaunayTinBuilder tinBuilder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
-    forEachPoint((lasPoint) -> {
-      if (filter.test(lasPoint)) {
-        tinBuilder.insertVertex(lasPoint);
-      }
-    });
-    final TriangulatedIrregularNetwork tin = tinBuilder.newTriangulatedIrregularNetwork();
-    return tin;
-  }
-
   private ChannelReader open() {
     final ChannelReader reader = this.lasResource.newChannelReader(this.byteBuffer);
     if (reader == null) {

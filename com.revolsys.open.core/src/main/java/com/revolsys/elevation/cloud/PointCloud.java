@@ -88,7 +88,7 @@ public interface PointCloud<P extends Point>
     final Predicate<? super Point> filter) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final QuadEdgeDelaunayTinBuilder tinBuilder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
-    forEachPoint((point) -> {
+    forEachPoint(point -> {
       if (filter.test(point)) {
         tinBuilder.insertVertex(point);
       }
