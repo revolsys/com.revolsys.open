@@ -1,13 +1,12 @@
 package com.revolsys.geometry.cs.geoid;
 
 import com.revolsys.geometry.cs.gridshift.VerticalShiftOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.grid.Grid;
 import com.revolsys.spring.resource.Resource;
 
-public abstract class AbstractGeoidGrid implements GeoidGrid {
+public abstract class AbstractGeoidGrid implements Geoid {
 
   protected final Resource resource;
 
@@ -31,19 +30,6 @@ public abstract class AbstractGeoidGrid implements GeoidGrid {
   }
 
   @Override
-  public boolean geodeticToOrthometricHeight(final CoordinatesOperationPoint point) {
-    final double x = point.x;
-    final double y = point.y;
-    final double geoidHeight = this.grid.getValueBicubic(x, y);
-    if (Double.isFinite(geoidHeight)) {
-      point.z -= geoidHeight;
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public VerticalShiftOperation geodeticToOrthometricHeightOperation() {
     return this::geodeticToOrthometricHeight;
   }
@@ -64,23 +50,14 @@ public abstract class AbstractGeoidGrid implements GeoidGrid {
   }
 
   @Override
-  public boolean orthometricToGeodeticHeight(final CoordinatesOperationPoint point) {
-    final double x = point.x;
-    final double y = point.y;
-    final double geoidHeight = this.grid.getValueBicubic(x, y);
-    if (Double.isFinite(geoidHeight)) {
-      point.z += geoidHeight;
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public VerticalShiftOperation orthometricToGeodeticHeightOperation() {
     return this::orthometricToGeodeticHeight;
   }
 
   protected abstract void read();
 
+  @Override
+  public String toString() {
+    return this.resource.toString();
+  }
 }
