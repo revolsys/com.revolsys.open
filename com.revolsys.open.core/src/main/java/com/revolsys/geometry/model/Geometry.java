@@ -1813,7 +1813,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   Geometry intersectionBbox(BoundingBox boundingBox);
 
-  boolean intersects(BoundingBox boundingBox);
+  boolean intersectsBbox(BoundingBox boundingBox);
 
   default boolean intersects(final double x, final double y) {
     return locate(x, y) != Location.EXTERIOR;

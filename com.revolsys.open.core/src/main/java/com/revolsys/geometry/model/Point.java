@@ -804,7 +804,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
   }
 
   @Override
-  default boolean intersects(final BoundingBox boundingBox) {
+  default boolean intersectsBbox(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
     } else {

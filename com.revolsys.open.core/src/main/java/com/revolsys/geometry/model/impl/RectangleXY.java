@@ -63,7 +63,7 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
     if (rectangle == null) {
       throw new NullPointerException("Argument rectangle cannot be null");
     } else if (!geometryFactory.isSameCoordinateSystem(rectangle)) {
-      throw new NullPointerException(
+      throw new IllegalArgumentException(
         "Rectangle operations require the same coordinate system this != rectangle\n  "
           + geometryFactory.getHorizontalCoordinateSystem() + "\n  "
           + rectangle.getHorizontalCoordinateSystem());

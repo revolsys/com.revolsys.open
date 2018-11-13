@@ -550,7 +550,7 @@ public interface Records {
         try {
           final Geometry geometry = record.getGeometry();
           if (geometry != null) {
-            return geometry.intersects(boundingBox);
+            return geometry.intersectsBbox(boundingBox);
           }
         } catch (final Throwable t) {
           Logs.debug(Records.class, "Invalid Geometry", t);

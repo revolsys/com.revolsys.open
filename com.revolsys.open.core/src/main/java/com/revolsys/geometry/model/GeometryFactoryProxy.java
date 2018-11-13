@@ -195,7 +195,7 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
     if (value == null) {
       throw new NullPointerException("Argument rectangle cannot be null");
     } else if (!isSameCoordinateSystem(value)) {
-      throw new NullPointerException(
+      throw new IllegalArgumentException(
         "Rectangle operations require the same coordinate system this != rectangle\n  "
           + getHorizontalCoordinateSystem() + "\n  " + value.getHorizontalCoordinateSystem());
     }

@@ -49,7 +49,6 @@ import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PolygonEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
@@ -602,7 +601,7 @@ public interface Polygon extends Polygonal {
 
   @Override
   default Geometry intersectionBbox(final BoundingBox boundingBox) {
-    notNullSameCs( boundingBox);
+    notNullSameCs(boundingBox);
     if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {
@@ -612,7 +611,7 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default boolean intersects(final BoundingBox boundingBox) {
+  default boolean intersectsBbox(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
     } else {
@@ -623,7 +622,7 @@ public interface Polygon extends Polygonal {
         if (boundingBox.isProjectionRequired(this)) {
           return intersects(boundingBox.toPolygon(geometryFactory, 10));
         } else {
-          return intersects(boundingBox.toPolygon(0));
+          return intersects(boundingBox.toRectangle());
         }
       }
       // for (final LinearRing ring : rings()) {

@@ -414,12 +414,12 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
-  default boolean intersects(final BoundingBox boundingBox) {
+  default boolean intersectsBbox(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
     } else {
       for (final Geometry geometry : geometries()) {
-        if (geometry.intersects(boundingBox)) {
+        if (geometry.intersectsBbox(boundingBox)) {
           return true;
         }
       }

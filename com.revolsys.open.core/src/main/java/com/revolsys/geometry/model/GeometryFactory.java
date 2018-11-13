@@ -1505,6 +1505,16 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return 0;
   }
 
+  public double[] getScales() {
+    final int axisCount = getAxisCount();
+    final double[] scales = new double[axisCount];
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double scale = getScale(axisIndex);
+      scales[axisIndex] = scale;
+    }
+    return scales;
+  }
+
   public double getScaleX() {
     return 0;
   }

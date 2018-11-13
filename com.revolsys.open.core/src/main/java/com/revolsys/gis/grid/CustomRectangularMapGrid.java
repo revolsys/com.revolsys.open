@@ -99,7 +99,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
       final BoundingBox boundingBox = convertedGeometry.getBoundingBox();
       forEachTile(boundingBox, tile -> {
         final BoundingBox tileBoundingBox = tile.getBoundingBox();
-        if (convertedGeometry.intersects(tileBoundingBox)) {
+        if (convertedGeometry.intersectsBbox(tileBoundingBox)) {
           action.accept(tile);
         }
       });

@@ -120,7 +120,7 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     } else {
       point = point.convertGeometry(ring.getGeometryFactory());
       final BoundingBox boundingBox = ring.getBoundingBox();
-      if (point.intersects(boundingBox)) {
+      if (point.intersectsBbox(boundingBox)) {
 
         final RayCrossingCounter counter = new RayCrossingCounter(point);
 

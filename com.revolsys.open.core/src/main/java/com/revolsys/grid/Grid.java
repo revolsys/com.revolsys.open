@@ -18,6 +18,7 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.function.Consumer3Double;
 
@@ -32,7 +33,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     Polygon notNullRectangle = geometryFactory.newRectangleCorners(minX, minY, maxX, maxY);
     for (final Iterator<Polygon> iterator = polygons.iterator(); iterator.hasNext();) {
       final Polygon polygon = iterator.next();
-      if (polygon.intersects(notNullRectangle.getBoundingBox())) {
+      if (polygon.intersectsBbox(notNullRectangle.getBoundingBox())) {
         final Geometry union = notNullRectangle.union(polygon);
         if (union instanceof Polygon) {
           notNullRectangle = (Polygon)union;
@@ -58,6 +59,33 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
   }
 
   void clear();
+
+  default Grid copyGrid(final BoundingBoxProxy boundingBox) {
+    final BoundingBox bbox = convertBoundingBox(boundingBox);
+    final double gridCellWidth = getGridCellWidth();
+    final double gridCellHeight = getGridCellHeight();
+    final double minX = Math.floor(bbox.getMinX() / gridCellWidth) * gridCellWidth;
+    final double maxX = Math.floor(bbox.getMaxX() / gridCellWidth) * gridCellWidth;
+    final double minY = Math.floor(bbox.getMinY() / gridCellHeight) * gridCellHeight;
+    final double maxY = Math.floor(bbox.getMaxY() / gridCellHeight) * gridCellHeight;
+    final int width = (int)((maxX - minX) / gridCellWidth);
+    final int height = (int)((maxY - minY) / gridCellHeight);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Grid newGrid = newGrid(geometryFactory, minX, minY, width, height, gridCellWidth,
+      gridCellHeight);
+    for (int gridY = 0; gridY < height; gridY++) {
+      final double y = minY + gridY * gridCellHeight;
+      for (int gridX = 0; gridX < height; gridX++) {
+        final double x = minX + gridX * gridCellWidth;
+        final double elevation = getValue(x, y);
+        if (elevation != 0) {
+          Debug.noOp();
+        }
+        newGrid.setValue(gridX, gridY, elevation);
+      }
+    }
+    return newGrid;
+  }
 
   default void forEachPoint(final Consumer3Double action) {
     final double gridCellWidth = getGridCellWidth();

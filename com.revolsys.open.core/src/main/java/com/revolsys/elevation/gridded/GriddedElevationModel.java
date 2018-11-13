@@ -16,6 +16,7 @@ import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradien
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
 import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -121,6 +122,11 @@ public interface GriddedElevationModel extends Grid {
   }
 
   default void cancelChanges() {
+  }
+
+  @Override
+  default GriddedElevationModel copyGrid(final BoundingBoxProxy boundingBox) {
+    return (GriddedElevationModel)Grid.super.copyGrid(boundingBox);
   }
 
   default LineStringEditor getNullBoundaryPoints() {

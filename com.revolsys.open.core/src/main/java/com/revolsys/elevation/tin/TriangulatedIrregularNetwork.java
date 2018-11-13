@@ -92,7 +92,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   default void forEachTriangle(final BoundingBox boundingBox,
     final Consumer<? super Triangle> action) {
     forEachTriangle(triangle -> {
-      if (triangle.intersects(boundingBox)) {
+      if (triangle.intersectsBbox(boundingBox)) {
         action.accept(triangle);
       }
     });

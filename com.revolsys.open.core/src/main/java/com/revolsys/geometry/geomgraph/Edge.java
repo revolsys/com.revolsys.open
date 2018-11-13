@@ -178,8 +178,6 @@ public class Edge extends GraphComponent implements DelegatingLineString {
     return true;
   }
 
-  // of this edge
-
   public Edge getCollapsedEdge() {
     final LineString points = new LineStringDouble(getPoint(0), getPoint(1));
     final Label lineLabel = Label.toLineLabel(this.label);
@@ -190,6 +188,8 @@ public class Edge extends GraphComponent implements DelegatingLineString {
   public Depth getDepth() {
     return this.depth;
   }
+
+  // of this edge
 
   /**
    * The depthDelta is the change in depth as an edge is crossed from R to L
@@ -223,6 +223,16 @@ public class Edge extends GraphComponent implements DelegatingLineString {
   public Point getPoint() {
     final LineString line = getLineString();
     return line.getPoint();
+  }
+
+  @Override
+  public double getX(final int vertexIndex) {
+    return this.line.getX(vertexIndex);
+  }
+
+  @Override
+  public double getY(final int vertexIndex) {
+    return this.line.getY(vertexIndex);
   }
 
   /**

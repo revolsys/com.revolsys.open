@@ -167,9 +167,14 @@ public class IntArrayScaleGrid extends AbstractGrid {
   }
 
   @Override
-  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+  protected void setGeometryFactory(GeometryFactory geometryFactory) {
     if (geometryFactory.getScaleZ() <= 0) {
-      throw new IllegalArgumentException("Geometry factory must have a z scale factor");
+      if (geometryFactory.getAxisCount() < 3) {
+        geometryFactory = geometryFactory.convertAxisCount(3);
+      }
+      final double[] scales = geometryFactory.getScales();
+      scales[2] = 1000;
+      geometryFactory = geometryFactory.convertScales(scales);
     }
     super.setGeometryFactory(geometryFactory);
   }

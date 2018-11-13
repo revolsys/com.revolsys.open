@@ -1517,7 +1517,7 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default boolean intersects(final BoundingBox boundingBox) {
+  default boolean intersectsBbox(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
     } else {
@@ -1751,7 +1751,7 @@ public interface LineString extends Lineal {
   @Override
   default Location locate(final Point point) {
     // bounding-box check
-    if (point.intersects(getBoundingBox())) {
+    if (point.intersectsBbox(getBoundingBox())) {
       if (!isClosed()) {
         if (equals(2, 0, point) || equals(2, getVertexCount() - 1, point)) {
           return Location.BOUNDARY;
