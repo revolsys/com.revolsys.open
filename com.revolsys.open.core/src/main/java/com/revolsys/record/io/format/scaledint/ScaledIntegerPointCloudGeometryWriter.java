@@ -68,7 +68,14 @@ public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geomet
 
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory.convertToFixed(1000.0);
+    double defaultScale;
+    if (geometryFactory.isGeographics()) {
+      defaultScale = 1000;
+    } else {
+      defaultScale = 10000000;
+    }
+    this.geometryFactory = geometryFactory.convertToFixed(defaultScale);
+
   }
 
   @Override

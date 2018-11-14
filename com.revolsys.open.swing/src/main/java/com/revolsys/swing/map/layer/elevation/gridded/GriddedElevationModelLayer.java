@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.model.BoundingBox;
@@ -88,7 +88,7 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
     final String baseName = Paths.getBaseName(file);
     Invoke.background("Zoom to Gridded Elevation Model: " + baseName, () -> {
       try (
-        GriddedElevationModelReader reader = GriddedElevationModel
+        GriddedElevationModelReader reader = GriddedElevationModelReader
           .newGriddedElevationModelReader(file)) {
         MapPanel.zoomToBoundingBox(baseName, reader);
       }
@@ -113,9 +113,9 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
 
     // Menus
     final EnableCheck enableCheck = RsSwingServiceInitializer
-      .enableCheck(GriddedElevationModelReadFactory.class);
+      .enableCheck(GriddedElevationModelReaderFactory.class);
     menuItemPathAddLayer("gridded_dem", "Add Gridded Elevation Model Layer", "gridded_dem",
-      GriddedElevationModelReadFactory.class);
+      GriddedElevationModelReaderFactory.class);
 
     TreeNodes
       .addMenuItem(PathTreeNode.MENU, "gridded_dem", "Export Gridded Elevation Model",
@@ -269,8 +269,8 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
     final String fileExtension = FileUtil.getFileNameExtension(this.url);
     if (Property.hasValue(fileExtension)) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileExtension);
-      final GriddedElevationModelReadFactory factory = IoFactory
-        .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);
+      final GriddedElevationModelReaderFactory factory = IoFactory
+        .factoryByFileExtension(GriddedElevationModelReaderFactory.class, fileExtension);
       if (factory != null) {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }

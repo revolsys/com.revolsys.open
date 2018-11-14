@@ -4,29 +4,16 @@ import com.revolsys.geometry.cs.gridshift.VerticalShiftOperation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.grid.Grid;
-import com.revolsys.spring.resource.Resource;
 
-public abstract class AbstractGeoidGrid implements Geoid {
+public class GridGeoidModel extends AbstractGeoidModel {
 
-  protected final Resource resource;
-
-  protected GeometryFactory geometryFactory;
-
-  protected BoundingBox boundingBox;
-
-  protected double gridCellWidth;
-
-  protected int gridWidth;
-
-  protected int gridHeight;
-
-  protected double gridCellHeight;
+  private String geoidName;
 
   protected Grid grid;
 
-  public AbstractGeoidGrid(final Object source) {
-    this.resource = Resource.getResource(source);
-    read();
+  public GridGeoidModel(final String geoidName, final Grid grid) {
+    super(geoidName);
+    this.grid = grid;
   }
 
   @Override
@@ -36,7 +23,7 @@ public abstract class AbstractGeoidGrid implements Geoid {
 
   @Override
   public BoundingBox getBoundingBox() {
-    return this.boundingBox;
+    return this.grid.getBoundingBox();
   }
 
   @Override
@@ -46,7 +33,7 @@ public abstract class AbstractGeoidGrid implements Geoid {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return this.geometryFactory;
+    return this.grid.getGeometryFactory();
   }
 
   @Override
@@ -54,10 +41,8 @@ public abstract class AbstractGeoidGrid implements Geoid {
     return this::orthometricToGeodeticHeight;
   }
 
-  protected abstract void read();
-
   @Override
   public String toString() {
-    return this.resource.toString();
+    return this.geoidName.toString();
   }
 }

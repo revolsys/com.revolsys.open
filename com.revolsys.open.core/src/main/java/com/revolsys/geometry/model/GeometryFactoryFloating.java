@@ -35,4 +35,16 @@ public class GeometryFactoryFloating extends GeometryFactory {
     Arrays.fill(scales, defaultScale);
     return convertScales(scales);
   }
+
+  @Override
+  public GeometryFactory newWithOffsets(final double offsetX, final double offsetY,
+    final double offsetZ) {
+    if (this.coordinateSystemId > 0) {
+      return new GeometryFactoryWithOffsets(this.coordinateSystemId, offsetX, 0, offsetY, 0,
+        offsetZ, 0);
+    } else {
+      return new GeometryFactoryWithOffsets(this.coordinateSystem, offsetX, 0, offsetY, 0, offsetZ,
+        0);
+    }
+  }
 }

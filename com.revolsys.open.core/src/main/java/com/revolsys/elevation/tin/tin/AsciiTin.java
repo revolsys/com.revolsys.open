@@ -3,7 +3,7 @@ package com.revolsys.elevation.tin.tin;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
-import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriter;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriterFactory;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -12,7 +12,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
 public class AsciiTin extends AbstractIoFactoryWithCoordinateSystem
-  implements TriangulatedIrregularNetworkReadFactory, TriangulatedIrregularNetworkWriterFactory {
+  implements TriangulatedIrregularNetworkReaderFactory, TriangulatedIrregularNetworkWriterFactory {
   public AsciiTin() {
     super("ASCII TIN");
     addMediaTypeAndFileExtension("image/x-tin", "tin");

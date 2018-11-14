@@ -222,7 +222,7 @@ public class MapRulerBorder extends AbstractBorder {
         final long maxIndex = (long)Math.floor(maxX / this.step);
         long startIndex = (long)Math.floor(minX / this.step);
         if (minX < this.areaMinX) {
-          startIndex = (long)Math.floor((this.areaMinX - minX) / this.step);
+          startIndex = (long)Math.floor(this.areaMinX / this.step);
           final double delta = this.areaMinX - minX;
           final int minPixel = (int)Math.floor(delta * this.pixelsPerUnit);
           g.setColor(COLOR_OUTSIDE_AREA);

@@ -15,9 +15,9 @@ public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
 
   private final double offsetZ;
 
-  protected GeometryFactoryWithOffsets(final CoordinateSystem coordinateSystem,
-    final double offsetX, final double scaleX, final double offsetY, final double scaleY,
-    final double offsetZ, final double scaleZ) {
+  public GeometryFactoryWithOffsets(final CoordinateSystem coordinateSystem, final double offsetX,
+    final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
+    final double scaleZ) {
     super(coordinateSystem, 3, scaleX, scaleY, scaleZ);
     this.offsetX = offsetX;
     this.offsetY = offsetY;

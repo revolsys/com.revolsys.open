@@ -1,14 +1,13 @@
 package com.revolsys.elevation.gridded.img;
 
-import java.util.Map;
-
-import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 
 public class ImgGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
-  implements GriddedElevationModelReadFactory {
+  implements GriddedElevationModelReaderFactory {
 
   public static final String FILE_EXTENSION = "img";
 
@@ -19,7 +18,7 @@ public class ImgGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
 
   @Override
   public GriddedElevationModelReader newGriddedElevationModelReader(final Resource resource,
-    final Map<String, ? extends Object> properties) {
+    final MapEx properties) {
     return new ImgGriddedElevationReader(resource, properties);
   }
 }

@@ -16,6 +16,7 @@ import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.geometry.model.GeometryFactoryWithOffsets;
 import com.revolsys.io.StringWriter;
 import com.revolsys.record.code.Code;
 import com.revolsys.util.Md5;
@@ -64,6 +65,16 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
   GeometryFactory getGeometryFactoryFixed(int axisCount, double... scales);
 
   GeometryFactory getGeometryFactoryFloating(int axisCount);
+
+  default GeometryFactory getGeometryFactoryWithOffsets(final double offsetX, final double scaleX,
+    final double offsetY, final double scaleY, final double offsetZ, final double scaleZ) {
+    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
+      return getGeometryFactoryFixed(3, scaleX, scaleY, scaleZ);
+    } else {
+      return new GeometryFactoryWithOffsets(this, offsetX, scaleX, offsetY, scaleY, offsetZ,
+        scaleZ);
+    }
+  }
 
   @Override
   default <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {

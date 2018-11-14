@@ -24,8 +24,8 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
-import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
-import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.util.BoundingBoxEditor;
@@ -228,11 +228,11 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
     final Set<String> allElevationModelExtensions = new TreeSet<>();
     final List<FileNameExtensionFilter> elevationModelFileFilters = IoFactory
-      .newFileFilters(allElevationModelExtensions, GriddedElevationModelReadFactory.class);
+      .newFileFilters(allElevationModelExtensions, GriddedElevationModelReaderFactory.class);
 
     final Set<String> allTinExtensions = new TreeSet<>();
     final List<FileNameExtensionFilter> tinFileFilters = IoFactory.newFileFilters(allTinExtensions,
-      GriddedElevationModelReadFactory.class);
+      GriddedElevationModelReaderFactory.class);
 
     final Set<String> allExtensions = new TreeSet<>();
     allExtensions.addAll(allRecordExtensions);
@@ -828,9 +828,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     name = FileUtil.fromSafeName(name);
     properties.put("name", name);
     Layer layer;
-    if (factoryClass == TriangulatedIrregularNetworkReadFactory.class) {
+    if (factoryClass == TriangulatedIrregularNetworkReaderFactory.class) {
       layer = new TriangulatedIrregularNetworkLayer(properties);
-    } else if (factoryClass == GriddedElevationModelReadFactory.class) {
+    } else if (factoryClass == GriddedElevationModelReaderFactory.class) {
       layer = new GriddedElevationModelLayer(properties);
     } else if (factoryClass == GeoreferencedImageReadFactory.class) {
       layer = new GeoreferencedImageLayer(properties);
@@ -889,9 +889,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     name = FileUtil.fromSafeName(name);
     properties.put("name", name);
     Layer layer;
-    if (IoFactory.hasFactory(TriangulatedIrregularNetworkReadFactory.class, url)) {
+    if (IoFactory.hasFactory(TriangulatedIrregularNetworkReaderFactory.class, url)) {
       layer = new TriangulatedIrregularNetworkLayer(properties);
-    } else if (IoFactory.hasFactory(GriddedElevationModelReadFactory.class, url)) {
+    } else if (IoFactory.hasFactory(GriddedElevationModelReaderFactory.class, url)) {
       layer = new GriddedElevationModelLayer(properties);
     } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, url)) {
       layer = new GeoreferencedImageLayer(properties);

@@ -5,14 +5,14 @@ import java.nio.charset.StandardCharsets;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.tin.TriangleConsumer;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
-import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriter;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriterFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 
 public class ScaledIntegerTriangulatedIrregularNetwork extends AbstractIoFactoryWithCoordinateSystem
-  implements TriangulatedIrregularNetworkReadFactory, TriangulatedIrregularNetworkWriterFactory {
+  implements TriangulatedIrregularNetworkReaderFactory, TriangulatedIrregularNetworkWriterFactory {
 
   public static final String MEDIA_TYPE = "image/x-revolsys-sitin";
 

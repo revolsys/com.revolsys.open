@@ -12,6 +12,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.geometry.cs.CompoundCoordinateSystem;
@@ -69,11 +70,9 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
 
   private final Resource resource;
 
-  public UsgsGriddedElevationReader(final Resource resource,
-    final Map<String, ? extends Object> properties) {
-    this.resource = resource;
-    this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.wgs84());
+  public UsgsGriddedElevationReader(final Resource resource, final MapEx properties) {
     setProperties(properties);
+    this.resource = resource;
   }
 
   @Override
@@ -518,23 +517,31 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           horizontalCoordinateSystem = EpsgCoordinateSystems
             .getCoordinateSystem(horizontalCoordinateSystemId);
         }
-        if (horizontalCoordinateSystem == null) {
-          throw new IllegalArgumentException("No coordinate system found: " + this.resource);
-        } else {
-          CoordinateSystem coordinateSystem;
-          if (verticalCoordinateSystem == null) {
-            coordinateSystem = horizontalCoordinateSystem;
+        if (this.geometryFactory == null
+          || !this.geometryFactory.isHasHorizontalCoordinateSystem()) {
+          if (horizontalCoordinateSystem == null) {
+            throw new IllegalArgumentException("No coordinate system found: " + this.resource);
           } else {
-            final int verticalCoordinateSystemId = verticalCoordinateSystem.getCoordinateSystemId();
-            if (horizontalCoordinateSystemId > 0 && verticalCoordinateSystemId > 0) {
-              coordinateSystem = EpsgCoordinateSystems.getCompound(horizontalCoordinateSystemId,
-                verticalCoordinateSystemId);
+            CoordinateSystem coordinateSystem;
+            if (verticalCoordinateSystem == null) {
+              coordinateSystem = horizontalCoordinateSystem;
             } else {
-              coordinateSystem = new CompoundCoordinateSystem(horizontalCoordinateSystem,
-                verticalCoordinateSystem);
+              final int verticalCoordinateSystemId = verticalCoordinateSystem
+                .getCoordinateSystemId();
+              if (horizontalCoordinateSystemId > 0 && verticalCoordinateSystemId > 0) {
+                coordinateSystem = EpsgCoordinateSystems.getCompound(horizontalCoordinateSystemId,
+                  verticalCoordinateSystemId);
+              } else {
+                coordinateSystem = new CompoundCoordinateSystem(horizontalCoordinateSystem,
+                  verticalCoordinateSystem);
+              }
             }
+            this.geometryFactory = coordinateSystem.getGeometryFactoryFixed(3, 0.0, 0.0, scaleZ);
           }
-          this.geometryFactory = coordinateSystem.getGeometryFactoryFixed(3, 0.0, 0.0, scaleZ);
+        } else {
+          final double[] scales = this.geometryFactory.newScales(3);
+          scales[2] = scaleZ;
+          this.geometryFactory = this.geometryFactory.convertScales(scales);
         }
         if (horizontalDatum == 3 || horizontalDatum == 4) {
         } else {
@@ -554,6 +561,10 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
       }
       throw Exceptions.wrap(e);
     }
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   private void skip(final int count) {

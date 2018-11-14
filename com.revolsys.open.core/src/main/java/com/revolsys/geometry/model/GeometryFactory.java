@@ -2130,6 +2130,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
     return new double[axisCount];
   }
 
+  public abstract GeometryFactory newWithOffsets(double offsetX, double offsetY, double offsetZ);
+
   /**
    * <p>Construct a newn empty {@link Point}.</p>
    *

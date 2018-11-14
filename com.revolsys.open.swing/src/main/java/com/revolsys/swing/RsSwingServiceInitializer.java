@@ -1,6 +1,6 @@
 package com.revolsys.swing;
 
-import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
@@ -109,7 +109,7 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
       "Triangulated Irregular Network Layer", TriangulatedIrregularNetworkLayer::new);
 
     AbstractLayer.menuItemPathAddLayer("tin", "Add TIN Layer", "tin",
-      TriangulatedIrregularNetworkReadFactory.class);
+      TriangulatedIrregularNetworkReaderFactory.class);
 
     ArcGisRestServer.factoryInit();
 

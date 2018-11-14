@@ -1,11 +1,9 @@
 package com.revolsys.elevation.gridded.esriascii;
 
-import java.util.Map;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.io.PointReader;
@@ -14,7 +12,7 @@ import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 
 public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSystem implements
-  GriddedElevationModelReadFactory, GriddedElevationModelWriterFactory, PointReaderFactory {
+  GriddedElevationModelReaderFactory, GriddedElevationModelWriterFactory, PointReaderFactory {
   public static final String FILE_EXTENSION = "asc";
 
   public static final String FILE_EXTENSION_ZIP = FILE_EXTENSION + ".zip";
@@ -32,7 +30,7 @@ public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSy
 
   @Override
   public GriddedElevationModel newGriddedElevationModel(final Resource resource,
-    final Map<String, ? extends Object> properties) {
+    final MapEx properties) {
     try (
       EsriAsciiGriddedElevationModelReader reader = new EsriAsciiGriddedElevationModelReader(
         resource, properties)) {
@@ -42,7 +40,7 @@ public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSy
 
   @Override
   public GriddedElevationModelReader newGriddedElevationModelReader(final Resource resource,
-    final Map<String, ? extends Object> properties) {
+    final MapEx properties) {
     return new EsriAsciiGriddedElevationModelReader(resource, properties);
   }
 
@@ -52,8 +50,7 @@ public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSy
   }
 
   @Override
-  public PointReader newPointReader(final Resource resource,
-    final MapEx properties) {
+  public PointReader newPointReader(final Resource resource, final MapEx properties) {
     return new EsriAsciiGriddedElevationModelReader(resource, properties);
   }
 

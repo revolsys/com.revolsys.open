@@ -5,7 +5,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.number.Doubles;
 
-public class CoordinatesOperationPoint {
+public class CoordinatesOperationPoint implements Point {
   public double x;
 
   public double y;
@@ -50,6 +50,11 @@ public class CoordinatesOperationPoint {
     action.accept(this.x, this.y);
   }
 
+  @Override
+  public Point clone() {
+    return this;
+  }
+
   public void copyCoordinatesTo(final double[] coordinates) {
     final int axisCount = coordinates.length;
     coordinates[0] = this.x;
@@ -82,6 +87,48 @@ public class CoordinatesOperationPoint {
     if (axisCount > 3) {
       coordinates[offset + 3] = this.m;
     }
+  }
+
+  @Override
+  public double getCoordinate(final int axisIndex) {
+    switch (axisIndex) {
+      case X:
+        return this.x;
+      case Y:
+        return this.y;
+      case Z:
+        return this.z;
+      case M:
+        return this.m;
+
+      default:
+        return Double.NaN;
+    }
+  }
+
+  @Override
+  public double getM() {
+    return this.m;
+  }
+
+  @Override
+  public double getX() {
+    return this.x;
+  }
+
+  @Override
+  public double getY() {
+    return this.y;
+  }
+
+  @Override
+  public double getZ() {
+    return this.z;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
   }
 
   public void resetPoint(final double x, final double y, final double z) {

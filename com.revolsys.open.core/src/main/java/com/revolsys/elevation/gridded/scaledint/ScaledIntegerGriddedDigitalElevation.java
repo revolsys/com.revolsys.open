@@ -7,10 +7,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.model.Geometry;
@@ -23,7 +23,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
 public class ScaledIntegerGriddedDigitalElevation extends AbstractIoFactoryWithCoordinateSystem
-  implements GriddedElevationModelReadFactory, GriddedElevationModelWriterFactory {
+  implements GriddedElevationModelReaderFactory, GriddedElevationModelWriterFactory {
 
   public static final String MEDIA_TYPE = "image/x-revolsys-sigdem";
 
@@ -106,7 +106,7 @@ public class ScaledIntegerGriddedDigitalElevation extends AbstractIoFactoryWithC
 
   @Override
   public ScaledIntegerGriddedDigitalElevationModelReader newGriddedElevationModelReader(
-    final Resource resource, final Map<String, ? extends Object> properties) {
+    final Resource resource, final MapEx properties) {
     return new ScaledIntegerGriddedDigitalElevationModelReader(resource, properties);
   }
 

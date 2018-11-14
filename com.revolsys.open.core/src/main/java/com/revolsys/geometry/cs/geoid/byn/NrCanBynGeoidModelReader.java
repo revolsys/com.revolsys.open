@@ -3,22 +3,57 @@ package com.revolsys.geometry.cs.geoid.byn;
 import java.nio.ByteOrder;
 import java.nio.channels.ClosedByInterruptException;
 
+import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModelReader;
+import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.cs.epsg.EpsgId;
-import com.revolsys.geometry.cs.geoid.AbstractGeoidGrid;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.grid.IntArrayScaleGrid;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class NrCanBynGeoidGrid extends AbstractGeoidGrid {
+public class NrCanBynGeoidModelReader extends BaseObjectWithProperties
+  implements GriddedElevationModelReader {
+  private final Resource resource;
 
-  public NrCanBynGeoidGrid(final Object source) {
-    super(source);
+  private GeometryFactory geometryFactory;
+
+  private BoundingBox boundingBox;
+
+  private double gridCellWidth;
+
+  private int gridWidth;
+
+  private int gridHeight;
+
+  private double gridCellHeight;
+
+  public NrCanBynGeoidModelReader(final Resource resource, final MapEx properties) {
+    this.resource = resource;
+    setProperties(properties);
   }
 
   @Override
-  protected void read() {
+  public BoundingBox getBoundingBox() {
+    return this.boundingBox;
+  }
+
+  @Override
+  public double getGridCellHeight() {
+    return this.gridCellHeight;
+  }
+
+  @Override
+  public double getGridCellWidth() {
+    return this.gridCellWidth;
+  }
+
+  @Override
+  public GriddedElevationModel read() {
     try (
       ChannelReader reader = IoFactory.newChannelReader(this.resource, 8192)) {
       if (reader != null) {
@@ -35,8 +70,10 @@ public class NrCanBynGeoidGrid extends AbstractGeoidGrid {
               cells[index++] = value;
             }
           }
-          this.grid = new IntArrayScaleGrid(this.geometryFactory, this.boundingBox, gridWidth,
-            gridHeight, this.gridCellWidth, this.gridCellHeight, cells);
+          final IntArrayScaleGriddedElevationModel grid = new IntArrayScaleGriddedElevationModel(
+            this.geometryFactory, this.boundingBox, gridWidth, gridHeight, this.gridCellWidth,
+            this.gridCellHeight, cells);
+          return grid;
         } catch (final RuntimeException e) {
           if (!Exceptions.isException(e, ClosedByInterruptException.class)) {
             throw Exceptions.wrap("Unable to read : " + this.resource, e);
@@ -44,6 +81,7 @@ public class NrCanBynGeoidGrid extends AbstractGeoidGrid {
         }
       }
     }
+    return null;
   }
 
   @SuppressWarnings("unused")
@@ -109,5 +147,4 @@ public class NrCanBynGeoidGrid extends AbstractGeoidGrid {
       reader.setByteOrder(ByteOrder.BIG_ENDIAN);
     }
   }
-
 }

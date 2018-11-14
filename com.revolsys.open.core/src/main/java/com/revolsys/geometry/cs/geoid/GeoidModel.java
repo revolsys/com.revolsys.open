@@ -1,10 +1,30 @@
 package com.revolsys.geometry.cs.geoid;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.gridshift.VerticalShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.io.IoFactory;
+import com.revolsys.spring.resource.Resource;
 
-public interface Geoid extends BoundingBoxProxy {
+public interface GeoidModel extends BoundingBoxProxy {
+
+  static GeoidModel newGeoidModel(final Object source) {
+    final MapEx properties = MapEx.EMPTY;
+    return newGeoidModel(source, properties);
+  }
+
+  static GeoidModel newGeoidModel(final Object source, final MapEx properties) {
+    final GeoidModelReaderFactory factory = IoFactory.factory(GeoidModelReaderFactory.class,
+      source);
+    if (factory == null) {
+      return null;
+    } else {
+      final Resource resource = Resource.getResource(source);
+      final GeoidModel dem = factory.newGeoidModel(resource, properties);
+      return dem;
+    }
+  }
 
   /**
    * Convert a geodetic (ellipsoid) height (h) to an orthometric (geoid) height (H).
@@ -37,6 +57,8 @@ public interface Geoid extends BoundingBoxProxy {
    * @param lon The point's latitude.
    */
   double getGeoidHeight(double lon, double lat);
+
+  String getGeoidName();
 
   /**
    * Convert a orthometric (geoid) height (H) to an geodetic (ellipsoid) height(h).

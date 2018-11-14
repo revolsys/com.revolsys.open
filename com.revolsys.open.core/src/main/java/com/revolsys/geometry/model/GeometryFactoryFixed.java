@@ -565,6 +565,18 @@ public class GeometryFactoryFixed extends GeometryFactory {
   }
 
   @Override
+  public GeometryFactory newWithOffsets(final double offsetX, final double offsetY,
+    final double offsetZ) {
+    if (this.coordinateSystemId > 0) {
+      return new GeometryFactoryWithOffsets(this.coordinateSystemId, offsetX, this.scaleX, offsetY,
+        this.scaleY, offsetZ, this.scaleZ);
+    } else {
+      return new GeometryFactoryWithOffsets(this.coordinateSystem, offsetX, this.scaleX, offsetY,
+        this.scaleY, offsetZ, this.scaleZ);
+    }
+  }
+
+  @Override
   public double toDoubleX(final int x) {
     return x / this.scaleX;
   }

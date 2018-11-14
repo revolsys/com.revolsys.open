@@ -36,8 +36,8 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
 
   static boolean forEachTriangle(final Object source, final MapEx properties,
     final TriangleConsumer action) {
-    final TriangulatedIrregularNetworkReadFactory factory = IoFactory
-      .factory(TriangulatedIrregularNetworkReadFactory.class, source);
+    final TriangulatedIrregularNetworkReaderFactory factory = IoFactory
+      .factory(TriangulatedIrregularNetworkReaderFactory.class, source);
     if (factory == null) {
       return false;
     } else {
@@ -69,8 +69,8 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
 
   static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final Object source,
     final MapEx properties) {
-    final TriangulatedIrregularNetworkReadFactory factory = IoFactory
-      .factory(TriangulatedIrregularNetworkReadFactory.class, source);
+    final TriangulatedIrregularNetworkReaderFactory factory = IoFactory
+      .factory(TriangulatedIrregularNetworkReaderFactory.class, source);
     if (factory == null) {
       return null;
     } else {

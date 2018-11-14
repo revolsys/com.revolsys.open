@@ -1,10 +1,12 @@
 package com.revolsys.elevation.tin;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.io.ReadIoFactory;
+import com.revolsys.geometry.cs.geoid.GeoidModelReader;
+import com.revolsys.geometry.cs.geoid.GeoidModelReaderFactory;
+import com.revolsys.geometry.cs.geoid.TriangulatedIrregularNetworkGeoidModelReader;
 import com.revolsys.spring.resource.Resource;
 
-public interface TriangulatedIrregularNetworkReadFactory extends ReadIoFactory {
+public interface TriangulatedIrregularNetworkReaderFactory extends GeoidModelReaderFactory {
   default void forEachTriangle(final Resource resource, final MapEx properties,
     final TriangleConsumer action) {
     final TriangulatedIrregularNetwork tin = newTriangulatedIrregularNetwork(resource, properties);
@@ -24,5 +26,11 @@ public interface TriangulatedIrregularNetworkReadFactory extends ReadIoFactory {
     });
   }
 
+  @Override
+  default GeoidModelReader newGeoidModelReader(final Resource resource, final MapEx properties) {
+    return new TriangulatedIrregularNetworkGeoidModelReader(resource, properties);
+  }
+
   TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(Resource resource, MapEx properties);
+
 }

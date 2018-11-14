@@ -8,7 +8,7 @@ import java.util.Map;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModelGrid;
 import com.revolsys.geometry.model.BoundingBox;
@@ -241,8 +241,8 @@ public class TiledGriddedElevationModelLayer
     SwingUtil.addLabelledReadOnlyTextField(panel, "File Prefix", this.filePrefix);
     if (Property.hasValue(this.fileExtension)) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", this.fileExtension);
-      final GriddedElevationModelReadFactory factory = IoFactory
-        .factoryByFileExtension(GriddedElevationModelReadFactory.class, this.fileExtension);
+      final GriddedElevationModelReaderFactory factory = IoFactory
+        .factoryByFileExtension(GriddedElevationModelReaderFactory.class, this.fileExtension);
       if (factory != null) {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }

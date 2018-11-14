@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
 import com.revolsys.elevation.gridded.esrifloatgrid.EsriFloatGridGriddedElevation;
@@ -58,46 +59,26 @@ public interface GriddedElevationModel extends Grid {
   }
 
   static GriddedElevationModel newGriddedElevationModel(final Object source) {
-    final Map<String, Object> properties = Collections.emptyMap();
+    final MapEx properties = MapEx.EMPTY;
     return newGriddedElevationModel(source, properties);
   }
 
   static GriddedElevationModel newGriddedElevationModel(final Object source,
     final GeometryFactory defaultGeometryFactory) {
-    final Map<String, Object> properties = Collections.singletonMap("geometryFactory",
-      defaultGeometryFactory);
+    final MapEx properties = new LinkedHashMapEx("geometryFactory", defaultGeometryFactory);
     return newGriddedElevationModel(source, properties);
   }
 
   static GriddedElevationModel newGriddedElevationModel(final Object source,
-    final Map<String, ? extends Object> properties) {
-    final GriddedElevationModelReadFactory factory = IoFactory
-      .factory(GriddedElevationModelReadFactory.class, source);
+    final MapEx properties) {
+    final GriddedElevationModelReaderFactory factory = IoFactory
+      .factory(GriddedElevationModelReaderFactory.class, source);
     if (factory == null) {
       return null;
     } else {
       final Resource resource = Resource.getResource(source);
       final GriddedElevationModel dem = factory.newGriddedElevationModel(resource, properties);
       return dem;
-    }
-  }
-
-  public static <R extends GriddedElevationModelReader> R newGriddedElevationModelReader(
-    final Object source) {
-    final MapEx properties = MapEx.EMPTY;
-    return newGriddedElevationModelReader(source, properties);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <R extends GriddedElevationModelReader> R newGriddedElevationModelReader(
-    final Object source, final MapEx properties) {
-    final GriddedElevationModelReadFactory factory = IoFactory
-      .factory(GriddedElevationModelReadFactory.class, source);
-    if (factory == null) {
-      return null;
-    } else {
-      final Resource resource = Resource.getResource(source);
-      return (R)factory.newGriddedElevationModelReader(resource, properties);
     }
   }
 

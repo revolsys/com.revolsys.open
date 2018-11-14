@@ -24,8 +24,8 @@ import org.apache.commons.collections4.map.HashedMap;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
-import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
-import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileConnectionManager;
@@ -430,9 +430,9 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
         return true;
       } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
         return true;
-      } else if (IoFactory.hasFactory(GriddedElevationModelReadFactory.class, path)) {
+      } else if (IoFactory.hasFactory(GriddedElevationModelReaderFactory.class, path)) {
         return true;
-      } else if (IoFactory.hasFactory(TriangulatedIrregularNetworkReadFactory.class, path)) {
+      } else if (IoFactory.hasFactory(TriangulatedIrregularNetworkReaderFactory.class, path)) {
         return true;
       }
     }

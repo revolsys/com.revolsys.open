@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
-import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
@@ -132,8 +132,8 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer
     final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
-      final TriangulatedIrregularNetworkReadFactory factory = IoFactory
-        .factoryByFileExtension(TriangulatedIrregularNetworkReadFactory.class, fileNameExtension);
+      final TriangulatedIrregularNetworkReaderFactory factory = IoFactory
+        .factoryByFileExtension(TriangulatedIrregularNetworkReaderFactory.class, fileNameExtension);
       if (factory != null) {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }
