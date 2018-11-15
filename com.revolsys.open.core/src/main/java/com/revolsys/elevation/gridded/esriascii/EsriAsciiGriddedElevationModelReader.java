@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.gridded.DoubleArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
@@ -30,7 +30,7 @@ import com.revolsys.util.number.Doubles;
 public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point>
   implements GriddedElevationModelReader, PointReader {
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private final Resource resource;
 
@@ -54,11 +54,12 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
 
   private int gridY = 0;
 
-  public EsriAsciiGriddedElevationModelReader(final Resource resource,
-    final Map<String, ? extends Object> properties) {
+  public EsriAsciiGriddedElevationModelReader(final Resource resource, final MapEx properties) {
     this.resource = resource;
-    this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
     setProperties(properties);
+    if (this.geometryFactory == GeometryFactory.DEFAULT_3D) {
+      this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
+    }
   }
 
   @Override
@@ -95,10 +96,14 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
           .getNextEntry()) {
           final String name = zipEntry.getName();
           if (name.equals(projName)) {
-            final String wkt = FileUtil.getString(new InputStreamReader(in, StandardCharsets.UTF_8),
-              false);
-            final GeometryFactory geometryFactory = GeometryFactory.floating3d(wkt);
-            setGeometryFactory(geometryFactory);
+            if (this.geometryFactory != GeometryFactory.DEFAULT_3D) {
+              final String wkt = FileUtil
+                .getString(new InputStreamReader(in, StandardCharsets.UTF_8), false);
+              final GeometryFactory geometryFactory = GeometryFactory.floating3d(wkt);
+              if (geometryFactory.isHasHorizontalCoordinateSystem()) {
+                this.geometryFactory = geometryFactory;
+              }
+            }
           } else if (name.equals(fileName)) {
             this.reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             return this.reader;

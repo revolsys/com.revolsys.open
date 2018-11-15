@@ -20,7 +20,7 @@ public class NrCanBynGeoidModelReader extends BaseObjectWithProperties
   implements GriddedElevationModelReader {
   private final Resource resource;
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private BoundingBox boundingBox;
 
@@ -32,52 +32,77 @@ public class NrCanBynGeoidModelReader extends BaseObjectWithProperties
 
   private double gridCellHeight;
 
+  private boolean initialized = false;
+
+  private ChannelReader reader;
+
   public NrCanBynGeoidModelReader(final Resource resource, final MapEx properties) {
     this.resource = resource;
     setProperties(properties);
+    if (this.geometryFactory == GeometryFactory.DEFAULT_3D) {
+      this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
+    }
   }
 
   @Override
   public BoundingBox getBoundingBox() {
+    open();
     return this.boundingBox;
   }
 
   @Override
   public double getGridCellHeight() {
+    open();
     return this.gridCellHeight;
   }
 
   @Override
   public double getGridCellWidth() {
+    open();
     return this.gridCellWidth;
+  }
+
+  private void open() {
+    if (!this.initialized) {
+      this.initialized = true;
+      try {
+        this.reader = IoFactory.newChannelReader(this.resource, 8192);
+      } catch (final RuntimeException e) {
+        if (!Exceptions.isException(e, ClosedByInterruptException.class)) {
+          throw Exceptions.wrap("Unable to read : " + this.resource, e);
+        }
+      }
+      if (this.reader != null) {
+        readHeader();
+      }
+
+    }
   }
 
   @Override
   public GriddedElevationModel read() {
-    try (
-      ChannelReader reader = IoFactory.newChannelReader(this.resource, 8192)) {
-      if (reader != null) {
-        readHeader(reader);
-        try {
-          final int gridWidth = this.gridWidth;
-          final int gridHeight = this.gridHeight;
-          final int cellCount = gridWidth * gridHeight;
-          final int[] cells = new int[cellCount];
-          for (int gridY = gridHeight - 1; gridY >= 0; gridY--) {
-            int index = gridY * gridWidth;
-            for (int gridX = 0; gridX < gridWidth; gridX++) {
-              final int value = reader.getInt();
-              cells[index++] = value;
-            }
+    open();
+    final ChannelReader reader = this.reader;
+    if (reader != null) {
+      try {
+        final int gridWidth = this.gridWidth;
+        final int gridHeight = this.gridHeight;
+        final int cellCount = gridWidth * gridHeight;
+        final int[] cells = new int[cellCount];
+        for (int gridY = gridHeight - 1; gridY >= 0; gridY--) {
+          int index = gridY * gridWidth;
+          for (int gridX = 0; gridX < gridWidth; gridX++) {
+            final int value = reader.getInt();
+            cells[index++] = value;
           }
-          final IntArrayScaleGriddedElevationModel grid = new IntArrayScaleGriddedElevationModel(
-            this.geometryFactory, this.boundingBox, gridWidth, gridHeight, this.gridCellWidth,
-            this.gridCellHeight, cells);
-          return grid;
-        } catch (final RuntimeException e) {
-          if (!Exceptions.isException(e, ClosedByInterruptException.class)) {
-            throw Exceptions.wrap("Unable to read : " + this.resource, e);
-          }
+        }
+        final IntArrayScaleGriddedElevationModel grid = new IntArrayScaleGriddedElevationModel(
+          this.geometryFactory, this.boundingBox, gridWidth, gridHeight, this.gridCellWidth,
+          this.gridCellHeight, cells);
+        return grid;
+      } catch (final RuntimeException e) {
+        if (!Exceptions.isException(e, ClosedByInterruptException.class)) {
+          throw Exceptions.wrap("Unable to read : " + this.resource, e);
         }
       }
     }
@@ -85,7 +110,8 @@ public class NrCanBynGeoidModelReader extends BaseObjectWithProperties
   }
 
   @SuppressWarnings("unused")
-  private void readHeader(final ChannelReader reader) {
+  private void readHeader() {
+    final ChannelReader reader = this.reader;
     reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
     final int minYSeconds = reader.getInt();
     final int maxYSeconds = reader.getInt();
@@ -119,7 +145,7 @@ public class NrCanBynGeoidModelReader extends BaseObjectWithProperties
     } else if (datum == 1) {
       this.geometryFactory = GeometryFactory.fixed3d(EpsgId.NAD83, 3600.0, 3600.0, scaleZ);
     } else {
-      throw new IllegalArgumentException("Ellipsoid must be in range 0,.3 not " + datum);
+      throw new IllegalArgumentException("Ellipsoid must be in range 0..3 not " + datum);
     }
     final short byteOrder = reader.getShort();
     final short scaleFlag = reader.getShort();
@@ -145,6 +171,14 @@ public class NrCanBynGeoidModelReader extends BaseObjectWithProperties
     this.boundingBox = this.geometryFactory.newBoundingBox(2, minX, minY, maxX, maxY);
     if (byteOrder == 0) {
       reader.setByteOrder(ByteOrder.BIG_ENDIAN);
+    }
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
+    } else {
+      this.geometryFactory = geometryFactory;
     }
   }
 }

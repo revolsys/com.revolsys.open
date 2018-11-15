@@ -26,12 +26,12 @@ import com.revolsys.spring.resource.NoSuchResourceException;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-class ImgGriddedElevationReader extends BaseObjectWithProperties
+public class ImgGriddedElevationReader extends BaseObjectWithProperties
   implements GriddedElevationModelReader {
 
   private BoundingBox boundingBox;
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private boolean initialized;
 
@@ -70,8 +70,10 @@ class ImgGriddedElevationReader extends BaseObjectWithProperties
   public ImgGriddedElevationReader(final Resource resource,
     final Map<String, ? extends Object> properties) {
     this.resource = resource;
-    this.geometryFactory = GeometryFactory.floating3d(resource, null);
     setProperties(properties);
+    if (this.geometryFactory == GeometryFactory.DEFAULT_3D) {
+      this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
+    }
   }
 
   @Override
@@ -456,6 +458,14 @@ class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   protected void seek(final long position) {
     this.channel.seek(position);
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
+    } else {
+      this.geometryFactory = geometryFactory;
+    }
   }
 
   @Override

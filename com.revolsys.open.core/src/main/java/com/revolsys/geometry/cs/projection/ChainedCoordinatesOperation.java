@@ -15,6 +15,10 @@ public class ChainedCoordinatesOperation implements CoordinatesOperation {
     this.operations = new ArrayList<>(operations);
   }
 
+  public void addOperation(final CoordinatesOperation operation) {
+    this.operations.add(operation);
+  }
+
   @Override
   public void perform(final CoordinatesOperationPoint point) {
     for (final CoordinatesOperation operation : this.operations) {

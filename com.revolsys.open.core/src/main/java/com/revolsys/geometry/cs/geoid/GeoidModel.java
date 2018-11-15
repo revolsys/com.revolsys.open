@@ -1,7 +1,11 @@
 package com.revolsys.geometry.cs.geoid;
 
+import java.util.List;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.gridshift.VerticalShiftOperation;
+import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.io.IoFactory;
@@ -23,6 +27,17 @@ public interface GeoidModel extends BoundingBoxProxy {
       final Resource resource = Resource.getResource(source);
       final GeoidModel dem = factory.newGeoidModel(resource, properties);
       return dem;
+    }
+  }
+
+  default void addCoordinatesOperations(final List<CoordinatesOperation> operations,
+    final GeoidModel targetGeoidModel) {
+    if (this != targetGeoidModel) {
+      final VerticalShiftOperation thisToEllipsoid = this.orthometricToGeodeticHeightOperation();
+      final VerticalShiftOperation ellipsoidToTarget = targetGeoidModel
+        .geodeticToOrthometricHeightOperation();
+      operations.add(thisToEllipsoid);
+      operations.add(ellipsoidToTarget);
     }
   }
 
@@ -48,6 +63,18 @@ public interface GeoidModel extends BoundingBoxProxy {
 
   default VerticalShiftOperation geodeticToOrthometricHeightOperation() {
     return this::geodeticToOrthometricHeight;
+  }
+
+  default CoordinatesOperation getCoordinatesOperation(final GeoidModel targetGeoidModel) {
+    if (this == targetGeoidModel) {
+      return null;
+    } else {
+      final VerticalShiftOperation thisToEllipsoid = targetGeoidModel
+        .orthometricToGeodeticHeightOperation();
+      final VerticalShiftOperation ellipsoidToTarget = targetGeoidModel
+        .geodeticToOrthometricHeightOperation();
+      return new ChainedCoordinatesOperation(thisToEllipsoid, ellipsoidToTarget);
+    }
   }
 
   /**

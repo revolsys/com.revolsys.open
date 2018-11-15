@@ -2,7 +2,7 @@ package com.revolsys.geometry.cs.geoid;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 
 public class MultipleGeoidModel extends AbstractGeoidModel {
@@ -13,7 +13,7 @@ public class MultipleGeoidModel extends AbstractGeoidModel {
 
   public MultipleGeoidModel(final String geoidName, final Iterable<GeoidModel> geoids) {
     super(geoidName);
-    this.geoids = Lists.newArrayList(geoids);
+    this.geoids = Lists.toArray(geoids);
     this.boundingBox = BoundingBox.bboxNew(geoids);
   }
 

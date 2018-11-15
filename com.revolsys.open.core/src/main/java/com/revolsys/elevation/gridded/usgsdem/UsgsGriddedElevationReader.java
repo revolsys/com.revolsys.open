@@ -54,7 +54,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
 
   private final double[] cornersY = new double[4];
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private int gridHeight;
 
@@ -73,6 +73,9 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   public UsgsGriddedElevationReader(final Resource resource, final MapEx properties) {
     setProperties(properties);
     this.resource = resource;
+    if (this.geometryFactory == GeometryFactory.DEFAULT_3D) {
+      this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
+    }
   }
 
   @Override
@@ -120,11 +123,13 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
           .getNextEntry()) {
           final String name = zipEntry.getName();
           if (name.equals(projName)) {
-            final String wkt = FileUtil.getString(new InputStreamReader(in, StandardCharsets.UTF_8),
-              false);
-            final GeometryFactory geometryFactory = GeometryFactory.floating3d(wkt);
-            if (geometryFactory.isHasHorizontalCoordinateSystem()) {
-              this.geometryFactory = geometryFactory;
+            if (this.geometryFactory != GeometryFactory.DEFAULT_3D) {
+              final String wkt = FileUtil
+                .getString(new InputStreamReader(in, StandardCharsets.UTF_8), false);
+              final GeometryFactory geometryFactory = GeometryFactory.floating3d(wkt);
+              if (geometryFactory.isHasHorizontalCoordinateSystem()) {
+                this.geometryFactory = geometryFactory;
+              }
             }
           } else if (name.equals(fileName)) {
             return new InputStreamResource(in).newReadableByteChannel();
@@ -564,7 +569,11 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
+    if (geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
+    } else {
+      this.geometryFactory = geometryFactory;
+    }
   }
 
   private void skip(final int count) {

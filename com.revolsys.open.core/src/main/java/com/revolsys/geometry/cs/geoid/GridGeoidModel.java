@@ -7,8 +7,6 @@ import com.revolsys.grid.Grid;
 
 public class GridGeoidModel extends AbstractGeoidModel {
 
-  private String geoidName;
-
   protected Grid grid;
 
   public GridGeoidModel(final String geoidName, final Grid grid) {
@@ -39,10 +37,5 @@ public class GridGeoidModel extends AbstractGeoidModel {
   @Override
   public VerticalShiftOperation orthometricToGeodeticHeightOperation() {
     return this::orthometricToGeodeticHeight;
-  }
-
-  @Override
-  public String toString() {
-    return this.geoidName.toString();
   }
 }

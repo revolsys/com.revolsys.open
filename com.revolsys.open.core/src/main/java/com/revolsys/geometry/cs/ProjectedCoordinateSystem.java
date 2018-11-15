@@ -112,7 +112,7 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
     coordinateSystem.addProjectionOperations(operations);
   }
 
-  protected void addInverseOperations(final List<CoordinatesOperation> operations) {
+  public void addInverseOperations(final List<CoordinatesOperation> operations) {
     final CoordinatesProjection projection = getCoordinatesProjection();
     if (projection != null) {
       final CoordinatesOperation inverseOperation = projection.getInverseOperation();
@@ -125,7 +125,7 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
     throw new IllegalArgumentException("No inverse operation found for " + this);
   }
 
-  protected void addProjectionOperations(final List<CoordinatesOperation> operations) {
+  public void addProjectionOperations(final List<CoordinatesOperation> operations) {
     final CoordinatesProjection projection = getCoordinatesProjection();
     if (projection != null) {
       final CoordinatesOperation projectionOperation = projection.getProjectOperation();

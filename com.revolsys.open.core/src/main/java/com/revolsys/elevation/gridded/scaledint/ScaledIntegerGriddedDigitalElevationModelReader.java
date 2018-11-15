@@ -32,7 +32,7 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
 
   private ChannelReader reader;
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private BoundingBox boundingBox;
 
@@ -52,6 +52,9 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
     final Map<String, ? extends Object> properties) {
     this.resource = resource;
     setProperties(properties);
+    if (this.geometryFactory == GeometryFactory.DEFAULT_3D) {
+      this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
+    }
   }
 
   @Override
@@ -182,6 +185,14 @@ public class ScaledIntegerGriddedDigitalElevationModelReader extends BaseObjectW
 
   public void setByteBuffer(final ByteBuffer byteBuffer) {
     this.byteBuffer = byteBuffer;
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
+    } else {
+      this.geometryFactory = geometryFactory;
+    }
   }
 
   public void setMemoryMapped(final boolean memoryMapped) {

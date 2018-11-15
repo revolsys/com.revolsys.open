@@ -2,10 +2,10 @@ package com.revolsys.elevation.gridded.esrifloatgrid;
 
 import java.io.BufferedReader;
 import java.nio.ByteOrder;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
@@ -21,7 +21,7 @@ import com.revolsys.util.Exceptions;
 public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<Point>
   implements GriddedElevationModelReader, PointReader {
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private final Resource resource;
 
@@ -47,11 +47,12 @@ public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<P
 
   private String byteorder = "LSBFIRST";
 
-  public EsriFloatGridGriddedElevationModelReader(final Resource resource,
-    final Map<String, ? extends Object> properties) {
+  public EsriFloatGridGriddedElevationModelReader(final Resource resource, final MapEx properties) {
     this.resource = resource;
-    this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
     setProperties(properties);
+    if (this.geometryFactory == GeometryFactory.DEFAULT_3D) {
+      this.geometryFactory = GeometryFactory.floating3d(resource, GeometryFactory.DEFAULT_3D);
+    }
   }
 
   @Override
