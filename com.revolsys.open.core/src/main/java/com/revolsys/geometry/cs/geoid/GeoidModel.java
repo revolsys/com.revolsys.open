@@ -90,7 +90,7 @@ public interface GeoidModel extends BoundingBoxProxy {
   /**
    * Convert a orthometric (geoid) height (H) to an geodetic (ellipsoid) height(h).
    *
-   * <pre>h = H - N</pre>
+   * <pre>h = H + N</pre>
    *
    * @param point The point to convert.
    * @return True if the point was converted.
