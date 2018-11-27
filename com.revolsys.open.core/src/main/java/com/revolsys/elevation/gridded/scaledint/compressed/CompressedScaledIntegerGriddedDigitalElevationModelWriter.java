@@ -1,18 +1,11 @@
-package com.revolsys.elevation.gridded.scaledint;
+package com.revolsys.elevation.gridded.scaledint.compressed;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
-import java.util.zip.GZIPOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
-import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
@@ -20,16 +13,16 @@ import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class ScaledIntegerGriddedDigitalElevationModelWriter
+public class CompressedScaledIntegerGriddedDigitalElevationModelWriter
   extends AbstractWriter<GriddedElevationModel> implements GriddedElevationModelWriter {
   public static void writeHeader(final ChannelWriter writer, final BoundingBox boundingBox,
     final GeometryFactory geometryFactory, final int gridWidth, final int gridHeight,
     final double gridCellWidth, final double gridCellHeight) throws IOException {
     final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
-    writer.putBytes(ScaledIntegerGriddedDigitalElevation.FILE_FORMAT_BYTES);
-    writer.putShort(ScaledIntegerGriddedDigitalElevation.VERSION);
+    writer.putBytes(CompressedScaledIntegerGriddedDigitalElevation.FILE_FORMAT_BYTES);
+    writer.putShort(CompressedScaledIntegerGriddedDigitalElevation.VERSION);
+    writer.putShort((short)0); // Padding to make multiples of 8 bytes in header
     writer.putInt(coordinateSystemId);
-
     for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
       final double offset = geometryFactory.getOffset(axisIndex);
       writer.putDouble(offset);
@@ -63,7 +56,7 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter
 
   private ByteBuffer byteBuffer;
 
-  ScaledIntegerGriddedDigitalElevationModelWriter(final Resource resource) {
+  CompressedScaledIntegerGriddedDigitalElevationModelWriter(final Resource resource) {
     this.resource = resource;
   }
 
@@ -84,36 +77,7 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter
   @Override
   public void open() {
     if (this.writer == null) {
-      final String fileNameExtension = this.resource.getFileNameExtension();
-      if ("zip".equals(fileNameExtension)
-        || ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION_ZIP.equals(fileNameExtension)) {
-        try {
-          final OutputStream bufferedOut = this.resource.newBufferedOutputStream();
-          final String fileName = this.resource.getBaseName();
-          final ZipOutputStream zipOut = new ZipOutputStream(bufferedOut);
-          final ZipEntry zipEntry = new ZipEntry(fileName);
-          zipOut.putNextEntry(zipEntry);
-          final WritableByteChannel channel = Channels.newChannel(zipOut);
-          this.writer = new ChannelWriter(channel, true, this.byteBuffer);
-        } catch (final IOException e) {
-          throw Exceptions.wrap("Error creating: " + this.resource, e);
-        }
-      } else if ("gz".equals(fileNameExtension)) {
-        try {
-          String fileName = this.resource.getBaseName();
-          if (!fileName.endsWith("." + ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION)) {
-            fileName += "." + ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION;
-          }
-          final OutputStream bufferedOut = this.resource.newBufferedOutputStream();
-          final GZIPOutputStream zipOut = new GZIPOutputStream(bufferedOut);
-          final WritableByteChannel channel = Channels.newChannel(zipOut);
-          this.writer = new ChannelWriter(channel, true, this.byteBuffer);
-        } catch (final IOException e) {
-          throw Exceptions.wrap("Error creating: " + this.resource, e);
-        }
-      } else {
-        this.writer = this.resource.newChannelWriter(this.byteBuffer);
-      }
+      this.writer = this.resource.newChannelWriter(this.byteBuffer);
     }
   }
 
@@ -129,28 +93,67 @@ public class ScaledIntegerGriddedDigitalElevationModelWriter
     open();
     try {
       writeHeader(elevationModel);
-      if (elevationModel instanceof IntArrayScaleGriddedElevationModel) {
-        final IntArrayScaleGriddedElevationModel scaleModel = (IntArrayScaleGriddedElevationModel)elevationModel;
-        scaleModel.writeIntArray(this.writer);
-      } else {
-        writeGrid(elevationModel);
-      }
+      // if (elevationModel instanceof IntArrayScaleGriddedElevationModel) {
+      // final IntArrayScaleGriddedElevationModel scaleModel =
+      // (IntArrayScaleGriddedElevationModel)elevationModel;
+      // scaleModel.writeIntArray(this.writer);
+      // } else {
+      writeGrid(elevationModel);
+      // }3
     } catch (final IOException e) {
       Exceptions.throwUncheckedException(e);
     }
   }
 
   private void writeGrid(final GriddedElevationModel elevationModel) throws IOException {
-    final ChannelWriter out = this.writer;
+    final ChannelWriter writer = this.writer;
     final int gridWidth = this.gridWidth;
     final int gridHeight = this.gridHeight;
-    final GeometryFactory geometryFactory = elevationModel.getGeometryFactory();
-    for (int gridY = 0; gridY < gridHeight; gridY++) {
-      for (int gridX = 0; gridX < gridWidth; gridX++) {
-        final double elevation = elevationModel.getValue(gridX, gridY);
-        final int zInt = geometryFactory.toIntZ(elevation);
-        out.putInt(zInt);
+    if (gridWidth > 0 && gridHeight > 0) {
+      final GeometryFactory geometryFactory = elevationModel.getGeometryFactory();
+      final ArithmeticEncoder encoder = new ArithmeticEncoder(writer);
+      final IntegerCompressor compressor = new IntegerCompressor(encoder, 32);
+
+      final double minZ = elevationModel.getBoundingBox().getMinZ();
+      final int minZInt = geometryFactory.toIntZ(minZ);
+      final int nullInt = minZInt - 1;
+
+      final double elevation0 = elevationModel.getValue(0, 0);
+      int previousZ = geometryFactory.toIntZ(elevation0);
+      writer.putInt(previousZ);
+
+      boolean leftToRight = true;
+      for (int gridY = 0; gridY < gridHeight; gridY++) {
+        if (leftToRight) {
+          int startX = 0;
+          if (gridY == 0) {
+            startX = 1;
+          } else {
+            startX = 0;
+          }
+          for (int gridX = startX; gridX < gridWidth; gridX++) {
+            final double elevation = elevationModel.getValue(gridX, gridY);
+            int zInt = geometryFactory.toIntZ(elevation);
+            if (zInt == Integer.MIN_VALUE) {
+              zInt = nullInt;
+            }
+            compressor.compress(previousZ, zInt);
+            previousZ = zInt;
+          }
+        } else {
+          for (int gridX = gridWidth - 1; gridX >= 0; gridX--) {
+            final double elevation = elevationModel.getValue(gridX, gridY);
+            int zInt = geometryFactory.toIntZ(elevation);
+            if (zInt == Integer.MIN_VALUE) {
+              zInt = nullInt;
+            }
+            compressor.compress(previousZ, zInt);
+            previousZ = zInt;
+          }
+        }
+        leftToRight = !leftToRight;
       }
+      encoder.done();
     }
   }
 

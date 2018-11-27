@@ -74,6 +74,10 @@ public class IntArrayScaleGrid extends AbstractGrid {
     }
   }
 
+  public int[] getCells() {
+    return this.cells;
+  }
+
   @Override
   public double getValueFast(final int gridX, final int gridY) {
     final int index = gridY * this.gridWidth + gridX;

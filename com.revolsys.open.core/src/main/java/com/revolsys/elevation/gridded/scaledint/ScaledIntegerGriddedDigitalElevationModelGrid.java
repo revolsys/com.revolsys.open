@@ -150,7 +150,7 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
   // final int gridCellX = GriddedElevationModel.getGridCellX(tileX, gridCellSize, x);
   // final int gridCellY = GriddedElevationModel.getGridCellY(tileY, gridCellSize, y);
   // final int elevationByteSize = 4;
-  // final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
+  // final int offset = CompressedScaledIntegerGriddedDigitalElevation.HEADER_SIZE
   // + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
   // try (
   // FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {

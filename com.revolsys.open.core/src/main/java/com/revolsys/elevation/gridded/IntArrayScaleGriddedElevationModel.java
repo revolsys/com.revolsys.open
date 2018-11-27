@@ -2,7 +2,6 @@ package com.revolsys.elevation.gridded;
 
 import java.io.IOException;
 
-import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModelWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.editor.LineStringEditor;
@@ -106,8 +105,7 @@ public class IntArrayScaleGriddedElevationModel extends IntArrayScaleGrid
     return (IntArrayScaleGriddedElevationModel)super.resample(newGridCellSize);
   }
 
-  public void writeIntArray(final ScaledIntegerGriddedDigitalElevationModelWriter writer,
-    final ChannelWriter out) throws IOException {
+  public void writeIntArray(final ChannelWriter out) throws IOException {
     final int[] values = this.cells;
     for (final int valueInt : values) {
       out.putInt(valueInt);

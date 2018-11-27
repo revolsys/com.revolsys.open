@@ -15,6 +15,7 @@ import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelR
 import com.revolsys.elevation.gridded.rasterizer.gradient.GradientStop;
 import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradient;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
+import com.revolsys.elevation.gridded.scaledint.compressed.CompressedScaledIntegerGriddedDigitalElevation;
 import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
@@ -84,6 +85,7 @@ public interface GriddedElevationModel extends Grid {
 
   public static void serviceInit() {
     IoFactoryRegistry.addFactory(new ScaledIntegerGriddedDigitalElevation());
+    IoFactoryRegistry.addFactory(new CompressedScaledIntegerGriddedDigitalElevation());
     IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());
     IoFactoryRegistry.addFactory(new EsriFloatGridGriddedElevation());
     IoFactoryRegistry.addFactory(new UsgsGriddedElevation());
