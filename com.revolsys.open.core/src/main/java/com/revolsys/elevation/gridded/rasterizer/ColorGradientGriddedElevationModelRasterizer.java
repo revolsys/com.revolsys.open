@@ -6,6 +6,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.gradient.GradientLibrary;
 import com.revolsys.elevation.gridded.rasterizer.gradient.LinearGradient;
+import com.revolsys.util.Debug;
 
 public class ColorGradientGriddedElevationModelRasterizer
   extends AbstractGriddedElevationModelRasterizer {
@@ -47,6 +48,9 @@ public class ColorGradientGriddedElevationModelRasterizer
   @Override
   public int getValue(final int gridX, final int gridY) {
     final double elevation = this.elevationModel.getValue(gridX, gridY);
+    if (gridX == 437 && gridY == 478) {
+      Debug.noOp();
+    }
     return this.gradient.getColorIntForValue(elevation);
 
   }

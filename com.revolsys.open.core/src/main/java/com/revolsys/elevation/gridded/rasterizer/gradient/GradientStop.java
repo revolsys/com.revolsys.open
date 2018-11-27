@@ -7,6 +7,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.util.Debug;
 
 public class GradientStop extends BaseObjectWithProperties
   implements Cloneable, MapSerializer, Comparable<GradientStop> {
@@ -103,17 +104,22 @@ public class GradientStop extends BaseObjectWithProperties
   }
 
   public int getValueFast(final double value) {
-    if (value <= this.previousValue) {
+    if (this.value == this.previousValue) {
+      return NULL_COLOUR;
+    } else if (value <= this.previousValue) {
       return this.previousColorInt;
     } else if (value > this.value) {
       return NULL_COLOUR;
     } else {
-      final double elevationPercent = (value - this.previousValue) * this.valueRangeMultiple;
+      final double elevationPercent = 1 - (value - this.previousValue) * this.valueRangeMultiple;
       final int alpha = this.alpha + (int)Math.round(elevationPercent * this.alphaRange);
       final int red = this.red + (int)Math.round(elevationPercent * this.redRange);
       final int green = this.green + (int)Math.round(elevationPercent * this.greenRange);
       final int blue = this.blue + (int)Math.round(elevationPercent * this.blueRange);
       final int colour = WebColors.colorToRGB(alpha, red, green, blue);
+      if (value == 1506.101) {
+        Debug.noOp();
+      }
       return colour;
     }
   }
@@ -148,6 +154,7 @@ public class GradientStop extends BaseObjectWithProperties
     this.previousColor = previousStop.getColor();
     this.previousColorInt = this.previousColor.getRGB();
     this.previousValue = previousStop.getValue();
+    updateValues();
   }
 
   public void setValue(final double value) {
@@ -170,7 +177,7 @@ public class GradientStop extends BaseObjectWithProperties
   }
 
   public void updateValues() {
-    if (Double.isFinite(this.previousValue) && Double.isFinite(this.value)) {
+    if (!Double.isFinite(this.previousValue) && !Double.isFinite(this.value)) {
       this.valueRange = 0;
       this.valueRangeMultiple = 0;
     } else {

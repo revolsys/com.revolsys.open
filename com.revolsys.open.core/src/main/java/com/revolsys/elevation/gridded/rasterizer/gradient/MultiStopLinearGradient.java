@@ -133,14 +133,13 @@ public class MultiStopLinearGradient extends BaseObjectWithProperties
 
   @Override
   public void updateValues() {
-    final int stopCount = this.stops.size();
     Collections.sort(this.stops);
 
-    if (stopCount > 0) {
+    if (!this.stops.isEmpty()) {
       final GradientStop minStop = this.stops.get(0);
       GradientStop previousStop = minStop;
       previousStop.setPrevious(previousStop);
-      for (int i = 1; i < stopCount; i++) {
+      for (int i = 1; i < this.stops.size(); i++) {
         final GradientStop stop = this.stops.get(i);
         stop.setPrevious(previousStop);
 
