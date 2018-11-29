@@ -75,10 +75,9 @@ public class ArithmeticCodingCompressEncoder implements BaseCloseable {
 
     renorm_enc_interval(); // renormalization = output last bytes
 
-    // if (endbyte != endbuffer)
-    // {
-    // outstream.putBytes(outbuffer + AC_BUFFER_SIZE, AC_BUFFER_SIZE);
-    // }
+    if (this.endByteIndex != this.endBufferIndex) {
+      this.writer.putBytes(this.outBuffer, AC_BUFFER_SIZE, AC_BUFFER_SIZE);
+    }
     final int buffer_size = this.outByteIndex;
     if (buffer_size != 0) {
       this.writer.putBytes(this.outBuffer, buffer_size);
