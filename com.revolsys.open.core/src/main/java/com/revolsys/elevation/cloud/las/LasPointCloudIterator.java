@@ -31,7 +31,9 @@ public class LasPointCloudIterator
   @Override
   public void close() {
     this.index = this.pointCount;
-    this.reader.close();
+    if (this.reader != null) {
+      this.reader.close();
+    }
     this.reader = null;
   }
 

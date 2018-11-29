@@ -20,8 +20,9 @@ public class ServiceInitializerLoader {
         } catch (final Throwable e) {
           Logs.error(serviceInitializer, "Unable to initialize", e);
         }
-        Dates.debugEllapsedTime(ServiceInitializer.class, "init\t" + serviceInitializer.getClass(),
-          startTime);
+        // Dates.debugEllapsedTime(ServiceInitializer.class, "init\t" +
+        // serviceInitializer.getClass(),
+        // startTime);
       }
     } catch (final Error e) {
       Logs.error(ServiceInitializerLoader.class, "Unable to initialize services", e);

@@ -11,15 +11,18 @@
 package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel;
 
 public class LazDecompressRgb12V1 extends LazDecompressRgb12 {
 
-  private final IntegerCompressor intDecompressor;
+  private final ArithmeticCodingDecompressInteger intDecompressor;
 
-  public LazDecompressRgb12V1(final ArithmeticDecoder decoder) {
+  public LazDecompressRgb12V1(final ArithmeticCodingDecompressDecoder decoder) {
     super(decoder);
     this.byteUsed = decoder.createSymbolModel(64);
-    this.intDecompressor = new IntegerCompressor(decoder, 8, 6);
+    this.intDecompressor = new ArithmeticCodingDecompressInteger(decoder, 8, 6);
   }
 
   private int decompress(final int lastValue, final boolean lowChanged, final boolean highChanged) {
@@ -40,8 +43,10 @@ public class LazDecompressRgb12V1 extends LazDecompressRgb12 {
   @Override
   public void init(final LasPoint firstPoint) {
     super.init(firstPoint);
-    this.decoder.initSymbolModel(this.byteUsed);
-    this.intDecompressor.initDecompressor();
+    final ArithmeticCodingDecompressModel m = this.byteUsed;
+    ArithmeticCodingDecompressDecoder r = this.decoder;
+    m.reset();
+    this.intDecompressor.reset();
   }
 
   @Override

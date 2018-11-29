@@ -7,7 +7,6 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
-import com.revolsys.util.Debug;
 
 public class GradientStop extends BaseObjectWithProperties
   implements Cloneable, MapSerializer, Comparable<GradientStop> {
@@ -117,9 +116,6 @@ public class GradientStop extends BaseObjectWithProperties
       final int green = this.green + (int)Math.round(elevationPercent * this.greenRange);
       final int blue = this.blue + (int)Math.round(elevationPercent * this.blueRange);
       final int colour = WebColors.colorToRGB(alpha, red, green, blue);
-      if (value == 1506.101) {
-        Debug.noOp();
-      }
       return colour;
     }
   }

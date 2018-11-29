@@ -7,7 +7,6 @@ import java.util.function.BiFunction;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoder;
 import com.revolsys.elevation.cloud.las.zip.LazDecompress;
 import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTime11V1;
 import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTime11V2;
@@ -18,6 +17,7 @@ import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V2;
 import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.io.Buffers;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
 
@@ -142,7 +142,7 @@ public class LasZipHeader implements MapSerializer {
   }
 
   public LazDecompress[] newLazDecompressors(final LasPointCloud pointCloud,
-    final ArithmeticDecoder decoder) {
+    final ArithmeticCodingDecompressDecoder decoder) {
     final int numItems = this.getNumItems();
     final LazDecompress[] pointDecompressors = new LazDecompress[numItems];
     for (int i = 0; i < numItems; i++) {

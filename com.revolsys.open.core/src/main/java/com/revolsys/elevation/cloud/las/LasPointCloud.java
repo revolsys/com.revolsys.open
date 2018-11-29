@@ -189,11 +189,8 @@ public class LasPointCloud extends BaseObjectWithProperties
   }
 
   public Iterable<LasPoint> iterable() {
-    final long pointCount = getPointCount();
     if (this.allLoaded) {
       return this.points;
-    } else if (pointCount == 0) {
-      return Collections.emptyList();
     } else {
       ChannelReader reader = this.reader;
       this.reader = null;

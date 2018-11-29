@@ -11,22 +11,24 @@
 package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel;
 
 public class LazDecompressRgb12V2 extends LazDecompressRgb12 {
 
-  private final ArithmeticModel rgbDiff0;
+  private final ArithmeticCodingDecompressModel rgbDiff0;
 
-  private final ArithmeticModel rgbDiff1;
+  private final ArithmeticCodingDecompressModel rgbDiff1;
 
-  private final ArithmeticModel rgbDiff2;
+  private final ArithmeticCodingDecompressModel rgbDiff2;
 
-  private final ArithmeticModel rgbDiff3;
+  private final ArithmeticCodingDecompressModel rgbDiff3;
 
-  private final ArithmeticModel rgbDiff4;
+  private final ArithmeticCodingDecompressModel rgbDiff4;
 
-  private final ArithmeticModel rgbDiff5;
+  private final ArithmeticCodingDecompressModel rgbDiff5;
 
-  public LazDecompressRgb12V2(final ArithmeticDecoder decoder) {
+  public LazDecompressRgb12V2(final ArithmeticCodingDecompressDecoder decoder) {
     super(decoder);
     this.byteUsed = decoder.createSymbolModel(128);
     this.rgbDiff0 = decoder.createSymbolModel(256);
@@ -40,13 +42,21 @@ public class LazDecompressRgb12V2 extends LazDecompressRgb12 {
   @Override
   public void init(final LasPoint firstPoint) {
     super.init(firstPoint);
-    this.decoder.initSymbolModel(this.byteUsed);
-    this.decoder.initSymbolModel(this.rgbDiff0);
-    this.decoder.initSymbolModel(this.rgbDiff1);
-    this.decoder.initSymbolModel(this.rgbDiff2);
-    this.decoder.initSymbolModel(this.rgbDiff3);
-    this.decoder.initSymbolModel(this.rgbDiff4);
-    this.decoder.initSymbolModel(this.rgbDiff5);
+    final ArithmeticCodingDecompressModel m = this.byteUsed;
+    ArithmeticCodingDecompressDecoder r = this.decoder;
+    m.reset();
+    ArithmeticCodingDecompressDecoder r1 = this.decoder;
+    this.rgbDiff0.reset();
+    ArithmeticCodingDecompressDecoder r2 = this.decoder;
+    this.rgbDiff1.reset();
+    ArithmeticCodingDecompressDecoder r3 = this.decoder;
+    this.rgbDiff2.reset();
+    ArithmeticCodingDecompressDecoder r4 = this.decoder;
+    this.rgbDiff3.reset();
+    ArithmeticCodingDecompressDecoder r5 = this.decoder;
+    this.rgbDiff4.reset();
+    ArithmeticCodingDecompressDecoder r6 = this.decoder;
+    this.rgbDiff5.reset();
   }
 
   @Override

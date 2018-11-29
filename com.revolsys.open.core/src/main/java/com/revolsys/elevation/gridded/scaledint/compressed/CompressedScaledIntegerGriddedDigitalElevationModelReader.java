@@ -12,6 +12,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressInteger;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
@@ -108,12 +110,58 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelReader
     init();
     if (this.exists) {
       try {
-        final ChannelReader in = this.reader;
+        final ChannelReader reader = this.reader;
+        final double minZ = this.boundingBox.getMinZ();
+        final int minZInt = this.geometryFactory.toIntZ(minZ);
+        final int nullInt = minZInt - 1;
+
         final int cellCount = this.gridWidth * this.gridHeight;
         final int[] elevations = new int[cellCount];
-        for (int index = 0; index < cellCount; index++) {
-          final int elevation = in.getInt();
-          elevations[index] = elevation;
+        int previousZ = reader.getInt();
+        if (previousZ == nullInt) {
+          elevations[0] = Integer.MIN_VALUE;
+        } else {
+          elevations[0] = previousZ;
+        }
+        final ArithmeticCodingDecompressDecoder decoder = new ArithmeticCodingDecompressDecoder();
+        decoder.init(reader);
+        final ArithmeticCodingDecompressInteger decompressor = new ArithmeticCodingDecompressInteger(
+          decoder, 32);
+        decompressor.reset();
+        boolean leftToRight = true;
+        int rowIndex = 0;
+        for (int gridY = 0; gridY < this.gridHeight; gridY++) {
+          if (leftToRight) {
+            int startX = 0;
+            if (gridY == 0) {
+              startX = 1;
+            } else {
+              startX = 0;
+            }
+            for (int gridX = startX; gridX < this.gridWidth; gridX++) {
+              final int zDiff = decompressor.decompress(0);
+              final int zInt = previousZ + zDiff;
+              if (zInt == nullInt) {
+                elevations[rowIndex + gridX] = Integer.MIN_VALUE;
+              } else {
+                elevations[rowIndex + gridX] = zInt;
+              }
+              previousZ = zInt;
+            }
+          } else {
+            for (int gridX = this.gridWidth - 1; gridX >= 0; gridX--) {
+              final int zDiff = decompressor.decompress(0);
+              final int zInt = previousZ + zDiff;
+              if (zInt == nullInt) {
+                elevations[rowIndex + gridX] = Integer.MIN_VALUE;
+              } else {
+                elevations[rowIndex + gridX] = zInt;
+              }
+              previousZ = zInt;
+            }
+          }
+          leftToRight = !leftToRight;
+          rowIndex += this.gridWidth;
         }
         final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
           this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight,
@@ -127,32 +175,36 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelReader
           throw Exceptions.wrap("Unable to read DEM: " + this.resource, e);
         }
       }
-    } else {
+    } else
+
+    {
       return null;
     }
   }
 
   private void readHeader() {
-    final byte[] fileTypeBytes = new byte[6]; // 0 offset
+    final byte[] fileTypeBytes = new byte[8]; // 0 offset
     this.reader.getBytes(fileTypeBytes);
     @SuppressWarnings("unused")
-    final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8);
+    final String fileType = new String(fileTypeBytes, 0, 7, StandardCharsets.UTF_8);
     @SuppressWarnings("unused")
-    final short version = this.reader.getShort(); // 6 offset
-    final GeometryFactory geometryFactory = GeometryFactory.readOffsetScaled3d(this.reader); // 8
-                                                                                             // offset
+    final short version = this.reader.getShort(); // 8 offset
+    @SuppressWarnings("unused")
+    final short blank = this.reader.getShort();
+    final GeometryFactory geometryFactory = GeometryFactory.readOffsetScaled3d(this.reader); // 12
+    // offset
     this.geometryFactory = geometryFactory;
-    final double minX = this.reader.getDouble(); // 60 offset
-    final double minY = this.reader.getDouble(); // 68 offset
-    final double minZ = this.reader.getDouble(); // 76 offset
-    final double maxX = this.reader.getDouble(); // 84 offset
-    final double maxY = this.reader.getDouble(); // 92 offset
-    final double maxZ = this.reader.getDouble(); // 100 offset
-    this.gridWidth = this.reader.getInt(); // 104 offset
-    this.gridHeight = this.reader.getInt(); // 108 offset
-    this.gridCellWidth = this.reader.getDouble(); // 116 offset
-    this.gridCellHeight = this.reader.getDouble(); // 124 offset
-    // 132 offset
+    final double minX = this.reader.getDouble(); // 64 offset
+    final double minY = this.reader.getDouble(); // 72 offset
+    final double minZ = this.reader.getDouble(); // 80 offset
+    final double maxX = this.reader.getDouble(); // 88 offset
+    final double maxY = this.reader.getDouble(); // 96 offset
+    final double maxZ = this.reader.getDouble(); // 104 offset
+    this.gridWidth = this.reader.getInt(); // 108 offset
+    this.gridHeight = this.reader.getInt(); // 112 offset
+    this.gridCellWidth = this.reader.getDouble(); // 120 offset
+    this.gridCellHeight = this.reader.getDouble(); // 128 offset
+    // 136 offset
     this.boundingBox = geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY, maxZ);
   }
 

@@ -1,12 +1,14 @@
 package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel;
 
 public abstract class LazDecompressRgb12 implements LazDecompress {
 
-  protected final ArithmeticDecoder decoder;
+  protected final ArithmeticCodingDecompressDecoder decoder;
 
-  protected ArithmeticModel byteUsed;
+  protected ArithmeticCodingDecompressModel byteUsed;
 
   protected int red;
 
@@ -14,7 +16,7 @@ public abstract class LazDecompressRgb12 implements LazDecompress {
 
   protected int blue;
 
-  LazDecompressRgb12(final ArithmeticDecoder decoder) {
+  LazDecompressRgb12(final ArithmeticCodingDecompressDecoder decoder) {
     this.decoder = decoder;
   }
 

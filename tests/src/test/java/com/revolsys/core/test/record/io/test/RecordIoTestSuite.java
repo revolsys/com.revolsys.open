@@ -35,7 +35,6 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.testapi.GeometryAssert;
 import com.revolsys.testapi.RunnableTestCase;
-import com.revolsys.util.Debug;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -107,9 +106,6 @@ public class RecordIoTestSuite {
       directory.mkdirs();
       final String fileName = geometryTypeString + "_" + geometryFactory.getAxisCount() + "_"
         + geometry.getVertexCount() + "." + fileExtension;
-      if ("LineString_2_0.gml".equals(fileName)) {
-        Debug.noOp();
-      }
       final File file = new File(directory, fileName);
       if (!file.delete()) {
         if (file.exists()) {

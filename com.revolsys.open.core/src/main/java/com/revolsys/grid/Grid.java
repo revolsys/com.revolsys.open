@@ -18,7 +18,6 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.function.Consumer3Double;
 
@@ -78,9 +77,6 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
       for (int gridX = 0; gridX < height; gridX++) {
         final double x = minX + gridX * gridCellWidth;
         final double elevation = getValue(x, y);
-        if (elevation != 0) {
-          Debug.noOp();
-        }
         newGrid.setValue(gridX, gridY, elevation);
       }
     }

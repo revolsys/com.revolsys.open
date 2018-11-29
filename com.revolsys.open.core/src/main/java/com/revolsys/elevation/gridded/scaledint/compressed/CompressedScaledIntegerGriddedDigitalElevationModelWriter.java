@@ -10,6 +10,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingCompressEncoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingCompressInteger;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
@@ -93,13 +95,7 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelWriter
     open();
     try {
       writeHeader(elevationModel);
-      // if (elevationModel instanceof IntArrayScaleGriddedElevationModel) {
-      // final IntArrayScaleGriddedElevationModel scaleModel =
-      // (IntArrayScaleGriddedElevationModel)elevationModel;
-      // scaleModel.writeIntArray(this.writer);
-      // } else {
       writeGrid(elevationModel);
-      // }3
     } catch (final IOException e) {
       Exceptions.throwUncheckedException(e);
     }
@@ -111,49 +107,52 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelWriter
     final int gridHeight = this.gridHeight;
     if (gridWidth > 0 && gridHeight > 0) {
       final GeometryFactory geometryFactory = elevationModel.getGeometryFactory();
-      final ArithmeticEncoder encoder = new ArithmeticEncoder(writer);
-      final IntegerCompressor compressor = new IntegerCompressor(encoder, 32);
+      try (
+        final ArithmeticCodingCompressEncoder encoder = new ArithmeticCodingCompressEncoder(writer)) {
+        final ArithmeticCodingCompressInteger compressor = new ArithmeticCodingCompressInteger(encoder, 32);
 
-      final double minZ = elevationModel.getBoundingBox().getMinZ();
-      final int minZInt = geometryFactory.toIntZ(minZ);
-      final int nullInt = minZInt - 1;
+        final double minZ = elevationModel.getBoundingBox().getMinZ();
+        final int minZInt = geometryFactory.toIntZ(minZ);
+        final int nullInt = minZInt - 1;
 
-      final double elevation0 = elevationModel.getValue(0, 0);
-      int previousZ = geometryFactory.toIntZ(elevation0);
-      writer.putInt(previousZ);
-
-      boolean leftToRight = true;
-      for (int gridY = 0; gridY < gridHeight; gridY++) {
-        if (leftToRight) {
-          int startX = 0;
-          if (gridY == 0) {
-            startX = 1;
-          } else {
-            startX = 0;
-          }
-          for (int gridX = startX; gridX < gridWidth; gridX++) {
-            final double elevation = elevationModel.getValue(gridX, gridY);
-            int zInt = geometryFactory.toIntZ(elevation);
-            if (zInt == Integer.MIN_VALUE) {
-              zInt = nullInt;
-            }
-            compressor.compress(previousZ, zInt);
-            previousZ = zInt;
-          }
-        } else {
-          for (int gridX = gridWidth - 1; gridX >= 0; gridX--) {
-            final double elevation = elevationModel.getValue(gridX, gridY);
-            int zInt = geometryFactory.toIntZ(elevation);
-            if (zInt == Integer.MIN_VALUE) {
-              zInt = nullInt;
-            }
-            compressor.compress(previousZ, zInt);
-            previousZ = zInt;
-          }
+        int previousZ = elevationModel.getValueInt(0, 0);
+        if (previousZ == Integer.MIN_VALUE) {
+          previousZ = nullInt;
         }
-        leftToRight = !leftToRight;
+        writer.putInt(previousZ);
+
+        boolean leftToRight = true;
+        for (int gridY = 0; gridY < gridHeight; gridY++) {
+          if (leftToRight) {
+            int startX = 0;
+            if (gridY == 0) {
+              startX = 1;
+            } else {
+              startX = 0;
+            }
+            for (int gridX = startX; gridX < gridWidth; gridX++) {
+              int zInt = elevationModel.getValueInt(gridX, gridY);
+              if (zInt == Integer.MIN_VALUE) {
+                zInt = nullInt;
+              }
+              final int zDiff = zInt - previousZ;
+              compressor.compress(0, zDiff);
+              previousZ = zInt;
+            }
+          } else {
+            for (int gridX = gridWidth - 1; gridX >= 0; gridX--) {
+              int zInt = elevationModel.getValueInt(gridX, gridY);
+              if (zInt == Integer.MIN_VALUE) {
+                zInt = nullInt;
+              }
+              final int zDiff = zInt - previousZ;
+              compressor.compress(0, zDiff);
+              previousZ = zInt;
+            }
+          }
+          leftToRight = !leftToRight;
+        }
       }
-      encoder.done();
     }
   }
 

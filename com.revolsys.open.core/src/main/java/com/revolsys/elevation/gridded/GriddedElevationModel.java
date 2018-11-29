@@ -157,6 +157,11 @@ public interface GriddedElevationModel extends Grid {
     return points;
   }
 
+  default int getValueInt(final int gridX, final int gridY) {
+    final double value = getValue(gridX, gridY);
+    return toIntZ(value);
+  }
+
   @Override
   default GriddedElevationModel newGrid(final BoundingBox boundingBox, final double gridCellSize) {
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();

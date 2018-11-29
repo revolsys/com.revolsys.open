@@ -11,6 +11,8 @@
 package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressInteger;
 
 public class LazDecompressGpsTime11V2 extends LazDecompressGpsTime11 implements LazDecompress {
 
@@ -37,11 +39,11 @@ public class LazDecompressGpsTime11V2 extends LazDecompressGpsTime11 implements 
 
   private final int[] multiExtremeCounter = new int[4];
 
-  public LazDecompressGpsTime11V2(final ArithmeticDecoder decoder) {
+  public LazDecompressGpsTime11V2(final ArithmeticCodingDecompressDecoder decoder) {
     super(decoder);
     this.gpsTimeMulti = decoder.createSymbolModel(LASZIP_GPSTIME_MULTI_TOTAL);
     this.gpsTime0Diff = decoder.createSymbolModel(6);
-    this.decompressGpsTime = new IntegerCompressor(decoder, 32, 9);
+    this.decompressGpsTime = new ArithmeticCodingDecompressInteger(decoder, 32, 9);
   }
 
   @Override
@@ -70,12 +72,12 @@ public class LazDecompressGpsTime11V2 extends LazDecompressGpsTime11 implements 
     int multi;
     final int[] lastGpsTimeDiff = this.lastGpsTimeDiff;
     final int lastDiff = lastGpsTimeDiff[this.last];
-    final ArithmeticDecoder decoder = this.decoder;
+    final ArithmeticCodingDecompressDecoder decoder = this.decoder;
     final long[] lastGpsTime = this.lastGpsTime;
     final int[] multiExtremeCounter = this.multiExtremeCounter;
     int last = this.last;
     int next = this.next;
-    final IntegerCompressor decompressGpsTime = this.decompressGpsTime;
+    final ArithmeticCodingDecompressInteger decompressGpsTime = this.decompressGpsTime;
     if (lastDiff == 0) { // if the last integer difference was zero
       multi = decoder.decodeSymbol(this.gpsTime0Diff);
       if (multi == 1) {// the difference can be represented with 32 bits

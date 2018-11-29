@@ -20,6 +20,9 @@ import java.nio.ByteBuffer;
 
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel;
 
 public class LazDecompressPoint10V2 implements LazDecompress {
 
@@ -102,17 +105,17 @@ public class LazDecompressPoint10V2 implements LazDecompress {
      */
   }
 
-  private final ArithmeticDecoder dec;
+  private final ArithmeticCodingDecompressDecoder dec;
 
-  private final IntegerCompressor ic_z;
+  private final ArithmeticCodingDecompressInteger ic_z;
 
-  private final IntegerCompressor ic_dx;
+  private final ArithmeticCodingDecompressInteger ic_dx;
 
-  private final IntegerCompressor ic_dy;
+  private final ArithmeticCodingDecompressInteger ic_dy;
 
-  private final IntegerCompressor ic_intensity;
+  private final ArithmeticCodingDecompressInteger ic_intensity;
 
-  private final IntegerCompressor ic_point_source_ID;
+  private final ArithmeticCodingDecompressInteger ic_point_source_ID;
 
   private final int[] last_height = new int[8]; // signed
 
@@ -122,21 +125,21 @@ public class LazDecompressPoint10V2 implements LazDecompress {
 
   private final StreamingMedian5[] last_y_diff_median5 = newStreamingMedian5(16);
 
-  private final ArithmeticModel[] m_bit_byte = new ArithmeticModel[256];
+  private final ArithmeticCodingDecompressModel[] m_bit_byte = new ArithmeticCodingDecompressModel[256];
 
-  private final ArithmeticModel m_changed_values;
+  private final ArithmeticCodingDecompressModel m_changed_values;
 
-  private final ArithmeticModel[] m_classification = new ArithmeticModel[256];
+  private final ArithmeticCodingDecompressModel[] m_classification = new ArithmeticCodingDecompressModel[256];
 
-  private final ArithmeticModel[] m_scan_angle_rank = new ArithmeticModel[2];
+  private final ArithmeticCodingDecompressModel[] m_scan_angle_rank = new ArithmeticCodingDecompressModel[2];
 
-  private final ArithmeticModel[] m_user_data = new ArithmeticModel[256];
+  private final ArithmeticCodingDecompressModel[] m_user_data = new ArithmeticCodingDecompressModel[256];
 
   private final byte[] last_item = new byte[20];
 
   private final LASpoint10 lp = LASpoint10.wrap(this.last_item);
 
-  public LazDecompressPoint10V2(final LasPointCloud pointCloud, final ArithmeticDecoder dec) {
+  public LazDecompressPoint10V2(final LasPointCloud pointCloud, final ArithmeticCodingDecompressDecoder dec) {
     int i; // unsigned
 
     /* set decoder */
@@ -145,18 +148,18 @@ public class LazDecompressPoint10V2 implements LazDecompress {
 
     /* create models and integer compressors */
     this.m_changed_values = dec.createSymbolModel(64);
-    this.ic_intensity = new IntegerCompressor(dec, 16, 4);
+    this.ic_intensity = new ArithmeticCodingDecompressInteger(dec, 16, 4);
     this.m_scan_angle_rank[0] = dec.createSymbolModel(256);
     this.m_scan_angle_rank[1] = dec.createSymbolModel(256);
-    this.ic_point_source_ID = new IntegerCompressor(dec, 16);
+    this.ic_point_source_ID = new ArithmeticCodingDecompressInteger(dec, 16);
     for (i = 0; i < 256; i++) {
       this.m_bit_byte[i] = null;
       this.m_classification[i] = null;
       this.m_user_data[i] = null;
     }
-    this.ic_dx = new IntegerCompressor(dec, 32, 2); // 32 bits, 2 context
-    this.ic_dy = new IntegerCompressor(dec, 32, 22); // 32 bits, 22 contexts
-    this.ic_z = new IntegerCompressor(dec, 32, 20); // 32 bits, 20 contexts
+    this.ic_dx = new ArithmeticCodingDecompressInteger(dec, 32, 2); // 32 bits, 2 context
+    this.ic_dy = new ArithmeticCodingDecompressInteger(dec, 32, 22); // 32 bits, 22 contexts
+    this.ic_z = new ArithmeticCodingDecompressInteger(dec, 32, 20); // 32 bits, 20 contexts
   }
 
   @Override
@@ -170,27 +173,33 @@ public class LazDecompressPoint10V2 implements LazDecompress {
       this.last_intensity[i] = 0;
       this.last_height[i / 2] = 0;
     }
+    ArithmeticCodingDecompressDecoder r = this.dec;
 
     /* init models and integer compressors */
-    this.dec.initSymbolModel(this.m_changed_values);
-    this.ic_intensity.initDecompressor();
-    this.dec.initSymbolModel(this.m_scan_angle_rank[0]);
-    this.dec.initSymbolModel(this.m_scan_angle_rank[1]);
-    this.ic_point_source_ID.initDecompressor();
+    this.m_changed_values.reset();
+    this.ic_intensity.reset();
+    ArithmeticCodingDecompressDecoder r1 = this.dec;
+    this.m_scan_angle_rank[0].reset();
+    ArithmeticCodingDecompressDecoder r2 = this.dec;
+    this.m_scan_angle_rank[1].reset();
+    this.ic_point_source_ID.reset();
     for (i = 0; i < 256; i++) {
       if (this.m_bit_byte[i] != null) {
-        this.dec.initSymbolModel(this.m_bit_byte[i]);
+        ArithmeticCodingDecompressDecoder r3 = this.dec;
+        this.m_bit_byte[i].reset();
       }
       if (this.m_classification[i] != null) {
-        this.dec.initSymbolModel(this.m_classification[i]);
+        ArithmeticCodingDecompressDecoder r3 = this.dec;
+        this.m_classification[i].reset();
       }
       if (this.m_user_data[i] != null) {
-        this.dec.initSymbolModel(this.m_user_data[i]);
+        ArithmeticCodingDecompressDecoder r3 = this.dec;
+        this.m_user_data[i].reset();
       }
     }
-    this.ic_dx.initDecompressor();
-    this.ic_dy.initDecompressor();
-    this.ic_z.initDecompressor();
+    this.ic_dx.reset();
+    this.ic_dy.reset();
+    this.ic_z.reset();
 
     this.lp.setX(point.getXInt()); // last_item[0]
     this.lp.setY(point.getYInt()); // last_item[4]
@@ -236,7 +245,8 @@ public class LazDecompressPoint10V2 implements LazDecompress {
       if ((changed_values & 32) != 0) {
         if (this.m_bit_byte[Byte.toUnsignedInt(this.last_item[14])] == null) {
           this.m_bit_byte[Byte.toUnsignedInt(this.last_item[14])] = this.dec.createSymbolModel(256);
-          this.dec.initSymbolModel(this.m_bit_byte[Byte.toUnsignedInt(this.last_item[14])]);
+          ArithmeticCodingDecompressDecoder r1 = this.dec;
+          this.m_bit_byte[Byte.toUnsignedInt(this.last_item[14])].reset();
         }
         this.last_item[14] = (byte)this.dec
           .decodeSymbol(this.m_bit_byte[Byte.toUnsignedInt(this.last_item[14])]);
@@ -260,7 +270,8 @@ public class LazDecompressPoint10V2 implements LazDecompress {
         if (this.m_classification[Byte.toUnsignedInt(this.last_item[15])] == null) {
           this.m_classification[Byte.toUnsignedInt(this.last_item[15])] = this.dec
             .createSymbolModel(256);
-          this.dec.initSymbolModel(this.m_classification[Byte.toUnsignedInt(this.last_item[15])]);
+          ArithmeticCodingDecompressDecoder r1 = this.dec;
+          this.m_classification[Byte.toUnsignedInt(this.last_item[15])].reset();
         }
         this.last_item[15] = (byte)this.dec
           .decodeSymbol(this.m_classification[Byte.toUnsignedInt(this.last_item[15])]);
@@ -277,7 +288,8 @@ public class LazDecompressPoint10V2 implements LazDecompress {
         if (this.m_user_data[Byte.toUnsignedInt(this.last_item[17])] == null) {
           this.m_user_data[Byte.toUnsignedInt(this.last_item[17])] = this.dec
             .createSymbolModel(256);
-          this.dec.initSymbolModel(this.m_user_data[Byte.toUnsignedInt(this.last_item[17])]);
+          ArithmeticCodingDecompressDecoder r1 = this.dec;
+          this.m_user_data[Byte.toUnsignedInt(this.last_item[17])].reset();
         }
         this.last_item[17] = (byte)this.dec
           .decodeSymbol(this.m_user_data[Byte.toUnsignedInt(this.last_item[17])]);

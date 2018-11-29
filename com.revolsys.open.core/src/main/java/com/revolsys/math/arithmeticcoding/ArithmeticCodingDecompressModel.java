@@ -8,9 +8,7 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.gridded.scaledint.compressed;
-
-import java.util.Arrays;
+package com.revolsys.math.arithmeticcoding;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //                                                                           -
@@ -49,54 +47,79 @@ import java.util.Arrays;
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-public class ArithmeticModel {
+public class ArithmeticCodingDecompressModel {
 
-  protected static final int DM__LengthShift = 15; // length bits discarded
-                                                   // before
-  // mult.
+  static final int AC_BUFFER_SIZE = 1024;
 
-  private static final int DM__MaxCount = 1 << DM__LengthShift; // for adaptive
-                                                                // models
+  static final int AC__MinLength = 0x01000000; // threshold for renormalization
 
-  protected int[] distribution;
+  static final int AC__MaxLength = 0xFFFFFFFF; // maximum AC interval length
 
-  private final int[] symbolCounts;
+  static final int BM__LengthShift = 13; // length bits discarded before mult.
 
-  private int totalCount = 0;
+  static final int BM__MaxCount = 1 << BM__LengthShift; // for adaptive models
+
+  static final int DM__LengthShift = 15; // length bits discarded before mult.
+
+  static final int DM__MaxCount = 1 << DM__LengthShift; // for adaptive models
+
+  public int[] decoderTable;
+
+  public int[] distribution;
+
+  public int[] symbolCounts;
+
+  private int totalCount;
 
   private int updateCycle;
 
-  private int symbolCountUntilUpdate;
+  public int symbolsUntilUpdate;
 
-  private final int symbolCount;
+  public final int symbolCount;
 
-  protected int lastSymbol;
+  public int lastSymbol;
 
-  public ArithmeticModel(final int symbolCount) {
+  private int tableSize;
+
+  public int tableShift;
+
+  public ArithmeticCodingDecompressModel(final int symbolCount) {
     if (symbolCount < 2 || symbolCount > 1 << 11) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("sumbolCount=" + symbolCount);
     }
     this.symbolCount = symbolCount;
-    this.updateCycle = symbolCount;
-
     this.lastSymbol = symbolCount - 1;
-    this.distribution = new int[symbolCount];
+    if (symbolCount > 16) {
+      int table_bits = 3;
+      while (symbolCount > 1 << table_bits + 2) {
+        ++table_bits;
+      }
+      this.tableSize = 1 << table_bits;
+      this.tableShift = DM__LengthShift - table_bits;
+      this.distribution = new int[symbolCount];
+      this.decoderTable = new int[this.tableSize + 2];
+    } else {// small alphabet: no table needed
+      this.decoderTable = null;
+      this.tableSize = this.tableShift = 0;
+      this.distribution = new int[symbolCount];
+    }
     this.symbolCounts = new int[symbolCount];
+    reset();
+  }
 
-    Arrays.fill(this.symbolCounts, 1);
+  public void reset() {
+    this.totalCount = 0;
+    this.updateCycle = this.symbolCount;
+    for (int k = 0; k < this.symbolCount; k++) {
+      this.symbolCounts[k] = 1;
+    }
 
     update();
-    this.symbolCountUntilUpdate = this.updateCycle = this.symbolCount + 6 >>> 1;
+    this.updateCycle = this.symbolCount + 6 >>> 1;
+    this.symbolsUntilUpdate = this.updateCycle;
   }
 
-  public void addCount(final int symbol) {
-    ++this.symbolCounts[symbol];
-    if (--this.symbolCountUntilUpdate == 0) {
-      update();
-    }
-  }
-
-  void update() {
+  public void update() {
     // halve counts when a threshold is reached
     if ((this.totalCount += this.updateCycle) > DM__MaxCount) {
       this.totalCount = 0;
@@ -106,20 +129,35 @@ public class ArithmeticModel {
     }
 
     // compute cumulative distribution, decoder table
-    int sum = 0;
+    int k, sum = 0, s = 0;
     final int scale = Integer.divideUnsigned(0x80000000, this.totalCount);
 
-    for (int k = 0; k < this.symbolCount; k++) {
-      this.distribution[k] = scale * sum >>> 31 - DM__LengthShift;
-      sum += this.symbolCounts[k];
+    if (this.tableSize == 0) {
+      for (k = 0; k < this.symbolCount; k++) {
+        this.distribution[k] = scale * sum >>> 31 - DM__LengthShift;
+        sum += this.symbolCounts[k];
+      }
+    } else {
+      for (k = 0; k < this.symbolCount; k++) {
+        this.distribution[k] = scale * sum >>> 31 - DM__LengthShift;
+        sum += this.symbolCounts[k];
+        final int w = this.distribution[k] >>> this.tableShift;
+        while (s < w) {
+          this.decoderTable[++s] = k - 1;
+        }
+      }
+      this.decoderTable[0] = 0;
+      while (s <= this.tableSize) {
+        this.decoderTable[++s] = this.symbolCount - 1;
+      }
     }
 
     // set frequency of model updates
     this.updateCycle = 5 * this.updateCycle >>> 2;
-    final int maxCycle = this.symbolCount + 6 << 3;
-    if (Integer.compareUnsigned(this.updateCycle, maxCycle) > 0) {
-      this.updateCycle = maxCycle;
+    final int max_cycle = this.symbolCount + 6 << 3;
+    if (Integer.compareUnsigned(this.updateCycle, max_cycle) > 0) {
+      this.updateCycle = max_cycle;
     }
-    this.symbolCountUntilUpdate = this.updateCycle;
+    this.symbolsUntilUpdate = this.updateCycle;
   }
 }

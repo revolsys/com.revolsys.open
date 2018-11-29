@@ -88,6 +88,26 @@ public class AbstractChannelWriter implements BaseCloseable {
     }
   }
 
+  public void putBytes(final byte[] bytes, final int offset, final int length) {
+    if (length <= this.available) {
+      this.available -= length;
+      this.buffer.put(bytes, offset, length);
+    } else {
+      this.buffer.put(bytes, offset, this.available);
+      int fileOffset = this.available;
+      do {
+        int bytesToWrite = length - fileOffset;
+        write();
+        if (bytesToWrite > this.available) {
+          bytesToWrite = this.available;
+        }
+        this.available -= bytesToWrite;
+        this.buffer.put(bytes, offset + fileOffset, bytesToWrite);
+        fileOffset += bytesToWrite;
+      } while (fileOffset < length);
+    }
+  }
+
   public void putDouble(final double d) {
     if (this.available < 8) {
       write();

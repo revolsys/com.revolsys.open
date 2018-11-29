@@ -2,8 +2,6 @@ package com.revolsys.geometry.graph;
 
 import java.util.Comparator;
 
-import com.revolsys.util.Debug;
-
 public class BinaryRoutePath {
 
   public static final Comparator<BinaryRoutePath> COMPARATOR = (a, b) -> {
@@ -122,13 +120,6 @@ public class BinaryRoutePath {
   }
 
   public boolean startsWith(final BinaryRoutePath route2) {
-    if (this.x == route2.x) {
-      if (this.y == route2.y) {
-        if (this.edgeCount > route2.edgeCount) {
-          Debug.noOp();
-        }
-      }
-    }
     return false;
   }
 
