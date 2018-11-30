@@ -108,8 +108,10 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelWriter
     if (gridWidth > 0 && gridHeight > 0) {
       final GeometryFactory geometryFactory = elevationModel.getGeometryFactory();
       try (
-        final ArithmeticCodingCompressEncoder encoder = new ArithmeticCodingCompressEncoder(writer)) {
-        final ArithmeticCodingCompressInteger compressor = new ArithmeticCodingCompressInteger(encoder, 32);
+        final ArithmeticCodingCompressEncoder encoder = new ArithmeticCodingCompressEncoder(
+          writer)) {
+        final ArithmeticCodingCompressInteger compressor = new ArithmeticCodingCompressInteger(
+          encoder, 32);
 
         final double minZ = elevationModel.getBoundingBox().getMinZ();
         final int minZInt = geometryFactory.toIntZ(minZ);
@@ -120,7 +122,6 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelWriter
           previousZ = nullInt;
         }
         writer.putInt(previousZ);
-
         boolean leftToRight = true;
         for (int gridY = 0; gridY < gridHeight; gridY++) {
           if (leftToRight) {
@@ -135,8 +136,7 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelWriter
               if (zInt == Integer.MIN_VALUE) {
                 zInt = nullInt;
               }
-              final int zDiff = zInt - previousZ;
-              compressor.compress(0, zDiff);
+              compressor.compress(previousZ, zInt);
               previousZ = zInt;
             }
           } else {
@@ -145,8 +145,7 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelWriter
               if (zInt == Integer.MIN_VALUE) {
                 zInt = nullInt;
               }
-              final int zDiff = zInt - previousZ;
-              compressor.compress(0, zDiff);
+              compressor.compress(previousZ, zInt);
               previousZ = zInt;
             }
           }
