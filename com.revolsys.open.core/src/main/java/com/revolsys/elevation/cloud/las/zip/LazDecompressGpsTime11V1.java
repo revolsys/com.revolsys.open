@@ -13,6 +13,7 @@ package com.revolsys.elevation.cloud.las.zip;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel;
 
 public class LazDecompressGpsTime11V1 extends LazDecompressGpsTime11 {
 
@@ -26,8 +27,8 @@ public class LazDecompressGpsTime11V1 extends LazDecompressGpsTime11 {
 
   public LazDecompressGpsTime11V1(final ArithmeticCodingDecompressDecoder dec) {
     super(dec);
-    this.gpsTimeMulti = dec.createSymbolModel(LASZIP_GPSTIME_MULTIMAX);
-    this.gpsTime0Diff = dec.createSymbolModel(3);
+    this.gpsTimeMulti = new ArithmeticCodingDecompressModel(LASZIP_GPSTIME_MULTIMAX);
+    this.gpsTime0Diff = new ArithmeticCodingDecompressModel(3);
     this.decompressGpsTime = new ArithmeticCodingDecompressInteger(dec, 32, 6);
   }
 

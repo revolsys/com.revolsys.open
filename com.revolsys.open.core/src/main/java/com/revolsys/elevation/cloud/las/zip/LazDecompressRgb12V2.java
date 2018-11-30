@@ -30,32 +30,24 @@ public class LazDecompressRgb12V2 extends LazDecompressRgb12 {
 
   public LazDecompressRgb12V2(final ArithmeticCodingDecompressDecoder decoder) {
     super(decoder);
-    this.byteUsed = decoder.createSymbolModel(128);
-    this.rgbDiff0 = decoder.createSymbolModel(256);
-    this.rgbDiff1 = decoder.createSymbolModel(256);
-    this.rgbDiff2 = decoder.createSymbolModel(256);
-    this.rgbDiff3 = decoder.createSymbolModel(256);
-    this.rgbDiff4 = decoder.createSymbolModel(256);
-    this.rgbDiff5 = decoder.createSymbolModel(256);
+    this.byteUsed = new ArithmeticCodingDecompressModel(128);
+    this.rgbDiff0 = new ArithmeticCodingDecompressModel(256);
+    this.rgbDiff1 = new ArithmeticCodingDecompressModel(256);
+    this.rgbDiff2 = new ArithmeticCodingDecompressModel(256);
+    this.rgbDiff3 = new ArithmeticCodingDecompressModel(256);
+    this.rgbDiff4 = new ArithmeticCodingDecompressModel(256);
+    this.rgbDiff5 = new ArithmeticCodingDecompressModel(256);
   }
 
   @Override
   public void init(final LasPoint firstPoint) {
     super.init(firstPoint);
-    final ArithmeticCodingDecompressModel m = this.byteUsed;
-    ArithmeticCodingDecompressDecoder r = this.decoder;
-    m.reset();
-    ArithmeticCodingDecompressDecoder r1 = this.decoder;
+    this.byteUsed.reset();
     this.rgbDiff0.reset();
-    ArithmeticCodingDecompressDecoder r2 = this.decoder;
     this.rgbDiff1.reset();
-    ArithmeticCodingDecompressDecoder r3 = this.decoder;
     this.rgbDiff2.reset();
-    ArithmeticCodingDecompressDecoder r4 = this.decoder;
     this.rgbDiff3.reset();
-    ArithmeticCodingDecompressDecoder r5 = this.decoder;
     this.rgbDiff4.reset();
-    ArithmeticCodingDecompressDecoder r6 = this.decoder;
     this.rgbDiff5.reset();
   }
 

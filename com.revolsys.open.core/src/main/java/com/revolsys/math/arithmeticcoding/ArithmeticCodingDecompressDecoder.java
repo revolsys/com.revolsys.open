@@ -67,22 +67,18 @@ public class ArithmeticCodingDecompressDecoder {
     this.reader = null;
   }
 
-  public ArithmeticCodingDecompressModel createSymbolModel(final int n) {
-    return new ArithmeticCodingDecompressModel(n);
-  }
-
   public int decodeBit(final ArithmeticCodingBitModel model) {
-    final int u_x = model.bit0Probability * (this.length >>> BM__LengthShift); // product
+    final int x = model.bit0Probability * (this.length >>> BM__LengthShift); // product
     // l x
     // p0
-    final int u_sym = compareUnsigned(this.value, u_x) >= 0 ? 1 : 0; // decision
+    final int sym = compareUnsigned(this.value, x) >= 0 ? 1 : 0; // decision
     // update & shift interval
-    if (u_sym == 0) {
-      this.length = u_x;
+    if (sym == 0) {
+      this.length = x;
       ++model.bit0Count;
     } else {
-      this.value -= u_x; // shifted interval base = 0
-      this.length -= u_x;
+      this.value -= x; // shifted interval base = 0
+      this.length -= x;
     }
 
     if (compareUnsigned(this.length, AC__MinLength) < 0) {
@@ -90,65 +86,62 @@ public class ArithmeticCodingDecompressDecoder {
     }
     model.update();
 
-    return u_sym; // return data bit value
+    return sym; // return data bit value
   }
 
   public int decodeSymbol(final ArithmeticCodingDecompressModel model) {
-    int u_n, u_sym, u_x, u_y = this.length;
+    int n;
+    int sym;
+    int x;
+    int y = this.length;
 
-    if (model.decoderTable != null) { // use table look-up for faster decoding
+    if (model.decoderTable != null) {
+      final int dv = Integer.divideUnsigned(this.value, this.length >>>= DM__LengthShift);
+      final int t = dv >>> model.tableShift;
 
-      final int u_dv = Integer.divideUnsigned(this.value, this.length >>>= DM__LengthShift);
-      final int t = u_dv >>> model.tableShift;
+      sym = model.decoderTable[t];
+      n = model.decoderTable[t + 1] + 1;
 
-      u_sym = model.decoderTable[t]; // initial decision based on table look-up
-      u_n = model.decoderTable[t + 1] + 1;
-
-      while (compareUnsigned(u_n, u_sym + 1) > 0) { // finish with bisection
-                                                    // search
-        final int u_k = u_sym + u_n >>> 1;
-        if (compareUnsigned(model.distribution[u_k], u_dv) > 0) {
-          u_n = u_k;
+      while (compareUnsigned(n, sym + 1) > 0) {
+        final int k = sym + n >>> 1;
+        if (compareUnsigned(model.distribution[k], dv) > 0) {
+          n = k;
         } else {
-          u_sym = u_k;
+          sym = k;
         }
       }
-      // compute products
-      u_x = model.distribution[u_sym] * this.length;
-      if (u_sym != model.lastSymbol) {
-        u_y = model.distribution[u_sym + 1] * this.length;
+      x = model.distribution[sym] * this.length;
+      if (sym != model.lastSymbol) {
+        y = model.distribution[sym + 1] * this.length;
       }
-    } else { // decode using only multiplications
-
-      u_x = u_sym = 0;
+    } else {
+      x = sym = 0;
       this.length >>>= DM__LengthShift;
-      int u_k = (u_n = model.symbolCount) >>> 1;
-      // decode via bisection search
+      int k = (n = model.symbolCount) >>> 1;
       do {
-        final int u_z = this.length * model.distribution[u_k];
-        if (compareUnsigned(u_z, this.value) > 0) {
-          u_n = u_k;
-          u_y = u_z; // value is smaller
+        final int z = this.length * model.distribution[k];
+        if (compareUnsigned(z, this.value) > 0) {
+          n = k;
+          y = z;
         } else {
-          u_sym = u_k;
-          u_x = u_z; // value is larger or equal
+          sym = k;
+          x = z;
         }
-      } while ((u_k = u_sym + u_n >>> 1) != u_sym);
+      } while ((k = sym + n >>> 1) != sym);
     }
 
-    this.value -= u_x; // update interval
-    this.length = u_y - u_x;
+    this.value -= x;
+    this.length = y - x;
 
     if (compareUnsigned(this.length, AC__MinLength) < 0) {
-      renorm_dec_interval(); // renormalization
+      renorm_dec_interval();
     }
 
-    ++model.symbolCounts[u_sym];
+    ++model.symbolCounts[sym];
     if (--model.symbolsUntilUpdate == 0) {
-      model.update(); // periodic model update
+      model.update();
     }
-
-    return u_sym;
+    return sym;
   }
 
   public boolean init(final ChannelReader reader) {
@@ -165,65 +158,54 @@ public class ArithmeticCodingDecompressDecoder {
   }
 
   public int readBit() {
-    final int u_sym = Integer.divideUnsigned(this.value, this.length >>>= 1); // decode
-                                                                              // symbol,
-                                                                              // change
-                                                                              // length
-    this.value -= this.length * u_sym; // update interval
+    final int sym = Integer.divideUnsigned(this.value, this.length >>>= 1);
+    this.value -= this.length * sym;
 
     if (compareUnsigned(this.length, AC__MinLength) < 0) {
-      renorm_dec_interval(); // renormalization
+      renorm_dec_interval();
     }
 
-    if (compareUnsigned(u_sym, 2) >= 0) {
+    if (compareUnsigned(sym, 2) >= 0) {
       throw new IllegalStateException("Error decompressing file");
     }
 
-    return u_sym;
+    return sym;
   }
 
-  public int readBits(int u_bits) {
-
-    if (u_bits > 19) {
-      final int u_tmp = readShort();
-      u_bits = u_bits - 16;
-      final int u_tmp1 = readBits(u_bits) << 16;
-      return u_tmp1 | u_tmp;
+  public int readBits(int bits) {
+    if (bits > 19) {
+      final int tmp = readShort();
+      bits = bits - 16;
+      final int tmp1 = readBits(bits) << 16;
+      return tmp1 | tmp;
     }
 
-    final int u_sym = Integer.divideUnsigned(this.value, this.length >>>= u_bits);// decode
-                                                                                  // symbol,
-                                                                                  // change
-                                                                                  // length
-    this.value -= this.length * u_sym; // update interval
+    final int sym = Integer.divideUnsigned(this.value, this.length >>>= bits);
+    this.value -= this.length * sym;
 
     if (compareUnsigned(this.length, AC__MinLength) < 0) {
-      renorm_dec_interval(); // renormalization
+      renorm_dec_interval();
     }
 
-    if (compareUnsigned(u_sym, 1 << u_bits) >= 0) {
-      throw new IllegalStateException("Error decompressing LAZ file");
+    if (compareUnsigned(sym, 1 << bits) >= 0) {
+      throw new IllegalStateException("Error decompressing file");
     }
-
-    return u_sym;
+    return sym;
   }
 
   public byte readByte() {
-    final int u_sym = Integer.divideUnsigned(this.value, this.length >>>= 8); // decode
-                                                                              // symbol,
-                                                                              // change
-                                                                              // length
-    this.value -= this.length * u_sym; // update interval
+    final int sym = Integer.divideUnsigned(this.value, this.length >>>= 8);
+    this.value -= this.length * sym;
 
     if (compareUnsigned(this.length, AC__MinLength) < 0) {
-      renorm_dec_interval(); // renormalization
+      renorm_dec_interval();
     }
 
-    if (compareUnsigned(u_sym, 1 << 8) >= 0) {
-      throw new IllegalStateException("Error decompressing LAZ file");
+    if (compareUnsigned(sym, 1 << 8) >= 0) {
+      throw new IllegalStateException("Error decompressing file");
     }
 
-    return (byte)u_sym;
+    return (byte)sym;
   }
 
   public double readDouble() {
@@ -237,41 +219,35 @@ public class ArithmeticCodingDecompressDecoder {
   }
 
   public int readInt() {
-    final int u_lowerInt = readShort();
-    final int u_upperInt = readShort();
-    return u_upperInt << 16 | u_lowerInt;
+    final int lowerInt = readShort();
+    final int upperInt = readShort();
+    return upperInt << 16 | lowerInt;
   }
 
   public long readInt64() {
-    final long u_lowerInt = readInt();
-    final long u_upperInt = readInt();
-    return u_upperInt << 32 | u_lowerInt;
+    final long lowerInt = readInt();
+    final long upperInt = readInt();
+    return upperInt << 32 | lowerInt;
   }
 
   public char readShort() {
-    final int u_sym = Integer.divideUnsigned(this.value, this.length >>>= 16); // decode
-                                                                               // symbol,
-                                                                               // change
-                                                                               // length
-    this.value -= this.length * u_sym; // update interval
+    final int sym = Integer.divideUnsigned(this.value, this.length >>>= 16);
+    this.value -= this.length * sym;
 
     if (compareUnsigned(this.length, AC__MinLength) < 0) {
-      renorm_dec_interval(); // renormalization
+      renorm_dec_interval();
     }
 
-    if (compareUnsigned(u_sym, 1 << 16) >= 0) {
+    if (compareUnsigned(sym, 1 << 16) >= 0) {
       throw new IllegalStateException("Error decompressing file");
     }
 
-    return (char)u_sym;
+    return (char)sym;
   }
 
   private void renorm_dec_interval() {
-    do { // read least-significant byte
+    do {
       this.value = this.value << 8 | this.reader.getByte() & 0xff;
-    } while (Integer.compareUnsigned(this.length <<= 8, AC__MinLength) < 0); // length
-                                                                             // multiplied
-                                                                             // by
-                                                                             // 256
+    } while (Integer.compareUnsigned(this.length <<= 8, AC__MinLength) < 0);
   }
 }

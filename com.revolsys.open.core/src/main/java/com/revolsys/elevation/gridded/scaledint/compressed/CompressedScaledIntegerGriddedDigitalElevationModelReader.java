@@ -200,8 +200,8 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelReader
     final double maxX = this.reader.getDouble(); // 88 offset
     final double maxY = this.reader.getDouble(); // 96 offset
     final double maxZ = this.reader.getDouble(); // 104 offset
-    this.gridWidth = this.reader.getInt(); // 108 offset
-    this.gridHeight = this.reader.getInt(); // 112 offset
+    this.gridWidth = this.reader.getInt(); // 112 offset
+    this.gridHeight = this.reader.getInt(); // 116 offset
     this.gridCellWidth = this.reader.getDouble(); // 120 offset
     this.gridCellHeight = this.reader.getDouble(); // 128 offset
     // 136 offset

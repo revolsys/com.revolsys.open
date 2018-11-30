@@ -121,9 +121,10 @@ public class LazDecompressPoint10V1 implements LazDecompress {
 
   private final LASpoint10 lp = LASpoint10.wrap(this.last_item);
 
-  public LazDecompressPoint10V1(final LasPointCloud pointCloud, final ArithmeticCodingDecompressDecoder decoder) {
+  public LazDecompressPoint10V1(final LasPointCloud pointCloud,
+    final ArithmeticCodingDecompressDecoder decoder) {
     this.dec = decoder;
-    this.m_changed_values = decoder.createSymbolModel(64);
+    this.m_changed_values = new ArithmeticCodingDecompressModel(64);
 
     this.ic_dx = new ArithmeticCodingDecompressInteger(decoder, 32);
     this.ic_dy = new ArithmeticCodingDecompressInteger(decoder, 32, 20);
@@ -149,19 +150,15 @@ public class LazDecompressPoint10V1 implements LazDecompress {
     this.ic_intensity.reset();
     this.ic_scan_angle_rank.reset();
     this.ic_point_source_ID.reset();
-    ArithmeticCodingDecompressDecoder r = this.dec;
     this.m_changed_values.reset();
     for (i = 0; i < 256; i++) {
       if (this.m_bit_byte[i] != null) {
-        ArithmeticCodingDecompressDecoder r1 = this.dec;
         this.m_bit_byte[i].reset();
       }
       if (this.m_classification[i] != null) {
-        ArithmeticCodingDecompressDecoder r1 = this.dec;
         this.m_classification[i].reset();
       }
       if (this.m_user_data[i] != null) {
-        ArithmeticCodingDecompressDecoder r1 = this.dec;
         this.m_user_data[i].reset();
       }
     }
@@ -259,8 +256,7 @@ public class LazDecompressPoint10V1 implements LazDecompress {
       // changed
       if ((changed_values & 16) != 0) {
         if (this.m_bit_byte[this.last_item[14]] == null) {
-          this.m_bit_byte[this.last_item[14]] = this.dec.createSymbolModel(256);
-          ArithmeticCodingDecompressDecoder r = this.dec;
+          this.m_bit_byte[this.last_item[14]] = new ArithmeticCodingDecompressModel(256);
           this.m_bit_byte[this.last_item[14]].reset();
         }
         this.last_item[14] = (byte)this.dec.decodeSymbol(this.m_bit_byte[this.last_item[14]]);
@@ -269,8 +265,7 @@ public class LazDecompressPoint10V1 implements LazDecompress {
       // decompress the classification ... if it has changed
       if ((changed_values & 8) != 0) {
         if (this.m_classification[this.last_item[15]] == null) {
-          this.m_classification[this.last_item[15]] = this.dec.createSymbolModel(256);
-          ArithmeticCodingDecompressDecoder r = this.dec;
+          this.m_classification[this.last_item[15]] = new ArithmeticCodingDecompressModel(256);
           this.m_classification[this.last_item[15]].reset();
         }
         this.last_item[15] = (byte)this.dec.decodeSymbol(this.m_classification[this.last_item[15]]);
@@ -285,8 +280,7 @@ public class LazDecompressPoint10V1 implements LazDecompress {
       // decompress the user_data ... if it has changed
       if ((changed_values & 2) != 0) {
         if (this.m_user_data[this.last_item[17]] == null) {
-          this.m_user_data[this.last_item[17]] = this.dec.createSymbolModel(256);
-          ArithmeticCodingDecompressDecoder r = this.dec;
+          this.m_user_data[this.last_item[17]] = new ArithmeticCodingDecompressModel(256);
           this.m_user_data[this.last_item[17]].reset();
         }
         this.last_item[17] = (byte)this.dec.decodeSymbol(this.m_user_data[this.last_item[17]]);

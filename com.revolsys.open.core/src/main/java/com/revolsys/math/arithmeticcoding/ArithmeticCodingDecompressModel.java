@@ -98,7 +98,7 @@ public class ArithmeticCodingDecompressModel {
       this.tableShift = DM__LengthShift - table_bits;
       this.distribution = new int[symbolCount];
       this.decoderTable = new int[this.tableSize + 2];
-    } else {// small alphabet: no table needed
+    } else {
       this.decoderTable = null;
       this.tableSize = this.tableShift = 0;
       this.distribution = new int[symbolCount];
@@ -120,7 +120,6 @@ public class ArithmeticCodingDecompressModel {
   }
 
   public void update() {
-    // halve counts when a threshold is reached
     if ((this.totalCount += this.updateCycle) > DM__MaxCount) {
       this.totalCount = 0;
       for (int n = 0; n < this.symbolCount; n++) {
@@ -128,17 +127,17 @@ public class ArithmeticCodingDecompressModel {
       }
     }
 
-    // compute cumulative distribution, decoder table
-    int k, sum = 0, s = 0;
+    int sum = 0;
+    int s = 0;
     final int scale = Integer.divideUnsigned(0x80000000, this.totalCount);
 
     if (this.tableSize == 0) {
-      for (k = 0; k < this.symbolCount; k++) {
+      for (int k = 0; k < this.symbolCount; k++) {
         this.distribution[k] = scale * sum >>> 31 - DM__LengthShift;
         sum += this.symbolCounts[k];
       }
     } else {
-      for (k = 0; k < this.symbolCount; k++) {
+      for (int k = 0; k < this.symbolCount; k++) {
         this.distribution[k] = scale * sum >>> 31 - DM__LengthShift;
         sum += this.symbolCounts[k];
         final int w = this.distribution[k] >>> this.tableShift;
@@ -152,7 +151,6 @@ public class ArithmeticCodingDecompressModel {
       }
     }
 
-    // set frequency of model updates
     this.updateCycle = 5 * this.updateCycle >>> 2;
     final int max_cycle = this.symbolCount + 6 << 3;
     if (Integer.compareUnsigned(this.updateCycle, max_cycle) > 0) {
