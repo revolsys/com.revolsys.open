@@ -48,12 +48,20 @@ public class HillShadeGriddedElevationModelRasterizer
     return this.azimuthDegrees;
   }
 
+  public double getAzimuthRadians() {
+    return this.azimuthRadians;
+  }
+
+  public double getCosZenithRadians() {
+    return this.cosZenithRadians;
+  }
+
   private int getHillShade(final double a, final double b, final double c, final double d,
     final double f, final double g, final double h, final double i) {
     final double oneDivCellSizeTimes8 = this.oneDivCellSizeTimes8;
-    final double dzDivDx = (c + 2 * f + i - (a + 2 * d + g)) * oneDivCellSizeTimes8;
-    final double dzDivDy = (g + 2 * h + i - (a + 2 * b + c)) * oneDivCellSizeTimes8;
-    final double slopeRadians = Math
+    final float dzDivDx = (float)((c + 2 * f + i - (a + 2 * d + g)) * oneDivCellSizeTimes8);
+    final float dzDivDy = (float)((g + 2 * h + i - (a + 2 * b + c)) * oneDivCellSizeTimes8);
+    final double slopeRadians = (float)Math
       .atan(this.zFactor * Math.sqrt(dzDivDx * dzDivDx + dzDivDy * dzDivDy));
 
     double aspectRadians;
@@ -84,6 +92,14 @@ public class HillShadeGriddedElevationModelRasterizer
   @Override
   public String getName() {
     return "Hillshade";
+  }
+
+  public double getOneDivCellSizeTimes8() {
+    return this.oneDivCellSizeTimes8;
+  }
+
+  public double getSinZenithRadians() {
+    return this.sinZenithRadians;
   }
 
   @Override
@@ -186,7 +202,11 @@ public class HillShadeGriddedElevationModelRasterizer
     return this.zenithDegrees;
   }
 
-  public double getzFactor() {
+  public double getZenithRadians() {
+    return this.zenithRadians;
+  }
+
+  public double getZFactor() {
     return this.zFactor;
   }
 
