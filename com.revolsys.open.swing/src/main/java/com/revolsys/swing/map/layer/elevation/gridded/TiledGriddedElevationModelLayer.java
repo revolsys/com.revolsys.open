@@ -16,6 +16,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -54,6 +55,8 @@ public class TiledGriddedElevationModelLayer
   private double scaleZ;
 
   private final int minResolution = 1;
+
+  private BufferedGeoreferencedImage renderImage;
 
   public TiledGriddedElevationModelLayer() {
     super("tiledGriddedElevationModelLayer");
@@ -255,6 +258,12 @@ public class TiledGriddedElevationModelLayer
   @Override
   protected AbstractTiledLayerRenderer<GriddedElevationModel, TiledGriddedElevationModelLayerTile> newRenderer() {
     return new TiledMultipleGriddedElevationModelLayerRenderer(this);
+  }
+
+  @Override
+  public BufferedGeoreferencedImage newRenderImage() {
+    return BufferedGeoreferencedImage.newImage(BoundingBox.empty(), this.tileSizePixels,
+      this.tileSizePixels);
   }
 
   protected TiledGriddedElevationModelLayerTile newTile(final int resolution, final int tileSize,

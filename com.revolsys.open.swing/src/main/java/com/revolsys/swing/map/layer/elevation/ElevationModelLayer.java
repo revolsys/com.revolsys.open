@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.elevation;
 import java.util.List;
 
 import com.revolsys.geometry.model.Point;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 
@@ -82,6 +83,8 @@ public interface ElevationModelLayer extends Layer {
   default boolean isUseElevationAtScale(final double scale) {
     return isVisible(scale);
   }
+
+  BufferedGeoreferencedImage newRenderImage();
 
   void redraw();
 }

@@ -9,8 +9,8 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -20,6 +20,7 @@ import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.RsSwingServiceInitializer;
@@ -277,6 +278,14 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
     }
     GroupLayouts.makeColumns(panel, 2, true);
     return panel;
+  }
+
+  @Override
+  public BufferedGeoreferencedImage newRenderImage() {
+    final int width = this.elevationModel.getGridWidth();
+    final int height = this.elevationModel.getGridHeight();
+    final BoundingBox boundingBox = getBoundingBox();
+    return new BufferedGeoreferencedImage(boundingBox, width, height);
   }
 
   @Override

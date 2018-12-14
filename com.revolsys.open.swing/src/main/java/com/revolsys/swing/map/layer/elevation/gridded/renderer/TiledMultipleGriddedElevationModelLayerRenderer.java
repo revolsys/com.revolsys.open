@@ -12,6 +12,7 @@ import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelR
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.layer.Layer;
@@ -214,16 +215,18 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   @Override
   protected void renderTile(final ViewRenderer view, final Cancellable cancellable,
     final TiledGriddedElevationModelLayerTile tile) {
+    final TiledGriddedElevationModelLayer layer = getLayer();
+    final BufferedGeoreferencedImage image = layer.newRenderImage();
     final GriddedElevationModel elevationModel = tile.getElevationModel();
     if (elevationModel != null) {
-      final TiledGriddedElevationModelLayer layer = getLayer();
       final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
       for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
         .cancellable(renderers)) {
         final long scaleForVisible = (long)view.getScaleForVisible();
         if (renderer.isVisible(scaleForVisible)) {
           renderer.setElevationModel(elevationModel);
-          renderer.render(view, layer);
+          image.setBoundingBox(tile.getBoundingBox());
+          renderer.render(view, layer, image);
         }
       }
     }
@@ -233,6 +236,7 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   protected void renderTiles(final ViewRenderer view, final BooleanCancellable cancellable,
     final List<TiledGriddedElevationModelLayerTile> mapTiles) {
     final TiledGriddedElevationModelLayer layer = getLayer();
+    final BufferedGeoreferencedImage image = layer.newRenderImage();
     final long scaleForVisible = (long)view.getScaleForVisible();
     final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
     for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
@@ -243,7 +247,8 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
           if (elevationModel != null) {
             synchronized (renderer) {
               renderer.setElevationModel(elevationModel);
-              renderer.render(view, layer);
+              image.setBoundingBox(tile.getBoundingBox());
+              renderer.render(view, layer, image);
             }
           }
         }

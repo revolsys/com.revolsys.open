@@ -11,6 +11,7 @@ import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRaste
 import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
@@ -156,7 +157,8 @@ public class RasterizerGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final ViewRenderer view, final ElevationModelLayer layer) {
+  public void render(final ViewRenderer view, final ElevationModelLayer layer,
+    final BufferedGeoreferencedImage image) {
     // TODO cancel
     final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
@@ -183,14 +185,12 @@ public class RasterizerGriddedElevationModelLayerRenderer
               this.redraw = true;
             }
           }
+          final BoundingBox boundingBox = layer.getBoundingBox();
           if (!this.redrawInBackground) {
-            this.image.redraw();
-          }
-          if (!this.redrawInBackground
-            || this.image.hasImage() && !(this.image.isCached() && this.redraw)) {
-            final BoundingBox boundingBox = layer.getBoundingBox();
+            this.rasterizer.rasterize(image);
+            view.drawImage(image, true, this.opacity, null);
+          } else if (this.image.hasImage() && !(this.image.isCached() && this.redraw)) {
             view.drawImage(this.image, true, this.opacity, null);
-            view.drawDifferentCoordinateSystem(boundingBox);
           } else {
             synchronized (this) {
               if (this.redraw && this.worker == null) {
@@ -208,6 +208,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
               }
             }
           }
+          view.drawDifferentCoordinateSystem(boundingBox);
         }
       }
     }

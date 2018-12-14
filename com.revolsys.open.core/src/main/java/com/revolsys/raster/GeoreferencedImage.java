@@ -182,6 +182,7 @@ public interface GeoreferencedImage
             }
           }
         } catch (final Throwable e) {
+          e.printStackTrace();
         } finally {
           graphics.setTransform(transform);
         }

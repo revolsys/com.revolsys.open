@@ -11,6 +11,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.logging.Logs;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -140,6 +141,11 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer
     }
     GroupLayouts.makeColumns(panel, 2, true);
     return panel;
+  }
+
+  @Override
+  public BufferedGeoreferencedImage newRenderImage() {
+    return null;
   }
 
   @Override
