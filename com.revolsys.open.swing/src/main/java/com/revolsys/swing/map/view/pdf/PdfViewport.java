@@ -10,7 +10,7 @@ import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
 
@@ -42,7 +42,7 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     this.document = document;
     this.page = page;
     this.contentStream = new PDPageContentStream(document, page);
-    final COSDictionary pageDictionary = page.getCOSDictionary();
+    final COSDictionary pageDictionary = page.getCOSObject();
     final COSArray viewports = PdfUtil.getArray(pageDictionary, "VP");
 
     final COSDictionary viewport = new COSDictionary();

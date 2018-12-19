@@ -1,5 +1,6 @@
 package com.revolsys.swing.component;
 
+import java.awt.Desktop;
 import java.awt.HeadlessException;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -13,6 +14,8 @@ import com.revolsys.swing.parallel.Invoke;
 
 public class BaseFrame extends JFrame implements WindowListener {
   private static final long serialVersionUID = 1L;
+
+  private JMenuBar menuBar;
 
   public BaseFrame() throws HeadlessException {
     this(true);
@@ -54,7 +57,8 @@ public class BaseFrame extends JFrame implements WindowListener {
   protected void initUi() {
     setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     addWindowListener(this);
-    newMenuBar();
+    this.menuBar = newMenuBar();
+    Desktop.getDesktop().setDefaultMenuBar(this.menuBar);
   }
 
   protected JMenuBar newMenuBar() {
@@ -82,6 +86,7 @@ public class BaseFrame extends JFrame implements WindowListener {
 
   @Override
   public void windowActivated(final WindowEvent e) {
+    Desktop.getDesktop().setDefaultMenuBar(this.menuBar);
   }
 
   @Override

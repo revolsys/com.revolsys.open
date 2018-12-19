@@ -1,4 +1,4 @@
-package com.revolsys.doclet.tags;
+package com.revolsys.doclet11.tags;
 
 import java.util.Collections;
 import java.util.List;

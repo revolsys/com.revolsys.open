@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
@@ -19,11 +18,11 @@ import javax.measure.quantity.Length;
 
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDResources;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.graphics.PDExtendedGraphicsState;
 import org.apache.pdfbox.pdmodel.graphics.PDLineDashPattern;
+import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
@@ -328,13 +327,16 @@ public class PdfViewRenderer extends ViewRenderer {
                * final double textHaloRadius = Viewport2D.toDisplayValue(this,
                * style.getTextHaloRadius()); if (textHaloRadius > 0) {
                * graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-               * RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB); final Stroke savedStroke =
-               * graphics.getStroke(); final Stroke outlineStroke = new BasicStroke(
-               * (float)textHaloRadius, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
-               * graphics.setColor(style.getTextHaloFill()); graphics.setStroke(outlineStroke);
-               * final Font font = graphics.getFont(); final FontRenderContext fontRenderContext =
-               * graphics.getFontRenderContext(); final TextLayout textLayout = new TextLayout(ring,
-               * font, fontRenderContext); final Shape outlineShape =
+               * RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB); final Stroke
+               * savedStroke = graphics.getStroke(); final Stroke outlineStroke
+               * = new BasicStroke( (float)textHaloRadius, BasicStroke.CAP_BUTT,
+               * BasicStroke.JOIN_BEVEL);
+               * graphics.setColor(style.getTextHaloFill());
+               * graphics.setStroke(outlineStroke); final Font font =
+               * graphics.getFont(); final FontRenderContext fontRenderContext =
+               * graphics.getFontRenderContext(); final TextLayout textLayout =
+               * new TextLayout(ring, font, fontRenderContext); final Shape
+               * outlineShape =
                * textLayout.getOutline(TextStyleRenderer.NOOP_TRANSFORM);
                * graphics.draw(outlineShape); graphics.setStroke(savedStroke); }
                */
@@ -462,13 +464,8 @@ public class PdfViewRenderer extends ViewRenderer {
         graphicsState.setNonStrokingAlphaConstant(polygonFillOpacity / 255f);
       }
 
-      final PDResources resources = this.page.findResources();
-      Map<String, PDExtendedGraphicsState> graphicsStateDictionary = resources.getGraphicsStates();
-      if (graphicsStateDictionary == null) {
-        graphicsStateDictionary = new TreeMap<>();
-      }
-      graphicsStateDictionary.put(styleName, graphicsState);
-      resources.setGraphicsStates(graphicsStateDictionary);
+      final PDResources resources = this.page.getResources();
+      resources.add(graphicsState);
 
       this.styleNames.put(style, styleName);
     }

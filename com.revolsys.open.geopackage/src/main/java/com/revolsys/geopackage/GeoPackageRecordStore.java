@@ -17,7 +17,7 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.DelegatingConnection;
-import org.sqlite.core.CoreConnection;
+import org.sqlite.SQLiteConnection;
 import org.sqlite.core.DB;
 
 import com.revolsys.datatype.DataTypes;
@@ -101,9 +101,9 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     super.initialize();
     try (
       JdbcConnection connection = getJdbcConnection(true)) {
-      final CoreConnection sqliteConnection = (CoreConnection)((DelegatingConnection<?>)connection
+      final SQLiteConnection sqliteConnection = (SQLiteConnection)((DelegatingConnection<?>)connection
         .getConnection()).getInnermostDelegate();
-      final DB db = sqliteConnection.db();
+      final DB db = sqliteConnection.getDatabase();
       db.enable_load_extension(true);
       try {
         db._exec("select load_extension('libgpkg')");
