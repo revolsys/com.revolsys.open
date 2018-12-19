@@ -9,6 +9,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.logging.Logs;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -172,13 +173,14 @@ public class MultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final ViewRenderer view, final ElevationModelLayer layer) {
+  public void render(final ViewRenderer view, final ElevationModelLayer layer,
+    final BufferedGeoreferencedImage image) {
     final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
     for (final AbstractGriddedElevationModelLayerRenderer renderer : view.cancellable(renderers)) {
       try {
         final long scaleForVisible = (long)view.getScaleForVisible();
         if (renderer.isVisible(scaleForVisible)) {
-          renderer.render(view, layer);
+          renderer.render(view, layer, image);
         }
       } catch (final Exception e) {
         Logs.error(this, "Unable to render:" + renderer, e);

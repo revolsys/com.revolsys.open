@@ -15,6 +15,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
@@ -121,7 +122,8 @@ public class BoundingBoxGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public void render(final ViewRenderer view, final ElevationModelLayer layer) {
+  public void render(final ViewRenderer view, final ElevationModelLayer layer,
+    final BufferedGeoreferencedImage image) {
     if (!view.isCancelled()) {
       final Polygon boundary = getLayer().getBoundingBox().toPolygon(10);
       view.drawGeometry(boundary, this.style);

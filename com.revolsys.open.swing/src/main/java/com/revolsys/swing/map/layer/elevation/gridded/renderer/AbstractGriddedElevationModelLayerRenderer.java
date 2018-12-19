@@ -6,10 +6,12 @@ import javax.swing.Icon;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 
@@ -61,6 +63,15 @@ public abstract class AbstractGriddedElevationModelLayerRenderer
     final Icon icon = newIcon();
     setIcon(icon);
   }
+
+  @Override
+  public final void render(final ViewRenderer view, final ElevationModelLayer layer) {
+    final BufferedGeoreferencedImage image = layer.newRenderImage();
+    render(view, layer, image);
+  }
+
+  public abstract void render(final ViewRenderer view, final ElevationModelLayer layer,
+    final BufferedGeoreferencedImage image);
 
   public void setElevationModel(final GriddedElevationModel elevationModel) {
     this.elevationModel = elevationModel;

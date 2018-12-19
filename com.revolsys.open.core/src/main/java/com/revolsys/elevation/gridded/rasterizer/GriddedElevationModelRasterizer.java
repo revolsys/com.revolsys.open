@@ -1,12 +1,15 @@
 package com.revolsys.elevation.gridded.rasterizer;
 
+import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.util.IconNameProxy;
 
 public interface GriddedElevationModelRasterizer extends BoundingBoxProxy, Cloneable, IconNameProxy,
@@ -36,14 +39,22 @@ public interface GriddedElevationModelRasterizer extends BoundingBoxProxy, Clone
 
   int getWidth();
 
+  default void rasterize(final BufferedGeoreferencedImage image) {
+    final BufferedImage bufferedImage = image.getBufferedImage();
+    final Raster data = bufferedImage.getRaster();
+    final DataBuffer dataBuffer = data.getDataBuffer();
+    rasterize(dataBuffer);
+  }
+
   default void rasterize(final DataBuffer imageBuffer) {
     final int width = getWidth();
     final int height = getHeight();
     int index = 0;
     for (int gridY = height - 1; gridY >= 0; gridY--) {
       for (int gridX = 0; gridX < width; gridX++) {
-        final int hillShade = getValue(gridX, gridY);
-        imageBuffer.setElem(index, hillShade);
+        final int value = getValue(gridX, gridY);
+
+        imageBuffer.setElem(index, value);
         index++;
       }
     }
