@@ -16,6 +16,7 @@ public class IntArrayScaleGrid extends AbstractGrid {
     final double gridCellHeight, final int[] cells) {
     super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
     this.cells = cells;
+    expandRange();
   }
 
   public IntArrayScaleGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,

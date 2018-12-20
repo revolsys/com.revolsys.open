@@ -207,6 +207,7 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
           }
         }
       }
+      elevationModel.updateValues();
       return elevationModel;
     } catch (final Exception e) {
       throw Exceptions.wrap("Error reading: " + this.resource, e);

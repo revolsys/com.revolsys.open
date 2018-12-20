@@ -27,6 +27,7 @@ public class DoubleArrayGrid extends AbstractGrid {
     final double gridCellHeight, final double[] values) {
     super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
     this.cells = values;
+    expandRange();
   }
 
   public DoubleArrayGrid(final GeometryFactory geometryFactory, final BoundingBox boundingBox,
@@ -54,6 +55,7 @@ public class DoubleArrayGrid extends AbstractGrid {
     final double gridCellHeight, final double[] values) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellWidth, gridCellHeight);
     this.cells = values;
+    expandRange();
   }
 
   public DoubleArrayGrid(final GeometryFactory geometryFactory, final double x, final double y,

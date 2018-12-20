@@ -25,8 +25,6 @@ public class ColorGriddedElevationModelRasterizer extends AbstractGriddedElevati
 
   private int rangeRed;
 
-  private double rangeZ;
-
   private Color maxColour = WebColors.White;
 
   private double multipleZ;
