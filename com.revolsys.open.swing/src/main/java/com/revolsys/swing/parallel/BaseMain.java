@@ -3,7 +3,6 @@ package com.revolsys.swing.parallel;
 import java.awt.Image;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -14,14 +13,13 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import org.apache.commons.beanutils.MethodUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.revolsys.logging.Logs;
-import com.revolsys.swing.listener.MacApplicationListenerHandler;
+import com.revolsys.swing.desktop.DesktopInitializer;
 import com.revolsys.swing.logging.ListLog4jAppender;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.util.Property;
@@ -113,33 +111,10 @@ public class BaseMain implements UncaughtExceptionHandler {
   }
 
   protected void setMacDockIcon(final Image image) {
-    final String version = System.getProperty("java.version");
-    if (version.startsWith("1.8")) {
-      try {
-        final Class<?> clazz = Class.forName("com.apple.eawt.Application");
-        final Method appMethod = clazz.getMethod("getApplication");
-        final Object application = appMethod.invoke(clazz);
-        if (image != null) {
-          MethodUtils.invokeMethod(application, "setDockIconImage", image);
-        }
-        final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
-        final Object closeAllWindows = quitStrategyClass.getField("CLOSE_ALL_WINDOWS")
-          .get(quitStrategyClass);
-        MethodUtils.invokeExactMethod(application, "setQuitStrategy", closeAllWindows);
-        MacApplicationListenerHandler.init(application, this.initialFiles);
-      } catch (final ClassNotFoundException t) {
-      } catch (final Throwable t) {
-        t.printStackTrace();
-      }
-    } else {
-      try {
-        final Class<?> clazz = Class.forName("com.revolsys.swing.desktop.DesktopInitializer");
-        final Method initializeMethod = clazz.getMethod("initialize", Image.class);
-        initializeMethod.invoke(clazz, image);
-      } catch (final ClassNotFoundException t) {
-      } catch (final Throwable t) {
-        t.printStackTrace();
-      }
+    try {
+      DesktopInitializer.initialize(image, this.initialFiles);
+    } catch (final Throwable t) {
+      t.printStackTrace();
     }
   }
 

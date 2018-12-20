@@ -537,8 +537,16 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
           unitsPerPixel = width / viewWidthPixels;
           if (!this.unitsPerPixelList.isEmpty() && viewHeightPixels > 0) {
             if (this.zoomByUnitsPerPixel) {
-              // TODO have to adjust bounding box
               unitsPerPixel = getClosestUnitsPerPixel(unitsPerPixel);
+              final double centreX = Math.floor(newBoundingBox.getCentreX() / unitsPerPixel)
+                * unitsPerPixel;
+              final double centreY = Math.floor(newBoundingBox.getCentreY() / unitsPerPixel)
+                * unitsPerPixel;
+              final double minX = centreX - Math.floor(viewWidthPixels / 2) * unitsPerPixel;
+              final double minY = centreY - Math.floor(viewHeightPixels / 2) * unitsPerPixel;
+              final double maxX = minX + viewWidthPixels * unitsPerPixel;
+              final double maxY = minY + viewHeightPixels * unitsPerPixel;
+              newBoundingBox = geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
             } else if (unitsPerPixel < this.minUnitsPerPixel) {
               unitsPerPixel = this.minUnitsPerPixel;
             } else if (unitsPerPixel > this.maxUnitsPerPixel) {

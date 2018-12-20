@@ -5,12 +5,14 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.logging.Logs;
@@ -40,21 +42,23 @@ public class PdfImage extends JaiGeoreferencedImage {
     try {
       final File file = Resource.getOrDownloadFile(imageResource);
       // TODO password support
-      final PDDocument document = PDDocument.loadNonSeq(file, null, null);
+      final PDDocument document = PDDocument.load(file);
 
-      @SuppressWarnings("unchecked")
-      final List<PDPage> pages = document.getDocumentCatalog().getAllPages();
-      if (pages.isEmpty()) {
+      final PDPageTree pages = document.getDocumentCatalog().getPages();
+      final int pageCount = pages.getCount();
+      if (pageCount == 0) {
         throw new RuntimeException("PDF file " + imageResource + " doesn't contain any pages");
       } else {
-        if (pages.size() > 1) {
+        if (pageCount > 1) {
           Logs.warn(this, "PDF file " + imageResource + " doesn't contais more than 1 page");
         }
         final PDPage page = pages.get(0);
-        final COSDictionary pageDictionary = page.getCOSDictionary();
+        final COSDictionary pageDictionary = page.getCOSObject();
         final Rectangle2D mediaBox = PdfUtil.findRectangle(pageDictionary, COSName.MEDIA_BOX);
         final int resolution = 72;
-        BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_ARGB, resolution);
+        final PDFRenderer pdfRenderer = new PDFRenderer(document);
+
+        BufferedImage image = pdfRenderer.renderImageWithDPI(0, resolution, ImageType.ARGB);
         final COSDictionary viewport = PdfUtil.getPageViewport(pageDictionary);
         if (viewport != null) {
           final Rectangle2D bbox = PdfUtil.findRectangle(viewport, COSName.BBOX);
