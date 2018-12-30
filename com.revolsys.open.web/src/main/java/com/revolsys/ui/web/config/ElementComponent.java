@@ -21,12 +21,13 @@ import java.io.Writer;
 import javax.servlet.ServletException;
 import javax.servlet.jsp.PageContext;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.ui.html.view.Element;
 
 public class ElementComponent extends Component {
-  private static final Logger log = Logger.getLogger(ElementComponent.class);
+  private static final Logger log = LoggerFactory.getLogger(ElementComponent.class);
 
   private String attribute;
 

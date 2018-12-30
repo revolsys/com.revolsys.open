@@ -18,7 +18,6 @@ import org.springframework.context.support.GenericApplicationContext;
 import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.Logs;
-import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.AbstractRunnable;
 import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.spring.factory.Parameter;
@@ -91,7 +90,6 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
           parentFile.mkdirs();
         }
         logPath = logFile.getAbsolutePath();
-        ThreadLocalFileAppender.getAppender().setLocalFile(logPath);
       }
       if (this.logScriptInfo) {
         final StringBuilder message = new StringBuilder("Processing ");

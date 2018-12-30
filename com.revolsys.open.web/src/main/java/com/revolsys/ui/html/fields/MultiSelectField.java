@@ -24,7 +24,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
@@ -33,7 +34,7 @@ import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 
 public class MultiSelectField extends Field {
-  private static final Logger log = Logger.getLogger(MultiSelectField.class);
+  private static final Logger log = LoggerFactory.getLogger(MultiSelectField.class);
 
   private boolean hasInvalidOptions = false;
 

@@ -24,7 +24,7 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl2.JexlContext;
 import org.springframework.web.util.UrlPathHelper;
 
 public class JexlHttpServletRequestContext implements JexlContext {
@@ -41,6 +41,10 @@ public class JexlHttpServletRequestContext implements JexlContext {
   }
 
   @Override
+  public Object get(final String name) {
+    return getVars().get(name);
+  }
+
   public Map getVars() {
     return new AbstractMap() {
       @Override
@@ -91,7 +95,11 @@ public class JexlHttpServletRequestContext implements JexlContext {
   }
 
   @Override
-  public void setVars(final Map arg0) {
+  public boolean has(final String name) {
+    return getVars().containsKey(name);
   }
 
+  @Override
+  public void set(final String name, final Object value) {
+  }
 }

@@ -19,13 +19,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.log4j.Logger;
+import org.apache.commons.jexl2.Expression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.ui.web.exception.PageNotFoundException;
 
 public class PageRefMenuItem extends MenuItem {
-  private static final Logger log = Logger.getLogger(PageRefMenuItem.class);
+  private static final Logger log = LoggerFactory.getLogger(PageRefMenuItem.class);
 
   private final String pageRef;
 

@@ -42,7 +42,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.revolsys.ui.web.annotation.RequestMapping;
 import com.revolsys.util.Property;
@@ -298,8 +298,7 @@ public class AnnotationHandlerMethodResolver {
         throw new HttpRequestMethodNotSupportedException(request.getMethod(),
           StringUtils.toStringArray(allowedMethods));
       } else {
-        throw new NoSuchRequestHandlingMethodException(lookupPath, request.getMethod(),
-          request.getParameterMap());
+        throw new NoHandlerFoundException(request.getMethod(), lookupPath, null);
       }
     }
   }

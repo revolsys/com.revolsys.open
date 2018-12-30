@@ -1,27 +1,23 @@
 package com.revolsys.swing.logging;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.core.LogEvent;
 
-public class ListLog4jAppender extends AppenderSkeleton {
+public class ListLog4jAppender extends BaseAppender {
   private final Log4jTableModel tableModel;
 
   public ListLog4jAppender(final Log4jTableModel tableModel) {
+    setName("table");
     this.tableModel = tableModel;
   }
 
   @Override
-  protected void append(final LoggingEvent event) {
+  public void append(final LogEvent event) {
     this.tableModel.addLoggingEvent(event);
   }
 
   @Override
-  public void close() {
+  public void stop() {
+    super.stop();
     this.tableModel.clear();
-  }
-
-  @Override
-  public boolean requiresLayout() {
-    return false;
   }
 }

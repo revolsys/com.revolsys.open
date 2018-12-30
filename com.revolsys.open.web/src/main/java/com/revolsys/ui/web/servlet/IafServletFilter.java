@@ -29,7 +29,8 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -43,7 +44,7 @@ import com.revolsys.ui.web.config.XmlConfigLoader;
  * @version 1.0
  */
 public class IafServletFilter implements Filter {
-  private static final Logger log = Logger.getLogger(IafServletFilter.class);
+  private static final Logger log = LoggerFactory.getLogger(IafServletFilter.class);
 
   private Config rsWebUiConfig;
 
@@ -86,7 +87,7 @@ public class IafServletFilter implements Filter {
       this.rsWebUiConfig = configLoader.loadConfig();
       servletContext.setAttribute("rsWebUiConfig", this.rsWebUiConfig);
     } catch (final InvalidConfigException e) {
-      log.error(e.getErrors(), e);
+      log.error(e.getErrors().toString(), e);
       throw new UnavailableException(
         "Cannot load a rsWebUiConfig resource from '" + config + "' due to " + e.getErrors());
     } catch (final Exception e) {

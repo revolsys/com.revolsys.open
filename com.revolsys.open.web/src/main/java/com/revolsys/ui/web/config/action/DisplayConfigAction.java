@@ -11,7 +11,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.ui.html.layout.DefinitionListLayout;
 import com.revolsys.ui.html.layout.UnorderedListLayout;
@@ -28,7 +29,7 @@ import com.revolsys.util.HtmlElem;
 
 public class DisplayConfigAction implements Action {
 
-  private static final Logger log = Logger.getLogger(DisplayConfigAction.class);
+  private static final Logger log = LoggerFactory.getLogger(DisplayConfigAction.class);
 
   private void addMenu(final ElementContainer menusView, final String name, final Menu menu) {
     // TODO Auto-generated method stub

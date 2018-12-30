@@ -19,10 +19,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Attribute {
-  private static final Logger log = Logger.getLogger(Attribute.class);
+  private static final Logger log = LoggerFactory.getLogger(Attribute.class);
 
   private final Config config;
 

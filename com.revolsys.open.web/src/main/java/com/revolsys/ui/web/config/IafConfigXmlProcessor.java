@@ -28,7 +28,8 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.io.format.xml.XmlProcessor;
@@ -38,7 +39,7 @@ import com.revolsys.ui.html.view.Style;
 import com.revolsys.ui.web.exception.PageNotFoundException;
 
 public class IafConfigXmlProcessor extends XmlProcessor {
-  private static final Logger log = Logger.getLogger(IafConfigXmlProcessor.class);
+  private static final Logger log = LoggerFactory.getLogger(IafConfigXmlProcessor.class);
 
   private static final Map standardTypes = new HashMap();
 
@@ -146,7 +147,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
         try {
           type = Class.forName(typePath);
         } catch (final ClassNotFoundException e) {
-          log.error(e);
+          log.error(e.getMessage(), e);
           throw new RuntimeException("Type " + typePath + "could not be found", e);
         }
       }
@@ -170,7 +171,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
         try {
           type = Class.forName(typePath);
         } catch (final ClassNotFoundException e) {
-          log.error(e);
+          log.error(e.getMessage(), e);
           throw new RuntimeException("Type " + typePath + "could not be found", e);
         }
       }

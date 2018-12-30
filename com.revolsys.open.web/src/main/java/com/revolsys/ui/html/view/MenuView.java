@@ -20,7 +20,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.web.config.Menu;
@@ -31,7 +32,7 @@ import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class MenuView extends ObjectView {
-  private static final Logger log = Logger.getLogger(MenuView.class);
+  private static final Logger log = LoggerFactory.getLogger(MenuView.class);
 
   private String cssClass = "menu";
 

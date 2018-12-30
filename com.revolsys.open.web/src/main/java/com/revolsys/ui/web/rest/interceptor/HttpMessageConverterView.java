@@ -68,7 +68,7 @@ public class HttpMessageConverterView extends AbstractView {
       .contains(this.mediaType)) {
       render(response);
     } else {
-      final Charset charSet = this.mediaType.getCharSet();
+      final Charset charSet = this.mediaType.getCharset();
       if (charSet == null) {
         response.setContentType(this.mediaType.toString() + "; charset=UTF-8");
       } else {

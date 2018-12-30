@@ -21,14 +21,15 @@ import javax.servlet.ServletContext;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.record.io.format.xml.SimpleXmlProcessorContext;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.io.format.xml.XmlProcessorContext;
 
 public class XmlConfigLoader {
-  private static final Logger log = Logger.getLogger(XmlConfigLoader.class);
+  private static final Logger log = LoggerFactory.getLogger(XmlConfigLoader.class);
 
   private final URL configFileUrl;
 

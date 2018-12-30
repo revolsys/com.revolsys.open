@@ -39,7 +39,7 @@ public class GeometryReaderHttpMessageConverter
     try {
       final HttpHeaders headers = inputMessage.getHeaders();
       final MediaType mediaType = headers.getContentType();
-      Charset charset = mediaType.getCharSet();
+      Charset charset = mediaType.getCharset();
       if (charset == null) {
         charset = StandardCharsets.UTF_8;
       }

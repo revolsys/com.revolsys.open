@@ -7,8 +7,8 @@ import java.util.Objects;
 import javax.measure.Quantity;
 import javax.measure.Unit;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
 
 import com.revolsys.util.JexlUtil;
 

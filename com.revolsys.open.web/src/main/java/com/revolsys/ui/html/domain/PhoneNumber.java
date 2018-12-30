@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.context.HashMapContext;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.MapContext;
 
 import com.revolsys.util.JexlUtil;
 
@@ -143,8 +143,7 @@ public final class PhoneNumber {
           throw new IllegalArgumentException(
             regex + " is not a valid regular expression: " + e.getMessage());
         }
-        final HashMapContext context = new HashMapContext();
-        context.setVars(values);
+        final MapContext context = new MapContext(values);
         try {
           return (String)expression.evaluate(context);
         } catch (final Exception e) {

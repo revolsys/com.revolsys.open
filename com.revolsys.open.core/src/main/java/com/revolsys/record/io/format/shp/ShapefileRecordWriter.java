@@ -23,7 +23,8 @@ package com.revolsys.record.io.format.shp;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -43,7 +44,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
 public class ShapefileRecordWriter extends XbaseRecordWriter {
-  private static final Logger LOG = Logger.getLogger(ShapefileRecordWriter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ShapefileRecordWriter.class);
 
   private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
 

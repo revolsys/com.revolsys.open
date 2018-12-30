@@ -31,7 +31,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
@@ -57,7 +58,7 @@ import com.revolsys.util.Property;
 public class SaifWriter extends AbstractRecordWriter {
   private static final String GLOBAL_METADATA = "/GlobalMetadata";
 
-  private static final Logger log = Logger.getLogger(SaifWriter.class);
+  private static final Logger log = LoggerFactory.getLogger(SaifWriter.class);
 
   private RecordDefinition annotatedSpatialDataSetType;
 

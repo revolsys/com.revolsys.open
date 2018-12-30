@@ -8,7 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.ui.web.config.Action;
 
@@ -30,7 +30,7 @@ public class PathForwardAction implements Action {
   public void process(final HttpServletRequest request, final HttpServletResponse response)
     throws IOException, ServletException {
     final RequestDispatcher requestDispatcher = request.getRequestDispatcher(this.path);
-    Logger.getLogger(PathForwardAction.class).debug(this.path + '=' + requestDispatcher);
+    LoggerFactory.getLogger(PathForwardAction.class).debug(this.path + '=' + requestDispatcher);
     if (requestDispatcher != null) {
       requestDispatcher.forward(request, response);
     }

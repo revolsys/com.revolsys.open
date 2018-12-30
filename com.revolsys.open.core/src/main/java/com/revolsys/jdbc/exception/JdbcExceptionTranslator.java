@@ -7,8 +7,8 @@ import java.util.function.BiFunction;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLErrorCodesFactory;
@@ -20,7 +20,8 @@ public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator 
   private static final Map<String, BiFunction<String, SQLException, DataAccessException>> ERROR_CODE_TO_FUNCTION = new HashMap<>();
 
   static {
-    Logger.getLogger(SQLErrorCodesFactory.class).setLevel(Level.ERROR);
+    ((org.apache.logging.log4j.core.Logger)LogManager.getLogger(SQLErrorCodesFactory.class))
+      .setLevel(Level.ERROR);
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28000",
       UsernameOrPasswordInvalidException::new);
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28P01",

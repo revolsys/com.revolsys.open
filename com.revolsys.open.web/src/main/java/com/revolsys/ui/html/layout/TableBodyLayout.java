@@ -18,7 +18,8 @@ package com.revolsys.ui.html.layout;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.Element;
@@ -27,7 +28,7 @@ import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
 
 public class TableBodyLayout implements ElementContainerLayout {
-  private static final Logger log = Logger.getLogger(TableLayout.class);
+  private static final Logger log = LoggerFactory.getLogger(TableLayout.class);
 
   private final String cssClass;
 

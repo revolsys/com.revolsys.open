@@ -30,7 +30,8 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.spring.resource.PathResource;
@@ -62,7 +63,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> imple
   private boolean hasNext = true;
 
   /** The logging instance. */
-  private final Logger log = Logger.getLogger(getClass());
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   /** The files to be read by this reader. */
   private Iterator<Entry<File, Reader<T>>> readerIterator;

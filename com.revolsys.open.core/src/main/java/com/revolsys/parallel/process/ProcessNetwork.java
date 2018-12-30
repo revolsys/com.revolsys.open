@@ -14,7 +14,6 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.Logs;
-import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.spring.TargetBeanProcess;
@@ -251,7 +250,7 @@ public class ProcessNetwork {
             runProcess = process;
           }
           final String name = runProcess.toString();
-          final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(() -> {
+          final Runnable runnable = () -> {
             try {
               runProcess.run();
             } catch (final Throwable e) {
@@ -263,8 +262,8 @@ public class ProcessNetwork {
                 runProcess.close();
               }
             }
-          });
-          thread = new Thread(this.threadGroup, appenderRunnable, name);
+          };
+          thread = new Thread(this.threadGroup, runnable, name);
           this.processes.put(runProcess, thread);
           if (!thread.isAlive()) {
             thread.start();

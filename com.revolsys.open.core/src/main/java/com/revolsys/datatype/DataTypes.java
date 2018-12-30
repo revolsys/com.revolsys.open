@@ -20,7 +20,8 @@ import java.util.UUID;
 import javax.measure.Quantity;
 import javax.xml.namespace.QName;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
@@ -129,7 +130,7 @@ public final class DataTypes {
   public static final GeometryDataType<LinearRing, LinearRingEditor> LINEAR_RING = new GeometryDataType<>(
     LinearRing.class, LinearRing::newLinearRing, LinearRingEditor::new);
 
-  private static final Logger LOG = Logger.getLogger(DataTypes.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataTypes.class);
 
   public static final DataType LONG = new Longs();
 

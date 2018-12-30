@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.builder;
 
-import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl2.JexlContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;

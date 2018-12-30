@@ -25,12 +25,13 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.ui.web.exception.PageNotFoundException;
 
 public class Config implements Serializable {
-  private static final Logger log = Logger.getLogger(Config.class);
+  private static final Logger log = LoggerFactory.getLogger(Config.class);
 
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = 4510031487114008232L;

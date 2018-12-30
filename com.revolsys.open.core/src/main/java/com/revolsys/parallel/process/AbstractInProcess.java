@@ -1,6 +1,7 @@
 package com.revolsys.parallel.process;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
@@ -58,7 +59,7 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements In
 
   @Override
   public final void run() {
-    final Logger log = Logger.getLogger(getClass());
+    final Logger log = LoggerFactory.getLogger(getClass());
     try {
       log.debug("Start");
       init();

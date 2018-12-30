@@ -26,12 +26,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.io.FileUtil;
 
 public class ObjectSetOutputStream extends OutputStream {
-  private static final Logger log = Logger.getLogger(ObjectSetOutputStream.class);
+  private static final Logger log = LoggerFactory.getLogger(ObjectSetOutputStream.class);
 
   private File file;
 

@@ -24,7 +24,7 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl2.JexlContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UrlPathHelper;
@@ -43,6 +43,11 @@ public class HttpServletRequestJexlContext implements JexlContext {
 
   public void clearAttributes() {
     this.localAttributes.remove();
+  }
+
+  @Override
+  public Object get(final String name) {
+    return getVars().get(name);
   }
 
   public Object getAttribute(final String key) {
@@ -66,7 +71,6 @@ public class HttpServletRequestJexlContext implements JexlContext {
     return request;
   }
 
-  @Override
   public Map getVars() {
     return new AbstractMap<String, Object>() {
       @Override
@@ -100,6 +104,16 @@ public class HttpServletRequestJexlContext implements JexlContext {
     };
   }
 
+  @Override
+  public boolean has(final String name) {
+    return getVars().containsKey(name);
+  }
+
+  @Override
+  public void set(final String name, final Object value) {
+    getAttributes().put(name, value);
+  }
+
   public void setAttribute(final String key, final Object value) {
     final Map<String, Object> attributes = getAttributes();
     attributes.put(key, value);
@@ -109,7 +123,4 @@ public class HttpServletRequestJexlContext implements JexlContext {
     getAttributes().putAll(parameters);
   }
 
-  @Override
-  public void setVars(final Map arg0) {
-  }
 }

@@ -72,8 +72,6 @@ import org.springframework.web.servlet.HandlerAdapter;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.mvc.annotation.ModelAndViewResolver;
-import org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver;
-import org.springframework.web.servlet.mvc.multiaction.MethodNameResolver;
 import org.springframework.web.servlet.support.WebContentGenerator;
 import org.springframework.web.util.UrlPathHelper;
 
@@ -135,7 +133,7 @@ public class WebAnnotationMethodHandlerAdapter extends WebContentGenerator
     new FormHttpMessageConverter()
   };
 
-  protected MethodNameResolver methodNameResolver = new InternalPathMethodNameResolver();
+  protected InternalPathMethodNameResolver methodNameResolver = new InternalPathMethodNameResolver();
 
   private final Map<Class<?>, AnnotationHandlerMethodResolver> methodResolverCache = new ConcurrentHashMap<>();
 
@@ -478,7 +476,7 @@ public class WebAnnotationMethodHandlerAdapter extends WebContentGenerator
    * Will only kick in when the handler method cannot be resolved uniquely
    * through the annotation metadata already.
    */
-  public void setMethodNameResolver(final MethodNameResolver methodNameResolver) {
+  public void setMethodNameResolver(final InternalPathMethodNameResolver methodNameResolver) {
     this.methodNameResolver = methodNameResolver;
   }
 

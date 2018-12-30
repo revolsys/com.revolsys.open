@@ -26,7 +26,8 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.ui.html.view.Element;
 
@@ -35,7 +36,7 @@ import com.revolsys.ui.html.view.Element;
  */
 public abstract class AbstractElementTag extends SimpleTagSupport {
   /** The log instance. */
-  private static final Logger log = Logger.getLogger(AbstractElementTag.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractElementTag.class);
 
   /** The exression to get the elements to write. */
   private final String elementExpression;

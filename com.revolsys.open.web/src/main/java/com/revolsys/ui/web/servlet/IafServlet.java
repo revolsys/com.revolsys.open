@@ -27,7 +27,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.ui.web.config.Argument;
 import com.revolsys.ui.web.config.Attribute;
@@ -46,7 +47,7 @@ import com.revolsys.ui.web.exception.RedirectException;
 
 public final class IafServlet extends HttpServlet {
   /** The logging category */
-  private static final Logger log = Logger.getLogger(IafServlet.class);
+  private static final Logger log = LoggerFactory.getLogger(IafServlet.class);
 
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = -5543695651259069014L;
@@ -122,10 +123,10 @@ public final class IafServlet extends HttpServlet {
       this.servletContext.setAttribute("rsWebUiConfig", this.applicationConfig);
     } catch (final InvalidConfigException ice) {
       ice.printStackTrace();
-      log.fatal(ice.getErrors());
+      log.error(ice.getErrors().toString());
       throw new UnavailableException(ice.getMessage() + ":" + ice.getErrors());
     } catch (final MalformedURLException mue) {
-      log.fatal(mue.getMessage(), mue);
+      log.error(mue.getMessage(), mue);
       throw new UnavailableException("Failed to initialise Servlet");
     } catch (final Throwable t) {
       t.printStackTrace();

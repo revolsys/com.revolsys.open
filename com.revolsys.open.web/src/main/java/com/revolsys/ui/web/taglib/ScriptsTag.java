@@ -23,7 +23,8 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.ui.html.view.Script;
 import com.revolsys.ui.web.config.Page;
@@ -72,7 +73,7 @@ import com.revolsys.ui.web.config.WebUiContext;
  */
 public class ScriptsTag extends TagSupport {
   /** The logging instance. */
-  private static final Logger log = Logger.getLogger(ScriptsTag.class);
+  private static final Logger log = LoggerFactory.getLogger(ScriptsTag.class);
 
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = -2928296078151434180L;

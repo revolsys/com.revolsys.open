@@ -14,8 +14,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.log4j.Logger;
+import org.apache.commons.jexl2.Expression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.ui.html.view.Script;
 import com.revolsys.ui.html.view.Style;
@@ -26,7 +27,7 @@ import com.revolsys.util.UrlUtil;
 
 public class PageController implements SiteNodeController {
 
-  private static final Logger log = Logger.getLogger(PageController.class);
+  private static final Logger log = LoggerFactory.getLogger(PageController.class);
 
   /** The list of actions to perform on this page. */
   private Collection actions = new ArrayList();
@@ -488,7 +489,6 @@ public class PageController implements SiteNodeController {
         this.styles.add(new Style(styleUrl));
       }
     }
-    log.debug(styles);
   }
 
   public void setTitle(final String title) {

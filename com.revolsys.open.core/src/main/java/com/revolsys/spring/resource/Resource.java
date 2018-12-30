@@ -133,7 +133,7 @@ public interface Resource extends org.springframework.core.io.Resource {
         final org.springframework.core.io.UrlResource springResource = (org.springframework.core.io.UrlResource)source;
         try {
           return new UrlResource(springResource.getURL());
-        } catch (final IOException e) {
+        } catch (final Exception e) {
           throw Exceptions.wrap(e);
         }
       }
@@ -161,6 +161,15 @@ public interface Resource extends org.springframework.core.io.Resource {
       }
     }
     return null;
+  }
+
+  static Resource newResource(final ZipFile zipFile, final ZipEntry zipEntry) {
+    try {
+      final InputStream inputStream = zipFile.getInputStream(zipEntry);
+      return new InputStreamResource(inputStream);
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Cannot open " + zipFile + "!" + zipEntry, e);
+    }
   }
 
   static Resource setBaseResource(final Resource baseResource) {
@@ -383,6 +392,7 @@ public interface Resource extends org.springframework.core.io.Resource {
   @Override
   URL getURL();
 
+  @Override
   default boolean isFile() {
     try {
       getFile();
@@ -574,15 +584,6 @@ public interface Resource extends org.springframework.core.io.Resource {
       }
     } else {
       return null;
-    }
-  }
-
-  static Resource newResource(final ZipFile zipFile, final ZipEntry zipEntry) {
-    try {
-      final InputStream inputStream = zipFile.getInputStream(zipEntry);
-      return new InputStreamResource(inputStream);
-    } catch (final IOException e) {
-      throw Exceptions.wrap("Cannot open " + zipFile + "!" + zipEntry, e);
     }
   }
 }

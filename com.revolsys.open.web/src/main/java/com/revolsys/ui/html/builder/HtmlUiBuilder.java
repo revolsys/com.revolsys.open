@@ -25,10 +25,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.JexlContext;
-import org.apache.commons.jexl.context.HashMapContext;
-import org.apache.log4j.Logger;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.MapContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.http.HttpStatus;
@@ -168,7 +169,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private final Map<String, List<List<Object>>> listSortOrder = new HashMap<>();
 
-  private Logger log = Logger.getLogger(getClass());
+  private Logger log = LoggerFactory.getLogger(getClass());
 
   private int maxPageSize = 100;
 
@@ -690,8 +691,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       try {
         final Expression expression = JexlUtil.newExpression(message);
         if (expression != null) {
-          final JexlContext context = new HashMapContext();
-          context.setVars(variables);
+          final JexlContext context = new MapContext(variables);
           return (String)expression.evaluate(context);
         }
       } catch (final Throwable e) {

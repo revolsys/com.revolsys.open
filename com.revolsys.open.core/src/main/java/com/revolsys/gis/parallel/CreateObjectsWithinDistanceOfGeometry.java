@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.JexlContext;
-import org.apache.commons.jexl.context.HashMapContext;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.MapContext;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineCap;
@@ -84,11 +84,10 @@ public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Reco
       for (final Record record : this.geometryObjects) {
         Geometry geometry = record.getGeometry();
         if (geometry != null) {
-          final JexlContext context = new HashMapContext();
           final Map<String, Object> vars = new HashMap<>(this.attributes);
           vars.putAll(record);
           vars.put("typePath", recordDefinition.getPath());
-          context.setVars(vars);
+          final JexlContext context = new MapContext(vars);
           final String typePath = (String)JexlUtil.evaluateExpression(context,
             this.typePathTemplateExpression);
           newRecordDefinition = new RecordDefinitionImpl(PathName.newPathName(typePath),

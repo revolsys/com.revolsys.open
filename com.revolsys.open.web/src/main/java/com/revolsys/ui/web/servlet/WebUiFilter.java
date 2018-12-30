@@ -14,12 +14,14 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.apache.xbean.spring.context.ResourceXmlApplicationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.ui.web.config.Config;
 import com.revolsys.ui.web.config.InvalidConfigException;
 import com.revolsys.ui.web.config.Page;
@@ -30,7 +32,7 @@ import com.revolsys.ui.web.config.XmlConfigLoader;
 import com.revolsys.ui.web.exception.PageNotFoundException;
 
 public class WebUiFilter implements Filter {
-  private static final Logger LOG = Logger.getLogger(WebUiFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(WebUiFilter.class);
 
   private ApplicationContext applicationContext;
 
@@ -145,11 +147,11 @@ public class WebUiFilter implements Filter {
       this.rsWebUiConfig = configLoader.loadConfig();
       servletContext.setAttribute("rsWebUiConfig", this.rsWebUiConfig);
     } catch (final InvalidConfigException e) {
-      LOG.error(e.getErrors(), e);
+      Logs.error(this, e.getErrors().toString(), e);
       throw new UnavailableException(
         "Cannot load a rsWebUiConfig resource from '" + config + "' due to " + e.getErrors());
     } catch (final Exception e) {
-      LOG.error(e.getMessage(), e);
+      Logs.error(this, e.getMessage(), e);
       throw new UnavailableException(
         "Cannot load a rsWebUiConfig resource from '" + config + "' due to " + e.getMessage());
     }

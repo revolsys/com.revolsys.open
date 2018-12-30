@@ -1,10 +1,16 @@
 package com.revolsys.logging;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -16,6 +22,15 @@ import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public class Logs {
+
+  public static void addRootAppender(final Appender appender) {
+    final org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger)LogManager
+      .getRootLogger();
+    if (!appender.isStarted()) {
+      appender.start();
+    }
+    logger.addAppender(appender);
+  }
 
   public static void debug(final Class<?> clazz, final String message) {
     final String name = clazz.getName();
@@ -207,12 +222,53 @@ public class Logs {
     return isDebugEnabled(logClass);
   }
 
+  public static FileAppender newFileAppender(final File file, final String pattern) {
+    final PatternLayout layout = newLayout(pattern);
+    return FileAppender.newBuilder() //
+      .withLayout(layout)//
+      .withName("file")
+      .withFileName(file.getAbsolutePath())
+      .build();
+  }
+
+  public static FileAppender newFileAppender(final File file, final String pattern,
+    final boolean append) {
+    final PatternLayout layout = newLayout(pattern);
+    return FileAppender.newBuilder() //
+      .withLayout(layout)//
+      .withName("file")
+      .withFileName(file.getAbsolutePath())
+      .withAppend(append)
+      .build();
+  }
+
+  public static FileAppender newFileAppender(final Path file, final String pattern) {
+    final PatternLayout layout = newLayout(pattern);
+    return FileAppender.newBuilder() //
+      .withLayout(layout)//
+      .withName("file")
+      .withFileName(file.toString())
+      .build();
+  }
+
+  public static PatternLayout newLayout(final String pattern) {
+    return PatternLayout.newBuilder() //
+      .withPattern(pattern)//
+      .build();
+  }
+
+  public static void removeRootAppender(final Appender appender) {
+    final org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger)LogManager
+      .getRootLogger();
+    logger.removeAppender(appender);
+  }
+
   public static void setLevel(final String name, final String level) {
-    org.apache.log4j.Logger logger;
+    org.apache.logging.log4j.core.Logger logger;
     if (name == null) {
-      logger = org.apache.log4j.Logger.getRootLogger();
+      logger = (org.apache.logging.log4j.core.Logger)LogManager.getRootLogger();
     } else {
-      logger = org.apache.log4j.Logger.getLogger(name);
+      logger = (org.apache.logging.log4j.core.Logger)LogManager.getLogger(name);
     }
     final Level level2 = Level.toLevel(level.toUpperCase());
     logger.setLevel(level2);

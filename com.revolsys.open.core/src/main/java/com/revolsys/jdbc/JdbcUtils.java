@@ -19,7 +19,8 @@ import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
@@ -44,7 +45,7 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Property;
 
 public final class JdbcUtils {
-  private static final Logger LOG = Logger.getLogger(JdbcUtils.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcUtils.class);
 
   public static void addColumnNames(final StringBuilder sql,
     final RecordDefinition recordDefinition, final String tablePrefix) {

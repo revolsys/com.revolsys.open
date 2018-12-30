@@ -25,14 +25,17 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.revolsys.logging.Logs;
 
 /**
 
  */
 public abstract class AbstractMapElementTag extends SimpleTagSupport {
   /** The log instance. */
-  private static final Logger log = Logger.getLogger(AbstractMapElementTag.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractMapElementTag.class);
 
   /** The key to the element in the map. */
   private String key;
@@ -71,7 +74,7 @@ public abstract class AbstractMapElementTag extends SimpleTagSupport {
           serializeObject(out, object);
         }
       } else {
-        log.debug(t);
+        Logs.debug(this, t.toString());
       }
 
     } catch (final Throwable t) {

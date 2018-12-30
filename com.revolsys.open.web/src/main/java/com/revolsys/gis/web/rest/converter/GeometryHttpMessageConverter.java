@@ -46,7 +46,7 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
     final HttpHeaders headers = inputMessage.getHeaders();
     final MediaType mediaType = headers.getContentType();
     try {
-      Charset charset = mediaType.getCharSet();
+      Charset charset = mediaType.getCharset();
       if (charset == null) {
         charset = StandardCharsets.UTF_8;
       }

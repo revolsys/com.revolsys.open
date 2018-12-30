@@ -32,7 +32,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.MethodInvocationException;
 import org.springframework.beans.PropertyAccessException;
 import org.springframework.beans.factory.BeanCreationException;
@@ -40,7 +41,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.process.ProcessNetwork;
 
 public class ProcessorPipelineTool {
@@ -48,7 +48,7 @@ public class ProcessorPipelineTool {
 
   private static final String EXCLUDE_PATTERN_OPTION = "x";
 
-  private static final Logger log = Logger.getLogger(ProcessorPipelineTool.class);
+  private static final Logger log = LoggerFactory.getLogger(ProcessorPipelineTool.class);
 
   private static final String LOG_DIRECTORY = "logDirectory";
 
@@ -259,14 +259,6 @@ public class ProcessorPipelineTool {
       }
     }
 
-    final ThreadLocalFileAppender localAppender = ThreadLocalFileAppender.getAppender();
-    if (localAppender != null) {
-      final File parentFile = logFile.getParentFile();
-      if (parentFile != null) {
-        parentFile.mkdirs();
-      }
-      localAppender.setLocalFile(logFile.getAbsolutePath());
-    }
     log.info("Processing file '" + sourceFile + "' to '" + targetFile + "'");
     System.out.println("Processing file '" + sourceFile + "' to '" + targetFile + "'");
 

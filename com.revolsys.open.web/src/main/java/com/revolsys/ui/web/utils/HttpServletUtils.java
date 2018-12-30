@@ -18,9 +18,9 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
-import org.springframework.web.util.WebUtils;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.io.FileUtil;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.util.Property;
 
@@ -163,13 +163,13 @@ public final class HttpServletUtils {
 
   public static String getRequestBaseFileName() {
     final String originatingRequestUri = getOriginatingRequestUri();
-    final String baseName = WebUtils.extractFilenameFromUrlPath(originatingRequestUri);
+    final String baseName = FileUtil.getBaseName(originatingRequestUri);
     return baseName;
   }
 
   public static String getRequestFileName() {
     final String originatingRequestUri = getOriginatingRequestUri();
-    final String baseName = WebUtils.extractFullFilenameFromUrlPath(originatingRequestUri);
+    final String baseName = FileUtil.getBaseName(originatingRequestUri);
     return baseName;
   }
 
@@ -267,7 +267,7 @@ public final class HttpServletUtils {
   }
 
   public static Charset setContentTypeWithCharset(final HttpHeaders headers, MediaType mediaType) {
-    Charset charset = mediaType.getCharSet();
+    Charset charset = mediaType.getCharset();
     if (charset == null) {
       charset = StandardCharsets.UTF_8;
       final Map<String, String> params = Collections.singletonMap("charset", "utf-8");

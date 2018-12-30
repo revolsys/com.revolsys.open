@@ -33,7 +33,8 @@ import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -64,7 +65,7 @@ import com.revolsys.spring.resource.Resource;
 public class SaifReader extends AbstractReader<Record>
   implements Iterator<Record>, RecordDefinitionFactory, RecordReader {
   /** The logging instance. */
-  private static final Logger log = Logger.getLogger(SaifReader.class);
+  private static final Logger log = LoggerFactory.getLogger(SaifReader.class);
 
   /** The current data object that was read. */
   private Record currentRecord;
@@ -185,11 +186,6 @@ public class SaifReader extends AbstractReader<Record>
     }
   }
 
-  @Override
-  public int getHorizontalCoordinateSystemId() {
-    return this.srid;
-  }
-
   /**
    * Get the schema definition declared in the SAIF archive.
    *
@@ -237,6 +233,11 @@ public class SaifReader extends AbstractReader<Record>
       }
     }
     return this.globalMetadata;
+  }
+
+  @Override
+  public int getHorizontalCoordinateSystemId() {
+    return this.srid;
   }
 
   /**

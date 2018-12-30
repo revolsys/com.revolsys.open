@@ -178,7 +178,7 @@ public class WebMethodHandler {
             }
             String body = null;
             if (MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)) {
-              Charset charset = contentType.getCharSet();
+              Charset charset = contentType.getCharset();
               if (charset == null) {
                 charset = StandardCharsets.UTF_8;
               }

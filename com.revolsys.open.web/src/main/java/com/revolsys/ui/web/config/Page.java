@@ -11,7 +11,8 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -30,7 +31,7 @@ import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
 
 public class Page extends Component {
-  private static final Logger LOG = Logger.getLogger(Page.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Page.class);
 
   private final List<Argument> arguments = new ArrayList<>();
 
@@ -64,7 +65,7 @@ public class Page extends Component {
 
   private String title = "";
 
-  private org.apache.commons.jexl.Expression titleExpression;
+  private org.apache.commons.jexl2.Expression titleExpression;
 
   private StringTemplate titleTemplate;
 

@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UrlPathHelper;
-import org.springframework.web.util.WebUtils;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Property;
@@ -76,7 +76,7 @@ public class MediaTypeUtil {
       addMediaType(mediaTypes, format);
     }
     final String requestUri = URL_PATH_HELPER.getRequestUri(request);
-    final String filename = WebUtils.extractFullFilenameFromUrlPath(requestUri);
+    final String filename = FileUtil.getBaseName(requestUri);
     addMediaTypeFromFilename(mediaTypes, filename);
 
     final String acceptHeader = request.getHeader(ACCEPT_HEADER);
@@ -96,7 +96,7 @@ public class MediaTypeUtil {
     for (final String source : mediaTypeOrder) {
       if (source.equals("pathExtension")) {
         final String requestUri = urlPathHelper.getRequestUri(request);
-        final String filename = WebUtils.extractFullFilenameFromUrlPath(requestUri);
+        final String filename = FileUtil.getBaseName(requestUri);
         final MediaType mediaType = getMediaTypeFromFilename(extensionToMediaTypeMap, filename);
         if (mediaType != null) {
           mediaTypes.add(mediaType);
@@ -184,7 +184,7 @@ public class MediaTypeUtil {
         }
       } else if (source.equals("pathExtension")) {
         final String requestUri = urlPathHelper.getRequestUri(request);
-        final String pathFileName = WebUtils.extractFullFilenameFromUrlPath(requestUri);
+        final String pathFileName = FileUtil.getBaseName(requestUri);
         final MediaType mediaType = getMediaTypeFromFilename(extensionToMediaTypeMap, pathFileName);
         if (mediaType != null) {
           return mediaType;
@@ -250,7 +250,7 @@ public class MediaTypeUtil {
       return false;
     }
     final String requestUri = URL_PATH_HELPER.getRequestUri(request);
-    final String filename = WebUtils.extractFullFilenameFromUrlPath(requestUri);
+    final String filename = FileUtil.getBaseName(requestUri);
     final String extension = StringUtils.getFilenameExtension(filename);
     if (Property.hasValue(extension)) {
       return false;

@@ -12,9 +12,9 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.JexlContext;
-import org.apache.commons.jexl.context.HashMapContext;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.MapContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -66,10 +66,9 @@ public class ScriptExecutorProcess extends BaseInProcess<Record> implements Bean
 
   private void executeScript(final Record record) {
     try {
-      final JexlContext context = new HashMapContext();
       final Map<String, Object> vars = new HashMap<>(this.attributes);
       vars.putAll(record);
-      context.setVars(vars);
+      final JexlContext context = new MapContext(vars);
       final Map<String, Object> scriptParams = new HashMap<>();
       scriptParams.putAll(this.attributes);
       for (final Entry<String, Expression> param : this.expressions.entrySet()) {

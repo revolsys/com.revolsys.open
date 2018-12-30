@@ -19,14 +19,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.log4j.Logger;
+import org.apache.commons.jexl2.Expression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
 
 public class MenuItem implements Cloneable, Comparable {
-  private static final Logger log = Logger.getLogger(MenuItem.class);
+  private static final Logger log = LoggerFactory.getLogger(MenuItem.class);
 
   private String anchor;
 

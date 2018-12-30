@@ -24,7 +24,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
@@ -72,7 +73,7 @@ public class DateSelectField extends Field {
 
   private final int endYear;
 
-  private final Logger log = Logger.getLogger(DateSelectField.class);
+  private final Logger log = LoggerFactory.getLogger(DateSelectField.class);
 
   private String monthStringValue;
 

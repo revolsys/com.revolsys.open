@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.JexlContext;
-import org.apache.log4j.Logger;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -19,7 +20,7 @@ import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
 
 public class Menu extends BaseObjectWithProperties implements Cloneable, BeanNameAware {
-  private static final Logger LOG = Logger.getLogger(Menu.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Menu.class);
 
   private String anchor;
 

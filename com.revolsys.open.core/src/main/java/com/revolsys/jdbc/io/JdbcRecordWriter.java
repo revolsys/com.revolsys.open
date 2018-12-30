@@ -13,7 +13,8 @@ import java.util.Map.Entry;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 
 import com.revolsys.collection.map.Maps;
@@ -23,6 +24,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.property.GlobalIdProperty;
@@ -33,7 +35,7 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.util.count.CategoryLabelCountMap;
 
 public class JdbcRecordWriter extends AbstractRecordWriter {
-  private static final Logger LOG = Logger.getLogger(JdbcRecordWriter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcRecordWriter.class);
 
   private int batchSize = 1;
 
@@ -631,7 +633,7 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
       final String sql = sqlMap.get(recordDefinition);
       throw this.connection.getException("Process Batch", sql, e);
     } catch (final RuntimeException e) {
-      LOG.error(sqlMap, e);
+      Logs.error(this, sqlMap.toString(), e);
       throw e;
     } finally {
       batchCountMap.put(recordDefinition, 0);

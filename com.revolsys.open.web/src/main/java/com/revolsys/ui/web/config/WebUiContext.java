@@ -21,15 +21,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.ExpressionFactory;
-import org.apache.commons.jexl.JexlContext;
-import org.apache.log4j.Logger;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.JexlEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WebUiContext {
   private static final ThreadLocal<WebUiContext> local = new ThreadLocal<>();
 
-  private static final Logger log = Logger.getLogger(WebUiContext.class);
+  private static final Logger log = LoggerFactory.getLogger(WebUiContext.class);
 
   private static ServletContext servletContext;
 
@@ -92,7 +93,7 @@ public class WebUiContext {
 
   public Object evaluateExpression(final String expression) {
     try {
-      return evaluateExpression(ExpressionFactory.createExpression(expression));
+      return evaluateExpression(new JexlEngine().createExpression(expression));
     } catch (final Exception e) {
       log.error("Unable to create expression " + expression + ": " + e.getMessage(), e);
       return null;

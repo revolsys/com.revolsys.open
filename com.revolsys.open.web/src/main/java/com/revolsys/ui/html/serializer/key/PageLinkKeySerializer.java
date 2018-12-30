@@ -3,7 +3,7 @@ package com.revolsys.ui.html.serializer.key;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
@@ -70,7 +70,7 @@ public class PageLinkKeySerializer extends AbstractKeySerializer
       }
       uiBuilder.serializeLink(out, currentObject, key, this.pageName, this.parameterKeys);
     } catch (final Throwable e) {
-      Logger.getLogger(getClass()).error("Unable to serialize " + this.pageName, e);
+      LoggerFactory.getLogger(getClass()).error("Unable to serialize " + this.pageName, e);
     }
   }
 

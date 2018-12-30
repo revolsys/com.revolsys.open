@@ -1,34 +1,28 @@
 package com.revolsys.swing.logging;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LogEvent;
 
 import com.revolsys.swing.SwingUtil;
 
-public class SwingAlertAppender extends AppenderSkeleton {
+public class SwingAlertAppender extends BaseAppender {
 
   private boolean hasError = false;
 
+  public SwingAlertAppender() {
+    setName("swing");
+  }
+
   @Override
-  protected void append(final LoggingEvent event) {
+  public void append(final LogEvent event) {
     if (event.getLevel().equals(Level.ERROR)) {
       this.hasError = true;
       LoggingEventPanel.showDialog(SwingUtil.getActiveWindow(), event);
     }
   }
 
-  @Override
-  public void close() {
-  }
-
   public boolean isHasError() {
     return this.hasError;
-  }
-
-  @Override
-  public boolean requiresLayout() {
-    return false;
   }
 
 }

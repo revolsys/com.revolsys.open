@@ -26,13 +26,14 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.jsp.PageContext;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.log4j.Logger;
+import org.apache.commons.jexl2.Expression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.util.JexlUtil;
 
 public class JavaComponent extends Component {
-  private static final Logger log = Logger.getLogger(JavaComponent.class);
+  private static final Logger log = LoggerFactory.getLogger(JavaComponent.class);
 
   private static final Class[] SERIALIZE_METHOD_ARGS = new Class[] {
     Writer.class

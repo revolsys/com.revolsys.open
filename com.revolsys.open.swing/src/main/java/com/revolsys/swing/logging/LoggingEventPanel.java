@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.Window;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -22,8 +23,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import org.apache.commons.io.output.StringBuilderWriter;
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.impl.ThrowableProxy;
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 
 import com.revolsys.datatype.DataTypes;
@@ -74,11 +76,15 @@ public class LoggingEventPanel extends JPanel {
     panel.add(label);
   }
 
-  public static String getStackTrace(final LoggingEvent event) {
+  public static String getStackTrace(final LogEvent event) {
+    final ThrowableProxy thrown = event.getThrownProxy();
+    return getStackTrace(thrown);
+  }
+
+  static String getStackTrace(final ThrowableProxy thrown) {
     final StringBuilder stackTrace = new StringBuilder();
-    final String[] stack = event.getThrowableStrRep();
-    if (stack != null) {
-      for (final String trace : stack) {
+    if (thrown != null) {
+      for (final StackTraceElement trace : thrown.getStackTrace()) {
         stackTrace.append(trace);
         stackTrace.append("\n");
       }
@@ -86,21 +92,27 @@ public class LoggingEventPanel extends JPanel {
     return stackTrace.toString();
   }
 
-  public static void showDialog(final Component parent, final LoggingEvent event) {
-    Invoke.later(() -> {
-      final long time = event.getTimeStamp();
-      final Timestamp timestamp = new Timestamp(time);
+  public static void showDialog(final Component parent, final List<Object> event) {
+    final Timestamp timestamp = (Timestamp)event.get(0);
+    final Level level = (Level)event.get(1);
+    final String loggerName = (String)event.get(2);
+    final String message = (String)event.get(3);
+    final String threadName = (String)event.get(4);
+    final String stackTrace = getStackTrace((ThrowableProxy)event.get(5)); // TODO
+    showDialog(parent, timestamp, level, loggerName, message, threadName, stackTrace);
+  }
 
-      final String stackTraceBuilder = getStackTrace(event);
+  public static void showDialog(final Component parent, final LogEvent event) {
+    final long time = event.getTimeMillis();
+    final Timestamp timestamp = new Timestamp(time);
 
-      final Level level = event.getLevel();
-      final String loggerName = event.getLoggerName();
-      final String threadName = event.getThreadName();
-      final Object message = event.getMessage();
-      final LoggingEventPanel panel = new LoggingEventPanel(timestamp, level, loggerName,
-        threadName, message, stackTraceBuilder);
-      panel.showDialog(parent, "Application Log Details");
-    });
+    final String stackTrace = getStackTrace(event);
+
+    final Level level = event.getLevel();
+    final String loggerName = event.getLoggerName();
+    final String threadName = event.getThreadName();
+    final Object message = event.getMessage();
+    showDialog(parent, timestamp, level, loggerName, message, threadName, stackTrace);
   }
 
   public static void showDialog(final Component parent, final String title, final String message,
@@ -121,6 +133,16 @@ public class LoggingEventPanel extends JPanel {
 
   public static void showDialog(final Component parent, final String message, final Throwable e) {
     showDialog(parent, "Error", message, e);
+  }
+
+  public static void showDialog(final Component parent, final Timestamp timestamp,
+    final Level level, final String loggerName, final Object message, final String threadName,
+    final String stackTrace) {
+    Invoke.later(() -> {
+      final LoggingEventPanel panel = new LoggingEventPanel(timestamp, level, loggerName,
+        threadName, message, stackTrace);
+      panel.showDialog(parent, "Application Log Details");
+    });
   }
 
   private final StringBuilder copyText = new StringBuilder();

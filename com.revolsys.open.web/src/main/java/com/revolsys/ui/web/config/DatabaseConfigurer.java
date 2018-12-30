@@ -26,7 +26,8 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -37,7 +38,7 @@ import com.revolsys.jdbc.JdbcUtils;
 
 public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor, Ordered {
   /** The LOG for the instance. */
-  private static final Logger LOG = Logger.getLogger(DatabaseConfigurer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DatabaseConfigurer.class);
 
   /** The data source used to load properties from. */
   private DataSource dataSource;
