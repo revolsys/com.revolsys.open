@@ -9,9 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.util.comparator.ComparableComparator;
-
 import com.revolsys.collection.map.MapKeySetEntrySet;
+import com.revolsys.comparator.Comparators;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.page.FileMappedPageManager;
 import com.revolsys.io.page.FilePageManager;
@@ -66,7 +65,7 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
   public static <K extends Comparable<K>, V> Map<K, V> newInMemory(
     final PageValueManager<K> keyManager, final PageValueManager<V> valueManager) {
     final MemoryPageManager pages = new MemoryPageManager();
-    final Comparator<K> comparator = new ComparableComparator<>();
+    final Comparator<K> comparator = Comparators.newComparator();
     return new BPlusTreeMap<>(pages, comparator, keyManager, valueManager);
   }
 
@@ -77,7 +76,7 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
     final SerializablePageValueManager<V> valueSerializer = new SerializablePageValueManager<>();
     final PageValueManager<V> valueManager = BPlusTreePageValueManager
       .newPageValueManager(pageManager, valueSerializer);
-    final Comparator<Integer> comparator = new ComparableComparator<>();
+    final Comparator<Integer> comparator = Comparators.newComparator();
     return new BPlusTreeMap<>(pageManager, comparator, keyManager, valueManager);
   }
 
@@ -88,7 +87,7 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
     final SerializablePageValueManager<V> valueSerializer = new SerializablePageValueManager<>();
     final PageValueManager<V> valueManager = BPlusTreePageValueManager
       .newPageValueManager(pageManager, valueSerializer);
-    final Comparator<Integer> comparator = new ComparableComparator<>();
+    final Comparator<Integer> comparator = Comparators.newComparator();
     final BPlusTreeMap<Integer, V> map = new BPlusTreeMap<>(pageManager, comparator, keyManager,
       valueManager);
     map.putAll(values);
@@ -102,7 +101,7 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
 
   public static <K extends Comparable<K>, V> Map<K, V> newMap(final PageManager pages,
     final PageValueManager<K> keyManager, final PageValueManager<V> valueManager) {
-    final Comparator<K> comparator = new ComparableComparator<>();
+    final Comparator<K> comparator = Comparators.newComparator();
     return new BPlusTreeMap<>(pages, comparator, keyManager, valueManager);
   }
 
@@ -122,7 +121,7 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
         serializeableManager);
     }
 
-    final Comparator<K> comparator = new ComparableComparator();
+    final Comparator<K> comparator = (o1, o2) -> ((Comparable<Object>)o1).compareTo(o2);
     final BPlusTreeMap<K, V> map = new BPlusTreeMap<>(pageManager, comparator, keyManager,
       valueManager);
     map.putAll(values);
@@ -145,7 +144,7 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
         serializeableManager);
     }
 
-    final Comparator<K> comparator = new ComparableComparator<>();
+    final Comparator<K> comparator = Comparators.newComparator();
     final BPlusTreeMap<K, V> map = new BPlusTreeMap<>(pageManager, comparator, keyManager,
       valueManager);
     return map;

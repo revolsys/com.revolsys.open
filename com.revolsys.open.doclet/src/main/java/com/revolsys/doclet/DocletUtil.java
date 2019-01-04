@@ -10,8 +10,6 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlAttr;
@@ -310,7 +308,7 @@ public class DocletUtil {
 
   public static void link(final StringBuilder text, final String url, final String label,
     final boolean code) {
-    final boolean hasUrl = StringUtils.hasText(url);
+    final boolean hasUrl = Property.hasValue(url);
     if (hasUrl) {
       text.append("<a href=\"");
       text.append(url);
@@ -324,7 +322,7 @@ public class DocletUtil {
 
   public static void link(final XmlWriter writer, final String url, final String label,
     final boolean code) {
-    final boolean hasUrl = StringUtils.hasText(url);
+    final boolean hasUrl = Property.hasValue(url);
     if (hasUrl) {
       writer.startTag(HtmlElem.A);
       writer.attribute(HtmlAttr.HREF, url);
@@ -581,7 +579,7 @@ public class DocletUtil {
           final PackageDoc packagedoc = seeTag.referencedPackage();
           if (packagedoc != null && packagedoc.isIncluded()) {
             final String packageName = packagedoc.name();
-            if (!StringUtils.hasText(label)) {
+            if (!Property.hasValue(label)) {
               label = packageName;
             }
             link(text, "#" + packageName, label, code);
@@ -608,7 +606,7 @@ public class DocletUtil {
             url = "#" + className;
           } else {
             url = getExternalUrl(className);
-            if (!StringUtils.hasText(url)) {
+            if (!Property.hasValue(url)) {
               label = className;
             }
           }
@@ -618,7 +616,7 @@ public class DocletUtil {
                 final ExecutableMemberDoc executableDoc = (ExecutableMemberDoc)referencedMember;
                 referencedMemberName = referencedMemberName + executableDoc.signature();
               }
-              if (StringUtils.hasText(referencedMemberName)) {
+              if (Property.hasValue(referencedMemberName)) {
                 label = referencedMemberName;
               } else {
                 label = seeTagText;
@@ -626,13 +624,13 @@ public class DocletUtil {
             }
             if (referencedClass.isIncluded()) {
               url += "." + referencedMemberName;
-            } else if (StringUtils.hasText(url)) {
+            } else if (Property.hasValue(url)) {
               url += "#" + referencedMemberName;
             } else {
               label = referencedMember.toString();
             }
           }
-          if (!StringUtils.hasText(label)) {
+          if (!Property.hasValue(label)) {
             label = referencedClass.name();
           }
           link(text, url, label, code);
@@ -662,7 +660,7 @@ public class DocletUtil {
           final PackageDoc packagedoc = seeTag.referencedPackage();
           if (packagedoc != null && packagedoc.isIncluded()) {
             final String packageName = packagedoc.name();
-            if (!StringUtils.hasText(label)) {
+            if (!Property.hasValue(label)) {
               label = packageName;
             }
             link(writer, "#" + packageName, label, code);
@@ -689,7 +687,7 @@ public class DocletUtil {
             url = "#" + className;
           } else {
             url = getExternalUrl(className);
-            if (!StringUtils.hasText(url)) {
+            if (!Property.hasValue(url)) {
               label = className;
             }
           }
@@ -699,7 +697,7 @@ public class DocletUtil {
                 final ExecutableMemberDoc executableDoc = (ExecutableMemberDoc)referencedMember;
                 referencedMemberName = referencedMemberName + executableDoc.signature();
               }
-              if (StringUtils.hasText(referencedMemberName)) {
+              if (Property.hasValue(referencedMemberName)) {
                 label = referencedMemberName;
               } else {
                 label = seeTagText;
@@ -707,13 +705,13 @@ public class DocletUtil {
             }
             if (referencedClass.isIncluded()) {
               url += "." + referencedMemberName;
-            } else if (StringUtils.hasText(url)) {
+            } else if (Property.hasValue(url)) {
               url += "#" + referencedMemberName;
             } else {
               label = referencedMember.toString();
             }
           }
-          if (!StringUtils.hasText(label)) {
+          if (!Property.hasValue(label)) {
             label = referencedClass.name();
           }
           link(writer, url, label, code);

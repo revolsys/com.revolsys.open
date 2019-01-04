@@ -36,8 +36,6 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic.Kind;
 import javax.xml.namespace.QName;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.doclet11.option.ConsumerOption;
 import com.revolsys.doclet11.option.FunctionOption;
 import com.revolsys.io.FileUtil;
@@ -83,8 +81,8 @@ public class BaseDoclet implements Doclet {
   public BaseDoclet(final String name) {
     this.name = name;
     this.options.add(new FunctionOption("-d", "Destination directory", "file", this::setDestDir));
-    this.options
-      .add(new ConsumerOption("-doctitle", "RetainJavaDocComment Title", "title", this::setDocTitle));
+    this.options.add(
+      new ConsumerOption("-doctitle", "RetainJavaDocComment Title", "title", this::setDocTitle));
     this.options
       .add(new ConsumerOption("-customcssurl", "Add Custom CSS URL", "url", this::addCustomCssUrl));
 
@@ -496,7 +494,7 @@ public class BaseDoclet implements Doclet {
 
   public void link(final String url, final String label, final boolean code) {
     final XmlWriter writer = this.writer;
-    final boolean hasUrl = StringUtils.hasText(url);
+    final boolean hasUrl = Property.hasValue(url);
     if (hasUrl) {
       writer.startTag(HtmlElem.A);
       writer.attribute(HtmlAttr.HREF, url);
@@ -509,7 +507,7 @@ public class BaseDoclet implements Doclet {
 
   public void link(final StringBuilder text, final String url, final String label,
     final boolean code) {
-    final boolean hasUrl = StringUtils.hasText(url);
+    final boolean hasUrl = Property.hasValue(url);
     if (hasUrl) {
       text.append("<a href=\"");
       text.append(url);
