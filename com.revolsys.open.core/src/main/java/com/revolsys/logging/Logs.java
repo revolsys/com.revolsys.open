@@ -257,10 +257,26 @@ public class Logs {
       .build();
   }
 
+  public static void removeAllAppenders() {
+    final org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger)LogManager
+      .getRootLogger();
+    removeAllAppenders(logger);
+  }
+
+  public static void removeAllAppenders(final org.apache.logging.log4j.core.Logger logger) {
+    for (final Appender appender : logger.getAppenders().values()) {
+      logger.removeAppender(appender);
+    }
+  }
+
   public static void removeRootAppender(final Appender appender) {
     final org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger)LogManager
       .getRootLogger();
     logger.removeAppender(appender);
+  }
+
+  public static void setLevel(final String name, final org.slf4j.event.Level level) {
+    setLevel(name, level.toString());
   }
 
   public static void setLevel(final String name, final String level) {
