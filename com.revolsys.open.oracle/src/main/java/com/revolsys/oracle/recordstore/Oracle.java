@@ -22,7 +22,7 @@ import javax.sql.DataSource;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.jdbc.io.JdbcDatabaseFactory;
+import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.schema.FieldDefinition;
@@ -37,7 +37,7 @@ import com.revolsys.util.Strings;
  * :@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=[host])(PORT=[port
  * ]))(CONNECT_DATA=(SERVICE_NAME=[service])))
  */
-public class Oracle implements JdbcDatabaseFactory {
+public class Oracle extends AbstractJdbcDatabaseFactory {
   private static final String REGEX_NAME = "[a-zA-Z0-9_\\$#\\.\\-]+";
 
   private static final String REGEX_URL_PREFIX_USER_PASSWORD = "jdbc:oracle:(?:thin|oci):" //
@@ -55,7 +55,7 @@ public class Oracle implements JdbcDatabaseFactory {
       + "(?::(\\d+))?" // Optional Port Number
       + "[/:]" // Separator
       + "(" + REGEX_NAME + "+)" // SID or ArcGisRestService Name
-  );
+    );
 
   private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //
     new FieldDefinition("host", DataTypes.STRING, 50, true) //

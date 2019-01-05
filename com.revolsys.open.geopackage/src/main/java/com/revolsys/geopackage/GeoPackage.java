@@ -19,7 +19,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
-import com.revolsys.jdbc.io.JdbcDatabaseFactory;
+import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.io.FileRecordStoreFactory;
 import com.revolsys.record.schema.FieldDefinition;
@@ -30,7 +30,7 @@ import com.revolsys.util.Property;
 /**
  * jdbc:sqlite:[file]
  */
-public class GeoPackage implements JdbcDatabaseFactory, FileRecordStoreFactory {
+public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecordStoreFactory {
   static {
     try {
       SQLiteJDBCLoader.initialize();
@@ -140,7 +140,7 @@ public class GeoPackage implements JdbcDatabaseFactory, FileRecordStoreFactory {
       }
     }
     newConfig.put("enable_load_extension", true);
-    return JdbcDatabaseFactory.super.newDataSource(newConfig);
+    return super.newDataSource(newConfig);
   }
 
   @Override

@@ -64,7 +64,7 @@ public class MultiStopLinearGradient extends BaseObjectWithProperties
     }
   }
 
-  private void addStop(final double value, final Color color) {
+  public void addStop(final double value, final Color color) {
     this.stops.add(new GradientStop(value, color));
   }
 

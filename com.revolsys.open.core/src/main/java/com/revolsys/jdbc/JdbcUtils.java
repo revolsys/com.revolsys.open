@@ -212,7 +212,7 @@ public final class JdbcUtils {
     try {
       return executeUpdate(connection, sql, parameters);
     } catch (final SQLException e) {
-      throw getException(dataSource, connection, "Update", sql, e);
+      throw getException(dataSource, "Update", sql, e);
     } finally {
       release(connection, dataSource);
     }
@@ -241,7 +241,7 @@ public final class JdbcUtils {
     try {
       return DataSourceUtils.doGetConnection(dataSource);
     } catch (final SQLException e) {
-      throw getException(dataSource, null, "Get Connection", null, e);
+      throw getException(dataSource, "Get Connection", null, e);
     }
   }
 
@@ -258,7 +258,7 @@ public final class JdbcUtils {
   }
 
   public static DataAccessException getException(final DataSource dataSource,
-    final Connection connection, final String task, final String sql, final SQLException e) {
+    final String task, final String sql, final SQLException e) {
     SQLExceptionTranslator translator;
     if (dataSource == null) {
       translator = new SQLStateSQLExceptionTranslator();
@@ -503,7 +503,7 @@ public final class JdbcUtils {
         close(statement);
       }
     } catch (final SQLException e) {
-      throw getException(dataSource, connection, "selectInt", sql, e);
+      throw getException(dataSource, "selectInt", sql, e);
     } finally {
       if (dataSource != null) {
         release(connection, dataSource);

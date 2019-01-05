@@ -28,6 +28,7 @@ import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
@@ -65,7 +66,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     initSettings();
   }
 
-  public PostgreSQLRecordStore(final PostgreSQL databaseFactory,
+  public PostgreSQLRecordStore(final AbstractJdbcDatabaseFactory databaseFactory,
     final Map<String, ? extends Object> connectionProperties) {
     super(databaseFactory, connectionProperties);
     initSettings();
