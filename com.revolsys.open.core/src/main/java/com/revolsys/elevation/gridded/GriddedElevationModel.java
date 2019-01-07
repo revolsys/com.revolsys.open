@@ -26,6 +26,7 @@ import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.grid.Grid;
+import com.revolsys.grid.IntArrayScaleGrid;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
@@ -110,6 +111,32 @@ public interface GriddedElevationModel extends Grid {
   @Override
   default GriddedElevationModel copyGrid(final BoundingBoxProxy boundingBox) {
     return (GriddedElevationModel)Grid.super.copyGrid(boundingBox);
+  }
+
+  default int[] getCellsInt() {
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+    final int[] cells = new int[gridWidth * gridHeight];
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final double offsetZ = geometryFactory.getOffsetZ();
+    double scaleZ = geometryFactory.getScaleZ();
+    if (scaleZ <= 0) {
+      scaleZ = 1000;
+    }
+    int i = 0;
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      for (int gridX = 0; gridX < gridHeight; gridX++) {
+        final double z = getValue(gridX, gridY);
+        if (Double.isFinite(z)) {
+          final int zInt = (int)Math.round((z - offsetZ) * scaleZ);
+          cells[i] = zInt;
+        } else {
+          cells[i] = IntArrayScaleGrid.NULL_VALUE;
+        }
+        i++;
+      }
+    }
+    return cells;
   }
 
   default LineStringEditor getNullBoundaryPoints() {

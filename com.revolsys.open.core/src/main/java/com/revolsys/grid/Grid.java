@@ -345,6 +345,12 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     return scaleY;
   }
 
+  default double getScaleZ() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final double scaleX = geometryFactory.getScaleX();
+    return scaleX;
+  }
+
   /**
    * <p>Get the value at the given coordinates by rounding down to the grid cell.</p>
    *

@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.elevation.gridded.renderer;
 
+import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -10,6 +11,7 @@ import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationMo
 import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.SlopeColorGradientGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.component.Form;
@@ -19,6 +21,8 @@ import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelStylePanel;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelZRange;
 import com.revolsys.swing.map.layer.elevation.gridded.TiledGriddedElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.gridded.renderer.jocl.GriddedElevationModelImageRasterizer;
+import com.revolsys.swing.map.layer.elevation.gridded.renderer.jocl.JoclGriddedElevationModelImageRasterizer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
@@ -54,6 +58,9 @@ public class RasterizerGriddedElevationModelLayerRenderer
 
     addAddMenuItem(menu, "Hillshade", RasterizerGriddedElevationModelLayerRenderer::newHillshade);
 
+    addAddMenuItem(menu, "Slope Color Gradient",
+      RasterizerGriddedElevationModelLayerRenderer::newSlopeColorGradient);
+
     addAddMenuItem(menu, "Outline", BoundingBoxGriddedElevationModelLayerRenderer::new);
 
   }
@@ -79,6 +86,15 @@ public class RasterizerGriddedElevationModelLayerRenderer
     return new RasterizerGriddedElevationModelLayerRenderer(layer, parent, rasterizer);
   }
 
+  public static RasterizerGriddedElevationModelLayerRenderer newSlopeColorGradient(
+    final ElevationModelLayer layer, final IMultipleGriddedElevationModelLayerRenderer parent) {
+    final SlopeColorGradientGriddedElevationModelRasterizer rasterizer = new SlopeColorGradientGriddedElevationModelRasterizer();
+    final RasterizerGriddedElevationModelLayerRenderer renderer = new RasterizerGriddedElevationModelLayerRenderer(
+      layer, parent, rasterizer);
+    renderer.setOpacity(0.8f);
+    return renderer;
+  }
+
   private GriddedElevationModelImage image;
 
   private transient Thread worker;
@@ -90,6 +106,8 @@ public class RasterizerGriddedElevationModelLayerRenderer
   private float opacity = 1;
 
   private boolean redrawInBackground = false;
+
+  private GriddedElevationModelImageRasterizer joclRasterizer;
 
   private RasterizerGriddedElevationModelLayerRenderer() {
     super("rasterizerGriddedElevationModelLayerRenderer", "DEM Style");
@@ -186,7 +204,15 @@ public class RasterizerGriddedElevationModelLayerRenderer
             }
           }
           final BoundingBox boundingBox = layer.getBoundingBox();
-          if (!this.redrawInBackground) {
+          if (this.joclRasterizer != null) {
+            final BoundingBox modelBoundingBox = elevationModel.getBoundingBox();
+            image.setBoundingBox(modelBoundingBox);
+            final BufferedImage bufferedImage = image.getBufferedImage();
+            if (bufferedImage != null) {
+              this.joclRasterizer.rasterize(elevationModel, bufferedImage);
+            }
+            view.drawImage(image, true, this.opacity, null);
+          } else if (!this.redrawInBackground) {
             this.rasterizer.rasterize(image);
             view.drawImage(image, true, this.opacity, null);
           } else if (this.image.hasImage() && !(this.image.isCached() && this.redraw)) {
@@ -267,6 +293,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
       } else {
         rasterizer.setElevationModel(elevationModel);
       }
+      this.joclRasterizer = JoclGriddedElevationModelImageRasterizer.newJoclRasterizer(rasterizer);
     }
 
     this.redraw = true;

@@ -2,9 +2,11 @@ package com.revolsys.elevation.gridded.rasterizer;
 
 import java.util.Map;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.gradient.LinearGradient;
+import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradient;
 import com.revolsys.grid.Grid;
 
 public class SlopeColorGradientGriddedElevationModelRasterizer
@@ -39,22 +41,22 @@ public class SlopeColorGradientGriddedElevationModelRasterizer
     return this.gradient;
   }
 
-  private int getHillShade(final double a, final double b, final double c, final double d,
-    final double f, final double g, final double h, final double i) {
-    final double oneDivCellSizeTimes8 = this.oneDivCellSizeTimes8;
-    final float dzDivDx = (float)((c + 2 * f + i - (a + 2 * d + g)) * oneDivCellSizeTimes8);
-    final float dzDivDy = (float)((g + 2 * h + i - (a + 2 * b + c)) * oneDivCellSizeTimes8);
-    final double slopeRadians = (float)Math.atan(Math.sqrt(dzDivDx * dzDivDx + dzDivDy * dzDivDy));
-    return this.gradient.getColorIntForValue(Math.toDegrees(slopeRadians));
-  }
-
   @Override
   public String getName() {
-    return "Hillshade";
+    return "Slope Color Gradient";
   }
 
   public double getOneDivCellSizeTimes8() {
     return this.oneDivCellSizeTimes8;
+  }
+
+  private int getSlopeColor(final double a, final double b, final double c, final double d,
+    final double f, final double g, final double h, final double i) {
+    final double oneDivCellSizeTimes8 = this.oneDivCellSizeTimes8;
+    final double dzDivDx = (c + 2 * f + i - (a + 2 * d + g)) * oneDivCellSizeTimes8;
+    final double dzDivDy = (g + 2 * h + i - (a + 2 * b + c)) * oneDivCellSizeTimes8;
+    final double slopeRadians = Math.atan(Math.sqrt(dzDivDx * dzDivDx + dzDivDy * dzDivDy));
+    return this.gradient.getColorIntForValue(Math.toDegrees(slopeRadians));
   }
 
   @Override
@@ -147,7 +149,7 @@ public class SlopeColorGradientGriddedElevationModelRasterizer
       if (!Double.isFinite(i)) {
         i = f - (c - f);
       }
-      return getHillShade(a, b, c, d, f, g, h, i);
+      return getSlopeColor(a, b, c, d, f, g, h, i);
     } else {
       return Grid.NULL_COLOUR;
     }
@@ -173,6 +175,15 @@ public class SlopeColorGradientGriddedElevationModelRasterizer
   @Override
   public void updateValues() {
     super.updateValues();
+    if (this.gradient == null) {
+      final MultiStopLinearGradient gradient = new MultiStopLinearGradient();
+      gradient.addStop(0, WebColors.Green);
+      gradient.addStop(25, WebColors.Yellow);
+      gradient.addStop(35, WebColors.Orange);
+      gradient.addStop(50, WebColors.Red);
+      gradient.addStop(90, WebColors.Black);
+      this.gradient = gradient;
+    }
     if (this.elevationModel != null) {
       final double gridCellWidth = this.elevationModel.getGridCellWidth();
       this.oneDivCellSizeTimes8 = 1.0 / (8 * gridCellWidth);

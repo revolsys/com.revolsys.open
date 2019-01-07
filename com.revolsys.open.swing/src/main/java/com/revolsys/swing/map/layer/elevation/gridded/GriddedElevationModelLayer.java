@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.elevation.gridded;
 
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.nio.file.Path;
@@ -285,7 +286,10 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
     final int width = this.elevationModel.getGridWidth();
     final int height = this.elevationModel.getGridHeight();
     final BoundingBox boundingBox = getBoundingBox();
-    return new BufferedGeoreferencedImage(boundingBox, width, height);
+    final BufferedGeoreferencedImage image = new BufferedGeoreferencedImage(boundingBox, width,
+      height);
+    image.setRenderedImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
+    return image;
   }
 
   @Override

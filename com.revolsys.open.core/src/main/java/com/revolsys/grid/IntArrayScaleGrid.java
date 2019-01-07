@@ -7,7 +7,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class IntArrayScaleGrid extends AbstractGrid {
-  protected static final int NULL_VALUE = Integer.MIN_VALUE;
+  public static final int NULL_VALUE = Integer.MIN_VALUE;
 
   protected final int[] cells;
 
@@ -75,7 +75,7 @@ public class IntArrayScaleGrid extends AbstractGrid {
     }
   }
 
-  public int[] getCells() {
+  public int[] getCellsInt() {
     return this.cells;
   }
 
