@@ -72,7 +72,7 @@ public class FloatArrayGrid extends AbstractGrid {
     float min = Float.MAX_VALUE;
     float max = -Float.MAX_VALUE;
     for (final float value : this.cells) {
-      if (value != NULL_VALUE) {
+      if (Double.isFinite(value)) {
         if (value < min) {
           min = value;
         }
@@ -90,31 +90,31 @@ public class FloatArrayGrid extends AbstractGrid {
   @Override
   public void forEachValueFinite(final DoubleConsumer action) {
     for (final float value : this.cells) {
-      if (value != NULL_VALUE) {
+      if (Double.isFinite(value)) {
         action.accept(value);
       }
     }
+  }
+
+  public float[] getCellsFloat() {
+    return this.cells;
   }
 
   @Override
   public double getValueFast(final int gridX, final int gridY) {
     final int index = gridY * this.gridWidth + gridX;
     final float value = this.cells[index];
-    if (value == NULL_VALUE) {
-      return Double.NaN;
-    } else {
-      return value;
-    }
+    return value;
   }
 
   @Override
   public boolean hasValueFast(final int gridX, final int gridY) {
     final int index = gridY * this.gridWidth + gridX;
     final float value = this.cells[index];
-    if (value == NULL_VALUE) {
-      return false;
-    } else {
+    if (Double.isFinite(value)) {
       return true;
+    } else {
+      return false;
     }
   }
 
@@ -159,7 +159,7 @@ public class FloatArrayGrid extends AbstractGrid {
         for (int gridY = gridYMin; gridY < gridYMax; gridY++) {
           for (int gridX = gridXMin; gridX < gridXMax; gridX++) {
             final float oldValue = oldValues[gridY * gridWidth + gridX];
-            if (oldValue != NULL_VALUE) {
+            if (Double.isFinite(oldValue)) {
               count++;
               sum += oldValue;
             }
