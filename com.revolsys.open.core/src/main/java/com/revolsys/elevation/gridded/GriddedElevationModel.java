@@ -12,6 +12,7 @@ import com.revolsys.elevation.gridded.img.ImgGriddedElevation;
 import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
+import com.revolsys.elevation.gridded.rasterizer.SlopeColorGradientGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.gradient.GradientStop;
 import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradient;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
@@ -102,7 +103,8 @@ public interface GriddedElevationModel extends Grid {
       ColorGradientGriddedElevationModelRasterizer::new);
     MapObjectFactoryRegistry.newFactory("hillShadeGriddedElevationModelRasterizer",
       HillShadeGriddedElevationModelRasterizer::new);
-
+    MapObjectFactoryRegistry.newFactory("slopeColorGradientGriddedElevationModelRasterizer",
+      SlopeColorGradientGriddedElevationModelRasterizer::new);
   }
 
   default void cancelChanges() {
