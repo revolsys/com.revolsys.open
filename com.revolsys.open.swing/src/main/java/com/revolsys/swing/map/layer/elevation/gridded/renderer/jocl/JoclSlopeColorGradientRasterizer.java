@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.List;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.gradient.GradientStop;
 import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradient;
@@ -15,7 +16,7 @@ import com.revolsys.jocl.core.OpenClUtil;
 
 public class JoclSlopeColorGradientRasterizer extends JoclGriddedElevationModelImageRasterizer {
   private static final String SOURCE = OpenClUtil.sourceFromClasspath(
-    "com/revolsys/swing/map/layer/elevation/gridded/renderer/jocl/SlopeColorGradientRasterizerInt.cl");
+    "com/revolsys/swing/map/layer/elevation/gridded/renderer/jocl/SlopeColorGradientRasterizer.cl");
 
   private final int[] r;
 
@@ -46,7 +47,7 @@ public class JoclSlopeColorGradientRasterizer extends JoclGriddedElevationModelI
   @Override
   protected void addArgs(final List<OpenClMemory> memories,
     final GriddedElevationModel elevationModel, final GeometryFactory geometryFactory,
-    final OpenClKernel kernel, DataType modelDataType) {
+    final OpenClKernel kernel, final DataType modelDataType) {
     final float offsetZ = (float)geometryFactory.getOffsetZ();
     final float scaleZ = (float)geometryFactory.getScaleZ();
 
@@ -57,14 +58,17 @@ public class JoclSlopeColorGradientRasterizer extends JoclGriddedElevationModelI
     int i = 0;
     for (final GradientStop stop : stops) {
       final double slope = stop.getValue();
-      slopes[i] = (float)slope;
+      slopes[i] = (float)Math.toRadians(slope);
       i++;
     }
-    kernel.addArgFloat(offsetZ);
-    kernel.addArgFloat(scaleZ);
+    if (modelDataType == DataTypes.INT) {
+      kernel.addArgFloat(offsetZ);
+      kernel.addArgFloat(scaleZ);
+    }
 
-    kernel.addArgInt(rangeCount);
     kernel.addArgFloat(1.0 / (8 * elevationModel.getGridCellWidth()));
+    kernel.addArgFloat(1.0 / (8 * elevationModel.getGridCellHeight()));
+    kernel.addArgInt(rangeCount);
 
     kernel.addArgMemory(memories, slopes);
     kernel.addArgMemory(memories, this.r);

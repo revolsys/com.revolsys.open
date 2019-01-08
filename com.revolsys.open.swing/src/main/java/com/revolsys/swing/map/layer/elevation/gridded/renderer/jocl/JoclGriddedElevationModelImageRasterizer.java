@@ -33,6 +33,8 @@ import com.revolsys.jocl.core.OpenClUtil;
 
 public abstract class JoclGriddedElevationModelImageRasterizer
   implements GriddedElevationModelImageRasterizer, BaseCloseable {
+  private static final String COMMON_SOURCE = OpenClUtil
+    .sourceFromClasspath("com/revolsys/swing/map/layer/elevation/gridded/renderer/jocl/Common.cl");
 
   public static GriddedElevationModelImageRasterizer newJoclRasterizer(
     final GriddedElevationModelRasterizer javaRasterizer) {
@@ -52,7 +54,7 @@ public abstract class JoclGriddedElevationModelImageRasterizer
     if (javaRasterizer instanceof HillShadeGriddedElevationModelRasterizer) {
       final HillShadeGriddedElevationModelRasterizer rasterizer = (HillShadeGriddedElevationModelRasterizer)javaRasterizer;
       return new JoclHillshadeRasterizer(device, rasterizer);
-    } else if (javaRasterizer instanceof HillShadeGriddedElevationModelRasterizer) {
+    } else if (javaRasterizer instanceof ColorGriddedElevationModelRasterizer) {
       final ColorGriddedElevationModelRasterizer rasterizer = (ColorGriddedElevationModelRasterizer)javaRasterizer;
       return new JoclGreyscaleRasterizer(device, rasterizer);
     } else if (javaRasterizer instanceof SlopeColorGradientGriddedElevationModelRasterizer) {
@@ -79,7 +81,7 @@ public abstract class JoclGriddedElevationModelImageRasterizer
     final String kernelName) {
     this.context = device.newContext();
     this.commandQueue = this.context.newCommandQueue();
-    this.program = this.context.newProgram(source);
+    this.program = this.context.newProgram(COMMON_SOURCE, source);
     this.kernelName = kernelName;
   }
 
@@ -105,7 +107,8 @@ public abstract class JoclGriddedElevationModelImageRasterizer
     }
 
     DataType modelDataType = DataTypes.DOUBLE;
-    if (!(this instanceof JoclHillshadeRasterizer)) {
+    if (!(this instanceof JoclHillshadeRasterizer
+      || this instanceof JoclSlopeColorGradientRasterizer)) {
       modelDataType = DataTypes.INT;
     } else if (elevationModel instanceof IntArrayScaleGriddedElevationModel) {
       modelDataType = DataTypes.INT;
