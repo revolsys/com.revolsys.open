@@ -127,7 +127,7 @@ public interface GriddedElevationModel extends Grid {
     }
     int i = 0;
     for (int gridY = 0; gridY < gridHeight; gridY++) {
-      for (int gridX = 0; gridX < gridHeight; gridX++) {
+      for (int gridX = 0; gridX < gridWidth; gridX++) {
         final double z = getValue(gridX, gridY);
         if (Double.isFinite(z)) {
           final int zInt = (int)Math.round((z - offsetZ) * scaleZ);

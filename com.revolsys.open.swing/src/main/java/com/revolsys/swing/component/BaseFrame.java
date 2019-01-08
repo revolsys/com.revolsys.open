@@ -58,7 +58,7 @@ public class BaseFrame extends JFrame implements WindowListener {
     setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     addWindowListener(this);
     this.menuBar = newMenuBar();
-    Desktop.getDesktop().setDefaultMenuBar(this.menuBar);
+    updateMenuBar();
   }
 
   protected JMenuBar newMenuBar() {
@@ -84,9 +84,16 @@ public class BaseFrame extends JFrame implements WindowListener {
     });
   }
 
+  private void updateMenuBar() {
+    final Desktop desktop = Desktop.getDesktop();
+    if (desktop.isSupported(Desktop.Action.APP_MENU_BAR)) {
+      desktop.setDefaultMenuBar(this.menuBar);
+    }
+  }
+
   @Override
   public void windowActivated(final WindowEvent e) {
-    Desktop.getDesktop().setDefaultMenuBar(this.menuBar);
+    updateMenuBar();
   }
 
   @Override
