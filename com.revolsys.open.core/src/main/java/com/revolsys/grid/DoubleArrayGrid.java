@@ -7,7 +7,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class DoubleArrayGrid extends AbstractGrid {
-  protected static final double NULL_VALUE = -Double.MAX_VALUE;
+  protected static final double NULL_VALUE = Double.NaN;
 
   protected final double[] cells;
 
@@ -74,7 +74,7 @@ public class DoubleArrayGrid extends AbstractGrid {
     double min = Double.MAX_VALUE;
     double max = -Double.MAX_VALUE;
     for (final double value : this.cells) {
-      if (value != NULL_VALUE) {
+      if (Double.isFinite(value)) {
         if (value < min) {
           min = value;
         }
@@ -92,7 +92,7 @@ public class DoubleArrayGrid extends AbstractGrid {
   @Override
   public void forEachValueFinite(final DoubleConsumer action) {
     for (final double value : this.cells) {
-      if (value != NULL_VALUE) {
+      if (Double.isFinite(value)) {
         action.accept(value);
       }
     }
@@ -106,18 +106,14 @@ public class DoubleArrayGrid extends AbstractGrid {
   public double getValueFast(final int gridX, final int gridY) {
     final int index = gridY * this.gridWidth + gridX;
     final double value = this.cells[index];
-    if (value == NULL_VALUE) {
-      return Double.NaN;
-    } else {
-      return value;
-    }
+    return value;
   }
 
   @Override
   public boolean hasValueFast(final int gridX, final int gridY) {
     final int index = gridY * this.gridWidth + gridX;
     final double value = this.cells[index];
-    if (value == NULL_VALUE) {
+    if (Double.isFinite(value)) {
       return false;
     } else {
       return true;
@@ -165,7 +161,7 @@ public class DoubleArrayGrid extends AbstractGrid {
         for (int gridY = gridYMin; gridY < gridYMax; gridY++) {
           for (int gridX = gridXMin; gridX < gridXMax; gridX++) {
             final double oldValue = oldValues[gridY * gridWidth + gridX];
-            if (oldValue != NULL_VALUE) {
+            if (!Double.isFinite(oldValue)) {
               count++;
               sum += oldValue;
             }

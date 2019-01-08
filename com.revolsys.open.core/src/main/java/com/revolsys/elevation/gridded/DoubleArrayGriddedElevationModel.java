@@ -74,7 +74,7 @@ public class DoubleArrayGriddedElevationModel extends DoubleArrayGrid
     for (int gridY = 0; gridY < gridHeight; gridY++) {
       for (int gridX = 0; gridX < gridWidth; gridX++) {
         final double elevation = elevations[index];
-        if (elevation == NULL_VALUE) {
+        if (!Double.isFinite(elevation)) {
           int countZ = 0;
           double sumZ = 0;
           for (final int offsetY : offsets) {
@@ -83,7 +83,7 @@ public class DoubleArrayGriddedElevationModel extends DoubleArrayGrid
               for (final int offsetX : offsets) {
                 if (!(gridX == 0 && offsetX == -1 || gridX == gridWidth - 1 && offsetX == 1)) {
                   final double elevationNeighbour = elevations[offsetIndex + offsetX];
-                  if (elevationNeighbour != NULL_VALUE) {
+                  if (Double.isFinite(elevationNeighbour)) {
                     sumZ += elevationNeighbour;
                     countZ++;
                   }

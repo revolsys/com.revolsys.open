@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.List;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.gradient.GradientStop;
@@ -16,7 +17,7 @@ import com.revolsys.jocl.core.OpenClUtil;
 
 public class JoclColorGradientRasterizer extends JoclGriddedElevationModelImageRasterizer {
   private static final String SOURCE = OpenClUtil.sourceFromClasspath(
-    "com/revolsys/swing/map/layer/elevation/gridded/renderer/jocl/ColorGradientRasterizerInt.cl");
+    "com/revolsys/swing/map/layer/elevation/gridded/renderer/jocl/ColorGradientRasterizer.cl");
 
   private final ColorGradientGriddedElevationModelRasterizer rasterizer;
 
@@ -48,19 +49,29 @@ public class JoclColorGradientRasterizer extends JoclGriddedElevationModelImageR
   @Override
   protected void addArgs(final List<OpenClMemory> memories,
     final GriddedElevationModel elevationModel, final GeometryFactory geometryFactory,
-    final OpenClKernel kernel, DataType modelDataType) {
+    final OpenClKernel kernel, final DataType modelDataType) {
     final MultiStopLinearGradient gradient = (MultiStopLinearGradient)this.rasterizer.getGradient();
     final List<GradientStop> stops = gradient.getStops();
     final int rangeCount = stops.size();
-    final int[] z = new int[rangeCount];
-    int i = 0;
-    for (final GradientStop stop : stops) {
-      final double zDouble = stop.getValue();
-      z[i] = geometryFactory.toIntZ(zDouble);
-      i++;
-    }
     kernel.addArgInt(rangeCount);
-    kernel.addArgMemory(memories, z);
+
+    if (modelDataType == DataTypes.INT) {
+      final int[] z = new int[rangeCount];
+      int i = 0;
+      for (final GradientStop stop : stops) {
+        final double zDouble = stop.getValue();
+        z[i++] = geometryFactory.toIntZ(zDouble);
+      }
+      kernel.addArgMemory(memories, z);
+    } else {
+      final float[] z = new float[rangeCount];
+      int i = 0;
+      for (final GradientStop stop : stops) {
+        z[i++] = (float)stop.getValue();
+      }
+      kernel.addArgMemory(memories, z);
+    }
+
     kernel.addArgMemory(memories, this.r);
     kernel.addArgMemory(memories, this.g);
     kernel.addArgMemory(memories, this.b);

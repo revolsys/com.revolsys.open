@@ -56,7 +56,7 @@ public abstract class JoclGriddedElevationModelImageRasterizer
       return new JoclHillshadeRasterizer(device, rasterizer);
     } else if (javaRasterizer instanceof ColorGriddedElevationModelRasterizer) {
       final ColorGriddedElevationModelRasterizer rasterizer = (ColorGriddedElevationModelRasterizer)javaRasterizer;
-      return new JoclGreyscaleRasterizer(device, rasterizer);
+      return new JoclColorRasterizer(device, rasterizer);
     } else if (javaRasterizer instanceof SlopeColorGradientGriddedElevationModelRasterizer) {
       final SlopeColorGradientGriddedElevationModelRasterizer rasterizer = (SlopeColorGradientGriddedElevationModelRasterizer)javaRasterizer;
       final MultiStopLinearGradient gradient = (MultiStopLinearGradient)rasterizer.getGradient();
@@ -107,10 +107,7 @@ public abstract class JoclGriddedElevationModelImageRasterizer
     }
 
     DataType modelDataType = DataTypes.DOUBLE;
-    if (!(this instanceof JoclHillshadeRasterizer
-      || this instanceof JoclSlopeColorGradientRasterizer)) {
-      modelDataType = DataTypes.INT;
-    } else if (elevationModel instanceof IntArrayScaleGriddedElevationModel) {
+    if (elevationModel instanceof IntArrayScaleGriddedElevationModel) {
       modelDataType = DataTypes.INT;
     } else if (elevationModel instanceof FloatArrayGriddedElevationModel) {
       modelDataType = DataTypes.FLOAT;

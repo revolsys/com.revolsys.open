@@ -2,7 +2,7 @@
  
 uchar4 hillshade(
   float *m,
-  const int isNull,
+  const int hasValue,
   const float azimuthRadians,
   const float cosZenithRadians,
   const float sinZenithRadians,
@@ -11,7 +11,7 @@ uchar4 hillshade(
   const float zFactor,
   __global uchar4 *output
 ) {
-  if (isNull == 0) {
+  if (hasValue == 0) {
     return (uchar4)(0);
   } else {
     float dzDivDx = deltaZX(m, xFactor);
@@ -49,8 +49,8 @@ uchar4 hillshade(
   int imageY = get_global_id(1);
 
   float m[9];
-  int isNull = subGridInt3x3(cells, width, height, m, imageX, imageY, offsetZ, scaleZ);
-  output[imageY * width + imageX] = hillshade(m, isNull, azimuthRadians, cosZenithRadians, sinZenithRadians, xFactor, yFactor, zFactor, output);
+  int hasValue = subGridInt3x3(cells, width, height, m, imageX, imageY, offsetZ, scaleZ);
+  output[imageY * width + imageX] = hillshade(m, hasValue, azimuthRadians, cosZenithRadians, sinZenithRadians, xFactor, yFactor, zFactor, output);
 }
 
  __kernel void hillshadeRasterizer_float(
@@ -69,8 +69,8 @@ uchar4 hillshade(
   int imageY = get_global_id(1);
 
   float m[9];
-  int isNull = subGridFloat3x3(cells, width, height, m, imageX, imageY);
-  output[imageY * width + imageX] = hillshade(m, isNull, azimuthRadians, cosZenithRadians, sinZenithRadians, xFactor, yFactor, zFactor, output);
+  int hasValue = subGridFloat3x3(cells, width, height, m, imageX, imageY);
+  output[imageY * width + imageX] = hillshade(m, hasValue, azimuthRadians, cosZenithRadians, sinZenithRadians, xFactor, yFactor, zFactor, output);
 }
 
  __kernel void hillshadeRasterizer_double(
@@ -89,6 +89,6 @@ uchar4 hillshade(
   int imageY = get_global_id(1);
 
   float m[9];
-  int isNull = subGridDouble3x3(cells, width, height, m, imageX, imageY);
-  output[imageY * width + imageX] = hillshade(m, isNull, azimuthRadians, cosZenithRadians, sinZenithRadians, xFactor, yFactor, zFactor, output);
+  int hasValue = subGridDouble3x3(cells, width, height, m, imageX, imageY);
+  output[imageY * width + imageX] = hillshade(m, hasValue, azimuthRadians, cosZenithRadians, sinZenithRadians, xFactor, yFactor, zFactor, output);
 }

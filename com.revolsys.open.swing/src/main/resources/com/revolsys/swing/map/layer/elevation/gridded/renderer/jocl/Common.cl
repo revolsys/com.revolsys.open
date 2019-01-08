@@ -179,3 +179,102 @@ float deltaZX(float* m, float xFactor) {
 float deltaZY(float* m, float yFactor) {
   return (m[6] + 2 * m[7] + m[8] - (m[0] + 2 * m[1] + m[2])) * yFactor;
 }
+
+int rangeIndexFloat(
+  const __global float *ranges,
+  const int rangeCount,
+  const float value
+) {
+  if (value <= ranges[0]) {
+    return 0;
+  } else {
+    for (int i = 1; i < rangeCount; i++) {
+      float rangeCurrent = ranges[i];
+      if (value <= rangeCurrent) {
+        return i;
+      }
+    }
+  }
+  return -1;
+}
+
+int rangeIndexInt(
+  const __global int *ranges,
+  const int rangeCount,
+  const float value
+) {
+  if (value <= ranges[0]) {
+    return 0;
+  } else {
+    for (int i = 1; i < rangeCount; i++) {
+      int rangeCurrent = ranges[i];
+      if (value <= rangeCurrent) {
+        return i;
+      }
+    }
+  }
+  return -1;
+}
+
+float rangePercentFloat(
+  const __global float *ranges,
+  const int index,
+  const float value
+) {
+  if (index == 0) {
+    return 0;
+  } else if (index < 0) {
+    return 0;
+  } else {
+    float previous = ranges[index - 1];
+    float next = ranges[index];
+    return (value - previous) / (next - previous);
+  }
+}
+
+float rangePercentInt(
+  const __global int *ranges,
+  const int index,
+  const float value
+) {
+  if (index == 0) {
+    return 0;
+  } else if (index < 0) {
+    return 0;
+  } else {
+    int previous = ranges[index - 1];
+    int next = ranges[index];
+    return (float)(value - previous) / (next - previous);
+  }
+}
+
+int rangeOffsetInt( 
+  const __global int *values,
+  const int rangeCount,
+  const int index,
+  const float percent
+) {
+  int next = values[index];
+  if (index == 0) {
+    return values[0];
+  } else if (index == -1) {
+    return values[rangeCount - 1];
+  } else {
+    int previous = values[index -1];
+    return round(previous + (next - previous) * percent);
+  }
+}
+
+uchar4 rangeColor(
+  const int index,
+  const float percent,
+  const int rangeCount,
+  const __global int *rRange,
+  const __global int *gRange,
+  const __global int *bRange
+) {
+  int red = rangeOffsetInt(rRange, rangeCount, index, percent);
+  int green = rangeOffsetInt(gRange, rangeCount, index, percent);
+  int blue = rangeOffsetInt(bRange, rangeCount, index, percent);
+  return (uchar4)(blue, green , red, 255);
+}
