@@ -115,6 +115,36 @@ public interface GriddedElevationModel extends Grid {
     return (GriddedElevationModel)Grid.super.copyGrid(boundingBox);
   }
 
+  default double[] getCellsDouble() {
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+    final double[] cells = new double[gridWidth * gridHeight];
+    int i = 0;
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      for (int gridX = 0; gridX < gridHeight; gridX++) {
+        final double z = getValue(gridX, gridY);
+        cells[i] = z;
+        i++;
+      }
+    }
+    return cells;
+  }
+
+  default float[] getCellsFloat() {
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+    final float[] cells = new float[gridWidth * gridHeight];
+    int i = 0;
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      for (int gridX = 0; gridX < gridHeight; gridX++) {
+        final double z = getValue(gridX, gridY);
+        cells[i] = (float)z;
+        i++;
+      }
+    }
+    return cells;
+  }
+
   default int[] getCellsInt() {
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();

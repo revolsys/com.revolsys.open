@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.elevation.gridded.renderer.jocl;
 
 import java.util.List;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -18,14 +19,14 @@ public class JoclGreyscaleRasterizer extends JoclGriddedElevationModelImageRaste
 
   public JoclGreyscaleRasterizer(final OpenClDevice device,
     final ColorGriddedElevationModelRasterizer rasterizer) {
-    super(device, SOURCE, "colorRasterizerInt");
+    super(device, SOURCE, "colorRasterizer");
     this.rasterizer = rasterizer;
   }
 
   @Override
   protected void addArgs(final List<OpenClMemory> memories,
     final GriddedElevationModel elevationModel, final GeometryFactory geometryFactory,
-    final OpenClKernel kernel) {
+    final OpenClKernel kernel, DataType modelDataType) {
     final int minZInt = geometryFactory.toIntZ(this.rasterizer.getMinZ());
     final int maxZInt = geometryFactory.toIntZ(this.rasterizer.getMaxZ());
     kernel//

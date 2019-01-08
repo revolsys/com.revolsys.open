@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.elevation.gridded.renderer.jocl;
 import java.awt.Color;
 import java.util.List;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.gradient.GradientStop;
@@ -27,7 +28,7 @@ public class JoclColorGradientRasterizer extends JoclGriddedElevationModelImageR
 
   public JoclColorGradientRasterizer(final OpenClDevice device,
     final ColorGradientGriddedElevationModelRasterizer rasterizer) {
-    super(device, SOURCE, "colorGradientRasterizerInt");
+    super(device, SOURCE, "colorGradientRasterizer");
     this.rasterizer = rasterizer;
     final MultiStopLinearGradient gradient = (MultiStopLinearGradient)rasterizer.getGradient();
     final List<GradientStop> stops = gradient.getStops();
@@ -47,7 +48,7 @@ public class JoclColorGradientRasterizer extends JoclGriddedElevationModelImageR
   @Override
   protected void addArgs(final List<OpenClMemory> memories,
     final GriddedElevationModel elevationModel, final GeometryFactory geometryFactory,
-    final OpenClKernel kernel) {
+    final OpenClKernel kernel, DataType modelDataType) {
     final MultiStopLinearGradient gradient = (MultiStopLinearGradient)this.rasterizer.getGradient();
     final List<GradientStop> stops = gradient.getStops();
     final int rangeCount = stops.size();

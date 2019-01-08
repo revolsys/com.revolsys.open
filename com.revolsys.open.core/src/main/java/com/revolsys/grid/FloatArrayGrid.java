@@ -96,6 +96,10 @@ public class FloatArrayGrid extends AbstractGrid {
     }
   }
 
+  public float[] getCellsFloat() {
+    return this.cells;
+  }
+
   @Override
   public double getValueFast(final int gridX, final int gridY) {
     final int index = gridY * this.gridWidth + gridX;

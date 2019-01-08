@@ -98,6 +98,10 @@ public class DoubleArrayGrid extends AbstractGrid {
     }
   }
 
+  public double[] getCellsDouble() {
+    return this.cells;
+  }
+
   @Override
   public double getValueFast(final int gridX, final int gridY) {
     final int index = gridY * this.gridWidth + gridX;

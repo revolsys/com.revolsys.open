@@ -1,5 +1,5 @@
  #pragma OPENCL EXTENSION cl_khr_fp64 : enable
- __kernel void colorRasterizerInt(
+ __kernel void colorRasterizer_int(
     __global int *cells,
    const int width, 
    const int height, 

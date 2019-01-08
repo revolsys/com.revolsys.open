@@ -9,7 +9,11 @@ import org.jocl.CL;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
 
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
 import com.revolsys.elevation.gridded.rasterizer.GriddedElevationModelRasterizer;
@@ -80,7 +84,7 @@ public abstract class JoclGriddedElevationModelImageRasterizer
   }
 
   protected abstract void addArgs(List<OpenClMemory> memories, GriddedElevationModel elevationModel,
-    GeometryFactory geometryFactory, final OpenClKernel kernel);
+    GeometryFactory geometryFactory, final OpenClKernel kernel, DataType modelDataType);
 
   @Override
   public void close() {
@@ -100,16 +104,18 @@ public abstract class JoclGriddedElevationModelImageRasterizer
       throw new IllegalArgumentException("Images do not have the same size");
     }
 
-    final int dataSrc[] = elevationModel.getCellsInt();
+    DataType modelDataType = DataTypes.DOUBLE;
+    if (!(this instanceof JoclHillshadeRasterizer)) {
+      modelDataType = DataTypes.INT;
+    } else if (elevationModel instanceof IntArrayScaleGriddedElevationModel) {
+      modelDataType = DataTypes.INT;
+    } else if (elevationModel instanceof FloatArrayGriddedElevationModel) {
+      modelDataType = DataTypes.FLOAT;
+    }
 
     final List<OpenClMemory> memories = new ArrayList<>();
     try (
-      final OpenClKernel kernel = this.program.newKernel(this.kernelName)) {
-      kernel.addArgMemory(memories, dataSrc);
-      kernel //
-        .addArg(gridWidth) //
-        .addArg(gridHeight) //
-      ;
+      final OpenClKernel kernel = this.program.newKernel(this.kernelName + "_" + modelDataType)) {
 
       GeometryFactory geometryFactory = elevationModel.getGeometryFactory();
       final double scaleZ = geometryFactory.getScaleZ();
@@ -118,7 +124,24 @@ public abstract class JoclGriddedElevationModelImageRasterizer
         final double scaleY = geometryFactory.getScaleY();
         geometryFactory = geometryFactory.convertScales(scaleX, scaleY, 1000);
       }
-      addArgs(memories, elevationModel, geometryFactory, kernel);
+
+      if (modelDataType == DataTypes.INT) {
+        final int cells[] = elevationModel.getCellsInt();
+        kernel.addArgMemory(memories, cells);
+      } else if (modelDataType == DataTypes.FLOAT) {
+        final float cells[] = elevationModel.getCellsFloat();
+        kernel.addArgMemory(memories, cells);
+      } else {
+        final double cells[] = elevationModel.getCellsDouble();
+        kernel.addArgMemory(memories, cells);
+      }
+      kernel //
+        .addArg(gridWidth) //
+        .addArg(gridHeight) //
+      ;
+
+      addArgs(memories, elevationModel, geometryFactory, kernel, modelDataType);
+
       final int outputSize = gridWidth * gridHeight * Sizeof.cl_int;
       final OpenClMemory outputImageMem = kernel.addArgNewMemory(memories, outputSize);
 

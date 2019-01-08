@@ -1,5 +1,5 @@
  #pragma OPENCL EXTENSION cl_khr_fp64 : enable
- __kernel void slopeColorGradientRasterizerInt(
+ __kernel void slopeColorGradientRasterizer_int(
    const __global int *cells,
    const int width, 
    const int height,
