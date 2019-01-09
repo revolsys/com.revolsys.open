@@ -39,14 +39,15 @@ public abstract class JoclGriddedElevationModelImageRasterizer
   public static GriddedElevationModelImageRasterizer newJoclRasterizer(
     final GriddedElevationModelRasterizer javaRasterizer) {
     final List<OpenClPlatform> platforms = OpenClUtil.getPlatforms();
-    final OpenClPlatform platform = platforms.get(0);
-    final List<OpenClDevice> devices = platform.getDevices(CL.CL_DEVICE_TYPE_GPU);
-    if (devices.isEmpty()) {
-      return null;
-    } else {
-      final OpenClDevice device = devices.get(devices.size() - 1);
-      return newJoclRasterizer(device, javaRasterizer);
+    if (!platforms.isEmpty()) {
+      final OpenClPlatform platform = platforms.get(0);
+      final List<OpenClDevice> devices = platform.getDevices(CL.CL_DEVICE_TYPE_GPU);
+      if (!devices.isEmpty()) {
+        final OpenClDevice device = devices.get(devices.size() - 1);
+        return newJoclRasterizer(device, javaRasterizer);
+      }
     }
+    return null;
   }
 
   public static GriddedElevationModelImageRasterizer newJoclRasterizer(final OpenClDevice device,
