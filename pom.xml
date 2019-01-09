@@ -46,7 +46,6 @@
   </issueManagement>
 
   <modules>
-    <module>com.revolsys.open.javac</module>
     <module>com.revolsys.open.core</module>
     <module>com.revolsys.open.doclet</module>
     <module>com.revolsys.open.fgdb</module>
@@ -55,28 +54,73 @@
     <module>com.revolsys.open.postgresql</module>
     <module>com.revolsys.open.maki</module>
     <module>com.revolsys.open.swing</module>
-    <module>com.revolsys.open.web</module>
-    <module>war-overlay</module>
   </modules>
 
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M2</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.5.0</version>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>11</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.1.0</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.8.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <release>11</release>
           <debug>true</debug>
+          <debuglevel>lines,source,vars</debuglevel>
+          <parameters>true</parameters>
           <compilerArgument>-parameters</compilerArgument>
           <testCompilerArgument>-parameters</testCompilerArgument>
         </configuration>
       </plugin>
       <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>2.2.5</version>
+        <executions>
+          <execution>
+            <id>get-the-git-infos</id>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
+        <version>3.1.1</version>
         <configuration>
           <archive>
             <manifestEntries>
@@ -86,24 +130,15 @@
               <Implementation-Title>${project.name}</Implementation-Title>
               <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
               <Implementation-Version>${project.version}</Implementation-Version>
+              <SCM-Commit>${git.branch}-${git.commit.id}-${git.dirty}</SCM-Commit>
             </manifestEntries>
           </archive>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.17</version>
-        <configuration>
-          <includes>
-            <include>com.revolsys.NoTest</include>
-          </includes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.3</version>
+        <version>3.0.1</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -116,7 +151,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
+        <version>3.0.1</version>
         <configuration>
           <failOnError>false</failOnError>
           <quiet>yes</quiet>
@@ -128,7 +163,7 @@
             <id>attach-javadocs</id>
             <configuration>
               <skip>${maven.javadoc.skip}</skip>
-            </configuration> 
+            </configuration>
             <goals>
               <goal>jar</goal>
             </goals>
@@ -138,7 +173,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.1.1</version>
+        <version>3.2.2</version>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
@@ -146,7 +181,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>
@@ -160,6 +195,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.3</version>
         <configuration>
           <goals>deploy</goals>
           <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -171,7 +207,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
-        <version>2.3.1</version>
+        <version>3.0.0-M1</version>
         <configuration>
           <createChecksum>true</createChecksum>
         </configuration>
@@ -179,85 +215,45 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>2.8.2</version>
+        <version>3.0.0-M1</version>
       </plugin>
-<!--    <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.3</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>sonatype-nexus-staging</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
-        </configuration>
-      </plugin> -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>1.8</version>
-    <!--   <executions>
-          <execution>
-            <id>aggregate-add-third-party</id>
-            <inherited>true</inherited>
-            <phase>install</phase>
-            <configuration>
-              <force>true</force>
-              <outputDirectory>src/license/</outputDirectory>
-              <useMissingFile>true</useMissingFile>
-              <licenseMerges>
-                <licenseMerge>apache_2_0|apache_v2</licenseMerge>
-                <licenseMerge>apache_2_0|The Apache Software License, Version 2.0</licenseMerge>
-                <licenseMerge>apache_2_0|Apache License, Version 2.0</licenseMerge>
-                <licenseMerge>apache_2_0|Apache License 2.0</licenseMerge>
-                <licenseMerge>apache_2_0|Apache License</licenseMerge>
-                <licenseMerge>apache_2_0|Apache 2.0 License</licenseMerge>
-                <licenseMerge>apache_2_0|Apache 2</licenseMerge>
-                <licenseMerge>apache_2_0|ASF 2.0</licenseMerge>
-                <licenseMerge>bsd_2|The BSD License</licenseMerge>
-                <licenseMerge>bsd_2|BSD License</licenseMerge>
-                <licenseMerge>bsd_2|BSD</licenseMerge>
-                <licenseMerge>cddl_1_0|Common Development and Distribution License (CDDL) v1.0</licenseMerge>
-                <licenseMerge>cddl_1_0|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</licenseMerge>
-                <licenseMerge>epl_1|Eclipse Public License - v 1.0</licenseMerge>
-                <licenseMerge>lgpl_2_1|LGPL 2.1</licenseMerge>
-                <licenseMerge>lgpl_2_1|GNU Lesser General Public License</licenseMerge>
-                <licenseMerge>lgpl_2_1|Lesser General Public License (LGPL)</licenseMerge>
-                <licenseMerge>mit|MIT License</licenseMerge>
-                <licenseMerge>mpl_1_1|MPL 1.1</licenseMerge>
-              </licenseMerges>
-            </configuration>
-            <goals>
-              <goal>aggregate-add-third-party</goal>
-            </goals>
-          </execution>
-        </executions> -->
+        <version>1.16</version>
+        <!-- <executions> <execution> <id>aggregate-add-third-party</id> 
+          <inherited>true</inherited> <phase>install</phase> <configuration> <force>true</force> 
+          <outputDirectory>src/license/</outputDirectory> <useMissingFile>true</useMissingFile> 
+          <licenseMerges> <licenseMerge>apache_2_0|apache_v2</licenseMerge> <licenseMerge>apache_2_0|The 
+          Apache Software License, Version 2.0</licenseMerge> <licenseMerge>apache_2_0|Apache 
+          License, Version 2.0</licenseMerge> <licenseMerge>apache_2_0|Apache License 
+          2.0</licenseMerge> <licenseMerge>apache_2_0|Apache License</licenseMerge> 
+          <licenseMerge>apache_2_0|Apache 2.0 License</licenseMerge> <licenseMerge>apache_2_0|Apache 
+          2</licenseMerge> <licenseMerge>apache_2_0|ASF 2.0</licenseMerge> <licenseMerge>bsd_2|The 
+          BSD License</licenseMerge> <licenseMerge>bsd_2|BSD License</licenseMerge> 
+          <licenseMerge>bsd_2|BSD</licenseMerge> <licenseMerge>cddl_1_0|Common Development 
+          and Distribution License (CDDL) v1.0</licenseMerge> <licenseMerge>cddl_1_0|COMMON 
+          DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</licenseMerge> <licenseMerge>epl_1|Eclipse 
+          Public License - v 1.0</licenseMerge> <licenseMerge>lgpl_2_1|LGPL 2.1</licenseMerge> 
+          <licenseMerge>lgpl_2_1|GNU Lesser General Public License</licenseMerge> <licenseMerge>lgpl_2_1|Lesser 
+          General Public License (LGPL)</licenseMerge> <licenseMerge>mit|MIT License</licenseMerge> 
+          <licenseMerge>mpl_1_1|MPL 1.1</licenseMerge> </licenseMerges> </configuration> 
+          <goals> <goal>aggregate-add-third-party</goal> </goals> </execution> </executions> -->
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M2</version>
+        <configuration>
+          <argLine>
+            --illegal-access=permit
+          </argLine>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.4</version>
-        <configuration>
-          <reportPlugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-project-info-reports-plugin</artifactId>
-              <version>2.4</version>
-              <configuration>
-                <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-              </configuration>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <version>2.10.3</version>
-              <configuration>
-                <additionalparam>-Xdoclint:none</additionalparam>
-              </configuration>
-            </plugin>
-          </reportPlugins>
-        </configuration>
+        <version>3.7.1</version>
         <executions>
           <execution>
             <id>attach-descriptor</id>
@@ -270,7 +266,7 @@
           <dependency>
             <groupId>org.apache.maven.doxia</groupId>
             <artifactId>doxia-module-markdown</artifactId>
-            <version>1.6</version>
+            <version>1.8</version>
           </dependency>
           <dependency>
             <groupId>lt.velykis.maven.skins</groupId>
@@ -285,20 +281,19 @@
           <dependency>
             <groupId>net.trajano.wagon</groupId>
             <artifactId>wagon-git</artifactId>
-            <version>2.0.2</version>
+            <version>2.0.4</version>
           </dependency>
         </dependencies>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <generateBackupPoms>false</generateBackupPoms>
+        </configuration>
+      </plugin>
     </plugins>
-<!--
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh-external</artifactId>
-        <version>2.10</version>
-      </extension>
-    </extensions>
--->
   </build>
 
   <reporting>

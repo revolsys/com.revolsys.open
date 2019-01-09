@@ -1,57 +1,25 @@
 package com.revolsys.doclet.tags;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-import com.sun.javadoc.Tag;
-import com.sun.tools.doclets.Taglet;
+import javax.lang.model.element.Element;
+
+import com.sun.source.doctree.DocTree;
+
+import jdk.javadoc.doclet.Taglet;
 
 public class WebResponseCodeTaglet implements Taglet {
 
-  private static final String NAME = "web.response.code";
-
-  public static void register(final Map tagletMap) {
-    final WebResponseCodeTaglet tag = new WebResponseCodeTaglet();
-    final String name = tag.getName();
-    final Taglet t = (Taglet)tagletMap.get(name);
-    if (t != null) {
-      tagletMap.remove(name);
-    }
-    tagletMap.put(name, tag);
+  @Override
+  public Set<Location> getAllowedLocations() {
+    return Collections.singleton(Location.METHOD);
   }
 
   @Override
   public String getName() {
-    return NAME;
-  }
-
-  @Override
-  public boolean inConstructor() {
-    return false;
-  }
-
-  @Override
-  public boolean inField() {
-    return false;
-  }
-
-  @Override
-  public boolean inMethod() {
-    return true;
-  }
-
-  @Override
-  public boolean inOverview() {
-    return false;
-  }
-
-  @Override
-  public boolean inPackage() {
-    return false;
-  }
-
-  @Override
-  public boolean inType() {
-    return false;
+    return "web.response.code";
   }
 
   @Override
@@ -60,12 +28,7 @@ public class WebResponseCodeTaglet implements Taglet {
   }
 
   @Override
-  public String toString(final Tag tag) {
-    return null;
-  }
-
-  @Override
-  public String toString(final Tag[] tags) {
+  public String toString(final List<? extends DocTree> tags, final Element element) {
     return null;
   }
 }
