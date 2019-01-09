@@ -364,7 +364,8 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         final Graphics2D graphics = (Graphics2D)image.getGraphics();
 
         this.image.drawImage(graphics, viewBoundingBox, viewport.getViewWidthPixels(),
-          viewport.getViewHeightPixels(), !this.layer.isShowOriginalImage());
+          viewport.getViewHeightPixels(), !this.layer.isShowOriginalImage(),
+          RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         GeoreferencedImageLayerRenderer.render(imageViewport, graphics, this.image,
           !this.layer.isShowOriginalImage());
         this.cachedImage = new BufferedGeoreferencedImage(imageViewport.getBoundingBox(), image);

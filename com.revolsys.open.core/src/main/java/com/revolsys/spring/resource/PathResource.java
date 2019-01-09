@@ -48,6 +48,10 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   private final Path path;
 
+  public PathResource(final File file) {
+    this(file.toPath());
+  }
+
   /**
    * Construct a new new PathResource from a PathUtil handle.
    * <p>Note: Unlike {@link FileSystemResource}, when building relative resources

@@ -33,6 +33,7 @@
 package com.revolsys.geometry.model;
 
 import java.io.Serializable;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,6 +54,7 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
+import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
@@ -70,8 +72,10 @@ import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
+import com.revolsys.io.StringWriter;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
@@ -245,6 +249,37 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    */
   public static GeometryFactory floating(final int coordinateSystemId, final int axisCount) {
     return fixed(coordinateSystemId, axisCount);
+  }
+
+  public static GeometryFactory floating(final String wkt, final int axisCount) {
+    final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
+    if (esriCoordinateSystem == null) {
+      return DEFAULT.convertAxisCount(axisCount);
+    } else {
+      return floating(esriCoordinateSystem, axisCount);
+    }
+  }
+
+  public static GeometryFactory floating2d(final Resource resource) {
+    return EsriCoordinateSystems.getGeometryFactory(resource);
+  }
+
+  public static GeometryFactory floating2d(final String wkt) {
+    final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
+    if (esriCoordinateSystem != null) {
+      CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
+        .getCoordinateSystem(esriCoordinateSystem);
+      if (epsgCoordinateSystem == null) {
+        epsgCoordinateSystem = esriCoordinateSystem;
+      }
+      final int srid = epsgCoordinateSystem.getCoordinateSystemId();
+      if (srid > 0 && srid < 2000000) {
+        return floating(srid, 2);
+      } else {
+        return fixed(epsgCoordinateSystem, 2, -1);
+      }
+    }
+    return null;
   }
 
   /**
@@ -854,6 +889,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   @Override
   public GeometryFactory getGeometryFactory() {
     return this;
+  }
+
+  public CoordinateSystem getHorizontalCoordinateSystem() {
+    return getCoordinateSystem();
+  }
+
+  public int getHorizontalCoordinateSystemId() {
+    return getCoordinateSystemId();
   }
 
   private LinearRing getLinearRing(final List<?> rings, final int index) {
@@ -1806,5 +1849,30 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     string.append(", scales=");
     string.append(Arrays.toString(this.scales));
     return string.toString();
+  }
+
+  public String toWktCs() {
+    try (
+      StringWriter stringWriter = new StringWriter()) {
+      writeWktCs(stringWriter, -1);
+      return stringWriter.toString();
+    }
+  }
+
+  private boolean writeWktCs(final Writer writer, final int indentLevel) {
+    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
+    if (coordinateSystem == null) {
+      return false;
+    } else {
+      final int coordinateSystemId = getHorizontalCoordinateSystemId();
+      final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
+        .getCoordinateSystem(coordinateSystemId);
+      if (esriCoordinateSystem == null) {
+        EsriCsWktWriter.write(writer, coordinateSystem, indentLevel);
+      } else {
+        EsriCsWktWriter.write(writer, esriCoordinateSystem, indentLevel);
+      }
+      return true;
+    }
   }
 }

@@ -65,6 +65,10 @@ public class LeftUnaryCondition extends Condition {
     return Collections.singletonList(this.value);
   }
 
+  public <V extends QueryValue> V getValue() {
+    return getQueryValue();
+  }
+
   @Override
   public String toString() {
     return this.operator + " " + this.value;

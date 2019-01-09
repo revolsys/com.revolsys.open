@@ -3,9 +3,9 @@ package com.revolsys.raster;
 import com.revolsys.io.IoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public interface GeoreferencedImageFactory extends IoFactory {
+public interface GeoreferencedImageReadFactory extends IoFactory {
   static GeoreferencedImage loadGeoreferencedImage(final Resource resource) {
-    final GeoreferencedImageFactory factory = IoFactory.factory(GeoreferencedImageFactory.class,
+    final GeoreferencedImageReadFactory factory = IoFactory.factory(GeoreferencedImageReadFactory.class,
       resource);
     if (factory == null) {
       return null;

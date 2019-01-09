@@ -84,7 +84,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
     final int[] day = new int[1];
     final int[] hour = new int[1];
     final int[] minute = new int[1];
-    final int[] second = new int[1];
+    final float[] second = new float[1];
     final int[] timeZoneId = new int[1];
     feature.GetFieldAsDateTime(fieldIndex, year, month, day, hour, minute, second, timeZoneId);
     TimeZone timeZone;
@@ -99,7 +99,8 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
     calendar.set(Calendar.DAY_OF_MONTH, day[0]);
     calendar.set(Calendar.HOUR, hour[0]);
     calendar.set(Calendar.MINUTE, minute[0]);
-    calendar.set(Calendar.SECOND, second[0]);
+    calendar.set(Calendar.SECOND, (int)Math.floor(second[0]));
+    calendar.set(Calendar.MILLISECOND, (int)Math.floor(second[0] * 1000));
     return calendar;
   }
 

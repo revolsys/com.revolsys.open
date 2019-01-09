@@ -29,28 +29,26 @@ import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
 
 import com.revolsys.gdal.raster.GdalImageFactory;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
+import com.revolsys.util.ServiceInitializer;
 
-public class Gdal {
+public class Gdal implements ServiceInitializer {
   private static boolean available = false;
 
   static {
     try {
 
-      gdal.SetConfigOption("CPL_TMPDIR", System.getProperty("java.io.tmpdir"));
+      final String tempDir = System.getProperty("java.io.tmpdir");
+      gdal.SetConfigOption("CPL_TMPDIR", tempDir);
 
       osr.UseExceptions();
       ogr.UseExceptions();
@@ -71,7 +69,7 @@ public class Gdal {
       available = true;
     } catch (final UnsatisfiedLinkError e) {
     } catch (final Throwable e) {
-      Logs.debug(Gdal.class, e);
+      // Logs.debug(Gdal.class, e);
     }
   }
 
@@ -287,7 +285,8 @@ public class Gdal {
         sampleModel = new BandedSampleModel(dataBufferType, targetWidth, targetHeight, targetWidth,
           banks, offsets);
         dataType = rasterColorInterpretation == gdalconstConstants.GCI_PaletteIndex
-          ? BufferedImage.TYPE_BYTE_INDEXED : BufferedImage.TYPE_BYTE_GRAY;
+          ? BufferedImage.TYPE_BYTE_INDEXED
+          : BufferedImage.TYPE_BYTE_GRAY;
       } else if (bandDataType == gdalconstConstants.GDT_Int16) {
         final short[][] shorts = new short[bandCount][];
         for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {
@@ -346,16 +345,6 @@ public class Gdal {
     return getBufferedImage(file);
   }
 
-  public static CoordinateSystem getCoordinateSystem(final SpatialReference spatialReference) {
-    if (spatialReference == null) {
-      return null;
-    } else {
-      final String wkt = spatialReference.ExportToWkt();
-      final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
-      return EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
-    }
-  }
-
   public static Dataset getDataset(final File file) {
     final int mode = gdalconstConstants.GA_ReadOnly;
     return getDataset(file, mode);
@@ -369,7 +358,7 @@ public class Gdal {
         if (dataset == null) {
           throw new GdalException();
         } else {
-          final Resource resource = new FileSystemResource(file);
+          final Resource resource = new PathResource(file);
           setProjectionFromPrjFile(dataset, resource);
           final long modifiedTime = loadSettings(dataset, resource);
           // loadAuxXmlFile(modifiedTime);
@@ -398,19 +387,13 @@ public class Gdal {
     }
   }
 
-  public static SpatialReference getSpatialReference(CoordinateSystem coordinateSystem) {
-    if (coordinateSystem == null) {
+  public static GeometryFactory getGeometryFactory(final SpatialReference spatialReference,
+    final int axisCount) {
+    if (spatialReference == null) {
       return null;
     } else {
-      final int srid = coordinateSystem.getCoordinateSystemId();
-      if (srid <= 0) {
-        coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
-        final String wkt = EsriCsWktWriter.toWkt(coordinateSystem);
-        final SpatialReference spatialReference = new SpatialReference(wkt);
-        return spatialReference;
-      } else {
-        return getSpatialReference(srid);
-      }
+      final String wkt = spatialReference.ExportToWkt();
+      return GeometryFactory.floating(wkt, axisCount);
     }
   }
 
@@ -418,10 +401,10 @@ public class Gdal {
     if (geometryFactory == null) {
       return null;
     } else {
-      final int srid = geometryFactory.getCoordinateSystemId();
+      final int srid = geometryFactory.getHorizontalCoordinateSystemId();
       if (srid <= 0) {
-        final GeometryFactory coordinateSystem = geometryFactory;
-        return getSpatialReference(coordinateSystem);
+        final String wkt = geometryFactory.toWktCs();
+        return new SpatialReference(wkt);
       } else {
         return getSpatialReference(srid);
       }
@@ -448,11 +431,6 @@ public class Gdal {
   }
 
   public static void init() {
-  }
-
-  public static void ioFactoryInit() {
-    addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
-    addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
   }
 
   public static boolean isAvailable() {
@@ -495,9 +473,9 @@ public class Gdal {
         final Map<String, Object> settings = Json.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {
-          final BoundingBox boundingBox = BoundingBox.newBoundingBox(boundingBoxWkt);
+          final BoundingBox boundingBox = BoundingBox.bboxNew(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
-            setSpatialReference(dataset, boundingBox.getCoordinateSystem());
+            setSpatialReference(dataset, boundingBox.getGeometryFactory());
             final double x = boundingBox.getMinX();
             final double width = boundingBox.getWidth();
             final int imageWidth = dataset.getRasterXSize();
@@ -535,18 +513,28 @@ public class Gdal {
   }
 
   public static void setProjectionFromPrjFile(final Dataset dataset, final Resource resource) {
-    final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+    final GeometryFactory geometryFactory = GeometryFactory.floating2d(resource);
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      setSpatialReference(dataset, coordinateSystem);
+      setSpatialReference(dataset, geometryFactory);
     }
   }
 
   public static void setSpatialReference(final Dataset dataset,
-    final CoordinateSystem coordinateSystem) {
-    final SpatialReference spatialReference = getSpatialReference(coordinateSystem);
+    final GeometryFactory geometryFactory) {
+    final SpatialReference spatialReference = getSpatialReference(geometryFactory);
     if (spatialReference != null) {
       dataset.SetProjection(spatialReference.ExportToWkt());
     }
+  }
+
+  @Override
+  public void initializeService() {
+    addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
+    addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
+  }
+
+  @Override
+  public int priority() {
+    return 200;
   }
 }

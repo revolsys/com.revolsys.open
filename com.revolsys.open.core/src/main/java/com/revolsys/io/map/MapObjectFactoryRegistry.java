@@ -16,6 +16,7 @@ import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
+import com.revolsys.util.ServiceInitializer;
 
 @SuppressWarnings("unchecked")
 public class MapObjectFactoryRegistry {
@@ -95,6 +96,7 @@ public class MapObjectFactoryRegistry {
       runnable.run();
     }
     Dates.debugEllapsedTime(MapObjectFactoryRegistry.class, "init", startTime);
+    ServiceInitializer.initializeServices();
   }
 
   public static void addFactory(final MapObjectFactory factory) {

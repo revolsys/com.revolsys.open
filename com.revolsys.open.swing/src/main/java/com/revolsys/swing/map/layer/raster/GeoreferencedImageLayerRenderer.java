@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.raster;
 import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
@@ -27,7 +28,8 @@ public class GeoreferencedImageLayerRenderer
       final BoundingBox viewBoundingBox = viewport.getBoundingBox();
       final int viewWidth = viewport.getViewWidthPixels();
       final int viewHeight = viewport.getViewHeightPixels();
-      image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, useTransform);
+      image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, useTransform,
+        RenderingHints.VALUE_INTERPOLATION_BILINEAR);
     }
   }
 

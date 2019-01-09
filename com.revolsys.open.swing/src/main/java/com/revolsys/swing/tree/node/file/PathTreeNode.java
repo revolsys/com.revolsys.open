@@ -27,7 +27,7 @@ import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordIo;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
@@ -403,7 +403,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       final Path path = getPath();
       if (!this.hasFile) {
         return false;
-      } else if (IoFactory.hasFactory(GeoreferencedImageFactory.class, path)) {
+      } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, path)) {
         return true;
       } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
         return true;

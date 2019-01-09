@@ -30,6 +30,10 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
 
   BoundingBox EMPTY = new BoundingBoxDoubleGf();
 
+  static BoundingBox bboxNew(final String wkt) {
+    return newBoundingBox(wkt);
+  }
+
   static BoundingBox empty() {
     return EMPTY;
   }
@@ -137,6 +141,10 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
     }
 
     return EMPTY;
+  }
+
+  default BoundingBox bboxIntersection(final BoundingBox boundingBox) {
+    return intersection(boundingBox);
   }
 
   BoundingBox clipToCoordinateSystem();
@@ -322,7 +330,7 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
    * @return a new BoundingBox representing the intersection of the envelopes (this will be
    * the null envelope if either argument is null, or they do not intersect
    */
-  BoundingBox intersection(BoundingBox env);
+  BoundingBox intersection(BoundingBox boundingBox);
 
   /**
    *  Check if the region defined by <code>other</code>

@@ -15,6 +15,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.util.Property;
+import com.revolsys.util.ServiceInitializer;
 
 public class IoFactoryRegistry {
   static final Map<Class<? extends IoFactory>, Set<IoFactory>> factoriesByClass = new HashMap<>();
@@ -97,6 +98,7 @@ public class IoFactoryRegistry {
     } catch (final Throwable e) {
       Logs.error(IoFactoryRegistry.class, "Unable to read resources", e);
     }
+    ServiceInitializer.initializeServices();
   }
 
   public static void addFactory(final IoFactory factory) {

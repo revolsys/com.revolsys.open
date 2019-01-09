@@ -14,7 +14,9 @@ import org.gdal.ogr.Layer;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.AbstractRecordWriter;
@@ -216,13 +218,13 @@ public class OgrRecordWriter extends AbstractRecordWriter {
       switch (geometryType) {
         case 1:
         case 0x80000000 + 1: {
-          final Vertex vertex = geometry.getVertex(0);
-          final double x = vertex.getX();
-          final double y = vertex.getY();
+          final Point point = (Point)geometry;
+          final double x = point.getX();
+          final double y = point.getY();
           if (axisCount == 2) {
             ogrGeometry.AddPoint(x, y);
           } else {
-            final double z = vertex.getZ();
+            final double z = point.getZ();
             ogrGeometry.AddPoint(x, y, z);
           }
         }
@@ -230,13 +232,15 @@ public class OgrRecordWriter extends AbstractRecordWriter {
 
         case 2:
         case 0x80000000 + 2:
-          for (final Vertex vertex : geometry.vertices()) {
-            final double x = vertex.getX();
-            final double y = vertex.getY();
+          final LineString line = (LineString)geometry;
+          final int vertexCount = line.getVertexCount();
+          for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+            final double x = line.getX(vertexIndex);
+            final double y = line.getY(vertexIndex);
             if (axisCount == 2) {
               ogrGeometry.AddPoint(x, y);
             } else {
-              final double z = vertex.getZ();
+              final double z = line.getZ(vertexIndex);
               ogrGeometry.AddPoint(x, y, z);
             }
           }

@@ -2,6 +2,7 @@ package com.revolsys.gdal.raster;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
@@ -10,9 +11,6 @@ import org.gdal.gdal.Band;
 import org.gdal.gdal.Dataset;
 
 import com.revolsys.gdal.Gdal;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.AbstractGeoreferencedImage;
@@ -36,21 +34,8 @@ public class GdalImage extends AbstractGeoreferencedImage {
     final String projection = dataset.GetProjection();
     final double[] geoTransform = dataset.GetGeoTransform();
     if (projection != null) {
-      final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-        .getCoordinateSystem(projection);
-      if (esriCoordinateSystem != null) {
-        CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
-          .getCoordinateSystem(esriCoordinateSystem);
-        if (epsgCoordinateSystem == null) {
-          epsgCoordinateSystem = esriCoordinateSystem;
-        }
-        final int srid = epsgCoordinateSystem.getCoordinateSystemId();
-        if (srid > 0 && srid < 2000000) {
-          setGeometryFactory(GeometryFactory.floating(srid, 2));
-        } else {
-          setGeometryFactory(GeometryFactory.fixed(epsgCoordinateSystem, 2, -1));
-        }
-      }
+      final GeometryFactory geometryFactory = GeometryFactory.floating2d(projection);
+      setGeometryFactory(geometryFactory);
     }
     setBoundingBox(geoTransform[0], geoTransform[3], geoTransform[1], geoTransform[5]);
     postConstruct();
@@ -58,12 +43,13 @@ public class GdalImage extends AbstractGeoreferencedImage {
 
   @Override
   public void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
-    final int viewWidth, final int viewHeight, final boolean useTransform) {
+    final int viewWidth, final int viewHeight, final boolean useTransform,
+    final Object interpolationMethod) {
     try {
       final Dataset dataset = getDataset();
 
       final BoundingBox imageBoundingBox = getBoundingBox();
-      final BoundingBox clipBoundingBox = viewBoundingBox.intersection(imageBoundingBox);
+      final BoundingBox clipBoundingBox = viewBoundingBox.bboxIntersection(imageBoundingBox);
       final double scaleFactor = viewWidth / viewBoundingBox.getWidth();
 
       final double clipModelWidth = clipBoundingBox.getWidth();
@@ -102,7 +88,7 @@ public class GdalImage extends AbstractGeoreferencedImage {
         clipYoff, clipWidth, clipHeight, targetWidth, targetHeight);
 
       super.drawRenderedImage(bufferedImage, clipBoundingBox, graphics, viewBoundingBox, viewWidth,
-        useTransform);
+        useTransform, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
     } catch (final Throwable e) {
       e.printStackTrace();

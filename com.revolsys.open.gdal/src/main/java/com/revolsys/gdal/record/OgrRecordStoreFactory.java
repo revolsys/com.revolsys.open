@@ -84,21 +84,25 @@ public class OgrRecordStoreFactory implements FileRecordStoreFactory {
     this.name = name;
     this.driverName = driverName;
     this.fileNameExtensions = fileNameExtensions;
-    if (Gdal.isAvailable()) {
-      this.available = ogr.GetDriverByName(driverName) != null;
-      if (this.available) {
-        // final RecordStoreRecordAndGeometryWriterFactory writerFactory = new
-        // RecordStoreRecordAndGeometryWriterFactory(
-        // name, mediaType, true, true, fileNameExtensions);
-        // IoFactoryRegistry.getInstance().addFactory(writerFactory);
+    try {
+      if (Gdal.isAvailable()) {
+        this.available = ogr.GetDriverByName(driverName) != null;
+        if (this.available) {
+          // final RecordStoreRecordAndGeometryWriterFactory writerFactory = new
+          // RecordStoreRecordAndGeometryWriterFactory(
+          // name, mediaType, true, true, fileNameExtensions);
+          // IoFactoryRegistry.getInstance().addFactory(writerFactory);
 
-        for (final String extension : fileNameExtensions) {
-          this.urlPatterns.add(Pattern.compile("file:/(//)?.*." + extension + "/?"));
-          this.urlPatterns.add(Pattern.compile("folderconnection:/(//)?.*." + extension + "/?"));
+          for (final String extension : fileNameExtensions) {
+            this.urlPatterns.add(Pattern.compile("file:/(//)?.*." + extension + "/?"));
+            this.urlPatterns.add(Pattern.compile("folderconnection:/(//)?.*." + extension + "/?"));
 
+          }
         }
+      } else {
+        this.available = false;
       }
-    } else {
+    } catch (final UnsatisfiedLinkError e) {
       this.available = false;
     }
   }

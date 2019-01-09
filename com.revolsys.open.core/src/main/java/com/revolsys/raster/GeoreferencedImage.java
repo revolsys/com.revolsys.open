@@ -105,7 +105,7 @@ public interface GeoreferencedImage
   }
 
   static boolean isReadable(final Path path) {
-    return IoFactory.isAvailable(GeoreferencedImageFactory.class, path);
+    return IoFactory.isAvailable(GeoreferencedImageReadFactory.class, path);
   }
 
   default void cancelChanges() {
@@ -114,18 +114,19 @@ public interface GeoreferencedImage
   void deleteTiePoint(MappedLocation tiePoint);
 
   default void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
-    final int viewWidth, final int viewHeight, final boolean useTransform) {
+    final int viewWidth, final int viewHeight, final boolean useTransform,
+    final Object interpolationMethod) {
     final BoundingBox imageBoundingBox = getBoundingBox();
     if (viewBoundingBox.intersects(imageBoundingBox) && viewWidth > 0 && viewHeight > 0) {
       final RenderedImage renderedImage = getRenderedImage();
       drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth, viewHeight,
-        useTransform);
+        useTransform, interpolationMethod);
     }
   }
 
   default void drawRenderedImage(final RenderedImage renderedImage, BoundingBox imageBoundingBox,
     final Graphics2D graphics, final BoundingBox viewBoundingBox, final int viewWidth,
-    final boolean useTransform) {
+    final boolean useTransform, final Object interpolationMethod) {
     if (renderedImage != null) {
       final int imageWidth = renderedImage.getWidth();
       final int imageHeight = renderedImage.getHeight();
@@ -151,8 +152,9 @@ public interface GeoreferencedImage
           final int imageScreenHeight = (int)Math.ceil(imageModelHeight * scaleFactor);
 
           if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-            graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-              RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            if (interpolationMethod != null) {
+              graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+            }
             if (imageScreenWidth > 0 && imageScreenHeight > 0) {
 
               graphics.translate(screenX, screenY);
@@ -187,10 +189,10 @@ public interface GeoreferencedImage
 
   default void drawRenderedImage(final RenderedImage renderedImage, final Graphics2D graphics,
     final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
-    final boolean useTransform) {
+    final boolean useTransform, final Object interpolationMethod) {
     final BoundingBox imageBoundingBox = getBoundingBox();
     drawRenderedImage(renderedImage, imageBoundingBox, graphics, viewBoundingBox, viewWidth,
-      useTransform);
+      useTransform, interpolationMethod);
   }
 
   default AffineTransform getAffineTransformation(final BoundingBox boundingBox) {

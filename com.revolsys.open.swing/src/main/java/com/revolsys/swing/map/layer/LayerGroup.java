@@ -33,7 +33,7 @@ import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
-import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
@@ -167,7 +167,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
     final Set<String> allImageExtensions = new TreeSet<>();
     final List<FileNameExtensionFilter> imageFileFilters = IoFactory
-      .newFileFilters(allImageExtensions, GeoreferencedImageFactory.class);
+      .newFileFilters(allImageExtensions, GeoreferencedImageReadFactory.class);
 
     final Set<String> allRecordExtensions = new TreeSet<>();
     final List<FileNameExtensionFilter> recordFileFilters = IoFactory
@@ -716,7 +716,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     final Map<String, Object> properties = new HashMap<>();
     properties.put("url", urlString);
     Layer layer;
-    if (IoFactory.hasFactory(GeoreferencedImageFactory.class, url)) {
+    if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, url)) {
       String name = FileUtil.getFileName(urlString);
       name = FileUtil.fromSafeName(name);
       properties.put("name", name);
