@@ -1,14 +1,16 @@
 package com.revolsys.swing.pdf;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-import org.apache.jempbox.xmp.XMPMetadata;
-import org.apache.jempbox.xmp.XMPSchemaDublinCore;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.xmpbox.XMPMetadata;
+import org.apache.xmpbox.schema.DublinCoreSchema;
+import org.apache.xmpbox.xml.XmpSerializer;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.logging.Logs;
@@ -50,12 +52,15 @@ public class SaveAsPdf {
       final PDMetadata metadata = new PDMetadata(document);
       catalog.setMetadata(metadata);
 
-      // jempbox version
-      final XMPMetadata xmp = new XMPMetadata();
-      final XMPSchemaDublinCore xmpSchema = new XMPSchemaDublinCore(xmp);
-      xmp.addSchema(xmpSchema);
-      xmpSchema.setAbout("");
-      metadata.importXMPMetadata(xmp);
+      final XMPMetadata xmpMetadata = XMPMetadata.createXMPMetadata();
+      final DublinCoreSchema dcSchema = xmpMetadata.createAndAddDublinCoreSchema();
+
+      dcSchema.setAboutAsSimple("");
+
+      final XmpSerializer serializer = new XmpSerializer();
+      final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      serializer.serialize(xmpMetadata, baos, false);
+      metadata.importXMPMetadata(baos.toByteArray());
 
       document.save(file);
     } catch (final Throwable e) {

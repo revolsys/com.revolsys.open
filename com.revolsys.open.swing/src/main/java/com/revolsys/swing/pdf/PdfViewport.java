@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
@@ -25,12 +24,11 @@ import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDResources;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
-import org.apache.pdfbox.pdmodel.graphics.PDExtendedGraphicsState;
 import org.apache.pdfbox.pdmodel.graphics.PDLineDashPattern;
+import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
@@ -80,7 +78,7 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     this.document = document;
     this.page = page;
     this.contentStream = new PDPageContentStream(document, page);
-    final COSDictionary pageDictionary = page.getCOSDictionary();
+    final COSDictionary pageDictionary = page.getCOSObject();
     final COSArray viewports = PdfUtil.getArray(pageDictionary, "VP");
 
     final COSDictionary viewport = new COSDictionary();
@@ -476,14 +474,6 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
       if (polygonFillOpacity != 255) {
         graphicsState.setNonStrokingAlphaConstant(polygonFillOpacity / 255f);
       }
-
-      final PDResources resources = this.page.findResources();
-      Map<String, PDExtendedGraphicsState> graphicsStateDictionary = resources.getGraphicsStates();
-      if (graphicsStateDictionary == null) {
-        graphicsStateDictionary = new TreeMap<>();
-      }
-      graphicsStateDictionary.put(styleName, graphicsState);
-      resources.setGraphicsStates(graphicsStateDictionary);
 
       this.styleNames.put(style, styleName);
     }

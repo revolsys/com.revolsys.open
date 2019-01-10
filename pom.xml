@@ -545,6 +545,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <org.apache.xmlgraphics.batik.version>1.10</org.apache.xmlgraphics.batik.version>
     <org.gdal.version>2.3.1-1</org.gdal.version>
     <org.slf4j.version>1.7.21</org.slf4j.version>
     <org.springframework.version>4.1.9.RELEASE</org.springframework.version>
