@@ -10,11 +10,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.measure.Measurable;
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -262,14 +260,14 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
    */
   double getHeight();
 
-  Measure<Length> getHeightLength();
+  Quantity<Length> getHeightLength();
 
   double getMax(int i);
 
-  <Q extends Quantity> Measurable<Q> getMaximum(int axisIndex);
+  <Q extends Quantity<Q>> Quantity<Q> getMaximum(int axisIndex);
 
   @SuppressWarnings("rawtypes")
-  <Q extends Quantity> double getMaximum(int axisIndex, final Unit convertUnit);
+  <Q extends Quantity<Q>> double getMaximum(int axisIndex, final Unit convertUnit);
 
   /**
    *  Returns the <code>BoundingBox</code>s maximum x-value. min x > max x
@@ -289,10 +287,10 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
 
   double getMin(int i);
 
-  <Q extends Quantity> Measurable<Q> getMinimum(int axisIndex);
+  <Q extends Quantity<Q>> Quantity<Q> getMinimum(int axisIndex);
 
   @SuppressWarnings("rawtypes")
-  <Q extends Quantity> double getMinimum(int axisIndex, final Unit convertUnit);
+  <Q extends Quantity<Q>> double getMinimum(int axisIndex, final Unit convertUnit);
 
   /**
    *  Returns the <code>BoundingBox</code>s minimum x-value. min x > max x
@@ -321,7 +319,7 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
    */
   double getWidth();
 
-  Measure<Length> getWidthLength();
+  Quantity<Length> getWidthLength();
 
   /**
    * Computes the intersection of two {@link BoundingBox}s.

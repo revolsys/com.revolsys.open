@@ -38,9 +38,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
-import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;

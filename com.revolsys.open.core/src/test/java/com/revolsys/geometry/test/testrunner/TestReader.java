@@ -41,11 +41,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.jdom.Attribute;
-import org.jdom.DataConversionException;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Attribute;
+import org.jdom2.DataConversionException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -54,8 +54,6 @@ import com.revolsys.geometry.test.function.TestCaseGeometryFunctions;
 import com.revolsys.geometry.test.geomop.GeometryFunctionOperation;
 import com.revolsys.geometry.test.geomop.GeometryOperation;
 import com.revolsys.geometry.test.util.FileUtil;
-import com.revolsys.geometry.test.util.LineNumberElement;
-import com.revolsys.geometry.test.util.LineNumberSAXBuilder;
 import com.revolsys.geometry.test.util.WKTOrWKBReader;
 
 /**
@@ -159,7 +157,7 @@ public class TestReader {
   public TestFile newTestRun(final TestDirectory parent, final File testFile, final int runIndex)
     throws Throwable {
     try {
-      final SAXBuilder builder = new LineNumberSAXBuilder();
+      final SAXBuilder builder = new SAXBuilder();
       final Document document = builder.build(new FileInputStream(testFile));
       final Element runElement = document.getRootElement();
       if (!runElement.getName().equalsIgnoreCase("run")) {
@@ -272,8 +270,7 @@ public class TestReader {
         final Geometry a = readGeometry(aElement, absoluteWktFile(aWktFile, testRun));
         final Geometry b = readGeometry(bElement, absoluteWktFile(bWktFile, testRun));
         final TestCase testCase = new TestCase(descElement != null ? descElement.getTextTrim() : "",
-          a, b, aWktFile, bWktFile, testRun, caseIndex,
-          ((LineNumberElement)caseElement).getStartLine());
+          a, b, aWktFile, bWktFile, testRun, caseIndex, 0);
         final List testElements = caseElement.getChildren("test");
         // if (testElements.size() == 0) {
         // throw new TestParseException("Missing <test> in <case>");

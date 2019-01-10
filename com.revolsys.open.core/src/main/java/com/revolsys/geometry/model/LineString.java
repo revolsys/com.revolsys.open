@@ -39,10 +39,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -69,7 +68,11 @@ import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
+import com.revolsys.util.QuantityType;
 import com.revolsys.util.number.Doubles;
+
+import si.uom.SI;
+import tec.uom.se.quantity.Quantities;
 
 /**
  * Models an OGC-style <code>LineString</code>. A LineString consists of a
@@ -843,15 +846,15 @@ public interface LineString extends Lineal {
           lat0 = lat1;
         }
       }
-      final Measure<Length> lengthMeasure = Measure.valueOf(length, SI.METRE);
-      length = lengthMeasure.doubleValue(unit);
+      final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, SI.METRE);
+      length = QuantityType.doubleValue(lengthMeasure, unit);
     } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
       final Unit<Length> lengthUnit = projectedCoordinateSystem.getLengthUnit();
 
       length = getLength();
-      final Measure<Length> lengthMeasure = Measure.valueOf(length, lengthUnit);
-      length = lengthMeasure.doubleValue(unit);
+      final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, lengthUnit);
+      length = QuantityType.doubleValue(lengthMeasure, unit);
     } else {
       length = getLength();
     }

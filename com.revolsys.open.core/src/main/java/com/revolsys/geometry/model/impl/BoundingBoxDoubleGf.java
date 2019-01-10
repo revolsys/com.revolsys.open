@@ -34,12 +34,9 @@ package com.revolsys.geometry.model.impl;
 
 import java.io.Serializable;
 
-import javax.measure.Measurable;
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
@@ -62,7 +59,11 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.QuantityType;
 import com.revolsys.util.number.Doubles;
+
+import si.uom.SI;
+import tec.uom.se.quantity.Quantities;
 
 /**
  *  Defines a rectangular region of the 2D coordinate plane.
@@ -902,13 +903,13 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public Measure<Length> getHeightLength() {
+  public Quantity<Length> getHeightLength() {
     final double height = getHeight();
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     if (coordinateSystem == null) {
-      return Measure.valueOf(height, SI.METRE);
+      return Quantities.getQuantity(height, SI.METRE);
     } else {
-      return Measure.valueOf(height, coordinateSystem.getLengthUnit());
+      return Quantities.getQuantity(height, coordinateSystem.getLengthUnit());
     }
   }
 
@@ -922,19 +923,19 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public <Q extends Quantity> Measurable<Q> getMaximum(final int axisIndex) {
+  public <Q extends Quantity<Q>> Quantity<Q> getMaximum(final int axisIndex) {
     final Unit<Q> unit = getUnit();
     final double max = this.getMax(axisIndex);
-    return Measure.valueOf(max, unit);
+    return Quantities.getQuantity(max, unit);
   }
 
   @Override
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public <Q extends Quantity> double getMaximum(final int axisIndex, final Unit convertUnit) {
-    final Measurable<Quantity> max = getMaximum(axisIndex);
-    return max.doubleValue(convertUnit);
+  public <Q extends Quantity<Q>> double getMaximum(final int axisIndex, final Unit convertUnit) {
+    final Quantity<Q> max = getMaximum(axisIndex);
+    return QuantityType.doubleValue(max, convertUnit);
   }
 
   /**
@@ -969,19 +970,19 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public <Q extends Quantity> Measurable<Q> getMinimum(final int axisIndex) {
+  public <Q extends Quantity<Q>> Quantity<Q> getMinimum(final int axisIndex) {
     final Unit<Q> unit = getUnit();
     final double min = this.getMin(axisIndex);
-    return Measure.valueOf(min, unit);
+    return Quantities.getQuantity(min, unit);
   }
 
   @Override
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public <Q extends Quantity> double getMinimum(final int axisIndex, final Unit convertUnit) {
-    final Measurable<Quantity> min = getMinimum(axisIndex);
-    return min.doubleValue(convertUnit);
+  public <Q extends Quantity<Q>> double getMinimum(final int axisIndex, final Unit convertUnit) {
+    final Quantity<Q> min = getMinimum(axisIndex);
+    return QuantityType.doubleValue(min, convertUnit);
   }
 
   /**
@@ -1023,7 +1024,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @SuppressWarnings("unchecked")
-  private <Q extends Quantity> Unit<Q> getUnit() {
+  private <Q extends Quantity<Q>> Unit<Q> getUnit() {
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     if (coordinateSystem == null) {
       return (Unit<Q>)SI.METRE;
@@ -1050,13 +1051,13 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public Measure<Length> getWidthLength() {
+  public Quantity<Length> getWidthLength() {
     final double width = getWidth();
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     if (coordinateSystem == null) {
-      return Measure.valueOf(width, SI.METRE);
+      return Quantities.getQuantity(width, SI.METRE);
     } else {
-      return Measure.valueOf(width, coordinateSystem.getLengthUnit());
+      return Quantities.getQuantity(width, coordinateSystem.getLengthUnit());
     }
   }
 

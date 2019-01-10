@@ -2,12 +2,13 @@ package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
 
+import javax.measure.Unit;
 import javax.measure.quantity.Angle;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataType;
+
+import si.uom.NonSI;
+import si.uom.SI;
 
 public class AngularUnit implements Serializable {
   /**
@@ -45,7 +46,7 @@ public class AngularUnit implements Serializable {
       unit = baseUnit;
     }
     if (conversionFactor != 1) {
-      unit = unit.times(conversionFactor);
+      unit = unit.multiply(conversionFactor);
       // Normalize the unit
       for (final Unit siUnit : SI.getInstance().getUnits()) {
         if (siUnit.equals(unit)) {

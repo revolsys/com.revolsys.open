@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
@@ -44,7 +44,7 @@ import com.revolsys.record.RecordDataType;
 import com.revolsys.record.code.CodeDataType;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Dates;
-import com.revolsys.util.Measures;
+import com.revolsys.util.QuantityType;
 import com.revolsys.util.UrlUtil;
 import com.revolsys.util.number.BigDecimals;
 import com.revolsys.util.number.BigIntegers;
@@ -120,8 +120,8 @@ public final class DataTypes {
 
   public static final DataType LONG = new Longs();
 
-  public static final DataType MEASURE = new FunctionDataType("measure", Measure.class,
-    Measures::newMeasure, Measures::toString);
+  public static final DataType MEASURE = new FunctionDataType("measure", Quantity.class,
+    QuantityType::newQuantity, QuantityType::toString);
 
   public static final DataType MULTI_LINE_STRING = FunctionDataType.newToObjectEquals(
     "MultiLineString", MultiLineString.class, Lineal::newLineal, Geometry::equalsExact);

@@ -4,13 +4,14 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.print.PageFormat;
 
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
+
+import systems.uom.common.USCustomary;
 
 public class PrintViewport2D extends Viewport2D {
   private final Rectangle2D contentRect;
@@ -50,7 +51,7 @@ public class PrintViewport2D extends Viewport2D {
    */
   @Override
   public Unit<Length> getScreenUnit() {
-    return NonSI.INCH.divide(this.dpi);
+    return USCustomary.INCH.divide(this.dpi);
   }
 
   @Override

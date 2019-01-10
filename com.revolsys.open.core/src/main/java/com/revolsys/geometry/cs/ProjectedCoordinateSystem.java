@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;

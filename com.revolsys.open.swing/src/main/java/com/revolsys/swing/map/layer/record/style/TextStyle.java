@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -21,7 +21,10 @@ import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
+import com.revolsys.util.QuantityType;
 import com.revolsys.util.Strings;
+
+import tec.uom.se.quantity.Quantities;
 
 public class TextStyle extends BaseObjectWithPropertiesAndChange
   implements MapSerializer, Cloneable {
@@ -87,9 +90,9 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
 
   private int textBoxOpacity = 255;
 
-  private Measure<Length> textDx = GeometryStyle.ZERO_PIXEL;
+  private Quantity<Length> textDx = GeometryStyle.ZERO_PIXEL;
 
-  private Measure<Length> textDy = GeometryStyle.ZERO_PIXEL;
+  private Quantity<Length> textDy = GeometryStyle.ZERO_PIXEL;
 
   private String textFaceName = "Arial";
 
@@ -112,7 +115,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
 
   private String textPlacementType = AUTO;
 
-  private Measure<Length> textSize = GeometryStyle.TEN_PIXELS;
+  private Quantity<Length> textSize = GeometryStyle.TEN_PIXELS;
 
   private String textVerticalAlignment = AUTO;
 
@@ -148,11 +151,11 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     return this.textBoxOpacity;
   }
 
-  public Measure<Length> getTextDx() {
+  public Quantity<Length> getTextDx() {
     return this.textDx;
   }
 
-  public Measure<Length> getTextDy() {
+  public Quantity<Length> getTextDy() {
     return this.textDy;
   }
 
@@ -196,7 +199,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     return this.textPlacementType;
   }
 
-  public Measure<Length> getTextSize() {
+  public Quantity<Length> getTextSize() {
     return this.textSize;
   }
 
@@ -240,7 +243,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     firePropertyChange("textBoxOpacity", oldTextBoxOpacity, this.textBoxOpacity);
   }
 
-  public void setTextDx(final Measure<Length> textDx) {
+  public void setTextDx(final Quantity<Length> textDx) {
     final Object oldValue = this.textDy;
     if (textDx == null) {
       this.textDx = this.textDy;
@@ -251,7 +254,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     updateTextDeltaUnits(this.textDx.getUnit());
   }
 
-  public void setTextDy(final Measure<Length> textDy) {
+  public void setTextDy(final Quantity<Length> textDy) {
     final Object oldValue = this.textDy;
     if (textDy == null) {
       this.textDy = this.textDx;
@@ -298,8 +301,8 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     firePropertyChange("textHaloRadius", oldValue, this.textHaloRadius);
   }
 
-  public void setTextHaloRadius(final Measure<Length> textHaloRadius) {
-    setTextHaloRadius(textHaloRadius.doubleValue(textHaloRadius.getUnit()));
+  public void setTextHaloRadius(final Quantity<Length> textHaloRadius) {
+    setTextHaloRadius(QuantityType.doubleValue(textHaloRadius, textHaloRadius.getUnit()));
   }
 
   public void setTextHorizontalAlignment(final String textHorizontalAlignment) {
@@ -366,7 +369,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     firePropertyChange("textPlacementType", oldValue, this.textPlacementType);
   }
 
-  public void setTextSize(final Measure<Length> textSize) {
+  public void setTextSize(final Quantity<Length> textSize) {
     final Object oldValue = this.textSize;
     this.textSize = MarkerStyle.getWithDefault(textSize, MarkerStyle.TEN_PIXELS);
     this.font = null;
@@ -435,12 +438,12 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
   private void updateTextDeltaUnits(final Unit<Length> unit) {
     if (!this.textDx.getUnit().equals(unit)) {
       final double oldValue = this.textDx.getValue().doubleValue();
-      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      final Quantity<Length> newValue = Quantities.getQuantity(oldValue, unit);
       setTextDx(newValue);
     }
     if (!this.textDy.getUnit().equals(unit)) {
       final double oldValue = this.textDy.getValue().doubleValue();
-      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      final Quantity<Length> newValue = Quantities.getQuantity(oldValue, unit);
       setTextDy(newValue);
     }
   }

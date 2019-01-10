@@ -12,8 +12,7 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Vector;
 
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.Unit;
+import javax.measure.Unit;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -144,7 +143,7 @@ public class SelectMapUnitsPerPixel extends JComboBox
           } else {
             model = PROJECTED_MODEL;
           }
-          final Unit<Quantity> unit = coordinateSystem.getUnit();
+          final Unit<?> unit = coordinateSystem.getUnit();
           this.unitString = unit.toString();
           toolTip = "Map Resolution (" + unit + "/pixel)";
         }
@@ -163,7 +162,7 @@ public class SelectMapUnitsPerPixel extends JComboBox
           } else {
             model = PROJECTED_MODEL;
           }
-          final Unit<Quantity> unit = coordinateSystem.getUnit();
+          final Unit<?> unit = coordinateSystem.getUnit();
           this.unitString = unit.toString();
           toolTip = "Map Resolution (" + unit + "/pixel)";
         }

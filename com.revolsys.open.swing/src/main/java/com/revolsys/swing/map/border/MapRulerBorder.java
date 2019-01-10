@@ -15,14 +15,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.BaseUnit;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 import javax.swing.border.AbstractBorder;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -34,19 +30,28 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
+import com.revolsys.util.QuantityType;
+
+import si.uom.NonSI;
+import si.uom.SI;
+import systems.uom.common.USCustomary;
+import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 public class MapRulerBorder extends AbstractBorder implements PropertyChangeListener {
-  private static final List<Unit<Length>> IMPERIAL_FOOT_STEPS = newSteps(NonSI.FOOT.times(1000000),
-    NonSI.FOOT.times(100000), NonSI.FOOT.times(10000), NonSI.FOOT.times(1000),
-    NonSI.FOOT.times(100), NonSI.FOOT.times(10), NonSI.FOOT);
+  private static final List<Unit<Length>> IMPERIAL_FOOT_STEPS = newSteps(
+    USCustomary.FOOT.multiply(1000000), USCustomary.FOOT.multiply(100000),
+    USCustomary.FOOT.multiply(10000), USCustomary.FOOT.multiply(1000),
+    USCustomary.FOOT.multiply(100), USCustomary.FOOT.multiply(10), USCustomary.FOOT);
 
-  private static final List<Unit<Length>> IMPERIAL_MILE_STEPS = newSteps(NonSI.MILE.times(1000),
-    NonSI.MILE.times(100), NonSI.MILE.times(10), NonSI.MILE, NonSI.MILE.divide(10),
-    NonSI.MILE.divide(100));
+  private static final List<Unit<Length>> IMPERIAL_MILE_STEPS = newSteps(
+    USCustomary.MILE.multiply(1000), USCustomary.MILE.multiply(100), USCustomary.MILE.multiply(10),
+    USCustomary.MILE, USCustomary.MILE.divide(10), USCustomary.MILE.divide(100));
 
   private static final List<Unit<Length>> IMPERIAL_PROJECTED_STEPS = newSteps(
-    NonSI.MILE.times(1000), NonSI.MILE.times(100), NonSI.MILE.times(10), NonSI.MILE,
-    NonSI.MILE.divide(16), NonSI.MILE.divide(32), NonSI.FOOT, NonSI.INCH);
+    USCustomary.MILE.multiply(1000), USCustomary.MILE.multiply(100), USCustomary.MILE.multiply(10),
+    USCustomary.MILE, USCustomary.MILE.divide(16), USCustomary.MILE.divide(32), USCustomary.FOOT,
+    USCustomary.INCH);
 
   private static final List<Unit<Angle>> METRIC_GEOGRAPHICS_STEPS = newSteps(NonSI.DEGREE_ANGLE, 30,
     10, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13, 1e-14,
@@ -61,7 +66,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
    */
   private static final long serialVersionUID = -3070841484052913548L;
 
-  public static <U extends Quantity> List<Unit<U>> newSteps(final Unit<U>... steps) {
+  public static <U extends Quantity<U>> List<Unit<U>> newSteps(final Unit<U>... steps) {
     final List<Unit<U>> stepList = new ArrayList<>();
     for (final Unit<U> step : steps) {
       stepList.add(step);
@@ -77,14 +82,14 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
    * @param steps The list of steps.
    * @return The list of step measures.
    */
-  public static <U extends Quantity> List<Unit<U>> newSteps(final Unit<U> unit,
+  public static <U extends Quantity<U>> List<Unit<U>> newSteps(final Unit<U> unit,
     final double... steps) {
     final List<Unit<U>> stepList = new ArrayList<>();
     for (final double step : steps) {
       if (step == 1) {
         stepList.add(unit);
       } else {
-        stepList.add(unit.times(step));
+        stepList.add(unit.multiply(step));
       }
     }
     return stepList;
@@ -118,7 +123,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
     Property.addListener(viewport, "geometryFactory", this);
   }
 
-  private <Q extends Quantity> void drawLabel(final Graphics2D graphics, final int textX,
+  private <Q extends Quantity<Q>> void drawLabel(final Graphics2D graphics, final int textX,
     final int textY, final Unit<Q> displayUnit, final double displayValue,
     final Unit<Q> scaleUnit) {
     DecimalFormat format;
@@ -126,7 +131,8 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
       format = new DecimalFormat("#,###,###,###");
     } else {
       final StringBuilder formatString = new StringBuilder("#,###,###,###.");
-      final double stepSize = Measure.valueOf(1, scaleUnit).doubleValue(displayUnit);
+      final double stepSize = QuantityType.doubleValue(Quantities.getQuantity(1, scaleUnit),
+        displayUnit);
       final int numZeros = (int)Math.abs(Math.round(Math.log10(stepSize % 1.0)));
       for (int j = 0; j < numZeros; j++) {
         formatString.append("0");
@@ -165,12 +171,12 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
     return this.rulerGeometryFactory;
   }
 
-  private <Q extends Quantity> int getStepLevel(final List<Unit<Q>> steps,
-    final Measure<Q> modelUnitsPer10ViewUnits) {
+  private <Q extends Quantity<Q>> int getStepLevel(final List<Unit<Q>> steps,
+    final Quantity<Q> modelUnitsPer10ViewUnits) {
     for (int i = 0; i < steps.size(); i++) {
       final Unit<Q> stepUnit = steps.get(i);
-      final Measure<Q> step = Measure.valueOf(1, stepUnit);
-      final int compare = modelUnitsPer10ViewUnits.compareTo(step);
+      final double modelValue = QuantityType.doubleValue(modelUnitsPer10ViewUnits, stepUnit);
+      final int compare = Double.compare(modelValue, 1);
       if (compare > 0) {
         if (i == 0) {
           return 0;
@@ -195,37 +201,40 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
   @Override
   public void paintBorder(final Component c, final Graphics g, final int x, final int y,
     final int width, final int height) {
-    final Graphics2D graphics = (Graphics2D)g;
+    if (width > 0) {
+      final Graphics2D graphics = (Graphics2D)g;
 
-    graphics.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-    final FontMetrics fontMetrics = graphics.getFontMetrics();
-    this.labelHeight = fontMetrics.getHeight();
+      graphics.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
+      final FontMetrics fontMetrics = graphics.getFontMetrics();
+      this.labelHeight = fontMetrics.getHeight();
 
-    paintBackground(graphics, x, y, width, height);
+      paintBackground(graphics, x, y, width, height);
 
-    final BoundingBox boundingBox = this.viewport.getBoundingBox();
-    if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
-      final Unit<Angle> displayUnit = NonSI.DEGREE_ANGLE;
-      paintRuler(graphics, boundingBox, displayUnit, METRIC_GEOGRAPHICS_STEPS, true, x, y, width,
-        height);
-    } else if (this.rulerCoordinateSystem instanceof ProjectedCoordinateSystem) {
-      if (this.baseUnit.equals(NonSI.FOOT)) {
-        final Unit<Length> displayUnit = NonSI.FOOT;
-        paintRuler(graphics, boundingBox, displayUnit, IMPERIAL_FOOT_STEPS, true, x, y, width,
-          height);
-      } else {
-        final BaseUnit<Length> displayUnit = SI.METRE;
-        paintRuler(graphics, boundingBox, displayUnit, METRIC_PROJECTED_STEPS, true, x, y, width,
-          height);
+      final BoundingBox boundingBox = this.viewport.getBoundingBox();
+      if (this.viewport.getViewWidthPixels() > 0) {
+        if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
+          final Unit<Angle> displayUnit = NonSI.DEGREE_ANGLE;
+          paintRuler(graphics, boundingBox, displayUnit, METRIC_GEOGRAPHICS_STEPS, true, x, y,
+            width, height);
+        } else if (this.rulerCoordinateSystem instanceof ProjectedCoordinateSystem) {
+          if (this.baseUnit.equals(USCustomary.FOOT)) {
+            final Unit<Length> displayUnit = USCustomary.FOOT;
+            paintRuler(graphics, boundingBox, displayUnit, IMPERIAL_FOOT_STEPS, true, x, y, width,
+              height);
+          } else {
+            final Unit<Length> displayUnit = Units.METRE;
+            paintRuler(graphics, boundingBox, displayUnit, METRIC_PROJECTED_STEPS, true, x, y,
+              width, height);
+          }
+        }
+        graphics.setColor(Color.BLACK);
+        graphics.drawRect(this.rulerSize - 1, this.rulerSize - 1, width - 2 * this.rulerSize + 1,
+          height - 2 * this.rulerSize + 1);
       }
     }
-    graphics.setColor(Color.BLACK);
-    graphics.drawRect(this.rulerSize - 1, this.rulerSize - 1, width - 2 * this.rulerSize + 1,
-      height - 2 * this.rulerSize + 1);
-
   }
 
-  private <Q extends Quantity> void paintHorizontalRuler(final Graphics2D g,
+  private <Q extends Quantity<Q>> void paintHorizontalRuler(final Graphics2D g,
     final BoundingBox boundingBox, final Unit<Q> displayUnit, final List<Unit<Q>> steps,
     final int x, final int y, final int width, final int height, final boolean top) {
 
@@ -263,10 +272,10 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
 
       if (mapSize > 0) {
         final Unit<Q> screenToModelUnit = this.viewport.getViewToModelUnit(this.baseUnit);
-        final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6, screenToModelUnit);
+        final Quantity<Q> modelUnitsPer6ViewUnits = Quantities.getQuantity(6, screenToModelUnit);
         final int stepLevel = getStepLevel(steps, modelUnitsPer6ViewUnits);
         final Unit<Q> stepUnit = steps.get(stepLevel);
-        final double step = toBaseUnit(Measure.valueOf(1, stepUnit));
+        final double step = toBaseUnit(Quantities.getQuantity(1, stepUnit));
 
         final double pixelsPerUnit = viewSize / mapSize;
 
@@ -277,9 +286,9 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
           startIndex = minIndex;
         }
         for (long index = startIndex; index < maxIndex; index++) {
-          final Measure<Q> measureValue = Measure.valueOf(index, stepUnit);
+          final Quantity<Q> measureValue = Quantities.getQuantity(index, stepUnit);
           final double value = toBaseUnit(measureValue);
-          final double displayValue = measureValue.doubleValue(displayUnit);
+          final double displayValue = QuantityType.doubleValue(measureValue, displayUnit);
           final int pixel = (int)((value - minX) * pixelsPerUnit);
           boolean found = false;
           int barSize = 4;
@@ -287,7 +296,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
           g.setColor(Color.LIGHT_GRAY);
           for (int i = 0; !found && i < stepLevel; i++) {
             final Unit<Q> scaleUnit = steps.get(i);
-            final double stepValue = measureValue.doubleValue(scaleUnit);
+            final double stepValue = QuantityType.doubleValue(measureValue, scaleUnit);
 
             if (Math.abs(stepValue - Math.round(stepValue)) < 0.000001) {
               barSize = 4 + (int)((this.rulerSize - 4) * (((double)stepLevel - i) / stepLevel));
@@ -312,7 +321,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
     }
   }
 
-  private <Q extends Quantity> void paintRuler(final Graphics2D g, final BoundingBox boundingBox,
+  private <Q extends Quantity<Q>> void paintRuler(final Graphics2D g, final BoundingBox boundingBox,
     final Unit<Q> displayUnit, final List<Unit<Q>> steps, final boolean horizontal, final int x,
     final int y, final int width, final int height) {
     paintHorizontalRuler(g, boundingBox, displayUnit, steps, x, y, width, height, true);
@@ -323,7 +332,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
 
   }
 
-  private <Q extends Quantity> void paintVerticalRuler(final Graphics2D g,
+  private <Q extends Quantity<Q>> void paintVerticalRuler(final Graphics2D g,
     final BoundingBox boundingBox, final Unit<Q> displayUnit, final List<Unit<Q>> steps,
     final int x, final int y, final int width, final int height, final boolean left) {
 
@@ -360,10 +369,10 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
 
       if (mapSize > 0) {
         final Unit<Q> screenToModelUnit = this.viewport.getViewToModelUnit(this.baseUnit);
-        final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6, screenToModelUnit);
+        final Quantity<Q> modelUnitsPer6ViewUnits = Quantities.getQuantity(6, screenToModelUnit);
         final int stepLevel = getStepLevel(steps, modelUnitsPer6ViewUnits);
         final Unit<Q> stepUnit = steps.get(stepLevel);
-        final double step = toBaseUnit(Measure.valueOf(1, stepUnit));
+        final double step = toBaseUnit(Quantities.getQuantity(1, stepUnit));
 
         final double pixelsPerUnit = viewSize / mapSize;
 
@@ -374,9 +383,9 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
           startIndex = minIndex;
         }
         for (long index = startIndex; index < maxIndex; index++) {
-          final Measure<Q> measureValue = Measure.valueOf(index, stepUnit);
+          final Quantity<Q> measureValue = Quantities.getQuantity(index, stepUnit);
           final double value = toBaseUnit(measureValue);
-          final double displayValue = measureValue.doubleValue(displayUnit);
+          final double displayValue = QuantityType.doubleValue(measureValue, displayUnit);
           final int pixel = (int)((value - minY) * pixelsPerUnit);
           boolean found = false;
           int barSize = 4;
@@ -384,7 +393,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
           g.setColor(Color.LIGHT_GRAY);
           for (int i = 0; !found && i < stepLevel; i++) {
             final Unit<Q> scaleUnit = steps.get(i);
-            final double stepValue = measureValue.doubleValue(scaleUnit);
+            final double stepValue = QuantityType.doubleValue(measureValue, scaleUnit);
 
             if (Math.abs(stepValue - Math.round(stepValue)) < 0.000001) {
               barSize = 4 + (int)((this.rulerSize - 4) * (((double)stepLevel - i) / stepLevel));
@@ -442,8 +451,8 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
   }
 
   @SuppressWarnings("unchecked")
-  private <Q extends Quantity> double toBaseUnit(final Measure<Q> value) {
-    return value.doubleValue(this.baseUnit);
+  private <Q extends Quantity<Q>> double toBaseUnit(final Quantity<Q> value) {
+    return QuantityType.doubleValue(value, this.baseUnit);
   }
 
 }

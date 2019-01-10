@@ -3,9 +3,9 @@ package com.revolsys.geometry.cs;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.model.BoundingBox;
@@ -37,7 +37,7 @@ public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
 
   Unit<Length> getLengthUnit();
 
-  <Q extends Quantity> Unit<Q> getUnit();
+  <Q extends Quantity<Q>> Unit<Q> getUnit();
 
   boolean isDeprecated();
 }

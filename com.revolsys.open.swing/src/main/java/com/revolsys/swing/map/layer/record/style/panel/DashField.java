@@ -5,7 +5,7 @@ import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 import javax.swing.JComboBox;
 import javax.swing.SpringLayout;
@@ -20,7 +20,7 @@ public class DashField extends ValueField implements ItemListener {
 
   private final JComboBox<List<Double>> dashField;
 
-  public DashField(final String fieldName, final List<Measure<Length>> dash) {
+  public DashField(final String fieldName, final List<Quantity<Length>> dash) {
     super(new SpringLayout(), fieldName, dash);
 
     final List<List<Double>> dashes = Arrays.asList(null, //
@@ -44,22 +44,22 @@ public class DashField extends ValueField implements ItemListener {
   }
 
   @SuppressWarnings("unchecked")
-  public List<Measure<Length>> getDash() {
-    return (List<Measure<Length>>)this.dashField.getSelectedItem();
+  public List<Quantity<Length>> getDash() {
+    return (List<Quantity<Length>>)this.dashField.getSelectedItem();
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public void itemStateChanged(final ItemEvent event) {
     if (event.getSource() == this.dashField && event.getStateChange() == ItemEvent.SELECTED) {
-      final List<Measure<Length>> dash = (List<Measure<Length>>)this.dashField.getSelectedItem();
+      final List<Quantity<Length>> dash = (List<Quantity<Length>>)this.dashField.getSelectedItem();
       setFieldValue(dash);
     }
   }
 
   @Override
   public void save() {
-    final List<Measure<Length>> dash = getDash();
+    final List<Quantity<Length>> dash = getDash();
     setFieldValue(dash);
   }
 }

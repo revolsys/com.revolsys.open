@@ -1,9 +1,11 @@
 package com.revolsys.swing.parallel;
 
 import java.awt.Image;
+import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.lang.reflect.Method;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -11,14 +13,13 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import org.apache.commons.beanutils.MethodUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.revolsys.logging.Logs;
-import com.revolsys.swing.listener.MacApplicationListenerHandler;
+import com.revolsys.swing.desktop.DesktopInitializer;
 import com.revolsys.swing.logging.ListLog4jAppender;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.util.Property;
@@ -35,24 +36,7 @@ public class BaseMain implements UncaughtExceptionHandler {
     }
   }
 
-  protected static void setMacDockIcon(final Image image) {
-    try {
-      final Class<?> clazz = Class.forName("com.apple.eawt.Application");
-      final Method appMethod = clazz.getMethod("getApplication");
-      final Object application = appMethod.invoke(clazz);
-      if (image != null) {
-        MethodUtils.invokeMethod(application, "setDockIconImage", image);
-      }
-      final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
-      final Object closeAllWindows = quitStrategyClass.getField("CLOSE_ALL_WINDOWS")
-        .get(quitStrategyClass);
-      MethodUtils.invokeExactMethod(application, "setQuitStrategy", closeAllWindows);
-      MacApplicationListenerHandler.init(application);
-    } catch (final ClassNotFoundException t) {
-    } catch (final Throwable t) {
-      t.printStackTrace();
-    }
-  }
+  protected Set<File> initialFiles = new LinkedHashSet<>();
 
   private String lookAndFeelName;
 
@@ -124,6 +108,14 @@ public class BaseMain implements UncaughtExceptionHandler {
 
   public void setLookAndFeelName(final String lookAndFeelName) {
     this.lookAndFeelName = lookAndFeelName;
+  }
+
+  protected void setMacDockIcon(final Image image) {
+    try {
+      DesktopInitializer.initialize(image, this.initialFiles);
+    } catch (final Throwable t) {
+      t.printStackTrace();
+    }
   }
 
   @Override

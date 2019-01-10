@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.measure.Measurable;
+import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -164,10 +164,10 @@ public class FixedScaleZoomMode implements ZoomMode {
   }
 
   protected double getScale(final ComponentViewport2D viewport, final BoundingBox newBoundingBox) {
-    final Measurable<Length> viewWidth = viewport.getViewWidthLength();
-    final Measurable<Length> viewHeight = viewport.getViewHeightLength();
-    final Measurable<Length> modelWidth = newBoundingBox.getWidthLength();
-    final Measurable<Length> modelHeight = newBoundingBox.getHeightLength();
+    final Quantity<Length> viewWidth = viewport.getViewWidthLength();
+    final Quantity<Length> viewHeight = viewport.getViewHeightLength();
+    final Quantity<Length> modelWidth = newBoundingBox.getWidthLength();
+    final Quantity<Length> modelHeight = newBoundingBox.getHeightLength();
     final double horizontalScale = Viewport2D.getScale(viewWidth, modelWidth);
     final double verticalScale = Viewport2D.getScale(viewHeight, modelHeight);
     final double scale = Math.max(horizontalScale, verticalScale);
@@ -254,7 +254,7 @@ public class FixedScaleZoomMode implements ZoomMode {
     final BoundingBox boundingBox = viewport.getBoundingBox(xc1, yc1, xc2, yc2);
     final double x = boundingBox.getCentreX();
     final double y = boundingBox.getCentreY();
-    final Measurable<Length> modelWidth = boundingBox.getWidthLength();
+    final Quantity<Length> modelWidth = boundingBox.getWidthLength();
     double scale = Viewport2D.getScale(viewport.getViewWidthLength(), modelWidth);
     scale = getNextScale(scale, false);
     final double newScale = getBestScale(viewport, scale);

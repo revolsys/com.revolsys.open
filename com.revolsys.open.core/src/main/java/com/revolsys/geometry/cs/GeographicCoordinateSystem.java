@@ -3,16 +3,17 @@ package com.revolsys.geometry.cs;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.measure.converter.UnitConverter;
+import javax.measure.Unit;
+import javax.measure.UnitConverter;
 import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+
+import si.uom.SI;
 
 public class GeographicCoordinateSystem implements CoordinateSystem {
   public static final double EARTH_RADIUS = 6378137;
@@ -227,7 +228,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     final Spheroid spheroid = this.datum.getSpheroid();
     final double radius = spheroid.getSemiMajorAxis();
     final double radianFactor = radianConverter.convert(1);
-    return SI.METRE.times(radius).times(radianFactor);
+    return SI.METRE.multiply(radius).multiply(radianFactor);
   }
 
   public PrimeMeridian getPrimeMeridian() {

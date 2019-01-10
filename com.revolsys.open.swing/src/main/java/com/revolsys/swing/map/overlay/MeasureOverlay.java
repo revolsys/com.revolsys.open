@@ -18,12 +18,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.measure.Measure;
+import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
@@ -31,6 +28,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -49,6 +47,9 @@ import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.util.number.Doubles;
+
+import si.uom.SI;
+import tec.uom.se.quantity.Quantities;
 
 public class MeasureOverlay extends AbstractOverlay {
 
@@ -344,7 +345,7 @@ public class MeasureOverlay extends AbstractOverlay {
             if (getSnapPoint() == null) {
               point = getPoint(geometryFactory, event);
             } else {
-              point = (Point)getSnapPoint().newGeometry(geometryFactory);
+              point = getSnapPoint().newGeometry(geometryFactory);
             }
             final int[] vertexIndex = location.getVertexId();
             Geometry newGeometry;
@@ -497,19 +498,19 @@ public class MeasureOverlay extends AbstractOverlay {
       if (!(this.measureGeometry instanceof Punctual)) {
         final TextStyle measureTextStyle = new TextStyle();
         measureTextStyle.setTextBoxColor(WebColors.Violet);
-        measureTextStyle.setTextSize(Measure.valueOf(14, NonSI.PIXEL));
+        measureTextStyle.setTextSize(Quantities.getQuantity(14, CustomUnits.PIXEL));
         measureTextStyle.setTextFaceName(Font.MONOSPACED);
 
         Point textPoint;
         measureTextStyle.setTextHorizontalAlignment("right");
         if (this.measureDataType == DataTypes.POLYGON && this.measureGeometry instanceof Polygon) {
-          measureTextStyle.setTextDx(Measure.valueOf(-5, NonSI.PIXEL));
+          measureTextStyle.setTextDx(Quantities.getQuantity(-5, CustomUnits.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n-1)");
           measureTextStyle.setTextVerticalAlignment("middle");
           textPoint = this.measureGeometry.getVertex(0, -2);
         } else {
-          measureTextStyle.setTextDx(Measure.valueOf(-7, NonSI.PIXEL));
-          measureTextStyle.setTextDy(Measure.valueOf(-2, NonSI.PIXEL));
+          measureTextStyle.setTextDx(Quantities.getQuantity(-7, CustomUnits.PIXEL));
+          measureTextStyle.setTextDy(Quantities.getQuantity(-2, CustomUnits.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n)");
           measureTextStyle.setTextVerticalAlignment("top");
           textPoint = this.measureGeometry.getVertex(-1);
@@ -563,7 +564,7 @@ public class MeasureOverlay extends AbstractOverlay {
         final double length = measureGeometry.getLength(lengthUnit);
 
         @SuppressWarnings("unchecked")
-        final Unit<Area> areaUnit = (Unit<Area>)lengthUnit.times(lengthUnit);
+        final Unit<Area> areaUnit = (Unit<Area>)lengthUnit.multiply(lengthUnit);
         final double area = measureGeometry.getArea(areaUnit);
         final String unitString = lengthUnit.toString();
 

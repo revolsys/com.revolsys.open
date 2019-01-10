@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
+import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
@@ -45,6 +45,8 @@ import com.revolsys.swing.tree.node.WebServiceConnectionTrees;
 import com.revolsys.util.OS;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
+
+import tec.uom.se.quantity.Quantities;
 
 public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   public static final String J_TYPE = "arcGisRestServerRecordLayer";
@@ -180,10 +182,12 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
       final double angle = symbol.getDouble("angle", 0);
       textStyle.setTextOrientation(angle);
 
-      final Measure<Length> textDx = Measure.valueOf(symbol.getDouble("xoffset", 0), NonSI.PIXEL);
+      final Quantity<Length> textDx = Quantities.getQuantity(symbol.getDouble("xoffset", 0),
+        CustomUnits.PIXEL);
       textStyle.setTextDx(textDx);
 
-      final Measure<Length> textDy = Measure.valueOf(symbol.getDouble("yoffset", 0), NonSI.PIXEL);
+      final Quantity<Length> textDy = Quantities.getQuantity(symbol.getDouble("yoffset", 0),
+        CustomUnits.PIXEL);
       textStyle.setTextDx(textDy);
 
       final MapEx font = symbol.getValue("font");
@@ -191,7 +195,8 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
         final String faceName = font.getString("family", "Arial");
         textStyle.setTextFaceName(faceName);
 
-        final Measure<Length> size = Measure.valueOf(font.getDouble("size", 10), NonSI.PIXEL);
+        final Quantity<Length> size = Quantities.getQuantity(font.getDouble("size", 10),
+          CustomUnits.PIXEL);
         textStyle.setTextSize(size);
 
       }
@@ -225,7 +230,8 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void forEachRecordInternal(final Query query, final Consumer<? super LayerRecord> consumer) {
+  protected void forEachRecordInternal(final Query query,
+    final Consumer<? super LayerRecord> consumer) {
     try (
       RecordReader reader = this.layerDescription.newRecordReader(this::newLayerRecord, query)) {
       for (final Record record : reader) {
@@ -362,7 +368,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     final GeometryStyle style;
     if (outline == null) {
       style = new GeometryStyle();
-      style.setLineWidth(Measure.valueOf(0, NonSI.PIXEL));
+      style.setLineWidth(Quantities.getQuantity(0, CustomUnits.PIXEL));
     } else {
       style = newSimpleLineStyle(outline);
     }
@@ -386,7 +392,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     if (LINE_STYLE_PATTERNS.containsKey(dashStyle)) {
       final List<Double> dashArray = LINE_STYLE_PATTERNS.get(dashStyle);
       if (dashArray == null) {
-        style.setLineWidth(Measure.valueOf(0, NonSI.PIXEL));
+        style.setLineWidth(Quantities.getQuantity(0, CustomUnits.PIXEL));
       } else if (!dashArray.isEmpty()) {
         style.setLineDashArray(dashArray);
       }

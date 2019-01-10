@@ -11,10 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.Unit;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JPanel;
@@ -25,6 +24,7 @@ import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.swing.Icons;
@@ -165,10 +165,10 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
   protected void addLengthMeasureField(final JPanel container, final Object object,
     final String fieldName) {
     SwingUtil.addLabel(container, fieldName);
-    final Measure<Length> value = Property.get(object, fieldName);
+    final Quantity<Length> value = Property.get(object, fieldName);
     Unit<Length> unit;
     if (value == null) {
-      unit = NonSI.PIXEL;
+      unit = CustomUnits.PIXEL;
     } else {
       unit = value.getUnit();
     }
@@ -255,7 +255,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
     } else if (fieldName.equals("lineJoin")) {
       field = newLineJoinField((LineJoin)value);
     } else if (fieldName.equals("lineDashArray")) {
-      field = new DashField(fieldName, (List<Measure<Length>>)value);
+      field = new DashField(fieldName, (List<Quantity<Length>>)value);
     } else if (fieldName.equals("queryFilter")) {
       final AbstractRecordLayer layer = getLayer();
       field = new QueryFilterField(layer, fieldName, (String)value);
@@ -283,8 +283,8 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
       field = new ColorChooserField(fieldName, (Color)value);
     } else if (Boolean.TYPE.equals(fieldClass) || Boolean.class.equals(fieldClass)) {
       field = new CheckBox(fieldName, value);
-    } else if (Measure.class.equals(fieldClass)) {
-      field = new LengthMeasureTextField(fieldName, (Measure<Length>)value, NonSI.PIXEL);
+    } else if (Quantity.class.equals(fieldClass)) {
+      field = new LengthMeasureTextField(fieldName, (Quantity<Length>)value, CustomUnits.PIXEL);
     } else {
       field = new TextField(fieldName, value, 20);
     }

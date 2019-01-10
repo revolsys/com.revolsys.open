@@ -11,16 +11,16 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.Unit;
 import javax.swing.Icon;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
+import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
@@ -34,6 +34,8 @@ import com.revolsys.swing.map.symbol.SymbolLibrary;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
+import tec.uom.se.quantity.Quantities;
+
 public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   implements Cloneable, MapSerializer {
 
@@ -41,13 +43,13 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
 
   public static final AbstractMarker ELLIPSE = new ShapeMarker("ellipse");
 
-  public static final Measure<Length> ONE_PIXEL = Measure.valueOf(1, NonSI.PIXEL);
+  public static final Quantity<Length> ONE_PIXEL = Quantities.getQuantity(1, CustomUnits.PIXEL);
 
   private static final Set<String> PROPERTY_NAMES = new HashSet<>();
 
-  public static final Measure<Length> TEN_PIXELS = Measure.valueOf(10, NonSI.PIXEL);
+  public static final Quantity<Length> TEN_PIXELS = Quantities.getQuantity(10, CustomUnits.PIXEL);
 
-  public static final Measure<Length> ZERO_PIXEL = Measure.valueOf(0, NonSI.PIXEL);
+  public static final Quantity<Length> ZERO_PIXEL = Quantities.getQuantity(0, CustomUnits.PIXEL);
 
   static {
     addStyleProperty("marker", null);
@@ -108,7 +110,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     final Color lineColor, final double lineWidth, final Color fillColor) {
     final AbstractMarker marker = new ShapeMarker(markerName);
     final MarkerStyle style = marker(marker, markerSize, lineColor, fillColor);
-    style.setMarkerLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
+    style.setMarkerLineWidth(Quantities.getQuantity(lineWidth, CustomUnits.PIXEL));
     return style;
   }
 
@@ -120,9 +122,9 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
 
   private String markerCompOp;
 
-  private Measure<Length> markerDx = ZERO_PIXEL;
+  private Quantity<Length> markerDx = ZERO_PIXEL;
 
-  private Measure<Length> markerDy = ZERO_PIXEL;
+  private Quantity<Length> markerDy = ZERO_PIXEL;
 
   private String markerFile;
 
@@ -132,7 +134,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
 
   private int markerFillOpacity = 255;
 
-  private Measure<Length> markerHeight = TEN_PIXELS;
+  private Quantity<Length> markerHeight = TEN_PIXELS;
 
   private String markerHorizontalAlignment = "center";
 
@@ -142,7 +144,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
 
   private int markerLineOpacity = 255;
 
-  private Measure<Length> markerLineWidth = ONE_PIXEL;
+  private Quantity<Length> markerLineWidth = ONE_PIXEL;
 
   private int markerOpacity = 255;
 
@@ -161,7 +163,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
 
   private String markerVerticalAlignment = "middle";
 
-  private Measure<Length> markerWidth = TEN_PIXELS;
+  private Quantity<Length> markerWidth = TEN_PIXELS;
 
   public MarkerStyle() {
   }
@@ -183,11 +185,11 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     return this.markerCompOp;
   }
 
-  public Measure<Length> getMarkerDx() {
+  public Quantity<Length> getMarkerDx() {
     return this.markerDx;
   }
 
-  public Measure<Length> getMarkerDy() {
+  public Quantity<Length> getMarkerDy() {
     return this.markerDy;
   }
 
@@ -203,7 +205,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     return this.markerFillOpacity;
   }
 
-  public Measure<Length> getMarkerHeight() {
+  public Quantity<Length> getMarkerHeight() {
     return this.markerHeight;
   }
 
@@ -223,7 +225,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     return this.markerLineOpacity;
   }
 
-  public Measure<Length> getMarkerLineWidth() {
+  public Quantity<Length> getMarkerLineWidth() {
     return this.markerLineWidth;
   }
 
@@ -259,7 +261,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     return this.markerVerticalAlignment;
   }
 
-  public Measure<Length> getMarkerWidth() {
+  public Quantity<Length> getMarkerWidth() {
     return this.markerWidth;
   }
 
@@ -278,8 +280,8 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   public void setMarker(final AbstractMarker marker, final double markerSize, final Color lineColor,
     final Color fillColor) {
     setMarker(marker);
-    setMarkerWidth(Measure.valueOf(markerSize, NonSI.PIXEL));
-    setMarkerHeight(Measure.valueOf(markerSize, NonSI.PIXEL));
+    setMarkerWidth(Quantities.getQuantity(markerSize, CustomUnits.PIXEL));
+    setMarkerHeight(Quantities.getQuantity(markerSize, CustomUnits.PIXEL));
     setMarkerLineColor(lineColor);
     setMarkerHorizontalAlignment("center");
     setMarkerVerticalAlignment("middle");
@@ -304,7 +306,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     final Color lineColor, final double lineWidth, final Color fillColor) {
     final AbstractMarker marker = new ShapeMarker(markerName);
     setMarker(marker, markerSize, lineColor, fillColor);
-    setMarkerLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
+    setMarkerLineWidth(Quantities.getQuantity(lineWidth, CustomUnits.PIXEL));
     return (V)this;
   }
 
@@ -327,10 +329,10 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   }
 
   public void setMarkerDx(final double markerDx) {
-    setMarkerDx(Measure.valueOf(markerDx, NonSI.PIXEL));
+    setMarkerDx(Quantities.getQuantity(markerDx, CustomUnits.PIXEL));
   }
 
-  public void setMarkerDx(final Measure<Length> markerDx) {
+  public void setMarkerDx(final Quantity<Length> markerDx) {
     final Object oldValue = this.markerDy;
     if (markerDx == null) {
       this.markerDx = this.markerDy;
@@ -342,10 +344,10 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   }
 
   public void setMarkerDy(final double markerDy) {
-    setMarkerDy(Measure.valueOf(markerDy, NonSI.PIXEL));
+    setMarkerDy(Quantities.getQuantity(markerDy, CustomUnits.PIXEL));
   }
 
-  public void setMarkerDy(final Measure<Length> markerDy) {
+  public void setMarkerDy(final Quantity<Length> markerDy) {
     final Object oldValue = this.markerDy;
     if (markerDy == null) {
       this.markerDy = this.markerDx;
@@ -420,7 +422,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     }
   }
 
-  public void setMarkerHeight(final Measure<Length> markerHeight) {
+  public void setMarkerHeight(final Quantity<Length> markerHeight) {
     final Object oldValue = this.markerHeight;
     if (markerHeight == null) {
       this.markerHeight = this.markerWidth;
@@ -490,10 +492,10 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     }
   }
 
-  public void setMarkerLineWidth(final Measure<Length> markerLineWidth) {
+  public void setMarkerLineWidth(final Quantity<Length> markerLineWidth) {
     final Object oldValue = this.markerLineWidth;
     if (markerLineWidth == null) {
-      this.markerLineWidth = Measure.valueOf(1, this.markerWidth.getUnit());
+      this.markerLineWidth = Quantities.getQuantity(1, this.markerWidth.getUnit());
     } else {
       this.markerLineWidth = markerLineWidth;
     }
@@ -570,7 +572,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     firePropertyChange("markerVerticalAlignment", oldValue, this.markerVerticalAlignment);
   }
 
-  public void setMarkerWidth(final Measure<Length> markerWidth) {
+  public void setMarkerWidth(final Quantity<Length> markerWidth) {
     final Object oldValue = this.markerWidth;
     if (markerWidth == null) {
       this.markerWidth = this.markerHeight;
@@ -615,12 +617,12 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   private void updateMarkerDeltaUnits(final Unit<Length> unit) {
     if (!this.markerDx.getUnit().equals(unit)) {
       final double oldValue = this.markerDx.getValue().doubleValue();
-      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      final Quantity<Length> newValue = Quantities.getQuantity(oldValue, unit);
       setMarkerDx(newValue);
     }
     if (!this.markerDy.getUnit().equals(unit)) {
       final double oldValue = this.markerDy.getValue().doubleValue();
-      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      final Quantity<Length> newValue = Quantities.getQuantity(oldValue, unit);
       setMarkerDy(newValue);
     }
   }
@@ -628,17 +630,17 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   private void updateMarkerUnits(final Unit<Length> unit) {
     if (!this.markerWidth.getUnit().equals(unit)) {
       final double oldValue = this.markerWidth.getValue().doubleValue();
-      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      final Quantity<Length> newValue = Quantities.getQuantity(oldValue, unit);
       setMarkerWidth(newValue);
     }
     if (!this.markerHeight.getUnit().equals(unit)) {
       final double oldValue = this.markerHeight.getValue().doubleValue();
-      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      final Quantity<Length> newValue = Quantities.getQuantity(oldValue, unit);
       setMarkerHeight(newValue);
     }
     if (!this.markerLineWidth.getUnit().equals(unit)) {
       final double oldValue = this.markerLineWidth.getValue().doubleValue();
-      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      final Quantity<Length> newValue = Quantities.getQuantity(oldValue, unit);
       setMarkerLineWidth(newValue);
     }
   }

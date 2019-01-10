@@ -2,62 +2,97 @@ package com.revolsys.beans;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Objects;
 
-import javax.measure.Measure;
-import javax.measure.converter.UnitConverter;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.Unit;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 
 import com.revolsys.util.JexlUtil;
 
-public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
-  private static final long serialVersionUID = 1L;
+import tec.uom.se.AbstractConverter;
+import tec.uom.se.AbstractQuantity;
+import tec.uom.se.ComparableQuantity;
+import tec.uom.se.quantity.Quantities;
+
+public class ExpressionMeasurable<Q extends Quantity<Q>> extends AbstractQuantity<Q> {
 
   private JexlContext context;
 
   private final Expression expression;
 
-  private final Unit<Q> unit;
-
   protected ExpressionMeasurable(final Expression expression, final JexlContext context,
     final Unit<Q> unit) {
+    super(unit);
     this.expression = expression;
     this.context = context;
-    this.unit = unit;
   }
 
   public ExpressionMeasurable(final String expression, final Unit<Q> unit) {
+    super(unit);
     try {
       this.expression = JexlUtil.newExpression(expression);
     } catch (final Exception e) {
       throw new IllegalArgumentException("Expression " + expression + " is not valid", e);
     }
-    this.unit = unit;
   }
 
   @Override
-  public BigDecimal decimalValue(final Unit<Q> arg0, final MathContext arg1)
+  public ComparableQuantity<Q> add(final Quantity<Q> that) {
+    final double value = getValue();
+    if (getUnit().equals(that.getUnit())) {
+      return Quantities.getQuantity(value + that.getValue().doubleValue(), getUnit());
+    }
+    final Quantity<Q> converted = that.to(getUnit());
+    return Quantities.getQuantity(value + converted.getValue().doubleValue(), getUnit());
+  }
+
+  @Override
+  public BigDecimal decimalValue(final Unit<Q> unit, final MathContext ctx)
     throws ArithmeticException {
-    throw new UnsupportedOperationException();
+    final double value = getValue();
+    final BigDecimal decimal = BigDecimal.valueOf(value); // TODO check value if
+    // it is a BD, otherwise
+    // use different
+    // converter
+    return super.getUnit().equals(unit) ? decimal
+      : ((AbstractConverter)super.getUnit().getConverterTo(unit)).convert(decimal, ctx);
+  }
+
+  @Override
+  public ComparableQuantity<Q> divide(final Number that) {
+    final double value = getValue();
+    return Quantities.getQuantity(value / that.doubleValue(), getUnit());
+  }
+
+  @Override
+  public ComparableQuantity<?> divide(final Quantity<?> that) {
+    final double value = getValue();
+    return Quantities.getQuantity(value / that.getValue().doubleValue(),
+      getUnit().divide(that.getUnit()));
   }
 
   @Override
   public double doubleValue(final Unit<Q> unit) {
-    final Double value = getValue();
-    if (unit == this.unit || this.unit.equals(unit)) {
-      return value;
-    } else {
-      final UnitConverter unitConverter = this.unit.getConverterTo(unit);
-      return unitConverter.convert(value);
-    }
+    final double value = getValue();
+    return super.getUnit().equals(unit) ? value
+      : super.getUnit().getConverterTo(unit).convert(value);
   }
 
   @Override
-  public Unit<Q> getUnit() {
-    return this.unit;
+  public boolean equals(final Object obj) {
+    final double value = getValue();
+    if (this == obj) {
+      return true;
+    }
+    if (obj instanceof Quantity<?>) {
+      final Quantity<?> that = (Quantity<?>)obj;
+      return Objects.equals(getUnit(), that.getUnit())
+        && Equalizer.hasEquality(value, that.getValue());
+    }
+    return false;
   }
 
   @Override
@@ -74,18 +109,46 @@ public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
     }
   }
 
-  public void setContext(final JexlContext context) {
-    this.context = context;
+  @Override
+  public AbstractQuantity<Q> inverse() {
+    final double value = getValue();
+    return (AbstractQuantity<Q>)Quantities.getQuantity(1d / value, getUnit().inverse());
   }
 
   @Override
-  public Measure to(final Unit<Q> unit) {
-    if (unit == this.unit || this.unit.equals(unit)) {
-      return this;
-    } else {
-      final UnitConverter unitConverter = this.unit.getConverterTo(unit);
-      final Unit<Q> transformedUnit = this.unit.transform(unitConverter);
-      return new ExpressionMeasurable<>(this.expression, this.context, transformedUnit);
+  public boolean isBig() {
+    return false;
+  }
+
+  @Override
+  public long longValue(final Unit<Q> unit) {
+    final double result = doubleValue(unit);
+    if (result < Long.MIN_VALUE || result > Long.MAX_VALUE) {
+      throw new ArithmeticException("Overflow (" + result + ")");
     }
+    return (long)result;
+  }
+
+  @Override
+  public ComparableQuantity<Q> multiply(final Number that) {
+    final double value = getValue();
+    return Quantities.getQuantity(value * that.doubleValue(), getUnit());
+  }
+
+  @Override
+  public ComparableQuantity<?> multiply(final Quantity<?> that) {
+    final double value = getValue();
+    return Quantities.getQuantity(value * that.getValue().doubleValue(),
+      getUnit().multiply(that.getUnit()));
+  }
+
+  @Override
+  public ComparableQuantity<Q> subtract(final Quantity<Q> that) {
+    final double value = getValue();
+    if (getUnit().equals(that.getUnit())) {
+      return Quantities.getQuantity(value - that.getValue().doubleValue(), getUnit());
+    }
+    final Quantity<Q> converted = that.to(getUnit());
+    return Quantities.getQuantity(value - converted.getValue().doubleValue(), getUnit());
   }
 }

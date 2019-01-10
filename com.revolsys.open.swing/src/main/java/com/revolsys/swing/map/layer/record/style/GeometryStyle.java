@@ -9,17 +9,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.measure.Measure;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+
+import tec.uom.se.quantity.Quantities;
 
 public class GeometryStyle extends MarkerStyle {
 
@@ -147,7 +149,7 @@ public class GeometryStyle extends MarkerStyle {
   public static GeometryStyle line(final Color color, final double lineWidth) {
     final GeometryStyle style = new GeometryStyle();
     style.setLineColor(color);
-    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
+    style.setLineWidth(Quantities.getQuantity(lineWidth, CustomUnits.PIXEL));
     return style;
   }
 
@@ -178,7 +180,7 @@ public class GeometryStyle extends MarkerStyle {
     final Color fillColor) {
     final GeometryStyle style = new GeometryStyle();
     style.setLineColor(lineColor);
-    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
+    style.setLineWidth(Quantities.getQuantity(lineWidth, CustomUnits.PIXEL));
     style.setPolygonFill(fillColor);
     return style;
   }
@@ -207,7 +209,7 @@ public class GeometryStyle extends MarkerStyle {
 
   private double lineSmooth;
 
-  private Measure<Length> lineWidth = ONE_PIXEL;
+  private Quantity<Length> lineWidth = ONE_PIXEL;
 
   private boolean polygonClip = true;
 
@@ -279,7 +281,7 @@ public class GeometryStyle extends MarkerStyle {
     return this.lineSmooth;
   }
 
-  public Measure<Length> getLineWidth() {
+  public Quantity<Length> getLineWidth() {
     return this.lineWidth;
   }
 
@@ -453,7 +455,7 @@ public class GeometryStyle extends MarkerStyle {
     final float width = (float)Viewport2D.toModelValue(viewport, this.lineWidth);
 
     final float dashOffset = (float)Viewport2D.toModelValue(viewport,
-      Measure.valueOf(this.lineDashOffset, unit));
+      Quantities.getQuantity(this.lineDashOffset, unit));
 
     final float[] dashArray;
     final int dashArraySize = this.lineDashArray.size();
@@ -464,7 +466,7 @@ public class GeometryStyle extends MarkerStyle {
       for (int i = 0; i < dashArray.length; i++) {
         final Double dashDouble = this.lineDashArray.get(i);
         final float dashFloat = (float)Viewport2D.toModelValue(viewport,
-          Measure.valueOf(dashDouble, unit));
+          Quantities.getQuantity(dashDouble, unit));
         dashArray[i] = dashFloat;
       }
     }
@@ -476,7 +478,7 @@ public class GeometryStyle extends MarkerStyle {
     graphics.setStroke(basicStroke);
   }
 
-  public void setLineWidth(final Measure<Length> lineWidth) {
+  public void setLineWidth(final Quantity<Length> lineWidth) {
     final Object oldValue = this.lineWidth;
     this.lineWidth = getWithDefault(lineWidth, ZERO_PIXEL);
     firePropertyChange("lineWidth", oldValue, this.lineWidth);
