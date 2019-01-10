@@ -1,18 +1,16 @@
 package com.revolsys.gis.parallel;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;
 
 public class ValidateGeometryRange extends BaseInOutProcess<Record, Record> {
-  private static final Logger LOG = Logger.getLogger(ValidateGeometryRange.class);
 
   private double maxX = Double.MAX_VALUE;
 
@@ -117,7 +115,7 @@ public class ValidateGeometryRange extends BaseInOutProcess<Record, Record> {
     if (!isValid(this.minX, this.maxY, coordinate.getX())
       || !isValid(this.minY, this.maxY, coordinate.getY())
       || !isValid(this.minZ, this.maxZ, coordinate.getZ())) {
-      LOG.warn(type + " has invalid coordinate at " + coordinate);
+      Logs.warn(this, type + " has invalid coordinate at " + coordinate);
       return false;
     } else {
       return true;

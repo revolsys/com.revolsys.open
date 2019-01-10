@@ -36,12 +36,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.ZipUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.saif.util.ObjectSetUtil;
 import com.revolsys.record.io.format.saif.util.OsnConverterRegistry;
@@ -61,8 +60,6 @@ import com.revolsys.util.Property;
  */
 public class SaifWriter extends AbstractRecordWriter {
   private static final String GLOBAL_METADATA = "/GlobalMetadata";
-
-  private static final Logger log = Logger.getLogger(SaifWriter.class);
 
   private RecordDefinition annotatedSpatialDataSetType;
 
@@ -135,25 +132,16 @@ public class SaifWriter extends AbstractRecordWriter {
   public synchronized void close() {
     if (this.tempDirectory != null) {
       try {
-        if (log.isInfoEnabled()) {
-          log.info("Closing SAIF archive '" + this.file.getCanonicalPath() + "'");
-        }
         writeExports();
         writeMissingDirObject("InternallyReferencedObjects", "internal.dir");
         writeMissingDirObject("ImportedObjects", "imports.dir");
         writeMissingGlobalMetadata();
-        if (log.isInfoEnabled()) {
-          log.info("  Closing serializers");
-        }
         for (final OsnSerializer serializer : this.serializers.values()) {
           try {
             serializer.close();
           } catch (final Throwable e) {
-            log.error(e.getMessage(), e);
+            Logs.error(this, e.getMessage(), e);
           }
-        }
-        if (log.isDebugEnabled()) {
-          log.debug("  Compressing SAIF archive");
         }
         if (!this.file.isDirectory()) {
           ZipUtil.zipDirectory(this.file, this.tempDirectory);
@@ -165,17 +153,11 @@ public class SaifWriter extends AbstractRecordWriter {
         this.file.delete();
         throw e;
       } catch (final IOException e) {
-        log.error("  Unable to compress SAIF archive: " + e.getMessage(), e);
+        Logs.error(this, "  Unable to compress SAIF archive: " + e.getMessage(), e);
         e.printStackTrace();
       } finally {
-        if (log.isDebugEnabled()) {
-          log.debug("  Deleting temporary files");
-        }
         if (!this.file.isDirectory()) {
           FileUtil.deleteDirectory(this.tempDirectory);
-          if (log.isDebugEnabled()) {
-            log.debug("  Finished closing file");
-          }
         }
         this.tempDirectory = null;
       }
@@ -306,7 +288,7 @@ public class SaifWriter extends AbstractRecordWriter {
           this.serializers.put(typePath, serializer);
         }
       } catch (final IOException e) {
-        log.error("Unable to create serializer: " + e.getMessage(), e);
+        Logs.error(this, "Unable to create serializer: " + e.getMessage(), e);
       }
     }
     return serializer;
@@ -388,9 +370,6 @@ public class SaifWriter extends AbstractRecordWriter {
         fileName = filePrefix + ".saf";
       }
       this.file = new File(file.getCanonicalFile().getParentFile(), fileName);
-      if (log.isInfoEnabled()) {
-        log.info("Creating SAIF archive '" + file.getAbsolutePath() + "'");
-      }
       this.tempDirectory = FileUtil.newTempDirectory(filePrefix, ".saf");
       FileUtil.deleteFileOnExit(this.tempDirectory);
     } else {
@@ -480,10 +459,10 @@ public class SaifWriter extends AbstractRecordWriter {
           serializer.endLine();
         }
       } else {
-        log.error("No serializer for type '" + type.getPath() + "'");
+        Logs.error(this, "No serializer for type '" + type.getPath() + "'");
       }
     } catch (final IOException e) {
-      log.error(e.getMessage(), e);
+      Logs.error(this, e.getMessage(), e);
     }
   }
 

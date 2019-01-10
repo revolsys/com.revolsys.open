@@ -20,7 +20,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.Logs;
-import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.TargetBeanProcess;
@@ -298,10 +297,17 @@ public class ProcessNetwork
           } else {
             runProcess = process;
           }
-          final Runnable runnable = new ProcessRunnable(this, runProcess);
           final String name = runProcess.toString();
-          final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(runnable);
-          thread = new Thread(this.threadGroup, appenderRunnable, name);
+          final Runnable runnable = () -> {
+            try {
+              runProcess.run();
+            } catch (final Throwable e) {
+              Logs.error(this, e);
+            } finally {
+              removeProcess(runProcess);
+            }
+          };
+          thread = new Thread(this.threadGroup, runnable, name);
           this.processes.put(runProcess, thread);
           if (!thread.isAlive()) {
             thread.start();

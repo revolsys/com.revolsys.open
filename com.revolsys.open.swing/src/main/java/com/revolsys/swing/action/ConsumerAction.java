@@ -11,9 +11,8 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.i18n.I18nCharSequence;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.AbstractActionMainMenuItemFactory;
@@ -142,7 +141,7 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
         this.handler.accept(event);
       } catch (final NoSuchElementException e) {
       } catch (final Throwable e) {
-        Logger.getLogger(this.handler.getClass()).error("Error Performing action", e);
+        Logs.error(this, "Error Performing action", e);
       }
     }
   }

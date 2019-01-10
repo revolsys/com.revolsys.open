@@ -3,7 +3,7 @@ package com.revolsys.swing.parallel;
 import java.awt.Image;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.Enumeration;
+import java.sql.Timestamp;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -13,16 +13,20 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.impl.Log4jLogEvent;
+import org.apache.logging.log4j.message.SimpleMessage;
 
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.desktop.DesktopInitializer;
 import com.revolsys.swing.logging.ListLog4jAppender;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class BaseMain implements UncaughtExceptionHandler {
 
@@ -52,11 +56,18 @@ public class BaseMain implements UncaughtExceptionHandler {
   }
 
   public void logError(final Throwable e) {
-    final Logger logger = Logger.getLogger(getClass());
-    final LoggingEvent event = new LoggingEvent(logger.getClass().getName(), logger, Level.ERROR,
-      "Unable to start application", e);
+    final LogEvent event = Log4jLogEvent.newBuilder()//
+      .setLoggerName(getClass().getName()) //
+      .setLevel(Level.ERROR) //
+      .setMessage(new SimpleMessage("Unable to start application".toString())) //
+      .setThrown(e)
+      .build();
 
-    LoggingEventPanel.showDialog(null, event);
+    final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    final String threadName = Thread.currentThread().getName();
+    final String stackTrace = Strings.toString("\n", e.getStackTrace());
+    LoggingEventPanel.showDialog(null, timestamp, Level.ERROR, getClass().getName(),
+      "Unable to start application", threadName, stackTrace);
     Logs.error(this, "Unable to start application " + this.name, e);
   }
 
@@ -130,19 +141,21 @@ public class BaseMain implements UncaughtExceptionHandler {
       }
     }
     Logs.error(logClass, message, e);
-    @SuppressWarnings("unchecked")
-    final Enumeration<Appender> allAppenders = Logger.getRootLogger().getAllAppenders();
-    while (allAppenders.hasMoreElements()) {
-      final Appender appender = allAppenders.nextElement();
+    final Logger rootLogger = (Logger)LogManager.getRootLogger();
+    for (final Appender appender : rootLogger.getAppenders().values()) {
       if (appender instanceof ListLog4jAppender) {
         return;
       }
     }
-    final Logger logger = Logger.getLogger(logClass);
-    final LoggingEvent event = new LoggingEvent(logger.getClass().getName(), logger, Level.ERROR,
-      message, e);
+    final Logger logger = (Logger)LogManager.getLogger(logClass);
+    final String name = logger.getClass().getName();
+    final LogEvent event = Log4jLogEvent.newBuilder()//
+      .setLoggerName(name) //
+      .setLevel(Level.ERROR) //
+      .setMessage(new SimpleMessage(message)) //
+      .setThrown(e)
+      .build();
 
     LoggingEventPanel.showDialog(null, event);
-
   }
 }

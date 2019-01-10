@@ -19,14 +19,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
 
 public class FileDropTargetListener implements DropTargetListener, HierarchyListener {
-  private static final Logger LOG = Logger.getLogger(FileDropTargetListener.class);
 
   private static final String ZERO_CHAR_STRING = String.valueOf((char)0);
 
@@ -102,7 +100,7 @@ public class FileDropTargetListener implements DropTargetListener, HierarchyList
                   }
                 }
               } catch (final URISyntaxException e) {
-                LOG.error("Drag and Drop file " + fileName + " not valid", e);
+                Logs.error(this, "Drag and Drop file " + fileName + " not valid", e);
               }
             }
           }
@@ -116,7 +114,7 @@ public class FileDropTargetListener implements DropTargetListener, HierarchyList
       Invoke.background("Open Files", () -> project.openFiles(files));
       event.getDropTargetContext().dropComplete(true);
     } catch (final Throwable e) {
-      LOG.error("Unable to drop", e);
+      Logs.error(this, "Unable to drop", e);
     }
   }
 

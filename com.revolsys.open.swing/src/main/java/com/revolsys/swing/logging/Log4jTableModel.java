@@ -11,12 +11,16 @@ import javax.swing.JTable;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.impl.ThrowableProxy;
+import org.apache.logging.log4j.message.Message;
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.dnd.ClipboardUtil;
@@ -47,12 +51,7 @@ public class Log4jTableModel extends AbstractTableModel {
     tabs.setSelectedIndex(tabIndex);
   }
 
-  public static TablePanel newPanel() {
-    final BaseJTable table = newTable();
-    return new TablePanel(table);
-  }
-
-  public static BaseJTable newTable() {
+  private static BaseJTable newLogTable() {
     final Log4jTableModel model = new Log4jTableModel();
     final BaseJTable table = new BaseJTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -83,7 +82,7 @@ public class Log4jTableModel extends AbstractTableModel {
           int row = table.rowAtPoint(e.getPoint());
           row = table.convertRowIndexToModel(row);
           if (row != -1) {
-            final LoggingEvent loggingEvent = model.getLoggingEvent(row);
+            final List<Object> loggingEvent = model.rows.get(row);
             LoggingEventPanel.showDialog(table, loggingEvent);
           }
         }
@@ -92,14 +91,19 @@ public class Log4jTableModel extends AbstractTableModel {
     return table;
   }
 
+  public static TablePanel newPanel() {
+    final BaseJTable table = newLogTable();
+    return new TablePanel(table);
+  }
+
   private final ListLog4jAppender appender = new ListLog4jAppender(this);
 
-  private List<LoggingEvent> rows = new ArrayList<>();
+  private List<List<Object>> rows = new ArrayList<>();
 
   private boolean hasNewErrors = false;
 
   public Log4jTableModel() {
-    Logger.getRootLogger().addAppender(this.appender);
+    Logs.addRootAppender(this.appender);
     final MenuFactory menu = getMenu();
     menu.addMenuItem("all", "Delete all messages", "delete", this::clear);
     addMenuItem("selected", "Delete selected messages", "delete", (final BaseJTable table) -> {
@@ -118,13 +122,21 @@ public class Log4jTableModel extends AbstractTableModel {
     addMenuItem("message", "Copy message", "page_copy", this::copyLoggingEvent);
   }
 
-  public void addLoggingEvent(final LoggingEvent event) {
+  public void addLoggingEvent(final LogEvent event) {
     if (event != null) {
+      final long time = event.getTimeMillis();
+      final Timestamp timestamp = new Timestamp(time);
+      final Level level = event.getLevel();
+      final String loggerName = event.getLoggerName();
+      final Message message = event.getMessage();
+
+      final List<Object> row = Arrays.asList(timestamp, level, loggerName,
+        message.getFormattedMessage(), event.getThreadName(), event.getThrownProxy());
       Invoke.later(() -> {
-        if (event.getLevel().isGreaterOrEqual(Level.ERROR)) {
+        if (event.getLevel().isMoreSpecificThan(Level.ERROR)) {
           this.hasNewErrors = true;
         }
-        this.rows.add(event);
+        this.rows.add(row);
         while (this.rows.size() > 99) {
           this.rows.remove(0);
         }
@@ -150,17 +162,17 @@ public class Log4jTableModel extends AbstractTableModel {
   }
 
   public void copyLoggingEvent(final int index) {
-    final LoggingEvent event = getLoggingEvent(index);
+    final List<Object> event = this.rows.get(index);
     final StringBuilder plain = new StringBuilder();
     final StringBuilder html = new StringBuilder();
-    final Object message = event.getMessage();
+    final Object message = event.get(3);
     if (message != null) {
       plain.append(message);
       html.append("<b>");
       html.append(message);
       html.append("</b>");
     }
-    final String stackTrace = LoggingEventPanel.getStackTrace(event);
+    final String stackTrace = LoggingEventPanel.getStackTrace((ThrowableProxy)event.get(5));
     if (Property.hasValue(stackTrace)) {
       if (plain.length() > 0) {
         plain.append("\n");
@@ -178,7 +190,8 @@ public class Log4jTableModel extends AbstractTableModel {
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
-    Logger.getRootLogger().removeAppender(this.appender);
+    final Logger rootLogger = (Logger)LogManager.getRootLogger();
+    rootLogger.removeAppender(this.appender);
   }
 
   @Override
@@ -189,16 +202,6 @@ public class Log4jTableModel extends AbstractTableModel {
   @Override
   public String getColumnName(final int column) {
     return COLUMN_NAMES.get(column);
-  }
-
-  public LoggingEvent getLoggingEvent(final int rowIndex) {
-    try {
-      if (rowIndex < this.rows.size()) {
-        return this.rows.get(rowIndex);
-      }
-    } catch (final Throwable e) {
-    }
-    return null;
   }
 
   @Override
@@ -218,24 +221,11 @@ public class Log4jTableModel extends AbstractTableModel {
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final LoggingEvent event = getLoggingEvent(rowIndex);
-    if (event == null) {
+    final List<Object> values = this.rows.get(rowIndex);
+    if (values == null) {
       return null;
     } else {
-      switch (columnIndex) {
-        case 0:
-          final long time = event.getTimeStamp();
-          final Timestamp timestamp = new Timestamp(time);
-          return timestamp;
-        case 1:
-          return event.getLevel();
-        case 2:
-          return event.getLoggerName();
-        case 3:
-          return event.getMessage();
-        default:
-          return null;
-      }
+      return values.get(columnIndex);
     }
   }
 
@@ -255,7 +245,7 @@ public class Log4jTableModel extends AbstractTableModel {
     });
   }
 
-  public void setRows(final List<LoggingEvent> rows) {
+  public void setRows(final List<List<Object>> rows) {
     Invoke.later(() -> {
       this.rows = new ArrayList<>(rows);
       fireTableDataChanged();

@@ -20,11 +20,11 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.MapContext;
-import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.PatternLayout;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.MethodInvocationException;
 import org.springframework.beans.PropertyAccessException;
@@ -37,7 +37,6 @@ import org.springframework.context.support.GenericApplicationContext;
 import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.Logs;
-import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.ManifestUtil;
@@ -291,24 +290,19 @@ public class ScriptTool {
   private void run() {
     final long startTime = System.currentTimeMillis();
 
-    final ThreadLocalFileAppender localAppender = ThreadLocalFileAppender.getAppender();
-    if (localAppender != null && this.logFile != null) {
-      final File parentFile = this.logFile.getParentFile();
-      if (parentFile != null) {
-        parentFile.mkdirs();
-      }
-      localAppender.setLocalFile(this.logFile.getAbsolutePath());
-    } else if (this.logFile != null) {
+    if (this.logFile != null) {
 
-      final org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
+      final Logger rootLogger = (Logger)LogManager.getRootLogger();
       try {
-        final Layout layout = new PatternLayout("%d\t%p\t%m%n");
-        final Appender appender = new FileAppender(layout, this.logFile.getAbsolutePath(), false);
+        final PatternLayout layout = PatternLayout.newBuilder().withPattern("%d\t%p\t%m%n").build();
+        final Appender appender = FileAppender.newBuilder() //
+          .withLayout(layout) //
+          .withFileName(this.logFile.getAbsolutePath()) //
+          .withAppend(false) //
+          .build();
         rootLogger.addAppender(appender);
-      } catch (final IOException e) {
-        final Layout layout = new PatternLayout("%p\t%m%n");
-        final Appender appender = new ConsoleAppender(layout);
-        rootLogger.addAppender(appender);
+      } catch (final Exception e) {
+        Logs.addRootAppender("%p\t%m%n");
         Logs.error(this, "Cannot find log file " + this.logFile, e);
       }
 

@@ -1,7 +1,6 @@
 package com.revolsys.parallel.process;
 
-import org.apache.log4j.Logger;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.store.Buffer;
@@ -54,17 +53,16 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements O
 
   @Override
   public final void run() {
-    final Logger log = Logger.getLogger(getClass());
     try {
-      log.debug("Start");
+      Logs.debug(this, "Start");
       init();
       run(getOut());
     } catch (final ClosedException e) {
-      log.debug("Shutdown");
+      Logs.debug(this, "Shutdown");
     } catch (final ThreadDeath e) {
-      log.debug("Shutdown");
+      Logs.debug(this, "Shutdown");
     } catch (final Throwable e) {
-      log.error(e.getMessage(), e);
+      Logs.error(this, e.getMessage(), e);
       getProcessNetwork().stop();
     } finally {
       if (this.out != null) {

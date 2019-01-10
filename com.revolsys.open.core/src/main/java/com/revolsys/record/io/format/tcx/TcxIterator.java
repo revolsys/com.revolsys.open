@@ -11,8 +11,6 @@ import java.util.Queue;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
@@ -25,8 +23,6 @@ import com.revolsys.spring.resource.Resource;
 
 public class TcxIterator extends BaseObjectWithProperties
   implements Iterator<Record>, RecordReader {
-
-  private static final Logger LOG = Logger.getLogger(TcxIterator.class);
 
   private String baseName;
 

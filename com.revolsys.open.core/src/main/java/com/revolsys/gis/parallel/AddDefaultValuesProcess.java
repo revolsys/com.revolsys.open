@@ -26,11 +26,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.NDC;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.PathUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 import com.revolsys.record.Record;
@@ -38,7 +36,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
 
 public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record> {
-  private static final Logger log = Logger.getLogger(AddDefaultValuesProcess.class);
 
   private Set<String> excludedFieldNames = new HashSet<>();
 
@@ -133,37 +130,32 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record
     final int dotIndex = key.indexOf('.');
     if (dotIndex == -1) {
       if (record.getValue(key) == null && !this.excludedFieldNames.contains(key)) {
-        log.info("Adding attribute " + key + "=" + value);
+        Logs.info(this, "Adding attribute " + key + "=" + value);
         record.setValue(key, value);
       }
     } else {
       final String fieldName = key.substring(0, dotIndex);
-      NDC.push(" -> " + fieldName);
-      try {
-        final String subKey = key.substring(dotIndex + 1);
-        final Object attributeValue = record.getValue(fieldName);
-        if (attributeValue == null) {
-          final RecordDefinition type = record.getRecordDefinition();
-          final int attrIndex = type.getFieldIndex(fieldName);
-          final DataType dataType = type.getFieldType(attrIndex);
-          final Class<?> typeClass = dataType.getJavaClass();
-          if (typeClass == Record.class) {
+      final String subKey = key.substring(dotIndex + 1);
+      final Object attributeValue = record.getValue(fieldName);
+      if (attributeValue == null) {
+        final RecordDefinition type = record.getRecordDefinition();
+        final int attrIndex = type.getFieldIndex(fieldName);
+        final DataType dataType = type.getFieldType(attrIndex);
+        final Class<?> typeClass = dataType.getJavaClass();
+        if (typeClass == Record.class) {
 
-            final RecordDefinition subClass = this.recordDefinitionFactory
-              .getRecordDefinition(dataType.getName());
-            final Record subObject = subClass.newRecord();
-            setDefaultValue(subObject, subKey, value);
-            record.setValue(fieldName, subObject);
-            process(subObject);
-          }
-        } else if (attributeValue instanceof Record) {
-          final Record subObject = (Record)attributeValue;
+          final RecordDefinition subClass = this.recordDefinitionFactory
+            .getRecordDefinition(dataType.getName());
+          final Record subObject = subClass.newRecord();
           setDefaultValue(subObject, subKey, value);
-        } else if (!fieldName.equals(record.getRecordDefinition().getGeometryFieldName())) {
-          log.error("Attribute '" + fieldName + "' must be a Record");
+          record.setValue(fieldName, subObject);
+          process(subObject);
         }
-      } finally {
-        NDC.pop();
+      } else if (attributeValue instanceof Record) {
+        final Record subObject = (Record)attributeValue;
+        setDefaultValue(subObject, subKey, value);
+      } else if (!fieldName.equals(record.getRecordDefinition().getGeometryFieldName())) {
+        Logs.error(this, "Attribute '" + fieldName + "' must be a Record");
       }
     }
   }

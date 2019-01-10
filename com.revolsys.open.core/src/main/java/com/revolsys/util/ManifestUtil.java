@@ -8,12 +8,10 @@ import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.io.FileUtil;
+import com.revolsys.logging.Logs;
 
 public class ManifestUtil {
-  private static final Logger LOG = Logger.getLogger(ManifestUtil.class);
 
   public static String getImplementationVersion(final String implementationTitle) {
     final Manifest manifest = getManifestByImplementationTitle(implementationTitle);
@@ -57,7 +55,7 @@ public class ManifestUtil {
         }
       }
     } catch (final IOException e) {
-      LOG.error("Unable to get manifest for: " + implementationTitle, e);
+      Logs.error(ManifestUtil.class, "Unable to get manifest for: " + implementationTitle, e);
     }
     return null;
   }

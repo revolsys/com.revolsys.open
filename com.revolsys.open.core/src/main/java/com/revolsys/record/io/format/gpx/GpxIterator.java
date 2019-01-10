@@ -16,8 +16,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -37,8 +35,6 @@ import com.revolsys.util.MathUtil;
 
 public class GpxIterator extends BaseObjectWithProperties
   implements Iterator<Record>, RecordReader {
-
-  private static final Logger LOG = Logger.getLogger(GpxIterator.class);
 
   private String baseName;
 
@@ -354,8 +350,8 @@ public class GpxIterator extends BaseObjectWithProperties
       return this.geometryFactory.convertAxisCount(axisCount)
         .point(MathUtil.toDoubleArray(coordinates));
     } else {
-      return this.geometryFactory.convertAxisCount(axisCount).lineString(4,
-        MathUtil.toDoubleArray(coordinates));
+      return this.geometryFactory.convertAxisCount(axisCount)
+        .lineString(4, MathUtil.toDoubleArray(coordinates));
     }
   }
 

@@ -32,7 +32,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.Logger;
 import org.springframework.beans.MethodInvocationException;
 import org.springframework.beans.PropertyAccessException;
 import org.springframework.beans.factory.BeanCreationException;
@@ -40,15 +39,13 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.logging.log4j.ThreadLocalFileAppender;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.process.ProcessNetwork;
 
 public class ProcessorPipelineTool {
   private static final String EXCLUDE_PATTERN = "exclude";
 
   private static final String EXCLUDE_PATTERN_OPTION = "x";
-
-  private static final Logger log = Logger.getLogger(ProcessorPipelineTool.class);
 
   private static final String LOG_DIRECTORY = "logDirectory";
 
@@ -255,19 +252,11 @@ public class ProcessorPipelineTool {
           return;
         }
       } catch (final IOException e) {
-        log.error(e.getMessage(), e);
+        Logs.error(this, e.getMessage(), e);
       }
     }
 
-    final ThreadLocalFileAppender localAppender = ThreadLocalFileAppender.getAppender();
-    if (localAppender != null) {
-      final File parentFile = logFile.getParentFile();
-      if (parentFile != null) {
-        parentFile.mkdirs();
-      }
-      localAppender.setLocalFile(logFile.getAbsolutePath());
-    }
-    log.info("Processing file '" + sourceFile + "' to '" + targetFile + "'");
+    Logs.info(this, "Processing file '" + sourceFile + "' to '" + targetFile + "'");
     System.out.println("Processing file '" + sourceFile + "' to '" + targetFile + "'");
 
     System.setProperty("sourceFile", sourceFile.getAbsolutePath());
@@ -291,7 +280,7 @@ public class ProcessorPipelineTool {
     long seconds = time / 1000;
     final long minutes = seconds / 60;
     seconds = seconds % 60;
-    log.info(minutes + " minutes " + seconds + " seconds");
+    Logs.info(this, minutes + " minutes " + seconds + " seconds");
     System.out.println(minutes + " minutes " + seconds + " seconds");
 
   }

@@ -14,14 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.endian.ResourceEndianOutput;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
@@ -49,7 +48,6 @@ import com.revolsys.util.number.Doubles;
  * <ul>
  */
 public class XbaseRecordWriter extends AbstractRecordWriter {
-  private static final Logger log = Logger.getLogger(XbaseRecordWriter.class);
 
   private Charset charset = StandardCharsets.UTF_8;
 
@@ -261,7 +259,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       for (final XBaseFieldDefinition field : this.fields) {
         if (!writeField(record, field)) {
           final String fieldName = field.getFullName();
-          log.warn("Unable to write attribute '" + fieldName + "' with value "
+          Logs.warn(this, "Unable to write attribute '" + fieldName + "' with value "
             + record.getValue(fieldName));
         }
       }

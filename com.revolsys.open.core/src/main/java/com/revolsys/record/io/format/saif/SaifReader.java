@@ -38,12 +38,11 @@ import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -68,8 +67,6 @@ import com.revolsys.spring.resource.SpringUtil;
  */
 public class SaifReader extends AbstractReader<Record>
   implements Iterator<Record>, RecordDefinitionFactory, RecordReader {
-  /** The logging instance. */
-  private static final Logger log = Logger.getLogger(SaifReader.class);
 
   /** The current data object that was read. */
   private Record currentRecord;
@@ -168,18 +165,9 @@ public class SaifReader extends AbstractReader<Record>
    */
   @Override
   public void close() {
-    if (log.isDebugEnabled()) {
-      log.debug("Closing SAIF archive '" + this.file.getAbsolutePath() + "'");
-    }
     closeCurrentReader();
     if (!this.file.isDirectory() && this.saifArchiveDirectory != null) {
-      if (log.isDebugEnabled()) {
-        log.debug("  Deleting temporary files");
-      }
       FileUtil.deleteDirectory(this.saifArchiveDirectory);
-    }
-    if (log.isDebugEnabled()) {
-      log.debug("  Finished closing file");
     }
   }
 
@@ -500,7 +488,7 @@ public class SaifReader extends AbstractReader<Record>
         this.loadNewObject = false;
         return true;
       } catch (final Throwable e) {
-        log.error(e.getMessage(), e);
+        Logs.error(this, e.getMessage(), e);
       }
     } while (openNextObjectSet());
     this.currentRecord = null;
@@ -568,18 +556,12 @@ public class SaifReader extends AbstractReader<Record>
     if (!this.opened) {
       this.opened = true;
       try {
-        if (log.isDebugEnabled()) {
-          log.debug("Opening SAIF archive '" + this.file.getCanonicalPath() + "'");
-        }
         if (this.file.isDirectory()) {
           this.saifArchiveDirectory = this.file;
         } else if (!this.file.exists()) {
           throw new IllegalArgumentException("SAIF file " + this.file + " does not exist");
         } else {
           this.zipFile = new ZipFile(this.file);
-        }
-        if (log.isDebugEnabled()) {
-          log.debug("  Finished opening archive");
         }
         loadSchema();
         loadExportedObjects();

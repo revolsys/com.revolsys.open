@@ -1,7 +1,6 @@
 package com.revolsys.parallel.process;
 
-import org.apache.log4j.Logger;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ChannelValueStore;
 import com.revolsys.parallel.channel.ClosedException;
@@ -92,17 +91,16 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   @Override
   public final void run() {
     boolean hasError = false;
-    final Logger log = Logger.getLogger(getClass());
     try {
-      log.debug("Start");
+      Logs.debug(this, "Start");
       init();
       run(this.in, this.out);
     } catch (final ClosedException e) {
-      log.debug("Shutdown");
+      Logs.debug(this, "Shutdown");
     } catch (final ThreadDeath e) {
-      log.debug("Shutdown");
+      Logs.debug(this, "Shutdown");
     } catch (final Throwable e) {
-      log.error(e.getMessage(), e);
+      Logs.error(this, e.getMessage(), e);
       hasError = true;
     } finally {
       if (this.in != null) {

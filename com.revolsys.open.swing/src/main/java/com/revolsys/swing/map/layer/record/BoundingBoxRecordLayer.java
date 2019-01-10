@@ -7,17 +7,15 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class BoundingBoxRecordLayer extends AbstractRecordLayer {
-  private static final Logger LOG = Logger.getLogger(BoundingBoxRecordLayer.class);
 
   private BoundingBox boundingBox;
 
@@ -76,11 +74,11 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
               this.worker = (SwingWorker)constructor.newInstance(this, boundingBox);
               Invoke.worker(this.worker);
             } catch (final NoSuchMethodException e) {
-              LOG.error("Worker Constructor not found", e);
+              Logs.error(this, "Worker Constructor not found", e);
             } catch (final InvocationTargetException e) {
-              LOG.error("Unable to construct loader class", e.getTargetException());
+              Logs.error(this, "Unable to construct loader class", e.getTargetException());
             } catch (final Throwable e) {
-              LOG.error("Unable to construct loader class", e);
+              Logs.error(this, "Unable to construct loader class", e);
             }
           }
         }

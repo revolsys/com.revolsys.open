@@ -20,8 +20,6 @@ import java.util.UUID;
 import javax.measure.Quantity;
 import javax.xml.namespace.QName;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
@@ -40,6 +38,7 @@ import com.revolsys.geometry.model.Punctual;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.RecordDataType;
 import com.revolsys.record.code.CodeDataType;
 import com.revolsys.util.Booleans;
@@ -115,8 +114,6 @@ public final class DataTypes {
 
   public static final DataType LINEAR_RING = FunctionDataType.newToObjectEquals("LinearRing",
     LinearRing.class, LinearRing::newLinearRing, Geometry::equalsExact);
-
-  private static final Logger LOG = Logger.getLogger(DataTypes.class);
 
   public static final DataType LONG = new Longs();
 
@@ -194,7 +191,7 @@ public final class DataTypes {
             final DataType type = (DataType)field.get(null);
             register(type);
           } catch (final Throwable e) {
-            LOG.error("Error registering type " + field.getName(), e);
+            Logs.error(DataTypes.class, "Error registering type " + field.getName(), e);
           }
         }
       }

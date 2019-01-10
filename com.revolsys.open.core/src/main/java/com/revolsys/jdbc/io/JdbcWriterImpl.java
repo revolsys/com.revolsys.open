@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 
 import com.revolsys.collection.map.Maps;
@@ -23,6 +22,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.property.GlobalIdProperty;
@@ -32,7 +32,6 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.util.count.CategoryLabelCountMap;
 
 public class JdbcWriterImpl extends AbstractRecordWriter {
-  private static final Logger LOG = Logger.getLogger(JdbcWriterImpl.class);
 
   private int batchSize = 1;
 
@@ -152,7 +151,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
         if (this.throwExceptions) {
           throw e;
         } else {
-          LOG.error("Error commiting records", e);
+          Logs.error(this, "Error commiting records", e);
         }
       }
       JdbcUtils.close(statement);
@@ -227,7 +226,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
         statement = this.connection.prepareStatement(sql);
         this.typeDeleteStatementMap.put(recordDefinition, statement);
       } catch (final SQLException e) {
-        LOG.error(sql, e);
+        Logs.error(this, sql, e);
         return;
       }
     }
@@ -270,7 +269,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
           if (this.throwExceptions) {
             throw e;
           } else {
-            LOG.error("Error writing to database", e);
+            Logs.error(this, "Error writing to database", e);
           }
         }
       }
@@ -546,7 +545,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
         }
         statementMap.put(recordDefinition, statement);
       } catch (final SQLException e) {
-        LOG.error(sql, e);
+        Logs.error(this, sql, e);
         return null;
       }
     }
@@ -602,7 +601,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
       final String sql = sqlMap.get(recordDefinition);
       throw this.connection.getException("Process Batch", sql, e);
     } catch (final RuntimeException e) {
-      LOG.error(sqlMap, e);
+      Logs.error(this, sqlMap.toString(), e);
       throw e;
     } finally {
       batchCountMap.put(recordDefinition, 0);
@@ -666,7 +665,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
         statement = this.connection.prepareStatement(sql);
         this.typeUpdateStatementMap.put(recordDefinition, statement);
       } catch (final SQLException e) {
-        LOG.error(sql, e);
+        Logs.error(this, sql, e);
       }
     }
     int parameterIndex = 1;
@@ -721,7 +720,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
       throw e;
     } catch (final BatchUpdateException e) {
       for (SQLException e1 = e.getNextException(); e1 != null; e1 = e1.getNextException()) {
-        LOG.error("Unable to write", e1);
+        Logs.error(this, "Unable to write", e1);
       }
       throw new RuntimeException("Unable to write", e);
     } catch (final Exception e) {
