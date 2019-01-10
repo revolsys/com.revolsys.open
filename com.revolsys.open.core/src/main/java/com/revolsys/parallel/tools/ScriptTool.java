@@ -23,7 +23,6 @@ import org.apache.commons.jexl2.MapContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Logger;
-import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.springframework.beans.InvalidPropertyException;
@@ -303,9 +302,7 @@ public class ScriptTool {
           .build();
         rootLogger.addAppender(appender);
       } catch (final Exception e) {
-        final PatternLayout layout = PatternLayout.newBuilder().withPattern("%p\t%m%n").build();
-        final Appender appender = ConsoleAppender.newBuilder().withLayout(layout).build();
-        rootLogger.addAppender(appender);
+        Logs.addRootAppender("%p\t%m%n");
         Logs.error(this, "Cannot find log file " + this.logFile, e);
       }
 
