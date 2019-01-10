@@ -291,6 +291,7 @@
         <version>2.7</version>
         <configuration>
           <generateBackupPoms>false</generateBackupPoms>
+          <rulesUri>file:${session.executionRootDirectory}/version-rules.xml</rulesUri>
         </configuration>
       </plugin>
     </plugins>
@@ -478,41 +479,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-web</artifactId>
-        <version>${org.springframework.version}</version>
-        <exclusions>
-          <exclusion>
-            <artifactId>commons-logging</artifactId>
-            <groupId>commons-logging</groupId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-webmvc</artifactId>
-        <version>${org.springframework.version}</version>
-        <exclusions>
-          <exclusion>
-            <artifactId>commons-logging</artifactId>
-            <groupId>commons-logging</groupId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-web</artifactId>
-        <version>${org.springframework.security.version}</version>
-      </dependency>
-      <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>1.2.17</version>
@@ -520,7 +486,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.11</version>
+        <version>4.12</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -547,12 +513,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <org.apache.xmlgraphics.batik.version>1.10</org.apache.xmlgraphics.batik.version>
-    <org.codehaus.groovy.version>2.4.5</org.codehaus.groovy.version>
+    <org.codehaus.groovy.version>2.5.4</org.codehaus.groovy.version>
     <org.docx4java.version>6.1.0</org.docx4java.version>
     <org.gdal.version>2.3.1-1</org.gdal.version>
-    <org.slf4j.version>1.7.21</org.slf4j.version>
-    <org.springframework.version>4.1.9.RELEASE</org.springframework.version>
-    <org.springframework.security.version>4.0.2.RELEASE</org.springframework.security.version>
+    <org.slf4j.version>1.7.25</org.slf4j.version>
+    <org.springframework.version>5.1.3.RELEASE</org.springframework.version>
 
     <gpg.skip>true</gpg.skip>
     <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>

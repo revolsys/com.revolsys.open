@@ -28,7 +28,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.util.Assert;
-import org.springframework.web.util.UriUtils;
 
 /**
  * Represents a URI template. A URI template is a URI-like String that contains variables enclosed
@@ -115,7 +114,7 @@ public class UriTemplate implements Serializable {
 
   /**
    * Encodes the given String as URL.
-   * <p>Defaults to {@link UriUtils#encodeUri(String, String)}.
+   *
    * @param uri the URI to encode
    * @return the encoded URI
    */
