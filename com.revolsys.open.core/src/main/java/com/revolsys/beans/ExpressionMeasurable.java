@@ -8,8 +8,8 @@ import javax.measure.converter.UnitConverter;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
 
 import com.revolsys.util.JexlUtil;
 

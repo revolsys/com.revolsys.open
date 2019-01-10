@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
-import org.postgresql.jdbc2.AbstractJdbc2Connection;
+import org.postgresql.jdbc.PgConnection;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
@@ -138,7 +138,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     final DataSource dataSource = getDataSource();
     final Connection connection = JdbcUtils.getConnection(dataSource);
     try {
-      final AbstractJdbc2Connection pgConnection = connection.unwrap(AbstractJdbc2Connection.class);
+      final PgConnection pgConnection = connection.unwrap(PgConnection.class);
       pgConnection.addDataType("geometry", PostgreSQLGeometryWrapper.class);
       pgConnection.addDataType("box2d", PostgreSQLBoundingBoxWrapper.class);
       pgConnection.addDataType("box3d", PostgreSQLBoundingBoxWrapper.class);
@@ -223,6 +223,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     addFieldAdder("double precision", doubleFieldAdder);
 
     addFieldAdder("date", new JdbcFieldAdder(DataTypes.DATE_TIME));
+    addFieldAdder("timestamp", new JdbcFieldAdder(DataTypes.TIMESTAMP));
 
     addFieldAdder("bool", new JdbcFieldAdder(DataTypes.BOOLEAN));
 

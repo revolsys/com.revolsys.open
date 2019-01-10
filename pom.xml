@@ -301,7 +301,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.8</version>
+        <version>3.0.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -358,7 +358,7 @@
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
-        <version>3.1.0</version>
+        <version>4.0.1</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
@@ -545,12 +545,15 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
     <org.apache.xmlgraphics.batik.version>1.10</org.apache.xmlgraphics.batik.version>
+    <org.codehaus.groovy.version>2.4.5</org.codehaus.groovy.version>
+    <org.docx4java.version>6.1.0</org.docx4java.version>
     <org.gdal.version>2.3.1-1</org.gdal.version>
     <org.slf4j.version>1.7.21</org.slf4j.version>
     <org.springframework.version>4.1.9.RELEASE</org.springframework.version>
     <org.springframework.security.version>4.0.2.RELEASE</org.springframework.security.version>
-    <org.codehaus.groovy.version>2.4.5</org.codehaus.groovy.version>
+
     <gpg.skip>true</gpg.skip>
     <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
     <github.global.server>github</github.global.server>

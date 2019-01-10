@@ -18,9 +18,9 @@ package com.revolsys.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.ExpressionFactory;
-import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.JexlEngine;
 import org.apache.log4j.Logger;
 
 /**
@@ -119,7 +119,7 @@ public final class JexlUtil {
       expr = expr.replaceAll(" \\+ '' \\+ ", " + ");
       expr = expr.replaceAll("^'' \\+ ", "");
       expr = expr.replaceAll("\\+ ''$", "");
-      return ExpressionFactory.createExpression(expr);
+      return new JexlEngine().createExpression(expr);
     } else {
       return null;
     }

@@ -18,8 +18,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.context.HashMapContext;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.MapContext;
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
@@ -246,8 +246,7 @@ public class ScriptTool {
           try {
             while (logFileName.contains("${")) {
               final Expression expression = JexlUtil.newExpression(logFileName);
-              final HashMapContext context = new HashMapContext();
-              context.setVars(ThreadSharedProperties.getProperties());
+              final MapContext context = new MapContext(ThreadSharedProperties.getProperties());
               logFileName = (String)JexlUtil.evaluateExpression(context, expression);
             }
           } catch (final Exception e) {
