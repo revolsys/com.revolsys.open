@@ -70,11 +70,7 @@ public interface Resource extends org.springframework.core.io.Resource {
         return new PathResource(springResource.getPath());
       } else if (source instanceof org.springframework.core.io.UrlResource) {
         final org.springframework.core.io.UrlResource springResource = (org.springframework.core.io.UrlResource)source;
-        try {
           return new UrlResource(springResource.getURL());
-        } catch (final IOException e) {
-          throw new WrappedException(e);
-        }
       }
     }
 
