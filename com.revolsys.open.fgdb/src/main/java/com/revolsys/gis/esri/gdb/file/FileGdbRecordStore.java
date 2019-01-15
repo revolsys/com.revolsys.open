@@ -1399,15 +1399,19 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               spatialReference = null;
             }
             PathName schemaPath = toPath(schemaCatalogPath);
-            final RecordStoreSchema schema = newSchema(schemaPath, spatialReference);
+            RecordStoreSchema schema = newSchema(schemaPath, spatialReference);
 
             if (schemaPath.equals(this.defaultSchemaPath)) {
               if (!(deTable instanceof DEFeatureClass)) {
                 schemaCatalogPath = "\\";
                 deTable.setCatalogPath("\\" + deTable.getName());
+                schema = getRootSchema();
+                schemaPath = schema.getPathName();
               }
             } else if (schemaPath.length() <= 1) {
-              schemaPath = this.defaultSchemaPath;
+              if (deTable instanceof DEFeatureClass) {
+                schemaPath = this.defaultSchemaPath;
+              }
             }
             for (final Field field : deTable.getFields()) {
               final String fieldName = field.getName();
