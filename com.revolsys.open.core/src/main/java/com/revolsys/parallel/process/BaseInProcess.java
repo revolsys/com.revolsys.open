@@ -31,7 +31,7 @@ public class BaseInProcess<T> extends AbstractInProcess<T> {
   }
 
   @Override
-  protected final void run(final Channel<T> in) {
+  protected void run(final Channel<T> in) {
     this.running = true;
     try {
       preRun(in);

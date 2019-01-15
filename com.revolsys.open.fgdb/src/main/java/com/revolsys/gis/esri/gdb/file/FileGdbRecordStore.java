@@ -29,6 +29,7 @@ import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.esri.filegdb.jni.VectorOfWString;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.esri.gdb.file.capi.FileGdbDomainCodeTable;
@@ -181,8 +182,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   private int geodatabaseReferenceCount;
 
   private final Map<PathName, AtomicLong> idGenerators = new HashMap<>();
-
-  private boolean initialized;
 
   private final Map<String, Table> tableByCatalogPath = new HashMap<>();
 
@@ -712,7 +711,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                     final Geometry geometry = (Geometry)geometryField.getValue(row);
                     if (geometry != null) {
                       final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
-                      if (geometryBoundingBox.intersects(boundingBox)) {
+                      if (geometryBoundingBox.bboxIntersects(boundingBox)) {
                         count++;
                       }
                     }
@@ -740,7 +739,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           final PathName typePath = PathName.newPathName(schemaName.newChild(tableName));
           final RecordStoreSchema schema = getSchema(schemaName);
           final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
-          recordDefinition.setPolygonOrientation(null);
+          recordDefinition.setPolygonRingDirection(ClockDirection.CLOCKWISE);
           String lengthFieldName = null;
           String areaFieldName = null;
           if (deTable instanceof DEFeatureClass) {
@@ -825,8 +824,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public RecordDefinition getRecordDefinition(final RecordDefinition sourceRecordDefinition) {
+  public <RD extends RecordDefinition> RD getRecordDefinition(
+    final RecordDefinition sourceRecordDefinition) {
     synchronized (this.apiSync) {
       if (getGeometryFactory() == null) {
         setGeometryFactory(sourceRecordDefinition.getGeometryFactory());
@@ -841,7 +842,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           recordDefinition = newTableRecordDefinition(sourceRecordDefinition);
         }
       }
-      return recordDefinition;
+      return (RD)recordDefinition;
     }
   }
 
@@ -915,11 +916,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return whereClause;
   }
 
-  protected boolean hasCatalogPath(final String path) {
-    final String catalogPath = this.catalogPathByPath.get(path);
-    return catalogPath != null;
-  }
-
   private boolean hasChildDataset(final Geodatabase geodatabase, final String parentCatalogPath,
     final String datasetType, final String childCatalogPath) {
     try {
@@ -945,51 +941,47 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   public void initializeDo() {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (!this.initialized) {
-          Geodatabase geodatabase = null;
-          this.initialized = true;
-          try {
-            super.initialize();
-            final File file = new File(this.fileName);
-            if (file.exists()) {
-              if (file.isDirectory()) {
-                if (!new File(this.fileName, "gdb").exists()) {
-                  throw new IllegalArgumentException(
-                    FileUtil.getCanonicalPath(file) + " is not a valid ESRI File Geodatabase");
-                }
-                geodatabase = getSingleThreadResult(() -> {
-                  return EsriFileGdb.openGeodatabase(this.fileName);
-                });
-              } else {
+        Geodatabase geodatabase = null;
+        try {
+          super.initializeDo();
+          final File file = new File(this.fileName);
+          if (file.exists()) {
+            if (file.isDirectory()) {
+              if (!new File(this.fileName, "gdb").exists()) {
                 throw new IllegalArgumentException(
-                  FileUtil.getCanonicalPath(file) + " ESRI File Geodatabase must be a directory");
+                  FileUtil.getCanonicalPath(file) + " is not a valid ESRI File Geodatabase");
               }
-            } else if (this.createMissingRecordStore) {
-              geodatabase = newGeodatabase();
+              geodatabase = getSingleThreadResult(() -> {
+                return EsriFileGdb.openGeodatabase(this.fileName);
+              });
             } else {
               throw new IllegalArgumentException(
-                "ESRI file geodatabase not found " + this.fileName);
+                FileUtil.getCanonicalPath(file) + " ESRI File Geodatabase must be a directory");
             }
-            if (geodatabase == null) {
-              throw new IllegalArgumentException(
-                "Unable to open ESRI file geodatabase not found " + this.fileName);
-            }
-            final VectorOfWString domainNames = geodatabase.getDomains();
-            for (int i = 0; i < domainNames.size(); i++) {
-              final String domainName = domainNames.get(i);
-              loadDomain(geodatabase, domainName);
-            }
-            this.exists = true;
-          } catch (final Throwable e) {
-            try {
-              closeDo();
-            } finally {
-              Exceptions.throwUncheckedException(e);
-            }
+          } else if (this.createMissingRecordStore) {
+            geodatabase = newGeodatabase();
+          } else {
+            throw new IllegalArgumentException("ESRI file geodatabase not found " + this.fileName);
+          }
+          if (geodatabase == null) {
+            throw new IllegalArgumentException(
+              "Unable to open ESRI file geodatabase not found " + this.fileName);
+          }
+          final VectorOfWString domainNames = geodatabase.getDomains();
+          for (int i = 0; i < domainNames.size(); i++) {
+            final String domainName = domainNames.get(i);
+            loadDomain(geodatabase, domainName);
+          }
+          this.exists = true;
+        } catch (final Throwable e) {
+          try {
+            closeDo();
           } finally {
-            if (geodatabase != null) {
-              closeGeodatabase(geodatabase);
-            }
+            Exceptions.throwUncheckedException(e);
+          }
+        } finally {
+          if (geodatabase != null) {
+            closeGeodatabase(geodatabase);
           }
         }
       }
@@ -1723,7 +1715,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 boundingBox.getXMax(), //
                 boundingBox.getYMax()//
               ));
-              Exceptions.wrap(logQuery.toString(), e);
+              throw Exceptions.wrap(logQuery.toString(), e);
             }
           }
         }

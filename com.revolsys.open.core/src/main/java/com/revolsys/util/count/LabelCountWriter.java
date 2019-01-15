@@ -48,6 +48,11 @@ public class LabelCountWriter extends AbstractRecordWriter {
     this.labelCountMap.connect();
   }
 
+  public LabelCountWriter setCounts(final LabelCountMap labelCountMap) {
+    this.labelCountMap = labelCountMap;
+    return this;
+  }
+
   /**
    * @param labelCountMap the labelCountMap to set
    */

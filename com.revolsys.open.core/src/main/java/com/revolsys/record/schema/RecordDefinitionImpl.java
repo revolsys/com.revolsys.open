@@ -846,6 +846,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     this.polygonOrientation = polygonOrientation;
   }
 
+  public void setPolygonRingDirection(final ClockDirection polygonOrientation) {
+    this.polygonOrientation = polygonOrientation;
+  }
+
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     if (properties != null) {

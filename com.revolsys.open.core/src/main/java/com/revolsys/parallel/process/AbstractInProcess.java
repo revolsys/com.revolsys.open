@@ -56,7 +56,7 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements In
   }
 
   @Override
-  public final void run() {
+  public void run() {
     try {
       Logs.debug(this, "Start");
       init();
