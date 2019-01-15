@@ -20,18 +20,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.core</artifactId>
-      <version>${project.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.revolsys.esri</groupId>
       <artifactId>filegdb-jni</artifactId>
       <version>1.5.1-1</version>
