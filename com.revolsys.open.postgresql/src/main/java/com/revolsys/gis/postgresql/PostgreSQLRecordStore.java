@@ -188,8 +188,8 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   @Override
   @PostConstruct
-  public void initialize() {
-    super.initialize();
+  public void initializeDo() {
+    super.initializeDo();
     final JdbcFieldAdder numberFieldAdder = new JdbcFieldAdder(DataTypes.DECIMAL);
     addFieldAdder("numeric", numberFieldAdder);
 

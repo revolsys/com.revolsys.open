@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.annotation.PostConstruct;
-
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
@@ -166,9 +164,8 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     return resource;
   }
 
-  @PostConstruct
   @Override
-  public void initialize() {
+  public void initializeDo() {
     if (!this.directory.exists()) {
       this.directory.mkdirs();
     }

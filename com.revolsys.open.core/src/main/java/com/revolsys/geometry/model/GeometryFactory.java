@@ -453,6 +453,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public BoundingBox bboxEmpty() {
+    return boundingBox();
+  }
+
   public BoundingBox boundingBox() {
     return new BoundingBoxDoubleGf(this);
   }
@@ -891,8 +895,9 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return this;
   }
 
-  public CoordinateSystem getHorizontalCoordinateSystem() {
-    return getCoordinateSystem();
+  @Override
+  public <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
+    return (C)getCoordinateSystem();
   }
 
   public int getHorizontalCoordinateSystemId() {
@@ -1033,8 +1038,16 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public double getScaleX() {
+    return getScale(0);
+  }
+
   public double getScaleXY() {
     return getScale(0);
+  }
+
+  public double getScaleY() {
+    return getScale(1);
   }
 
   public double getScaleZ() {
@@ -1435,6 +1448,18 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public double makeXPrecise(final double value) {
+    return makePrecise(0, value);
+  }
+
+  public double makeXPreciseCeil(final double value) {
+    return makePreciseCeil(0, value);
+  }
+
+  public double makeXPreciseFloor(final double value) {
+    return makePreciseFloor(0, value);
+  }
+
   public double makeXyPrecise(final double value) {
     return makePrecise(0, value);
   }
@@ -1445,6 +1470,18 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public double makeXyPreciseFloor(final double value) {
     return makePreciseFloor(0, value);
+  }
+
+  public double makeYPrecise(final double value) {
+    return makePrecise(1, value);
+  }
+
+  public double makeYPreciseCeil(final double value) {
+    return makePreciseCeil(1, value);
+  }
+
+  public double makeYPreciseFloor(final double value) {
+    return makePreciseFloor(1, value);
   }
 
   public double makeZPrecise(final double value) {

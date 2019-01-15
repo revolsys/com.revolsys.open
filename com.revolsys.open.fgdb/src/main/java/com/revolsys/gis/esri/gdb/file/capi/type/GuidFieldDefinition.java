@@ -3,8 +3,8 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 import java.util.WeakHashMap;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Guid;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
+import com.revolsys.esri.filegdb.jni.Guid;
+import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;
@@ -45,10 +45,10 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (getRecordStore().isNull(row, name)) {
-      return null;
-    } else {
-      synchronized (getSync()) {
+    synchronized (getSync()) {
+      if (row.isNull(name)) {
+        return null;
+      } else {
         final Guid guid = row.getGuid(name);
         addGuid(guid);
         return guid.toString();

@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.beans.ObjectException;
@@ -22,17 +21,17 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.esri.filegdb.jni.EnumRows;
+import com.revolsys.esri.filegdb.jni.Envelope;
+import com.revolsys.esri.filegdb.jni.EsriFileGdb;
+import com.revolsys.esri.filegdb.jni.Geodatabase;
+import com.revolsys.esri.filegdb.jni.Row;
+import com.revolsys.esri.filegdb.jni.Table;
+import com.revolsys.esri.filegdb.jni.VectorOfWString;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.esri.gdb.file.capi.FileGdbDomainCodeTable;
-import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Envelope;
-import com.revolsys.gis.esri.gdb.file.capi.swig.EsriFileGdb;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Geodatabase;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
-import com.revolsys.gis.esri.gdb.file.capi.swig.VectorOfWString;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.AreaFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.BinaryFieldDefinition;
@@ -60,6 +59,7 @@ import com.revolsys.parallel.SingleThreadExecutor;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureClass;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureDataset;
@@ -97,7 +97,6 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.Dates;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -149,11 +148,12 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   public static SpatialReference getSpatialReference(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null || geometryFactory.getCoordinateSystemId() == 0) {
+    if (geometryFactory == null || geometryFactory.getHorizontalCoordinateSystemId() == 0) {
       return null;
     } else {
       final String wkt = getSingleThreadResult(() -> {
-        return EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getCoordinateSystemId());
+        return EsriFileGdb
+          .getSpatialReferenceWkt(geometryFactory.getHorizontalCoordinateSystemId());
       });
       final SpatialReference spatialReference = SpatialReference.get(geometryFactory, wkt);
       return spatialReference;
@@ -254,7 +254,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     } else if (condition instanceof LeftUnaryCondition) {
       final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
       final String operator = unaryCondition.getOperator();
-      final QueryValue right = unaryCondition.getQueryValue();
+      final QueryValue right = unaryCondition.getValue();
       buffer.append(operator);
       buffer.append(" ");
       appendQueryValue(query, buffer, right);
@@ -391,8 +391,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   public void close() {
     if (FileGdbRecordStoreFactory.release(this)) {
       closeDo();
-    } else {
-      Debug.noOp();
     }
   }
 
@@ -944,8 +942,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  @PostConstruct
-  public void initialize() {
+  public void initializeDo() {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
         if (!this.initialized) {
@@ -1091,12 +1088,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   public boolean isExists() {
     return this.exists && !isClosed();
-  }
-
-  public boolean isNull(final Row row, final String name) {
-    synchronized (this.apiSync) {
-      return row.isNull(name);
-    }
   }
 
   public boolean isOpen(final Table table) {
@@ -1337,6 +1328,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  @Override
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
+    return new FileGdbWriter(this, recordDefinition);
+  }
+
   protected Row newRowObject(final Table table) {
     synchronized (this.apiSync) {
       if (isOpen(table)) {
@@ -1372,8 +1368,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                       geodatabase.createFeatureDataset(datasetDefinition);
                     } catch (final Throwable t) {
                       Logs.debug(this, datasetDefinition);
-                      throw new RuntimeException(
-                        "Unable to create feature dataset " + childCatalogPath, t);
+                      throw Exceptions.wrap("Unable to create feature dataset " + childCatalogPath,
+                        t);
                     }
                   }
                 }
@@ -1418,7 +1414,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 schemaCatalogPath = "\\";
                 deTable.setCatalogPath("\\" + deTable.getName());
               }
-            } else if (schemaPath.equals("")) {
+            } else if (schemaPath.length() <= 1) {
               schemaPath = this.defaultSchemaPath;
             }
             for (final Field field : deTable.getFields()) {
@@ -1691,7 +1687,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               logQuery.append(" WHERE ");
               logQuery.append(whereClause);
             }
-            Exceptions.wrap(logQuery.toString(), e);
+            throw Exceptions.wrap(logQuery.toString(), e);
           }
 
         }
@@ -1720,15 +1716,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 logQuery.append(whereClause);
                 logQuery.append(" AND");
               }
-              logQuery.append("GEOMETRY intersects BBOX(");
-              logQuery.append(boundingBox.getXMin());
-              logQuery.append(" ");
-              logQuery.append(boundingBox.getXMax());
-              logQuery.append(",");
-              logQuery.append(boundingBox.getYMin());
-              logQuery.append(" ");
-              logQuery.append(boundingBox.getYMax());
-              logQuery.append(")");
+              logQuery.append("GEOMETRY intersects ");
+              logQuery.append(BoundingBox.bboxToWkt(//
+                boundingBox.getXMin(), //
+                boundingBox.getYMin(), //
+                boundingBox.getXMax(), //
+                boundingBox.getYMax()//
+              ));
               Exceptions.wrap(logQuery.toString(), e);
             }
           }

@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.map.MapEx;
@@ -62,6 +61,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   private final CategoryLabelCountMap statistics = new CategoryLabelCountMap();
 
   private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<>();
+
+  private boolean initialized;
 
   protected AbstractRecordStore() {
     this(ArrayRecord.FACTORY);
@@ -255,9 +256,20 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  @PostConstruct
-  public void initialize() {
-    getStatistics().connect();
+  public final void initialize() {
+    synchronized (this) {
+      if (!this.initialized) {
+        this.initialized = true;
+        initializeDo();
+      }
+    }
+  }
+
+  protected void initializeDo() {
+    final CategoryLabelCountMap statistics = getStatistics();
+    if (statistics != null) {
+      statistics.connect();
+    }
   }
 
   protected void initRecordDefinition(final RecordDefinition recordDefinition) {

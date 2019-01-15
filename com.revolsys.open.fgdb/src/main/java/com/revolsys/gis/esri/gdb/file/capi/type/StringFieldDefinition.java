@@ -1,8 +1,7 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
+import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
@@ -17,11 +16,10 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    final FileGdbRecordStore recordStore = getRecordStore();
-    if (recordStore.isNull(row, name)) {
-      return null;
-    } else {
-      synchronized (getSync()) {
+    synchronized (getSync()) {
+      if (row.isNull(name)) {
+        return null;
+      } else {
         return row.getString(name);
       }
     }

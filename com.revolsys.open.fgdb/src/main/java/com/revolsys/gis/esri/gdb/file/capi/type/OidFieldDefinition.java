@@ -1,8 +1,7 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
+import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;
@@ -21,11 +20,10 @@ public class OidFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    final FileGdbRecordStore recordStore = getRecordStore();
-    if (recordStore.isNull(row, name)) {
-      return null;
-    } else {
-      synchronized (getSync()) {
+    synchronized (getSync()) {
+      if (row.isNull(name)) {
+        return null;
+      } else {
         return row.getOid();
       }
     }

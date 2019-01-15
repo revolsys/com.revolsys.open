@@ -18,7 +18,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
@@ -428,17 +427,16 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  @PostConstruct
-  public void initialize() {
-    super.initialize();
-    if (this.dataSource != null) {
-      this.transactionManager = new DataSourceTransactionManager(this.dataSource);
-    }
+  public void initialize(final RecordStore recordStore,
+    final Map<String, Object> connectionProperties) {
   }
 
   @Override
-  public void initialize(final RecordStore recordStore,
-    final Map<String, Object> connectionProperties) {
+  protected void initializeDo() {
+    super.initializeDo();
+    if (this.dataSource != null) {
+      this.transactionManager = new DataSourceTransactionManager(this.dataSource);
+    }
   }
 
   @Override

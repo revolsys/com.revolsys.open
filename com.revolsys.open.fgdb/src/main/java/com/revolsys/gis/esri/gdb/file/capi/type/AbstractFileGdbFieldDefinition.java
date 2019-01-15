@@ -4,8 +4,8 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 

@@ -9,10 +9,9 @@ import java.util.Map;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.endian.EndianInputStream;
@@ -104,44 +103,43 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    final FileGdbRecordStore recordStore = getRecordStore();
-    if (recordStore.isNull(row, name)) {
-      return null;
-    } else {
-      final byte[] buffer;
-      synchronized (getSync()) {
-        buffer = row.getGeometry();
+    final byte[] bytes;
+    synchronized (getSync()) {
+      if (row.isNull(name)) {
+        return null;
+      } else {
+        bytes = row.getGeometry();
       }
-      final ByteArrayInputStream byteIn = new ByteArrayInputStream(buffer);
-      final EndianInput in = new EndianInputStream(byteIn);
-      try {
-        final int type = in.readLEInt();
-        if (type == 0) {
-          final DataType dataType = getDataType();
-          if (DataTypes.POINT.equals(dataType)) {
-            return this.geometryFactory.point();
-          } else if (DataTypes.MULTI_POINT.equals(dataType)) {
-            return this.geometryFactory.point();
-          } else if (DataTypes.LINE_STRING.equals(dataType)) {
-            return this.geometryFactory.lineString();
-          } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
-            return this.geometryFactory.lineString();
-          } else if (DataTypes.POLYGON.equals(dataType)) {
-            return this.geometryFactory.polygon();
-          } else if (DataTypes.MULTI_POLYGON.equals(dataType)) {
-            return this.geometryFactory.polygon();
-          } else {
-            return null;
-          }
+    }
+    final ByteArrayInputStream byteIn = new ByteArrayInputStream(bytes);
+    final EndianInput in = new EndianInputStream(byteIn);
+    try {
+      final int type = in.readLEInt();
+      if (type == 0) {
+        final DataType dataType = getDataType();
+        if (DataTypes.POINT.equals(dataType)) {
+          return this.geometryFactory.point();
+        } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+          return this.geometryFactory.point();
+        } else if (DataTypes.LINE_STRING.equals(dataType)) {
+          return this.geometryFactory.lineString();
+        } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
+          return this.geometryFactory.lineString();
+        } else if (DataTypes.POLYGON.equals(dataType)) {
+          return this.geometryFactory.polygon();
+        } else if (DataTypes.MULTI_POLYGON.equals(dataType)) {
+          return this.geometryFactory.polygon();
         } else {
-          final Geometry geometry = SHP_UTIL.read(this.readMethod, this.geometryFactory, in, -1);
-          return geometry;
+          return null;
         }
-      } catch (final IOException e) {
-        throw new RuntimeException(e);
-      } finally {
-        FileUtil.closeSilent(in);
+      } else {
+        final Geometry geometry = SHP_UTIL.read(this.readMethod, this.geometryFactory, in, -1);
+        return geometry;
       }
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      FileUtil.closeSilent(in);
     }
   }
 

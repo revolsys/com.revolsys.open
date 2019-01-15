@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
+import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;

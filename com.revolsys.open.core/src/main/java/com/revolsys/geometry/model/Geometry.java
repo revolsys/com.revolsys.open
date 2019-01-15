@@ -404,6 +404,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return (GRET)this;
   }
 
+  default <V extends Geometry> V as2d(final GeometryFactory geometryFactory) {
+    if (isProjectionRequired(geometryFactory)) {
+      return (V)newGeometry(geometryFactory);
+    } else {
+      return (V)this;
+    }
+  }
+
   /**
    * Computes a buffer area around this geometry having the given width. The
    * buffer of a Geometry is the Minkowski sum or difference of the geometry

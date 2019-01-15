@@ -67,6 +67,12 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
     }
   }
 
+  public static FileGdbRecordStore newRecordStoreInitialized(final Path path) {
+    final FileGdbRecordStore recordStore = newRecordStore(path);
+    recordStore.initialize();
+    return recordStore;
+  }
+
   /**
    * Release the record store for the file. Decrements the count of references to the file. If
    * the count <=0 then the record store will be removed.
@@ -135,6 +141,10 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
     return true;
   }
 
+  public boolean isReadFromDirectorySupported() {
+    return true;
+  }
+
   @Override
   public FileGdbRecordStore newRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
@@ -142,9 +152,11 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 
-    final FileGdbRecordStore recordStore = newRecordStore(file);
-    RecordStore.setConnectionProperties(recordStore, properties);
-    return recordStore;
+    synchronized (COUNTS) {
+      final FileGdbRecordStore recordStore = newRecordStore(file);
+      RecordStore.setConnectionProperties(recordStore, properties);
+      return recordStore;
+    }
   }
 
   @Override

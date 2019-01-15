@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.transaction.PlatformTransactionManager;
@@ -180,8 +179,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  @PostConstruct
-  public void initialize() {
+  public void initializeDo() {
     this.recordStore.initialize();
   }
 
