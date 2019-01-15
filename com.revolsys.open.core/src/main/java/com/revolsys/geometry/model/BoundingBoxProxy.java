@@ -11,7 +11,7 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
   }
 
   default boolean bboxCovers(final BoundingBoxProxy boundingBox) {
-    final BoundingBoxFunction<Boolean> action = BoundingBox::bbxCovers;
+    final BoundingBoxFunction<Boolean> action = BoundingBox::bboxCovers;
     return bboxWith(boundingBox, action, false);
   }
 

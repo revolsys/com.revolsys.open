@@ -943,7 +943,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       synchronized (API_SYNC) {
         Geodatabase geodatabase = null;
         try {
-          super.initialize();
+          super.initializeDo();
           final File file = new File(this.fileName);
           if (file.exists()) {
             if (file.isDirectory()) {
@@ -1715,7 +1715,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 boundingBox.getXMax(), //
                 boundingBox.getYMax()//
               ));
-              logQuery.append(")");
               throw Exceptions.wrap(logQuery.toString(), e);
             }
           }

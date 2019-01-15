@@ -1,8 +1,8 @@
 package com.revolsys.elevation.gridded.rasterizer;
 
+import java.awt.Color;
 import java.util.Map;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.gradient.LinearGradient;
@@ -177,11 +177,16 @@ public class SlopeColorGradientGriddedElevationModelRasterizer
     super.updateValues();
     if (this.gradient == null) {
       final MultiStopLinearGradient gradient = new MultiStopLinearGradient();
-      gradient.addStop(0, WebColors.Green);
-      gradient.addStop(25, WebColors.Yellow);
-      gradient.addStop(35, WebColors.Orange);
-      gradient.addStop(50, WebColors.Red);
-      gradient.addStop(90, WebColors.Black);
+      gradient.addStop(0, new Color(90, 224, 202));
+      gradient.addStop(5, new Color(113, 227, 132));
+      gradient.addStop(15, new Color(180, 224, 90));
+      gradient.addStop(25, new Color(242, 223, 46));
+      gradient.addStop(35, new Color(245, 165, 54));
+      gradient.addStop(45, new Color(242, 91, 61));
+      gradient.addStop(55, new Color(196, 0, 121));
+      gradient.addStop(65, new Color(133, 0, 133));
+      gradient.addStop(75, new Color(74, 0, 143));
+      gradient.addStop(90, new Color(66, 0, 128));
       this.gradient = gradient;
     }
     if (this.elevationModel != null) {

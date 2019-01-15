@@ -632,7 +632,7 @@ public interface BoundingBox
    *@param  other the <code>BoundingBox</code> to check
    *@return true if this <code>BoundingBox</code> covers the <code>other</code>
    */
-  default boolean bbxCovers(final double minX, final double minY, final double maxX,
+  default boolean bboxCovers(final double minX, final double minY, final double maxX,
     final double maxY) {
     final double minX2 = getMinX();
     final double minY2 = getMinY();
