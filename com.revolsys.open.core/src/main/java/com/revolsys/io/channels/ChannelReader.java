@@ -102,6 +102,10 @@ public class ChannelReader implements BaseCloseable {
       this.available = 0;
       do {
         int bytesToRead = byteCount - offset;
+        final int limit = this.buffer.limit();
+        if (bytesToRead > limit) {
+          bytesToRead = limit;
+        }
         read(bytesToRead);
         if (bytesToRead > this.available) {
           bytesToRead = this.available;
