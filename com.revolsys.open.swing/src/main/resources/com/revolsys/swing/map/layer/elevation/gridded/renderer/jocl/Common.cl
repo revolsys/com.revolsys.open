@@ -1,8 +1,8 @@
- #pragma OPENCL EXTENSION cl_khr_fp64 : enable
+#pragma OPENCL EXTENSION cl_khr_fp64 : enable
  
- float slope(float dzDivDx, float dzDivDy, float zFactor) {
-    return atan(zFactor * sqrt(dzDivDx * dzDivDx + dzDivDy * dzDivDy));
- }
+float slope(float dzDivDx, float dzDivDy, float zFactor) {
+  return atan(zFactor * sqrt(dzDivDx * dzDivDx + dzDivDy * dzDivDy));
+}
  
 float aspect(float dzDivDx, float dzDivDy) {
   double aspect = 0;
@@ -172,6 +172,7 @@ int subGridDouble3x3(const __global double *cells, int width, int height, float*
   }
   return fixNulls3x3(m);
 }
+
 float deltaZX(float* m, float xFactor) {
   return (m[2] + 2 * m[5] + m[8] - (m[0] + 2 * m[3] + m[6])) * xFactor;
 }
