@@ -63,8 +63,9 @@ public class CloseableResourceProxy<R extends BaseCloseable> implements BaseClos
     private R newProxy() {
       final Class<?> resourceClass = this.resource.getClass();
       final ClassLoader classLoader = resourceClass.getClassLoader();
-      final Class<?>[] resourceInterfaces = resourceClass.getInterfaces();
-      return (R)Proxy.newProxyInstance(classLoader, resourceInterfaces, this);
+      final Object proxy = Proxy.newProxyInstance(classLoader,
+        CloseableResourceProxy.this.resourceInterfaces, this);
+      return (R)proxy;
     }
 
     private void resourceClose() {
@@ -81,8 +82,8 @@ public class CloseableResourceProxy<R extends BaseCloseable> implements BaseClos
   }
 
   public static <RS extends BaseCloseable> CloseableResourceProxy<RS> newProxy(
-    final Supplier<RS> resourceFactory) {
-    return new CloseableResourceProxy<>(resourceFactory);
+    final Supplier<RS> resourceFactory, final Class<?>... interfaces) {
+    return new CloseableResourceProxy<>(resourceFactory, interfaces);
   }
 
   private Supplier<R> resourceFactory;
@@ -91,8 +92,11 @@ public class CloseableResourceProxy<R extends BaseCloseable> implements BaseClos
 
   private R resourceProxy;
 
-  public CloseableResourceProxy(final Supplier<R> resourceFactory) {
+  private final Class<?>[] resourceInterfaces;
+
+  public CloseableResourceProxy(final Supplier<R> resourceFactory, final Class<?>[] interfaces) {
     this.resourceFactory = resourceFactory;
+    this.resourceInterfaces = interfaces;
   }
 
   @Override
