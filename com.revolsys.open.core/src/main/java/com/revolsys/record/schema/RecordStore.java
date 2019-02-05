@@ -1,6 +1,5 @@
 package com.revolsys.record.schema;
 
-import java.io.Closeable;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
@@ -29,6 +29,7 @@ import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.io.ListRecordReader;
@@ -40,6 +41,8 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.Transactionable;
 import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
@@ -47,7 +50,7 @@ import com.revolsys.util.count.CategoryLabelCountMap;
 import com.revolsys.util.count.LabelCountMap;
 
 public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFactory, Transactionable,
-  Closeable, ObjectWithProperties {
+  BaseCloseable, ObjectWithProperties {
 
   static boolean isRecordStore(final Path path) {
     for (final RecordStoreFactory recordStoreFactory : IoFactory
@@ -637,7 +640,11 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     return record;
   }
 
-  RecordWriter newRecordWriter();
+  default RecordWriter newRecordWriter() {
+    return newRecordWriter(false);
+  }
+
+  RecordWriter newRecordWriter(final boolean throwExceptions);
 
   default RecordWriter newRecordWriter(final PathName pathName) {
     final RecordDefinition recordDefinition = getRecordDefinition(pathName);
@@ -677,12 +684,65 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   default void updateRecord(final Record record) {
-    throw new UnsupportedOperationException("Update not supported");
+    write(record, null);
   }
 
   default void updateRecords(final Iterable<? extends Record> records) {
-    for (final Record record : records) {
-      updateRecord(record);
+    writeAll(records, null);
+  }
+
+  default void write(final Record record, final RecordState state) {
+    try (
+      Transaction transaction = newTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      // It's important to have this in an inner try. Otherwise the exceptions
+      // won't get caught on closing the writer and the transaction won't get
+      // rolled back.
+      try (
+        RecordWriter writer = newRecordWriter(true)) {
+        write(writer, record, state);
+      } catch (final RuntimeException e) {
+        transaction.setRollbackOnly();
+        throw e;
+      } catch (final Error e) {
+        transaction.setRollbackOnly();
+        throw e;
+      }
     }
+  }
+
+  default Record write(final RecordWriter writer, Record record, final RecordState state) {
+    if (state == RecordState.NEW) {
+      if (record.getState() != state) {
+        record = newRecord(record);
+      }
+    } else if (state != null) {
+      record.setState(state);
+    }
+    writer.write(record);
+    return record;
+  }
+
+  default int writeAll(final Iterable<? extends Record> records, final RecordState state) {
+    int count = 0;
+    try (
+      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
+      // It's important to have this in an inner try. Otherwise the exceptions
+      // won't get caught on closing the writer and the transaction won't get
+      // rolled back.
+      try (
+        final RecordWriter writer = newRecordWriter(true)) {
+        for (final Record record : records) {
+          write(writer, record, state);
+          count++;
+        }
+      } catch (final RuntimeException e) {
+        transaction.setRollbackOnly();
+        throw e;
+      } catch (final Error e) {
+        transaction.setRollbackOnly();
+        throw e;
+      }
+    }
+    return count;
   }
 }

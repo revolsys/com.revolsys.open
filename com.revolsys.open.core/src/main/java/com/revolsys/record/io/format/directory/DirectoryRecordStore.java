@@ -237,7 +237,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordWriter newRecordWriter() {
+  public RecordWriter newRecordWriter(final boolean throwExceptions) {
     return new DirectoryRecordStoreWriter(this);
   }
 

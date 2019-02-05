@@ -58,7 +58,6 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Exceptions;
@@ -661,11 +660,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public RecordWriter newRecordWriter() {
-    return newRecordWriter(false);
-  }
-
-  protected RecordWriter newRecordWriter(final boolean throwExceptions) {
+  public RecordWriter newRecordWriter(final boolean throwExceptions) {
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
       Object writerKey;
       if (throwExceptions) {
@@ -899,68 +894,4 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     this.usesSchema = usesSchema;
   }
 
-  @Override
-  public void updateRecord(final Record record) {
-    write(record, null);
-  }
-
-  @Override
-  public void updateRecords(final Iterable<? extends Record> records) {
-    writeAll(records, null);
-  }
-
-  protected void write(final Record record, final RecordState state) {
-    try (
-      Transaction transaction = newTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
-      // It's important to have this in an inner try. Otherwise the exceptions
-      // won't get caught on closing the writer and the transaction won't get
-      // rolled back.
-      try (
-        RecordWriter writer = newRecordWriter(true)) {
-        write(writer, record, state);
-      } catch (final RuntimeException e) {
-        transaction.setRollbackOnly();
-        throw e;
-      } catch (final Error e) {
-        transaction.setRollbackOnly();
-        throw e;
-      }
-    }
-  }
-
-  protected Record write(final RecordWriter writer, Record record, final RecordState state) {
-    if (state == RecordState.NEW) {
-      if (record.getState() != state) {
-        record = newRecord(record);
-      }
-    } else if (state != null) {
-      record.setState(state);
-    }
-    writer.write(record);
-    return record;
-  }
-
-  protected int writeAll(final Iterable<? extends Record> records, final RecordState state) {
-    int count = 0;
-    try (
-      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
-      // It's important to have this in an inner try. Otherwise the exceptions
-      // won't get caught on closing the writer and the transaction won't get
-      // rolled back.
-      try (
-        final RecordWriter writer = newRecordWriter(true)) {
-        for (final Record record : records) {
-          write(writer, record, state);
-          count++;
-        }
-      } catch (final RuntimeException e) {
-        transaction.setRollbackOnly();
-        throw e;
-      } catch (final Error e) {
-        transaction.setRollbackOnly();
-        throw e;
-      }
-    }
-    return count;
-  }
 }
