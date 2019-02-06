@@ -18,23 +18,25 @@ public class CloseableResourceProxy<R extends BaseCloseable> implements BaseClos
     }
 
     private void disconnect() {
-      final R resourceToClose;
-      synchronized (CloseableResourceHandler.this) {
-        this.referenceCount--;
-        if (this.referenceCount <= 0) {
-          CloseableResourceProxy.this.resourceHandler = null;
-          CloseableResourceProxy.this.resourceProxy = null;
-          resourceToClose = this.resource;
-          synchronized (this) {
-            this.resource = null;
+      if (this.resource != null) {
+        final R resourceToClose;
+        synchronized (CloseableResourceHandler.this) {
+          this.referenceCount--;
+          if (this.referenceCount <= 0) {
+            CloseableResourceProxy.this.resourceHandler = null;
+            CloseableResourceProxy.this.resourceProxy = null;
+            resourceToClose = this.resource;
+            synchronized (this) {
+              this.resource = null;
+            }
+            this.referenceCount = 0;
+          } else {
+            resourceToClose = null;
           }
-          this.referenceCount = 0;
-        } else {
-          resourceToClose = null;
         }
-      }
-      if (resourceToClose != null) {
-        resourceToClose.close();
+        if (resourceToClose != null) {
+          resourceToClose.close();
+        }
       }
     }
 
@@ -49,11 +51,11 @@ public class CloseableResourceProxy<R extends BaseCloseable> implements BaseClos
       synchronized (this) {
         resource = this.resource;
       }
-      if (resource == null) {
-        throw new IllegalStateException("Resource is closed");
-      } else if (args == null && "close".equals(method.getName())) {
+      if (args == null && "close".equals(method.getName())) {
         disconnect();
         return null;
+      } else if (resource == null) {
+        throw new IllegalStateException("Resource is closed");
       } else {
         return method.invoke(resource, args);
       }
