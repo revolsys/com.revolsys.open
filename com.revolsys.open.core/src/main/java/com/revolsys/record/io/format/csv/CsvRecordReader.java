@@ -44,8 +44,8 @@ public class CsvRecordReader extends AbstractRecordReader {
     this.fieldSeparator = fieldSeparator;
   }
 
-  private void addValue(final List<String> values, final StringBuilder sb,
-    final boolean hadQuotes) {
+  private void addValue(final List<String> values, final boolean hadQuotes) {
+    final StringBuilder sb = this.sb;
     if (hadQuotes || sb.length() > 0) {
       values.add(sb.toString());
       sb.setLength(0);
@@ -124,7 +124,7 @@ public class CsvRecordReader extends AbstractRecordReader {
         final int character = in.read();
         switch (character) {
           case -1:
-            return returnEof(values, this.sb, hadQuotes);
+            return returnEof(values, hadQuotes);
           case '"':
             if (!hadQuotes && this.sb.length() > 0) {
               this.sb.append('"');
@@ -156,7 +156,7 @@ public class CsvRecordReader extends AbstractRecordReader {
                   // skip empty lines
                 }
               } else {
-                addValue(values, this.sb, hadQuotes);
+                addValue(values, hadQuotes);
                 return values;
               }
             }
@@ -178,7 +178,7 @@ public class CsvRecordReader extends AbstractRecordReader {
                     // skip empty lines
                   }
                 } else {
-                  addValue(values, this.sb, hadQuotes);
+                  addValue(values, hadQuotes);
                   return values;
                 }
               }
@@ -189,7 +189,7 @@ public class CsvRecordReader extends AbstractRecordReader {
               if (inQuotes) {
                 this.sb.append(fieldSeparator);
               } else {
-                addValue(values, this.sb, hadQuotes);
+                addValue(values, hadQuotes);
                 hadQuotes = false;
               }
             } else {
@@ -201,8 +201,8 @@ public class CsvRecordReader extends AbstractRecordReader {
     }
   }
 
-  private List<String> returnEof(final List<String> values, final StringBuilder sb,
-    final boolean hadQuotes) {
+  private List<String> returnEof(final List<String> values, final boolean hadQuotes) {
+    final StringBuilder sb = this.sb;
     if (values.isEmpty()) {
       if (sb.length() > 0) {
         values.add(sb.toString());
@@ -210,7 +210,7 @@ public class CsvRecordReader extends AbstractRecordReader {
         throw new NoSuchElementException();
       }
     } else {
-      addValue(values, sb, hadQuotes);
+      addValue(values, hadQuotes);
     }
     return values;
   }

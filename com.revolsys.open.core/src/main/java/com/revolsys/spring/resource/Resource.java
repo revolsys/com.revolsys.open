@@ -85,18 +85,10 @@ public interface Resource extends org.springframework.core.io.Resource {
   }
 
   static File getOrDownloadFile(final Resource resource) {
-    try {
-      return resource.getFile();
-    } catch (final Throwable e) {
-      if (resource.exists()) {
-        final String baseName = resource.getBaseName();
-        final String fileNameExtension = resource.getFileNameExtension();
-        final File file = FileUtil.newTempFile(baseName, fileNameExtension);
-        FileUtil.copy(resource.getInputStream(), file);
-        return file;
-      } else {
-        throw new IllegalArgumentException("Cannot get File for resource " + resource, e);
-      }
+    if (resource == null) {
+      return null;
+    } else {
+      return resource.getOrDownloadFile();
     }
   }
 
@@ -342,7 +334,12 @@ public interface Resource extends org.springframework.core.io.Resource {
         final String baseName = getBaseName();
         final String fileNameExtension = getFileNameExtension();
         final File file = FileUtil.newTempFile(baseName, fileNameExtension);
-        FileUtil.copy(getInputStream(), file);
+        try (
+          InputStream inputStream = getInputStream()) {
+          FileUtil.copy(inputStream, file);
+        } catch (final IOException e1) {
+          throw Exceptions.wrap("Error downloading: " + this, e1);
+        }
         return file;
       } else {
         throw new IllegalArgumentException("Cannot get File for resource " + this, e);

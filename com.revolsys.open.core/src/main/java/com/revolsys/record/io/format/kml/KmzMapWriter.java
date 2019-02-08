@@ -31,8 +31,11 @@ public class KmzMapWriter extends AbstractMapWriter {
   @Override
   public void close() {
     try {
-      this.kmlWriter.close();
-      this.zipOut.close();
+      try {
+        this.kmlWriter.close();
+      } finally {
+        this.zipOut.close();
+      }
     } catch (final IOException e) {
     }
   }

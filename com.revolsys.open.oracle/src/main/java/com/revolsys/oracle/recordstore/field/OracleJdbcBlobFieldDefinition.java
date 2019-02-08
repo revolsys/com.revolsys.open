@@ -1,6 +1,7 @@
 package com.revolsys.oracle.recordstore.field;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Blob;
@@ -12,6 +13,7 @@ import java.util.Collections;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Exceptions;
 
 public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
   public OracleJdbcBlobFieldDefinition(final String dbName, final String name, final int sqlType,
@@ -26,6 +28,24 @@ public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
     return resultSet.getBlob(columnIndex);
   }
 
+  private InputStream openInputStream(final Object value) {
+    if (value instanceof byte[]) {
+      final byte[] bytes = (byte[])value;
+      return new ByteArrayInputStream(bytes);
+    } else if (value instanceof CharSequence) {
+      final String string = ((CharSequence)value).toString();
+      final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+      return new ByteArrayInputStream(bytes);
+    } else {
+      try {
+        final Resource resource = Resource.getResource(value);
+        return resource.newBufferedInputStream();
+      } catch (final IllegalArgumentException e) {
+        throw new IllegalArgumentException(value.getClass() + " not valid for a blob column");
+      }
+    }
+  }
+
   @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
@@ -37,26 +57,12 @@ public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
         final Blob blob = (Blob)value;
         statement.setBlob(parameterIndex, blob);
       } else {
-        InputStream in;
-        if (value instanceof Blob) {
-          final Blob blob = (Blob)value;
-          in = blob.getBinaryStream();
-        } else if (value instanceof byte[]) {
-          final byte[] bytes = (byte[])value;
-          in = new ByteArrayInputStream(bytes);
-        } else if (value instanceof CharSequence) {
-          final String string = ((CharSequence)value).toString();
-          final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
-          in = new ByteArrayInputStream(bytes);
-        } else {
-          try {
-            final Resource resource = Resource.getResource(value);
-            in = resource.newBufferedInputStream();
-          } catch (final IllegalArgumentException e) {
-            throw new IllegalArgumentException(value.getClass() + " not valid for a blob column");
-          }
+        try (
+          InputStream in = openInputStream(value)) {
+          statement.setBinaryStream(parameterIndex, in);
+        } catch (final IOException e) {
+          throw Exceptions.wrap(e);
         }
-        statement.setBinaryStream(parameterIndex, in);
       }
     }
     return parameterIndex + 1;
