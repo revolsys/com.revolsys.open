@@ -140,7 +140,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    if (this.geometryFactory == null) {
+    if (this.geometryFactory == GeometryFactory.DEFAULT_3D) {
       init();
       if (this.bands.size() == 0) {
         this.geometryFactory = GeometryFactory.DEFAULT_3D;

@@ -20,15 +20,13 @@ public class CloseableResourceProxy<R extends BaseCloseable> implements BaseClos
     private void disconnect() {
       if (this.resource != null) {
         final R resourceToClose;
-        synchronized (CloseableResourceHandler.this) {
+        synchronized (CloseableResourceProxy.this) {
           this.referenceCount--;
           if (this.referenceCount <= 0) {
             CloseableResourceProxy.this.resourceHandler = null;
             CloseableResourceProxy.this.resourceProxy = null;
             resourceToClose = this.resource;
-            synchronized (this) {
-              this.resource = null;
-            }
+            this.resource = null;
             this.referenceCount = 0;
           } else {
             resourceToClose = null;
@@ -47,17 +45,20 @@ public class CloseableResourceProxy<R extends BaseCloseable> implements BaseClos
     @Override
     public Object invoke(final Object proxy, final Method method, final Object[] args)
       throws Throwable {
-      final R resource;
-      synchronized (this) {
-        resource = this.resource;
-      }
+
       if (args == null && "close".equals(method.getName())) {
         disconnect();
         return null;
-      } else if (resource == null) {
-        throw new IllegalStateException("Resource is closed");
       } else {
-        return method.invoke(resource, args);
+        final R resource;
+        synchronized (CloseableResourceProxy.this) {
+          resource = this.resource;
+        }
+        if (resource == null) {
+          throw new IllegalStateException("Resource is closed");
+        } else {
+          return method.invoke(resource, args);
+        }
       }
     }
 
@@ -72,7 +73,7 @@ public class CloseableResourceProxy<R extends BaseCloseable> implements BaseClos
 
     private void resourceClose() {
       final R resourceToClose;
-      synchronized (CloseableResourceHandler.this) {
+      synchronized (CloseableResourceProxy.this) {
         resourceToClose = this.resource;
         this.resource = null;
         this.referenceCount = 0;
@@ -102,13 +103,11 @@ public class CloseableResourceProxy<R extends BaseCloseable> implements BaseClos
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
     final CloseableResourceHandler handler;
-    synchronized (this) {
-      handler = this.resourceHandler;
-      this.resourceFactory = null;
-      this.resourceHandler = null;
-    }
+    handler = this.resourceHandler;
+    this.resourceFactory = null;
+    this.resourceHandler = null;
     if (handler != null) {
       handler.resourceClose();
     }
