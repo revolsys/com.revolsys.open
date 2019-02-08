@@ -21,7 +21,7 @@ public class CsvRecordReader extends AbstractRecordReader {
 
   private Resource resource;
 
-  final StringBuilder sb = new StringBuilder(1024);
+  private final StringBuilder sb = new StringBuilder(1024);
 
   public CsvRecordReader(final Resource resource) {
     this(resource, ArrayRecord.FACTORY, Csv.FIELD_SEPARATOR);
