@@ -12,7 +12,6 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordReader;
-import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class CsvRecordReader extends AbstractRecordReader {
@@ -22,7 +21,7 @@ public class CsvRecordReader extends AbstractRecordReader {
 
   private Resource resource;
 
-  final StringBuilder sb = new StringBuilder();
+  final StringBuilder sb = new StringBuilder(1024);
 
   public CsvRecordReader(final Resource resource) {
     this(resource, ArrayRecord.FACTORY, Csv.FIELD_SEPARATOR);
@@ -214,10 +213,4 @@ public class CsvRecordReader extends AbstractRecordReader {
     }
     return values;
   }
-
-  @Override
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    super.setRecordDefinition(recordDefinition);
-  }
-
 }
