@@ -67,6 +67,10 @@ public class FileGdbWriter extends AbstractRecordWriter {
     return this.recordDefinition;
   }
 
+  public FileGdbRecordStore getRecordStore() {
+    return this.recordStore;
+  }
+
   private Table getTable(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final String catalogPath = this.recordStore.getCatalogPath(recordDefinition);

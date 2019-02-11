@@ -20,8 +20,8 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
   @SuppressWarnings("deprecation")
   public static final Date MIN_DATE = new Date(70, 0, 1);
 
-  public DateFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.DATE,
+  public DateFieldDefinition(final int fieldNumber, final Field field) {
+    super(fieldNumber, field.getName(), DataTypes.DATE,
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
@@ -32,14 +32,13 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    final String name = getName();
     synchronized (getSync()) {
-      if (row.isNull(name)) {
+      if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
         long time;
         synchronized (LOCK) {
-          time = row.getDate(name) * 1000;
+          time = row.getDate(this.fieldNumber) * 1000;
         }
         return new Date(time);
       }
@@ -51,7 +50,6 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (value == null) {
       setNull(row);
     } else {
-      final String name = getName();
       if (value instanceof String) {
         try {
           value = Dates.getDate("yyyy-MM-dd", (String)value);
@@ -62,26 +60,26 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
       if (value instanceof Date) {
         Date date = (Date)value;
         if (date.before(MIN_DATE)) {
-          Logs.error(this, name + "=" + date + " is before " + MIN_DATE
+          Logs.error(this, getName() + "=" + date + " is before " + MIN_DATE
             + " which is not supported by ESRI File Geodatabases\n" + record);
           if (isRequired()) {
             date = MIN_DATE;
           } else {
-            row.setNull(name);
+            row.setNull(this.fieldNumber);
           }
         } else if (date.after(MAX_DATE)) {
-          Logs.error(this, name + "=" + date + " is after " + MAX_DATE
+          Logs.error(this, getName() + "=" + date + " is after " + MAX_DATE
             + " which is not supported by ESRI File Geodatabases\n" + record);
           if (isRequired()) {
             date = MAX_DATE;
           } else {
-            row.setNull(name);
+            row.setNull(this.fieldNumber);
           }
         }
         synchronized (getSync()) {
           final long time = date.getTime() / 1000;
           synchronized (LOCK) {
-            row.setDate(name, time);
+            row.setDate(this.fieldNumber, time);
           }
         }
       } else {

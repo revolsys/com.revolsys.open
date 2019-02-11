@@ -8,13 +8,14 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;
 
 public class GlobalIdFieldDefinition extends AbstractFileGdbFieldDefinition {
-  public GlobalIdFieldDefinition(final Field field) {
-    this(field.getName(), field.getLength(),
+  public GlobalIdFieldDefinition(final int fieldNumber, final Field field) {
+    this(fieldNumber, field.getName(), field.getLength(),
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
-  public GlobalIdFieldDefinition(final String name, final int length, final boolean required) {
-    super(name, DataTypes.STRING, length, required);
+  public GlobalIdFieldDefinition(final int fieldNumber, final String name, final int length,
+    final boolean required) {
+    super(fieldNumber, name, DataTypes.STRING, length, required);
   }
 
   @Override

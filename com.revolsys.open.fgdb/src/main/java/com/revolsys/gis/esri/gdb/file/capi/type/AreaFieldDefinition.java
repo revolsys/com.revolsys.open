@@ -8,8 +8,8 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;
 
 public class AreaFieldDefinition extends AbstractFileGdbFieldDefinition {
-  public AreaFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.DOUBLE,
+  public AreaFieldDefinition(final int fieldNumber, final Field field) {
+    super(fieldNumber, field.getName(), DataTypes.DOUBLE,
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
@@ -20,12 +20,11 @@ public class AreaFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    final String name = getName();
     synchronized (getSync()) {
-      if (row.isNull(name)) {
+      if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
-        return row.getDouble(name);
+        return row.getDouble(this.fieldNumber);
       }
     }
   }
@@ -42,7 +41,6 @@ public class AreaFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (geometry != null) {
       area = geometry.getArea();
     }
-    final String name = getName();
-    row.setDouble(name, area);
+    row.setDouble(this.fieldNumber, area);
   }
 }

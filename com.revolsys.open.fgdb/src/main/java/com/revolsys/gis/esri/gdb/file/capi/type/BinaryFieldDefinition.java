@@ -8,8 +8,8 @@ import com.revolsys.util.Booleans;
 
 public class BinaryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
-  public BinaryFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.BASE64_BINARY, field.getLength(),
+  public BinaryFieldDefinition(final int fieldNumber, final Field field) {
+    super(fieldNumber, field.getName(), DataTypes.BASE64_BINARY, field.getLength(),
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 

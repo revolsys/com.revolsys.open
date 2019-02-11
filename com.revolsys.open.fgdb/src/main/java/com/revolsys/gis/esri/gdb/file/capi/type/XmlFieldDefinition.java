@@ -8,32 +8,30 @@ import com.revolsys.util.Booleans;
 
 public class XmlFieldDefinition extends AbstractFileGdbFieldDefinition {
 
-  public XmlFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.STRING, field.getLength(),
+  public XmlFieldDefinition(final int fieldNumber, final Field field) {
+    super(fieldNumber, field.getName(), DataTypes.STRING, field.getLength(),
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override
   public Object getValue(final Row row) {
-    final String name = getName();
     synchronized (getSync()) {
-      if (row.isNull(name)) {
+      if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
-        return row.getXML(name);
+        return row.getXML(this.fieldNumber);
       }
     }
   }
 
   @Override
   public void setValue(final Record record, final Row row, final Object value) {
-    final String name = getName();
     if (value == null) {
       setNull(row);
     } else {
       final String string = value.toString();
       synchronized (getSync()) {
-        row.setXML(name, string);
+        row.setXML(this.fieldNumber, string);
       }
     }
   }

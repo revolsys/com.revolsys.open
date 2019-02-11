@@ -13,14 +13,18 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
 
   private Reference<FileGdbRecordStore> recordStore;
 
-  public AbstractFileGdbFieldDefinition(final String name, final DataType dataType,
-    final boolean required) {
+  protected final int fieldNumber;
+
+  public AbstractFileGdbFieldDefinition(final int fieldNumber, final String name,
+    final DataType dataType, final boolean required) {
     super(name, dataType, required);
+    this.fieldNumber = fieldNumber;
   }
 
-  public AbstractFileGdbFieldDefinition(final String name, final DataType dataType,
-    final int length, final boolean required) {
+  public AbstractFileGdbFieldDefinition(final int fieldNumber, final String name,
+    final DataType dataType, final int length, final boolean required) {
     super(name, dataType, length, required);
+    this.fieldNumber = fieldNumber;
   }
 
   public FileGdbRecordStore getRecordStore() {
@@ -42,7 +46,9 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
   }
 
   public void setInsertValue(final Record record, final Row row, final Object value) {
-    setValue(record, row, value);
+    if (value != null) {
+      setValue(record, row, value);
+    }
   }
 
   protected void setNull(final Row row) {
@@ -50,7 +56,7 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
     if (isRequired()) {
       throw new IllegalArgumentException(name + " is required and cannot be null");
     } else {
-      row.setNull(name);
+      row.setNull(this.fieldNumber);
     }
   }
 

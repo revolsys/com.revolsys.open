@@ -8,8 +8,8 @@ import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
 public class DoubleFieldDefinition extends AbstractFileGdbFieldDefinition {
-  public DoubleFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.DOUBLE,
+  public DoubleFieldDefinition(final int fieldNumber, final Field field) {
+    super(fieldNumber, field.getName(), DataTypes.DOUBLE,
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
@@ -20,38 +20,36 @@ public class DoubleFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    final String name = getName();
     synchronized (getSync()) {
-      if (row.isNull(name)) {
+      if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
-        return row.getDouble(name);
+        return row.getDouble(this.fieldNumber);
       }
     }
   }
 
   @Override
   public void setValue(final Record record, final Row row, final Object value) {
-    final String name = getName();
     if (value == null) {
       setNull(row);
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final double doubleValue = number.doubleValue();
       synchronized (getSync()) {
-        row.setDouble(name, doubleValue);
+        row.setDouble(this.fieldNumber, doubleValue);
       }
     } else {
       final String string = value.toString();
       if (Property.hasValue(string)) {
         final double doubleValue = Double.parseDouble(string);
         synchronized (getSync()) {
-          row.setDouble(name, doubleValue);
+          row.setDouble(this.fieldNumber, doubleValue);
         }
       } else if (isRequired()) {
-        throw new IllegalArgumentException(name + " is required and cannot be null");
+        throw new IllegalArgumentException(getName() + " is required and cannot be null");
       } else {
-        row.setNull(name);
+        setNull(row);
       }
     }
   }
