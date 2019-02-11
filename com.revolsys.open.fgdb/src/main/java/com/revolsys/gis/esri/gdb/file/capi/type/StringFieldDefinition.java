@@ -8,26 +8,24 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;
 
 public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
-  public StringFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.STRING, field.getLength(),
+  public StringFieldDefinition(final int fieldNumber, final Field field) {
+    super(fieldNumber, field.getName(), DataTypes.STRING, field.getLength(),
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override
   public Object getValue(final Row row) {
-    final String name = getName();
     synchronized (getSync()) {
-      if (row.isNull(name)) {
+      if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
-        return row.getString(name);
+        return row.getString(this.fieldNumber);
       }
     }
   }
 
   @Override
   public void setValue(final Record record, final Row row, final Object value) {
-    final String name = getName();
     if (value == null) {
       setNull(row);
     } else {
@@ -36,7 +34,7 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
         Logs.warn(this, "Value is to long for: " + this + ":" + string);
         string = string.substring(0, getLength());
       }
-      row.setString(name, string);
+      row.setString(this.fieldNumber, string);
     }
   }
 }

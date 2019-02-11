@@ -33,23 +33,23 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
     }
   }
 
-  public GuidFieldDefinition(final Field field) {
-    this(field.getName(), field.getLength(),
+  public GuidFieldDefinition(final int fieldNumber, final Field field) {
+    this(fieldNumber, field.getName(), field.getLength(),
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
-  public GuidFieldDefinition(final String name, final int length, final boolean required) {
-    super(name, DataTypes.STRING, length, required);
+  public GuidFieldDefinition(final int fieldNumber, final String name, final int length,
+    final boolean required) {
+    super(fieldNumber, name, DataTypes.STRING, length, required);
   }
 
   @Override
   public Object getValue(final Row row) {
-    final String name = getName();
     synchronized (getSync()) {
-      if (row.isNull(name)) {
+      if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
-        final Guid guid = row.getGuid(name);
+        final Guid guid = row.getGuid(this.fieldNumber);
         addGuid(guid);
         return guid.toString();
       }
@@ -58,14 +58,13 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public void setValue(final Record record, final Row row, final Object value) {
-    final String name = getName();
     if (value == null) {
       setNull(row);
     } else {
       final String guidString = value.toString();
       final Guid guid = getGuid(guidString);
       synchronized (getSync()) {
-        row.setGuid(name, guid);
+        row.setGuid(this.fieldNumber, guid);
       }
     }
   }

@@ -15,7 +15,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 import si.uom.SI;
 
-public class GeographicCoordinateSystem implements CoordinateSystem {
+public class GeographicCoordinateSystem implements HorizontalCoordinateSystem {
   public static final double EARTH_RADIUS = 6378137;
 
   private static final long serialVersionUID = 8655274386401351222L;
@@ -218,6 +218,11 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   public Datum getDatum() {
     return this.datum;
+  }
+
+  @Override
+  public <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
+    return (C)this;
   }
 
   @Override

@@ -383,8 +383,14 @@ public interface Lists {
   }
 
   public static <V> List<V> toArrayThreadSafe(final List<? extends V> values) {
-    final List<V> list = new ArrayList<>();
-    addAll(list, new ListByIndexIterator<>(values));
+    final List<V> list = new ArrayList<>(values.size());
+    for (int i = 0; i < values.size(); i++) {
+      try {
+        final V value = values.get(i);
+        list.add(value);
+      } catch (final IndexOutOfBoundsException e) {
+      }
+    }
     return list;
   }
 

@@ -7,8 +7,8 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;
 
 public class OidFieldDefinition extends AbstractFileGdbFieldDefinition {
-  public OidFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.INT,
+  public OidFieldDefinition(final int fieldNumber, final Field field) {
+    super(fieldNumber, field.getName(), DataTypes.INT,
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
@@ -19,9 +19,8 @@ public class OidFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    final String name = getName();
     synchronized (getSync()) {
-      if (row.isNull(name)) {
+      if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
         return row.getOid();

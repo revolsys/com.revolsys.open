@@ -63,7 +63,13 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements Proce
     if (command != null) {
       while (!isShutdown()) {
         if (this.taskCount.get() >= getMaximumPoolSize()) {
-          ThreadUtil.pause(this.monitor);
+          synchronized (this.monitor) {
+            try {
+              this.monitor.wait();
+            } catch (final InterruptedException e) {
+              throw new ThreadInterruptedException(e);
+            }
+          }
         }
         this.taskCount.incrementAndGet();
         try {

@@ -2522,7 +2522,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public final boolean saveChanges(final Collection<? extends LayerRecord> records) {
+  public boolean saveChanges(final Collection<? extends LayerRecord> records) {
     try {
       if (records.isEmpty()) {
         return true;

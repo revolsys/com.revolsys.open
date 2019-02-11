@@ -76,6 +76,8 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   private static final MenuFactory MENU = new MenuFactory("File");
 
+  private static Icon iconFolder;
+
   static {
     addRefreshMenuItem(MENU);
 
@@ -133,6 +135,13 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       file.delete();
       return file;
     }
+  }
+
+  public static Icon getIconFolder() {
+    if (iconFolder == null) {
+      iconFolder = Icons.getIcon("folder");
+    }
+    return iconFolder;
   }
 
   public static List<BaseTreeNode> getPathNodes(final Iterable<Path> paths,

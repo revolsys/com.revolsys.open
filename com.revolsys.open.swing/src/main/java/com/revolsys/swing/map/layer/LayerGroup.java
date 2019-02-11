@@ -21,6 +21,7 @@ import javax.swing.filechooser.FileFilter;
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -40,8 +41,10 @@ import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.map.component.CoordinateSystemField;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
+import com.revolsys.swing.map.layer.record.ScratchRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
@@ -56,17 +59,45 @@ import com.revolsys.util.UrlUtil;
 public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable<Layer> {
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
-    menu.addGroup(0, "group");
-    Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
-      Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "add"), LayerGroup::actionAddLayerGroup,
-      false);
+    MenuFactory.addMenuInitializer(LayerGroup.class, menu -> {
+      menu.addGroup(0, "group");
+      Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
+        Icons.getIconWithBadge(PathTreeNode.getIconFolder(), "add"),
+        LayerGroup::actionAddLayerGroup, false);
 
-    Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer...", "page_add",
-      LayerGroup::actionOpenFileLayer, false);
+      final MenuFactory scratchMenu = new MenuFactory("Add Scratch Layer");
+      scratchMenu.setIconName("map:add");
 
-    Menus.<LayerGroup> addMenuItem(menu, "group", "Import Project...", "map:import",
-      LayerGroup::actionImportProject, false);
+      for (final DataType dataType : Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING,
+        DataTypes.POLYGON, DataTypes.MULTI_POINT, DataTypes.MULTI_LINE_STRING,
+        DataTypes.MULTI_POLYGON, DataTypes.GEOMETRY, DataTypes.GEOMETRY_COLLECTION)) {
+        String iconName;
+        if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
+          iconName = "table_geometry";
+        } else {
+          iconName = "table_" + dataType.toString().toLowerCase();
+        }
+        Menus.<LayerGroup> addMenuItem(scratchMenu, "layer", "Add " + dataType + " Layer", iconName,
+          layerGroup -> {
+            CoordinateSystemField.selectHorizontalCoordinateSystem(
+              "Select coordinate system for layer", layerGroup, coordinateSystem -> {
+                final GeometryFactory geometryFactory = coordinateSystem.getGeometryFactory();
+                final Layer layer = new ScratchRecordLayer(geometryFactory, dataType);
+                layerGroup.addLayer(layer);
+              });
+          }, false);
+
+      }
+      menu.addComponentFactory("group", scratchMenu);
+
+      Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer...", "page:add",
+        LayerGroup::actionOpenFileLayer, false);
+
+      Menus.<LayerGroup> addMenuItem(menu, "group", "Import Project...", "map:import",
+        LayerGroup::actionImportProject, false);
+
+    });
+
   }
 
   private static Layer getLayer(LayerGroup group, final String name) {

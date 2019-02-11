@@ -50,6 +50,7 @@ import com.revolsys.gis.esri.gdb.file.capi.type.StringFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.XmlFieldDefinition;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.SingleIdentifier;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
@@ -60,7 +61,6 @@ import com.revolsys.parallel.SingleThreadExecutor;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureClass;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureDataset;
@@ -132,7 +132,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     final Class<? extends AbstractFileGdbFieldDefinition> fieldClass) {
     try {
       final Constructor<? extends AbstractFileGdbFieldDefinition> constructor = fieldClass
-        .getConstructor(Field.class);
+        .getConstructor(int.class, Field.class);
       ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP.put(fieldType, constructor);
     } catch (final SecurityException e) {
       Logs.error(FileGdbRecordStore.class, "No public constructor for ESRI type " + fieldType, e);
@@ -754,20 +754,22 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             areaFieldNameProperty.setRecordDefinition(recordDefinition);
 
           }
+          int fieldNumber = 0;
           for (final Field field : deTable.getFields()) {
             final String fieldName = field.getName();
             AbstractFileGdbFieldDefinition fieldDefinition = null;
             if (fieldName.equals(lengthFieldName)) {
-              fieldDefinition = new LengthFieldDefinition(field);
+              fieldDefinition = new LengthFieldDefinition(fieldNumber, field);
             } else if (fieldName.equals(areaFieldName)) {
-              fieldDefinition = new AreaFieldDefinition(field);
+              fieldDefinition = new AreaFieldDefinition(fieldNumber, field);
             } else {
               final FieldType type = field.getType();
               final Constructor<? extends AbstractFileGdbFieldDefinition> fieldConstructor = ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP
                 .get(type);
               if (fieldConstructor != null) {
                 try {
-                  fieldDefinition = JavaBeanUtil.invokeConstructor(fieldConstructor, field);
+                  fieldDefinition = JavaBeanUtil.invokeConstructor(fieldConstructor, fieldNumber,
+                    field);
                 } catch (final Throwable e) {
                   Logs.error(this, tableDefinition);
                   throw new RuntimeException("Error creating field for " + typePath + "."
@@ -793,6 +795,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 recordDefinition.setIdFieldName(fieldName);
               }
             }
+            fieldNumber++;
           }
           final String oidFieldName = deTable.getOIDFieldName();
           recordDefinition.setProperty(EsriGeodatabaseXmlConstants.ESRI_OBJECT_ID_FIELD_NAME,
@@ -1321,7 +1324,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
+  public FileGdbWriter newRecordWriter(final RecordDefinition recordDefinition) {
     return new FileGdbWriter(this, recordDefinition);
   }
 
@@ -1772,12 +1775,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     this.fileName = fileName;
   }
 
-  public void setNull(final Row row, final String name) {
-    synchronized (this.apiSync) {
-      row.setNull(name);
-    }
-  }
-
   public String toCatalogPath(final PathName path) {
     return path.getPath().replaceAll("/", "\\\\");
   }
@@ -1873,6 +1870,19 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         }
       }
     }
+  }
+
+  public BaseCloseable writeLock(final PathName path) {
+    final RecordDefinition recordDefinition = getRecordDefinition(path);
+    if (recordDefinition != null) {
+      final Table table = getTableWithWriteLock(recordDefinition);
+      if (table != null) {
+        return () -> {
+          releaseTableAndWriteLock(recordDefinition);
+        };
+      }
+    }
+    return null;
   }
 
 }

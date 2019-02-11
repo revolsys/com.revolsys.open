@@ -260,6 +260,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public static GeometryFactory floating2d(final int coordinateSystemId) {
+    return fixed(coordinateSystemId, 0.0);
+  }
+
   public static GeometryFactory floating2d(final Resource resource) {
     return EsriCoordinateSystems.getGeometryFactory(resource);
   }
@@ -853,6 +857,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @param geometryFactory The geometry factory to convert to.
    * @return The coordinates operation or null if no conversion is available.
    */
+  @Override
   public CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     final CoordinateSystem otherCoordinateSystem = geometryFactory.getCoordinateSystem();
@@ -900,6 +905,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return (C)getCoordinateSystem();
   }
 
+  @Override
   public int getHorizontalCoordinateSystemId() {
     return getCoordinateSystemId();
   }

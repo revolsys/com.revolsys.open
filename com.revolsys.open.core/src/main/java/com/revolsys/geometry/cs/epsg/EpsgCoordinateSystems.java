@@ -33,6 +33,7 @@ import com.revolsys.geometry.cs.Axis;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.Datum;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.HorizontalCoordinateSystem;
 import com.revolsys.geometry.cs.LinearUnit;
 import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
@@ -253,6 +254,11 @@ public final class EpsgCoordinateSystems {
       }
     }
     return coordinateSystems;
+  }
+
+  public static HorizontalCoordinateSystem getHorizontalCoordinateSystem(
+    final int coordinateSystemId) {
+    return (HorizontalCoordinateSystem)getCoordinateSystem(coordinateSystemId);
   }
 
   private static Integer getInteger(final String value) {

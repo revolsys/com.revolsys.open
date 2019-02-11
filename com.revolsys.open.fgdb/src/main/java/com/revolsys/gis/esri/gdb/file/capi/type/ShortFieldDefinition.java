@@ -7,8 +7,8 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;
 
 public class ShortFieldDefinition extends AbstractFileGdbFieldDefinition {
-  public ShortFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.SHORT,
+  public ShortFieldDefinition(final int fieldNumber, final Field field) {
+    super(fieldNumber, field.getName(), DataTypes.SHORT,
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
@@ -19,32 +19,30 @@ public class ShortFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    final String name = getName();
     synchronized (getSync()) {
-      if (row.isNull(name)) {
+      if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
-        return row.getShort(name);
+        return row.getShort(this.fieldNumber);
       }
     }
   }
 
   @Override
   public void setValue(final Record record, final Row row, final Object value) {
-    final String name = getName();
     if (value == null) {
       setNull(row);
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final short shortValue = number.shortValue();
       synchronized (getSync()) {
-        row.setShort(name, shortValue);
+        row.setShort(this.fieldNumber, shortValue);
       }
     } else {
       final String string = value.toString();
       final short shortValue = Short.parseShort(string);
       synchronized (getSync()) {
-        row.setShort(name, shortValue);
+        row.setShort(this.fieldNumber, shortValue);
       }
     }
   }

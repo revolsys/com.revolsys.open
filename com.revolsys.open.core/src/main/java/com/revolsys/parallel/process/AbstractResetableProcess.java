@@ -103,7 +103,14 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
             } else {
               this.status = "waiting";
             }
-            ThreadUtil.pause(this, this.waitTime);
+            final long milliSeconds = this.waitTime;
+            synchronized (this) {
+              try {
+                this.wait(milliSeconds);
+              } catch (final InterruptedException e) {
+                throw new ThreadInterruptedException(e);
+              }
+            }
           }
         }
 
@@ -155,7 +162,14 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
 
   protected void waitOnExecutions() {
     this.status = "waiting on executions";
-    ThreadUtil.pause(this.executions, this.waitTime);
+    final long milliSeconds = this.waitTime;
+    synchronized (this.executions) {
+      try {
+        this.executions.wait(milliSeconds);
+      } catch (final InterruptedException e) {
+        throw new ThreadInterruptedException(e);
+      }
+    }
   }
 
 }

@@ -16,6 +16,11 @@
     {
       "typeName": "recordStoreLayer",
       "description": "Record Store Layer",
+      "typeClass": "com.revolsys.swing.map.layer.record.ScratchRecordLayer"
+    },
+    {
+      "typeName": "recordStoreLayer",
+      "description": "Record Store Layer",
       "typeClass": "com.revolsys.swing.map.layer.record.RecordStoreLayer"
     },
     {

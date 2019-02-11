@@ -137,7 +137,13 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
         }
         if (this.data.getState() == ChannelValueStore.EMPTY) {
           try {
-            ThreadUtil.pause(this.monitor, timeout);
+            synchronized (this.monitor) {
+              try {
+                this.monitor.wait(timeout);
+              } catch (final InterruptedException e) {
+                throw new ThreadInterruptedException(e);
+              }
+            }
             if (isClosed()) {
               throw new ClosedException();
             }
@@ -216,7 +222,13 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
         }
         if (this.data.getState() == ChannelValueStore.FULL) {
           try {
-            ThreadUtil.pause(this.monitor);
+            synchronized (this.monitor) {
+              try {
+                this.monitor.wait();
+              } catch (final InterruptedException e) {
+                throw new ThreadInterruptedException(e);
+              }
+            }
             if (this.closed) {
               throw new ClosedException();
             }

@@ -1,6 +1,5 @@
 package com.revolsys.parallel.process;
 
-import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.Channel;
 
 public class BaseInProcess<T> extends AbstractInProcess<T> {
@@ -35,12 +34,13 @@ public class BaseInProcess<T> extends AbstractInProcess<T> {
     this.running = true;
     try {
       preRun(in);
+      final Thread thread = Thread.currentThread();
       while (this.running) {
-        if (ThreadUtil.isInterrupted()) {
+        if (thread.isInterrupted()) {
           return;
         } else {
           final T object = in.read(5000);
-          if (ThreadUtil.isInterrupted()) {
+          if (thread.isInterrupted()) {
             return;
           } else if (object != null) {
             process(in, object);

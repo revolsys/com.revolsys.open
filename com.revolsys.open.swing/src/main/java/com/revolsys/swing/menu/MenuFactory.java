@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -29,9 +30,23 @@ import com.revolsys.util.Property;
 public class MenuFactory extends BaseObjectWithProperties implements ComponentFactory<JMenuItem> {
   private static final ClassRegistry<MenuFactory> CLASS_MENUS = new ClassRegistry<>();
 
+  private static final ClassRegistry<List<Consumer<MenuFactory>>> CLASS_MENUS_INITIALIZER = new ClassRegistry<>();
+
   private static final String KEY_POPUP_MENU = MenuFactory.class.getName() + ".popup";
 
   private static Object menuSource;
+
+  public static void addMenuInitializer(final Class<?> clazz,
+    final Consumer<MenuFactory> initializer) {
+    synchronized (CLASS_MENUS) {
+      List<Consumer<MenuFactory>> list = CLASS_MENUS_INITIALIZER.get(clazz);
+      if (list == null) {
+        list = new ArrayList<>();
+        CLASS_MENUS_INITIALIZER.put(clazz, list);
+      }
+      list.add(initializer);
+    }
+  }
 
   public static void addToComponent(final JComponent component, final MenuFactory menuFactory) {
     component.putClientProperty(KEY_POPUP_MENU, menuFactory);
@@ -64,6 +79,12 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
           final MenuFactory parentMenu = getMenu(superClass);
           menu = new MenuFactory(clazz.getName(), parentMenu);
           CLASS_MENUS.put(clazz, menu);
+          final List<Consumer<MenuFactory>> initializers = CLASS_MENUS_INITIALIZER.get(clazz);
+          if (initializers != null) {
+            for (final Consumer<MenuFactory> initializer : initializers) {
+              initializer.accept(menu);
+            }
+          }
         }
         return menu;
       }
@@ -134,11 +155,14 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   private String name;
 
+  private String iconName;
+
   public MenuFactory() {
   }
 
   public MenuFactory(final MenuFactory menuFactory) {
-    this(null, menuFactory);
+    this(menuFactory.name, menuFactory);
+    this.iconName = menuFactory.iconName;
   }
 
   public MenuFactory(final String name) {
@@ -236,11 +260,12 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     addComponentFactory(groupName, menuItem);
   }
 
-  public void addMenuItem(final String groupName, final String title, final String iconName,
-    final Runnable runnable) {
+  public RunnableAction addMenuItem(final String groupName, final String title,
+    final String iconName, final Runnable runnable) {
     final Icon icon = Icons.getIcon(iconName);
     final RunnableAction menuItem = newMenuItem(title, title, icon, null, runnable);
     addComponentFactory(groupName, menuItem);
+    return menuItem;
   }
 
   public void addMenuItem(final String groupName, final String title, final String toolTip,
@@ -281,9 +306,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   @Override
   public MenuFactory clone() {
-    final MenuFactory clone = new MenuFactory(this);
-
-    return clone;
+    return new MenuFactory(this);
   }
 
   @Override
@@ -360,9 +383,9 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   }
 
   /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
+   * public void setGroupEnabled(final String groupName, final boolean enabled) { final
+   * List<Component> components = getGroup(groupName); for (final Component component : components)
+   * { component.setEnabled(enabled); } }
    */
 
   public Map<String, List<ComponentFactory<?>>> getGroups() {
@@ -407,12 +430,17 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   }
 
   public JMenu newJMenu(final boolean forceEnable) {
-    final String name = this.name;
-    return newJMenu(name, forceEnable);
+    return newJMenu(this.name, forceEnable);
   }
 
   public JMenu newJMenu(final String name, final boolean forceEnable) {
     final JMenu menu = new JMenu(name);
+    if (this.iconName != null) {
+      final Icon icon = Icons.getIcon(this.iconName);
+      menu.setIcon(icon);
+      final Icon disabledIcon = Icons.getDisabledIcon(this.iconName);
+      menu.setDisabledIcon(disabledIcon);
+    }
     if (this.enableCheck != null) {
       final boolean enabled = this.enableCheck.isEnabled();
       menu.setEnabled(enabled);
@@ -454,10 +482,8 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     for (final String groupName : this.groupNames) {
       boolean groupHasItem = false;
       final List<ComponentFactory<?>> factories = this.groups.get(groupName);
-      if (!factories.isEmpty()) {
-
+      if (!Property.isEmpty(factories)) {
         for (final ComponentFactory<?> factory : factories) {
-
           final Component component = factory.newComponent();
           if (component != null) {
             if (forceEnable) {
@@ -487,6 +513,10 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   public void setEnableCheck(final EnableCheck enableCheck) {
     this.enableCheck = enableCheck;
+  }
+
+  public void setIconName(final String iconName) {
+    this.iconName = iconName;
   }
 
   public void setName(final String name) {

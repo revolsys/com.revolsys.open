@@ -46,8 +46,8 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   private Method writeMethod;
 
-  public GeometryFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.GEOMETRY,
+  public GeometryFieldDefinition(final int fieldNumber, final Field field) {
+    super(fieldNumber, field.getName(), DataTypes.GEOMETRY,
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
     final GeometryDef geometryDef = field.getGeometryDef();
     if (geometryDef == null) {
@@ -102,10 +102,9 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    final String name = getName();
     final byte[] bytes;
     synchronized (getSync()) {
-      if (row.isNull(name)) {
+      if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
         bytes = row.getGeometry();

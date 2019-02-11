@@ -63,20 +63,21 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
     this.idIdCache.put(id, id);
     addValueId(id, values);
     String lowerId = id.toString();
+    this.stringIdMap.put(lowerId, id);
     if (!this.caseSensitive) {
       lowerId = lowerId.toLowerCase();
     }
     this.stringIdMap.put(lowerId, id);
   }
 
-  protected void addValueId(final Identifier id, final List<Object> values) {
-    this.valueIdCache.put(values, id);
-    this.valueIdCache.put(getNormalizedValues(values), id);
-  }
-
   protected void addValue(final Identifier id, final Object... values) {
     final List<Object> valueList = Arrays.asList(values);
     addValue(id, valueList);
+  }
+
+  protected void addValueId(final Identifier id, final List<Object> values) {
+    this.valueIdCache.put(values, id);
+    this.valueIdCache.put(getNormalizedValues(values), id);
   }
 
   protected synchronized void addValues(final Map<Identifier, List<Object>> valueMap) {
@@ -135,11 +136,15 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
           return cachedId;
         } else {
           String lowerId = id.toString();
-          if (!this.caseSensitive) {
-            lowerId = lowerId.toLowerCase();
-          }
           if (this.stringIdMap.containsKey(lowerId)) {
             return this.stringIdMap.get(lowerId);
+          } else {
+            if (!this.caseSensitive) {
+              lowerId = lowerId.toLowerCase();
+            }
+            if (this.stringIdMap.containsKey(lowerId)) {
+              return this.stringIdMap.get(lowerId);
+            }
           }
         }
       }
@@ -216,12 +221,17 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
       List<Object> values = this.idValueCache.get(id);
       if (values == null) {
         String lowerId = id.toString();
-        if (!this.caseSensitive) {
-          lowerId = lowerId.toLowerCase();
-        }
         if (this.stringIdMap.containsKey(lowerId)) {
           id = this.stringIdMap.get(lowerId);
           values = this.idValueCache.get(id);
+        } else {
+          if (!this.caseSensitive) {
+            lowerId = lowerId.toLowerCase();
+          }
+          if (this.stringIdMap.containsKey(lowerId)) {
+            id = this.stringIdMap.get(lowerId);
+            values = this.idValueCache.get(id);
+          }
         }
       }
       return values;

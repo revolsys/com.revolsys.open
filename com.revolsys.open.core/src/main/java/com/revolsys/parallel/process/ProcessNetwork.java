@@ -20,6 +20,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.Logs;
+import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.TargetBeanProcess;
@@ -386,7 +387,13 @@ public class ProcessNetwork
       synchronized (this.sync) {
         try {
           while (!this.stopping && this.count > 0) {
-            ThreadUtil.pause(this.sync);
+            synchronized (this.sync) {
+              try {
+                this.sync.wait();
+              } catch (final InterruptedException e) {
+                throw new ThreadInterruptedException(e);
+              }
+            }
           }
         } finally {
           finishRunning();

@@ -181,7 +181,13 @@ public class NamedChannelBundle<T> {
           Queue<T> queue = getNextValueQueue(names);
           if (timeout == 0) {
             while (queue == null && readerNotifyCount == this.readerNotifyCount) {
-              ThreadUtil.pause(this.monitor);
+              synchronized (this.monitor) {
+                try {
+                  this.monitor.wait();
+                } catch (final InterruptedException e) {
+                  throw new ThreadInterruptedException(e);
+                }
+              }
               if (isClosed()) {
                 throw new ClosedException();
               }
@@ -191,7 +197,14 @@ public class NamedChannelBundle<T> {
           } else if (timeout > 0) {
             long waitTime = maxTime - System.currentTimeMillis();
             while (queue == null && waitTime > 0 && readerNotifyCount == this.readerNotifyCount) {
-              ThreadUtil.pause(this.monitor, waitTime);
+              final long milliSeconds = waitTime;
+              synchronized (this.monitor) {
+                try {
+                  this.monitor.wait(milliSeconds);
+                } catch (final InterruptedException e) {
+                  throw new ThreadInterruptedException(e);
+                }
+              }
               if (isClosed()) {
                 throw new ClosedException();
               }

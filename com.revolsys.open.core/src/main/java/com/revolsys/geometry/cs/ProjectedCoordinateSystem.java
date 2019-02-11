@@ -17,7 +17,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
-public class ProjectedCoordinateSystem implements CoordinateSystem {
+public class ProjectedCoordinateSystem implements HorizontalCoordinateSystem {
   private static final long serialVersionUID = 1902383026085071877L;
 
   private Area area;
@@ -205,6 +205,11 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   public GeographicCoordinateSystem getGeographicCoordinateSystem() {
     return this.geographicCoordinateSystem;
+  }
+
+  @Override
+  public <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
+    return (C)this;
   }
 
   @Override

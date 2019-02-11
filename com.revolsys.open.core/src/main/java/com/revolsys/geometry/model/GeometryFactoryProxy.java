@@ -1,10 +1,11 @@
 package com.revolsys.geometry.model;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 
-public interface GeometryFactoryProxy {
+public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
   default BoundingBox convertBoundingBox(final BoundingBox boundingBox) {
     if (boundingBox != null) {
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -108,21 +109,13 @@ public interface GeometryFactoryProxy {
     return GeometryFactory.DEFAULT;
   }
 
+  @Override
   default <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
       return null;
     } else {
       return geometryFactory.getHorizontalCoordinateSystem();
-    }
-  }
-
-  default int getHorizontalCoordinateSystemId() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (geometryFactory == null) {
-      return 0;
-    } else {
-      return geometryFactory.getHorizontalCoordinateSystemId();
     }
   }
 

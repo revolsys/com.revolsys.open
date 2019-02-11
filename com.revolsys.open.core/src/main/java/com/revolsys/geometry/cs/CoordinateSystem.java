@@ -17,6 +17,7 @@ public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
 
   Area getArea();
 
+  @Override
   BoundingBox getAreaBoundingBox();
 
   Authority getAuthority();
@@ -33,6 +34,11 @@ public interface CoordinateSystem extends GeometryFactoryProxy, Serializable {
   @Override
   default GeometryFactory getGeometryFactory() {
     return GeometryFactory.floating3(this);
+  }
+
+  @Override
+  default int getHorizontalCoordinateSystemId() {
+    return getCoordinateSystemId();
   }
 
   Unit<Length> getLengthUnit();

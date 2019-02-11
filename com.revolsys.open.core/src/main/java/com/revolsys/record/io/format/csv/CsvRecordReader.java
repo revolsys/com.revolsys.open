@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.FileUtil;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -21,6 +20,8 @@ public class CsvRecordReader extends AbstractRecordReader {
   private BufferedReader in;
 
   private Resource resource;
+
+  private final StringBuilder sb = new StringBuilder(1024);
 
   public CsvRecordReader(final Resource resource) {
     this(resource, ArrayRecord.FACTORY, Csv.FIELD_SEPARATOR);
@@ -42,8 +43,8 @@ public class CsvRecordReader extends AbstractRecordReader {
     this.fieldSeparator = fieldSeparator;
   }
 
-  private void addValue(final List<String> values, final StringBuilder sb,
-    final boolean hadQuotes) {
+  private void addValue(final List<String> values, final boolean hadQuotes) {
+    final StringBuilder sb = this.sb;
     if (hadQuotes || sb.length() > 0) {
       values.add(sb.toString());
       sb.setLength(0);
@@ -55,8 +56,14 @@ public class CsvRecordReader extends AbstractRecordReader {
   @Override
   protected void closeDo() {
     super.closeDo();
-    FileUtil.closeSilent(this.in);
-    this.in = null;
+    final BufferedReader in = this.in;
+    if (in != null) {
+      try {
+        in.close();
+      } catch (final IOException e) {
+      }
+      this.in = null;
+    }
     this.resource = null;
   }
 
@@ -80,8 +87,10 @@ public class CsvRecordReader extends AbstractRecordReader {
     try {
       this.in = this.resource.newBufferedReader();
       final List<String> line = readNextRow();
-      final String filename = this.resource.getFilename();
-      newRecordDefinition(filename, line);
+      final String baseName = this.resource.getBaseName();
+      if (getRecordDefinition() == null) {
+        newRecordDefinition(baseName, line);
+      }
     } catch (final IOException e) {
       Logs.error(this, "Unable to open " + this.resource, e);
     } catch (final NoSuchElementException e) {
@@ -90,7 +99,7 @@ public class CsvRecordReader extends AbstractRecordReader {
 
   @Override
   protected GeometryFactory loadGeometryFactory() {
-    return EsriCoordinateSystems.getGeometryFactory(this.resource);
+    return GeometryFactory.floating2d(this.resource);
   }
 
   /**
@@ -106,43 +115,47 @@ public class CsvRecordReader extends AbstractRecordReader {
     if (in == null) {
       throw new NoSuchElementException();
     } else {
+      this.sb.setLength(0);
       final List<String> values = new ArrayList<>();
-      final StringBuilder sb = new StringBuilder();
       boolean inQuotes = false;
       boolean hadQuotes = false;
       while (true) {
         final int character = in.read();
         switch (character) {
           case -1:
-            return returnEof(values, sb, hadQuotes);
+            return returnEof(values, hadQuotes);
           case '"':
-            hadQuotes = true;
-            if (inQuotes) {
-              in.mark(1);
-              final int nextCharacter = in.read();
-              if ('"' == nextCharacter) {
-                sb.append('"');
-              } else {
-                inQuotes = false;
-                in.reset();
-              }
+            if (!hadQuotes && this.sb.length() > 0) {
+              this.sb.append('"');
             } else {
-              inQuotes = true;
+              hadQuotes = true;
+              if (inQuotes) {
+                in.mark(1);
+                final int nextCharacter = in.read();
+                if ('"' == nextCharacter) {
+                  this.sb.append('"');
+                } else {
+                  inQuotes = false;
+                  in.reset();
+                }
+              } else {
+                inQuotes = true;
+              }
             }
           break;
           case '\n':
             if (inQuotes) {
-              sb.append('\n');
+              this.sb.append('\n');
             } else {
               if (values.isEmpty()) {
-                if (sb.length() > 0) {
-                  values.add(sb.toString());
+                if (this.sb.length() > 0) {
+                  values.add(this.sb.toString());
                   return values;
                 } else {
                   // skip empty lines
                 }
               } else {
-                addValue(values, sb, hadQuotes);
+                addValue(values, hadQuotes);
                 return values;
               }
             }
@@ -154,17 +167,17 @@ public class CsvRecordReader extends AbstractRecordReader {
             if (nextCharacter == '\n') {
             } else {
               if (inQuotes) {
-                sb.append('\n');
+                this.sb.append('\n');
               } else {
                 if (values.isEmpty()) {
-                  if (sb.length() > 0) {
-                    values.add(sb.toString());
+                  if (this.sb.length() > 0) {
+                    values.add(this.sb.toString());
                     return values;
                   } else {
                     // skip empty lines
                   }
                 } else {
-                  addValue(values, sb, hadQuotes);
+                  addValue(values, hadQuotes);
                   return values;
                 }
               }
@@ -173,13 +186,13 @@ public class CsvRecordReader extends AbstractRecordReader {
           default:
             if (character == fieldSeparator) {
               if (inQuotes) {
-                sb.append(fieldSeparator);
+                this.sb.append(fieldSeparator);
               } else {
-                addValue(values, sb, hadQuotes);
+                addValue(values, hadQuotes);
                 hadQuotes = false;
               }
             } else {
-              sb.append((char)character);
+              this.sb.append((char)character);
             }
           break;
         }
@@ -187,8 +200,8 @@ public class CsvRecordReader extends AbstractRecordReader {
     }
   }
 
-  private List<String> returnEof(final List<String> values, final StringBuilder sb,
-    final boolean hadQuotes) {
+  private List<String> returnEof(final List<String> values, final boolean hadQuotes) {
+    final StringBuilder sb = this.sb;
     if (values.isEmpty()) {
       if (sb.length() > 0) {
         values.add(sb.toString());
@@ -196,7 +209,7 @@ public class CsvRecordReader extends AbstractRecordReader {
         throw new NoSuchElementException();
       }
     } else {
-      addValue(values, sb, hadQuotes);
+      addValue(values, hadQuotes);
     }
     return values;
   }
