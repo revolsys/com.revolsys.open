@@ -35,7 +35,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public interface Records {
-  static BoundingBox boundingBox(final Iterable<Record> records) {
+  static BoundingBox boundingBox(final Iterable<? extends Record> records) {
     BoundingBox boundingBox = BoundingBox.EMPTY;
     for (final Record record : records) {
       boundingBox = boundingBox.expandToInclude(boundingBox(record));

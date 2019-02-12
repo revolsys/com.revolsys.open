@@ -2732,6 +2732,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             }
           }
         }
+        fireHasChangedRecords();
         final List<LayerRecord> invalidRecords = validator.getInvalidRecords();
         if (!invalidRecords.isEmpty()) {
           allSaved.add(false);

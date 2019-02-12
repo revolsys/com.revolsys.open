@@ -1116,6 +1116,32 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return this.coordinateSystem instanceof ProjectedCoordinateSystem;
   }
 
+  private boolean isProjectionRequired(final CoordinateSystem coordinateSystem) {
+    final CoordinateSystem coordinateSystemThis = getHorizontalCoordinateSystem();
+    if (coordinateSystemThis == coordinateSystem //
+      || coordinateSystemThis == null //
+      || coordinateSystem == null //
+      || coordinateSystemThis.getHorizontalCoordinateSystemId() == coordinateSystem
+        .getHorizontalCoordinateSystemId() //
+      || coordinateSystemThis.equals(coordinateSystem)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  @Override
+  public boolean isProjectionRequired(final GeometryFactory geometryFactory) {
+    if (this == geometryFactory) {
+      return false;
+    } else if (geometryFactory == null) {
+      return false;
+    } else {
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
+      return isProjectionRequired(coordinateSystem);
+    }
+  }
+
   @Override
   public boolean isSameCoordinateSystem(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
