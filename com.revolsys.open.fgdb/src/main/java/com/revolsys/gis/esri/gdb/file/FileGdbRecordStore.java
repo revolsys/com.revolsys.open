@@ -478,7 +478,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           try {
             for (final Table table : this.tableByCatalogPath.values()) {
               try {
-                table.setLoadOnlyMode(false);
+                setLoadOnlyMode(table, false);
                 table.freeWriteLock();
                 geodatabase.closeTable(table);
               } catch (final Throwable e) {
@@ -548,11 +548,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             synchronized (this.apiSync) {
               final boolean loadOnly = isTableLocked(typePath);
               if (loadOnly) {
-                table.setLoadOnlyMode(false);
+                setLoadOnlyMode(table, false);
               }
               table.deleteRow(row);
               if (loadOnly) {
-                table.setLoadOnlyMode(true);
+                setLoadOnlyMode(table, true);
               }
             }
             record.setState(RecordState.DELETED);
@@ -903,7 +903,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         final Integer count = Maps.addCount(this.tableWriteLockCountsByCatalogPath, catalogPath);
         if (count == 1) {
           table.setWriteLock();
-          table.setLoadOnlyMode(true);
+          setLoadOnlyMode(table, true);
         }
       }
       return table;
@@ -1654,7 +1654,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               catalogPath);
             if (count == 0) {
               try {
-                table.setLoadOnlyMode(false);
+                setLoadOnlyMode(table, false);
                 table.freeWriteLock();
               } catch (final Exception e) {
                 Logs.error(this, "Unable to free write lock for table: " + catalogPath, e);
@@ -1775,6 +1775,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     this.fileName = fileName;
   }
 
+  private void setLoadOnlyMode(final Table table, final boolean mode) {
+    // table.setLoadOnlyMode(mode);
+  }
+
   public String toCatalogPath(final PathName path) {
     return path.getPath().replaceAll("/", "\\\\");
   }
@@ -1850,11 +1854,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       if (isOpen(table)) {
         final boolean loadOnly = isTableLocked(typePath);
         if (loadOnly) {
-          table.setLoadOnlyMode(false);
+          setLoadOnlyMode(table, false);
         }
         table.updateRow(row);
         if (loadOnly) {
-          table.setLoadOnlyMode(true);
+          setLoadOnlyMode(table, true);
         }
       }
     }
