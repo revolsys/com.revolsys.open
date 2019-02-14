@@ -5,43 +5,56 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.csv.Csv;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class RecordReaderTransferable implements Transferable {
-  public static final DataFlavor DATA_OBJECT_READER_FLAVOR = new DataFlavor(RecordReader.class,
-    "Data Object List");
+  public static final DataFlavor RECORD_READER_FLAVOR = new DataFlavor(RecordReader.class,
+    "Record Reader");
 
   private static final DataFlavor[] DATA_FLAVORS = {
-    DATA_OBJECT_READER_FLAVOR, DataFlavor.stringFlavor
+    RECORD_READER_FLAVOR, DataFlavor.stringFlavor
   };
 
-  private final RecordReader reader;
+  private final RecordDefinition recordDefinition;
 
-  public RecordReaderTransferable(final RecordReader reader) {
-    this.reader = reader;
+  private final List<Record> records;
+
+  public RecordReaderTransferable(final RecordDefinition recordDefinition,
+    final List<LayerRecord> records) {
+    this.recordDefinition = recordDefinition;
+    this.records = new ArrayList<>();
+    for (final LayerRecord record : records) {
+      final ArrayRecord recordCopy = new ArrayRecord(recordDefinition, record);
+      this.records.add(recordCopy);
+    }
+
   }
 
   @Override
   public Object getTransferData(final DataFlavor flavor)
     throws UnsupportedFlavorException, IOException {
-    if (this.reader == null) {
+    if (this.records.isEmpty()) {
       return null;
-    } else if (DATA_OBJECT_READER_FLAVOR.equals(flavor)
-      || MapTransferable.MAP_FLAVOR.equals(flavor)) {
-      return this.reader;
+    } else if (RECORD_READER_FLAVOR.equals(flavor) || MapTransferable.MAP_FLAVOR.equals(flavor)) {
+      return new ListRecordReader(this.recordDefinition, this.records);
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter out = new StringWriter();
-      final RecordDefinition recordDefinition = this.reader.getRecordDefinition();
+      final RecordDefinition recordDefinition = this.recordDefinition;
       if (recordDefinition != null) {
         final Collection<String> fieldNames = recordDefinition.getFieldNames();
         Csv.writeColumns(out, fieldNames, '\t', '\n');
-        for (final Record record : this.reader) {
+        for (final Record record : this.records) {
           if (record != null) {
             final Collection<Object> values = record.values();
             Csv.writeColumns(out, values, '\t', '\n');

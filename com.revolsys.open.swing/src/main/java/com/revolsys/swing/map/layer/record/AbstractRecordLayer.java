@@ -66,7 +66,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.Records;
-import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordIo;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
@@ -700,13 +699,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void copyRecordsToClipboard(final List<LayerRecord> records) {
     if (!records.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final List<Record> copies = new ArrayList<>();
-      for (final LayerRecord record : records) {
-        final ArrayRecord recordCopy = new ArrayRecord(recordDefinition, record);
-        copies.add(recordCopy);
-      }
-      final RecordReader reader = new ListRecordReader(recordDefinition, copies);
-      final RecordReaderTransferable transferable = new RecordReaderTransferable(reader);
+      final RecordReaderTransferable transferable = new RecordReaderTransferable(recordDefinition,
+        records);
       ClipboardUtil.setContents(transferable);
     }
   }
@@ -1198,7 +1192,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         geometryDataType = geometryField.getDataType();
         layerGeometryClass = geometryDataType.getJavaClass();
         RecordReader reader = ClipboardUtil
-          .getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+          .getContents(RecordReaderTransferable.RECORD_READER_FLAVOR);
         if (reader == null) {
           final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
           if (Property.hasValue(string)) {
@@ -1326,7 +1320,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           geometryDataType = geometryField.getDataType();
           layerGeometryClass = geometryDataType.getJavaClass();
           RecordReader reader = ClipboardUtil
-            .getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+            .getContents(RecordReaderTransferable.RECORD_READER_FLAVOR);
           if (reader == null) {
             final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
             if (Property.hasValue(string)) {
@@ -1945,7 +1939,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       } else if (!super.isEditable()) {
         return false;
       } else if (ClipboardUtil
-        .isDataFlavorAvailable(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR)) {
+        .isDataFlavorAvailable(RecordReaderTransferable.RECORD_READER_FLAVOR)) {
         return true;
       } else {
         if (ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
@@ -2317,7 +2311,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     try (
       BaseCloseable eventsEnabled = eventsDisabled()) {
       RecordReader reader = ClipboardUtil
-        .getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+        .getContents(RecordReaderTransferable.RECORD_READER_FLAVOR);
       if (reader == null) {
         final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
         if (Property.hasValue(string)) {
