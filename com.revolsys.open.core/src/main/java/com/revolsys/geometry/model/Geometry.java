@@ -200,6 +200,8 @@ import com.revolsys.util.number.Doubles;
  */
 public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object>, Emptyable,
   GeometryFactoryProxy, Serializable, DataTypeProxy {
+  int M = 3;
+
   List<String> SORTED_GEOMETRY_TYPES = Arrays.asList("Point", "MultiPoint", "LineString",
     "LinearRing", "MultiLineString", "Polygon", "MultiPolygon", "GeometryCollection");
 
@@ -211,8 +213,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   int Y = 1;
 
   int Z = 2;
-
-  int M = 3;
 
   /**
   *  Throws an exception if the <code>geometry</code>'s is a {@link #isHeterogeneousGeometryCollection()}.
@@ -1813,8 +1813,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   Geometry intersectionBbox(BoundingBox boundingBox);
 
-  boolean intersectsBbox(BoundingBox boundingBox);
-
   default boolean intersects(final double x, final double y) {
     return locate(x, y) != Location.EXTERIOR;
   }
@@ -1883,6 +1881,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     final double y = point.getY();
     return intersects(x, y);
   }
+
+  boolean intersectsBbox(BoundingBox boundingBox);
 
   boolean isContainedInBoundary(final BoundingBox boundingBox);
 

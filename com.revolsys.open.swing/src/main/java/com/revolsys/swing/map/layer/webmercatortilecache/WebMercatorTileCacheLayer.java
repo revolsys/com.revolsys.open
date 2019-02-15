@@ -140,7 +140,7 @@ public class WebMercatorTileCacheLayer
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
-    map.put("type", "openStreetMap");
+    map.put("type", "webMercatorTileCacheLayer");
     addToMap(map, "url", this.url);
     return map;
   }

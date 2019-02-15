@@ -47,6 +47,7 @@
     <url>https://github.com/revolsys/com.revolsys.open/issues</url>
   </issueManagement>
   <modules>
+    <module>com.revolsys.open.coordinatesystems</module>
     <module>com.revolsys.open.core</module>
     <module>com.revolsys.open.testapi</module>
     <module>com.revolsys.open.doclet</module>
@@ -59,7 +60,6 @@
     <module>com.revolsys.open.swing</module>
     <module>com.revolsys.open.web</module>
     <module>war-overlay</module>
-    <module>com.revolsys.open.coordinatesystems</module>
   </modules>
 
   <build>

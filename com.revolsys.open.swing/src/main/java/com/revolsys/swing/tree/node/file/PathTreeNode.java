@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -19,8 +20,6 @@ import java.util.Vector;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-
-import org.apache.commons.collections4.map.HashedMap;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
@@ -79,11 +78,11 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   private static Icon iconFile;
 
-  private static final Map<String, Icon> ICON_FILE_MAP = new HashedMap<>();
+  private static final Map<String, Icon> ICON_FILE_MAP = new HashMap<>();
 
   private static Icon iconFolder;
 
-  private static final Map<String, Icon> ICON_FOLDER_MAP = new HashedMap<>();
+  private static final Map<String, Icon> ICON_FOLDER_MAP = new HashMap<>();
 
   public static void addPathNode(final List<BaseTreeNode> children, final Path path,
     final boolean showHidden) {

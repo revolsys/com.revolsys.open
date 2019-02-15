@@ -45,7 +45,6 @@ import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PointEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -794,26 +793,12 @@ public interface Point extends Punctual, Serializable, BoundingBox {
 
   @Override
   default Geometry intersectionBbox(final BoundingBox boundingBox) {
-    notNullSameCs( boundingBox);
+    notNullSameCs(boundingBox);
     if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       return geometryFactory.point();
-    }
-  }
-
-  @Override
-  default boolean intersectsBbox(final BoundingBox boundingBox) {
-    if (isEmpty() || boundingBox.isEmpty()) {
-      return false;
-    } else {
-      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-      final Point convertedPoint = convertPoint2d(geometryFactory);
-      final double x = convertedPoint.getX();
-      final double y = convertedPoint.getY();
-
-      return boundingBox.bboxIntersects(x, y);
     }
   }
 
@@ -833,6 +818,20 @@ public interface Point extends Punctual, Serializable, BoundingBox {
       return false;
     } else {
       return equals(point);
+    }
+  }
+
+  @Override
+  default boolean intersectsBbox(final BoundingBox boundingBox) {
+    if (isEmpty() || boundingBox.isEmpty()) {
+      return false;
+    } else {
+      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+      final Point convertedPoint = convertPoint2d(geometryFactory);
+      final double x = convertedPoint.getX();
+      final double y = convertedPoint.getY();
+
+      return boundingBox.bboxIntersects(x, y);
     }
   }
 
@@ -932,7 +931,6 @@ public interface Point extends Punctual, Serializable, BoundingBox {
         point.copyCoordinatesTo(targetCoordinates);
         return geometryFactory.point(targetCoordinates);
       }
-
     }
   }
 

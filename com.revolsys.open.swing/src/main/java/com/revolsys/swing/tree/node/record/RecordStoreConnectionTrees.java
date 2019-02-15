@@ -53,7 +53,7 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
     });
 
     MenuFactory.addMenuInitializer(RecordDefinitionImpl.class, (menu) -> {
-      TreeNodes.addMenuItemNodeValue(menu, "default", "Add Layer", "map:add",
+      TreeNodes.addMenuItemNodeValue(menu, "default", "Add Record Layer", "map:add",
         RecordStoreConnectionTrees::addLayer);
       // LazyLoadTreeNode.addRefreshMenuItem(menu);
     });

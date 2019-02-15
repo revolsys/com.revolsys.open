@@ -80,8 +80,7 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     AbstractLayer.menuItemPathAddLayer("record", "Add Record Layer", "map",
       RecordReaderFactory.class);
 
-    MapObjectFactoryRegistry.newFactory(ScratchRecordLayer.TYPE_NAME, "File",
-      ScratchRecordLayer::newLayer);
+    MapObjectFactoryRegistry.newFactory("scratchRecordLayer", "File", ScratchRecordLayer::newLayer);
 
     MapObjectFactoryRegistry.newFactory("recordFileLayer", "File", FileRecordLayer::newLayer);
 
@@ -90,6 +89,9 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
 
     MapObjectFactoryRegistry.newFactory("openStreetMapVectorApi", "Open Street Map (Vector API)",
       OpenStreetMapApiLayer::newLayer);
+
+    // TODO remove
+    MapObjectFactoryRegistry.newFactory("grid", "Grid Layer", GridLayer::newLayer);
 
     MapObjectFactoryRegistry.newFactory("gridLayer", "Grid Layer", GridLayer::newLayer);
 
