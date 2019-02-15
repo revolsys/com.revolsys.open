@@ -20,8 +20,6 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.MapTile;
-import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
 
 public class BingLayer extends AbstractTiledImageLayer {
@@ -54,25 +52,18 @@ public class BingLayer extends AbstractTiledImageLayer {
     dialog.showDialog();
   }
 
-  public static void mapObjectFactoryInit() {
-    final MenuFactory baseMapsMenu = MenuFactory.getMenu(BaseMapLayerGroup.class);
-
-    Menus.addMenuItem(baseMapsMenu, "group", "Add Bing Layer", "bing", BingLayer::actionAddLayer,
-      false);
-  }
-
   private BingClient client;
 
   private ImagerySet imagerySet = ImagerySet.Road;
 
   private MapLayer mapLayer;
 
-  private BingLayer() {
+  BingLayer() {
     super("bing");
     setIcon(Icons.getIcon("bing"));
   }
 
-  public BingLayer(final Map<String, Object> properties) {
+  public BingLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
   }

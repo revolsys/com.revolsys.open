@@ -6,7 +6,9 @@ import java.util.Map;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.gis.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
 import com.revolsys.io.IoFactory;
+import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
@@ -29,6 +31,30 @@ public interface GriddedElevationModel extends ObjectWithProperties {
       final GriddedElevationModel dem = factory.newGriddedElevationModel(resource, properties);
       return dem;
     }
+  }
+
+  public static void serviceInit() {
+    // IoFactoryRegistry.addFactory(new ScaledIntegerGriddedDigitalElevation());
+    // IoFactoryRegistry.addFactory(new
+    // CompressedScaledIntegerGriddedDigitalElevation());
+    IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());
+    // IoFactoryRegistry.addFactory(new EsriFloatGridGriddedElevation());
+    // IoFactoryRegistry.addFactory(new UsgsGriddedElevation());
+    // IoFactoryRegistry.addFactory(new ImgGriddedElevation());
+
+    // MapObjectFactoryRegistry.newFactory("gradientStop", GradientStop::new);
+    // MapObjectFactoryRegistry.newFactory("multiStopLinearGradient",
+    // MultiStopLinearGradient::new);
+    //
+    // // Rasterizers
+    // MapObjectFactoryRegistry.newFactory("colorGriddedElevationModelRasterizer",
+    // ColorGriddedElevationModelRasterizer::new);
+    // MapObjectFactoryRegistry.newFactory("colorGradientGriddedElevationModelRasterizer",
+    // ColorGradientGriddedElevationModelRasterizer::new);
+    // MapObjectFactoryRegistry.newFactory("hillShadeGriddedElevationModelRasterizer",
+    // HillShadeGriddedElevationModelRasterizer::new);
+    // MapObjectFactoryRegistry.newFactory("slopeColorGradientGriddedElevationModelRasterizer",
+    // SlopeColorGradientGriddedElevationModelRasterizer::new);
   }
 
   void clear();

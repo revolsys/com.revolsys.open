@@ -26,14 +26,14 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractMultipleRenderer.class);
 
-    addAddMenuItem(menu, "Geometry", GeometryStyleRenderer::new);
+    addAddMenuItem(menu, "Geometry", GeometryStyleRecordLayerRenderer::new);
     addAddMenuItem(menu, "Text", TextStyleRenderer::new);
     addAddMenuItem(menu, "Marker", MarkerStyleRenderer::new);
-    addAddMenuItem(menu, "Multiple", MultipleRenderer::new);
+    addAddMenuItem(menu, "Multiple", MultipleRecordRenderer::new);
     addAddMenuItem(menu, "Filter", FilterMultipleRenderer::new);
     addAddMenuItem(menu, "Scale", ScaleMultipleRenderer::new);
 
-    addConvertMenuItem(menu, "Multiple", MultipleRenderer.class,
+    addConvertMenuItem(menu, "Multiple", MultipleRecordRenderer.class,
       AbstractMultipleRenderer::convertToMultipleStyle);
     addConvertMenuItem(menu, "Filter", FilterMultipleRenderer.class,
       AbstractMultipleRenderer::convertToFilterStyle);
@@ -147,13 +147,13 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     return newRenderer;
   }
 
-  public MultipleRenderer convertToMultipleStyle() {
+  public MultipleRecordRenderer convertToMultipleStyle() {
     final AbstractRecordLayer layer = getLayer();
     final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
-    final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent);
+    final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(layer, parent);
     newRenderer.setProperties(style);
 
     newRenderer.setRenderers(JavaBeanUtil.clone(renderers));

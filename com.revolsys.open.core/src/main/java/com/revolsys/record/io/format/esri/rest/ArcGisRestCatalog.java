@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.PathName;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
@@ -34,32 +33,6 @@ public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
     .add("MapServer", MapService::new) //
     .add("FeatureServer", FeatureService::new) //
     .getMap();
-
-  @SuppressWarnings("unchecked")
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "Arc GIS REST Server",
-      ArcGisRestCatalog::newArcGisRestCatalog);
-
-    MapObjectFactoryRegistry.newFactory("arcGisRestServerLayerRecordReaderFactory",
-      "Factory to create a RecordReader from a ArcGis Server later", (properties) -> {
-        final String serverUrl = (String)properties.get("serverUrl");
-        final String layerPath = (String)properties.get("layerPath");
-
-        final Supplier<RecordReader> factory = () -> {
-          final FeatureLayer layer = FeatureLayer.getRecordLayerDescription(serverUrl, layerPath);
-          if (layer == null) {
-            throw new RuntimeException("Cannot find layer: " + layerPath + " on " + serverUrl);
-          } else {
-            final RecordReader reader = layer.newRecordReader((Query)null, true);
-            final Map<String, Object> readerProperties = (Map<String, Object>)properties
-              .get("readerProperties");
-            reader.setProperties(readerProperties);
-            return reader;
-          }
-        };
-        return new SupplierWithProperties<>(factory, properties);
-      });
-  }
 
   public static ArcGisRestCatalog newArcGisRestCatalog(
     final Map<String, ? extends Object> properties) {
@@ -89,6 +62,27 @@ public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
         return new ArcGisRestCatalog(url);
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Supplier<RecordReader> newRecordReaderFactory(
+    final Map<String, ? extends Object> properties) {
+    final String serverUrl = (String)properties.get("serverUrl");
+    final String layerPath = (String)properties.get("layerPath");
+
+    final Supplier<RecordReader> factory = () -> {
+      final FeatureLayer layer = FeatureLayer.getRecordLayerDescription(serverUrl, layerPath);
+      if (layer == null) {
+        throw new RuntimeException("Cannot find layer: " + layerPath + " on " + serverUrl);
+      } else {
+        final RecordReader reader = layer.newRecordReader((Query)null, true);
+        final Map<String, Object> readerProperties = (Map<String, Object>)properties
+          .get("readerProperties");
+        reader.setProperties(readerProperties);
+        return reader;
+      }
+    };
+    return new SupplierWithProperties<>(factory, properties);
   }
 
   private Map<String, CatalogElement> childByName = new HashMap<>();

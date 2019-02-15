@@ -141,6 +141,7 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
     return true;
   }
 
+  @Override
   public boolean isReadFromDirectorySupported() {
     return true;
   }

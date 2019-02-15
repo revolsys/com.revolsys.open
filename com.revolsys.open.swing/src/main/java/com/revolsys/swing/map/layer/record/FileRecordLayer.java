@@ -32,7 +32,7 @@ public class FileRecordLayer extends ListRecordLayer {
       Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revertDo, true);
   }
 
-  public static FileRecordLayer newLayer(final Map<String, Object> properties) {
+  public static FileRecordLayer newLayer(final Map<String, ? extends Object> properties) {
     return new FileRecordLayer(properties);
   }
 

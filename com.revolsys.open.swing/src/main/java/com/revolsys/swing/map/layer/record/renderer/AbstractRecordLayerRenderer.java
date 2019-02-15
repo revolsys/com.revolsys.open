@@ -24,7 +24,6 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
@@ -244,15 +243,6 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     return new PointWithOrientation(point, orientation);
   }
 
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory("geometryStyle", GeometryStyleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("textStyle", TextStyleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("markerStyle", MarkerStyleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("multipleStyle", MultipleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("scaleStyle", ScaleMultipleRenderer::new);
-    MapObjectFactoryRegistry.newFactory("filterStyle", FilterMultipleRenderer::new);
-  }
-
   private Predicate<Record> filter = Predicates.all();
 
   public AbstractRecordLayerRenderer(final String type, final String name) {
@@ -453,10 +443,10 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     return newRenderer;
   }
 
-  public MultipleRenderer wrapWithMultipleStyle() {
+  public MultipleRecordRenderer wrapWithMultipleStyle() {
     final AbstractRecordLayer layer = getLayer();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
-    final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent);
+    final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
   }

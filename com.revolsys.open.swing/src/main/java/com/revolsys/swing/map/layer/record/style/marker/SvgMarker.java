@@ -52,7 +52,7 @@ public class SvgMarker extends AbstractMarker {
   // }
   // }
 
-  public SvgMarker(final Map<String, Object> properties) {
+  public SvgMarker(final Map<String, ? extends Object> properties) {
     setProperties(properties);
   }
 

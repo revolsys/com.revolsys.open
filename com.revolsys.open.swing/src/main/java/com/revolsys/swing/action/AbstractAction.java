@@ -165,6 +165,18 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     putValue(SMALL_ICON, icon);
   }
 
+  public AbstractAction setIconName(final String iconName) {
+    final Icon icon = Icons.getIcon(iconName);
+    setIcon(icon);
+    return this;
+  }
+
+  public AbstractAction setIconName(final String iconName, final String badgeName) {
+    final Icon icon = Icons.getIconWithBadge(iconName, badgeName);
+    setIcon(icon);
+    return this;
+  }
+
   public void setMnemonicKey(final int key) {
     putValue(MNEMONIC_KEY, key);
   }

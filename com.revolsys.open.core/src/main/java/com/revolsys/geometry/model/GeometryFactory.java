@@ -403,10 +403,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  public static GeometryFactory newGeometryFactory(final Map<String, Object> properties) {
+  public static GeometryFactory newGeometryFactory(final Map<String, ? extends Object> properties) {
     final int coordinateSystemId = Maps.getInteger(properties, "srid", 0);
     final int axisCount = Maps.getInteger(properties, "axisCount", 2);
     final double scaleXY = Maps.getDouble(properties, "scaleXy", 0.0);
+    final double scaleX = Maps.getDouble(properties, "scaleX", scaleXY);
+    final double scaleY = Maps.getDouble(properties, "scaleY", scaleXY);
     final double scaleZ = Maps.getDouble(properties, "scaleZ", 0.0);
     return GeometryFactory.fixed(coordinateSystemId, axisCount, scaleXY, scaleZ);
   }

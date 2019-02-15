@@ -4,20 +4,17 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.record.io.format.esri.rest.map.TileInfo;
 import com.revolsys.spring.resource.UrlResource;
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -25,11 +22,8 @@ import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.BaseMapLayer;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.MapTile;
-import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.PasswordUtil;
@@ -61,24 +55,6 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     });
 
     dialog.showDialog();
-  }
-
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory("arcGisRestServerTileLayer",
-      "Arc GIS REST Server Tile Cache Layer", ArcGisRestServerTileCacheLayer::new);
-
-    MapObjectFactoryRegistry.newFactory("arcgisServerRest", "Arc GIS REST Server Tile Cache Layer",
-      ArcGisRestServerTileCacheLayer::new);
-
-    final MenuFactory baseMapsMenu = MenuFactory.getMenu(BaseMapLayerGroup.class);
-
-    Menus.addMenuItem(baseMapsMenu, "group", "Add ArcGIS Tile Cache",
-      Icons.getIconWithBadge("map", "add"), ArcGisRestServerTileCacheLayer::actionAddLayer, false);
-
-    final MenuFactory tileInfoMenu = MenuFactory.getMenu(TileInfo.class);
-
-    final Function<TileInfo, BaseMapLayer> baseMapLayerFactory = ArcGisRestServerTileCacheLayer::new;
-    BaseMapLayer.addNewLayerMenu(tileInfoMenu, baseMapLayerFactory);
   }
 
   private String username;

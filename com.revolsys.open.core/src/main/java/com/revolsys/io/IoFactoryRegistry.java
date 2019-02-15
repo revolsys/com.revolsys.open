@@ -1,24 +1,19 @@
 package com.revolsys.io;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.logging.Logs;
-import com.revolsys.record.io.format.json.JsonParser;
-import com.revolsys.util.Property;
 import com.revolsys.util.ServiceInitializer;
 
 public class IoFactoryRegistry {
   static final Map<Class<? extends IoFactory>, Set<IoFactory>> factoriesByClass = new HashMap<>();
+
+  static final Map<String, Set<IoFactory>> factoriesByFileExtension = new HashMap<>();
 
   static final Map<Class<? extends IoFactory>, Map<String, IoFactory>> factoryByClassAndFileExtension = new HashMap<>();
 
@@ -33,6 +28,7 @@ public class IoFactoryRegistry {
   static final Set<IoFactory> factories = new HashSet<>();
 
   static {
+    ServiceInitializer.initializeServices();
     try {
       final ClassLoader classLoader = IoFactoryRegistry.class.getClassLoader();
       final ServiceLoader<IoFactory> ioFactories = ServiceLoader.load(IoFactory.class, classLoader);
@@ -46,59 +42,9 @@ public class IoFactoryRegistry {
         }
       }
 
-      final String resourceName = "META-INF/" + IoFactory.class.getName() + ".json";
-      final Enumeration<URL> resources = classLoader.getResources(resourceName);
-      while (resources.hasMoreElements()) {
-        final URL resource = resources.nextElement();
-        try {
-          final Map<String, Object> config = JsonParser.getMap(resource.openStream());
-          @SuppressWarnings("unchecked")
-          final List<Map<String, Object>> factories = (List<Map<String, Object>>)config
-            .get("factories");
-          for (final Map<String, Object> factoryConfig : factories) {
-            try {
-              final String typeClassName = (String)factoryConfig.get("typeClass");
-              if (Property.hasValue(typeClassName)) {
-                final Class<?> factoryClass = Class.forName(typeClassName, false, classLoader);
-                if (IoFactory.class.isAssignableFrom(factoryClass)) {
-                  try {
-                    final IoFactory factory = (IoFactory)factoryClass.newInstance();
-                    if (factory.isAvailable()) {
-                      addFactory(factory);
-                    }
-                  } catch (final Throwable e) {
-                    Logs.debug(factoryClass, "Unable to instantiate factory", e);
-                  }
-                }
-                for (final Method method : factoryClass.getDeclaredMethods()) {
-                  final String methodName = method.getName();
-                  if (methodName.equals("ioFactoryInit")) {
-                    if (Modifier.isStatic(method.getModifiers())) {
-                      if (method.getParameterTypes().length == 0) {
-                        if (method.getReturnType() == Void.TYPE) {
-                          try {
-                            method.invoke(null);
-                          } catch (final Throwable e) {
-                            Logs.error(factoryClass, e);
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            } catch (final Throwable e) {
-              Logs.error(IoFactoryRegistry.class, "Unable to add factory: " + factoryConfig, e);
-            }
-          }
-        } catch (final Throwable e) {
-          Logs.error(IoFactoryRegistry.class, "Unable to read resource: " + resource, e);
-        }
-      }
     } catch (final Throwable e) {
       Logs.error(IoFactoryRegistry.class, "Unable to read resources", e);
     }
-    ServiceInitializer.initializeServices();
   }
 
   public static void addFactory(final IoFactory factory) {
@@ -120,6 +66,7 @@ public class IoFactoryRegistry {
         final Class<IoFactory> ioInterface = (Class<IoFactory>)factoryInterface;
         if (Maps.addToSet(factoriesByClass, ioInterface, factory)) {
           for (final String fileExtension : factory.getFileExtensions()) {
+            Maps.addToSet(factoriesByFileExtension, fileExtension, factory);
             Maps.addToTreeSet(fileExtensionsByClass, ioInterface, fileExtension);
             Maps.put(factoryByClassAndFileExtension, ioInterface, fileExtension, factory);
 

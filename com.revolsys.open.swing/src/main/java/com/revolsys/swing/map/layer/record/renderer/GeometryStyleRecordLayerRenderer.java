@@ -33,7 +33,7 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePreview;
 
-public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
+public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRenderer {
 
   private static final Icon ICON = Icons.getIcon("style_geometry");
 
@@ -149,35 +149,35 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
   private GeometryStyle style = new GeometryStyle();
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer) {
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer) {
     this(layer, new GeometryStyle());
   }
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer, final GeometryStyle style) {
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer, final GeometryStyle style) {
     this(layer, null, style);
   }
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
     super("geometryStyle", "Geometry Style", layer, parent);
     setIcon(ICON);
   }
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
     final GeometryStyle style) {
     super("geometryStyle", "Geometry Style", layer, parent);
     setStyle(style);
     setIcon(ICON);
   }
 
-  public GeometryStyleRenderer(final Map<String, ? extends Object> properties) {
+  public GeometryStyleRecordLayerRenderer(final Map<String, ? extends Object> properties) {
     super("geometryStyle", "Geometry Style");
     setIcon(ICON);
     setProperties(properties);
   }
 
   @Override
-  public GeometryStyleRenderer clone() {
-    final GeometryStyleRenderer clone = (GeometryStyleRenderer)super.clone();
+  public GeometryStyleRecordLayerRenderer clone() {
+    final GeometryStyleRecordLayerRenderer clone = (GeometryStyleRecordLayerRenderer)super.clone();
     if (this.style != null) {
       clone.setStyle(this.style.clone());
     }

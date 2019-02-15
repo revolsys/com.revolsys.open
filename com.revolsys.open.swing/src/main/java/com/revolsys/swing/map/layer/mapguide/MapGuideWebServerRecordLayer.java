@@ -51,16 +51,6 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
     }
   }
 
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "Map Guide Web Server Record Layer",
-      ArcGisRestServerRecordLayer::new);
-
-    final MenuFactory recordLayerDescriptionMenu = MenuFactory.getMenu(FeatureLayer.class);
-
-    Menus.addMenuItem(recordLayerDescriptionMenu, "default", "Add Layer", "map_add",
-      MapGuideWebServerRecordLayer::actionAddLayer, false);
-  }
-
   private FeatureLayer webServiceLayer;
 
   private String url;

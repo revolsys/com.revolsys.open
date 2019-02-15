@@ -31,7 +31,7 @@ public class TextMarker extends AbstractMarker {
 
   private String textFaceName = "san-serif";
 
-  public TextMarker(final Map<String, Object> properties) {
+  public TextMarker(final Map<String, ? extends Object> properties) {
     setProperties(properties);
   }
 

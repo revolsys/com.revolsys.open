@@ -35,7 +35,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
@@ -1028,7 +1028,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
             final double[] targetCoordinates = MappedLocation.toModelCoordinates(image, boundingBox,
               true, 0, height, width, height, width, 0, 0, 0, 0, height);
             final LineString line = viewGeometryFactory.lineString(2, targetCoordinates);
-            GeometryStyleRenderer.renderLineString(viewport, graphics, line, STYLE_IMAGE_LINE);
+            GeometryStyleRecordLayerRenderer.renderLineString(viewport, graphics, line, STYLE_IMAGE_LINE);
           }
         }
         final MappedLocation moveTiePoint = getMoveTiePoint();

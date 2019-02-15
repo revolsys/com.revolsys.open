@@ -55,7 +55,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     return RECORD_DEFINITION_CACHE.get(instanceId);
   }
 
-  public static RecordDefinitionImpl newRecordDefinition(final Map<String, Object> properties) {
+  public static RecordDefinitionImpl newRecordDefinition(
+    final Map<String, ? extends Object> properties) {
     return new RecordDefinitionImpl(properties);
   }
 
@@ -117,7 +118,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @SuppressWarnings("unchecked")
-  public RecordDefinitionImpl(final Map<String, Object> properties) {
+  public RecordDefinitionImpl(final Map<String, ? extends Object> properties) {
     this(PathName.newPathName(Maps.getString(properties, "path")));
     final List<Object> fields = (List<Object>)properties.get("fields");
     for (final Object object : fields) {

@@ -45,7 +45,7 @@ import com.revolsys.swing.map.component.CoordinateSystemField;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.ScratchRecordLayer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
@@ -128,7 +128,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return null;
   }
 
-  public static LayerGroup newLayer(final Map<String, Object> properties) {
+  public static LayerGroup newLayer(final Map<String, ? extends Object> properties) {
     final LayerGroup layerGroup = new LayerGroup();
     layerGroup.loadLayers(properties);
     return layerGroup;
@@ -695,7 +695,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   @SuppressWarnings("unchecked")
-  protected void loadLayers(final Map<String, Object> properties) {
+  protected void loadLayers(final Map<String, ? extends Object> properties) {
     final List<String> layerFiles = (List<String>)properties.remove("layers");
     setProperties(properties);
     if (layerFiles != null) {
@@ -710,8 +710,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
             final Layer layer = (Layer)object;
             addLayer(layer);
           } else if (object != null) {
-            Logs.error(this,
-              "Unexpected object type " + object.getClass() + " in " + childResource);
+            Logs.error(this, "Unexpected object type " + object.getClass() + " in " + childResource
+              + "\n" + object);
           }
         } else {
           Logs.error(LayerGroup.class, "Cannot find " + childResource);
@@ -757,7 +757,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       name = FileUtil.fromSafeName(name);
       properties.put("name", name);
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
-      final GeometryStyleRenderer renderer = recordLayer.getRenderer();
+      final GeometryStyleRecordLayerRenderer renderer = recordLayer.getRenderer();
       renderer.setStyle(GeometryStyle.newStyle());
       layer = recordLayer;
     } else {

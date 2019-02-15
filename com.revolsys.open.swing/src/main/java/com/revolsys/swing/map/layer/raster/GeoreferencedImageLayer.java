@@ -66,7 +66,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     menu.deleteMenuItem("refresh", "Refresh");
   }
 
-  public static GeoreferencedImageLayer newLayer(final Map<String, Object> properties) {
+  public static GeoreferencedImageLayer newLayer(final Map<String, ? extends Object> properties) {
     return new GeoreferencedImageLayer(properties);
   }
 
@@ -80,7 +80,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
   private String url;
 
-  public GeoreferencedImageLayer(final Map<String, Object> properties) {
+  public GeoreferencedImageLayer(final Map<String, ? extends Object> properties) {
     super("geoReferencedImageLayer");
     setProperties(properties);
     setSelectSupported(false);
@@ -465,8 +465,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       final double height = image.getImageHeight() - 1;
       final double[] targetCoordinates = MappedLocation.toModelCoordinates(image, layerBoundingBox,
         true, 0, height, width, height, width, 0, 0, 0, 0, height);
-      final LineString line = layerBoundingBox.getGeometryFactory().lineString(2,
-        targetCoordinates);
+      final LineString line = layerBoundingBox.getGeometryFactory()
+        .lineString(2, targetCoordinates);
       boundingBox = boundingBox.expandToInclude(line);
     }
     boundingBox = boundingBox.convert(geometryFactory).expandPercent(0.1).clipToCoordinateSystem();

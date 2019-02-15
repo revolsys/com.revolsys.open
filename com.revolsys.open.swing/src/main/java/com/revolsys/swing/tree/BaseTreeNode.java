@@ -44,8 +44,8 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.ToolTipProxy;
 
-public class BaseTreeNode
-  implements TreeNode, Iterable<BaseTreeNode>, PropertyChangeListener, NonWeakListener {
+public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyChangeListener,
+  NonWeakListener, Comparable<BaseTreeNode> {
   private static final ClassRegistry<Function<Object, BaseTreeNode>> NODE_FACTORY_REGISTRY = new ClassRegistry<>();
 
   private static final ClassRegistry<Icon> NODE_ICON_REGISTRY = new ClassRegistry<>();
@@ -187,6 +187,13 @@ public class BaseTreeNode
     for (final BaseTreeNode child : getChildren()) {
       child.collapse();
     }
+  }
+
+  @Override
+  public int compareTo(final BaseTreeNode other) {
+    final String name1 = getName().toLowerCase();
+    final String name2 = other.getName().toLowerCase();
+    return name1.compareTo(name2);
   }
 
   public final void delete() {
@@ -421,7 +428,7 @@ public class BaseTreeNode
     }
 
     final Object userData = getUserData();
-    JComponent component = (JComponent)renderer;
+    final JComponent component = (JComponent)renderer;
     if (userData instanceof ToolTipProxy) {
       final ToolTipProxy toolTipProxy = (ToolTipProxy)userData;
       final String toolTip = toolTipProxy.getToolTip();

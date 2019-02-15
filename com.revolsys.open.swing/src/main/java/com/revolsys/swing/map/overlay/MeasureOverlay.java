@@ -42,7 +42,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
@@ -491,7 +491,7 @@ public class MeasureOverlay extends AbstractOverlay {
           this.measureGeometry);
         if (this.measureGeometry instanceof Polygon) {
           final Polygon polygon = (Polygon)this.measureGeometry;
-          GeometryStyleRenderer.renderPolygon(viewport, graphics, polygon, POLYGON_STYLE);
+          GeometryStyleRecordLayerRenderer.renderPolygon(viewport, graphics, polygon, POLYGON_STYLE);
         }
       }
 

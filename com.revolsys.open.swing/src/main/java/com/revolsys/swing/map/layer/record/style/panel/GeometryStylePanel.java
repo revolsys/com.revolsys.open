@@ -17,7 +17,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.util.Property;
 
@@ -28,16 +28,16 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
 
   private final GeometryStyle geometryStyle;
 
-  private final GeometryStyleRenderer geometryStyleRenderer;
+  private final GeometryStyleRecordLayerRenderer geometryStyleRecordLayerRenderer;
 
   private JPanel previews;
 
-  public GeometryStylePanel(final GeometryStyleRenderer geometryStyleRenderer) {
-    super(geometryStyleRenderer);
+  public GeometryStylePanel(final GeometryStyleRecordLayerRenderer geometryStyleRecordLayerRenderer) {
+    super(geometryStyleRecordLayerRenderer);
 
-    this.geometryStyleRenderer = geometryStyleRenderer;
-    this.geometryStyle = geometryStyleRenderer.getStyle();
-    final AbstractRecordLayer layer = geometryStyleRenderer.getLayer();
+    this.geometryStyleRecordLayerRenderer = geometryStyleRecordLayerRenderer;
+    this.geometryStyle = geometryStyleRecordLayerRenderer.getStyle();
+    final AbstractRecordLayer layer = geometryStyleRecordLayerRenderer.getLayer();
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
 
@@ -124,6 +124,6 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
   @Override
   public void save() {
     super.save();
-    this.geometryStyleRenderer.setStyle(this.geometryStyle);
+    this.geometryStyleRecordLayerRenderer.setStyle(this.geometryStyle);
   }
 }

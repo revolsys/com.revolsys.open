@@ -3,18 +3,15 @@ package com.revolsys.swing.map.layer.ogc.wms;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
-import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
@@ -22,17 +19,6 @@ import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceConnectionManager;
 
 public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory("ogcWmsImageLayer", "OGC WMS Image Layer",
-      OgcWmsImageLayer::new);
-
-    final MenuFactory wmsLayerMenu = MenuFactory.getMenu(WmsLayerDefinition.class);
-
-    final Function<WmsLayerDefinition, BaseMapLayer> baseMapLayerFactory = OgcWmsImageLayer::new;
-    BaseMapLayer.addNewLayerMenu(wmsLayerMenu, baseMapLayerFactory);
-
-  }
-
   private String connectionName;
 
   private String serviceUrl;
@@ -199,8 +185,9 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
-    map.keySet().removeAll(Arrays.asList("readOnly", "querySupported", "selectSupported",
-      "minimumScale", "maximumScale"));
+    map.keySet()
+      .removeAll(Arrays.asList("readOnly", "querySupported", "selectSupported", "minimumScale",
+        "maximumScale"));
     if (Property.hasValue(this.connectionName)) {
       addToMap(map, "connectionName", this.connectionName);
     } else {

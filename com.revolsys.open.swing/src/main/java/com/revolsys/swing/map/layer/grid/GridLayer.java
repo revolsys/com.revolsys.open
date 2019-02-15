@@ -33,7 +33,7 @@ public class GridLayer extends AbstractLayer {
       GridLayer::zoomToSheet, false);
   }
 
-  public static GridLayer newLayer(final Map<String, Object> properties) {
+  public static GridLayer newLayer(final Map<String, ? extends Object> properties) {
     return new GridLayer(properties);
   }
 
@@ -41,7 +41,7 @@ public class GridLayer extends AbstractLayer {
 
   private RectangularMapGrid grid;
 
-  public GridLayer(final Map<String, Object> properties) {
+  public GridLayer(final Map<String, ? extends Object> properties) {
     super("gridLayer");
     setProperties(properties);
     setReadOnly(true);

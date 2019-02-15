@@ -220,6 +220,10 @@ public interface IoFactory extends Available {
   default void init() {
   }
 
+  default boolean isReadFromDirectorySupported() {
+    return false;
+  }
+
   default FileNameExtensionFilter newFileFilter() {
     final List<String> fileExtensions = getFileExtensions();
     String description = getName();

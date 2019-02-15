@@ -55,7 +55,7 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
       "Export Connection", "database:export", ConnectionManagerTrees::exportConnection);
 
     final MenuFactory recordDefinitionMenu = MenuFactory.getMenu(RecordDefinitionImpl.class);
-    TreeNodes.addMenuItemNodeValue(recordDefinitionMenu, "default", "Add Layer", "map_add",
+    TreeNodes.addMenuItemNodeValue(recordDefinitionMenu, "default", "Add Record Layer", "map:add",
       RecordStoreConnectionTrees::addLayer);
     LazyLoadTreeNode.addRefreshMenuItem(recordDefinitionMenu);
   }

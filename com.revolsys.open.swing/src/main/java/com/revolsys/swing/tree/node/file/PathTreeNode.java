@@ -12,7 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -40,56 +42,44 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.FunctionChildrenTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
-import com.revolsys.util.UrlUtil;
-import com.revolsys.util.WrappedException;
 
 public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
-  private static final JFileChooser CHOOSER = new JFileChooser();
+  private static JFileChooser chooser;
 
-  public static final Icon ICON_FILE = CHOOSER.getIcon(FileUtil.newTempFile("xxxx", "6z4gsdj"));
-
-  public static final Icon ICON_FILE_DATABASE = Icons.getIconWithBadge(ICON_FILE, "database");
-
-  public static final Icon ICON_FILE_IMAGE = Icons.getIconWithBadge(ICON_FILE, "picture");
-
-  public static final Icon ICON_FILE_TABLE = Icons.getIconWithBadge(ICON_FILE, "table");
-
-  public static final Icon ICON_FILE_VECTOR = Icons.getIconWithBadge(ICON_FILE, "table");
-
-  public static final Icon ICON_FOLDER = Icons.getIcon("folder");
-
-  public static final Icon ICON_FOLDER_DRIVE = Icons.getIconWithBadge(ICON_FOLDER, "drive");
-
-  public static final Icon ICON_FOLDER_LINK = Icons.getIconWithBadge(ICON_FOLDER, "link");
-
-  public static final Icon ICON_FOLDER_MISSING = Icons.getIconWithBadge(ICON_FOLDER, "error");
-
-  private static final MenuFactory MENU = new MenuFactory("File");
-
-  private static Icon iconFolder;
+  public static final MenuFactory MENU = new MenuFactory("File");
 
   static {
     addRefreshMenuItem(MENU);
 
-    TreeNodes.addMenuItem(MENU, "default", "Add Layer", "map_add", PathTreeNode::isFileLayer,
-      PathTreeNode::actionAddLayer);
+    TreeNodes
+      .addMenuItem(MENU, "record", "Export Records", "table_save",
+        PathTreeNode::actionExportRecords) //
+      .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isRecordFileLayer));
 
-    TreeNodes.addMenuItem(MENU, "default", "Export Records", "table_save",
-      PathTreeNode::isRecordFileLayer, PathTreeNode::actionExportRecords);
-
-    TreeNodes.addMenuItem(MENU, "default", "Add Folder Connection", "link_add",
-      PathTreeNode::isDirectory, PathTreeNode::actionAddFolderConnection);
+    TreeNodes
+      .addMenuItem(MENU, "folder", "Add Folder Connection", "link:add",
+        PathTreeNode::actionAddFolderConnection)//
+      .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isDirectory));
   }
+
+  private static Icon iconFile;
+
+  private static final Map<String, Icon> ICON_FILE_MAP = new HashMap<>();
+
+  private static Icon iconFolder;
+
+  private static final Map<String, Icon> ICON_FOLDER_MAP = new HashMap<>();
 
   public static void addPathNode(final List<BaseTreeNode> children, final Path path,
     final boolean showHidden) {
@@ -99,42 +89,61 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     }
   }
 
+  private synchronized static JFileChooser getChooser() {
+    if (chooser == null) {
+      Invoke.andWait(() -> chooser = new JFileChooser());
+    }
+    return chooser;
+  }
+
+  private static Icon getIcon(final File file) {
+    final JFileChooser chooser = getChooser();
+    return chooser.getIcon(file);
+  }
+
   public static Icon getIcon(final Path path) {
     if (path == null) {
-      return ICON_FOLDER_MISSING;
+      return getIconFolder("error");
     } else {
       if (GeoreferencedImage.isReadable(path)) {
-        return ICON_FILE_IMAGE;
+        return getIconFile("picture");
       } else if (RecordReader.isReadable(path)) {
-        return ICON_FILE_TABLE;
+        return getIconFile("table");
       }
       File file;
       try {
         file = path.toFile();
-        final Icon icon = CHOOSER.getIcon(file);
+        final Icon icon = getIcon(file);
         return icon;
       } catch (final UnsupportedOperationException e) {
         if (Files.isDirectory(path)) {
-          return ICON_FOLDER;
+          return getIconFolder();
         }
         final String fileNameExtension = Paths.getFileNameExtension(path);
         file = FileUtil.newTempFile("1234567890", fileNameExtension);
-        final Icon icon = CHOOSER.getIcon(file);
+        final Icon icon = getIcon(file);
         file.delete();
         return icon;
       }
     }
   }
 
-  private static File getIconFile(final Path path) {
-    try {
-      return path.toFile();
-    } catch (final UnsupportedOperationException e) {
-      final String fileNameExtension = Paths.getFileNameExtension(path);
-      final File file = FileUtil.newTempFile("1234567890", fileNameExtension);
-      file.delete();
-      return file;
+  public static Icon getIconFile() {
+    if (iconFile == null) {
+      final JFileChooser chooser = getChooser();
+      iconFile = chooser.getIcon(FileUtil.newTempFile("xxxx", "6z4gsdj"));
     }
+    return iconFile;
+  }
+
+  public static Icon getIconFile(final String badgeName) {
+    Icon icon = ICON_FILE_MAP.get(badgeName);
+    if (icon == null) {
+      final Icon iconFile = getIconFile();
+      icon = Icons.getIconWithBadge(iconFile, badgeName);
+      ICON_FILE_MAP.put(badgeName, icon);
+    }
+    return icon;
   }
 
   public static Icon getIconFolder() {
@@ -142,6 +151,16 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       iconFolder = Icons.getIcon("folder");
     }
     return iconFolder;
+  }
+
+  public static Icon getIconFolder(final String badgeName) {
+    Icon icon = ICON_FOLDER_MAP.get(badgeName);
+    if (icon == null) {
+      final Icon iconFolder = getIconFolder();
+      icon = Icons.getIconWithBadge(iconFolder, badgeName);
+      ICON_FOLDER_MAP.put(badgeName, icon);
+    }
+    return icon;
   }
 
   public static List<BaseTreeNode> getPathNodes(final Iterable<Path> paths,
@@ -152,6 +171,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
         addPathNode(children, path, showHidden);
       }
     }
+    Collections.sort(children);
     return children;
   }
 
@@ -171,18 +191,13 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public static URL getUrl(final BaseTreeNode parent, final Path path) {
     if (parent instanceof UrlProxy) {
       final UrlProxy parentProxy = (UrlProxy)parent;
-      String childPath = Paths.getFileName(path);
-
-      if (Files.isDirectory(path)) {
-        childPath += "/";
-      }
-      return UrlUtil.getUrl(parentProxy, childPath);
+      return parentProxy.getUrl(path);
     } else {
       try {
         final URL url = path.toUri().toURL();
         return url;
       } catch (final MalformedURLException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }
@@ -201,7 +216,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public static BaseTreeNode newFileSystemsTreeNode() {
     final BaseTreeNode fileSystems = new FunctionChildrenTreeNode(FileSystems.getDefault(),
-      "File Systems", ICON_FOLDER_DRIVE, (fileSystem) -> {
+      "File Systems", getIconFolder("drive"), (fileSystem) -> {
         final Iterable<Path> roots = ((FileSystem)fileSystem).getRootDirectories();
         return getPathNodes(roots, true);
       });
@@ -247,7 +262,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       Borders.titled(panel, "Folder Connection");
 
       SwingUtil.addLabel(panel, "Folder");
-      final JLabel fileLabel = new JLabel(getIconFile(path).getAbsolutePath());
+      final JLabel fileLabel = new JLabel(path.toString());
       panel.add(fileLabel);
 
       SwingUtil.addLabel(panel, "Name");
@@ -277,15 +292,9 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
           connectionName = fileName;
         }
 
-        registry.addConnection(connectionName, getIconFile(path));
+        registry.addConnection(connectionName, path);
       }
     }
-  }
-
-  private void actionAddLayer() {
-    final URL url = getUrl();
-    final Project project = Project.get();
-    project.openFile(url);
   }
 
   private void actionExportRecords() {
@@ -305,9 +314,8 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       }
     }
     final String title = Paths.getBaseName(path);
-    AbstractRecordLayer.exportRecords(title, hasGeometryField, (targetFile) -> {
-      RecordIo.copyRecords(path, targetFile);
-    });
+    AbstractRecordLayer.exportRecords(title, hasGeometryField,
+      targetFile -> RecordIo.copyRecords(path, targetFile));
   }
 
   @Override
@@ -326,24 +334,6 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       }
     }
     return false;
-  }
-
-  @Override
-  public Icon getIcon() {
-    Icon icon = super.getIcon();
-    if (icon == null) {
-      if (isExists()) {
-        final Path path = getPath();
-        icon = getIcon(path);
-        setIcon(icon);
-      }
-    }
-    return icon;
-  }
-
-  @Override
-  public MenuFactory getMenu() {
-    return MENU;
   }
 
   // @Override
@@ -365,6 +355,24 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   // return "Missing File/Folder";
   // }
   // }
+
+  @Override
+  public Icon getIcon() {
+    Icon icon = super.getIcon();
+    if (icon == null) {
+      if (isExists()) {
+        final Path path = getPath();
+        icon = getIcon(path);
+        setIcon(icon);
+      }
+    }
+    return icon;
+  }
+
+  @Override
+  public MenuFactory getMenu() {
+    return MENU;
+  }
 
   public Path getPath() {
     return getUserData();
@@ -425,16 +433,25 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     return this.hasFile;
   }
 
-  public boolean isRecordFileLayer() {
+  public <F extends IoFactory> boolean isReadable(final Class<F> factoryClass) {
     if (isExists()) {
       final Path path = getPath();
       if (!this.hasFile) {
         return false;
-      } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
-        return true;
+      } else {
+        final F factory = IoFactory.factory(factoryClass, path);
+        if (factory != null) {
+          if (factory.isReadFromDirectorySupported() || !Files.isDirectory(path)) {
+            return true;
+          }
+        }
       }
     }
     return false;
+  }
+
+  public boolean isRecordFileLayer() {
+    return isReadable(RecordReaderFactory.class);
   }
 
   @Override

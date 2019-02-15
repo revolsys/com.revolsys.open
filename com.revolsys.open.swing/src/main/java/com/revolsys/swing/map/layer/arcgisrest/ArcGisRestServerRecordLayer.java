@@ -15,7 +15,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.PathName;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
@@ -32,15 +31,13 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.FilterMultipleRenderer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
-import com.revolsys.swing.map.layer.record.renderer.MultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.MultipleRecordRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.tree.node.WebServiceConnectionTrees;
 import com.revolsys.util.OS;
 import com.revolsys.util.PasswordUtil;
@@ -88,16 +85,6 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
       return new Color(red, green, blue, alpha);
     }
     return null;
-  }
-
-  public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "Arc GIS REST Server Record Layer",
-      ArcGisRestServerRecordLayer::new);
-
-    final MenuFactory recordLayerDescriptionMenu = MenuFactory.getMenu(FeatureLayer.class);
-
-    Menus.addMenuItem(recordLayerDescriptionMenu, "default", "Add Layer", "map_add",
-      ArcGisRestServerRecordLayer::actionAddLayer, false);
   }
 
   private FeatureLayer layerDescription;
@@ -345,7 +332,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
 
       final List<MapEx> labellingInfo = drawingInfo.getValue("labelingInfo");
       if (labellingInfo != null) {
-        final MultipleRenderer labelRenderer = new MultipleRenderer(this);
+        final MultipleRecordRenderer labelRenderer = new MultipleRecordRenderer(this);
         labelRenderer.setName("labels");
         for (final MapEx labelProperties : labellingInfo) {
           addTextRenderer(labelRenderer, labelProperties);
@@ -359,7 +346,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     } else if (renderers.size() == 1) {
       setRenderer(renderers.get(0));
     } else {
-      setRenderer(new MultipleRenderer(this, renderers));
+      setRenderer(new MultipleRecordRenderer(this, renderers));
     }
   }
 
@@ -375,12 +362,12 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     final Color fillColor = getColor(symbol);
     style.setPolygonFill(fillColor);
 
-    return new GeometryStyleRenderer(this, style);
+    return new GeometryStyleRecordLayerRenderer(this, style);
   }
 
   private AbstractRecordLayerRenderer newSimpleLineRenderer(final MapEx symbol) {
     final GeometryStyle style = newSimpleLineStyle(symbol);
-    return new GeometryStyleRenderer(this, style);
+    return new GeometryStyleRecordLayerRenderer(this, style);
   }
 
   private GeometryStyle newSimpleLineStyle(final MapEx symbol) {
@@ -435,7 +422,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
         // TODO PMS
         // TODO PFS
         Logs.error(this, "Unsupported symbol=" + symbolType + "\n" + symbolType);
-        return new GeometryStyleRenderer(this);
+        return new GeometryStyleRecordLayerRenderer(this);
       }
     }
   }

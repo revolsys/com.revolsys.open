@@ -26,8 +26,8 @@ public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements Ima
   private final Icon loadingIcon = BaseTreeNodeLoadingIcon.getIcon();
 
   public BaseTreeCellRenderer() {
-    setOpenIcon(PathTreeNode.ICON_FOLDER);
-    setClosedIcon(PathTreeNode.ICON_FOLDER);
+    setOpenIcon(PathTreeNode.getIconFolder());
+    setClosedIcon(PathTreeNode.getIconFolder());
     setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
     final Dimension zeroSize = new Dimension(0, 0);
     this.hiddenRenderer.setMinimumSize(zeroSize);

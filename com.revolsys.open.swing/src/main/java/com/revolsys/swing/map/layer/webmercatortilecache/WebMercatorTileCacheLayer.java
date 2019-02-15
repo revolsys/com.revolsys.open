@@ -10,18 +10,13 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.logging.Logs;
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.MapTile;
-import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
@@ -31,35 +26,6 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2,
     -180, -85, 180, 85);
 
-  private static void actionAddLayer(final BaseMapLayerGroup parent) {
-    final ValueField dialog = new ValueField();
-    dialog.setTitle("Add Web Mercator Tile Cache Layer");
-
-    SwingUtil.addLabel(dialog, "URL");
-    final TextField urlField = new TextField("url", 50);
-    dialog.add(urlField);
-
-    GroupLayouts.makeColumns(dialog, 2, true, true);
-
-    dialog.setSaveAction(() -> {
-      final String url = urlField.getText();
-      if (Property.hasValue(url)) {
-        final WebMercatorTileCacheLayer layer = new WebMercatorTileCacheLayer();
-        layer.setUrl(url);
-        layer.setVisible(true);
-        parent.addLayer(layer);
-      }
-    });
-    dialog.showDialog();
-  }
-
-  public static void mapObjectFactoryInit() {
-    final MenuFactory baseMapsMenu = MenuFactory.getMenu(BaseMapLayerGroup.class);
-
-    Menus.addMenuItem(baseMapsMenu, "group", "Add Web Mercator Tile Cache Layer",
-      Icons.getIconWithBadge("map", "add"), WebMercatorTileCacheLayer::actionAddLayer, false);
-  }
-
   private WebMercatorTileCacheClient client;
 
   private String url;
@@ -68,7 +34,7 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
     super("webMercatorTileCacheLayer");
   }
 
-  public WebMercatorTileCacheLayer(final Map<String, Object> properties) {
+  public WebMercatorTileCacheLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
   }
@@ -174,7 +140,7 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
-    map.put("type", "openStreetMap");
+    map.put("type", "webMercatorTileCacheLayer");
     addToMap(map, "url", this.url);
     return map;
   }

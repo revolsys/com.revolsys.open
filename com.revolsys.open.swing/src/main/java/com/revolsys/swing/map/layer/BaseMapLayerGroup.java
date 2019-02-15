@@ -15,7 +15,7 @@ public class BaseMapLayerGroup extends LayerGroup {
     menu.deleteMenuItem("layer", "Layer Properties");
   }
 
-  public static LayerGroup newLayer(final Map<String, Object> properties) {
+  public static LayerGroup newLayer(final Map<String, ? extends Object> properties) {
     final BaseMapLayerGroup layerGroup = new BaseMapLayerGroup();
     layerGroup.loadLayers(properties);
     return layerGroup;

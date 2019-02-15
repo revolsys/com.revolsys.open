@@ -41,7 +41,13 @@ public class FolderConnection extends AbstractConnection<FolderConnection, Folde
 
   @Override
   public List<Path> getChildren() {
-    return Paths.getChildPaths(this.path);
+    final List<Path> paths = Paths.getChildPaths(this.path);
+    paths.sort((a, b) -> {
+      final String name1 = a.getName(a.getNameCount() - 1).toString().toLowerCase();
+      final String name2 = b.getName(b.getNameCount() - 1).toString().toLowerCase();
+      return name1.compareTo(name2);
+    });
+    return paths;
   }
 
   public File getFile() {

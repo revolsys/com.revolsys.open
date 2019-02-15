@@ -60,8 +60,6 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
     return action.newComponent();
   }
 
-  private String iconName;
-
   private boolean invokeLater;
 
   private Runnable runnable;
@@ -159,15 +157,6 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
     } else {
       this.runnable.run();
     }
-  }
-
-  @Override
-  public String getIconName() {
-    return this.iconName;
-  }
-
-  public void setIconName(final String iconName) {
-    this.iconName = iconName;
   }
 
   @Override
