@@ -123,15 +123,15 @@ public class IntersectionMatrix implements Cloneable {
   }
 
   /**
-   *  Tests if each of the actual dimension symbolCount in a matrix string satisfies the
+   *  Tests if each of the actual dimension symbols in a matrix string satisfies the
    *  corresponding required dimension symbol in a pattern string.
    *
-   *@param  actualDimensionSymbols    nine dimension symbolCount to validate.
+   *@param  actualDimensionSymbols    nine dimension symbols to validate.
    *      Possible values are <code>{T, F, * , 0, 1, 2}</code>.
-   *@param  requiredDimensionSymbols  nine dimension symbolCount to validate
+   *@param  requiredDimensionSymbols  nine dimension symbols to validate
    *      against. Possible values are <code>{T, F, * , 0, 1, 2}</code>.
    *@return                           true if each of the required dimension
-   *      symbolCount encompass the corresponding actual dimension symbol
+   *      symbols encompass the corresponding actual dimension symbol
    */
   public static boolean matches(final String actualDimensionSymbols,
     final String requiredDimensionSymbols) {
@@ -174,9 +174,9 @@ public class IntersectionMatrix implements Cloneable {
 
   /**
    *  Creates an <code>IntersectionMatrix</code> with the given dimension
-   *  symbolCount.
+   *  symbols.
    *
-   *@param  elements  a String of nine dimension symbolCount in row major order
+   *@param  elements  a String of nine dimension symbols in row major order
    */
   public IntersectionMatrix(final String elements) {
     this();
@@ -431,13 +431,13 @@ public class IntersectionMatrix implements Cloneable {
 
   /**
    *  Returns whether the elements of this <code>IntersectionMatrix</code>
-   *  satisfies the required dimension symbolCount.
+   *  satisfies the required dimension symbols.
    *
-   *@param  requiredDimensionSymbols  nine dimension symbolCount with which to
+   *@param  requiredDimensionSymbols  nine dimension symbols with which to
    *      compare the elements of this <code>IntersectionMatrix</code>. Possible
    *      values are <code>{T, F, * , 0, 1, 2}</code>.
    *@return                           <code>true</code> if this <code>IntersectionMatrix</code>
-   *      matches the required dimension symbolCount
+   *      matches the required dimension symbols
    */
   public boolean matches(final String requiredDimensionSymbols) {
     if (requiredDimensionSymbols.length() != 9) {
@@ -473,9 +473,9 @@ public class IntersectionMatrix implements Cloneable {
 
   /**
    *  Changes the elements of this <code>IntersectionMatrix</code> to the
-   *  dimension symbolCount in <code>dimensionSymbols</code>.
+   *  dimension symbols in <code>dimensionSymbols</code>.
    *
-   *@param  dimensionSymbols  nine dimension symbolCount to which to set this <code>IntersectionMatrix</code>
+   *@param  dimensionSymbols  nine dimension symbols to which to set this <code>IntersectionMatrix</code>
    *      s elements. Possible values are <code>{T, F, * , 0, 1, 2}</code>
    */
   public void set(final String dimensionSymbols) {
@@ -525,7 +525,7 @@ public class IntersectionMatrix implements Cloneable {
    *  element to the corresponding minimum dimension symbol if the element is
    *  less.
    *
-   *@param  minimumDimensionSymbols  nine dimension symbolCount with which to
+   *@param  minimumDimensionSymbols  nine dimension symbols with which to
    *      compare the elements of this <code>IntersectionMatrix</code>. The
    *      order of dimension values from least to greatest is <code>{DONTCARE, TRUE, FALSE, 0, 1, 2}</code>
    *      .
@@ -565,7 +565,7 @@ public class IntersectionMatrix implements Cloneable {
    *  Returns a nine-character <code>String</code> representation of this <code>IntersectionMatrix</code>
    *  .
    *
-   *@return    the nine dimension symbolCount of this <code>IntersectionMatrix</code>
+   *@return    the nine dimension symbols of this <code>IntersectionMatrix</code>
    *      in row-major order.
    */
   @Override

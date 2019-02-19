@@ -1104,8 +1104,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   * within the given tolerance distance, in exactly the same order.
   * </ul>
   * This method does <i>not</i>
-  * test the values of the <code>GeometryFactory</code>, the <code>SRID</code>,
-  * or the <code>userData</code> fields.
+  * test the values of the <code>GeometryFactory</code>, the <code>SRID</code>.
   * <p>
   * To properly test equality between different geometries,
   * it is usually necessary to {@link #normalize()} them first.
