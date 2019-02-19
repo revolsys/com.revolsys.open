@@ -64,7 +64,6 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
 import com.revolsys.geometry.model.prep.PreparedLineString;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
@@ -1500,7 +1499,7 @@ public interface LineString extends Lineal {
 
   @Override
   default Geometry intersectionBbox(final BoundingBox boundingBox) {
-    notNullSameCs( boundingBox);
+    notNullSameCs(boundingBox);
     if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {

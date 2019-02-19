@@ -81,8 +81,8 @@ public class BoundingBoxDoubleGeometryFactory extends BaseBoundingBox {
 
   private final GeometryFactory geometryFactory;
 
-  public BoundingBoxDoubleGeometryFactory(final GeometryFactory geometryFactory, final int axisCount,
-    final double... bounds) {
+  public BoundingBoxDoubleGeometryFactory(final GeometryFactory geometryFactory,
+    final int axisCount, final double... bounds) {
     this.geometryFactory = geometryFactory;
     if (bounds == null || bounds.length == 0 || axisCount < 1) {
       this.bounds = null;
@@ -179,9 +179,11 @@ public class BoundingBoxDoubleGeometryFactory extends BaseBoundingBox {
 
   @Override
   public boolean isEmpty() {
-    for (final double value : this.bounds) {
-      if (Double.isFinite(value)) {
-        return false;
+    if (this.bounds != null) {
+      for (final double value : this.bounds) {
+        if (Double.isFinite(value)) {
+          return false;
+        }
       }
     }
     return true;

@@ -303,7 +303,7 @@ public class GeometryCollectionImpl implements GeometryCollection {
 
   @Override
   public Geometry intersectionBbox(final BoundingBox boundingBox) {
-    notNullSameCs( boundingBox);
+    notNullSameCs(boundingBox);
     if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {

@@ -2173,7 +2173,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   /**
    * Tests whether the elements in the DE-9IM
    * {@link IntersectionMatrix} for the two <code>Geometry</code>s match the elements in <code>intersectionPattern</code>.
-   * The pattern is a 9-character string, with symbolCount drawn from the following set:
+   * The pattern is a 9-character string, with symbols drawn from the following set:
    *  <UL>
    *    <LI> 0 (dimension 0)
    *    <LI> 1 (dimension 1)

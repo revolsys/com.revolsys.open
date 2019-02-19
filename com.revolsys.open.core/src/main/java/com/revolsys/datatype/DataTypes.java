@@ -20,7 +20,6 @@ import java.util.UUID;
 import javax.measure.Quantity;
 import javax.xml.namespace.QName;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.awt.WebColors;
@@ -130,8 +129,6 @@ public final class DataTypes {
   public static final GeometryDataType<LinearRing, LinearRingEditor> LINEAR_RING = new GeometryDataType<>(
     LinearRing.class, LinearRing::newLinearRing, LinearRingEditor::new);
 
-  private static final Logger LOG = LoggerFactory.getLogger(DataTypes.class);
-
   public static final DataType LONG = new Longs();
 
   public static final DataType MEASURE = new FunctionDataType("measure", Quantity.class,
@@ -208,7 +205,8 @@ public final class DataTypes {
             final DataType type = (DataType)field.get(null);
             register(type);
           } catch (final Throwable e) {
-            LOG.error("Error registering type " + field.getName(), e);
+            LoggerFactory.getLogger(DataTypes.class)
+              .error("Error registering type " + field.getName(), e);
           }
         }
       }
