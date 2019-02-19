@@ -126,6 +126,12 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
   }
 
   @Override
+  public boolean bboxCovers(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    return this.minX <= minX && maxX <= this.maxX && this.minY <= minY && maxY <= this.maxY;
+  }
+
+  @Override
   public boolean bboxIntersects(final double x, final double y) {
     return !(x > this.maxX || x < this.minX || y > this.maxY || y < this.minY);
   }
@@ -143,12 +149,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
       y2 = t;
     }
     return !(x1 > this.maxX || x2 < this.minX || y1 > this.maxY || y2 < this.minY);
-  }
-
-  @Override
-  public boolean bboxCovers(final double minX, final double minY, final double maxX,
-    final double maxY) {
-    return this.minX <= minX && maxX <= this.maxX && this.minY <= minY && maxY <= this.maxY;
   }
 
   protected void clear() {
