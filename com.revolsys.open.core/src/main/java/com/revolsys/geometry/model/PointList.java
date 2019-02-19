@@ -246,9 +246,9 @@ public class PointList extends ArrayList<Point> {
   }
 
   /**
-   * Returns a deep copy of this <tt>CoordinateList</tt> instance.
+   * Returns a deep copy of this <tt>PointList</tt> instance.
    *
-   * @return a clone of this <tt>CoordinateList</tt> instance
+   * @return a clone of this <tt>PointList</tt> instance
    */
   @Override
   public Object clone() {
