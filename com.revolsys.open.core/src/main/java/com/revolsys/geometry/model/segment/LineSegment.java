@@ -17,7 +17,6 @@ import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
@@ -641,7 +640,7 @@ public interface LineSegment extends LineString {
 
   @Override
   default Geometry intersectionBbox(final BoundingBox boundingBox) {
-    notNullSameCs( boundingBox);
+    notNullSameCs(boundingBox);
     if (bboxCoveredBy(boundingBox)) {
       return this;
     } else {
@@ -918,11 +917,11 @@ public interface LineSegment extends LineString {
      * For instance, the following situation produces identical results in spite
      * of the inverse orientation of the line segment:
      *
-     * Point p0 = new PointDouble((double)219.3649559090992, 140.84159161824724);
-     * Point p1 = new PointDouble((double)168.9018919682399, -5.713787599646864);
+     * Point p0 = new PointDoubleXY(219.3649559090992, 140.84159161824724);
+     * Point p1 = new PointDoubleXY(168.9018919682399, -5.713787599646864);
      *
-     * Point p = new PointDouble((double)186.80814046338352, 46.28973405831556); int
-     * orient = orientationIndex(p0, p1, p); int orientInv =
+     * Point p = new PointDoubleXY(186.80814046338352, 46.28973405831556);
+     * int orient = orientationIndex(p0, p1, p); int orientInv =
      * orientationIndex(p1, p0, p);
      *
      * A way to force consistent results is to normalize the orientation of the
