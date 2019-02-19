@@ -31,7 +31,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.util.BoundingBoxEditor;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.ResourceEndianOutput;

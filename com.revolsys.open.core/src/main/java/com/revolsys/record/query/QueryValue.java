@@ -36,7 +36,7 @@ import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
-import com.revolsys.geometry.model.util.BoundingBoxEditor;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.functions.EnvelopeIntersects;

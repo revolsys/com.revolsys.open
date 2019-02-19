@@ -23,9 +23,9 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
-import com.revolsys.geometry.model.util.BoundingBoxEditor;
 
 public class GeometryGraph extends Graph<LineSegment> {
 

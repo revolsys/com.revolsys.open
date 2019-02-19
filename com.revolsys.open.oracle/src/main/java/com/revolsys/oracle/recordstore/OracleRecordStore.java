@@ -19,7 +19,7 @@ import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.util.BoundingBoxEditor;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;

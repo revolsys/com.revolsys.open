@@ -1,4 +1,4 @@
-package com.revolsys.geometry.model.util;
+package com.revolsys.geometry.model.editor;
 
 import java.util.Arrays;
 

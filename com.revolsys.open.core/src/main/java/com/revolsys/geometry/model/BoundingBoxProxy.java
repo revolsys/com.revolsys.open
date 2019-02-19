@@ -2,7 +2,7 @@ package com.revolsys.geometry.model;
 
 import java.util.function.BiFunction;
 
-import com.revolsys.geometry.model.util.BoundingBoxEditor;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 
 public interface BoundingBoxProxy extends GeometryFactoryProxy {
   default boolean bboxCoveredBy(final BoundingBoxProxy boundingBox) {

@@ -10,7 +10,7 @@ import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.util.BoundingBoxEditor;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.util.ExitLoopException;
 
 public class RStarTree<T> implements SpatialIndex<T> {
