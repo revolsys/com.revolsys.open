@@ -1599,7 +1599,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
 
   @Override
   public boolean isHasHorizontalCoordinateSystem() {
-    return this.coordinateSystem != null;
+    return this.horizontalCoordinateSystem != null;
   }
 
   public boolean isMoreDetailed(final GeometryFactory geometryFactory) {

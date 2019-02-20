@@ -333,6 +333,22 @@ public interface BoundingBox
     }
   }
 
+  /**
+   * Tests if the <code>BoundingBox other</code>
+   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
+   *
+   *@param  other the <code>BoundingBox</code> to check
+   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
+   */
+  default boolean bboxCovers(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double minX2 = getMinX();
+    final double minY2 = getMinY();
+    final double maxX2 = getMaxX();
+    final double maxY2 = getMaxY();
+    return minX2 <= minX && maxX <= maxX2 && minY2 <= minY && maxY <= maxY2;
+  }
+
   default double bboxDistance(final double x, final double y) {
     if (bboxIntersects(x, y)) {
       return 0;
@@ -433,6 +449,7 @@ public interface BoundingBox
    * @return a new BoundingBox representing the intersection of the envelopes (this will be
    * the null envelope if either argument is null, or they do not intersect
    */
+  @Override
   default BoundingBox bboxIntersection(final BoundingBoxProxy boundingBox) {
     final BoundingBoxFunction<BoundingBox> action = BoundingBox::bboxIntersection;
     final GeometryFactory geometryFactory = getGeometryFactory();
@@ -623,22 +640,6 @@ public interface BoundingBox
 
     }
     return emptyResult;
-  }
-
-  /**
-   * Tests if the <code>BoundingBox other</code>
-   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
-   *
-   *@param  other the <code>BoundingBox</code> to check
-   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
-   */
-  default boolean bboxCovers(final double minX, final double minY, final double maxX,
-    final double maxY) {
-    final double minX2 = getMinX();
-    final double minY2 = getMinY();
-    final double maxX2 = getMaxX();
-    final double maxY2 = getMaxY();
-    return minX2 <= minX && maxX <= maxX2 && minY2 <= minY && maxY <= maxY2;
   }
 
   default BoundingBox clone() {
