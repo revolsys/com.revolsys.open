@@ -436,12 +436,6 @@ public interface BoundingBox
     }
   }
 
-  default BoundingBox bboxEdit(final Consumer<BoundingBoxEditor> action) {
-    final BoundingBoxEditor editor = new BoundingBoxEditor(this);
-    action.accept(editor);
-    return editor.newBoundingBox();
-  }
-
   /**
    * Computes the intersection of two {@link BoundingBox}s.
    *

@@ -1,6 +1,7 @@
 package com.revolsys.geometry.model;
 
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 
@@ -50,6 +51,12 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
     return bboxWith(point, action, Double.POSITIVE_INFINITY);
   }
 
+  default BoundingBox bboxEdit(final Consumer<BoundingBoxEditor> action) {
+    final BoundingBoxEditor editor = new BoundingBoxEditor(this);
+    action.accept(editor);
+    return editor.newBoundingBox();
+  }
+
   default BoundingBoxEditor bboxEditor() {
     return new BoundingBoxEditor(this);
   }
@@ -86,6 +93,24 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
   default boolean bboxIntersects(final Point point) {
     final BoundingBoxPointFunction<Boolean> action = BoundingBox::bboxIntersects;
     return bboxWith(point, action, false);
+  }
+
+  default BoundingBox bboxNewExpandDelta(final double distance) {
+    final BoundingBox boundingBox = getBoundingBox();
+    if (boundingBox.isEmpty() || distance == 0) {
+      return boundingBox;
+    } else {
+      return bboxEdit(editor -> editor.expandDelta(distance));
+    }
+  }
+
+  default BoundingBox bboxNewExpandDelta(final double deltaX, final double deltaY) {
+    final BoundingBox boundingBox = getBoundingBox();
+    if (boundingBox.isEmpty() || deltaX == 0 && deltaY == 0) {
+      return boundingBox;
+    } else {
+      return bboxEdit(editor -> editor.expandDelta(deltaX, deltaY));
+    }
   }
 
   default <R> R bboxWith(final BoundingBoxProxy boundingBox,

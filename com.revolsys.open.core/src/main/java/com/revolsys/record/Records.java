@@ -22,6 +22,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.TopologyException;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.logging.Logs;
@@ -40,6 +41,24 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public interface Records {
+  static BoundingBox bboxAddRecords(final BoundingBoxEditor boundingBox,
+    final Iterable<? extends Record> records) {
+    for (final Record record : records) {
+      final Geometry geometry = record.getGeometry();
+      boundingBox.addGeometry(geometry);
+    }
+    return boundingBox.newBoundingBox();
+  }
+
+  static BoundingBox boundingBox(final GeometryFactory geometryFactory,
+    final Iterable<? extends Record> records) {
+    final BoundingBoxEditor boundingBox = geometryFactory.bboxEditor();
+    for (final Record record : records) {
+      final Geometry geometry = record.getGeometry();
+      boundingBox.addGeometry(geometry);
+    }
+    return boundingBox.newBoundingBox();
+  }
 
   static int compareNullFirst(final Record record1, final Record record2, final String fieldName) {
     final Object value1 = getValue(record1, fieldName);

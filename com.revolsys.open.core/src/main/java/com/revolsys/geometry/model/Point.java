@@ -73,10 +73,14 @@ public interface Point extends Punctual, Serializable, BoundingBox {
   static int hashCode(final Point point) {
     final double x = point.getX();
     final double y = point.getY();
-    long bits = 17;
-    bits ^= java.lang.Double.doubleToLongBits(x) * 37;
-    bits ^= java.lang.Double.doubleToLongBits(y) * 37;
-    return (int)bits ^ (int)(bits >> 32);
+    final int prime = 31;
+    int result = 1;
+    long temp;
+    temp = Double.doubleToLongBits(x);
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    temp = Double.doubleToLongBits(y);
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    return result;
   }
 
   @SuppressWarnings("unchecked")
