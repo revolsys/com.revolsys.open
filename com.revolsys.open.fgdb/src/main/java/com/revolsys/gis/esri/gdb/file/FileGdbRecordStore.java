@@ -1298,11 +1298,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public FileGdbWriter newRecordWriter() {
-    return newRecordWriter(false);
-  }
-
-  @Override
   public FileGdbWriter newRecordWriter(final boolean throwExceptions) {
     synchronized (this.apiSync) {
       FileGdbWriter writer = getThreadProperty("writer");
