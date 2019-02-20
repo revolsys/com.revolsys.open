@@ -9,8 +9,6 @@ import com.revolsys.util.number.Doubles;
 
 public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
 
-  public static final String GEOMETRY_VERTEX_INDEX = "_GeometryVertexQuadTree";
-
   private static final long serialVersionUID = 1L;
 
   private static final WeakKeyValueMap<Geometry, GeometryVertexQuadTree> CACHE = new WeakKeyValueMap<>();

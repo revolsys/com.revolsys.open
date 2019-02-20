@@ -478,7 +478,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           try {
             for (final Table table : this.tableByCatalogPath.values()) {
               try {
-                table.setLoadOnlyMode(false);
                 table.freeWriteLock();
                 geodatabase.closeTable(table);
               } catch (final Throwable e) {
@@ -546,14 +545,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             false)) {
           for (final Row row : rows) {
             synchronized (this.apiSync) {
-              final boolean loadOnly = isTableLocked(typePath);
-              if (loadOnly) {
-                table.setLoadOnlyMode(false);
-              }
               table.deleteRow(row);
-              if (loadOnly) {
-                table.setLoadOnlyMode(true);
-              }
             }
             record.setState(RecordState.DELETED);
             addStatistic("Delete", record);
@@ -903,7 +895,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         final Integer count = Maps.addCount(this.tableWriteLockCountsByCatalogPath, catalogPath);
         if (count == 1) {
           table.setWriteLock();
-          table.setLoadOnlyMode(true);
         }
       }
       return table;
@@ -1132,11 +1123,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       }
       return pathExists;
     }
-  }
-
-  private boolean isTableLocked(final PathName typePath) {
-    final String path = getCatalogPath(typePath);
-    return Maps.getCount(this.tableWriteLockCountsByCatalogPath, path) > 0;
   }
 
   protected FileGdbDomainCodeTable loadDomain(final Geodatabase geodatabase,
@@ -1659,7 +1645,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               catalogPath);
             if (count == 0) {
               try {
-                table.setLoadOnlyMode(false);
                 table.freeWriteLock();
               } catch (final Exception e) {
                 Logs.error(this, "Unable to free write lock for table: " + catalogPath, e);
@@ -1853,14 +1838,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   protected void updateRow(final PathName typePath, final Table table, final Row row) {
     synchronized (this.apiSync) {
       if (isOpen(table)) {
-        final boolean loadOnly = isTableLocked(typePath);
-        if (loadOnly) {
-          table.setLoadOnlyMode(false);
-        }
         table.updateRow(row);
-        if (loadOnly) {
-          table.setLoadOnlyMode(true);
-        }
       }
     }
   }
