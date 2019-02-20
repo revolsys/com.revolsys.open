@@ -8,6 +8,19 @@ public class Longs extends AbstractDataType {
     return left + right.longValue();
   }
 
+  public static int compareDistance(final long x1, final long y1, final long x2, final long y2) {
+    final double distance1 = Math.sqrt(x1 * x1 + y1 * y1);
+    final double distance2 = Math.sqrt(x2 * x2 + y2 * y2);
+    int compare = Double.compare(distance1, distance2);
+    if (compare == 0) {
+      compare = Long.compare(y1, y2);
+      if (compare == 0) {
+        compare = Long.compare(x1, x2);
+      }
+    }
+    return compare;
+  }
+
   public static long divide(final long left, final Number right) {
     return left / right.longValue();
   }
@@ -132,19 +145,6 @@ public class Longs extends AbstractDataType {
   @Override
   protected String toStringDo(final Object value) {
     return String.valueOf((long)value);
-  }
-
-  public static int compareDistance(final long x1, final long y1, final long x2, final long y2) {
-    final double distance1 = Math.sqrt(x1 * x1 + y1 * y1);
-    final double distance2 = Math.sqrt(x2 * x2 + y2 * y2);
-    int compare = Double.compare(distance1, distance2);
-    if (compare == 0) {
-      compare = Long.compare(y1, y2);
-      if (compare == 0) {
-        compare = Long.compare(x1, x2);
-      }
-    }
-    return compare;
   }
 
 }

@@ -133,8 +133,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private GeometryEditor<?> addGeometryEditor;
 
-  private Geometry addGeometry;
-
   public EditRecordGeometryOverlay(final MapPanel map) {
     super(map);
     addOverlayAction( //

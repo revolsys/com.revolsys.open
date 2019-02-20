@@ -23,11 +23,6 @@ public class ScaleUnit implements UnitOfMeasure {
     this.deprecated = deprecated;
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <U extends UnitOfMeasure> ValueWithUnit<U> newValue(final double value) {
-    return (ValueWithUnit<U>)new ValueWithUnit<>(this, value);
-  }
   @Override
   public boolean equals(final Object object) {
     if (object == null) {
@@ -81,6 +76,12 @@ public class ScaleUnit implements UnitOfMeasure {
 
   public boolean isDeprecated() {
     return this.deprecated;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <U extends UnitOfMeasure> ValueWithUnit<U> newValue(final double value) {
+    return (ValueWithUnit<U>)new ValueWithUnit<>(this, value);
   }
 
   @Override

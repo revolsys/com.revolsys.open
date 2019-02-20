@@ -86,7 +86,8 @@ public class PriorityQueue<I extends Comparable<I>> implements Emptyable {
    * Establish heap from an arbitrary arrangement of items.
    */
   /*
-   * private void buildHeap( ) { for( int i = currentSize / 2; i > 0; i-- ) reorder( i ); }
+   * private void buildHeap( ) { for( int i = currentSize / 2; i > 0; i-- )
+   * reorder( i ); }
    */
 
   /**

@@ -8,6 +8,11 @@ import com.revolsys.swing.component.ValueField;
 
 public class ColorGradientField extends ValueField {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public ColorGradientField(final ColorGradientGriddedElevationModelRasterizer rasterizer) {
     super("gradient", rasterizer.getGradient());
     setLayout(new BorderLayout());

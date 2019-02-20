@@ -182,8 +182,7 @@ public class LineSegmentUtil {
         final double deltaY2Y = y2 - y;
         return Math.sqrt(deltaX2X * deltaX2X + deltaY2Y * deltaY2Y);
       } else {
-        final double s = (deltaY1Y * deltaX2X1 - deltaX1X * deltaY2Y1)
-          / deltaX2X1SqPlusDeltaY2Y1Sq;
+        final double s = (deltaY1Y * deltaX2X1 - deltaX1X * deltaY2Y1) / deltaX2X1SqPlusDeltaY2Y1Sq;
 
         return Math.abs(s) * Math.sqrt(deltaX2X1SqPlusDeltaY2Y1Sq);
       }

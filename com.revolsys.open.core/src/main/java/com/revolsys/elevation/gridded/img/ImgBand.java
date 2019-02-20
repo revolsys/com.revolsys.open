@@ -105,10 +105,12 @@ class ImgBand {
           // final char szFieldName[40] = {};
           //
           // snprintf(szFieldName, sizeof(szFieldName), "proParams[%d]", i);
-          // psProParms.proParams[i] = projectionEntry.GetDoubleField(szFieldName);
+          // psProParms.proParams[i] =
+          // projectionEntry.GetDoubleField(szFieldName);
           // }
 
-          // final MapEx spheroidEntry = projectionEntry.getValue("proSpheroid");
+          // final MapEx spheroidEntry =
+          // projectionEntry.getValue("proSpheroid");
           // final String sphereName = spheroidEntry.getString("sphereName");
           // double a = spheroidEntry.getDouble("a");
           // if (a == 0) {

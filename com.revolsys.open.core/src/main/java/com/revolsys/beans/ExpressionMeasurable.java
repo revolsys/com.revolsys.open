@@ -19,6 +19,11 @@ import tec.uom.se.quantity.Quantities;
 
 public class ExpressionMeasurable<Q extends Quantity<Q>> extends AbstractQuantity<Q> {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private JexlContext context;
 
   private final Expression expression;

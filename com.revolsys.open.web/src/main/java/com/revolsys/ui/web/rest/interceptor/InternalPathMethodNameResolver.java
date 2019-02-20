@@ -41,7 +41,7 @@ public class InternalPathMethodNameResolver extends AbstractUrlMethodNameResolve
   private String suffix = "";
 
   /** Request URL path String --> method name String */
-  private final Map<String, String> methodNameCache = new ConcurrentHashMap<String, String>(16);
+  private final Map<String, String> methodNameCache = new ConcurrentHashMap<>(16);
 
   /**
    * Extract the handler method name from the given request URI.

@@ -276,8 +276,8 @@ public class GeometryGraph extends PlanarGraph {
     final EdgeSetIntersector esi = newEdgeSetIntersector();
     esi.computeIntersections(this.edges, g.edges, si);
     /*
-     * for (Iterator i = g.edges.iterator(); i.hasNext();) { Edge e = (Edge) i.next();
-     * Debug.print(e.getEdgeIntersectionList()); }
+     * for (Iterator i = g.edges.iterator(); i.hasNext();) { Edge e = (Edge)
+     * i.next(); Debug.print(e.getEdgeIntersectionList()); }
      */
     return si;
   }

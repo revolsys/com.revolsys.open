@@ -79,7 +79,8 @@ public class HtmlField extends Field {
 
   /*
    * (non-Javadoc)
-   * @see com.revolsys.ui.html.form.Field#initialize(com.revolsys.ui.html.form.Form,
+   * @see
+   * com.revolsys.ui.html.form.Field#initialize(com.revolsys.ui.html.form.Form,
    * javax.servlet.http.HttpServletRequest)
    */
   @Override

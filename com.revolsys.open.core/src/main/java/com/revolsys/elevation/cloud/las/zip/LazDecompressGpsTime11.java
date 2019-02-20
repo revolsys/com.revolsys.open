@@ -22,10 +22,10 @@ public abstract class LazDecompressGpsTime11 implements LazDecompress {
   @Override
   public void init(final LasPoint firstPoint) {
     final ArithmeticCodingDecompressModel m = this.gpsTimeMulti;
-    ArithmeticCodingDecompressDecoder r = this.decoder;
+    final ArithmeticCodingDecompressDecoder r = this.decoder;
     m.reset();
     final ArithmeticCodingDecompressModel m1 = this.gpsTime0Diff;
-    ArithmeticCodingDecompressDecoder r1 = this.decoder;
+    final ArithmeticCodingDecompressDecoder r1 = this.decoder;
     m1.reset();
     this.decompressGpsTime.reset();
   }

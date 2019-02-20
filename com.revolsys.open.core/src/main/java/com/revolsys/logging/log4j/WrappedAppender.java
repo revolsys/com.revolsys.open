@@ -20,6 +20,10 @@ public class WrappedAppender implements Appender {
     this.getAppender().append(event);
   }
 
+  protected Appender getAppender() {
+    return this.appender;
+  }
+
   @Override
   public ErrorHandler getHandler() {
     return this.getAppender().getHandler();
@@ -73,9 +77,5 @@ public class WrappedAppender implements Appender {
   @Override
   public void stop() {
     this.getAppender().stop();
-  }
-
-  protected Appender getAppender() {
-    return appender;
   }
 }

@@ -1,8 +1,8 @@
 package com.revolsys.elevation.gridded.img;
 
-import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 

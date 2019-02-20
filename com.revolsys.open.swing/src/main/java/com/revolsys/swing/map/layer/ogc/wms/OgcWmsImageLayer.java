@@ -189,8 +189,9 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
-    map.keySet().removeAll(Arrays.asList("readOnly", "querySupported", "selectSupported",
-      "minimumScale", "maximumScale"));
+    map.keySet()
+      .removeAll(Arrays.asList("readOnly", "querySupported", "selectSupported", "minimumScale",
+        "maximumScale"));
     if (Property.hasValue(this.connectionName)) {
       addToMap(map, "connectionName", this.connectionName);
     } else {

@@ -14,6 +14,11 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class VerticalCoordinateSystem extends AbstractCoordinateSystem {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private static int getId(final Authority authority) {
     if (authority == null) {
       return 0;

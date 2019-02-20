@@ -38,26 +38,31 @@ public class CholeskyDecomposition implements java.io.Serializable {
   private final int n;
 
   /*
-   * ------------------------ Temporary, experimental code. ------------------------ *\ \** Right
-   * Triangular Cholesky Decomposition. <P> For a symmetric, positive definite matrix A, the Right
-   * Cholesky decomposition is an upper triangular matrix R so that A = R'*R. This constructor
-   * computes R with the Fortran inspired column oriented algorithm used in LINPACK and MATLAB. In
-   * Java, we suspect a row oriented, lower triangular decomposition is faster. We have temporarily
-   * included this constructor here until timing experiments confirm this suspicion.\ \** Array for
-   * internal storage of right triangular decomposition. **\ private transient double[][] R; \**
-   * Cholesky algorithm for symmetric and positive definite matrix.
+   * ------------------------ Temporary, experimental code.
+   * ------------------------ *\ \** Right Triangular Cholesky Decomposition.
+   * <P> For a symmetric, positive definite matrix A, the Right Cholesky
+   * decomposition is an upper triangular matrix R so that A = R'*R. This
+   * constructor computes R with the Fortran inspired column oriented algorithm
+   * used in LINPACK and MATLAB. In Java, we suspect a row oriented, lower
+   * triangular decomposition is faster. We have temporarily included this
+   * constructor here until timing experiments confirm this suspicion.\ \**
+   * Array for internal storage of right triangular decomposition. **\ private
+   * transient double[][] R; \** Cholesky algorithm for symmetric and positive
+   * definite matrix.
    * @param A Square, symmetric matrix.
    * @param rightflag Actual value ignored.
-   * @return Structure to access R and isspd flag.\ public CholeskyDecomposition (Matrix Arg, int
-   * rightflag) { // Initialize. double[][] A = Arg.getArray(); n = Arg.getColumnDimension(); R =
-   * new double[n][n]; isspd = (Arg.getColumnDimension() == n); // Main loop. for (int j = 0; j < n;
-   * j++) { double d = 0.0; for (int k = 0; k < j; k++) { double s = A[k][j]; for (int i = 0; i < k;
-   * i++) { s = s - R[i][k]*R[i][j]; } R[k][j] = s = s/R[k][k]; d = d + s*s; isspd = isspd &
-   * (A[k][j] == A[j][k]); } d = A[j][j] - d; isspd = isspd & (d > 0.0); R[j][j] =
-   * Math.sqrt(Math.max(d,0.0)); for (int k = j+1; k < n; k++) { R[k][j] = 0.0; } } } \** Return
-   * upper triangular factor.
-   * @return R\ public Matrix getR () { return new Matrix(R,n,n); } \* ------------------------ End
-   * of temporary code. ------------------------
+   * @return Structure to access R and isspd flag.\ public CholeskyDecomposition
+   * (Matrix Arg, int rightflag) { // Initialize. double[][] A = Arg.getArray();
+   * n = Arg.getColumnDimension(); R = new double[n][n]; isspd =
+   * (Arg.getColumnDimension() == n); // Main loop. for (int j = 0; j < n; j++)
+   * { double d = 0.0; for (int k = 0; k < j; k++) { double s = A[k][j]; for
+   * (int i = 0; i < k; i++) { s = s - R[i][k]*R[i][j]; } R[k][j] = s =
+   * s/R[k][k]; d = d + s*s; isspd = isspd & (A[k][j] == A[j][k]); } d = A[j][j]
+   * - d; isspd = isspd & (d > 0.0); R[j][j] = Math.sqrt(Math.max(d,0.0)); for
+   * (int k = j+1; k < n; k++) { R[k][j] = 0.0; } } } \** Return upper
+   * triangular factor.
+   * @return R\ public Matrix getR () { return new Matrix(R,n,n); } \*
+   * ------------------------ End of temporary code. ------------------------
    */
 
   /*

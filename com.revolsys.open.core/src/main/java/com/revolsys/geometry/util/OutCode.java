@@ -16,16 +16,20 @@ public enum OutCode {
   ;
 
   /** Bit flag indicating a point is to the left of a rectangle. */
-  public static final int OUT_LEFT = 1; // 0001 Wikipedia value, others have different bit orders
+  public static final int OUT_LEFT = 1; // 0001 Wikipedia value, others have
+                                        // different bit orders
 
   /** Bit flag indicating a point is to the right of a rectangle. */
-  public static final int OUT_RIGHT = 2; // 0010 Wikipedia value, others have different bit orders
+  public static final int OUT_RIGHT = 2; // 0010 Wikipedia value, others have
+                                         // different bit orders
 
   /** Bit flag indicating a point is below a rectangle. */
-  public static final int OUT_BOTTOM = 4; // 0100 Wikipedia value, others have different bit orders
+  public static final int OUT_BOTTOM = 4; // 0100 Wikipedia value, others have
+                                          // different bit orders
 
   /** Bit flag indicating a point is above a rectangle. */
-  public static final int OUT_TOP = 8; // 1000 Wikipedia value, others have different bit orders
+  public static final int OUT_TOP = 8; // 1000 Wikipedia value, others have
+                                       // different bit orders
 
   public static int getOutcode(final double minX, final double minY, final double maxX,
     final double maxY, final double x, final double y) {

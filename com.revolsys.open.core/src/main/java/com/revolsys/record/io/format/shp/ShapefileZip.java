@@ -32,7 +32,7 @@ public class ShapefileZip extends AbstractRecordIoFactory implements RecordWrite
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> factory, MapEx properties) {
+    final RecordFactory<? extends Record> factory, final MapEx properties) {
     return new ZipRecordReader(resource, ShapefileConstants.FILE_EXTENSION, factory);
   }
 

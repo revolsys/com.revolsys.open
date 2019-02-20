@@ -31,7 +31,7 @@ public class SelectMapScale extends JComboBox<Long>
     this.map = new WeakReference<>(map);
 
     setEditable(true);
-    final FunctionStringConverter<Long> renderer = new FunctionStringConverter<Long>(
+    final FunctionStringConverter<Long> renderer = new FunctionStringConverter<>(
       MapScale::formatScale);
     renderer.setHorizontalAlignment(SwingConstants.RIGHT);
     final SelectMapScaleEditor editor = new SelectMapScaleEditor(getEditor(), renderer);
@@ -93,8 +93,9 @@ public class SelectMapScale extends JComboBox<Long>
         if (currentValue instanceof Number) {
           currentScale = ((Number)currentValue).doubleValue();
         } else if (Property.hasValue(currentValue)) {
-          final String scaleString = currentValue.toString().replaceAll("1:", "").replaceAll(
-            "[^0-9\\.]+", "");
+          final String scaleString = currentValue.toString()
+            .replaceAll("1:", "")
+            .replaceAll("[^0-9\\.]+", "");
           if (Property.hasValue(scaleString)) {
             try {
               currentScale = Double.valueOf(scaleString);

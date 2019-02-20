@@ -87,7 +87,7 @@ public interface MapDefault<K, V> extends Map<K, V> {
 
   @Override
   default Set<K> keySet() {
-    return new AbstractSet<K>() {
+    return new AbstractSet<>() {
       @Override
       public void clear() {
         MapDefault.this.clear();
@@ -105,7 +105,7 @@ public interface MapDefault<K, V> extends Map<K, V> {
 
       @Override
       public Iterator<K> iterator() {
-        return new Iterator<K>() {
+        return new Iterator<>() {
           private final Iterator<Entry<K, V>> interator = entrySet().iterator();
 
           @Override
@@ -249,7 +249,7 @@ public interface MapDefault<K, V> extends Map<K, V> {
 
   @Override
   default Collection<V> values() {
-    return new AbstractCollection<V>() {
+    return new AbstractCollection<>() {
       @Override
       public void clear() {
         MapDefault.this.clear();
@@ -267,7 +267,7 @@ public interface MapDefault<K, V> extends Map<K, V> {
 
       @Override
       public Iterator<V> iterator() {
-        return new Iterator<V>() {
+        return new Iterator<>() {
           private final Iterator<Entry<K, V>> iterator = entrySet().iterator();
 
           @Override

@@ -41,7 +41,7 @@ public class XBase extends AbstractIoFactoryWithCoordinateSystem
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory, MapEx properties) {
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
     try {
       return new XbaseRecordReader(resource, recordFactory);
     } catch (final IOException e) {

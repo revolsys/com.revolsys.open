@@ -13,17 +13,6 @@ public interface GriddedElevationModelReader
     return IoFactory.isAvailable(GriddedElevationModelReaderFactory.class, source);
   }
 
-  @Override
-  default void close() {
-    ObjectWithProperties.super.close();
-  }
-
-  double getGridCellHeight();
-
-  double getGridCellWidth();
-
-  GriddedElevationModel read();
-
   static <R extends GriddedElevationModelReader> R newGriddedElevationModelReader(
     final Object source) {
     final MapEx properties = MapEx.EMPTY;
@@ -42,4 +31,15 @@ public interface GriddedElevationModelReader
       return (R)factory.newGriddedElevationModelReader(resource, properties);
     }
   }
+
+  @Override
+  default void close() {
+    ObjectWithProperties.super.close();
+  }
+
+  double getGridCellHeight();
+
+  double getGridCellWidth();
+
+  GriddedElevationModel read();
 }

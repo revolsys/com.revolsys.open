@@ -7,6 +7,11 @@ import com.revolsys.util.Md5;
 import com.revolsys.util.number.Doubles;
 
 public class ParameterValueNumber extends Number implements ParameterValue {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final double unitValue;
 
   private final UnitOfMeasure unit;

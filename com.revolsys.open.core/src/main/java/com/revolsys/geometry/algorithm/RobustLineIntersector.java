@@ -280,9 +280,9 @@ public class RobustLineIntersector extends LineIntersector {
       line2y1, line2x2, line2y2);
 
     /*
-     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1, q2); double dist =
-     * intPt.distance(intPtDD); System.out.println(intPt + " - " + intPtDD + " dist = " + dist);
-     * //intPt = intPtDD;
+     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1,
+     * q2); double dist = intPt.distance(intPtDD); System.out.println(intPt +
+     * " - " + intPtDD + " dist = " + dist); //intPt = intPtDD;
      */
 
     /**

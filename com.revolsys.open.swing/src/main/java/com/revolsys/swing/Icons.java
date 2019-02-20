@@ -299,11 +299,13 @@ public class Icons {
     final String resourceName = RESOURCE_FOLDER + imageName + "." + fileExtension;
     InputStream in = clazz.getResourceAsStream(resourceName);
     if (in == null) {
-      in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
-        "images/" + imageName + "." + fileExtension);
+      in = Thread.currentThread()
+        .getContextClassLoader()
+        .getResourceAsStream("images/" + imageName + "." + fileExtension);
       if (in == null) {
-        in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
-          "icons/" + imageName + "." + fileExtension);
+        in = Thread.currentThread()
+          .getContextClassLoader()
+          .getResourceAsStream("icons/" + imageName + "." + fileExtension);
       }
     }
     return getImage(in);

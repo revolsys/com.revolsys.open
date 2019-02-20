@@ -93,7 +93,8 @@ public class SnapRoundingTest extends TestCase {
     noder.setValidate(true);
     final List nodedLines = noder.node(geoms);
     /*
-     * for (Iterator it = nodedLines.iterator(); it.hasNext(); ) { System.out.println(it.next()); }
+     * for (Iterator it = nodedLines.iterator(); it.hasNext(); ) {
+     * System.out.println(it.next()); }
      */
     assertTrue(isSnapped(nodedLines, SNAP_TOLERANCE));
   }

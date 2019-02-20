@@ -63,8 +63,8 @@ public abstract class RTreeNode<T> extends BoundingBoxNode {
     return areaExpansion;
   }
 
-  public abstract boolean remove(final double minX, final double minY,
-    final double maxX, final double maxY, T object);
+  public abstract boolean remove(final double minX, final double minY, final double maxX,
+    final double maxY, T object);
 
   protected abstract void updateEnvelope();
 }

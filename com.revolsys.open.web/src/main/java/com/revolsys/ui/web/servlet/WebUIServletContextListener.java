@@ -30,7 +30,8 @@ public class WebUIServletContextListener implements ServletContextListener {
 
   /*
    * (non-Javadoc)
-   * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet. ServletContextEvent)
+   * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.
+   * ServletContextEvent)
    */
   @Override
   public final void contextDestroyed(final ServletContextEvent event) {

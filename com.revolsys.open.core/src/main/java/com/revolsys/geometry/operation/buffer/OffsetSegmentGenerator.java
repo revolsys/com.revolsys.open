@@ -155,7 +155,8 @@ class OffsetSegmentGenerator {
       this.closingSegLengthFactor = MAX_CLOSING_SEG_LEN_FACTOR;
     }
     this.distance = distance;
-    // Choose the min vertex separation as a small fraction of the offset distance.
+    // Choose the min vertex separation as a small fraction of the offset
+    // distance.
     final double minimimVertexDistance = distance * CURVE_VERTEX_SNAP_DISTANCE_FACTOR;
     this.segList = new OffsetSegmentString(this.geometryFactory, minimimVertexDistance);
   }

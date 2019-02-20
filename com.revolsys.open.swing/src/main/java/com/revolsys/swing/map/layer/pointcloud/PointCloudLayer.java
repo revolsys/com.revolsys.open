@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -206,7 +207,7 @@ public class PointCloudLayer extends AbstractLayer {
     scrollPane.setMinimumSize(new Dimension(1000, 350));
     scrollPane.setPreferredSize(new Dimension(1000, 350));
     scrollPane.setMaximumSize(new Dimension(1000, 350));
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     propertiesPanel.add(scrollPane);
     final ValueHolder<JButton> buttonHolder = new ValueHolder<>();
     final JButton refreshButton = RunnableAction.newButton("Update Classification Counts", () -> {

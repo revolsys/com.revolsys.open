@@ -134,6 +134,7 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
     return this.pointCloud.toDoubleX(this.x);
   }
 
+  @Override
   public int getXInt() {
     return this.x;
   }
@@ -143,6 +144,7 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
     return this.pointCloud.toDoubleY(this.y);
   }
 
+  @Override
   public int getYInt() {
     return this.y;
   }
@@ -152,6 +154,7 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
     return this.pointCloud.toDoubleZ(this.z);
   }
 
+  @Override
   public int getZInt() {
     return this.z;
   }

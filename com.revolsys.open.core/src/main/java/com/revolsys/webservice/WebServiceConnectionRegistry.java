@@ -50,6 +50,7 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
     this(connectionManager, name, true, false, resource);
   }
 
+  @Override
   public WebServiceConnection addConnection(final MapEx config) {
     getConnectionName(config, null, true);
     final WebServiceConnection connection = new WebServiceConnection(this, config);

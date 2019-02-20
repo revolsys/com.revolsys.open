@@ -257,8 +257,8 @@ public final class JdbcUtils {
     return sql.toString();
   }
 
-  public static DataAccessException getException(final DataSource dataSource,
-    final String task, final String sql, final SQLException e) {
+  public static DataAccessException getException(final DataSource dataSource, final String task,
+    final String sql, final SQLException e) {
     SQLExceptionTranslator translator;
     if (dataSource == null) {
       translator = new SQLStateSQLExceptionTranslator();

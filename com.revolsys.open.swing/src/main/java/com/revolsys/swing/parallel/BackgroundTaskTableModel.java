@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.Timer;
@@ -48,7 +49,7 @@ public class BackgroundTaskTableModel extends AbstractTableModel implements Prop
     label.setBackground(background);
     label.setForeground(foreground);
     label.setMaximumSize(new Dimension(50, 30));
-    label.setHorizontalAlignment(JTextField.RIGHT);
+    label.setHorizontalAlignment(SwingConstants.RIGHT);
     model.addPropertyChangeListener(propertyName, e -> {
       final Integer count = (Integer)e.getNewValue();
       label.setText(count.toString());

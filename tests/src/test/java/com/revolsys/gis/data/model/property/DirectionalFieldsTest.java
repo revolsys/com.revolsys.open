@@ -63,7 +63,7 @@ public class DirectionalFieldsTest {
 
   private static RecordDefinitionImpl TABLE;
 
-  private static Map<String, String> DIRECTIONAL_VALUES = new LinkedHashMap<String, String>();
+  private static Map<String, String> DIRECTIONAL_VALUES = new LinkedHashMap<>();
 
   private static DirectionalFields DIRECTIONAL_ATTRIBUTES;
 
@@ -94,7 +94,8 @@ public class DirectionalFieldsTest {
     DIRECTIONAL_ATTRIBUTES.addEndFieldNamePair(START, END);
     DIRECTIONAL_ATTRIBUTES.addEndAndSideFieldNamePairs(START_LEFT, START_RIGHT, END_LEFT,
       END_RIGHT);
-    // DIRECTIONAL_ATTRIBUTES.addEndTurnFieldNamePairs(START_LEFT_TURN, START_RIGHT_TURN,
+    // DIRECTIONAL_ATTRIBUTES.addEndTurnFieldNamePairs(START_LEFT_TURN,
+    // START_RIGHT_TURN,
     // END_LEFT_TURN, END_RIGHT_TURN);
   }
 

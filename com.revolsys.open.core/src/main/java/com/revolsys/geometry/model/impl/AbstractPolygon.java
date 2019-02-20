@@ -132,7 +132,7 @@ public abstract class AbstractPolygon implements Polygon {
 
   @Override
   public int hashCode() {
-    BoundingBox boundingBox = getBoundingBox();
+    final BoundingBox boundingBox = getBoundingBox();
     return boundingBox.hashCode();
   }
 

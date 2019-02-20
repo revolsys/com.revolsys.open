@@ -7,6 +7,11 @@ import com.revolsys.geometry.model.LinearRing;
 
 public class LinearRingVertex extends LineStringVertex {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public LinearRingVertex(final LinearRing line, final int... vertexId) {
     super(line, vertexId);
   }

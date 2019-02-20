@@ -91,6 +91,20 @@ public class EsriCsWktWriter {
     }
   }
 
+  public static void write(final Writer out, final Ellipsoid ellipsoid, final int indentLevel)
+    throws IOException {
+    out.write("SPHEROID[");
+    write(out, ellipsoid.getName(), incrementIndent(indentLevel));
+    out.write(',');
+    final double semiMajorAxis = ellipsoid.getSemiMajorAxis();
+    write(out, semiMajorAxis, incrementIndent(indentLevel));
+    out.write(',');
+    final double inverseFlattening = ellipsoid.getInverseFlattening();
+    write(out, inverseFlattening, incrementIndent(indentLevel));
+    indent(out, indentLevel);
+    out.write(']');
+  }
+
   public static void write(final Writer out, final GeodeticDatum geodeticDatum,
     final int indentLevel) throws IOException {
     out.write("DATUM[");
@@ -201,20 +215,6 @@ public class EsriCsWktWriter {
     if (unit != null) {
       write(out, unit, incrementIndent(indentLevel));
     }
-    indent(out, indentLevel);
-    out.write(']');
-  }
-
-  public static void write(final Writer out, final Ellipsoid ellipsoid, final int indentLevel)
-    throws IOException {
-    out.write("SPHEROID[");
-    write(out, ellipsoid.getName(), incrementIndent(indentLevel));
-    out.write(',');
-    final double semiMajorAxis = ellipsoid.getSemiMajorAxis();
-    write(out, semiMajorAxis, incrementIndent(indentLevel));
-    out.write(',');
-    final double inverseFlattening = ellipsoid.getInverseFlattening();
-    write(out, inverseFlattening, incrementIndent(indentLevel));
     indent(out, indentLevel);
     out.write(']');
   }

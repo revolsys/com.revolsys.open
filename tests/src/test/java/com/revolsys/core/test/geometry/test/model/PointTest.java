@@ -180,8 +180,10 @@ public class PointTest implements TestConstants {
       }
       final GeometryFactory geometryFactory = GeometryFactory.fixed(EpsgId.nad83Utm(10), axisCount,
         GeometryFactory.newScalesFixed(axisCount, 1000.0));
-      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(EpsgId.nad83Utm(10), axisCount + 1);
-      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(EpsgId.nad83Utm(10), axisCountLess);
+      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(EpsgId.nad83Utm(10),
+        axisCount + 1);
+      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(EpsgId.nad83Utm(10),
+        axisCountLess);
       final double[] coordinatesExtra = new double[axisCount + 1];
       final double[] coordinates = new double[axisCount];
       final double[] coordinatesLess = new double[axisCountLess];

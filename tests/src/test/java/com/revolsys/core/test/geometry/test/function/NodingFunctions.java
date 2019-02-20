@@ -42,7 +42,8 @@ public class NodingFunctions {
     int index = 0;
     for (final Iterator i = segStrings.iterator(); i.hasNext();) {
       final SegmentString ss = (SegmentString)i.next();
-      final LineString line = FunctionsUtil.getFactoryOrDefault(null).lineString(ss.getLineString());
+      final LineString line = FunctionsUtil.getFactoryOrDefault(null)
+        .lineString(ss.getLineString());
       lines[index++] = line;
     }
     return FunctionsUtil.getFactoryOrDefault(null).lineal(lines);

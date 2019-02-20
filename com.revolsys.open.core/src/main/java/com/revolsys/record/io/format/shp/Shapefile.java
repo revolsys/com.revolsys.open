@@ -33,7 +33,7 @@ public class Shapefile extends AbstractRecordIoFactory implements RecordWriterFa
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory, MapEx properties) {
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
     try {
       return new ShapefileRecordReader(resource, recordFactory);
     } catch (final IOException e) {

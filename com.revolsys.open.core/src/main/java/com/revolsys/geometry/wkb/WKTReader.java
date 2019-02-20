@@ -541,7 +541,8 @@ public class WKTReader {
   }
 
   /*
-   * private MultiPoint OLDreadMultiPointText() throws IOException, ParseException { return
+   * private MultiPoint OLDreadMultiPointText() throws IOException,
+   * ParseException { return
    * geometryFactory.multiPoint(toPoints(getCoordinates())); }
    */
 

@@ -286,8 +286,9 @@ public abstract class LineIntersector {
   }
 
   /*
-   * public String toString() { String str = inputLines[0][0] + "-" + inputLines[0][1] + " " +
-   * inputLines[1][0] + "-" + inputLines[1][1] + " : " + getTopologySummary(); return str; }
+   * public String toString() { String str = inputLines[0][0] + "-" +
+   * inputLines[0][1] + " " + inputLines[1][0] + "-" + inputLines[1][1] + " : "
+   * + getTopologySummary(); return str; }
    */
 
   /**

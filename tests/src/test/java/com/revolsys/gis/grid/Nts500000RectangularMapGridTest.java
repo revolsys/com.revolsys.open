@@ -1,7 +1,6 @@
 package com.revolsys.gis.grid;
 
-public class Nts500000RectangularMapGridTest extends
-  Nts1000000RectangularMapGridTest {
+public class Nts500000RectangularMapGridTest extends Nts1000000RectangularMapGridTest {
   private static final RectangularMapGrid GRID = new Nts500000RectangularMapGrid();
 
   private static final double TILE_HEIGHT = NtsConstants.HEIGHT_500000;
@@ -9,9 +8,7 @@ public class Nts500000RectangularMapGridTest extends
   private static final double TILE_WIDTH = NtsConstants.WIDTH_500000;
 
   @Override
-  protected void doTestNts1000000ByName(
-    final String parentTileName,
-    final double parentLon,
+  protected void doTestNts1000000ByName(final String parentTileName, final double parentLon,
     final double parentLat) {
     for (int v = 0; v <= 1; v++) {
       double lat = parentLat;
@@ -32,8 +29,7 @@ public class Nts500000RectangularMapGridTest extends
           eastWest = 'E';
         }
 
-        final String tileName = parentTileName + northSouth + "." + eastWest
-          + ".";
+        final String tileName = parentTileName + northSouth + "." + eastWest + ".";
 
         checkTileByName(GRID, tileName, lon, lat, TILE_WIDTH, TILE_HEIGHT);
       }

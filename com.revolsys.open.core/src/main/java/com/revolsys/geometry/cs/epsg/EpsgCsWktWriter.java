@@ -59,6 +59,22 @@ public class EpsgCsWktWriter {
     }
   }
 
+  public static void write(final PrintWriter out, final Ellipsoid ellipsoid) {
+    if (ellipsoid != null) {
+      out.print(",SPHEROID[");
+      write(out, ellipsoid.getName());
+      out.write(',');
+      final double semiMajorAxis = ellipsoid.getSemiMajorAxis();
+      write(out, semiMajorAxis);
+      out.print(',');
+      final double inverseFlattening = ellipsoid.getInverseFlattening();
+      write(out, inverseFlattening);
+      final Authority authority = ellipsoid.getAuthority();
+      write(out, authority);
+      out.write(']');
+    }
+  }
+
   public static void write(final PrintWriter out, final GeodeticDatum geodeticDatum) {
     if (geodeticDatum != null) {
       out.print(",DATUM[");
@@ -155,22 +171,6 @@ public class EpsgCsWktWriter {
         write(out, unit);
       }
       final Authority authority = coordinateSystem.getAuthority();
-      write(out, authority);
-      out.write(']');
-    }
-  }
-
-  public static void write(final PrintWriter out, final Ellipsoid ellipsoid) {
-    if (ellipsoid != null) {
-      out.print(",SPHEROID[");
-      write(out, ellipsoid.getName());
-      out.write(',');
-      final double semiMajorAxis = ellipsoid.getSemiMajorAxis();
-      write(out, semiMajorAxis);
-      out.print(',');
-      final double inverseFlattening = ellipsoid.getInverseFlattening();
-      write(out, inverseFlattening);
-      final Authority authority = ellipsoid.getAuthority();
       write(out, authority);
       out.write(']');
     }

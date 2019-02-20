@@ -81,6 +81,11 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
   protected double minY;
 
   private final LinearRing ring = new LinearRing() {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public LinearRing clone() {
       return this;

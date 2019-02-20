@@ -34,7 +34,7 @@ public class Channels {
       }
     } else {
       long ofset = 0;
-      int blockSize = 8196;
+      final int blockSize = 8196;
       while (ofset < size) {
         long remaining = size - ofset;
         long readCount;

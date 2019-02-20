@@ -82,14 +82,18 @@ public class TriPredicate {
     final DD cx = new DD(c.getX());
     final DD cy = new DD(c.getY());
 
-    final DD aTerm = ax.multiply(ax).add(ay.multiply(ay)).multiply(
-      triAreaDD(bx, by, cx, cy, px, py));
-    final DD bTerm = bx.multiply(bx).add(by.multiply(by)).multiply(
-      triAreaDD(ax, ay, cx, cy, px, py));
-    final DD cTerm = cx.multiply(cx).add(cy.multiply(cy)).multiply(
-      triAreaDD(ax, ay, bx, by, px, py));
-    final DD pTerm = px.multiply(px).add(py.multiply(py)).multiply(
-      triAreaDD(ax, ay, bx, by, cx, cy));
+    final DD aTerm = ax.multiply(ax)
+      .add(ay.multiply(ay))
+      .multiply(triAreaDD(bx, by, cx, cy, px, py));
+    final DD bTerm = bx.multiply(bx)
+      .add(by.multiply(by))
+      .multiply(triAreaDD(ax, ay, cx, cy, px, py));
+    final DD cTerm = cx.multiply(cx)
+      .add(cy.multiply(cy))
+      .multiply(triAreaDD(ax, ay, bx, by, px, py));
+    final DD pTerm = px.multiply(px)
+      .add(py.multiply(py))
+      .multiply(triAreaDD(ax, ay, bx, by, cx, cy));
 
     final DD sum = aTerm.subtract(bTerm).add(cTerm).subtract(pTerm);
     final boolean isInCircle = sum.doubleValue() > 0;
@@ -124,8 +128,9 @@ public class TriPredicate {
     final DD blift = bdx.multiply(bdx).selfSubtract(bdy.multiply(bdy));
     final DD clift = cdx.multiply(cdx).selfSubtract(cdy.multiply(cdy));
 
-    final DD sum = alift.selfMultiply(bcdet).selfAdd(blift.selfMultiply(cadet)).selfAdd(
-      clift.selfMultiply(abdet));
+    final DD sum = alift.selfMultiply(bcdet)
+      .selfAdd(blift.selfMultiply(cadet))
+      .selfAdd(clift.selfMultiply(abdet));
 
     final boolean isInCircle = sum.doubleValue() > 0;
 
@@ -175,17 +180,20 @@ public class TriPredicate {
    */
   public static DD triAreaDD(final DD ax, final DD ay, final DD bx, final DD by, final DD cx,
     final DD cy) {
-    return bx.subtract(ax).multiply(cy.subtract(ay)).subtract(
-      by.subtract(ay).multiply(cx.subtract(ax)));
+    return bx.subtract(ax)
+      .multiply(cy.subtract(ay))
+      .subtract(by.subtract(ay).multiply(cx.subtract(ax)));
   }
 
   public static DD triAreaDD2(final Point a, final Point b, final Point c) {
 
-    final DD t1 = DD.valueOf(b.getX()).selfSubtract(a.getX()).selfMultiply(
-      DD.valueOf(c.getY()).selfSubtract(a.getY()));
+    final DD t1 = DD.valueOf(b.getX())
+      .selfSubtract(a.getX())
+      .selfMultiply(DD.valueOf(c.getY()).selfSubtract(a.getY()));
 
-    final DD t2 = DD.valueOf(b.getY()).selfSubtract(a.getY()).selfMultiply(
-      DD.valueOf(c.getX()).selfSubtract(a.getX()));
+    final DD t2 = DD.valueOf(b.getY())
+      .selfSubtract(a.getY())
+      .selfMultiply(DD.valueOf(c.getX()).selfSubtract(a.getX()));
 
     return t1.selfSubtract(t2);
   }

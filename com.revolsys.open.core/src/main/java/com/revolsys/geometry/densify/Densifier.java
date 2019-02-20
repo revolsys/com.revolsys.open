@@ -104,7 +104,7 @@ public class Densifier {
     }
     final GeometryFactory geometryFactory = polygonal.getGeometryFactory();
     final Polygonal newMultiPolygon = geometryFactory.polygonal(polygons);
-    return (Polygonal)newMultiPolygon.buffer(0);
+    return newMultiPolygon.buffer(0);
   }
 
   /**

@@ -401,8 +401,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
           if (value instanceof Geometry) {
             Geometry geometry = (Geometry)value;
             if (!this.allowCustomCoordinateSystem) {
-              final GeometryFactory wgs84 = geometryFactory
-                .convertSrid(EpsgId.WGS84);
+              final GeometryFactory wgs84 = geometryFactory.convertSrid(EpsgId.WGS84);
               geometry = geometry.convertGeometry(wgs84);
             }
             geometry(geometry);

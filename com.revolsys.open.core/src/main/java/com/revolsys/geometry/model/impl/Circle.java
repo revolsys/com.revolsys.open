@@ -36,6 +36,7 @@ public class Circle extends PointDoubleXY {
     return this.radius;
   }
 
+  @Override
   public Geometry toGeometry() {
     return buffer(this.radius);
   }

@@ -75,8 +75,8 @@ import com.revolsys.math.Angle;
  */
 public class MinimumBoundingCircle {
   /*
-   * The algorithm used is based on the one by Jon Rokne in the article "An Easy Bounding Circle" in
-   * <i>Graphic Gems II</i>.
+   * The algorithm used is based on the one by Jon Rokne in the article
+   * "An Easy Bounding Circle" in <i>Graphic Gems II</i>.
    */
 
   /**

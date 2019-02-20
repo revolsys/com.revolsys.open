@@ -105,9 +105,10 @@ public class BoundaryOp {
   }
 
   /*
-   * // MD - superseded private Point[] computeBoundaryFromGeometryGraph(MultiLineString mLine) {
-   * GeometryGraph g = new GeometryGraph(0, mLine, bnRule); Point[] bdyPts = g.getBoundaryPoints();
-   * return bdyPts; }
+   * // MD - superseded private Point[]
+   * computeBoundaryFromGeometryGraph(MultiLineString mLine) { GeometryGraph g =
+   * new GeometryGraph(0, mLine, bnRule); Point[] bdyPts =
+   * g.getBoundaryPoints(); return bdyPts; }
    */
 
   private Geometry boundaryMultiLineString(final Lineal mLine) {

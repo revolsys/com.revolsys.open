@@ -253,7 +253,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     final List<Geometry> geometries = new ArrayList<>(this.points);
     final GeometryFactory geometryFactory = getGeometryFactory();
     final List<Point> points = new ArrayList<>();
-    final Consumer<Edge<LineSegment>> action = new Consumer<Edge<LineSegment>>() {
+    final Consumer<Edge<LineSegment>> action = new Consumer<>() {
       private Node<LineSegment> previousNode = null;
 
       @Override

@@ -18,6 +18,11 @@ import com.revolsys.util.function.Function4Double;
 public class AbstractDelegatingLineString extends AbstractLineString
   implements DelegatingLineString {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   protected final LineString line;
 
   public AbstractDelegatingLineString(final LineString line) {
@@ -55,19 +60,20 @@ public class AbstractDelegatingLineString extends AbstractLineString
   }
 
   @Override
+  public void forEachVertex(final Consumer3Double action) {
+    this.line.forEachVertex(action);
+  }
+
+  @Override
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     this.line.forEachVertex(coordinatesOperation, point, action);
   }
 
   @Override
-  public void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
     this.line.forEachVertex(coordinates, action);
-  }
-
-  @Override
-  public void forEachVertex(final Consumer3Double action) {
-    this.line.forEachVertex(action);
   }
 
   @Override

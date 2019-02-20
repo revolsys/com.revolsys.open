@@ -98,14 +98,16 @@ public final class UrlUtil {
                   } else {
                     query.append('&');
                   }
-                  query.append(name).append('=').append(
-                    URLEncoder.encode(childValue.toString(), "US-ASCII"));
+                  query.append(name)
+                    .append('=')
+                    .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
                 }
               }
 
             } else {
-              query.append(name).append('=').append(
-                URLEncoder.encode(value.toString(), "US-ASCII"));
+              query.append(name)
+                .append('=')
+                .append(URLEncoder.encode(value.toString(), "US-ASCII"));
             }
           } catch (final UnsupportedEncodingException e) {
             throw new Error(e);
@@ -141,8 +143,9 @@ public final class UrlUtil {
               } else {
                 query.append('&');
               }
-              query.append(name).append('=').append(
-                URLEncoder.encode(childValue.toString(), "US-ASCII"));
+              query.append(name)
+                .append('=')
+                .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
             }
           }
 
@@ -163,8 +166,9 @@ public final class UrlUtil {
    * @return
    */
   public static String cleanPath(final String url) {
-    return url.replaceAll("/+", "/").replaceAll("^((\\w)+:)/", "$1//").replaceAll("^file://",
-      "file:///");
+    return url.replaceAll("/+", "/")
+      .replaceAll("^((\\w)+:)/", "$1//")
+      .replaceAll("^file://", "file:///");
   }
 
   public static String getContent(final String urlString) {

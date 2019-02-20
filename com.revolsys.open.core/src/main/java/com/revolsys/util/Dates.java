@@ -359,8 +359,8 @@ public interface Dates {
         final Timestamp time = new Timestamp(timeInMillis);
         if (nanoSecond != 0) {
           BigDecimal number = new BigDecimal("0." + nanoSecond);
-          number = number.multiply(BigDecimal.valueOf(1000000000)).setScale(0,
-            RoundingMode.HALF_DOWN);
+          number = number.multiply(BigDecimal.valueOf(1000000000))
+            .setScale(0, RoundingMode.HALF_DOWN);
           nanoSecond = number.intValue();
           time.setNanos(nanoSecond);
         }

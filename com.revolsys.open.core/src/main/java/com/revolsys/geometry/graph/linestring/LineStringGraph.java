@@ -121,7 +121,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       "INDEX");
     final List<LineString> lines = new ArrayList<>();
     final List<Point> points = new ArrayList<>();
-    final Consumer<Edge<LineSegment>> action = new Consumer<Edge<LineSegment>>() {
+    final Consumer<Edge<LineSegment>> action = new Consumer<>() {
       private Node<LineSegment> previousNode = null;
 
       @Override

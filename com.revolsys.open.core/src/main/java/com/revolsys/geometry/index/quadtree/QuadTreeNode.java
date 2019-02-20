@@ -61,8 +61,8 @@ public class QuadTreeNode<T> extends AbstractQuadTreeNode<T> {
 
       int i = 0;
       for (final double[] itemBounds : this.boundingBoxes) {
-        if (RectangleUtil.intersects(itemBounds[0], itemBounds[1], itemBounds[2], itemBounds[3],
-          x, y)) {
+        if (RectangleUtil.intersects(itemBounds[0], itemBounds[1], itemBounds[2], itemBounds[3], x,
+          y)) {
           final T item = this.items.get(i);
           action.accept(item);
         }

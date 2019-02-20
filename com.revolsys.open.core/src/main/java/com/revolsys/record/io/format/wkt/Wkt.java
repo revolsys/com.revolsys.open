@@ -28,7 +28,7 @@ public class Wkt extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> factory, MapEx properties) {
+    final RecordFactory<? extends Record> factory, final MapEx properties) {
     return new WktRecordReader(factory, resource);
   }
 

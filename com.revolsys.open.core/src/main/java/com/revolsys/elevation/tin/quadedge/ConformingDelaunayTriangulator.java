@@ -478,10 +478,10 @@ public class ConformingDelaunayTriangulator extends QuadEdgeDelaunayTinBuilder {
   }
 
   /*
-   * private List findMissingConstraints() { List missingSegs = new ArrayList(); for (int i = 0; i <
-   * segments.size(); i++) { Segment s = (Segment) segments.get(i); QuadEdge q =
-   * subdiv.locate(s.getStart(), s.getEnd()); if (q == null) missingSegs.add(s); } return
-   * missingSegs; }
+   * private List findMissingConstraints() { List missingSegs = new ArrayList();
+   * for (int i = 0; i < segments.size(); i++) { Segment s = (Segment)
+   * segments.get(i); QuadEdge q = subdiv.locate(s.getStart(), s.getEnd()); if
+   * (q == null) missingSegs.add(s); } return missingSegs; }
    */
 
   /**

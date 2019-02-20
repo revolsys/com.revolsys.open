@@ -76,7 +76,7 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
    */
   static RecordReader newRecordReader(final Object source,
     final RecordFactory<? extends Record> recordFactory) {
-    return newRecordReader(source, recordFactory, LinkedHashMapEx.EMPTY);
+    return newRecordReader(source, recordFactory, MapEx.EMPTY);
   }
 
   static RecordReader newRecordReader(final Object source,

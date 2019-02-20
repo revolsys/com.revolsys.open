@@ -51,7 +51,7 @@ public class CustomUnits extends AbstractSystemOfUnits {
   public static final Unit<Length> GOLD_COAST_FOOT = addUnit(
     Units.METRE.multiply(6378300).divide(20926201), "Gold Coast foot", "ft");
 
-  public static final Unit<Angle> GRAD = addUnit(new TransformedUnit<Angle>(RADIAN,
+  public static final Unit<Angle> GRAD = addUnit(new TransformedUnit<>(RADIAN,
     new PiMultiplierConverter().concatenate(new RationalConverter(1, 200))), "Grad", "grad");
 
   public static final Unit<Length> INDIAN_YARD = addUnit(Units.METRE.multiply(36).divide(39.370142),

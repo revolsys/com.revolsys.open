@@ -12,7 +12,8 @@ public class RectangleUtil {
   public static void clipLine(final double minX, final double minY, final double maxX,
     final double maxY, double lineX1, double lineY1, double lineX2, double lineY2,
     final Consumer4Double action) {
-    // compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
+    // compute outcodes for P0, P1, and whatever point lies outside the clip
+    // rectangle
     int outcode1 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
     int outcode2 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
     boolean accept = false;
@@ -22,7 +23,8 @@ public class RectangleUtil {
         // Bitwise OR is 0. Trivially accept and get out of loop
         accept = true;
       } else if ((outcode1 & outcode2) != 0) {
-        // Bitwise AND is not 0. (implies both end points are in the same region outside the
+        // Bitwise AND is not 0. (implies both end points are in the same region
+        // outside the
         // window). Reject and get out of loop
         return;
       } else {
@@ -45,15 +47,18 @@ public class RectangleUtil {
           final double ratio = (maxY - lineY1) / deltaY;
           x = lineX1 + deltaX * ratio;
           y = maxY;
-        } else if (OutCode.isBottom(outcodeOut)) { // point is below the clip rectangle
+        } else if (OutCode.isBottom(outcodeOut)) { // point is below the clip
+                                                   // rectangle
           final double ratio = (minY - lineY1) / deltaY;
           x = lineX2 + deltaX * ratio;
           y = minY;
-        } else if (OutCode.isRight(outcodeOut)) { // point is to the right of clip
+        } else if (OutCode.isRight(outcodeOut)) { // point is to the right of
+                                                  // clip
           final double ratio = (maxX - lineX1) / deltaX;
           x = maxX;
           y = lineY1 + deltaY * ratio;
-        } else if (OutCode.isLeft(outcodeOut)) { // point is to the left of clip rectangle
+        } else if (OutCode.isLeft(outcodeOut)) { // point is to the left of clip
+                                                 // rectangle
           final double ratio = (minX - lineX1) / deltaX;
           x = minX;
           y = lineY1 + deltaY * ratio;
@@ -83,7 +88,8 @@ public class RectangleUtil {
   public static void clipLine(final double minX, final double minY, final double maxX,
     final double maxY, double lineX1, double lineY1, double lineZ1, double lineX2, double lineY2,
     double lineZ2, final Consumer6Double action) {
-    // compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
+    // compute outcodes for P0, P1, and whatever point lies outside the clip
+    // rectangle
     int outcode1 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX1, lineY1);
     int outcode2 = OutCode.getOutcode(minX, minY, maxX, maxY, lineX2, lineY2);
     boolean accept = false;
@@ -93,7 +99,8 @@ public class RectangleUtil {
         // Bitwise OR is 0. Trivially accept and get out of loop
         accept = true;
       } else if ((outcode1 & outcode2) != 0) {
-        // Bitwise AND is not 0. (implies both end points are in the same region outside the
+        // Bitwise AND is not 0. (implies both end points are in the same region
+        // outside the
         // window). Reject and get out of loop
         return;
       } else {
@@ -118,18 +125,21 @@ public class RectangleUtil {
           x = lineX1 + deltaX * ratio;
           y = maxY;
           z = lineZ1 + deltaX * ratio;
-        } else if (OutCode.isBottom(outcodeOut)) { // point is below the clip rectangle
+        } else if (OutCode.isBottom(outcodeOut)) { // point is below the clip
+                                                   // rectangle
           final double ratio = (minY - lineY1) / deltaY;
           x = lineX2 + deltaX * ratio;
           y = minY;
           z = lineZ1 + deltaX * ratio;
-        } else if (OutCode.isRight(outcodeOut)) { // point is to the right of clip
+        } else if (OutCode.isRight(outcodeOut)) { // point is to the right of
+                                                  // clip
                                                   // rectangle
           final double ratio = (maxX - lineX1) / deltaX;
           y = lineY1 + deltaY * ratio;
           x = maxX;
           z = lineZ1 + deltaY * ratio;
-        } else if (OutCode.isLeft(outcodeOut)) { // point is to the left of clip rectangle
+        } else if (OutCode.isLeft(outcodeOut)) { // point is to the left of clip
+                                                 // rectangle
           final double ratio = (minX - lineX1) / deltaX;
           y = lineY1 + deltaY * ratio;
           x = minX;

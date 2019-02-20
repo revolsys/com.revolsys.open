@@ -8,6 +8,11 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 
 public class LineSegmentEditor extends LineSegmentDoubleGF {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final int axisCount;
 
   public LineSegmentEditor(final GeometryFactory geometryFactory) {

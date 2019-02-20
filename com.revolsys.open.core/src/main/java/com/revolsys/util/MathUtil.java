@@ -634,9 +634,9 @@ public interface MathUtil {
 
     // otherwise use comgraphics.algorithms Frequently Asked Questions method
     /*
-     * (1) AC dot AB r = --------- ||AB||^2 r has the following meaning: r=0 P = A r=1 P = B r<0 P
-     * is on the backward extension of AB r>1 P is on the forward extension of AB 0<r<1 P is
-     * interior to AB
+     * (1) AC dot AB r = --------- ||AB||^2 r has the following meaning: r=0 P =
+     * A r=1 P = B r<0 P is on the backward extension of AB r>1 P is on the
+     * forward extension of AB 0<r<1 P is interior to AB
      */
 
     final double r = ((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1))
@@ -650,8 +650,8 @@ public interface MathUtil {
     }
 
     /*
-     * (2) (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) s = ----------------------------- L^2 Then the distance
-     * from C to P = |s|*L.
+     * (2) (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) s = ----------------------------- L^2
+     * Then the distance from C to P = |s|*L.
      */
 
     final double s = ((y1 - y) * (x2 - x1) - (x1 - x) * (y2 - y1))

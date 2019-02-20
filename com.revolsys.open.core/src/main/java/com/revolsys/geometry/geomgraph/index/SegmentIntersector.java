@@ -264,17 +264,6 @@ public class SegmentIntersector {
     return false;
   }
 
-  /**
-   * A trivial intersection is an apparent self-intersection which in fact
-   * is simply the point shared by adjacent line segments.
-   * Note that closed edges require a special check for the point shared by the beginning
-   * and end segments.
-   */
-  private boolean isTrivialIntersection(final Edge e0, final int segIndex0, final Edge e1,
-    final int segIndex1) {
-    return false;
-  }
-
   public void setBoundaryNodes(final Collection<Node> boundaryNodes1,
     final Collection<Node> boundaryNodes2) {
     this.boundaryNodes1 = boundaryNodes1;

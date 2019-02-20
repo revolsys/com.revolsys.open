@@ -12,6 +12,11 @@ import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   final List<RStarNode<T>> items;
 
   boolean hasLeaves;

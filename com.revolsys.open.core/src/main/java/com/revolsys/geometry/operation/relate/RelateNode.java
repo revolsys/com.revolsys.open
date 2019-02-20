@@ -42,6 +42,11 @@ import com.revolsys.geometry.model.IntersectionMatrix;
  */
 public class RelateNode extends Node {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public RelateNode(final double x, final double y, final EdgeEndBundleStar edges) {
     super(x, y, edges);
   }

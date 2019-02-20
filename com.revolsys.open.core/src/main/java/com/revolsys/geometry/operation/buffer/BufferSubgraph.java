@@ -70,6 +70,11 @@ import com.revolsys.util.function.BiConsumerDouble;
  * @version 1.7
  */
 class BufferSubgraph extends BoundingBoxDoubleXY implements Comparable {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final List<DirectedEdge> dirEdgeList = new ArrayList<>();
 
   private final RightmostEdgeFinder finder;
@@ -268,16 +273,13 @@ class BufferSubgraph extends BoundingBoxDoubleXY implements Comparable {
     }
   }
 
-  public List<DirectedEdge> getDirectedEdges() {
-    return this.dirEdgeList;
-  }
-
   /**
    * Computes the envelope of the edges in the subgraph.
    * The envelope is cached after being computed.
    *
    * @return the envelope of the graph.
    */
+  @Override
   public BoundingBox getBoundingBox() {
     if (isEmpty()) {
       for (final DirectedEdge dirEdge : this.dirEdgeList) {
@@ -288,6 +290,10 @@ class BufferSubgraph extends BoundingBoxDoubleXY implements Comparable {
       }
     }
     return this;
+  }
+
+  public List<DirectedEdge> getDirectedEdges() {
+    return this.dirEdgeList;
   }
 
   public List<Node> getNodes() {

@@ -143,8 +143,8 @@ public class MapPageable implements Pageable {
       - pageXOffset;
     final double y = startY + row * this.modelGridSizeMetres * this.coreCellsPerHeight
       - pageYOffset;
-    final BoundingBox pageBoundingBox = this.map.getGeometryFactory().newBoundingBox(x, y,
-      x + this.modelPageWidth, y + this.modelPageHeight);
+    final BoundingBox pageBoundingBox = this.map.getGeometryFactory()
+      .newBoundingBox(x, y, x + this.modelPageWidth, y + this.modelPageHeight);
     return new MapPrintable(this.map, column, this.numYPages - row, pageBoundingBox,
       this.contentRect, this.dpi, this.rulerSizePixels, this.modelGridSizeMetres, this.scale);
   }

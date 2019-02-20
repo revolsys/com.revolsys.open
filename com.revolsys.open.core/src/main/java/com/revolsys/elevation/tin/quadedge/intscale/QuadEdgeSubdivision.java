@@ -398,10 +398,11 @@ public class QuadEdgeSubdivision {
     final int x = vertex.getX();
     final int y = vertex.getY();
     /*
-     * This code is based on Guibas and Stolfi (1985), with minor modifications and a bug fix from
-     * Dani Lischinski (Graphic Gems 1993). (The modification I believe is the test for the inserted
-     * site falling exactly on an existing edge. Without this test zero-width triangles have been
-     * observed to be created)
+     * This code is based on Guibas and Stolfi (1985), with minor modifications
+     * and a bug fix from Dani Lischinski (Graphic Gems 1993). (The modification
+     * I believe is the test for the inserted site falling exactly on an
+     * existing edge. Without this test zero-width triangles have been observed
+     * to be created)
      */
     QuadEdge edge = findQuadEdge(x, y);
 
@@ -430,8 +431,8 @@ public class QuadEdgeSubdivision {
     }
     final PointIntXYZ fromPoint = edgeFromPoint;
     /*
-     * Connect the new point to the vertices of the containing triangle (or quadrilateral, if the
-     * new point fell on an existing edge.)
+     * Connect the new point to the vertices of the containing triangle (or
+     * quadrilateral, if the new point fell on an existing edge.)
      */
     this.edgeCount++;
     final QuadEdge base = new QuadEdge(fromPoint, vertex);

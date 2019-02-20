@@ -1011,8 +1011,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, Serializa
   }
 
   public boolean equalsScales(final double[] scales) {
-    for (int i = 0; i < scales.length; i++) {
-      final double scale2 = scales[i];
+    for (final double scale2 : scales) {
       if (0 != scale2) {
         return false;
       }

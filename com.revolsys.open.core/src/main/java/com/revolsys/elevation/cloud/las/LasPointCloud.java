@@ -33,6 +33,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.html.HtmlWriter;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Pair;
 
@@ -330,7 +331,7 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   public void writeHtml(final HtmlWriter writer) {
     writer.divClass("las");
-    writer.attribute(HtmlWriter.CLASS, "las");
+    writer.attribute(HtmlAttr.CLASS, "las");
     this.header.writeHtml(writer);
     if (this.classificationsLoaded) {
       writer.h2("Classifications");

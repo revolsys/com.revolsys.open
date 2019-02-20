@@ -366,7 +366,8 @@ public class ConvexHull {
         }
       }
 
-      // ensure that computed array has at least 3 points (not necessarily unique)
+      // ensure that computed array has at least 3 points (not necessarily
+      // unique)
       if (reducedSet.size() < 3) {
         return padArray3(reducedSet);
       } else {

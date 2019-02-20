@@ -56,8 +56,6 @@ public class TiledGriddedElevationModelLayer
 
   private final int minResolution = 1;
 
-  private BufferedGeoreferencedImage renderImage;
-
   public TiledGriddedElevationModelLayer() {
     super("tiledGriddedElevationModelLayer");
     setIcon("gridded_dem");

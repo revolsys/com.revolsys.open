@@ -470,7 +470,8 @@ public class Ellipsoid implements Serializable {
     final double s12 = distanceMetresRadians(λ1, φ1, λ2, φ2);
 
     // Always 0 as dh = 0
-    final double c1 = 0;// (-(xsi) * Math.sin(a12) + eta * Math.cos(a12)) * 0 / sqrt(ssq - 0 * 0);
+    final double c1 = 0;// (-(xsi) * Math.sin(a12) + eta * Math.cos(a12)) * 0 /
+                        // sqrt(ssq - 0 * 0);
 
     final double cosPhi2 = Math.cos(φ2);
     final double c2 = h2 / mm * esq * Math.sin(a12) * Math.cos(a12) * (cosPhi2 * cosPhi2);
@@ -731,12 +732,14 @@ public class Ellipsoid implements Serializable {
     final double s12 = distanceMetresRadians(λ1, φ1, λ2, φ2);
     final double a12 = azimuthRadians(λ1, φ1, λ2, φ2);
 
-    // final double slopeDistance = this.slopeDistanceRadians(λ1, φ1, h1, λ2, φ2, h2,
+    // final double slopeDistance = this.slopeDistanceRadians(λ1, φ1, h1, λ2,
+    // φ2, h2,
     // x0,
     // y0, z0);
 
     // final double dh = 0;
-    final double c1 = 0;// (-xsi * Math.sin(a12) + eta * Math.cos(a12)) * dh / Math.sqrt(ssq - dh *
+    final double c1 = 0;// (-xsi * Math.sin(a12) + eta * Math.cos(a12)) * dh /
+                        // Math.sqrt(ssq - dh *
                         // dh);
 
     final double cosPhi2 = Math.cos(φ2);

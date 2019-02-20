@@ -161,10 +161,11 @@ public abstract class AbstractIndexedLineTest extends TestCase {
   }
 
   /*
-   * // example of indicesOfThenLocate method private Geometry indicesOfThenLocate(LineString input,
-   * LineString subLine) { LocationIndexedLine indexedLine = new LocationIndexedLine(input);
-   * LineStringLocation[] loc = indexedLine.indicesOf(subLine); Geometry result =
-   * indexedLine.locate(loc[0], loc[1]); return result; }
+   * // example of indicesOfThenLocate method private Geometry
+   * indicesOfThenLocate(LineString input, LineString subLine) {
+   * LocationIndexedLine indexedLine = new LocationIndexedLine(input);
+   * LineStringLocation[] loc = indexedLine.indicesOf(subLine); Geometry result
+   * = indexedLine.locate(loc[0], loc[1]); return result; }
    */
 
   public void testOffsetStartPoint() {

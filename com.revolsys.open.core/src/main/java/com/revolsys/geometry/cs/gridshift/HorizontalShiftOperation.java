@@ -5,10 +5,10 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 
 public interface HorizontalShiftOperation extends CoordinatesOperation {
 
+  boolean horizontalShift(CoordinatesOperationPoint point);
+
   @Override
   default void perform(final CoordinatesOperationPoint point) {
     horizontalShift(point);
   }
-
-  boolean horizontalShift(CoordinatesOperationPoint point);
 }

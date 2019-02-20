@@ -20,6 +20,5 @@ public interface GriddedElevationModelReaderFactory extends GeoidModelReaderFact
     }
   }
 
-  GriddedElevationModelReader newGriddedElevationModelReader(Resource resource,
-    MapEx properties);
+  GriddedElevationModelReader newGriddedElevationModelReader(Resource resource, MapEx properties);
 }

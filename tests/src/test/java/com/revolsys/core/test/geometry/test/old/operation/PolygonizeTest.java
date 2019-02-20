@@ -87,10 +87,12 @@ public class PolygonizeTest extends TestCase {
 
   /*
    * public void test2() { doTest(new String[]{ "LINESTRING(20 20, 20 100)",
-   * "LINESTRING  (20 100, 20 180, 100 180)", "LINESTRING  (100 180, 180 180, 180 100)",
+   * "LINESTRING  (20 100, 20 180, 100 180)",
+   * "LINESTRING  (100 180, 180 180, 180 100)",
    * "LINESTRING  (180 100, 180 20, 100 20)", "LINESTRING  (100 20, 20 20)",
    * "LINESTRING  (100 20, 20 100)", "LINESTRING  (20 100, 100 180)",
-   * "LINESTRING  (100 180, 180 100)", "LINESTRING  (180 100, 100 20)" }, new String[]{}); }
+   * "LINESTRING  (100 180, 180 100)", "LINESTRING  (180 100, 100 20)" }, new
+   * String[]{}); }
    */
 
   public void test1() {

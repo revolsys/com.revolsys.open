@@ -29,7 +29,8 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
 
     for (final ProjectedCoordinateSystem projectedCoordinateSystem : EpsgCoordinateSystems
       .getProjectedCoordinateSystems()) {
-      final CoordinateOperationMethod coordinateOperationMethod = projectedCoordinateSystem.getCoordinateOperationMethod();
+      final CoordinateOperationMethod coordinateOperationMethod = projectedCoordinateSystem
+        .getCoordinateOperationMethod();
       Maps.addToList(this.projectedCoordinateSystemsByProjection, coordinateOperationMethod,
         projectedCoordinateSystem);
     }

@@ -102,6 +102,7 @@ class OffsetSegmentString extends LineStringEditor {
     }
   }
 
+  @Override
   public void closeRing() {
     final int vertexCount = getVertexCount();
     if (vertexCount > 0) {

@@ -17,7 +17,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
 
 public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
@@ -317,7 +316,7 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       "Invalid Geometry header, expecting GP\n" + Arrays.toString(data));
   }
 
-
+  @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
     final int parameterIndex, final Object value) throws SQLException {
     final Object jdbcValue = getInsertUpdateValue(value);
@@ -329,7 +328,6 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     }
     return parameterIndex + 1;
   }
-  
 
   @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,

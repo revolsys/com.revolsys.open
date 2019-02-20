@@ -44,6 +44,11 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class Node extends GraphComponent implements Point {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final double x;
 
   private final double y;

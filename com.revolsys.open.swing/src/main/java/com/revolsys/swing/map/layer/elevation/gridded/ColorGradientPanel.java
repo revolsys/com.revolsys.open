@@ -10,6 +10,11 @@ import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationMo
 import com.revolsys.elevation.gridded.rasterizer.gradient.LinearGradient;
 
 public class ColorGradientPanel extends JPanel {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final ColorGradientGriddedElevationModelRasterizer rasterizer;
 
   public ColorGradientPanel(final ColorGradientGriddedElevationModelRasterizer rasterizer) {

@@ -11,10 +11,15 @@ import com.revolsys.swing.table.lambda.LambdaTableModel;
 
 public class ColorGradientStylePanel extends ValueField {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public ColorGradientStylePanel(final ColorGradientGriddedElevationModelRasterizer style) {
     super("gradient", null);
     final MultiStopLinearGradient gradient = (MultiStopLinearGradient)style.getGradient();
-    final LambdaTableModel<GradientStop> tableModel = new LambdaTableModel<GradientStop>(
+    final LambdaTableModel<GradientStop> tableModel = new LambdaTableModel<>(
       gradient.getStops());
 
     tableModel.addColumnIndex();

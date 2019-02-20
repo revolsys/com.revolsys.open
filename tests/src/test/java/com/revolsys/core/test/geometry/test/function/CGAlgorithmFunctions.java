@@ -43,9 +43,10 @@ public class CGAlgorithmFunctions {
         return g1.getGeometryFactory().point(ri.getIntersection(0));
       case 2:
         // return line
-        return g1.getGeometryFactory().lineString(new Point[] {
-          ri.getIntersection(0), ri.getIntersection(1)
-        });
+        return g1.getGeometryFactory()
+          .lineString(new Point[] {
+            ri.getIntersection(0), ri.getIntersection(1)
+          });
     }
     return null;
   }

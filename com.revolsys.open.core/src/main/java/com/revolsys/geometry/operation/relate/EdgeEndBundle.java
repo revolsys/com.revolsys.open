@@ -60,8 +60,8 @@ public class EdgeEndBundle extends EdgeEnd implements Iterable<EdgeEnd> {
     super(e.getEdge(), e.getX1(), e.getY1(), e.getX2(), e.getY2(), new Label(e.getLabel()));
     insert(e);
     /*
-     * if (boundaryNodeRule != null) this.boundaryNodeRule = boundaryNodeRule; else boundaryNodeRule
-     * = BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE;
+     * if (boundaryNodeRule != null) this.boundaryNodeRule = boundaryNodeRule;
+     * else boundaryNodeRule = BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE;
      */
   }
 

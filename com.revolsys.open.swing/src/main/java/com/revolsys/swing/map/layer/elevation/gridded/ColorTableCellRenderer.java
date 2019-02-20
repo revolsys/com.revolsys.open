@@ -10,6 +10,11 @@ import javax.swing.table.TableCellRenderer;
 
 public class ColorTableCellRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private Color color;
 
   @Override

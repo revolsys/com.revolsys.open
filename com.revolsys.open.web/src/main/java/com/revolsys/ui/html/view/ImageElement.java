@@ -43,7 +43,8 @@ public class ImageElement extends Element {
 
   /*
    * (non-Javadoc)
-   * @see com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml. XmlWriter )
+   * @see com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.
+   * XmlWriter )
    */
   @Override
   public void serializeElement(final XmlWriter out) {

@@ -63,8 +63,8 @@ public class SingularValueDecomposition implements java.io.Serializable {
     this.n = Arg.getColumnCount();
 
     /*
-     * Apparently the failing cases are only a proper subset of (m<n), so let's not throw error.
-     * Correct fix to come later? if (m<n) { throw new
+     * Apparently the failing cases are only a proper subset of (m<n), so let's
+     * not throw error. Correct fix to come later? if (m<n) { throw new
      * IllegalArgumentException("Jama SVD only works for m >= n"); }
      */
     final int nu = Math.min(this.m, this.n);

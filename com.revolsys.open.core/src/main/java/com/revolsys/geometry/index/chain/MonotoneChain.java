@@ -115,11 +115,11 @@ public class MonotoneChain {
 
       // the chains overlap, so split each in half and iterate (binary search)
       final int mid = (start + end) / 2;
-      LineString points = this.points;
+      final LineString points = this.points;
       final double midX = points.getX(mid);
       final double midY = points.getY(mid);
       final int cMid = (cStart + cEnd) / 2;
-      LineString chainPoints = chain.points;
+      final LineString chainPoints = chain.points;
       final double cMidX = chainPoints.getX(cMid);
       final double cMidY = chainPoints.getY(cMid);
 
@@ -146,11 +146,6 @@ public class MonotoneChain {
         }
       }
     }
-  }
-
-  private void computeOverlaps(final int start, final int end, final MonotoneChain chain,
-    final int cStart, final int cEnd, final MonotoneChainOverlapAction action) {
-
   }
 
   /**
@@ -200,7 +195,8 @@ public class MonotoneChain {
       // the chains overlap, so split each in half and iterate (binary search)
       final int mid = (start0 + end0) / 2;
 
-      // Assert: mid != start or end (since we checked above for end - start <= 1)
+      // Assert: mid != start or end (since we checked above for end - start <=
+      // 1)
       // check terminating conditions before recursing
       if (start0 < mid) {
         computeSelect(searchEnv, start0, mid, mcs);

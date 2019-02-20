@@ -31,7 +31,7 @@ public class MoepBinary extends AbstractRecordIoFactory {
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory, MapEx properties) {
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
     return new MoepBinaryReader(null, resource, recordFactory);
   }
 }

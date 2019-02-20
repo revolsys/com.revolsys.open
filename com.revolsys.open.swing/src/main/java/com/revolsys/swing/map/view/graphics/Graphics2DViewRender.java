@@ -36,8 +36,8 @@ import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
-import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
@@ -236,8 +236,8 @@ public class Graphics2DViewRender extends ViewRenderer {
       for (final Geometry part : geometry.geometries()) {
         if (Property.hasValue(label) && part != null || this == null) {
           final String textPlacementType = style.getTextPlacementType();
-          final PointDoubleXYOrientation point = TextStyleRenderer.getPointWithOrientation(this,
-            part, textPlacementType);
+          final PointDoubleXYOrientation point = AbstractRecordLayerRenderer
+            .getPointWithOrientation(this, part, textPlacementType);
           if (point != null) {
             double orientation;
             final String orientationType = style.getTextOrientationType();

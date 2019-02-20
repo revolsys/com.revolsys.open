@@ -253,8 +253,10 @@ public class LineStringTest {
       }
       final GeometryFactory geometryFactory = GeometryFactory.fixed(EpsgId.nad83Utm(10), axisCount,
         GeometryFactory.newScalesFixed(axisCount, 1000.0));
-      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(EpsgId.nad83Utm(10), axisCount + 1);
-      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(EpsgId.nad83Utm(10), axisCountLess);
+      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(EpsgId.nad83Utm(10),
+        axisCount + 1);
+      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(EpsgId.nad83Utm(10),
+        axisCountLess);
       final double[] coordinatesExtra = new double[axisCount + 1];
       final double[] coordinates = new double[axisCount];
       final double[] coordinatesLess = new double[axisCountLess];
@@ -357,7 +359,8 @@ public class LineStringTest {
 
   @Test
   public void testMerge() {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed3d(EpsgId.nad83Utm(10), 1.0, 1.0, 1.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed3d(EpsgId.nad83Utm(10), 1.0, 1.0,
+      1.0);
 
     // Last point is duplicated
     final LineString line1 = geometryFactory.lineString(3, START_X, START_Y, 0, START_X + 100,
@@ -420,7 +423,8 @@ public class LineStringTest {
 
   @Test
   public void testSplit() {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed3d(EpsgId.nad83Utm(10), 1000.0, 1000.0, 1.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed3d(EpsgId.nad83Utm(10), 1000.0,
+      1000.0, 1.0);
 
     // Last point is duplicated
     final LineString line = geometryFactory.lineString(3, START_X, START_Y, 0, START_X + 100,

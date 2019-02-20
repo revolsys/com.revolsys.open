@@ -87,8 +87,8 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  protected void renderRecords(final ViewRenderer view,
-    final AbstractRecordLayer layer, final List<LayerRecord> records) {
+  protected void renderRecords(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
     final Map<AbstractRecordLayerRenderer, List<LayerRecord>> rendererToRecordMap = new LinkedHashMap<>();
     final BoundingBox visibleArea = view.getBoundingBox();
     final double scaleForVisible = view.getScaleForVisible();
@@ -127,8 +127,8 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public void renderSelectedRecord(final ViewRenderer view,
-    final AbstractRecordLayer layer, final LayerRecord record) {
+  public void renderSelectedRecord(final ViewRenderer view, final AbstractRecordLayer layer,
+    final LayerRecord record) {
     if (isVisible(record)) {
       final double scaleForVisible = view.getScaleForVisible();
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {

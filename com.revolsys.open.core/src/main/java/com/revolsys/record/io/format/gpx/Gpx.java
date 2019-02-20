@@ -41,7 +41,7 @@ public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory 
    */
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory, MapEx properties) {
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
     try {
       return new GpxIterator(resource, recordFactory, null);
     } catch (final IOException e) {

@@ -303,8 +303,8 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     final double maxY = bounds[3];
     int level = computeQuadLevel(bounds);
     setBounds(minX, minY, newBounds, level);
-    while (!RectangleUtil.covers(newBounds[0], newBounds[1], newBounds[2], newBounds[3], minX,
-      minY, maxX, maxY)) {
+    while (!RectangleUtil.covers(newBounds[0], newBounds[1], newBounds[2], newBounds[3], minX, minY,
+      maxX, maxY)) {
       level++;
       setBounds(minX, minY, newBounds, level);
     }

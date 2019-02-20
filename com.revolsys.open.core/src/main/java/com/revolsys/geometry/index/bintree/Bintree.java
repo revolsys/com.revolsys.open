@@ -125,9 +125,10 @@ public class Bintree {
     // int oldSize = size();
     this.root.insert(insertInterval, item);
     /*
-     * DEBUG int newSize = size(); System.out.println("BinTree: size = " + newSize +
-     * "   node size = " + nodeSize()); if (newSize <= oldSize) { System.out.println("Lost item!");
-     * root.insert(insertInterval, item); System.out.println("reinsertion size = " + size()); }
+     * DEBUG int newSize = size(); System.out.println("BinTree: size = " +
+     * newSize + "   node size = " + nodeSize()); if (newSize <= oldSize) {
+     * System.out.println("Lost item!"); root.insert(insertInterval, item);
+     * System.out.println("reinsertion size = " + size()); }
      */
   }
 

@@ -12,6 +12,7 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.elevation.cloud.PointCloud;
@@ -57,7 +58,7 @@ public class TriangulationVisualization {
     transform.concatenate(AffineTransform.getTranslateInstance(-originX, -originY));
     SwingUtilities.invokeLater(() -> {
       final JFrame frame = new JFrame();
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
       frame.setSize(850, 850);
       frame.setVisible(true);
       frame.setLayout(new BorderLayout());
@@ -118,14 +119,17 @@ public class TriangulationVisualization {
                 g2.draw(ellipse);
               });
             }
-            // for (int vertexIndex = 0; vertexIndex < tin.getVertexCount(); vertexIndex++) {
+            // for (int vertexIndex = 0; vertexIndex < tin.getVertexCount();
+            // vertexIndex++) {
             // final Point point = tin.getVertex(vertexIndex);
             // final double x = point.getX();
             // final double y = point.getY();
             // final double size = 7;
             // final double half = size / 2;
-            // final Ellipse2D.Double shape = new Ellipse2D.Double(x - half / pixelsPerXUnit,
-            // y - half / pixelsPerXUnit, size / pixelsPerXUnit, size / pixelsPerXUnit);
+            // final Ellipse2D.Double shape = new Ellipse2D.Double(x - half /
+            // pixelsPerXUnit,
+            // y - half / pixelsPerXUnit, size / pixelsPerXUnit, size /
+            // pixelsPerXUnit);
             // g2.setPaint(WebColors.Yellow);
             // g2.fill(shape);
             // g2.setColor(WebColors.Black);
@@ -139,20 +143,23 @@ public class TriangulationVisualization {
             // final double y = point.getY();
             // final double size = 9;
             // final double half = size / 2;
-            // g2.fill(new Ellipse2D.Double(x - half / pixelsPerXUnit, y - half / pixelsPerXUnit,
+            // g2.fill(new Ellipse2D.Double(x - half / pixelsPerXUnit, y - half
+            // / pixelsPerXUnit,
             // size / pixelsPerXUnit, size / pixelsPerXUnit));
             // }
             // }
             // g2.setTransform(oldTransform);
             // g2.translate(0, 800);
             // g2.setPaint(WebColors.Green);
-            // for (int vertexIndex = 0; vertexIndex < tin.getVertexCount(); vertexIndex++) {
+            // for (int vertexIndex = 0; vertexIndex < tin.getVertexCount();
+            // vertexIndex++) {
             // final Point point = tin.getVertex(vertexIndex);
             // final double x = point.getX();
             // final double y = point.getY();
             // final int screenX = (int)((x + 2) * pixelsPerXUnit);
             // final int screenY = (int)((y + 2) * pixelsPerYUnit);
-            // g2.drawString(Integer.toString(vertexIndex), screenX + 5, screenY);
+            // g2.drawString(Integer.toString(vertexIndex), screenX + 5,
+            // screenY);
             // }
           }
         }
@@ -181,11 +188,13 @@ public class TriangulationVisualization {
   }
   //
   // public static void testDem() throws IOException {
-  // final GeometryFactory geometryFactory = GeometryFactory.fixed(3005, 1000.0);
+  // final GeometryFactory geometryFactory = GeometryFactory.fixed(3005,
+  // 1000.0);
   // final bcDemConfig config = new bcDemConfig();
   // final Path basePath = config.getBasePath();
   // final boolean processAll = false;
-  // final RecordDefinition extentRecordDefinition = new RecordDefinitionBuilder("extents") //
+  // final RecordDefinition extentRecordDefinition = new
+  // RecordDefinitionBuilder("extents") //
   // .addField("LETTER_BLOCK", DataTypes.STRING) //
   // .addField("POLYGON", DataTypes.POLYGON) //
   // .setGeometryFactory(geometryFactory) //
@@ -211,7 +220,8 @@ public class TriangulationVisualization {
   //
   // final Map<String, Object> properties = new HashMap<>();
   // properties.put(GriddedElevationModel.GEOMETRY_FACTORY, geometryFactory);
-  // properties.put(EsriFloatGridGriddedElevation.PROPERTY_READ_DATA, !processAll);
+  // properties.put(EsriFloatGridGriddedElevation.PROPERTY_READ_DATA,
+  // !processAll);
   //
   // final GriddedElevationModel sourceModel = GriddedElevationModel
   // .newGriddedElevationModel(demFile, properties);
@@ -226,9 +236,11 @@ public class TriangulationVisualization {
   // } else {
   // System.err.println(targetTile);
   // }
-  // final Path targetPath = config.getGriddedElevationModelPath(3005, 25, targetTile,
+  // final Path targetPath = config.getGriddedElevationModelPath(3005, 25,
+  // targetTile,
   // "asc");
-  // final GriddedElevationModel targetModel = config.getGriddedElevationModel(3005,
+  // final GriddedElevationModel targetModel =
+  // config.getGriddedElevationModel(3005,
   // 25, targetTile, "asc");
   // final int targetHeight = targetModel.getHeight();
   // final int targetWidth = targetModel.getWidth();

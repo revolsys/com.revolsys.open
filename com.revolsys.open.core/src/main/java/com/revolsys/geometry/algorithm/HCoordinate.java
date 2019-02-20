@@ -94,10 +94,11 @@ public class HCoordinate {
   }
 
   /*
-   * public static Point OLDintersection( Point p1, Point p2, Point q1, Point q2) throws
-   * NotRepresentableException { HCoordinate l1 = new HCoordinate(p1, p2); HCoordinate l2 = new
-   * HCoordinate(q1, q2); HCoordinate intHCoord = new HCoordinate(l1, l2); Point intPt =
-   * intHCoord.getCoordinate(); return intPt; }
+   * public static Point OLDintersection( Point p1, Point p2, Point q1, Point
+   * q2) throws NotRepresentableException { HCoordinate l1 = new HCoordinate(p1,
+   * p2); HCoordinate l2 = new HCoordinate(q1, q2); HCoordinate intHCoord = new
+   * HCoordinate(l1, l2); Point intPt = intHCoord.getCoordinate(); return intPt;
+   * }
    */
 
   public double x, y, w;

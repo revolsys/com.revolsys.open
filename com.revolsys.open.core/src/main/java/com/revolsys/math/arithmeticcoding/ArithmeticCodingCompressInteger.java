@@ -22,7 +22,8 @@ public class ArithmeticCodingCompressInteger {
 
   private final ArithmeticCodingCompressModel[] mCorrector;
 
-  public ArithmeticCodingCompressInteger(final ArithmeticCodingCompressEncoder enc, final int bits) {
+  public ArithmeticCodingCompressInteger(final ArithmeticCodingCompressEncoder enc,
+    final int bits) {
     this.enc = enc;
     this.bits_high = 8;
 

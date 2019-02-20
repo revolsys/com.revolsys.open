@@ -6,6 +6,11 @@ import java.security.MessageDigest;
 import com.revolsys.util.Md5;
 
 public class ParameterValueBigDecimal extends Number implements ParameterValue {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final BigDecimal unitValue;
 
   private final double value;

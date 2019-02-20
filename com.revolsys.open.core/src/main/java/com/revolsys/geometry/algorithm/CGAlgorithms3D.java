@@ -65,9 +65,9 @@ public class CGAlgorithms3D {
 
     // otherwise use comp.graphics.algorithms Frequently Asked Questions method
     /*
-     * (1) r = AC dot AB --------- ||AB||^2 r has the following meaning: r=0 P = A r=1 P = B r<0 P
-     * is on the backward extension of AB r>1 P is on the forward extension of AB 0<r<1 P is
-     * interior to AB
+     * (1) r = AC dot AB --------- ||AB||^2 r has the following meaning: r=0 P =
+     * A r=1 P = B r<0 P is on the backward extension of AB r>1 P is on the
+     * forward extension of AB 0<r<1 P is interior to AB
      */
 
     final double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX())

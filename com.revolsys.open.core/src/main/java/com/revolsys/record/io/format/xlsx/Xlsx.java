@@ -36,7 +36,7 @@ public class Xlsx extends AbstractRecordIoFactory implements RecordWriterFactory
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory, MapEx properties) {
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
     return new XlsxRecordReader(resource, recordFactory);
   }
 

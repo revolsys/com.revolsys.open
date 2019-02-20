@@ -82,8 +82,8 @@ public class TestCase extends junit.framework.TestSuite implements MapSerializer
     this.testFile = testFile;
     this.caseIndex = caseIndex;
     if (Property.hasValue(description)) {
-      this.testDescription = description.replaceAll("\\s+", " ").replaceAll("[^A-Za-z0-9\\-_ ]",
-        " ");
+      this.testDescription = description.replaceAll("\\s+", " ")
+        .replaceAll("[^A-Za-z0-9\\-_ ]", " ");
       setName(getId() + "." + this.testDescription);
     } else {
       setName(getId() + ".");

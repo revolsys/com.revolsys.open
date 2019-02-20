@@ -117,7 +117,8 @@ public class MonotoneChainEdge {
         final double midX2 = line2.getX(midIndex2);
         final double midY2 = line2.getY(midIndex2);
 
-        // Assert: mid != start or end (since we checked above for end - start <= 1)
+        // Assert: mid != start or end (since we checked above for end - start
+        // <= 1)
         // check terminating conditions before recursing
         // Reuse the sub-chain. Resetting after each operation
         if (fromIndex1 < midIndex1) {

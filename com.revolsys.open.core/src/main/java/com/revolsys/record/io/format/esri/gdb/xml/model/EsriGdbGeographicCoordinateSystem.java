@@ -7,7 +7,8 @@ public class EsriGdbGeographicCoordinateSystem extends SpatialReference {
   public EsriGdbGeographicCoordinateSystem() {
   }
 
-  public EsriGdbGeographicCoordinateSystem(final GeometryFactory geometryFactory, final String wkt) {
+  public EsriGdbGeographicCoordinateSystem(final GeometryFactory geometryFactory,
+    final String wkt) {
     super(geometryFactory, wkt);
   }
 

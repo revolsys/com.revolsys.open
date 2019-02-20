@@ -129,8 +129,10 @@ public class TransverseMercatorJhs extends TransverseMercator {
       final double QO = MathUtil.asinh(Math.tan(φ)) - e * MathUtil.atanh(e * Math.sin(φ));
       final double βO = Math.atan(Math.sinh(QO));
       final double ξO0 = Math.asin(Math.sin(βO));
-      // Note: The previous two steps are taken from the generic calculation flow given below for
-      // latitude φ, but here for φO may be simplified to ξO0 = βO = atan(sinh QO).
+      // Note: The previous two steps are taken from the generic calculation
+      // flow given below for
+      // latitude φ, but here for φO may be simplified to ξO0 = βO = atan(sinh
+      // QO).
       final double ξO1 = this.h1 * Math.sin(2 * ξO0);
       final double ξO2 = this.h2 * Math.sin(4 * ξO0);
       final double ξO3 = this.h3 * Math.sin(6 * ξO0);

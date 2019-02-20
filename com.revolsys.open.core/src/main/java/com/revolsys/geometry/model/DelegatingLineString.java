@@ -48,6 +48,12 @@ public interface DelegatingLineString extends LineString {
   }
 
   @Override
+  default void forEachVertex(final Consumer3Double action) {
+    final LineString line = getLineString();
+    line.forEachVertex(action);
+  }
+
+  @Override
   default void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     final LineString line = getLineString();
@@ -55,15 +61,10 @@ public interface DelegatingLineString extends LineString {
   }
 
   @Override
-  default void forEachVertex(final CoordinatesOperationPoint coordinates, final Consumer<CoordinatesOperationPoint> action) {
+  default void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
     final LineString line = getLineString();
     line.forEachVertex(coordinates, action);
-  }
-
-  @Override
-  default void forEachVertex(final Consumer3Double action) {
-    final LineString line = getLineString();
-    line.forEachVertex(action);
   }
 
   @Override

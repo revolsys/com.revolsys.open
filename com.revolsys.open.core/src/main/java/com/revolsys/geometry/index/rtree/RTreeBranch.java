@@ -135,8 +135,8 @@ public class RTreeBranch<T> extends RTreeNode<T> {
   }
 
   @Override
-  public boolean remove(final double minX, final double minY, final double maxX,
-    final double maxY, final T object) {
+  public boolean remove(final double minX, final double minY, final double maxX, final double maxY,
+    final T object) {
     final int childCount = this.size;
     final RTreeNode<T>[] childNodes = this.nodes;
     for (int i = 0; i < childCount; i++) {

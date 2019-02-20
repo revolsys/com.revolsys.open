@@ -133,8 +133,8 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
   public void expandToQueue(final PriorityQueue<BoundablePair<I>> priQ,
     final ItemDistance<I> itemDistance, final double minDistance) {
     /*
-     * HEURISTIC: If both boundable are composite, choose the one with largest area to expand.
-     * Otherwise, simply expand whichever is composite.
+     * HEURISTIC: If both boundable are composite, choose the one with largest
+     * area to expand. Otherwise, simply expand whichever is composite.
      */
     if (this.boundable1.isNode()) {
       if (this.boundable2.isNode()) {

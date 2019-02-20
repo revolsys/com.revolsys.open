@@ -23,7 +23,6 @@ import javax.measure.quantity.Length;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.view.TextStyleViewRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;

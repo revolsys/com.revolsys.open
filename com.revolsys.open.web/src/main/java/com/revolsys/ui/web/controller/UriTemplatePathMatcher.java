@@ -47,7 +47,7 @@ public class UriTemplatePathMatcher implements PathMatcher {
 
   @Override
   public Comparator<String> getPatternComparator(final String arg0) {
-    return new Comparator<String>() {
+    return new Comparator<>() {
       @Override
       public int compare(final String pattern1, final String Pattern2) {
         // TODO improve

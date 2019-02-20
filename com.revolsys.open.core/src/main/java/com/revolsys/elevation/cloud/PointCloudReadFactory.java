@@ -6,11 +6,11 @@ import com.revolsys.io.ReadIoFactory;
 import com.revolsys.spring.resource.Resource;
 
 public interface PointCloudReadFactory extends ReadIoFactory {
-  
 
   // TODO figure out how to do this with decent memory usage
   // @Override
-  // default GriddedElevationModel newGriddedElevationModel(final Resource resource,
+  // default GriddedElevationModel newGriddedElevationModel(final Resource
+  // resource,
   // final Map<String, ? extends Object> properties) {
   // final PointCloud<?> pointCloud = openPointCloud(resource);
   // if (pointCloud == null) {
