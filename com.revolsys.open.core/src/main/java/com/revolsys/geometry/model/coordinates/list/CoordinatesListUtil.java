@@ -316,14 +316,14 @@ public class CoordinatesListUtil {
    * @return 0 if q is collinear with p1-p2
    */
   public static int orientationIndex(final double x1, final double y1, final double x2,
-    final double y2, final double x, final double y3) {
+    final double y2, final double x, final double y) {
     // travelling along p1->p2, turn counter clockwise to get to q return 1,
     // travelling along p1->p2, turn clockwise to get to q return -1,
     // p1, p2 and q are colinear return 0.
     final double dx1 = x2 - x1;
     final double dy1 = y2 - y1;
     final double dx2 = x - x2;
-    final double dy2 = y3 - y2;
+    final double dy2 = y - y2;
     return RobustDeterminant.signOfDet2x2(dx1, dy1, dx2, dy2);
   }
 

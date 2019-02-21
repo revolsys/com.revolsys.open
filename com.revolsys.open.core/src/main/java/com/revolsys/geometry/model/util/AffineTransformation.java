@@ -456,7 +456,7 @@ public class AffineTransformation implements Cloneable
    * the transform is singular (not invertible),
    * and operations which attempt to compute
    * an inverse will throw a <tt>NoninvertibleTransformException</tt>.
-  
+
    * @return the determinant of the transformation
    * @see #getInverse()
    */
