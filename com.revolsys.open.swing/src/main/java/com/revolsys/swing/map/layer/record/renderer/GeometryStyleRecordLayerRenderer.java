@@ -127,12 +127,6 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
     return icon;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#
-   * getStyle()
-   */
   @Override
   public GeometryStyle getStyle() {
     return this.style;
@@ -208,12 +202,6 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer#
-   * setStyle(com.revolsys. swing.map.layer.record.style.GeometryStyle)
-   */
   @Override
   public void setStyle(final GeometryStyle style) {
     if (this.style != null) {

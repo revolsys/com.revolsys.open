@@ -204,15 +204,6 @@ public class Project extends LayerGroup {
       return directory;
     }
     if (this.resource instanceof PathResource) {
-      final PathResource fileResource = (PathResource)this.resource;
-      final File directory = fileResource.getFile();
-      if (!directory.exists()) {
-        directory.mkdirs();
-      }
-      if (directory.isDirectory()) {
-        return directory.toPath();
-      }
-    } else if (this.resource instanceof PathResource) {
       final PathResource pathResource = (PathResource)this.resource;
       final Path directory = pathResource.getPath();
       if (!Files.exists(directory)) {

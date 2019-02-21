@@ -1028,8 +1028,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   }
 
   public void setIcon(final String iconName) {
-    final Icon icon2 = Icons.getIcon(iconName);
-    setIcon(icon2);
+    final Icon icon = Icons.getIcon(iconName);
+    setIcon(icon);
   }
 
   protected void setInitialized(final boolean initialized) {
