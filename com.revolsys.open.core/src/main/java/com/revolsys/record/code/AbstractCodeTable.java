@@ -61,9 +61,9 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
     this.identifiers.add(id);
     this.idValueCache.put(id, values);
     this.idIdCache.put(id, id);
-
     addValueId(id, values);
     String lowerId = id.toString();
+    this.stringIdMap.put(lowerId, id);
     if (!this.caseSensitive) {
       lowerId = lowerId.toLowerCase();
     }
@@ -136,15 +136,13 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
           return cachedId;
         } else {
           String lowerId = id.toString();
-          if (!this.caseSensitive) {
-            lowerId = lowerId.toLowerCase();
-          }
           if (this.stringIdMap.containsKey(lowerId)) {
             return this.stringIdMap.get(lowerId);
           } else {
-            final Identifier identifier = Identifier.newIdentifier(id);
-            final Object value = getValue(identifier);
-            if (value != null && value != id) {
+            if (!this.caseSensitive) {
+              lowerId = lowerId.toLowerCase();
+            }
+            if (this.stringIdMap.containsKey(lowerId)) {
               return this.stringIdMap.get(lowerId);
             }
           }
@@ -224,12 +222,17 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
       List<Object> values = this.idValueCache.get(id);
       if (values == null) {
         String lowerId = id.toString();
-        if (!this.caseSensitive) {
-          lowerId = lowerId.toLowerCase();
-        }
         if (this.stringIdMap.containsKey(lowerId)) {
           id = this.stringIdMap.get(lowerId);
           values = this.idValueCache.get(id);
+        } else {
+          if (!this.caseSensitive) {
+            lowerId = lowerId.toLowerCase();
+          }
+          if (this.stringIdMap.containsKey(lowerId)) {
+            id = this.stringIdMap.get(lowerId);
+            values = this.idValueCache.get(id);
+          }
         }
       }
       return values;
