@@ -49,8 +49,8 @@ public class BaseInProcess<T> extends AbstractInProcess<T> implements Cancellabl
     this.running = true;
     try {
       preRun(in);
+      final Thread thread = Thread.currentThread();
       while (!isCancelled()) {
-        final Thread thread = Thread.currentThread();
         if (thread.isInterrupted()) {
           return;
         } else {
