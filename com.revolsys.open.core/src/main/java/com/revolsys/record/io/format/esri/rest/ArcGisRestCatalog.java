@@ -43,7 +43,7 @@ public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
     } else {
       throw new IllegalArgumentException("Missing serviceUrl");
     }
-  };
+  }
 
   public static ArcGisRestCatalog newArcGisRestCatalog(String rootUrl) {
     rootUrl = rootUrl.replaceAll("/+$", "");
