@@ -30,10 +30,8 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.io.filter.ExtensionFilenameFilter;
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
@@ -61,9 +59,6 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> imple
 
   /** Flag indicating if the reader has more objects to be read. */
   private boolean hasNext = true;
-
-  /** The logging instance. */
-  private final Logger log = LoggerFactory.getLogger(getClass());
 
   /** The files to be read by this reader. */
   private Iterator<Entry<File, Reader<T>>> readerIterator;
@@ -161,7 +156,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> imple
           try {
             this.currentReader.close();
           } catch (final Throwable t) {
-            this.log.warn(t.getMessage(), t);
+            Logs.warn(this, t.getMessage(), t);
           }
         }
         final Entry<File, Reader<T>> entry = this.readerIterator.next();
@@ -172,7 +167,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> imple
           this.hasNext = this.currentIterator.hasNext();
         } catch (final Throwable e) {
           this.hasNext = false;
-          this.log.error(e.getMessage(), e);
+          Logs.error(this, e.getMessage(), e);
         }
       } else {
         this.hasNext = false;

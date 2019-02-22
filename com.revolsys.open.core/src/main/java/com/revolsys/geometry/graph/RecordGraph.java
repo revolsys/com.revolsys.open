@@ -128,7 +128,7 @@ public class RecordGraph extends Graph<Record> {
 
   public boolean hasEdge(final Record record) {
     final LineString line = record.getGeometry();
-    final Point fromPoint = line.getPoint(0);
+    final Point fromPoint = line.getFromPoint();
     final Point toPoint = line.getToPoint();
     final Node<Record> fromNode = findNode(fromPoint);
     final Node<Record> toNode = findNode(toPoint);
