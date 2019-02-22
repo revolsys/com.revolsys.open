@@ -8,7 +8,6 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.parallel.ThreadUtil;
 
 public abstract class AbstractResetableProcess extends AbstractProcess {
   private final Set<UUID> executions = new LinkedHashSet<>();
@@ -103,7 +102,13 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
             } else {
               this.status = "waiting";
             }
-            ThreadUtil.pause(this, this.waitTime);
+            synchronized (this) {
+              try {
+                this.wait(this.waitTime);
+              } catch (final InterruptedException e) {
+                throw new ThreadInterruptedException(e);
+              }
+            }
           }
         }
 
@@ -155,7 +160,13 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
 
   protected void waitOnExecutions() {
     this.status = "waiting on executions";
-    ThreadUtil.pause(this.executions, this.waitTime);
+    synchronized (this.executions) {
+      try {
+        this.executions.wait(this.waitTime);
+      } catch (final InterruptedException e) {
+        throw new ThreadInterruptedException(e);
+      }
+    }
   }
 
 }

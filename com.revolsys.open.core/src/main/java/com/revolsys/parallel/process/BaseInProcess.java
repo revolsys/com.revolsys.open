@@ -1,6 +1,5 @@
 package com.revolsys.parallel.process;
 
-import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.util.Cancellable;
 
@@ -51,11 +50,12 @@ public class BaseInProcess<T> extends AbstractInProcess<T> implements Cancellabl
     try {
       preRun(in);
       while (!isCancelled()) {
-        if (ThreadUtil.isInterrupted()) {
+        final Thread thread = Thread.currentThread();
+        if (thread.isInterrupted()) {
           return;
         } else {
           final T object = in.read(5000);
-          if (ThreadUtil.isInterrupted()) {
+          if (thread.isInterrupted()) {
             return;
           } else if (object != null) {
             process(in, object);
