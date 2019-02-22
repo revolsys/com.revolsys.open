@@ -39,14 +39,6 @@ import com.revolsys.util.number.Integers;
 
 public interface Property {
   class NewValueListener<V> implements PropertyChangeListener, NonWeakListener {
-    static boolean hasValue(final Collection<?> collection) {
-      if (collection == null || collection.isEmpty()) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-
     private final Consumer<V> consumer;
 
     private final Object source;
@@ -664,6 +656,14 @@ public interface Property {
       }
     }
     return false;
+  }
+
+  static boolean hasValue(final Collection<?> collection) {
+    if (collection == null || collection.isEmpty()) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   static boolean hasValue(final Emptyable value) {
