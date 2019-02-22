@@ -72,6 +72,7 @@ public class ScaledIntegerGriddedDigitalElevationModelTest extends GriddedElevat
     try (
       final ScaledIntegerGriddedDigitalElevationModelFile actualModel = new ScaledIntegerGriddedDigitalElevationModelFile(
         path, geometryFactory, 0, 0, 255, 255, 1)) {
+      actualModel.setCreateMissing(true);
       assertModelEquals(expectedModel, actualModel);
     }
 
@@ -90,6 +91,7 @@ public class ScaledIntegerGriddedDigitalElevationModelTest extends GriddedElevat
     try (
       final ScaledIntegerGriddedDigitalElevationModelFile actualModel = new ScaledIntegerGriddedDigitalElevationModelFile(
         path, geometryFactory, 0, 0, 255, 255, 1)) {
+      actualModel.setCreateMissing(true);
       actualModel.setValues(expectedModel);
       assertModelEquals(expectedModel, actualModel);
     }

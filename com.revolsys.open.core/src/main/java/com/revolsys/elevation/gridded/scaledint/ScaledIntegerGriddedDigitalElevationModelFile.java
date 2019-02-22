@@ -55,7 +55,7 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
 
   private double scaleZ;
 
-  private final boolean createMissing = false;
+  private boolean createMissing = false;
 
   private boolean useLocks = false;
 
@@ -143,6 +143,10 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
     return this.reader;
   }
 
+  public boolean isCreateMissing() {
+    return this.createMissing;
+  }
+
   public boolean isUseLocks() {
     return this.useLocks;
   }
@@ -222,6 +226,10 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
     } catch (final IOException e) {
       throw Exceptions.wrap("Unable to read: " + this.path, e);
     }
+  }
+
+  public void setCreateMissing(final boolean createMissing) {
+    this.createMissing = createMissing;
   }
 
   public void setElevations(final double x, final double y, final double[] elevations) {
