@@ -11,9 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -140,7 +137,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  @PreDestroy
   public void close() {
     this.closed = true;
     try {
@@ -260,7 +256,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  @PostConstruct
   public final void initialize() {
     synchronized (this) {
       if (!this.initialized) {
@@ -283,7 +278,9 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       if (!recordDefinition.isIdField(fieldName)) {
         final CodeTable codeTable = getCodeTableByFieldName(fieldName);
         if (codeTable != null) {
-          field.setCodeTable(codeTable);
+          if (field.getCodeTable() != codeTable) {
+            field.setCodeTable(codeTable);
+          }
         }
       }
     }
