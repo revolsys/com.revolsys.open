@@ -21,8 +21,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.revolsys.logging.Logs;
 
 /**
  * The JexlUtil is a utility class for processing strings that contain patterns
@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 public final class JexlUtil {
   /** The default expression pattern matching expressions in the form ${el}. */
   public static final String DEFAULT_EXPRESSION_PATTERN = "\\$\\{([^\\}]+)\\}";
-
-  private static final Logger LOG = LoggerFactory.getLogger(JexlUtil.class);
 
   /**
    * Add the text to the Jexl expression, wrapping the text in a '' string.
@@ -50,7 +48,7 @@ public final class JexlUtil {
     try {
       return expression.evaluate(context);
     } catch (final Exception e) {
-      LOG.error(
+      Logs.error(JexlUtil.class,
         "Unable to evaluate expression '" + expression.getExpression() + "': " + e.getMessage(), e);
       return null;
     }
