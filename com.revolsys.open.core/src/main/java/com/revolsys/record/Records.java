@@ -60,6 +60,24 @@ public interface Records {
     return boundingBox.newBoundingBox();
   }
 
+  static BoundingBox boundingBox(final Iterable<? extends Record> records) {
+    BoundingBox boundingBox = BoundingBox.empty();
+    for (final Record record : records) {
+      boundingBox = boundingBox.bboxEdit(editor -> editor.addBbox(boundingBox(record)));
+    }
+    return boundingBox;
+  }
+
+  static BoundingBox boundingBox(final Record record) {
+    if (record != null) {
+      final Geometry geometry = record.getGeometry();
+      if (geometry != null) {
+        return geometry.getBoundingBox();
+      }
+    }
+    return BoundingBox.empty();
+  }
+
   static int compareNullFirst(final Record record1, final Record record2, final String fieldName) {
     final Object value1 = getValue(record1, fieldName);
     final Object value2 = getValue(record2, fieldName);
