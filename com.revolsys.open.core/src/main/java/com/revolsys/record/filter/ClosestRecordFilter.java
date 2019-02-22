@@ -59,7 +59,7 @@ public class ClosestRecordFilter implements Predicate<Record> {
   }
 
   public BoundingBox getFilterBoundingBox() {
-    return BoundingBox.bboxEditor(this.geometry) //
+    return this.geometry.bboxEditor() //
       .expandDelta(this.maxDistance) //
       .newBoundingBox();
   }
@@ -71,7 +71,7 @@ public class ClosestRecordFilter implements Predicate<Record> {
       if (Property.hasValue(geometry)) {
         if (!(geometry instanceof Point)) {
           final BoundingBox boundingBox = geometry.getBoundingBox();
-          if (!boundingBox.bboxWithinDistance(this.geometry.getBoundingBox(), this.maxDistance)) {
+          if (!boundingBox.bboxWithinDistance(this.geometry, this.maxDistance)) {
             return false;
           }
         }
