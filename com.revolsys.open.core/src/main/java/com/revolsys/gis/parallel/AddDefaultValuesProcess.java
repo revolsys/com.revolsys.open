@@ -21,11 +21,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.PathUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 import com.revolsys.record.Record;
@@ -33,8 +31,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
 
 public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record> {
-  private static final Logger log = LoggerFactory.getLogger(AddDefaultValuesProcess.class);
-
   private Set<String> excludedFieldNames = new HashSet<>();
 
   private RecordDefinitionFactory recordDefinitionFactory;
@@ -128,7 +124,7 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record
     final int dotIndex = key.indexOf('.');
     if (dotIndex == -1) {
       if (record.getValue(key) == null && !this.excludedFieldNames.contains(key)) {
-        log.info("Adding attribute " + key + "=" + value);
+        Logs.info(this, "Adding attribute " + key + "=" + value);
         record.setValue(key, value);
       }
     } else {
@@ -153,7 +149,7 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record
         final Record subObject = (Record)attributeValue;
         setDefaultValue(subObject, subKey, value);
       } else if (!fieldName.equals(record.getRecordDefinition().getGeometryFieldName())) {
-        log.error("Attribute '" + fieldName + "' must be a Record");
+        Logs.error(this, "Attribute '" + fieldName + "' must be a Record");
       }
     }
   }

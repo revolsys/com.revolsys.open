@@ -22,7 +22,6 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.process.BaseInProcess;
@@ -50,7 +49,11 @@ public class ScriptExecutorProcess extends BaseInProcess<Record> implements Bean
     try {
       while (!this.tasks.isEmpty()) {
         synchronized (this) {
-          ThreadUtil.pause(this, 1000);
+          try {
+            this.wait(1000);
+          } catch (final InterruptedException e) {
+            throw new ThreadInterruptedException(e);
+          }
           for (final Iterator<Future<?>> taskIter = this.tasks.iterator(); taskIter.hasNext();) {
             final Future<?> task = taskIter.next();
             if (task.isDone()) {
@@ -85,7 +88,11 @@ public class ScriptExecutorProcess extends BaseInProcess<Record> implements Bean
         while (this.tasks.size() >= this.maxConcurrentScripts) {
           try {
             synchronized (this) {
-              ThreadUtil.pause(1000);
+              try {
+                this.wait(1000);
+              } catch (final InterruptedException e) {
+                throw new ThreadInterruptedException(e);
+              }
               for (final Iterator<Future<?>> taskIter = this.tasks.iterator(); taskIter
                 .hasNext();) {
                 final Future<?> task = taskIter.next();
