@@ -95,8 +95,13 @@ public class RecordDefinitionBuilder {
     return this;
   }
 
+  public void setIdFieldName(final String name) {
+    this.recordDefinition.setIdFieldName(name);
+  }
+
   public RecordDefinitionBuilder setPathName(final String path) {
     this.recordDefinition.setPathName(path);
     return this;
   }
+
 }

@@ -217,6 +217,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     this.fieldNamesSet = Sets.unmodifiableLinked(this.internalFieldNames);
     this.internalFields.add(field);
     this.fields = Lists.unmodifiable(this.internalFields);
+    this.fieldMap.put(name, field);
     this.fieldMap.put(lowerName, field);
     this.fieldIdMap.put(name, fieldIndex);
     this.fieldIdMap.put(lowerName, fieldIndex);
@@ -415,8 +416,13 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     if (name == null) {
       return null;
     } else {
-      final String lowerName = name.toString().toLowerCase();
-      return this.fieldMap.get(lowerName);
+      final String nameString = name.toString();
+      FieldDefinition field = this.fieldMap.get(nameString);
+      if (field == null) {
+        final String lowerName = nameString.toLowerCase();
+        field = this.fieldMap.get(lowerName);
+      }
+      return field;
     }
   }
 
@@ -657,8 +663,14 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     if (name == null) {
       return false;
     } else {
-      final String lowerName = name.toString().toLowerCase();
-      return this.fieldMap.containsKey(lowerName);
+      final String nameString = name.toString();
+      final boolean hasField = this.fieldMap.containsKey(nameString);
+      if (hasField) {
+        return true;
+      } else {
+        final String lowerName = nameString.toLowerCase();
+        return this.fieldMap.containsKey(lowerName);
+      }
     }
   }
 
@@ -734,6 +746,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       final int index = field.getIndex();
       this.internalFields.set(index, newFieldDefinition);
       this.fields = Lists.unmodifiable(this.internalFields);
+      this.fieldMap.put(name, newFieldDefinition);
       this.fieldMap.put(lowerName, newFieldDefinition);
       newFieldDefinition.setIndex(index);
     } else {
