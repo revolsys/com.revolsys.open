@@ -126,6 +126,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   @Override
   public Identifier getIdentifier(final List<Object> values, final boolean loadMissing) {
+    refreshIfNeeded();
     if (values.size() == 1) {
       final Object id = values.get(0);
       if (id == null) {
