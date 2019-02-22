@@ -1,8 +1,6 @@
 package com.revolsys.parallel.process;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
@@ -43,9 +41,7 @@ public class ProcessQueueWorker extends Thread {
             if (e instanceof ThreadInterruptedException) {
               throw (ThreadInterruptedException)e;
             } else {
-              final Class<? extends Process> processClass = this.process.getClass();
-              final Logger log = LoggerFactory.getLogger(processClass);
-              log.error(e.getMessage(), e);
+              Logs.error(this.process, e.getMessage(), e);
             }
           }
         }

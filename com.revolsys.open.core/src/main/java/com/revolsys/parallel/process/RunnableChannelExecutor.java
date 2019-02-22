@@ -18,7 +18,6 @@ import org.springframework.beans.factory.BeanNameAware;
 import com.revolsys.logging.Logs;
 import com.revolsys.parallel.NamedThreadFactory;
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.MultiInputSelector;
@@ -63,7 +62,13 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements Proce
     if (command != null) {
       while (!isShutdown()) {
         if (this.taskCount.get() >= getMaximumPoolSize()) {
-          ThreadUtil.pause(this.monitor);
+          synchronized (this.monitor) {
+            try {
+              this.monitor.wait();
+            } catch (final InterruptedException e) {
+              throw new ThreadInterruptedException(e);
+            }
+          }
         }
         this.taskCount.incrementAndGet();
         try {
