@@ -1,4 +1,4 @@
-package com.revolsys.spring.resource;
+package com.revolsys.ui.web.servlet;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +14,8 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
+import com.revolsys.spring.resource.AbstractResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
 public class ServletContextResource extends AbstractResource implements ContextResource {
