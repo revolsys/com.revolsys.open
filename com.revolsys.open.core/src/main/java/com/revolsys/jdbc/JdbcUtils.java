@@ -19,8 +19,6 @@ import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
@@ -33,6 +31,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
@@ -45,8 +44,6 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Property;
 
 public final class JdbcUtils {
-  private static final Logger LOG = LoggerFactory.getLogger(JdbcUtils.class);
-
   public static void addColumnNames(final StringBuilder sql,
     final RecordDefinition recordDefinition, final String tablePrefix) {
     for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
@@ -140,9 +137,9 @@ public final class JdbcUtils {
       try {
         resultSet.close();
       } catch (final SQLException e) {
-        LOG.debug("SQL error closing result set", e);
+        Logs.debug(JdbcUtils.class, "SQL error closing result set", e);
       } catch (final Throwable e) {
-        LOG.debug("Unknown error closing result set", e);
+        Logs.debug(JdbcUtils.class, "Unknown error closing result set", e);
       }
     }
   }
@@ -152,9 +149,9 @@ public final class JdbcUtils {
       try {
         statement.close();
       } catch (final SQLException e) {
-        LOG.debug("SQL error closing statement", e);
+        Logs.debug(JdbcUtils.class, "SQL error closing statement", e);
       } catch (final Throwable e) {
-        LOG.debug("Unknown error closing statement", e);
+        Logs.debug(JdbcUtils.class, "Unknown error closing statement", e);
       }
     }
   }
@@ -182,14 +179,14 @@ public final class JdbcUtils {
         setValue(statement, 1, id);
         statement.executeQuery();
       } catch (final SQLException e) {
-        LOG.error("Unable to delete:" + sql, e);
+        Logs.error(JdbcUtils.class, "Unable to delete:" + sql, e);
         throw new RuntimeException("Unable to delete:" + sql, e);
       } finally {
         close(statement);
         connection.commit();
       }
     } catch (final SQLException e) {
-      LOG.error("Invalid table name or id column: " + sql, e);
+      Logs.error(JdbcUtils.class, "Invalid table name or id column: " + sql, e);
       throw new IllegalArgumentException("Invalid table name or id column: " + sql);
     }
 
