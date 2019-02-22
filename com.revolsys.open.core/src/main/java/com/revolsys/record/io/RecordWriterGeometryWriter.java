@@ -39,7 +39,7 @@ public class RecordWriterGeometryWriter extends AbstractWriter<Geometry> impleme
 
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    setProperty("geometryFactory", geometryFactory);
+    this.writer.setProperty("geometryFactory", geometryFactory);
   }
 
   @Override

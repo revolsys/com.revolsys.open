@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
-
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
@@ -43,7 +41,6 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
-  @PreDestroy
   public void close() {
     if (this.writers != null) {
       for (final Writer<Record> writer : this.writers.values()) {
