@@ -5,12 +5,12 @@ import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.revolsys.core.test.geometry.test.model.GeometryTestUtil;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.util.GeometryTestUtil;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;

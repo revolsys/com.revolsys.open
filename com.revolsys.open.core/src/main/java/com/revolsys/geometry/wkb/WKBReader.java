@@ -71,7 +71,7 @@ public class WKBReader {
 
   /**
    * Converts a hexadecimal string to a byte array.
-   * The hexadecimal digit symbolCount are case-insensitive.
+   * The hexadecimal digit symbols are case-insensitive.
    *
    * @param hex a string containing hex digits
    * @return an array of bytes with the value of the hex string

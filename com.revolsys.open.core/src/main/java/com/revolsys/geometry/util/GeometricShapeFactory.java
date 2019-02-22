@@ -41,6 +41,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.util.AffineTransformation;
 
 /**
  * Computes various kinds of common geometric shapes.
@@ -53,7 +54,7 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
  *  GeometricShapeFactory gsf = new GeometricShapeFactory();
  *  gsf.setSize(100);
  *  gsf.setNumPoints(100);
- *  gsf.setBase(new BaseLasPoint(100.0, 100.0));
+ *  gsf.setBase(new PointDoubleXY(100.0, 100.0));
  *  gsf.setRotation(0.5);
  *  Polygon rect = gsf.createRectangle();
  * </pre>
@@ -84,15 +85,15 @@ public class GeometricShapeFactory {
 
     public BoundingBox getEnvelope() {
       if (this.base != null) {
-        return new BoundingBoxDoubleXY(this.base.getX(), this.base.getY(),
+        return BoundingBoxDoubleXY.newBoundingBoxDoubleXY(this.base.getX(), this.base.getY(),
           this.base.getX() + this.width, this.base.getY() + this.height);
       }
       if (this.centre != null) {
-        return new BoundingBoxDoubleXY(this.centre.getX() - this.width / 2,
+        return BoundingBoxDoubleXY.newBoundingBoxDoubleXY(this.centre.getX() - this.width / 2,
           this.centre.getY() - this.height / 2, this.centre.getX() + this.width / 2,
           this.centre.getY() + this.height / 2);
       }
-      return new BoundingBoxDoubleXY(0, 0, this.width, this.height);
+      return BoundingBoxDoubleXY.newBoundingBoxDoubleXY(0, 0, this.width, this.height);
     }
 
     public double getHeight() {
@@ -142,6 +143,11 @@ public class GeometricShapeFactory {
   protected GeometryFactory geomFact;
 
   protected int vertexCount = 100;
+
+  /**
+   * Default is no rotation.
+   */
+  protected double rotationAngle = 0.0;
 
   /**
    * Construct a new shape factory which will create shapes using the default
@@ -198,7 +204,7 @@ public class GeometricShapeFactory {
       pts[iPt++] = newPoint(x, y);
     }
     final LineString line = this.geomFact.lineString(pts);
-    return line;
+    return (LineString)rotate(line);
   }
 
   /**
@@ -223,7 +229,7 @@ public class GeometricShapeFactory {
       angSize = 2 * Math.PI;
     }
     final double angInc = angSize / (this.vertexCount - 1);
-    // double check = angInc * nPts;
+    // double check = angInc * vertexCount;
     // double checkEndAng = startAng + check;
 
     final Point[] pts = new Point[this.vertexCount + 2];
@@ -240,7 +246,7 @@ public class GeometricShapeFactory {
     pts[iPt++] = newPoint(centreX, centreY);
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
-    return poly;
+    return (Polygon)rotate(poly);
   }
 
   // * @deprecated use {@link createEllipse} instead
@@ -282,7 +288,7 @@ public class GeometricShapeFactory {
     coordinates[coordinateIndex++] = 1;
 
     final Polygon poly = this.geomFact.polygon(2, coordinates);
-    return poly;
+    return (Polygon)rotate(poly);
   }
 
   protected Point newPoint(final double x, final double y) {
@@ -335,7 +341,7 @@ public class GeometricShapeFactory {
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
-    return poly;
+    return (Polygon)rotate(poly);
   }
 
   /**
@@ -399,7 +405,16 @@ public class GeometricShapeFactory {
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
-    return poly;
+    return (Polygon)rotate(poly);
+  }
+
+  protected Geometry rotate(final Geometry geom) {
+    if (this.rotationAngle != 0.0) {
+      final AffineTransformation trans = AffineTransformation.rotationInstance(this.rotationAngle,
+        this.dim.getCentre().getX(), this.dim.getCentre().getY());
+      trans.transform(geom);
+    }
+    return geom;
   }
 
   /**
@@ -443,6 +458,16 @@ public class GeometricShapeFactory {
    */
   public void setNumPoints(final int nPts) {
     this.vertexCount = nPts;
+  }
+
+  /**
+   * Sets the rotation angle to use for the shape.
+   * The rotation is applied relative to the centre of the shape.
+   *
+   * @param radians the rotation angle in radians.
+   */
+  public void setRotation(final double radians) {
+    this.rotationAngle = radians;
   }
 
   /**
