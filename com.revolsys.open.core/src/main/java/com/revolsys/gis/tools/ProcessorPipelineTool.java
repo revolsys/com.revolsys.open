@@ -252,12 +252,11 @@ public class ProcessorPipelineTool {
           return;
         }
       } catch (final IOException e) {
-        Logs.error(ProcessorPipelineTool.class, e.getMessage(), e);
+        Logs.error(this, e.getMessage(), e);
       }
     }
 
-    Logs.info(ProcessorPipelineTool.class,
-      "Processing file '" + sourceFile + "' to '" + targetFile + "'");
+    Logs.info(this, "Processing file '" + sourceFile + "' to '" + targetFile + "'");
     System.out.println("Processing file '" + sourceFile + "' to '" + targetFile + "'");
 
     System.setProperty("sourceFile", sourceFile.getAbsolutePath());
@@ -281,7 +280,7 @@ public class ProcessorPipelineTool {
     long seconds = time / 1000;
     final long minutes = seconds / 60;
     seconds = seconds % 60;
-    Logs.info(ProcessorPipelineTool.class, minutes + " minutes " + seconds + " seconds");
+    Logs.info(this, minutes + " minutes " + seconds + " seconds");
     System.out.println(minutes + " minutes " + seconds + " seconds");
 
   }
