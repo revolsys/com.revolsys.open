@@ -1208,9 +1208,6 @@ public final class FileUtil {
     return toUrlString(file);
   }
 
-  /**
-   * Construct a new TestFileUtil.
-   */
   private FileUtil() {
   }
 
