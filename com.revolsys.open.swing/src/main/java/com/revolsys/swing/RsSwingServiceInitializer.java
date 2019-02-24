@@ -90,9 +90,6 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("openStreetMapVectorApi", "Open Street Map (Vector API)",
       OpenStreetMapApiLayer::newLayer);
 
-    // TODO remove
-    MapObjectFactoryRegistry.newFactory("grid", "Grid Layer", GridLayer::newLayer);
-
     MapObjectFactoryRegistry.newFactory("gridLayer", "Grid Layer", GridLayer::newLayer);
 
     MapObjectFactoryRegistry.newFactory("wikipedia", "Wikipedia Articles",

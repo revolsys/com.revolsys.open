@@ -172,7 +172,9 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
     this.webServiceLayer = layerDescription;
     if (this.webServiceLayer != null) {
       final String name = this.webServiceLayer.getName();
-      setName(name);
+      if (getName() == null) {
+        setName(name);
+      }
 
       final UrlResource serviceUrl = this.webServiceLayer.getWebService().getServiceUrl();
       setUrl(serviceUrl);
