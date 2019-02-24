@@ -2585,18 +2585,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               final RecordLayerErrors errors = new RecordLayerErrors("Saving Changes", this);
               try (
                 BaseCloseable eventsEnabled = eventsDisabled()) {
-                for (final LayerRecord record : validRecords) {
-                  synchronized (this.getSync()) {
-                    try {
-                      final boolean saved = internalSaveChanges(errors, record);
-                      if (!saved) {
-                        errors.addRecord(record, "Unknown error");
-                      }
-                    } catch (final Throwable t) {
-                      errors.addRecord(record, t);
-                    }
-                  }
-                }
+                saveChangesDo(errors, validRecords);
                 cleanCachedRecords();
               } finally {
                 if (!errors.showErrorDialog()) {
@@ -2676,6 +2665,21 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected boolean saveChangesDo(final RecordLayerErrors errors, final LayerRecord record) {
     return true;
+  }
+
+  protected void saveChangesDo(final RecordLayerErrors errors, final List<LayerRecord> records) {
+    for (final LayerRecord record : records) {
+      synchronized (this.getSync()) {
+        try {
+          final boolean saved = internalSaveChanges(errors, record);
+          if (!saved) {
+            errors.addRecord(record, "Unknown error");
+          }
+        } catch (final Throwable t) {
+          errors.addRecord(record, t);
+        }
+      }
+    }
   }
 
   public void setCanAddRecords(final boolean canAddRecords) {
