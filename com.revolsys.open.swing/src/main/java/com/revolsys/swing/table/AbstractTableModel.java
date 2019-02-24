@@ -150,7 +150,12 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   @PreDestroy
   public void dispose() {
-    this.table = null;
+    if (this.table != null) {
+      if (this.table.getModel() == this) {
+        this.table.setModel(null);
+      }
+      this.table = null;
+    }
     this.propertyChangeSupport = null;
     this.menu = null;
   }
