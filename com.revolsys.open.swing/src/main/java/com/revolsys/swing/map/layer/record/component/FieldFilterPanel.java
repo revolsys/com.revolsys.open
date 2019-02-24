@@ -602,6 +602,9 @@ public class FieldFilterPanel extends JComponent
               value = this.layer.getValidSearchValue(this.field, searchValue);
             } else {
               value = this.codeTable.getIdentifier(searchValue);
+              if (value == null) {
+                return;
+              }
             }
             if (value != null) {
               condition = Q.binary(this.field, searchOperator, value);
