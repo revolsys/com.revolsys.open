@@ -41,6 +41,16 @@ import com.revolsys.geometry.model.GeometryFactory;
 public class QuadtreeTest {
 
   @Test
+  public void testPoints() throws Exception {
+    final QuadTree<Object> quadTree = new QuadTree<>(GeometryFactory.DEFAULT_3D);
+    quadTree.insertItem(-10, -10, new Object());
+    quadTree.insertItem(-10, 10, new Object());
+    quadTree.insertItem(10, 10, new Object());
+    quadTree.insertItem(10, -10, new Object());
+    quadTree.insertItem(-11, -11, new Object());
+  }
+
+  @Test
   public void testSpatialIndex() throws Exception {
     final SpatialIndexTester tester = new SpatialIndexTester();
     tester.setSpatialIndex(new QuadTree<>(GeometryFactory.DEFAULT_3D));

@@ -35,11 +35,11 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
-  private double minExtent;
+  private double minExtent = 1;
 
-  private final double absoluteMinExtent;
+  private double absoluteMinExtent;
 
-  private double minExtentTimes2;
+  private double minExtentTimes2 = 2;
 
   private AbstractQuadTreeNode<T> root;
 
@@ -52,22 +52,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   protected QuadTree(final GeometryFactory geometryFactory, final AbstractQuadTreeNode<T> root) {
-    if (geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.DEFAULT_3D;
-    } else {
-      this.geometryFactory = geometryFactory;
-    }
-    if (this.geometryFactory.isFloating()) {
-      this.absoluteMinExtent = 0.00000001;
-    } else {
-      this.absoluteMinExtent = this.geometryFactory.getResolutionX();
-    }
-    if (this.absoluteMinExtent < 0.5) {
-      this.minExtent = 0.5;
-    } else {
-      this.minExtent = this.absoluteMinExtent;
-    }
-    this.minExtentTimes2 = this.minExtent * 2;
+    setGeometryFactory(geometryFactory);
     this.root = root;
   }
 
@@ -90,8 +75,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  // TODO forEach and remove in one call
-
   @Override
   public boolean forEach(final Consumer<? super T> action) {
     try {
@@ -101,6 +84,8 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
       return false;
     }
   }
+
+  // TODO forEach and remove in one call
 
   @Override
   public boolean forEach(final double x, final double y, final Consumer<? super T> action) {
@@ -157,32 +142,22 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  public void insertItem(final double minX, final double minY, final double maxX, final double maxY,
-    final T item) {
+  public final void insertItem(final double minX, final double minY, final double maxX,
+    final double maxY, final T item) {
     final double delX = maxX - minX;
-    if (delX < this.minExtent && delX > 0) {
-      this.minExtent = this.geometryFactory.makeXyPrecise(delX);
-      if (this.minExtent < this.absoluteMinExtent) {
-        this.minExtent = this.absoluteMinExtent;
-        this.minExtentTimes2 = this.minExtent * 2;
-      }
-    }
+    setMinExtent(delX);
     final double delY = maxY - minY;
-    if (delY < this.minExtent & delY > 0) {
-      this.minExtent = this.geometryFactory.makeXyPrecise(delY);
-      if (this.minExtent < this.absoluteMinExtent) {
-        this.minExtent = this.absoluteMinExtent;
-        this.minExtentTimes2 = this.minExtent * 2;
-      }
-    }
+    setMinExtent(delY);
 
     if (this.root.insertRoot(this, minX, minY, maxX, maxY, item)) {
       this.size++;
     }
   }
 
-  public void insertItem(final double x, final double y, final T item) {
-    insertItem(x, y, x, y, item);
+  public final void insertItem(final double x, final double y, final T item) {
+    if (this.root.insertRoot(this, x, y, x, y, item)) {
+      this.size++;
+    }
   }
 
   @Override
@@ -211,7 +186,34 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
+    if (geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.DEFAULT_2D;
+    } else {
+      this.geometryFactory = geometryFactory;
+    }
+    if (this.geometryFactory.isFloating()) {
+      this.absoluteMinExtent = 0.00000001;
+    } else {
+      this.absoluteMinExtent = this.geometryFactory.getResolutionX();
+      if (this.absoluteMinExtent < 0) {
+        this.absoluteMinExtent = 0.00000001;
+      }
+    }
+    if (this.minExtent < this.absoluteMinExtent) {
+      this.minExtent = this.absoluteMinExtent;
+      this.minExtentTimes2 = this.minExtent * 2;
+    }
+  }
+
+  private void setMinExtent(double minExtent) {
+    if (minExtent > 0 && minExtent < this.minExtent) {
+      minExtent = this.geometryFactory.makeXPrecise(minExtent);
+      if (minExtent <= this.absoluteMinExtent) {
+        minExtent = this.absoluteMinExtent;
+      }
+      this.minExtent = minExtent;
+      this.minExtentTimes2 = minExtent * 2;
+    }
   }
 
   public void setUseEquals(final boolean useEquals) {
