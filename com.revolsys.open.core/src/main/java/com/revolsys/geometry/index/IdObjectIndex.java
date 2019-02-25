@@ -10,6 +10,8 @@ import com.revolsys.geometry.model.BoundingBoxProxy;
 public interface IdObjectIndex<T> extends Iterable<T> {
   public T add(final T object);
 
+  void clear();
+
   void forEach(BoundingBoxProxy boundingBox, Consumer<? super T> action);
 
   void forEach(BoundingBoxProxy boundingBox, Predicate<? super T> filter,

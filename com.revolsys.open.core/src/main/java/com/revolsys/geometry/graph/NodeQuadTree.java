@@ -19,6 +19,11 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   }
 
   @Override
+  public void clear() {
+    this.graph.clear();
+  }
+
+  @Override
   public BoundingBox getBoundingBox(final Node<T> node) {
     if (node == null) {
       return BoundingBox.empty();

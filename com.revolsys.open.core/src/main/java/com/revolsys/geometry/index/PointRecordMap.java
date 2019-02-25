@@ -215,6 +215,11 @@ public class PointRecordMap {
     }
   }
 
+  @Override
+  public String toString() {
+    return this.recordMap.toString();
+  }
+
   public void write(final Channel<Record> out) {
     if (out != null) {
       for (final Point point : getKeys()) {

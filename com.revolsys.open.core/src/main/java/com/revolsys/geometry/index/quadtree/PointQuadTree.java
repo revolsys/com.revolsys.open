@@ -53,6 +53,11 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     this.geometryFactory = geometryFactory;
   }
 
+  @Override
+  public void clear() {
+    this.root = null;
+  }
+
   public boolean contains(final Point point) {
     if (this.root == null) {
       return false;

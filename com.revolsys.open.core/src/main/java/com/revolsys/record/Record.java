@@ -350,7 +350,7 @@ public interface Record
   }
 
   /**
-   * Equal if the the keys and values in the map are equal to those field values on the record.
+   * Equal if the keys and values in the map are equal to those field values on the record.
    * @param map
    */
   default boolean equalValues(final Map<String, ? extends Object> map) {

@@ -203,6 +203,33 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     this.edgeListeners.add(listener);
   }
 
+  public void clear() {
+    if (this.edgeIds != null) {
+      this.edgeIds.clear();
+    }
+    if (this.edgePropertiesById != null) {
+      this.edgePropertiesById.clear();
+    }
+    this.edgeIds.clear();
+    // TODO edgeIndex
+    if (this.edgeLinesById != null) {
+      this.edgeLinesById.clear();
+    }
+
+    if (this.edgeObjectsById != null) {
+      this.edgeObjectsById.clear();
+    }
+    if (this.edgesById != null) {
+      this.edgesById.clear();
+    }
+
+    this.nodeIndex.clear();
+    if (this.nodePropertiesById != null) {
+      this.nodePropertiesById.clear();
+    }
+    this.nodesIdsByPoint.clear();
+  }
+
   /**
    * Clone the object, setting the line property to the new value.
    *
