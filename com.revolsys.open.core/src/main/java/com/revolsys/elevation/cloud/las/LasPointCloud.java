@@ -15,7 +15,6 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
-import com.revolsys.elevation.cloud.las.pointformat.LasPoint0Core;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.elevation.cloud.las.zip.LazChunkedIterator;
 import com.revolsys.elevation.cloud.las.zip.LazPointwiseIterator;
@@ -28,7 +27,6 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.StringWriter;
 import com.revolsys.io.ZipUtil;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.html.HtmlWriter;
@@ -70,7 +68,7 @@ public class LasPointCloud extends BaseObjectWithProperties
   private boolean classificationsLoaded;
 
   public LasPointCloud(final LasPointFormat pointFormat, final GeometryFactory geometryFactory) {
-    final LasPointCloudHeader header = new LasPointCloudHeader(pointFormat, geometryFactory);
+    final LasPointCloudHeader header = new LasPointCloudHeader(this, pointFormat, geometryFactory);
     this.header = header;
     this.geometryFactory = header.getGeometryFactory();
   }
@@ -99,7 +97,7 @@ public class LasPointCloud extends BaseObjectWithProperties
   }
 
   @SuppressWarnings("unchecked")
-  public <P extends LasPoint0Core> P addPoint(final double x, final double y, final double z) {
+  public <P extends LasPoint> P addPoint(final double x, final double y, final double z) {
     final LasPoint lasPoint = this.header.newLasPoint(this, x, y, z);
     this.points.add(lasPoint);
     return (P)lasPoint;
@@ -228,10 +226,10 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   private synchronized void loadAllPoints() {
     if (!this.allLoaded && this.lasResource != null) {
-      this.allLoaded = true;
       final List<LasPoint> points = new ArrayList<>((int)getPointCount());
       forEachPoint(points::add);
       this.points = points;
+      this.allLoaded = true;
     }
   }
 
@@ -253,7 +251,7 @@ public class LasPointCloud extends BaseObjectWithProperties
     } else {
       reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       this.exists = true;
-      this.header = new LasPointCloudHeader(reader, this.geometryFactory);
+      this.header = new LasPointCloudHeader(this, reader, this.geometryFactory);
       this.geometryFactory = this.header.getGeometryFactory();
       if (this.header.getPointCount() == 0) {
         reader.close();
@@ -351,14 +349,4 @@ public class LasPointCloud extends BaseObjectWithProperties
     writer.endTag();
   }
 
-  public void writePointCloud(final Object target) {
-    final Resource resource = Resource.getResource(target);
-    try (
-      EndianOutputStream out = resource.newBufferedOutputStream(EndianOutputStream::new)) {
-      this.header.writeHeader(out);
-      for (final LasPoint point : this.points) {
-        point.write(out);
-      }
-    }
-  }
 }

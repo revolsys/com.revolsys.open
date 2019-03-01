@@ -3,7 +3,7 @@ package com.revolsys.elevation.cloud.las.pointformat;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.io.endian.EndianOutput;
+import com.revolsys.io.channels.ChannelWriter;
 
 public class LasPoint9GpsTimeWavePackets extends LasPoint6GpsTime implements LasPointWavePackets {
   private static final long serialVersionUID = 1L;
@@ -69,7 +69,7 @@ public class LasPoint9GpsTimeWavePackets extends LasPoint6GpsTime implements Las
   @Override
   public void read(final LasPointCloud pointCloud, final ChannelReader reader) {
     super.read(pointCloud, reader);
-    this.wavePacketDescriptorIndex = reader.getByte();
+    this.wavePacketDescriptorIndex = reader.getUnsignedByte();
     this.byteOffsetToWaveformData = reader.getUnsignedLong();
     this.waveformPacketSizeInBytes = reader.getUnsignedInt();
     this.returnPointWaveformLocation = reader.getFloat();
@@ -92,14 +92,14 @@ public class LasPoint9GpsTimeWavePackets extends LasPoint6GpsTime implements Las
   }
 
   @Override
-  public void write(final EndianOutput out) {
-    super.write(out);
-    out.write(this.wavePacketDescriptorIndex);
-    out.writeLEUnsignedLong(this.byteOffsetToWaveformData);
-    out.writeLEUnsignedInt(this.waveformPacketSizeInBytes);
-    out.writeLEFloat(this.returnPointWaveformLocation);
-    out.writeLEFloat(this.xT);
-    out.writeLEFloat(this.yT);
-    out.writeLEFloat(this.zT);
+  public void writeLasPoint(final ChannelWriter out) {
+    super.writeLasPoint(out);
+    out.putUnsignedByte(this.wavePacketDescriptorIndex);
+    out.putUnsignedLong(this.byteOffsetToWaveformData);
+    out.putUnsignedInt(this.waveformPacketSizeInBytes);
+    out.putFloat(this.returnPointWaveformLocation);
+    out.putFloat(this.xT);
+    out.putFloat(this.yT);
+    out.putFloat(this.zT);
   }
 }

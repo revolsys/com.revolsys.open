@@ -1,9 +1,9 @@
 package com.revolsys.elevation.cloud.las;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Map;
-import java.util.function.BiFunction;
+import java.nio.channels.Channels;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -16,10 +16,10 @@ import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V1;
 import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V2;
 import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.io.Buffers;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.Pair;
 
 public class LasZipHeader implements MapSerializer {
   public static final Version VERSION_1_0 = new Version(1, 0);
@@ -34,9 +34,17 @@ public class LasZipHeader implements MapSerializer {
 
   private static final int LAS_ZIP_TAG = 22204;
 
-  public static void init(
-    final Map<Pair<String, Integer>, BiFunction<LasPointCloudHeader, byte[], Object>> vlrfactory) {
-    vlrfactory.put(new Pair<>(LAS_ZIP, LAS_ZIP_TAG), LasZipHeader::newLasZipHeader);
+  public static void init() {
+    new LasVariableLengthRecordConverterFunction(LAS_ZIP, LAS_ZIP_TAG,
+      LasZipHeader::newLasZipHeader, (pointCloud, variable) -> {
+        final Object value = variable.getValue();
+        if (value instanceof LasZipHeader) {
+          final LasZipHeader header = (LasZipHeader)value;
+          return header.toBytes(pointCloud, variable);
+        } else {
+          return null;
+        }
+      });
   }
 
   private static LasZipHeader newLasZipHeader(final LasPointCloudHeader header,
@@ -91,7 +99,8 @@ public class LasZipHeader implements MapSerializer {
     this.sizes = new int[this.numItems];
     this.versions = new int[this.numItems];
     for (int i = 0; i < this.numItems; i++) {
-      this.types[i] = LazItemType.fromOrdinal(Buffers.getLEUnsignedShort(buffer));
+      final int typeId = Buffers.getLEUnsignedShort(buffer);
+      this.types[i] = LazItemType.fromId(typeId);
       this.sizes[i] = Buffers.getLEUnsignedShort(buffer);
       this.versions[i] = Buffers.getLEUnsignedShort(buffer);
     }
@@ -179,6 +188,29 @@ public class LasZipHeader implements MapSerializer {
       }
     }
     return pointDecompressors;
+  }
+
+  public byte[] toBytes(final LasPointCloud cloud, final LasVariableLengthRecord variable) {
+    final ByteArrayOutputStream bytes = new ByteArrayOutputStream(34 + 6 * this.numItems);
+    try (
+      ChannelWriter out = new ChannelWriter(Channels.newChannel(bytes))) {
+      out.putUnsignedShort(this.compressor);
+      out.putUnsignedShort(this.coder);
+      out.putUnsignedByte(this.version.getMajor());
+      out.putUnsignedByte(this.version.getMinor());
+      out.putUnsignedShort(this.versionRevision);
+      out.putUnsignedInt(this.options);
+      out.putUnsignedInt(this.chunkSize);
+      out.putUnsignedLong(this.numberOfSpecialEvlrs);
+      out.putUnsignedLong(this.offsetToSpecialEvlrs);
+      out.putUnsignedShort(this.numItems);
+      for (int i = 0; i < this.numItems; i++) {
+        out.putUnsignedShort(this.types[i].getId());
+        out.putUnsignedShort(this.sizes[i]);
+        out.putUnsignedShort(this.versions[i]);
+      }
+    }
+    return bytes.toByteArray();
   }
 
   @Override

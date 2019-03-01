@@ -100,4 +100,18 @@ public interface PointCloud<P extends Point>
   void refreshClassificationCounts();
 
   String toHtml();
+
+  default boolean writePointCloud(final Object target) {
+    return writePointCloud(target, MapEx.EMPTY);
+  }
+
+  default boolean writePointCloud(final Object target, final MapEx properties) {
+    final PointCloudWriteFactory factory = IoFactory.factory(PointCloudWriteFactory.class, target);
+    if (factory == null) {
+      return false;
+    } else {
+      final Resource resource = Resource.getResource(target);
+      return factory.writePointCloud(this, resource, properties);
+    }
+  }
 }

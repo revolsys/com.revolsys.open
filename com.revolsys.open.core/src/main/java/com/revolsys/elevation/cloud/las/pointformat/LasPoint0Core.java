@@ -3,7 +3,7 @@ package com.revolsys.elevation.cloud.las.pointformat;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.io.endian.EndianOutput;
+import com.revolsys.io.channels.ChannelWriter;
 
 public class LasPoint0Core extends BaseLasPoint {
   private static final long serialVersionUID = 1L;
@@ -253,21 +253,21 @@ public class LasPoint0Core extends BaseLasPoint {
   }
 
   @Override
-  public void write(final EndianOutput out) {
+  public void writeLasPoint(final ChannelWriter out) {
     final int xRecord = getXInt();
     final int yRecord = getYInt();
     final int zRecord = getZInt();
 
-    out.writeLEInt(xRecord);
-    out.writeLEInt(yRecord);
-    out.writeLEInt(zRecord);
+    out.putInt(xRecord);
+    out.putInt(yRecord);
+    out.putInt(zRecord);
 
-    out.writeLEUnsignedShort(this.intensity);
+    out.putUnsignedShort(this.intensity);
 
-    out.write(this.returnByte);
-    out.write(this.classificationByte);
-    out.write(this.scanAngleRank);
-    out.write(this.userData);
-    out.writeLEUnsignedShort(this.pointSourceID);
+    out.putByte(this.returnByte);
+    out.putByte(this.classificationByte);
+    out.putByte(this.scanAngleRank);
+    out.putUnsignedByte(this.userData);
+    out.putUnsignedShort(this.pointSourceID);
   }
 }

@@ -1,12 +1,10 @@
 package com.revolsys.elevation.cloud.las;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -14,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import java.util.function.BiFunction;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
@@ -27,7 +25,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.io.endian.EndianOutputStream;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.html.HtmlWriter;
 import com.revolsys.record.schema.RecordDefinition;
@@ -37,11 +35,11 @@ import com.revolsys.util.Pair;
 
 public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryProxy, MapSerializer {
 
-  private static final Map<Pair<String, Integer>, BiFunction<LasPointCloudHeader, byte[], Object>> PROPERTY_FACTORY_BY_KEY = new HashMap<>();
+  private static final Map<Pair<String, Integer>, LasVariableLengthRecordConverter> CONVERTER_FACTORY_BY_KEY = new HashMap<>();
 
   static {
-    LasProjection.init(PROPERTY_FACTORY_BY_KEY);
-    LasZipHeader.init(PROPERTY_FACTORY_BY_KEY);
+    LasProjection.init();
+    LasZipHeader.init();
   }
 
   public static final Version VERSION_1_0 = new Version(1, 0);
@@ -56,9 +54,18 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   private static final long MAX_UNSIGNED_INT = 1l << 32;
 
-  private final double[] bounds;
+  public static void addVariableLengthRecordConverter(
+    final LasVariableLengthRecordConverter converter) {
+    final Pair<String, Integer> key = converter.getKey();
+    CONVERTER_FACTORY_BY_KEY.put(key, converter);
+  }
 
-  private int dayOfYear = new GregorianCalendar().get(Calendar.DAY_OF_YEAR);
+  public static LasVariableLengthRecordConverter getVariableLengthRecordConverter(
+    final Pair<String, Integer> key) {
+    return CONVERTER_FACTORY_BY_KEY.get(key);
+  }
+
+  private final double[] bounds;
 
   private int fileSourceId;
 
@@ -90,9 +97,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   private String systemIdentifier = "TRANSFORMATION";
 
-  private int year = new GregorianCalendar().get(Calendar.YEAR);
-
-  private Date date;
+  private LocalDate date = LocalDate.now();
 
   private int headerSize;
 
@@ -102,8 +107,12 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   private LasZipHeader lasZipHeader;
 
+  private final LasPointCloud pointCloud;
+
   @SuppressWarnings("unused")
-  public LasPointCloudHeader(final ChannelReader reader, final GeometryFactory geometryFactory) {
+  public LasPointCloudHeader(final LasPointCloud pointCloud, final ChannelReader reader,
+    final GeometryFactory geometryFactory) {
+    this.pointCloud = pointCloud;
     setGeometryFactory(geometryFactory);
     try {
       if (reader.getUsAsciiString(4).equals("LASF")) {
@@ -117,12 +126,9 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
         this.version = new Version(reader);
         this.systemIdentifier = reader.getUsAsciiString(32);
         this.generatingSoftware = reader.getUsAsciiString(32);
-        this.dayOfYear = reader.getUnsignedShort();
-        this.year = reader.getUnsignedShort();
-        final Calendar calendar = new GregorianCalendar();
-        calendar.set(Calendar.YEAR, this.year);
-        calendar.set(Calendar.DAY_OF_YEAR, this.dayOfYear);
-        this.date = new Date(calendar.getTimeInMillis());
+        final int dayOfYear = reader.getUnsignedShort() + 1;
+        final int year = reader.getUnsignedShort();
+        this.date = LocalDate.ofYearDay(year, dayOfYear);
         this.headerSize = reader.getUnsignedShort();
         this.pointRecordsOffset = reader.getUnsignedInt();
         final long numberOfVariableLengthRecords = reader.getUnsignedInt();
@@ -195,8 +201,9 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     }
   }
 
-  public LasPointCloudHeader(final LasPointFormat pointFormat,
+  public LasPointCloudHeader(final LasPointCloud pointCloud, final LasPointFormat pointFormat,
     final GeometryFactory geometryFactory) {
+    this.pointCloud = pointCloud;
     this.pointFormat = pointFormat;
     if (this.pointFormat.getId() > 5) {
       this.globalEncoding |= 0b10000;
@@ -204,6 +211,14 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     this.recordLength = pointFormat.getRecordLength();
     setGeometryFactory(geometryFactory);
     this.bounds = RectangleUtil.newBounds(3);
+    this.projectId = UUID.randomUUID();
+  }
+
+  protected void addLasProperty(final Pair<String, Integer> key, final String description,
+    final Object value) {
+    final LasVariableLengthRecord property = new LasVariableLengthRecord(this.pointCloud, key,
+      description, value);
+    this.lasProperties.put(key, property);
   }
 
   protected void addProperty(final LasVariableLengthRecord property) {
@@ -219,17 +234,26 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     Arrays.fill(this.bounds, Double.NaN);
   }
 
+  public Object convertVariableLenthRecord(final Pair<String, Integer> key, final byte[] bytes) {
+    final LasVariableLengthRecordConverter converter = getVariableLengthRecordConverter(key);
+    if (converter == null) {
+      return bytes;
+    } else {
+      return converter.readObject(this, bytes);
+    }
+  }
+
   @Override
   public BoundingBox getBoundingBox() {
     return this.geometryFactory.newBoundingBox(3, this.bounds);
   }
 
-  public Date getDate() {
+  public LocalDate getDate() {
     return this.date;
   }
 
   public int getDayOfYear() {
-    return this.dayOfYear;
+    return this.date.getDayOfYear() - 1;
   }
 
   public int getFileSourceId() {
@@ -251,6 +275,33 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   protected LasVariableLengthRecord getLasProperty(final Pair<String, Integer> key) {
     return this.lasProperties.get(key);
+  }
+
+  public List<Pair<String, Integer>> getLasPropertyKeys() {
+    return Lists.toArray(this.lasProperties.keySet());
+  }
+
+  public <V> V getLasPropertyValue(final Pair<String, Integer> key) {
+    final LasVariableLengthRecord property = this.lasProperties.get(key);
+    if (property == null) {
+      return null;
+    } else {
+      return property.getValue();
+    }
+  }
+
+  public <V> V getLasPropertyValue(final Pair<String, Integer> key, final V defaultValue) {
+    final LasVariableLengthRecord property = this.lasProperties.get(key);
+    if (property == null) {
+      return defaultValue;
+    } else {
+      final V value = property.getValue();
+      if (value == null) {
+        return defaultValue;
+      } else {
+        return value;
+      }
+    }
   }
 
   public LasZipHeader getLasZipHeader() {
@@ -290,7 +341,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
   }
 
   public int getYear() {
-    return this.year;
+    return this.date.getYear();
   }
 
   public boolean isLaszip() {
@@ -317,20 +368,18 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
       final int valueLength = reader.getUnsignedShort();
       final String description = reader.getUsAsciiString(32);
       final byte[] bytes = reader.getBytes(valueLength);
-      final LasVariableLengthRecord property = new LasVariableLengthRecord(userId, recordId,
+      final LasVariableLengthRecord property = new LasVariableLengthRecord(this, userId, recordId,
         description, bytes);
       addProperty(property);
       byteCount += 54 + valueLength;
     }
+
     for (final Entry<Pair<String, Integer>, LasVariableLengthRecord> entry : this.lasProperties
       .entrySet()) {
       final Pair<String, Integer> key = entry.getKey();
       final LasVariableLengthRecord property = entry.getValue();
-      final BiFunction<LasPointCloudHeader, byte[], Object> converter = PROPERTY_FACTORY_BY_KEY
-        .get(key);
-      if (converter != null) {
-        property.convertValue(converter, this);
-      }
+      final LasVariableLengthRecordConverter converter = getVariableLengthRecordConverter(key);
+      property.getValue();
     }
     return byteCount;
   }
@@ -347,6 +396,14 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   public void setCoordinateSystemInternal(final CoordinateSystem coordinateSystem) {
     this.geometryFactory = this.geometryFactory.convertCoordinateSystem(coordinateSystem);
+  }
+
+  public void setDate(final LocalDate date) {
+    if (date == null) {
+      this.date = LocalDate.now();
+    } else {
+      this.date = date;
+    }
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
@@ -453,24 +510,22 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     return map;
   }
 
-  public void writeHeader(final EndianOutputStream out) {
-    out.writeBytes("LASF");
-    out.writeLEUnsignedShort(this.fileSourceId);
-    out.writeLEUnsignedShort(this.globalEncoding);
+  public void writeHeader(final ChannelWriter out) {
+    out.putString("LASF", 4);
+    out.putUnsignedShort(this.fileSourceId);
+    out.putUnsignedShort(this.globalEncoding);
     final long uuidLeast = this.projectId.getLeastSignificantBits();
     final long uuidMost = this.projectId.getMostSignificantBits();
-    out.writeLELong(uuidLeast);
-    out.writeLELong(uuidMost);
+    out.putLong(uuidLeast);
+    out.putLong(uuidMost);
 
-    out.write((byte)this.version.getMajor());
-    out.write((byte)this.version.getMinor());
-    // out.writeString("TRANSFORMATION", 32); // System Identifier
-    // out.writeString("RevolutionGis", 32); // Generating Software
-    out.writeString(this.systemIdentifier, 32); // System Identifier
-    out.writeString(this.generatingSoftware, 32); // Generating Software
+    out.putByte((byte)this.version.getMajor());
+    out.putByte((byte)this.version.getMinor());
+    out.putString(this.systemIdentifier, 32);
+    out.putString(this.generatingSoftware, 32);
 
-    out.writeLEUnsignedShort(this.dayOfYear);
-    out.writeLEUnsignedShort(this.year);
+    out.putUnsignedShort(getDayOfYear());
+    out.putUnsignedShort(getYear());
 
     int headerSize = 227;
     if (this.version.atLeast(LasPointCloudHeader.VERSION_1_3)) {
@@ -479,80 +534,80 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
         headerSize += 140;
       }
     }
-    out.writeLEUnsignedShort(headerSize);
+    out.putUnsignedShort(headerSize);
 
     final int numberOfVariableLengthRecords = this.lasProperties.size();
     int variableLengthRecordsSize = 0;
     for (final LasVariableLengthRecord record : this.lasProperties.values()) {
-      variableLengthRecordsSize += 54 + record.getBytes().length;
+      variableLengthRecordsSize += 54 + record.getValueLength();
     }
 
     final long offsetToPointData = headerSize + variableLengthRecordsSize;
-    out.writeLEUnsignedInt(offsetToPointData);
+    out.putUnsignedInt(offsetToPointData);
 
-    out.writeLEUnsignedInt(numberOfVariableLengthRecords);
+    out.putUnsignedInt(numberOfVariableLengthRecords);
 
     final int pointFormatId = this.pointFormat.getId();
-    out.write(pointFormatId);
-    out.writeLEUnsignedShort(this.recordLength);
+    out.putUnsignedByte((short)pointFormatId);
+    out.putUnsignedShort(this.recordLength);
     if (this.pointCount > MAX_UNSIGNED_INT) {
-      out.writeLEUnsignedInt(0);
+      out.putUnsignedInt(0);
     } else {
-      out.writeLEUnsignedInt(this.pointCount);
+      out.putUnsignedInt(this.pointCount);
     }
     for (int i = 0; i < 5; i++) {
       final long count = this.pointCountByReturn[i];
       if (count > MAX_UNSIGNED_INT) {
-        out.writeLEUnsignedInt(0);
+        out.putUnsignedInt(0);
       } else {
-        out.writeLEUnsignedInt(count);
+        out.putUnsignedInt(count);
       }
     }
     for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
       final double resolution = this.geometryFactory.getResolution(axisIndex);
-      out.writeLEDouble(resolution);
+      out.putDouble(resolution);
     }
     for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
       final double offset = this.geometryFactory.getOffset(axisIndex);
-      out.writeLEDouble(offset);
+      out.putDouble(offset);
     }
 
     for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
       final double max = this.bounds[3 + axisIndex];
-      out.writeLEDouble(max);
+      out.putDouble(max);
       final double min = this.bounds[axisIndex];
-      out.writeLEDouble(min);
+      out.putDouble(min);
     }
 
     if (this.version.atLeast(LasPointCloudHeader.VERSION_1_3)) {
-      out.writeLEUnsignedLong(0); // startOfWaveformDataPacketRecord
+      out.putUnsignedLong(0); // startOfWaveformDataPacketRecord
       if (this.version.atLeast(LasPointCloudHeader.VERSION_1_4)) {
-        out.writeLEUnsignedLong(0); // startOfFirstExetendedDataRecord
-        out.writeLEUnsignedInt(0); // numberOfExtendedVariableLengthRecords
-        out.writeLEUnsignedLong(this.pointCount);
+        out.putUnsignedLong(0); // startOfFirstExetendedDataRecord
+        out.putUnsignedInt(0); // numberOfExtendedVariableLengthRecords
+        out.putUnsignedLong(this.pointCount);
         for (int i = 0; i < 15; i++) {
           final long count = this.pointCountByReturn[i];
-          out.writeLEUnsignedLong(count);
+          out.putUnsignedLong(count);
         }
       }
     }
 
     for (final LasVariableLengthRecord record : this.lasProperties.values()) {
-      out.writeLEUnsignedShort(0);
+      out.putUnsignedShort(0);
       final String userId = record.getUserId();
-      out.writeString(userId, 16);
+      out.putString(userId, 16);
 
       final int recordId = record.getRecordId();
-      out.writeLEUnsignedShort(recordId);
+      out.putUnsignedShort(recordId);
 
       final int valueLength = record.getValueLength();
-      out.writeLEUnsignedShort(valueLength);
+      out.putUnsignedShort(valueLength);
 
       final String description = record.getDescription();
-      out.writeString(description, 32);
+      out.putString(description, 32);
 
       final byte[] bytes = record.getBytes();
-      out.write(bytes);
+      out.putBytes(bytes);
     }
   }
 

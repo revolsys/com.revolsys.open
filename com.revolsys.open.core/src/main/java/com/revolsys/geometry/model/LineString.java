@@ -1448,8 +1448,26 @@ public interface LineString extends Lineal {
     }
   }
 
+  default double getX(final End end) {
+    if (end.isFrom()) {
+      return getX(0);
+    } else {
+      final int lastVertexIndex = getLastVertexIndex();
+      return getX(lastVertexIndex);
+    }
+  }
+
   default double getX(final int vertexIndex) {
     return getCoordinate(vertexIndex, X);
+  }
+
+  default double getY(final End end) {
+    if (end.isFrom()) {
+      return getY(0);
+    } else {
+      final int lastVertexIndex = getLastVertexIndex();
+      return getY(lastVertexIndex);
+    }
   }
 
   default double getY(final int vertexIndex) {

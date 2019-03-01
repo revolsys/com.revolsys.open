@@ -103,6 +103,22 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
     return this;
   }
 
+  public BoundingBoxEditor addBbox(final double x, final double y) {
+    if (x < this.minX) {
+      this.minX = x;
+    }
+    if (x > this.maxX) {
+      this.maxX = x;
+    }
+    if (y < this.minY) {
+      this.minY = y;
+    }
+    if (y > this.maxY) {
+      this.maxY = y;
+    }
+    return this;
+  }
+
   public BoundingBoxEditor addBbox(final double minX, final double minY, final double maxX,
     final double maxY) {
     if (minX < this.minX) {

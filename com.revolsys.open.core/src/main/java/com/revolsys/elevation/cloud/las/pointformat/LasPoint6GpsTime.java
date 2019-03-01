@@ -3,7 +3,7 @@ package com.revolsys.elevation.cloud.las.pointformat;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.io.endian.EndianOutput;
+import com.revolsys.io.channels.ChannelWriter;
 
 public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   private static final long serialVersionUID = 1L;
@@ -290,17 +290,17 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   }
 
   @Override
-  public void write(final EndianOutput out) {
+  public void writeLasPoint(final ChannelWriter out) {
     final int xRecord = getXInt();
     final int yRecord = getYInt();
     final int zRecord = getZInt();
 
-    out.writeLEInt(xRecord);
-    out.writeLEInt(yRecord);
-    out.writeLEInt(zRecord);
+    out.putInt(xRecord);
+    out.putInt(yRecord);
+    out.putInt(zRecord);
 
-    out.writeLEUnsignedShort(this.intensity);
-    out.write(this.returnByte);
+    out.putUnsignedShort(this.intensity);
+    out.putByte(this.returnByte);
 
     byte classificationFlags = 0;
     if (this.synthetic) {
@@ -322,12 +322,12 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
     if (this.edgeOfFlightLine) {
       classificationFlags |= 0b1000000;
     }
-    out.write(classificationFlags);
-    out.write(this.classification);
-    out.write(this.userData);
-    out.writeLEShort(this.scanAngle);
-    out.writeLEUnsignedShort(this.pointSourceID);
-    out.writeLEDouble(this.gpsTime);
+    out.putByte(classificationFlags);
+    out.putUnsignedByte(this.classification);
+    out.putUnsignedByte(this.userData);
+    out.putShort(this.scanAngle);
+    out.putUnsignedShort(this.pointSourceID);
+    out.putDouble(this.gpsTime);
   }
 
 }

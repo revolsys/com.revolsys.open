@@ -148,6 +148,19 @@ public class AbstractChannelWriter implements BaseCloseable {
     this.buffer.putShort(s);
   }
 
+  public void putString(final String text, final int maxLength) {
+    final byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+    int length = bytes.length;
+    if (length <= maxLength) {
+      putBytes(bytes, length);
+      for (int i = length; i < maxLength; i++) {
+        putByte((byte)0);
+      }
+    } else {
+      putBytes(bytes, maxLength);
+    }
+  }
+
   /**
    * Convert the string to UTF-8 bytes and write the number of bytes followed by the bytes.
    */

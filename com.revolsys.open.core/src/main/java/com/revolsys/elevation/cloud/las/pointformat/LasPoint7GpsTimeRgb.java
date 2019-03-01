@@ -3,7 +3,7 @@ package com.revolsys.elevation.cloud.las.pointformat;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.io.endian.EndianOutput;
+import com.revolsys.io.channels.ChannelWriter;
 
 public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb {
   private static final long serialVersionUID = 1L;
@@ -56,10 +56,10 @@ public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb
   }
 
   @Override
-  public void write(final EndianOutput out) {
-    super.write(out);
-    out.writeLEUnsignedShort(this.red);
-    out.writeLEUnsignedShort(this.green);
-    out.writeLEUnsignedShort(this.blue);
+  public void writeLasPoint(ChannelWriter out) {
+    super.writeLasPoint(out);
+    out.putUnsignedShort(this.red);
+    out.putUnsignedShort(this.green);
+    out.putUnsignedShort(this.blue);
   }
 }

@@ -197,10 +197,14 @@ public interface SwingUtil {
 
   static void autoAdjustSize(final Window window) {
     window.pack();
+    final int windowX = window.getX();
+    final int windowY = window.getY();
+    final int windowWidth = window.getWidth();
+    final int windowHeight = window.getHeight();
 
     final Rectangle bounds = getScreenBounds();
-    final int width = Math.min(window.getWidth(), bounds.width - 20 - window.getX());
-    final int height = Math.min(window.getHeight(), bounds.height - 20 - window.getY());
+    final int width = Math.min(windowWidth, bounds.width - 20 - (windowX - (int)bounds.getX()));
+    final int height = Math.min(windowHeight, bounds.height - 20 - (windowY - (int)bounds.getY()));
     window.setSize(width, height);
   }
 

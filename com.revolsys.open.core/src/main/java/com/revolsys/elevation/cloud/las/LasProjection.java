@@ -1,14 +1,8 @@
 package com.revolsys.elevation.cloud.las;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
@@ -24,125 +18,109 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.unit.LinearUnit;
-import com.revolsys.io.Buffers;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.io.format.tiff.TiffImage;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
 
 public class LasProjection {
-  private static final int LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS = 34737;
-
-  private static final int LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG = 34735;
-
-  private static final int LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS = 34736;
-
   private static final String LASF_PROJECTION = "LASF_Projection";
 
-  private static final int LASF_PROJECTION_WKT_COORDINATE_SYSTEM = 2112;
+  private static final int ID_TIFF_GEO_KEY_DIRECTORY_TAG = 34735;
+
+  private static final int ID_TIFF_GEO_DOUBLE_PARAMS = 34736;
+
+  private static final int ID_TIFF_GEO_ASCII_PARAMS = 34737;
+
+  private static final int ID_OGC_MATH_TRANSFORM_WKT_RECORD = 2111; // Not yet
+                                                                    // supported
+
+  private static final Pair<String, Integer> KEY_TIFF_GEO_ASCII_PARAMS = new Pair<>(LASF_PROJECTION,
+    ID_TIFF_GEO_ASCII_PARAMS);
+
+  private static final Pair<String, Integer> KEY_TIFF_GEO_DOUBLE_PARAMS = new Pair<>(
+    LASF_PROJECTION, ID_TIFF_GEO_DOUBLE_PARAMS);
+
+  private static final Pair<String, Integer> KEY_WKT_COORDINATE_SYSTEM = new Pair<>(LASF_PROJECTION,
+    2112);
 
   @SuppressWarnings("unused")
   private static Object convertGeoTiffProjection(final LasPointCloudHeader header,
     final byte[] bytes) {
-    try {
-      final List<Double> doubleParams = new ArrayList<>();
-      {
-        final LasVariableLengthRecord doubleParamsProperty = header
-          .getLasProperty(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS));
-        if (doubleParamsProperty != null) {
-          final byte[] doubleParamBytes = doubleParamsProperty.getBytes();
-          final ByteBuffer buffer = ByteBuffer.wrap(doubleParamBytes);
-          buffer.order(ByteOrder.LITTLE_ENDIAN);
-          for (int i = 0; i < doubleParamBytes.length / 8; i++) {
-            final double value = buffer.getDouble();
-            doubleParams.add(value);
-          }
-        }
+    final double[] doubleParams = header.getLasPropertyValue(KEY_TIFF_GEO_DOUBLE_PARAMS,
+      new double[0]);
+    final byte[] asciiParamsBytes = header.getLasPropertyValue(KEY_TIFF_GEO_ASCII_PARAMS,
+      new byte[0]);
+
+    final Map<Integer, Object> properties = new LinkedHashMap<>();
+    final int[] geoKeys = LasVariableLengthRecordConverter.getUnsignedShortArray(bytes);
+
+    int i = 0;
+    final int keyDirectoryVersion = geoKeys[i++];
+    final int keyRevision = geoKeys[i++];
+    final int minorRevision = geoKeys[i++];
+    final int keyCount = geoKeys[i++];
+    for (int keyIndex = 0; keyIndex < keyCount; keyIndex++) {
+      final int keyId = geoKeys[i++];
+      final int tagLocation = geoKeys[i++];
+      final int count = geoKeys[i++];
+      final int offset = geoKeys[i++];
+      if (tagLocation == 0) {
+        properties.put(keyId, offset);
+      } else if (tagLocation == ID_TIFF_GEO_DOUBLE_PARAMS) {
+        final double value = doubleParams[offset];
+        properties.put(keyId, value);
+      } else if (tagLocation == ID_TIFF_GEO_ASCII_PARAMS) {
+        final String value = new String(asciiParamsBytes, offset, count, StandardCharsets.US_ASCII);
+        properties.put(keyId, value);
       }
-      byte[] asciiParamsBytes;
-      {
-        final LasVariableLengthRecord asciiParamsProperty = header
-          .getLasProperty(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS));
-        if (asciiParamsProperty == null) {
-          asciiParamsBytes = new byte[0];
-        } else {
-          asciiParamsBytes = asciiParamsProperty.getBytes();
-        }
-      }
-      final Map<Integer, Object> properties = new LinkedHashMap<>();
-      final ByteBuffer buffer = ByteBuffer.wrap(bytes);
-      buffer.order(ByteOrder.LITTLE_ENDIAN);
-      final int keyDirectoryVersion = Buffers.getLEUnsignedShort(buffer);
-      final int keyRevision = Buffers.getLEUnsignedShort(buffer);
-      final int minorRevision = Buffers.getLEUnsignedShort(buffer);
-      final int numberOfKeys = Buffers.getLEUnsignedShort(buffer);
-      for (int i = 0; i < numberOfKeys; i++) {
-        final int keyId = Buffers.getLEUnsignedShort(buffer);
-        final int tagLocation = Buffers.getLEUnsignedShort(buffer);
-        final int count = Buffers.getLEUnsignedShort(buffer);
-        final int offset = Buffers.getLEUnsignedShort(buffer);
-        if (tagLocation == 0) {
-          properties.put(keyId, offset);
-        } else if (tagLocation == LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS) {
-          final double value = doubleParams.get(offset);
-          properties.put(keyId, value);
-        } else if (tagLocation == LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS) {
-          final String value = new String(asciiParamsBytes, offset, count,
-            StandardCharsets.US_ASCII);
-          properties.put(keyId, value);
-        }
-      }
-      CoordinateSystem coordinateSystem = null;
-      int coordinateSystemId = Maps.getInteger(properties, TiffImage.PROJECTED_COORDINATE_SYSTEM_ID,
+    }
+    CoordinateSystem coordinateSystem = null;
+    int coordinateSystemId = Maps.getInteger(properties, TiffImage.PROJECTED_COORDINATE_SYSTEM_ID,
+      0);
+    if (coordinateSystemId == 0) {
+      coordinateSystemId = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID,
         0);
-      if (coordinateSystemId == 0) {
-        coordinateSystemId = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID,
-          0);
-        if (coordinateSystemId != 0) {
-          coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
-        }
-      } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
-        final int geoSrid = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID,
-          0);
-        if (geoSrid != 0) {
-          if (geoSrid > 0 && geoSrid < 32767) {
-            final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
-              .getCoordinateSystem(geoSrid);
-            final String name = "unknown";
-            final CoordinateOperationMethod coordinateOperationMethod = TiffImage
-              .getProjection(properties);
-
-            final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
-            TiffImage.addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_1, properties,
-              TiffImage.STANDARD_PARALLEL_1_KEY);
-            TiffImage.addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_2, properties,
-              TiffImage.STANDARD_PARALLEL_2_KEY);
-            TiffImage.addDoubleParameter(parameters, ParameterNames.CENTRAL_MERIDIAN, properties,
-              TiffImage.LONGITUDE_OF_CENTER_2_KEY);
-            TiffImage.addDoubleParameter(parameters, ParameterNames.LATITUDE_OF_ORIGIN, properties,
-              TiffImage.LATITUDE_OF_CENTER_2_KEY);
-            TiffImage.addDoubleParameter(parameters, ParameterNames.FALSE_EASTING, properties,
-              TiffImage.FALSE_EASTING_KEY);
-            TiffImage.addDoubleParameter(parameters, ParameterNames.FALSE_NORTHING, properties,
-              TiffImage.FALSE_NORTHING_KEY);
-
-            final LinearUnit linearUnit = TiffImage.getLinearUnit(properties);
-            final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
-              coordinateSystemId, name, geographicCoordinateSystem, coordinateOperationMethod,
-              parameters, linearUnit);
-            coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(projectedCoordinateSystem);
-          }
-        }
-      } else {
+      if (coordinateSystemId != 0) {
         coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
       }
-      header.setCoordinateSystemInternal(coordinateSystem);
-      return coordinateSystem;
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
+    } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
+      final int geoSrid = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID, 0);
+      if (geoSrid != 0) {
+        if (geoSrid > 0 && geoSrid < 32767) {
+          final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
+            .getCoordinateSystem(geoSrid);
+          final String name = "unknown";
+          final CoordinateOperationMethod coordinateOperationMethod = TiffImage
+            .getProjection(properties);
+
+          final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
+          TiffImage.addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_1, properties,
+            TiffImage.STANDARD_PARALLEL_1_KEY);
+          TiffImage.addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_2, properties,
+            TiffImage.STANDARD_PARALLEL_2_KEY);
+          TiffImage.addDoubleParameter(parameters, ParameterNames.CENTRAL_MERIDIAN, properties,
+            TiffImage.LONGITUDE_OF_CENTER_2_KEY);
+          TiffImage.addDoubleParameter(parameters, ParameterNames.LATITUDE_OF_ORIGIN, properties,
+            TiffImage.LATITUDE_OF_CENTER_2_KEY);
+          TiffImage.addDoubleParameter(parameters, ParameterNames.FALSE_EASTING, properties,
+            TiffImage.FALSE_EASTING_KEY);
+          TiffImage.addDoubleParameter(parameters, ParameterNames.FALSE_NORTHING, properties,
+            TiffImage.FALSE_NORTHING_KEY);
+
+          final LinearUnit linearUnit = TiffImage.getLinearUnit(properties);
+          final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
+            coordinateSystemId, name, geographicCoordinateSystem, coordinateOperationMethod,
+            parameters, linearUnit);
+          coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(projectedCoordinateSystem);
+        }
+      }
+    } else {
+      coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
     }
+    header.setCoordinateSystemInternal(coordinateSystem);
+    return coordinateSystem;
   }
 
   private static Object convertWktProjection(final LasPointCloudHeader header, final byte[] bytes) {
@@ -161,12 +139,31 @@ public class LasProjection {
     }
   }
 
-  public static void init(
-    final Map<Pair<String, Integer>, BiFunction<LasPointCloudHeader, byte[], Object>> vlrfactory) {
-    vlrfactory.put(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG),
+  private static byte[] coordinateSystemToWktBytes(final LasPointCloud pointCloud,
+    final LasVariableLengthRecord variable) {
+    final Object value = variable.getValue();
+    if (value instanceof CoordinateSystem) {
+      final CoordinateSystem coordinateSystem = (CoordinateSystem)value;
+      final String wkt = EpsgCoordinateSystems.toWkt(coordinateSystem);
+      final byte[] stringBytes = wkt.getBytes(StandardCharsets.UTF_8);
+      final byte[] bytes = new byte[stringBytes.length + 1];
+      System.arraycopy(stringBytes, 0, bytes, 0, stringBytes.length);
+      return bytes;
+    } else {
+      throw new IllegalArgumentException(
+        "Not a CoordinateSystem\n" + value.getClass() + "\n" + value);
+    }
+  }
+
+  public static void init() {
+    LasVariableLengthRecordConverter.bytes(KEY_TIFF_GEO_ASCII_PARAMS);
+    LasVariableLengthRecordConverter.doubleArray(KEY_TIFF_GEO_DOUBLE_PARAMS);
+
+    new LasVariableLengthRecordConverterFunction(LASF_PROJECTION, ID_TIFF_GEO_KEY_DIRECTORY_TAG,
       LasProjection::convertGeoTiffProjection);
-    vlrfactory.put(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_WKT_COORDINATE_SYSTEM),
-      LasProjection::convertWktProjection);
+
+    new LasVariableLengthRecordConverterFunction(KEY_WKT_COORDINATE_SYSTEM,
+      LasProjection::convertWktProjection, LasProjection::coordinateSystemToWktBytes);
   }
 
   protected static void setCoordinateSystem(final LasPointCloudHeader header,
@@ -198,18 +195,12 @@ public class LasProjection {
           }
         }
         final byte[] bytes = byteOut.toByteArray();
-        final LasVariableLengthRecord property = new LasVariableLengthRecord(LASF_PROJECTION,
-          LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG, "TIFF GeoKeyDirectoryTag", bytes,
+        final LasVariableLengthRecord property = new LasVariableLengthRecord(header,
+          LASF_PROJECTION, ID_TIFF_GEO_KEY_DIRECTORY_TAG, "TIFF GeoKeyDirectoryTag", bytes,
           coordinateSystem);
         header.addProperty(property);
       } else {
-        final String wkt = EpsgCoordinateSystems.toWkt(coordinateSystem);
-        final byte[] stringBytes = wkt.getBytes(StandardCharsets.UTF_8);
-        final byte[] bytes = new byte[stringBytes.length + 1];
-        System.arraycopy(stringBytes, 0, bytes, 0, stringBytes.length);
-        final LasVariableLengthRecord property = new LasVariableLengthRecord(LASF_PROJECTION,
-          LASF_PROJECTION_WKT_COORDINATE_SYSTEM, "WKT", bytes, coordinateSystem);
-        header.addProperty(property);
+        header.addLasProperty(KEY_WKT_COORDINATE_SYSTEM, "WKT", coordinateSystem);
       }
     }
   }

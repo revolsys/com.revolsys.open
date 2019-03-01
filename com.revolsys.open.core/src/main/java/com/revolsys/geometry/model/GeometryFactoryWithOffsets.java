@@ -9,6 +9,32 @@ public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
 
   private static final long serialVersionUID = 1L;
 
+  public static GeometryFactory newWithOffsets(final CoordinateSystem coordinateSystem,
+    final double offsetX, final double scaleX, final double offsetY, final double scaleY,
+    final double offsetZ, final double scaleZ) {
+    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
+      if (coordinateSystem == null) {
+        return GeometryFactory.fixed3d(0, scaleX, scaleY, scaleZ);
+      } else {
+        return coordinateSystem.getGeometryFactoryFixed(3, scaleX, scaleY, scaleZ);
+      }
+    } else {
+      return new GeometryFactoryWithOffsets(coordinateSystem, offsetX, scaleX, offsetY, scaleY,
+        offsetZ, scaleZ);
+    }
+  }
+
+  public static GeometryFactory newWithOffsets(final int coordinateSystemId, final double offsetX,
+    final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
+    final double scaleZ) {
+    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
+      return GeometryFactory.fixed3d(coordinateSystemId, scaleX, scaleY, scaleZ);
+    } else {
+      return new GeometryFactoryWithOffsets(coordinateSystemId, offsetX, scaleX, offsetY, scaleY,
+        offsetZ, scaleZ);
+    }
+  }
+
   private final double offsetX;
 
   private final double offsetY;

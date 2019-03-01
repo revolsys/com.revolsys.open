@@ -1,41 +1,63 @@
 package com.revolsys.elevation.cloud.las;
 
 import java.util.Arrays;
-import java.util.function.BiFunction;
 
 import com.revolsys.util.Pair;
 
 public class LasVariableLengthRecord {
-  private final byte[] bytes;
+  private byte[] bytes;
 
   private final String description;
 
-  private final int recordId;
-
-  private final String userId;
-
   private Object value;
 
-  public LasVariableLengthRecord(final String userId, final int recordId, final String description,
-    final byte[] bytes) {
-    this.userId = userId;
-    this.recordId = recordId;
+  private boolean valueInitialized = false;
+
+  private final LasPointCloudHeader header;
+
+  private final Pair<String, Integer> key;
+
+  public LasVariableLengthRecord(final LasPointCloud pointCloud, final Pair<String, Integer> key,
+    final String description, final Object value) {
+    this(pointCloud.getHeader(), key, description);
+    final LasVariableLengthRecordConverter converter = LasPointCloudHeader
+      .getVariableLengthRecordConverter(this.key);
+    if (converter == null) {
+      throw new IllegalArgumentException(
+        "Setting LAS record type " + this.key + "=" + value + " is not supported");
+    }
+    this.value = value;
+    this.valueInitialized = true;
+    this.bytes = converter.objectToBytes(pointCloud, this);
+    if (this.bytes == null) {
+      throw new IllegalArgumentException(value + " is not valid for " + key);
+    }
+  }
+
+  private LasVariableLengthRecord(final LasPointCloudHeader header, final Pair<String, Integer> key,
+    final String description) {
+    this.header = header;
+    this.key = key;
     this.description = description;
+  }
+
+  private LasVariableLengthRecord(final LasPointCloudHeader header, final String userId,
+    final int recordId, final String description) {
+    this(header, new Pair<>(userId, recordId), description);
+  }
+
+  public LasVariableLengthRecord(final LasPointCloudHeader header, final String userId,
+    final int recordId, final String description, final byte[] bytes) {
+    this(header, userId, recordId, description);
     this.bytes = bytes;
   }
 
-  public LasVariableLengthRecord(final String userId, final int recordId, final String description,
-    final byte[] bytes, final Object value) {
-    this.userId = userId;
-    this.recordId = recordId;
-    this.description = description;
+  public LasVariableLengthRecord(final LasPointCloudHeader header, final String userId,
+    final int recordId, final String description, final byte[] bytes, final Object value) {
+    this(header, userId, recordId, description);
     this.bytes = bytes;
     this.value = value;
-  }
-
-  void convertValue(final BiFunction<LasPointCloudHeader, byte[], Object> converter,
-    final LasPointCloudHeader header) {
-    this.value = converter.apply(header, this.bytes);
+    this.valueInitialized = true;
   }
 
   public byte[] getBytes() {
@@ -47,19 +69,30 @@ public class LasVariableLengthRecord {
   }
 
   public Pair<String, Integer> getKey() {
-    return new Pair<>(this.userId, this.recordId);
+    return this.key;
   }
 
   public int getRecordId() {
-    return this.recordId;
+    return this.key.getValue2();
   }
 
   public String getUserId() {
-    return this.userId;
+    return this.key.getValue1();
   }
 
-  public Object getValue() {
-    return this.value;
+  @SuppressWarnings("unchecked")
+  public <V> V getValue() {
+    if (!this.valueInitialized) {
+      final LasVariableLengthRecordConverter converter = LasPointCloudHeader
+        .getVariableLengthRecordConverter(this.key);
+      if (converter == null) {
+        this.value = this.bytes;
+      } else {
+        this.value = converter.readObject(this.header, this.bytes);
+      }
+      this.valueInitialized = true;
+    }
+    return (V)this.value;
   }
 
   public int getValueLength() {
@@ -68,10 +101,30 @@ public class LasVariableLengthRecord {
 
   @Override
   public String toString() {
-    Object value = this.value;
-    if (value == null) {
-      value = Arrays.toString(this.bytes);
+    String valueString;
+    if (this.value == null) {
+      valueString = Arrays.toString(this.bytes);
+    } else if (this.value.getClass().isArray()) {
+      if (this.value instanceof byte[]) {
+        valueString = Arrays.toString((byte[])this.value);
+      } else if (this.value instanceof boolean[]) {
+        valueString = Arrays.toString((boolean[])this.value);
+      } else if (this.value instanceof short[]) {
+        valueString = Arrays.toString((short[])this.value);
+      } else if (this.value instanceof int[]) {
+        valueString = Arrays.toString((int[])this.value);
+      } else if (this.value instanceof long[]) {
+        valueString = Arrays.toString((long[])this.value);
+      } else if (this.value instanceof float[]) {
+        valueString = Arrays.toString((float[])this.value);
+      } else if (this.value instanceof double[]) {
+        valueString = Arrays.toString((double[])this.value);
+      } else {
+        valueString = this.value.toString();
+      }
+    } else {
+      valueString = this.value.toString();
     }
-    return this.userId + "-" + this.recordId + "=" + value + " (" + this.description + ")";
+    return this.key + "=" + valueString + " (" + this.description + ")";
   }
 }

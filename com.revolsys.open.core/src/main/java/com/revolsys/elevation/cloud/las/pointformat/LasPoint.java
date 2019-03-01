@@ -5,7 +5,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.io.endian.EndianOutput;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
 
 public interface LasPoint extends Point, MapSerializer {
@@ -129,5 +129,5 @@ public interface LasPoint extends Point, MapSerializer {
     return map;
   }
 
-  void write(final EndianOutput out);
+  void writeLasPoint(ChannelWriter out);
 }
