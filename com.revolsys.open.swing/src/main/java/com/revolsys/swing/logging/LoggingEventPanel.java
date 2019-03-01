@@ -82,14 +82,7 @@ public class LoggingEventPanel extends JPanel {
   }
 
   static String getStackTrace(final ThrowableProxy thrown) {
-    final StringBuilder stackTrace = new StringBuilder();
-    if (thrown != null) {
-      for (final StackTraceElement trace : thrown.getStackTrace()) {
-        stackTrace.append(trace);
-        stackTrace.append("\n");
-      }
-    }
-    return stackTrace.toString();
+    return thrown.getExtendedStackTraceAsString();
   }
 
   public static void showDialog(final Component parent, final List<Object> event) {

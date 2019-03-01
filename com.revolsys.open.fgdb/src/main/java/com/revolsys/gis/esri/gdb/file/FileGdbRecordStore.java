@@ -414,21 +414,34 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     synchronized (this.apiSync) {
       try {
         if (!isClosed()) {
-          if (this.geodatabase != null) {
+          final Geodatabase geodatabase = this.geodatabase;
+          if (geodatabase != null) {
+            this.geodatabase = null;
             final Writer<Record> writer = getThreadProperty("writer");
             if (writer != null) {
               writer.close();
               setThreadProperty("writer", null);
             }
-            closeTables();
-            try {
-              if (this.geodatabase != null) {
-                closeGeodatabase(this.geodatabase);
+            if (!this.tableByCatalogPath.isEmpty()) {
+              for (final Table table : this.tableByCatalogPath.values()) {
+                try {
+                  setLoadOnlyMode(table, false);
+                  table.freeWriteLock();
+                  geodatabase.closeTable(table);
+                } catch (final Throwable e) {
+                } finally {
+                  try {
+                    table.delete();
+                  } catch (final Throwable t) {
+                  }
+                }
               }
-            } finally {
-              this.geodatabase = null;
+              this.tableByCatalogPath.clear();
+              this.tableReferenceCountsByCatalogPath.clear();
+              this.tableWriteLockCountsByCatalogPath.clear();
             }
           }
+          closeGeodatabase(this.geodatabase);
         }
       } finally {
         super.close();
@@ -478,36 +491,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       } else {
         this.tableReferenceCountsByCatalogPath.put(path, count);
         return false;
-      }
-    }
-  }
-
-  private void closeTables() {
-    synchronized (this.apiSync) {
-      if (!this.tableByCatalogPath.isEmpty()) {
-        final Geodatabase geodatabase = getGeodatabase();
-        if (geodatabase != null) {
-          try {
-            for (final Table table : this.tableByCatalogPath.values()) {
-              try {
-                setLoadOnlyMode(table, false);
-                table.freeWriteLock();
-                geodatabase.closeTable(table);
-              } catch (final Throwable e) {
-              } finally {
-                try {
-                  table.delete();
-                } catch (final Throwable t) {
-                }
-              }
-            }
-            this.tableByCatalogPath.clear();
-            this.tableReferenceCountsByCatalogPath.clear();
-            this.tableWriteLockCountsByCatalogPath.clear();
-          } finally {
-            releaseGeodatabase();
-          }
-        }
       }
     }
   }
@@ -911,7 +894,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         final Integer count = Maps.addCount(this.tableWriteLockCountsByCatalogPath, catalogPath);
         if (count == 1) {
           table.setWriteLock();
-          setLoadOnlyMode(table, true);
+          table.setLoadOnlyMode(true);
         }
       }
       return table;
