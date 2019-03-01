@@ -334,6 +334,7 @@ public interface Point extends Punctual, Serializable {
    * @param c a point
    * @return the 2-dimensional Euclidean distance between the locations
    */
+  @Override
   default double distancePoint(Point point) {
     if (isEmpty()) {
       return 0;
@@ -432,6 +433,15 @@ public interface Point extends Punctual, Serializable {
     } else {
       return false;
     }
+  }
+
+  default boolean equalsVertex(final double x, final double y) {
+    if (x == getX()) {
+      if (y == getY()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

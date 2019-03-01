@@ -125,6 +125,24 @@ public class PointDouble extends AbstractPoint implements Serializable {
   }
 
   @Override
+  public double getX() {
+    if (this.coordinates == null) {
+      return Double.NaN;
+    } else {
+      return this.coordinates[0];
+    }
+  }
+
+  @Override
+  public double getY() {
+    if (this.coordinates == null) {
+      return Double.NaN;
+    } else {
+      return this.coordinates[1];
+    }
+  }
+
+  @Override
   public boolean isEmpty() {
     return this.coordinates == null;
   }

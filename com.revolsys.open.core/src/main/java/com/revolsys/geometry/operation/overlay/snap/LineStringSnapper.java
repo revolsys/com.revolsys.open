@@ -52,12 +52,14 @@ import com.revolsys.geometry.model.impl.PointDouble;
 public class LineStringSnapper {
   public static Point findSnapForVertex(final Point pt, final Point[] snapPts,
     final double snapTolerance) {
+    final double x = pt.getX();
+    final double y = pt.getY();
     for (final Point snapPt : snapPts) {
       // if point is already equal to a src pt, don't snap
-      if (pt.equals(2, snapPt)) {
+      if (snapPt.equalsVertex(x, y)) {
         return null;
       }
-      if (pt.distance(snapPt) < snapTolerance) {
+      if (snapPt.distance(x, y) < snapTolerance) {
         return snapPt;
       }
     }

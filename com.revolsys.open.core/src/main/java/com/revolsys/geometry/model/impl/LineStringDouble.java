@@ -119,7 +119,13 @@ public class LineStringDouble extends AbstractLineString {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.floating(0, this.axisCount);
+    if (this.axisCount == 2) {
+      return GeometryFactory.DEFAULT_2D;
+    } else if (this.axisCount == 3) {
+      return GeometryFactory.DEFAULT_3D;
+    } else {
+      return GeometryFactory.floating(0, this.axisCount);
+    }
   }
 
   @Override
