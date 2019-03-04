@@ -7,7 +7,6 @@ com.revolsys.open.geopackage
 com.revolsys.open.maki
 com.revolsys.open.oracle
 com.revolsys.open.postgresql
-com.revolsys.open.server
 com.revolsys.open.swing
 com.revolsys.open.testapi
 com.revolsys.open.web
