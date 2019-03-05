@@ -8,14 +8,17 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.zip;
+package com.revolsys.elevation.cloud.las.zip.v1;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressInteger;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel;
+import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingEncoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
-public class LazDecompressGpsTime11V1 extends LazDecompressGpsTime11 {
+public class LasZipItemCodecGpsTime11V1 implements LasZipItemCodec {
 
   private static final int LASZIP_GPSTIME_MULTIMAX = 512;
 
@@ -25,16 +28,39 @@ public class LazDecompressGpsTime11V1 extends LazDecompressGpsTime11 {
 
   private int gpstimeDiff;
 
-  public LazDecompressGpsTime11V1(final ArithmeticCodingDecompressDecoder dec) {
-    super(dec);
-    this.gpsTimeMulti = new ArithmeticCodingDecompressModel(LASZIP_GPSTIME_MULTIMAX);
-    this.gpsTime0Diff = new ArithmeticCodingDecompressModel(3);
-    this.decompressGpsTime = new ArithmeticCodingDecompressInteger(dec, 32, 6);
+  private ArithmeticCodingDecoder decoder;
+
+  private ArithmeticCodingEncoder encoder;
+
+  private final ArithmeticModel gpsTimeMulti;
+
+  private final ArithmeticModel gpsTime0Diff;
+
+  private final ArithmeticCodingInteger decompressGpsTime;
+
+  public LasZipItemCodecGpsTime11V1(final ArithmeticCodingCodec codec) {
+    if (codec instanceof ArithmeticCodingDecoder) {
+      this.decoder = (ArithmeticCodingDecoder)codec;
+    } else if (codec instanceof ArithmeticCodingEncoder) {
+      this.encoder = (ArithmeticCodingEncoder)codec;
+    } else {
+      throw new IllegalArgumentException("Not supported:" + codec.getClass());
+    }
+    this.gpsTimeMulti = codec.createSymbolModel(LASZIP_GPSTIME_MULTIMAX);
+    this.gpsTime0Diff = codec.createSymbolModel(3);
+    this.decompressGpsTime = codec.newCodecInteger(32, 6);
+  }
+
+  public LasZipItemCodecGpsTime11V1(final ArithmeticCodingDecoder decoder) {
+    this((ArithmeticCodingCodec)decoder);
+    this.decoder = decoder;
   }
 
   @Override
   public void init(final LasPoint point) {
-    super.init(point);
+    this.gpsTimeMulti.reset();
+    this.gpsTime0Diff.reset();
+    this.decompressGpsTime.init();
     this.gpstimeDiff = 0;
     this.multiExtremeCounter = 0;
 

@@ -10,13 +10,14 @@
  */
 package com.revolsys.math.arithmeticcoding;
 
-import static com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel.AC__MaxLength;
-import static com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel.AC__MinLength;
-import static com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel.BM__LengthShift;
-import static com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel.DM__LengthShift;
+import static com.revolsys.math.arithmeticcoding.ArithmeticModel.AC__MaxLength;
+import static com.revolsys.math.arithmeticcoding.ArithmeticModel.AC__MinLength;
+import static com.revolsys.math.arithmeticcoding.ArithmeticModel.BM__LengthShift;
+import static com.revolsys.math.arithmeticcoding.ArithmeticModel.DM__LengthShift;
 import static java.lang.Integer.compareUnsigned;
 
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.logging.Logs;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //                                                                           -
@@ -55,7 +56,7 @@ import com.revolsys.io.channels.ChannelReader;
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-public class ArithmeticCodingDecompressDecoder {
+public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
 
   private ChannelReader reader;
 
@@ -63,11 +64,16 @@ public class ArithmeticCodingDecompressDecoder {
 
   private int length;
 
-  public ArithmeticCodingDecompressDecoder() {
+  public ArithmeticCodingDecoder() {
     this.reader = null;
   }
 
-  public int decodeBit(final ArithmeticCodingBitModel model) {
+  @Override
+  public ArithmeticModel createSymbolModel(final int symbolCount) {
+    return new ArithmeticModel(symbolCount, false);
+  }
+
+  public int decodeBit(final ArithmeticBitModel model) {
     final int x = model.bit0Probability * (this.length >>> BM__LengthShift); // product
     // l x
     // p0
@@ -86,10 +92,11 @@ public class ArithmeticCodingDecompressDecoder {
     }
     model.update();
 
+    Logs.debug(this, "bit=" + sym);
     return sym; // return data bit value
   }
 
-  public int decodeSymbol(final ArithmeticCodingDecompressModel model) {
+  public int decodeSymbol(final ArithmeticModel model) {
     int n;
     int sym;
     int x;
@@ -141,20 +148,21 @@ public class ArithmeticCodingDecompressDecoder {
     if (--model.symbolsUntilUpdate == 0) {
       model.update();
     }
+    Logs.debug(this, "symbol=" + sym + "\t" + this.value + "\t" + this.length);
     return sym;
   }
 
-  public boolean init(final ChannelReader reader) {
-    if (reader == null) {
-      return false;
-    }
+  public void init(final ChannelReader reader) {
     this.reader = reader;
     this.length = AC__MaxLength;
-    this.value = (reader.getByte() & 0xff) << 24;
-    this.value |= (reader.getByte() & 0xff) << 16;
-    this.value |= (reader.getByte() & 0xff) << 8;
-    this.value |= reader.getByte() & 0xff;
-    return true;
+    final byte b1 = reader.getByte();
+    final byte b2 = reader.getByte();
+    final byte b3 = reader.getByte();
+    final byte b4 = reader.getByte();
+    this.value = (b1 & 0xff) << 24;
+    this.value |= (b2 & 0xff) << 16;
+    this.value |= (b3 & 0xff) << 8;
+    this.value |= b4 & 0xff;
   }
 
   public int readBit() {
@@ -190,6 +198,7 @@ public class ArithmeticCodingDecompressDecoder {
     if (compareUnsigned(sym, 1 << bits) >= 0) {
       throw new IllegalStateException("Error decompressing file");
     }
+    Logs.debug(this, "bits=" + sym + "\t" + this.value + "\t" + this.length);
     return sym;
   }
 
@@ -242,12 +251,15 @@ public class ArithmeticCodingDecompressDecoder {
       throw new IllegalStateException("Error decompressing file");
     }
 
+    Logs.debug(this, "short=" + sym);
     return (char)sym;
   }
 
   private void renorm_dec_interval() {
     do {
-      this.value = this.value << 8 | this.reader.getByte() & 0xff;
-    } while (Integer.compareUnsigned(this.length <<= 8, AC__MinLength) < 0);
+      final byte b = this.reader.getByte();
+      this.value = this.value << 8 | b & 0xff;
+      this.length <<= 8;
+    } while (Integer.compareUnsigned(this.length, AC__MinLength) < 0);
   }
 }

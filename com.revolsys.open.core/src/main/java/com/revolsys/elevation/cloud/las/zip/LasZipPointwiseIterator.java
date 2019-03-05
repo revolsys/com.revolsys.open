@@ -2,23 +2,22 @@ package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloudIterator;
-import com.revolsys.elevation.cloud.las.LasZipHeader;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
 import com.revolsys.util.Exceptions;
 
-public class LazPointwiseIterator extends LasPointCloudIterator {
+public class LasZipPointwiseIterator extends LasPointCloudIterator {
 
-  private final ArithmeticCodingDecompressDecoder decoder;
+  private final ArithmeticCodingDecoder decoder;
 
-  private final LazDecompress[] pointDecompressors;
+  private final LasZipItemCodec[] pointDecompressors;
 
-  public LazPointwiseIterator(final LasPointCloud pointCloud, final ChannelReader reader) {
+  public LasZipPointwiseIterator(final LasPointCloud pointCloud, final ChannelReader reader) {
     super(pointCloud, reader);
-    this.decoder = new ArithmeticCodingDecompressDecoder();
-    final LasZipHeader lasZipHeader = pointCloud.getLasZipHeader();
-    this.pointDecompressors = lasZipHeader.newLazDecompressors(pointCloud, this.decoder);
+    this.decoder = new ArithmeticCodingDecoder();
+    final LasZipHeader lasZipHeader = LasZipHeader.getLasZipHeader(pointCloud);
+    this.pointDecompressors = lasZipHeader.newLazCodecs(this.decoder);
   }
 
   @Override
@@ -28,20 +27,22 @@ public class LazPointwiseIterator extends LasPointCloudIterator {
       if (this.index == 0) {
         final ChannelReader reader = this.reader;
         point = this.pointFormat.readLasPoint(this.pointCloud, reader);
-        for (final LazDecompress pointDecompressor : this.pointDecompressors) {
+        for (final LasZipItemCodec pointDecompressor : this.pointDecompressors) {
           pointDecompressor.init(point);
         }
         this.decoder.init(reader);
       } else {
         point = this.pointFormat.newLasPoint(this.pointCloud);
-        for (final LazDecompress pointDecompressor : this.pointDecompressors) {
+        for (final LasZipItemCodec pointDecompressor : this.pointDecompressors) {
           pointDecompressor.read(point);
         }
       }
       return point;
     } catch (final Exception e) {
+      final long index = this.index;
       close();
-      throw Exceptions.wrap("Error decompressing: " + this.pointCloud.getResource(), e);
+      throw Exceptions
+        .wrap("Error decompressing: " + this.pointCloud.getResource() + "\npointCount=" + index, e);
     }
   }
 

@@ -79,47 +79,51 @@ public interface LasPoint extends Point, MapSerializer {
 
   void read(LasPointCloud pointCloud, ChannelReader reader);
 
-  default void setBlue(final int blue) {
+  default LasPoint setBlue(final int blue) {
+    return this;
   }
 
-  void setClassification(short classification);
+  LasPoint setClassification(short classification);
 
-  void setClassificationByte(byte classificationByte);
+  LasPoint setClassificationByte(byte classificationByte);
 
-  void setEdgeOfFlightLine(boolean edgeOfFlightLine);
+  LasPoint setEdgeOfFlightLine(boolean edgeOfFlightLine);
 
-  default void setGpsTime(final double gpsTime) {
+  default LasPoint setGpsTime(final double gpsTime) {
+    return this;
   }
 
-  default void setGreen(final int green) {
+  default LasPoint setGreen(final int green) {
+    return this;
   }
 
-  void setIntensity(int intensity);
+  LasPoint setIntensity(int intensity);
 
-  void setKeyPoint(boolean keyPoint);
+  LasPoint setKeyPoint(boolean keyPoint);
 
-  void setNumberOfReturns(byte numberOfReturns);
+  LasPoint setNumberOfReturns(byte numberOfReturns);
 
-  void setPointSourceID(int pointSourceID);
+  LasPoint setPointSourceID(int pointSourceID);
 
-  default void setRed(final int red) {
+  default LasPoint setRed(final int red) {
+    return this;
   }
 
-  void setReturnByte(byte returnByte);
+  LasPoint setReturnByte(byte returnByte);
 
-  void setReturnNumber(byte returnNumber);
+  LasPoint setReturnNumber(byte returnNumber);
 
-  void setScanAngleRank(byte scanAngleRank);
+  LasPoint setScanAngleRank(byte scanAngleRank);
 
-  void setScanDirectionFlag(boolean scanDirectionFlag);
+  LasPoint setScanDirectionFlag(boolean scanDirectionFlag);
 
-  void setScannerChannel(byte scannerChannel);
+  LasPoint setScannerChannel(byte scannerChannel);
 
-  void setSynthetic(boolean synthetic);
+  LasPoint setSynthetic(boolean synthetic);
 
-  void setUserData(short userData);
+  LasPoint setUserData(short userData);
 
-  void setWithheld(boolean withheld);
+  LasPoint setWithheld(boolean withheld);
 
   void setXYZ(int x, int y, int z);
 

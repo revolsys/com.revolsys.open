@@ -9,14 +9,24 @@ public class Version implements Comparable<Version> {
 
   private final short minor;
 
+  private final int revision;
+
   public Version(final ChannelReader reader) throws IOException {
     this.major = reader.getUnsignedByte();
     this.minor = reader.getUnsignedByte();
+    this.revision = 0;
   }
 
   public Version(final int major, final int minor) {
     this.major = (short)major;
     this.minor = (short)minor;
+    this.revision = 0;
+  }
+
+  public Version(final int major, final int minor, final int revision) {
+    this.major = (short)major;
+    this.minor = (short)minor;
+    this.revision = revision;
   }
 
   public boolean atLeast(final Version version) {
@@ -53,6 +63,10 @@ public class Version implements Comparable<Version> {
 
   public short getMinor() {
     return this.minor;
+  }
+
+  public int getRevision() {
+    return this.revision;
   }
 
   @Override

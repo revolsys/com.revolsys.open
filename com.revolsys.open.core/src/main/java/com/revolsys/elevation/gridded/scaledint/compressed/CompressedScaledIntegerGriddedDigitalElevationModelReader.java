@@ -12,8 +12,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
@@ -123,11 +123,10 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelReader
         } else {
           elevations[0] = previousZ;
         }
-        final ArithmeticCodingDecompressDecoder decoder = new ArithmeticCodingDecompressDecoder();
+        final ArithmeticCodingDecoder decoder = new ArithmeticCodingDecoder();
         decoder.init(reader);
-        final ArithmeticCodingDecompressInteger decompressor = new ArithmeticCodingDecompressInteger(
-          decoder, 32);
-        decompressor.reset();
+        final ArithmeticCodingInteger decompressor = decoder.newCodecInteger(32);
+        decompressor.init();
         boolean leftToRight = true;
         int rowIndex = 0;
         for (int gridY = 0; gridY < this.gridHeight; gridY++) {

@@ -36,8 +36,9 @@ public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
   }
 
   @Override
-  public void setGpsTime(final double gpsTime) {
+  public LasPoint1GpsTime setGpsTime(final double gpsTime) {
     this.gpsTime = gpsTime;
+    return this;
   }
 
   @Override

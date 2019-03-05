@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.revolsys.collection.list.Lists;
@@ -18,6 +17,7 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
+import com.revolsys.elevation.cloud.las.zip.LasZipHeader;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
@@ -25,7 +25,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.html.HtmlWriter;
 import com.revolsys.record.schema.RecordDefinition;
@@ -41,18 +40,6 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     LasProjection.init();
     LasZipHeader.init();
   }
-
-  public static final Version VERSION_1_0 = new Version(1, 0);
-
-  public static final Version VERSION_1_1 = new Version(1, 1);
-
-  public static final Version VERSION_1_2 = new Version(1, 2);
-
-  public static final Version VERSION_1_3 = new Version(1, 3);
-
-  public static final Version VERSION_1_4 = new Version(1, 4);
-
-  private static final long MAX_UNSIGNED_INT = 1l << 32;
 
   public static void addVariableLengthRecordConverter(
     final LasVariableLengthRecordConverter converter) {
@@ -77,7 +64,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   private final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = new LinkedHashMap<>();
 
-  private Version version = LasPointCloudHeader.VERSION_1_2;
+  private Version version = LasVersion.VERSION_1_2;
 
   private long pointCount = 0;
 
@@ -104,8 +91,6 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
   private long pointRecordsOffset;
 
   private boolean laszip;
-
-  private LasZipHeader lasZipHeader;
 
   private final LasPointCloud pointCloud;
 
@@ -164,13 +149,13 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
         if (this.headerSize > 227) {
 
-          if (this.version.atLeast(LasPointCloudHeader.VERSION_1_3)) {
+          if (this.version.atLeast(LasVersion.VERSION_1_3)) {
             final long startOfWaveformDataPacketRecord = reader.getUnsignedLong(); // TODO
             // unsigned
             // long
             // long support
             // needed
-            if (this.version.atLeast(LasPointCloudHeader.VERSION_1_4)) {
+            if (this.version.atLeast(LasVersion.VERSION_1_4)) {
               final long startOfFirstExetendedDataRecord = reader.getUnsignedLong();
               final long numberOfExtendedVariableLengthRecords = reader.getUnsignedInt();
               this.pointCount = reader.getUnsignedLong();
@@ -184,7 +169,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
         this.bounds = new double[] {
           minX, minY, minZ, maxX, maxY, maxZ
         };
-        if (this.version.equals(LasPointCloudHeader.VERSION_1_0)) {
+        if (this.version.equals(LasVersion.VERSION_1_0)) {
           reader.skipBytes(2);
           this.headerSize += 2;
         }
@@ -214,7 +199,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     this.projectId = UUID.randomUUID();
   }
 
-  protected void addLasProperty(final Pair<String, Integer> key, final String description,
+  public void addLasProperty(final Pair<String, Integer> key, final String description,
     final Object value) {
     final LasVariableLengthRecord property = new LasVariableLengthRecord(this.pointCloud, key,
       description, value);
@@ -248,6 +233,10 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     return this.geometryFactory.newBoundingBox(3, this.bounds);
   }
 
+  public double[] getBounds() {
+    return this.bounds;
+  }
+
   public LocalDate getDate() {
     return this.date;
   }
@@ -271,6 +260,10 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   public int getGlobalEncoding() {
     return this.globalEncoding;
+  }
+
+  public Map<Pair<String, Integer>, LasVariableLengthRecord> getLasProperties() {
+    return this.lasProperties;
   }
 
   protected LasVariableLengthRecord getLasProperty(final Pair<String, Integer> key) {
@@ -304,12 +297,16 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     }
   }
 
-  public LasZipHeader getLasZipHeader() {
-    return this.lasZipHeader;
+  public LasPointCloud getPointCloud() {
+    return this.pointCloud;
   }
 
   public long getPointCount() {
     return this.pointCount;
+  }
+
+  public long[] getPointCountByReturn() {
+    return this.pointCountByReturn;
   }
 
   public LasPointFormat getPointFormat() {
@@ -374,11 +371,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
       byteCount += 54 + valueLength;
     }
 
-    for (final Entry<Pair<String, Integer>, LasVariableLengthRecord> entry : this.lasProperties
-      .entrySet()) {
-      final Pair<String, Integer> key = entry.getKey();
-      final LasVariableLengthRecord property = entry.getValue();
-      final LasVariableLengthRecordConverter converter = getVariableLengthRecordConverter(key);
+    for (final LasVariableLengthRecord property : this.lasProperties.values()) {
       property.getValue();
     }
     return byteCount;
@@ -429,10 +422,6 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
       LasProjection.setCoordinateSystem(this, coordinateSystem);
     }
-  }
-
-  public void setLasZipHeader(final LasZipHeader lasZipHeader) {
-    this.lasZipHeader = lasZipHeader;
   }
 
   @Override
@@ -488,9 +477,6 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     }
     addToMap(map, "boundingBox", getBoundingBox());
     addToMap(map, "headerSize", this.headerSize);
-    if (this.laszip) {
-      addToMap(map, "laszip", this.lasZipHeader);
-    }
     addToMap(map, "pointRecordsOffset", this.pointRecordsOffset, 0);
     addToMap(map, "pointFormat", this.pointFormat.getId());
     addToMap(map, "pointCount", this.pointCount);
@@ -508,107 +494,6 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     }
     addToMap(map, "pointCountByReturn", pointCountByReturn);
     return map;
-  }
-
-  public void writeHeader(final ChannelWriter out) {
-    out.putString("LASF", 4);
-    out.putUnsignedShort(this.fileSourceId);
-    out.putUnsignedShort(this.globalEncoding);
-    final long uuidLeast = this.projectId.getLeastSignificantBits();
-    final long uuidMost = this.projectId.getMostSignificantBits();
-    out.putLong(uuidLeast);
-    out.putLong(uuidMost);
-
-    out.putByte((byte)this.version.getMajor());
-    out.putByte((byte)this.version.getMinor());
-    out.putString(this.systemIdentifier, 32);
-    out.putString(this.generatingSoftware, 32);
-
-    out.putUnsignedShort(getDayOfYear());
-    out.putUnsignedShort(getYear());
-
-    int headerSize = 227;
-    if (this.version.atLeast(LasPointCloudHeader.VERSION_1_3)) {
-      headerSize += 8;
-      if (this.version.atLeast(LasPointCloudHeader.VERSION_1_4)) {
-        headerSize += 140;
-      }
-    }
-    out.putUnsignedShort(headerSize);
-
-    final int numberOfVariableLengthRecords = this.lasProperties.size();
-    int variableLengthRecordsSize = 0;
-    for (final LasVariableLengthRecord record : this.lasProperties.values()) {
-      variableLengthRecordsSize += 54 + record.getValueLength();
-    }
-
-    final long offsetToPointData = headerSize + variableLengthRecordsSize;
-    out.putUnsignedInt(offsetToPointData);
-
-    out.putUnsignedInt(numberOfVariableLengthRecords);
-
-    final int pointFormatId = this.pointFormat.getId();
-    out.putUnsignedByte((short)pointFormatId);
-    out.putUnsignedShort(this.recordLength);
-    if (this.pointCount > MAX_UNSIGNED_INT) {
-      out.putUnsignedInt(0);
-    } else {
-      out.putUnsignedInt(this.pointCount);
-    }
-    for (int i = 0; i < 5; i++) {
-      final long count = this.pointCountByReturn[i];
-      if (count > MAX_UNSIGNED_INT) {
-        out.putUnsignedInt(0);
-      } else {
-        out.putUnsignedInt(count);
-      }
-    }
-    for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
-      final double resolution = this.geometryFactory.getResolution(axisIndex);
-      out.putDouble(resolution);
-    }
-    for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
-      final double offset = this.geometryFactory.getOffset(axisIndex);
-      out.putDouble(offset);
-    }
-
-    for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
-      final double max = this.bounds[3 + axisIndex];
-      out.putDouble(max);
-      final double min = this.bounds[axisIndex];
-      out.putDouble(min);
-    }
-
-    if (this.version.atLeast(LasPointCloudHeader.VERSION_1_3)) {
-      out.putUnsignedLong(0); // startOfWaveformDataPacketRecord
-      if (this.version.atLeast(LasPointCloudHeader.VERSION_1_4)) {
-        out.putUnsignedLong(0); // startOfFirstExetendedDataRecord
-        out.putUnsignedInt(0); // numberOfExtendedVariableLengthRecords
-        out.putUnsignedLong(this.pointCount);
-        for (int i = 0; i < 15; i++) {
-          final long count = this.pointCountByReturn[i];
-          out.putUnsignedLong(count);
-        }
-      }
-    }
-
-    for (final LasVariableLengthRecord record : this.lasProperties.values()) {
-      out.putUnsignedShort(0);
-      final String userId = record.getUserId();
-      out.putString(userId, 16);
-
-      final int recordId = record.getRecordId();
-      out.putUnsignedShort(recordId);
-
-      final int valueLength = record.getValueLength();
-      out.putUnsignedShort(valueLength);
-
-      final String description = record.getDescription();
-      out.putString(description, 32);
-
-      final byte[] bytes = record.getBytes();
-      out.putBytes(bytes);
-    }
   }
 
   public void writeHtml(final HtmlWriter writer) {

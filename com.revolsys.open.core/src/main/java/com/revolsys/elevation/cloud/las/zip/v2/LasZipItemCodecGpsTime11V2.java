@@ -8,14 +8,17 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.zip;
+package com.revolsys.elevation.cloud.las.zip.v2;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressInteger;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel;
+import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingEncoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
-public class LazDecompressGpsTime11V2 extends LazDecompressGpsTime11 implements LazDecompress {
+public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
 
   private static int LASZIP_GPSTIME_MULTI = 500;
 
@@ -40,17 +43,39 @@ public class LazDecompressGpsTime11V2 extends LazDecompressGpsTime11 implements 
 
   private final int[] multiExtremeCounter = new int[4];
 
-  public LazDecompressGpsTime11V2(final ArithmeticCodingDecompressDecoder decoder) {
-    super(decoder);
-    final int n = LASZIP_GPSTIME_MULTI_TOTAL;
-    this.gpsTimeMulti = new ArithmeticCodingDecompressModel(n);
-    this.gpsTime0Diff = new ArithmeticCodingDecompressModel(6);
-    this.decompressGpsTime = new ArithmeticCodingDecompressInteger(decoder, 32, 9);
+  private ArithmeticCodingDecoder decoder;
+
+  private ArithmeticCodingEncoder encoder;
+
+  private final ArithmeticModel gpsTimeMulti;
+
+  private final ArithmeticModel gpsTime0Diff;
+
+  private final ArithmeticCodingInteger decompressGpsTime;
+
+  public LasZipItemCodecGpsTime11V2(final ArithmeticCodingCodec codec) {
+    if (codec instanceof ArithmeticCodingDecoder) {
+      this.decoder = (ArithmeticCodingDecoder)codec;
+    } else if (codec instanceof ArithmeticCodingEncoder) {
+      this.encoder = (ArithmeticCodingEncoder)codec;
+    } else {
+      throw new IllegalArgumentException("Not supported:" + codec.getClass());
+    }
+    this.gpsTimeMulti = codec.createSymbolModel(LASZIP_GPSTIME_MULTI_TOTAL);
+    this.gpsTime0Diff = codec.createSymbolModel(6);
+    this.decompressGpsTime = codec.newCodecInteger(32, 9);
+  }
+
+  @Override
+  public int getVersion() {
+    return 2;
   }
 
   @Override
   public void init(final LasPoint point) {
-    super.init(point);
+    this.gpsTimeMulti.reset();
+    this.gpsTime0Diff.reset();
+    this.decompressGpsTime.init();
 
     this.last = 0;
     this.next = 0;
@@ -74,12 +99,12 @@ public class LazDecompressGpsTime11V2 extends LazDecompressGpsTime11 implements 
     int multi;
     final int[] lastGpsTimeDiff = this.lastGpsTimeDiff;
     final int lastDiff = lastGpsTimeDiff[this.last];
-    final ArithmeticCodingDecompressDecoder decoder = this.decoder;
+    final ArithmeticCodingDecoder decoder = this.decoder;
     final long[] lastGpsTime = this.lastGpsTime;
     final int[] multiExtremeCounter = this.multiExtremeCounter;
     int last = this.last;
     int next = this.next;
-    final ArithmeticCodingDecompressInteger decompressGpsTime = this.decompressGpsTime;
+    final ArithmeticCodingInteger decompressGpsTime = this.decompressGpsTime;
     if (lastDiff == 0) { // if the last integer difference was zero
       multi = decoder.decodeSymbol(this.gpsTime0Diff);
       if (multi == 1) {// the difference can be represented with 32 bits

@@ -8,40 +8,69 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.zip;
+package com.revolsys.elevation.cloud.las.zip.v2;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressDecoder;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecompressModel;
+import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
+import com.revolsys.elevation.cloud.las.zip.MyDefs;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingEncoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
-public class LazDecompressRgb12V2 extends LazDecompressRgb12 {
+public class LasZipItemCodecRgb12V2 implements LasZipItemCodec {
 
-  private final ArithmeticCodingDecompressModel rgbDiff0;
+  private final ArithmeticModel rgbDiff0;
 
-  private final ArithmeticCodingDecompressModel rgbDiff1;
+  private final ArithmeticModel rgbDiff1;
 
-  private final ArithmeticCodingDecompressModel rgbDiff2;
+  private final ArithmeticModel rgbDiff2;
 
-  private final ArithmeticCodingDecompressModel rgbDiff3;
+  private final ArithmeticModel rgbDiff3;
 
-  private final ArithmeticCodingDecompressModel rgbDiff4;
+  private final ArithmeticModel rgbDiff4;
 
-  private final ArithmeticCodingDecompressModel rgbDiff5;
+  private final ArithmeticModel rgbDiff5;
 
-  public LazDecompressRgb12V2(final ArithmeticCodingDecompressDecoder decoder) {
-    super(decoder);
-    this.byteUsed = new ArithmeticCodingDecompressModel(128);
-    this.rgbDiff0 = new ArithmeticCodingDecompressModel(256);
-    this.rgbDiff1 = new ArithmeticCodingDecompressModel(256);
-    this.rgbDiff2 = new ArithmeticCodingDecompressModel(256);
-    this.rgbDiff3 = new ArithmeticCodingDecompressModel(256);
-    this.rgbDiff4 = new ArithmeticCodingDecompressModel(256);
-    this.rgbDiff5 = new ArithmeticCodingDecompressModel(256);
+  private ArithmeticCodingDecoder decoder;
+
+  private ArithmeticCodingEncoder encoder;
+
+  private final ArithmeticModel byteUsed;
+
+  private int red;
+
+  private int green;
+
+  private int blue;
+
+  public LasZipItemCodecRgb12V2(final ArithmeticCodingCodec codec) {
+    if (codec instanceof ArithmeticCodingDecoder) {
+      this.decoder = (ArithmeticCodingDecoder)codec;
+    } else if (codec instanceof ArithmeticCodingEncoder) {
+      this.encoder = (ArithmeticCodingEncoder)codec;
+    } else {
+      throw new IllegalArgumentException("Not supported:" + codec.getClass());
+    }
+    this.byteUsed = codec.createSymbolModel(128);
+    this.rgbDiff0 = codec.createSymbolModel(256);
+    this.rgbDiff1 = codec.createSymbolModel(256);
+    this.rgbDiff2 = codec.createSymbolModel(256);
+    this.rgbDiff3 = codec.createSymbolModel(256);
+    this.rgbDiff4 = codec.createSymbolModel(256);
+    this.rgbDiff5 = codec.createSymbolModel(256);
+  }
+
+  @Override
+  public int getVersion() {
+    return 2;
   }
 
   @Override
   public void init(final LasPoint firstPoint) {
-    super.init(firstPoint);
+    this.red = firstPoint.getRed();
+    this.green = firstPoint.getBlue();
+    this.blue = firstPoint.getGreen();
     this.byteUsed.reset();
     this.rgbDiff0.reset();
     this.rgbDiff1.reset();
@@ -105,6 +134,8 @@ public class LazDecompressRgb12V2 extends LazDecompressRgb12 {
       this.green = this.red;
       this.blue = this.red;
     }
-    super.read(point);
+    point.setRed(this.red);
+    point.setGreen(this.green);
+    point.setBlue(this.blue);
   }
 }

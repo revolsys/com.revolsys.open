@@ -32,8 +32,9 @@ public class LasPoint3GpsTimeRgb extends LasPoint2Rgb implements LasPointGpsTime
   }
 
   @Override
-  public void setGpsTime(final double gpsTime) {
+  public LasPoint3GpsTimeRgb setGpsTime(final double gpsTime) {
     this.gpsTime = gpsTime;
+    return this;
   }
 
   @Override

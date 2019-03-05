@@ -47,7 +47,7 @@ package com.revolsys.math.arithmeticcoding;
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-public class ArithmeticCodingDecompressModel {
+public class ArithmeticModel {
 
   static final int AC_BUFFER_SIZE = 1024;
 
@@ -83,11 +83,14 @@ public class ArithmeticCodingDecompressModel {
 
   public int tableShift;
 
-  public ArithmeticCodingDecompressModel(final int symbolCount) {
+  private final boolean compress;
+
+  public ArithmeticModel(final int symbolCount, final boolean compress) {
     if (symbolCount < 2 || symbolCount > 1 << 11) {
       throw new IllegalArgumentException("sumbolCount=" + symbolCount);
     }
     this.symbolCount = symbolCount;
+    this.compress = compress;
     this.lastSymbol = symbolCount - 1;
     if (symbolCount > 16) {
       int table_bits = 3;
@@ -131,7 +134,7 @@ public class ArithmeticCodingDecompressModel {
     int s = 0;
     final int scale = Integer.divideUnsigned(0x80000000, this.totalCount);
 
-    if (this.tableSize == 0) {
+    if (this.compress || this.tableSize == 0) {
       for (int k = 0; k < this.symbolCount; k++) {
         this.distribution[k] = scale * sum >>> 31 - DM__LengthShift;
         sum += this.symbolCounts[k];

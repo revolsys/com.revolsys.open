@@ -12,8 +12,6 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
     return System.currentTimeMillis() / 1000.0 - 315964800;
   }
 
-  private int intensity;
-
   private boolean scanDirectionFlag;
 
   private boolean edgeOfFlightLine;
@@ -32,13 +30,11 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   private short userData;
 
-  private int pointSourceID;
-
   private byte scannerChannel;
 
   private double gpsTime;
 
-  private byte returnByte;
+  private byte returnByte = 0b00010001;
 
   public LasPoint6GpsTime(final LasPointCloud pointCloud) {
     super(pointCloud);
@@ -66,11 +62,6 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   }
 
   @Override
-  public int getIntensity() {
-    return this.intensity;
-  }
-
-  @Override
   public byte getNumberOfReturns() {
     return (byte)(this.returnByte >> 4 & 0b1111);
   }
@@ -78,11 +69,6 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   @Override
   public LasPointFormat getPointFormat() {
     return LasPointFormat.ExtendedGpsTime;
-  }
-
-  @Override
-  public int getPointSourceID() {
-    return this.pointSourceID;
   }
 
   @Override
@@ -176,42 +162,47 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   }
 
   @Override
-  public void setClassification(final short classification) {
+  public LasPoint6GpsTime setClassification(final short classification) {
     if (classification < 0 && classification > 256) {
       throw new IllegalArgumentException("Invalid LAS classificaion " + classification
         + " not in 0..255 for record format " + getPointFormatId());
     }
     this.classification = classification;
+    return this;
   }
 
   @Override
-  public void setClassificationByte(final byte classificationByte) {
+  public LasPoint6GpsTime setClassificationByte(final byte classificationByte) {
     throw new RuntimeException("Not implemented");
   }
 
   @Override
-  public void setEdgeOfFlightLine(final boolean edgeOfFlightLine) {
+  public LasPoint6GpsTime setEdgeOfFlightLine(final boolean edgeOfFlightLine) {
     this.edgeOfFlightLine = edgeOfFlightLine;
+    return this;
   }
 
   @Override
-  public void setGpsTime(final double gpsTime) {
+  public LasPoint6GpsTime setGpsTime(final double gpsTime) {
     this.gpsTime = gpsTime;
+    return this;
   }
 
   @Override
-  public void setIntensity(final int intensity) {
-    this.intensity = intensity;
-  }
-
-  @Override
-  public void setKeyPoint(final boolean keyPoint) {
+  public LasPoint6GpsTime setKeyPoint(final boolean keyPoint) {
     this.keyPoint = keyPoint;
+    return this;
   }
 
   @Override
-  public void setNumberOfReturns(final byte numberOfReturns) {
-    this.returnByte &= numberOfReturns | 0b11110000;
+  public LasPoint6GpsTime setNumberOfReturns(final byte numberOfReturns) {
+    if (numberOfReturns >= 1 && numberOfReturns <= 31) {
+      this.returnByte &= numberOfReturns | 0b11110000;
+    } else {
+      throw new IllegalArgumentException(
+        "numberOfReturns must be in range 1..31: " + numberOfReturns);
+    }
+    return this;
   }
 
   @Override
@@ -220,18 +211,18 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   }
 
   @Override
-  public void setPointSourceID(final int pointSourceID) {
-    this.pointSourceID = pointSourceID;
-  }
-
-  @Override
-  public void setReturnByte(final byte returnByte) {
+  public LasPoint6GpsTime setReturnByte(final byte returnByte) {
     throw new RuntimeException("Not implemented");
   }
 
   @Override
-  public void setReturnNumber(final byte returnNumber) {
-    this.returnByte &= returnNumber << 4 | 0b00001111;
+  public LasPoint6GpsTime setReturnNumber(final byte returnNumber) {
+    if (returnNumber >= 1 && returnNumber <= 31) {
+      this.returnByte &= returnNumber << 4 | 0b00001111;
+    } else {
+      throw new IllegalArgumentException("returnNumber must be in range 1..31: " + returnNumber);
+    }
+    return this;
   }
 
   public void setScanAngle(final short scanAngle) {
@@ -239,33 +230,38 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   }
 
   @Override
-  public void setScanAngleRank(final byte scanAngleRank) {
+  public LasPoint6GpsTime setScanAngleRank(final byte scanAngleRank) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void setScanDirectionFlag(final boolean scanDirectionFlag) {
+  public LasPoint6GpsTime setScanDirectionFlag(final boolean scanDirectionFlag) {
     this.scanDirectionFlag = scanDirectionFlag;
+    return this;
   }
 
   @Override
-  public void setScannerChannel(final byte scannerChannel) {
+  public LasPoint6GpsTime setScannerChannel(final byte scannerChannel) {
     this.scannerChannel = scannerChannel;
+    return this;
   }
 
   @Override
-  public void setSynthetic(final boolean synthetic) {
+  public LasPoint6GpsTime setSynthetic(final boolean synthetic) {
     this.synthetic = synthetic;
+    return this;
   }
 
   @Override
-  public void setUserData(final short userData) {
+  public LasPoint6GpsTime setUserData(final short userData) {
     this.userData = userData;
+    return this;
   }
 
   @Override
-  public void setWithheld(final boolean withheld) {
+  public LasPoint6GpsTime setWithheld(final boolean withheld) {
     this.withheld = withheld;
+    return this;
   }
 
   @Override

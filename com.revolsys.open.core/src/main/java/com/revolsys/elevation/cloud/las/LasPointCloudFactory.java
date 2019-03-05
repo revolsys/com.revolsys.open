@@ -4,7 +4,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.elevation.cloud.PointCloudWriteFactory;
-import com.revolsys.elevation.cloud.las.zip.writer.LazPointCloudWriter;
+import com.revolsys.elevation.cloud.las.zip.LasZipPointCloudWriter;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
@@ -32,7 +32,7 @@ public class LasPointCloudFactory extends AbstractIoFactory
     if ("las".equals(fileNameExtension)) {
       return new LasPointCloudWriter(resource);
     } else if ("laz".equals(fileNameExtension)) {
-      return new LazPointCloudWriter(resource);
+      return new LasZipPointCloudWriter(resource);
     } else {
       return null;
     }

@@ -23,16 +23,17 @@ package com.revolsys.math.arithmeticcoding;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.logging.Logs;
 
-public class ArithmeticCodingCompressEncoder implements BaseCloseable {
+public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseCloseable {
 
   private static final int AC_BUFFER_SIZE = 1024;
 
-  private static final long AC__MinLength = 0x01000000L; // threshold for
-                                                         // renormalization
+  private static final int AC__MinLength = 0x01000000; // threshold for
+                                                       // renormalization
 
-  private static final long AC__MaxLength = 0xFFFFFFFFL; // maximum AC interval
-                                                         // length
+  private static final int AC__MaxLength = 0xFFFFFFFF; // maximum AC interval
+                                                       // length
 
   // Maximum values for binary models
   private static final int BM__LengthShift = 13; // length bits discarded
@@ -52,11 +53,14 @@ public class ArithmeticCodingCompressEncoder implements BaseCloseable {
 
   private int endByteIndex = this.endBufferIndex;
 
-  private long base = 0;
+  private int base = 0;
 
-  private long length = AC__MaxLength;
+  private int length = AC__MaxLength;
 
-  public ArithmeticCodingCompressEncoder(final ChannelWriter writer) {
+  public ArithmeticCodingEncoder() {
+  }
+
+  public ArithmeticCodingEncoder(final ChannelWriter writer) {
     this.writer = writer;
   }
 
@@ -64,18 +68,19 @@ public class ArithmeticCodingCompressEncoder implements BaseCloseable {
   public void close() {
     boolean another_byte = true;
 
-    if (this.length > 2 * AC__MinLength) {
-      this.length = AC__MinLength >> 1; // set new length for 1 more byte
+    if (Integer.compareUnsigned(this.length, 2 * AC__MinLength) > 0) {
+      this.length = AC__MinLength >>> 1; // set new length for 1 more byte
       setBase(this.base + AC__MinLength);
     } else {
-      this.length = AC__MinLength >> 9; // set new length for 2 more bytes
+      this.length = AC__MinLength >>> 9; // set new length for 2 more bytes
       another_byte = false;
-      setBase(this.base + (AC__MinLength >> 1));
+      setBase(this.base + (AC__MinLength >>> 1));
     }
 
     renorm_enc_interval(); // renormalization = output last bytes
 
     if (this.endByteIndex != this.endBufferIndex) {
+
       this.writer.putBytes(this.outBuffer, AC_BUFFER_SIZE, AC_BUFFER_SIZE);
     }
     final int buffer_size = this.outByteIndex;
@@ -93,10 +98,16 @@ public class ArithmeticCodingCompressEncoder implements BaseCloseable {
     this.writer = null;
   }
 
+  @Override
+  public ArithmeticModel createSymbolModel(final int symbolCount) {
+    return new ArithmeticModel(symbolCount, true);
+  }
+
   /* Encode a bit with modelling */
-  public void encodeBit(final ArithmeticCodingBitModel m, final long sym) {
-    final long x = m.bit0Probability * (this.length >> BM__LengthShift);
-    long length;
+  public void encodeBit(final ArithmeticBitModel m, final int sym) {
+    Logs.debug(this, "bit=" + sym);
+    final int x = m.bit0Probability * (this.length >>> BM__LengthShift);
+    int length;
     if (sym == 0) {
       length = x;
       ++m.bit0Count;
@@ -110,23 +121,25 @@ public class ArithmeticCodingCompressEncoder implements BaseCloseable {
   }
 
   /* Encode a symbol with modelling */
-  public void encodeSymbol(final ArithmeticCodingCompressModel m, final int sym) {
-    long x;
-    long length = this.length;
-    if (sym == m.last_symbol) {
-      x = m.distribution[sym] * (length >> DM__LengthShift);
+  public void encodeSymbol(final ArithmeticModel m, final int sym) {
+    int x;
+    int length = this.length;
+    if (sym == m.lastSymbol) {
+      x = m.distribution[sym] * (length >>> DM__LengthShift);
       length -= x; // no product needed
     } else {
-      x = m.distribution[sym] * (length >>= DM__LengthShift);
+      x = m.distribution[sym] * (length >>>= DM__LengthShift);
       length = m.distribution[sym + 1] * length - x;
     }
     setBase(this.base + x);
     setLength(length);
 
-    ++m.symbol_count[sym];
-    if (--m.symbols_until_update == 0) {
+    ++m.symbolCounts[sym];
+    if (--m.symbolsUntilUpdate == 0) {
       m.update(); // periodic model update
     }
+
+    Logs.debug(this, "symbol=" + sym + "\t" + this.base + "\t" + this.length);
   }
 
   private void manage_outbuffer() {
@@ -139,22 +152,20 @@ public class ArithmeticCodingCompressEncoder implements BaseCloseable {
 
   private void renorm_enc_interval() {
     do { // output and discard top byte
-      final long outValue = this.base >> 24;
+      final int outValue = this.base >>> 24;
       this.outBuffer[this.outByteIndex++] = (byte)outValue;
       if (this.outByteIndex == this.endByteIndex) {
         manage_outbuffer();
       }
       this.base <<= 8;
-      this.base &= AC__MaxLength;
-    } while ((this.length <<= 8) < AC__MinLength); // length multiplied by 256
-
+      this.length <<= 8;// length multiplied by 256
+    } while (Integer.compareUnsigned(this.length, AC__MinLength) < 0);
   }
 
-  private void setBase(final long base) {
-    final long init_base = this.base;
+  private void setBase(final int base) {
+    final int init_base = this.base;
     this.base = base;
-    this.base &= AC__MaxLength;
-    if (init_base > this.base) {
+    if (Integer.compareUnsigned(init_base, this.base) > 0) {
       int index;
       if (this.outByteIndex == 0) {
         index = this.endBufferIndex - 1;
@@ -173,29 +184,32 @@ public class ArithmeticCodingCompressEncoder implements BaseCloseable {
     }
   }
 
-  private void setLength(final long length) {
+  private void setLength(final int length) {
     this.length = length;
-    if (length < AC__MinLength) {
+    if (Integer.compareUnsigned(length, AC__MinLength) < 0) {
       renorm_enc_interval();
     }
   }
 
   /* Encode bits without modelling */
-  public void writeBits(long bits, long sym) {
+  public void writeBits(int bits, int sym) {
     if (bits > 19) {
-      writeShort((int)(sym & 0xFFFF));
-      sym = sym >> 16;
+      writeShort(sym & 0xFFFF);
+      sym = sym >>> 16;
       bits = bits - 16;
     }
 
-    final long length = this.length >> bits;
+    final int length = this.length >>> bits;
     setBase(this.base + sym * length); // new interval base and
     setLength(length);
+
+    Logs.debug(this, "bits=" + sym + "\t" + this.base + "\t" + this.length);
   }
 
   /* Encode an unsigned short without modelling */
   public void writeShort(final int sym) {
-    final long length = this.length >>= 16;
+    Logs.debug(this, "short=" + sym);
+    final int length = this.length >>> 16;
     setBase(this.base + sym * length);
     setLength(length);
   }

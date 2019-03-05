@@ -40,7 +40,7 @@ A. Said, Introduction to Arithetic Coding Theory and Practice
 HP Labs report HPL-2004-76  -  http://www.hpl.hp.com/techreports/
 */
 
-public class ArithmeticCodingBitModel {
+public class ArithmeticBitModel {
 
   /** length bits discarded before multiplication. */
   private static final int BM_LENGTH_SHIFT = 13; // length bits discarded before
@@ -60,7 +60,7 @@ public class ArithmeticCodingBitModel {
 
   private int updateCycle;
 
-  public ArithmeticCodingBitModel() {
+  public ArithmeticBitModel() {
     reset();
   }
 

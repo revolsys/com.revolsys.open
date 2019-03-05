@@ -8,17 +8,13 @@ import com.revolsys.io.channels.ChannelWriter;
 public class LasPoint0Core extends BaseLasPoint {
   private static final long serialVersionUID = 1L;
 
-  private int intensity;
-
   private byte scanAngleRank;
 
   private short userData;
 
-  private int pointSourceID;
-
   private byte scannerChannel;
 
-  private byte returnByte;
+  private byte returnByte = 0b001001;
 
   private byte classificationByte;
 
@@ -42,11 +38,6 @@ public class LasPoint0Core extends BaseLasPoint {
   }
 
   @Override
-  public int getIntensity() {
-    return this.intensity;
-  }
-
-  @Override
   public byte getNumberOfReturns() {
     return (byte)(this.returnByte >> 3 & 0b111);
   }
@@ -54,11 +45,6 @@ public class LasPoint0Core extends BaseLasPoint {
   @Override
   public LasPointFormat getPointFormat() {
     return LasPointFormat.Core;
-  }
-
-  @Override
-  public int getPointSourceID() {
-    return this.pointSourceID;
   }
 
   @Override
@@ -127,110 +113,123 @@ public class LasPoint0Core extends BaseLasPoint {
 
     this.classificationByte = reader.getByte();
     this.scanAngleRank = reader.getByte();
-    this.userData = reader.getByte();
+    this.userData = reader.getUnsignedByte();
     this.pointSourceID = reader.getUnsignedShort();
   }
 
   @Override
-  public void setClassification(final short classification) {
-    if (classification < 0 && classification > 31) {
-      throw new IllegalArgumentException("Invalid LAS classificaion " + classification
-        + " not in 0..31 for record format " + getPointFormatId());
-    }
-    byte newClassificationByte = this.classificationByte;
-    newClassificationByte &= 0b11100000;
-    newClassificationByte |= classification & 0b11111;
-    this.classificationByte = newClassificationByte;
-  }
-
-  @Override
-  public void setClassificationByte(final byte classificationByte) {
-    this.classificationByte = classificationByte;
-  }
-
-  @Override
-  public void setEdgeOfFlightLine(final boolean edgeOfFlightLine) {
-    if (edgeOfFlightLine) {
-      this.returnByte |= 0b1000000;
+  public LasPoint0Core setClassification(final short classification) {
+    if (classification >= 0 && classification <= 31) {
+      byte newClassificationByte = this.classificationByte;
+      newClassificationByte &= 0b11100000;
+      newClassificationByte |= classification & 0b11111;
+      this.classificationByte = newClassificationByte;
     } else {
-      this.returnByte &= ~0b1000000;
+      throw new IllegalArgumentException(
+        "classification must be in range 0..31: " + classification);
     }
+    return this;
   }
 
   @Override
-  public void setIntensity(final int intensity) {
-    this.intensity = intensity;
+  public LasPoint0Core setClassificationByte(final byte classificationByte) {
+    this.classificationByte = classificationByte;
+    return this;
   }
 
   @Override
-  public void setKeyPoint(final boolean keyPoint) {
+  public LasPoint0Core setEdgeOfFlightLine(final boolean edgeOfFlightLine) {
+    if (edgeOfFlightLine) {
+      this.returnByte |= 0b10000000;
+    } else {
+      this.returnByte &= ~0b10000000;
+    }
+    return this;
+  }
+
+  @Override
+  public LasPoint0Core setKeyPoint(final boolean keyPoint) {
     if (keyPoint) {
       this.classificationByte |= 0b1000000;
     } else {
       this.classificationByte &= ~0b1000000;
     }
+    return this;
   }
 
   @Override
-  public void setNumberOfReturns(final byte numberOfReturns) {
-    this.returnByte &= numberOfReturns | 0b11111000;
+  public LasPoint0Core setNumberOfReturns(final byte numberOfReturns) {
+    if (numberOfReturns >= 1 && numberOfReturns <= 15) {
+      this.returnByte &= numberOfReturns | 0b11111000;
+    } else {
+      throw new IllegalArgumentException(
+        "numberOfReturns must be in range 1..15: " + numberOfReturns);
+    }
+    return this;
   }
 
   @Override
-  public void setPointSourceID(final int pointSourceID) {
-    this.pointSourceID = pointSourceID;
-  }
-
-  @Override
-  public void setReturnByte(final byte returnByte) {
+  public LasPoint0Core setReturnByte(final byte returnByte) {
     this.returnByte = returnByte;
+    return this;
   }
 
   @Override
-  public void setReturnNumber(final byte returnNumber) {
-    this.returnByte &= returnNumber << 3 | 0b11000111;
+  public LasPoint0Core setReturnNumber(final byte returnNumber) {
+    if (returnNumber >= 1 && returnNumber <= 15) {
+      this.returnByte &= returnNumber << 3 | 0b11000111;
+    } else {
+      throw new IllegalArgumentException("returnNumber must be in range 1..15: " + returnNumber);
+    }
+    return this;
   }
 
   @Override
-  public void setScanAngleRank(final byte scanAngleRank) {
+  public LasPoint0Core setScanAngleRank(final byte scanAngleRank) {
     this.scanAngleRank = scanAngleRank;
+    return this;
   }
 
   @Override
-  public void setScanDirectionFlag(final boolean scanDirectionFlag) {
+  public LasPoint0Core setScanDirectionFlag(final boolean scanDirectionFlag) {
     if (scanDirectionFlag) {
       this.returnByte |= 0b100000;
     } else {
       this.returnByte &= ~0b100000;
     }
+    return this;
   }
 
   @Override
-  public void setScannerChannel(final byte scannerChannel) {
+  public LasPoint0Core setScannerChannel(final byte scannerChannel) {
     this.scannerChannel = scannerChannel;
+    return this;
   }
 
   @Override
-  public void setSynthetic(final boolean synthetic) {
+  public LasPoint0Core setSynthetic(final boolean synthetic) {
     if (synthetic) {
       this.classificationByte |= 0b100000;
     } else {
       this.classificationByte &= ~0b100000;
     }
+    return this;
   }
 
   @Override
-  public void setUserData(final short userData) {
+  public LasPoint0Core setUserData(final short userData) {
     this.userData = userData;
+    return this;
   }
 
   @Override
-  public void setWithheld(final boolean withheld) {
+  public LasPoint0Core setWithheld(final boolean withheld) {
     if (withheld) {
       this.classificationByte |= 0b10000000;
     } else {
       this.classificationByte &= ~0b10000000;
     }
+    return this;
   }
 
   @Override

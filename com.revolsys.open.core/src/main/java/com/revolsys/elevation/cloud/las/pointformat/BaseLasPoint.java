@@ -17,13 +17,17 @@ import com.revolsys.util.function.Consumer3Double;
 public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Serializable {
   private static final long serialVersionUID = 1L;
 
+  protected int intensity;
+
+  private final LasPointCloud pointCloud;
+
   private int x = Integer.MIN_VALUE;
 
   private int y = Integer.MIN_VALUE;
 
   private int z = Integer.MIN_VALUE;
 
-  private final LasPointCloud pointCloud;
+  protected int pointSourceID = 1;
 
   public BaseLasPoint(final LasPointCloud pointCloud) {
     this.pointCloud = pointCloud;
@@ -125,8 +129,18 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
     return this.pointCloud.getGeometryFactory();
   }
 
+  @Override
+  public int getIntensity() {
+    return this.intensity;
+  }
+
   public LasPointCloud getPointCloud() {
     return this.pointCloud;
+  }
+
+  @Override
+  public int getPointSourceID() {
+    return this.pointSourceID;
   }
 
   @Override
@@ -169,6 +183,28 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
   @Override
   public boolean isEmpty() {
     return false;
+  }
+
+  @Override
+  public BaseLasPoint setIntensity(final int intensity) {
+    if (intensity >= 0 && intensity <= 65535) {
+      this.intensity = intensity;
+    } else {
+      throw new IllegalArgumentException("intensity must be in range 0..65535: " + intensity);
+    }
+    return this;
+  }
+
+  @Override
+  public BaseLasPoint setPointSourceID(final int pointSourceID) {
+    if (pointSourceID >= 1 && pointSourceID <= 65535) {
+      this.pointSourceID = pointSourceID;
+    } else {
+      throw new IllegalArgumentException(
+        "pointSourceID must be in range 1..65535: " + pointSourceID);
+    }
+
+    return this;
   }
 
   @Override

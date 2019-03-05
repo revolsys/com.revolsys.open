@@ -12,9 +12,16 @@ package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
-public interface LazDecompress {
+public interface LasZipItemCodec {
+  default int getVersion() {
+    return 1;
+  }
+
   void init(LasPoint firstPoint);
 
   void read(LasPoint point);
 
+  default void write(final LasPoint point) {
+    throw new UnsupportedOperationException("Not yet implemented");
+  }
 }

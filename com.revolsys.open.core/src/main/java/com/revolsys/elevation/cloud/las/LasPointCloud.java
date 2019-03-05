@@ -16,8 +16,10 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
-import com.revolsys.elevation.cloud.las.zip.LazChunkedIterator;
-import com.revolsys.elevation.cloud.las.zip.LazPointwiseIterator;
+import com.revolsys.elevation.cloud.las.zip.LasZipChunkedIterator;
+import com.revolsys.elevation.cloud.las.zip.LasZipCompressorType;
+import com.revolsys.elevation.cloud.las.zip.LasZipHeader;
+import com.revolsys.elevation.cloud.las.zip.LasZipPointwiseIterator;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.BoundingBox;
@@ -162,10 +164,6 @@ public class LasPointCloud extends BaseObjectWithProperties
     return this.header;
   }
 
-  public LasZipHeader getLasZipHeader() {
-    return this.header.getLasZipHeader();
-  }
-
   public long getPointCount() {
     return this.header.getPointCount();
   }
@@ -200,16 +198,15 @@ public class LasPointCloud extends BaseObjectWithProperties
         return Collections.emptyList();
       } else {
         try {
-          if (this.header.isLaszip()) {
-            final LasZipHeader lasZipHeader = getLasZipHeader();
-            if (lasZipHeader.isCompressor(LasZipHeader.LASZIP_COMPRESSOR_POINTWISE)) {
-              return new LazPointwiseIterator(this, reader);
-            } else {
-              return new LazChunkedIterator(this, reader);
-            }
-
-          } else {
+          final LasZipHeader lasZipHeader = LasZipHeader.getLasZipHeader(this);
+          if (lasZipHeader == null) {
             return new LasPointCloudIterator(this, reader);
+          } else {
+            if (lasZipHeader.isCompressor(LasZipCompressorType.POINTWISE)) {
+              return new LasZipPointwiseIterator(this, reader);
+            } else {
+              return new LasZipChunkedIterator(this, reader);
+            }
           }
         } catch (RuntimeException | Error e) {
           reader.close();
