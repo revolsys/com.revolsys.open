@@ -25,6 +25,11 @@ public interface LasPoint extends Point, MapSerializer {
     return 315964800;
   }
 
+  default long getGpsTimeLong() {
+    final double gpsTime = getGpsTime();
+    return Double.doubleToLongBits(gpsTime);
+  }
+
   default int getGreen() {
     return 0;
   }

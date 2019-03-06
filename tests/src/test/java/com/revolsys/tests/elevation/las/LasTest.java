@@ -27,7 +27,6 @@ import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryWithOffsets;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 
 public class LasTest {
@@ -112,8 +111,10 @@ public class LasTest {
     }
     for (int i = 0; i < 500; i++) {
       final int value = RANDOM.nextInt(65535);
-      final LasPoint point = addRandomPoint(cloud);
-      action.accept(point, value);
+      if (value > minValue) {
+        final LasPoint point = addRandomPoint(cloud);
+        action.accept(point, value);
+      }
     }
   }
 
@@ -129,17 +130,7 @@ public class LasTest {
     final double x = Math.round(randomDouble() * size * SCALE) / SCALE;
     final double y = Math.round(randomDouble() * size * SCALE) / SCALE;
     final double z = Math.round(randomDouble() * 3500 * SCALE) / SCALE;
-    if (x < 0 || y < 0 || z < 0) {
-      Debug.noOp();
-    }
     final LasPoint point = cloud.addPoint(x, y, z);
-    if (Math.abs(x - point.getX()) >= 0.001) {
-      Debug.noOp();
-    } else if (Math.abs(y - point.getY()) >= 0.001) {
-      Debug.noOp();
-    } else if (Math.abs(z - point.getZ()) >= 0.001) {
-      Debug.noOp();
-    }
     return point;
   }
 
@@ -225,10 +216,44 @@ public class LasTest {
     return RANDOM.nextDouble();
   }
 
+  private void addGpsTimePoints(final LasPointCloud cloud) {
+    final int maxMilliSecondsInWeek = 604800 * 1000;
+    int time = maxMilliSecondsInWeek / 2;
+    for (int i = 0; i < 1000; i++) {
+      time += RANDOM.nextInt(999999);
+      final double gpsTime = time / 100000.0;
+      addRandomPoint(cloud) //
+        .setGpsTime(gpsTime);
+      ;
+    }
+  }
+
   private void addRandomPoints(final LasPointCloud cloud, final int count) {
     for (int i = 0; i < count; i++) {
       addRandomPoint(cloud);
     }
+  }
+
+  private void addRgbPoint(final LasPointCloud cloud, final int red, final int green,
+    final int blue) {
+    addRandomPoint(cloud) //
+      .setRed(red) //
+      .setGreen(green) //
+      .setBlue(blue) //
+    ;
+  }
+
+  private void addRgbPoints(final LasPointCloud cloud) {
+    for (final int c : Arrays.asList(0, 1, 65534, 65535)) {
+      addRgbPoint(cloud, c, c, c);
+
+    }
+    // for (int i = 0; i < 1000; i++) {
+    // final int red = RANDOM.nextInt(65535);
+    // final int green = RANDOM.nextInt(65535);
+    // final int blue = RANDOM.nextInt(65535);
+    // addRgbPoint(cloud, red, green, blue);
+    // }
   }
 
   private void assertPointCloudEqual(final String label, final LasPointCloud cloud1,
@@ -290,12 +315,18 @@ public class LasTest {
     if ("laz".equals(fileExtension)) {
       switch (pointFormat) {
         case Core:
-        case GpsTime:
+          writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion", 1));
+          writeVariations.put("v2", new LinkedHashMapEx("lasZipVersion", 2));
+        break;
         case Rgb:
+          writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion", 1));
+          writeVariations.put("v2", new LinkedHashMapEx("lasZipVersion", 2));
+        break;
+
+        case GpsTime:
         case GpsTimeRgb:
-          for (int version = 1; version <= 2; version++) {
-            writeVariations.put("v" + version, new LinkedHashMapEx("lasZipVersion", version));
-          }
+          // writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion", 1));
+          writeVariations.put("v2", new LinkedHashMapEx("lasZipVersion", 2));
         break;
         case GpsTimeWavePackets:
           writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion", 1));
@@ -329,6 +360,7 @@ public class LasTest {
         final String label = prefix + "_" + pointFormat.name() + "_" + suffix;
         final Path file = DIR.resolve(label + "." + fileExtension);
         cloud.writePointCloud(file, writeProperties);
+        System.out.println(label + "\t" + cloud.getPointCount());
         assertRead(label, file, cloud);
       }
     }
@@ -337,6 +369,12 @@ public class LasTest {
   public void asssertWriteRead(final String prefix, final LasPointFormat recordFormat,
     final String fileExtension) {
     final Consumer<LasPointCloud> cloudAction = cloud -> {
+      if (recordFormat.name().contains("GpsTime")) {
+        addGpsTimePoints(cloud);
+      }
+      if (recordFormat.name().contains("Rgb")) {
+        addRgbPoints(cloud);
+      }
       addRandomPoints(cloud, 1000);
       addIntensityPoints(cloud);
       if (recordFormat.getId() < 6) {
@@ -390,6 +428,12 @@ public class LasTest {
 
   @Test
   public void readWriteLazManyPoints() {
-    asssertWriteRead("readWriteLazManyPoints", LasPointFormat.Core, "laz");
+    for (final LasPointFormat recordFormat : Arrays.asList(//
+      LasPointFormat.Core, //
+      // LasPointFormat.GpsTime, //
+      LasPointFormat.Rgb//
+    )) {
+      asssertWriteRead("readWriteLazManyPoints", recordFormat, "laz");
+    }
   }
 }

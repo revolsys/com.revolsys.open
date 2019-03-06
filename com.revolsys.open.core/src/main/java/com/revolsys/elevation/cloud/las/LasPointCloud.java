@@ -185,6 +185,11 @@ public class LasPointCloud extends BaseObjectWithProperties
     return this.exists;
   }
 
+  public boolean isGpsTime() {
+    final int globalEncoding = this.header.getGlobalEncoding();
+    return (globalEncoding & 1) != 0;
+  }
+
   public Iterable<LasPoint> iterable() {
     if (this.allLoaded) {
       return this.points;

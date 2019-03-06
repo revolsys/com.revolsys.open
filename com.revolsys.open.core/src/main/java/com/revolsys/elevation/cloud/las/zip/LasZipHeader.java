@@ -54,17 +54,18 @@ public class LasZipHeader implements MapSerializer {
   }
 
   public static LasZipHeader newLasZipHeader(final LasPointCloud pointCloud,
-    final LasZipCompressorType compressor, int lazVersion) {
+    final LasZipCompressorType compressor, final int lazVersion) {
     final LasPointFormat pointFormat = pointCloud.getPointFormat();
     final LasPointCloudHeader header = pointCloud.getHeader();
     final int recordLength = header.getRecordLength();
     final int extraByteCount = recordLength - pointFormat.getRecordLength();
-    final LasZipHeader lasZipHeader = newLasZipHeader(pointFormat, extraByteCount, compressor, lazVersion);
+    final LasZipHeader lasZipHeader = newLasZipHeader(pointFormat, extraByteCount, compressor,
+      lazVersion);
     return lasZipHeader;
   }
 
   public static LasZipHeader newLasZipHeader(final LasPointFormat pointFormat,
-    final int extraByteCount, final LasZipCompressorType compressor, int lazVersion) {
+    final int extraByteCount, final LasZipCompressorType compressor, final int lazVersion) {
     final LasZipHeader header = new LasZipHeader();
     header.initialize(pointFormat, extraByteCount, compressor, lazVersion);
     return header;
@@ -167,7 +168,7 @@ public class LasZipHeader implements MapSerializer {
   }
 
   private void initialize(final LasPointFormat pointFormat, final int extraByteCount,
-    final LasZipCompressorType compressor, int lazVersion) {
+    final LasZipCompressorType compressor, final int lazVersion) {
     boolean compatible = false;
 
     compatible = (this.options & 1) == 1;
@@ -428,5 +429,10 @@ public class LasZipHeader implements MapSerializer {
     addToMap(map, "versions", this.versions);
 
     return map;
+  }
+
+  @Override
+  public String toString() {
+    return toMap().toString();
   }
 }

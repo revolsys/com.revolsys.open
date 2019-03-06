@@ -47,6 +47,36 @@ public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb
   }
 
   @Override
+  public LasPoint7GpsTimeRgb setBlue(final int blue) {
+    if (blue >= 0 && blue <= 65535) {
+      this.blue = blue;
+    } else {
+      throw new IllegalArgumentException("blue must be in range 0..65535: " + blue);
+    }
+    return this;
+  }
+
+  @Override
+  public LasPoint7GpsTimeRgb setGreen(final int green) {
+    if (green >= 0 && green <= 65535) {
+      this.green = green;
+    } else {
+      throw new IllegalArgumentException("green must be in range 0..65535: " + green);
+    }
+    return this;
+  }
+
+  @Override
+  public LasPoint7GpsTimeRgb setRed(final int red) {
+    if (red >= 0 && red <= 65535) {
+      this.red = red;
+    } else {
+      throw new IllegalArgumentException("red must be in range 0..65535: " + red);
+    }
+    return this;
+  }
+
+  @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
     addToMap(map, "red", this.red);
@@ -56,7 +86,7 @@ public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb
   }
 
   @Override
-  public void writeLasPoint(ChannelWriter out) {
+  public void writeLasPoint(final ChannelWriter out) {
     super.writeLasPoint(out);
     out.putUnsignedShort(this.red);
     out.putUnsignedShort(this.green);

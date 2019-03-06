@@ -17,7 +17,7 @@ import static com.revolsys.math.arithmeticcoding.ArithmeticModel.DM__LengthShift
 import static java.lang.Integer.compareUnsigned;
 
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.logging.Logs;
+import com.revolsys.util.Debug;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //                                                                           -
@@ -92,7 +92,6 @@ public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
     }
     model.update();
 
-    Logs.debug(this, "bit=" + sym);
     return sym; // return data bit value
   }
 
@@ -148,7 +147,7 @@ public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
     if (--model.symbolsUntilUpdate == 0) {
       model.update();
     }
-    Logs.debug(this, "symbol=" + sym + "\t" + this.value + "\t" + this.length);
+
     return sym;
   }
 
@@ -198,7 +197,7 @@ public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
     if (compareUnsigned(sym, 1 << bits) >= 0) {
       throw new IllegalStateException("Error decompressing file");
     }
-    Logs.debug(this, "bits=" + sym + "\t" + this.value + "\t" + this.length);
+
     return sym;
   }
 
@@ -217,16 +216,6 @@ public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
     return (byte)sym;
   }
 
-  public double readDouble() {
-    // danger in float reinterpretation
-    return Double.longBitsToDouble(readInt64());
-  }
-
-  public float readFloat() {
-    // danger in float reinterpretation
-    return Float.intBitsToFloat(readInt());
-  }
-
   public int readInt() {
     final int lowerInt = readShort();
     final int upperInt = readShort();
@@ -234,9 +223,11 @@ public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
   }
 
   public long readInt64() {
-    final long lowerInt = readInt();
-    final long upperInt = readInt();
-    return upperInt << 32 | lowerInt;
+    final long lower = readInt();
+    final long upper = readInt();
+    final long sym = upper << 32 | lower;
+    Debug.println(sym + "\t" + lower + "\t" + upper);
+    return sym;
   }
 
   public char readShort() {
@@ -250,8 +241,6 @@ public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
     if (compareUnsigned(sym, 1 << 16) >= 0) {
       throw new IllegalStateException("Error decompressing file");
     }
-
-    Logs.debug(this, "short=" + sym);
     return (char)sym;
   }
 

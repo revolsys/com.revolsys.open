@@ -12,8 +12,6 @@ package com.revolsys.elevation.cloud.las.zip.v2;
 
 import static com.revolsys.elevation.cloud.las.zip.Common_v2.number_return_level;
 import static com.revolsys.elevation.cloud.las.zip.Common_v2.number_return_map;
-import static com.revolsys.elevation.cloud.las.zip.MyDefs.U32_ZERO_BIT_0;
-import static com.revolsys.elevation.cloud.las.zip.MyDefs.U8_FOLD;
 import static com.revolsys.elevation.cloud.las.zip.StreamingMedian5.newStreamingMedian5;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
@@ -210,7 +208,7 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
       if ((changed_values & 4) != 0) {
         final int val = this.decoder
           .decodeSymbol(this.m_scan_angle_rank[getLastScanDirectionFlag()]);
-        this.lastScanAngleRank = U8_FOLD(val + this.lastScanAngleRank);
+        this.lastScanAngleRank = LasZipItemCodec.U8_FOLD(val + this.lastScanAngleRank);
       }
 
       // decompress the user_data ... if it has changed
@@ -243,14 +241,14 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
     median = this.last_y_diff_median5[m].get();
     k_bits = this.ic_dx.getK();
     diff = this.ic_dy.decompress(median,
-      (n == 1 ? 1 : 0) + (k_bits < 20 ? U32_ZERO_BIT_0(k_bits) : 20));
+      (n == 1 ? 1 : 0) + (k_bits < 20 ? LasZipItemCodec.U32_ZERO_BIT_0(k_bits) : 20));
     this.lastY += diff;
     this.last_y_diff_median5[m].add(diff);
 
     // decompress z coordinate
     k_bits = (this.ic_dx.getK() + this.ic_dy.getK()) / 2;
     this.lastZ = this.ic_z.decompress(this.last_height[l],
-      (n == 1 ? 1 : 0) + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
+      (n == 1 ? 1 : 0) + (k_bits < 18 ? LasZipItemCodec.U32_ZERO_BIT_0(k_bits) : 18));
     this.last_height[l] = this.lastZ;
 
     point.setXYZ(this.lastX, this.lastY, this.lastZ);
@@ -340,7 +338,7 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
     if (scanAngleRankChanged) {
       final int i = item.isScanDirectionFlag() ? 1 : 0;
       this.encoder.encodeSymbol(this.m_scan_angle_rank[i],
-        U8_FOLD(scanAngleRank - this.lastScanAngleRank));
+        LasZipItemCodec.U8_FOLD(scanAngleRank - this.lastScanAngleRank));
       this.lastScanAngleRank = scanAngleRank;
     }
 
@@ -374,13 +372,14 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
     final int k_bitsY = this.ic_dx.getK();
     final int medianY = this.last_y_diff_median5[m].get();
     final int diffY = y - this.lastY;
-    this.ic_dy.compress(medianY, diffY, nIndex + (k_bitsY < 20 ? U32_ZERO_BIT_0(k_bitsY) : 20));
+    this.ic_dy.compress(medianY, diffY,
+      nIndex + (k_bitsY < 20 ? LasZipItemCodec.U32_ZERO_BIT_0(k_bitsY) : 20));
     this.last_y_diff_median5[m].add(diffY);
 
     // compress z coordinate
     final int k_bits = (this.ic_dx.getK() + this.ic_dy.getK()) / 2;
     this.ic_z.compress(this.last_height[l], z,
-      nIndex + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
+      nIndex + (k_bits < 18 ? LasZipItemCodec.U32_ZERO_BIT_0(k_bits) : 18));
     this.last_height[l] = z;
 
     this.lastX = x;

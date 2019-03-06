@@ -13,14 +13,14 @@ package com.revolsys.elevation.cloud.las.zip.v1;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticCodingEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
 public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
 
-  private final ArithmeticCodingInteger intDecompressor;
+  private final ArithmeticCodingInteger ic_rgb;
 
   private ArithmeticCodingDecoder decoder;
 
@@ -28,11 +28,17 @@ public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
 
   private final ArithmeticModel byteUsed;
 
-  private int red;
+  private int lastRedLower;
 
-  private int green;
+  private int lastRedUpper;
 
-  private int blue;
+  private int lastGreenLower;
+
+  private int lastGreenUpper;
+
+  private int lastBlueLower;
+
+  private int lastBlueUpper;
 
   public LasZipItemCodecRgb12V1(final ArithmeticCodingCodec codec) {
     if (codec instanceof ArithmeticCodingDecoder) {
@@ -43,43 +49,143 @@ public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
       throw new IllegalArgumentException("Not supported:" + codec.getClass());
     }
     this.byteUsed = codec.createSymbolModel(64);
-    this.intDecompressor = codec.newCodecInteger(8, 6);
-  }
-
-  private int decompress(final int lastValue, final boolean lowChanged, final boolean highChanged) {
-    int value;
-    if (lowChanged) {
-      value = this.intDecompressor.decompress(lastValue & 0xFF, 0);
-    } else {
-      value = lastValue & 0xFF;
-    }
-    if (highChanged) {
-      value = this.intDecompressor.decompress(lastValue >> 8, 1) << 8;
-    } else {
-      value += lastValue & 0xFF00;
-    }
-    return value;
+    this.ic_rgb = codec.newCodecInteger(8, 6);
   }
 
   @Override
-  public void init(final LasPoint firstPoint) {
-    this.red = firstPoint.getRed();
-    this.green = firstPoint.getBlue();
-    this.blue = firstPoint.getGreen();
+  public void init(final LasPoint point) {
     this.byteUsed.reset();
-    this.intDecompressor.init();
+    this.ic_rgb.init();
+    final int red = point.getRed();
+    final int green = point.getGreen();
+    final int blue = point.getBlue();
+    this.lastRedLower = red & 0xFF;
+    this.lastRedUpper = red >>> 8;
+    this.lastGreenLower = green & 0xFF;
+    this.lastGreenUpper = green >>> 8;
+    this.lastBlueLower = blue & 0xFF;
+    this.lastBlueUpper = blue >>> 8;
   }
 
   @Override
   public void read(final LasPoint point) {
     final int sym = this.decoder.decodeSymbol(this.byteUsed);
 
-    this.red = decompress(this.red, (sym & 1) != 0, (sym & 1 << 1) != 0);
-    this.green = decompress(this.green, (sym & 1 << 2) != 0, (sym & 1 << 3) != 0);
-    this.blue = decompress(this.blue, (sym & 1 << 4) != 0, (sym & 1 << 5) != 0);
+    int redLower;
+    int redUpper;
+    if ((sym & 0b1) != 0) {
+      redLower = this.ic_rgb.decompress(this.lastRedLower, 0);
+      this.lastRedLower = redLower;
+    } else {
+      redLower = this.lastRedLower;
+    }
+    if ((sym & 0b10) != 0) {
+      redUpper = this.ic_rgb.decompress(this.lastRedUpper, 1);
+      this.lastRedUpper = redUpper;
+    } else {
+      redUpper = this.lastRedUpper;
+    }
 
-    point.setRed(this.red);
-    point.setGreen(this.green);
-    point.setBlue(this.blue);
+    int greenLower;
+    int greenUpper;
+    if ((sym & 0b100) != 0) {
+      greenLower = this.ic_rgb.decompress(this.lastGreenLower, 2);
+      this.lastGreenLower = greenLower;
+    } else {
+      greenLower = this.lastGreenLower;
+    }
+    if ((sym & 0b1000) != 0) {
+      greenUpper = this.ic_rgb.decompress(this.lastGreenUpper, 3);
+      this.lastGreenUpper = greenUpper;
+    } else {
+      greenUpper = this.lastGreenUpper;
+    }
+
+    int blueLower;
+    int blueUpper;
+    if ((sym & 0b10000) != 0) {
+      blueLower = this.ic_rgb.decompress(this.lastBlueLower, 4);
+      this.lastBlueLower = blueLower;
+    } else {
+      blueLower = this.lastBlueLower;
+    }
+    if ((sym & 0b100000) != 0) {
+      blueUpper = this.ic_rgb.decompress(this.lastBlueUpper, 5);
+      this.lastBlueUpper = blueUpper;
+    } else {
+      blueUpper = this.lastBlueUpper;
+    }
+
+    final int red = redUpper << 8 | redLower;
+    final int green = greenUpper << 8 | greenLower;
+    final int blue = blueUpper << 8 | blueLower;
+    point.setRed(red);
+    point.setGreen(green);
+    point.setBlue(blue);
   }
+
+  @Override
+  public void write(final LasPoint point) {
+    final int red = point.getRed();
+    final int green = point.getGreen();
+    final int blue = point.getBlue();
+    final int redLower = red & 0xFF;
+    final int redUpper = red >>> 8;
+    final int greenLower = green & 0xFF;
+    final int greenUpper = green >>> 8;
+    final int blueLower = blue & 0xFF;
+    final int blueUpper = blue >>> 8;
+    int sym = 0;
+    final boolean redLowerChanged = this.lastRedLower != redLower;
+    if (redLowerChanged) {
+      sym |= 0b1;
+    }
+    final boolean redUpperChanged = this.lastRedUpper != redUpper;
+    if (redUpperChanged) {
+      sym |= 0b10;
+    }
+    final boolean greenLowerChanged = this.lastGreenLower != greenLower;
+    if (greenLowerChanged) {
+      sym |= 0b100;
+    }
+    final boolean greenUpperChanged = this.lastGreenUpper != greenUpper;
+    if (greenUpperChanged) {
+      sym |= 0b1000;
+    }
+    final boolean blueLowerChanged = this.lastBlueLower != blueLower;
+    if (blueLowerChanged) {
+      sym |= 0b10000;
+    }
+    final boolean blueUpperChanged = this.lastBlueUpper != blueUpper;
+    if (blueUpperChanged) {
+      sym |= 0b100000;
+    }
+
+    this.encoder.encodeSymbol(this.byteUsed, sym);
+    if (redLowerChanged) {
+      this.ic_rgb.compress(this.lastRedLower, redLower, 0);
+      this.lastRedLower = redLower;
+    }
+    if (redUpperChanged) {
+      this.ic_rgb.compress(this.lastRedUpper, redUpper, 1);
+      this.lastRedUpper = redUpper;
+    }
+    if (greenLowerChanged) {
+      this.ic_rgb.compress(this.lastGreenLower, greenLower, 2);
+      this.lastGreenLower = greenLower;
+    }
+    if (greenUpperChanged) {
+      this.ic_rgb.compress(this.lastGreenUpper, greenUpper, 3);
+      this.lastGreenUpper = greenUpper;
+    }
+    if (blueLowerChanged) {
+      this.ic_rgb.compress(this.lastBlueLower, blueLower, 4);
+      this.lastBlueLower = blueLower;
+    }
+    if (blueUpperChanged) {
+      this.ic_rgb.compress(this.lastBlueUpper, blueUpper, 5);
+      this.lastBlueUpper = blueUpper;
+    }
+  }
+
 }

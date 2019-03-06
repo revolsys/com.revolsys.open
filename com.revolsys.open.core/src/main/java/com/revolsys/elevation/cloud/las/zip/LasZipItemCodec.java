@@ -22,6 +22,34 @@ public interface LasZipItemCodec {
   void read(LasPoint point);
 
   default void write(final LasPoint point) {
-    throw new UnsupportedOperationException("Not yet implemented");
+    throw new UnsupportedOperationException("Not yet implemented: " + getClass());
+  }
+
+  static int I32_QUANTIZE(final float n) {
+    return n >= 0 ? (int)(n + 0.5f) : (int)(n - 0.5f);
+  }
+
+  static int U32_ZERO_BIT_0(final int n) {
+    return n & 0xFFFFFFFE;
+  }
+
+  static int U8_CLAMP(final int n) {
+    if (n < 0) {
+      return 0;
+    } else if (n > 255) {
+      return 255;
+    } else {
+      return n;
+    }
+  }
+
+  static int U8_FOLD(final int n) {
+    if (n < 0) {
+      return n + 256;
+    } else if (n > 255) {
+      return n - 256;
+    } else {
+      return n;
+    }
   }
 }

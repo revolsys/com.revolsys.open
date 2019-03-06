@@ -23,7 +23,7 @@ package com.revolsys.math.arithmeticcoding;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.channels.ChannelWriter;
-import com.revolsys.logging.Logs;
+import com.revolsys.util.Debug;
 
 public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseCloseable {
 
@@ -105,7 +105,6 @@ public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseClose
 
   /* Encode a bit with modelling */
   public void encodeBit(final ArithmeticBitModel m, final int sym) {
-    Logs.debug(this, "bit=" + sym);
     final int x = m.bit0Probability * (this.length >>> BM__LengthShift);
     int length;
     if (sym == 0) {
@@ -138,8 +137,6 @@ public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseClose
     if (--m.symbolsUntilUpdate == 0) {
       m.update(); // periodic model update
     }
-
-    Logs.debug(this, "symbol=" + sym + "\t" + this.base + "\t" + this.length);
   }
 
   private void manage_outbuffer() {
@@ -202,15 +199,26 @@ public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseClose
     final int length = this.length >>> bits;
     setBase(this.base + sym * length); // new interval base and
     setLength(length);
+  }
 
-    Logs.debug(this, "bits=" + sym + "\t" + this.base + "\t" + this.length);
+  public void writeInt(final int sym) {
+    writeShort(sym & 0xFFFF); // lower 16 bits
+    writeShort(sym >>> 16); // UPPER 16 bits
+  }
+
+  public void writeInt64(final long sym) {
+    final long lower = sym & 0xFFFFFFFFL;
+    final long upper = sym >>> 32;
+    Debug.println(sym + "\t" + lower + "\t" + upper);
+    writeInt((int)lower); // lower 32 bits
+    writeInt((int)upper); // UPPER 32 bits
   }
 
   /* Encode an unsigned short without modelling */
   public void writeShort(final int sym) {
-    Logs.debug(this, "short=" + sym);
     final int length = this.length >>> 16;
     setBase(this.base + sym * length);
     setLength(length);
   }
+
 }

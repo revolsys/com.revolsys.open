@@ -16,7 +16,9 @@ public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
 
   public LasPoint1GpsTime(final LasPointCloud pointCloud) {
     super(pointCloud);
-    this.gpsTime = getCurrentGpsTime();
+    if (pointCloud.isGpsTime()) {
+      this.gpsTime = getCurrentGpsTime();
+    }
   }
 
   @Override
