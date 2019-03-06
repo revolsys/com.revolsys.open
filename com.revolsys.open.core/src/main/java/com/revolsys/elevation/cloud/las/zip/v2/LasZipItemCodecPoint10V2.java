@@ -128,20 +128,20 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
     }
 
     /* init models and integer compressors */
-    this.m_changed_values.reset();
+    this.m_changed_values.init();
     this.ic_intensity.init();
-    this.m_scan_angle_rank[0].reset();
-    this.m_scan_angle_rank[1].reset();
+    this.m_scan_angle_rank[0].init();
+    this.m_scan_angle_rank[1].init();
     this.ic_point_source_ID.init();
     for (i = 0; i < 256; i++) {
       if (this.m_bit_byte[i] != null) {
-        this.m_bit_byte[i].reset();
+        this.m_bit_byte[i].init();
       }
       if (this.m_classification[i] != null) {
-        this.m_classification[i].reset();
+        this.m_classification[i].init();
       }
       if (this.m_user_data[i] != null) {
-        this.m_user_data[i].reset();
+        this.m_user_data[i].init();
       }
     }
     this.ic_dx.init();
@@ -176,7 +176,7 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
       if ((changed_values & 32) != 0) {
         if (this.m_bit_byte[this.lastReturnField] == null) {
           this.m_bit_byte[this.lastReturnField] = this.decoder.createSymbolModel(256);
-          this.m_bit_byte[this.lastReturnField].reset();
+          this.m_bit_byte[this.lastReturnField].init();
         }
         this.lastReturnField = this.decoder.decodeSymbol(this.m_bit_byte[this.lastReturnField]);
       }
@@ -198,7 +198,7 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
       if ((changed_values & 8) != 0) {
         if (this.m_classification[this.lastClassificationField] == null) {
           this.m_classification[this.lastClassificationField] = this.decoder.createSymbolModel(256);
-          this.m_classification[this.lastClassificationField].reset();
+          this.m_classification[this.lastClassificationField].init();
         }
         this.lastClassificationField = this.decoder
           .decodeSymbol(this.m_classification[this.lastClassificationField]);
@@ -215,7 +215,7 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
       if ((changed_values & 2) != 0) {
         if (this.m_user_data[this.lastUserData] == null) {
           this.m_user_data[this.lastUserData] = this.decoder.createSymbolModel(256);
-          this.m_user_data[this.lastUserData].reset();
+          this.m_user_data[this.lastUserData].init();
         }
         this.lastUserData = this.decoder.decodeSymbol(this.m_user_data[this.lastUserData]);
       }

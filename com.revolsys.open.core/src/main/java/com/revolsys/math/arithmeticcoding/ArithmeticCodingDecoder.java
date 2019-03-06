@@ -17,7 +17,6 @@ import static com.revolsys.math.arithmeticcoding.ArithmeticModel.DM__LengthShift
 import static java.lang.Integer.compareUnsigned;
 
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.util.Debug;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //                                                                           -
@@ -217,16 +216,15 @@ public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
   }
 
   public int readInt() {
-    final int lowerInt = readShort();
-    final int upperInt = readShort();
-    return upperInt << 16 | lowerInt;
+    final int lower = readShort();
+    final int upper = readShort();
+    return upper << 16 | lower;
   }
 
   public long readInt64() {
-    final long lower = readInt();
-    final long upper = readInt();
-    final long sym = upper << 32 | lower;
-    Debug.println(sym + "\t" + lower + "\t" + upper);
+    final long lower = Integer.toUnsignedLong(readInt());
+    final long upper = Integer.toUnsignedLong(readInt());
+    final long sym = upper << 32 + lower;
     return sym;
   }
 

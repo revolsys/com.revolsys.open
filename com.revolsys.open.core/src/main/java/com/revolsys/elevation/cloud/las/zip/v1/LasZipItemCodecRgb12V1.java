@@ -54,7 +54,7 @@ public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
 
   @Override
   public void init(final LasPoint point) {
-    this.byteUsed.reset();
+    this.byteUsed.init();
     this.ic_rgb.init();
     final int red = point.getRed();
     final int green = point.getGreen();

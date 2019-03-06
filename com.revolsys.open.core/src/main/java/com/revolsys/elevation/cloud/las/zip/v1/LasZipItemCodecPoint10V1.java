@@ -96,16 +96,16 @@ public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
     this.ic_intensity.init();
     this.ic_scan_angle_rank.init();
     this.ic_point_source_ID.init();
-    this.m_changed_values.reset();
+    this.m_changed_values.init();
     for (int i = 0; i < 256; i++) {
       if (this.m_bit_byte[i] != null) {
-        this.m_bit_byte[i].reset();
+        this.m_bit_byte[i].init();
       }
       if (this.m_classification[i] != null) {
-        this.m_classification[i].reset();
+        this.m_classification[i].init();
       }
       if (this.m_user_data[i] != null) {
-        this.m_user_data[i].reset();
+        this.m_user_data[i].init();
       }
     }
 
@@ -156,7 +156,7 @@ public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
       if ((changed_values & 16) != 0) {
         if (this.m_bit_byte[this.lastReturnField] == null) {
           this.m_bit_byte[this.lastReturnField] = this.decoder.createSymbolModel(256);
-          this.m_bit_byte[this.lastReturnField].reset();
+          this.m_bit_byte[this.lastReturnField].init();
         }
         this.lastReturnField = this.decoder.decodeSymbol(this.m_bit_byte[this.lastReturnField]);
       }

@@ -23,7 +23,7 @@ public class LasZipItemCodecRgb12V2 implements LasZipItemCodec {
 
   private final ArithmeticModel diffRedUpper;
 
-  private final ArithmeticModel diffGreenLowe;
+  private final ArithmeticModel diffGreenLower;
 
   private final ArithmeticModel diffGreenUpper;
 
@@ -36,12 +36,6 @@ public class LasZipItemCodecRgb12V2 implements LasZipItemCodec {
   private ArithmeticCodingEncoder encoder;
 
   private final ArithmeticModel byteUsed;
-
-  private int red;
-
-  private int green;
-
-  private int blue;
 
   private int lastRedLower;
 
@@ -66,7 +60,7 @@ public class LasZipItemCodecRgb12V2 implements LasZipItemCodec {
     this.byteUsed = codec.createSymbolModel(128);
     this.diffRedLower = codec.createSymbolModel(256);
     this.diffRedUpper = codec.createSymbolModel(256);
-    this.diffGreenLowe = codec.createSymbolModel(256);
+    this.diffGreenLower = codec.createSymbolModel(256);
     this.diffGreenUpper = codec.createSymbolModel(256);
     this.diffBlueLower = codec.createSymbolModel(256);
     this.diffBlueUpper = codec.createSymbolModel(256);
@@ -79,10 +73,6 @@ public class LasZipItemCodecRgb12V2 implements LasZipItemCodec {
 
   @Override
   public void init(final LasPoint point) {
-    this.red = point.getRed();
-    this.green = point.getBlue();
-    this.blue = point.getGreen();
-
     final int red = point.getRed();
     final int green = point.getGreen();
     final int blue = point.getBlue();
@@ -93,72 +83,89 @@ public class LasZipItemCodecRgb12V2 implements LasZipItemCodec {
     this.lastBlueLower = blue & 0xFF;
     this.lastBlueUpper = blue >>> 8;
 
-    this.byteUsed.reset();
-    this.diffRedLower.reset();
-    this.diffRedUpper.reset();
-    this.diffGreenLowe.reset();
-    this.diffGreenUpper.reset();
-    this.diffBlueLower.reset();
-    this.diffBlueUpper.reset();
+    this.byteUsed.init();
+    this.diffRedLower.init();
+    this.diffRedUpper.init();
+    this.diffGreenLower.init();
+    this.diffGreenUpper.init();
+    this.diffBlueLower.init();
+    this.diffBlueUpper.init();
   }
 
   @Override
   public void read(final LasPoint point) {
-    final int lastRed = this.red;
-    final int lastGreen = this.green;
-    final int lastBlue = this.blue;
+    int redLower = this.lastRedLower;
+    int redUpper = this.lastRedUpper;
+    int greenLower = this.lastGreenLower;
+    int greenUpper = this.lastGreenUpper;
+    int blueLower = this.lastBlueLower;
+    int blueUpper = this.lastBlueUpper;
 
-    byte corr;
-    int diff = 0;
-    final int sym = this.decoder.decodeSymbol(this.byteUsed);
-    if ((sym & 1 << 0) != 0) {
-      corr = (byte)this.decoder.decodeSymbol(this.diffRedLower);
-      this.red = LasZipItemCodec.U8_FOLD(corr + (lastRed & 255));
-    } else {
-      this.red = lastRed & 0xFF;
+    int redLowerDiff = 0;
+    final ArithmeticCodingDecoder decoder = this.decoder;
+    final int sym = decoder.decodeSymbol(this.byteUsed);
+    if ((sym & 0b1) != 0) {
+      final int corr = decoder.decodeSymbol(this.diffRedLower);
+      redLower = LasZipItemCodec.U8_FOLD(redLower + corr);
+      redLowerDiff = redLower - this.lastRedLower;
+      this.lastRedLower = redLower;
     }
-    if ((sym & 1 << 1) != 0) {
-      corr = (byte)this.decoder.decodeSymbol(this.diffRedUpper);
-      this.red |= LasZipItemCodec.U8_FOLD(corr + (lastRed >>> 8)) << 8;
-    } else {
-      this.red |= lastRed & 0xFF00;
+
+    int redUpperDiff = 0;
+    if ((sym & 0b10) != 0) {
+      final int corr = decoder.decodeSymbol(this.diffRedUpper);
+      redUpper = LasZipItemCodec.U8_FOLD(redUpper + corr);
+      redUpperDiff = redUpper - this.lastRedUpper;
+      this.lastRedUpper = redUpper;
     }
-    if ((sym & 1 << 6) != 0) {
-      diff = (this.red & 0x00FF) - (lastRed & 0x00FF);
-      if ((sym & 1 << 2) != 0) {
-        corr = (byte)this.decoder.decodeSymbol(this.diffGreenLowe);
-        this.green = LasZipItemCodec.U8_FOLD(corr + LasZipItemCodec.U8_CLAMP(diff + (lastGreen & 255)));
-      } else {
-        this.green = lastGreen & 0xFF;
+    final int red = redUpper << 8 | redLower;
+
+    if ((sym & 0b1000000) != 0) {
+      int greenLowerDiff = 0;
+      if ((sym & 0b100) != 0) {
+        final int corr = decoder.decodeSymbol(this.diffGreenLower);
+        greenLower = LasZipItemCodec
+          .U8_FOLD(LasZipItemCodec.U8_CLAMP(redLowerDiff + greenLower) + corr);
+        greenLowerDiff = (redLowerDiff + greenLower - this.lastGreenLower) / 2;
+        this.lastGreenLower = greenLower;
       }
-      if ((sym & 1 << 4) != 0) {
-        corr = (byte)this.decoder.decodeSymbol(this.diffBlueLower);
-        diff = (diff + (this.green & 0x00FF) - (lastGreen & 0x00FF)) / 2;
-        this.blue = LasZipItemCodec.U8_FOLD(corr + LasZipItemCodec.U8_CLAMP(diff + (lastBlue & 255)));
-      } else {
-        this.blue = lastBlue & 0xFF;
+
+      if ((sym & 0b10000) != 0) {
+        final int corr = decoder.decodeSymbol(this.diffBlueLower);
+        blueLower = LasZipItemCodec
+          .U8_FOLD(LasZipItemCodec.U8_CLAMP(greenLowerDiff + blueLower) + corr);
+        this.lastBlueLower = blueLower;
       }
-      diff = (this.red >>> 8) - (lastRed >>> 8);
-      if ((sym & 1 << 3) != 0) {
-        corr = (byte)this.decoder.decodeSymbol(this.diffGreenUpper);
-        this.green |= LasZipItemCodec.U8_FOLD(corr + LasZipItemCodec.U8_CLAMP(diff + (lastGreen >>> 8))) << 8;
-      } else {
-        this.green |= lastGreen & 0xFF00;
+
+      int greenUpperDiff = 0;
+      if ((sym & 0b1000) != 0) {
+        final int corr = decoder.decodeSymbol(this.diffGreenUpper);
+        greenUpper = LasZipItemCodec
+          .U8_FOLD(LasZipItemCodec.U8_CLAMP(redUpperDiff + greenUpper) + corr);
+        greenUpperDiff = (redUpperDiff + greenUpper - this.lastGreenUpper) / 2;
+        this.lastGreenUpper = greenUpper;
       }
-      if ((sym & 1 << 5) != 0) {
-        corr = (byte)this.decoder.decodeSymbol(this.diffBlueUpper);
-        diff = (diff + (this.green >>> 8) - (lastGreen >>> 8)) / 2;
-        this.blue |= LasZipItemCodec.U8_FOLD(corr + LasZipItemCodec.U8_CLAMP(diff + (lastBlue >>> 8))) << 8;
-      } else {
-        this.blue |= lastBlue & 0xFF00;
+
+      if ((sym & 0b100000) != 0) {
+        final int corr = decoder.decodeSymbol(this.diffBlueUpper);
+        blueUpper = LasZipItemCodec
+          .U8_FOLD(LasZipItemCodec.U8_CLAMP(greenUpperDiff + blueUpper) + corr);
+        this.lastBlueUpper = blueUpper;
       }
+      final int green = greenUpper << 8 | greenLower;
+      final int blue = blueUpper << 8 | blueLower;
+      point.setGreen(green);
+      point.setBlue(blue);
     } else {
-      this.green = this.red;
-      this.blue = this.red;
+      point.setGreen(red);
+      point.setBlue(red);
+      this.lastGreenLower = redLower;
+      this.lastGreenUpper = redUpper;
+      this.lastBlueLower = redLower;
+      this.lastBlueUpper = redUpper;
     }
-    point.setRed(this.red);
-    point.setGreen(this.green);
-    point.setBlue(this.blue);
+
+    point.setRed(red);
   }
 
   @Override
@@ -204,48 +211,50 @@ public class LasZipItemCodecRgb12V2 implements LasZipItemCodec {
       sym |= 0b1000000;
     }
 
-    this.encoder.encodeSymbol(this.byteUsed, sym);
-    int diffLower = 0;
+    final ArithmeticCodingEncoder encoder = this.encoder;
+    encoder.encodeSymbol(this.byteUsed, sym);
+    int redLowerDiff = 0;
     if (redLowerChanged) {
-      diffLower = redLower - this.lastRedLower;
-      this.encoder.encodeSymbol(this.diffRedLower, LasZipItemCodec.U8_FOLD(diffLower));
+      redLowerDiff = redLower - this.lastRedLower;
+      encoder.encodeSymbol(this.diffRedLower, LasZipItemCodec.U8_FOLD(redLowerDiff));
       this.lastRedLower = redLower;
     }
-    int diffUpper = 0;
+    int redUpperDiff = 0;
     if (redUpperChanged) {
-      diffUpper = redUpper - this.lastRedUpper;
-      this.encoder.encodeSymbol(this.diffRedUpper, LasZipItemCodec.U8_FOLD(diffUpper));
+      redUpperDiff = redUpper - this.lastRedUpper;
+      encoder.encodeSymbol(this.diffRedUpper, LasZipItemCodec.U8_FOLD(redUpperDiff));
       this.lastRedUpper = redUpper;
     }
     if (redDiffFromGreenAndBlue) {
+      int greenLowerDiff = 0;
       if (greenLowerChanged) {
-        final int corr = greenLower - LasZipItemCodec.U8_CLAMP(diffLower + this.lastGreenLower);
-        this.encoder.encodeSymbol(this.diffGreenLowe, LasZipItemCodec.U8_FOLD(corr));
+        greenLowerDiff = (redLowerDiff + greenLower - this.lastGreenLower) / 2;
+        final int corr = greenLower - LasZipItemCodec.U8_CLAMP(redLowerDiff + this.lastGreenLower);
+        encoder.encodeSymbol(this.diffGreenLower, LasZipItemCodec.U8_FOLD(corr));
+        this.lastGreenLower = greenLower;
       }
       if (blueLowerChanged) {
-        diffLower = (diffLower + greenLower - this.lastGreenLower) / 2;
-        final int corr = blueLower - LasZipItemCodec.U8_CLAMP(diffLower + this.lastBlueLower);
-        this.encoder.encodeSymbol(this.diffBlueLower, LasZipItemCodec.U8_FOLD(corr));
+        final int corr = blueLower - LasZipItemCodec.U8_CLAMP(greenLowerDiff + this.lastBlueLower);
+        encoder.encodeSymbol(this.diffBlueLower, LasZipItemCodec.U8_FOLD(corr));
         this.lastBlueLower = blueLower;
       }
-      this.lastGreenUpper = greenUpper;
+      int greenUpperDiff = 0;
       if (greenUpperChanged) {
-        final int corr = greenUpper - LasZipItemCodec.U8_CLAMP(diffUpper + this.lastGreenUpper);
-        this.encoder.encodeSymbol(this.diffGreenUpper, LasZipItemCodec.U8_FOLD(corr));
+        greenUpperDiff = (redUpperDiff + greenUpper - this.lastGreenUpper) / 2;
+        final int corr = greenUpper - LasZipItemCodec.U8_CLAMP(redUpperDiff + this.lastGreenUpper);
+        encoder.encodeSymbol(this.diffGreenUpper, LasZipItemCodec.U8_FOLD(corr));
+        this.lastGreenUpper = greenUpper;
       }
       if (blueUpperChanged) {
-        diffUpper = (diffUpper + greenUpper - this.lastGreenUpper) / 2;
-        final int corr = blueUpper - LasZipItemCodec.U8_CLAMP(diffUpper + this.lastBlueUpper);
-        this.encoder.encodeSymbol(this.diffBlueUpper, LasZipItemCodec.U8_FOLD(corr));
+        final int corr = blueUpper - LasZipItemCodec.U8_CLAMP(greenUpperDiff + this.lastBlueUpper);
+        encoder.encodeSymbol(this.diffBlueUpper, LasZipItemCodec.U8_FOLD(corr));
         this.lastBlueUpper = blueUpper;
       }
-      this.lastGreenUpper = greenUpper;
     } else {
-      this.lastGreenLower = greenLower;
-      this.lastGreenUpper = greenUpper;
-      this.lastBlueLower = blueLower;
-      this.lastBlueUpper = blueUpper;
-
+      this.lastGreenLower = redLower;
+      this.lastGreenUpper = redUpper;
+      this.lastBlueLower = redLower;
+      this.lastBlueUpper = redUpper;
     }
   }
 

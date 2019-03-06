@@ -74,8 +74,8 @@ public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
 
   @Override
   public void init(final LasPoint point) {
-    this.gpsTimeMulti.reset();
-    this.gpsTime0Diff.reset();
+    this.gpsTimeMulti.init();
+    this.gpsTime0Diff.init();
     this.ic_gpstime.init();
 
     this.last = 0;

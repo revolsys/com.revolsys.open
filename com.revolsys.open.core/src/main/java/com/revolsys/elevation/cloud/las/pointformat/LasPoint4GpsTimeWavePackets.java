@@ -79,6 +79,52 @@ public class LasPoint4GpsTimeWavePackets extends LasPoint1GpsTime implements Las
   }
 
   @Override
+  public LasPoint4GpsTimeWavePackets setByteOffsetToWaveformData(
+    final long byteOffsetToWaveformData) {
+    this.byteOffsetToWaveformData = byteOffsetToWaveformData;
+    return this;
+  }
+
+  @Override
+  public LasPoint4GpsTimeWavePackets setReturnPointWaveformLocation(
+    final float returnPointWaveformLocation) {
+    this.returnPointWaveformLocation = returnPointWaveformLocation;
+    return this;
+  }
+
+  @Override
+  public LasPoint4GpsTimeWavePackets setWaveformPacketSizeInBytes(
+    final long waveformPacketSizeInBytes) {
+    this.waveformPacketSizeInBytes = waveformPacketSizeInBytes;
+    return this;
+  }
+
+  @Override
+  public LasPoint4GpsTimeWavePackets setWavePacketDescriptorIndex(
+    final short wavePacketDescriptorIndex) {
+    this.wavePacketDescriptorIndex = wavePacketDescriptorIndex;
+    return this;
+  }
+
+  @Override
+  public LasPoint4GpsTimeWavePackets setXT(final float xt) {
+    this.xT = xt;
+    return this;
+  }
+
+  @Override
+  public LasPoint4GpsTimeWavePackets setYT(final float yt) {
+    this.yT = yt;
+    return this;
+  }
+
+  @Override
+  public LasPoint4GpsTimeWavePackets setZT(final float zt) {
+    this.zT = zt;
+    return this;
+  }
+
+  @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
     addToMap(map, "wavePacketDescriptorIndex", this.wavePacketDescriptorIndex);

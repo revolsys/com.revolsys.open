@@ -88,6 +88,10 @@ public interface LasPoint extends Point, MapSerializer {
     return this;
   }
 
+  default LasPoint setByteOffsetToWaveformData(final long byteOffsetToWaveformData) {
+    throw new UnsupportedOperationException();
+  }
+
   LasPoint setClassification(short classification);
 
   LasPoint setClassificationByte(byte classificationByte);
@@ -118,6 +122,10 @@ public interface LasPoint extends Point, MapSerializer {
 
   LasPoint setReturnNumber(byte returnNumber);
 
+  default LasPoint setReturnPointWaveformLocation(final float returnPointWaveformLocation) {
+    throw new UnsupportedOperationException();
+  }
+
   LasPoint setScanAngleRank(byte scanAngleRank);
 
   LasPoint setScanDirectionFlag(boolean scanDirectionFlag);
@@ -128,9 +136,29 @@ public interface LasPoint extends Point, MapSerializer {
 
   LasPoint setUserData(short userData);
 
+  default LasPoint setWaveformPacketSizeInBytes(final long waveformPacketSizeInBytes) {
+    throw new UnsupportedOperationException();
+  }
+
+  default LasPoint setWavePacketDescriptorIndex(final short wavePacketDescriptorIndex) {
+    throw new UnsupportedOperationException();
+  }
+
   LasPoint setWithheld(boolean withheld);
 
+  default LasPoint setXT(final float xT) {
+    throw new UnsupportedOperationException();
+  }
+
   void setXYZ(int x, int y, int z);
+
+  default LasPoint setYT(final float yT) {
+    throw new UnsupportedOperationException();
+  }
+
+  default LasPoint setZT(final float zT) {
+    throw new UnsupportedOperationException();
+  }
 
   @Override
   default MapEx toMap() {

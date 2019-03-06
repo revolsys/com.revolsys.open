@@ -23,7 +23,6 @@ package com.revolsys.math.arithmeticcoding;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.channels.ChannelWriter;
-import com.revolsys.util.Debug;
 
 public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseCloseable {
 
@@ -202,14 +201,15 @@ public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseClose
   }
 
   public void writeInt(final int sym) {
-    writeShort(sym & 0xFFFF); // lower 16 bits
-    writeShort(sym >>> 16); // UPPER 16 bits
+    final int lower = sym & 0xFFFF;
+    final int upper = sym >>> 16;
+    writeShort(lower); // lower 16 bits
+    writeShort(upper); // UPPER 16 bits
   }
 
   public void writeInt64(final long sym) {
     final long lower = sym & 0xFFFFFFFFL;
     final long upper = sym >>> 32;
-    Debug.println(sym + "\t" + lower + "\t" + upper);
     writeInt((int)lower); // lower 32 bits
     writeInt((int)upper); // UPPER 32 bits
   }

@@ -107,10 +107,10 @@ public class ArithmeticModel {
       this.distribution = new int[symbolCount];
     }
     this.symbolCounts = new int[symbolCount];
-    reset();
+    init();
   }
 
-  public void reset() {
+  public void init() {
     this.totalCount = 0;
     this.updateCycle = this.symbolCount;
     for (int k = 0; k < this.symbolCount; k++) {

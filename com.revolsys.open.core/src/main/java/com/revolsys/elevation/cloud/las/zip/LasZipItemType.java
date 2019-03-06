@@ -39,11 +39,12 @@ public enum LasZipItemType {
     }
 
     POINT10.addCodec(1, LasZipItemCodecPoint10V1::new);
-    GPSTIME11.addCodec(1, LasZipItemCodecGpsTime11V1::new);
-    RGB12.addCodec(1, LasZipItemCodecRgb12V1::new);
-
     POINT10.addCodec(2, LasZipItemCodecPoint10V2::new);
+
+    GPSTIME11.addCodec(1, LasZipItemCodecGpsTime11V1::new);
     GPSTIME11.addCodec(2, LasZipItemCodecGpsTime11V2::new);
+
+    RGB12.addCodec(1, LasZipItemCodecRgb12V1::new);
     RGB12.addCodec(2, LasZipItemCodecRgb12V2::new);
   }
 

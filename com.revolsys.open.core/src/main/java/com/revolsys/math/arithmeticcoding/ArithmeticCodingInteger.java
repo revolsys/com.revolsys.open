@@ -132,12 +132,12 @@ public class ArithmeticCodingInteger {
 
   public void init() {
     for (final ArithmeticModel model : this.mBits) {
-      model.reset();
+      model.init();
     }
     this.mCorrector0.reset();
     for (int i = 1; i <= this.corr_bits; i++) {
       final ArithmeticModel model = this.mCorrector[i];
-      model.reset();
+      model.init();
     }
   }
 

@@ -510,6 +510,18 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
       .tableRowLabelValue("Record Length", this.recordLength) //
       .tableRowLabelValue("Point Count", numberFormat.format(this.pointCount)) //
     ;
+    if (this.lasProperties.size() > 0) {
+      writer.tr() //
+        .thLabel("Properties") //
+        .td()//
+        .table();
+      for (final LasVariableLengthRecord variable : this.lasProperties.values()) {
+        writer.tableRowLabelValue(variable.getKey(), variable.getValue());
+      }
+      writer.endTag();
+      writer.endTag();
+      writer.endTag();
+    }
     if (this.pointCount > 0) {
       writer.tr() //
         .thLabel("Point Count by Return") //
