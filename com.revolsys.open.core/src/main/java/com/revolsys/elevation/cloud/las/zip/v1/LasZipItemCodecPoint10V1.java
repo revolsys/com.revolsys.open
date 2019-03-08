@@ -14,15 +14,15 @@ import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
 import com.revolsys.elevation.cloud.las.zip.Median;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingEncoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
 public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
-  private ArithmeticCodingDecoder decoder;
+  private ArithmeticDecoder decoder;
 
-  private ArithmeticCodingEncoder encoder;
+  private ArithmeticEncoder encoder;
 
   private final ArithmeticCodingInteger ic_dx;
 
@@ -67,10 +67,10 @@ public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
   private final ArithmeticModel[] m_user_data = new ArithmeticModel[256];
 
   public LasZipItemCodecPoint10V1(final ArithmeticCodingCodec codec) {
-    if (codec instanceof ArithmeticCodingDecoder) {
-      this.decoder = (ArithmeticCodingDecoder)codec;
-    } else if (codec instanceof ArithmeticCodingEncoder) {
-      this.encoder = (ArithmeticCodingEncoder)codec;
+    if (codec instanceof ArithmeticDecoder) {
+      this.decoder = (ArithmeticDecoder)codec;
+    } else if (codec instanceof ArithmeticEncoder) {
+      this.encoder = (ArithmeticEncoder)codec;
     } else {
       throw new IllegalArgumentException("Not supported:" + codec.getClass());
     }
@@ -85,7 +85,7 @@ public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
   }
 
   @Override
-  public void init(final LasPoint point) {
+  public int init(final LasPoint point, final int context) {
     /* init state */
     this.lastXDiff.reset();
     this.lastYDiff.reset();
@@ -120,10 +120,11 @@ public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
     this.lastScanAngleRank = Byte.toUnsignedInt(point.getScanAngleRank());
     this.lastUserData = point.getUserData();
     this.lastPointSourceID = point.getPointSourceID();
+    return context;
   }
 
   @Override
-  public void read(final LasPoint point) {
+  public int read(final LasPoint point, final int context) {
     // find median difference for x and y from 3 preceding differences
     final int median_x = this.lastXDiff.median();
     final int median_y = this.lastYDiff.median();
@@ -201,15 +202,11 @@ public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
     point.setScanAngleRank((byte)this.lastScanAngleRank);
     point.setUserData(this.lastUserData);
     point.setPointSourceID(this.lastPointSourceID);
+    return context;
   }
 
   @Override
-  public String toString() {
-    return super.toString();
-  }
-
-  @Override
-  public void write(final LasPoint item) {
+  public int write(final LasPoint item, final int context) {
     final int x = item.getXInt();
     final int y = item.getYInt();
     final int z = item.getZInt();
@@ -327,5 +324,6 @@ public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
     this.lastX = x;
     this.lastY = y;
     this.lastZ = z;
+    return context;
   }
 }

@@ -10,12 +10,15 @@
  */
 package com.revolsys.io.channels;
 
+import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
+import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -41,6 +44,14 @@ public class ChannelReader implements BaseCloseable {
   private int available = 0;
 
   private ByteBuffer tempBuffer = ByteBuffer.allocate(8);
+
+  public ChannelReader() {
+    this((ReadableByteChannel)null);
+  }
+
+  public ChannelReader(final InputStream in) {
+    this(Channels.newChannel(in));
+  }
 
   public ChannelReader(final ReadableByteChannel channel) {
     this(channel, 8192);
@@ -231,6 +242,41 @@ public class ChannelReader implements BaseCloseable {
     return getString(byteCount, StandardCharsets.US_ASCII);
   }
 
+  public void init(final byte[] bytes) {
+    this.available = 0;
+    if (bytes == null) {
+      this.channel = null;
+    } else {
+      this.channel = Channels.newChannel(new ByteArrayInputStream(bytes));
+    }
+  }
+
+  public void init(final byte[] bytes, final int length) {
+    this.available = 0;
+    if (bytes == null) {
+      this.channel = null;
+    } else {
+      this.channel = Channels.newChannel(new ByteArrayInputStream(bytes, 0, length));
+    }
+  }
+
+  public boolean isSeekable() {
+    return this.channel instanceof SeekableByteChannel;
+  }
+
+  public long position() {
+    if (this.channel instanceof SeekableByteChannel) {
+      final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
+      try {
+        return channel.position() - this.available;
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    } else {
+      return -1;
+    }
+  }
+
   private void read(final int minCount) {
     final ReadableByteChannel channel = this.channel;
     final ByteBuffer buffer = this.buffer;
@@ -274,11 +320,25 @@ public class ChannelReader implements BaseCloseable {
 
   public void seek(final long position) {
     try {
-      if (this.channel instanceof FileChannel) {
-        final FileChannel fileChannel = (FileChannel)this.channel;
-        fileChannel.position(position);
+      if (this.channel instanceof SeekableByteChannel) {
+        final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
+        channel.position(position);
         this.available = 0;
         this.buffer.clear();
+      } else {
+        throw new IllegalArgumentException("Not supported");
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  public void seekEnd(final long distance) {
+    try {
+      if (this.channel instanceof SeekableByteChannel) {
+        final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
+        final long position = channel.size() - distance;
+        seek(position);
       } else {
         throw new IllegalArgumentException("Not supported");
       }

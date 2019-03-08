@@ -1,9 +1,12 @@
 package com.revolsys.elevation.cloud.las;
 
+import java.util.List;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.elevation.cloud.PointCloudWriteFactory;
+import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.LasZipPointCloudWriter;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.AbstractIoFactory;
@@ -27,12 +30,20 @@ public class LasPointCloudFactory extends AbstractIoFactory
     return (PC)new LasPointCloud(resource, properties);
   }
 
-  private LasPointCloudWriter newWriter(final Resource resource) {
-    final String fileNameExtension = resource.getFileNameExtension();
-    if ("las".equals(fileNameExtension)) {
-      return new LasPointCloudWriter(resource);
-    } else if ("laz".equals(fileNameExtension)) {
-      return new LasZipPointCloudWriter(resource);
+  private LasPointCloudWriter newWriter(final PointCloud<?> pointCloud, final Resource resource,
+    final MapEx properties) {
+    if (pointCloud instanceof LasPointCloud) {
+      final LasPointCloud lasPointCloud = (LasPointCloud)pointCloud;
+      final String fileNameExtension = resource.getFileNameExtension();
+      if ("las".equals(fileNameExtension)) {
+        final LasPointCloudWriter writer = new LasPointCloudWriter(lasPointCloud, resource,
+          properties);
+        return writer;
+      } else if ("laz".equals(fileNameExtension)) {
+        return new LasZipPointCloudWriter(lasPointCloud, resource, properties);
+      } else {
+        return null;
+      }
     } else {
       return null;
     }
@@ -42,12 +53,12 @@ public class LasPointCloudFactory extends AbstractIoFactory
   public boolean writePointCloud(final PointCloud<?> pointCloud, final Resource resource,
     final MapEx properties) {
     try (
-      LasPointCloudWriter writer = newWriter(resource)) {
+      LasPointCloudWriter writer = newWriter(pointCloud, resource, properties)) {
       if (writer == null) {
         return false;
       } else {
-        writer.setProperties(properties);
-        writer.writePointCloud(pointCloud);
+        final List<LasPoint> points = ((LasPointCloud)pointCloud).getPoints();
+        writer.writePoints(points);
         return true;
       }
     }

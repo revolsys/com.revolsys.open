@@ -5,7 +5,9 @@ import java.nio.ByteOrder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,10 +18,8 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
-import com.revolsys.elevation.cloud.las.zip.LasZipChunkedIterator;
 import com.revolsys.elevation.cloud.las.zip.LasZipCompressorType;
 import com.revolsys.elevation.cloud.las.zip.LasZipHeader;
-import com.revolsys.elevation.cloud.las.zip.LasZipPointwiseIterator;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.BoundingBox;
@@ -69,9 +69,11 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   private boolean classificationsLoaded;
 
+  private double fileGpsTime = 0;
+
   public LasPointCloud(final LasPointFormat pointFormat, final GeometryFactory geometryFactory) {
     final LasPointCloudHeader header = new LasPointCloudHeader(this, pointFormat, geometryFactory);
-    this.header = header;
+    setHeader(header);
     this.geometryFactory = header.getGeometryFactory();
   }
 
@@ -102,6 +104,7 @@ public class LasPointCloud extends BaseObjectWithProperties
   public <P extends LasPoint> P addPoint(final double x, final double y, final double z) {
     final LasPoint lasPoint = this.header.newLasPoint(this, x, y, z);
     this.points.add(lasPoint);
+    this.header.addCounts(lasPoint);
     return (P)lasPoint;
   }
 
@@ -150,9 +153,29 @@ public class LasPointCloud extends BaseObjectWithProperties
     return this.classificationCounts.clone();
   }
 
+  public double getCurrentGpsTime() {
+    if (isGpsTime()) {
+      return System.currentTimeMillis() / 1000.0 - 315964800;
+    } else {
+      final Calendar calendar = new GregorianCalendar();
+      final long time = calendar.getTimeInMillis();
+      calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+      calendar.set(Calendar.HOUR_OF_DAY, 0);
+      calendar.set(Calendar.MINUTE, 0);
+      calendar.set(Calendar.SECOND, 0);
+      final long startOfWeekTime = calendar.getTimeInMillis();
+      final long gpsWeekTime = time - startOfWeekTime;
+      return gpsWeekTime / 1000.0;
+    }
+  }
+
   @Override
   public Predicate<Point> getDefaultFilter() {
     return point -> LasClassification.GROUND == ((LasPoint)point).getClassification();
+  }
+
+  public double getFileGpsTime() {
+    return this.fileGpsTime;
   }
 
   @Override
@@ -207,11 +230,8 @@ public class LasPointCloud extends BaseObjectWithProperties
           if (lasZipHeader == null) {
             return new LasPointCloudIterator(this, reader);
           } else {
-            if (lasZipHeader.isCompressor(LasZipCompressorType.POINTWISE)) {
-              return new LasZipPointwiseIterator(this, reader);
-            } else {
-              return new LasZipChunkedIterator(this, reader);
-            }
+            final LasZipCompressorType compressor = lasZipHeader.getCompressor();
+            return compressor.newIterator(this, reader);
           }
         } catch (RuntimeException | Error e) {
           reader.close();
@@ -253,7 +273,9 @@ public class LasPointCloud extends BaseObjectWithProperties
     } else {
       reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       this.exists = true;
-      this.header = new LasPointCloudHeader(this, reader, this.geometryFactory);
+      final LasPointCloudHeader header = new LasPointCloudHeader(this, reader,
+        this.geometryFactory);
+      setHeader(header);
       this.geometryFactory = this.header.getGeometryFactory();
       if (this.header.getPointCount() == 0) {
         reader.close();
@@ -279,6 +301,11 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+  }
+
+  public void setHeader(final LasPointCloudHeader header) {
+    this.header = header;
+    this.fileGpsTime = getCurrentGpsTime();
   }
 
   @Override

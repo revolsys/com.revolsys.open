@@ -32,7 +32,8 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
 
-public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryProxy, MapSerializer {
+public class LasPointCloudHeader
+  implements BoundingBoxProxy, Cloneable, GeometryFactoryProxy, MapSerializer {
 
   private static final Map<Pair<String, Integer>, LasVariableLengthRecordConverter> CONVERTER_FACTORY_BY_KEY = new HashMap<>();
 
@@ -52,7 +53,7 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     return CONVERTER_FACTORY_BY_KEY.get(key);
   }
 
-  private final double[] bounds;
+  private double[] bounds;
 
   private int fileSourceId;
 
@@ -62,13 +63,13 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   private int globalEncoding = 0;
 
-  private final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = new LinkedHashMap<>();
+  private Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = new LinkedHashMap<>();
 
   private Version version = LasVersion.VERSION_1_2;
 
   private long pointCount = 0;
 
-  private final long[] pointCountByReturn = {
+  private long[] pointCountByReturn = {
     0l, 0l, 0l, 0l, 0l, 0l, 0l, 0l, 0l, 0l, 0l, 0l, 0l, 0l, 0l
   };
 
@@ -100,7 +101,8 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     this.pointCloud = pointCloud;
     setGeometryFactory(geometryFactory);
     try {
-      if (reader.getUsAsciiString(4).equals("LASF")) {
+      final String headerBytes = reader.getUsAsciiString(4);
+      if (headerBytes.equals("LASF")) {
         this.fileSourceId = reader.getUnsignedShort();
         this.globalEncoding = reader.getUnsignedShort();
 
@@ -197,6 +199,18 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     setGeometryFactory(geometryFactory);
     this.bounds = RectangleUtil.newBounds(3);
     this.projectId = UUID.randomUUID();
+    setVersion(LasVersion.VERSION_1_2);
+  }
+
+  public void addCounts(final LasPoint lasPoint) {
+    this.pointCount++;
+    byte returnNumber = lasPoint.getReturnNumber();
+    final int returnNumberIndex = returnNumber - 1;
+    this.pointCountByReturn[returnNumberIndex]++;
+    final double x = lasPoint.getX();
+    final double y = lasPoint.getY();
+    final double z = lasPoint.getZ();
+    RectangleUtil.expand(this.bounds, 3, x, y, z);
   }
 
   public void addLasProperty(final Pair<String, Integer> key, final String description,
@@ -208,15 +222,31 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   protected void addProperty(final LasVariableLengthRecord property) {
     final Pair<String, Integer> key = property.getKey();
+    property.setHeader(this);
     this.lasProperties.put(key, property);
   }
 
   protected void clear() {
     this.pointCount = 0;
-    for (int i = 0; i < this.pointCountByReturn.length; i++) {
-      this.pointCountByReturn[i] = 0;
-    }
+    Arrays.fill(this.pointCountByReturn, 0);
     Arrays.fill(this.bounds, Double.NaN);
+  }
+
+  @Override
+  public LasPointCloudHeader clone() {
+    try {
+      final LasPointCloudHeader clone = (LasPointCloudHeader)super.clone();
+      clone.bounds = this.bounds.clone();
+      clone.pointCountByReturn = this.pointCountByReturn.clone();
+      clone.lasProperties = new LinkedHashMap<>();
+      for (LasVariableLengthRecord variable : this.lasProperties.values()) {
+        variable = variable.clone();
+        clone.addProperty(variable);
+      }
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   public Object convertVariableLenthRecord(final Pair<String, Integer> key, final byte[] bytes) {
@@ -347,9 +377,6 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
 
   public LasPoint newLasPoint(final LasPointCloud lasPointCloud, final double x, final double y,
     final double z) {
-    this.pointCount++;
-    this.pointCountByReturn[0]++;
-    RectangleUtil.expand(this.bounds, 3, x, y, z);
     return this.pointFormat.newLasPoint(lasPointCloud, x, y, z);
   }
 
@@ -421,6 +448,15 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
         offsetY, scaleY, offsetZ, scaleZ);
 
       LasProjection.setCoordinateSystem(this, coordinateSystem);
+    }
+  }
+
+  public void setVersion(final Version version) {
+    final Version minVersion = this.pointFormat.getMinVersion();
+    if (version.atLeast(minVersion)) {
+      this.version = version;
+    } else {
+      this.version = minVersion;
     }
   }
 
@@ -539,4 +575,5 @@ public class LasPointCloudHeader implements BoundingBoxProxy, GeometryFactoryPro
     }
     writer.endTag();
   }
+
 }

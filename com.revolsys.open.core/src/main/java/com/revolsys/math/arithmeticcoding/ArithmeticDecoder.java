@@ -17,6 +17,7 @@ import static com.revolsys.math.arithmeticcoding.ArithmeticModel.DM__LengthShift
 import static java.lang.Integer.compareUnsigned;
 
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.util.number.Longs;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //                                                                           -
@@ -55,16 +56,16 @@ import com.revolsys.io.channels.ChannelReader;
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
+public class ArithmeticDecoder implements ArithmeticCodingCodec {
 
-  private ChannelReader reader;
+  private ChannelReader in;
 
   private int value;
 
   private int length;
 
-  public ArithmeticCodingDecoder() {
-    this.reader = null;
+  public ArithmeticDecoder() {
+    this.in = null;
   }
 
   @Override
@@ -150,17 +151,40 @@ public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
     return sym;
   }
 
-  public void init(final ChannelReader reader) {
-    this.reader = reader;
-    this.length = AC__MaxLength;
-    final byte b1 = reader.getByte();
-    final byte b2 = reader.getByte();
-    final byte b3 = reader.getByte();
-    final byte b4 = reader.getByte();
-    this.value = (b1 & 0xff) << 24;
-    this.value |= (b2 & 0xff) << 16;
-    this.value |= (b3 & 0xff) << 8;
-    this.value |= b4 & 0xff;
+  public int decodeSymbol(final ArithmeticModel[] models, final int modelIndex,
+    final int symbolCount) {
+    ArithmeticModel model = models[modelIndex];
+    if (model == null) {
+      model = createSymbolModel(symbolCount);
+      model.init();
+      models[modelIndex] = model;
+    }
+    return decodeSymbol(model);
+  }
+
+  public ChannelReader getIn() {
+    return this.in;
+  }
+
+  public void init(final ChannelReader in) {
+    init(in, true);
+  }
+
+  public void init(final ChannelReader in, final boolean reallyInit) {
+    if (in != null) {
+      this.in = in;
+      this.length = AC__MaxLength;
+      if (reallyInit) {
+        final byte b1 = in.getByte();
+        final byte b2 = in.getByte();
+        final byte b3 = in.getByte();
+        final byte b4 = in.getByte();
+        this.value = (b1 & 0xff) << 24 //
+          | (b2 & 0xff) << 16 //
+          | (b3 & 0xff) << 8 //
+          | b4 & 0xff;
+      }
+    }
   }
 
   public int readBit() {
@@ -222,10 +246,9 @@ public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
   }
 
   public long readInt64() {
-    final long lower = Integer.toUnsignedLong(readInt());
-    final long upper = Integer.toUnsignedLong(readInt());
-    final long sym = upper << 32 + lower;
-    return sym;
+    final int lowerInt = readInt();
+    final int upperInt = readInt();
+    return Longs.toLong(upperInt, lowerInt);
   }
 
   public char readShort() {
@@ -244,7 +267,7 @@ public class ArithmeticCodingDecoder implements ArithmeticCodingCodec {
 
   private void renorm_dec_interval() {
     do {
-      final byte b = this.reader.getByte();
+      final byte b = this.in.getByte();
       this.value = this.value << 8 | b & 0xff;
       this.length <<= 8;
     } while (Integer.compareUnsigned(this.length, AC__MinLength) < 0);

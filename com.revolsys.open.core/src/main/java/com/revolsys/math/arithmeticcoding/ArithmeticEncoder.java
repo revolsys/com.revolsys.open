@@ -24,7 +24,7 @@ package com.revolsys.math.arithmeticcoding;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.channels.ChannelWriter;
 
-public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseCloseable {
+public class ArithmeticEncoder implements ArithmeticCodingCodec, BaseCloseable {
 
   private static final int AC_BUFFER_SIZE = 1024;
 
@@ -42,29 +42,39 @@ public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseClose
   private static final int DM__LengthShift = 15; // length bits discarded
                                                  // before mult.
 
+  private static final int END_BUFFER_INDEX = 2 * AC_BUFFER_SIZE;
+
   private ChannelWriter writer;
 
   private final byte[] outBuffer = new byte[2 * AC_BUFFER_SIZE];
 
-  private final int endBufferIndex = 2 * AC_BUFFER_SIZE;
-
   private int outByteIndex = 0;
 
-  private int endByteIndex = this.endBufferIndex;
+  private int endByteIndex = END_BUFFER_INDEX;
 
   private int base = 0;
 
   private int length = AC__MaxLength;
 
-  public ArithmeticCodingEncoder() {
+  public ArithmeticEncoder() {
   }
 
-  public ArithmeticCodingEncoder(final ChannelWriter writer) {
+  public ArithmeticEncoder(final ChannelWriter writer) {
     this.writer = writer;
   }
 
   @Override
   public void close() {
+    done();
+    this.writer = null;
+  }
+
+  @Override
+  public ArithmeticModel createSymbolModel(final int symbolCount) {
+    return new ArithmeticModel(symbolCount, true);
+  }
+
+  public void done() {
     boolean another_byte = true;
 
     if (Integer.compareUnsigned(this.length, 2 * AC__MinLength) > 0) {
@@ -78,7 +88,7 @@ public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseClose
 
     renorm_enc_interval(); // renormalization = output last bytes
 
-    if (this.endByteIndex != this.endBufferIndex) {
+    if (this.endByteIndex != END_BUFFER_INDEX) {
 
       this.writer.putBytes(this.outBuffer, AC_BUFFER_SIZE, AC_BUFFER_SIZE);
     }
@@ -93,13 +103,7 @@ public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseClose
     if (another_byte) {
       this.writer.putByte((byte)0);
     }
-
-    this.writer = null;
-  }
-
-  @Override
-  public ArithmeticModel createSymbolModel(final int symbolCount) {
-    return new ArithmeticModel(symbolCount, true);
+    this.writer.flush();
   }
 
   /* Encode a bit with modelling */
@@ -138,8 +142,35 @@ public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseClose
     }
   }
 
+  public void encodeSymbol(final ArithmeticModel[] models, final int modelIndex,
+    final int symbolCount, final int symbol) {
+    ArithmeticModel model = models[modelIndex];
+    if (model == null) {
+      model = createSymbolModel(symbolCount);
+      model.init();
+      models[modelIndex] = model;
+    }
+    encodeSymbol(model, symbol);
+  }
+
+  public ChannelWriter getWriter() {
+    return this.writer;
+  }
+
+  public void init() {
+    this.base = 0;
+    this.length = AC__MaxLength;
+    this.outByteIndex = 0;
+    this.endByteIndex = END_BUFFER_INDEX;
+  }
+
+  @Override
+  public void initModel(final ArithmeticModel arithmeticModel) {
+    arithmeticModel.init();
+  }
+
   private void manage_outbuffer() {
-    if (this.outByteIndex == this.endBufferIndex) {
+    if (this.outByteIndex == END_BUFFER_INDEX) {
       this.outByteIndex = 0;
     }
     this.writer.putBytes(this.outBuffer, this.outByteIndex, AC_BUFFER_SIZE);
@@ -164,14 +195,14 @@ public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseClose
     if (Integer.compareUnsigned(init_base, this.base) > 0) {
       int index;
       if (this.outByteIndex == 0) {
-        index = this.endBufferIndex - 1;
+        index = END_BUFFER_INDEX - 1;
       } else {
         index = this.outByteIndex - 1;
       }
       while (this.outBuffer[index] == (byte)0xFF) {
         this.outBuffer[index] = 0;
         if (index == 0) {
-          index = this.endBufferIndex - 1;
+          index = END_BUFFER_INDEX - 1;
         } else {
           index--;
         }
@@ -185,6 +216,11 @@ public class ArithmeticCodingEncoder implements ArithmeticCodingCodec, BaseClose
     if (Integer.compareUnsigned(length, AC__MinLength) < 0) {
       renorm_enc_interval();
     }
+  }
+
+  public void setWriter(final ChannelWriter writer) {
+    this.writer = writer;
+    init();
   }
 
   /* Encode bits without modelling */

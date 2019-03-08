@@ -2,9 +2,10 @@ package com.revolsys.elevation.cloud.las;
 
 import java.util.Arrays;
 
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
 
-public class LasVariableLengthRecord {
+public class LasVariableLengthRecord implements Cloneable {
   private byte[] bytes;
 
   private final String description;
@@ -13,7 +14,7 @@ public class LasVariableLengthRecord {
 
   private boolean valueInitialized = false;
 
-  private final LasPointCloudHeader header;
+  private LasPointCloudHeader header;
 
   private final Pair<String, Integer> key;
 
@@ -60,6 +61,15 @@ public class LasVariableLengthRecord {
     this.valueInitialized = true;
   }
 
+  @Override
+  public LasVariableLengthRecord clone() {
+    try {
+      return (LasVariableLengthRecord)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
   public byte[] getBytes() {
     return this.bytes;
   }
@@ -97,6 +107,10 @@ public class LasVariableLengthRecord {
 
   public int getValueLength() {
     return this.bytes.length;
+  }
+
+  void setHeader(final LasPointCloudHeader header) {
+    this.header = header;
   }
 
   @Override

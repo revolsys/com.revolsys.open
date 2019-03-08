@@ -208,10 +208,28 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
   }
 
   @Override
+  public BaseLasPoint setXInt(final int x) {
+    this.x = x;
+    return this;
+  }
+
+  @Override
   public void setXYZ(final int x, final int y, final int z) {
     this.x = x;
     this.y = y;
     this.z = z;
+  }
+
+  @Override
+  public BaseLasPoint setYInt(final int y) {
+    this.y = y;
+    return this;
+  }
+
+  @Override
+  public BaseLasPoint setZInt(final int z) {
+    this.z = z;
+    return this;
   }
 
   @Override

@@ -4,18 +4,18 @@ import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloudIterator;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 import com.revolsys.util.Exceptions;
 
 public class LasZipPointwiseIterator extends LasPointCloudIterator {
 
-  private final ArithmeticCodingDecoder decoder;
+  private final ArithmeticDecoder decoder;
 
   private final LasZipItemCodec[] pointDecompressors;
 
   public LasZipPointwiseIterator(final LasPointCloud pointCloud, final ChannelReader reader) {
     super(pointCloud, reader);
-    this.decoder = new ArithmeticCodingDecoder();
+    this.decoder = new ArithmeticDecoder();
     final LasZipHeader lasZipHeader = LasZipHeader.getLasZipHeader(pointCloud);
     this.pointDecompressors = lasZipHeader.newLazCodecs(this.decoder);
   }
@@ -28,13 +28,13 @@ public class LasZipPointwiseIterator extends LasPointCloudIterator {
         final ChannelReader reader = this.reader;
         point = this.pointFormat.readLasPoint(this.pointCloud, reader);
         for (final LasZipItemCodec pointDecompressor : this.pointDecompressors) {
-          pointDecompressor.init(point);
+          pointDecompressor.init(point, 0);
         }
         this.decoder.init(reader);
       } else {
         point = this.pointFormat.newLasPoint(this.pointCloud);
         for (final LasZipItemCodec pointDecompressor : this.pointDecompressors) {
-          pointDecompressor.read(point);
+          pointDecompressor.read(point, 0);
         }
       }
       return point;

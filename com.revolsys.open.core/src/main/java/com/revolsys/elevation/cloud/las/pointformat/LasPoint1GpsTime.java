@@ -8,17 +8,11 @@ import com.revolsys.io.channels.ChannelWriter;
 public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
   private static final long serialVersionUID = 1L;
 
-  public static double getCurrentGpsTime() {
-    return System.currentTimeMillis() / 1000.0 - 315964800;
-  }
-
   private double gpsTime;
 
   public LasPoint1GpsTime(final LasPointCloud pointCloud) {
     super(pointCloud);
-    if (pointCloud.isGpsTime()) {
-      this.gpsTime = getCurrentGpsTime();
-    }
+    this.gpsTime = pointCloud.getFileGpsTime();
   }
 
   @Override

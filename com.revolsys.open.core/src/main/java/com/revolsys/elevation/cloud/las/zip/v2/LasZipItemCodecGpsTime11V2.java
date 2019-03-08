@@ -13,11 +13,10 @@ package com.revolsys.elevation.cloud.las.zip.v2;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
-import com.revolsys.util.Debug;
 
 public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
 
@@ -44,9 +43,9 @@ public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
 
   private final int[] multiExtremeCounter = new int[4];
 
-  private ArithmeticCodingDecoder decoder;
+  private ArithmeticDecoder decoder;
 
-  private ArithmeticCodingEncoder encoder;
+  private ArithmeticEncoder encoder;
 
   private final ArithmeticModel gpsTimeMulti;
 
@@ -55,10 +54,10 @@ public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
   private final ArithmeticCodingInteger ic_gpstime;
 
   public LasZipItemCodecGpsTime11V2(final ArithmeticCodingCodec codec) {
-    if (codec instanceof ArithmeticCodingDecoder) {
-      this.decoder = (ArithmeticCodingDecoder)codec;
-    } else if (codec instanceof ArithmeticCodingEncoder) {
-      this.encoder = (ArithmeticCodingEncoder)codec;
+    if (codec instanceof ArithmeticDecoder) {
+      this.decoder = (ArithmeticDecoder)codec;
+    } else if (codec instanceof ArithmeticEncoder) {
+      this.encoder = (ArithmeticEncoder)codec;
     } else {
       throw new IllegalArgumentException("Not supported:" + codec.getClass());
     }
@@ -73,7 +72,7 @@ public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
   }
 
   @Override
-  public void init(final LasPoint point) {
+  public int init(final LasPoint point, final int context) {
     this.gpsTimeMulti.init();
     this.gpsTime0Diff.init();
     this.ic_gpstime.init();
@@ -93,14 +92,15 @@ public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
     this.lastGpsTime[1] = 0;
     this.lastGpsTime[2] = 0;
     this.lastGpsTime[3] = 0;
+    return context;
   }
 
   @Override
-  public void read(final LasPoint point) {
+  public int read(final LasPoint point, final int context) {
     int multi;
     final int[] lastGpsTimeDiff = this.lastGpsTimeDiff;
     final int lastDiff = lastGpsTimeDiff[this.last];
-    final ArithmeticCodingDecoder decoder = this.decoder;
+    final ArithmeticDecoder decoder = this.decoder;
     final long[] lastGpsTime = this.lastGpsTime;
     final int[] multiExtremeCounter = this.multiExtremeCounter;
     int last = this.last;
@@ -130,7 +130,7 @@ public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
       } else if (multi > 2) {// we switch to another sequence
         last = last + multi - 2;
         this.last = last & 3;
-        read(point);
+        read(point, context);
       }
     } else {
       multi = decoder.decodeSymbol(this.gpsTimeMulti);
@@ -195,21 +195,18 @@ public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
       } else if (multi >= LASZIP_GPSTIME_MULTI_CODE_FULL) {
         last += multi - LASZIP_GPSTIME_MULTI_CODE_FULL;
         this.last = last & 3;
-        read(point);
-        return;
+        return read(point, context);
       }
     }
-    final double gpsTime = Double.longBitsToDouble(lastGpsTime[this.last]);
-    if (!Double.isFinite(gpsTime)) {
-      Debug.noOp();
-    }
-    point.setGpsTime(gpsTime);
+    point.setGpsTimeLong(lastGpsTime[this.last]);
+    return context;
   }
 
   @Override
-  public void write(final LasPoint item) {
+  public int write(final LasPoint item, final int context) {
     final long gpsTime = item.getGpsTimeLong();
     writeGpsTime(gpsTime);
+    return context;
   }
 
   private void writeGpsTime(final long gpsTime) {
@@ -271,7 +268,7 @@ public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
         if (curr_gpstime_diff_64 == curr_gpstime_diff) {
           // compute multiplier between current and last integer difference
           final float multi_f = (float)curr_gpstime_diff / (float)this.lastGpsTimeDiff[this.last];
-          final int multi = LasZipItemCodec.I32_QUANTIZE(multi_f);
+          final int multi = I32_QUANTIZE(multi_f);
 
           // compress the residual curr_gpstime_diff in dependance on the
           // multiplier

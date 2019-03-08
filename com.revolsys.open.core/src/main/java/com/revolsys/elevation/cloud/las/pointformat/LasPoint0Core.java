@@ -58,6 +58,11 @@ public class LasPoint0Core extends BaseLasPoint {
   }
 
   @Override
+  public short getScanAngle() {
+    return (short)(this.scanAngleRank / 0.006);
+  }
+
+  @Override
   public double getScanAngleDegrees() {
     return this.scanAngleRank;
   }
@@ -160,7 +165,8 @@ public class LasPoint0Core extends BaseLasPoint {
   @Override
   public LasPoint0Core setNumberOfReturns(final byte numberOfReturns) {
     if (numberOfReturns >= 1 && numberOfReturns <= 15) {
-      this.returnByte &= numberOfReturns | 0b11111000;
+      this.returnByte &= 0b11000111;
+      this.returnByte |= numberOfReturns << 3;
     } else {
       throw new IllegalArgumentException(
         "numberOfReturns must be in range 1..15: " + numberOfReturns);
@@ -177,11 +183,18 @@ public class LasPoint0Core extends BaseLasPoint {
   @Override
   public LasPoint0Core setReturnNumber(final byte returnNumber) {
     if (returnNumber >= 1 && returnNumber <= 15) {
-      this.returnByte &= returnNumber << 3 | 0b11000111;
+      this.returnByte &= 0b11111000;
+      this.returnByte |= returnNumber;
     } else {
       throw new IllegalArgumentException("returnNumber must be in range 1..15: " + returnNumber);
     }
     return this;
+  }
+
+  @Override
+  public LasPoint setScanAngle(final short scanAngle) {
+    final double degrees = scanAngle * 0.006;
+    return setScanAngleRank((byte)degrees);
   }
 
   @Override
@@ -193,9 +206,9 @@ public class LasPoint0Core extends BaseLasPoint {
   @Override
   public LasPoint0Core setScanDirectionFlag(final boolean scanDirectionFlag) {
     if (scanDirectionFlag) {
-      this.returnByte |= 0b100000;
+      this.returnByte |= 0b1000000;
     } else {
-      this.returnByte &= ~0b100000;
+      this.returnByte &= ~0b1000000;
     }
     return this;
   }

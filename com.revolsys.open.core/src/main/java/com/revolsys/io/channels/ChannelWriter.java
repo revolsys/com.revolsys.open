@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -58,6 +59,10 @@ public class ChannelWriter extends AbstractChannelWriter implements BaseCloseabl
   }
 
   WritableByteChannel channel;
+
+  public ChannelWriter(final OutputStream out) {
+    this(Channels.newChannel(out));
+  }
 
   /**
    * <p>Create a new ChannelWriter with buffer of 8192 bytes.<p>
@@ -170,6 +175,53 @@ public class ChannelWriter extends AbstractChannelWriter implements BaseCloseabl
           throw Exceptions.wrap(e);
         }
       }
+    }
+  }
+
+  public boolean isSeekable() {
+    return this.channel instanceof SeekableByteChannel;
+  }
+
+  public long position() {
+    if (this.channel instanceof SeekableByteChannel) {
+      final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
+      try {
+        return channel.position();
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    }
+    return -1;
+  }
+
+  public void seek(final long position) {
+    try {
+      if (this.channel instanceof SeekableByteChannel) {
+        final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
+        channel.position(position);
+        this.available = 0;
+        this.buffer.clear();
+      } else {
+        throw new IllegalArgumentException("Not supported");
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  public void seekEnd(final long distance) {
+    try {
+      if (this.channel instanceof SeekableByteChannel) {
+        final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
+        final long position = channel.size() - distance;
+        channel.position(position);
+        this.available = 0;
+        this.buffer.clear();
+      } else {
+        throw new IllegalArgumentException("Not supported");
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 

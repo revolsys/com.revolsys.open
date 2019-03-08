@@ -13,18 +13,18 @@ package com.revolsys.elevation.cloud.las.zip.v1;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingEncoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
 public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
 
   private final ArithmeticCodingInteger ic_rgb;
 
-  private ArithmeticCodingDecoder decoder;
+  private ArithmeticDecoder decoder;
 
-  private ArithmeticCodingEncoder encoder;
+  private ArithmeticEncoder encoder;
 
   private final ArithmeticModel byteUsed;
 
@@ -41,10 +41,10 @@ public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
   private int lastBlueUpper;
 
   public LasZipItemCodecRgb12V1(final ArithmeticCodingCodec codec) {
-    if (codec instanceof ArithmeticCodingDecoder) {
-      this.decoder = (ArithmeticCodingDecoder)codec;
-    } else if (codec instanceof ArithmeticCodingEncoder) {
-      this.encoder = (ArithmeticCodingEncoder)codec;
+    if (codec instanceof ArithmeticDecoder) {
+      this.decoder = (ArithmeticDecoder)codec;
+    } else if (codec instanceof ArithmeticEncoder) {
+      this.encoder = (ArithmeticEncoder)codec;
     } else {
       throw new IllegalArgumentException("Not supported:" + codec.getClass());
     }
@@ -53,7 +53,7 @@ public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
   }
 
   @Override
-  public void init(final LasPoint point) {
+  public int init(final LasPoint point, final int context) {
     this.byteUsed.init();
     this.ic_rgb.init();
     final int red = point.getRed();
@@ -65,10 +65,11 @@ public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
     this.lastGreenUpper = green >>> 8;
     this.lastBlueLower = blue & 0xFF;
     this.lastBlueUpper = blue >>> 8;
+    return context;
   }
 
   @Override
-  public void read(final LasPoint point) {
+  public int read(final LasPoint point, final int context) {
     final int sym = this.decoder.decodeSymbol(this.byteUsed);
 
     int redLower;
@@ -122,10 +123,11 @@ public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
     point.setRed(red);
     point.setGreen(green);
     point.setBlue(blue);
+    return context;
   }
 
   @Override
-  public void write(final LasPoint point) {
+  public int write(final LasPoint point, final int context) {
     final int red = point.getRed();
     final int green = point.getGreen();
     final int blue = point.getBlue();
@@ -186,6 +188,7 @@ public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
       this.ic_rgb.compress(this.lastBlueUpper, blueUpper, 5);
       this.lastBlueUpper = blueUpper;
     }
+    return context;
   }
 
 }

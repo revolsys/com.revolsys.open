@@ -54,6 +54,8 @@ public interface LasPoint extends Point, MapSerializer {
 
   byte getReturnNumber();
 
+  short getScanAngle();
+
   double getScanAngleDegrees();
 
   byte getScanAngleRank();
@@ -102,6 +104,12 @@ public interface LasPoint extends Point, MapSerializer {
     return this;
   }
 
+  default LasPoint setGpsTimeLong(final long gpsTime) {
+    final double time = Double.longBitsToDouble(gpsTime);
+    setGpsTime(time);
+    return this;
+  }
+
   default LasPoint setGreen(final int green) {
     return this;
   }
@@ -126,6 +134,8 @@ public interface LasPoint extends Point, MapSerializer {
     throw new UnsupportedOperationException();
   }
 
+  LasPoint setScanAngle(short scanAngle);
+
   LasPoint setScanAngleRank(byte scanAngleRank);
 
   LasPoint setScanDirectionFlag(boolean scanDirectionFlag);
@@ -146,13 +156,25 @@ public interface LasPoint extends Point, MapSerializer {
 
   LasPoint setWithheld(boolean withheld);
 
+  default LasPoint setXInt(final int x) {
+    throw new UnsupportedOperationException();
+  }
+
   default LasPoint setXT(final float xT) {
     throw new UnsupportedOperationException();
   }
 
   void setXYZ(int x, int y, int z);
 
+  default LasPoint setYInt(final int y) {
+    throw new UnsupportedOperationException();
+  }
+
   default LasPoint setYT(final float yT) {
+    throw new UnsupportedOperationException();
+  }
+
+  default LasPoint setZInt(final int z) {
     throw new UnsupportedOperationException();
   }
 

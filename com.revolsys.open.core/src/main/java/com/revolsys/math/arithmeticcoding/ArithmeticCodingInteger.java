@@ -26,9 +26,9 @@ public class ArithmeticCodingInteger {
 
   private int corr_min;
 
-  private ArithmeticCodingDecoder decoder;
+  private ArithmeticDecoder decoder;
 
-  private ArithmeticCodingEncoder encoder;
+  private ArithmeticEncoder encoder;
 
   private final ArithmeticModel[] mBits;
 
@@ -38,6 +38,10 @@ public class ArithmeticCodingInteger {
 
   private int corr_max;
 
+  public ArithmeticCodingInteger(final ArithmeticCodingCodec codec, final int bits) {
+    this(codec, bits, 1, 8, 0);
+  }
+
   public ArithmeticCodingInteger(final ArithmeticCodingCodec codec, final int bits,
     final int contexts) {
     this(codec, bits, contexts, 8, 0);
@@ -45,10 +49,10 @@ public class ArithmeticCodingInteger {
 
   private ArithmeticCodingInteger(final ArithmeticCodingCodec codec, final int bits,
     final int contexts, final int bits_high, int range) {
-    if (codec instanceof ArithmeticCodingDecoder) {
-      this.decoder = (ArithmeticCodingDecoder)codec;
-    } else if (codec instanceof ArithmeticCodingEncoder) {
-      this.encoder = (ArithmeticCodingEncoder)codec;
+    if (codec instanceof ArithmeticDecoder) {
+      this.decoder = (ArithmeticDecoder)codec;
+    } else if (codec instanceof ArithmeticEncoder) {
+      this.encoder = (ArithmeticEncoder)codec;
     } else {
       throw new IllegalArgumentException(codec.getClass().getName());
     }
@@ -139,6 +143,14 @@ public class ArithmeticCodingInteger {
       final ArithmeticModel model = this.mCorrector[i];
       model.init();
     }
+  }
+
+  public void initCompressor() {
+    init();
+  }
+
+  public void initDecompressor() {
+    init();
   }
 
   private int readCorrector(final ArithmeticModel mBits) {

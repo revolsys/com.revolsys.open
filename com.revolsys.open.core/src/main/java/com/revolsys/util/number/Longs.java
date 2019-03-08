@@ -147,4 +147,11 @@ public class Longs extends AbstractDataType {
     return String.valueOf((long)value);
   }
 
+  public static long toLong(final int upperInt, final int lowerInt) {
+    final long lower = lowerInt & 0xffffffffL;
+    final long upper = upperInt & 0xffffffffL;
+    final long l = upper << 32 | lower;
+    return l;
+  }
+
 }

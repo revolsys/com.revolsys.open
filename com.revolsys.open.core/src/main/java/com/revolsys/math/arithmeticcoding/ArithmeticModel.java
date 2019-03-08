@@ -48,7 +48,6 @@ package com.revolsys.math.arithmeticcoding;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 public class ArithmeticModel {
-
   static final int AC_BUFFER_SIZE = 1024;
 
   static final int AC__MinLength = 0x01000000; // threshold for renormalization
@@ -62,6 +61,20 @@ public class ArithmeticModel {
   static final int DM__LengthShift = 15; // length bits discarded before mult.
 
   static final int DM__MaxCount = 1 << DM__LengthShift; // for adaptive models
+
+  public static void initModel(final ArithmeticModel model) {
+    if (model != null) {
+      model.init();
+    }
+  }
+
+  public static void initModels(final ArithmeticModel[] models) {
+    for (final ArithmeticModel model : models) {
+      if (model != null) {
+        model.init();
+      }
+    }
+  }
 
   public int[] decoderTable;
 

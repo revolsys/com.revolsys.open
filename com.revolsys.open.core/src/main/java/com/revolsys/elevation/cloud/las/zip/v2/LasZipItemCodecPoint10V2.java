@@ -10,24 +10,61 @@
  */
 package com.revolsys.elevation.cloud.las.zip.v2;
 
-import static com.revolsys.elevation.cloud.las.zip.Common_v2.number_return_level;
-import static com.revolsys.elevation.cloud.las.zip.Common_v2.number_return_map;
 import static com.revolsys.elevation.cloud.las.zip.StreamingMedian5.newStreamingMedian5;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
 import com.revolsys.elevation.cloud.las.zip.StreamingMedian5;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingDecoder;
-import com.revolsys.math.arithmeticcoding.ArithmeticCodingEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
 public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
+  private static final byte[][] number_return_level = {
+    {
+      0, 1, 2, 3, 4, 5, 6, 7
+    }, {
+      1, 0, 1, 2, 3, 4, 5, 6
+    }, {
+      2, 1, 0, 1, 2, 3, 4, 5
+    }, {
+      3, 2, 1, 0, 1, 2, 3, 4
+    }, {
+      4, 3, 2, 1, 0, 1, 2, 3
+    }, {
+      5, 4, 3, 2, 1, 0, 1, 2
+    }, {
+      6, 5, 4, 3, 2, 1, 0, 1
+    }, {
+      7, 6, 5, 4, 3, 2, 1, 0
+    }
+  };
 
-  private ArithmeticCodingDecoder decoder;
+  private static final byte[][] number_return_map = {
+    {
+      15, 14, 13, 12, 11, 10, 9, 8
+    }, {
+      14, 0, 1, 3, 6, 10, 10, 9
+    }, {
+      13, 1, 2, 4, 7, 11, 11, 10
+    }, {
+      12, 3, 4, 5, 8, 12, 12, 11
+    }, {
+      11, 6, 7, 8, 9, 13, 13, 12
+    }, {
+      10, 10, 11, 12, 13, 14, 14, 13
+    }, {
+      9, 10, 11, 12, 13, 14, 15, 14
+    }, {
+      8, 9, 10, 11, 12, 13, 14, 15
+    }
+  };
 
-  private ArithmeticCodingEncoder encoder;
+  private ArithmeticDecoder decoder;
+
+  private ArithmeticEncoder encoder;
 
   private final ArithmeticCodingInteger ic_z;
 
@@ -76,10 +113,10 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
   private int lastZ;
 
   public LasZipItemCodecPoint10V2(final ArithmeticCodingCodec codec) {
-    if (codec instanceof ArithmeticCodingDecoder) {
-      this.decoder = (ArithmeticCodingDecoder)codec;
-    } else if (codec instanceof ArithmeticCodingEncoder) {
-      this.encoder = (ArithmeticCodingEncoder)codec;
+    if (codec instanceof ArithmeticDecoder) {
+      this.decoder = (ArithmeticDecoder)codec;
+    } else if (codec instanceof ArithmeticEncoder) {
+      this.encoder = (ArithmeticEncoder)codec;
     } else {
       throw new IllegalArgumentException("Not supported:" + codec.getClass());
     }
@@ -116,7 +153,7 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
   }
 
   @Override
-  public void init(final LasPoint point) {
+  public int init(final LasPoint point, final int context) {
     int i; // unsigned
 
     /* init state */
@@ -159,10 +196,11 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
     this.lastScanAngleRank = point.getScanAngleRank();
     this.lastUserData = point.getUserData();
     this.lastPointSourceID = point.getPointSourceID();
+    return context;
   }
 
   @Override
-  public void read(final LasPoint point) {
+  public int read(final LasPoint point, final int context) {
     int r, n, m, l; // unsigned
     int k_bits; // unsigned
     int median, diff; // signed
@@ -208,7 +246,7 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
       if ((changed_values & 4) != 0) {
         final int val = this.decoder
           .decodeSymbol(this.m_scan_angle_rank[getLastScanDirectionFlag()]);
-        this.lastScanAngleRank = LasZipItemCodec.U8_FOLD(val + this.lastScanAngleRank);
+        this.lastScanAngleRank = U8_FOLD(val + this.lastScanAngleRank);
       }
 
       // decompress the user_data ... if it has changed
@@ -241,14 +279,14 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
     median = this.last_y_diff_median5[m].get();
     k_bits = this.ic_dx.getK();
     diff = this.ic_dy.decompress(median,
-      (n == 1 ? 1 : 0) + (k_bits < 20 ? LasZipItemCodec.U32_ZERO_BIT_0(k_bits) : 20));
+      (n == 1 ? 1 : 0) + (k_bits < 20 ? U32_ZERO_BIT_0(k_bits) : 20));
     this.lastY += diff;
     this.last_y_diff_median5[m].add(diff);
 
     // decompress z coordinate
     k_bits = (this.ic_dx.getK() + this.ic_dy.getK()) / 2;
     this.lastZ = this.ic_z.decompress(this.last_height[l],
-      (n == 1 ? 1 : 0) + (k_bits < 18 ? LasZipItemCodec.U32_ZERO_BIT_0(k_bits) : 18));
+      (n == 1 ? 1 : 0) + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
     this.last_height[l] = this.lastZ;
 
     point.setXYZ(this.lastX, this.lastY, this.lastZ);
@@ -259,22 +297,23 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
     point.setScanAngleRank((byte)this.lastScanAngleRank);
     point.setUserData((short)this.lastUserData);
     point.setPointSourceID(this.lastPointSourceID);
+    return context;
   }
 
   @Override
-  public void write(final LasPoint item) {
-    final int x = item.getXInt();
-    final int y = item.getYInt();
-    final int z = item.getZInt();
-    final int intensity = item.getIntensity();
-    final int returnByte = Byte.toUnsignedInt(item.getReturnByte());
-    final int classificationByte = Byte.toUnsignedInt(item.getClassificationByte());
-    final int scanAngleRank = Byte.toUnsignedInt(item.getScanAngleRank());
-    final int userData = item.getUserData();
-    final int pointSourceID = item.getPointSourceID();
+  public int write(final LasPoint point, final int context) {
+    final int x = point.getXInt();
+    final int y = point.getYInt();
+    final int z = point.getZInt();
+    final int intensity = point.getIntensity();
+    final int returnByte = Byte.toUnsignedInt(point.getReturnByte());
+    final int classificationByte = Byte.toUnsignedInt(point.getClassificationByte());
+    final int scanAngleRank = Byte.toUnsignedInt(point.getScanAngleRank());
+    final int userData = point.getUserData();
+    final int pointSourceID = point.getPointSourceID();
 
-    final int r = item.getReturnNumber();
-    final int n = item.getNumberOfReturns();
+    final int r = point.getReturnNumber();
+    final int n = point.getNumberOfReturns();
     final int m = number_return_map[n][r];
     final int l = number_return_level[n][r];
 
@@ -320,7 +359,7 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
     // compress the intensity if it has changed
     if (intensityChanged) {
       this.ic_intensity.compress(this.last_intensity[m], intensity, m < 3 ? m : 3);
-      this.last_intensity[m] = item.getIntensity();
+      this.last_intensity[m] = point.getIntensity();
       this.lastIntensity = intensity;
     }
 
@@ -336,9 +375,9 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
 
     // compress the scan_angle_rank ... if it has changed
     if (scanAngleRankChanged) {
-      final int i = item.isScanDirectionFlag() ? 1 : 0;
+      final int i = point.isScanDirectionFlag() ? 1 : 0;
       this.encoder.encodeSymbol(this.m_scan_angle_rank[i],
-        LasZipItemCodec.U8_FOLD(scanAngleRank - this.lastScanAngleRank));
+        U8_FOLD(scanAngleRank - this.lastScanAngleRank));
       this.lastScanAngleRank = scanAngleRank;
     }
 
@@ -372,20 +411,19 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
     final int k_bitsY = this.ic_dx.getK();
     final int medianY = this.last_y_diff_median5[m].get();
     final int diffY = y - this.lastY;
-    this.ic_dy.compress(medianY, diffY,
-      nIndex + (k_bitsY < 20 ? LasZipItemCodec.U32_ZERO_BIT_0(k_bitsY) : 20));
+    this.ic_dy.compress(medianY, diffY, nIndex + (k_bitsY < 20 ? U32_ZERO_BIT_0(k_bitsY) : 20));
     this.last_y_diff_median5[m].add(diffY);
 
     // compress z coordinate
     final int k_bits = (this.ic_dx.getK() + this.ic_dy.getK()) / 2;
     this.ic_z.compress(this.last_height[l], z,
-      nIndex + (k_bits < 18 ? LasZipItemCodec.U32_ZERO_BIT_0(k_bits) : 18));
+      nIndex + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
     this.last_height[l] = z;
 
     this.lastX = x;
     this.lastY = y;
     this.lastZ = z;
-
+    return context;
   }
 
 }

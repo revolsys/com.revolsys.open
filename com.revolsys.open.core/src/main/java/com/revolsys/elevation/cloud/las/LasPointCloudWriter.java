@@ -1,11 +1,10 @@
 package com.revolsys.elevation.cloud.las;
 
 import java.nio.ByteOrder;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.revolsys.elevation.cloud.PointCloud;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
@@ -20,9 +19,20 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
 
   private final Resource resource;
 
-  private ChannelWriter out;
+  protected ChannelWriter out;
 
   private LasPointCloud pointCloud;
+
+  private Version version = LasVersion.VERSION_1_2;
+
+  protected LasPointCloudHeader header;
+
+  public LasPointCloudWriter(final LasPointCloud pointCloud, final Resource resource,
+    final MapEx properties) {
+    this(resource);
+    setProperties(properties);
+    setPointCloud(pointCloud);
+  }
 
   public LasPointCloudWriter(final Resource resource) {
     this.resource = resource;
@@ -30,12 +40,17 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
 
   @Override
   public void close() {
-    this.pointCloud = null;
     final ChannelWriter out = this.out;
     if (out != null) {
+      out.flush();
+      if (out.isSeekable()) {
+        out.seek(0);
+        writeHeader();
+      }
       this.out = null;
       out.close();
     }
+    this.pointCloud = null;
   }
 
   protected Map<Pair<String, Integer>, LasVariableLengthRecord> getLasProperties(
@@ -43,28 +58,41 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     return header.getLasProperties();
   }
 
-  protected void setPointCloud(final LasPointCloud pointCloud) {
-    this.pointCloud = pointCloud;
+  public Version getVersion() {
+    return this.version;
   }
 
-  protected void writeHeader(final LasPointCloudHeader header) {
+  protected void setPointCloud(final LasPointCloud pointCloud) {
+    this.pointCloud = pointCloud;
+    this.out = this.resource.newChannelWriter(8192, ByteOrder.LITTLE_ENDIAN);
+    this.header = this.pointCloud.getHeader().clone();
+    this.header.setVersion(this.version);
+    this.header.clear();
+    writeHeader();
+  }
+
+  public void setVersion(final Version version) {
+    this.version = version;
+  }
+
+  protected void writeHeader() {
     this.out.putString("LASF", 4);
-    this.out.putUnsignedShort(header.getFileSourceId());
-    this.out.putUnsignedShort(header.getGlobalEncoding());
-    final UUID projectId = header.getProjectId();
+    this.out.putUnsignedShort(this.header.getFileSourceId());
+    this.out.putUnsignedShort(this.header.getGlobalEncoding());
+    final UUID projectId = this.header.getProjectId();
     final long uuidLeast = projectId.getLeastSignificantBits();
     final long uuidMost = projectId.getMostSignificantBits();
     this.out.putLong(uuidLeast);
     this.out.putLong(uuidMost);
 
-    final Version version = header.getVersion();
+    final Version version = this.header.getVersion();
     this.out.putByte((byte)version.getMajor());
     this.out.putByte((byte)version.getMinor());
-    this.out.putString(header.getSystemIdentifier(), 32);
-    this.out.putString(header.getGeneratingSoftware(), 32);
+    this.out.putString(this.header.getSystemIdentifier(), 32);
+    this.out.putString(this.header.getGeneratingSoftware(), 32);
 
-    this.out.putUnsignedShort(header.getDayOfYear());
-    this.out.putUnsignedShort(header.getYear());
+    this.out.putUnsignedShort(this.header.getDayOfYear());
+    this.out.putUnsignedShort(this.header.getYear());
 
     int headerSize = 227;
     if (version.atLeast(LasVersion.VERSION_1_3)) {
@@ -76,7 +104,7 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     this.out.putUnsignedShort(headerSize);
 
     final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = getLasProperties(
-      header);
+      this.header);
     final int numberOfVariableLengthRecords = lasProperties.size();
     int variableLengthRecordsSize = 0;
     for (final LasVariableLengthRecord record : lasProperties.values()) {
@@ -88,27 +116,27 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
 
     this.out.putUnsignedInt(numberOfVariableLengthRecords);
 
-    final int pointFormatId = header.getPointFormatId();
+    final int pointFormatId = this.header.getPointFormatId();
     this.out.putUnsignedByte((short)pointFormatId);
 
-    final int recordLength = header.getRecordLength();
+    final int recordLength = this.header.getRecordLength();
     this.out.putUnsignedShort(recordLength);
-    final long pointCount = header.getPointCount();
-    if (pointCount > MAX_UNSIGNED_INT) {
+    final long pointCount = this.header.getPointCount();
+    if (pointCount > MAX_UNSIGNED_INT || pointFormatId >= 6) {
       this.out.putUnsignedInt(0);
     } else {
       this.out.putUnsignedInt(pointCount);
     }
-    final long[] pointCountByReturn = header.getPointCountByReturn();
+    final long[] pointCountByReturn = this.header.getPointCountByReturn();
     for (int i = 0; i < 5; i++) {
       final long count = pointCountByReturn[i];
-      if (count > MAX_UNSIGNED_INT) {
+      if (count > MAX_UNSIGNED_INT || pointFormatId >= 6) {
         this.out.putUnsignedInt(0);
       } else {
         this.out.putUnsignedInt(count);
       }
     }
-    final GeometryFactory geometryFactory = header.getGeometryFactory();
+    final GeometryFactory geometryFactory = this.header.getGeometryFactory();
     for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
       final double resolution = geometryFactory.getResolution(axisIndex);
       this.out.putDouble(resolution);
@@ -117,7 +145,7 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
       final double offset = geometryFactory.getOffset(axisIndex);
       this.out.putDouble(offset);
     }
-    final double[] bounds = header.getBounds();
+    final double[] bounds = this.header.getBounds();
     for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
       final double max = bounds[3 + axisIndex];
       this.out.putDouble(max);
@@ -128,7 +156,7 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     if (version.atLeast(LasVersion.VERSION_1_3)) {
       this.out.putUnsignedLong(0); // startOfWaveformDataPacketRecord
       if (version.atLeast(LasVersion.VERSION_1_4)) {
-        this.out.putUnsignedLong(0); // startOfFirstExetendedDataRecord
+        this.out.putUnsignedLong(0); // startOfFirstExtendedDataRecord
         this.out.putUnsignedInt(0); // numberOfExtendedVariableLengthRecords
         this.out.putUnsignedLong(pointCount);
         for (int i = 0; i < 15; i++) {
@@ -157,25 +185,14 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     }
   }
 
-  public boolean writePointCloud(final PointCloud<?> pointCloud) {
-    if (pointCloud instanceof LasPointCloud) {
-      final LasPointCloud lasPointCloud = (LasPointCloud)pointCloud;
-      setPointCloud(lasPointCloud);
-      this.out = this.resource.newChannelWriter(8192, ByteOrder.LITTLE_ENDIAN);
-
-      final LasPointCloudHeader header = lasPointCloud.getHeader();
-      writeHeader(header);
-      final List<LasPoint> points = lasPointCloud.getPoints();
-      writePoints(this.out, points);
-      return true;
-    } else {
-      return false;
-    }
+  public void writePoint(final LasPoint point) {
+    this.header.addCounts(point);
+    point.writeLasPoint(this.out);
   }
 
-  protected void writePoints(final ChannelWriter out, final List<LasPoint> points) {
+  public void writePoints(final Iterable<LasPoint> points) {
     for (final LasPoint point : points) {
-      point.writeLasPoint(out);
+      writePoint(point);
     }
   }
 }

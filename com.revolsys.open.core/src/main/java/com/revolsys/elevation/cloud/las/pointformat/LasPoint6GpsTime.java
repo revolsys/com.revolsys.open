@@ -4,13 +4,10 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.util.Debug;
 
 public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   private static final long serialVersionUID = 1L;
-
-  public static double getCurrentGpsTime() {
-    return System.currentTimeMillis() / 1000.0 - 315964800;
-  }
 
   private boolean scanDirectionFlag;
 
@@ -38,7 +35,10 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   public LasPoint6GpsTime(final LasPointCloud pointCloud) {
     super(pointCloud);
-    this.gpsTime = getCurrentGpsTime();
+    this.gpsTime = pointCloud.getFileGpsTime();
+    if (this.gpsTime < 0) {
+      Debug.noOp();
+    }
   }
 
   @Override
@@ -81,6 +81,7 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
     return (byte)(this.returnByte & 0b1111);
   }
 
+  @Override
   public short getScanAngle() {
     return this.scanAngle;
   }
@@ -92,7 +93,7 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public byte getScanAngleRank() {
-    throw new UnsupportedOperationException();
+    return (byte)getScanAngleDegrees();
   }
 
   @Override
@@ -184,6 +185,10 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public LasPoint6GpsTime setGpsTime(final double gpsTime) {
+    if (gpsTime < 0) {
+      Debug.noOp();
+    }
+
     this.gpsTime = gpsTime;
     return this;
   }
@@ -196,11 +201,12 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public LasPoint6GpsTime setNumberOfReturns(final byte numberOfReturns) {
-    if (numberOfReturns >= 1 && numberOfReturns <= 31) {
-      this.returnByte &= numberOfReturns | 0b11110000;
+    if (numberOfReturns >= 1 && numberOfReturns <= 15) {
+      this.returnByte &= 0b1111;
+      this.returnByte |= numberOfReturns << 4;
     } else {
       throw new IllegalArgumentException(
-        "numberOfReturns must be in range 1..31: " + numberOfReturns);
+        "numberOfReturns must be in range 1..15: " + numberOfReturns);
     }
     return this;
   }
@@ -217,16 +223,19 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public LasPoint6GpsTime setReturnNumber(final byte returnNumber) {
-    if (returnNumber >= 1 && returnNumber <= 31) {
-      this.returnByte &= returnNumber << 4 | 0b00001111;
+    if (returnNumber >= 1 && returnNumber <= 15) {
+      this.returnByte &= 0b11110000;
+      this.returnByte |= returnNumber;
     } else {
-      throw new IllegalArgumentException("returnNumber must be in range 1..31: " + returnNumber);
+      throw new IllegalArgumentException("returnNumber must be in range 1..15: " + returnNumber);
     }
     return this;
   }
 
-  public void setScanAngle(final short scanAngle) {
+  @Override
+  public LasPoint6GpsTime setScanAngle(final short scanAngle) {
     this.scanAngle = scanAngle;
+    return this;
   }
 
   @Override
