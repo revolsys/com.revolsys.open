@@ -250,7 +250,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
 
   @Override
   public int getVersion() {
-    return 2;
+    return 3;
   }
 
   @Override
