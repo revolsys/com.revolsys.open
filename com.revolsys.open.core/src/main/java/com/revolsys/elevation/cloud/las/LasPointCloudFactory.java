@@ -27,7 +27,12 @@ public class LasPointCloudFactory extends AbstractIoFactory
   @Override
   public <P extends Point, PC extends PointCloud<P>> PC newPointCloud(final Resource resource,
     final MapEx properties) {
-    return (PC)new LasPointCloud(resource, properties);
+    final LasPointCloud pointCloud = new LasPointCloud(resource, properties);
+    if (pointCloud.isExists()) {
+      return (PC)pointCloud;
+    } else {
+      return null;
+    }
   }
 
   private LasPointCloudWriter newWriter(final PointCloud<?> pointCloud, final Resource resource,
@@ -35,15 +40,16 @@ public class LasPointCloudFactory extends AbstractIoFactory
     if (pointCloud instanceof LasPointCloud) {
       final LasPointCloud lasPointCloud = (LasPointCloud)pointCloud;
       final String fileNameExtension = resource.getFileNameExtension();
+      LasPointCloudWriter writer;
       if ("las".equals(fileNameExtension)) {
-        final LasPointCloudWriter writer = new LasPointCloudWriter(lasPointCloud, resource,
-          properties);
-        return writer;
+        writer = new LasPointCloudWriter(lasPointCloud, resource, properties);
       } else if ("laz".equals(fileNameExtension)) {
-        return new LasZipPointCloudWriter(lasPointCloud, resource, properties);
+        writer = new LasZipPointCloudWriter(lasPointCloud, resource, properties);
       } else {
         return null;
       }
+      writer.open();
+      return writer;
     } else {
       return null;
     }

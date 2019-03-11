@@ -1,6 +1,5 @@
 package com.revolsys.io.channels;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -13,6 +12,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.io.EndOfFileException;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
@@ -186,7 +186,7 @@ public class ChannelWriter extends AbstractChannelWriter implements BaseCloseabl
     if (this.channel instanceof SeekableByteChannel) {
       final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
       try {
-        return channel.position();
+        return channel.position() + this.buffer.position();
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }
@@ -195,6 +195,7 @@ public class ChannelWriter extends AbstractChannelWriter implements BaseCloseabl
   }
 
   public void seek(final long position) {
+    flush();
     try {
       if (this.channel instanceof SeekableByteChannel) {
         final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
@@ -214,9 +215,7 @@ public class ChannelWriter extends AbstractChannelWriter implements BaseCloseabl
       if (this.channel instanceof SeekableByteChannel) {
         final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
         final long position = channel.size() - distance;
-        channel.position(position);
-        this.available = 0;
-        this.buffer.clear();
+        seek(position);
       } else {
         throw new IllegalArgumentException("Not supported");
       }
@@ -237,7 +236,7 @@ public class ChannelWriter extends AbstractChannelWriter implements BaseCloseabl
         while (totalWritten < size) {
           final int written = channel.write(buffer);
           if (written == -1) {
-            throw new EOFException();
+            throw new EndOfFileException();
           }
           totalWritten += written;
         }

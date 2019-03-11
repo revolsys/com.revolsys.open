@@ -106,10 +106,7 @@ public class LasZipPointCloudWriter extends LasPointCloudWriter {
         codec.writeChunkBytes();
       }
     }
-    if (this.encoder != null) {
-      this.encoder.close();
-      this.encoder = null;
-    }
+    this.encoder.done();
     if (this.chunk_start_position != 0) {
       if (this.chunk_count != 0) {
         add_chunk_to_table();
@@ -151,6 +148,28 @@ public class LasZipPointCloudWriter extends LasPointCloudWriter {
     return this.lasZipVersion;
   }
 
+  @Override
+  protected void open() {
+    super.open();
+    if (this.compressor != LasZipCompressorType.POINTWISE) {
+      this.chunk_count = 0;
+      this.number_chunks = Integer.MAX_VALUE;
+    }
+    this.encoder = new ArithmeticEncoder(this.out);
+    this.codecs = this.lasZipHeader.newLazCodecs(this.encoder);
+    if (this.number_chunks == Integer.MAX_VALUE) {
+      this.number_chunks = 0;
+      if (this.out.isSeekable()) {
+        this.chunk_table_start_position = this.out.position();
+      } else {
+        this.chunk_table_start_position = -1;
+      }
+      this.out.putLong(this.chunk_table_start_position);
+      this.chunk_start_position = this.out.position();
+    }
+
+  }
+
   public void setCompressor(final LasZipCompressorType compressor) {
     this.compressor = compressor;
   }
@@ -168,13 +187,7 @@ public class LasZipPointCloudWriter extends LasPointCloudWriter {
       this.compressor = this.lasZipHeader.getCompressor();
       this.isNewHeader = true;
     }
-    if (this.compressor != LasZipCompressorType.POINTWISE) {
-      this.chunk_count = 0;
-      this.number_chunks = Integer.MAX_VALUE;
-    }
     super.setPointCloud(pointCloud);
-    this.encoder = new ArithmeticEncoder(this.out);
-    this.codecs = this.lasZipHeader.newLazCodecs(this.encoder);
   }
 
   private void startChunk() {

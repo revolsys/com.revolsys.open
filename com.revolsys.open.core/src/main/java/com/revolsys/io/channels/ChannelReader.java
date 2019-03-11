@@ -11,7 +11,6 @@
 package com.revolsys.io.channels;
 
 import java.io.ByteArrayInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -23,6 +22,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.io.EndOfFileException;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
@@ -286,7 +286,7 @@ public class ChannelReader implements BaseCloseable {
       while (available < minCount) {
         final int readCount = channel.read(buffer);
         if (readCount == -1) {
-          throw new EOFException();
+          throw new EndOfFileException();
         } else {
           available += readCount;
         }

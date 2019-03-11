@@ -1,6 +1,5 @@
 package com.revolsys.elevation.tin.compactbinary;
 
-import java.io.EOFException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -11,11 +10,10 @@ import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
-import com.revolsys.util.WrappedException;
 
 public class ScaledIntegerTriangulatedIrregularNetworkReader extends BaseObjectWithProperties
   implements BaseCloseable {
@@ -74,8 +72,8 @@ public class ScaledIntegerTriangulatedIrregularNetworkReader extends BaseObjectW
           final double z3 = geometryFactory.toDoubleZ(in.getInt());
           action.accept(x1, y1, z1, x2, y2, z2, x3, y3, z3);
           triangleVertexCount = 9;
-        } catch (final WrappedException e) {
-          if (Exceptions.isException(e, EOFException.class) && triangleVertexCount == 0) {
+        } catch (final EndOfFileException e) {
+          if (triangleVertexCount == 0) {
             hasMore = false;
           } else {
             throw e;
@@ -126,8 +124,8 @@ public class ScaledIntegerTriangulatedIrregularNetworkReader extends BaseObjectW
         triangleYCoordinates[coordinateIndex] = this.in.getInt();
         triangleZCoordinates[coordinateIndex] = this.in.getInt();
         coordinateIndex++;
-      } catch (final WrappedException e) {
-        if (Exceptions.isException(e, EOFException.class) && coordinateIndex % 3 == 0) {
+      } catch (final EndOfFileException e) {
+        if (coordinateIndex % 3 == 0) {
           hasMore = false;
         } else {
           throw e;

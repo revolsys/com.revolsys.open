@@ -241,6 +241,9 @@ public class LasZipLayeredChunkedIterator extends LasPointCloudIterator {
         }
       }
       return point;
+    } catch (final RuntimeException e) {
+      close();
+      throw e;
     } catch (final Exception e) {
       close();
       throw Exceptions.wrap("Error decompressing: " + this.pointCloud.getResource(), e);

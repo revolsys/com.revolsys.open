@@ -9,18 +9,6 @@ import com.revolsys.util.Debug;
 public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   private static final long serialVersionUID = 1L;
 
-  private boolean scanDirectionFlag;
-
-  private boolean edgeOfFlightLine;
-
-  private boolean synthetic;
-
-  private boolean keyPoint;
-
-  private boolean withheld;
-
-  private boolean overlap;
-
   private short classification;
 
   private short scanAngle;
@@ -32,6 +20,8 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   private double gpsTime;
 
   private byte returnByte = 0b00010001;
+
+  private byte classificationFlags;
 
   public LasPoint6GpsTime(final LasPointCloud pointCloud) {
     super(pointCloud);
@@ -54,6 +44,11 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   @Override
   public byte getClassificationByte() {
     throw new RuntimeException("Not implemented");
+  }
+
+  @Override
+  public byte getClassificationFlags() {
+    return this.classificationFlags;
   }
 
   @Override
@@ -98,7 +93,7 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public byte getScannerChannel() {
-    return this.scannerChannel;
+    return (byte)(this.classificationFlags >> 4 & 0b11);
   }
 
   @Override
@@ -108,32 +103,32 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public boolean isEdgeOfFlightLine() {
-    return this.edgeOfFlightLine;
+    return (this.classificationFlags & 0b10000000) != 0;
   }
 
   @Override
   public boolean isKeyPoint() {
-    return this.keyPoint;
+    return (this.classificationFlags & 0b10) != 0;
   }
 
   @Override
   public boolean isOverlap() {
-    return this.overlap;
+    return (this.classificationFlags & 0b1000) != 0;
   }
 
   @Override
   public boolean isScanDirectionFlag() {
-    return this.scanDirectionFlag;
+    return (this.classificationFlags & 0b1000000) != 0;
   }
 
   @Override
   public boolean isSynthetic() {
-    return this.synthetic;
+    return (this.classificationFlags & 0b1) != 0;
   }
 
   @Override
   public boolean isWithheld() {
-    return this.withheld;
+    return (this.classificationFlags & 0b100) != 0;
   }
 
   @Override
@@ -145,21 +140,12 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
     this.intensity = reader.getUnsignedShort();
     this.returnByte = reader.getByte();
 
-    final byte classificationByte = reader.getByte();
+    this.classificationFlags = reader.getByte();
     this.classification = reader.getUnsignedByte();
     this.userData = reader.getUnsignedByte();
     this.scanAngle = reader.getShort();
     this.pointSourceID = reader.getUnsignedShort();
     this.gpsTime = reader.getDouble();
-
-    this.synthetic = (classificationByte & 0b1) == 1;
-    this.keyPoint = (classificationByte >> 1 & 0b1) == 1;
-    this.withheld = (classificationByte >> 2 & 0b1) == 1;
-    this.overlap = (classificationByte >> 3 & 0b1) == 1;
-    this.scannerChannel = (byte)(classificationByte >> 4 & 0b11);
-    this.scanDirectionFlag = (classificationByte >> 6 & 0b1) == 1;
-    this.edgeOfFlightLine = (classificationByte >> 7 & 0b1) == 1;
-
   }
 
   @Override
@@ -178,8 +164,18 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   }
 
   @Override
+  public LasPoint6GpsTime setClassificationFlags(final byte classificationFlags) {
+    this.classificationFlags = classificationFlags;
+    return this;
+  }
+
+  @Override
   public LasPoint6GpsTime setEdgeOfFlightLine(final boolean edgeOfFlightLine) {
-    this.edgeOfFlightLine = edgeOfFlightLine;
+    if (edgeOfFlightLine) {
+      this.classificationFlags |= 0b10000000;
+    } else {
+      this.classificationFlags &= ~0b10000000;
+    }
     return this;
   }
 
@@ -195,7 +191,11 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public LasPoint6GpsTime setKeyPoint(final boolean keyPoint) {
-    this.keyPoint = keyPoint;
+    if (keyPoint) {
+      this.classificationFlags |= 0b10;
+    } else {
+      this.classificationFlags &= ~0b10;
+    }
     return this;
   }
 
@@ -213,7 +213,11 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public void setOverlap(final boolean overlap) {
-    this.overlap = overlap;
+    if (overlap) {
+      this.classificationFlags |= 0b1000;
+    } else {
+      this.classificationFlags &= ~0b1000;
+    }
   }
 
   @Override
@@ -245,19 +249,28 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public LasPoint6GpsTime setScanDirectionFlag(final boolean scanDirectionFlag) {
-    this.scanDirectionFlag = scanDirectionFlag;
+    if (scanDirectionFlag) {
+      this.classificationFlags |= 0b1000000;
+    } else {
+      this.classificationFlags &= ~0b1000000;
+    }
     return this;
   }
 
   @Override
   public LasPoint6GpsTime setScannerChannel(final byte scannerChannel) {
-    this.scannerChannel = scannerChannel;
+    this.classificationFlags &= 0b11001111;
+    this.scannerChannel |= scannerChannel << 4;
     return this;
   }
 
   @Override
   public LasPoint6GpsTime setSynthetic(final boolean synthetic) {
-    this.synthetic = synthetic;
+    if (synthetic) {
+      this.classificationFlags |= 0b1;
+    } else {
+      this.classificationFlags &= ~0b1;
+    }
     return this;
   }
 
@@ -269,7 +282,11 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public LasPoint6GpsTime setWithheld(final boolean withheld) {
-    this.withheld = withheld;
+    if (withheld) {
+      this.classificationFlags |= 0b100;
+    } else {
+      this.classificationFlags &= ~0b100;
+    }
     return this;
   }
 
@@ -279,16 +296,16 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
     addToMap(map, "intensity", this.intensity);
     addToMap(map, "returnNumber", getReturnNumber());
     addToMap(map, "numberOfReturns", getNumberOfReturns());
-    addToMap(map, "scanDirectionFlag", this.scanDirectionFlag);
-    addToMap(map, "edgeOfFlightLine", this.edgeOfFlightLine);
+    addToMap(map, "scanDirectionFlag", isScanDirectionFlag());
+    addToMap(map, "edgeOfFlightLine", isEdgeOfFlightLine());
     addToMap(map, "classification", this.classification);
-    addToMap(map, "synthetic", this.synthetic);
-    addToMap(map, "keyPoint", this.keyPoint);
-    addToMap(map, "withheld", this.withheld);
+    addToMap(map, "synthetic", isSynthetic());
+    addToMap(map, "keyPoint", isKeyPoint());
+    addToMap(map, "withheld", isWithheld());
     addToMap(map, "scanAngle", getScanAngleDegrees());
     addToMap(map, "userData", this.userData);
     addToMap(map, "pointSourceID", this.pointSourceID);
-    addToMap(map, "overlap", this.overlap);
+    addToMap(map, "overlap", isOverlap());
     addToMap(map, "scannerChannel", this.scannerChannel);
     addToMap(map, "gpsTime", this.gpsTime);
     return map;
@@ -307,27 +324,7 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
     out.putUnsignedShort(this.intensity);
     out.putByte(this.returnByte);
 
-    byte classificationFlags = 0;
-    if (this.synthetic) {
-      classificationFlags |= 0b1;
-    }
-    if (this.keyPoint) {
-      classificationFlags |= 0b10;
-    }
-    if (this.withheld) {
-      classificationFlags |= 0b100;
-    }
-    if (this.overlap) {
-      classificationFlags |= 0b1000;
-    }
-    this.scannerChannel = (byte)(classificationFlags >> 4 & 0b11);
-    if (this.scanDirectionFlag) {
-      classificationFlags |= 0b100000;
-    }
-    if (this.edgeOfFlightLine) {
-      classificationFlags |= 0b1000000;
-    }
-    out.putByte(classificationFlags);
+    out.putByte(this.classificationFlags);
     out.putUnsignedByte(this.classification);
     out.putUnsignedByte(this.userData);
     out.putShort(this.scanAngle);

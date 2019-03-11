@@ -21,6 +21,10 @@ public interface LasPoint extends Point, MapSerializer {
 
   byte getClassificationByte();
 
+  default byte getClassificationFlags() {
+    return 0;
+  }
+
   default double getGpsTime() {
     return 315964800;
   }
@@ -97,6 +101,10 @@ public interface LasPoint extends Point, MapSerializer {
   LasPoint setClassification(short classification);
 
   LasPoint setClassificationByte(byte classificationByte);
+
+  default LasPoint setClassificationFlags(final byte classificationFlags) {
+    return this;
+  }
 
   LasPoint setEdgeOfFlightLine(boolean edgeOfFlightLine);
 

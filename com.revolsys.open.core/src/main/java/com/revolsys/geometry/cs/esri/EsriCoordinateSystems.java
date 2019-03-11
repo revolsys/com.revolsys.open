@@ -1,6 +1,5 @@
 package com.revolsys.geometry.cs.esri;
 
-import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,11 +28,9 @@ import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
+import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
-import com.revolsys.util.WrappedException;
 
 public class EsriCoordinateSystems {
   private static Map<Integer, CoordinateSystem> COORDINATE_SYSTEM_BY_ID = new HashMap<>();
@@ -103,12 +100,8 @@ public class EsriCoordinateSystems {
               }
             }
           }
-        } catch (final WrappedException e) {
-          if (Exceptions.isException(e, EOFException.class)) {
-            return Collections.emptyList();
-          } else {
-            throw e;
-          }
+        } catch (final EndOfFileException e) {
+          return Collections.emptyList();
         }
       }
     } else {
@@ -156,13 +149,8 @@ public class EsriCoordinateSystems {
             return coordinateSystem;
           }
         }
-      } catch (final WrappedException e) {
-        if (Exceptions.isException(e, EOFException.class)) {
-          return null;
-        } else {
-          Logs.error("Cannot load coordinate system=" + id, e);
-          throw e;
-        }
+      } catch (final EndOfFileException e) {
+        return null;
       }
     }
     return coordinateSystem;
@@ -236,13 +224,8 @@ public class EsriCoordinateSystems {
             return coordinateSystem;
           }
         }
-      } catch (final WrappedException e) {
-        if (Exceptions.isException(e, EOFException.class)) {
-          return null;
-        } else {
-          Logs.error("Cannot load coordinate system=" + id, e);
-          throw e;
-        }
+      } catch (final EndOfFileException e) {
+        return null;
       }
     }
     return coordinateSystem;
@@ -282,13 +265,8 @@ public class EsriCoordinateSystems {
             return coordinateSystem;
           }
         }
-      } catch (final WrappedException e) {
-        if (Exceptions.isException(e, EOFException.class)) {
-          return null;
-        } else {
-          Logs.error("Cannot load coordinate system=" + id, e);
-          throw e;
-        }
+      } catch (final EndOfFileException e) {
+        return null;
       }
     }
     return coordinateSystem;

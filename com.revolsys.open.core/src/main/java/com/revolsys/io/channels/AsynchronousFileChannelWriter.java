@@ -1,12 +1,12 @@
 package com.revolsys.io.channels;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.AsynchronousFileChannel;
 
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.io.EndOfFileException;
 import com.revolsys.util.Exceptions;
 
 public class AsynchronousFileChannelWriter extends AbstractChannelWriter implements BaseCloseable {
@@ -143,7 +143,7 @@ public class AsynchronousFileChannelWriter extends AbstractChannelWriter impleme
         while (totalWritten < size) {
           final int written = channel.write(buffer, this.filePosition).get();
           if (written == -1) {
-            throw new EOFException();
+            throw new EndOfFileException();
           } else {
             this.filePosition += written;
           }

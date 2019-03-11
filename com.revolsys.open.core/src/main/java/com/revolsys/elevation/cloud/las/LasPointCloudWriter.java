@@ -62,13 +62,16 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     return this.version;
   }
 
+  protected void open() {
+    this.out = this.resource.newChannelWriter(8192, ByteOrder.LITTLE_ENDIAN);
+    writeHeader();
+  }
+
   protected void setPointCloud(final LasPointCloud pointCloud) {
     this.pointCloud = pointCloud;
-    this.out = this.resource.newChannelWriter(8192, ByteOrder.LITTLE_ENDIAN);
     this.header = this.pointCloud.getHeader().clone();
     this.header.setVersion(this.version);
     this.header.clear();
-    writeHeader();
   }
 
   public void setVersion(final Version version) {

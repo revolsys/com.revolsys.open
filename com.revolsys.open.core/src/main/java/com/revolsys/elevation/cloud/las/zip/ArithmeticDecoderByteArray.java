@@ -11,13 +11,19 @@ public class ArithmeticDecoderByteArray extends ArithmeticDecoder {
 
   private int size;
 
+  private boolean enabled = true;
+
   public ArithmeticDecoderByteArray() {
   }
 
-  public int initializeBytes(final ChannelReader reader, final boolean enabled) {
+  public boolean isEnabled() {
+    return this.enabled;
+  }
+
+  public boolean readBytes(final ChannelReader reader) {
     if (this.size <= 0) {
-      return 0;
-    } else if (enabled) {
+      return false;
+    } else if (this.enabled) {
       if (this.size > 0) {
         final byte[] bytes = new byte[this.size];
         reader.getBytes(bytes);
@@ -26,16 +32,24 @@ public class ArithmeticDecoderByteArray extends ArithmeticDecoder {
         newReader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         init(newReader, true);
       }
-      return this.size;
+      return true;
     } else {
       reader.skipBytes(this.size);
-      return 0;
+      return false;
     }
   }
 
   public int readSize(final ChannelReader in) {
     this.size = in.getInt();
     return this.size;
+  }
+
+  public void setEnabled(final boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  public void setEnabled(final int flags, final int flagMask) {
+    this.enabled = (flags & flagMask) != 0;
   }
 
 }

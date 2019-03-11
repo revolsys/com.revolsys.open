@@ -43,15 +43,15 @@ public class ArithmeticEncoderByteArray extends ArithmeticEncoder {
     }
   }
 
-  public int writeNumBytes(final ChannelWriter out, final boolean enabled) {
-    int byteCount;
+  public int writeSize(final ChannelWriter out, final boolean enabled) {
+    int size;
     if (enabled) {
       done();
-      byteCount = this.out.size();
+      size = this.out.size();
     } else {
-      byteCount = 0;
+      size = 0;
     }
-    out.putInt(byteCount);
-    return byteCount;
+    out.putInt(size);
+    return size;
   }
 }

@@ -8,7 +8,7 @@ import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 public class LAScontextPOINT14 {
   public boolean unused;
 
-  public LasPoint last_item;
+  public LasPoint lastPoint;
 
   public int legacy_return_number;
 

@@ -1,6 +1,5 @@
 package com.revolsys.record.io.format.shp;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.util.NoSuchElementException;
@@ -11,6 +10,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.PathName;
@@ -110,7 +110,7 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
       } catch (final IllegalArgumentException e) {
         Logs.error(this, "Error reading geometry from:" + this.resource + "\n" + record, e);
       }
-    } catch (final EOFException e) {
+    } catch (final EndOfFileException e) {
       throw new NoSuchElementException();
     } catch (final IOException e) {
       throw new RuntimeException("Error reading geometry " + this.resource, e);

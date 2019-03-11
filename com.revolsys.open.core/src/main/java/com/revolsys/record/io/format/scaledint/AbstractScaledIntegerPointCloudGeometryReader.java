@@ -1,6 +1,5 @@
 package com.revolsys.record.io.format.scaledint;
 
-import java.io.EOFException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -11,11 +10,11 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.WrappedException;
 
 public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
   extends AbstractIterator<G> {
@@ -69,12 +68,8 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
           z = this.geometryFactory.toDoubleZ(zInt);
         }
         return (G)this.geometryFactory.point(x, y, z);
-      } catch (final WrappedException e) {
-        if (e.getCause() instanceof EOFException) {
-          throw new NoSuchElementException();
-        } else {
-          throw e;
-        }
+      } catch (final EndOfFileException e) {
+        throw new NoSuchElementException();
       }
     }
   }

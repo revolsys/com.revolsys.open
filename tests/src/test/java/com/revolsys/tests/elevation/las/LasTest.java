@@ -336,9 +336,11 @@ public class LasTest {
         final MapEx writeProperties = entry.getValue();
         final String label = prefix + "_" + pointFormat.name() + "_" + suffix;
         final Path file = DIR.resolve(label + "." + fileExtension);
-        cloud.writePointCloud(file, writeProperties);
         System.out.println(label + "\t" + cloud.getPointCount());
+        cloud.writePointCloud(file, writeProperties);
+        System.out.println();
         assertRead(label, file, cloud);
+        System.out.println();
       }
     }
   }
@@ -411,7 +413,7 @@ public class LasTest {
   }
 
   @Test
-  public void readWrite() {
+  public void readWriteLas() {
     for (final LasPointFormat recordFormat : LasPointFormat.values()) {
       asssertWriteRead("readWriteLas", recordFormat, "las");
     }

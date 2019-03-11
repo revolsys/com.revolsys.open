@@ -1,7 +1,6 @@
 package com.revolsys.record.io.format.moep;
 
 import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +17,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.gis.grid.Bcgs20000RectangularMapGrid;
 import com.revolsys.gis.grid.UtmRectangularMapGrid;
+import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -330,7 +330,7 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
     final int ch3 = in.read();
     final int ch4 = in.read();
     if ((ch1 | ch2 | ch3 | ch4) < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     return (ch1 << 0) + (ch2 << 8) + (ch3 << 16) + (ch4 << 24);
 
@@ -340,7 +340,7 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
     final int ch1 = in.read();
     final int ch2 = in.read();
     if ((ch1 | ch2) < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     return (short)((ch1 << 0) + (ch2 << 8));
 

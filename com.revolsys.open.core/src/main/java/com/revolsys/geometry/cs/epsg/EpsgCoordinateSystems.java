@@ -1,6 +1,5 @@
 package com.revolsys.geometry.cs.epsg;
 
-import java.io.EOFException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -53,14 +52,13 @@ import com.revolsys.geometry.cs.unit.ScaleUnit;
 import com.revolsys.geometry.cs.unit.TimeUnit;
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.NoSuchResourceException;
 import com.revolsys.util.Dates;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public final class EpsgCoordinateSystems {
 
@@ -465,11 +463,7 @@ public final class EpsgCoordinateSystems {
         AREA_BY_ID.put(code, area);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
-      }
+    } catch (final EndOfFileException e) {
     }
   }
 
@@ -493,11 +487,7 @@ public final class EpsgCoordinateSystems {
         axises.add(axis);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
-      }
+    } catch (final EndOfFileException e) {
     }
     return axisesByCoordinateSystemId;
   }
@@ -514,11 +504,7 @@ public final class EpsgCoordinateSystems {
         AXIS_NAME_BY_NAME.put(name.toLowerCase(), axisName);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
-      }
+    } catch (final EndOfFileException e) {
     }
   }
 
@@ -582,11 +568,7 @@ public final class EpsgCoordinateSystems {
         addCoordinateSystem(coordinateSystem);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
-      }
+    } catch (final EndOfFileException e) {
     }
   }
 
@@ -603,11 +585,7 @@ public final class EpsgCoordinateSystems {
         COORDINATE_SYSTEM_TYPE_BY_ID.put(id, coordinateSystemType);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
-      }
+    } catch (final EndOfFileException e) {
     }
   }
 
@@ -638,11 +616,7 @@ public final class EpsgCoordinateSystems {
 
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        Logs.error(EpsgCoordinateSystems.class, "Error loading coordOperation", e);
-      }
+    } catch (final EndOfFileException e) {
     }
   }
 
@@ -668,11 +642,7 @@ public final class EpsgCoordinateSystems {
         methodById.put(id, method);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
-      }
+    } catch (final EndOfFileException e) {
     }
     return methodById;
   }
@@ -691,11 +661,7 @@ public final class EpsgCoordinateSystems {
         PARAM_NAME_BY_ID.put(id, parameterName);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
-      }
+    } catch (final EndOfFileException e) {
     }
   }
 
@@ -713,11 +679,7 @@ public final class EpsgCoordinateSystems {
         Maps.addToList(paramReversal, methodId, signReversal);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        Logs.error(EpsgCoordinateSystems.class, "Error loading coordOperationParamValue", e);
-      }
+    } catch (final EndOfFileException e) {
     }
   }
 
@@ -762,11 +724,7 @@ public final class EpsgCoordinateSystems {
         method.setParameter(parameterValues, parameterName, parameterValue);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        Logs.error(EpsgCoordinateSystems.class, "Error loading coordOperationParamValue", e);
-      }
+    } catch (final EndOfFileException e) {
     }
   }
 
@@ -801,11 +759,7 @@ public final class EpsgCoordinateSystems {
 
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
-      }
+    } catch (final EndOfFileException e) {
     }
   }
 
@@ -829,11 +783,7 @@ public final class EpsgCoordinateSystems {
         ellipsoids.put(id, ellipsoid);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
-      }
+    } catch (final EndOfFileException e) {
     }
     return ellipsoids;
   }
@@ -853,11 +803,7 @@ public final class EpsgCoordinateSystems {
         PRIME_MERIDIAN_BY_ID.put(id, primeMeridian);
       }
     } catch (final NoSuchResourceException e) {
-    } catch (final WrappedException e) {
-      if (Exceptions.isException(e, EOFException.class)) {
-      } else {
-        throw e;
-      }
+    } catch (final EndOfFileException e) {
     }
   }
 
@@ -936,11 +882,7 @@ public final class EpsgCoordinateSystems {
           }
         }
       } catch (final NoSuchResourceException e) {
-      } catch (final WrappedException e) {
-        if (Exceptions.isException(e, EOFException.class)) {
-        } else {
-          throw e;
-        }
+      } catch (final EndOfFileException e) {
       }
     }
   }

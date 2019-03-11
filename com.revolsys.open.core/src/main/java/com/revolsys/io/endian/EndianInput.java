@@ -1,10 +1,11 @@
 package com.revolsys.io.endian;
 
 import java.io.Closeable;
-import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
+import com.revolsys.io.EndOfFileException;
 
 public interface EndianInput extends Closeable {
 
@@ -41,7 +42,7 @@ public interface EndianInput extends Closeable {
    * input stream.
    *
    * @return     the <code>boolean</code> value read.
-   * @exception  EOFException  if this input stream has reached the end.
+   * @exception  EndOfFileException  if this input stream has reached the end.
    * @exception  IOException   the stream has been closed and the contained
    *             input stream does not support reading after close, or
    *             another I/O error occurs.
@@ -50,7 +51,7 @@ public interface EndianInput extends Closeable {
   default boolean readBoolean() throws IOException {
     final int ch = read();
     if (ch < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     return ch != 0;
   }
@@ -65,7 +66,7 @@ public interface EndianInput extends Closeable {
    *
    * @return     the next byte of this input stream as a signed 8-bit
    *             <code>byte</code>.
-   * @exception  EOFException  if this input stream has reached the end.
+   * @exception  EndOfFileException  if this input stream has reached the end.
    * @exception  IOException   the stream has been closed and the contained
    *             input stream does not support reading after close, or
    *             another I/O error occurs.
@@ -74,7 +75,7 @@ public interface EndianInput extends Closeable {
   default byte readByte() throws IOException {
     final int ch = read();
     if (ch < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     return (byte)ch;
   }
@@ -84,7 +85,7 @@ public interface EndianInput extends Closeable {
     if (read(buffer, 0, length) == length) {
       return buffer;
     } else {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
   }
 
@@ -98,7 +99,7 @@ public interface EndianInput extends Closeable {
    *
    * @return     the next two bytes of this input stream, interpreted as a
    *             <code>char</code>.
-   * @exception  EOFException  if this input stream reaches the end before
+   * @exception  EndOfFileException  if this input stream reaches the end before
    *               reading two bytes.
    * @exception  IOException   the stream has been closed and the contained
    *             input stream does not support reading after close, or
@@ -109,7 +110,7 @@ public interface EndianInput extends Closeable {
     final int ch1 = read();
     final int ch2 = read();
     if ((ch1 | ch2) < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     return (char)((ch1 << 8) + (ch2 << 0));
   }
@@ -134,7 +135,7 @@ public interface EndianInput extends Closeable {
    *
    * @return     the next four bytes of this input stream, interpreted as a
    *             <code>float</code>.
-   * @exception  EOFException  if this input stream reaches the end before
+   * @exception  EndOfFileException  if this input stream reaches the end before
    *               reading four bytes.
    * @exception  IOException   the stream has been closed and the contained
    *             input stream does not support reading after close, or
@@ -155,7 +156,7 @@ public interface EndianInput extends Closeable {
    * input stream.
    *
    * @param      b   the buffer into which the data is read.
-   * @exception  EOFException  if this input stream reaches the end before
+   * @exception  EndOfFileException  if this input stream reaches the end before
    *             reading all the bytes.
    * @exception  IOException   the stream has been closed and the contained
    *             input stream does not support reading after close, or
@@ -177,7 +178,7 @@ public interface EndianInput extends Closeable {
    * @param      b     the buffer into which the data is read.
    * @param      off   the start offset of the data.
    * @param      len   the number of bytes to read.
-   * @exception  EOFException  if this input stream reaches the end before
+   * @exception  EndOfFileException  if this input stream reaches the end before
    *               reading all the bytes.
    * @exception  IOException   the stream has been closed and the contained
    *             input stream does not support reading after close, or
@@ -192,7 +193,7 @@ public interface EndianInput extends Closeable {
     while (n < len) {
       final int count = read(b, off + n, len - n);
       if (count < 0) {
-        throw new EOFException();
+        throw new EndOfFileException();
       }
       n += count;
     }
@@ -210,7 +211,7 @@ public interface EndianInput extends Closeable {
     final int ch3 = read();
     final int ch4 = read();
     if ((ch1 | ch2 | ch3 | ch4) < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     return (ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0);
   }
@@ -243,7 +244,7 @@ public interface EndianInput extends Closeable {
     final int b3 = read();
     final int b4 = read();
     if ((b1 | b2 | b3 | b4) < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     final int value = (b4 << 24) + (b3 << 16) + (b2 << 8) + b1;
 
@@ -274,7 +275,7 @@ public interface EndianInput extends Closeable {
     final int b1 = read();
     final int b2 = read();
     if ((b1 | b2) < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     final int value = (b2 << 8) + b1;
     return (short)value;
@@ -292,7 +293,7 @@ public interface EndianInput extends Closeable {
     final long b3 = read();
     final long b4 = read();
     if ((b1 | b2 | b3 | b4) < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     final long value = (b4 << 24) + (b3 << 16) + (b2 << 8) + b1;
     return value;
@@ -317,7 +318,7 @@ public interface EndianInput extends Closeable {
     final int ch1 = read();
     final int ch2 = read();
     if ((ch1 | ch2) < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     return (ch1 << 0) + (ch2 << 8);
   }
@@ -344,7 +345,7 @@ public interface EndianInput extends Closeable {
     final int ch1 = read();
     final int ch2 = read();
     if ((ch1 | ch2) < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     return (short)((ch1 << 8) + (ch2 << 0));
   }
@@ -365,7 +366,7 @@ public interface EndianInput extends Closeable {
   default int readUnsignedByte() throws IOException {
     final int ch = read();
     if (ch < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     return ch;
   }
@@ -374,7 +375,7 @@ public interface EndianInput extends Closeable {
     final int ch1 = read();
     final int ch2 = read();
     if ((ch1 | ch2) < 0) {
-      throw new EOFException();
+      throw new EndOfFileException();
     }
     return (ch1 << 8) + (ch2 << 0);
   }
