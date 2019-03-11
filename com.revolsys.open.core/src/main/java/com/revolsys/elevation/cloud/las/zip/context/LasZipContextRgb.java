@@ -8,9 +8,8 @@ import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 import com.revolsys.util.number.Integers;
 
 public class LasZipContextRgb {
-  public boolean unused;
 
-  public LasPoint lastPoint;
+  public boolean unused;
 
   private ArithmeticModel rgbBytesUsed;
 
@@ -26,17 +25,7 @@ public class LasZipContextRgb {
 
   private ArithmeticModel diffBlueLower;
 
-  private int lastRedLower;
-
-  private int lastRedUpper;
-
-  private int lastGreenLower;
-
-  private int lastGreenUpper;
-
-  private int lastBlueLower;
-
-  private int lastBlueUpper;
+  public final RgbUpperLower lastRgb = new RgbUpperLower();
 
   public void initPoint(final ArithmeticCodingCodec codec, final LasPoint point) {
     this.unused = false;
@@ -58,32 +47,61 @@ public class LasZipContextRgb {
       this.diffBlueUpper.init();
     }
 
-    setLastPoint(point);
+    this.lastRgb.setValues(point);
+    ;
+  }
+
+  public void initRgb(final ArithmeticCodingCodec codec, final RgbUpperLower rgb) {
+    this.unused = false;
+    if (this.rgbBytesUsed == null) {
+      this.rgbBytesUsed = codec.createSymbolModel(128);
+      this.diffRedLower = codec.createSymbolModel(256);
+      this.diffRedUpper = codec.createSymbolModel(256);
+      this.diffGreenLower = codec.createSymbolModel(256);
+      this.diffGreenUpper = codec.createSymbolModel(256);
+      this.diffBlueLower = codec.createSymbolModel(256);
+      this.diffBlueUpper = codec.createSymbolModel(256);
+    } else {
+      this.rgbBytesUsed.init();
+      this.diffRedLower.init();
+      this.diffRedUpper.init();
+      this.diffGreenLower.init();
+      this.diffGreenUpper.init();
+      this.diffBlueLower.init();
+      this.diffBlueUpper.init();
+    }
+
+    this.lastRgb.setValues(rgb);
   }
 
   public void readRgb(final ArithmeticDecoder decoder, final LasPoint point) {
-    int redLower = this.lastRedLower;
-    int redUpper = this.lastRedUpper;
-    int greenLower = this.lastGreenLower;
-    int greenUpper = this.lastGreenUpper;
-    int blueLower = this.lastBlueLower;
-    int blueUpper = this.lastBlueUpper;
+    readRgb(decoder, point, this.lastRgb);
+  }
+
+  public void readRgb(final ArithmeticDecoder decoder, final LasPoint point,
+    final RgbUpperLower lastRgb) {
+    int redLower = lastRgb.redLower;
+    int redUpper = lastRgb.redUpper;
+    int greenLower = lastRgb.greenLower;
+    int greenUpper = lastRgb.greenUpper;
+    int blueLower = lastRgb.blueLower;
+    int blueUpper = lastRgb.blueUpper;
 
     int redLowerDiff = 0;
     final int sym = decoder.decodeSymbol(this.rgbBytesUsed);
     if ((sym & 0b1) != 0) {
       final int corr = decoder.decodeSymbol(this.diffRedLower);
       redLower = Integers.U8_FOLD(redLower + corr);
-      redLowerDiff = redLower - this.lastRedLower;
-      this.lastRedLower = redLower;
+      redLowerDiff = redLower - lastRgb.redLower;
+      lastRgb.redLower = redLower;
     }
 
     int redUpperDiff = 0;
     if ((sym & 0b10) != 0) {
       final int corr = decoder.decodeSymbol(this.diffRedUpper);
       redUpper = Integers.U8_FOLD(redUpper + corr);
-      redUpperDiff = redUpper - this.lastRedUpper;
-      this.lastRedUpper = redUpper;
+      redUpperDiff = redUpper - lastRgb.redUpper;
+      lastRgb.redUpper = redUpper;
     }
     final int red = redUpper << 8 | redLower;
 
@@ -92,28 +110,28 @@ public class LasZipContextRgb {
       if ((sym & 0b100) != 0) {
         final int corr = decoder.decodeSymbol(this.diffGreenLower);
         greenLower = Integers.U8_FOLD(Integers.U8_CLAMP(redLowerDiff + greenLower) + corr);
-        greenLowerDiff = (redLowerDiff + greenLower - this.lastGreenLower) / 2;
-        this.lastGreenLower = greenLower;
+        greenLowerDiff = (redLowerDiff + greenLower - lastRgb.greenLower) / 2;
+        lastRgb.greenLower = greenLower;
       }
 
       if ((sym & 0b10000) != 0) {
         final int corr = decoder.decodeSymbol(this.diffBlueLower);
         blueLower = Integers.U8_FOLD(Integers.U8_CLAMP(greenLowerDiff + blueLower) + corr);
-        this.lastBlueLower = blueLower;
+        lastRgb.blueLower = blueLower;
       }
 
       int greenUpperDiff = 0;
       if ((sym & 0b1000) != 0) {
         final int corr = decoder.decodeSymbol(this.diffGreenUpper);
         greenUpper = Integers.U8_FOLD(Integers.U8_CLAMP(redUpperDiff + greenUpper) + corr);
-        greenUpperDiff = (redUpperDiff + greenUpper - this.lastGreenUpper) / 2;
-        this.lastGreenUpper = greenUpper;
+        greenUpperDiff = (redUpperDiff + greenUpper - lastRgb.greenUpper) / 2;
+        lastRgb.greenUpper = greenUpper;
       }
 
       if ((sym & 0b100000) != 0) {
         final int corr = decoder.decodeSymbol(this.diffBlueUpper);
         blueUpper = Integers.U8_FOLD(Integers.U8_CLAMP(greenUpperDiff + blueUpper) + corr);
-        this.lastBlueUpper = blueUpper;
+        lastRgb.blueUpper = blueUpper;
       }
       final int green = greenUpper << 8 | greenLower;
       final int blue = blueUpper << 8 | blueLower;
@@ -122,30 +140,22 @@ public class LasZipContextRgb {
     } else {
       point.setGreen(red);
       point.setBlue(red);
-      this.lastGreenLower = redLower;
-      this.lastGreenUpper = redUpper;
-      this.lastBlueLower = redLower;
-      this.lastBlueUpper = redUpper;
+      lastRgb.greenLower = redLower;
+      lastRgb.greenUpper = redUpper;
+      lastRgb.blueLower = redLower;
+      lastRgb.blueUpper = redUpper;
     }
 
     point.setRed(red);
-    this.lastPoint = point;
-  }
-
-  protected void setLastPoint(final LasPoint point) {
-    this.lastPoint = point;
-    final int red = point.getRed();
-    final int green = point.getGreen();
-    final int blue = point.getBlue();
-    this.lastRedLower = red & 0xFF;
-    this.lastRedUpper = red >>> 8;
-    this.lastGreenLower = green & 0xFF;
-    this.lastGreenUpper = green >>> 8;
-    this.lastBlueLower = blue & 0xFF;
-    this.lastBlueUpper = blue >>> 8;
   }
 
   public boolean writeRgb(final ArithmeticEncoder encoder, final LasPoint point) {
+    return writeRgb(encoder, point, this.lastRgb);
+
+  }
+
+  public boolean writeRgb(final ArithmeticEncoder encoder, final LasPoint point,
+    final RgbUpperLower lastRgb) {
     final int red = point.getRed();
     final int green = point.getGreen();
     final int blue = point.getBlue();
@@ -156,27 +166,27 @@ public class LasZipContextRgb {
     final int blueLower = blue & 0xFF;
     final int blueUpper = blue >>> 8;
     int sym = 0;
-    final boolean redLowerChanged = this.lastRedLower != redLower;
+    final boolean redLowerChanged = lastRgb.redLower != redLower;
     if (redLowerChanged) {
       sym |= 0b1;
     }
-    final boolean redUpperChanged = this.lastRedUpper != redUpper;
+    final boolean redUpperChanged = lastRgb.redUpper != redUpper;
     if (redUpperChanged) {
       sym |= 0b10;
     }
-    final boolean greenLowerChanged = this.lastGreenLower != greenLower;
+    final boolean greenLowerChanged = lastRgb.greenLower != greenLower;
     if (greenLowerChanged) {
       sym |= 0b100;
     }
-    final boolean greenUpperChanged = this.lastGreenUpper != greenUpper;
+    final boolean greenUpperChanged = lastRgb.greenUpper != greenUpper;
     if (greenUpperChanged) {
       sym |= 0b1000;
     }
-    final boolean blueLowerChanged = this.lastBlueLower != blueLower;
+    final boolean blueLowerChanged = lastRgb.blueLower != blueLower;
     if (blueLowerChanged) {
       sym |= 0b10000;
     }
-    final boolean blueUpperChanged = this.lastBlueUpper != blueUpper;
+    final boolean blueUpperChanged = lastRgb.blueUpper != blueUpper;
     if (blueUpperChanged) {
       sym |= 0b100000;
     }
@@ -190,50 +200,48 @@ public class LasZipContextRgb {
     encoder.encodeSymbol(this.rgbBytesUsed, sym);
     int redLowerDiff = 0;
     if (redLowerChanged) {
-      redLowerDiff = redLower - this.lastRedLower;
+      redLowerDiff = redLower - lastRgb.redLower;
       encoder.encodeSymbol(this.diffRedLower, Integers.U8_FOLD(redLowerDiff));
-      this.lastRedLower = redLower;
+      lastRgb.redLower = redLower;
     }
     int redUpperDiff = 0;
     if (redUpperChanged) {
-      redUpperDiff = redUpper - this.lastRedUpper;
+      redUpperDiff = redUpper - lastRgb.redUpper;
       encoder.encodeSymbol(this.diffRedUpper, Integers.U8_FOLD(redUpperDiff));
-      this.lastRedUpper = redUpper;
+      lastRgb.redUpper = redUpper;
     }
     if (redDiffFromGreenAndBlue) {
       int greenLowerDiff = 0;
       if (greenLowerChanged) {
-        greenLowerDiff = (redLowerDiff + greenLower - this.lastGreenLower) / 2;
-        final int corr = greenLower - Integers.U8_CLAMP(redLowerDiff + this.lastGreenLower);
+        greenLowerDiff = (redLowerDiff + greenLower - lastRgb.greenLower) / 2;
+        final int corr = greenLower - Integers.U8_CLAMP(redLowerDiff + lastRgb.greenLower);
         encoder.encodeSymbol(this.diffGreenLower, Integers.U8_FOLD(corr));
-        this.lastGreenLower = greenLower;
+        lastRgb.greenLower = greenLower;
       }
       if (blueLowerChanged) {
-        final int corr = blueLower - Integers.U8_CLAMP(greenLowerDiff + this.lastBlueLower);
+        final int corr = blueLower - Integers.U8_CLAMP(greenLowerDiff + lastRgb.blueLower);
         encoder.encodeSymbol(this.diffBlueLower, Integers.U8_FOLD(corr));
-        this.lastBlueLower = blueLower;
+        lastRgb.blueLower = blueLower;
       }
       int greenUpperDiff = 0;
       if (greenUpperChanged) {
-        greenUpperDiff = (redUpperDiff + greenUpper - this.lastGreenUpper) / 2;
-        final int corr = greenUpper - Integers.U8_CLAMP(redUpperDiff + this.lastGreenUpper);
+        greenUpperDiff = (redUpperDiff + greenUpper - lastRgb.greenUpper) / 2;
+        final int corr = greenUpper - Integers.U8_CLAMP(redUpperDiff + lastRgb.greenUpper);
         encoder.encodeSymbol(this.diffGreenUpper, Integers.U8_FOLD(corr));
-        this.lastGreenUpper = greenUpper;
+        lastRgb.greenUpper = greenUpper;
       }
       if (blueUpperChanged) {
-        final int corr = blueUpper - Integers.U8_CLAMP(greenUpperDiff + this.lastBlueUpper);
+        final int corr = blueUpper - Integers.U8_CLAMP(greenUpperDiff + lastRgb.blueUpper);
         encoder.encodeSymbol(this.diffBlueUpper, Integers.U8_FOLD(corr));
-        this.lastBlueUpper = blueUpper;
+        lastRgb.blueUpper = blueUpper;
       }
     } else {
-      this.lastGreenLower = redLower;
-      this.lastGreenUpper = redUpper;
-      this.lastBlueLower = redLower;
-      this.lastBlueUpper = redUpper;
+      lastRgb.greenLower = redLower;
+      lastRgb.greenUpper = redUpper;
+      lastRgb.blueLower = redLower;
+      lastRgb.blueUpper = redUpper;
     }
-    this.lastPoint = point;
     return sym != 0;
-
   }
 
 }

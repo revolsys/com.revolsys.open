@@ -180,7 +180,9 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
 
   private final ArithmeticEncoderByteArray enc_Z = new ArithmeticEncoderByteArray();
 
-  public LasZipItemCodecPoint14V3(final ArithmeticCodingCodec codec) {
+  private final int version;
+
+  public LasZipItemCodecPoint14V3(final ArithmeticCodingCodec codec, final int version) {
     if (codec instanceof ArithmeticDecoder) {
       this.dec = (ArithmeticDecoder)codec;
     } else if (codec instanceof ArithmeticEncoder) {
@@ -188,27 +190,27 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
     } else {
       throw new IllegalArgumentException("Not supported:" + codec.getClass());
     }
+    this.version = version;
 
     for (int i = 0; i < this.contexts.length; i++) {
       this.contexts[i] = new LasZipContextPoint14();
     }
-    final int decompressSelective = LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_ALL;
-    this.dec_Z.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_Z);
+    final int decompressSelective = LasZipDecompressSelective.ALL;
+    this.dec_Z.setEnabled(decompressSelective, LasZipDecompressSelective.Z);
     this.dec_classification.setEnabled(decompressSelective,
-      LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION);
-    this.dec_flags.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_FLAGS);
-    this.dec_intensity.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_INTENSITY);
-    this.dec_scan_angle.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE);
-    this.dec_user_data.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_USER_DATA);
-    this.dec_point_source.setEnabled(decompressSelective,
-      LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE);
-    this.dec_gps_time.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME);
+      LasZipDecompressSelective.CLASSIFICATION);
+    this.dec_flags.setEnabled(decompressSelective, LasZipDecompressSelective.FLAGS);
+    this.dec_intensity.setEnabled(decompressSelective, LasZipDecompressSelective.INTENSITY);
+    this.dec_scan_angle.setEnabled(decompressSelective, LasZipDecompressSelective.SCAN_ANGLE);
+    this.dec_user_data.setEnabled(decompressSelective, LasZipDecompressSelective.USER_DATA);
+    this.dec_point_source.setEnabled(decompressSelective, LasZipDecompressSelective.POINT_SOURCE);
+    this.dec_gps_time.setEnabled(decompressSelective, LasZipDecompressSelective.GPS_TIME);
 
   }
 
   @Override
   public int getVersion() {
-    return 3;
+    return this.version;
   }
 
   @Override
@@ -313,7 +315,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
   }
 
   @Override
-  public int read(final LasPoint point, final int contextIndex) {
+  public int read(final LasPoint point, int contextIndex) {
     LasZipContextPoint14 context = this.contexts[this.current_context];
     LasPoint lastPoint = context.lastPoint;
 
@@ -344,6 +346,12 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
       context = this.contexts[this.current_context];
       lastPoint = context.lastPoint;
       point.setScannerChannel((byte)scanner_channel);
+      if (this.version < 4) {
+        contextIndex = this.current_context;
+      }
+    }
+    if (this.version >= 4) {
+      contextIndex = this.current_context;
     }
 
     final boolean gps_time_change = (changedValues & FLAG_GPS_TIME) != 0;
@@ -478,7 +486,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
 
     context.lastPoint = point;
     context.gps_time_change = gps_time_change;
-    return this.current_context;
+    return contextIndex;
   }
 
   @Override
@@ -618,8 +626,8 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
   }
 
   @Override
-  public int write(final LasPoint point, final int contextIndex) {
-    LasZipContextPoint14 context = this.contexts[this.current_context];
+  public int write(final LasPoint point, int contextIndex) {
+    final LasZipContextPoint14 context = this.contexts[this.current_context];
     LasPoint lastPoint = context.lastPoint;
 
     final byte lastNumberOfReturns = lastPoint.getNumberOfReturns();
@@ -699,8 +707,12 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
         lastPoint = this.contexts[scannerChannel].lastPoint;
       }
       this.current_context = scannerChannel;
-      context = this.contexts[this.current_context];
-
+      if (this.version < 4) {
+        contextIndex = this.current_context;
+      }
+    }
+    if (this.version >= 4) {
+      contextIndex = this.current_context;
     }
 
     if (numberOfReturnsChanged) {
@@ -801,7 +813,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
     context.lastPoint = point;
     context.gps_time_change = gps_time_change;
 
-    return this.current_context;
+    return contextIndex;
 
   }
 

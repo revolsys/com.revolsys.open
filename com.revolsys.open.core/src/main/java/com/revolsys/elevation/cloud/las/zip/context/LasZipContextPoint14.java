@@ -6,6 +6,7 @@ import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
 public class LasZipContextPoint14 {
+
   public boolean unused;
 
   public LasPoint lastPoint;

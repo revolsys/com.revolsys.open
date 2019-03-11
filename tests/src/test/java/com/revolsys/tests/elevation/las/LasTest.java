@@ -353,12 +353,10 @@ public class LasTest {
         final String suffix = entry.getKey();
         final MapEx writeProperties = entry.getValue();
         final String label = prefix + "_" + pointFormat.name() + "_" + suffix;
-        final Path file = DIR//
-          .resolve(fileExtension) //
-          .resolve(prefix)//
-          .resolve(label + "." + fileExtension);
+        final String filePath = fileExtension + "/" + prefix + "/" + label + "." + fileExtension;
+        final Path file = DIR.resolve(filePath);
         com.revolsys.io.file.Paths.createParentDirectories(file);
-        System.out.println(label + "\t" + cloud.getPointCount());
+        System.out.println(filePath + "\t" + cloud.getPointCount());
         cloud.writePointCloud(file, writeProperties);
         System.out.println();
         assertRead(label, file, cloud);
@@ -410,11 +408,10 @@ public class LasTest {
         break;
 
         case ExtendedGpsTime:
-          writeVariations.put("v3", new LinkedHashMapEx("lasZipVersion", 3));
-        break;
         case ExtendedGpsTimeRgb:
         case ExtendedGpsTimeRgbNir:
           writeVariations.put("v3", new LinkedHashMapEx("lasZipVersion", 3));
+          writeVariations.put("v4", new LinkedHashMapEx("lasZipVersion", 4));
         break;
         case GpsTimeWavePackets:
         case GpsTimeRgbWavePackets:
@@ -474,7 +471,7 @@ public class LasTest {
 
   @Test
   public void nPoints() {
-    for (final int pointCount : Arrays.asList(1, 2, 3, 100001)) {
+    for (final int pointCount : Arrays.asList(1, 2, 3, 49000, 100001)) {
       final Consumer<LasPointCloud> cloudAction = newPointsAction(pointCount);
       for (final String fileFormat : FILE_EXTENSIONS) {
         for (final LasPointFormat recordFormat : LAZ_TEST_FORMATS) {

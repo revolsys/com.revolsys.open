@@ -1,5 +1,6 @@
 package com.revolsys.elevation.cloud.las.zip;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -50,11 +51,11 @@ public enum LasZipItemType {
     RGB12.addCodec(1, LasZipItemCodecRgb12V1::new);
     RGB12.addCodec(2, LasZipItemCodecRgb12V2::new);
 
-    POINT14.addCodec(3, LasZipItemCodecPoint14V3::new);
-
-    RGB14.addCodec(3, LasZipItemCodecRgb14V3::new);
-
-    RGBNIR14.addCodec(3, LasZipItemCodecRgbNir14V3::new);
+    for (final int version : Arrays.asList(3, 4)) {
+      POINT14.addCodec(version, codec -> new LasZipItemCodecPoint14V3(codec, version));
+      RGB14.addCodec(version, codec -> new LasZipItemCodecRgb14V3(codec, version));
+      RGBNIR14.addCodec(version, codec -> new LasZipItemCodecRgbNir14V3(codec, version));
+    }
   }
 
   public static LasZipItemType fromId(final int i) {

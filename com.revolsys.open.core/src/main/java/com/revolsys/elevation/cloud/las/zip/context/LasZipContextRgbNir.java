@@ -15,9 +15,10 @@ public class LasZipContextRgbNir extends LasZipContextRgb {
 
   private ArithmeticModel diffNirUpper;
 
-  private int lastNirLower;
+  public ShortUpperLower lastNir = new ShortUpperLower();
 
-  private int lastNirUpper;
+  public LasZipContextRgbNir() {
+  }
 
   @Override
   public void initPoint(final ArithmeticCodingCodec codec, final LasPoint point) {
@@ -31,63 +32,58 @@ public class LasZipContextRgbNir extends LasZipContextRgb {
       this.diffNirLower.init();
       this.diffNirUpper.init();
     }
+    final int nir = point.getNir();
+    this.lastNir.setValues(nir);
   }
 
-  public void readNir(final ArithmeticDecoder decoder, final LasPoint point) {
-    int nirLower = this.lastNirLower;
-    int nirUpper = this.lastNirUpper;
+  public void readNir(final ArithmeticDecoder decoder, final LasPoint point,
+    final ShortUpperLower lastNir) {
+    int nirLower = lastNir.lower;
+    int nirUpper = lastNir.upper;
 
     final int sym = decoder.decodeSymbol(this.nirBytesUsed);
     if ((sym & 0b1) != 0) {
       final int corr = decoder.decodeSymbol(this.diffNirLower);
       nirLower = Integers.U8_FOLD(nirLower + corr);
-      this.lastNirLower = nirLower;
+      lastNir.lower = nirLower;
     }
 
     if ((sym & 0b10) != 0) {
       final int corr = decoder.decodeSymbol(this.diffNirUpper);
       nirUpper = Integers.U8_FOLD(nirUpper + corr);
-      this.lastNirUpper = nirUpper;
+      lastNir.upper = nirUpper;
     }
 
     final int nir = nirUpper << 8 | nirLower;
     point.setNir(nir);
-    this.lastPoint = point;
   }
 
-  @Override
-  protected void setLastPoint(final LasPoint point) {
-    super.setLastPoint(point);
-    final int nir = point.getNir();
-    this.lastNirLower = nir & 0xFF;
-    this.lastNirUpper = nir >>> 8;
-  }
-
-  public boolean writeNir(final ArithmeticEncoder encoder, final LasPoint point) {
+  public boolean writeNir(final ArithmeticEncoder encoder, final LasPoint point,
+    final ShortUpperLower lastNir) {
     final int nir = point.getNir();
 
     final int nirLower = nir & 0xFF;
     final int nirUpper = nir >>> 8;
     int sym = 0;
-    final boolean nirLowerChanged = this.lastNirLower != nirLower;
+    final boolean nirLowerChanged = lastNir.lower != nirLower;
     if (nirLowerChanged) {
       sym |= 0b1;
     }
-    final boolean nirUpperChanged = this.lastNirUpper != nirUpper;
+    final boolean nirUpperChanged = lastNir.upper != nirUpper;
     if (nirUpperChanged) {
       sym |= 0b10;
     }
 
     encoder.encodeSymbol(this.nirBytesUsed, sym);
     if (nirLowerChanged) {
-      final int nirLowerDiff = nirLower - this.lastNirLower;
+      final int nirLowerDiff = nirLower - lastNir.lower;
       encoder.encodeSymbol(this.diffNirLower, Integers.U8_FOLD(nirLowerDiff));
-      this.lastNirLower = nirLower;
+      lastNir.lower = nirLower;
     }
     if (nirUpperChanged) {
-      final int nirUpperDiff = nirUpper - this.lastNirUpper;
+      final int nirUpperDiff = nirUpper - lastNir.upper;
       encoder.encodeSymbol(this.diffNirUpper, Integers.U8_FOLD(nirUpperDiff));
-      this.lastNirUpper = nirUpper;
+      lastNir.upper = nirUpper;
     }
 
     return sym != 0;

@@ -15,7 +15,10 @@ import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoderByteArray;
 import com.revolsys.elevation.cloud.las.zip.ArithmeticEncoderByteArray;
 import com.revolsys.elevation.cloud.las.zip.LasZipDecompressSelective;
 import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
+import com.revolsys.elevation.cloud.las.zip.context.LasZipContextRgb;
 import com.revolsys.elevation.cloud.las.zip.context.LasZipContextRgbNir;
+import com.revolsys.elevation.cloud.las.zip.context.RgbUpperLower;
+import com.revolsys.elevation.cloud.las.zip.context.ShortUpperLower;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
@@ -24,27 +27,29 @@ import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 
 public class LasZipItemCodecRgbNir14V3 implements LasZipItemCodec {
 
-  private ArithmeticDecoder decoder;
-
-  private ArithmeticEncoder encoder;
-
-  private final ArithmeticEncoderByteArray rgbEncoder = new ArithmeticEncoderByteArray();
-
-  private final ArithmeticDecoderByteArray rgbDecoder = new ArithmeticDecoderByteArray();
-
-  private final ArithmeticEncoderByteArray nirEncoder = new ArithmeticEncoderByteArray();
-
-  private final ArithmeticDecoderByteArray nirDecoder = new ArithmeticDecoderByteArray();
-
-  private boolean rgbChanged;
-
-  private boolean nirChanged;
-
   private final LasZipContextRgbNir[] contexts = new LasZipContextRgbNir[4];
 
   private int currentContextIndex;
 
-  public LasZipItemCodecRgbNir14V3(final ArithmeticCodingCodec codec) {
+  private ArithmeticDecoder decoder;
+
+  private ArithmeticEncoder encoder;
+
+  private boolean nirChanged;
+
+  private final ArithmeticDecoderByteArray nirDecoder = new ArithmeticDecoderByteArray();
+
+  private final ArithmeticEncoderByteArray nirEncoder = new ArithmeticEncoderByteArray();
+
+  private boolean rgbChanged;
+
+  private final ArithmeticDecoderByteArray rgbDecoder = new ArithmeticDecoderByteArray();
+
+  private final ArithmeticEncoderByteArray rgbEncoder = new ArithmeticEncoderByteArray();
+
+  private final int version;
+
+  public LasZipItemCodecRgbNir14V3(final ArithmeticCodingCodec codec, final int version) {
     if (codec instanceof ArithmeticDecoder) {
       this.decoder = (ArithmeticDecoder)codec;
     } else if (codec instanceof ArithmeticEncoder) {
@@ -52,56 +57,61 @@ public class LasZipItemCodecRgbNir14V3 implements LasZipItemCodec {
     } else {
       throw new IllegalArgumentException("Not supported:" + codec.getClass());
     }
+    this.version = version;
 
     for (int i = 0; i < this.contexts.length; i++) {
       this.contexts[i] = new LasZipContextRgbNir();
     }
-    final int decompressSelective = LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_ALL;
+    final int decompressSelective = LasZipDecompressSelective.ALL;
     this.rgbDecoder.setEnabled(decompressSelective,
-      LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_RGB);
+      LasZipDecompressSelective.RGB);
     this.nirDecoder.setEnabled(decompressSelective,
-      LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_NIR);
+      LasZipDecompressSelective.NIR);
   }
 
   @Override
   public int getVersion() {
-    return 3;
+    return this.version;
   }
 
   @Override
   public int init(final LasPoint point, final int contextIndex) {
     this.currentContextIndex = contextIndex;
     if (this.encoder != null) {
-      return writeInit(point);
+      writeInit(point);
     }
 
     if (this.decoder != null) {
-      return readInit(point);
+      readInit(point);
     }
     return this.currentContextIndex;
-  }
-
-  private void initContext(final int contextIndex, final LasPoint point,
-    final ArithmeticCodingCodec codec) {
-    final LasZipContextRgbNir context = this.contexts[contextIndex];
-    context.initPoint(codec, point);
   }
 
   @Override
   public int read(final LasPoint point, final int contextIndex) {
     LasZipContextRgbNir context = this.contexts[this.currentContextIndex];
+    RgbUpperLower lastRgb = context.lastRgb;
+    ShortUpperLower lastNir = context.lastNir;
     if (this.currentContextIndex != contextIndex) {
       this.currentContextIndex = contextIndex;
+      context = this.contexts[this.currentContextIndex];
       if (context.unused) {
-        readInitContext(this.currentContextIndex, context.lastPoint);
-        context = this.contexts[this.currentContextIndex];
+        context.initRgb(this.decoder, lastRgb);
+        if (this.version < 4) {
+          lastRgb = context.lastRgb;
+          lastNir = context.lastNir;
+        }
+      }
+      if (this.version >= 4) {
+        lastRgb = context.lastRgb;
+        lastNir = context.lastNir;
       }
     }
     if (this.rgbChanged) {
-      context.readRgb(this.rgbDecoder, point);
+      context.readRgb(this.rgbDecoder, point, lastRgb);
     }
     if (this.nirChanged) {
-      context.readNir(this.nirDecoder, point);
+      context.readNir(this.nirDecoder, point, lastNir);
     }
     return contextIndex;
   }
@@ -117,39 +127,45 @@ public class LasZipItemCodecRgbNir14V3 implements LasZipItemCodec {
     final ChannelReader in = this.decoder.getIn();
 
     this.rgbChanged = this.rgbDecoder.readBytes(in);
+
     this.nirChanged = this.nirDecoder.readBytes(in);
 
-    for (final LasZipContextRgbNir context : this.contexts) {
+    for (final LasZipContextRgb context : this.contexts) {
       context.unused = true;
     }
-
-    readInitContext(this.currentContextIndex, point);
+    final LasZipContextRgb context = this.contexts[this.currentContextIndex];
+    context.initPoint(this.decoder, point);
 
     return this.currentContextIndex;
-  }
-
-  private void readInitContext(final int contextIndex, final LasPoint point) {
-    initContext(contextIndex, point, this.decoder);
   }
 
   @Override
   public int write(final LasPoint point, final int contextIndex) {
     LasZipContextRgbNir context = this.contexts[this.currentContextIndex];
+    ShortUpperLower lastNir = context.lastNir;
+    RgbUpperLower lastRgb = context.lastRgb;
     if (this.currentContextIndex != contextIndex) {
       this.currentContextIndex = contextIndex;
+      context = this.contexts[this.currentContextIndex];
       if (context.unused) {
-        writeInitContext(this.currentContextIndex, context.lastPoint);
-        context = this.contexts[this.currentContextIndex];
+        context.initRgb(this.encoder, lastRgb);
+        if (this.version < 4) {
+          lastRgb = context.lastRgb;
+          lastNir = context.lastNir;
+        }
+      }
+      if (this.version >= 4) {
+        lastRgb = context.lastRgb;
+        lastNir = context.lastNir;
       }
     }
 
-    if (context.writeRgb(this.rgbEncoder, point)) {
+    if (context.writeRgb(this.rgbEncoder, point, lastRgb)) {
       this.rgbChanged = true;
     }
-    if (context.writeNir(this.nirEncoder, point)) {
+    if (context.writeNir(this.nirEncoder, point, lastNir)) {
       this.nirChanged = true;
     }
-
     return contextIndex;
 
   }
@@ -168,19 +184,15 @@ public class LasZipItemCodecRgbNir14V3 implements LasZipItemCodec {
     this.nirEncoder.writeSize(writer, this.nirChanged);
   }
 
-  public int writeInit(final LasPoint point) {
+  public void writeInit(final LasPoint point) {
     this.rgbEncoder.init();
-    this.nirEncoder.init();
     this.rgbChanged = false;
+    this.nirEncoder.init();
     this.nirChanged = false;
-    for (final LasZipContextRgbNir context : this.contexts) {
+    for (final LasZipContextRgb context : this.contexts) {
       context.unused = true;
     }
-    writeInitContext(this.currentContextIndex, point);
-    return this.currentContextIndex;
-  }
-
-  private void writeInitContext(final int contextIndex, final LasPoint point) {
-    initContext(contextIndex, point, this.encoder);
+    final LasZipContextRgb context = this.contexts[this.currentContextIndex];
+    context.initPoint(this.encoder, point);
   }
 }
