@@ -62,11 +62,13 @@ public class LasTest {
   private static final Path DIR = Paths.get("target/test/elevation");
 
   private static final List<LasPointFormat> LAZ_TEST_FORMATS = Arrays.asList(//
-    LasPointFormat.Core, //
-    LasPointFormat.Rgb, //
-    LasPointFormat.GpsTime, //
-    LasPointFormat.GpsTimeRgb //
+    LasPointFormat.Core //
+    , LasPointFormat.Rgb //
+    , LasPointFormat.GpsTime //
+    , LasPointFormat.GpsTimeRgb //
     , LasPointFormat.ExtendedGpsTime //
+    , LasPointFormat.ExtendedGpsTimeRgb //
+    , LasPointFormat.ExtendedGpsTimeRgbNir //
   );
 
   private static final List<String> FILE_EXTENSIONS = Arrays.asList("las", "laz");
@@ -245,6 +247,20 @@ public class LasTest {
     }
   }
 
+  private void addNirPoints(final LasPointCloud cloud) {
+    for (final int nir : Arrays.asList(0, 1, 65534, 65535)) {
+      addRandomPoint(cloud) //
+        .setNir(nir) //
+      ;
+    }
+    for (int i = 0; i < 1000; i++) {
+      final int nir = RANDOM.nextInt(65535);
+      addRandomPoint(cloud) //
+        .setNir(nir) //
+      ;
+    }
+  }
+
   private void addRandomPoints(final LasPointCloud cloud, final int count) {
     for (int i = 0; i < count; i++) {
       addRandomPoint(cloud);
@@ -354,6 +370,9 @@ public class LasTest {
   public void asssertWriteRead(final String prefix, final LasPointFormat recordFormat,
     final GeometryFactory geometryFactory, final String fileExtension) {
     final Consumer<LasPointCloud> cloudAction = cloud -> {
+      if (recordFormat.name().contains("Nir")) {
+        addNirPoints(cloud);
+      }
       if (recordFormat.name().contains("GpsTime")) {
         addGpsTimePoints(cloud);
       }
@@ -389,24 +408,17 @@ public class LasTest {
           writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion", 1));
           writeVariations.put("v2", new LinkedHashMapEx("lasZipVersion", 2));
         break;
-        case GpsTimeWavePackets:
-          // TODO writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion",
-          // 1));
-          // break;
-          throw new UnsupportedOperationException();
 
         case ExtendedGpsTime:
           writeVariations.put("v3", new LinkedHashMapEx("lasZipVersion", 3));
         break;
         case ExtendedGpsTimeRgb:
-          // TODO
-          throw new UnsupportedOperationException();
         case ExtendedGpsTimeRgbNir:
-          // TODO
-          throw new UnsupportedOperationException();
+          writeVariations.put("v3", new LinkedHashMapEx("lasZipVersion", 3));
+        break;
+        case GpsTimeWavePackets:
+        case GpsTimeRgbWavePackets:
         case ExtendedGpsTimeWavePackets:
-          // TODO
-          throw new UnsupportedOperationException();
         case ExtendedGpsTimeRgbNirWavePackets:
           // TODO
           throw new UnsupportedOperationException();

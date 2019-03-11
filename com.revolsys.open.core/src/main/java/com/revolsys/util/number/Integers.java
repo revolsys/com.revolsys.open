@@ -156,6 +156,26 @@ public class Integers extends AbstractDataType {
     }
   }
 
+  public static int U8_CLAMP(final int n) {
+    if (n < 0) {
+      return 0;
+    } else if (n > 255) {
+      return 255;
+    } else {
+      return n;
+    }
+  }
+
+  public static int U8_FOLD(final int n) {
+    if (n < 0) {
+      return n + 256;
+    } else if (n > 255) {
+      return n - 256;
+    } else {
+      return n;
+    }
+  }
+
   public Integers() {
     super("int", Integer.class, false);
   }

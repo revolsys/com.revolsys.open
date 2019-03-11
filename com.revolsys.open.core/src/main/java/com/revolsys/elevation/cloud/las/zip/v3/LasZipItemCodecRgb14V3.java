@@ -13,14 +13,16 @@ package com.revolsys.elevation.cloud.las.zip.v3;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoderByteArray;
 import com.revolsys.elevation.cloud.las.zip.ArithmeticEncoderByteArray;
+import com.revolsys.elevation.cloud.las.zip.LasZipDecompressSelective;
 import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
+import com.revolsys.elevation.cloud.las.zip.context.LasZipContextRgb;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 
-public class LasZipItemCodecRGB14V3 implements LasZipItemCodec {
+public class LasZipItemCodecRgb14V3 implements LasZipItemCodec {
 
   private ArithmeticDecoder dec;
 
@@ -32,11 +34,11 @@ public class LasZipItemCodecRGB14V3 implements LasZipItemCodec {
 
   private boolean changed_RGB;
 
-  private final LAScontextRGB14[] contexts = new LAScontextRGB14[4];
+  private final LasZipContextRgb[] contexts = new LasZipContextRgb[4];
 
-  private int current_context;
+  private int currentContextIndex;
 
-  public LasZipItemCodecRGB14V3(final ArithmeticCodingCodec codec) {
+  public LasZipItemCodecRgb14V3(final ArithmeticCodingCodec codec) {
     if (codec instanceof ArithmeticDecoder) {
       this.dec = (ArithmeticDecoder)codec;
     } else if (codec instanceof ArithmeticEncoder) {
@@ -45,15 +47,22 @@ public class LasZipItemCodecRGB14V3 implements LasZipItemCodec {
       throw new IllegalArgumentException("Not supported:" + codec.getClass());
     }
 
+    for (int i = 0; i < this.contexts.length; i++) {
+      this.contexts[i] = new LasZipContextRgb();
+    }
+    final int decompressSelective = LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_ALL;
+    this.dec_RGB.setEnabled(decompressSelective,
+      LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_RGB);
   }
 
   @Override
   public int getVersion() {
-    return 2;
+    return 3;
   }
 
   @Override
   public int init(final LasPoint point, final int contextIndex) {
+    this.currentContextIndex = contextIndex;
     if (this.enc != null) {
       return writeInit(point);
     }
@@ -61,38 +70,29 @@ public class LasZipItemCodecRGB14V3 implements LasZipItemCodec {
     if (this.dec != null) {
       return readInit(point);
     }
-    return this.current_context;
+    return this.currentContextIndex;
   }
 
   private void initContext(final int contextIndex, final LasPoint point,
     final ArithmeticCodingCodec codecRGB) {
-    final LAScontextRGB14 context = this.contexts[contextIndex];
-    if (context.m_byte_used == null) {
-      context.m_byte_used = codecRGB.createSymbolModel(128);
-      context.m_rgb_diff_0 = codecRGB.createSymbolModel(256);
-      context.m_rgb_diff_1 = codecRGB.createSymbolModel(256);
-      context.m_rgb_diff_2 = codecRGB.createSymbolModel(256);
-      context.m_rgb_diff_3 = codecRGB.createSymbolModel(256);
-      context.m_rgb_diff_4 = codecRGB.createSymbolModel(256);
-      context.m_rgb_diff_5 = codecRGB.createSymbolModel(256);
-    }
-
-    codecRGB.initModel(context.m_byte_used);
-    codecRGB.initModel(context.m_rgb_diff_0);
-    codecRGB.initModel(context.m_rgb_diff_1);
-    codecRGB.initModel(context.m_rgb_diff_2);
-    codecRGB.initModel(context.m_rgb_diff_3);
-    codecRGB.initModel(context.m_rgb_diff_4);
-    codecRGB.initModel(context.m_rgb_diff_5);
-
-    context.last_item = point;
-    context.unused = false;
+    final LasZipContextRgb context = this.contexts[contextIndex];
+    context.initPoint(codecRGB, point);
   }
 
   @Override
   public int read(final LasPoint point, final int contextIndex) {
-
-    return this.current_context;
+    if (this.changed_RGB) {
+      LasZipContextRgb context = this.contexts[this.currentContextIndex];
+      if (this.currentContextIndex != contextIndex) {
+        this.currentContextIndex = contextIndex;
+        if (context.unused) {
+          readInitContext(this.currentContextIndex, context.lastPoint);
+          context = this.contexts[this.currentContextIndex];
+        }
+      }
+      context.readRgb(this.dec_RGB, point);
+    }
+    return contextIndex;
   }
 
   @Override
@@ -104,7 +104,15 @@ public class LasZipItemCodecRGB14V3 implements LasZipItemCodec {
   public int readInit(final LasPoint point) {
     final ChannelReader in = this.dec.getIn();
 
-    return this.current_context;
+    this.changed_RGB = this.dec_RGB.readBytes(in);
+
+    for (final LasZipContextRgb context : this.contexts) {
+      context.unused = true;
+    }
+
+    readInitContext(this.currentContextIndex, point);
+
+    return this.currentContextIndex;
   }
 
   private void readInitContext(final int contextIndex, final LasPoint point) {
@@ -113,7 +121,20 @@ public class LasZipItemCodecRGB14V3 implements LasZipItemCodec {
 
   @Override
   public int write(final LasPoint point, final int contextIndex) {
-    return this.current_context;
+    LasZipContextRgb context = this.contexts[this.currentContextIndex];
+    if (this.currentContextIndex != contextIndex) {
+      this.currentContextIndex = contextIndex;
+      if (context.unused) {
+        writeInitContext(this.currentContextIndex, context.lastPoint);
+        context = this.contexts[this.currentContextIndex];
+      }
+    }
+
+    if (context.writeRgb(this.enc_RGB, point)) {
+      this.changed_RGB = true;
+    }
+
+    return contextIndex;
 
   }
 
@@ -130,7 +151,13 @@ public class LasZipItemCodecRGB14V3 implements LasZipItemCodec {
   }
 
   public int writeInit(final LasPoint point) {
-    return this.current_context;
+    this.enc_RGB.init();
+    this.changed_RGB = false;
+    for (final LasZipContextRgb context : this.contexts) {
+      context.unused = true;
+    }
+    writeInitContext(this.currentContextIndex, point);
+    return this.currentContextIndex;
   }
 
   private void writeInitContext(final int contextIndex, final LasPoint point) {

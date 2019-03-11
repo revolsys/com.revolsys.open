@@ -1,11 +1,11 @@
-package com.revolsys.elevation.cloud.las.zip.v3;
+package com.revolsys.elevation.cloud.las.zip.context;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.StreamingMedian5;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
-public class LAScontextPOINT14 {
+public class LasZipContextPoint14 {
   public boolean unused;
 
   public LasPoint lastPoint;

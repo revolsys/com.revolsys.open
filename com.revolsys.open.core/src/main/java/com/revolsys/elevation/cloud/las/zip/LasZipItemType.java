@@ -12,6 +12,8 @@ import com.revolsys.elevation.cloud.las.zip.v2.LasZipItemCodecGpsTime11V2;
 import com.revolsys.elevation.cloud.las.zip.v2.LasZipItemCodecPoint10V2;
 import com.revolsys.elevation.cloud.las.zip.v2.LasZipItemCodecRgb12V2;
 import com.revolsys.elevation.cloud.las.zip.v3.LasZipItemCodecPoint14V3;
+import com.revolsys.elevation.cloud.las.zip.v3.LasZipItemCodecRgb14V3;
+import com.revolsys.elevation.cloud.las.zip.v3.LasZipItemCodecRgbNir14V3;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
 
 public enum LasZipItemType {
@@ -49,6 +51,10 @@ public enum LasZipItemType {
     RGB12.addCodec(2, LasZipItemCodecRgb12V2::new);
 
     POINT14.addCodec(3, LasZipItemCodecPoint14V3::new);
+
+    RGB14.addCodec(3, LasZipItemCodecRgb14V3::new);
+
+    RGBNIR14.addCodec(3, LasZipItemCodecRgbNir14V3::new);
   }
 
   public static LasZipItemType fromId(final int i) {

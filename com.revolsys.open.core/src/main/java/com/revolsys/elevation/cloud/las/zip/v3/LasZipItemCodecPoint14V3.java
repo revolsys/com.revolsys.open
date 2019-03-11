@@ -15,7 +15,9 @@ import java.util.Arrays;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoderByteArray;
 import com.revolsys.elevation.cloud.las.zip.ArithmeticEncoderByteArray;
+import com.revolsys.elevation.cloud.las.zip.LasZipDecompressSelective;
 import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
+import com.revolsys.elevation.cloud.las.zip.context.LasZipContextPoint14;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
@@ -35,50 +37,6 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
   private static final int FLAG_POINT_SOURCE_ID = 0b100000;
 
   private static final int FLAG_SCAN_ANGLE = 0b1000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_ALL = 0xFFFFFFFF;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE0 = 0x00010000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE1 = 0x00020000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE2 = 0x00040000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE3 = 0x00080000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE4 = 0x00100000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE5 = 0x00200000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE6 = 0x00400000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE7 = 0x00800000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY = 0x00000000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION = 0x00000002;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES = 0xFFFF0000;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_FLAGS = 0x00000004;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME = 0x00000080;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_INTENSITY = 0x00000008;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_NIR = 0x00000200;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE = 0x00000040;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_RGB = 0x00000100;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE = 0x00000010;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_USER_DATA = 0x00000020;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET = 0x00000400;
-
-  public static final int LASZIP_DECOMPRESS_SELECTIVE_Z = 0x00000001;
 
   private static final int LASZIP_GPSTIME_MULTI = 500;
 
@@ -178,7 +136,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
 
   private boolean changed_Z;
 
-  private final LAScontextPOINT14[] contexts = new LAScontextPOINT14[4];
+  private final LasZipContextPoint14[] contexts = new LasZipContextPoint14[4];
 
   private int current_context;
 
@@ -232,19 +190,19 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
     }
 
     for (int i = 0; i < this.contexts.length; i++) {
-      this.contexts[i] = new LAScontextPOINT14();
+      this.contexts[i] = new LasZipContextPoint14();
     }
-    final int decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_ALL;
-    this.dec_Z.setEnabled(decompress_selective, LASZIP_DECOMPRESS_SELECTIVE_Z);
-    this.dec_classification.setEnabled(decompress_selective,
-      LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION);
-    this.dec_flags.setEnabled(decompress_selective, LASZIP_DECOMPRESS_SELECTIVE_FLAGS);
-    this.dec_intensity.setEnabled(decompress_selective, LASZIP_DECOMPRESS_SELECTIVE_INTENSITY);
-    this.dec_scan_angle.setEnabled(decompress_selective, LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE);
-    this.dec_user_data.setEnabled(decompress_selective, LASZIP_DECOMPRESS_SELECTIVE_USER_DATA);
-    this.dec_point_source.setEnabled(decompress_selective,
-      LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE);
-    this.dec_gps_time.setEnabled(decompress_selective, LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME);
+    final int decompressSelective = LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_ALL;
+    this.dec_Z.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_Z);
+    this.dec_classification.setEnabled(decompressSelective,
+      LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION);
+    this.dec_flags.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_FLAGS);
+    this.dec_intensity.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_INTENSITY);
+    this.dec_scan_angle.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE);
+    this.dec_user_data.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_USER_DATA);
+    this.dec_point_source.setEnabled(decompressSelective,
+      LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE);
+    this.dec_gps_time.setEnabled(decompressSelective, LasZipDecompressSelective.LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME);
 
   }
 
@@ -269,7 +227,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
     final ArithmeticCodingCodec codecXY, final ArithmeticCodingCodec codecZ,
     final ArithmeticCodingCodec codecIntensity, final ArithmeticCodingCodec codecScanAngle,
     final ArithmeticCodingCodec codecPointSource, final ArithmeticCodingCodec codecGpsTime) {
-    final LAScontextPOINT14 context = this.contexts[contextIndex];
+    final LasZipContextPoint14 context = this.contexts[contextIndex];
 
     if (context.m_changed_values[0] == null) {
       /* for the channel_returns_XY layer */
@@ -356,7 +314,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
 
   @Override
   public int read(final LasPoint point, final int contextIndex) {
-    LAScontextPOINT14 context = this.contexts[this.current_context];
+    LasZipContextPoint14 context = this.contexts[this.current_context];
     LasPoint lastPoint = context.lastPoint;
 
     final byte lastNumberOfReturns = lastPoint.getNumberOfReturns();
@@ -538,7 +496,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
   }
 
   private void readGpsTime() {
-    final LAScontextPOINT14 context = this.contexts[this.current_context];
+    final LasZipContextPoint14 context = this.contexts[this.current_context];
     if (context.last_gpstime_diff[context.last] == 0) {
       final int multi = this.dec_gps_time.decodeSymbol(context.m_gpstime_0diff);
       if (multi == 0) {
@@ -643,7 +601,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
 
     this.changed_gps_time = this.dec_gps_time.readBytes(in);
 
-    for (final LAScontextPOINT14 context : this.contexts) {
+    for (final LasZipContextPoint14 context : this.contexts) {
       context.unused = true;
     }
 
@@ -661,7 +619,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
 
   @Override
   public int write(final LasPoint point, final int contextIndex) {
-    LAScontextPOINT14 context = this.contexts[this.current_context];
+    LasZipContextPoint14 context = this.contexts[this.current_context];
     LasPoint lastPoint = context.lastPoint;
 
     final byte lastNumberOfReturns = lastPoint.getNumberOfReturns();
@@ -894,7 +852,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
   }
 
   private void writeGpsTime(final long gpsTime) {
-    final LAScontextPOINT14 context = this.contexts[this.current_context];
+    final LasZipContextPoint14 context = this.contexts[this.current_context];
     if (context.last_gpstime_diff[context.last] == 0) {
       final long curr_gpstime_diff_64 = gpsTime - context.last_gpstime[context.last];
       final int curr_gpstime_diff = (int)curr_gpstime_diff_64;
@@ -1031,7 +989,7 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
 
     /* mark the four scanner channel contexts as unused */
 
-    for (final LAScontextPOINT14 context : this.contexts) {
+    for (final LasZipContextPoint14 context : this.contexts) {
       context.unused = true;
     }
 

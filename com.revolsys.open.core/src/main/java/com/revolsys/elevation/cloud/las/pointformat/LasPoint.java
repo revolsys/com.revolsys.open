@@ -40,6 +40,10 @@ public interface LasPoint extends Point, MapSerializer {
 
   int getIntensity();
 
+  default int getNir() {
+    return 0;
+  }
+
   byte getNumberOfReturns();
 
   LasPointFormat getPointFormat();
@@ -125,6 +129,10 @@ public interface LasPoint extends Point, MapSerializer {
   LasPoint setIntensity(int intensity);
 
   LasPoint setKeyPoint(boolean keyPoint);
+
+  default LasPoint setNir(final int nir) {
+    return this;
+  }
 
   LasPoint setNumberOfReturns(byte numberOfReturns);
 

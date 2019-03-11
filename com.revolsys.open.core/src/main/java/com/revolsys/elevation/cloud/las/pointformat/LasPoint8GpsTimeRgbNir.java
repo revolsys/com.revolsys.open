@@ -31,6 +31,12 @@ public class LasPoint8GpsTimeRgbNir extends LasPoint7GpsTimeRgb implements LasPo
   }
 
   @Override
+  public LasPoint8GpsTimeRgbNir setNir(final int nir) {
+    this.nir = nir;
+    return this;
+  }
+
+  @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
     addToMap(map, "nir", this.nir);
@@ -38,7 +44,7 @@ public class LasPoint8GpsTimeRgbNir extends LasPoint7GpsTimeRgb implements LasPo
   }
 
   @Override
-  public void writeLasPoint(ChannelWriter out) {
+  public void writeLasPoint(final ChannelWriter out) {
     super.writeLasPoint(out);
     out.putUnsignedShort(this.nir);
   }
