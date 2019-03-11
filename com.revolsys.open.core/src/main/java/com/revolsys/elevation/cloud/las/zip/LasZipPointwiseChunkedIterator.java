@@ -9,7 +9,7 @@ import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 import com.revolsys.util.Exceptions;
 
-public class LasZipChunkedIterator extends LasPointCloudIterator {
+public class LasZipPointwiseChunkedIterator extends LasPointCloudIterator {
 
   private final ArithmeticDecoder decoder;
 
@@ -23,7 +23,7 @@ public class LasZipChunkedIterator extends LasPointCloudIterator {
 
   private int context = 0;
 
-  public LasZipChunkedIterator(final LasPointCloud pointCloud, final ChannelReader reader) {
+  public LasZipPointwiseChunkedIterator(final LasPointCloud pointCloud, final ChannelReader reader) {
     super(pointCloud, reader);
     this.decoder = new ArithmeticDecoder();
     final LasZipHeader lasZipHeader = LasZipHeader.getLasZipHeader(pointCloud);

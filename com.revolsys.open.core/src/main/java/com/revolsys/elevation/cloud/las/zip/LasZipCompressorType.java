@@ -9,7 +9,7 @@ import com.revolsys.io.channels.ChannelReader;
 
 public enum LasZipCompressorType {
   POINTWISE(1, LasZipPointwiseIterator::new), //
-  POINTWISE_CHUNKED(2, LasZipChunkedIterator::new), //
+  POINTWISE_CHUNKED(2, LasZipPointwiseChunkedIterator::new), //
   LAYERED_CHUNKED(3, LasZipLayeredChunkedIterator::new) //
   ;
 

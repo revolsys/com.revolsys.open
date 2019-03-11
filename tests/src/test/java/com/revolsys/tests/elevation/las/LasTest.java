@@ -49,17 +49,17 @@ public class LasTest {
     "classification", "synthetic", "keyPoint", "withheld", "scanAngleDegrees", "userData",
     "pointSourceID", "gpsTime", "red", "green", "blue", "scannerChannel");
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactoryWithOffsets.newWithOffsets(
-    EpsgId.nad83Utm(10), //
-    OFFSET_X, SCALE, //
-    OFFSET_Y, SCALE, //
-    0, SCALE //
-  );
+  private static final GeometryFactory GEOMETRY_FACTORY_OFFSET = GeometryFactoryWithOffsets
+    .newWithOffsets(EpsgId.nad83Utm(10), //
+      OFFSET_X, 100.0, //
+      OFFSET_Y, 100.0, //
+      0, 1000.0 //
+    );
 
   private static final GeometryFactory GEOMETRY_FACTORY_0 = GeometryFactory
     .fixed3d(EpsgId.nad83Utm(10), SCALE, SCALE, SCALE);
 
-  private static final Path DIR = Paths.get("target/test/elevation/las");
+  private static final Path DIR = Paths.get("target/test/elevation");
 
   private static final List<LasPointFormat> LAZ_TEST_FORMATS = Arrays.asList(//
     LasPointFormat.Core, //
@@ -68,6 +68,8 @@ public class LasTest {
     LasPointFormat.GpsTimeRgb //
     , LasPointFormat.ExtendedGpsTime //
   );
+
+  private static final List<String> FILE_EXTENSIONS = Arrays.asList("las", "laz");
 
   public static void addClassificationAndFlags(final LasPointCloud cloud) {
     for (byte classification = 0; classification <= 31; classification++) {
@@ -224,7 +226,6 @@ public class LasTest {
 
   @BeforeClass
   public static void init() {
-    com.revolsys.io.file.Paths.deleteDirectories(DIR);
     com.revolsys.io.file.Paths.createDirectories(DIR);
   }
 
@@ -326,16 +327,21 @@ public class LasTest {
   }
 
   public void asssertWriteRead(final String prefix, final LasPointFormat pointFormat,
-    final Consumer<LasPointCloud> cloudAction, final String fileExtension) {
+    final GeometryFactory geometryFactory, final Consumer<LasPointCloud> cloudAction,
+    final String fileExtension) {
     final Map<String, MapEx> writeVariations = getWriteVariations(pointFormat, fileExtension);
     try (
-      LasPointCloud cloud = new LasPointCloud(pointFormat, GEOMETRY_FACTORY_0)) {
+      LasPointCloud cloud = new LasPointCloud(pointFormat, geometryFactory)) {
       cloudAction.accept(cloud);
       for (final Entry<String, MapEx> entry : writeVariations.entrySet()) {
         final String suffix = entry.getKey();
         final MapEx writeProperties = entry.getValue();
         final String label = prefix + "_" + pointFormat.name() + "_" + suffix;
-        final Path file = DIR.resolve(label + "." + fileExtension);
+        final Path file = DIR//
+          .resolve(fileExtension) //
+          .resolve(prefix)//
+          .resolve(label + "." + fileExtension);
+        com.revolsys.io.file.Paths.createParentDirectories(file);
         System.out.println(label + "\t" + cloud.getPointCount());
         cloud.writePointCloud(file, writeProperties);
         System.out.println();
@@ -346,7 +352,7 @@ public class LasTest {
   }
 
   public void asssertWriteRead(final String prefix, final LasPointFormat recordFormat,
-    final String fileExtension) {
+    final GeometryFactory geometryFactory, final String fileExtension) {
     final Consumer<LasPointCloud> cloudAction = cloud -> {
       if (recordFormat.name().contains("GpsTime")) {
         addGpsTimePoints(cloud);
@@ -368,7 +374,7 @@ public class LasTest {
       addUserDataPoints(cloud);
       addPointSourceIDPoints(cloud);
     };
-    asssertWriteRead(prefix, recordFormat, cloudAction, fileExtension);
+    asssertWriteRead(prefix, recordFormat, geometryFactory, cloudAction, fileExtension);
   }
 
   public Map<String, MapEx> getWriteVariations(final LasPointFormat pointFormat,
@@ -378,17 +384,17 @@ public class LasTest {
       switch (pointFormat) {
         case Core:
         case Rgb:
-          writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion", 1));
-          writeVariations.put("v2", new LinkedHashMapEx("lasZipVersion", 2));
-        break;
         case GpsTime:
         case GpsTimeRgb:
           writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion", 1));
           writeVariations.put("v2", new LinkedHashMapEx("lasZipVersion", 2));
         break;
         case GpsTimeWavePackets:
-          writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion", 1));
-        break;
+          // TODO writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion",
+          // 1));
+          // break;
+          throw new UnsupportedOperationException();
+
         case ExtendedGpsTime:
           writeVariations.put("v3", new LinkedHashMapEx("lasZipVersion", 3));
         break;
@@ -413,49 +419,57 @@ public class LasTest {
   }
 
   @Test
-  public void readWriteLas() {
+  public void manyLas() {
     for (final LasPointFormat recordFormat : LasPointFormat.values()) {
-      asssertWriteRead("readWriteLas", recordFormat, "las");
+      asssertWriteRead("many", recordFormat, GEOMETRY_FACTORY_0, "las");
     }
   }
 
   @Test
-  public void readWriteLaz1Point() {
-    final Consumer<LasPointCloud> cloudAction = cloud -> {
-      cloud.addPoint(OFFSET_X, OFFSET_Y, 0);
+  public void manyLaz() {
+    for (final LasPointFormat recordFormat : LAZ_TEST_FORMATS) {
+      asssertWriteRead("many", recordFormat, GEOMETRY_FACTORY_0, "laz");
+    }
+  }
+
+  private Consumer<LasPointCloud> newPointsAction(final int pointCount) {
+    return cloud -> {
+      if (pointCount > 0) {
+        cloud.addPoint(OFFSET_X + 0.01, OFFSET_Y + 0.01, 0.001);
+        if (pointCount > 1) {
+          cloud.addPoint(OFFSET_X - 999.99, OFFSET_Y + 999.99, 999.999);
+          if (pointCount > 2) {
+            if (pointCount > 3) {
+              final double range = 1900;
+              double x = OFFSET_X - 999.99;
+              double y = OFFSET_Y - 999.99;
+              double z = -999.999;
+              final double step = range / (pointCount - 3);
+              for (int i = 0; i < pointCount - 3; i++) {
+                cloud.addPoint(x, y, z);
+                x += step;
+                y += step;
+                z += step;
+              }
+            }
+            cloud.addPoint(OFFSET_X + 999.99, OFFSET_Y + 999.99, 999.999);
+          }
+
+        }
+      }
     };
-    for (final LasPointFormat recordFormat : LAZ_TEST_FORMATS) {
-      asssertWriteRead("readWriteLaz1Point", recordFormat, cloudAction, "laz");
-    }
   }
 
   @Test
-  public void readWriteLaz2Points() {
-    final Consumer<LasPointCloud> cloudAction = cloud -> {
-      cloud.addPoint(OFFSET_X, OFFSET_Y, 0);
-      cloud.addPoint(OFFSET_X + 999, OFFSET_Y + 998, 996);
-    };
-    for (final LasPointFormat recordFormat : LAZ_TEST_FORMATS) {
-      asssertWriteRead("readWriteLaz2Points", recordFormat, cloudAction, "laz");
-    }
-  }
-
-  @Test
-  public void readWriteLaz3Points() {
-    final Consumer<LasPointCloud> cloudAction = cloud -> {
-      cloud.addPoint(OFFSET_X, OFFSET_Y, 0);
-      cloud.addPoint(OFFSET_X + 999, OFFSET_Y + 998, 996);
-      cloud.addPoint(OFFSET_X - 999, OFFSET_Y - 998, -996);
-    };
-    for (final LasPointFormat recordFormat : LAZ_TEST_FORMATS) {
-      asssertWriteRead("readWriteLaz3Points", recordFormat, cloudAction, "laz");
-    }
-  }
-
-  @Test
-  public void readWriteLazManyPoints() {
-    for (final LasPointFormat recordFormat : LAZ_TEST_FORMATS) {
-      asssertWriteRead("readWriteLazManyPoints", recordFormat, "laz");
+  public void nPoints() {
+    for (final int pointCount : Arrays.asList(1, 2, 3, 100001)) {
+      final Consumer<LasPointCloud> cloudAction = newPointsAction(pointCount);
+      for (final String fileFormat : FILE_EXTENSIONS) {
+        for (final LasPointFormat recordFormat : LAZ_TEST_FORMATS) {
+          final String prefix = Integer.toString(pointCount);
+          asssertWriteRead(prefix, recordFormat, GEOMETRY_FACTORY_OFFSET, cloudAction, fileFormat);
+        }
+      }
     }
   }
 }

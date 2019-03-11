@@ -181,10 +181,6 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public LasPoint6GpsTime setGpsTime(final double gpsTime) {
-    if (gpsTime < 0) {
-      Debug.noOp();
-    }
-
     this.gpsTime = gpsTime;
     return this;
   }

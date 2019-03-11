@@ -7,7 +7,7 @@ import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.elevation.cloud.PointCloudWriteFactory;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
-import com.revolsys.elevation.cloud.las.zip.LasZipPointCloudWriter;
+import com.revolsys.elevation.cloud.las.zip.LasZipPointCloudWriterFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
@@ -40,19 +40,16 @@ public class LasPointCloudFactory extends AbstractIoFactory
     if (pointCloud instanceof LasPointCloud) {
       final LasPointCloud lasPointCloud = (LasPointCloud)pointCloud;
       final String fileNameExtension = resource.getFileNameExtension();
-      LasPointCloudWriter writer;
       if ("las".equals(fileNameExtension)) {
-        writer = new LasPointCloudWriter(lasPointCloud, resource, properties);
+        final LasPointCloudWriter writer = new LasPointCloudWriter(lasPointCloud, resource,
+          properties);
+        writer.open();
+        return writer;
       } else if ("laz".equals(fileNameExtension)) {
-        writer = new LasZipPointCloudWriter(lasPointCloud, resource, properties);
-      } else {
-        return null;
+        return new LasZipPointCloudWriterFactory(lasPointCloud, resource, properties).newWriter();
       }
-      writer.open();
-      return writer;
-    } else {
-      return null;
     }
+    return null;
   }
 
   @Override

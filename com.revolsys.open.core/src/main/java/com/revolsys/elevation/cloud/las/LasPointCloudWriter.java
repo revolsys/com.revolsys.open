@@ -62,7 +62,7 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     return this.version;
   }
 
-  protected void open() {
+  public void open() {
     this.out = this.resource.newChannelWriter(8192, ByteOrder.LITTLE_ENDIAN);
     writeHeader();
   }
@@ -106,8 +106,8 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     }
     this.out.putUnsignedShort(headerSize);
 
-    final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = getLasProperties(
-      this.header);
+    final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = this.header
+      .getLasProperties();
     final int numberOfVariableLengthRecords = lasProperties.size();
     int variableLengthRecordsSize = 0;
     for (final LasVariableLengthRecord record : lasProperties.values()) {
