@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
+import com.revolsys.elevation.cloud.las.zip.LasZipHeader;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.channels.ChannelWriter;
@@ -29,15 +30,19 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
 
   protected LasPointCloudHeader header;
 
+  private boolean lasZip = false;
+
   public LasPointCloudWriter(final LasPointCloud pointCloud, final Resource resource,
     final MapEx properties) {
     this(resource);
     setProperties(properties);
     setPointCloud(pointCloud);
+    this.lasZip = false;
   }
 
   public LasPointCloudWriter(final Resource resource) {
     this.resource = resource;
+    this.lasZip = true;
   }
 
   @Override
@@ -118,6 +123,9 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
 
     final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = this.header
       .getLasProperties();
+    if (!this.lasZip) {
+      lasProperties.remove(LasZipHeader.KAY_LAS_ZIP);
+    }
     final int numberOfVariableLengthRecords = lasProperties.size();
     int variableLengthRecordsSize = 0;
     for (final LasVariableLengthRecord record : lasProperties.values()) {

@@ -154,39 +154,44 @@ public class ArithmeticCodingInteger {
   }
 
   private int readCorrector(final ArithmeticModel mBits) {
+    final ArithmeticDecoder decoder = this.decoder;
+
+    final int k = decoder.decodeSymbol(mBits);
+    this.k = k;
+
     int c;
-
-    this.k = this.decoder.decodeSymbol(mBits);
-
-    if (this.k != 0) {
-      if (compareUnsigned(this.k, 32) < 0) {
-        if (compareUnsigned(this.k, this.bits_high) <= 0) {
-          c = this.decoder.decodeSymbol(this.mCorrector[this.k]);
+    if (k != 0) {
+      if (compareUnsigned(k, 32) < 0) {
+        if (compareUnsigned(k, this.bits_high) <= 0) {
+          c = decoder.decodeSymbol(this.mCorrector[k]);
         } else {
-          final int k1 = this.k - this.bits_high;
-          c = this.decoder.decodeSymbol(this.mCorrector[this.k]);
-          final int c1 = this.decoder.readBits(k1);
+          final int k1 = k - this.bits_high;
+          c = decoder.decodeSymbol(this.mCorrector[k]);
+          final int c1 = decoder.readBits(k1);
           c = c << k1 | c1;
         }
-        if (c >= 1 << this.k - 1) {
+        if (c >= 1 << k - 1) {
           c += 1;
         } else {
-          c -= (1 << this.k) - 1;
+          c -= (1 << k) - 1;
         }
       } else {
         c = this.corr_min;
       }
     } else {
-      c = this.decoder.decodeBit(this.mCorrector0);
+      c = decoder.decodeBit(this.mCorrector0);
     }
 
     return c;
   }
 
   void writeCorrector(int c, final ArithmeticModel mBits) {
+    final ArithmeticEncoder encoder = this.encoder;
+    final int bitsHigh = this.bits_high;
+
     // find the tighest interval [ - (2^k - 1) ... + (2^k) ] that contains c
 
-    this.k = 0;
+    int k = 0;
 
     // do this by checking the absolute value of c (adjusted for the case that c
     // is 2^k)
@@ -197,51 +202,52 @@ public class ArithmeticCodingInteger {
 
     while (c1 != 0) {
       c1 = c1 >>> 1;
-      this.k = this.k + 1;
+      k++;
     }
+    this.k = k;
 
     // the number k is between 0 and corr_bits and describes the interval the
     // corrector falls into
     // we can compress the exact location of c within this interval using k bits
 
-    this.encoder.encodeSymbol(mBits, this.k);
+    encoder.encodeSymbol(mBits, k);
 
-    if (this.k != 0) {// then c is either smaller than 0 or bigger than 1
-      if (this.k < 32) {
+    if (k != 0) {// then c is either smaller than 0 or bigger than 1
+      if (k < 32) {
         // translate the corrector c into the k-bit interval [ 0 ... 2^k - 1 ]
         if (c < 0) // then c is in the interval [ - (2^k - 1) ... - (2^(k-1))
                    // ]
         {
           // so we translate c into the interval [ 0 ... + 2^(k-1) - 1 ] by
           // adding (2^k - 1)
-          c += (1 << this.k) - 1;
+          c += (1 << k) - 1;
         } else // then c is in the interval [ 2^(k-1) + 1 ... 2^k ]
         {
           // so we translate c into the interval [ 2^(k-1) ... + 2^k - 1 ] by
           // subtracting 1
           c -= 1;
         }
-        if (this.k <= this.bits_high) // for small k we code the interval in
+        if (k <= bitsHigh) // for small k we code the interval in
         // one step
         {
           // compress c with the range coder
-          this.encoder.encodeSymbol(this.mCorrector[this.k], c);
+          encoder.encodeSymbol(this.mCorrector[k], c);
         } else // for larger k we need to code the interval in two steps
         {
           // figure out how many lower bits there are
-          final int k1 = this.k - this.bits_high;
+          final int k1 = k - bitsHigh;
           // c1 represents the lowest k-bits_high+1 bits
           c1 = c & (1 << k1) - 1;
           // c represents the highest bits_high bits
           c = c >> k1;
           // compress the higher bits using a context table
-          this.encoder.encodeSymbol(this.mCorrector[this.k], c);
+          encoder.encodeSymbol(this.mCorrector[k], c);
           // store the lower k1 bits raw
-          this.encoder.writeBits(k1, c1);
+          encoder.writeBits(k1, c1);
         }
       }
     } else {// then c is 0 or 1
-      this.encoder.encodeBit(this.mCorrector0, c);
+      encoder.encodeBit(this.mCorrector0, c);
     }
   }
 }

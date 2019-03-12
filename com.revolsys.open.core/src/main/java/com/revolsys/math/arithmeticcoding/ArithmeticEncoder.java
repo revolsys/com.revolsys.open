@@ -169,24 +169,30 @@ public class ArithmeticEncoder implements ArithmeticCodingCodec, BaseCloseable {
     arithmeticModel.init();
   }
 
-  private void manage_outbuffer() {
-    if (this.outByteIndex == END_BUFFER_INDEX) {
-      this.outByteIndex = 0;
-    }
-    this.writer.putBytes(this.outBuffer, this.outByteIndex, AC_BUFFER_SIZE);
-    this.endByteIndex = this.outByteIndex + AC_BUFFER_SIZE;
-  }
-
   private void renorm_enc_interval() {
-    do { // output and discard top byte
-      final int outValue = this.base >>> 24;
-      this.outBuffer[this.outByteIndex++] = (byte)outValue;
-      if (this.outByteIndex == this.endByteIndex) {
-        manage_outbuffer();
+    int base = this.base;
+    int length = this.length;
+    final byte[] outBuffer = this.outBuffer;
+    int outByteIndex = this.outByteIndex;
+    int endByteIndex = this.endByteIndex;
+    do {
+      // output and discard top byte
+      final int outValue = base >>> 24;
+      outBuffer[outByteIndex++] = (byte)outValue;
+      if (outByteIndex == endByteIndex) {
+        if (outByteIndex == END_BUFFER_INDEX) {
+          outByteIndex = 0;
+        }
+        this.writer.putBytes(outBuffer, outByteIndex, AC_BUFFER_SIZE);
+        endByteIndex = outByteIndex + AC_BUFFER_SIZE;
       }
-      this.base <<= 8;
-      this.length <<= 8;// length multiplied by 256
-    } while (Integer.compareUnsigned(this.length, AC__MinLength) < 0);
+      base <<= 8;
+      length <<= 8;// length multiplied by 256
+    } while (Integer.compareUnsigned(length, AC__MinLength) < 0);
+    this.length = length;
+    this.base = base;
+    this.outByteIndex = outByteIndex;
+    this.endByteIndex = endByteIndex;
   }
 
   private void setBase(final int base) {

@@ -16,6 +16,7 @@ import com.revolsys.collection.ValueHolder;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
+import com.revolsys.elevation.cloud.las.LasPointCloudWriterFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
@@ -31,6 +32,7 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.io.SwingIo;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -42,6 +44,21 @@ import com.revolsys.util.Property;
 public class PointCloudLayer extends AbstractLayer {
 
   public static final String J_TYPE = "pointCloudLayer";
+
+  private static void addMenuExportPointCloud(final EnableCheck enableCheck) {
+    TreeNodes.addMenuItem(PathTreeNode.MENU, "point_cloud", "Export Point Cloud...",
+      (final PathTreeNode node) -> {
+        final Path sourceFile = node.getPath();
+        SwingIo.exportToFile("Point Coud", "com.revolsys.swing.map.layer.pointcloud.export",
+          LasPointCloudWriterFactory.class, "las", sourceFile, targetFile -> {
+            if (!PointCloud.copyPointCloud(sourceFile, targetFile)) {
+              Logs.error(PointCloudLayer.class, "Cannot read Point cloud: " + sourceFile);
+            }
+          });
+      })
+      .setVisibleCheck(enableCheck) //
+      .setIconName("point_cloud", "save");
+  }
 
   private static void addMenuPointCloudProperties(final EnableCheck enableCheck) {
     TreeNodes.addMenuItem(PathTreeNode.MENU, "point_cloud", "Point Cloud Properties",
@@ -86,6 +103,7 @@ public class PointCloudLayer extends AbstractLayer {
 
     final EnableCheck enableCheck = RsSwingServiceInitializer
       .enableCheck(PointCloudReadFactory.class);
+    addMenuExportPointCloud(enableCheck);
     addMenuZoomToCloud(enableCheck);
     addMenuPointCloudProperties(enableCheck);
 

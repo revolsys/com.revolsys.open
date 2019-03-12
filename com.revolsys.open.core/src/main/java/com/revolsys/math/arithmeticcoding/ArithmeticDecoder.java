@@ -101,31 +101,33 @@ public class ArithmeticDecoder implements ArithmeticCodingCodec {
     int x;
     int y = this.length;
 
-    if (model.decoderTable != null) {
+    int[] decoderTable = model.decoderTable;
+    int[] distribution = model.distribution;
+    if (decoderTable != null) {
       final int dv = Integer.divideUnsigned(this.value, this.length >>>= DM__LengthShift);
       final int t = dv >>> model.tableShift;
 
-      sym = model.decoderTable[t];
-      n = model.decoderTable[t + 1] + 1;
+      sym = decoderTable[t];
+      n = decoderTable[t + 1] + 1;
 
       while (compareUnsigned(n, sym + 1) > 0) {
         final int k = sym + n >>> 1;
-        if (compareUnsigned(model.distribution[k], dv) > 0) {
+        if (compareUnsigned(distribution[k], dv) > 0) {
           n = k;
         } else {
           sym = k;
         }
       }
-      x = model.distribution[sym] * this.length;
+      x = distribution[sym] * this.length;
       if (sym != model.lastSymbol) {
-        y = model.distribution[sym + 1] * this.length;
+        y = distribution[sym + 1] * this.length;
       }
     } else {
       x = sym = 0;
       this.length >>>= DM__LengthShift;
       int k = (n = model.symbolCount) >>> 1;
       do {
-        final int z = this.length * model.distribution[k];
+        final int z = this.length * distribution[k];
         if (compareUnsigned(z, this.value) > 0) {
           n = k;
           y = z;

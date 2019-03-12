@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
@@ -22,6 +23,18 @@ import com.revolsys.spring.resource.Resource;
 
 public interface PointCloud<P extends Point>
   extends BaseCloseable, GeometryFactoryProxy, BoundingBoxProxy {
+
+  static boolean copyPointCloud(final Object source, final Object target) {
+    try (
+      LasPointCloud pointCloud = PointCloud.newPointCloud(source)) {
+      if (pointCloud == null) {
+        return false;
+      } else {
+        pointCloud.writePointCloud(target);
+        return true;
+      }
+    }
+  }
 
   static <P extends Point> void forEachPoint(final Object source,
     final Consumer<? super P> action) {

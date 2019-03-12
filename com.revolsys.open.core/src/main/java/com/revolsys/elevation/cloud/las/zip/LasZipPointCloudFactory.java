@@ -1,20 +1,20 @@
-package com.revolsys.elevation.cloud.las;
+package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
+import com.revolsys.elevation.cloud.las.LasPointCloud;
+import com.revolsys.elevation.cloud.las.LasPointCloudWriterFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class LasPointCloudFactory extends AbstractIoFactory
+public class LasZipPointCloudFactory extends AbstractIoFactory
   implements PointCloudReadFactory, LasPointCloudWriterFactory {
 
-  public LasPointCloudFactory() {
-    super("LASer Point Cloud");
-    addMediaTypeAndFileExtension("application/vnd.las", "las");
-    addFileExtension("las.zip");
-    addFileExtension("las.gz");
+  public LasZipPointCloudFactory() {
+    super("LASzip Point Cloud");
+    addMediaTypeAndFileExtension("application/vnd.laz", "laz");
   }
 
   @SuppressWarnings("unchecked")

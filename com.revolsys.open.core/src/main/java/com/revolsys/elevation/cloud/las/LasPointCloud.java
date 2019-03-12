@@ -56,29 +56,29 @@ public class LasPointCloud extends BaseObjectWithProperties
     return pointCloud.newWriter(target, properties);
   }
 
+  private boolean allLoaded = false;
+
+  private ByteBuffer byteBuffer;
+
+  private final long[] classificationCounts = new long[256];
+
+  private boolean classificationsLoaded;
+
+  private boolean exists;
+
+  private double fileGpsTime = 0;
+
   private GeometryFactory geometryFactory = GeometryFactory.fixed3d(1000.0, 1000.0, 1000.0);
 
   private LasPointCloudHeader header;
+
+  private Resource lasResource;
 
   private List<LasPoint> points = new ArrayList<>();
 
   private ChannelReader reader;
 
   private Resource resource;
-
-  private boolean exists;
-
-  private ByteBuffer byteBuffer;
-
-  private Resource lasResource;
-
-  private boolean allLoaded = false;
-
-  private final long[] classificationCounts = new long[256];
-
-  private boolean classificationsLoaded;
-
-  private double fileGpsTime = 0;
 
   public LasPointCloud(final LasPointFormat pointFormat, final GeometryFactory geometryFactory) {
     final LasPointCloudHeader header = new LasPointCloudHeader(this, pointFormat, geometryFactory);
@@ -224,7 +224,7 @@ public class LasPointCloud extends BaseObjectWithProperties
   }
 
   public Iterable<LasPoint> iterable() {
-    if (this.allLoaded) {
+    if (this.allLoaded || !this.points.isEmpty()) {
       return this.points;
     } else {
       ChannelReader reader = this.reader;
@@ -300,7 +300,12 @@ public class LasPointCloud extends BaseObjectWithProperties
   }
 
   private ChannelReader open() {
-    final ChannelReader reader = this.lasResource.newChannelReader(this.byteBuffer);
+    final ChannelReader reader;
+    if (this.lasResource == null) {
+      reader = null;
+    } else {
+      reader = this.lasResource.newChannelReader(this.byteBuffer);
+    }
     if (reader == null) {
       this.exists = false;
     } else {

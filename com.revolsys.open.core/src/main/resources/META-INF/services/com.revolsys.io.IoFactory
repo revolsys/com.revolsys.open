@@ -21,6 +21,7 @@ com.revolsys.record.io.format.xbase.XBase
 com.revolsys.record.io.format.xlsx.Xlsx
 com.revolsys.record.io.format.xml.Xml
 com.revolsys.elevation.cloud.las.LasPointCloudFactory
+com.revolsys.elevation.cloud.las.zip.LasZipPointCloudFactory
 com.revolsys.geometry.cs.geoid.byn.NrCanByn
 com.revolsys.geometry.cs.geoid.usngsbin.UsNgsBin
 com.revolsys.geometry.cs.geoid.ngabgh.NgaBinary

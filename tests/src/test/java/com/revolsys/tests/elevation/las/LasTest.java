@@ -17,7 +17,9 @@ import java.util.function.Consumer;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -35,6 +37,7 @@ import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 import com.revolsys.util.ServiceInitializer;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class LasTest {
 
   private static final Random RANDOM = new Random(0);
@@ -624,13 +627,14 @@ public class LasTest {
     assertWriter("writer", writerAction);
   }
 
-  @Test
-  public void testZ() {
-    final String fileFormat = "laz";
-    final LasPointFormat recordFormat = LasPointFormat.ExtendedGpsTime;
-    final int pointCount = 2;
-    final Consumer<LasPointCloud> cloudAction = newPointsAction(pointCount);
-    final String prefix = Integer.toString(pointCount);
-    asssertWriteRead(prefix, recordFormat, GEOMETRY_FACTORY_OFFSET, cloudAction, fileFormat);
-  }
+  // @Test
+  // public void testZ() {
+  // final String fileFormat = "laz";
+  // final LasPointFormat recordFormat = LasPointFormat.ExtendedGpsTime;
+  // final int pointCount = 2;
+  // final Consumer<LasPointCloud> cloudAction = newPointsAction(pointCount);
+  // final String prefix = Integer.toString(pointCount);
+  // asssertWriteRead(prefix, recordFormat, GEOMETRY_FACTORY_OFFSET,
+  // cloudAction, fileFormat);
+  // }
 }
