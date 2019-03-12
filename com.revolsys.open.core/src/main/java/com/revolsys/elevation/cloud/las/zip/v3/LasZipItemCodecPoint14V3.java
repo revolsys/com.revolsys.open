@@ -408,25 +408,24 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
     point.setYInt(lastPoint.getYInt() + diffY);
     context.last_Y_diff_median5[m << 1 | gpsTimeChangeBit].add(diffY);
 
+    int z = lastPoint.getZInt();
     if (this.changed_Z) {
       k_bits = (context.ic_dX.getK() + context.ic_dY.getK()) / 2;
-      final int z = context.ic_Z.decompress(context.last_Z[l],
+      z = context.ic_Z.decompress(context.last_Z[l],
         (numberOfReturns == 1 ? 1 : 0) + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
-      point.setZInt(z);
       context.last_Z[l] = z;
     }
+    point.setZInt(z);
 
+    short classification = lastPoint.getClassification();
     if (this.changed_classification) {
       final int last_classification = lastPoint.getClassification();
       final int ccc = ((last_classification & 0x1F) << 1) + (cpr == 3 ? 1 : 0);
-      final short classification = (short)this.dec_classification
-        .decodeSymbol(context.m_classification, ccc, 256);
-      point.setClassification(classification);
+      classification = (short)this.dec_classification.decodeSymbol(context.m_classification, ccc,
+        256);
 
-      if (classification < 32) {
-        context.legacy_classification = classification;
-      }
     }
+    point.setClassification(classification);
 
     if (this.changed_flags) {
       final int last_flags = lastPoint.isEdgeOfFlightLine() ? 1 << 5
@@ -435,54 +434,47 @@ public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
       point.setEdgeOfFlightLine((flags & 1 << 5) != 0);
       point.setScanDirectionFlag((flags & 0b10000) != 0);
       point.setClassificationFlags((byte)(flags & 0x0F));
-
-      context.legacy_flags = flags & 0x07;
     }
 
+    int intensity = lastPoint.getIntensity();
     if (this.changed_intensity) {
-      final int intensity = context.ic_intensity
+      intensity = context.ic_intensity
         .decompress(context.last_intensity[cpr << 1 | gpsTimeChangeBit], cpr);
       context.last_intensity[cpr << 1 | gpsTimeChangeBit] = intensity;
-      point.setIntensity(intensity);
     }
+    point.setIntensity(intensity);
 
+    short scanAngle = lastPoint.getScanAngle();
     if (this.changed_scan_angle) {
       if ((changedValues & FLAG_SCAN_ANGLE) != 0) {
-        final short lastScanAngle = lastPoint.getScanAngle();
-        final short scan_angle = (short)context.ic_scan_angle.decompress(lastScanAngle,
-          gpsTimeChangeBit);
-        point.setScanAngle(scan_angle);
-        context.legacy_scan_angle_rank = I8_CLAMP(I16_QUANTIZE(0.006f * scan_angle));
+        scanAngle = (short)context.ic_scan_angle.decompress(scanAngle, gpsTimeChangeBit);
       }
     }
+    point.setScanAngle(scanAngle);
 
+    short userData = lastPoint.getUserData();
     if (this.changed_user_data) {
       final int lastUserDataDiv4 = lastPoint.getUserData() / 4;
-      final short userData = (short)this.dec_user_data.decodeSymbol(context.m_user_data,
-        lastUserDataDiv4, 256);
-      point.setUserData(userData);
+      userData = (short)this.dec_user_data.decodeSymbol(context.m_user_data, lastUserDataDiv4, 256);
     }
+    point.setUserData(userData);
 
+    int pointSourceId = lastPoint.getPointSourceID();
     if (this.changed_point_source) {
-      int pointSourceId;
       if ((changedValues & FLAG_POINT_SOURCE_ID) != 0) {
         pointSourceId = context.ic_point_source_ID.decompress(lastPoint.getPointSourceID());
-      } else {
-        pointSourceId = lastPoint.getPointSourceID();
       }
-      point.setPointSourceID(pointSourceId);
     }
+    point.setPointSourceID(pointSourceId);
 
+    long gpsTime = lastPoint.getGpsTimeLong();
     if (this.changed_gps_time) {
-      long gpsTime;
       if (gps_time_change) {
         readGpsTime();
         gpsTime = context.last_gpstime[context.last];
-      } else {
-        gpsTime = lastPoint.getGpsTimeLong();
       }
-      point.setGpsTimeLong(gpsTime);
     }
+    point.setGpsTimeLong(gpsTime);
 
     context.lastPoint = point;
     context.gps_time_change = gps_time_change;

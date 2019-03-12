@@ -4,7 +4,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
-import com.revolsys.util.Debug;
 
 public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   private static final long serialVersionUID = 1L;
@@ -26,9 +25,6 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   public LasPoint6GpsTime(final LasPointCloud pointCloud) {
     super(pointCloud);
     this.gpsTime = pointCloud.getFileGpsTime();
-    if (this.gpsTime < 0) {
-      Debug.noOp();
-    }
   }
 
   @Override
@@ -240,7 +236,8 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public LasPoint6GpsTime setScanAngleRank(final byte scanAngleRank) {
-    throw new UnsupportedOperationException();
+    this.scanAngle = (short)(scanAngleRank / 0.006);
+    return this;
   }
 
   @Override

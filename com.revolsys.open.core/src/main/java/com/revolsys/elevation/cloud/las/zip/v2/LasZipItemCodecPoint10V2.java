@@ -112,7 +112,7 @@ public class LasZipItemCodecPoint10V2 implements LasZipItemCodec {
 
   private int lastZ;
 
-  public LasZipItemCodecPoint10V2(final ArithmeticCodingCodec codec) {
+  public LasZipItemCodecPoint10V2(final ArithmeticCodingCodec codec, final int size) {
     if (codec instanceof ArithmeticDecoder) {
       this.decoder = (ArithmeticDecoder)codec;
     } else if (codec instanceof ArithmeticEncoder) {

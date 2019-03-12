@@ -13,9 +13,9 @@ package com.revolsys.elevation.cloud.las.zip.v1;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
-import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
 public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
@@ -40,7 +40,7 @@ public class LasZipItemCodecRgb12V1 implements LasZipItemCodec {
 
   private int lastBlueUpper;
 
-  public LasZipItemCodecRgb12V1(final ArithmeticCodingCodec codec) {
+  public LasZipItemCodecRgb12V1(final ArithmeticCodingCodec codec, final int size) {
     if (codec instanceof ArithmeticDecoder) {
       this.decoder = (ArithmeticDecoder)codec;
     } else if (codec instanceof ArithmeticEncoder) {

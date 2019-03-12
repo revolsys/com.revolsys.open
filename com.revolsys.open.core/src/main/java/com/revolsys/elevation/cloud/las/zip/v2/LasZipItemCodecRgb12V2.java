@@ -25,7 +25,7 @@ public class LasZipItemCodecRgb12V2 implements LasZipItemCodec {
 
   private final LasZipContextRgb context = new LasZipContextRgb();
 
-  public LasZipItemCodecRgb12V2(final ArithmeticCodingCodec codec) {
+  public LasZipItemCodecRgb12V2(final ArithmeticCodingCodec codec, final int size) {
     if (codec instanceof ArithmeticDecoder) {
       this.decoder = (ArithmeticDecoder)codec;
     } else if (codec instanceof ArithmeticEncoder) {

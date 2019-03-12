@@ -316,7 +316,8 @@ public class LasZipHeader implements MapSerializer {
     for (int i = 0; i < itemCount; i++) {
       final LasZipItemType type = this.types[i];
       final int version = this.versions[i];
-      itemCodecs[i] = type.newCodec(version, codec);
+      final int size = this.sizes[i];
+      itemCodecs[i] = type.newCodec(codec, version, size);
     }
     return itemCodecs;
   }

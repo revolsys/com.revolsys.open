@@ -70,12 +70,6 @@ public class LasZipContextPoint14 {
 
   public ArithmeticCodingInteger ic_gpstime;
 
-  public short legacy_classification;
-
-  public int legacy_flags;
-
-  public Object legacy_scan_angle_rank;
-
   public int classification_flags;
 
 }

@@ -38,7 +38,7 @@ public class LasZipItemCodecGpsTime11V1 implements LasZipItemCodec {
 
   private int multi_extreme_counter;
 
-  public LasZipItemCodecGpsTime11V1(final ArithmeticCodingCodec codec) {
+  public LasZipItemCodecGpsTime11V1(final ArithmeticCodingCodec codec, final int size) {
     if (codec instanceof ArithmeticDecoder) {
       this.decoder = (ArithmeticDecoder)codec;
     } else if (codec instanceof ArithmeticEncoder) {
@@ -49,11 +49,6 @@ public class LasZipItemCodecGpsTime11V1 implements LasZipItemCodec {
     this.m_gpstime_multi = codec.createSymbolModel(LASZIP_GPSTIME_MULTIMAX);
     this.m_gpstime_0diff = codec.createSymbolModel(3);
     this.ic_gpstime = codec.newCodecInteger(32, 6);
-  }
-
-  public LasZipItemCodecGpsTime11V1(final ArithmeticDecoder decoder) {
-    this((ArithmeticCodingCodec)decoder);
-    this.decoder = decoder;
   }
 
   @Override

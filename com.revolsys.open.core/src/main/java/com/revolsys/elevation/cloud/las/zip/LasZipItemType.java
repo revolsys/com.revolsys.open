@@ -3,7 +3,7 @@ package com.revolsys.elevation.cloud.las.zip;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.elevation.cloud.las.zip.v1.LasZipItemCodecGpsTime11V1;
@@ -12,6 +12,7 @@ import com.revolsys.elevation.cloud.las.zip.v1.LasZipItemCodecRgb12V1;
 import com.revolsys.elevation.cloud.las.zip.v2.LasZipItemCodecGpsTime11V2;
 import com.revolsys.elevation.cloud.las.zip.v2.LasZipItemCodecPoint10V2;
 import com.revolsys.elevation.cloud.las.zip.v2.LasZipItemCodecRgb12V2;
+import com.revolsys.elevation.cloud.las.zip.v3.LasZipItemCodecByte14V3;
 import com.revolsys.elevation.cloud.las.zip.v3.LasZipItemCodecPoint14V3;
 import com.revolsys.elevation.cloud.las.zip.v3.LasZipItemCodecRgb14V3;
 import com.revolsys.elevation.cloud.las.zip.v3.LasZipItemCodecRgbNir14V3;
@@ -52,9 +53,10 @@ public enum LasZipItemType {
     RGB12.addCodec(2, LasZipItemCodecRgb12V2::new);
 
     for (final int version : Arrays.asList(3, 4)) {
-      POINT14.addCodec(version, codec -> new LasZipItemCodecPoint14V3(codec, version));
-      RGB14.addCodec(version, codec -> new LasZipItemCodecRgb14V3(codec, version));
-      RGBNIR14.addCodec(version, codec -> new LasZipItemCodecRgbNir14V3(codec, version));
+      POINT14.addCodec(version, (codec, size) -> new LasZipItemCodecPoint14V3(codec, version));
+      RGB14.addCodec(version, (codec, size) -> new LasZipItemCodecRgb14V3(codec, version));
+      RGBNIR14.addCodec(version, (codec, size) -> new LasZipItemCodecRgbNir14V3(codec, version));
+      BYTE14.addCodec(version, (codec, size) -> new LasZipItemCodecByte14V3(codec, version, size));
     }
   }
 
@@ -66,7 +68,7 @@ public enum LasZipItemType {
 
   private int size;
 
-  private final IntHashMap<Function<ArithmeticCodingCodec, LasZipItemCodec>> codecByVersion = new IntHashMap<>();
+  private final IntHashMap<BiFunction<ArithmeticCodingCodec, Integer, LasZipItemCodec>> codecByVersion = new IntHashMap<>();
 
   private LasZipItemType(final int id, final int size) {
     this.id = id;
@@ -74,7 +76,7 @@ public enum LasZipItemType {
   }
 
   private void addCodec(final int version,
-    final Function<ArithmeticCodingCodec, LasZipItemCodec> codecConstructor) {
+    final BiFunction<ArithmeticCodingCodec, Integer, LasZipItemCodec> codecConstructor) {
     this.codecByVersion.put(version, codecConstructor);
   }
 
@@ -86,14 +88,15 @@ public enum LasZipItemType {
     return this.size;
   }
 
-  public LasZipItemCodec newCodec(final int version, final ArithmeticCodingCodec codec) {
-    final Function<ArithmeticCodingCodec, LasZipItemCodec> codecConstructor = this.codecByVersion
+  public LasZipItemCodec newCodec(final ArithmeticCodingCodec codec, final int version,
+    final int size) {
+    final BiFunction<ArithmeticCodingCodec, Integer, LasZipItemCodec> codecConstructor = this.codecByVersion
       .get(version);
     if (codecConstructor == null) {
       throw new IllegalArgumentException(
         "LasZip item type " + name() + " version " + version + " not currently supported");
     } else {
-      return codecConstructor.apply(codec);
+      return codecConstructor.apply(codec, size);
     }
   }
 }

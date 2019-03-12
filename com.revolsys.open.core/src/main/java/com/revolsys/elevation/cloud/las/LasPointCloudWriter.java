@@ -3,9 +3,11 @@ package com.revolsys.elevation.cloud.las;
 import java.nio.ByteOrder;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
+import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.channels.ChannelWriter;
@@ -58,8 +60,16 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     return header.getLasProperties();
   }
 
+  public LasPointFormat getPointFormat() {
+    return this.pointCloud.getPointFormat();
+  }
+
   public Version getVersion() {
     return this.version;
+  }
+
+  public LasPoint newLasPoint(final double x, final double y, final double z) {
+    return this.pointCloud.newLasPoint(x, y, z);
   }
 
   public void open() {
@@ -186,6 +196,14 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
       final byte[] bytes = record.getBytes();
       this.out.putBytes(bytes);
     }
+  }
+
+  public LasPoint writeNewLasPoint(final double x, final double y, final double z,
+    final Consumer<LasPoint> action) {
+    final LasPoint point = this.pointCloud.newLasPoint(x, y, z);
+    action.accept(point);
+    return point;
+
   }
 
   public void writePoint(final LasPoint point) {

@@ -20,6 +20,7 @@ import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.elevation.cloud.las.zip.LasZipCompressorType;
 import com.revolsys.elevation.cloud.las.zip.LasZipHeader;
+import com.revolsys.elevation.cloud.las.zip.LasZipPointCloudWriterFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.BoundingBox;
@@ -45,6 +46,14 @@ public class LasPointCloud extends BaseObjectWithProperties
       final LasPointCloud pointCloud = PointCloud.newPointCloud(source)) {
       pointCloud.forEachPoint(action);
     }
+  }
+
+  public static LasPointCloudWriter newWriter(final LasPointFormat pointFormat,
+    final GeometryFactory geometryFactory, final Object target, final MapEx properties) {
+    @SuppressWarnings("resource")
+    final LasPointCloud pointCloud = new LasPointCloud(pointFormat, geometryFactory);
+    pointCloud.setProperties(properties);
+    return pointCloud.newWriter(target, properties);
   }
 
   private GeometryFactory geometryFactory = GeometryFactory.fixed3d(1000.0, 1000.0, 1000.0);
@@ -102,7 +111,7 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   @SuppressWarnings("unchecked")
   public <P extends LasPoint> P addPoint(final double x, final double y, final double z) {
-    final LasPoint lasPoint = this.header.newLasPoint(this, x, y, z);
+    final LasPoint lasPoint = newLasPoint(x, y, z);
     this.points.add(lasPoint);
     this.header.addCounts(lasPoint);
     return (P)lasPoint;
@@ -163,6 +172,7 @@ public class LasPointCloud extends BaseObjectWithProperties
       calendar.set(Calendar.HOUR_OF_DAY, 0);
       calendar.set(Calendar.MINUTE, 0);
       calendar.set(Calendar.SECOND, 0);
+      calendar.set(Calendar.MILLISECOND, 0);
       final long startOfWeekTime = calendar.getTimeInMillis();
       final long gpsWeekTime = time - startOfWeekTime;
       return gpsWeekTime / 1000.0;
@@ -255,6 +265,10 @@ public class LasPointCloud extends BaseObjectWithProperties
     }
   }
 
+  public LasPoint newLasPoint(final double x, final double y, final double z) {
+    return this.header.newLasPoint(this, x, y, z);
+  }
+
   @Override
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
     final GeometryFactory geometryFactory = getGeometryFactory();
@@ -264,6 +278,25 @@ public class LasPointCloud extends BaseObjectWithProperties
     });
     final TriangulatedIrregularNetwork tin = tinBuilder.newTriangulatedIrregularNetwork();
     return tin;
+  }
+
+  public LasPointCloudWriter newWriter(final Object target, final MapEx properties) {
+    final Resource resource = Resource.getResource(target);
+    return newWriter(resource, properties);
+  }
+
+  public LasPointCloudWriter newWriter(final Resource resource, final MapEx properties) {
+    final String fileNameExtension = resource.getFileNameExtension();
+    if ("las".equals(fileNameExtension)) {
+      final LasPointCloudWriter writer = new LasPointCloudWriter(this, resource, properties);
+      writer.open();
+      return writer;
+    } else if ("laz".equals(fileNameExtension)) {
+      return new LasZipPointCloudWriterFactory(this, resource, properties).newWriter();
+    } else {
+      throw new IllegalArgumentException(
+        "Cannot write a LAS point cloud to file extension: " + resource);
+    }
   }
 
   private ChannelReader open() {

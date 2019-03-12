@@ -14,9 +14,9 @@ import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.LasZipItemCodec;
 import com.revolsys.elevation.cloud.las.zip.Median;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
-import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
+import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
 
 public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
@@ -66,7 +66,7 @@ public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
 
   private final ArithmeticModel[] m_user_data = new ArithmeticModel[256];
 
-  public LasZipItemCodecPoint10V1(final ArithmeticCodingCodec codec) {
+  public LasZipItemCodecPoint10V1(final ArithmeticCodingCodec codec, final int size) {
     if (codec instanceof ArithmeticDecoder) {
       this.decoder = (ArithmeticDecoder)codec;
     } else if (codec instanceof ArithmeticEncoder) {

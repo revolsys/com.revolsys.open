@@ -53,7 +53,7 @@ public class LasZipItemCodecGpsTime11V2 implements LasZipItemCodec {
 
   private final ArithmeticCodingInteger ic_gpstime;
 
-  public LasZipItemCodecGpsTime11V2(final ArithmeticCodingCodec codec) {
+  public LasZipItemCodecGpsTime11V2(final ArithmeticCodingCodec codec, final int size) {
     if (codec instanceof ArithmeticDecoder) {
       this.decoder = (ArithmeticDecoder)codec;
     } else if (codec instanceof ArithmeticEncoder) {

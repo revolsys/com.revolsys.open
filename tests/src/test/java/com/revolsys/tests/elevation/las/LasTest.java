@@ -2,6 +2,7 @@ package com.revolsys.tests.elevation.las;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -11,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
@@ -22,13 +24,16 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloudHeader;
+import com.revolsys.elevation.cloud.las.LasPointCloudWriter;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryWithOffsets;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
+import com.revolsys.util.ServiceInitializer;
 
 public class LasTest {
 
@@ -43,11 +48,6 @@ public class LasTest {
   private static final List<String> PROPERTY_NAMES_HEADER = Arrays.asList("boundingBox", "date",
     "dayOfYear", "fileSourceId", "globalEncoding", "pointCount", "pointFormat", "pointFormatId",
     "projectId", "recordLength", "systemIdentifier", "version", "year");
-
-  private static final List<String> PROPERTY_NAMES_POINT = Arrays.asList("pointFormatId", "x", "y",
-    "z", "intensity", "returnNumber", "numberOfReturns", "scanDirectionFlag", "edgeOfFlightLine",
-    "classification", "synthetic", "keyPoint", "withheld", "scanAngleDegrees", "userData",
-    "pointSourceID", "gpsTime", "red", "green", "blue", "scannerChannel");
 
   private static final GeometryFactory GEOMETRY_FACTORY_OFFSET = GeometryFactoryWithOffsets
     .newWithOffsets(EpsgId.nad83Utm(10), //
@@ -229,6 +229,8 @@ public class LasTest {
   @BeforeClass
   public static void init() {
     com.revolsys.io.file.Paths.createDirectories(DIR);
+    ServiceInitializer.initializeServices();
+    Debug.noOp();
   }
 
   private static double randomDouble() {
@@ -295,15 +297,8 @@ public class LasTest {
     final LasPointCloudHeader header2 = cloud2.getHeader();
     assertPointCloudHeaderEqual(header1, header2);
 
-    final AtomicInteger index = new AtomicInteger();
     final List<LasPoint> points1 = cloud1.getPoints();
-    final Iterator<LasPoint> iterator1 = points1.iterator();
-    cloud2.forEachPoint(point2 -> {
-      final LasPoint point1 = iterator1.next();
-      final int i = index.getAndIncrement();
-
-      assertPointEqual(label + "-" + i, point1, point2);
-    });
+    assertPointsEqual(label, points1, cloud2);
   }
 
   private void assertPointCloudHeaderEqual(final LasPointCloudHeader header1,
@@ -313,10 +308,50 @@ public class LasTest {
     }
   }
 
-  private void assertPointEqual(final String label, final LasPoint point1, final LasPoint point2) {
-    for (final String propertyName : PROPERTY_NAMES_POINT) {
-      assertPropertyEqual(label, point1, point2, propertyName);
-    }
+  private void assertPointEqual(final LasPoint point1, final LasPoint point2) {
+    Assert.assertEquals("pointFormat", point1.getPointFormat(), point2.getPointFormat());
+    Assert.assertEquals("xInt", point1.getXInt(), point2.getXInt());
+    Assert.assertEquals("yInt", point1.getYInt(), point2.getYInt());
+    Assert.assertEquals("zInt", point1.getZInt(), point2.getZInt());
+    Assert.assertEquals("intensity", point1.getIntensity(), point2.getIntensity());
+    Assert.assertEquals("returnNumber", point1.getReturnNumber(), point2.getReturnNumber());
+    Assert.assertEquals("numberOfReturns", point1.getNumberOfReturns(),
+      point2.getNumberOfReturns());
+    Assert.assertEquals("scanDirectionFlag", point1.isScanDirectionFlag(),
+      point2.isScanDirectionFlag());
+    Assert.assertEquals("edgeOfFlightLine", point1.isEdgeOfFlightLine(),
+      point2.isEdgeOfFlightLine());
+    Assert.assertEquals("classification", point1.getClassification(), point2.getClassification());
+    Assert.assertEquals("synthetic", point1.isSynthetic(), point2.isSynthetic());
+    Assert.assertEquals("keyPoint", point1.isKeyPoint(), point2.isKeyPoint());
+    Assert.assertEquals("withheld", point1.isWithheld(), point2.isWithheld());
+    Assert.assertEquals("scanAngleDegrees", point1.getScanAngleDegrees(),
+      point2.getScanAngleDegrees(), 0);
+    Assert.assertEquals("userData", point1.getUserData(), point2.getUserData());
+    Assert.assertEquals("pointSourceID", point1.getPointSourceID(), point2.getPointSourceID());
+    Assert.assertEquals("gpsTime", point1.getGpsTime(), point2.getGpsTime(), 0);
+    Assert.assertEquals("red", point1.getRed(), point2.getRed());
+    Assert.assertEquals("green", point1.getGreen(), point2.getGreen());
+    Assert.assertEquals("blue", point1.getBlue(), point2.getBlue());
+    Assert.assertEquals("scannerChannel", point1.getScannerChannel(), point2.getScannerChannel());
+
+  }
+
+  public void assertPointsEqual(final String label, final List<LasPoint> points1,
+    final LasPointCloud cloud2) {
+    final Iterator<LasPoint> iterator1 = points1.iterator();
+    final AtomicInteger index = new AtomicInteger();
+    cloud2.forEachPoint(point2 -> {
+      final LasPoint point1 = iterator1.next();
+      final int i = index.getAndIncrement();
+
+      try {
+        assertPointEqual(point1, point2);
+      } catch (final AssertionError e) {
+        Logs.error(this, label + "-" + i, e);
+        throw e;
+      }
+    });
   }
 
   private void assertPropertyEqual(final Object object1, final Object object2,
@@ -327,18 +362,46 @@ public class LasTest {
 
   }
 
-  private void assertPropertyEqual(final String label, final Object object1, final Object object2,
-    final String propertyName) {
-    final Object value1 = Property.getProperty(object1, propertyName);
-    final Object value2 = Property.getProperty(object2, propertyName);
-    Assert.assertEquals(label + " " + propertyName, value1, value2);
-
-  }
-
   private void assertRead(final String label, final Path file, final LasPointCloud cloud) {
     try (
       LasPointCloud cloud2 = PointCloud.newPointCloud(file)) {
       assertPointCloudEqual(label, cloud, cloud2);
+    }
+  }
+
+  private void assertRead(final String label, final Path file, final List<LasPoint> points) {
+    try (
+      LasPointCloud cloud2 = PointCloud.newPointCloud(file)) {
+      assertPointsEqual(label, points, cloud2);
+    }
+  }
+
+  public void assertWriter(final String prefix,
+    final BiFunction<LasPointCloudWriter, Integer, List<LasPoint>> writerAction) {
+    for (final int pointCount : Arrays.asList(1, 2, 3, 49000, 100001)) {
+      for (final String fileFormat : FILE_EXTENSIONS) {
+        for (final LasPointFormat recordFormat : LAZ_TEST_FORMATS) {
+          final String prefix2 = prefix + "-" + Integer.toString(pointCount);
+          final Map<String, MapEx> writeVariations = getWriteVariations(recordFormat, fileFormat);
+          for (final Entry<String, MapEx> entry : writeVariations.entrySet()) {
+            final String suffix = entry.getKey();
+            final MapEx writeProperties = entry.getValue();
+            final String label = prefix2 + "_" + recordFormat.name() + "_" + suffix;
+            final String filePath = fileFormat + "/" + prefix2 + "/" + label + "." + fileFormat;
+            final Path file = DIR.resolve(filePath);
+            com.revolsys.io.file.Paths.createParentDirectories(file);
+            System.out.println(filePath + "\t" + pointCount);
+            final List<LasPoint> points;
+            try (
+              LasPointCloudWriter writer = LasPointCloud.newWriter(recordFormat,
+                GEOMETRY_FACTORY_OFFSET, file, writeProperties)) {
+              points = writerAction.apply(writer, pointCount);
+            }
+            assertRead(label, file, points);
+            System.out.println();
+          }
+        }
+      }
     }
   }
 
@@ -427,20 +490,6 @@ public class LasTest {
     return writeVariations;
   }
 
-  @Test
-  public void manyLas() {
-    for (final LasPointFormat recordFormat : LasPointFormat.values()) {
-      asssertWriteRead("many", recordFormat, GEOMETRY_FACTORY_0, "las");
-    }
-  }
-
-  @Test
-  public void manyLaz() {
-    for (final LasPointFormat recordFormat : LAZ_TEST_FORMATS) {
-      asssertWriteRead("many", recordFormat, GEOMETRY_FACTORY_0, "laz");
-    }
-  }
-
   private Consumer<LasPointCloud> newPointsAction(final int pointCount) {
     return cloud -> {
       if (pointCount > 0) {
@@ -470,7 +519,21 @@ public class LasTest {
   }
 
   @Test
-  public void nPoints() {
+  public void testManyLas() {
+    for (final LasPointFormat recordFormat : LasPointFormat.values()) {
+      asssertWriteRead("many", recordFormat, GEOMETRY_FACTORY_0, "las");
+    }
+  }
+
+  @Test
+  public void testManyLaz() {
+    for (final LasPointFormat recordFormat : LAZ_TEST_FORMATS) {
+      asssertWriteRead("many", recordFormat, GEOMETRY_FACTORY_0, "laz");
+    }
+  }
+
+  @Test
+  public void testNPoints() {
     for (final int pointCount : Arrays.asList(1, 2, 3, 49000, 100001)) {
       final Consumer<LasPointCloud> cloudAction = newPointsAction(pointCount);
       for (final String fileFormat : FILE_EXTENSIONS) {
@@ -480,5 +543,94 @@ public class LasTest {
         }
       }
     }
+  }
+
+  @Test
+  public void testWriter() {
+    final BiFunction<LasPointCloudWriter, Integer, List<LasPoint>> writerAction = (writer,
+      pointCount) -> {
+      final List<LasPoint> points = new ArrayList<>();
+      for (int i = 0; i < pointCount; i++) {
+        final double size = 10000;
+        final double x = Math.round(randomDouble() * size * SCALE) / SCALE;
+        final double y = Math.round(randomDouble() * size * SCALE) / SCALE;
+        final double z = Math.round(randomDouble() * 3500 * SCALE) / SCALE;
+        points.add(writer.writeNewLasPoint(x, y, z, point -> {
+        }));
+      }
+      return points;
+    };
+    assertWriter("writer", writerAction);
+  }
+
+  @Test
+  public void testWriterSamePoint() {
+    final BiFunction<LasPointCloudWriter, Integer, List<LasPoint>> writerAction = (writer,
+      pointCount) -> {
+      final int maxUnsignedShort = 65535;
+
+      final LasPointFormat pointFormat = writer.getPointFormat();
+      final String formatName = pointFormat.name();
+
+      final double gpsTime;
+      if (formatName.contains("Gps")) {
+        gpsTime = 60 * 60 * 24 * 7 + 0.123456;
+      } else {
+        gpsTime = 0;
+      }
+      final byte scannerChannel;
+      if (pointFormat.getId() > 5) {
+        scannerChannel = 3;
+      } else {
+        scannerChannel = 0;
+      }
+      final boolean rgb = formatName.contains("Rgb");
+      final boolean nir = formatName.contains("Nir");
+      final List<LasPoint> points = new ArrayList<>();
+      for (int i = 0; i < pointCount; i++) {
+        final double x = OFFSET_X + 12345.67;
+        final double y = OFFSET_Y + 76543.21;
+        final double z = 3456.321;
+        points.add(writer.writeNewLasPoint(x, y, z, point -> {
+          point//
+            .setIntensity(maxUnsignedShort) //
+            .setReturnNumber((byte)5)//
+            .setNumberOfReturns((byte)5) //
+            .setScanDirectionFlag(true) //
+            .setEdgeOfFlightLine(true) //
+            .setClassification((short)1) //
+            .setScanAngleRank((byte)-90) //
+            .setUserData(Byte.MIN_VALUE) //
+            .setPointSourceID(maxUnsignedShort) //
+          ;
+          if (gpsTime != 0) {
+            point.setGpsTime(gpsTime);
+          }
+          if (scannerChannel != 0) {
+            point.setScannerChannel(scannerChannel);
+          }
+          if (rgb) {
+            point.setRed(maxUnsignedShort);
+            point.setGreen(maxUnsignedShort);
+            point.setBlue(maxUnsignedShort);
+          }
+          if (nir) {
+            point.setNir(maxUnsignedShort);
+          }
+        }));
+      }
+      return points;
+    };
+    assertWriter("writer", writerAction);
+  }
+
+  @Test
+  public void testZ() {
+    final String fileFormat = "laz";
+    final LasPointFormat recordFormat = LasPointFormat.ExtendedGpsTime;
+    final int pointCount = 2;
+    final Consumer<LasPointCloud> cloudAction = newPointsAction(pointCount);
+    final String prefix = Integer.toString(pointCount);
+    asssertWriteRead(prefix, recordFormat, GEOMETRY_FACTORY_OFFSET, cloudAction, fileFormat);
   }
 }
