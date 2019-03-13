@@ -15,6 +15,8 @@ public class LasZipPointCloudFactory extends AbstractIoFactory
   public LasZipPointCloudFactory() {
     super("LASzip Point Cloud");
     addMediaTypeAndFileExtension("application/vnd.laz", "laz");
+    addFileExtension("laz.gz");
+    addFileExtension("laz.zip");
   }
 
   @SuppressWarnings("unchecked")

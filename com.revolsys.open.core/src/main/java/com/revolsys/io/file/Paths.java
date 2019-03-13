@@ -459,4 +459,17 @@ public interface Paths {
     final Path parent = path.getParent();
     return parent.resolve(newFileName);
   }
+
+  static Path withExtension(final Path path, final String oldExtension, final String newExtension) {
+    final String fileName = getFileName(path);
+    if (fileName.endsWith(oldExtension)) {
+      final String newFileName = fileName.substring(0, fileName.length() - oldExtension.length())
+        + newExtension;
+      final Path parent = path.getParent();
+      return parent.resolve(newFileName);
+    } else {
+      return path;
+    }
+  }
+
 }

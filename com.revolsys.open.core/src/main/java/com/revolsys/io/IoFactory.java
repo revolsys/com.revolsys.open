@@ -161,6 +161,21 @@ public interface IoFactory extends Available {
     return fileName;
   }
 
+  static String fileNameExtension(final Class<? extends IoFactory> factoryClass,
+    final String fileName) {
+    String fullFileNameExtension = "";
+    for (final String fileNameExtension : FileUtil.getFileNameExtensions(fileName)) {
+      fullFileNameExtension = fileNameExtension + fullFileNameExtension;
+      final IoFactory factory = factoryByFileExtension(factoryClass, fullFileNameExtension);
+      if (factory != null) {
+        return fullFileNameExtension;
+      }
+      fullFileNameExtension = "." + fullFileNameExtension;
+    }
+
+    return null;
+  }
+
   static <C extends IoFactory> boolean hasFactory(final Class<C> factoryClass,
     final Object source) {
     final C factory = factory(factoryClass, source);

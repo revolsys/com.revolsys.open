@@ -135,7 +135,6 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
     setXYZ(xRecord, yRecord, zRecord);
     this.intensity = reader.getUnsignedShort();
     this.returnByte = reader.getByte();
-
     this.classificationFlags = reader.getByte();
     this.classification = reader.getUnsignedByte();
     this.userData = reader.getUnsignedByte();
@@ -193,7 +192,7 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public LasPoint6GpsTime setNumberOfReturns(final byte numberOfReturns) {
-    if (numberOfReturns >= 1 && numberOfReturns <= 15) {
+    if (numberOfReturns >= 0 && numberOfReturns <= 15) {
       this.returnByte &= 0b1111;
       this.returnByte |= numberOfReturns << 4;
     } else {
@@ -219,7 +218,7 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
 
   @Override
   public LasPoint6GpsTime setReturnNumber(final byte returnNumber) {
-    if (returnNumber >= 1 && returnNumber <= 15) {
+    if (returnNumber >= 0 && returnNumber <= 15) {
       this.returnByte &= 0b11110000;
       this.returnByte |= returnNumber;
     } else {

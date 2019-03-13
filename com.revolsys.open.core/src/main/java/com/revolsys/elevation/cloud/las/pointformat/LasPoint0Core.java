@@ -164,7 +164,7 @@ public class LasPoint0Core extends BaseLasPoint {
 
   @Override
   public LasPoint0Core setNumberOfReturns(final byte numberOfReturns) {
-    if (numberOfReturns >= 1 && numberOfReturns <= 15) {
+    if (numberOfReturns >= 0 && numberOfReturns <= 15) {
       this.returnByte &= 0b11000111;
       this.returnByte |= numberOfReturns << 3;
     } else {
@@ -182,7 +182,7 @@ public class LasPoint0Core extends BaseLasPoint {
 
   @Override
   public LasPoint0Core setReturnNumber(final byte returnNumber) {
-    if (returnNumber >= 1 && returnNumber <= 15) {
+    if (returnNumber >= 0 && returnNumber <= 15) {
       this.returnByte &= 0b11111000;
       this.returnByte |= returnNumber;
     } else {

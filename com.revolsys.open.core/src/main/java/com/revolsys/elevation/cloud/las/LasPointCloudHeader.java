@@ -205,8 +205,10 @@ public class LasPointCloudHeader
   public void addCounts(final LasPoint lasPoint) {
     this.pointCount++;
     final byte returnNumber = lasPoint.getReturnNumber();
-    final int returnNumberIndex = returnNumber - 1;
-    this.pointCountByReturn[returnNumberIndex]++;
+    if (returnNumber > 0) {
+      final int returnNumberIndex = returnNumber - 1;
+      this.pointCountByReturn[returnNumberIndex]++;
+    }
     final double x = lasPoint.getX();
     final double y = lasPoint.getY();
     final double z = lasPoint.getZ();

@@ -1,6 +1,7 @@
 package com.revolsys.io;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.function.Supplier;
@@ -57,7 +58,18 @@ public class CloseableResourceProxy<R extends BaseCloseable> implements BaseClos
         if (resource == null) {
           throw new IllegalStateException("Resource is closed");
         } else {
-          return method.invoke(resource, args);
+          try {
+            return method.invoke(resource, args);
+          } catch (final InvocationTargetException e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof Error) {
+              throw (Error)cause;
+            } else if (cause instanceof RuntimeException) {
+              throw (RuntimeException)cause;
+            } else {
+              throw e;
+            }
+          }
         }
       }
     }
