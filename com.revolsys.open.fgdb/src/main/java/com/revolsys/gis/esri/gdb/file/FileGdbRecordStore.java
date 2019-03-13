@@ -440,8 +440,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               this.tableReferenceCountsByCatalogPath.clear();
               this.tableWriteLockCountsByCatalogPath.clear();
             }
+            closeGeodatabase(geodatabase);
           }
-          closeGeodatabase(this.geodatabase);
         }
       } finally {
         super.close();
