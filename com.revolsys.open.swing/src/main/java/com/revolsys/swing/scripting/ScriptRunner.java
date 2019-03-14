@@ -22,9 +22,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.util.PreferencesUtil;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-
 public class ScriptRunner {
   private static final String[] NULL_MAIN_ARGS = new String[0];
 
@@ -49,10 +46,6 @@ public class ScriptRunner {
     final JFileChooser fileChooser = SwingUtil.newFileChooser("Select Script",
       "com.revolsys.swing.tools.script", "directory");
 
-    final FileNameExtensionFilter groovyFilter = new FileNameExtensionFilter("Groovy Script",
-      "groovy");
-    fileChooser.addChoosableFileFilter(groovyFilter);
-
     final FileNameExtensionFilter javaFilter = new FileNameExtensionFilter("Java", "java");
     fileChooser.addChoosableFileFilter(javaFilter);
 
@@ -67,26 +60,25 @@ public class ScriptRunner {
     }
   }
 
-  public static void runScriptProcess(final Window window, final File logDirectory,
-    final JavaProcess process) {
-    runScript(window, (scriptFile) -> {
-      process.setProgramClass(ScriptRunner.class);
-      process.addProgramArgument(0, scriptFile.getAbsolutePath());
-      if (logDirectory != null) {
-        final String logFileName = FileUtil.getBaseName(scriptFile) + ".log";
-        final File logFile = FileUtil.getFile(logDirectory, logFileName);
-        logDirectory.mkdirs();
-        process.setLogFile(logFile);
-      }
-      process.startThread();
-    });
+  public static void runScriptProcess(final Window window) {
+    final JavaProcess process = new JavaProcess();
+    runScriptProcess(window, null, process);
   }
 
-  public static void runScriptProcess(final Window window, final JavaProcess process) {
-    runScript(window, (scriptFile) -> {
-      process.setProgramClass(ScriptRunner.class);
-      process.addProgramArgument(0, scriptFile.getAbsolutePath());
-      process.startThread();
+  public static void runScriptProcess(final Window window, final File logDirectory,
+    final JavaProcess javaProcess) {
+    runScript(window, scriptFile -> {
+      javaProcess.setProgramClass(ScriptRunner.class);
+      javaProcess.addProgramArgument(0, scriptFile.getAbsolutePath());
+      final String baseName = FileUtil.getBaseName(scriptFile);
+      if (logDirectory != null) {
+        final String logFileName = baseName + ".log";
+        final File logFile = FileUtil.getFile(logDirectory, logFileName);
+        logDirectory.mkdirs();
+        javaProcess.setLogFile(logFile);
+      }
+      final ProcessBuilder processBuilder = javaProcess.newBuilder();
+      new ProcessWindow(baseName, processBuilder);
     });
   }
 
@@ -144,10 +136,6 @@ public class ScriptRunner {
             return;
 
           }
-        } else {
-          final Binding binding = new Binding();
-          final GroovyShell shell = new GroovyShell(binding);
-          shell.run(this.scriptFile, NULL_MAIN_ARGS);
         }
       } catch (final Throwable e) {
         showErrorDialog(getClass(), e);

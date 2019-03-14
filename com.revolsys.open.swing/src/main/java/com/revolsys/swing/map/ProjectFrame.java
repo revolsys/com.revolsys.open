@@ -52,7 +52,6 @@ import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.logging.Logs;
-import com.revolsys.process.JavaProcess;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
@@ -268,8 +267,7 @@ public class ProjectFrame extends BaseFrame {
 
   private void actionRunScript() {
     final File logDirectory = getLogDirectory();
-    final JavaProcess javaProcess = newJavaProcess();
-    ScriptRunner.runScriptProcess(this, logDirectory, javaProcess);
+    ScriptRunner.runScriptProcess(this);
   }
 
   public void actionSaveProjectAs() {
@@ -647,10 +645,6 @@ public class ProjectFrame extends BaseFrame {
 
   protected Project newEmptyProject() {
     return new Project();
-  }
-
-  public JavaProcess newJavaProcess() {
-    return new JavaProcess();
   }
 
   protected MapPanel newMapPanel() {

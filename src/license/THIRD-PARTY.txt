@@ -31,7 +31,6 @@ Lists of 64 third-party dependencies.
      (apache_2_0) Apache JempBox (org.apache.pdfbox:jempbox:1.8.6 - http://www.apache.org/pdfbox-parent/jempbox/)
      (apache_2_0) Apache PDFBox (org.apache.pdfbox:pdfbox:1.8.6 - http://www.apache.org/pdfbox-parent/pdfbox/)
      (apache_2_0) Apache XBean :: Spring (org.apache.xbean:xbean-spring:3.5 - http://geronimo.apache.org/xbean/xbean-spring)
-     (apache_2_0) Groovy (org.codehaus.groovy:groovy:2.2.1 - http://groovy.codehaus.org/)
      (bsd_2) Stax2 API (org.codehaus.woodstox:stax2-api:3.0.1 - http://woodstox.codehaus.org/StAX2)
      (apache_2_0) Woodstox (org.codehaus.woodstox:woodstox-core-asl:4.0.7 - http://woodstox.codehaus.org)
      (New BSD License) Hamcrest Core (org.hamcrest:hamcrest-core:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-core)
