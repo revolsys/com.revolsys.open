@@ -173,6 +173,7 @@ public class ProcessWindow extends JFrame {
         this.stopProcessButton.setEnabled(false);
         this.statusLabel.setForeground(Color.red);
         this.statusLabel.setText("Terminated");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       });
     });
   }
