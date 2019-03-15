@@ -359,8 +359,8 @@ public interface Dates {
         final Timestamp time = new Timestamp(timeInMillis);
         if (nanoSecond != 0) {
           BigDecimal number = new BigDecimal("0." + nanoSecond);
-          number = number.multiply(BigDecimal.valueOf(1000000000)).setScale(0,
-            RoundingMode.HALF_DOWN);
+          number = number.multiply(BigDecimal.valueOf(1000000000))
+            .setScale(0, RoundingMode.HALF_DOWN);
           nanoSecond = number.intValue();
           time.setNanos(nanoSecond);
         }
@@ -387,6 +387,13 @@ public interface Dates {
   static int getYear() {
     final Calendar calendar = Calendar.getInstance();
     return calendar.get(Calendar.YEAR);
+  }
+
+  static long infoEllapsedTime(final Object object, final String message, final long startTime) {
+    final long endTime = System.currentTimeMillis();
+    final String timeString = toEllapsedTime(startTime, endTime);
+    Logs.info(object, message + " " + timeString);
+    return endTime;
   }
 
   static long printEllapsedTime(final long startTime) {
