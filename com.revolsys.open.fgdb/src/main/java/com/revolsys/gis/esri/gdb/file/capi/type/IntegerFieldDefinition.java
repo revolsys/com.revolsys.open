@@ -20,7 +20,7 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    synchronized (getSync()) {
+    synchronized (row) {
       if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
@@ -36,14 +36,14 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final int intValue = number.intValue();
-      synchronized (getSync()) {
+      synchronized (row) {
         row.setInteger(this.fieldNumber, intValue);
       }
     } else {
       final String string = value.toString().trim();
       if (Property.hasValue(string)) {
         final int intValue = Integer.parseInt(string);
-        synchronized (getSync()) {
+        synchronized (row) {
           row.setInteger(this.fieldNumber, intValue);
         }
       } else {

@@ -20,7 +20,7 @@ public class GlobalIdFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    synchronized (getSync()) {
+    synchronized (row) {
       final Guid guid = row.getGlobalId();
       return guid.toString();
     }
@@ -33,7 +33,7 @@ public class GlobalIdFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public void setPostInsertValue(final Record record, final Row row) {
-    synchronized (getSync()) {
+    synchronized (row) {
       final Guid guid = row.getGlobalId();
       final String name = getName();
       final String string = guid.toString();

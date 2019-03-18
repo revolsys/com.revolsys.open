@@ -181,11 +181,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public RecordStoreConnected getConnected() {
-    return new RecordStoreConnected(this);
-  }
-
-  @Override
   public MapEx getConnectionProperties() {
     return Maps.newLinkedHashEx(this.connectionProperties);
   }
@@ -300,9 +295,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     return new RecordStoreSchema(this);
   }
 
-  protected void obtainConnected() {
-  }
-
   protected RecordDefinition refreshRecordDefinition(final RecordStoreSchema schema,
     final PathName typePath) {
     return null;
@@ -322,9 +314,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   protected Map<PathName, ? extends RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
     return Collections.emptyMap();
-  }
-
-  protected void releaseConnected() {
   }
 
   public void setCodeTableColumNames(final Map<String, List<String>> domainColumNames) {

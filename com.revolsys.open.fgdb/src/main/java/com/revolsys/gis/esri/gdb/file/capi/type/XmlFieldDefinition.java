@@ -15,7 +15,7 @@ public class XmlFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    synchronized (getSync()) {
+    synchronized (row) {
       if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
@@ -30,7 +30,7 @@ public class XmlFieldDefinition extends AbstractFileGdbFieldDefinition {
       setNull(row);
     } else {
       final String string = value.toString();
-      synchronized (getSync()) {
+      synchronized (row) {
         row.setXML(this.fieldNumber, string);
       }
     }

@@ -103,7 +103,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final byte[] bytes;
-    synchronized (getSync()) {
+    synchronized (row) {
       if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
@@ -160,7 +160,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
           SHP_UTIL.write(this.writeMethod, out, projectedGeometry);
         }
         final byte[] bytes = byteOut.toByteArray();
-        synchronized (getSync()) {
+        synchronized (row) {
           row.setGeometry(bytes);
         }
       }

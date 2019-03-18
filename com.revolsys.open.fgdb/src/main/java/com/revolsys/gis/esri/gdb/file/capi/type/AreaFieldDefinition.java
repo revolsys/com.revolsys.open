@@ -20,7 +20,7 @@ public class AreaFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    synchronized (getSync()) {
+    synchronized (row) {
       if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
