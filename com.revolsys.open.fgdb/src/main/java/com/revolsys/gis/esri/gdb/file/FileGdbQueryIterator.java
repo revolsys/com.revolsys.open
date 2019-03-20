@@ -46,13 +46,9 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
 
   private LabelCountMap labelCountMap;
 
-  private TableReference table;
+  private TableWrapper table;
 
   private boolean closed = false;
-
-  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String catalogPath) {
-    this(recordStore, catalogPath, "*", "", null, 0, -1);
-  }
 
   FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String catalogPath,
     final String whereClause) {
@@ -79,7 +75,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
       this.closed = true;
     } else {
       this.recordStore = recordStore;
-      this.table = recordStore.getTable(this.recordDefinition);
+      this.table = recordStore.getTableReference(this.recordDefinition).connect();
       if ("*".equals(fields)) {
         this.fields = Strings.toString(this.recordDefinition.getFieldNames());
       } else {
@@ -112,7 +108,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
                 this.rows.close();
               }
             } finally {
-              final TableReference table = this.table;
+              final TableWrapper table = this.table;
               if (table != null) {
                 this.table = null;
                 table.close();

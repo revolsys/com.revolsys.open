@@ -67,8 +67,7 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void init() {
-    super.init();
+  protected void initializeDo() {
     if (this.tinIn != null) {
       this.tinIn.readConnect();
     }

@@ -3,8 +3,6 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
-
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
@@ -14,11 +12,11 @@ import com.revolsys.record.schema.RecordStore;
 public class FileGdbWriter extends AbstractRecordWriter {
   private FileGdbRecordStore recordStore;
 
-  private Map<String, TableReference> tablesByCatalogPath = new HashMap<>();
+  private final Map<String, TableWrapper> tablesByCatalogPath = new HashMap<>();
 
   private RecordDefinition recordDefinition;
 
-  private TableReference table;
+  private TableWrapper table;
 
   private PathName pathName;
 
@@ -30,39 +28,42 @@ public class FileGdbWriter extends AbstractRecordWriter {
     this.recordStore = recordStore;
     if (recordDefinition != null) {
       this.pathName = recordDefinition.getPathName();
-      this.table = getTable(recordDefinition);
+      this.table = recordStore.getTableLocked(recordDefinition);
       this.recordDefinition = recordDefinition;
     }
   }
 
   @Override
-  @PreDestroy
-  public synchronized void close() {
+  public void close() {
     try {
-      if (this.tablesByCatalogPath != null) {
-        for (final TableReference table : this.tablesByCatalogPath.values()) {
+      synchronized (this.tablesByCatalogPath) {
+        for (final TableWrapper table : this.tablesByCatalogPath.values()) {
           table.close();
         }
       }
+      final TableWrapper table = this.table;
+      this.table = null;
+      if (table != null) {
+        table.close();
+      }
     } finally {
-      this.tablesByCatalogPath = null;
+      this.tablesByCatalogPath.clear();
       this.recordStore = null;
     }
   }
 
-  public synchronized void closeTable(final PathName typePath) {
-    if (this.tablesByCatalogPath != null) {
+  public void closeTable(final PathName typePath) {
+    synchronized (this.tablesByCatalogPath) {
       final String catalogPath = this.recordStore.getCatalogPath(typePath);
-      final TableReference table = this.tablesByCatalogPath.remove(catalogPath);
+      final TableWrapper table = this.tablesByCatalogPath.remove(catalogPath);
       if (table != null) {
-        // TODO release write lock
         table.close();
       }
     }
   }
 
   private void deleteRecord(final Record record) {
-    final TableReference table = getTable(record);
+    final TableWrapper table = getTable(record);
     if (table != null) {
       table.deleteRecord(record);
     }
@@ -82,12 +83,12 @@ public class FileGdbWriter extends AbstractRecordWriter {
     return this.recordStore;
   }
 
-  private TableReference getTable(final Record record) {
+  private TableWrapper getTable(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     return getTable(recordDefinition);
   }
 
-  private TableReference getTable(final RecordDefinition recordDefinition) {
+  private TableWrapper getTable(final RecordDefinition recordDefinition) {
     if (this.recordDefinition != null) {
       if (this.recordDefinition == recordDefinition) {
         return this.table;
@@ -97,9 +98,9 @@ public class FileGdbWriter extends AbstractRecordWriter {
     }
     final String catalogPath = this.recordStore.getCatalogPath(recordDefinition);
     synchronized (this.tablesByCatalogPath) {
-      TableReference table = this.tablesByCatalogPath.get(catalogPath);
+      TableWrapper table = this.tablesByCatalogPath.get(catalogPath);
       if (table == null) {
-        table = this.recordStore.getTable(recordDefinition);
+        table = this.recordStore.getTableLocked(recordDefinition);
         // TODO lock
         if (table != null) {
           this.tablesByCatalogPath.put(catalogPath, table);
@@ -110,7 +111,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
   }
 
   private void insertRecord(final Record record) {
-    final TableReference table = getTable(record);
+    final TableWrapper table = getTable(record);
     if (table != null) {
       table.insertRecord(record);
     }
@@ -121,14 +122,14 @@ public class FileGdbWriter extends AbstractRecordWriter {
   }
 
   private void updateRecord(final Record record) {
-    final TableReference table = getTable(record);
+    final TableWrapper table = getTable(record);
     if (table != null) {
       table.updateRecord(record);
     }
   }
 
   @Override
-  public synchronized void write(final Record record) {
+  public void write(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final RecordStore recordStore = recordDefinition.getRecordStore();
     if (recordStore == this.recordStore) {

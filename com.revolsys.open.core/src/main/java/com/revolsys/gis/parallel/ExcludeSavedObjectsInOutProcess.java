@@ -43,7 +43,7 @@ public class ExcludeSavedObjectsInOutProcess extends BaseInOutProcess<Record, Re
   }
 
   @Override
-  protected void init() {
+  protected void initializeDo() {
     this.statistics.connect();
   }
 

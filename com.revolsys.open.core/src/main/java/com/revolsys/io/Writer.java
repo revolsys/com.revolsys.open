@@ -1,16 +1,25 @@
 package com.revolsys.io;
 
-import java.io.Closeable;
-
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.ObjectWithProperties;
 
-public interface Writer<T> extends ObjectWithProperties, Closeable {
+public interface Writer<T> extends ObjectWithProperties, BaseCloseable {
+
   @Override
-  void close();
+  default void close() {
+    ObjectWithProperties.super.close();
+  }
 
-  void flush();
+  default void flush() {
+  }
 
-  void open();
+  @Override
+  default MapEx getProperties() {
+    return MapEx.EMPTY;
+  }
+
+  default void open() {
+  }
 
   void write(T object);
 }

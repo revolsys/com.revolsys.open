@@ -143,8 +143,8 @@ public final class FileUtil {
     } else if (separator == UNIX_FILE_SEPARATOR) {
       return path.replace(WINDOWS_FILE_SEPARATOR, separator);
     } else {
-      return path.replace(UNIX_FILE_SEPARATOR, separator).replace(WINDOWS_FILE_SEPARATOR,
-        separator);
+      return path.replace(UNIX_FILE_SEPARATOR, separator)
+        .replace(WINDOWS_FILE_SEPARATOR, separator);
     }
   }
 

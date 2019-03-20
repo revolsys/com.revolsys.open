@@ -185,7 +185,7 @@ public interface SwingUtil {
 
     final Rectangle bounds = getScreenBounds();
     final int width = Math.min(window.getWidth(), bounds.width - 20 - window.getX());
-    final int height = Math.min(window.getHeight(), bounds.height - 20 - window.getY());
+    final int height = Math.max(window.getHeight(), bounds.height - 20 - window.getY());
     window.setSize(width, height);
   }
 

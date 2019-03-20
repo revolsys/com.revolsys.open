@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.PostConstruct;
-
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.ArrayRecord;
@@ -82,9 +80,7 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  @PostConstruct
-  protected void init() {
-    super.init();
+  public void initializeDo() {
     if (this.recordDefinition == null) {
       this.recordDefinition = this.recordDefinitionFactory.getRecordDefinition(this.typeName);
     }

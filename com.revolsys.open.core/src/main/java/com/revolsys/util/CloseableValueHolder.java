@@ -4,55 +4,87 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.revolsys.io.BaseCloseable;
+public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
 
-public class CloseableValueHolder<R> extends ValueHolder<R> implements BaseCloseable {
+  public static <R2> CloseableValueHolder<R2> lambda(final Supplier<R2> valueFactory,
+    final Consumer<R2> valueCloseFunction) {
+    return new LambaCloseableValueHolder<>(valueFactory, valueCloseFunction);
+  }
+
+  private final ValueWrapper<R> closeable = new ValueWrapper<R>() {
+    @Override
+    public void close() {
+      disconnect();
+    }
+
+    @Override
+    public ValueWrapper<R> connect() {
+      return CloseableValueHolder.super.connect();
+    }
+
+    @Override
+    public R getValue() {
+      return CloseableValueHolder.this.getValue();
+    }
+  };
 
   private int referenceCount = 1;
 
-  private Supplier<R> resourceFactory;
-
-  private final Consumer<R> resourceCloseFunction;
-
-  public CloseableValueHolder(final Supplier<R> resourceFactory,
-    final Consumer<R> resourceCloseFunction) {
-    this.resourceFactory = resourceFactory;
-    this.resourceCloseFunction = resourceCloseFunction;
+  public CloseableValueHolder() {
   }
 
   @Override
   public synchronized void close() {
-    final R value = this.value;
-    this.resourceFactory = null;
-    this.value = null;
-    if (value != null) {
-      this.resourceCloseFunction.accept(value);
-    }
-  }
-
-  public synchronized BaseCloseable connect() {
-    if (this.resourceFactory == null) {
-      throw new IllegalStateException("Resource closed");
-    } else {
-      this.referenceCount++;
-      return () -> disconnect();
-    }
-  }
-
-  void disconnect() {
-    final R resourceToClose;
-    synchronized (this) {
-      this.referenceCount--;
-      if (this.referenceCount <= 0) {
-        resourceToClose = this.value;
-        this.value = null;
-        this.referenceCount = 0;
-      } else {
-        resourceToClose = null;
+    if (!isClosed()) {
+      this.referenceCount = Integer.MIN_VALUE;
+      try {
+        closeBefore();
+      } finally {
+        try {
+          final R value = this.value;
+          this.value = null;
+          if (value != null) {
+            valueClose(value);
+          }
+        } finally {
+          closeAfter();
+        }
       }
     }
-    if (resourceToClose != null) {
-      this.resourceCloseFunction.accept(resourceToClose);
+  }
+
+  protected void closeAfter() {
+  }
+
+  protected void closeBefore() {
+  }
+
+  @Override
+  public synchronized ValueWrapper<R> connect() {
+    if (isClosed()) {
+      throw new IllegalStateException("Resource closed");
+    } else {
+      getValue();
+      return valueConnectCloseable();
+    }
+  }
+
+  protected synchronized void disconnect() {
+    if (!isClosed()) {
+      final R value;
+      synchronized (this) {
+        this.referenceCount--;
+        if (this.referenceCount <= 0) {
+          value = this.value;
+          this.value = null;
+          this.referenceCount = 0;
+        } else {
+          value = null;
+        }
+      }
+      if (value != null) {
+        valueClose(value);
+      }
     }
   }
 
@@ -62,21 +94,31 @@ public class CloseableValueHolder<R> extends ValueHolder<R> implements BaseClose
   }
 
   @Override
-  protected synchronized R getValue() {
-    this.referenceCount++;
-    if (this.resourceFactory == null) {
-      throw new IllegalStateException("Resource closed");
+  public synchronized R getValue() {
+    if (isClosed()) {
+      throw new IllegalStateException("Value closed");
     } else {
+      this.referenceCount++;
       if (this.value == null) {
-        final R resource = this.resourceFactory.get();
-        if (resource == null) {
+        final R value = valueNew();
+        if (value == null) {
           return null;
         } else {
-          this.value = resource;
+          this.value = value;
         }
       }
       return this.value;
     }
+  }
+
+  public boolean isClosed() {
+    return this.referenceCount == Integer.MIN_VALUE;
+  }
+
+  protected abstract void valueClose(final R value);
+
+  protected ValueWrapper<R> valueConnectCloseable() {
+    return this.closeable;
   }
 
   @Override
@@ -105,5 +147,7 @@ public class CloseableValueHolder<R> extends ValueHolder<R> implements BaseClose
       disconnect();
     }
   }
+
+  protected abstract R valueNew();
 
 }

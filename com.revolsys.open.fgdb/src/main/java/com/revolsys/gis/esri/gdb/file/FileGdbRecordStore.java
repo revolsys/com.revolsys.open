@@ -196,10 +196,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private String fileName;
 
-  private CloseableValueHolder<Geodatabase> geodatabase = new CloseableValueHolder<>(
-    this::openGeodatabase, this::closeGeodatabase);
-
-  private int geodatabaseReferenceCount;
+  private CloseableValueHolder<Geodatabase> geodatabase = CloseableValueHolder
+    .lambda(this::openGeodatabase, this::closeGeodatabase);
 
   private final Map<PathName, AtomicLong> idGenerators = new HashMap<>();
 
@@ -399,21 +397,22 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     synchronized (this.apiSync) {
       try {
         if (!isClosed()) {
-          final Geodatabase geodatabase = this.geodatabase;
+          final Writer<Record> writer = getThreadProperty("writer");
+          if (writer != null) {
+            writer.close();
+            setThreadProperty("writer", null);
+          }
+          synchronized (this.tableByCatalogPath) {
+            for (final TableReference table : this.tableByCatalogPath.values()) {
+              table.close();
+            }
+            this.tableByCatalogPath.clear();
+          }
+
+          final CloseableValueHolder<Geodatabase> geodatabase = this.geodatabase;
           if (geodatabase != null) {
             this.geodatabase = null;
-            final Writer<Record> writer = getThreadProperty("writer");
-            if (writer != null) {
-              writer.close();
-              setThreadProperty("writer", null);
-            }
-            synchronized (this.tableByCatalogPath) {
-              for (final TableReference table : this.tableByCatalogPath.values()) {
-                table.close();
-              }
-              this.tableByCatalogPath.clear();
-            }
-            closeGeodatabase(geodatabase);
+            geodatabase.close();
           }
         }
       } finally {
@@ -453,12 +452,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public boolean deleteRecord(final Record record) {
-    final TableReference table = getTable(record);
-    if (table == null) {
-      return false;
-    } else {
-      return table.deleteRecord(record);
+    try (
+      TableWrapper tableWrapper = getTableWrapper(record)) {
+      if (tableWrapper != null) {
+        return tableWrapper.deleteRecord(record);
+      }
     }
+    return false;
   }
 
   protected String getCatalogPath(final PathName path) {
@@ -523,7 +523,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     if (query == null) {
       return 0;
     } else {
-      final Function<Geodatabase, V> action = geodatabase -> {
+      final Function<Geodatabase, Integer> action = geodatabase -> {
         String typePath = query.getTypeName();
         RecordDefinition recordDefinition = query.getRecordDefinition();
         if (recordDefinition == null) {
@@ -587,7 +587,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
         }
       };
-      return this.geodatabase.valueFunction(action, (V)0);
+      return this.geodatabase.valueFunction(action, (Integer)0);
     }
   }
 
@@ -723,61 +723,48 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return FileGdbRecordStoreFactory.DESCRIPTION;
   }
 
-  protected TableReference getTable(final RecordDefinition recordDefinition) {
+  public TableWrapper getTableLocked(final RecordDefinition recordDefinition) {
+    final TableReference table = getTableReference(recordDefinition);
+    if (table == null) {
+      return null;
+    } else {
+      return table.writeLock();
+    }
+  }
+
+  protected TableReference getTableReference(final RecordDefinition recordDefinition) {
     synchronized (this.tableByCatalogPath) {
       final RecordDefinition fgdbRecordDefinition = getRecordDefinition(recordDefinition);
       if (!isExists() || fgdbRecordDefinition == null) {
         return null;
       } else {
         final String catalogPath = getCatalogPath(fgdbRecordDefinition);
-        try {
-          TableReference tableReference = this.tableByCatalogPath.get(catalogPath);
-          if (tableReference == null) {
-            tableReference = threadGeodatabaseResult(geodatabase -> {
-              final Table table = geodatabase.openTable(catalogPath);
-              if (table == null) {
-                return null;
-              } else {
-                this.geodatabaseReferenceCount++;
-                return new TableReference(this, geodatabase, table, catalogPath);
-
-              }
-            });
-            if (tableReference != null) {
-              this.tableByCatalogPath.put(catalogPath, tableReference);
-            }
-          } else {
-            synchronized (tableReference) {
-              if (!tableReference.isOpen()) {
-                final TableReference ref = tableReference;
-                if (threadGeodatabaseResult(geodatabase -> {
-                  final Table table = geodatabase.openTable(catalogPath);
-                  if (table == null) {
-                    return Boolean.FALSE;
-                  } else {
-                    this.geodatabaseReferenceCount++;
-                    ref.setTable(geodatabase, table);
-                    return Boolean.TRUE;
-                  }
-                }) == Boolean.FALSE) {
-                  return null;
-                }
-              }
-            }
-
-          }
-          return tableReference;
-        } catch (final RuntimeException e) {
-          throw new RuntimeException("Unable to open table " + catalogPath, e);
+        TableReference tableReference = this.tableByCatalogPath.get(catalogPath);
+        if (tableReference == null) {
+          final PathName pathName = fgdbRecordDefinition.getPathName();
+          tableReference = new TableReference(this, this.geodatabase, pathName, catalogPath);
+          this.tableByCatalogPath.put(catalogPath, tableReference);
         }
+        return tableReference;
       }
     }
   }
 
-  protected TableReference getTable(final RecordDefinitionProxy recordDefinition) {
+  protected TableReference getTableReference(final RecordDefinitionProxy recordDefinition) {
     if (recordDefinition != null) {
       final RecordDefinition rd = recordDefinition.getRecordDefinition();
-      return getTable(rd);
+      return getTableReference(rd);
+    }
+    return null;
+  }
+
+  private TableWrapper getTableWrapper(final Record record) {
+    final TableReference tableReference = getTableReference(record);
+    if (tableReference != null) {
+      try (
+        TableWrapper tableWrapper = tableReference.connect()) {
+        return tableWrapper;
+      }
     }
     return null;
   }
@@ -863,9 +850,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public void insertRecord(final Record record) {
-    final TableReference table = getTable(record);
-    if (table != null) {
-      table.insertRecord(record);
+    try (
+      TableWrapper tableWrapper = getTableWrapper(record)) {
+      if (tableWrapper != null) {
+        tableWrapper.insertRecord(record);
+      }
     }
   }
 
@@ -887,10 +876,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   public boolean isExists() {
     return this.exists && !isClosed();
-  }
-
-  public boolean isOpen(final TableReference table) {
-    return table.isOpen();
   }
 
   private boolean isPathExists(final Geodatabase geodatabase, String path) {
@@ -1104,7 +1089,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public FileGdbWriter newRecordWriter(final RecordDefinition recordDefinition) {
-    return new FileGdbWriter(this, recordDefinition);
+    final RecordDefinition fgdbRecordDefinition = getRecordDefinition(recordDefinition);
+    return new FileGdbWriter(this, fgdbRecordDefinition);
   }
 
   private RecordStoreSchema newSchema(final Geodatabase geodatabase, final PathName schemaPath,
@@ -1140,7 +1126,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   private RecordDefinitionImpl newTableRecordDefinition(final DETable deTable) {
-    final Function<Geodatabase, V> action = geodatabase -> {
+    final Function<Geodatabase, RecordDefinitionImpl> action = geodatabase -> {
       String schemaCatalogPath = deTable.getParentCatalogPath();
       SpatialReference spatialReference;
       if (deTable instanceof DEFeatureClass) {
@@ -1291,22 +1277,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     });
   }
 
-  private void releaseGeodatabase() {
-    synchronized (this.apiSync) {
-      if (this.geodatabase != null) {
-        this.geodatabaseReferenceCount--;
-        if (this.geodatabaseReferenceCount <= 0) {
-          this.geodatabaseReferenceCount = 0;
-          try {
-            closeGeodatabase(this.geodatabase);
-          } finally {
-            this.geodatabase = null;
-          }
-        }
-      }
-    }
-  }
-
   public void setCreateAreaField(final boolean createAreaField) {
     this.createAreaField = createAreaField;
   }
@@ -1350,7 +1320,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     });
   }
 
-  private <V> V threadGeodatabaseResult(final Function<Geodatabase, V> action) {
+  <V> V threadGeodatabaseResult(final Function<Geodatabase, V> action) {
     return getSingleThreadResult(() -> {
       return this.geodatabase.valueFunction(action);
     });
@@ -1371,16 +1341,18 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public void updateRecord(final Record record) {
-    final TableReference table = getTable(record);
-    if (table != null) {
-      table.updateRecord(record);
+    try (
+      TableWrapper tableWrapper = getTableWrapper(record)) {
+      if (tableWrapper != null) {
+        tableWrapper.updateRecord(record);
+      }
     }
   }
 
   public BaseCloseable writeLock(final PathName path) {
     final RecordDefinition recordDefinition = getRecordDefinition(path);
     if (recordDefinition != null) {
-      final TableReference table = getTable(recordDefinition);
+      final TableReference table = getTableReference(recordDefinition);
       if (table != null) {
         return table.writeLock();
       }
