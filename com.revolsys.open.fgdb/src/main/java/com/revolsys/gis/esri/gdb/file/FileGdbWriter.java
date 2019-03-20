@@ -121,6 +121,15 @@ public class FileGdbWriter extends AbstractRecordWriter {
     return this.recordStore == null;
   }
 
+  @Override
+  public String toString() {
+    if (this.pathName == null) {
+      return this.recordStore.toString();
+    } else {
+      return this.pathName + "\n" + this.recordStore;
+    }
+  }
+
   private void updateRecord(final Record record) {
     final TableWrapper table = getTable(record);
     if (table != null) {

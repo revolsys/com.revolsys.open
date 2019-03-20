@@ -13,7 +13,9 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
   private EnumRows rows;
 
   FileGdbEnumRowsIterator(final TableWrapper table, final EnumRows rows) {
-    this.table = table.connect();
+    if (table != null) {
+      this.table = table.connect();
+    }
     this.rows = rows;
   }
 

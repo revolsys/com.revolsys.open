@@ -1,5 +1,8 @@
 package com.revolsys.gis.esri.gdb.file;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import com.revolsys.esri.filegdb.jni.Geodatabase;
 import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.io.PathName;
@@ -125,6 +128,27 @@ public class TableReference extends CloseableValueHolder<Table> {
   @Override
   protected TableWrapper valueConnectCloseable() {
     return this.closeable;
+  }
+
+  @Override
+  public void valueConsumeSync(final Consumer<Table> action) {
+    synchronized (this.geodatabase) {
+      super.valueConsumeSync(action);
+    }
+  }
+
+  @Override
+  public <V> V valueFunctionSync(final Function<Table, V> action) {
+    synchronized (this.geodatabase) {
+      return valueFunction(action);
+    }
+  }
+
+  @Override
+  public <V> V valueFunctionSync(final Function<Table, V> action, final V defaultValue) {
+    synchronized (this.geodatabase) {
+      return valueFunction(action, defaultValue);
+    }
   }
 
   @Override

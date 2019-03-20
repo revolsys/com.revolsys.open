@@ -523,22 +523,25 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     if (query == null) {
       return 0;
     } else {
-      final Function<Geodatabase, Integer> action = geodatabase -> {
-        String typePath = query.getTypeName();
-        RecordDefinition recordDefinition = query.getRecordDefinition();
+      String typePath = query.getTypeName();
+      RecordDefinition recordDefinition = query.getRecordDefinition();
+      if (recordDefinition == null) {
+        typePath = query.getTypeName();
+        recordDefinition = getRecordDefinition(typePath);
         if (recordDefinition == null) {
-          typePath = query.getTypeName();
-          recordDefinition = getRecordDefinition(typePath);
-          if (recordDefinition == null) {
-            return 0;
-          }
-        } else {
-          typePath = recordDefinition.getPath();
+          return 0;
         }
-        final StringBuilder whereClause = getWhereClause(query);
-        final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
+      } else {
+        typePath = recordDefinition.getPath();
+      }
+      final StringBuilder whereClause = getWhereClause(query);
+      final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
 
-        if (boundingBox == null) {
+      if (boundingBox == null) {
+        if (whereClause.length() == 0) {
+          final TableReference table = getTableReference(recordDefinition);
+          return table.valueFunction(Table::getRowCount, 0);
+        } else {
           final StringBuilder sql = new StringBuilder();
           sql.append("SELECT OBJECTID FROM ");
           sql.append(JdbcUtils.getTableName(typePath));
@@ -556,38 +559,37 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             }
             return count;
           }
+        }
+      } else {
+        final GeometryFieldDefinition geometryField = (GeometryFieldDefinition)recordDefinition
+          .getGeometryField();
+        if (geometryField == null || boundingBox.isEmpty()) {
+          return 0;
         } else {
-          final GeometryFieldDefinition geometryField = (GeometryFieldDefinition)recordDefinition
-            .getGeometryField();
-          if (geometryField == null || boundingBox.isEmpty()) {
-            return 0;
-          } else {
-            final StringBuilder sql = new StringBuilder();
-            sql.append("SELECT " + geometryField.getName() + " FROM ");
-            sql.append(JdbcUtils.getTableName(typePath));
-            if (whereClause.length() > 0) {
-              sql.append(" WHERE ");
-              sql.append(whereClause);
-            }
+          final StringBuilder sql = new StringBuilder();
+          sql.append("SELECT " + geometryField.getName() + " FROM ");
+          sql.append(JdbcUtils.getTableName(typePath));
+          if (whereClause.length() > 0) {
+            sql.append(" WHERE ");
+            sql.append(whereClause);
+          }
 
-            try (
-              final FileGdbEnumRowsIterator rows = query(sql.toString(), false)) {
-              int count = 0;
-              for (final Row row : rows) {
-                final Geometry geometry = (Geometry)geometryField.getValue(row);
-                if (geometry != null) {
-                  final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
-                  if (geometryBoundingBox.bboxIntersects(boundingBox)) {
-                    count++;
-                  }
+          try (
+            final FileGdbEnumRowsIterator rows = query(sql.toString(), false)) {
+            int count = 0;
+            for (final Row row : rows) {
+              final Geometry geometry = (Geometry)geometryField.getValue(row);
+              if (geometry != null) {
+                final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
+                if (geometryBoundingBox.bboxIntersects(boundingBox)) {
+                  count++;
                 }
               }
-              return count;
             }
+            return count;
           }
         }
-      };
-      return this.geodatabase.valueFunction(action, (Integer)0);
+      }
     }
   }
 

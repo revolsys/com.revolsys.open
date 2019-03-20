@@ -1,8 +1,5 @@
 package com.revolsys.gis.esri.gdb.file;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import com.revolsys.beans.ObjectException;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.esri.filegdb.jni.EnumRows;
@@ -22,6 +19,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.ValueWrapper;
 
 public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
+
   @Override
   default TableWrapper connect() {
     final TableReference tableReference = getTableReference();
@@ -35,7 +33,8 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
     if (objectId != null) {
       final FileGdbRecordStore recordStore = getRecordStore();
       final String whereClause = "OBJECTID=" + objectId;
-      return valueFunctionSync(table -> {
+      final TableReference tableReference = getTableReference();
+      return tableReference.valueFunctionSync(table -> {
         try (
           BaseCloseable lock = writeLock();
           final FileGdbEnumRowsIterator rows = search(typePath, "OBJECTID", whereClause, false)) {
@@ -86,7 +85,8 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
     validateRequired(record, recordDefinition);
 
     try {
-      final Row row = valueFunctionSync(table -> table.createRowObject());
+      final TableReference tableReference = getTableReference();
+      final Row row = tableReference.valueFunctionSync(table -> table.createRowObject());
 
       try {
         for (final FieldDefinition field : recordDefinition.getFields()) {
@@ -99,7 +99,7 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
             throw new ObjectPropertyException(record, name, e);
           }
         }
-        insertRow(row);
+        tableReference.valueConsumeSync(table -> table.insertRow(row));
         if (sourceRecordDefinition == recordDefinition) {
           for (final FieldDefinition field : recordDefinition.getFields()) {
             final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
@@ -126,10 +126,6 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
     }
   }
 
-  default void insertRow(final Row row) {
-    valueConsumeSync(table -> table.insertRow(row));
-  }
-
   default boolean isClosed() {
     final TableReference tableReference = getTableReference();
     return tableReference.isClosed();
@@ -142,8 +138,9 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
 
   default FileGdbEnumRowsIterator search(final Object typePath, final String fields,
     final String whereClause, final boolean recycling) {
-    final EnumRows rows = valueFunctionSync(
-      table -> searchDo(table, typePath, fields, whereClause, recycling));
+    final TableReference tableReference = getTableReference();
+    final EnumRows rows = tableReference
+      .valueFunctionSync(table -> searchDo(table, typePath, fields, whereClause, recycling));
     return new FileGdbEnumRowsIterator(this, rows);
   }
 
@@ -151,7 +148,8 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
     final String whereClause, final Envelope boundingBox, final boolean recycling) {
     EnumRows rows = null;
     if (!boundingBox.IsEmpty()) {
-      rows = valueFunctionSync(table -> {
+      final TableReference tableReference = getTableReference();
+      rows = tableReference.valueFunctionSync(table -> {
         try {
           return table.search(fields, whereClause, boundingBox, recycling);
         } catch (final Throwable e) {
@@ -235,7 +233,17 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
                 throw new ObjectPropertyException(record, name, e);
               }
             }
-            updateRow(row);
+            final TableReference tableReference = getTableReference();
+            tableReference.valueConsumeSync(table -> {
+              final boolean loadOnly = isLocked();
+              if (loadOnly) {
+                setLoadOnlyMode(false);
+              }
+              table.updateRow(row);
+              if (loadOnly) {
+                setLoadOnlyMode(true);
+              }
+            });
             record.setState(RecordState.PERSISTED);
             recordStore.addStatistic("Update", record);
           } catch (final ObjectException e) {
@@ -252,19 +260,6 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
     }
   }
 
-  default void updateRow(final Row row) {
-    valueConsumeSync(table -> {
-      final boolean loadOnly = isLocked();
-      if (loadOnly) {
-        setLoadOnlyMode(false);
-      }
-      table.updateRow(row);
-      if (loadOnly) {
-        setLoadOnlyMode(true);
-      }
-    });
-  }
-
   private void validateRequired(final Record record, final RecordDefinition recordDefinition) {
     for (final FieldDefinition field : recordDefinition.getFields()) {
       final String name = field.getName();
@@ -275,42 +270,6 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
         }
       }
     }
-  }
-
-  @Override
-  default void valueConsume(final Consumer<Table> action) {
-    final TableReference tableReference = getTableReference();
-    tableReference.valueConsume(action);
-  }
-
-  @Override
-  default void valueConsumeSync(final Consumer<Table> action) {
-    final TableReference tableReference = getTableReference();
-    tableReference.valueConsumeSync(action);
-  }
-
-  @Override
-  default <V> V valueFunction(final Function<Table, V> action) {
-    final TableReference tableReference = getTableReference();
-    return tableReference.valueFunction(action);
-  }
-
-  @Override
-  default <V> V valueFunction(final Function<Table, V> action, final V defaultValue) {
-    final TableReference tableReference = getTableReference();
-    return tableReference.valueFunction(action, defaultValue);
-  }
-
-  @Override
-  default <V> V valueFunctionSync(final Function<Table, V> action) {
-    final TableReference tableReference = getTableReference();
-    return tableReference.valueFunctionSync(action);
-  }
-
-  @Override
-  default <V> V valueFunctionSync(final Function<Table, V> action, final V defaultValue) {
-    final TableReference tableReference = getTableReference();
-    return tableReference.valueFunctionSync(action, defaultValue);
   }
 
   default TableWrapper writeLock() {
