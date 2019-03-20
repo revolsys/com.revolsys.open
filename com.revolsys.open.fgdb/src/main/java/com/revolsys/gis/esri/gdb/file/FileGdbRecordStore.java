@@ -21,7 +21,6 @@ import com.revolsys.collection.ValueHolder;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.esri.filegdb.jni.EnumRows;
 import com.revolsys.esri.filegdb.jni.EsriFileGdb;
 import com.revolsys.esri.filegdb.jni.Geodatabase;
 import com.revolsys.esri.filegdb.jni.Row;
@@ -537,9 +536,9 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       final StringBuilder whereClause = getWhereClause(query);
       final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
 
+      final TableReference table = getTableReference(recordDefinition);
       if (boundingBox == null) {
         if (whereClause.length() == 0) {
-          final TableReference table = getTableReference(recordDefinition);
           return table.valueFunction(Table::getRowCount, 0);
         } else {
           final StringBuilder sql = new StringBuilder();
@@ -551,7 +550,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
 
           try (
-            final FileGdbEnumRowsIterator rows = query(sql.toString(), false)) {
+            final FileGdbEnumRowsIterator rows = table.query(sql.toString(), false)) {
             int count = 0;
             for (@SuppressWarnings("unused")
             final Row row : rows) {
@@ -575,7 +574,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
 
           try (
-            final FileGdbEnumRowsIterator rows = query(sql.toString(), false)) {
+            final FileGdbEnumRowsIterator rows = table.query(sql.toString(), false)) {
             int count = 0;
             for (final Row row : rows) {
               final Geometry geometry = (Geometry)geometryField.getValue(row);
@@ -1196,16 +1195,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       });
     } else {
       return null;
-    }
-  }
-
-  public FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {
-    final EnumRows rows = this.geodatabase
-      .valueFunction(geodatabase -> geodatabase.query(sql, recycling));
-    if (rows == null) {
-      return null;
-    } else {
-      return new FileGdbEnumRowsIterator(null, rows);
     }
   }
 

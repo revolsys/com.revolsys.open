@@ -3,6 +3,7 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.revolsys.esri.filegdb.jni.EnumRows;
 import com.revolsys.esri.filegdb.jni.Geodatabase;
 import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.io.PathName;
@@ -100,6 +101,18 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   public synchronized boolean isLocked() {
     return this.lockCount >= 0;
+  }
+
+  FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {
+    final TableWrapper table = connect();
+    final EnumRows rows = this.geodatabase
+      .valueFunction(geodatabase -> geodatabase.query(sql, recycling));
+    if (rows == null) {
+      table.close();
+      return null;
+    } else {
+      return new FileGdbEnumRowsIterator(table, rows);
+    }
   }
 
   public synchronized void setLoadOnlyMode(final boolean loadOnly) {

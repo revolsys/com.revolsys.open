@@ -136,6 +136,11 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
     return tableReference.isLocked();
   }
 
+  default FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {
+    final TableReference tableReference = getTableReference();
+    return tableReference.query(sql, recycling);
+  }
+
   default FileGdbEnumRowsIterator search(final Object typePath, final String fields,
     final String whereClause, final boolean recycling) {
     final TableReference tableReference = getTableReference();

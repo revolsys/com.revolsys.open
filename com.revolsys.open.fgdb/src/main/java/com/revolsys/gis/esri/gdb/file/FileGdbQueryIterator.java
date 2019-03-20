@@ -200,7 +200,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
     if (!this.closed) {
       if (this.boundingBox == null) {
         if (this.sql.startsWith("SELECT")) {
-          this.rows = this.recordStore.query(this.sql, true);
+          this.rows = this.table.query(this.sql, true);
         } else {
           this.rows = this.table.search(this.catalogPath, this.fields, this.sql, true);
         }
