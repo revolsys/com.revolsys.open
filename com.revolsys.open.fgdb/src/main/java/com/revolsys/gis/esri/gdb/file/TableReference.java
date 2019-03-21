@@ -106,7 +106,7 @@ public class TableReference extends CloseableValueHolder<Table> {
   FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {
     final TableWrapper table = connect();
     final EnumRows rows = this.geodatabase
-      .valueFunction(geodatabase -> geodatabase.query(sql, recycling));
+      .valueFunctionSync(geodatabase -> geodatabase.query(sql, recycling));
     if (rows == null) {
       table.close();
       return null;
@@ -126,7 +126,7 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   @Override
   protected void valueClose(final Table table) {
-    this.geodatabase.valueConsume(geodatabase -> {
+    this.geodatabase.valueConsumeSync(geodatabase -> {
       try {
         geodatabase.closeTable(table);
       } catch (final Exception e) {
@@ -166,10 +166,8 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   @Override
   protected Table valueNew() {
-    return this.recordStore.threadGeodatabaseResult(geodatabase -> {
-      final Table table = geodatabase.openTable(this.catalogPath);
-      return table;
-    });
+    return this.recordStore
+      .threadGeodatabaseResult(geodatabase -> geodatabase.openTable(this.catalogPath));
   }
 
   public synchronized TableWrapper writeLock() {

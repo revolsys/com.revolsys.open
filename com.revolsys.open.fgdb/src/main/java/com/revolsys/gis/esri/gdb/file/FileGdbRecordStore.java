@@ -1127,56 +1127,55 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   private RecordDefinitionImpl newTableRecordDefinition(final DETable deTable) {
-    final Function<Geodatabase, RecordDefinitionImpl> action = geodatabase -> {
-      String schemaCatalogPath = deTable.getParentCatalogPath();
-      SpatialReference spatialReference;
-      if (deTable instanceof DEFeatureClass) {
-        final DEFeatureClass featureClass = (DEFeatureClass)deTable;
-        spatialReference = featureClass.getSpatialReference();
-      } else {
-        spatialReference = null;
-      }
-      PathName schemaPath = toPath(schemaCatalogPath);
-      RecordStoreSchema schema = newSchema(geodatabase, schemaPath, spatialReference);
+    String schemaCatalogPath = deTable.getParentCatalogPath();
+    SpatialReference spatialReference;
+    if (deTable instanceof DEFeatureClass) {
+      final DEFeatureClass featureClass = (DEFeatureClass)deTable;
+      spatialReference = featureClass.getSpatialReference();
+    } else {
+      spatialReference = null;
+    }
+    PathName schemaPath = toPath(schemaCatalogPath);
+    final PathName schemaPath2 = schemaPath;
+    RecordStoreSchema schema = threadGeodatabaseResult(
+      geodatabase -> newSchema(geodatabase, schemaPath2, spatialReference));
 
-      if (schemaPath.equals(this.defaultSchemaPath)) {
-        if (!(deTable instanceof DEFeatureClass)) {
-          schemaCatalogPath = "\\";
-          deTable.setCatalogPath("\\" + deTable.getName());
-          schema = getRootSchema();
-          schemaPath = schema.getPathName();
-        }
-      } else if (schemaPath.length() <= 1) {
-        if (deTable instanceof DEFeatureClass) {
-          schemaPath = this.defaultSchemaPath;
-        }
+    if (schemaPath.equals(this.defaultSchemaPath)) {
+      if (!(deTable instanceof DEFeatureClass)) {
+        schemaCatalogPath = "\\";
+        deTable.setCatalogPath("\\" + deTable.getName());
+        schema = getRootSchema();
+        schemaPath = schema.getPathName();
       }
-      for (final Field field : deTable.getFields()) {
-        final String fieldName = field.getName();
-        final CodeTable codeTable = getCodeTableByFieldName(fieldName);
-        if (codeTable instanceof FileGdbDomainCodeTable) {
-          final FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
-          field.setDomain(domainCodeTable.getDomain());
-        }
+    } else if (schemaPath.length() <= 1) {
+      if (deTable instanceof DEFeatureClass) {
+        schemaPath = this.defaultSchemaPath;
       }
-      final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
-      try {
-        final String scp = schemaCatalogPath;
-        runSingleThread(() -> {
-          final Table table = geodatabase.createTable(tableDefinition, scp);
-          geodatabase.closeTable(table);
-          table.delete();
-        });
-        final RecordDefinitionImpl recordDefinition = getRecordDefinition(
-          PathName.newPathName(schemaPath), schemaCatalogPath, tableDefinition);
-        initRecordDefinition(recordDefinition);
-        schema.addElement(recordDefinition);
-        return recordDefinition;
-      } catch (final Throwable t) {
-        throw new RuntimeException("Unable to create table " + deTable.getCatalogPath(), t);
+    }
+    for (final Field field : deTable.getFields()) {
+      final String fieldName = field.getName();
+      final CodeTable codeTable = getCodeTableByFieldName(fieldName);
+      if (codeTable instanceof FileGdbDomainCodeTable) {
+        final FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
+        field.setDomain(domainCodeTable.getDomain());
       }
-    };
-    return this.geodatabase.valueFunction(action);
+    }
+    final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
+    try {
+      final String scp = schemaCatalogPath;
+      threadGeodatabase(geodatabase -> {
+        final Table table = geodatabase.createTable(tableDefinition, scp);
+        geodatabase.closeTable(table);
+        table.delete();
+      });
+      final RecordDefinitionImpl recordDefinition = getRecordDefinition(
+        PathName.newPathName(schemaPath), schemaCatalogPath, tableDefinition);
+      initRecordDefinition(recordDefinition);
+      schema.addElement(recordDefinition);
+      return recordDefinition;
+    } catch (final Throwable t) {
+      throw new RuntimeException("Unable to create table " + deTable.getCatalogPath(), t);
+    }
   }
 
   private Geodatabase openGeodatabase() {
@@ -1232,40 +1231,40 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         }
 
         if (schema.equalPath(this.defaultSchemaPath)) {
-          refreshSchemaRecordDefinitions(elementsByPath, schemaPath, "\\", "Feature Class");
-          refreshSchemaRecordDefinitions(elementsByPath, schemaPath, "\\", "Table");
+          refreshSchemaRecordDefinitions(geodatabase, elementsByPath, schemaPath, "\\",
+            "Feature Class");
+          refreshSchemaRecordDefinitions(geodatabase, elementsByPath, schemaPath, "\\", "Table");
         }
-        refreshSchemaRecordDefinitions(elementsByPath, schemaPath, schemaCatalogPath,
+        refreshSchemaRecordDefinitions(geodatabase, elementsByPath, schemaPath, schemaCatalogPath,
           "Feature Class");
-        refreshSchemaRecordDefinitions(elementsByPath, schemaPath, schemaCatalogPath, "Table");
+        refreshSchemaRecordDefinitions(geodatabase, elementsByPath, schemaPath, schemaCatalogPath,
+          "Table");
       };
-      this.geodatabase.valueConsume(action);
+      this.geodatabase.valueConsumeSync(action);
       return elementsByPath;
     }
   }
 
-  private void refreshSchemaRecordDefinitions(
+  private void refreshSchemaRecordDefinitions(final Geodatabase geodatabase,
     final Map<PathName, RecordStoreSchemaElement> elementsByPath, final PathName schemaPath,
     final String catalogPath, final String datasetType) {
-    this.geodatabase.valueConsume(geodatabase -> {
-      final boolean pathExists = isPathExists(geodatabase, catalogPath);
-      if (pathExists) {
-        final VectorOfWString childFeatureClasses = getChildDatasets(geodatabase, catalogPath,
-          datasetType);
-        if (childFeatureClasses != null) {
-          for (int i = 0; i < childFeatureClasses.size(); i++) {
-            final String childCatalogPath = childFeatureClasses.get(i);
-            final String tableDefinition = getSingleThreadResult(
-              () -> geodatabase.getTableDefinition(childCatalogPath));
-            final RecordDefinition recordDefinition = getRecordDefinition(schemaPath,
-              childCatalogPath, tableDefinition);
-            initRecordDefinition(recordDefinition);
-            final PathName childPath = recordDefinition.getPathName();
-            elementsByPath.put(childPath, recordDefinition);
-          }
+    final boolean pathExists = isPathExists(geodatabase, catalogPath);
+    if (pathExists) {
+      final VectorOfWString childFeatureClasses = getChildDatasets(geodatabase, catalogPath,
+        datasetType);
+      if (childFeatureClasses != null) {
+        for (int i = 0; i < childFeatureClasses.size(); i++) {
+          final String childCatalogPath = childFeatureClasses.get(i);
+          final String tableDefinition = getSingleThreadResult(
+            () -> geodatabase.getTableDefinition(childCatalogPath));
+          final RecordDefinition recordDefinition = getRecordDefinition(schemaPath,
+            childCatalogPath, tableDefinition);
+          initRecordDefinition(recordDefinition);
+          final PathName childPath = recordDefinition.getPathName();
+          elementsByPath.put(childPath, recordDefinition);
         }
       }
-    });
+    }
   }
 
   public void setCreateAreaField(final boolean createAreaField) {
@@ -1306,15 +1305,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private void threadGeodatabase(final Consumer<Geodatabase> action) {
     getSingleThreadResult(() -> {
-      this.geodatabase.valueConsume(action);
+      this.geodatabase.valueConsumeSync(action);
       return null;
     });
   }
 
   <V> V threadGeodatabaseResult(final Function<Geodatabase, V> action) {
-    return getSingleThreadResult(() -> {
-      return this.geodatabase.valueFunction(action);
-    });
+    return getSingleThreadResult(() -> this.geodatabase.valueFunctionSync(action));
   }
 
   public String toCatalogPath(final PathName path) {
