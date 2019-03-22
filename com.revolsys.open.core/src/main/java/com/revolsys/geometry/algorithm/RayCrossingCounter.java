@@ -70,6 +70,29 @@ import com.revolsys.geometry.model.segment.Segment;
  */
 public class RayCrossingCounter implements Consumer<LineSegment> {
 
+  public static Location locatePointInRing(final LineString ring, final double x, final double y) {
+    final BoundingBox boundingBox = ring.getBoundingBox();
+    if (boundingBox.intersects(x, y)) {
+      final RayCrossingCounter counter = new RayCrossingCounter(x, y);
+
+      double x0 = ring.getX(0);
+      double y0 = ring.getY(0);
+      for (int i = 1; i < ring.getVertexCount(); i++) {
+        final double x1 = ring.getX(i);
+        final double y1 = ring.getY(i);
+        counter.countSegment(x1, y1, x0, y0);
+        if (counter.isOnSegment()) {
+          return counter.getLocation();
+        }
+        x0 = x1;
+        y0 = y1;
+      }
+      return counter.getLocation();
+    } else {
+      return Location.EXTERIOR;
+    }
+  }
+
   /**
    * Determines the {@link Location} of a point in a ring.
    *
@@ -156,6 +179,11 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     final double y2 = segment.getY(1);
 
     countSegment(x1, y1, x2, y2);
+  }
+
+  public void clear() {
+    this.crossingCount = 0;
+    this.pointOnSegment = false;
   }
 
   public void countSegment(final double x1, final double y1, final double x2, final double y2) {

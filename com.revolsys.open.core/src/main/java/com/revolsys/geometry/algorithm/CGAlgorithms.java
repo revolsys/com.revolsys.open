@@ -209,6 +209,10 @@ public class CGAlgorithms {
     return false;
   }
 
+  public static boolean isPointInRing(final LineString ring, final double x, final double y) {
+    return RayCrossingCounter.locatePointInRing(ring, x, y) != Location.EXTERIOR;
+  }
+
   public static boolean isPointInRing(final Point point, final LineString ring) {
     return RayCrossingCounter.locatePointInRing(point, ring) != Location.EXTERIOR;
   }

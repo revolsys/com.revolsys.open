@@ -84,7 +84,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
         }
       } else {
         throw new IllegalArgumentException(
-          "Expecting a java,util.Date not " + value.getClass() + " " + value);
+          "Expecting a java.util.Date not " + value.getClass() + " " + value);
       }
     }
   }

@@ -106,9 +106,8 @@ abstract class AbstractPreparedPolygonContains {
    */
   public static boolean isAnyTargetComponentInAreaTest(final Geometry testGeom,
     final Geometry targetGeom) {
-    final PointOnGeometryLocator piaLoc = new SimplePointInAreaLocator(testGeom);
     for (final Vertex vertex : targetGeom.vertices()) {
-      final Location loc = piaLoc.locate(vertex);
+      final Location loc = SimplePointInAreaLocator.locate(testGeom, vertex);
       if (loc != Location.EXTERIOR) {
         return true;
       }

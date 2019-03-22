@@ -67,6 +67,12 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
     }
   }
 
+  public static FileGdbRecordStore newRecordStoreInitialized(final File file) {
+    final FileGdbRecordStore recordStore = newRecordStore(file);
+    recordStore.initialize();
+    return recordStore;
+  }
+
   public static FileGdbRecordStore newRecordStoreInitialized(final Path path) {
     final FileGdbRecordStore recordStore = newRecordStore(path);
     recordStore.initialize();
