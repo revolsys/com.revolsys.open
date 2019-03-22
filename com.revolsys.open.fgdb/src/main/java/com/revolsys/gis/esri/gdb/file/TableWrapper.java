@@ -20,6 +20,11 @@ import com.revolsys.util.ValueWrapper;
 
 public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
 
+  default EnumRows closeRows(final EnumRows rows) {
+    final TableReference tableReference = getTableReference();
+    return tableReference.closeRows(rows);
+  }
+
   @Override
   default TableWrapper connect() {
     final TableReference tableReference = getTableReference();
@@ -134,6 +139,11 @@ public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
   default boolean isLocked() {
     final TableReference tableReference = getTableReference();
     return tableReference.isLocked();
+  }
+
+  default Row nextRow(final EnumRows rows) {
+    final TableReference tableReference = getTableReference();
+    return tableReference.nextRow(rows);
   }
 
   default FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {

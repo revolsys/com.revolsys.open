@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import com.revolsys.esri.filegdb.jni.EnumRows;
 import com.revolsys.esri.filegdb.jni.Geodatabase;
+import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.io.PathName;
 import com.revolsys.logging.Logs;
@@ -78,8 +79,21 @@ public class TableReference extends CloseableValueHolder<Table> {
   }
 
   @Override
-  public synchronized void closeAfter() {
+  public void closeAfter() {
     this.geodatabase.close();
+  }
+
+  EnumRows closeRows(final EnumRows rows) {
+    synchronized (this.geodatabase) {
+      if (rows != null) {
+        try {
+          rows.Close();
+        } finally {
+          rows.delete();
+        }
+      }
+      return null;
+    }
   }
 
   @Override
@@ -95,12 +109,18 @@ public class TableReference extends CloseableValueHolder<Table> {
     return this.recordStore;
   }
 
-  public TableReference getTableReference() {
-    return this;
+  synchronized boolean isLocked() {
+    return this.lockCount >= 0;
   }
 
-  public synchronized boolean isLocked() {
-    return this.lockCount >= 0;
+  Row nextRow(final EnumRows rows) {
+    if (rows == null) {
+      return null;
+    } else {
+      synchronized (this.geodatabase) {
+        return rows.next();
+      }
+    }
   }
 
   FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {
@@ -115,7 +135,7 @@ public class TableReference extends CloseableValueHolder<Table> {
     }
   }
 
-  public synchronized void setLoadOnlyMode(final boolean loadOnly) {
+  synchronized void setLoadOnlyMode(final boolean loadOnly) {
     // table.setLoadOnlyMode(loadOnly);
   }
 
@@ -170,7 +190,7 @@ public class TableReference extends CloseableValueHolder<Table> {
       .threadGeodatabaseResult(geodatabase -> geodatabase.openTable(this.catalogPath));
   }
 
-  public synchronized TableWrapper writeLock() {
+  synchronized TableWrapper writeLock() {
     final Table table = getValue();
     if (++this.lockCount == 1) {
       table.setWriteLock();
