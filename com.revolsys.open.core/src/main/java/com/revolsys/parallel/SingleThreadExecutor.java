@@ -20,50 +20,31 @@ public class SingleThreadExecutor implements BaseCloseable {
 
   private Callable<? extends Object> task;
 
+  private Runnable runnable;
+
   private final Thread thread;
 
   private final String threadName;
 
+  private boolean hasTask;
+
+  private final Runnable preRun;
+
   public SingleThreadExecutor(final String threadName) {
+    this(threadName, null);
+  }
+
+  public SingleThreadExecutor(final String threadName, final Runnable preRun) {
     this.threadName = threadName;
+    this.preRun = preRun;
     this.thread = new Thread(this::taskHandler, threadName);
     this.thread.setDaemon(true);
     this.thread.start();
   }
 
-  @SuppressWarnings("unchecked")
   public <V> V call(final Callable<V> task) {
-    if (task != null) {
-      if (IS_THREAD.get() == Boolean.TRUE) {
-        try {
-          return task.call();
-        } catch (final Exception e) {
-          throw Exceptions.wrap(e);
-        }
-      } else {
-        synchronized (this.callSync) {
-          synchronized (this.handleSync) {
-            try {
-              this.task = task;
-              this.handleSync.notifyAll();
-              this.handleSync.wait();
-              if (this.exception == null) {
-                return (V)this.result;
-              } else {
-                throw Exceptions.wrap(this.threadName + ": error running task", this.exception);
-              }
-            } catch (final InterruptedException e) {
-              // Ignore
-            } finally {
-              this.task = null;
-              this.result = null;
-              this.exception = null;
-            }
-          }
-        }
-      }
-    }
-    return null;
+    final Runnable runnable = null;
+    return sendTask(task, runnable);
   }
 
   @Override
@@ -78,24 +59,83 @@ public class SingleThreadExecutor implements BaseCloseable {
     return IS_THREAD.get() == Boolean.TRUE;
   }
 
+  public void run(final Runnable runnable) {
+    sendTask(null, runnable);
+  }
+
+  @SuppressWarnings("unchecked")
+  private <V> V sendTask(final Callable<V> task, final Runnable runnable) throws Error {
+    if (IS_THREAD.get() == Boolean.TRUE) {
+      try {
+        if (task != null) {
+          return task.call();
+        } else if (runnable != null) {
+          runnable.run();
+        }
+      } catch (final Exception e) {
+        Exceptions.throwUncheckedException(e);
+      }
+    } else if (task != null || runnable != null) {
+      synchronized (this.callSync) {
+        try {
+          synchronized (this.handleSync) {
+            this.task = task;
+            this.runnable = runnable;
+            this.hasTask = true;
+            this.handleSync.notifyAll();
+
+            this.handleSync.wait();
+          }
+          if (this.exception instanceof Error) {
+            throw (Error)this.exception;
+          } else if (this.exception instanceof RuntimeException) {
+            throw (RuntimeException)this.exception;
+          } else if (this.exception != null) {
+            throw Exceptions.wrap(this.threadName + ": error running task", this.exception);
+          }
+          return (V)this.result;
+        } catch (final InterruptedException e) {
+          // Ignore
+        } finally {
+          this.result = null;
+          this.exception = null;
+        }
+      }
+    }
+    return null;
+  }
+
   private void taskHandler() {
     IS_THREAD.set(Boolean.TRUE);
+    if (this.preRun != null && this.running) {
+      this.preRun.run();
+    }
     while (this.running) {
       synchronized (this.handleSync) {
-        if (this.task == null) {
+        while (!this.hasTask && this.running) {
           try {
             this.handleSync.wait();
           } catch (final InterruptedException e) {
-            // Ignore
+            if (!this.running) {
+              synchronized (this.handleSync) {
+                this.handleSync.notifyAll();
+              }
+              return;
+            }
           }
-        } else {
-          try {
+        }
+        try {
+          if (this.task != null) {
             this.result = this.task.call();
-          } catch (final Throwable e) {
-            this.exception = e;
-          } finally {
-            this.task = null;
+          } else if (this.runnable != null) {
+            this.runnable.run();
           }
+        } catch (final Throwable e) {
+          this.exception = e;
+        } finally {
+          this.runnable = null;
+          this.task = null;
+          this.hasTask = false;
           this.handleSync.notifyAll();
         }
       }

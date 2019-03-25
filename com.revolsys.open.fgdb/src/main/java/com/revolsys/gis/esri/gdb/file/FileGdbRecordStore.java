@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.collection.ValueHolder;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -108,7 +107,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
 
   private static final SingleThreadExecutor TASK_EXECUTOR = new SingleThreadExecutor(
-    "ESRI FGDB Create Thread");
+    "ESRI FGDB Create Thread", () -> {
+      final File tempFile = FileUtil.newTempFile("test", ".gdb");
+      final String fileName = tempFile.getName();
+      final Geodatabase geodatabase = EsriFileGdb.createGeodatabase(fileName);
+      EsriFileGdb.CloseGeodatabase(geodatabase);
+      EsriFileGdb.DeleteGeodatabase(fileName);
+    });
 
   static {
     addFieldTypeConstructor(FieldType.esriFieldTypeInteger, IntegerFieldDefinition.class);
@@ -140,23 +145,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   private static <V> V getSingleThreadResult(final Callable<V> callable) {
-    final ValueHolder<Throwable> exception = new ValueHolder<>();
-    final V result = TASK_EXECUTOR.call(() -> {
-      try {
-        return callable.call();
-      } catch (RuntimeException | Error e) {
-        exception.setValue(e);
-        return null;
-      }
-    });
-    final Throwable e = exception.getValue();
-    if (e == null) {
-      return result;
-    } else if (e instanceof Error) {
-      throw (Error)e;
-    } else {
-      throw (RuntimeException)e;
-    }
+    return TASK_EXECUTOR.call(callable);
   }
 
   public static SpatialReference getSpatialReference(final GeometryFactory geometryFactory) {
@@ -173,10 +162,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   private static void runSingleThread(final Runnable runnable) {
-    getSingleThreadResult(() -> {
-      runnable.run();
-      return null;
-    });
+    TASK_EXECUTOR.run(runnable);
   }
 
   private final Object apiSync = new Object();
