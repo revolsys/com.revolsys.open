@@ -425,8 +425,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         if (!isClosed()) {
           final Writer<Record> writer = getThreadProperty("writer");
           if (writer != null) {
-            writer.close();
             setThreadProperty("writer", null);
+            writer.close();
           }
           synchronized (this.tableByCatalogPath) {
             for (final TableReference table : this.tableByCatalogPath.values()) {

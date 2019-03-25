@@ -84,16 +84,16 @@ public class TableReference extends CloseableValueHolder<Table> {
   }
 
   EnumRows closeRows(final EnumRows rows) {
-    synchronized (this.geodatabase) {
-      if (rows != null) {
+    if (rows != null) {
+      this.geodatabase.valueConsumeSync(g -> {
         try {
           rows.Close();
         } finally {
           rows.delete();
         }
-      }
-      return null;
+      });
     }
+    return null;
   }
 
   @Override

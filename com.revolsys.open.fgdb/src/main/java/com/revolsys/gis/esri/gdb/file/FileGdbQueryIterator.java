@@ -104,8 +104,10 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
           this.recordDefinition = null;
           try {
             try {
-              if (this.rows != null) {
-                this.rows.close();
+              final FileGdbEnumRowsIterator rows = this.rows;
+              if (rows != null) {
+                this.rows = null;
+                rows.close();
               }
             } finally {
               final TableWrapper table = this.table;

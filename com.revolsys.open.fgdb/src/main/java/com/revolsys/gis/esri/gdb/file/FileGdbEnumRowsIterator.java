@@ -23,9 +23,9 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
   protected void closeDo() {
     synchronized (this) {
       closeObject();
-      this.rows = this.table.closeRows(this.rows);
       final TableWrapper table = this.table;
       if (table != null) {
+        this.rows = table.closeRows(this.rows);
         this.table = null;
         table.close();
       }
