@@ -1143,8 +1143,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
     PathName schemaPath = toPath(schemaCatalogPath);
     final PathName schemaPath2 = schemaPath;
-    RecordStoreSchema schema = this.geodatabase
-      .valueFunctionSync(geodatabase -> newSchema(geodatabase, schemaPath2, spatialReference));
+    RecordStoreSchema schema = threadGeodatabaseResult(
+      geodatabase -> newSchema(geodatabase, schemaPath2, spatialReference));
 
     if (schemaPath.equals(this.defaultSchemaPath)) {
       if (!(deTable instanceof DEFeatureClass)) {
