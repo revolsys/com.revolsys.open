@@ -16,9 +16,9 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.ValueWrapper;
+import com.revolsys.util.ValueHolderWrapper;
 
-public interface TableWrapper extends ValueWrapper<Table>, BaseCloseable {
+public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
   default EnumRows closeRows(final EnumRows rows) {
     final TableReference tableReference = getTableReference();

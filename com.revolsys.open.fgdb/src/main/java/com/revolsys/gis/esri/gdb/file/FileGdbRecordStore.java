@@ -561,7 +561,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
 
           try (
-            final FileGdbEnumRowsIterator rows = table.query(sql.toString(), false)) {
+            final FileGdbEnumRowsIterator rows = table.query(sql.toString(), true)) {
             int count = 0;
             for (@SuppressWarnings("unused")
             final Row row : rows) {

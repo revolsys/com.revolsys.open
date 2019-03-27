@@ -25,6 +25,11 @@ public class TableReference extends CloseableValueHolder<Table> {
     public TableReference getTableReference() {
       return TableReference.this;
     }
+
+    @Override
+    public com.revolsys.util.ValueHolder<Table> getValueHolder() {
+      return TableReference.this;
+    }
   };
 
   private final TableWrapper locker = new TableWrapper() {
@@ -56,6 +61,11 @@ public class TableReference extends CloseableValueHolder<Table> {
 
     @Override
     public TableReference getTableReference() {
+      return TableReference.this;
+    }
+
+    @Override
+    public com.revolsys.util.ValueHolder<Table> getValueHolder() {
       return TableReference.this;
     }
   };

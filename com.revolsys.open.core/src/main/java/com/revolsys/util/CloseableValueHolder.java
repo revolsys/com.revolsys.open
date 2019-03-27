@@ -11,20 +11,14 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
     return new LambaCloseableValueHolder<>(valueFactory, valueCloseFunction);
   }
 
-  private final ValueWrapper<R> closeable = new ValueWrapper<R>() {
+  private final ValueWrapper<R> closeable = new ValueHolderWrapper<>() {
     @Override
     public void close() {
       disconnect();
     }
 
-    @Override
-    public ValueWrapper<R> connect() {
-      return CloseableValueHolder.super.connect();
-    }
-
-    @Override
-    public R getValue() {
-      return CloseableValueHolder.this.getValue();
+    public com.revolsys.util.ValueHolder<R> getValueHolder() {
+      return CloseableValueHolder.this;
     }
   };
 
@@ -131,6 +125,17 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
   }
 
   @Override
+  public void valueConsumeSync(final Consumer<R> action) {
+    synchronized (this) {
+      try {
+        super.valueConsume(action);
+      } finally {
+        disconnect();
+      }
+    }
+  }
+
+  @Override
   public <V> V valueFunction(final Function<R, V> action) {
     try {
       return super.valueFunction(action);
@@ -145,6 +150,28 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
       return super.valueFunction(action, defaultValue);
     } finally {
       disconnect();
+    }
+  }
+
+  @Override
+  public <V> V valueFunctionSync(final Function<R, V> action) {
+    synchronized (this) {
+      try {
+        return super.valueFunction(action);
+      } finally {
+        disconnect();
+      }
+    }
+  }
+
+  @Override
+  public <V> V valueFunctionSync(final Function<R, V> action, final V defaultValue) {
+    synchronized (this) {
+      try {
+        return super.valueFunction(action, defaultValue);
+      } finally {
+        disconnect();
+      }
     }
   }
 
