@@ -104,7 +104,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final byte[] bytes;
-    synchronized (getSync()) {
+    synchronized (row) {
       if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
@@ -163,7 +163,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
             throw Exceptions.wrap(e);
           }
         }
-        synchronized (getSync()) {
+        synchronized (row) {
           row.setGeometry(bytes);
         }
       }

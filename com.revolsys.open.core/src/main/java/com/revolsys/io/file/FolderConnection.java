@@ -2,7 +2,6 @@ package com.revolsys.io.file;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.Parent;
@@ -42,7 +41,11 @@ public class FolderConnection extends AbstractConnection<FolderConnection, Folde
   @Override
   public List<Path> getChildren() {
     final List<Path> paths = Paths.getChildPaths(this.path);
-    Collections.sort(paths);
+    paths.sort((a, b) -> {
+      final String name1 = a.getName(a.getNameCount() - 1).toString().toLowerCase();
+      final String name2 = b.getName(b.getNameCount() - 1).toString().toLowerCase();
+      return name1.compareTo(name2);
+    });
     return paths;
   }
 

@@ -148,7 +148,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   private Identifier newIdentifier(final String name) {
-    synchronized (this.recordStore) {
+    synchronized (this.domain) {
       final Identifier id = this.domain.newCodedValue(name);
       this.recordStore.alterDomain(this.domain);
       Logs.info(this, this.domain.getDomainName() + " created code " + id + "=" + name);

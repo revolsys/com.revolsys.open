@@ -33,14 +33,12 @@ import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -64,8 +62,6 @@ import com.revolsys.spring.resource.Resource;
  */
 public class SaifReader extends AbstractReader<Record>
   implements Iterator<Record>, RecordDefinitionFactory, RecordReader {
-  /** The logging instance. */
-  private static final Logger log = LoggerFactory.getLogger(SaifReader.class);
 
   /** The current data object that was read. */
   private Record currentRecord;
@@ -164,18 +160,18 @@ public class SaifReader extends AbstractReader<Record>
    */
   @Override
   public void close() {
-    if (log.isDebugEnabled()) {
-      log.debug("Closing SAIF archive '" + this.file.getAbsolutePath() + "'");
+    if (Logs.isDebugEnabled(this)) {
+      Logs.debug(this, "Closing SAIF archive '" + this.file.getAbsolutePath() + "'");
     }
     closeCurrentReader();
     if (!this.file.isDirectory() && this.saifArchiveDirectory != null) {
-      if (log.isDebugEnabled()) {
-        log.debug("  Deleting temporary files");
+      if (Logs.isDebugEnabled(this)) {
+        Logs.debug(this, "  Deleting temporary files");
       }
       FileUtil.deleteDirectory(this.saifArchiveDirectory);
     }
-    if (log.isDebugEnabled()) {
-      log.debug("  Finished closing file");
+    if (Logs.isDebugEnabled(this)) {
+      Logs.debug(this, "  Finished closing file");
     }
   }
 
@@ -496,7 +492,7 @@ public class SaifReader extends AbstractReader<Record>
         this.loadNewObject = false;
         return true;
       } catch (final Throwable e) {
-        log.error(e.getMessage(), e);
+        Logs.error(this, e.getMessage(), e);
       }
     } while (openNextObjectSet());
     this.currentRecord = null;
@@ -564,20 +560,20 @@ public class SaifReader extends AbstractReader<Record>
     if (!this.opened) {
       this.opened = true;
       try {
-        if (log.isDebugEnabled()) {
-          log.debug("Opening SAIF archive '" + this.file.getCanonicalPath() + "'");
+        if (Logs.isDebugEnabled(this)) {
+          Logs.debug(this,"Opening SAIF archive '" + this.file.getCanonicalPath() + "'");
         }
-        if (this.file.isDirectory()) {
+         if (this.file.isDirectory()) {
           this.saifArchiveDirectory = this.file;
         } else if (!this.file.exists()) {
           throw new IllegalArgumentException("SAIF file " + this.file + " does not exist");
         } else {
           this.zipFile = new ZipFile(this.file);
         }
-        if (log.isDebugEnabled()) {
-          log.debug("  Finished opening archive");
-        }
-        loadSchema();
+         if (Logs.isDebugEnabled(this)) {
+           Logs.debug(this,"  Finished opening archive");
+         }
+       loadSchema();
         loadExportedObjects();
         loadSrid();
         final GeometryFactory geometryFactory = GeometryFactory.fixed3d(this.srid, 1.0, 1.0, 1.0);

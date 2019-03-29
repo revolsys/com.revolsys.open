@@ -130,8 +130,13 @@ public class Log4jTableModel extends AbstractTableModel {
       final String loggerName = event.getLoggerName();
       final Message message = event.getMessage();
 
-      final List<Object> row = Arrays.asList(timestamp, level, loggerName,
-        message.getFormattedMessage(), event.getThreadName(), event.getThrownProxy());
+      final String formattedMessage = message.getFormattedMessage();
+      final ThrowableProxy thrownProxy = event.getThrownProxy();
+      // if (thrownProxy != null) {
+      // String thrownMessage = thrownProxy.
+      // }
+      final List<Object> row = Arrays.asList(timestamp, level, loggerName, formattedMessage,
+        event.getThreadName(), thrownProxy);
       Invoke.later(() -> {
         if (event.getLevel().isMoreSpecificThan(Level.ERROR)) {
           this.hasNewErrors = true;

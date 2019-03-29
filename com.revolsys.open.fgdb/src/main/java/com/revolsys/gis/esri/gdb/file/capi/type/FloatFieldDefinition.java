@@ -19,7 +19,7 @@ public class FloatFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    synchronized (getSync()) {
+    synchronized (row) {
       if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
@@ -35,13 +35,13 @@ public class FloatFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final float floatValue = number.floatValue();
-      synchronized (getSync()) {
+      synchronized (row) {
         row.setFloat(this.fieldNumber, floatValue);
       }
     } else {
       final String string = value.toString();
       final float floatValue = Float.parseFloat(string);
-      synchronized (getSync()) {
+      synchronized (row) {
         row.setFloat(this.fieldNumber, floatValue);
       }
     }

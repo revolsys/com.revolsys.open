@@ -1,8 +1,6 @@
 package com.revolsys.parallel.process;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ChannelValueStore;
 import com.revolsys.parallel.channel.ClosedException;
@@ -19,6 +17,8 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   private Channel<O> out;
 
   private int outBufferSize = 0;
+
+  private boolean initialized;
 
   public AbstractInOutProcess() {
   }
@@ -67,7 +67,15 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     return this.outBufferSize;
   }
 
-  protected void init() {
+  @Override
+  public final synchronized void initialize() {
+    if (!this.initialized) {
+      this.initialized = true;
+      initializeDo();
+    }
+  }
+
+  protected void initializeDo() {
   }
 
   protected ChannelValueStore<I> newInValueStore() {
@@ -93,17 +101,16 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   @Override
   public final void run() {
     boolean hasError = false;
-    final Logger log = LoggerFactory.getLogger(getClass());
     try {
-      log.debug("Start");
-      init();
+      Logs.debug(this, "Start");
+      initialize();
       run(this.in, this.out);
     } catch (final ClosedException e) {
-      log.debug("Shutdown");
+      Logs.debug(this, "Shutdown");
     } catch (final ThreadDeath e) {
-      log.debug("Shutdown");
+      Logs.debug(this, "Shutdown");
     } catch (final Throwable e) {
-      log.error(e.getMessage(), e);
+      Logs.error(this, e.getMessage(), e);
       hasError = true;
     } finally {
       if (this.in != null) {

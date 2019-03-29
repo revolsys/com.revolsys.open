@@ -26,14 +26,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.io.FileUtil;
 
 public class ObjectSetOutputStream extends OutputStream {
-  private static final Logger log = LoggerFactory.getLogger(ObjectSetOutputStream.class);
-
   private File file;
 
   private short index = 0;
@@ -59,9 +54,6 @@ public class ObjectSetOutputStream extends OutputStream {
 
   @Override
   public void close() throws IOException {
-    if (log.isDebugEnabled()) {
-      log.debug("Closing object subset '" + FileUtil.getFileName(this.file) + "' from writing");
-    }
     this.out.close();
   }
 
@@ -71,9 +63,6 @@ public class ObjectSetOutputStream extends OutputStream {
   }
 
   private void openFile() throws IOException {
-    if (log.isDebugEnabled()) {
-      log.debug("Creating object subset '" + FileUtil.getFileName(this.file) + "'");
-    }
     this.out = new BufferedOutputStream(new FileOutputStream(this.file), 4096);
   }
 

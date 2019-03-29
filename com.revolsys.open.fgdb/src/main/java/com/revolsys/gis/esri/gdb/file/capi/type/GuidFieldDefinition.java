@@ -45,7 +45,7 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    synchronized (getSync()) {
+    synchronized (row) {
       if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
@@ -63,7 +63,7 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else {
       final String guidString = value.toString();
       final Guid guid = getGuid(guidString);
-      synchronized (getSync()) {
+      synchronized (row) {
         row.setGuid(this.fieldNumber, guid);
       }
     }

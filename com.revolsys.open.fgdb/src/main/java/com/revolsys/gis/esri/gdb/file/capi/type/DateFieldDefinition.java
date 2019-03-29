@@ -32,7 +32,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    synchronized (getSync()) {
+    synchronized (row) {
       if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
@@ -76,15 +76,15 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
             row.setNull(this.fieldNumber);
           }
         }
-        synchronized (getSync()) {
-          final long time = date.getTime() / 1000;
-          synchronized (LOCK) {
+        final long time = date.getTime() / 1000;
+        synchronized (LOCK) {
+          synchronized (row) {
             row.setDate(this.fieldNumber, time);
           }
         }
       } else {
         throw new IllegalArgumentException(
-          "Expecting a java,util.Date not " + value.getClass() + " " + value);
+          "Expecting a java.util.Date not " + value.getClass() + " " + value);
       }
     }
   }

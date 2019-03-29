@@ -23,9 +23,6 @@ package com.revolsys.record.io.format.shp;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.ClockDirection;
@@ -35,6 +32,7 @@ import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.ResourceEndianOutput;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xbase.XBaseFieldDefinition;
 import com.revolsys.record.io.format.xbase.XbaseRecordWriter;
@@ -44,7 +42,6 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
 public class ShapefileRecordWriter extends XbaseRecordWriter {
-  private static final Logger LOG = LoggerFactory.getLogger(ShapefileRecordWriter.class);
 
   private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
 
@@ -100,7 +97,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         updateHeader(this.indexOut);
       }
     } catch (final IOException e) {
-      LOG.error(e.getMessage(), e);
+      Logs.error(this, e.getMessage(), e);
     } finally {
       this.out = null;
       this.indexOut = null;

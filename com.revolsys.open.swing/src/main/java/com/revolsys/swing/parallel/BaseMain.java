@@ -158,6 +158,5 @@ public class BaseMain implements UncaughtExceptionHandler {
       .build();
 
     LoggingEventPanel.showDialog(null, event);
-
   }
 }

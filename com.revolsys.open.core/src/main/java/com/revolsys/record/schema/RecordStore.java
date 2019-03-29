@@ -294,8 +294,6 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   Map<String, CodeTable> getCodeTableByFieldNameMap();
 
-  RecordStoreConnected getConnected();
-
   MapEx getConnectionProperties();
 
   String getConnectionTitle();

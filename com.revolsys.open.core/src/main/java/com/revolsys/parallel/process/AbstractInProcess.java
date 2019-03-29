@@ -1,8 +1,6 @@
 package com.revolsys.parallel.process;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.store.Buffer;
@@ -58,18 +56,17 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements In
   }
 
   @Override
-  public final void run() {
-    final Logger log = LoggerFactory.getLogger(getClass());
+  public void run() {
     try {
-      log.debug("Start");
+      Logs.debug(this, "Start");
       init();
       run(getIn());
     } catch (final ThreadDeath e) {
-      log.debug("Shutdown");
+      Logs.debug(this, "Shutdown");
     } catch (final ClosedException e) {
-      log.debug("Shutdown");
+      Logs.debug(this, "Shutdown");
     } catch (final Throwable e) {
-      log.error(e.getMessage(), e);
+      Logs.error(this, e.getMessage(), e);
       getProcessNetwork().stop();
     } finally {
       if (this.in != null) {

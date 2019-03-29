@@ -3,9 +3,6 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
-
-import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
@@ -15,9 +12,13 @@ import com.revolsys.record.schema.RecordStore;
 public class FileGdbWriter extends AbstractRecordWriter {
   private FileGdbRecordStore recordStore;
 
-  private Map<String, Table> tablesByCatalogPath = new HashMap<>();
+  private final Map<String, TableWrapper> tablesByCatalogPath = new HashMap<>();
 
   private RecordDefinition recordDefinition;
+
+  private TableWrapper table;
+
+  private PathName pathName;
 
   FileGdbWriter(final FileGdbRecordStore recordStore) {
     this.recordStore = recordStore;
@@ -25,36 +26,47 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   FileGdbWriter(final FileGdbRecordStore recordStore, final RecordDefinition recordDefinition) {
     this.recordStore = recordStore;
-    this.recordDefinition = recordDefinition;
+    if (recordDefinition != null) {
+      this.pathName = recordDefinition.getPathName();
+      this.table = recordStore.getTableLocked(recordDefinition);
+      this.recordDefinition = recordDefinition;
+    }
   }
 
   @Override
-  @PreDestroy
-  public synchronized void close() {
+  public void close() {
     try {
-      if (this.tablesByCatalogPath != null) {
-        for (final String catalogPath : this.tablesByCatalogPath.keySet()) {
-          this.recordStore.releaseTableAndWriteLock(catalogPath);
+      synchronized (this.tablesByCatalogPath) {
+        for (final TableWrapper table : this.tablesByCatalogPath.values()) {
+          table.close();
         }
       }
+      final TableWrapper table = this.table;
+      this.table = null;
+      if (table != null) {
+        table.close();
+      }
     } finally {
-      this.tablesByCatalogPath = null;
+      this.tablesByCatalogPath.clear();
       this.recordStore = null;
     }
   }
 
-  public synchronized void closeTable(final PathName typePath) {
-    if (this.tablesByCatalogPath != null) {
+  public void closeTable(final PathName typePath) {
+    synchronized (this.tablesByCatalogPath) {
       final String catalogPath = this.recordStore.getCatalogPath(typePath);
-      if (this.tablesByCatalogPath.remove(catalogPath) != null) {
-        this.recordStore.releaseTableAndWriteLock(catalogPath);
+      final TableWrapper table = this.tablesByCatalogPath.remove(catalogPath);
+      if (table != null) {
+        table.close();
       }
     }
   }
 
   private void deleteRecord(final Record record) {
-    final Table table = getTable(record);
-    this.recordStore.deleteRecord(table, record);
+    final TableWrapper table = getTable(record);
+    if (table != null) {
+      table.deleteRecord(record);
+    }
   }
 
   @Override
@@ -71,35 +83,62 @@ public class FileGdbWriter extends AbstractRecordWriter {
     return this.recordStore;
   }
 
-  private Table getTable(final Record record) {
+  private TableWrapper getTable(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
-    final String catalogPath = this.recordStore.getCatalogPath(recordDefinition);
-    Table table = this.tablesByCatalogPath.get(catalogPath);
-    if (table == null) {
-      table = this.recordStore.getTableWithWriteLock(recordDefinition);
-      if (table != null) {
-        this.tablesByCatalogPath.put(catalogPath, table);
+    return getTable(recordDefinition);
+  }
+
+  private TableWrapper getTable(final RecordDefinition recordDefinition) {
+    if (this.recordDefinition != null) {
+      if (this.recordDefinition == recordDefinition) {
+        return this.table;
+      } else if (recordDefinition.getPathName().equals(this.pathName)) {
+        return this.table;
       }
     }
-    return table;
+    final String catalogPath = this.recordStore.getCatalogPath(recordDefinition);
+    synchronized (this.tablesByCatalogPath) {
+      TableWrapper table = this.tablesByCatalogPath.get(catalogPath);
+      if (table == null) {
+        table = this.recordStore.getTableLocked(recordDefinition);
+        // TODO lock
+        if (table != null) {
+          this.tablesByCatalogPath.put(catalogPath, table);
+        }
+      }
+      return table;
+    }
   }
 
   private void insertRecord(final Record record) {
-    final Table table = getTable(record);
-    this.recordStore.insertRecord(table, record);
+    final TableWrapper table = getTable(record);
+    if (table != null) {
+      table.insertRecord(record);
+    }
   }
 
   public boolean isClosed() {
     return this.recordStore == null;
   }
 
+  @Override
+  public String toString() {
+    if (this.pathName == null) {
+      return this.recordStore.toString();
+    } else {
+      return this.pathName + "\n" + this.recordStore;
+    }
+  }
+
   private void updateRecord(final Record record) {
-    final Table table = getTable(record);
-    this.recordStore.updateRecord(table, record);
+    final TableWrapper table = getTable(record);
+    if (table != null) {
+      table.updateRecord(record);
+    }
   }
 
   @Override
-  public synchronized void write(final Record record) {
+  public void write(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final RecordStore recordStore = recordDefinition.getRecordStore();
     if (recordStore == this.recordStore) {

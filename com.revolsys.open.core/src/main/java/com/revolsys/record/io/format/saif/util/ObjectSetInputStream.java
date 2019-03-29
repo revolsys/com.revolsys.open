@@ -28,11 +28,7 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ObjectSetInputStream extends InputStream {
-  private static final Logger log = LoggerFactory.getLogger(ObjectSetInputStream.class);
 
   private File directory;
 
@@ -68,18 +64,12 @@ public class ObjectSetInputStream extends InputStream {
 
   @Override
   public void close() throws IOException {
-    if (log.isDebugEnabled()) {
-      log.debug("Closing object subset '" + this.fileName + "' from reading");
-    }
     if (this.in != null) {
       this.in.close();
     }
   }
 
   private InputStream openFile(final String fileName) throws IOException {
-    if (log.isDebugEnabled()) {
-      log.debug("Opening object subset '" + fileName + "' for reading");
-    }
     if (this.zipFile != null) {
       final ZipEntry entry = this.zipFile.getEntry(fileName);
       if (entry != null) {

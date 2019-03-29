@@ -8,12 +8,14 @@ import com.revolsys.esri.filegdb.jni.Row;
 
 public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
 
-  private final FileGdbRecordStore recordStore;
+  private TableWrapper table;
 
   private EnumRows rows;
 
-  FileGdbEnumRowsIterator(final FileGdbRecordStore recordStore, final EnumRows rows) {
-    this.recordStore = recordStore;
+  FileGdbEnumRowsIterator(final TableWrapper table, final EnumRows rows) {
+    if (table != null) {
+      this.table = table.connect();
+    }
     this.rows = rows;
   }
 
@@ -21,14 +23,11 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
   protected void closeDo() {
     synchronized (this) {
       closeObject();
-      final EnumRows rows = this.rows;
-      this.rows = null;
-      if (rows != null) {
-        try {
-          rows.Close();
-        } finally {
-          rows.delete();
-        }
+      final TableWrapper table = this.table;
+      if (table != null) {
+        this.rows = table.closeRows(this.rows);
+        this.table = null;
+        table.close();
       }
     }
   }
@@ -42,18 +41,12 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
 
   @Override
   protected Row getNext() {
-    synchronized (this.recordStore.getApiSync()) {
-      if (this.rows == null) {
-        throw new NoSuchElementException();
-      } else {
-        closeObject();
-        final Row row = this.rows.next();
-        if (row == null) {
-          throw new NoSuchElementException();
-        } else {
-          return row;
-        }
-      }
+    closeObject();
+    final Row row = this.table.nextRow(this.rows);
+    if (row == null) {
+      throw new NoSuchElementException();
+    } else {
+      return row;
     }
   }
 }

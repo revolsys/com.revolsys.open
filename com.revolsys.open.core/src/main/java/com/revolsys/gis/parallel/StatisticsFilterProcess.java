@@ -29,8 +29,7 @@ public class StatisticsFilterProcess extends FilterProcess<Record> {
   }
 
   @Override
-  protected void init() {
-    super.init();
+  protected void initializeDo() {
     if (this.acceptStatistics != null) {
       this.acceptStatistics.connect();
     }

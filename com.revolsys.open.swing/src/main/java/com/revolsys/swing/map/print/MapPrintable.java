@@ -58,7 +58,6 @@ public class MapPrintable implements Printable {
     this.rulerSizePixels = rulerSizePixels;
     this.millimetre = QuantityType.doubleValue(Quantities.getQuantity(1, CustomUnits.MILLIMETRE),
       USCustomary.INCH.divide(dpi));
-    ;
     this.minorDivisions = minorDivisions;
     this.majorDivisions = minorDivisions * 5;
     this.scale = scale;

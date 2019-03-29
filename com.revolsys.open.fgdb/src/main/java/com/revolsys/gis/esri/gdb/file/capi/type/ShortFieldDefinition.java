@@ -19,7 +19,7 @@ public class ShortFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public Object getValue(final Row row) {
-    synchronized (getSync()) {
+    synchronized (row) {
       if (row.isNull(this.fieldNumber)) {
         return null;
       } else {
@@ -35,13 +35,13 @@ public class ShortFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final short shortValue = number.shortValue();
-      synchronized (getSync()) {
+      synchronized (row) {
         row.setShort(this.fieldNumber, shortValue);
       }
     } else {
       final String string = value.toString();
       final short shortValue = Short.parseShort(string);
-      synchronized (getSync()) {
+      synchronized (row) {
         row.setShort(this.fieldNumber, shortValue);
       }
     }

@@ -55,7 +55,7 @@ public class LoggingEventPanel extends JPanel {
       label.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
       label.setFont(new JLabel().getFont());
 
-      label.setText(stringValue);
+      label.setText("<pre>" + stringValue + "</pre>");
       if (useScrollPane) {
         final JScrollPane scrollPane = new JScrollPane(label);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -82,14 +82,11 @@ public class LoggingEventPanel extends JPanel {
   }
 
   static String getStackTrace(final ThrowableProxy thrown) {
-    final StringBuilder stackTrace = new StringBuilder();
-    if (thrown != null) {
-      for (final StackTraceElement trace : thrown.getStackTrace()) {
-        stackTrace.append(trace);
-        stackTrace.append("\n");
-      }
+    if (thrown == null) {
+      return null;
+    } else {
+      return thrown.getExtendedStackTraceAsString();
     }
-    return stackTrace.toString();
   }
 
   public static void showDialog(final Component parent, final List<Object> event) {

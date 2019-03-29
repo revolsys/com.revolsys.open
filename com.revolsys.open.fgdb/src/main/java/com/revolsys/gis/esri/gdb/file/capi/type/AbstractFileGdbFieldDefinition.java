@@ -35,10 +35,6 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
     }
   }
 
-  public Object getSync() {
-    return getRecordStore().getApiSync();
-  }
-
   public abstract Object getValue(Row row);
 
   public boolean isAutoCalculated() {

@@ -29,7 +29,7 @@ public class DeleteFiles {
           final File file = resource.getFile();
           if (file.isDirectory()) {
             if (this.deleteDirectories) {
-              if (!FileUtil.deleteDirectory(file, true)) {
+              if (!FileUtil.deleteDirectory(file)) {
                 throw new RuntimeException("Unable to delete directory: " + file);
               }
             }

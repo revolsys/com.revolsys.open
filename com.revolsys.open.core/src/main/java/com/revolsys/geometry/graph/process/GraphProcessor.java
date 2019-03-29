@@ -30,8 +30,7 @@ public class GraphProcessor extends BaseInOutProcess<Record, Record> {
   }
 
   @Override
-  protected void init() {
-    super.init();
+  protected void initializeDo() {
     this.graph = new RecordGraph();
     if (this.precisionModel != null) {
       this.graph.setPrecisionModel(this.precisionModel);

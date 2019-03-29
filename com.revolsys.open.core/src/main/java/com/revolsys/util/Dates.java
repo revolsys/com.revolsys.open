@@ -389,6 +389,13 @@ public interface Dates {
     return calendar.get(Calendar.YEAR);
   }
 
+  static long infoEllapsedTime(final Object object, final String message, final long startTime) {
+    final long endTime = System.currentTimeMillis();
+    final String timeString = toEllapsedTime(startTime, endTime);
+    Logs.info(object, message + " " + timeString);
+    return endTime;
+  }
+
   static long printEllapsedTime(final long startTime) {
     final long endTime = System.currentTimeMillis();
     System.out.println(toEllapsedTime(startTime, endTime));
