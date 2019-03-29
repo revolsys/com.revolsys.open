@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.WindowConstants;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Style;
@@ -35,6 +36,11 @@ import com.revolsys.util.Exceptions;
 
 public class ProcessWindow extends JFrame {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final JTextPane textArea;
 
   private Process process;
@@ -50,7 +56,7 @@ public class ProcessWindow extends JFrame {
   public ProcessWindow(final String title) {
     super(title);
     this.threadPrefix = title.replaceAll("[^A-Za-z0-9_]", "_");
-    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     SwingUtil.setSize(this, 50, 100);
 
     this.textArea = new JTextPane();
@@ -173,7 +179,7 @@ public class ProcessWindow extends JFrame {
         this.stopProcessButton.setEnabled(false);
         this.statusLabel.setForeground(Color.red);
         this.statusLabel.setText("Terminated");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
       });
     });
   }

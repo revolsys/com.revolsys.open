@@ -561,19 +561,19 @@ public class SaifReader extends AbstractReader<Record>
       this.opened = true;
       try {
         if (Logs.isDebugEnabled(this)) {
-          Logs.debug(this,"Opening SAIF archive '" + this.file.getCanonicalPath() + "'");
+          Logs.debug(this, "Opening SAIF archive '" + this.file.getCanonicalPath() + "'");
         }
-         if (this.file.isDirectory()) {
+        if (this.file.isDirectory()) {
           this.saifArchiveDirectory = this.file;
         } else if (!this.file.exists()) {
           throw new IllegalArgumentException("SAIF file " + this.file + " does not exist");
         } else {
           this.zipFile = new ZipFile(this.file);
         }
-         if (Logs.isDebugEnabled(this)) {
-           Logs.debug(this,"  Finished opening archive");
-         }
-       loadSchema();
+        if (Logs.isDebugEnabled(this)) {
+          Logs.debug(this, "  Finished opening archive");
+        }
+        loadSchema();
         loadExportedObjects();
         loadSrid();
         final GeometryFactory geometryFactory = GeometryFactory.fixed3d(this.srid, 1.0, 1.0, 1.0);

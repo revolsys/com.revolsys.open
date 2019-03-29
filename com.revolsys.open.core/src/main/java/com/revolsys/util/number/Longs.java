@@ -37,6 +37,13 @@ public class Longs extends AbstractDataType {
     return left - right.longValue();
   }
 
+  public static long toLong(final int upperInt, final int lowerInt) {
+    final long lower = lowerInt & 0xffffffffL;
+    final long upper = upperInt & 0xffffffffL;
+    final long l = upper << 32 | lower;
+    return l;
+  }
+
   public static String toString(final long number) {
     return String.valueOf(number);
   }
@@ -145,13 +152,6 @@ public class Longs extends AbstractDataType {
   @Override
   protected String toStringDo(final Object value) {
     return String.valueOf((long)value);
-  }
-
-  public static long toLong(final int upperInt, final int lowerInt) {
-    final long lower = lowerInt & 0xffffffffL;
-    final long upper = upperInt & 0xffffffffL;
-    final long l = upper << 32 | lower;
-    return l;
   }
 
 }

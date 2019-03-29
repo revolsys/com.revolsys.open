@@ -33,9 +33,6 @@ public class LasProjection {
 
   private static final int ID_TIFF_GEO_ASCII_PARAMS = 34737;
 
-  private static final int ID_OGC_MATH_TRANSFORM_WKT_RECORD = 2111; // Not yet
-                                                                    // supported
-
   private static final Pair<String, Integer> KEY_TIFF_GEO_ASCII_PARAMS = new Pair<>(LASF_PROJECTION,
     ID_TIFF_GEO_ASCII_PARAMS);
 

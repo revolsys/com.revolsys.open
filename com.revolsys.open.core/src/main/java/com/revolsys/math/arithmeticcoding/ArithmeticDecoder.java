@@ -101,8 +101,8 @@ public class ArithmeticDecoder implements ArithmeticCodingCodec {
     int x;
     int y = this.length;
 
-    int[] decoderTable = model.decoderTable;
-    int[] distribution = model.distribution;
+    final int[] decoderTable = model.decoderTable;
+    final int[] distribution = model.distribution;
     if (decoderTable != null) {
       final int dv = Integer.divideUnsigned(this.value, this.length >>>= DM__LengthShift);
       final int t = dv >>> model.tableShift;

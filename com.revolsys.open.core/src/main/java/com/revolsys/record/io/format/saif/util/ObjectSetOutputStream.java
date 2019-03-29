@@ -26,8 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.revolsys.io.FileUtil;
-
 public class ObjectSetOutputStream extends OutputStream {
   private File file;
 

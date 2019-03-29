@@ -2,6 +2,11 @@ package com.revolsys.io;
 
 public class EndOfFileException extends RuntimeException {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public EndOfFileException() {
   }
 

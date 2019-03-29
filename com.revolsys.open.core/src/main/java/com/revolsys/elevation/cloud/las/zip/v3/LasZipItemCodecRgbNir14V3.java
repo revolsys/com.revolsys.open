@@ -63,10 +63,8 @@ public class LasZipItemCodecRgbNir14V3 implements LasZipItemCodec {
       this.contexts[i] = new LasZipContextRgbNir();
     }
     final int decompressSelective = LasZipDecompressSelective.ALL;
-    this.rgbDecoder.setEnabled(decompressSelective,
-      LasZipDecompressSelective.RGB);
-    this.nirDecoder.setEnabled(decompressSelective,
-      LasZipDecompressSelective.NIR);
+    this.rgbDecoder.setEnabled(decompressSelective, LasZipDecompressSelective.RGB);
+    this.nirDecoder.setEnabled(decompressSelective, LasZipDecompressSelective.NIR);
   }
 
   @Override

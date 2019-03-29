@@ -23,7 +23,8 @@ public class LasZipPointwiseChunkedIterator extends LasPointCloudIterator {
 
   private int context = 0;
 
-  public LasZipPointwiseChunkedIterator(final LasPointCloud pointCloud, final ChannelReader reader) {
+  public LasZipPointwiseChunkedIterator(final LasPointCloud pointCloud,
+    final ChannelReader reader) {
     super(pointCloud, reader);
     this.decoder = new ArithmeticDecoder();
     final LasZipHeader lasZipHeader = LasZipHeader.getLasZipHeader(pointCloud);

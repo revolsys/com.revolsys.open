@@ -10,8 +10,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.channels.ChannelWriter;
-import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
+import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
@@ -108,8 +108,7 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelWriter
     if (gridWidth > 0 && gridHeight > 0) {
       final GeometryFactory geometryFactory = elevationModel.getGeometryFactory();
       try (
-        final ArithmeticEncoder encoder = new ArithmeticEncoder(
-          writer)) {
+        final ArithmeticEncoder encoder = new ArithmeticEncoder(writer)) {
         final ArithmeticCodingInteger compressor = encoder.newCodecInteger(32);
 
         final double minZ = elevationModel.getBoundingBox().getMinZ();

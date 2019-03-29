@@ -19,8 +19,7 @@ public class ColorGradientStylePanel extends ValueField {
   public ColorGradientStylePanel(final ColorGradientGriddedElevationModelRasterizer style) {
     super("gradient", null);
     final MultiStopLinearGradient gradient = (MultiStopLinearGradient)style.getGradient();
-    final LambdaTableModel<GradientStop> tableModel = new LambdaTableModel<>(
-      gradient.getStops());
+    final LambdaTableModel<GradientStop> tableModel = new LambdaTableModel<>(gradient.getStops());
 
     tableModel.addColumnIndex();
 

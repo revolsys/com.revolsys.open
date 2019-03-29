@@ -31,8 +31,6 @@ public class LasZipLayeredChunkedWriter extends LasPointCloudWriter {
 
   private int contextIndex;
 
-  private int count = 0;
-
   private ArithmeticEncoder encoder;
 
   private final LasZipHeader lasZipHeader;
@@ -146,7 +144,6 @@ public class LasZipLayeredChunkedWriter extends LasPointCloudWriter {
 
   @Override
   public void writePoint(final LasPoint point) {
-    this.count++;
     this.header.addCounts(point);
     if (this.chunkPointCount == this.chunkMaxSize) {
       this.out.putInt(this.chunkPointCount);

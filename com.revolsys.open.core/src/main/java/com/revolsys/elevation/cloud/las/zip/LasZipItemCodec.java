@@ -13,15 +13,6 @@ package com.revolsys.elevation.cloud.las.zip;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
 public interface LasZipItemCodec {
-  default void writeChunkBytes() {
-  }
-
-  default void readChunkSizes() {
-  }
-
-  default void writeChunkSizes() {
-  }
-
   default int getVersion() {
     return 1;
   }
@@ -52,6 +43,9 @@ public interface LasZipItemCodec {
 
   int read(LasPoint point, int context);
 
+  default void readChunkSizes() {
+  }
+
   default int U32_ZERO_BIT_0(final int n) {
     return n & 0xFFFFFFFE;
   }
@@ -77,4 +71,10 @@ public interface LasZipItemCodec {
   }
 
   int write(LasPoint point, int context);
+
+  default void writeChunkBytes() {
+  }
+
+  default void writeChunkSizes() {
+  }
 }
