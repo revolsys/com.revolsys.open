@@ -174,21 +174,22 @@ public class TableReference extends CloseableValueHolder<Table> {
   }
 
   @Override
-  public void valueConsumeSync(final Consumer<Table> action) {
+  public synchronized void valueConsumeSync(final Consumer<Table> action) {
     synchronized (this.geodatabase) {
       super.valueConsumeSync(action);
     }
   }
 
   @Override
-  public <V> V valueFunctionSync(final Function<Table, V> action) {
+  public synchronized <V> V valueFunctionSync(final Function<Table, V> action) {
     synchronized (this.geodatabase) {
       return valueFunction(action);
     }
   }
 
   @Override
-  public <V> V valueFunctionSync(final Function<Table, V> action, final V defaultValue) {
+  public synchronized <V> V valueFunctionSync(final Function<Table, V> action,
+    final V defaultValue) {
     synchronized (this.geodatabase) {
       return valueFunction(action, defaultValue);
     }

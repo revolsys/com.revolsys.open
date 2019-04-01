@@ -125,13 +125,11 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
   }
 
   @Override
-  public void valueConsumeSync(final Consumer<R> action) {
-    synchronized (this) {
-      try {
-        super.valueConsume(action);
-      } finally {
-        disconnect();
-      }
+  public synchronized void valueConsumeSync(final Consumer<R> action) {
+    try {
+      super.valueConsume(action);
+    } finally {
+      disconnect();
     }
   }
 
@@ -154,24 +152,20 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
   }
 
   @Override
-  public <V> V valueFunctionSync(final Function<R, V> action) {
-    synchronized (this) {
-      try {
-        return super.valueFunction(action);
-      } finally {
-        disconnect();
-      }
+  public synchronized <V> V valueFunctionSync(final Function<R, V> action) {
+    try {
+      return super.valueFunction(action);
+    } finally {
+      disconnect();
     }
   }
 
   @Override
-  public <V> V valueFunctionSync(final Function<R, V> action, final V defaultValue) {
-    synchronized (this) {
-      try {
-        return super.valueFunction(action, defaultValue);
-      } finally {
-        disconnect();
-      }
+  public synchronized <V> V valueFunctionSync(final Function<R, V> action, final V defaultValue) {
+    try {
+      return super.valueFunction(action, defaultValue);
+    } finally {
+      disconnect();
     }
   }
 
