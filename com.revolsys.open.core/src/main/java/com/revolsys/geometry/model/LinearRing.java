@@ -37,10 +37,11 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
+
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.LineStringEditor;

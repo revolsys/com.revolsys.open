@@ -2,9 +2,10 @@ package com.revolsys.geometry.model;
 
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
-import com.revolsys.util.function.BiConsumerDouble;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.function.Consumer4Double;

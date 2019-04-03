@@ -38,9 +38,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PointEditor;
@@ -52,7 +54,6 @@ import com.revolsys.geometry.util.NumberUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.number.Doubles;

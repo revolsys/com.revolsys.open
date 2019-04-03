@@ -36,9 +36,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+
 import com.revolsys.collection.list.Lists;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
@@ -48,7 +49,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.util.OutCode;
-import com.revolsys.util.function.BiConsumerDouble;
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.function.Consumer4Double;

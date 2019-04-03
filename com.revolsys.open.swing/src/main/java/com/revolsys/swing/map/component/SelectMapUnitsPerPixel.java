@@ -19,8 +19,9 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.map.ComponentViewport2D;

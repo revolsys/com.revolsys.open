@@ -4,15 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.jeometry.coordinatesystem.model.Ellipsoid;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.operation.projection.CoordinatesProjection;
+import org.jeometry.coordinatesystem.operation.projection.TransverseMercator;
+import org.jeometry.coordinatesystem.operation.projection.TransverseMercatorThomas;
+import org.jeometry.coordinatesystem.operation.projection.TransverseMercatorUsgs;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.geometry.cs.Ellipsoid;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
-import com.revolsys.geometry.cs.projection.CoordinatesProjection;
-import com.revolsys.geometry.cs.projection.TransverseMercator;
-import com.revolsys.geometry.cs.projection.TransverseMercatorThomas;
-import com.revolsys.geometry.cs.projection.TransverseMercatorUsgs;
 import com.revolsys.math.Angle;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;

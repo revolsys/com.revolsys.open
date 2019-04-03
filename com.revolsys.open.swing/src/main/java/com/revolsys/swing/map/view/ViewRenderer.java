@@ -9,12 +9,13 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.Ellipsoid;
+import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.coordinatesystem.model.datum.GeodeticDatum;
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
+
 import com.revolsys.awt.WebColors;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.Ellipsoid;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.datum.GeodeticDatum;
-import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;

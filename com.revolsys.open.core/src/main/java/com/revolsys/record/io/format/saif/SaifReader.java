@@ -33,7 +33,8 @@ import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import com.revolsys.geometry.cs.epsg.EpsgId;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;

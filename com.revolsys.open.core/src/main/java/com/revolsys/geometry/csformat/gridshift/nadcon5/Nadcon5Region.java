@@ -9,7 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.Exceptions;

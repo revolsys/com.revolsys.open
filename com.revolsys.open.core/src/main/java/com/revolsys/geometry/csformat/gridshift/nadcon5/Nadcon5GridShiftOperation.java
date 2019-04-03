@@ -3,8 +3,8 @@ package com.revolsys.geometry.csformat.gridshift.nadcon5;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.operation.gridshift.HorizontalShiftOperation;
 
 public class Nadcon5GridShiftOperation implements HorizontalShiftOperation {
 

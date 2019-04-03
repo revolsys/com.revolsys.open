@@ -2,12 +2,12 @@ package com.revolsys.core.test.geometry.cs.projection;
 
 import java.util.function.BiFunction;
 
+import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.operation.projection.CoordinatesProjection;
 import org.junit.Assert;
 
 import com.revolsys.core.test.util.TestUtil;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
-import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.record.Record;

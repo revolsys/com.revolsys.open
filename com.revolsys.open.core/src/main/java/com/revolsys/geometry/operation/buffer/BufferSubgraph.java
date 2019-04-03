@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+
 import com.revolsys.geometry.geomgraph.DirectedEdge;
 import com.revolsys.geometry.geomgraph.DirectedEdgeStar;
 import com.revolsys.geometry.geomgraph.Edge;
@@ -53,7 +55,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.util.function.BiConsumerDouble;
 
 //import debug.*;
 

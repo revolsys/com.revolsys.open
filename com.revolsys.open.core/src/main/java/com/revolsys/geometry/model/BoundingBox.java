@@ -16,9 +16,10 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
+
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.LineStringDouble;

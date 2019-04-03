@@ -34,7 +34,7 @@ package com.revolsys.geometry.model.segment;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.util.function.BiConsumerDouble;
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
 
 public class LineSegmentDoubleXY extends AbstractLineSegment {
   private static final long serialVersionUID = 1L;

@@ -12,13 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.elevation.cloud.las.zip.LasZipHeader;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;

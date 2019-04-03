@@ -1,9 +1,9 @@
 package com.revolsys.elevation.gridded;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.geoid.GeoidModelReader;
-import com.revolsys.geometry.cs.geoid.GeoidModelReaderFactory;
-import com.revolsys.geometry.cs.geoid.GriddedElevationModelGeoidModelReader;
+import com.revolsys.geometry.geoid.GeoidModelReader;
+import com.revolsys.geometry.geoid.GeoidModelReaderFactory;
+import com.revolsys.geometry.geoid.GriddedElevationModelGeoidModelReader;
 import com.revolsys.spring.resource.Resource;
 
 public interface GriddedElevationModelReaderFactory extends GeoidModelReaderFactory {

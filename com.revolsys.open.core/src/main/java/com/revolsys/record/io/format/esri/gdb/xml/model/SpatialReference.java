@@ -1,7 +1,8 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 
@@ -12,9 +13,9 @@ public class SpatialReference implements GeometryFactoryProxy {
   public static SpatialReference get(final GeometryFactory geometryFactory, final String wkt) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      if (coordinateSystem instanceof com.revolsys.geometry.cs.GeographicCoordinateSystem) {
+      if (coordinateSystem instanceof org.jeometry.coordinatesystem.model.GeographicCoordinateSystem) {
         return new EsriGdbGeographicCoordinateSystem(geometryFactory, wkt);
-      } else if (coordinateSystem instanceof com.revolsys.geometry.cs.ProjectedCoordinateSystem) {
+      } else if (coordinateSystem instanceof org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem) {
         return new EsriGdbProjectedCoordinateSystem(geometryFactory, wkt);
       }
     }

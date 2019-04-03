@@ -8,7 +8,8 @@ import java.awt.print.Printable;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import com.revolsys.geometry.cs.unit.CustomUnits;
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.util.QuantityType;

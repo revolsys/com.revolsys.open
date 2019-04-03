@@ -16,11 +16,12 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;

@@ -32,8 +32,10 @@
  */
 package com.revolsys.geometry.model;
 
+import java.io.FileNotFoundException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,6 +49,22 @@ import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.jeometry.coordinatesystem.io.EsriCsWktWriter;
+import org.jeometry.coordinatesystem.io.WktCsParser;
+import org.jeometry.coordinatesystem.model.Area;
+import org.jeometry.coordinatesystem.model.CompoundCoordinateSystem;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.EpsgAuthority;
+import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystem;
+import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
+import org.jeometry.coordinatesystem.model.VerticalCoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+import org.jeometry.coordinatesystem.model.systems.EsriCoordinateSystems;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -54,19 +72,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.Area;
-import com.revolsys.geometry.cs.CompoundCoordinateSystem;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.HorizontalCoordinateSystem;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.VerticalCoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgAuthority;
-import com.revolsys.geometry.cs.epsg.EpsgId;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.model.editor.LineStringEditor;
@@ -101,7 +106,7 @@ import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.BiConsumerDouble;
+import com.revolsys.util.WrappedException;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer3Double;
 
@@ -519,14 +524,25 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     if (resource == null) {
       return DEFAULT_2D;
     } else {
-      final CoordinateSystem coordinateSystem = EsriCoordinateSystems
-        .readCoordinateSystem(resource);
-      if (coordinateSystem == null) {
-        return null;
-      } else {
-        final GeometryFactories instances = instances(coordinateSystem);
-        return instances.floating(axisCount);
+      final Resource projResource = resource.newResourceChangeExtension("prj");
+      if (projResource != null) {
+        try {
+          final String wkt = projResource.contentsAsString();
+          final CoordinateSystem coordinateSystem = EsriCoordinateSystems.readCoordinateSystem(wkt);
+          final GeometryFactories instances = instances(coordinateSystem);
+          return instances.floating(axisCount);
+        } catch (final WrappedException e) {
+          final Throwable cause = e.getCause();
+          if (cause instanceof FileNotFoundException) {
+          } else if (cause instanceof FileSystemException) {
+          } else {
+            Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
+          }
+        } catch (final Exception e) {
+          Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
+        }
       }
+      return null;
     }
   }
 

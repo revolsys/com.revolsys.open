@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;

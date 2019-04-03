@@ -1,10 +1,10 @@
 package com.revolsys.core.test.geometry.cs.esri;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.VerticalCoordinateSystem;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.VerticalCoordinateSystem;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
@@ -14,7 +14,7 @@ public class EsriCoordinateSystemsTest {
   private void doFileTest(final String type) {
     try (
       RecordReader reader = RecordReader.newRecordReader(
-        "../com.revolsys.open.coordinatesystems/src/main/data/esri/esri" + type + "Cs.tsv");) {
+        "../../jeometry/jeometry-coordinatesystem/src/main/data/esri/esri" + type + "Cs.tsv");) {
       for (final Record record : reader) {
         final int id = record.getInteger("ID");
         final String wkt = record.getString("WKT");
@@ -43,7 +43,7 @@ public class EsriCoordinateSystemsTest {
   public void verticalCoordinateSystems() {
     try (
       RecordReader reader = RecordReader.newRecordReader(
-        "../com.revolsys.open.coordinatesystems/src/main/data/esri/esriVerticalCs.tsv");) {
+        "../../jeometry/jeometry-coordinatesystem/src/main/data/esri/esriVerticalCs.tsv");) {
       for (final Record record : reader) {
         final int id = record.getInteger("ID");
         final String wkt = record.getString("WKT");

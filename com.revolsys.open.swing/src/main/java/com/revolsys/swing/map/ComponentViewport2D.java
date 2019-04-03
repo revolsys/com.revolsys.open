@@ -13,7 +13,8 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 import javax.swing.JComponent;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;

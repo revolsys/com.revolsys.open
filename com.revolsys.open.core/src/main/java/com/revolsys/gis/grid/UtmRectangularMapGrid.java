@@ -3,9 +3,10 @@ package com.revolsys.gis.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.epsg.EpsgId;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

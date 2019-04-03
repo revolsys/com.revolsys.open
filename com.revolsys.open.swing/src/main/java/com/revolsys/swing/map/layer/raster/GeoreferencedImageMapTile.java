@@ -4,7 +4,8 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.BufferedGeoreferencedImage;

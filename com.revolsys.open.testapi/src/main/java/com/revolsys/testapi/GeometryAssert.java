@@ -1,9 +1,9 @@
 package com.revolsys.testapi;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 import org.junit.Assert;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.Reader;

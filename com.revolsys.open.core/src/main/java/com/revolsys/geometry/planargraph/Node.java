@@ -33,9 +33,10 @@
 
 package com.revolsys.geometry.planargraph;
 
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.Consumer3Double;
 
 /**

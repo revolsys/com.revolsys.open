@@ -2,7 +2,7 @@ package com.revolsys.geometry.model;
 
 import java.util.Arrays;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
 public class GeometryFactoryFloating extends GeometryFactory {
 

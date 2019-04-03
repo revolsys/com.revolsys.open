@@ -3,10 +3,10 @@ package com.revolsys.gis.wms.capabilities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.w3c.dom.Element;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.WmsClient;

@@ -5,9 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;

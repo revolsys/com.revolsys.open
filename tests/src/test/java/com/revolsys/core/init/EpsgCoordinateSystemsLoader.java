@@ -10,12 +10,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystemType;
+import org.jeometry.coordinatesystem.model.unit.UnitOfMeasure;
+
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.geometry.cs.CoordinateSystemType;
-import com.revolsys.geometry.cs.unit.UnitOfMeasure;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.PathName;
 import com.revolsys.io.channels.ChannelWriter;
@@ -51,7 +52,7 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private final Resource baseResource = new PathResource(
-    "../com.revolsys.open.coordinatesystems/src/main/resources/CoordinateSystems/epsg");
+    "../../jeometry/jeometry-coordinatesystem/src/main/resources/org/jeometry/coordinatesystem/epsg");
 
   private final RecordStore recordStore;
 

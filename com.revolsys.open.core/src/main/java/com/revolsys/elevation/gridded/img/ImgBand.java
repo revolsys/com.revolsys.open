@@ -3,10 +3,11 @@ package com.revolsys.elevation.gridded.img;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.grid.FloatArrayGrid;

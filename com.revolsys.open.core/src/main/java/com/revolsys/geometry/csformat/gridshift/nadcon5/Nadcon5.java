@@ -1,6 +1,6 @@
 package com.revolsys.geometry.csformat.gridshift.nadcon5;
 
-import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
+import org.jeometry.coordinatesystem.operation.gridshift.HorizontalShiftOperation;
 
 public interface Nadcon5 {
 

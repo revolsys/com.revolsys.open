@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.revolsys.geometry.cs.epsg.EpsgId;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.logging.Logs;

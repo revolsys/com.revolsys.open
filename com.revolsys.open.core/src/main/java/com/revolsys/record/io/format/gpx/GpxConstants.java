@@ -2,9 +2,10 @@ package com.revolsys.record.io.format.gpx;
 
 import javax.xml.namespace.QName;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;

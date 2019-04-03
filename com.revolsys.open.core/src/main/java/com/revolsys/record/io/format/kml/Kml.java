@@ -6,10 +6,11 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Set;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
+
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.FileUtil;

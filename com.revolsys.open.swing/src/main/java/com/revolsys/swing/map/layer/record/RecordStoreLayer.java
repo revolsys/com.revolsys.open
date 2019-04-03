@@ -18,10 +18,11 @@ import java.util.function.Predicate;
 
 import javax.swing.SwingWorker;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+
 import com.revolsys.collection.iterator.Iterators;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;

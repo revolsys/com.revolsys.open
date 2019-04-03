@@ -5,7 +5,8 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.geometry.cs.epsg.EpsgId;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.geometry.model.GeometryFactory;
 
 public interface OsmConstants {

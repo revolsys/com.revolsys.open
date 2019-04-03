@@ -7,12 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.coordinatesystem.model.Ellipsoid;
+import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystemProxy;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
+import org.jeometry.coordinatesystem.operation.gridshift.HorizontalShiftOperation;
+
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.Ellipsoid;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.channels.ChannelReader;

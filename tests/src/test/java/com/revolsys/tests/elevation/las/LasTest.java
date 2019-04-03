@@ -15,6 +15,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -29,7 +30,6 @@ import com.revolsys.elevation.cloud.las.LasPointCloudHeader;
 import com.revolsys.elevation.cloud.las.LasPointCloudWriter;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryWithOffsets;
 import com.revolsys.logging.Logs;

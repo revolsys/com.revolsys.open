@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+
 import com.revolsys.geometry.algorithm.NotRepresentableException;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.Circle;
 import com.revolsys.geometry.model.impl.PointDoubleXY;

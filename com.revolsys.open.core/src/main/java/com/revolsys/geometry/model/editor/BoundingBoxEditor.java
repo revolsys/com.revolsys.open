@@ -2,16 +2,17 @@ package com.revolsys.geometry.model.editor;
 
 import java.util.Arrays;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.util.function.BiConsumerDouble;
 
 public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumerDouble {
 

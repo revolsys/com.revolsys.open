@@ -7,13 +7,13 @@ import java.util.List;
 
 import javax.measure.Unit;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.core.test.geometry.test.TestConstants;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

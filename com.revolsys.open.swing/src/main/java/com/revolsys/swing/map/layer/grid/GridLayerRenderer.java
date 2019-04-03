@@ -13,9 +13,10 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;

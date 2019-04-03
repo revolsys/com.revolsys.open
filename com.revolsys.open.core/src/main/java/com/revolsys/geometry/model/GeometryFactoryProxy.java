@@ -1,9 +1,9 @@
 package com.revolsys.geometry.model;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.ProjectionFactory;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystemProxy;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.projection.ProjectionFactory;
 
 public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
 

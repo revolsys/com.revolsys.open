@@ -39,7 +39,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.util.function.BiConsumerDouble;
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
 
 /**
  * Represents a line segment defined by two {@link Coordinates}s.

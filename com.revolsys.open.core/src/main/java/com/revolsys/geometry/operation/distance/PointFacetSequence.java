@@ -33,12 +33,13 @@
 
 package com.revolsys.geometry.operation.distance;
 
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.AbstractPoint;
-import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.Consumer3Double;
 
 /**

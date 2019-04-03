@@ -10,7 +10,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.BiConsumerDouble;
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer3Double;
 

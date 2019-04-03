@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -12,7 +13,6 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.revolsys.core.test.geometry.test.model.GeometryTestUtil;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;

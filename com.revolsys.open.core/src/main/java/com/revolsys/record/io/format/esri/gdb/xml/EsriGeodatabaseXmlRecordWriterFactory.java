@@ -4,8 +4,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.epsg.EpsgId;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;

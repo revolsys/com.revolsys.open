@@ -1,6 +1,6 @@
 package com.revolsys.geometry.csformat.gridshift.nadcon5;
 
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 public class Nadcon5RegionDatumGrids {
 

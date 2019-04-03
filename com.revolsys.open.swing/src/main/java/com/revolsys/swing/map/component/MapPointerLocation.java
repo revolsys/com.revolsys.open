@@ -9,7 +9,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.map.MapPanel;

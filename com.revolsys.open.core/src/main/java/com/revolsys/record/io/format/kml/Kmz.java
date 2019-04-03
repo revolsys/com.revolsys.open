@@ -4,8 +4,9 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Set;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;

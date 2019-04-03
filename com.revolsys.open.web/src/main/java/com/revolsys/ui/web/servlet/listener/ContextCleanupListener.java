@@ -12,10 +12,10 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.DisposableBean;
 
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.logging.Logs;

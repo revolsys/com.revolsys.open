@@ -1,6 +1,7 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+
 import com.revolsys.geometry.model.BoundingBox;
 
 public class EnvelopeN extends Envelope {

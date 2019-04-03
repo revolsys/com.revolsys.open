@@ -3,9 +3,10 @@ package com.revolsys.core.test.geometry.test.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

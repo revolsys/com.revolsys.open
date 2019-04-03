@@ -12,9 +12,9 @@ import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.w3c.dom.Document;
 
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.capabilities.WmsCapabilities;

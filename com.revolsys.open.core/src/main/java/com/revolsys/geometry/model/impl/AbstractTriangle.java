@@ -1,7 +1,8 @@
 package com.revolsys.geometry.model.impl;
 
+import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+
 import com.revolsys.geometry.model.Triangle;
-import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer3Double;
 
