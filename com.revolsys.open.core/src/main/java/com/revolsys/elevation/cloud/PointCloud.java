@@ -74,8 +74,7 @@ public interface PointCloud<P extends Point>
     return Predicates.all();
   }
 
-  default GriddedElevationModel newGriddedElevationModel(
-    final Map<String, ? extends Object> properties) {
+  default GriddedElevationModel newGriddedElevationModel(final int gridCellSize) {
     final TriangulatedIrregularNetwork tin = newTriangulatedIrregularNetwork();
     final BoundingBox boundingBox = getBoundingBox();
     final int minX = (int)Math.floor(boundingBox.getMinX());
@@ -86,10 +85,16 @@ public interface PointCloud<P extends Point>
     final int height = maxY - minY;
     final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
       getGeometryFactory().convertAxisCountAndScales(3, 1000.0, 1000.0, 1000.0), minX, minY, width,
-      height, 1);
+      height, gridCellSize);
 
     tin.forEachTriangle(elevationModel::setElevationsForTriangle);
-    return null;
+    return elevationModel;
+  }
+
+  default GriddedElevationModel newGriddedElevationModel(
+    final Map<String, ? extends Object> properties) {
+    final int gridCellSize = 1;
+    return newGriddedElevationModel(gridCellSize);
   }
 
   default TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
