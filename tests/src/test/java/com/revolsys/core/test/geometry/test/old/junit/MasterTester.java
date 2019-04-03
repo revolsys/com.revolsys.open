@@ -57,8 +57,6 @@ import com.revolsys.core.test.geometry.test.old.geom.RectanglePredicateSynthetic
 import com.revolsys.core.test.geometry.test.old.geom.RectanglePredicateTest;
 import com.revolsys.core.test.geometry.test.old.io.GeometryFactoryWktTest;
 import com.revolsys.core.test.geometry.test.old.io.WKBTest;
-import com.revolsys.core.test.geometry.test.old.linearref.LengthIndexedLineTest;
-import com.revolsys.core.test.geometry.test.old.linearref.LocationIndexedLineTest;
 import com.revolsys.core.test.geometry.test.old.operation.CascadedPolygonUnionTest;
 import com.revolsys.core.test.geometry.test.old.operation.DistanceTest;
 import com.revolsys.core.test.geometry.test.old.operation.IsValidTest;
@@ -83,9 +81,8 @@ import junit.framework.TestCase;
   AngleTest.class, AreaLengthTest.class, CascadedPolygonUnionTest.class,
   ConformingDelaunayTest.class, ConvexHullTest.class, DelaunayTest.class, DistanceTest.class,
   GeometryCollectionImplTest.class, GeometryImplTest.class, IntersectionMatrixTest.class,
-  IsCounterClockWiseTest.class, IsRectangleTest.class, IsValidTest.class,
-  LengthIndexedLineTest.class, LineMergerTest.class, LineStringImplTest.class,
-  LocationIndexedLineTest.class, MiscellaneousTest.class, MiscellaneousTest2.class,
+  IsCounterClockWiseTest.class, IsRectangleTest.class, IsValidTest.class, LineMergerTest.class,
+  LineStringImplTest.class, MiscellaneousTest.class, MiscellaneousTest2.class,
   MultiPointImplTest.class, NonRobustLineIntersectorTest.class, NormalizeTest.class,
   PointImplTest.class, PolygonizeTest.class, PredicateShortCircuitTest.class,
   RectanglePredicateSyntheticTest.class, RectanglePredicateTest.class,
