@@ -10,11 +10,11 @@ import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.io.PathName;
 import com.revolsys.logging.Logs;
 import com.revolsys.util.CloseableValueHolder;
+import com.revolsys.util.ValueHolder;
 import com.revolsys.util.ValueWrapper;
 
 public class TableReference extends CloseableValueHolder<Table> {
-
-  private final TableWrapper closeable = new TableWrapper() {
+  private class EsriFileGdbTableConnection implements TableWrapper {
 
     @Override
     public void close() {
@@ -27,36 +27,20 @@ public class TableReference extends CloseableValueHolder<Table> {
     }
 
     @Override
-    public com.revolsys.util.ValueHolder<Table> getValueHolder() {
+    public ValueHolder<Table> getValueHolder() {
       return TableReference.this;
     }
-  };
-
-  private final TableWrapper locker = new TableWrapper() {
 
     @Override
+    public String toString() {
+      return TableReference.this.toString();
+    }
+  }
+
+  private class EsriFileGdbTableLock implements TableWrapper {
+    @Override
     public void close() {
-      synchronized (TableReference.this) {
-        if (!isClosed()) {
-          TableReference.this.lockCount--;
-          if (TableReference.this.lockCount <= 0) {
-            TableReference.this.lockCount = 0;
-            try {
-              final Table table = TableReference.this.value;
-              if (table != null) {
-                synchronized (table) {
-                  setLoadOnlyMode(false);
-                  table.freeWriteLock();
-                }
-              }
-            } catch (final Exception e) {
-              Logs.error(this,
-                "Unable to free write lock for table: " + TableReference.this.catalogPath, e);
-            }
-          }
-        }
-      }
-      disconnect();
+      writeUnlock();
     }
 
     @Override
@@ -65,16 +49,25 @@ public class TableReference extends CloseableValueHolder<Table> {
     }
 
     @Override
-    public com.revolsys.util.ValueHolder<Table> getValueHolder() {
+    public ValueHolder<Table> getValueHolder() {
       return TableReference.this;
     }
+
+    @Override
+    public String toString() {
+      return TableReference.this.toString();
+    }
   };
+
+  private final TableWrapper locker = new EsriFileGdbTableLock();
 
   private int lockCount = 0;
 
   private final String catalogPath;
 
   private final ValueWrapper<Geodatabase> geodatabase;
+
+  private ValueWrapper<Geodatabase> geodatabaseClosable;
 
   private final FileGdbRecordStore recordStore;
 
@@ -83,14 +76,18 @@ public class TableReference extends CloseableValueHolder<Table> {
   TableReference(final FileGdbRecordStore recordStore, final ValueWrapper<Geodatabase> geodatabase,
     final PathName pathName, final String catalogPath) {
     this.recordStore = recordStore;
-    this.geodatabase = geodatabase.connect();
+    this.geodatabase = geodatabase;
     this.pathName = pathName;
     this.catalogPath = catalogPath;
   }
 
   @Override
   public void closeAfter() {
-    this.geodatabase.close();
+    final ValueWrapper<Geodatabase> geodatabaseClosable = this.geodatabaseClosable;
+    this.geodatabaseClosable = null;
+    if (geodatabaseClosable != null) {
+      geodatabaseClosable.close();
+    }
   }
 
   EnumRows closeRows(final EnumRows rows) {
@@ -123,6 +120,11 @@ public class TableReference extends CloseableValueHolder<Table> {
     return this.lockCount >= 0;
   }
 
+  @Override
+  protected TableWrapper newCloseable() {
+    return new EsriFileGdbTableConnection();
+  }
+
   Row nextRow(final EnumRows rows) {
     if (rows == null) {
       return null;
@@ -133,16 +135,8 @@ public class TableReference extends CloseableValueHolder<Table> {
     }
   }
 
-  FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {
-    final TableWrapper table = connect();
-    final EnumRows rows = this.geodatabase
-      .valueFunctionSync(geodatabase -> geodatabase.query(sql, recycling));
-    if (rows == null) {
-      table.close();
-      return null;
-    } else {
-      return new FileGdbEnumRowsIterator(table, rows);
-    }
+  EnumRows query(final String sql, final boolean recycling) {
+    return this.geodatabase.valueFunctionSync(geodatabase -> geodatabase.query(sql, recycling));
   }
 
   synchronized void setLoadOnlyMode(final boolean loadOnly) {
@@ -151,26 +145,29 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   @Override
   public String toString() {
-    return this.catalogPath;
+    return this.recordStore.getFileName() + "\t" + this.catalogPath;
   }
 
   @Override
   protected void valueClose(final Table table) {
-    this.geodatabase.valueConsumeSync(geodatabase -> {
-      try {
-        geodatabase.closeTable(table);
-      } catch (final Exception e) {
-        Logs.error(this, "Unable to close table: " + this.catalogPath, e);
-      } finally {
-        table.delete();
+    try {
+      this.geodatabase.valueConsumeSync(geodatabase -> {
+        try {
+          geodatabase.closeTable(table);
+        } catch (final Exception e) {
+          Logs.error(this, "Unable to close table: " + this.catalogPath, e);
+        } finally {
+          table.delete();
+        }
+      });
+    } finally {
 
+      final ValueWrapper<Geodatabase> geodatabaseClosable = this.geodatabaseClosable;
+      this.geodatabaseClosable = null;
+      if (geodatabaseClosable != null) {
+        geodatabaseClosable.close();
       }
-    });
-  }
-
-  @Override
-  protected TableWrapper valueConnectCloseable() {
-    return this.closeable;
+    }
   }
 
   @Override
@@ -197,16 +194,40 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   @Override
   protected Table valueNew() {
+    this.geodatabaseClosable = this.geodatabase.connect();
     return this.recordStore
       .threadGeodatabaseResult(geodatabase -> geodatabase.openTable(this.catalogPath));
   }
 
   synchronized TableWrapper writeLock() {
     final Table table = getValue();
-    if (++this.lockCount == 1) {
-      table.setWriteLock();
+    final boolean locked = this.lockCount > 0;
+    this.lockCount++;
+    if (!locked) {
+      this.recordStore.lockTable(table);
       setLoadOnlyMode(true);
     }
     return this.locker;
+  }
+
+  private synchronized void writeUnlock() {
+    try {
+      if (!isClosed()) {
+        final boolean locked = this.lockCount > 0;
+        this.lockCount--;
+        if (this.lockCount <= 0) {
+          this.lockCount = 0;
+          final Table table = this.value;
+          if (table != null && locked) {
+            this.recordStore.unlockTable(table);
+            setLoadOnlyMode(false);
+          }
+        }
+      }
+    } catch (final Exception e) {
+      Logs.error(this, "Unable to free write lock for table: " + this, e);
+    } finally {
+      disconnect();
+    }
   }
 }

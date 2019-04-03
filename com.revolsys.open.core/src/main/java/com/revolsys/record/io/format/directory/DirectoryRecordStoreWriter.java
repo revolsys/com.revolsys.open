@@ -5,13 +5,22 @@ import javax.annotation.PreDestroy;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class DirectoryRecordStoreWriter extends AbstractRecordWriter {
 
   private DirectoryRecordStore recordStore;
 
+  private RecordDefinition recordDefinition;
+
   public DirectoryRecordStoreWriter(final DirectoryRecordStore recordStore) {
     this.recordStore = recordStore;
+  }
+
+  public DirectoryRecordStoreWriter(final DirectoryRecordStore recordStore,
+    final RecordDefinition recordDefinition) {
+    this.recordStore = recordStore;
+    this.recordDefinition = recordDefinition;
   }
 
   @PreDestroy
@@ -19,6 +28,11 @@ public class DirectoryRecordStoreWriter extends AbstractRecordWriter {
   public void close() {
     super.close();
     this.recordStore = null;
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   @Override

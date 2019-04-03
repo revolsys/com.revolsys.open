@@ -235,6 +235,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
+    return new DirectoryRecordStoreWriter(this, recordDefinition);
+  }
+
+  @Override
   protected Map<PathName, RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
     final Map<PathName, RecordStoreSchemaElement> elements = new TreeMap<>();

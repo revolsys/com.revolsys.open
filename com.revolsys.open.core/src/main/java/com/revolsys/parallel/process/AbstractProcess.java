@@ -49,7 +49,7 @@ public abstract class AbstractProcess implements Process, BeanNameAware {
 
   @Override
   public String toString() {
-    final String className = getClass().getName();
+    final String className = getClass().getSimpleName();
     if (this.beanName == null) {
       return className;
     } else {

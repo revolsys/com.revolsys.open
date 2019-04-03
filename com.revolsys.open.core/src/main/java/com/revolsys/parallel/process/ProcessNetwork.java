@@ -21,7 +21,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.TargetBeanProcess;
 
@@ -308,7 +307,11 @@ public class ProcessNetwork
               removeProcess(runProcess);
             }
           };
-          thread = new Thread(this.threadGroup, runnable, name);
+          if (name == null) {
+            thread = new Thread(this.threadGroup, runnable);
+          } else {
+            thread = new Thread(this.threadGroup, runnable, name);
+          }
           this.processes.put(runProcess, thread);
           if (!thread.isAlive()) {
             thread.start();
