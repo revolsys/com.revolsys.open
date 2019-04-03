@@ -5,9 +5,9 @@ import org.junit.Test;
 
 import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
-import com.revolsys.geometry.cs.gridshift.gsb.GsbGridShiftFile;
-import com.revolsys.geometry.cs.gridshift.nadcon5.Nadcon5GridShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
+import com.revolsys.geometry.csformat.gridshift.gsb.GsbGridShiftFile;
+import com.revolsys.geometry.csformat.gridshift.nadcon5.Nadcon5GridShiftOperation;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.record.Record;

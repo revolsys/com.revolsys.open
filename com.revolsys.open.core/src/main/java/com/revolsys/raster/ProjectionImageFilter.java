@@ -3,7 +3,6 @@ package com.revolsys.raster;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
@@ -21,11 +20,6 @@ public class ProjectionImageFilter extends WholeImageFilter {
   private final int destWidth;
 
   private final BoundingBox sourceBoundingBox;
-
-  public ProjectionImageFilter(final BoundingBox imageBoundingBox,
-    final CoordinateSystem destCoordinateSystem, final double resolution) {
-    this(imageBoundingBox, destCoordinateSystem.getGeometryFactory(), resolution);
-  }
 
   public ProjectionImageFilter(final BoundingBox sourceBoundingBox,
     final GeometryFactory destGeometryFactory, final double destPixelSize) {

@@ -7,7 +7,7 @@ import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.Property;
 
-public class SelectMapCoordinateSystem extends CoordinateSystemField {
+public class SelectMapCoordinateSystem extends GeometryFactoryField {
   private static final long serialVersionUID = 1L;
 
   private ComponentViewport2D viewport;

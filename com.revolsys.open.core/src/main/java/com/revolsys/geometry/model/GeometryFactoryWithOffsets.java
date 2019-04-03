@@ -7,32 +7,11 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 
 public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
 
-  private static final long serialVersionUID = 1L;
-
-  public static GeometryFactory newWithOffsets(final CoordinateSystem coordinateSystem,
-    final double offsetX, final double scaleX, final double offsetY, final double scaleY,
-    final double offsetZ, final double scaleZ) {
-    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
-      if (coordinateSystem == null) {
-        return GeometryFactory.fixed3d(0, scaleX, scaleY, scaleZ);
-      } else {
-        return coordinateSystem.getGeometryFactoryFixed(3, scaleX, scaleY, scaleZ);
-      }
-    } else {
-      return new GeometryFactoryWithOffsets(coordinateSystem, offsetX, scaleX, offsetY, scaleY,
-        offsetZ, scaleZ);
-    }
-  }
-
   public static GeometryFactory newWithOffsets(final int coordinateSystemId, final double offsetX,
     final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
     final double scaleZ) {
-    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
-      return GeometryFactory.fixed3d(coordinateSystemId, scaleX, scaleY, scaleZ);
-    } else {
-      return new GeometryFactoryWithOffsets(coordinateSystemId, offsetX, scaleX, offsetY, scaleY,
-        offsetZ, scaleZ);
-    }
+    final GeometryFactories instances = GeometryFactory.instances(coordinateSystemId);
+    return instances.fixedWithOffsets(offsetX, scaleX, offsetY, scaleY, offsetZ, scaleZ);
   }
 
   private final double offsetX;
@@ -41,37 +20,47 @@ public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
 
   private final double offsetZ;
 
-  public GeometryFactoryWithOffsets(final CoordinateSystem coordinateSystem, final double offsetX,
+  public GeometryFactoryWithOffsets(final GeometryFactories instances, final double offsetX,
     final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
     final double scaleZ) {
-    super(coordinateSystem, 3, scaleX, scaleY, scaleZ);
-    this.offsetX = offsetX;
-    this.offsetY = offsetY;
-    this.offsetZ = offsetZ;
-  }
-
-  protected GeometryFactoryWithOffsets(final int coordinateSystemId, final double offsetX,
-    final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
-    final double scaleZ) {
-    super(coordinateSystemId, 3, scaleX, scaleY, scaleZ);
+    super(instances, 3, scaleX, scaleY, scaleZ);
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.offsetZ = offsetZ;
   }
 
   @Override
-  public GeometryFactoryWithOffsets convertCoordinateSystem(
-    final CoordinateSystem coordinateSystem) {
+  public GeometryFactory convertCoordinateSystem(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
       return this;
     } else {
       if (coordinateSystem == this.coordinateSystem) {
         return this;
       } else {
-        return new GeometryFactoryWithOffsets(coordinateSystem, this.offsetX, this.scaleX,
-          this.offsetY, this.scaleY, this.offsetZ, this.scaleZ);
+        return instances(coordinateSystem).fixedWithOffsets(this.offsetX, this.scaleX, this.offsetY,
+          this.scaleY, this.offsetZ, this.scaleZ);
       }
     }
+  }
+
+  @Override
+  public GeometryFactory convertScales(final double... scales) {
+    double scaleX = 0;
+    double scaleY = 0;
+    final double scaleZ = 0;
+    if (scales != null) {
+      if (scales.length >= 1) {
+        scaleX = scales[0];
+      }
+      if (scales.length >= 2) {
+        scaleY = scales[1];
+      }
+      if (scales.length >= 3) {
+        scaleY = scales[2];
+      }
+    }
+    return this.instances.fixedWithOffsets(this.offsetX, scaleX, this.offsetY, scaleY, this.offsetZ,
+      scaleZ);
   }
 
   @Override
@@ -90,8 +79,8 @@ public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
           scales[i] = defaultScale;
         }
       }
-      return new GeometryFactoryWithOffsets(this.coordinateSystem, this.offsetX, this.offsetY,
-        this.offsetZ, scales[0], scales[1], scales[2]);
+      return new GeometryFactoryWithOffsets(this.instances, this.offsetX, scales[0], this.offsetY,
+        scales[1], this.offsetZ, scales[2]);
     } else {
       return this;
     }

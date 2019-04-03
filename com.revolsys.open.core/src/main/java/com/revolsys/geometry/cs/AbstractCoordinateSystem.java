@@ -10,18 +10,11 @@ import com.revolsys.geometry.cs.epsg.EpsgAuthority;
 import com.revolsys.geometry.cs.projection.ChainedCoordinatesOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.NoOpOperation;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.GeometryFactoryFixed;
-import com.revolsys.geometry.model.GeometryFactoryFloating;
 import com.revolsys.logging.Logs;
 
 public abstract class AbstractCoordinateSystem implements CoordinateSystem {
-  private static final long serialVersionUID = 1L;
 
   private static final Object SYNC = new Object();
-
-  private GeometryFactory[] geometryFactoryByAxisCount;
 
   private final Area area;
 
@@ -34,10 +27,6 @@ public abstract class AbstractCoordinateSystem implements CoordinateSystem {
   private final int id;
 
   private final String name;
-
-  private BoundingBox areaBoundingBox;
-
-  private List<GeometryFactory>[] geometryFactoryFixedByAxisCount;
 
   private Map<CoordinateSystem, CoordinatesOperation> coordinatesOperationByCoordinateSystem;
 
@@ -128,14 +117,6 @@ public abstract class AbstractCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public BoundingBox getAreaBoundingBox() {
-    if (this.areaBoundingBox == null) {
-      this.areaBoundingBox = newAreaBoundingBox();
-    }
-    return this.areaBoundingBox;
-  }
-
-  @Override
   public Authority getAuthority() {
     return this.authority;
   }
@@ -188,88 +169,10 @@ public abstract class AbstractCoordinateSystem implements CoordinateSystem {
     return this.name;
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public GeometryFactory getGeometryFactoryFixed(final int axisCount, final double... scales) {
-    if (axisCount < 2 || axisCount > 4) {
-      throw new IllegalArgumentException("AxisCount must be in the range 2..4 not " + axisCount);
-    } else {
-      if (scales == null) {
-        return getGeometryFactoryFloating(axisCount);
-      } else {
-        boolean allZero = true;
-        for (final double scale : scales) {
-          if (scale > 0) {
-            allZero = false;
-          }
-        }
-        if (allZero) {
-          return getGeometryFactoryFloating(axisCount);
-        }
-      }
-      if (this.geometryFactoryFixedByAxisCount == null) {
-        synchronized (SYNC) {
-          if (this.geometryFactoryFixedByAxisCount == null) {
-            this.geometryFactoryFixedByAxisCount = new List[3];
-          }
-        }
-      }
-      final int index = axisCount - 2;
-      List<GeometryFactory> geometryFactories = this.geometryFactoryFixedByAxisCount[index];
-      if (geometryFactories == null) {
-        synchronized (this.geometryFactoryFixedByAxisCount) {
-          if (geometryFactories == null) {
-            geometryFactories = new ArrayList<>();
-            this.geometryFactoryFixedByAxisCount[index] = geometryFactories;
-          }
-        }
-      }
-      synchronized (geometryFactories) {
-        for (final GeometryFactory matchFactory : geometryFactories) {
-          if (matchFactory.equalsScales(scales)) {
-            return matchFactory;
-          }
-        }
-        final GeometryFactory geometryFactory = new GeometryFactoryFixed(this, axisCount, scales);
-        geometryFactories.add(geometryFactory);
-        return geometryFactory;
-      }
-    }
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactoryFloating(final int axisCount) {
-    if (axisCount < 2 || axisCount > 4) {
-      throw new IllegalArgumentException("AxisCount must be in the range 2..4 not " + axisCount);
-    } else {
-      if (this.geometryFactoryByAxisCount == null) {
-        synchronized (SYNC) {
-          if (this.geometryFactoryByAxisCount == null) {
-            this.geometryFactoryByAxisCount = new GeometryFactory[3];
-          }
-        }
-      }
-      final int index = axisCount - 2;
-      GeometryFactory geometryFactory = this.geometryFactoryByAxisCount[index];
-      if (geometryFactory == null) {
-        synchronized (SYNC) {
-          geometryFactory = this.geometryFactoryByAxisCount[index];
-          if (geometryFactory == null) {
-            geometryFactory = new GeometryFactoryFloating(this, axisCount);
-            this.geometryFactoryByAxisCount[index] = geometryFactory;
-          }
-        }
-      }
-      return geometryFactory;
-    }
-  }
-
   @Override
   public boolean isDeprecated() {
     return this.deprecated;
   }
-
-  protected abstract BoundingBox newAreaBoundingBox();
 
   protected CoordinatesOperation newCoordinatesOperation(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null || this == coordinateSystem) {

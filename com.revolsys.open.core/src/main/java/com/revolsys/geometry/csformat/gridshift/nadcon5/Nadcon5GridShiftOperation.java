@@ -1,4 +1,4 @@
-package com.revolsys.geometry.cs.gridshift.nadcon5;
+package com.revolsys.geometry.csformat.gridshift.nadcon5;
 
 import java.util.ArrayList;
 import java.util.List;

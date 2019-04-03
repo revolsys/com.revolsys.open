@@ -46,29 +46,25 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
 
   protected abstract BufferedImage loadBuffferedImage();
 
-  protected GeoreferencedImage loadData(final CoordinateSystem coordinateSystem) {
+  @Override
+  public GeoreferencedImage loadData(final GeometryFactory geometryFactory) {
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     synchronized (this.projectedImages) {
       GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
       if (projectedImage == null) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
+        final GeometryFactory geometryFactoryThis = getGeometryFactory();
         GeoreferencedImage image = getData();
         if (image == null) {
           image = loadData();
-          this.projectedImages.put(geometryFactory.getHorizontalCoordinateSystem(), image);
+          this.projectedImages.put(geometryFactoryThis.getHorizontalCoordinateSystem(), image);
         }
         if (image != null) {
-          projectedImage = image.getImage(coordinateSystem, getResolution());
+          projectedImage = image.getImage(geometryFactory, getResolution());
           this.projectedImages.put(coordinateSystem, projectedImage);
         }
       }
       return projectedImage;
     }
-  }
-
-  @Override
-  public GeoreferencedImage loadData(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-    return loadData(coordinateSystem);
   }
 
   @Override

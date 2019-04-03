@@ -229,7 +229,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       if (coordinateSystem != null) {
-        final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
+        final BoundingBox boundingBox = geometryFactory.getAreaBoundingBox();
         this.out.startTag(EXTENT);
         this.out.attribute(XsiConstants.TYPE, ENVELOPE_N_TYPE);
         this.out.element(X_MIN, boundingBox.getMinX());

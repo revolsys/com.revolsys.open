@@ -370,6 +370,16 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return true;
   }
 
+  default void applyCoordinatesOperation(final CoordinatesOperation operation,
+    final BiConsumerDouble action) {
+    final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+    forEachVertex((x, y) -> {
+      point.setPoint(x, y);
+      operation.perform(point);
+      point.apply2d(action);
+    });
+  }
+
   @SuppressWarnings("unchecked")
   default <GIN extends Geometry, GRET extends Geometry> GRET applyGeometry(
     final Function<? super GIN, ? super Geometry> function) {

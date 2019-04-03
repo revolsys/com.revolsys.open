@@ -34,7 +34,7 @@ public abstract class GriddedElevationModelTest {
   1. Write the model to the file specified by filePath.
   2. Read the model from the written file.
   3. Compare the read model with the original model
-
+  
    * @param model The model to test.
    * @param filePath The file to write to.
    */
@@ -57,7 +57,7 @@ public abstract class GriddedElevationModelTest {
   Create a new {@link UsgsGriddedElevationModel}.
   The elevation for each cell is set to gridX.gridY (e.g. 10.34).
   Except where gridX == gridY where NaN is used.
-  
+
    * @param coordinateSystemId The coordinate system id.
    * @return The model
    */

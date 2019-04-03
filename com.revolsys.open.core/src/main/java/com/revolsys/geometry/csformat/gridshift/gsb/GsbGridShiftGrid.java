@@ -1,4 +1,4 @@
-package com.revolsys.geometry.cs.gridshift.gsb;
+package com.revolsys.geometry.csformat.gridshift.gsb;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,8 +93,8 @@ public class GsbGridShiftGrid {
   }
 
   public BoundingBox getBoundingBox() {
-    final GeometryFactory geometryFactory = this.file.getFromCoordinateSystem()
-      .getGeometryFactoryFloating(2);
+    final GeometryFactory geometryFactory = GeometryFactory
+      .floating2d(this.file.getFromCoordinateSystem());
     return geometryFactory.newBoundingBox(-this.minX / 3600, this.minY / 3600, -this.maxX / 3600,
       this.maxY / 3600);
   }

@@ -1,7 +1,5 @@
 package com.revolsys.geometry.cs.epsg;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -79,8 +77,6 @@ public final class EpsgCoordinateSystems {
   private static Set<CoordinateSystem> coordinateSystems;
 
   private static final IntHashMap<Datum> DATUM_BY_ID = new IntHashMap<>();
-
-  private static final EpsgCoordinateSystems INSTANCE = new EpsgCoordinateSystems();
 
   private static boolean initialized = false;
 
@@ -928,13 +924,6 @@ public final class EpsgCoordinateSystems {
   private static <V> V readCode(final ChannelReader reader, final IntHashMap<V> valueById) {
     final int id = reader.getInt();
     return getCode(valueById, id);
-  }
-
-  public static String toWkt(final CoordinateSystem coordinateSystem) {
-    final StringWriter stringWriter = new StringWriter();
-    final PrintWriter out = new PrintWriter(stringWriter);
-    EpsgCsWktWriter.write(out, coordinateSystem);
-    return stringWriter.toString();
   }
 
   public static GeographicCoordinateSystem wgs84() {

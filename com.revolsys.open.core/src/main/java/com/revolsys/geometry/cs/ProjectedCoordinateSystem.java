@@ -18,12 +18,8 @@ import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.cs.unit.Radian;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 
 public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSystem {
-  private static final long serialVersionUID = 1902383026085071877L;
 
   private CoordinatesProjection coordinatesProjection;
 
@@ -320,21 +316,6 @@ public class ProjectedCoordinateSystem extends AbstractHorizontalCoordinateSyste
       }
     }
     return false;
-  }
-
-  @Override
-  protected BoundingBox newAreaBoundingBox() {
-    final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
-      .getGeometryFactory();
-    final BoundingBoxEditor boundingBox = geographicGeometryFactory.bboxEditor();
-    final Area area = getArea();
-    if (area == null) {
-      boundingBox.addBbox(-180, -90, 180, 90);
-    } else {
-      boundingBox.addBbox(area);
-    }
-    return boundingBox.setGeometryFactory(this) //
-      .newBoundingBox();
   }
 
   @Override

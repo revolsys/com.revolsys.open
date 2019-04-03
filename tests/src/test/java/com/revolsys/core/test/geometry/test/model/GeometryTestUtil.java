@@ -31,7 +31,7 @@ public class GeometryTestUtil {
       x = -123.123456;
       y = 52.123456;
     } else {
-      final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
+      final BoundingBox areaBoundingBox = geometryFactory.getAreaBoundingBox();
       x = Math.round(areaBoundingBox.getCentreX());
       y = Math.round(areaBoundingBox.getCentreY());
     }
@@ -105,7 +105,7 @@ public class GeometryTestUtil {
 
   private static Point getCentre(final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-    final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
+    final BoundingBox areaBoundingBox = geometryFactory.getAreaBoundingBox();
     final Point centre = areaBoundingBox.getCentre();
     return centre;
   }

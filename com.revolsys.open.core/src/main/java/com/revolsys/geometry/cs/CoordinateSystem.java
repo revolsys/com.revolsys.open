@@ -1,6 +1,6 @@
 package com.revolsys.geometry.cs;
 
-import java.io.Serializable;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.security.MessageDigest;
 import java.util.List;
@@ -9,19 +9,16 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import com.revolsys.geometry.cs.epsg.EpsgCsWktWriter;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.GeometryFactoryProxy;
-import com.revolsys.geometry.model.GeometryFactoryWithOffsets;
 import com.revolsys.io.StringWriter;
 import com.revolsys.record.code.Code;
 import com.revolsys.util.Md5;
 
-public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializable {
+public interface CoordinateSystem extends Code {
   public static <C extends CoordinateSystem> C getCoordinateSystem(final String wkt) {
     return EsriCoordinateSystems.readCoordinateSystem(wkt);
   }
@@ -31,9 +28,6 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
   boolean equalsExact(CoordinateSystem coordinateSystem);
 
   Area getArea();
-
-  @Override
-  BoundingBox getAreaBoundingBox();
 
   Authority getAuthority();
 
@@ -47,8 +41,9 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
 
   CoordinatesOperation getCoordinatesOperation(CoordinateSystem coordinateSystem);
 
-  @Override
   int getCoordinateSystemId();
+
+  String getCoordinateSystemName();
 
   String getCoordinateSystemType();
 
@@ -57,28 +52,12 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
     return getCoordinateSystemName();
   }
 
-  @Override
-  default GeometryFactory getGeometryFactory() {
-    return getGeometryFactoryFloating(3);
-  }
-
-  GeometryFactory getGeometryFactoryFixed(int axisCount, double... scales);
-
-  GeometryFactory getGeometryFactoryFloating(int axisCount);
-
-  default GeometryFactory getGeometryFactoryWithOffsets(final double offsetX, final double scaleX,
-    final double offsetY, final double scaleY, final double offsetZ, final double scaleZ) {
-    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
-      return getGeometryFactoryFixed(3, scaleX, scaleY, scaleZ);
-    } else {
-      return new GeometryFactoryWithOffsets(this, offsetX, scaleX, offsetY, scaleY, offsetZ,
-        scaleZ);
-    }
-  }
-
-  @Override
   default <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
     return null;
+  }
+
+  default int getHorizontalCoordinateSystemId() {
+    return -1;
   }
 
   @Override
@@ -104,6 +83,15 @@ public interface CoordinateSystem extends Code, GeometryFactoryProxy, Serializab
     final MessageDigest digest = Md5.getMessageDigest();
     updateDigest(digest);
     return digest.digest();
+  }
+
+  default String toEpsgWkt() {
+    try (
+      StringWriter stringWriter = new StringWriter()) {
+      final PrintWriter out = new PrintWriter(stringWriter);
+      EpsgCsWktWriter.write(out, this);
+      return stringWriter.toString();
+    }
   }
 
   default String toEsriWktCs() {

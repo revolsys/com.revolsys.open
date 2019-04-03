@@ -5,7 +5,6 @@ import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
-import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
@@ -234,8 +233,8 @@ public interface LineSegment extends LineString {
     if (geometryFactory == factory) {
       return (V)this;
     } else {
-      final Point point1 = ProjectionFactory.convert(getPoint(0), factory, geometryFactory);
-      final Point point2 = ProjectionFactory.convert(getPoint(1), factory, geometryFactory);
+      final Point point1 = getPoint(0).convertGeometry(geometryFactory);
+      final Point point2 = getPoint(1).convertGeometry(geometryFactory);
       return (V)new LineSegmentDoubleGF(geometryFactory, point1, point2);
     }
   }

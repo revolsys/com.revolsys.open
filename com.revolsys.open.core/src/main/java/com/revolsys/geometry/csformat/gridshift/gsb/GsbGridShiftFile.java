@@ -1,4 +1,4 @@
-package com.revolsys.geometry.cs.gridshift.gsb;
+package com.revolsys.geometry.csformat.gridshift.gsb;
 
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +13,7 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.record.io.RecordWriter;
@@ -326,7 +327,7 @@ public class GsbGridShiftFile {
     final RecordDefinition recordDefinition = new RecordDefinitionBuilder() //
       .addField("name", DataTypes.STRING) //
       .addField(DataTypes.POLYGON) //
-      .setGeometryFactory(this.fromCoordinateSystem.getGeometryFactoryFloating(2))
+      .setGeometryFactory(GeometryFactory.floating2d(this.fromCoordinateSystem))
       .getRecordDefinition();
     try (
       RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition,

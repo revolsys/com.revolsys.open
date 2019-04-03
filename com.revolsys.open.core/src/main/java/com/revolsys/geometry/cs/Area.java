@@ -1,21 +1,27 @@
 package com.revolsys.geometry.cs;
 
-import java.io.Serializable;
-
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-
-public class Area extends BoundingBoxDoubleXY implements Serializable {
-  private static final long serialVersionUID = 2662773652065582230L;
+public class Area {
 
   private final Authority authority;
 
   private final boolean deprecated;
 
+  private final double maxX;
+
+  private final double maxY;
+
+  private final double minX;
+
+  private final double minY;
+
   private final String name;
 
   public Area(final String name, final double minX, final double minY, final double maxX,
     final double maxY, final Authority authority, final boolean deprecated) {
-    super(minX, minY, maxX, maxY);
+    this.minX = minX;
+    this.minY = minY;
+    this.maxX = maxX;
+    this.maxY = maxY;
     this.name = name;
     this.authority = authority;
     this.deprecated = deprecated;
@@ -37,6 +43,22 @@ public class Area extends BoundingBoxDoubleXY implements Serializable {
 
   public Authority getAuthority() {
     return this.authority;
+  }
+
+  public double getMaxX() {
+    return this.maxX;
+  }
+
+  public double getMaxY() {
+    return this.maxY;
+  }
+
+  public double getMinX() {
+    return this.minX;
+  }
+
+  public double getMinY() {
+    return this.minY;
   }
 
   public String getName() {

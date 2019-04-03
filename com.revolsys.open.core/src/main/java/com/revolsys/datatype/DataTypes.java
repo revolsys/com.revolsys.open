@@ -71,14 +71,15 @@ public final class DataTypes {
 
   private static final Map<String, DataType> NAME_TYPE_MAP = new HashMap<>();
 
-  public static final DataType ANY_URI = new FunctionDataType("anyURI", URI.class, UrlUtil::toUri);
+  public static final DataType ANY_URI = new FunctionDataType("anyURI", URI.class,
+    value -> UrlUtil.toUri(value));
 
   public static final DataType BASE64_BINARY = new SimpleDataType("base64Binary", byte[].class);
 
   public static final DataType BLOB = new SimpleDataType("blob", Blob.class);
 
   public static final DataType BOOLEAN = new FunctionDataType("boolean", Boolean.class,
-    Booleans::valueOf);
+    value -> Booleans.valueOf(value));
 
   public static final DataType BOUNDING_BOX = new FunctionDataType("boolean", BoundingBox.class,
     BoundingBox::bboxGet);
@@ -86,15 +87,15 @@ public final class DataTypes {
   public static final DataType BYTE = new Bytes();
 
   public static final DataType COLOR = new FunctionDataType("color", Color.class,
-    WebColors::toColor, WebColors::toString);
+    value -> WebColors.toColor(value), WebColors::toString);
 
   public static final DataType CODE = new CodeDataType();
 
   public static final DataType DATE = new FunctionDataType("date", java.util.Date.class,
-    Dates::getDate, Dates::toDateTimeString, Dates::equalsNotNull);
+    value -> Dates.getDate(value), Dates::toDateTimeString, Dates::equalsNotNull);
 
   public static final DataType DATE_TIME = new FunctionDataType("dateTime", Timestamp.class,
-    Dates::getTimestamp, Dates::toTimestampString, Dates::equalsNotNull);
+    value -> Dates.getTimestamp(value), Dates::toTimestampString, Dates::equalsNotNull);
 
   public static final DataType DECIMAL = new BigDecimals();
 
@@ -102,19 +103,21 @@ public final class DataTypes {
 
   public static final DataType DURATION = new SimpleDataType("duration", Date.class);
 
-  public static final DataType FILE = new FunctionDataType("File", File.class, FileUtil::newFile);
+  public static final DataType FILE = new FunctionDataType("File", File.class,
+    value -> FileUtil.newFile(value));
 
   public static final DataType FLOAT = new Floats();
 
   public static final GeometryDataType<Geometry, GeometryCollectionImplEditor> GEOMETRY = new GeometryDataType<>(
-    Geometry.class, Geometry::newGeometry, GeometryCollectionImplEditor::new);
+    Geometry.class, value -> Geometry.newGeometry(value),
+    value -> new GeometryCollectionImplEditor(value));
 
   public static final DataType GEOMETRY_FACTORY = new FunctionDataType("GeometryFactory",
-    GeometryFactory.class, GeometryFactory::newGeometryFactory);
+    GeometryFactory.class, value -> GeometryFactory.newGeometryFactory(value));
 
   public static final GeometryDataType<GeometryCollection, GeometryCollectionImplEditor> GEOMETRY_COLLECTION = new GeometryDataType<>(
-    GeometryCollection.class, GeometryCollection::newGeometryCollection,
-    GeometryCollectionImplEditor::new);
+    GeometryCollection.class, value -> GeometryCollection.newGeometryCollection(value),
+    value -> new GeometryCollectionImplEditor(value));
 
   public static final DataType IDENTIFIER = new FunctionDataType("identifier", Identifier.class,
     Identifier::newIdentifier);
@@ -124,10 +127,12 @@ public final class DataTypes {
   public static final DataType BIG_INTEGER = new BigIntegers();
 
   public static final GeometryDataType<LineString, LineStringEditor> LINE_STRING = new GeometryDataType<>(
-    LineString.class, LineString::newLineString, LineStringEditor::new);
+    LineString.class, value -> LineString.newLineString(value),
+    value -> new LineStringEditor(value));
 
   public static final GeometryDataType<LinearRing, LinearRingEditor> LINEAR_RING = new GeometryDataType<>(
-    LinearRing.class, LinearRing::newLinearRing, LinearRingEditor::new);
+    LinearRing.class, value -> LinearRing.newLinearRing(value),
+    value -> new LinearRingEditor(value));
 
   public static final DataType LONG = new Longs();
 
@@ -135,21 +140,23 @@ public final class DataTypes {
     QuantityType::newQuantity, QuantityType::toString);
 
   public static final GeometryDataType<MultiLineString, MultiLineStringEditor> MULTI_LINE_STRING = new GeometryDataType<>(
-    MultiLineString.class, Lineal::newLineal, MultiLineStringEditor::new);
+    MultiLineString.class, value -> Lineal.newLineal(value),
+    value -> new MultiLineStringEditor(value));
 
   public static final GeometryDataType<MultiPoint, MultiPointEditor> MULTI_POINT = new GeometryDataType<>(
-    MultiPoint.class, Punctual::newPunctual, MultiPointEditor::new);
+    MultiPoint.class, value -> Punctual.newPunctual(value), value -> new MultiPointEditor(value));
 
   public static final GeometryDataType<MultiPolygon, MultiPolygonEditor> MULTI_POLYGON = new GeometryDataType<>(
-    MultiPolygon.class, Polygonal::newPolygonal, MultiPolygonEditor::new);
+    MultiPolygon.class, value -> Polygonal.newPolygonal(value),
+    value -> new MultiPolygonEditor(value));
 
   public static final DataType OBJECT = new ObjectDataType();
 
   public static final GeometryDataType<Point, PointEditor> POINT = new GeometryDataType<>(
-    Point.class, Point::newPoint, PointEditor::new);
+    Point.class, value -> Point.newPoint(value), value -> new PointEditor(value));
 
   public static final GeometryDataType<Polygon, PolygonEditor> POLYGON = new GeometryDataType<>(
-    Polygon.class, Polygon::newPolygon, PolygonEditor::new);
+    Polygon.class, value -> Polygon.newPolygon(value), value -> new PolygonEditor(value));
 
   public static final DataType QNAME = new SimpleDataType("QName", QName.class);
 
@@ -161,7 +168,7 @@ public final class DataTypes {
   public static final DataType SHORT = new Shorts();
 
   public static final DataType SQL_DATE = new FunctionDataType("date", java.sql.Date.class,
-    Dates::getSqlDate, Dates::toSqlDateString, Dates::equalsNotNull);
+    value -> Dates.getSqlDate(value), Dates::toSqlDateString, Dates::equalsNotNull);
 
   public static final DataType STRING = new FunctionDataType("string", String.class,
     Object::toString);
@@ -171,10 +178,10 @@ public final class DataTypes {
   public static final DataType TIME = new SimpleDataType("time", Time.class);
 
   public static final DataType TIMESTAMP = new FunctionDataType("timestamp", Timestamp.class,
-    Dates::getTimestamp, Dates::toTimestampString, Dates::equalsNotNull);
+    value -> Dates.getTimestamp(value), Dates::toTimestampString, Dates::equalsNotNull);
 
   public static final DataType URL = new FunctionDataType("url", java.net.URL.class,
-    UrlUtil::toUrl);
+    value -> UrlUtil.toUrl(value));
 
   public static final DataType UUID = new SimpleDataType("uuid", UUID.class);
 
@@ -183,7 +190,8 @@ public final class DataTypes {
 
   public static final DataType LIST = new CollectionDataType("List", List.class, OBJECT);
 
-  public static final DataType MAP = new FunctionDataType("Map", Map.class, (value) -> {
+  @SuppressWarnings("rawtypes")
+  public static final DataType MAP = new FunctionDataType("Map", Map.class, value -> {
     if (value instanceof Map) {
       return (Map)value;
     } else {

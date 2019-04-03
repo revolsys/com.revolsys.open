@@ -147,8 +147,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     GeometryFactory geometryFactory;
     if (boundingBox == null) {
       geometryFactory = GeometryFactory.worldMercator();
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      boundingBox = coordinateSystem.getAreaBoundingBox();
+      boundingBox = geometryFactory.getAreaBoundingBox();
     } else {
       geometryFactory = boundingBox.getGeometryFactory();
       if (!geometryFactory.isHasHorizontalCoordinateSystem()) {
@@ -157,7 +156,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
       if (boundingBox.isEmpty()) {
         final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
         if (coordinateSystem != null) {
-          boundingBox = coordinateSystem.getAreaBoundingBox();
+          boundingBox = geometryFactory.getAreaBoundingBox();
         }
       }
     }

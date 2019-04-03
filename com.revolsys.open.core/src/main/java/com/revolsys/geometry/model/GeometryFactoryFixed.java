@@ -7,7 +7,6 @@ import java.util.List;
 import com.revolsys.geometry.cs.CoordinateSystem;
 
 public class GeometryFactoryFixed extends GeometryFactory {
-  private static final long serialVersionUID = 1L;
 
   protected double resolutionX = 0;
 
@@ -23,27 +22,15 @@ public class GeometryFactoryFixed extends GeometryFactory {
 
   protected double scaleZ = 0;
 
-  public GeometryFactoryFixed(final CoordinateSystem coordinateSystem, final int axisCount,
+  public GeometryFactoryFixed(final GeometryFactories instances, final int axisCount,
     final double... scales) {
-    super(coordinateSystem, axisCount);
-    initScales(scales);
-  }
-
-  protected GeometryFactoryFixed(final int coordinateSystemId, final int axisCount,
-    final double... scales) {
-    super(coordinateSystemId, axisCount);
+    super(instances, axisCount);
     initScales(scales);
   }
 
   @Override
   public GeometryFactory convertAxisCount(final int axisCount) {
-    if (axisCount == this.axisCount) {
-      return this;
-    } else if (this.coordinateSystem == null) {
-      return fixed(this.coordinateSystemId, axisCount, this.scales);
-    } else {
-      return this.coordinateSystem.getGeometryFactoryFixed(axisCount, this.scales);
-    }
+    return this.instances.fixed(axisCount, this.scales);
   }
 
   @Override
@@ -54,7 +41,7 @@ public class GeometryFactoryFixed extends GeometryFactory {
       if (coordinateSystem == this.coordinateSystem) {
         return this;
       } else {
-        return coordinateSystem.getGeometryFactoryFixed(this.axisCount, this.scales);
+        return instances(coordinateSystem).fixed(this.axisCount, this.scales);
       }
     }
   }
@@ -567,13 +554,8 @@ public class GeometryFactoryFixed extends GeometryFactory {
   @Override
   public GeometryFactory newWithOffsets(final double offsetX, final double offsetY,
     final double offsetZ) {
-    if (this.coordinateSystemId > 0) {
-      return new GeometryFactoryWithOffsets(this.coordinateSystemId, offsetX, this.scaleX, offsetY,
-        this.scaleY, offsetZ, this.scaleZ);
-    } else {
-      return new GeometryFactoryWithOffsets(this.coordinateSystem, offsetX, this.scaleX, offsetY,
-        this.scaleY, offsetZ, this.scaleZ);
-    }
+    return new GeometryFactoryWithOffsets(this.instances, offsetX, this.scaleX, offsetY,
+      this.scaleY, offsetZ, this.scaleZ);
   }
 
   @Override

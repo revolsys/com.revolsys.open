@@ -28,7 +28,7 @@ public class EnvelopeN extends Envelope {
   public EnvelopeN(final SpatialReference spatialReference) {
     final CoordinateSystem coordinateSystem = spatialReference.getCoordinateSystem();
     if (coordinateSystem != null) {
-      final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
+      final BoundingBox boundingBox = spatialReference.getAreaBoundingBox();
       this.xMin = boundingBox.getMinX();
       this.yMin = boundingBox.getMinY();
       this.xMax = boundingBox.getMaxX();

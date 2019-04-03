@@ -4,7 +4,6 @@ import com.revolsys.geometry.cs.Ellipsoid;
 import com.revolsys.geometry.cs.NormalizedParameterNames;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.math.Angle;
-import com.revolsys.util.MathUtil;
 
 /**
  * An implementation of the Transverse Mercator projection. See section 1.3.5 of
@@ -104,12 +103,12 @@ public class TransverseMercatorJhs extends TransverseMercator {
     final double ξ0Prime = ξPrime - (ξ1Prime + ξ2Prime + ξ3Prime + ξ4Prime);
     final double η0Prime = ηPrime - (η1Prime + η2Prime + η3Prime + η4Prime);
     final double βPrime = Math.asin(Math.sin(ξ0Prime) / Math.cosh(η0Prime));
-    final double QPrime = MathUtil.asinh(Math.tan(βPrime));
-    double QPrimePrime = QPrime + this.e * MathUtil.atanh(this.e * Math.tanh(QPrime));
+    final double QPrime = Angle.asinh(Math.tan(βPrime));
+    double QPrimePrime = QPrime + this.e * Angle.atanh(this.e * Math.tanh(QPrime));
     final double lastQPrimePrime = QPrimePrime;
     int i = 0;
     do {
-      QPrimePrime = QPrime + this.e * MathUtil.atanh(this.e * Math.tanh(QPrimePrime));
+      QPrimePrime = QPrime + this.e * Angle.atanh(this.e * Math.tanh(QPrimePrime));
     } while (Math.abs(lastQPrimePrime - QPrimePrime) < 1.0e-011 && ++i < 100);
 
     point.x = this.λo + Math.asin(Math.tanh(η0Prime) / Math.cos(βPrime));
@@ -126,7 +125,7 @@ public class TransverseMercatorJhs extends TransverseMercator {
     } else if (φ == -Angle.PI_OVER_2) {
       return B * -Angle.PI_OVER_2;
     } else {
-      final double QO = MathUtil.asinh(Math.tan(φ)) - e * MathUtil.atanh(e * Math.sin(φ));
+      final double QO = Angle.asinh(Math.tan(φ)) - e * Angle.atanh(e * Math.sin(φ));
       final double βO = Math.atan(Math.sinh(QO));
       final double ξO0 = Math.asin(Math.sin(βO));
       // Note: The previous two steps are taken from the generic calculation
@@ -160,10 +159,10 @@ public class TransverseMercatorJhs extends TransverseMercator {
     final double h3 = this.h3;
     final double h4 = this.h4;
 
-    final double Q = MathUtil.asinh(Math.tan(φ)) - e * MathUtil.atanh(e * Math.sin(φ));
+    final double Q = Angle.asinh(Math.tan(φ)) - e * Angle.atanh(e * Math.sin(φ));
     final double β = Math.atan(Math.sinh(Q));
 
-    final double η0 = MathUtil.atanh(Math.cos(β) * Math.sin(λ - this.λo));
+    final double η0 = Angle.atanh(Math.cos(β) * Math.sin(λ - this.λo));
     final double ξ0 = Math.asin(Math.sin(β) * Math.cosh(η0));
 
     final double η1 = h1 * Math.cos(2 * ξ0) * Math.sinh(2 * η0);

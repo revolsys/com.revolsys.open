@@ -283,15 +283,15 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   public GeometryFactory getGeometryFactory(final int oracleSrid, final int axisCount,
     final double[] scales) {
-    CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(oracleSrid);
-    if (coordinateSystem == null) {
-      coordinateSystem = getCoordinateSystem(oracleSrid);
+    GeometryFactory geometryFactory = GeometryFactory.fixed(oracleSrid, axisCount, scales);
+    if (!geometryFactory.isHasHorizontalCoordinateSystem() && oracleSrid > 0) {
+      final CoordinateSystem coordinateSystem = getCoordinateSystem(oracleSrid);
+      if (coordinateSystem != null) {
+        geometryFactory = geometryFactory.convertCoordinateSystem(coordinateSystem);
+      }
     }
-    if (coordinateSystem == null) {
-      return GeometryFactory.fixed(0, axisCount, scales);
-    } else {
-      return coordinateSystem.getGeometryFactoryFixed(axisCount, scales);
-    }
+
+    return geometryFactory;
   }
 
   @Override

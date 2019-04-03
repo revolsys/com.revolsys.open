@@ -37,7 +37,6 @@ import org.jdesktop.swingx.JXBusyLabel;
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.index.RecordSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
@@ -60,7 +59,7 @@ import com.revolsys.swing.listener.ConsumerSelectedItemListener;
 import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
 import com.revolsys.swing.map.border.MapRulerBorder;
-import com.revolsys.swing.map.component.CoordinateSystemField;
+import com.revolsys.swing.map.component.GeometryFactoryField;
 import com.revolsys.swing.map.component.MapPointerElevation;
 import com.revolsys.swing.map.component.MapPointerLocation;
 import com.revolsys.swing.map.component.SelectMapCoordinateSystem;
@@ -118,7 +117,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public static void zoomToBoundingBox(final String baseName,
     final BoundingBoxProxy boundingBoxProxy) {
-    CoordinateSystemField.promptCoordinateSystem(baseName, boundingBoxProxy, geometryFactory -> {
+    GeometryFactoryField.promptGeometryFactory(baseName, boundingBoxProxy, geometryFactory -> {
       final Project project = Project.get();
       final MapPanel mapPanel = project.getMapPanel();
       final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox() //
@@ -272,12 +271,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
   }
 
-  public void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    this.selectCoordinateSystem.addCoordinateSystem(coordinateSystem);
-  }
-
   public void addCoordinateSystem(final int srid) {
-    this.selectCoordinateSystem.addCoordinateSystem(srid);
+    this.selectCoordinateSystem.addGeometryFactory(srid);
   }
 
   public void addMapOverlay(final int zIndex, final JComponent overlay) {
@@ -1300,8 +1295,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public void zoomToWorld() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-    final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
+    final BoundingBox boundingBox = geometryFactory.getAreaBoundingBox();
     setBoundingBox(boundingBox);
   }
 }

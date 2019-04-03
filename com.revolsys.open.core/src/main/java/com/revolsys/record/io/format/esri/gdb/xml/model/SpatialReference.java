@@ -3,8 +3,9 @@ package com.revolsys.record.io.format.esri.gdb.xml.model;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 
-public class SpatialReference {
+public class SpatialReference implements GeometryFactoryProxy {
 
   private static final double FLOATING_SCALE = 11258999068426.238;
 
@@ -94,6 +95,7 @@ public class SpatialReference {
     }
   }
 
+  @Override
   public CoordinateSystem getCoordinateSystem() {
     if (this.coordinateSystem == null) {
       this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(this.latestWKID);
@@ -104,6 +106,7 @@ public class SpatialReference {
     return this.coordinateSystem;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     if (this.geometryFactory == null) {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();

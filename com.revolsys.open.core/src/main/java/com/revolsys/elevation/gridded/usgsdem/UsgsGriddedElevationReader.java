@@ -541,7 +541,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
                   verticalCoordinateSystem);
               }
             }
-            this.geometryFactory = coordinateSystem.getGeometryFactoryFixed(3, 0.0, 0.0, scaleZ);
+            this.geometryFactory = GeometryFactory.fixed(coordinateSystem, 3, 0.0, 0.0, scaleZ);
           }
         } else {
           final double[] scales = this.geometryFactory.newScales(3);

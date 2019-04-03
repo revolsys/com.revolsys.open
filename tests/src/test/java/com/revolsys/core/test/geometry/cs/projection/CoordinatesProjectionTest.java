@@ -5,9 +5,7 @@ import java.util.function.BiFunction;
 import org.junit.Assert;
 
 import com.revolsys.core.test.util.TestUtil;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -68,9 +66,12 @@ public class CoordinatesProjectionTest {
     assertXyMM(prefix, x, y, xActual, yActual);
   }
 
-  private static void assertProjection(final ProjectedCoordinateSystem coordinateSystem,
-    final double x, final double y, final double lon, final double lat) {
-    final CoordinatesProjection projection = coordinateSystem.getCoordinatesProjection();
+  private static void assertProjection(final int coordinateSystemId, final double x, final double y,
+    final double lon, final double lat) {
+    final GeometryFactory geometryFactory = GeometryFactory.floating2d(coordinateSystemId);
+    final ProjectedCoordinateSystem projectedCoordinateSystem = geometryFactory
+      .getHorizontalCoordinateSystem();
+    final CoordinatesProjection projection = projectedCoordinateSystem.getCoordinatesProjection();
     final CoordinatesOperationPoint opPoint = new CoordinatesOperationPoint(x, y);
     projection.inverse(opPoint);
     final double λActual = opPoint.x;
@@ -81,11 +82,8 @@ public class CoordinatesProjectionTest {
     final double yActual = opPoint.y;
     assertXyMM("CoordinatesProjection ", x, y, xActual, yActual);
 
-    final GeographicCoordinateSystem geographicCoordinateSystem = coordinateSystem
-      .getGeographicCoordinateSystem();
-    final GeometryFactory geometryFactory = coordinateSystem.getGeometryFactoryFloating(2);
-    final GeometryFactory geographicGeometryFactory = geographicCoordinateSystem
-      .getGeometryFactoryFloating(2);
+    final GeometryFactory geographicGeometryFactory = geometryFactory
+      .getGeographicGeometryFactory();
     assertPoint("convertGeometry", geometryFactory, x, y, geographicGeometryFactory, lon, lat,
       Point::convertGeometry);
   }
@@ -103,9 +101,7 @@ public class CoordinatesProjectionTest {
     final double y = record.getDouble("y");
     final double lon = record.getDouble("expectedLon");
     final double lat = record.getDouble("expectedLat");
-    final ProjectedCoordinateSystem coordinateSystem = EpsgCoordinateSystems
-      .getCoordinateSystem(coordinateSystemId);
-    assertProjection(coordinateSystem, x, y, lon, lat);
+    assertProjection(coordinateSystemId, x, y, lon, lat);
   }
 
   public static TestSuite suite() {

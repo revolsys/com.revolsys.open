@@ -1,7 +1,6 @@
 package com.revolsys.raster;
 
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
@@ -86,7 +85,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   private List<Dimension> overviewSizes = new ArrayList<>();
 
-  private final Map<CoordinateSystem, AbstractGeoreferencedImage> projectedImages = new HashMap<>();
+  private final Map<CoordinateSystem, GeoreferencedImage> projectedImages = new HashMap<>();
 
   private RenderedImage renderedImage;
 
@@ -159,42 +158,20 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   }
 
   @Override
-  public AbstractGeoreferencedImage getImage(final CoordinateSystem coordinateSystem) {
+  public GeoreferencedImage getImage(final GeometryFactory geometryFactory) {
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     synchronized (this.projectedImages) {
       if (coordinateSystem.equals(getHorizontalCoordinateSystem())) {
         return this;
       } else {
-        AbstractGeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
+        GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
         if (projectedImage == null) {
-          projectedImage = getImage(coordinateSystem, this.resolution);
+          projectedImage = getImage(geometryFactory, this.resolution);
           this.projectedImages.put(coordinateSystem, projectedImage);
         }
         return projectedImage;
       }
     }
-  }
-
-  @Override
-  public AbstractGeoreferencedImage getImage(final CoordinateSystem coordinateSystem,
-    final double resolution) {
-    final int imageSrid = getGeometryFactory().getHorizontalCoordinateSystemId();
-    if (imageSrid > 0 && imageSrid != coordinateSystem.getHorizontalCoordinateSystemId()) {
-      final BoundingBox boundingBox = getBoundingBox();
-      final ProjectionImageFilter filter = new ProjectionImageFilter(boundingBox, coordinateSystem,
-        resolution);
-
-      final BufferedImage newImage = filter.filter(getBufferedImage());
-
-      final BoundingBox destBoundingBox = filter.getDestBoundingBox();
-      return new BufferedGeoreferencedImage(destBoundingBox, newImage);
-    }
-    return this;
-  }
-
-  @Override
-  public AbstractGeoreferencedImage getImage(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-    return getImage(coordinateSystem);
   }
 
   @Override

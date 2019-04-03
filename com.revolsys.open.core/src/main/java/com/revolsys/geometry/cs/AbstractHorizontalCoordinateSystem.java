@@ -4,8 +4,6 @@ import java.util.List;
 
 public abstract class AbstractHorizontalCoordinateSystem extends AbstractCoordinateSystem
   implements HorizontalCoordinateSystem {
-  private static final long serialVersionUID = 1L;
-
   public AbstractHorizontalCoordinateSystem(final int id, final String name, final List<Axis> axis,
     final Area area, final boolean deprecated) {
     super(id, name, axis, area, deprecated);

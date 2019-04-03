@@ -1,8 +1,6 @@
 package com.revolsys.geometry.cs;
 
-import java.io.FileNotFoundException;
 import java.math.BigDecimal;
-import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,47 +14,20 @@ import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.esri.EsriCsGridParser;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
-import com.revolsys.logging.Logs;
-import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Doubles;
 import com.revolsys.util.number.Integers;
 
 public class WktCsParser {
 
-  public static <C extends CoordinateSystem> C read(final Resource resource) {
-    if (resource == null) {
-      return null;
-    } else {
-      final Resource projResource = resource.newResourceChangeExtension("prj");
-      if (projResource != null) {
-        try {
-          final String wkt = projResource.contentsAsString();
-          try {
-            return read(wkt);
-          } catch (final StringIndexOutOfBoundsException e) {
-            return EsriCsGridParser.parse(wkt);
-          }
-        } catch (final WrappedException e) {
-          final Throwable cause = e.getCause();
-          if (cause instanceof FileNotFoundException) {
-          } else if (cause instanceof FileSystemException) {
-          } else {
-            Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
-          }
-        } catch (final Exception e) {
-          Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
-        }
-      }
-    }
-    return null;
-  }
-
   public static <C extends CoordinateSystem> C read(final String wkt) {
     if (Property.hasValue(wkt)) {
-      final WktCsParser parser = new WktCsParser(wkt);
-      return parser.parse();
+      try {
+        final WktCsParser parser = new WktCsParser(wkt);
+        return parser.parse();
+      } catch (final StringIndexOutOfBoundsException e) {
+        return EsriCsGridParser.parse(wkt);
+      }
     } else {
       return null;
     }

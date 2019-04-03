@@ -111,7 +111,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
       if (this.coordinates == null) {
         this.point.forEachVertex(coordinatesOperation, point, action);
       } else {
-        point.setPoint(this);
+        point.setPoint(this.coordinates);
         coordinatesOperation.perform(point);
         action.accept(point);
       }
@@ -125,7 +125,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
       if (this.coordinates == null) {
         this.point.forEachVertex(point, action);
       } else {
-        point.setPoint(this);
+        point.setPoint(this.coordinates);
         action.accept(point);
       }
     }

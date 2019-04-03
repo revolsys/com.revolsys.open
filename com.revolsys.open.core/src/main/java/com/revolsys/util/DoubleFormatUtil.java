@@ -454,7 +454,6 @@ public final class DoubleFormatUtil {
    * @param scale the expected rounding scale
    * @param intP the source integer part
    * @param decP the source decimal part, truncated to scale + 1 digit
-   * @throws IOException
    */
   public static void write(final Writer writer, int scale, long intP, long decP)
     throws IOException {
@@ -497,7 +496,6 @@ public final class DoubleFormatUtil {
   * @param source the source value to round
   * @param decimals the decimals to round at (use if abs(source) &ge; 1.0)
   * @param precision the precision to round at (use if abs(source) &lt; 1.0)
-  * @throws IOException
   */
   public static void writeDouble(final Writer writer, final double source, final int decimals,
     final int precision) throws IOException {
@@ -519,7 +517,6 @@ public final class DoubleFormatUtil {
    * @param source the source value to round
    * @param decimals the decimals to round at (use if abs(source) &ge; 1.0)
    * @param precision the precision to round at (use if abs(source) &lt; 1.0)
-   * @throws IOException
    */
   public static void writeDoubleFast(final Writer writer, double source, final int decimals,
     final int precision) throws IOException {
@@ -585,8 +582,7 @@ public final class DoubleFormatUtil {
    * @param source the source value to round
    * @param decimals the decimals to round at (use if abs(source) &ge; 1.0)
    * @param precision the precision to round at (use if abs(source) &lt; 1.0)
-   * @throws IOException
-   */
+  */
   public static void writeDoublePrecise(final Writer writer, double source, final int decimals,
     final int precision) throws IOException {
     if (isRoundedToZero(source, decimals, precision)) {

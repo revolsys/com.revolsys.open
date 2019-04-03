@@ -10,14 +10,8 @@ import javax.measure.quantity.Length;
 import com.revolsys.geometry.cs.datum.VerticalDatum;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
 
 public class VerticalCoordinateSystem extends AbstractCoordinateSystem {
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
 
   private static int getId(final Authority authority) {
     if (authority == null) {
@@ -177,16 +171,5 @@ public class VerticalCoordinateSystem extends AbstractCoordinateSystem {
       }
     }
     return false;
-  }
-
-  @Override
-  protected BoundingBox newAreaBoundingBox() {
-    final Area area = getArea();
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (area != null) {
-      return area.bboxEdit(editor -> editor.setGeometryFactory(geometryFactory));
-    } else {
-      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
-    }
   }
 }

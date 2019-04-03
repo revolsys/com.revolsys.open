@@ -14,7 +14,7 @@ public interface CoordinatesOperation {
     point.apply2d(action);
   }
 
-  default void perform2d(final Geometry geometry, final BiConsumerDouble action) {
+  default void perform2d4(final Geometry geometry, final BiConsumerDouble action) {
     final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
     geometry.forEachVertex((x, y) -> {
       point.setPoint(x, y);

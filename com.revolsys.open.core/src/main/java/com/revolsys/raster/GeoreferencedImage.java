@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -267,11 +266,23 @@ public interface GeoreferencedImage
 
   int[] getDpi();
 
-  GeoreferencedImage getImage(final CoordinateSystem coordinateSystem);
-
-  GeoreferencedImage getImage(final CoordinateSystem coordinateSystem, final double resolution);
-
   GeoreferencedImage getImage(final GeometryFactory geometryFactory);
+
+  default GeoreferencedImage getImage(final GeometryFactory geometryFactory,
+    final double resolution) {
+    final int imageSrid = getHorizontalCoordinateSystemId();
+    if (imageSrid > 0 && imageSrid != geometryFactory.getHorizontalCoordinateSystemId()) {
+      final BoundingBox boundingBox = getBoundingBox();
+      final ProjectionImageFilter filter = new ProjectionImageFilter(boundingBox, geometryFactory,
+        resolution);
+
+      final BufferedImage newImage = filter.filter(getBufferedImage());
+
+      final BoundingBox destBoundingBox = filter.getDestBoundingBox();
+      return new BufferedGeoreferencedImage(destBoundingBox, newImage);
+    }
+    return this;
+  }
 
   default double getImageAspectRatio() {
     final int imageWidth = getImageWidth();

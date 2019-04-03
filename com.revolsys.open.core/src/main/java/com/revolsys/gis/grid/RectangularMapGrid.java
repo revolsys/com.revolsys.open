@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -92,9 +91,7 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
   String getMapTileName(final double x, final double y);
 
   default String getMapTileName(final Geometry geometry) {
-    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-    final Geometry projectedGeometry = geometry
-      .convertGeometry(coordinateSystem.getGeometryFactory());
+    final Geometry projectedGeometry = geometry.convertGeometry(getGeometryFactory());
     final Point centroid = projectedGeometry.getCentroid();
     final Point coordinate = centroid.getPoint();
     final String mapsheet = getMapTileName(coordinate.getX(), coordinate.getY());
@@ -102,10 +99,6 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
   }
 
   String getName();
-
-  default Polygon getPolygon(final String mapTileName, final CoordinateSystem coordinateSystem) {
-    return getPolygon(mapTileName, coordinateSystem.getGeometryFactory());
-  }
 
   default Polygon getPolygon(final String mapTileName, final GeometryFactory geometryFactory) {
     final RectangularMapTile mapTile = getTileByName(mapTileName);

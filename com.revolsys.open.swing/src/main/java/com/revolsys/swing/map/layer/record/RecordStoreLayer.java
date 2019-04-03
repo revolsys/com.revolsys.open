@@ -315,7 +315,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (hasGeometryField()) {
       final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
       if (coordinateSystem != null) {
-        return coordinateSystem.getAreaBoundingBox();
+        return getAreaBoundingBox();
       }
     }
     return BoundingBox.empty();

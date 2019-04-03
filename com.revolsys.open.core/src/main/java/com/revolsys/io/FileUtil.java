@@ -48,7 +48,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;
@@ -1091,9 +1090,10 @@ public final class FileUtil {
     } else if (value instanceof Resource) {
       return getFile((Resource)value);
     } else {
-      final String string = DataTypes.toString(value);
-      return getFile(string);
+      // final String string = DataTypes.toString(value);
+      // return getFile(string);
     }
+    return null;
   }
 
   public static OutputStream newOutputStream(final File file) {

@@ -1,4 +1,4 @@
-package com.revolsys.geometry.cs.gridshift.nadcon5;
+package com.revolsys.geometry.csformat.gridshift.nadcon5;
 
 import java.sql.Date;
 import java.text.ParseException;

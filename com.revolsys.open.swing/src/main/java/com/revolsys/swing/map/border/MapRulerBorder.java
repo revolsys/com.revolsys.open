@@ -388,7 +388,7 @@ public class MapRulerBorder extends AbstractBorder {
             this.unitLabel = "°";
           }
         } else {
-          final BoundingBox areaBoundingBox = this.rulerCoordinateSystem.getAreaBoundingBox();
+          final BoundingBox areaBoundingBox = this.rulerGeometryFactory.getAreaBoundingBox();
 
           this.areaMinX = areaBoundingBox.getMinX();
           this.areaMaxX = areaBoundingBox.getMaxX();

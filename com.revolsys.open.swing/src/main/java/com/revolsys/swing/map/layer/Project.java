@@ -146,8 +146,7 @@ public class Project extends LayerGroup {
   public BoundingBox getBoundingBox() {
     final BoundingBox boundingBox = super.getBoundingBox();
     if (boundingBox.isEmpty()) {
-      final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-      return coordinateSystem.getAreaBoundingBox();
+      return getAreaBoundingBox();
     } else {
       return boundingBox;
     }
@@ -713,7 +712,7 @@ public class Project extends LayerGroup {
       if (geometryFactory != null) {
         final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
         if (coordinateSystem != null) {
-          defaultBoundingBox = coordinateSystem.getAreaBoundingBox();
+          defaultBoundingBox = getAreaBoundingBox();
         }
         boundingBox = boundingBox.bboxToCs(geometryFactory);
       }

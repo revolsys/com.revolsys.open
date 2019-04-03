@@ -1,4 +1,4 @@
-package com.revolsys.geometry.cs.gridshift.gsb;
+package com.revolsys.geometry.csformat.gridshift.gsb;
 
 import com.revolsys.geometry.cs.gridshift.HorizontalShiftOperation;
 import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;

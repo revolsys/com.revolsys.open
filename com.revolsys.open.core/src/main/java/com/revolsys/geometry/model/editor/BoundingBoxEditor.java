@@ -147,7 +147,7 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
 
           addBbox(geometry);
         } else {
-          coordinatesOperation.perform2d(geometry, this::addPoint);
+          geometry.applyCoordinatesOperation(coordinatesOperation, this::addPoint);
         }
       } else {
         addBbox(geometry);

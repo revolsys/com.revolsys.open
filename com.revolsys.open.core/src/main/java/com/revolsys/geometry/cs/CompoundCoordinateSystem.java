@@ -9,11 +9,8 @@ import javax.measure.quantity.Length;
 
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.LinearUnit;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
 
 public class CompoundCoordinateSystem extends AbstractCoordinateSystem {
-  private static final long serialVersionUID = 8655274386401351222L;
 
   private static List<Axis> getAxis(final CoordinateSystem horizontalCoordinateSystem,
     final VerticalCoordinateSystem verticalCoordinateSystem) {
@@ -174,17 +171,6 @@ public class CompoundCoordinateSystem extends AbstractCoordinateSystem {
       return isSame((CompoundCoordinateSystem)coordinateSystem);
     } else {
       return false;
-    }
-  }
-
-  @Override
-  protected BoundingBox newAreaBoundingBox() {
-    final Area area = getArea();
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (area != null) {
-      return area.bboxEdit(editor -> editor.setGeometryFactory(geometryFactory));
-    } else {
-      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
     }
   }
 }

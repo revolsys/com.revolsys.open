@@ -9,11 +9,8 @@ import javax.measure.quantity.Length;
 import com.revolsys.geometry.cs.datum.EngineeringDatum;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.cs.unit.UnitOfMeasure;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
 
 public class EngineeringCoordinateSystem extends AbstractHorizontalCoordinateSystem {
-  private static final long serialVersionUID = 8655274386401351222L;
 
   private final UnitOfMeasure unit;
 
@@ -140,16 +137,5 @@ public class EngineeringCoordinateSystem extends AbstractHorizontalCoordinateSys
       }
     }
     return false;
-  }
-
-  @Override
-  protected BoundingBox newAreaBoundingBox() {
-    final Area area = getArea();
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (area != null) {
-      return area.bboxEdit(editor -> editor.setGeometryFactory(geometryFactory));
-    } else {
-      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
-    }
   }
 }

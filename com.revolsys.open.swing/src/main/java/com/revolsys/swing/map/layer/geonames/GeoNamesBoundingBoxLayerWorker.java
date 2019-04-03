@@ -4,9 +4,6 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -55,11 +52,8 @@ public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<Lay
   protected List<LayerRecord> handleBackground() {
     BoundingBox boundingBox = this.boundingBox;
     GeometryFactory geometryFactory = this.geometryFactory;
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-    if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
-      final GeographicCoordinateSystem geoCs = projCs.getGeographicCoordinateSystem();
-      geometryFactory = geoCs.getGeometryFactory();
+    if (geometryFactory.isProjected()) {
+      geometryFactory = geometryFactory.getGeographicGeometryFactory();
       boundingBox = boundingBox.bboxToCs(geometryFactory);
     }
     final List<LayerRecord> results = (List)this.geoNamesService.getNames(boundingBox);

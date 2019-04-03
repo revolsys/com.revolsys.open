@@ -1008,7 +1008,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       if (Property.isEmpty(boundingBox)) {
         final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
         if (coordinateSystem != null) {
-          setBoundingBox(coordinateSystem.getAreaBoundingBox());
+          setBoundingBox(geometryFactory.getAreaBoundingBox());
         }
       } else if (!boundingBox.getGeometryFactory().isHasHorizontalCoordinateSystem()
         && geometryFactory.isHasHorizontalCoordinateSystem()) {

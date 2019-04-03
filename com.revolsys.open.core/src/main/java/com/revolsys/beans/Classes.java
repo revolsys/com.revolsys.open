@@ -36,16 +36,6 @@ public class Classes {
     }
   }
 
-  public static String className(final Class<?> clazz) {
-    final String name = clazz.getName();
-    final int index = name.lastIndexOf('.');
-    if (index == -1) {
-      return name;
-    } else {
-      return name.substring(index + 1);
-    }
-  }
-
   public static String className(final Object value) {
     if (value == null) {
       return null;
@@ -56,7 +46,7 @@ public class Classes {
     } else {
       clazz = value.getClass();
     }
-    return className(clazz);
+    return clazz.getSimpleName();
   }
 
   public static Set<Class<? extends Object>> getInterfaces(final Class<? extends Object> clazz) {

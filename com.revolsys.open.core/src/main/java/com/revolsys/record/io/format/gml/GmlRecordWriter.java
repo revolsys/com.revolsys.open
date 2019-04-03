@@ -148,8 +148,7 @@ public class GmlRecordWriter extends AbstractRecordWriter {
     this.out.startTag(Gml.FEATURE_COLLECTION);
     if (this.geometryFactory != null) {
       this.out.startTag(Gml.BOUNDED_BY);
-      box(this.geometryFactory,
-        this.geometryFactory.getHorizontalCoordinateSystem().getAreaBoundingBox());
+      box(this.geometryFactory, this.geometryFactory.getAreaBoundingBox());
       this.out.endTag(Gml.BOUNDED_BY);
     }
   }

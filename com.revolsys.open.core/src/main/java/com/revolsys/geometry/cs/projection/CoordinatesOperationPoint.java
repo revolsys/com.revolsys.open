@@ -1,15 +1,10 @@
 package com.revolsys.geometry.cs.projection;
 
-import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.number.Doubles;
 
-public class CoordinatesOperationPoint implements Point {
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
+public class CoordinatesOperationPoint {
 
   public double x;
 
@@ -44,20 +39,8 @@ public class CoordinatesOperationPoint implements Point {
     this.m = m;
   }
 
-  public CoordinatesOperationPoint(final Point point) {
-    this.x = point.getX();
-    this.y = point.getY();
-    this.z = point.getZ();
-    this.m = point.getM();
-  }
-
   public void apply2d(final BiConsumerDouble action) {
     action.accept(this.x, this.y);
-  }
-
-  @Override
-  public Point clone() {
-    return this;
   }
 
   public void copyCoordinatesTo(final double[] coordinates) {
@@ -94,44 +77,22 @@ public class CoordinatesOperationPoint implements Point {
     }
   }
 
-  @Override
-  public double getCoordinate(final int axisIndex) {
-    switch (axisIndex) {
-      case X:
-        return this.x;
-      case Y:
-        return this.y;
-      case Z:
-        return this.z;
-      case M:
-        return this.m;
-
-      default:
-        return Double.NaN;
-    }
-  }
-
-  @Override
   public double getM() {
     return this.m;
   }
 
-  @Override
   public double getX() {
     return this.x;
   }
 
-  @Override
   public double getY() {
     return this.y;
   }
 
-  @Override
   public double getZ() {
     return this.z;
   }
 
-  @Override
   public boolean isEmpty() {
     return false;
   }
@@ -156,6 +117,17 @@ public class CoordinatesOperationPoint implements Point {
     this.m = Double.NaN;
   }
 
+  public void setPoint(final double[] coordinates) {
+    this.x = coordinates[0];
+    this.y = coordinates[1];
+    if (coordinates.length > 2) {
+      this.z = coordinates[2];
+      if (coordinates.length > 3) {
+        this.m = coordinates[3];
+      }
+    }
+  }
+
   public void setPoint(final double[] coordinates, final int offset, final int axisCount) {
     this.x = coordinates[offset];
     this.y = coordinates[offset + 1];
@@ -165,13 +137,6 @@ public class CoordinatesOperationPoint implements Point {
         this.m = coordinates[offset + 3];
       }
     }
-  }
-
-  public void setPoint(final LineString lineString, final int vertexIndex) {
-    this.x = lineString.getCoordinate(0, vertexIndex);
-    this.y = lineString.getCoordinate(1, vertexIndex);
-    this.z = lineString.getCoordinate(2, vertexIndex);
-    this.m = lineString.getCoordinate(3, vertexIndex);
   }
 
   public void setPoint(final Point point) {

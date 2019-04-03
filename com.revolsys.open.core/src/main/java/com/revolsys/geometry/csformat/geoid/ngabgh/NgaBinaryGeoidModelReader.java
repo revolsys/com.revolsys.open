@@ -1,4 +1,4 @@
-package com.revolsys.geometry.cs.geoid.ngabgh;
+package com.revolsys.geometry.csformat.geoid.ngabgh;
 
 import java.nio.channels.ClosedByInterruptException;
 

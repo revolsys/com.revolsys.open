@@ -101,7 +101,7 @@ public class PointDouble extends AbstractPoint implements Serializable {
   public void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
     if (!isEmpty()) {
-      point.setPoint(this);
+      point.setPoint(this.coordinates);
       coordinatesOperation.perform(point);
       action.accept(point);
     }
@@ -111,7 +111,7 @@ public class PointDouble extends AbstractPoint implements Serializable {
   public void forEachVertex(final CoordinatesOperationPoint point,
     final Consumer<CoordinatesOperationPoint> action) {
     if (!isEmpty()) {
-      point.setPoint(this);
+      point.setPoint(this.coordinates);
       action.accept(point);
     }
   }

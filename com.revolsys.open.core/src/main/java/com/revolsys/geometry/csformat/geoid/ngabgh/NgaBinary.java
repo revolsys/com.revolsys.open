@@ -1,4 +1,4 @@
-package com.revolsys.geometry.cs.geoid.ngabgh;
+package com.revolsys.geometry.csformat.geoid.ngabgh;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;

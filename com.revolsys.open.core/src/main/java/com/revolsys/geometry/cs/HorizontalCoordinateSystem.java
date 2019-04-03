@@ -16,4 +16,13 @@ public interface HorizontalCoordinateSystem
       return (C)EpsgCoordinateSystems.getCoordinateSystem(compoundCoordinateSystem);
     }
   }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  default <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
+    return (C)this;
+  }
+
+  @Override
+  int getHorizontalCoordinateSystemId();
 }

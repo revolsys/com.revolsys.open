@@ -46,7 +46,7 @@ import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.map.component.CoordinateSystemField;
+import com.revolsys.swing.map.component.GeometryFactoryField;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLayer;
 import com.revolsys.swing.map.layer.pointcloud.PointCloudLayer;
@@ -88,9 +88,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         }
         Menus.<LayerGroup> addMenuItem(scratchMenu, "layer", "Add " + dataType + " Layer", iconName,
           layerGroup -> {
-            CoordinateSystemField.selectHorizontalCoordinateSystem(
-              "Select coordinate system for layer", layerGroup, coordinateSystem -> {
-                final GeometryFactory geometryFactory = coordinateSystem.getGeometryFactory();
+            GeometryFactoryField.selectGeometryFactory("Select coordinate system for layer",
+              layerGroup, geometryFactory -> {
                 final Layer layer = new ScratchRecordLayer(geometryFactory, dataType);
                 layerGroup.addLayer(layer);
               });

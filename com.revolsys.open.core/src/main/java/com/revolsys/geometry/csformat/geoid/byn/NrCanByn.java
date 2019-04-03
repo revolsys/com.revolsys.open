@@ -1,4 +1,4 @@
-package com.revolsys.geometry.cs.geoid.byn;
+package com.revolsys.geometry.csformat.geoid.byn;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;

@@ -257,7 +257,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
       if (coordinatesOperation == null) {
         return targetCoordinates;
       } else {
-        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(this);
+        final CoordinatesOperationPoint point = newCoordinatesOperationPoint();
         coordinatesOperation.perform(point);
         point.copyCoordinatesTo(targetCoordinates);
         return targetCoordinates;
@@ -274,7 +274,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
       if (coordinatesOperation == null) {
         return this;
       } else {
-        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(this);
+        final CoordinatesOperationPoint point = newCoordinatesOperationPoint();
         coordinatesOperation.perform(point);
         return new PointDoubleXY(point.x, point.y);
       }
@@ -307,7 +307,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
         final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
           .getCoordinatesOperation(geometryFactory);
         if (coordinatesOperation != null) {
-          final CoordinatesOperationPoint point = new CoordinatesOperationPoint(this);
+          final CoordinatesOperationPoint point = newCoordinatesOperationPoint();
           coordinatesOperation.perform(point);
           point.copyCoordinatesTo(coordinates);
         }
@@ -913,6 +913,14 @@ public interface Point extends Punctual, Serializable, BoundingBox {
     return this;
   }
 
+  default CoordinatesOperationPoint newCoordinatesOperationPoint() {
+    final double x = getX();
+    final double y = getY();
+    final double z = getZ();
+    final double m = getM();
+    return new CoordinatesOperationPoint(x, y, z, m);
+  }
+
   @Override
   default Point newGeometry(GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
@@ -928,7 +936,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
         final double[] coordinates = getCoordinates();
         return geometryFactory.point(coordinates);
       } else {
-        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(this);
+        final CoordinatesOperationPoint point = newCoordinatesOperationPoint();
         coordinatesOperation.perform(point);
         final int targetAxisCount = geometryFactory.getAxisCount();
         final double[] targetCoordinates = new double[targetAxisCount];

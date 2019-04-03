@@ -18,15 +18,11 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.geometry.cs.unit.Radian;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
 
 import tec.uom.se.unit.Units;
 
 public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSystem {
   public static final double EARTH_RADIUS = 6378137;
-
-  private static final long serialVersionUID = 8655274386401351222L;
 
   public static double distanceMetres(final double lon1, final double lat1, final double lon2,
     final double lat2) {
@@ -294,19 +290,6 @@ public class GeographicCoordinateSystem extends AbstractHorizontalCoordinateSyst
       }
     }
     return false;
-  }
-
-  @Override
-  public BoundingBox newAreaBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final Area area = getArea();
-    if (area == null) {
-      return geometryFactory.newBoundingBox(-180, -90, 180, 90);
-    } else {
-      return geometryFactory.bboxEditor() //
-        .addBbox(area) //
-        .newBoundingBox();
-    }
   }
 
   public synchronized void removeGridShiftOperation(

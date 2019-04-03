@@ -9,10 +9,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.HorizontalCoordinateSystem;
-import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -25,24 +21,24 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
 
-public class CoordinateSystemField extends BaseComboBox<Integer> implements ItemListener {
+public class GeometryFactoryField extends BaseComboBox<Integer> implements ItemListener {
   private static final long serialVersionUID = 1L;
 
-  public static String formatCoordinateSystem(final Integer value) {
-    final CoordinateSystem coordinateSystem = getCoordinateSystem(value);
-    if (coordinateSystem == null) {
+  public static String formatGeometryFactory(final Integer value) {
+    final GeometryFactory geometryFactory = getGeometryFactory(value);
+    if (geometryFactory == null) {
       return DataTypes.toString(value);
     } else {
-      return coordinateSystem.getHorizontalCoordinateSystemId() + " "
-        + coordinateSystem.getCoordinateSystemName();
+      return geometryFactory.getCoordinateSystemId() + " "
+        + geometryFactory.getCoordinateSystemName();
     }
   }
 
-  public static String formatCoordinateSystem(final Object object) {
-    if (object instanceof CoordinateSystem) {
-      final CoordinateSystem coordinateSystem = (CoordinateSystem)object;
-      final int id = coordinateSystem.getCoordinateSystemId();
-      final String name = coordinateSystem.getCoordinateSystemName();
+  public static String formatGeometryFactory(final Object object) {
+    if (object instanceof GeometryFactory) {
+      final GeometryFactory geometryFactory = (GeometryFactory)object;
+      final int id = geometryFactory.getCoordinateSystemId();
+      final String name = geometryFactory.getCoordinateSystemName();
       if (id > 0) {
         return id + " " + name;
       } else {
@@ -53,18 +49,18 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
     }
   }
 
-  public static CoordinateSystem getCoordinateSystem(final Object value) {
-    CoordinateSystem coordinateSystem = null;
-    if (value instanceof CoordinateSystem) {
-      coordinateSystem = (CoordinateSystem)value;
+  public static GeometryFactory getGeometryFactory(final Object value) {
+    GeometryFactory geometryFactory = null;
+    if (value instanceof GeometryFactory) {
+      geometryFactory = (GeometryFactory)value;
     } else if (value != null) {
       try {
         final int coordinateSystemId = Integer.parseInt(DataTypes.toString(value));
-        coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
+        geometryFactory = GeometryFactory.floating3d(coordinateSystemId);
       } catch (final Throwable t) {
       }
     }
-    return coordinateSystem;
+    return geometryFactory;
   }
 
   private static ArrayListComboBoxModel<Integer> newModel() {
@@ -80,7 +76,7 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
   /**
    * Prompt for a coordinate system if the geometry factory does not have a coordinate system.
    */
-  public static <GFP extends GeometryFactoryProxy> void promptCoordinateSystem(final String title,
+  public static <GFP extends GeometryFactoryProxy> void promptGeometryFactory(final String title,
     final GFP geometryFactoryProxy, final Consumer<GeometryFactory> action) {
     if (geometryFactoryProxy.isHasHorizontalCoordinateSystem()) {
       final GeometryFactory geometryFactory = geometryFactoryProxy.getGeometryFactory();
@@ -96,28 +92,26 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
   }
 
   public static void selectGeometryFactory(final String title,
-    final HorizontalCoordinateSystemProxy defaultCoordinateSystem,
-    final Consumer<GeometryFactory> action) {
-    selectHorizontalCoordinateSystem(title, defaultCoordinateSystem, coordinateSystem -> {
+    final GeometryFactoryProxy defaultGeometryFactory, final Consumer<GeometryFactory> action) {
+    selectHorizontalGeometryFactory(title, defaultGeometryFactory, coordinateSystem -> {
       final GeometryFactory geometryFactory = coordinateSystem.getGeometryFactory();
       action.accept(geometryFactory);
     });
   }
 
-  public static void selectHorizontalCoordinateSystem(final String title,
-    final HorizontalCoordinateSystemProxy defaultCoordinateSystem,
-    final Consumer<HorizontalCoordinateSystem> action) {
+  public static void selectHorizontalGeometryFactory(final String title,
+    final GeometryFactoryProxy defaultGeometryFactory, final Consumer<GeometryFactory> action) {
     Invoke.later(() -> {
       final Project project = Project.get();
       final MapPanel mapPanel = project.getMapPanel();
       int coordinateSystemId = -1;
-      if (defaultCoordinateSystem != null) {
-        coordinateSystemId = defaultCoordinateSystem.getHorizontalCoordinateSystemId();
+      if (defaultGeometryFactory != null) {
+        coordinateSystemId = defaultGeometryFactory.getCoordinateSystemId();
       }
       if (coordinateSystemId <= 0) {
-        coordinateSystemId = mapPanel.getHorizontalCoordinateSystemId();
+        coordinateSystemId = mapPanel.getCoordinateSystemId();
       }
-      final CoordinateSystemField coordinateSystemField = new CoordinateSystemField(
+      final GeometryFactoryField coordinateSystemField = new GeometryFactoryField(
         "coordinateSystem");
       if (coordinateSystemId > 0) {
         coordinateSystemField.setSelectedItem(coordinateSystemId);
@@ -129,17 +123,16 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
       valueField.add(fieldPanel);
       valueField.showDialog();
       if (valueField.isSaved()) {
-        final HorizontalCoordinateSystem coordinateSystem = coordinateSystemField
-          .getHorizontalCoordinateSystem();
-        if (coordinateSystem != null) {
-          Invoke.background(title, () -> action.accept(coordinateSystem));
+        final GeometryFactory geometryFactory = coordinateSystemField.getGeometryFactory();
+        if (geometryFactory != null) {
+          Invoke.background(title, () -> action.accept(geometryFactory));
         }
       }
     });
   }
 
-  public CoordinateSystemField(final String fieldName) {
-    super("fieldName", newModel(), CoordinateSystemField::formatCoordinateSystem);
+  public GeometryFactoryField(final String fieldName) {
+    super("fieldName", newModel(), GeometryFactoryField::formatGeometryFactory);
 
     setEditable(false);
     addItemListener(this);
@@ -148,12 +141,12 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
     setToolTipText("Coordinate System");
   }
 
-  public void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    final int srid = coordinateSystem.getHorizontalCoordinateSystemId();
-    addCoordinateSystem(srid);
+  public void addGeometryFactory(final GeometryFactory geometryFactory) {
+    final int srid = geometryFactory.getCoordinateSystemId();
+    addGeometryFactory(srid);
   }
 
-  public void addCoordinateSystem(final int srid) {
+  public void addGeometryFactory(final int srid) {
     final ArrayListComboBoxModel<Integer> model = (ArrayListComboBoxModel<Integer>)getModel();
     if (model.indexOf(srid) == -1) {
       model.addElement(srid);
@@ -168,21 +161,12 @@ public class CoordinateSystemField extends BaseComboBox<Integer> implements Item
     return GeometryFactory.floating2d(coordinateSystemId);
   }
 
-  public HorizontalCoordinateSystem getHorizontalCoordinateSystem() {
-    final Integer coordinateSystemId = getSelectedItem();
-    if (coordinateSystemId > 0) {
-      return EpsgCoordinateSystems.getHorizontalCoordinateSystem(coordinateSystemId);
-    } else {
-      return null;
-    }
-  }
-
   @Override
   public void itemStateChanged(final ItemEvent e) {
     final int stateChange = e.getStateChange();
     if (stateChange == ItemEvent.SELECTED) {
       final Object value = e.getItem();
-      final CoordinateSystem coordinateSystem = getCoordinateSystem(value);
+      final GeometryFactory coordinateSystem = getGeometryFactory(value);
       if (coordinateSystem != null) {
         final GeometryFactory geometryFactory = coordinateSystem.getGeometryFactory();
         geometryFactoryChanged(geometryFactory);

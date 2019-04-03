@@ -1,4 +1,4 @@
-package com.revolsys.geometry.cs.geoid.usngsbin;
+package com.revolsys.geometry.csformat.geoid.usngsbin;
 
 import java.nio.ByteOrder;
 import java.nio.channels.ClosedByInterruptException;

@@ -1,5 +1,7 @@
 package com.revolsys.geometry.cs.esri;
 
+import java.io.FileNotFoundException;
+import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +32,9 @@ import com.revolsys.geometry.cs.unit.AngularUnit;
 import com.revolsys.geometry.cs.unit.LinearUnit;
 import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.WrappedException;
 
 public class EsriCoordinateSystems {
   private static Map<Integer, CoordinateSystem> COORDINATE_SYSTEM_BY_ID = new HashMap<>();
@@ -277,10 +281,28 @@ public class EsriCoordinateSystems {
    *  {@link EpsgCoordinateSystems#getCoordinateSystem(int)} will be used to return that
    *  coordinate system.
    */
-  @SuppressWarnings("unchecked")
   public static <C extends CoordinateSystem> C readCoordinateSystem(final Resource resource) {
-    final CoordinateSystem coordinateSystem = WktCsParser.read(resource);
-    return (C)readCoordinateSystemPost(coordinateSystem);
+    if (resource == null) {
+      return null;
+    } else {
+      final Resource projResource = resource.newResourceChangeExtension("prj");
+      if (projResource != null) {
+        try {
+          final String wkt = projResource.contentsAsString();
+          return readCoordinateSystem(wkt);
+        } catch (final WrappedException e) {
+          final Throwable cause = e.getCause();
+          if (cause instanceof FileNotFoundException) {
+          } else if (cause instanceof FileSystemException) {
+          } else {
+            Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
+          }
+        } catch (final Exception e) {
+          Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
+        }
+      }
+    }
+    return null;
   }
 
   /**
