@@ -2,9 +2,9 @@ package com.revolsys.swing.tree.node;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.connection.ConnectionRegistry;
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.io.PathName;
-import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.mapguide.MapGuideWebService;
 import com.revolsys.swing.Borders;

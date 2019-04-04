@@ -23,6 +23,7 @@ import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -30,9 +31,8 @@ import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.file.FileNameExtensionFilter;
-import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.format.json.Json;

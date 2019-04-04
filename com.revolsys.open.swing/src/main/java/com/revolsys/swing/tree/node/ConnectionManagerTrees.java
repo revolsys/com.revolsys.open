@@ -7,12 +7,12 @@ import java.nio.file.Path;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import com.revolsys.connection.AbstractConnection;
+import com.revolsys.connection.AbstractConnectionRegistry;
+import com.revolsys.connection.Connection;
+import com.revolsys.connection.ConnectionRegistry;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.connection.AbstractConnection;
-import com.revolsys.io.connection.AbstractConnectionRegistry;
-import com.revolsys.io.connection.Connection;
-import com.revolsys.io.connection.ConnectionRegistry;
-import com.revolsys.io.file.FileNameExtensionFilter;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;

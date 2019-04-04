@@ -21,14 +21,14 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
+import com.revolsys.connection.file.FileConnectionManager;
+import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.datatype.DataType;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.file.FileConnectionManager;
-import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;

@@ -23,6 +23,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.renderer.shape.LineStringShape;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePreview;
@@ -146,7 +147,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
         return this.style.getMarker().newIcon(geometryStyle);
       } else if (DataTypes.LINE_STRING.equals(geometryDataType)
         || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
-        shape = GeometryStylePreview.getLineString(16).toShape();
+        shape = new LineStringShape(GeometryStylePreview.getLineString(16));
       } else if (DataTypes.POLYGON.equals(geometryDataType)
         || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         shape = getPolygonShape();

@@ -25,6 +25,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.Circle;
 import com.revolsys.spring.resource.PathResource;
+import com.revolsys.swing.map.layer.record.renderer.shape.PolygonShape;
 
 public class TriangulationVisualization {
   private static boolean showCircumcircle = false;
@@ -74,15 +75,15 @@ public class TriangulationVisualization {
           final Graphics2D g2 = (Graphics2D)graphics;
           g2.setPaint(WebColors.White);
           g2.fillRect(0, 0, 800, 800);
-          final AffineTransform oldTransform = g2.getTransform();
           g2.transform(transform);
           synchronized (tin) {
             g2.setStroke(new BasicStroke((float)(1 / pixelsPerXUnit)));
             tin.forEachTriangle((triangle) -> {
               g2.setPaint(WebColors.newAlpha(WebColors.Aqua, 25));
-              g2.fill(triangle.toShape());
+              final PolygonShape shape = new PolygonShape(triangle);
+              g2.fill(shape);
               g2.setColor(WebColors.Black);
-              g2.draw(triangle.toShape());
+              g2.draw(shape);
             });
             if (showCircumcircle) {
               tin.forEachTriangle((triangle) -> {

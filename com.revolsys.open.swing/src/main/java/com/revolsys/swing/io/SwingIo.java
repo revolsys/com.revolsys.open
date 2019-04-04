@@ -11,8 +11,8 @@ import javax.swing.JFileChooser;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.Paths;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.parallel.Invoke;

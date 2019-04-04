@@ -44,7 +44,6 @@ import javax.measure.quantity.Length;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
-import com.revolsys.geometry.model.awtshape.PolygonShape;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PolygonEditor;
@@ -972,10 +971,6 @@ public interface Polygon extends Polygonal {
       }
     }
     return (G)this;
-  }
-
-  default PolygonShape toShape() {
-    return new PolygonShape(this);
   }
 
   @Override

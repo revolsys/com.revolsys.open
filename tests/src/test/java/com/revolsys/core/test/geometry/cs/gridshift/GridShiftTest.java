@@ -6,8 +6,8 @@ import org.jeometry.coordinatesystem.operation.gridshift.HorizontalShiftOperatio
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.geometry.csformat.gridshift.gsb.GsbGridShiftFile;
-import com.revolsys.geometry.csformat.gridshift.nadcon5.Nadcon5GridShiftOperation;
+import com.revolsys.csformat.gridshift.gsb.GsbGridShiftFile;
+import com.revolsys.csformat.gridshift.nadcon5.Nadcon5GridShiftOperation;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.record.Record;

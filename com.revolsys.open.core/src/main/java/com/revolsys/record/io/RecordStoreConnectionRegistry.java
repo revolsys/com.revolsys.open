@@ -6,9 +6,9 @@ import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.io.connection.AbstractConnectionRegistry;
-import com.revolsys.io.connection.ConnectionRegistry;
-import com.revolsys.io.connection.ConnectionRegistryManager;
+import com.revolsys.connection.AbstractConnectionRegistry;
+import com.revolsys.connection.ConnectionRegistry;
+import com.revolsys.connection.ConnectionRegistryManager;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.schema.RecordStore;

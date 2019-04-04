@@ -59,7 +59,6 @@ import com.revolsys.geometry.algorithm.LineStringLocation;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
-import com.revolsys.geometry.model.awtshape.LineStringShape;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
@@ -2337,10 +2336,6 @@ public interface LineString extends Lineal {
     } else {
       return (G)this;
     }
-  }
-
-  default LineStringShape toShape() {
-    return new LineStringShape(this);
   }
 
   /**

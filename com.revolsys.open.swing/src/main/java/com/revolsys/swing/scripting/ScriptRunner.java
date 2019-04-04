@@ -16,7 +16,7 @@ import javax.tools.JavaFileObject.Kind;
 import javax.tools.ToolProvider;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.file.FileNameExtensionFilter;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.process.JavaProcess;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.logging.LoggingEventPanel;

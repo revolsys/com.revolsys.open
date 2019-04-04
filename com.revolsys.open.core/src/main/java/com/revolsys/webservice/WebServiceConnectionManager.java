@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.revolsys.io.connection.AbstractConnectionRegistryManager;
+import com.revolsys.connection.AbstractConnectionRegistryManager;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.OS;

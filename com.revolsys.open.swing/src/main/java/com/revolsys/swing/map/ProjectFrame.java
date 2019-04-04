@@ -42,15 +42,15 @@ import javax.swing.KeyStroke;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.collection.set.Sets;
+import com.revolsys.connection.file.FileConnectionManager;
+import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.file.FileConnectionManager;
-import com.revolsys.io.file.FileNameExtensionFilter;
-import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;

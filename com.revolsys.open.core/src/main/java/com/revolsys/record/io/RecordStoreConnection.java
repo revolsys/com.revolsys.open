@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.io.connection.AbstractConnection;
+import com.revolsys.connection.AbstractConnection;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;

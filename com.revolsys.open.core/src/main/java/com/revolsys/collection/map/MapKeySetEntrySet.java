@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.collection.bplus.BPlusTreeMap;
-
 public class MapKeySetEntrySet<K, V> extends AbstractSet<Entry<K, V>> {
   private final Map<K, V> map;
 
@@ -24,7 +22,7 @@ public class MapKeySetEntrySet<K, V> extends AbstractSet<Entry<K, V>> {
    */
   @Override
   public boolean contains(final Object o) {
-    if (o instanceof BPlusTreeMap.Entry) {
+    if (o instanceof MapKeyEntry) {
       @SuppressWarnings("unchecked")
       final Entry<K, V> e = (Entry<K, V>)o;
       final Entry<K, V> candidate = new MapKeyEntry<>(this.map, e.getKey());

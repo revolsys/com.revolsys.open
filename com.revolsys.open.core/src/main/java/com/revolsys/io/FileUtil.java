@@ -48,9 +48,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.revolsys.io.file.FileConnectionManager;
-import com.revolsys.io.file.FolderConnection;
-import com.revolsys.io.file.FolderConnectionRegistry;
+import com.revolsys.connection.file.FileConnectionManager;
+import com.revolsys.connection.file.FolderConnection;
+import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
 import com.revolsys.logging.Logs;
