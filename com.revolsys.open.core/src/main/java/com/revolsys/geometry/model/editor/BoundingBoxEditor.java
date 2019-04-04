@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;

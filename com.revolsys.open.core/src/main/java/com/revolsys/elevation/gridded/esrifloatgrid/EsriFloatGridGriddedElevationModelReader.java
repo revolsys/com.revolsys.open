@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.nio.ByteOrder;
 import java.util.NoSuchElementException;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
@@ -16,7 +18,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.io.Readers;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<Point>
   implements GriddedElevationModelReader, PointReader {

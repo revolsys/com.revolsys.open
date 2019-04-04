@@ -1,10 +1,10 @@
 package com.revolsys.geometry.model.impl;
 
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
 
 import com.revolsys.geometry.model.Triangle;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer3Double;
 
 public abstract class AbstractTriangle extends AbstractPolygon implements Triangle {
   /**

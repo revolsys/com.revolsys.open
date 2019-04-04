@@ -12,6 +12,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.coordinatesystem.model.CoordinateOperationMethod;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
@@ -37,7 +38,6 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.spring.resource.NoSuchResourceException;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class UsgsGriddedElevationReader extends BaseObjectWithProperties
   implements GriddedElevationModelReader {

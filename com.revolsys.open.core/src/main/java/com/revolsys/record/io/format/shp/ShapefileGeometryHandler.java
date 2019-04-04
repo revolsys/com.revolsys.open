@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import org.jeometry.common.function.Function3;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
@@ -22,7 +24,6 @@ import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.endian.EndianOutput;
-import com.revolsys.util.function.Function3;
 
 public final class ShapefileGeometryHandler {
 

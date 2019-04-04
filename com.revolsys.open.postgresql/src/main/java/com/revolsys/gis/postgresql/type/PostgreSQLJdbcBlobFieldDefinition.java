@@ -10,13 +10,13 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.apache.commons.dbcp2.DelegatingConnection;
+import org.jeometry.common.exception.Exceptions;
 import org.postgresql.PGConnection;
 import org.postgresql.largeobject.LargeObject;
 import org.postgresql.largeobject.LargeObjectManager;
 
 import com.revolsys.jdbc.field.JdbcBlobFieldDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class PostgreSQLJdbcBlobFieldDefinition extends JdbcBlobFieldDefinition {
   public PostgreSQLJdbcBlobFieldDefinition(final String dbName, final String name,

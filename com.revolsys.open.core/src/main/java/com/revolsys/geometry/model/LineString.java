@@ -50,7 +50,9 @@ import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.LineIntersector;
@@ -81,8 +83,6 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.function.Consumer3Double;
-import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;

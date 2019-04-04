@@ -25,14 +25,14 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.Exceptions;
 
 public class ProcessWindow extends JFrame {
 

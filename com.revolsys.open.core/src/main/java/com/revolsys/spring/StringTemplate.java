@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jeometry.common.logging.Logs;
 import org.springframework.util.Assert;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 
 public class StringTemplate implements Serializable {

@@ -21,6 +21,8 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.awt.ResetAffineTransform;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -30,7 +32,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.Viewport2D;

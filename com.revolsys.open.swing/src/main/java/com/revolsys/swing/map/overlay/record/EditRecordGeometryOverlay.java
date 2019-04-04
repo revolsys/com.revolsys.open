@@ -26,6 +26,8 @@ import java.util.TreeMap;
 import javax.swing.JOptionPane;
 import javax.swing.undo.UndoableEdit;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
@@ -39,7 +41,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;

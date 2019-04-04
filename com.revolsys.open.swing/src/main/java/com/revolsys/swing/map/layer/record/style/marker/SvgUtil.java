@@ -7,9 +7,9 @@ import org.apache.batik.dom.util.DocumentFactory;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.util.SVGConstants;
 import org.apache.batik.util.XMLResourceDescriptor;
+import org.jeometry.common.logging.Logs;
 import org.w3c.dom.Document;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 

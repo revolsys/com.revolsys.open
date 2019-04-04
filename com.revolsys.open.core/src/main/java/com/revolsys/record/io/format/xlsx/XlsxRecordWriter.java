@@ -15,6 +15,7 @@ import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.SpreadsheetML.TablePart;
 import org.docx4j.openpackaging.parts.SpreadsheetML.WorksheetPart;
+import org.jeometry.common.exception.Exceptions;
 import org.xlsx4j.jaxb.Context;
 import org.xlsx4j.sml.CTAutoFilter;
 import org.xlsx4j.sml.CTRst;
@@ -41,7 +42,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.number.Doubles;
 
 public class XlsxRecordWriter extends AbstractRecordWriter {

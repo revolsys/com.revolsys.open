@@ -4,6 +4,8 @@ import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
@@ -15,7 +17,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathUtil;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;

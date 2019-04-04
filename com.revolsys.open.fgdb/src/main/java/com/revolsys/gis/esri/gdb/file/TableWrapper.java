@@ -1,5 +1,7 @@
 package com.revolsys.gis.esri.gdb.file;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.beans.ObjectException;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.esri.filegdb.jni.EnumRows;
@@ -14,7 +16,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.ValueHolderWrapper;
 

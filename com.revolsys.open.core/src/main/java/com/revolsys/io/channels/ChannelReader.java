@@ -21,10 +21,11 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.EndOfFileException;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class ChannelReader implements BaseCloseable {
 

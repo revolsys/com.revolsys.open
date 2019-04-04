@@ -2,6 +2,8 @@ package com.revolsys.geometry.model.editor;
 
 import java.util.function.Consumer;
 
+import org.jeometry.common.function.BiFunctionDouble;
+
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
@@ -9,7 +11,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.util.function.BiFunctionDouble;
 
 public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual, Point, PointEditor>
   implements MultiPoint, PunctualEditor {

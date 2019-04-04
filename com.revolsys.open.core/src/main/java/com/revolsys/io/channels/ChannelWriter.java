@@ -11,10 +11,11 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.EndOfFileException;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class ChannelWriter extends AbstractChannelWriter implements BaseCloseable {
   public static ChannelWriter newChannelWriter(final Object source) {

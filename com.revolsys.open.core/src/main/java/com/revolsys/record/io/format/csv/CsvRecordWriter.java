@@ -3,6 +3,8 @@ package com.revolsys.record.io.format.csv;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.AbstractRecordWriter;
@@ -11,7 +13,6 @@ import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
   private final boolean ewkt;

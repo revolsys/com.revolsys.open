@@ -9,11 +9,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.util.Exceptions;
 
 public class Nadcon5Region {
 

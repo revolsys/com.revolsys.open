@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
@@ -21,7 +22,6 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.GeometryRecordReader;

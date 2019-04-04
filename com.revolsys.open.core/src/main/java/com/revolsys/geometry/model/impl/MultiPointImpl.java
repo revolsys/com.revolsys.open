@@ -45,9 +45,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer3Double;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
 
 /**
  * Models a collection of {@link Point}s.

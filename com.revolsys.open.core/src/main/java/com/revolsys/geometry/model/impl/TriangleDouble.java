@@ -4,7 +4,7 @@ import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
 
 public class TriangleDouble extends AbstractTriangle {
   private static final long serialVersionUID = 7579865828939708871L;

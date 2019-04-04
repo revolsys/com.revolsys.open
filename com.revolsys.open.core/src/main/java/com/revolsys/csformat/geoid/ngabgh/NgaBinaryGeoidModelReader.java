@@ -2,6 +2,7 @@ package com.revolsys.csformat.geoid.ngabgh;
 
 import java.nio.channels.ClosedByInterruptException;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.collection.map.MapEx;
@@ -14,7 +15,6 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 /*
  The total size of the file is 2,076,480 bytes. This file was created

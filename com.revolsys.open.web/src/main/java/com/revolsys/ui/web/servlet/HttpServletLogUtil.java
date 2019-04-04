@@ -5,7 +5,8 @@ import java.io.IOException;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public final class HttpServletLogUtil {

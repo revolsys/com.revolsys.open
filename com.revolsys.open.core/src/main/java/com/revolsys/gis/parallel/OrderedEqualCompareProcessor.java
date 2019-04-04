@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.MultiInputSelector;
 import com.revolsys.parallel.channel.store.Buffer;

@@ -8,6 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.function.Function3;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.esri.filegdb.jni.Row;
@@ -23,8 +26,6 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.record.io.format.shp.ShapefileGeometryHandler;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.util.Booleans;
-import com.revolsys.util.Exceptions;
-import com.revolsys.util.function.Function3;
 
 public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 

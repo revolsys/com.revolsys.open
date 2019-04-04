@@ -2,10 +2,10 @@ package com.revolsys.core.test.util;
 
 import java.util.List;
 
+import org.jeometry.common.logging.Logs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.util.Strings;
 

@@ -3,7 +3,7 @@ package com.revolsys.parallel;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
 
 public class InvokeMethodRunnable implements Runnable {
   private final Object object;

@@ -10,12 +10,12 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.jeometry.common.logging.Logs;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.access.expression.ExpressionUtils;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.html.Aria;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;

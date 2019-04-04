@@ -23,6 +23,7 @@ import org.gdal.ogr.Layer;
 import org.gdal.ogr.ogr;
 import org.gdal.ogr.ogrConstants;
 import org.gdal.osr.SpatialReference;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataType;
@@ -32,7 +33,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.property.FieldProperties;

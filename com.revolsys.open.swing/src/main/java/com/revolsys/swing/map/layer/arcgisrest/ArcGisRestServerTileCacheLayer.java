@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.record.io.format.esri.rest.map.TileInfo;
@@ -22,10 +25,8 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceConnectionManager;
 import com.revolsys.webservice.WebServiceResource;

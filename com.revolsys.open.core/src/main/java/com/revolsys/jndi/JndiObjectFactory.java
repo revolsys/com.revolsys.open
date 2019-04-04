@@ -7,10 +7,9 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.spi.NamingManager;
 
+import org.jeometry.common.logging.Logs;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
-
-import com.revolsys.logging.Logs;
 
 public class JndiObjectFactory extends AbstractFactoryBean<Object> {
   private String beanName;

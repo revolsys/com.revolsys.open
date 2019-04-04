@@ -8,9 +8,8 @@ import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
 import javax.naming.spi.NamingManager;
 
+import org.jeometry.common.logging.Logs;
 import org.springframework.util.ClassUtils;
-
-import com.revolsys.logging.Logs;
 
 public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder {
 

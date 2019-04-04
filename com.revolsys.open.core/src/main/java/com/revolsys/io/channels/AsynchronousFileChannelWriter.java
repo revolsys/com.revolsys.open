@@ -5,9 +5,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.AsynchronousFileChannel;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.EndOfFileException;
-import com.revolsys.util.Exceptions;
 
 public class AsynchronousFileChannelWriter extends AbstractChannelWriter implements BaseCloseable {
 

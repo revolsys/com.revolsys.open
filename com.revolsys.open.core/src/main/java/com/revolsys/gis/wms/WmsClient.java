@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.w3c.dom.Document;
 
@@ -22,7 +23,6 @@ import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.spring.resource.UrlResource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 import com.revolsys.webservice.AbstractWebService;

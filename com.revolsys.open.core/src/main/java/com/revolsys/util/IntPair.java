@@ -2,6 +2,8 @@ package com.revolsys.util;
 
 import java.util.List;
 
+import org.jeometry.common.exception.Exceptions;
+
 public class IntPair implements Cloneable, Comparable<IntPair> {
 
   public static void add(final List<IntPair> list, final int value1, final int value2) {

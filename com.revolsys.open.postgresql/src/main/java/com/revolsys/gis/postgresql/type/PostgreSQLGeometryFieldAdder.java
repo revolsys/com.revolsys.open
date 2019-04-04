@@ -3,6 +3,8 @@ package com.revolsys.gis.postgresql.type;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -14,7 +16,6 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.util.Property;
 

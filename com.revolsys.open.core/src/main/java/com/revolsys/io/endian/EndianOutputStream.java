@@ -18,7 +18,7 @@ package com.revolsys.io.endian;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.revolsys.util.Exceptions;
+import org.jeometry.common.exception.Exceptions;
 
 public class EndianOutputStream extends OutputStream implements EndianOutput {
   private final OutputStream out;

@@ -32,8 +32,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.MethodUtils;
-
-import com.revolsys.logging.Logs;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
 
 /**
  * The JavaBeanUtil is a utility class that provides methods to set/get

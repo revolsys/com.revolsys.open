@@ -3,7 +3,7 @@ package com.revolsys.io;
 import java.io.IOException;
 import java.io.Reader;
 
-import com.revolsys.util.Exceptions;
+import org.jeometry.common.exception.Exceptions;
 
 public interface Readers {
   static double readDouble(final Reader reader) throws IOException {

@@ -37,12 +37,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
+
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.MultiPointEditor;
 import com.revolsys.geometry.model.editor.PunctualEditor;
-import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.Function4Double;
 
 /**
  * Identifies {@link Geometry} subclasses which

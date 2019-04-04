@@ -1,7 +1,8 @@
 package com.revolsys.swing.map.layer.tile;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.util.Cancellable;
 
 public class TileLoadTask<D, T extends AbstractMapTile<D>> implements Runnable {

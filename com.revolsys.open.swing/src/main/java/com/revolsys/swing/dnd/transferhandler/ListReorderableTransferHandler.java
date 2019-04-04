@@ -12,7 +12,8 @@ import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.util.Reorderable;
 
 public class ListReorderableTransferHandler extends TransferHandler {

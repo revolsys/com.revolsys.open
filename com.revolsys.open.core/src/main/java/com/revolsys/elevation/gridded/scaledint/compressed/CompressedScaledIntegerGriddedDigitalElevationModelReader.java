@@ -5,6 +5,8 @@ import java.nio.channels.ClosedByInterruptException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
@@ -16,7 +18,6 @@ import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class CompressedScaledIntegerGriddedDigitalElevationModelReader
   extends BaseObjectWithProperties implements GriddedElevationModelReader {

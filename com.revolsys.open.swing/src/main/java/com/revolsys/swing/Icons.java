@@ -22,8 +22,9 @@ import javax.swing.ImageIcon;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.awt.WebColors;
-import com.revolsys.logging.Logs;
 import com.revolsys.util.IconNameProxy;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;

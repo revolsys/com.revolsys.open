@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
 
 /**
  * The ZipWriter is a wrapper for another writer which has been configured to

@@ -15,13 +15,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.xbean.spring.context.ResourceXmlApplicationContext;
+import org.jeometry.common.logging.Logs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.ui.web.config.Config;
 import com.revolsys.ui.web.config.InvalidConfigException;
 import com.revolsys.ui.web.config.Page;

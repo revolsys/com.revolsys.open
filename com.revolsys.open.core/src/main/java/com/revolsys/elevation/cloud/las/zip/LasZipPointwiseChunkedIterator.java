@@ -2,12 +2,13 @@ package com.revolsys.elevation.cloud.las.zip;
 
 import java.util.Iterator;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloudIterator;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
-import com.revolsys.util.Exceptions;
 
 public class LasZipPointwiseChunkedIterator extends LasPointCloudIterator {
 

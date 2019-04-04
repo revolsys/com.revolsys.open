@@ -18,6 +18,8 @@ import java.util.function.Predicate;
 
 import javax.swing.SwingWorker;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.iterator.Iterators;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
@@ -27,7 +29,6 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
-import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;

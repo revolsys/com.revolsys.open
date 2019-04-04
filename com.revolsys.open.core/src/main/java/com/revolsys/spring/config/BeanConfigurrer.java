@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jeometry.common.logging.Logs;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
@@ -27,7 +28,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.util.StringValueResolver;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.spring.BeanReference;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.factory.Parameter;

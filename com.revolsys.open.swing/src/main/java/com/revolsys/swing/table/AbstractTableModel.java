@@ -13,11 +13,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumnModel;
 
+import org.jeometry.common.function.IntBiConsumer;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.swing.SwingUtil;
@@ -26,7 +28,6 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.UndoManager;
-import com.revolsys.util.function.IntBiConsumer;
 
 public abstract class AbstractTableModel extends javax.swing.table.AbstractTableModel
   implements PropertyChangeSupportProxy {

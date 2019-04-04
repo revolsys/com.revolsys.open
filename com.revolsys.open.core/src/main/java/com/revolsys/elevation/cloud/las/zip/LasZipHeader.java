@@ -6,6 +6,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
@@ -18,7 +20,6 @@ import com.revolsys.io.Buffers;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
 
 public class LasZipHeader implements MapSerializer {

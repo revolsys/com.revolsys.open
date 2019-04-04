@@ -8,6 +8,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,8 +18,6 @@ import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalEleva
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevationModelFile;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.util.Dates;
-import com.revolsys.util.Exceptions;
-import com.revolsys.util.WrappedException;
 
 public class ScaledIntegerGriddedDigitalElevationModelTest extends GriddedElevationModelTest {
 

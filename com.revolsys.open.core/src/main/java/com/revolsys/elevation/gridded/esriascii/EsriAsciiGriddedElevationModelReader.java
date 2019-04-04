@@ -10,6 +10,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
@@ -23,7 +25,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Readers;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.number.BigDecimals;
 import com.revolsys.util.number.Doubles;
 

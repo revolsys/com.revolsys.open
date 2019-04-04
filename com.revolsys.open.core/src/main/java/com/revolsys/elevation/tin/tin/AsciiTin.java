@@ -1,5 +1,7 @@
 package com.revolsys.elevation.tin.tin;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
@@ -9,7 +11,6 @@ import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriterFactory;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class AsciiTin extends AbstractIoFactoryWithCoordinateSystem
   implements TriangulatedIrregularNetworkReaderFactory, TriangulatedIrregularNetworkWriterFactory {

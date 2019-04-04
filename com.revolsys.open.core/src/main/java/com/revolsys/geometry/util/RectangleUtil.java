@@ -1,11 +1,12 @@
 package com.revolsys.geometry.util;
 
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Consumer6Double;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.Consumer6Double;
 
 public class RectangleUtil {
   // https://en.wikipedia.org/wiki/Cohen–Sutherland_algorithm

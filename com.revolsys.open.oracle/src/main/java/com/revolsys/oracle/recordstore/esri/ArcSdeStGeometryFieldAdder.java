@@ -1,5 +1,7 @@
 package com.revolsys.oracle.recordstore.esri;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
@@ -7,7 +9,6 @@ import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.property.FieldProperties;
 
 public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {

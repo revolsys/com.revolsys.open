@@ -32,6 +32,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.jeometry.common.logging.Logs;
 import org.springframework.beans.MethodInvocationException;
 import org.springframework.beans.PropertyAccessException;
 import org.springframework.beans.factory.BeanCreationException;
@@ -39,7 +40,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.process.ProcessNetwork;
 
 public class ProcessorPipelineTool {

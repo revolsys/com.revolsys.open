@@ -3,13 +3,13 @@ package com.revolsys.geometry.model.editor;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer3Double;
 
 public class GeometryCollectionImplEditor
   extends AbstractGeometryCollectionEditor<GeometryCollectionImpl, Geometry, GeometryEditor<?>> {

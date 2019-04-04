@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.Layer;

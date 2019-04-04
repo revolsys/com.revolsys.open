@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import com.revolsys.util.function.Function3;
+import org.jeometry.common.function.Function3;
 
 public class FunctionDataType extends AbstractDataType {
   public static FunctionDataType newToObjectEquals(final String name, final Class<?> javaClass,

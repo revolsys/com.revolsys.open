@@ -18,6 +18,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
@@ -38,7 +40,6 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;

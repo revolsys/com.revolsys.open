@@ -7,6 +7,8 @@ import java.awt.event.FocusListener;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -15,7 +17,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.undo.UndoManager;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class PasswordField extends JPasswordField implements Field, FocusListener {

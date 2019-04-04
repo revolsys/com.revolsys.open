@@ -5,7 +5,8 @@ import java.sql.Clob;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlAttr;

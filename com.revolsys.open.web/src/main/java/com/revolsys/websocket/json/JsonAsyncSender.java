@@ -11,9 +11,10 @@ import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 import javax.websocket.Session;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 import com.revolsys.websocket.AsyncResult;
 

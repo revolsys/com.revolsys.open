@@ -25,10 +25,9 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
+import org.jeometry.common.logging.Logs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.revolsys.logging.Logs;
 
 /**
 

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -18,7 +20,6 @@ import com.revolsys.io.endian.EndianInput;
 import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.endian.EndianMappedByteBuffer;
 import com.revolsys.io.endian.LittleEndianRandomAccessFile;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.Records;

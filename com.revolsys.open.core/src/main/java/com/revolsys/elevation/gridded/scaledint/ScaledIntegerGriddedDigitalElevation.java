@@ -8,6 +8,8 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
@@ -20,7 +22,6 @@ import com.revolsys.gis.grid.CustomRectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class ScaledIntegerGriddedDigitalElevation extends AbstractIoFactoryWithCoordinateSystem
   implements GriddedElevationModelReaderFactory, GriddedElevationModelWriterFactory {

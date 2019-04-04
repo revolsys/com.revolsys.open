@@ -2,8 +2,8 @@ package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Triangle;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
-import com.revolsys.util.function.Consumer3Double;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.Consumer3Double;
 
 public class TriangleDoubleXYZ extends AbstractTriangle {
   private static final long serialVersionUID = 1l;

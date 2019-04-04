@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystem;
 
@@ -31,7 +32,6 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.html.HtmlWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
 
 public class LasPointCloudHeader

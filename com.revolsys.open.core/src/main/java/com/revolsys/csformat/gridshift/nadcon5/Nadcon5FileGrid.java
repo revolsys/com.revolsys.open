@@ -6,8 +6,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.io.Buffers;
-import com.revolsys.util.Exceptions;
 
 public class Nadcon5FileGrid {
 

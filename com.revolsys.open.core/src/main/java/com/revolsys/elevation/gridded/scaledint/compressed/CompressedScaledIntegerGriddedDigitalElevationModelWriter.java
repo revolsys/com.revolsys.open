@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.geometry.model.BoundingBox;
@@ -13,7 +15,6 @@ import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
 import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class CompressedScaledIntegerGriddedDigitalElevationModelWriter
   extends AbstractWriter<GriddedElevationModel> implements GriddedElevationModelWriter {

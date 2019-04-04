@@ -2,11 +2,12 @@ package com.revolsys.jdbc.io;
 
 import java.util.Map;
 
+import org.jeometry.common.function.Function3;
+
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.function.Function3;
 
 public class RecordStoreIteratorFactory {
 

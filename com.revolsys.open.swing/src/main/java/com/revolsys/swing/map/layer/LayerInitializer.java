@@ -2,7 +2,8 @@ package com.revolsys.swing.map.layer;
 
 import java.util.LinkedList;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.revolsys.swing.parallel.Invoke;

@@ -67,7 +67,11 @@ import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.jeometry.coordinatesystem.model.systems.EsriCoordinateSystems;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.IntHashMap;
@@ -105,14 +109,10 @@ import com.revolsys.io.StringWriter;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer3Double;
 
 import tec.uom.se.unit.Units;
 

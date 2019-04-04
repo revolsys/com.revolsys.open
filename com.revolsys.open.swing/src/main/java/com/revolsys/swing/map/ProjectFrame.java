@@ -41,6 +41,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.tree.TreePath;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.set.Sets;
 import com.revolsys.connection.file.FileConnectionManager;
 import com.revolsys.connection.file.FolderConnectionRegistry;
@@ -51,7 +53,6 @@ import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.filter.FileNameExtensionFilter;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
