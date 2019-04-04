@@ -73,8 +73,6 @@ public class GeometryFunctionRegistry {
     funcRegistry.add(AffineTransformationFunctions.class);
     funcRegistry.add(DissolveFunctions.class);
     funcRegistry.add(DistanceFunctions.class);
-    funcRegistry.add(CreateFractalShapeFunctions.class);
-    funcRegistry.add(CreateRandomShapeFunctions.class);
     funcRegistry.add(JTSFunctions.class);
     funcRegistry.add(CGAlgorithmFunctions.class);
     funcRegistry.add(OverlayFunctions.class);
