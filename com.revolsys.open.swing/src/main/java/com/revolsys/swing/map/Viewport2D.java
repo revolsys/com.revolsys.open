@@ -2,7 +2,6 @@ package com.revolsys.swing.map;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.lang.ref.Reference;
@@ -16,8 +15,7 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.coordinatesystem.model.Ellipsoid;
 
 import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -283,6 +281,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return this.propertyChangeSupport;
   }
 
+  @SuppressWarnings("unchecked")
   public <V extends Geometry> V getRoundedGeometry(final V geometry) {
     if (geometry == null) {
       return null;
@@ -333,8 +332,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   public int getScreenResolution() {
-    final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-    final int screenResolution = defaultToolkit.getScreenResolution();
+    // final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+    // final int screenResolution = defaultToolkit.getScreenResolution();
     return 96;
   }
 
@@ -591,14 +590,15 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
           viewHeightPixels);
         final Quantity<Length> modelWidthLength = boundingBox.getWidthLength();
         double modelWidthMetres;
-        if (getGeometryFactory().isProjected()) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        if (geometryFactory.isProjected()) {
           modelWidthMetres = QuantityType.doubleValue(modelWidthLength, Units.METRE);
         } else {
           final double minX = boundingBox.getMinX();
           final double centreY = boundingBox.getCentreY();
           final double maxX = boundingBox.getMaxX();
-          modelWidthMetres = GeographicCoordinateSystem.distanceMetres(minX, centreY, maxX,
-            centreY);
+          final Ellipsoid ellipsoid = geometryFactory.getEllipsoid();
+          modelWidthMetres = ellipsoid.distanceMetres(minX, centreY, maxX, centreY);
         }
         this.metresPerPixel = modelWidthMetres / viewWidthPixels;
         this.scale = this.metresPerPixel / pixelSizeMetres;

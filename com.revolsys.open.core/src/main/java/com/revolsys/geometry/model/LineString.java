@@ -993,6 +993,7 @@ public interface LineString extends Lineal {
     double length = 0;
     final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
     if (geometryFactory.isGeographics()) {
+      final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
       final int vertexCount = getVertexCount();
       if (vertexCount > 1) {
         double lon0 = getX(0);
@@ -1000,7 +1001,7 @@ public interface LineString extends Lineal {
         for (int i = 1; i < vertexCount; i++) {
           final double lon1 = getX(i);
           final double lat1 = getY(i);
-          length += GeographicCoordinateSystem.distanceMetres(lon0, lat0, lon1, lat1);
+          length += geographicCoordinateSystem.distanceMetres(lon0, lat0, lon1, lat1);
           lon0 = lon1;
           lat0 = lat1;
         }
