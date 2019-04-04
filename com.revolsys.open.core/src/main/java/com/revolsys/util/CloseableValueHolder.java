@@ -11,18 +11,9 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
     return new LambaCloseableValueHolder<>(valueFactory, valueCloseFunction);
   }
 
-  private final ValueWrapper<R> closeable = new ValueHolderWrapper<>() {
-    @Override
-    public void close() {
-      disconnect();
-    }
+  private final ValueWrapper<R> closeable = newCloseable();
 
-    public com.revolsys.util.ValueHolder<R> getValueHolder() {
-      return CloseableValueHolder.this;
-    }
-  };
-
-  private int referenceCount = 1;
+  private int referenceCount = 0;
 
   public CloseableValueHolder() {
   }
@@ -59,7 +50,7 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
       throw new IllegalStateException("Resource closed");
     } else {
       getValue();
-      return valueConnectCloseable();
+      return this.closeable;
     }
   }
 
@@ -109,11 +100,20 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
     return this.referenceCount == Integer.MIN_VALUE;
   }
 
-  protected abstract void valueClose(final R value);
+  protected ValueHolderWrapper<R> newCloseable() {
+    return new ValueHolderWrapper<>() {
+      @Override
+      public void close() {
+        disconnect();
+      }
 
-  protected ValueWrapper<R> valueConnectCloseable() {
-    return this.closeable;
+      public com.revolsys.util.ValueHolder<R> getValueHolder() {
+        return CloseableValueHolder.this;
+      }
+    };
   }
+
+  protected abstract void valueClose(final R value);
 
   @Override
   public void valueConsume(final Consumer<R> action) {
@@ -125,13 +125,11 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
   }
 
   @Override
-  public void valueConsumeSync(final Consumer<R> action) {
-    synchronized (this) {
-      try {
-        super.valueConsume(action);
-      } finally {
-        disconnect();
-      }
+  public synchronized void valueConsumeSync(final Consumer<R> action) {
+    try {
+      super.valueConsume(action);
+    } finally {
+      disconnect();
     }
   }
 
@@ -154,24 +152,20 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
   }
 
   @Override
-  public <V> V valueFunctionSync(final Function<R, V> action) {
-    synchronized (this) {
-      try {
-        return super.valueFunction(action);
-      } finally {
-        disconnect();
-      }
+  public synchronized <V> V valueFunctionSync(final Function<R, V> action) {
+    try {
+      return super.valueFunction(action);
+    } finally {
+      disconnect();
     }
   }
 
   @Override
-  public <V> V valueFunctionSync(final Function<R, V> action, final V defaultValue) {
-    synchronized (this) {
-      try {
-        return super.valueFunction(action, defaultValue);
-      } finally {
-        disconnect();
-      }
+  public synchronized <V> V valueFunctionSync(final Function<R, V> action, final V defaultValue) {
+    try {
+      return super.valueFunction(action, defaultValue);
+    } finally {
+      disconnect();
     }
   }
 

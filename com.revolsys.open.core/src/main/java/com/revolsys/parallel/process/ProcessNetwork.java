@@ -286,7 +286,11 @@ public class ProcessNetwork {
               }
             }
           };
-          thread = new Thread(this.threadGroup, runnable, name);
+          if (name == null) {
+            thread = new Thread(this.threadGroup, runnable);
+          } else {
+            thread = new Thread(this.threadGroup, runnable, name);
+          }
           this.processes.put(runProcess, thread);
           if (!thread.isAlive()) {
             thread.start();

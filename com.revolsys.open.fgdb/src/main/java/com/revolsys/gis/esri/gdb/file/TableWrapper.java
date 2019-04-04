@@ -148,7 +148,12 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
   default FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {
     final TableReference tableReference = getTableReference();
-    return tableReference.query(sql, recycling);
+    final EnumRows rows = tableReference.query(sql, recycling);
+    if (rows == null) {
+      return null;
+    } else {
+      return new FileGdbEnumRowsIterator(this, rows);
+    }
   }
 
   default FileGdbEnumRowsIterator search(final Object typePath, final String fields,

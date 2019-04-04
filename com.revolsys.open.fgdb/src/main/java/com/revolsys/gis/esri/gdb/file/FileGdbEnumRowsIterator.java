@@ -8,14 +8,14 @@ import com.revolsys.esri.filegdb.jni.Row;
 
 public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
 
-  private TableWrapper table;
+  private final TableWrapper table;
 
   private EnumRows rows;
 
+  private boolean closed;
+
   FileGdbEnumRowsIterator(final TableWrapper table, final EnumRows rows) {
-    if (table != null) {
-      this.table = table.connect();
-    }
+    this.table = table;
     this.rows = rows;
   }
 
@@ -25,9 +25,9 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
       closeObject();
       final TableWrapper table = this.table;
       if (table != null) {
-        this.rows = table.closeRows(this.rows);
-        this.table = null;
-        table.close();
+        if (!this.closed) {
+          this.rows = table.closeRows(this.rows);
+        }
       }
     }
   }
@@ -48,5 +48,10 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
     } else {
       return row;
     }
+  }
+
+  @Override
+  public String toString() {
+    return this.table.toString();
   }
 }

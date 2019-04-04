@@ -28,7 +28,7 @@ public final class Delta<T> extends AbstractInProcess<T> {
     }
   }
 
-  private void addOut(final ChannelOutput<T> channel) {
+  public void addOut(final ChannelOutput<T> channel) {
     if (channel != null) {
       channel.writeConnect();
       this.out.add(channel);
