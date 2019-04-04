@@ -843,36 +843,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
       this.horizontalCoordinateSystem = null;
       this.verticalCoordinateSystem = null;
     } else {
-      final HorizontalCoordinateSystem horizontalCoordinateSystem = this.coordinateSystem
-        .getHorizontalCoordinateSystem();
-      if (horizontalCoordinateSystem == null) {
-        this.horizontalCoordinateSystem = null;
-        this.areaBoundingBox = BoundingBox.empty();
-      } else {
-        this.horizontalCoordinateSystem = horizontalCoordinateSystem;
-        double minX;
-        double minY;
-        double maxX;
-        double maxY;
-
-        final Area area = horizontalCoordinateSystem.getArea();
-        if (area == null) {
-          minX = -180;
-          minY = -90;
-          maxX = 180;
-          maxY = 90;
-        } else {
-          minX = area.getMinX();
-          minY = area.getMinY();
-          maxX = area.getMaxX();
-          maxY = area.getMaxY();
-        }
-        this.areaBoundingBox = getGeographicGeometryFactory() //
-          .bboxEditor() //
-          .addBbox(minX, minY, maxX, maxY) //
-          .setGeometryFactory(this) //
-          .newBoundingBox();
-      }
+      this.horizontalCoordinateSystem = this.coordinateSystem.getHorizontalCoordinateSystem();
       if (this.coordinateSystem instanceof CompoundCoordinateSystem) {
         final CompoundCoordinateSystem compoundCoordinateSystem = (CompoundCoordinateSystem)this.coordinateSystem;
         this.verticalCoordinateSystem = compoundCoordinateSystem.getVerticalCoordinateSystem();
@@ -885,9 +856,32 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     }
     if (this.horizontalCoordinateSystem == null) {
       this.horizontalCoordinateSystemType = CoordinateSystemType.NONE;
+      this.areaBoundingBox = this.boundingBoxEmpty;
     } else {
       this.horizontalCoordinateSystemType = this.horizontalCoordinateSystem
         .getCoordinateSystemType();
+      double minX;
+      double minY;
+      double maxX;
+      double maxY;
+
+      final Area area = this.horizontalCoordinateSystem.getArea();
+      if (area == null) {
+        minX = -180;
+        minY = -90;
+        maxX = 180;
+        maxY = 90;
+      } else {
+        minX = area.getMinX();
+        minY = area.getMinY();
+        maxX = area.getMaxX();
+        maxY = area.getMaxY();
+      }
+      this.areaBoundingBox = getGeographicGeometryFactory() //
+        .bboxEditor() //
+        .addBbox(minX, minY, maxX, maxY) //
+        .setGeometryFactory(this) //
+        .newBoundingBox();
     }
     if (this.verticalCoordinateSystem == null) {
       this.verticalCoordinateSystemType = CoordinateSystemType.NONE;
