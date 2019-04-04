@@ -55,8 +55,9 @@ public class ZoomOverlay extends AbstractOverlay {
     }, 0f);
 
   static {
-    PreferencesDialog.get().addPreference("Zoom", "com.revolsys.gis", PREFERENCE_PATH,
-      PREFERENCE_WHEEL_FORWARDS_ZOOM_IN, DataTypes.BOOLEAN, true);
+    PreferencesDialog.get()
+      .addPreference("Zoom", "com.revolsys.gis", PREFERENCE_PATH, PREFERENCE_WHEEL_FORWARDS_ZOOM_IN,
+        DataTypes.BOOLEAN, true);
   }
 
   private int panButton;

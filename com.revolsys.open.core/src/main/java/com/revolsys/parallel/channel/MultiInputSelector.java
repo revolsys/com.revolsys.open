@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.parallel.ThreadUtil;
 
 public class MultiInputSelector {
   private int enabledChannels = 0;

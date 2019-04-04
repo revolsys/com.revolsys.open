@@ -49,7 +49,8 @@ public class MultipleRecordRenderer extends AbstractMultipleRenderer {
   }
 
   public void addStyle(final GeometryStyle style) {
-    final GeometryStyleRecordLayerRenderer renderer = new GeometryStyleRecordLayerRenderer(getLayer(), this, style);
+    final GeometryStyleRecordLayerRenderer renderer = new GeometryStyleRecordLayerRenderer(
+      getLayer(), this, style);
     addRenderer(renderer);
   }
 

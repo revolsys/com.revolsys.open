@@ -51,7 +51,7 @@ public class BaseComboBox<T> extends JComboBox<T> implements Field, KeyListener 
   public static <V, R> BaseComboBox<V> newComboBox(final String fieldName,
     final ComboBoxModel<V> model, final Function<V, R> converter) {
     final LambdaListCellRenderer<V, R> renderer = LambdaListCellRenderer.newRenderer(converter);
-    return new BaseComboBox<V>(fieldName, model, renderer);
+    return new BaseComboBox<>(fieldName, model, renderer);
   }
 
   public static <V> BaseComboBox<V> newComboBox(final String fieldName,

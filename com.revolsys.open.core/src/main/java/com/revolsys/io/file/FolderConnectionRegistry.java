@@ -69,13 +69,13 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
     return connection;
   }
 
+  public FolderConnection addConnection(final String name, final Path file) {
+    return addConnection(name, file.toFile());
+  }
+
   @Override
   public String getIconName() {
     return "folder:link";
-  }
-
-  public FolderConnection addConnection(String name, final Path file) {
-    return addConnection(name, file.toFile());
   }
 
   @Override

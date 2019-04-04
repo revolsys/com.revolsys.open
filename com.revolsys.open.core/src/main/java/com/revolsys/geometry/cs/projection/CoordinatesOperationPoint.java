@@ -6,6 +6,11 @@ import com.revolsys.util.function.BiConsumerDouble;
 import com.revolsys.util.number.Doubles;
 
 public class CoordinatesOperationPoint implements Point {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public double x;
 
   public double y;

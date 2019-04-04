@@ -5,6 +5,11 @@ import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 
 public class LineStringEditor extends LineStringDoubleBuilder {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public LineStringEditor(final GeometryFactory geometryFactory) {
     super(geometryFactory);
   }

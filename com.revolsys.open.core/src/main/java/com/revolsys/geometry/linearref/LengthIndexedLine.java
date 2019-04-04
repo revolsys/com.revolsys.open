@@ -139,8 +139,8 @@ public class LengthIndexedLine {
   public Point extractPoint(final double index, final double offsetDistance) {
     final LinearLocation loc = LengthLocationMap.getLocation(this.linearGeom, index);
     final LinearLocation locLow = loc.toLowest(this.linearGeom);
-    return locLow.getSegment(this.linearGeom).pointAlongOffset(locLow.getSegmentFraction(),
-      offsetDistance);
+    return locLow.getSegment(this.linearGeom)
+      .pointAlongOffset(locLow.getSegmentFraction(), offsetDistance);
   }
 
   /**

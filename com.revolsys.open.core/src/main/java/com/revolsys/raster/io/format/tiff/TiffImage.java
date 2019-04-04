@@ -133,8 +133,8 @@ public class TiffImage extends JaiGeoreferencedImage {
       if (values != null) {
         type = values.getType();
         if (type == XTIFFField.TIFF_ASCII) {
-          final String string = values.getAsString(0).substring(valueOrOffset,
-            valueOrOffset + valueCount - 1);
+          final String string = values.getAsString(0)
+            .substring(valueOrOffset, valueOrOffset + valueCount - 1);
           value = string;
         } else if (type == XTIFFField.TIFF_DOUBLE) {
           final double number = values.getAsDouble(valueOrOffset);

@@ -48,8 +48,8 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.util.number.Doubles;
 
-import si.uom.SI;
 import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 public class MeasureOverlay extends AbstractOverlay {
 
@@ -491,7 +491,8 @@ public class MeasureOverlay extends AbstractOverlay {
           this.measureGeometry);
         if (this.measureGeometry instanceof Polygon) {
           final Polygon polygon = (Polygon)this.measureGeometry;
-          GeometryStyleRecordLayerRenderer.renderPolygon(viewport, graphics, polygon, POLYGON_STYLE);
+          GeometryStyleRecordLayerRenderer.renderPolygon(viewport, graphics, polygon,
+            POLYGON_STYLE);
         }
       }
 
@@ -556,7 +557,7 @@ public class MeasureOverlay extends AbstractOverlay {
         this.measureLabel = "";
       } else {
 
-        Unit<Length> lengthUnit = SI.METRE;
+        Unit<Length> lengthUnit = Units.METRE;
         final CoordinateSystem coordinateSystem = measureGeometry.getCoordinateSystem();
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           lengthUnit = coordinateSystem.getLengthUnit();

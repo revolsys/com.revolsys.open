@@ -71,8 +71,8 @@ import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.number.Doubles;
 
-import si.uom.SI;
 import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 /**
  * Models an OGC-style <code>LineString</code>. A LineString consists of a
@@ -846,7 +846,7 @@ public interface LineString extends Lineal {
           lat0 = lat1;
         }
       }
-      final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, SI.METRE);
+      final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, Units.METRE);
       length = QuantityType.doubleValue(lengthMeasure, unit);
     } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;

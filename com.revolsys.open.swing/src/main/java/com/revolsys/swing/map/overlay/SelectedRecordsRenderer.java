@@ -30,9 +30,11 @@ public class SelectedRecordsRenderer {
     final GeometryFactory viewportGeometryFactory, Geometry geometry) {
     geometry = viewport.getGeometry(geometry);
     if (Property.hasValue(geometry)) {
-      GeometryStyleRecordLayerRenderer.renderGeometry(viewport, graphics, geometry, this.highlightStyle);
+      GeometryStyleRecordLayerRenderer.renderGeometry(viewport, graphics, geometry,
+        this.highlightStyle);
       if (!(geometry instanceof Punctual)) {
-        GeometryStyleRecordLayerRenderer.renderGeometryOutline(viewport, graphics, geometry, this.lineStyle);
+        GeometryStyleRecordLayerRenderer.renderGeometryOutline(viewport, graphics, geometry,
+          this.lineStyle);
       }
     }
   }

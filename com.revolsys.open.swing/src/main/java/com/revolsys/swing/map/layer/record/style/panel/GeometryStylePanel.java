@@ -32,7 +32,8 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
 
   private JPanel previews;
 
-  public GeometryStylePanel(final GeometryStyleRecordLayerRenderer geometryStyleRecordLayerRenderer) {
+  public GeometryStylePanel(
+    final GeometryStyleRecordLayerRenderer geometryStyleRecordLayerRenderer) {
     super(geometryStyleRecordLayerRenderer);
 
     this.geometryStyleRecordLayerRenderer = geometryStyleRecordLayerRenderer;

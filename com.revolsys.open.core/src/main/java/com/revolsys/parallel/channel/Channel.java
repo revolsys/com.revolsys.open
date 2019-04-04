@@ -3,7 +3,6 @@ package com.revolsys.parallel.channel;
 import java.util.Iterator;
 
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.store.ZeroBuffer;
 
 public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {

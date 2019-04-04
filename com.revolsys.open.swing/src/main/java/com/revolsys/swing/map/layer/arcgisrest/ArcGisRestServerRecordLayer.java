@@ -24,8 +24,6 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.UrlResource;
-import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
@@ -38,8 +36,6 @@ import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.swing.tree.node.WebServiceConnectionTrees;
-import com.revolsys.util.OS;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 
@@ -57,18 +53,6 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     .add("esriSLSNull", null) //
     .add("esriSLSSolid", Collections.emptyList()) //
     .getMap();
-
-  private static void actionAddLayer(final FeatureLayer layerDescription) {
-    final LayerGroup layerGroup = WebServiceConnectionTrees.getLayerGroup(layerDescription);
-    if (layerGroup != null) {
-      final ArcGisRestServerRecordLayer layer = new ArcGisRestServerRecordLayer(layerDescription);
-      layerGroup.addLayer(layer);
-      if (OS.getPreferenceBoolean("com.revolsys.gis", AbstractLayer.PREFERENCE_PATH,
-        AbstractLayer.PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false)) {
-        layer.showTableView();
-      }
-    }
-  }
 
   public static Color getColor(final MapEx properties) {
     final String fieldName = "color";

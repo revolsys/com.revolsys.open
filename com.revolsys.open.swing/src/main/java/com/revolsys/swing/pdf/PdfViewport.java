@@ -68,8 +68,6 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
 
   private final Map<String, PDFont> fonts = new HashMap<>();
 
-  private final PDPage page;
-
   private int styleId = 0;
 
   private final Map<GeometryStyle, String> styleNames = new HashMap<>();
@@ -78,7 +76,6 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     final int width, final int height, final BoundingBox boundingBox) throws IOException {
     super(project, width, height, boundingBox);
     this.document = document;
-    this.page = page;
     this.contentStream = new PDPageContentStream(document, page);
     final COSDictionary pageDictionary = page.getCOSObject();
     final COSArray viewports = PdfUtil.getArray(pageDictionary, "VP");

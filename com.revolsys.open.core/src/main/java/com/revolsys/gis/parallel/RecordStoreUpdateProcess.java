@@ -38,6 +38,7 @@ public class RecordStoreUpdateProcess extends BaseInProcess<Record> {
   public RecordStoreUpdateProcess() {
   }
 
+  @Override
   @PreDestroy
   public void close() {
     this.recordStore.close();

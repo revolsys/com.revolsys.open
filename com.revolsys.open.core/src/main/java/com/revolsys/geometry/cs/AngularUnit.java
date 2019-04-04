@@ -9,6 +9,7 @@ import com.revolsys.datatype.DataType;
 
 import si.uom.NonSI;
 import si.uom.SI;
+import tec.uom.se.unit.Units;
 
 public class AngularUnit implements Serializable {
   /**
@@ -41,7 +42,7 @@ public class AngularUnit implements Serializable {
   public static Unit<Angle> getUnit(final Unit<Angle> baseUnit, final double conversionFactor) {
     Unit<Angle> unit;
     if (baseUnit == null) {
-      unit = SI.RADIAN;
+      unit = Units.RADIAN;
     } else {
       unit = baseUnit;
     }

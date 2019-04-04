@@ -269,8 +269,9 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
           try (
             Reader<Record> reader = this.recordStore.getRecords(query)) {
             final List<Record> codes = reader.toList();
-            this.recordStore.getStatistics().getLabelCountMap("query").addCount(this.typePath,
-              -codes.size());
+            this.recordStore.getStatistics()
+              .getLabelCountMap("query")
+              .addCount(this.typePath, -codes.size());
             Collections.sort(codes, new RecordFieldComparator(this.orderBy));
             addValues(codes);
           }
@@ -316,8 +317,9 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       try {
         final List<Record> codes = reader.toList();
         if (codes.size() > 0) {
-          this.recordStore.getStatistics().getLabelCountMap("query").addCount(this.typePath,
-            -codes.size());
+          this.recordStore.getStatistics()
+            .getLabelCountMap("query")
+            .addCount(this.typePath, -codes.size());
 
           addValues(codes);
         }

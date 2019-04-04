@@ -264,7 +264,8 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
           try (
             BaseCloseable transformCloseable = this.viewport.setUseModelCoordinates(graphics,
               true)) {
-            GeometryStyleRecordLayerRenderer.renderGeometry(this.viewport, graphics, geometry, XOR_LINE_STYLE);
+            GeometryStyleRecordLayerRenderer.renderGeometry(this.viewport, graphics, geometry,
+              XOR_LINE_STYLE);
           }
         }
       } finally {

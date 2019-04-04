@@ -5,8 +5,8 @@ import com.revolsys.spring.resource.Resource;
 
 public interface GeoreferencedImageReadFactory extends IoFactory {
   static GeoreferencedImage loadGeoreferencedImage(final Resource resource) {
-    final GeoreferencedImageReadFactory factory = IoFactory.factory(GeoreferencedImageReadFactory.class,
-      resource);
+    final GeoreferencedImageReadFactory factory = IoFactory
+      .factory(GeoreferencedImageReadFactory.class, resource);
     if (factory == null) {
       return null;
     } else {

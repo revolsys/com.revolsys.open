@@ -22,7 +22,8 @@ public class TopologyPreservingSimplifierTest extends TestCase {
   public void testEmptyPolygon() throws Exception {
     final String geomStr = "POLYGON(EMPTY)";
     new GeometryOperationValidator(TPSimplifierResult.getResult(geomStr, 1))
-      .setExpectedResult(geomStr).test();
+      .setExpectedResult(geomStr)
+      .test();
   }
 
   public void testFlattishPolygon() throws Exception {
@@ -53,7 +54,8 @@ public class TopologyPreservingSimplifierTest extends TestCase {
   public void testMultiPoint() throws Exception {
     final String geomStr = "MULTIPOINT(80 200, 240 200, 240 60, 80 60, 80 200, 140 199, 120 120)";
     new GeometryOperationValidator(TPSimplifierResult.getResult(geomStr, 10.0))
-      .setExpectedResult(geomStr).test();
+      .setExpectedResult(geomStr)
+      .test();
   }
 
   public void testMultiPolygonWithEmpty() throws Exception {
@@ -79,7 +81,8 @@ public class TopologyPreservingSimplifierTest extends TestCase {
   public void testPoint() throws Exception {
     final String geomStr = "POINT (10 10)";
     new GeometryOperationValidator(TPSimplifierResult.getResult(geomStr, 1))
-      .setExpectedResult(geomStr).test();
+      .setExpectedResult(geomStr)
+      .test();
   }
 
   public void testPolygonNoReduction() throws Exception {
@@ -97,7 +100,8 @@ public class TopologyPreservingSimplifierTest extends TestCase {
   public void testPolygonWithFlattishHole() throws Exception {
     final String geomStr = "POLYGON ((0 0, 0 200, 200 200, 200 0, 0 0), (140 40, 90 95, 40 160, 95 100, 140 40))";
     new GeometryOperationValidator(TPSimplifierResult.getResult(geomStr, 20.0))
-      .setExpectedResult(geomStr).test();
+      .setExpectedResult(geomStr)
+      .test();
   }
 
   /**
@@ -112,16 +116,16 @@ public class TopologyPreservingSimplifierTest extends TestCase {
   public void testPolygonWithTouchingHole() throws Exception {
     new GeometryOperationValidator(TPSimplifierResult.getResult(
       "POLYGON ((80 200, 240 200, 240 60, 80 60, 80 200), (120 120, 220 120, 180 199, 160 200, 140 199, 120 120))",
-      10.0))
-        .setExpectedResult(
-          "POLYGON ((80 200, 240 200, 240 60, 80 60, 80 200), (120 120, 220 120, 180 199, 160 200, 140 199, 120 120))")
+      10.0)).setExpectedResult(
+        "POLYGON ((80 200, 240 200, 240 60, 80 60, 80 200), (120 120, 220 120, 180 199, 160 200, 140 199, 120 120))")
         .test();
   }
 
   public void testTinyClosedLineString() throws Exception {
     final String geomStr = "LINESTRING (0 0, 5 0, 5 5, 0 0)";
     new GeometryOperationValidator(TPSimplifierResult.getResult(geomStr, 10))
-      .setExpectedResult(geomStr).test();
+      .setExpectedResult(geomStr)
+      .test();
   }
 
   public void testTinyLineString() throws Exception {

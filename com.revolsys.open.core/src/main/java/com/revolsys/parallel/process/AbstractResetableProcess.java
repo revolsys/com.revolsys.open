@@ -8,7 +8,6 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.parallel.ThreadUtil;
 
 public abstract class AbstractResetableProcess extends AbstractProcess {
   private final Set<UUID> executions = new LinkedHashSet<>();

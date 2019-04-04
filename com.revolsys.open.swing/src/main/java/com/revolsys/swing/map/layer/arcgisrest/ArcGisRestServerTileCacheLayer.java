@@ -18,11 +18,9 @@ import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
@@ -34,29 +32,6 @@ import com.revolsys.webservice.WebServiceConnectionManager;
 import com.revolsys.webservice.WebServiceResource;
 
 public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
-  private static void actionAddLayer(final BaseMapLayerGroup parent) {
-    final ValueField dialog = new ValueField();
-    dialog.setTitle("Add ArcGIS Tile Cache");
-
-    SwingUtil.addLabel(dialog, "URL");
-    final TextField urlField = new TextField("url", 50);
-    dialog.add(urlField);
-
-    GroupLayouts.makeColumns(dialog, 2, true, true);
-
-    dialog.setSaveAction(() -> {
-      final String url = urlField.getText();
-      if (Property.hasValue(url)) {
-        final ArcGisRestServerTileCacheLayer layer = new ArcGisRestServerTileCacheLayer();
-        layer.setUrl(url);
-        layer.setVisible(true);
-        parent.addLayer(layer);
-      }
-    });
-
-    dialog.showDialog();
-  }
-
   private String username;
 
   private String password;

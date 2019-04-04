@@ -6,6 +6,11 @@ import com.revolsys.geometry.model.vertex.Vertex;
 
 public class VertexError extends AbstractGeometryValidationError {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final int[] vertexId;
 
   public VertexError(final String message, final Vertex vertex) {

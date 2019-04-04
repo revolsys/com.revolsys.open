@@ -32,8 +32,6 @@ public class ObjectSetInputStream extends InputStream {
 
   private File directory;
 
-  private final String fileName;
-
   private InputStream in;
 
   private int index;
@@ -44,7 +42,6 @@ public class ObjectSetInputStream extends InputStream {
 
   public ObjectSetInputStream(final File directory, final String fileName) throws IOException {
     this.directory = directory;
-    this.fileName = fileName;
     this.prefix = ObjectSetUtil.getObjectSubsetPrefix(fileName);
     this.in = openFile(fileName);
     if (this.in == null) {
@@ -54,7 +51,6 @@ public class ObjectSetInputStream extends InputStream {
 
   public ObjectSetInputStream(final ZipFile zipFile, final String fileName) throws IOException {
     this.zipFile = zipFile;
-    this.fileName = fileName;
     this.in = openFile(fileName);
     this.prefix = ObjectSetUtil.getObjectSubsetPrefix(fileName);
     if (this.in == null) {

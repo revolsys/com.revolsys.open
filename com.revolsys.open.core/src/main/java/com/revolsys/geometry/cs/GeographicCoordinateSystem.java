@@ -13,7 +13,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
-import si.uom.SI;
+import tec.uom.se.unit.Units;
 
 public class GeographicCoordinateSystem implements HorizontalCoordinateSystem {
   public static final double EARTH_RADIUS = 6378137;
@@ -228,12 +228,12 @@ public class GeographicCoordinateSystem implements HorizontalCoordinateSystem {
   @Override
   public Unit<Length> getLengthUnit() {
     final Unit<Angle> unit = this.angularUnit.getUnit();
-    final UnitConverter radianConverter = unit.getConverterTo(SI.RADIAN);
+    final UnitConverter radianConverter = unit.getConverterTo(Units.RADIAN);
 
     final Spheroid spheroid = this.datum.getSpheroid();
     final double radius = spheroid.getSemiMajorAxis();
     final double radianFactor = radianConverter.convert(1);
-    return SI.METRE.multiply(radius).multiply(radianFactor);
+    return Units.METRE.multiply(radius).multiply(radianFactor);
   }
 
   public PrimeMeridian getPrimeMeridian() {

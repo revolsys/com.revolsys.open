@@ -191,8 +191,10 @@ public class QueryWhereConditionField extends ValueField
       operatorToolBar.addButton("binary", binaryOperator, fieldCompareEnabled, runnable)
         .setBorderPainted(true);
     }
-    operatorToolBar.addButton("like", "LIKE", hasSearchText.and(this, "likeEnabled"),
-      this::actionAddLikeCondition).setBorderPainted(true);
+    operatorToolBar
+      .addButton("like", "LIKE", hasSearchText.and(this, "likeEnabled"),
+        this::actionAddLikeCondition)
+      .setBorderPainted(true);
 
     for (final String rightUnaryOperator : Arrays.asList("IS NULL", "IS NOT NULL")) {
       final Runnable runnable = () -> actionAddRightUnaryCondition(rightUnaryOperator);
@@ -488,12 +490,11 @@ public class QueryWhereConditionField extends ValueField
       } catch (final BadLocationException e) {
         previousText = "";
       }
-      if (!Property.hasValue(previousText) || !previousText.matches(".*"
-        + operator.replaceAll("\\(", "\\\\(")
+      if (!Property.hasValue(previousText)
+        || !previousText.matches(".*" + operator.replaceAll("\\(", "\\\\(")
           .replaceAll("\\)", "\\\\)")
           .replaceAll("\\*", "\\\\*")
-          .replaceAll("\\+", "\\\\+")
-        + "\\s*$")) {
+          .replaceAll("\\+", "\\\\+") + "\\s*$")) {
         final Document document = this.whereTextField.getDocument();
         try {
           if (Property.hasValue(previousText)

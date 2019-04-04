@@ -54,8 +54,8 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.number.Doubles;
 
-import si.uom.SI;
 import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 /**
  *  Defines a rectangular region of the 2D coordinate plane.
@@ -418,7 +418,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     final double height = getHeight();
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     if (coordinateSystem == null) {
-      return Quantities.getQuantity(height, SI.METRE);
+      return Quantities.getQuantity(height, Units.METRE);
     } else {
       return Quantities.getQuantity(height, coordinateSystem.getLengthUnit());
     }
@@ -548,7 +548,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     final double width = getWidth();
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     if (coordinateSystem == null) {
-      return Quantities.getQuantity(width, SI.METRE);
+      return Quantities.getQuantity(width, Units.METRE);
     } else {
       return Quantities.getQuantity(width, coordinateSystem.getLengthUnit());
     }

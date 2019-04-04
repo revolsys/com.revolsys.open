@@ -522,6 +522,7 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
     return s.toString();
   }
 
+  @Override
   default <R> R bboxWith(final BoundingBoxProxy boundingBox,
     final BiFunction<BoundingBox, BoundingBox, R> action, final R emptyValue) {
     BoundingBox boundingBox2;
@@ -534,6 +535,7 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
 
   }
 
+  @Override
   default <R> R bboxWith(final BoundingBoxProxy boundingBox, final BoundingBoxFunction<R> action,
     final R emptyResult) {
     if (boundingBox != null && !isEmpty()) {
@@ -554,6 +556,7 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
     return emptyResult;
   }
 
+  @Override
   default <R> R bboxWith(Point point, final BoundingBoxPointFunction<R> action,
     final R emptyResult) {
     if (point != null && !isEmpty()) {
@@ -1127,6 +1130,7 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
     }
   }
 
+  @Override
   default int getHorizontalCoordinateSystemId() {
     return getCoordinateSystemId();
   }

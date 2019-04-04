@@ -10,7 +10,6 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.parallel.ThreadUtil;
 
 public class NamedChannelBundle<T> {
 

@@ -21,7 +21,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.UrlUtil;
 
-import si.uom.SI;
+import tec.uom.se.unit.Units;
 
 public class GeoNamesService {
   public static final RecordDefinition NAME_RECORD_DEFINITION;
@@ -94,7 +94,7 @@ public class GeoNamesService {
     final double height = geographicBoundingBox.getHeight();
     final double width = geographicBoundingBox.getWidth();
     final double diagonal = Math.sqrt(width * width + height * height);
-    final double radiusKm = cs.getUnit().getConverterTo(SI.RADIAN).convert(diagonal) * radius
+    final double radiusKm = cs.getUnit().getConverterTo(Units.RADIAN).convert(diagonal) * radius
       / 1000;
 
     params.put("lat", geographicBoundingBox.getCentreY());

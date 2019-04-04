@@ -14,9 +14,9 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.util.QuantityType;
 
-import si.uom.SI;
 import systems.uom.common.USCustomary;
 import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 public class MapPageable implements Pageable {
 
@@ -65,9 +65,9 @@ public class MapPageable implements Pageable {
       .doubleValue(Quantities.getQuantity(0.5, CustomUnits.CENTIMETRE), pixelSize);
 
     final double modelWidthMetres = QuantityType.doubleValue(this.mapBoundingBox.getWidthLength(),
-      SI.METRE);
+      Units.METRE);
     final double modelHeightMetres = QuantityType.doubleValue(this.mapBoundingBox.getWidthLength(),
-      SI.METRE);
+      Units.METRE);
 
     final double printWidthPixels = pageFormat.getImageableWidth() * dpi / 72;
     final double printHeightPixels = pageFormat.getImageableHeight() * dpi / 72;
@@ -76,9 +76,9 @@ public class MapPageable implements Pageable {
     final double heightPixels = printHeightPixels - 3 * this.rulerSizePixels;
 
     final double pageWidthMetres = QuantityType
-      .doubleValue(Quantities.getQuantity(widthPixels, pixelSize), SI.METRE);
+      .doubleValue(Quantities.getQuantity(widthPixels, pixelSize), Units.METRE);
     final double pageHeightMetres = QuantityType
-      .doubleValue(Quantities.getQuantity(heightPixels, pixelSize), SI.METRE);
+      .doubleValue(Quantities.getQuantity(heightPixels, pixelSize), Units.METRE);
 
     this.modelPageWidth = pageWidthMetres * scale;
     this.modelPageHeight = pageHeightMetres * scale;

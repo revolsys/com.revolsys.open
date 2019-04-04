@@ -153,17 +153,19 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
     this(layer, new GeometryStyle());
   }
 
-  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer, final GeometryStyle style) {
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer,
+    final GeometryStyle style) {
     this(layer, null, style);
   }
 
-  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer,
+    final LayerRenderer<?> parent) {
     super("geometryStyle", "Geometry Style", layer, parent);
     setIcon(ICON);
   }
 
-  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
-    final GeometryStyle style) {
+  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer,
+    final LayerRenderer<?> parent, final GeometryStyle style) {
     super("geometryStyle", "Geometry Style", layer, parent);
     setStyle(style);
     setIcon(ICON);

@@ -459,7 +459,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     if (comparator != null) {
       Collections.sort(edges, comparator);
     }
-    final EdgeEventListener<T> listener = new EdgeEventListener<T>() {
+    final EdgeEventListener<T> listener = new EdgeEventListener<>() {
       @Override
       public void edgeEvent(final EdgeEvent<T> edgeEvent) {
         final Edge<T> edge = edgeEvent.getEdge();
@@ -532,7 +532,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
       }
     }
 
-    final NodeEventListener<T> listener = new NodeEventListener<T>() {
+    final NodeEventListener<T> listener = new NodeEventListener<>() {
       @Override
       public void nodeEvent(final NodeEvent<T> nodeEvent) {
         final Node<T> node = nodeEvent.getNode();

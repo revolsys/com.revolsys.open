@@ -5,7 +5,8 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class UsgsDemImageFactory extends AbstractIoFactory implements GeoreferencedImageReadFactory {
+public class UsgsDemImageFactory extends AbstractIoFactory
+  implements GeoreferencedImageReadFactory {
 
   public UsgsDemImageFactory() {
     super("USGS DEM");

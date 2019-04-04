@@ -15,7 +15,7 @@ public class ModeEmpty implements TableRecordsMode {
   }
 
   @Override
-  public void forEachRecord(Query query, final Consumer<? super LayerRecord> action) {
+  public void forEachRecord(final Query query, final Consumer<? super LayerRecord> action) {
   }
 
   @Override

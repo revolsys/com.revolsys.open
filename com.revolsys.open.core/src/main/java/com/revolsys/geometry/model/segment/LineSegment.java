@@ -220,6 +220,7 @@ public interface LineSegment extends LineString {
     }
   }
 
+  @Override
   default double distance(final double x, final double y) {
     final double x1 = getX(0);
     final double y1 = getY(0);

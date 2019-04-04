@@ -166,8 +166,9 @@ public final class UrlUtil {
    * @return
    */
   public static String cleanPath(final String url) {
-    return url.replaceAll("/+", "/").replaceAll("^((\\w)+:)/", "$1//").replaceAll("^file://",
-      "file:///");
+    return url.replaceAll("/+", "/")
+      .replaceAll("^((\\w)+:)/", "$1//")
+      .replaceAll("^file://", "file:///");
   }
 
   public static String getContent(final String urlString) {

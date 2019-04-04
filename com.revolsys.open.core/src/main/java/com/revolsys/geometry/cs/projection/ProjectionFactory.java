@@ -19,7 +19,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 
 import si.uom.NonSI;
-import si.uom.SI;
+import tec.uom.se.unit.Units;
 
 public final class ProjectionFactory {
   /** The map from projection names to projection classes. */
@@ -70,8 +70,8 @@ public final class ProjectionFactory {
           return null;
         }
         final Unit<Length> linearUnit1 = pcs1.getLengthUnit();
-        if (!linearUnit1.equals(SI.METRE)) {
-          operations.add(new UnitConverstionOperation(linearUnit1, SI.METRE));
+        if (!linearUnit1.equals(Units.METRE)) {
+          operations.add(new UnitConverstionOperation(linearUnit1, Units.METRE));
         }
         operations.add(inverseOperation);
       } else if (cs1 instanceof GeographicCoordinateSystem) {
@@ -87,12 +87,12 @@ public final class ProjectionFactory {
             return null;
           }
         } else {
-          if (!angularUnit1.equals(SI.RADIAN)) {
+          if (!angularUnit1.equals(Units.RADIAN)) {
             CoordinatesOperation converstionOperation;
             if (angularUnit1.equals(NonSI.DEGREE_ANGLE)) {
               converstionOperation = DegreesToRadiansOperation.INSTANCE;
             } else {
-              converstionOperation = new UnitConverstionOperation(angularUnit1, SI.RADIAN, 2);
+              converstionOperation = new UnitConverstionOperation(angularUnit1, Units.RADIAN, 2);
             }
 
             operations.add(converstionOperation);
@@ -108,14 +108,14 @@ public final class ProjectionFactory {
           operations.add(projectOperation);
         }
         final Unit<Length> linearUnit2 = pcs2.getLengthUnit();
-        if (!linearUnit2.equals(SI.METRE)) {
-          operations.add(new UnitConverstionOperation(SI.METRE, linearUnit2));
+        if (!linearUnit2.equals(Units.METRE)) {
+          operations.add(new UnitConverstionOperation(Units.METRE, linearUnit2));
         }
       } else if (cs2 instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem gcs2 = (GeographicCoordinateSystem)cs2;
         final Unit<Angle> angularUnit2 = gcs2.getUnit();
-        if (!angularUnit2.equals(SI.RADIAN)) {
-          operations.add(new UnitConverstionOperation(SI.RADIAN, angularUnit2, 2));
+        if (!angularUnit2.equals(Units.RADIAN)) {
+          operations.add(new UnitConverstionOperation(Units.RADIAN, angularUnit2, 2));
         }
       }
       switch (operations.size()) {

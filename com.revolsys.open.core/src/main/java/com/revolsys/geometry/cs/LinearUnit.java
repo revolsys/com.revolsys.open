@@ -7,6 +7,7 @@ import javax.measure.quantity.Length;
 
 import si.uom.NonSI;
 import si.uom.SI;
+import tec.uom.se.unit.Units;
 
 public class LinearUnit implements Serializable {
   /**
@@ -39,7 +40,7 @@ public class LinearUnit implements Serializable {
   public static Unit<Length> getUnit(final Unit<Length> baseUnit, final double conversionFactor) {
     Unit<Length> unit;
     if (baseUnit == null) {
-      unit = SI.METRE;
+      unit = Units.METRE;
     } else {
       unit = baseUnit;
     }

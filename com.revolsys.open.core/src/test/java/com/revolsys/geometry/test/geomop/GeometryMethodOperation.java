@@ -178,12 +178,12 @@ public class GeometryMethodOperation implements GeometryOperation {
   private Method getGeometryMethod(final String opName, final Object[] args,
     final Object[] actualArgs) {
     // could index methods by name for efficiency...
-    for (int i = 0; i < this.geometryMethods.length; i++) {
-      if (!this.geometryMethods[i].getName().equalsIgnoreCase(opName)) {
+    for (final Method geometryMethod : this.geometryMethods) {
+      if (!geometryMethod.getName().equalsIgnoreCase(opName)) {
         continue;
       }
-      if (convertArgs(this.geometryMethods[i].getParameterTypes(), args, actualArgs)) {
-        return this.geometryMethods[i];
+      if (convertArgs(geometryMethod.getParameterTypes(), args, actualArgs)) {
+        return geometryMethod;
       }
     }
     return null;

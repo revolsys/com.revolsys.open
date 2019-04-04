@@ -92,7 +92,8 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
           if (beanClassName.equals(TargetBeanFactoryBean.class.getName())) {
             final MutablePropertyValues propertyValues = bd.getPropertyValues();
             final BeanDefinition targetBeanDefinition = (BeanDefinition)propertyValues
-              .getPropertyValue("targetBeanDefinition").getValue();
+              .getPropertyValue("targetBeanDefinition")
+              .getValue();
             final String targetBeanClassName = targetBeanDefinition.getBeanClassName();
             addFields(allAttributes, beanFactory, targetBeanDefinition, beanName,
               targetBeanClassName);

@@ -463,9 +463,9 @@ public class ConvexHull {
      * but this doesn't matter since the points of the interior polygon
      * are forced to be in the reduced set.
      */
-    for (int i = 0; i < inputPts.length; i++) {
-      if (!ConvexHull.isPointInRing(inputPts[i], polyPts)) {
-        reducedSet.add(inputPts[i]);
+    for (final Point inputPt : inputPts) {
+      if (!ConvexHull.isPointInRing(inputPt, polyPts)) {
+        reducedSet.add(inputPt);
       }
     }
     final Point[] reducedPts = CoordinateArrays.toCoordinateArray(reducedSet);

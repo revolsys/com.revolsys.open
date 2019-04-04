@@ -120,8 +120,8 @@ public class LocationIndexedLine {
    */
   public Point extractPoint(final LinearLocation index, final double offsetDistance) {
     final LinearLocation indexLow = index.toLowest(this.linearGeom);
-    return indexLow.getSegment(this.linearGeom).pointAlongOffset(indexLow.getSegmentFraction(),
-      offsetDistance);
+    return indexLow.getSegment(this.linearGeom)
+      .pointAlongOffset(indexLow.getSegmentFraction(), offsetDistance);
   }
 
   /**

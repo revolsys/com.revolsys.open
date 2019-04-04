@@ -44,7 +44,6 @@ import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 
-import si.uom.SI;
 import systems.uom.common.USCustomary;
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;
@@ -514,7 +513,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
           }
           final Quantity<Length> viewWidthLength = getViewWidthLength();
           final Quantity<Length> modelWidthLength = newBoundingBox.getWidthLength();
-          unitsPerPixel = QuantityType.doubleValue(modelWidthLength, SI.METRE) / viewWidthPixels;
+          unitsPerPixel = QuantityType.doubleValue(modelWidthLength, Units.METRE) / viewWidthPixels;
           double scale = getScale(viewWidthLength, modelWidthLength);
           if (!this.scales.isEmpty() && viewWidthPixels > 0 && viewHeightPixels > 0) {
             final double minScale = this.scales.get(this.scales.size() - 1);
@@ -708,7 +707,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     if (unit.equals(CustomUnits.PIXEL)) {
       convertedValue = QuantityType.doubleValue(value, CustomUnits.PIXEL);
     } else {
-      convertedValue = QuantityType.doubleValue(value, SI.METRE);
+      convertedValue = QuantityType.doubleValue(value, Units.METRE);
       final CoordinateSystem coordinateSystem = this.geometryFactory2d.getCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;

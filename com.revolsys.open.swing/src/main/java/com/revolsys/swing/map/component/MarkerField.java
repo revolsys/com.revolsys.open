@@ -21,7 +21,7 @@ import com.revolsys.util.Property;
 public class MarkerField extends ValueField implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private static final ListCellRenderer<Marker> renderer = new ListCellRenderer<Marker>() {
+  private static final ListCellRenderer<Marker> renderer = new ListCellRenderer<>() {
     DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
     @Override

@@ -22,7 +22,8 @@ public class DouglasPeuckerSimplifierTest extends TestCase {
   public void testEmptyPolygon() throws Exception {
     final String geomStr = "POLYGON(EMPTY)";
     new GeometryOperationValidator(DPSimplifierResult.getResult(geomStr, 1))
-      .setExpectedResult(geomStr).test();
+      .setExpectedResult(geomStr)
+      .test();
   }
 
   public void testFlattishPolygon() throws Exception {
@@ -53,7 +54,8 @@ public class DouglasPeuckerSimplifierTest extends TestCase {
   public void testMultiPoint() throws Exception {
     final String geomStr = "MULTIPOINT(80 200, 240 200, 240 60, 80 60, 80 200, 140 199, 120 120)";
     new GeometryOperationValidator(TPSimplifierResult.getResult(geomStr, 10.0))
-      .setExpectedResult(geomStr).test();
+      .setExpectedResult(geomStr)
+      .test();
   }
 
   public void testMultiPolygonWithEmpty() throws Exception {
@@ -65,7 +67,8 @@ public class DouglasPeuckerSimplifierTest extends TestCase {
   public void testPoint() throws Exception {
     final String geomStr = "POINT (10 10)";
     new GeometryOperationValidator(DPSimplifierResult.getResult(geomStr, 1))
-      .setExpectedResult(geomStr).test();
+      .setExpectedResult(geomStr)
+      .test();
   }
 
   public void testPolygonNoReduction() throws Exception {
@@ -89,9 +92,8 @@ public class DouglasPeuckerSimplifierTest extends TestCase {
   public void testPolygonWithTouchingHole() throws Exception {
     new GeometryOperationValidator(DPSimplifierResult.getResult(
       "POLYGON ((80 200, 240 200, 240 60, 80 60, 80 200), (120 120, 220 120, 180 199, 160 200, 140 199, 120 120))",
-      10.0))
-        .setExpectedResult(
-          "POLYGON ((80 200, 160 200, 240 200, 240 60, 80 60, 80 200), (160 200, 140 199, 120 120, 220 120, 180 199, 160 200)))")
+      10.0)).setExpectedResult(
+        "POLYGON ((80 200, 160 200, 240 200, 240 60, 80 60, 80 200), (160 200, 140 199, 120 120, 220 120, 180 199, 160 200)))")
         .test();
   }
 

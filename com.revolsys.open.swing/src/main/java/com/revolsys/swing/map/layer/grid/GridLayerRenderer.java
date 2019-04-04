@@ -61,9 +61,10 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
 
               final FontMetrics metrics = graphics.getFontMetrics();
               final double[] coord = new double[2];
-              viewport.getModelToScreenTransform().transform(new double[] {
-                centreX, centreY
-              }, 0, coord, 0, 1);
+              viewport.getModelToScreenTransform()
+                .transform(new double[] {
+                  centreX, centreY
+                }, 0, coord, 0, 1);
               int x = (int)(coord[0] - metrics.stringWidth(tileName) / 2);
               int y = (int)(coord[1] + metrics.getHeight() / 2);
               final Rectangle2D bounds = metrics.getStringBounds(tileName, graphics);

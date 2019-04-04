@@ -1028,7 +1028,8 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
             final double[] targetCoordinates = MappedLocation.toModelCoordinates(image, boundingBox,
               true, 0, height, width, height, width, 0, 0, 0, 0, height);
             final LineString line = viewGeometryFactory.lineString(2, targetCoordinates);
-            GeometryStyleRecordLayerRenderer.renderLineString(viewport, graphics, line, STYLE_IMAGE_LINE);
+            GeometryStyleRecordLayerRenderer.renderLineString(viewport, graphics, line,
+              STYLE_IMAGE_LINE);
           }
         }
         final MappedLocation moveTiePoint = getMoveTiePoint();

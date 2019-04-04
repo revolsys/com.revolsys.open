@@ -21,8 +21,8 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.number.Doubles;
 
-import si.uom.SI;
 import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 // TODO
 //clipToCoordinateSystem()
@@ -82,8 +82,8 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("Axis Count", axisCount, boundingBox.getAxisCount());
     Assert.assertEquals("Bounds", Lists.newArray(bounds), Lists.newArray(boundingBox.getBounds()));
 
-    Unit unit = SI.METRE;
-    Unit lengthUnit = SI.METRE;
+    Unit unit = Units.METRE;
+    Unit lengthUnit = Units.METRE;
     final StringBuilder wkt = new StringBuilder();
     final int srid = boundingBox.getCoordinateSystemId();
     if (geometryFactory == null) {
