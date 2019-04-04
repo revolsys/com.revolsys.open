@@ -17,7 +17,6 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
-import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
@@ -810,12 +809,9 @@ public interface BoundingBox
 
   default Quantity<Length> getHeightLength() {
     final double height = getHeight();
-    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-    if (coordinateSystem == null) {
-      return Quantities.getQuantity(height, Units.METRE);
-    } else {
-      return Quantities.getQuantity(height, coordinateSystem.getLengthUnit());
-    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Unit<Length> unit = geometryFactory.getHorizontalLengthUnit();
+    return Quantities.getQuantity(height, unit);
   }
 
   default double getMax(final int i) {
@@ -972,12 +968,9 @@ public interface BoundingBox
 
   default Quantity<Length> getWidthLength() {
     final double width = getWidth();
-    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-    if (coordinateSystem == null) {
-      return Quantities.getQuantity(width, Units.METRE);
-    } else {
-      return Quantities.getQuantity(width, coordinateSystem.getLengthUnit());
-    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Unit<Length> unit = geometryFactory.getHorizontalLengthUnit();
+    return Quantities.getQuantity(width, unit);
   }
 
   @Override
@@ -1126,8 +1119,7 @@ public interface BoundingBox
       } else {
         try {
           double minStep = 0.00001;
-          final CoordinateSystem coordinateSystem = factory.getHorizontalCoordinateSystem();
-          if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+          if (factory.isProjected()) {
             minStep = 1;
           } else {
             minStep = 0.00001;

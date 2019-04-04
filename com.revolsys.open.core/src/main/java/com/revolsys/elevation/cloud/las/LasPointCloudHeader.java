@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystem;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -138,10 +139,8 @@ public class LasPointCloudHeader
         final double offsetY = reader.getDouble();
         final double offsetZ = reader.getDouble();
 
-        final CoordinateSystem coordinateSystem = this.geometryFactory
-          .getHorizontalCoordinateSystem();
-        this.geometryFactory = GeometryFactory.newWithOffsets(coordinateSystem, offsetX, scaleX,
-          offsetY, scaleY, offsetZ, scaleZ);
+        this.geometryFactory = geometryFactory.newWithOffsetsAndScales(offsetX, scaleX, offsetY,
+          scaleY, offsetZ, scaleZ);
 
         final double maxX = reader.getDouble();
         final double minX = reader.getDouble();
@@ -431,7 +430,6 @@ public class LasPointCloudHeader
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       double scaleX = geometryFactory.getScaleX();
       if (scaleX == 0) {
         scaleX = 1000;
@@ -444,13 +442,9 @@ public class LasPointCloudHeader
       if (scaleZ == 0) {
         scaleZ = 1000;
       }
-      final double offsetX = geometryFactory.getOffsetX();
-      final double offsetY = geometryFactory.getOffsetY();
-      final double offsetZ = geometryFactory.getOffsetZ();
-      this.geometryFactory = GeometryFactory.newWithOffsets(coordinateSystem, offsetX, scaleX,
-        offsetY, scaleY, offsetZ, scaleZ);
+      this.geometryFactory = geometryFactory.convertScales(scaleX, scaleY, scaleZ);
 
-      LasProjection.setCoordinateSystem(this, coordinateSystem);
+      LasProjection.setCoordinateSystem(this, this.geometryFactory);
     }
   }
 
@@ -507,10 +501,11 @@ public class LasPointCloudHeader
         addToMap(map, "coordinateSystemId", coordinateSystemId);
       }
 
-      final CoordinateSystem coordinateSystem = this.geometryFactory
-        .getHorizontalCoordinateSystem();
-      if (coordinateSystem != null) {
-        addToMap(map, "coordinateSystemName", coordinateSystem.getCoordinateSystemName());
+      if (this.geometryFactory.isHasHorizontalCoordinateSystem()) {
+        final String name = this.geometryFactory.getHorizontalCoordinateSystemName();
+        addToMap(map, "coordinateSystemName", name);
+        final HorizontalCoordinateSystem coordinateSystem = this.geometryFactory
+          .getHorizontalCoordinateSystem();
         addToMap(map, "coordinateSystem", coordinateSystem.toEsriWktCs());
       }
     }

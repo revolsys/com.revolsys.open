@@ -18,6 +18,7 @@ import org.jeometry.coordinatesystem.model.unit.LinearUnit;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.logging.Logs;
@@ -164,14 +165,14 @@ public class LasProjection {
   }
 
   protected static void setCoordinateSystem(final LasPointCloudHeader header,
-    final CoordinateSystem coordinateSystem) {
-    if (coordinateSystem != null) {
+    final GeometryFactory geometryFactory) {
+    if (geometryFactory != null) {
       header.removeLasProperties(LASF_PROJECTION);
       final LasPointFormat pointFormat = header.getPointFormat();
       if (pointFormat.getId() <= 5) {
-        final int coordinateSystemId = coordinateSystem.getHorizontalCoordinateSystemId();
+        final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
         int keyId;
-        if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+        if (geometryFactory.isProjected()) {
           keyId = TiffImage.PROJECTED_COORDINATE_SYSTEM_ID;
         } else {
           keyId = TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID;
@@ -194,10 +195,10 @@ public class LasProjection {
         final byte[] bytes = byteOut.toByteArray();
         final LasVariableLengthRecord property = new LasVariableLengthRecord(header,
           LASF_PROJECTION, ID_TIFF_GEO_KEY_DIRECTORY_TAG, "TIFF GeoKeyDirectoryTag", bytes,
-          coordinateSystem);
+          geometryFactory);
         header.addProperty(property);
       } else {
-        header.addLasProperty(KEY_WKT_COORDINATE_SYSTEM, "WKT", coordinateSystem);
+        header.addLasProperty(KEY_WKT_COORDINATE_SYSTEM, "WKT", geometryFactory);
       }
     }
   }

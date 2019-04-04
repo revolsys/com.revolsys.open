@@ -1,7 +1,5 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-
 import com.revolsys.geometry.model.BoundingBox;
 
 public class EnvelopeN extends Envelope {
@@ -27,8 +25,7 @@ public class EnvelopeN extends Envelope {
   }
 
   public EnvelopeN(final SpatialReference spatialReference) {
-    final CoordinateSystem coordinateSystem = spatialReference.getCoordinateSystem();
-    if (coordinateSystem != null) {
+    if (spatialReference.isHasHorizontalCoordinateSystem()) {
       final BoundingBox boundingBox = spatialReference.getAreaBoundingBox();
       this.xMin = boundingBox.getMinX();
       this.yMin = boundingBox.getMinY();

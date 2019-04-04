@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystemType;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems.EpsgCoordinateSystemType;
 import org.jeometry.coordinatesystem.model.unit.UnitOfMeasure;
 
 import com.revolsys.collection.map.IntHashMap;
@@ -285,7 +285,7 @@ public final class EpsgCoordinateSystemsLoader {
         recordWriter.write(record);
         final int id = writeInt(writer, record, "coord_sys_code");
         final String type = writeCodeByte(writer, record, "coord_sys_type",
-          CoordinateSystemType.TYPE_NAMES);
+          EpsgCoordinateSystemType.TYPE_NAMES);
         writeDeprecated(writer, record);
 
         final MapEx coordinateSystem = new LinkedHashMapEx() //

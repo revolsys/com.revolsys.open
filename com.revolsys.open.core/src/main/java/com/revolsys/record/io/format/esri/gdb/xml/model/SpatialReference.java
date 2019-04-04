@@ -1,8 +1,5 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
-
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 
@@ -12,17 +9,14 @@ public class SpatialReference implements GeometryFactoryProxy {
 
   public static SpatialReference get(final GeometryFactory geometryFactory, final String wkt) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      if (coordinateSystem instanceof org.jeometry.coordinatesystem.model.GeographicCoordinateSystem) {
+      if (geometryFactory.isGeographics()) {
         return new EsriGdbGeographicCoordinateSystem(geometryFactory, wkt);
-      } else if (coordinateSystem instanceof org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem) {
+      } else if (geometryFactory.isProjected()) {
         return new EsriGdbProjectedCoordinateSystem(geometryFactory, wkt);
       }
     }
     return null;
   }
-
-  private CoordinateSystem coordinateSystem;
 
   private GeometryFactory geometryFactory;
 
@@ -62,8 +56,7 @@ public class SpatialReference implements GeometryFactoryProxy {
   protected SpatialReference(final GeometryFactory geometryFactory, final String wkt) {
     this.geometryFactory = geometryFactory;
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      if (coordinateSystem != null) {
+      if (geometryFactory.isHasHorizontalCoordinateSystem()) {
         this.wkt = wkt;
         if (this instanceof EsriGdbGeographicCoordinateSystem) {
           this.xOrigin = -180;
@@ -91,38 +84,17 @@ public class SpatialReference implements GeometryFactoryProxy {
         this.zTolerance = 1.0 / this.zScale;
         this.mTolerance = 1.0 / this.mScale;
         this.highPrecision = true;
-        this.wkid = coordinateSystem.getHorizontalCoordinateSystemId();
+        this.wkid = geometryFactory.getHorizontalCoordinateSystemId();
       }
     }
-  }
-
-  @Override
-  public CoordinateSystem getCoordinateSystem() {
-    if (this.coordinateSystem == null) {
-      this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(this.latestWKID);
-      if (this.coordinateSystem == null) {
-        this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(this.wkid);
-      }
-    }
-    return this.coordinateSystem;
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
     if (this.geometryFactory == null) {
-      final CoordinateSystem coordinateSystem = getCoordinateSystem();
-      int coordinateSystemId;
-      if (coordinateSystem == null) {
-        coordinateSystemId = 0;
-      } else {
-        coordinateSystemId = coordinateSystem.getHorizontalCoordinateSystemId();
-      }
-
-      if (this.xYScale == FLOATING_SCALE) {
-        this.geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, 0.0, 0.0, this.zScale);
-      } else {
-        this.geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, this.xYScale,
-          this.xYScale, this.zScale);
+      this.geometryFactory = newGeometryFactory(this.latestWKID);
+      if (!this.geometryFactory.isHasHorizontalCoordinateSystem()) {
+        this.geometryFactory = newGeometryFactory(this.wkid);
       }
     }
     return this.geometryFactory;
@@ -186,6 +158,17 @@ public class SpatialReference implements GeometryFactoryProxy {
 
   public boolean isHighPrecision() {
     return this.highPrecision;
+  }
+
+  private GeometryFactory newGeometryFactory(final int coordinateSystemId) {
+    GeometryFactory geometryFactory;
+    if (this.xYScale == FLOATING_SCALE) {
+      geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, 0.0, 0.0, this.zScale);
+    } else {
+      geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, this.xYScale, this.xYScale,
+        this.zScale);
+    }
+    return geometryFactory;
   }
 
   public void setHighPrecision(final boolean highPrecision) {

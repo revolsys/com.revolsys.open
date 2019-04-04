@@ -9,10 +9,7 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.Ellipsoid;
-import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
-import org.jeometry.coordinatesystem.model.datum.GeodeticDatum;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.awt.WebColors;
@@ -411,11 +408,9 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
       convertedValue = QuantityType.doubleValue(value, CustomUnits.PIXEL);
     } else {
       convertedValue = QuantityType.doubleValue(value, Units.METRE);
-      final CoordinateSystem coordinateSystem = this.geometryFactory
-        .getHorizontalCoordinateSystem();
-      if (coordinateSystem instanceof GeographicCoordinateSystem) {
-        final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
-        final double radius = geoCs.getDatum().getEllipsoid().getSemiMajorAxis();
+      if (this.geometryFactory.isGeographics()) {
+        final Ellipsoid ellipsoid = this.geometryFactory.getEllipsoid();
+        final double radius = ellipsoid.getSemiMajorAxis();
         convertedValue = Math.toDegrees(convertedValue / radius);
 
       }
@@ -432,12 +427,8 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
       convertedValue *= this.modelUnitsPerViewUnit;
     } else {
       convertedValue = QuantityType.doubleValue(value, Units.METRE);
-      final CoordinateSystem coordinateSystem = this.geometryFactory
-        .getHorizontalCoordinateSystem();
-      if (coordinateSystem instanceof GeographicCoordinateSystem) {
-        final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
-        final GeodeticDatum datum = geoCs.getDatum();
-        final Ellipsoid ellipsoid = datum.getEllipsoid();
+      if (this.geometryFactory.isGeographics()) {
+        final Ellipsoid ellipsoid = this.geometryFactory.getEllipsoid();
         final double radius = ellipsoid.getSemiMajorAxis();
         convertedValue = Math.toDegrees(convertedValue / radius);
       }

@@ -93,7 +93,7 @@ public class GeoNamesService {
     final BoundingBox geographicBoundingBox = boundingBox.bboxToCs(geometryFactory);
     final Map<String, Object> params = new HashMap<>();
 
-    final double radius = cs.getDatum().getEllipsoid().getSemiMajorAxis();
+    final double radius = geometryFactory.getEllipsoid().getSemiMajorAxis();
     final double height = geographicBoundingBox.getHeight();
     final double width = geographicBoundingBox.getWidth();
     final double diagonal = Math.sqrt(width * width + height * height);

@@ -115,7 +115,7 @@ public class BoundingBoxTest implements TestConstants {
         boundingBox.getHorizontalCoordinateSystem());
       if (coordinateSystem != null) {
         unit = coordinateSystem.getUnit();
-        lengthUnit = coordinateSystem.getLengthUnit();
+        lengthUnit = geometryFactory.getHorizontalLengthUnit();
       }
     }
     wkt.append("BBOX");

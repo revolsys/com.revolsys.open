@@ -50,7 +50,7 @@ public class EsriCoordinateSystemsLoader {
         final byte[] digest = coordinateSystem.md5Digest();
         Maps.addToMap(Maps::newTree, csBymd5, new ByteArray(digest), id, coordinateSystem);
 
-        final GeodeticDatum datum = coordinateSystem.getDatum();
+        final GeodeticDatum datum = coordinateSystem.getGeodeticDatum();
         final Ellipsoid ellipsoid = datum.getEllipsoid();
         final PrimeMeridian primeMeridian = coordinateSystem.getPrimeMeridian();
         final AngularUnit angularUnit = coordinateSystem.getAngularUnit();

@@ -3,8 +3,6 @@ package com.revolsys.oracle.recordstore;
 import java.io.PrintWriter;
 import java.util.List;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
@@ -82,8 +80,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("','");
       out.print(name.toLowerCase());
       out.print("',");
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      out.print(coordinateSystem.getHorizontalCoordinateSystemId());
+      out.print(geometryFactory.getHorizontalCoordinateSystemId());
       out.print(",'");
       out.print(geometryType);
       out.print("', ");
@@ -183,8 +180,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       final String name = geometryField.getName();
       final int axisCount = geometryFactory.getAxisCount();
       final DataType dataType = geometryField.getDataType();
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      final int srid = coordinateSystem.getHorizontalCoordinateSystemId();
+      final int srid = geometryFactory.getHorizontalCoordinateSystemId();
 
       out.print(
         "INSERT INTO USER_SDO_GEOM_METADATA(TABLE_NAME, COLUMN_NAME, DIMINFO, SRID) VALUES('");

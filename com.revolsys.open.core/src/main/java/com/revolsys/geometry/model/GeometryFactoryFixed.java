@@ -554,8 +554,23 @@ public class GeometryFactoryFixed extends GeometryFactory {
   @Override
   public GeometryFactory newWithOffsets(final double offsetX, final double offsetY,
     final double offsetZ) {
-    return new GeometryFactoryWithOffsets(this.instances, offsetX, this.scaleX, offsetY,
-      this.scaleY, offsetZ, this.scaleZ);
+    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
+      return this;
+    } else {
+      return new GeometryFactoryWithOffsets(this.instances, offsetX, this.scaleX, offsetY,
+        this.scaleY, offsetZ, this.scaleZ);
+    }
+  }
+
+  @Override
+  public GeometryFactory newWithOffsetsAndScales(final double offsetX, final double scaleX,
+    final double offsetY, final double scaleY, final double offsetZ, final double scaleZ) {
+    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
+      return convertScales(scaleX, scaleY, scaleZ);
+    } else {
+      return new GeometryFactoryWithOffsets(this.instances, offsetX, scaleX, offsetY, scaleY,
+        offsetZ, scaleZ);
+    }
   }
 
   @Override

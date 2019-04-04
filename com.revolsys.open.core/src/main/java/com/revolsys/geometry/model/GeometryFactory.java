@@ -49,11 +49,15 @@ import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.measure.Unit;
+import javax.measure.quantity.Length;
+
 import org.jeometry.coordinatesystem.io.EsriCsWktWriter;
 import org.jeometry.coordinatesystem.io.WktCsParser;
 import org.jeometry.coordinatesystem.model.Area;
 import org.jeometry.coordinatesystem.model.CompoundCoordinateSystem;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.CoordinateSystemType;
 import org.jeometry.coordinatesystem.model.EpsgAuthority;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystem;
@@ -110,6 +114,8 @@ import com.revolsys.util.WrappedException;
 import com.revolsys.util.function.BiFunctionDouble;
 import com.revolsys.util.function.Consumer3Double;
 
+import tec.uom.se.unit.Units;
+
 /**
  * Supplies a set of utility methods for building Geometry objects from lists
  * of Coordinates.
@@ -122,7 +128,6 @@ import com.revolsys.util.function.Consumer3Double;
  * @version 1.7
  */
 public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerializer {
-
   private class EmptyGeometryCollection implements GeometryCollection {
     private static final long serialVersionUID = -5694727726395021467L;
 
@@ -800,7 +805,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
 
   protected final CoordinateSystem coordinateSystem;
 
-  protected HorizontalCoordinateSystem horizontalCoordinateSystem;
+  private HorizontalCoordinateSystem horizontalCoordinateSystem;
 
   protected final int coordinateSystemId;
 
@@ -816,6 +821,14 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
 
   protected GeometryFactories instances;
 
+  private final CoordinateSystemType coordinateSystemType;
+
+  private final CoordinateSystemType horizontalCoordinateSystemType;
+
+  private final CoordinateSystemType verticalCoordinateSystemType;
+
+  private VerticalCoordinateSystem verticalCoordinateSystem;
+
   protected GeometryFactory(final GeometryFactories instances, final int axisCount) {
     if (axisCount < 2) {
       this.axisCount = 2;
@@ -825,12 +838,61 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     this.instances = instances;
     this.coordinateSystemId = instances.getCoordinateSystemId();
     this.coordinateSystem = instances.getCoordinateSystem();
+
     if (this.coordinateSystem == null) {
       this.horizontalCoordinateSystem = null;
+      this.verticalCoordinateSystem = null;
     } else {
       final HorizontalCoordinateSystem horizontalCoordinateSystem = this.coordinateSystem
         .getHorizontalCoordinateSystem();
-      setHorizontalCoordinateSystem(horizontalCoordinateSystem);
+      if (horizontalCoordinateSystem == null) {
+        this.horizontalCoordinateSystem = null;
+        this.areaBoundingBox = BoundingBox.empty();
+      } else {
+        this.horizontalCoordinateSystem = horizontalCoordinateSystem;
+        double minX;
+        double minY;
+        double maxX;
+        double maxY;
+
+        final Area area = horizontalCoordinateSystem.getArea();
+        if (area == null) {
+          minX = -180;
+          minY = -90;
+          maxX = 180;
+          maxY = 90;
+        } else {
+          minX = area.getMinX();
+          minY = area.getMinY();
+          maxX = area.getMaxX();
+          maxY = area.getMaxY();
+        }
+        this.areaBoundingBox = getGeographicGeometryFactory() //
+          .bboxEditor() //
+          .addBbox(minX, minY, maxX, maxY) //
+          .setGeometryFactory(this) //
+          .newBoundingBox();
+      }
+      if (this.coordinateSystem instanceof CompoundCoordinateSystem) {
+        final CompoundCoordinateSystem compoundCoordinateSystem = (CompoundCoordinateSystem)this.coordinateSystem;
+        this.verticalCoordinateSystem = compoundCoordinateSystem.getVerticalCoordinateSystem();
+      }
+    }
+    if (this.coordinateSystem == null) {
+      this.coordinateSystemType = CoordinateSystemType.NONE;
+    } else {
+      this.coordinateSystemType = this.coordinateSystem.getCoordinateSystemType();
+    }
+    if (this.horizontalCoordinateSystem == null) {
+      this.horizontalCoordinateSystemType = CoordinateSystemType.NONE;
+    } else {
+      this.horizontalCoordinateSystemType = this.horizontalCoordinateSystem
+        .getCoordinateSystemType();
+    }
+    if (this.verticalCoordinateSystem == null) {
+      this.verticalCoordinateSystemType = CoordinateSystemType.NONE;
+    } else {
+      this.verticalCoordinateSystemType = this.verticalCoordinateSystem.getCoordinateSystemType();
     }
   }
 
@@ -846,8 +908,15 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
 
   public void addInverseOperations(final List<CoordinatesOperation> operations) {
     if (isProjected()) {
-      final ProjectedCoordinateSystem projCs = getCoordinateSystem();
+      final ProjectedCoordinateSystem projCs = getHorizontalCoordinateSystem();
       projCs.addInverseOperations(operations);
+    }
+  }
+
+  public void addProjectionOperations(final List<CoordinatesOperation> operations) {
+    if (isProjected()) {
+      final ProjectedCoordinateSystem projCs = getHorizontalCoordinateSystem();
+      projCs.addProjectionOperations(operations);
     }
   }
 
@@ -1261,19 +1330,20 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
    * @param geometryFactory The geometry factory to convert to.
    * @return The coordinates operation or null if no conversion is available.
    */
-  @Override
   public CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
-    if (geometryFactory == this || geometryFactory == null) {
-      return null;
-    } else {
-      final CoordinateSystem otherCoordinateSystem = geometryFactory
-        .getHorizontalCoordinateSystem();
-      if (this.horizontalCoordinateSystem == null || otherCoordinateSystem == null) {
-        return null;
-      } else {
-        return this.horizontalCoordinateSystem.getCoordinatesOperation(otherCoordinateSystem);
+    if (geometryFactory != this && geometryFactory != null) {
+      final CoordinateSystem coordinateSystemThis = this.horizontalCoordinateSystem;
+      if (coordinateSystemThis != null) {
+        final CoordinateSystem coordinateSystemOther = geometryFactory
+          .getHorizontalCoordinateSystem();
+        if (coordinateSystemThis == coordinateSystemOther || coordinateSystemOther == null) {
+          return null;
+        } else {
+          return coordinateSystemThis.getCoordinatesOperation(coordinateSystemOther);
+        }
       }
     }
+    return null;
   }
 
   @Override
@@ -1287,16 +1357,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     return this.coordinateSystemId;
   }
 
-  @Override
-  public String getCoordinateSystemName() {
-    return getCoordinateSystem().getCoordinateSystemName();
-  }
-
   public GeometryFactory getGeographicGeometryFactory() {
-    if (this.coordinateSystem instanceof GeographicCoordinateSystem) {
+    if (isGeographics()) {
       return this;
-    } else if (this.coordinateSystem instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)this.coordinateSystem;
+    } else if (isProjected()) {
+      final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)this.horizontalCoordinateSystem;
       final GeographicCoordinateSystem geographicCs = projectedCs.getGeographicCoordinateSystem();
       final int coordinateSystemId = geographicCs.getCoordinateSystemId();
       return floating(coordinateSystemId, this.axisCount);
@@ -1336,6 +1401,14 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
       }
     } else {
       return null;
+    }
+  }
+
+  public Unit<Length> getHorizontalLengthUnit() {
+    if (this.horizontalCoordinateSystem == null) {
+      return Units.METRE;
+    } else {
+      return this.horizontalCoordinateSystem.getLengthUnit();
     }
   }
 
@@ -1498,15 +1571,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   }
 
   public VerticalCoordinateSystem getVerticalCoordinateSystem() {
-    if (this.coordinateSystem instanceof CompoundCoordinateSystem) {
-      final CompoundCoordinateSystem compoundCoordinateSystem = (CompoundCoordinateSystem)this.coordinateSystem;
-      return compoundCoordinateSystem.getVerticalCoordinateSystem();
-    } else if (this.coordinateSystem instanceof VerticalCoordinateSystem) {
-      final VerticalCoordinateSystem verticalCoordinateSystem = (VerticalCoordinateSystem)this.coordinateSystem;
-      return verticalCoordinateSystem;
-    } else {
-      return null;
-    }
+    return this.verticalCoordinateSystem;
   }
 
   @Override
@@ -1547,20 +1612,16 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     return this.axisCount > 2;
   }
 
+  public boolean isCompound() {
+    return this.coordinateSystemType.isCompound();
+  }
+
   public boolean isFloating() {
     return true;
   }
 
   public boolean isGeographics() {
-    if (this.coordinateSystem instanceof GeographicCoordinateSystem) {
-      return true;
-    } else if (this.coordinateSystem instanceof CompoundCoordinateSystem) {
-      final CompoundCoordinateSystem compoundCoordinateSystem = (CompoundCoordinateSystem)this.coordinateSystem;
-      return compoundCoordinateSystem
-        .getHorizontalCoordinateSystem() instanceof GeographicCoordinateSystem;
-    } else {
-      return false;
-    }
+    return this.horizontalCoordinateSystemType.isGeographic();
   }
 
   @Override
@@ -1573,15 +1634,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   }
 
   public boolean isProjected() {
-    if (this.coordinateSystem instanceof ProjectedCoordinateSystem) {
-      return true;
-    } else if (this.coordinateSystem instanceof CompoundCoordinateSystem) {
-      final CompoundCoordinateSystem compoundCoordinateSystem = (CompoundCoordinateSystem)this.coordinateSystem;
-      return compoundCoordinateSystem
-        .getHorizontalCoordinateSystem() instanceof ProjectedCoordinateSystem;
-    } else {
-      return false;
-    }
+    return this.horizontalCoordinateSystemType.isProjected();
   }
 
   private boolean isProjectionRequired(final CoordinateSystem coordinateSystem) {
@@ -1668,6 +1721,10 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
         }
       }
     }
+  }
+
+  public boolean isVertical() {
+    return this.verticalCoordinateSystemType.isVertical();
   }
 
   public Lineal lineal(final Geometry geometry) {
@@ -2098,6 +2155,9 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
 
   public abstract GeometryFactory newWithOffsets(double offsetX, double offsetY, double offsetZ);
 
+  public abstract GeometryFactory newWithOffsetsAndScales(final double offsetX, final double scaleX,
+    final double offsetY, final double scaleY, final double offsetZ, final double scaleZ);
+
   /**
    * <p>Construct a newn empty {@link Point}.</p>
    *
@@ -2473,38 +2533,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     }
   }
 
-  private void setHorizontalCoordinateSystem(
-    final HorizontalCoordinateSystem horizontalCoordinateSystem) {
-    if (horizontalCoordinateSystem == null) {
-      this.horizontalCoordinateSystem = null;
-      this.areaBoundingBox = BoundingBox.empty();
-    } else {
-      this.horizontalCoordinateSystem = horizontalCoordinateSystem;
-      double minX;
-      double minY;
-      double maxX;
-      double maxY;
-
-      final Area area = horizontalCoordinateSystem.getArea();
-      if (area == null) {
-        minX = -180;
-        minY = -90;
-        maxX = 180;
-        maxY = 90;
-      } else {
-        minX = area.getMinX();
-        minY = area.getMinY();
-        maxX = area.getMaxX();
-        maxY = area.getMaxY();
-      }
-      this.areaBoundingBox = getGeographicGeometryFactory() //
-        .bboxEditor() //
-        .addBbox(minX, minY, maxX, maxY) //
-        .setGeometryFactory(this) //
-        .newBoundingBox();
-    }
-  }
-
   public GeometryFactory to2dFloating() {
     return this.instances.floating(this.axisCount);
   }
@@ -2576,7 +2604,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     final StringBuilder string = new StringBuilder();
     final int coordinateSystemId = getCoordinateSystemId();
     if (this.coordinateSystem != null) {
-      string.append(this.coordinateSystem.getCoordinateSystemName());
+      final String coordinateSystemName = getCoordinateSystemName();
+      string.append(coordinateSystemName);
       string.append(", ");
     }
     string.append("coordinateSystemId=");

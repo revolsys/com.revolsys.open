@@ -12,7 +12,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.jeometry.coordinatesystem.model.CompoundCoordinateSystem;
 import org.jeometry.coordinatesystem.model.CoordinateOperationMethod;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
@@ -538,8 +537,7 @@ public class UsgsGriddedElevationReader extends BaseObjectWithProperties
                 coordinateSystem = EpsgCoordinateSystems.getCompound(horizontalCoordinateSystemId,
                   verticalCoordinateSystemId);
               } else {
-                coordinateSystem = new CompoundCoordinateSystem(horizontalCoordinateSystem,
-                  verticalCoordinateSystem);
+                coordinateSystem = horizontalCoordinateSystem.getCompound(verticalCoordinateSystem);
               }
             }
             this.geometryFactory = GeometryFactory.fixed(coordinateSystem, 3, 0.0, 0.0, scaleZ);

@@ -48,7 +48,6 @@ import javax.measure.quantity.Length;
 
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
-import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 import org.jeometry.coordinatesystem.util.BiConsumerDouble;
@@ -990,9 +989,10 @@ public interface LineString extends Lineal {
 
   @Override
   default double getLength(final Unit<Length> unit) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     double length = 0;
     final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-    if (coordinateSystem instanceof GeographicCoordinateSystem) {
+    if (geometryFactory.isGeographics()) {
       final int vertexCount = getVertexCount();
       if (vertexCount > 1) {
         double lon0 = getX(0);
@@ -1007,9 +1007,8 @@ public interface LineString extends Lineal {
       }
       final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, Units.METRE);
       length = QuantityType.doubleValue(lengthMeasure, unit);
-    } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-      final Unit<Length> lengthUnit = projectedCoordinateSystem.getLengthUnit();
+    } else if (geometryFactory.isProjected()) {
+      final Unit<Length> lengthUnit = geometryFactory.getHorizontalLengthUnit();
 
       length = getLength();
       final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, lengthUnit);

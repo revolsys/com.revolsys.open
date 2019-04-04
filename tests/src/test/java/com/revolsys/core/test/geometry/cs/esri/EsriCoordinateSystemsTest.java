@@ -1,7 +1,7 @@
 package com.revolsys.core.test.geometry.cs.esri;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.VerticalCoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EsriCoordinateSystems;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,8 +48,8 @@ public class EsriCoordinateSystemsTest {
         final int id = record.getInteger("ID");
         final String wkt = record.getString("WKT");
         if (wkt.contains("VDATUM")) {
-          final VerticalCoordinateSystem coordinateSystem = CoordinateSystem
-            .getCoordinateSystem(wkt);
+          final VerticalCoordinateSystem coordinateSystem = EsriCoordinateSystems
+            .readCoordinateSystem(wkt);
           final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
           Assert.assertEquals(coordinateSystem.getCoordinateSystemName() + " ID", id,
             coordinateSystemId);

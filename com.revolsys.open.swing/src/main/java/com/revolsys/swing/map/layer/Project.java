@@ -19,9 +19,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.geometry.model.BoundingBox;
@@ -651,7 +648,7 @@ public class Project extends LayerGroup {
     } else {
       // TODO really should be min scale
       double minDimension;
-      if (viewBoundingBox.getHorizontalCoordinateSystem() instanceof GeographicCoordinateSystem) {
+      if (viewBoundingBox.getGeometryFactory().isGeographics()) {
         minDimension = 0.000005;
       } else {
         minDimension = 0.5;
@@ -708,13 +705,9 @@ public class Project extends LayerGroup {
 
     BoundingBox boundingBox = getViewBoundingBox();
     if (!RectangleUtil.isEmpty(boundingBox)) {
-      BoundingBox defaultBoundingBox = null;
+      final BoundingBox defaultBoundingBox = getAreaBoundingBox();
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (geometryFactory != null) {
-        final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-        if (coordinateSystem != null) {
-          defaultBoundingBox = getAreaBoundingBox();
-        }
         boundingBox = boundingBox.bboxToCs(geometryFactory);
       }
       addToMap(map, "viewBoundingBox", boundingBox, defaultBoundingBox);

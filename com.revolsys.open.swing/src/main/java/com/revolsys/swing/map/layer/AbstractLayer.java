@@ -34,7 +34,6 @@ import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -792,13 +791,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       panel.add(extentPanel);
 
       final JPanel coordinateSystemPanel = Panels.titledTransparent("Coordinate System");
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      if (coordinateSystem == null) {
+      if (!geometryFactory.isHasHorizontalCoordinateSystem()) {
         coordinateSystemPanel.add(new JLabel("Unknown"));
       } else {
         final int axisCount = geometryFactory.getAxisCount();
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "ID",
-          coordinateSystem.getHorizontalCoordinateSystemId(), 10);
+          geometryFactory.getHorizontalCoordinateSystemId(), 10);
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount", axisCount, 10);
 
         final double scaleX = geometryFactory.getScaleX();
@@ -1006,10 +1004,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       this.geometryFactory = geometryFactory;
       final BoundingBox boundingBox = getBoundingBox();
       if (Property.isEmpty(boundingBox)) {
-        final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-        if (coordinateSystem != null) {
-          setBoundingBox(geometryFactory.getAreaBoundingBox());
-        }
+        setBoundingBox(geometryFactory.getAreaBoundingBox());
       } else if (!boundingBox.getGeometryFactory().isHasHorizontalCoordinateSystem()
         && geometryFactory.isHasHorizontalCoordinateSystem()) {
         setBoundingBox(boundingBox.bboxToCs(geometryFactory));
