@@ -1,7 +1,8 @@
 package com.revolsys.geometry.model.metrics;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.model.Side;
-import com.revolsys.util.number.Doubles;
 
 public class PointLineStringMetrics {
 

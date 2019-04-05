@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.number.Numbers;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
@@ -32,7 +34,6 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Numbers;
 
 public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 

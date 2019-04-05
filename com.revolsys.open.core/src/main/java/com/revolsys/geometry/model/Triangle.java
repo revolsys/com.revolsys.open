@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 import org.jeometry.common.function.Consumer4Double;
 import org.jeometry.common.function.Function4Double;
+import org.jeometry.common.math.MathUtil;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
@@ -20,7 +21,6 @@ import com.revolsys.geometry.model.impl.TriangleLinearRing;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.geometry.util.Triangles;
-import com.revolsys.util.MathUtil;
 
 public interface Triangle extends Polygon {
   static void addIntersection(final GeometryFactory geometryFactory, final Set<Point> coordinates,

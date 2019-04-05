@@ -38,7 +38,7 @@ public interface EndianInput extends Closeable {
    * See the general contract of the <code>readBoolean</code>
    * method of <code>DataInput</code>.
    * <p>
-   * Bytes for this operation are read from the contained
+   * ByteDataType for this operation are read from the contained
    * input stream.
    *
    * @return     the <code>boolean</code> value read.
@@ -60,7 +60,7 @@ public interface EndianInput extends Closeable {
    * See the general contract of the <code>readByte</code>
    * method of <code>DataInput</code>.
    * <p>
-   * Bytes
+   * ByteDataType
    * for this operation are read from the contained
    * input stream.
    *
@@ -93,7 +93,7 @@ public interface EndianInput extends Closeable {
    * See the general contract of the <code>readChar</code>
    * method of <code>DataInput</code>.
    * <p>
-   * Bytes
+   * ByteDataType
    * for this operation are read from the contained
    * input stream.
    *
@@ -129,7 +129,7 @@ public interface EndianInput extends Closeable {
    * See the general contract of the <code>readFloat</code>
    * method of <code>DataInput</code>.
    * <p>
-   * Bytes
+   * ByteDataType
    * for this operation are read from the contained
    * input stream.
    *
@@ -151,7 +151,7 @@ public interface EndianInput extends Closeable {
    * See the general contract of the <code>readFully</code>
    * method of <code>DataInput</code>.
    * <p>
-   * Bytes
+   * ByteDataType
    * for this operation are read from the contained
    * input stream.
    *
@@ -171,7 +171,7 @@ public interface EndianInput extends Closeable {
    * See the general contract of the <code>readFully</code>
    * method of <code>DataInput</code>.
    * <p>
-   * Bytes
+   * ByteDataType
    * for this operation are read from the contained
    * input stream.
    *

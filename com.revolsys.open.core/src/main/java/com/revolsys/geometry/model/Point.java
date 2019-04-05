@@ -38,11 +38,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
-import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.math.Angle;
+import org.jeometry.common.math.MathUtil;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
@@ -53,10 +56,7 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.NumberUtil;
-import com.revolsys.math.Angle;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 /**
  * Represents a single point.
@@ -70,6 +70,48 @@ import com.revolsys.util.number.Doubles;
  *@version 1.7
  */
 public interface Point extends Punctual, Serializable, BoundingBox {
+  /**
+   * Returns the un-oriented smallest angle between two vectors.
+   * The computed angle will be in the range 0->Pi.
+   *
+   * @param p1 the tip of one vector
+   * @param p2 the tail of each vector
+   * @param p3 the tip of the other vector
+   * @return the angle between tail-tip1 and tail-tip2
+   */
+  static double angleBetween(final Point p1, final Point p2, final Point p3) {
+    final double x1 = p1.getX();
+    final double y1 = p1.getY();
+    final double x2 = p2.getX();
+    final double y2 = p2.getY();
+    final double x3 = p3.getX();
+    final double y3 = p3.getY();
+    return Angle.angleBetween(x1, y1, x2, y2, x3, y3);
+  }
+
+  /**
+   * Returns the oriented smallest angle between two vectors.
+   * The computed angle will be in the range (-Pi, Pi].
+   * A positive result corresponds to a counterclockwise
+   * (CCW) rotation
+   * from v1 to v2;
+   * a negative result corresponds to a clockwise (CW) rotation;
+   * a zero result corresponds to no rotation.
+   *
+   * @param tip1 the tip of v1
+   * @param tail the tail of each vector
+   * @param tip2 the tip of v2
+   * @return the angle between v1 and v2, relative to v1
+   */
+  static double angleBetweenOriented(final Point tip1, final Point tail, final Point tip2) {
+    final double x1 = tip1.getX();
+    final double y1 = tip1.getY();
+    final double x = tail.getX();
+    final double y = tail.getY();
+    final double x2 = tip2.getX();
+    final double y2 = tip2.getY();
+    return Angle.angleBetweenOriented(x1, y1, x, y, x2, y2);
+  }
 
   static int hashCode(final Point point) {
     final double x = point.getX();
@@ -82,6 +124,65 @@ public interface Point extends Punctual, Serializable, BoundingBox {
     temp = Double.doubleToLongBits(y);
     result = prime * result + (int)(temp ^ temp >>> 32);
     return result;
+  }
+
+  /**
+   * Computes the interior angle between two segments of a ring. The ring is
+   * assumed to be oriented in a clockwise direction. The computed angle will be
+   * in the range [0, 2Pi]
+   *
+   * @param p0
+   *          a point of the ring
+   * @param p1
+   *          the next point of the ring
+   * @param p2
+   *          the next point of the ring
+   * @return the interior angle based at <code>p1</code>
+   */
+  static double interiorAngle(final Point p0, final Point p1, final Point p2) {
+    final double anglePrev = p1.angle2d(p0);
+    final double angleNext = p1.angle2d(p2);
+    return Math.abs(angleNext - anglePrev);
+  }
+
+  /**
+   * Tests whether the angle between p0-p1-p2 is acute.
+   * An angle is acute if it is less than 90 degrees.
+   * <p>
+   * Note: this implementation is not precise (determistic) for angles very close to 90 degrees.
+   *
+   * @param p0 an endpoint of the angle
+   * @param p1 the base of the angle
+   * @param p2 the other endpoint of the angle
+   */
+  static boolean isAcute(final Point p0, final Point p1, final Point p2) {
+    // relies on fact that A dot B is positive iff A ang B is acute
+    final double dx0 = p0.getX() - p1.getX();
+    final double dy0 = p0.getY() - p1.getY();
+    final double dx1 = p2.getX() - p1.getX();
+    final double dy1 = p2.getY() - p1.getY();
+    final double dotprod = dx0 * dx1 + dy0 * dy1;
+    return dotprod > 0;
+  }
+
+  /**
+   * Tests whether the angle between p0-p1-p2 is obtuse.
+   * An angle is obtuse if it is greater than 90 degrees.
+   * <p>
+   * Note: this implementation is not precise (determistic) for angles very close to 90 degrees.
+   *
+   * @param p0 an endpoint of the angle
+   * @param p1 the base of the angle
+   * @param p2 the other endpoint of the angle
+   */
+  static boolean isObtuse(final Point p0, final Point p1, final Point p2) {
+    // relies on fact that A dot B is negative iff A ang B is obtuse
+    final double dx0 = p0.getX() - p1.getX();
+    final double dy0 = p0.getY() - p1.getY();
+    final double dx1 = p2.getX() - p1.getX();
+    final double dy1 = p2.getY() - p1.getY();
+    final double dotprod = dx0 * dx1 + dy0 * dy1;
+    return dotprod < 0;
   }
 
   @SuppressWarnings("unchecked")

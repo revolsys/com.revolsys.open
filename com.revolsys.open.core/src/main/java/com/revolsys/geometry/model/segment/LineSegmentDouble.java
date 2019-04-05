@@ -34,12 +34,13 @@ package com.revolsys.geometry.model.segment;
 
 import java.util.Arrays;
 
+import org.jeometry.common.function.BiConsumerDouble;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
-import org.jeometry.common.function.BiConsumerDouble;
 
 /**
  * Represents a line segment defined by two {@link Coordinates}s.

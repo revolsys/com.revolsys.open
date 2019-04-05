@@ -10,12 +10,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.Integers;
+import org.jeometry.common.number.Numbers;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Integers;
-import com.revolsys.util.number.Numbers;
 
 public class Slider extends JSlider implements Field, FocusListener, ChangeListener {
   public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();

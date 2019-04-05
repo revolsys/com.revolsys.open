@@ -9,7 +9,7 @@ import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import com.revolsys.util.MathUtil;
+import org.jeometry.common.math.MathUtil;
 
 /**
    Jama = Java Matrix class.

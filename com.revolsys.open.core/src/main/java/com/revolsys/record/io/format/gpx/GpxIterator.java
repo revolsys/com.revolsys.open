@@ -16,6 +16,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.geometry.model.Geometry;
@@ -31,7 +32,6 @@ import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Dates;
-import com.revolsys.util.MathUtil;
 
 public class GpxIterator extends BaseObjectWithProperties
   implements Iterator<Record>, RecordReader {
@@ -347,10 +347,10 @@ public class GpxIterator extends BaseObjectWithProperties
     }
     if (coordinates.size() == axisCount) {
       return this.geometryFactory.convertAxisCount(axisCount)
-        .point(MathUtil.toDoubleArray(coordinates));
+        .point(Doubles.toDoubleArray(coordinates));
     } else {
       return this.geometryFactory.convertAxisCount(axisCount)
-        .lineString(4, MathUtil.toDoubleArray(coordinates));
+        .lineString(4, Doubles.toDoubleArray(coordinates));
     }
   }
 

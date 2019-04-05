@@ -39,7 +39,6 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.util.Triangles;
-import com.revolsys.math.Angle;
 
 /**
  * Computes the <b>Minimum Bounding Circle</b> (MBC)
@@ -136,7 +135,7 @@ public class MinimumBoundingCircle {
         continue;
       }
 
-      final double ang = Angle.angleBetween(P, p, Q);
+      final double ang = Point.angleBetween(P, p, Q);
       if (ang < minAng) {
         minAng = ang;
         minAngPt = p;
@@ -278,16 +277,16 @@ public class MinimumBoundingCircle {
       final Point R = pointWithMinAngleWithSegment(pts, P, Q);
 
       // if PRQ is obtuse, then MBC is determined by P and Q
-      if (Angle.isObtuse(P, R, Q)) {
+      if (Point.isObtuse(P, R, Q)) {
         this.extremalPts = new Point[] {
           P, Q
         };
         return;
       }
-      if (Angle.isObtuse(R, P, Q)) {
+      if (Point.isObtuse(R, P, Q)) {
         // if RPQ is obtuse, update baseline and iterate
         P = R;
-      } else if (Angle.isObtuse(R, Q, P)) {
+      } else if (Point.isObtuse(R, Q, P)) {
         // if RQP is obtuse, update baseline and iterate
         Q = R;
       } else {

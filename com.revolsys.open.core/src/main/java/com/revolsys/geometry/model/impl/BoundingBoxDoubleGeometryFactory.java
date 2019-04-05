@@ -34,12 +34,12 @@ package com.revolsys.geometry.model.impl;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
+import org.jeometry.common.math.MathUtil;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.RectangleUtil;
-import com.revolsys.util.MathUtil;
 
 /**
  *  Defines a rectangular region of the 2D coordinate plane.

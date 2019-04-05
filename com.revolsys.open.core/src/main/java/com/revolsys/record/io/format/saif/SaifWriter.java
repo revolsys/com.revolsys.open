@@ -28,11 +28,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.jeometry.common.logging.Logs;
-
 import java.util.Set;
 import java.util.TreeMap;
+
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;

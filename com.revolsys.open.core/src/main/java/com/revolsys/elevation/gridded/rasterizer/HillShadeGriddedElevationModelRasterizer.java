@@ -2,15 +2,16 @@ package com.revolsys.elevation.gridded.rasterizer;
 
 import java.util.Map;
 
+import org.jeometry.common.math.Angle;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.grid.Grid;
-import com.revolsys.util.MathUtil;
 
 public class HillShadeGriddedElevationModelRasterizer
   extends AbstractGriddedElevationModelRasterizer {
-  private static final double PI_TIMES_2_MINUS_PI_OVER_2 = MathUtil.PI_TIMES_2 - MathUtil.PI_OVER_2;
+  private static final double PI_TIMES_2_MINUS_PI_OVER_2 = Angle.PI_TIMES_2 - Angle.PI_OVER_2;
 
   private double zenithRadians;
 
@@ -67,7 +68,7 @@ public class HillShadeGriddedElevationModelRasterizer
     double aspectRadians;
     if (dzDivDx == 0) {
       if (dzDivDy > 0) {
-        aspectRadians = MathUtil.PI_OVER_2;
+        aspectRadians = Angle.PI_OVER_2;
       } else if (dzDivDy < 0) {
         aspectRadians = PI_TIMES_2_MINUS_PI_OVER_2;
       } else {
@@ -76,7 +77,7 @@ public class HillShadeGriddedElevationModelRasterizer
     } else {
       aspectRadians = Math.atan2(dzDivDy, -dzDivDx);
       if (aspectRadians < 0) {
-        aspectRadians = MathUtil.PI_TIMES_2 + aspectRadians;
+        aspectRadians = Angle.PI_TIMES_2 + aspectRadians;
       }
 
     }

@@ -2,7 +2,7 @@ package com.revolsys.geometry.graph;
 
 import java.util.Comparator;
 
-import com.revolsys.math.Angle;
+import org.jeometry.common.math.Angle;
 
 /**
  * The EdgeToAngleComparator class is used to return edges in a clockwise order.

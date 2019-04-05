@@ -32,9 +32,10 @@
  */
 package com.revolsys.geometry.algorithm;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.util.MathUtil;
 
 /**
  * Computes an approximate intersection of two line segments

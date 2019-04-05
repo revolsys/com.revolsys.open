@@ -1,11 +1,12 @@
 package com.revolsys.elevation.cloud.las.zip.context;
 
+import org.jeometry.common.number.Integers;
+
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
-import com.revolsys.util.number.Integers;
 
 public class LasZipContextRgbNir extends LasZipContextRgb {
 

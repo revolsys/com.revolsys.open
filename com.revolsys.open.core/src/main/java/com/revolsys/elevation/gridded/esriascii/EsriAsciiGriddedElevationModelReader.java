@@ -11,6 +11,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.BigDecimals;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
@@ -25,8 +27,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Readers;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.number.BigDecimals;
-import com.revolsys.util.number.Doubles;
 
 public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point>
   implements GriddedElevationModelReader, PointReader {

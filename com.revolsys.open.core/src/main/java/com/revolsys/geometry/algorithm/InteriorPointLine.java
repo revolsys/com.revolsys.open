@@ -32,11 +32,12 @@
  */
 package com.revolsys.geometry.algorithm;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.util.MathUtil;
 
 /**
  * Computes a point in the interior of an linear geometry.

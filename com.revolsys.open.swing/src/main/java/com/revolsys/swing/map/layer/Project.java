@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Integers;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.connection.file.FolderConnectionRegistry;
@@ -47,7 +48,6 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
-import com.revolsys.util.number.Integers;
 import com.revolsys.webservice.WebServiceConnectionRegistry;
 
 public class Project extends LayerGroup {

@@ -1,11 +1,12 @@
 package com.revolsys.geometry.index.quadtree;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
 

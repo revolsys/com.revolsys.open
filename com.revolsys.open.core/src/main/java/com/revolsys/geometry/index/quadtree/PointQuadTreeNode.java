@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.util.MathUtil;
 
 public class PointQuadTreeNode<T> {
   private PointQuadTreeNode<T> northEast;

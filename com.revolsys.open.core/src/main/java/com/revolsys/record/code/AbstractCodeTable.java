@@ -12,12 +12,13 @@ import java.util.Map.Entry;
 import javax.annotation.PreDestroy;
 import javax.swing.JComponent;
 
+import org.jeometry.common.number.Numbers;
+
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.number.Numbers;
 
 public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChange
   implements BaseCloseable, CodeTable, Cloneable {

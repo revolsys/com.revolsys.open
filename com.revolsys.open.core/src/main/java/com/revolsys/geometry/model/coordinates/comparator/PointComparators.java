@@ -3,8 +3,9 @@ package com.revolsys.geometry.model.coordinates.comparator;
 import java.util.Comparator;
 import java.util.List;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.MathUtil;
 
 public interface PointComparators {
 

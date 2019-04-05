@@ -1,8 +1,9 @@
 package com.revolsys.collection.range;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public class DoubleMinMax extends DoubleRange implements Cloneable, Emptyable {
   public static DoubleMinMax newWithIgnore(final double ignoreValue, final double... numbers) {

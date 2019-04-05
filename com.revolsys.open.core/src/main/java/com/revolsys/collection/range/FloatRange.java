@@ -1,6 +1,6 @@
 package com.revolsys.collection.range;
 
-import com.revolsys.util.number.Floats;
+import org.jeometry.common.number.Floats;
 
 public class FloatRange extends AbstractRange<Float> {
   private float from;

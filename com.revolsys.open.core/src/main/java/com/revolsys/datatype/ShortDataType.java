@@ -1,9 +1,6 @@
-package com.revolsys.util.number;
+package com.revolsys.datatype;
 
-import com.revolsys.datatype.AbstractDataType;
-import com.revolsys.datatype.DataTypes;
-
-public class Shorts extends AbstractDataType {
+public class ShortDataType extends AbstractDataType {
   public static short add(final short left, final Number right) {
     return (short)(left + right.shortValue());
   }
@@ -141,7 +138,7 @@ public class Shorts extends AbstractDataType {
     }
   }
 
-  public Shorts() {
+  public ShortDataType() {
     super("short", Short.class, false);
   }
 

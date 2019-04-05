@@ -1,13 +1,15 @@
 package com.revolsys.geometry.model.coordinates;
 
+import org.jeometry.common.math.Angle;
+import org.jeometry.common.math.MathUtil;
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
-import com.revolsys.util.number.Doubles;
 
 public interface CoordinatesUtil {
 
@@ -209,7 +211,7 @@ public interface CoordinatesUtil {
     final double x3 = point3.getX();
     final double y3 = point3.getY();
 
-    return MathUtil.isAcute(x1, y1, x2, y2, x3, y3);
+    return Angle.isAcute(x1, y1, x2, y2, x3, y3);
   }
 
   /**

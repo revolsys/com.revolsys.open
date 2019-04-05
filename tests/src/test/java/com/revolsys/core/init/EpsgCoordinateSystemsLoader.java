@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems.EpsgCoordinateSystemType;
 import org.jeometry.coordinatesystem.model.unit.UnitOfMeasure;
 
@@ -30,7 +31,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.number.Doubles;
 
 /**
  * Make sure to watch out for parameter value conversions.

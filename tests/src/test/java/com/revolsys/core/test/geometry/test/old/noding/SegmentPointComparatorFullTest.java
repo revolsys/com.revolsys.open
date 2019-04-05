@@ -1,12 +1,13 @@
 package com.revolsys.core.test.geometry.test.old.noding;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.noding.Octant;
 import com.revolsys.geometry.noding.SegmentPointComparator;
-import com.revolsys.util.number.Doubles;
 
 import junit.framework.TestCase;
 

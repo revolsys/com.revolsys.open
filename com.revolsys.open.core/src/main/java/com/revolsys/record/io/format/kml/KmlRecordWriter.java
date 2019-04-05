@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -20,7 +21,6 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Constants {
   private static final Map<Class<?>, String> TYPE_MAP = new HashMap<>();

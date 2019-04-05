@@ -17,12 +17,13 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Integers;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.MathUtil;
 
 public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   public enum EventType {
@@ -217,7 +218,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
         throw new IllegalStateException("Exepecting end array, not: " + event);
       }
 
-      return MathUtil.toDoubleArray(list);
+      return Doubles.toDoubleArray(list);
     } else if (getEvent() == EventType.nullValue) {
       return null;
     } else {
@@ -248,7 +249,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
         throw new IllegalStateException("Exepecting end array, not: " + event);
       }
 
-      return MathUtil.toIntArray(list);
+      return Integers.toIntArray(list);
     } else if (getEvent() == EventType.nullValue) {
       return null;
     } else {

@@ -9,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -27,7 +29,6 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 

@@ -9,13 +9,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public class MapPointerLocation extends JLabel implements MouseMotionListener {
   private static final long serialVersionUID = 1L;

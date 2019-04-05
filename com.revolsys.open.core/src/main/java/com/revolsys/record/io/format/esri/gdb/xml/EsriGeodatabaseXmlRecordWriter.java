@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -27,7 +28,6 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Dates;
-import com.revolsys.util.number.Doubles;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   implements EsriGeodatabaseXmlConstants {

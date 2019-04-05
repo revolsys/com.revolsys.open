@@ -20,9 +20,10 @@ import java.text.DecimalFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.MathUtil;
 
 public class PercentField extends BigDecimalField {
   public PercentField(final String name, final boolean required) {

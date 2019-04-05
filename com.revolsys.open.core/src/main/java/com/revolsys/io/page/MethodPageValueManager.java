@@ -159,8 +159,8 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
   }
 
   protected MethodPageValueManager(final String typePath) {
-    this(typePath, "getValue" + typePath + "Bytes", "get" + typePath + "Value",
-      "get" + typePath + "Bytes");
+    this(typePath, "getValue" + typePath + "ByteDataType", "get" + typePath + "Value",
+      "get" + typePath + "ByteDataType");
   }
 
   protected MethodPageValueManager(final String typePath, final String byteArrayWriteMethodName,

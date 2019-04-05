@@ -3,11 +3,12 @@ package com.revolsys.geometry.model.vertex;
 import java.awt.geom.PathIterator;
 import java.util.Iterator;
 
+import org.jeometry.common.math.Angle;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryComponent;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.math.Angle;
 import com.revolsys.util.Property;
 
 public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, GeometryComponent {

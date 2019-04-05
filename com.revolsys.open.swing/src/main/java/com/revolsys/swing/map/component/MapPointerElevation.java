@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.parallel.channel.Channel;
@@ -21,7 +22,6 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.number.Doubles;
 
 public class MapPointerElevation extends JLabel implements MouseMotionListener {
 
