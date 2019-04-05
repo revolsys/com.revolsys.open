@@ -29,9 +29,10 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 import com.revolsys.util.number.Numbers;

@@ -5,8 +5,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 
 public abstract class BaseBoundingBox implements BoundingBox {
 
-  private static final long serialVersionUID = 1L;
-
   public BaseBoundingBox() {
   }
 

@@ -2,8 +2,9 @@ package com.revolsys.swing.parallel;
 
 import java.util.concurrent.Callable;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.parallel.AbstractRunnable;
-import com.revolsys.util.Exceptions;
 
 /**
  * <p>A {@link Runnable} wrapper for a {@link Callable}. The result of the {@link Callable} can

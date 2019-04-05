@@ -3,8 +3,6 @@ package com.revolsys.core.test.geometry.test.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
@@ -27,8 +25,7 @@ public class GeometryTestUtil {
     final double[] coordinates = new double[axisCount];
     double x;
     double y;
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-    if (coordinateSystem == null || geometryFactory.isGeographics()) {
+    if (!geometryFactory.isHasHorizontalCoordinateSystem() || geometryFactory.isGeographics()) {
       x = -123.123456;
       y = 52.123456;
     } else {
@@ -105,7 +102,6 @@ public class GeometryTestUtil {
   }
 
   private static Point getCentre(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     final BoundingBox areaBoundingBox = geometryFactory.getAreaBoundingBox();
     final Point centre = areaBoundingBox.getCentre();
     return centre;

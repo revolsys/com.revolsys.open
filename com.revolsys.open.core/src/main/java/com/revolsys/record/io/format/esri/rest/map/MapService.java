@@ -11,6 +11,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -19,7 +21,6 @@ import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
-import com.revolsys.util.Exceptions;
 
 public class MapService extends ArcGisRestAbstractLayerService {
   public static MapService getMapService(String url) {

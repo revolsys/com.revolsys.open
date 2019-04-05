@@ -27,13 +27,13 @@ import org.gdal.gdalconst.gdalconstConstants;
 import org.gdal.ogr.ogr;
 import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.gdal.raster.GdalImageFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;

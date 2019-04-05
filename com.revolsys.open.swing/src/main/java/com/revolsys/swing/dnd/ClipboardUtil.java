@@ -7,7 +7,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
 
 public class ClipboardUtil {
 

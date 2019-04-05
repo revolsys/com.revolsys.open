@@ -2,6 +2,9 @@ package com.revolsys.geometry.model.editor;
 
 import java.util.function.Consumer;
 
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Function4Double;
+
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
@@ -10,8 +13,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Function4Double;
 
 public class MultiPolygonEditor
   extends AbstractGeometryCollectionEditor<Polygonal, Polygon, PolygonEditor>

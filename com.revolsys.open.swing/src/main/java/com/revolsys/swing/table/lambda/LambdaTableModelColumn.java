@@ -8,11 +8,11 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jeometry.common.function.Consumer4;
+import org.jeometry.common.function.Function3;
 
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.function.Consumer4;
-import com.revolsys.util.function.Function3;
 
 public class LambdaTableModelColumn<R, V> {
 

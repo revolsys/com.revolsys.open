@@ -3,8 +3,6 @@ package com.revolsys.gis.postgresql;
 import java.io.PrintWriter;
 import java.util.List;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
@@ -82,8 +80,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
       out.print("','");
       out.print(name.toLowerCase());
       out.print("',");
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      out.print(coordinateSystem.getHorizontalCoordinateSystemId());
+      out.print(geometryFactory.getHorizontalCoordinateSystemId());
       out.print(",'");
       out.print(geometryType);
       out.print("', ");
@@ -210,8 +207,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
       out.print("', ");
       out.print(geometryFactory.getAxisCount());
       out.print(",");
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      out.print(coordinateSystem.getHorizontalCoordinateSystemId());
+      out.print(geometryFactory.getHorizontalCoordinateSystemId());
       out.print(",'");
       out.print(geometryType);
       out.println("');");

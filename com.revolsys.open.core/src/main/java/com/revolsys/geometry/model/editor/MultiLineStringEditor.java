@@ -2,6 +2,9 @@ package com.revolsys.geometry.model.editor;
 
 import java.util.function.Consumer;
 
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Function4Double;
+
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
@@ -10,8 +13,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Function4Double;
 
 public class MultiLineStringEditor
   extends AbstractGeometryCollectionEditor<Lineal, LineString, LineStringEditor>

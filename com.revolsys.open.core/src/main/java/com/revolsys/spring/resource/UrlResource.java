@@ -14,6 +14,7 @@ import java.net.URLConnection;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.jeometry.common.exception.Exceptions;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
@@ -21,7 +22,6 @@ import org.springframework.util.StringUtils;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.util.Base64;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 

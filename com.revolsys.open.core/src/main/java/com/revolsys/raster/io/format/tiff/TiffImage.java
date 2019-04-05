@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.media.jai.JAI;
 import javax.media.jai.OperationRegistry;
 
+import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.CoordinateOperationMethod;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
@@ -26,7 +27,6 @@ import org.libtiff.jai.operator.XTIFFDescriptor;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.JaiGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 import com.sun.media.jai.codec.ImageCodec;

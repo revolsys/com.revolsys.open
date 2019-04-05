@@ -33,11 +33,11 @@
 
 package com.revolsys.geometry.planargraph;
 
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.Consumer3Double;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.function.Consumer3Double;
 
 /**
  * A node in a {@link PlanarGraph}is a location where 0 or more {@link Edge}s

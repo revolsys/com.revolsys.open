@@ -36,6 +36,7 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.logging.Logs;
 
 import com.akiban.sql.StandardException;
 import com.akiban.sql.parser.BetweenOperatorNode;
@@ -66,7 +67,6 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.And;
 import com.revolsys.record.query.Between;

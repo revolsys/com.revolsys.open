@@ -12,11 +12,12 @@ import java.util.HashSet;
 
 import javax.swing.JComponent;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.ComponentViewport2D;

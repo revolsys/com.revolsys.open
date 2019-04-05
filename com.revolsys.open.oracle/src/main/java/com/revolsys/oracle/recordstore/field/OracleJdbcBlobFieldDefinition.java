@@ -10,10 +10,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
   public OracleJdbcBlobFieldDefinition(final String dbName, final String name, final int sqlType,

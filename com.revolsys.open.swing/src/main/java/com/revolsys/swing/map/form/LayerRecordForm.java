@@ -47,6 +47,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.PropertyChangeSupport;
@@ -57,7 +58,6 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;

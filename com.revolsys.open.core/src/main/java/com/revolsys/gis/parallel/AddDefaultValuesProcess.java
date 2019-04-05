@@ -19,11 +19,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.jeometry.common.logging.Logs;
+
 import java.util.Set;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.PathUtil;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 import com.revolsys.record.Record;

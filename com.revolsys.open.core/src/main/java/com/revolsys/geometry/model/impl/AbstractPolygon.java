@@ -32,11 +32,12 @@
  */
 package com.revolsys.geometry.model.impl;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.util.Exceptions;
 
 /**
  * Represents a polygon with linear edges, which may include holes.

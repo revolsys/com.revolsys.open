@@ -11,7 +11,7 @@ public class EllipsoidTest {
   private static final GeographicCoordinateSystem NAD83 = EpsgCoordinateSystems
     .getCoordinateSystem(EpsgId.NAD83);
 
-  private static final Ellipsoid NAD83_ELLIPSOID = NAD83.getDatum().getEllipsoid();
+  private static final Ellipsoid NAD83_ELLIPSOID = NAD83.getEllipsoid();
 
   @Test
   public void testCartesianToGeodetic() {

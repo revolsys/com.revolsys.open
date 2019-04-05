@@ -23,6 +23,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.identifier.Identifier;
@@ -38,7 +39,6 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class FieldCalculator extends AbstractUpdateField implements DocumentListener {

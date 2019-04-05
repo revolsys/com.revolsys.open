@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
+import org.jeometry.common.function.Consumer3Double;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
@@ -20,7 +21,6 @@ import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.function.Consumer3Double;
 
 public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
   String GEOMETRY_FACTORY = "geometryFactory";

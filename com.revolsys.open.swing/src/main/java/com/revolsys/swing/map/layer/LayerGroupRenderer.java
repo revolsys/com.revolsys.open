@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.view.ViewRenderer;
 
 public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {

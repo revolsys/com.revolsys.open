@@ -6,9 +6,10 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Domain;
 import com.revolsys.util.CompareUtil;

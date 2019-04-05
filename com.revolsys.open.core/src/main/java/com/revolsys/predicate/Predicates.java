@@ -11,18 +11,6 @@ import com.revolsys.collection.CollectionUtil;
 import com.revolsys.util.Property;
 
 public interface Predicates {
-  static <T> boolean add(final Collection<T> collection, final T value,
-    final Predicate<? super T> filter) {
-    if (filter == null) {
-      return collection.add(value);
-    } else {
-      if (filter.test(value)) {
-        return collection.add(value);
-      } else {
-        return false;
-      }
-    }
-  }
 
   static <T> void addAll(final Collection<T> collection, final Iterable<T> values,
     final Predicate<? super T> filter) {
@@ -43,15 +31,6 @@ public interface Predicates {
     };
   }
 
-  static <T> AndPredicate<T> and(final Iterable<Predicate<T>> filters) {
-    return new AndPredicate<>(filters);
-  }
-
-  @SuppressWarnings("unchecked")
-  static <T> AndPredicate<T> and(final Predicate<T>... filters) {
-    return new AndPredicate<>(filters);
-  }
-
   static <V> int count(final Collection<V> values, final Predicate<? super V> filter) {
     if (Property.isEmpty(values)) {
       return 0;
@@ -68,33 +47,9 @@ public interface Predicates {
     }
   }
 
-  static <V> int count(final Iterable<V> values, final Predicate<? super V> filter) {
-    int count = 0;
-    for (final V value : values) {
-      if (filter.test(value)) {
-        count++;
-      }
-    }
-    return count;
-  }
-
   static <T> List<T> filter(final Iterable<T> collection, final Predicate<? super T> filter) {
     final List<T> list = new ArrayList<>();
     addAll(list, collection, filter);
-    return list;
-  }
-
-  static <T> List<T> filterAndRemove(final Collection<T> collection,
-    final Predicate<? super T> filter) {
-    final List<T> list = new ArrayList<>();
-    final Iterator<T> iterator = collection.iterator();
-    while (iterator.hasNext()) {
-      final T object = iterator.next();
-      if (filter.test(object)) {
-        iterator.remove();
-        list.add(object);
-      }
-    }
     return list;
   }
 
@@ -138,21 +93,6 @@ public interface Predicates {
     };
   }
 
-  @SuppressWarnings("unchecked")
-  static <T> OrPredicate<T> or(final Predicate<T>... filters) {
-    return new OrPredicate<>(filters);
-  }
-
-  static <T> void remove(final Collection<T> collection, final Predicate<? super T> filter) {
-    final Iterator<T> iterator = collection.iterator();
-    while (iterator.hasNext()) {
-      final T value = iterator.next();
-      if (filter.test(value)) {
-        iterator.remove();
-      }
-    }
-  }
-
   static <T> void retain(final Collection<T> collection, final Predicate<? super T> filter) {
     final Iterator<T> iterator = collection.iterator();
     while (iterator.hasNext()) {
@@ -163,11 +103,4 @@ public interface Predicates {
     }
   }
 
-  static <V> boolean test(final Predicate<? super V> filter, final V value) {
-    if (filter == null) {
-      return true;
-    } else {
-      return filter.test(value);
-    }
-  }
 }

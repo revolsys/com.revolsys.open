@@ -6,6 +6,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -16,7 +18,6 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class WktParser {

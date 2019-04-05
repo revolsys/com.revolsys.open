@@ -48,15 +48,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.revolsys.io.file.FileConnectionManager;
-import com.revolsys.io.file.FolderConnection;
-import com.revolsys.io.file.FolderConnectionRegistry;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
+
+import com.revolsys.connection.file.FileConnectionManager;
+import com.revolsys.connection.file.FolderConnection;
+import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
-import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 

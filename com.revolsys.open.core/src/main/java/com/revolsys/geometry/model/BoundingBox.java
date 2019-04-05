@@ -16,8 +16,10 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.function.Consumer3;
+import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
-import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
@@ -26,14 +28,11 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.util.OutCode;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.function.Consumer3;
 import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
@@ -810,12 +809,9 @@ public interface BoundingBox
 
   default Quantity<Length> getHeightLength() {
     final double height = getHeight();
-    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-    if (coordinateSystem == null) {
-      return Quantities.getQuantity(height, Units.METRE);
-    } else {
-      return Quantities.getQuantity(height, coordinateSystem.getLengthUnit());
-    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Unit<Length> unit = geometryFactory.getHorizontalLengthUnit();
+    return Quantities.getQuantity(height, unit);
   }
 
   default double getMax(final int i) {
@@ -972,12 +968,9 @@ public interface BoundingBox
 
   default Quantity<Length> getWidthLength() {
     final double width = getWidth();
-    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-    if (coordinateSystem == null) {
-      return Quantities.getQuantity(width, Units.METRE);
-    } else {
-      return Quantities.getQuantity(width, coordinateSystem.getLengthUnit());
-    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Unit<Length> unit = geometryFactory.getHorizontalLengthUnit();
+    return Quantities.getQuantity(width, unit);
   }
 
   @Override
@@ -1126,8 +1119,7 @@ public interface BoundingBox
       } else {
         try {
           double minStep = 0.00001;
-          final CoordinateSystem coordinateSystem = factory.getHorizontalCoordinateSystem();
-          if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+          if (factory.isProjected()) {
             minStep = 1;
           } else {
             minStep = 0.00001;

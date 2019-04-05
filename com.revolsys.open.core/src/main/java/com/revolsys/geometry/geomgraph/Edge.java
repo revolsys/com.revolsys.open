@@ -32,6 +32,8 @@
  */
 package com.revolsys.geometry.geomgraph;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.geomgraph.index.MonotoneChainEdge;
 import com.revolsys.geometry.model.DelegatingLineString;
@@ -39,7 +41,6 @@ import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.util.Exceptions;
 
 /**
  * @version 1.7

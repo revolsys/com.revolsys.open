@@ -3,7 +3,6 @@ package com.revolsys.geometry.model;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystemProxy;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
-import org.jeometry.coordinatesystem.operation.projection.ProjectionFactory;
 
 public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
 
@@ -59,40 +58,21 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
     }
   }
 
-  default CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return null;
-    } else {
-      final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
-      final int coordinateSystemIdThis = getHorizontalCoordinateSystemId();
-      if (coordinateSystemId == coordinateSystemIdThis) {
-        return null;
-      } else if (coordinateSystemId == 0 || coordinateSystemIdThis == 0) {
-        return null;
-      } else {
-        final CoordinateSystem coordinateSystemThis = getHorizontalCoordinateSystem();
-        final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-        if (coordinateSystem == coordinateSystemThis) {
-          return null;
-        } else if (coordinateSystem == null || coordinateSystemThis == null) {
-          return null;
-        } else if (coordinateSystem.equals(coordinateSystemThis)) {
-          return null;
-        } else {
-          return ProjectionFactory.getCoordinatesOperation(coordinateSystemThis, coordinateSystem);
-        }
-      }
-    }
-  }
-
   default CoordinatesOperation getCoordinatesOperation(final GeometryFactoryProxy geometryFactory) {
     if (geometryFactory == null) {
       return null;
     } else {
-      return getCoordinatesOperation(geometryFactory.getGeometryFactory());
+      final GeometryFactory geometryFactoryThis = getGeometryFactory();
+      if (geometryFactoryThis == null) {
+        return null;
+      } else {
+        final GeometryFactory geometryFactoryOther = geometryFactory.getGeometryFactory();
+        return geometryFactoryThis.getCoordinatesOperation(geometryFactoryOther);
+      }
     }
   }
 
+  @Override
   default <C extends CoordinateSystem> C getCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
@@ -102,21 +82,13 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
     }
   }
 
+  @Override
   default int getCoordinateSystemId() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
       return 0;
     } else {
       return geometryFactory.getCoordinateSystemId();
-    }
-  }
-
-  default String getCoordinateSystemName() {
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
-    if (coordinateSystem == null) {
-      return "Unknown";
-    } else {
-      return coordinateSystem.getCoordinateSystemName();
     }
   }
 
@@ -191,13 +163,14 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
     }
   }
 
-  default void notNullSameCs(final GeometryFactoryProxy value) {
-    if (value == null) {
+  default void notNullSameCs(final GeometryFactoryProxy geometryFactory) {
+    if (geometryFactory == null) {
       throw new NullPointerException("Argument rectangle cannot be null");
-    } else if (!isSameCoordinateSystem(value)) {
+    } else if (!isSameCoordinateSystem(geometryFactory)) {
       throw new IllegalArgumentException(
         "Rectangle operations require the same coordinate system this != rectangle\n  "
-          + getHorizontalCoordinateSystem() + "\n  " + value.getHorizontalCoordinateSystem());
+          + getHorizontalCoordinateSystemName() + "\n  "
+          + geometryFactory.getHorizontalCoordinateSystemName());
     }
   }
 

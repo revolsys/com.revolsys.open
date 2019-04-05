@@ -40,11 +40,11 @@ public class FileGdbWriter extends AbstractRecordWriter {
         for (final TableWrapper table : this.tablesByCatalogPath.values()) {
           table.close();
         }
-      }
-      final TableWrapper table = this.table;
-      this.table = null;
-      if (table != null) {
-        table.close();
+        final TableWrapper table = this.table;
+        this.table = null;
+        if (table != null) {
+          table.close();
+        }
       }
     } finally {
       this.tablesByCatalogPath.clear();
@@ -101,7 +101,6 @@ public class FileGdbWriter extends AbstractRecordWriter {
       TableWrapper table = this.tablesByCatalogPath.get(catalogPath);
       if (table == null) {
         table = this.recordStore.getTableLocked(recordDefinition);
-        // TODO lock
         if (table != null) {
           this.tablesByCatalogPath.put(catalogPath, table);
         }

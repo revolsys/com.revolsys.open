@@ -11,7 +11,8 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.table.TableModel;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.util.Reorderable;
 
 public class TableRowTransferHandler extends TransferHandler {

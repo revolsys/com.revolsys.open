@@ -7,9 +7,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.logging.Logs;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public interface WebColors {

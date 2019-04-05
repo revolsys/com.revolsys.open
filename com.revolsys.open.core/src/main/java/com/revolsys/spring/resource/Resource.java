@@ -31,6 +31,8 @@ import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileNames;
@@ -39,7 +41,6 @@ import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.predicate.Predicates;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public interface Resource extends org.springframework.core.io.Resource {

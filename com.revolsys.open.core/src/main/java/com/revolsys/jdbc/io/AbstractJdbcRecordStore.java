@@ -22,6 +22,8 @@ import java.util.UUID;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -40,7 +42,6 @@ import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldFactory;
 import com.revolsys.jdbc.field.JdbcFieldFactoryAdder;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -60,7 +61,6 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Booleans;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public abstract class AbstractJdbcRecordStore extends AbstractRecordStore

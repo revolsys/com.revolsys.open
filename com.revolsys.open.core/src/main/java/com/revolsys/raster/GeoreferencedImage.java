@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -19,7 +21,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.logging.Logs;
 import com.revolsys.math.matrix.Matrix;
 import com.revolsys.spring.resource.Resource;
 

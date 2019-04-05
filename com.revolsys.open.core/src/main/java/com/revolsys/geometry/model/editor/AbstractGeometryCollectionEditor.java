@@ -7,7 +7,10 @@ import java.util.function.Consumer;
 
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.Geometry;
@@ -15,9 +18,6 @@ import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.function.Consumer3Double;
-import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.Function4Double;
 
 public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G extends Geometry, GE extends GeometryEditor<?>>
   extends AbstractGeometryEditor<GE> implements GeometryCollection {

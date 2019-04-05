@@ -6,8 +6,9 @@ import java.util.List;
 
 import javax.swing.Icon;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.Parent;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.util.Property;
 

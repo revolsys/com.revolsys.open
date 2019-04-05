@@ -39,7 +39,6 @@ import javax.measure.quantity.Length;
 
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
-import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
@@ -189,15 +188,15 @@ public interface LinearRing extends LineString {
 
   default double getPolygonArea(final Unit<Area> unit) {
     double area = 0;
+    final GeometryFactory geometryFactory = getGeometryFactory();
     final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
     if (coordinateSystem instanceof GeographicCoordinateSystem) {
       // TODO better algorithm than converting to world mercator
-      final GeometryFactory geometryFactory = GeometryFactory.worldMercator();
-      final LinearRing ring = as2d(geometryFactory);
+      final GeometryFactory geometryFactory2 = GeometryFactory.worldMercator();
+      final LinearRing ring = as2d(geometryFactory2);
       return ring.getPolygonArea(unit);
-    } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-      final Unit<Length> lengthUnit = projectedCoordinateSystem.getLengthUnit();
+    } else if (geometryFactory.isProjected()) {
+      final Unit<Length> lengthUnit = geometryFactory.getHorizontalLengthUnit();
       @SuppressWarnings("unchecked")
       final Unit<Area> areaUnit = (Unit<Area>)lengthUnit.multiply(lengthUnit);
       area = getPolygonArea();

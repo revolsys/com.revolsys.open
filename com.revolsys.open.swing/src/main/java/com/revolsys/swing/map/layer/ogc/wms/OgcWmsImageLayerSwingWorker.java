@@ -1,8 +1,9 @@
 package com.revolsys.swing.map.layer.ogc.wms;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.revolsys.util.Cancellable;

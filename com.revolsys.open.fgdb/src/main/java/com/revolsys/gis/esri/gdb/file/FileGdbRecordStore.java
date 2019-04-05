@@ -17,6 +17,9 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -53,7 +56,6 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.SingleThreadExecutor;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
@@ -96,7 +98,6 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.CloseableValueHolder;
 import com.revolsys.util.Dates;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.StringBuilders;
@@ -129,6 +130,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     addFieldTypeConstructor(FieldType.esriFieldTypeGUID, GuidFieldDefinition.class);
     addFieldTypeConstructor(FieldType.esriFieldTypeXML, XmlFieldDefinition.class);
   }
+
+  private static final Object API_SYNC = new Object();
 
   private static void addFieldTypeConstructor(final FieldType fieldType,
     final Class<? extends AbstractFileGdbFieldDefinition> fieldClass) {
@@ -561,7 +564,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
 
           try (
-            final FileGdbEnumRowsIterator rows = table.query(sql.toString(), true)) {
+            TableWrapper tableWrapper = table.connect();
+            final FileGdbEnumRowsIterator rows = tableWrapper.query(sql.toString(), true)) {
             int count = 0;
             for (@SuppressWarnings("unused")
             final Row row : rows) {
@@ -585,7 +589,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
 
           try (
-            final FileGdbEnumRowsIterator rows = table.query(sql.toString(), false)) {
+            TableWrapper tableWrapper = table.connect();
+            final FileGdbEnumRowsIterator rows = tableWrapper.query(sql.toString(), false)) {
             int count = 0;
             for (final Row row : rows) {
               final Geometry geometry = (Geometry)geometryField.getValue(row);
@@ -948,6 +953,14 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return null;
   }
 
+  void lockTable(final Table table) {
+    synchronized (this.geodatabase) {
+      synchronized (API_SYNC) {
+        table.setWriteLock();
+      }
+    }
+  }
+
   public CodeTable newDomainCodeTable(final Domain domain) {
     final String domainName = domain.getDomainName();
     if (!this.domainFieldNames.containsKey(domainName)) {
@@ -1295,14 +1308,18 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   private void threadGeodatabase(final Consumer<Geodatabase> action) {
-    getSingleThreadResult(() -> {
-      this.geodatabase.valueConsumeSync(action);
-      return null;
+    this.geodatabase.valueConsumeSync(geodatabase -> {
+      getSingleThreadResult(() -> {
+        action.accept(geodatabase);
+        return null;
+      });
     });
   }
 
   <V> V threadGeodatabaseResult(final Function<Geodatabase, V> action) {
-    return getSingleThreadResult(() -> this.geodatabase.valueFunctionSync(action));
+    return this.geodatabase.valueFunctionSync(geodatabase -> {
+      return getSingleThreadResult(() -> action.apply(geodatabase));
+    });
   }
 
   public String toCatalogPath(final PathName path) {
@@ -1316,6 +1333,15 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   @Override
   public String toString() {
     return this.fileName;
+  }
+
+  void unlockTable(final Table table) {
+    synchronized (this.geodatabase) {
+      synchronized (API_SYNC) {
+        table.setWriteLock(); // Sometimes FGDB loses the lock
+        table.freeWriteLock();
+      }
+    }
   }
 
   @Override

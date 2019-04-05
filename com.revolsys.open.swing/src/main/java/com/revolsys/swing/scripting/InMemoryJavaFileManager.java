@@ -11,7 +11,8 @@ import javax.tools.JavaFileObject.Kind;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
-import com.revolsys.util.Exceptions;
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.util.UrlUtil;
 
 public class InMemoryJavaFileManager extends ForwardingJavaFileManager<StandardJavaFileManager> {

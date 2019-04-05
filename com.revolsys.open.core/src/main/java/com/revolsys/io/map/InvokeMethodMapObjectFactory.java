@@ -4,10 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import org.apache.commons.beanutils.MethodUtils;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.util.Exceptions;
 
 public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
   implements MapSerializer {

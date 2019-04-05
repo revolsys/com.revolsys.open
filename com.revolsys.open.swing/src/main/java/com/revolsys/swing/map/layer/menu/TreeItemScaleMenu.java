@@ -11,12 +11,13 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.SwingConstants;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.Exceptions;
 
 public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 

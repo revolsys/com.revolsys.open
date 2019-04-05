@@ -21,8 +21,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
-
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
 
 /**
  * The JexlUtil is a utility class for processing strings that contain patterns

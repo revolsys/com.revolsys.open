@@ -1,10 +1,11 @@
 package com.revolsys.geometry.model.editor;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.util.Exceptions;
 
 public abstract class AbstractGeometryEditor<GE extends GeometryEditor<?>>
   implements GeometryEditor<GE> {

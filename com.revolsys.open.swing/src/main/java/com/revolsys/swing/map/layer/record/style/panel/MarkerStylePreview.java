@@ -8,9 +8,10 @@ import java.awt.Graphics2D;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.Graphics2DViewport;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;

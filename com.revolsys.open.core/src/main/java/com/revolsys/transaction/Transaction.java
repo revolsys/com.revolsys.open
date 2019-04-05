@@ -1,5 +1,6 @@
 package com.revolsys.transaction;
 
+import org.jeometry.common.exception.Exceptions;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -7,7 +8,6 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.util.Exceptions;
 
 public class Transaction implements BaseCloseable {
 

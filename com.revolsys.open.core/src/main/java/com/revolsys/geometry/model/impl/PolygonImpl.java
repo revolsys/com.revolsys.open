@@ -44,11 +44,11 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer3Double;
-import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.Function4Double;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
 
 /**
  * Represents a polygon with linear edges, which may include holes.

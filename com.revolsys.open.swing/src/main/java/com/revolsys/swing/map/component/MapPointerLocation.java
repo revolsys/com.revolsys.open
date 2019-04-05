@@ -9,8 +9,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.map.MapPanel;
@@ -89,8 +87,7 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener {
     if (geometryFactory != this.geometryFactory) {
       final int srid = geometryFactory.getHorizontalCoordinateSystemId();
       this.geometryFactory = geometryFactory;
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      this.setToolTipText(coordinateSystem.getCoordinateSystemName());
+      this.setToolTipText(geometryFactory.getHorizontalCoordinateSystemName());
       this.title = String.valueOf(srid);
       final Point mapLocation = geometryFactory.point(this.mapLocation);
       setMapLocation(mapLocation);

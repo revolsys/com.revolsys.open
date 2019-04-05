@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.jeometry.common.exception.Exceptions;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -16,7 +17,6 @@ import org.springframework.web.filter.GenericFilterBean;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.ui.web.utils.HttpSavedRequestAndResponse;
-import com.revolsys.util.Exceptions;
 
 public class TransactionFilter extends GenericFilterBean {
   private WebApplicationContext applicationContext;

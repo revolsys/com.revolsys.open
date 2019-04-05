@@ -11,8 +11,8 @@ import javax.swing.SwingUtilities;
 import org.jdesktop.swingx.JXCollapsiblePane;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.logging.Logs;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
 
 public class TitleCollapsiblePanel extends BasePanel implements MouseListener {

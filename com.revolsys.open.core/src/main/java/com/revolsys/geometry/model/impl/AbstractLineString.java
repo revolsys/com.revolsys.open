@@ -32,9 +32,10 @@
  */
 package com.revolsys.geometry.model.impl;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.util.Exceptions;
 
 /**
  * Models an OGC-style <code>LineString</code>. A LineString consists of a

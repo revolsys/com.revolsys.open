@@ -22,8 +22,9 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.io.FileUtil;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;

@@ -9,10 +9,10 @@ import javax.measure.quantity.Length;
 import javax.swing.Icon;
 
 import org.apache.batik.transcoder.TranscoderInput;
+import org.jeometry.common.logging.Logs;
 import org.w3c.dom.Document;
 
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;

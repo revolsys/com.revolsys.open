@@ -1,8 +1,9 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.esri.filegdb.jni.Row;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;

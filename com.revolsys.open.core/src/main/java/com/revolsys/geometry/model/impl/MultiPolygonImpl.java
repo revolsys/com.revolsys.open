@@ -45,12 +45,13 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.util.Exceptions;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer3Double;
-import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.Function4Double;
+
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
 
 /**
  * Models a collection of {@link Polygon}s.

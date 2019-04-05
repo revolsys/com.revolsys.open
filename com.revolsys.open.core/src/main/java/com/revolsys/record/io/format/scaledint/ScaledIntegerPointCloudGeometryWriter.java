@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.model.Geometry;
@@ -12,7 +14,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class ScaledIntegerPointCloudGeometryWriter extends AbstractWriter<Geometry>
   implements GeometryWriter {

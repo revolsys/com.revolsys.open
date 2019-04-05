@@ -10,9 +10,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer3Double;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
 
 public class PointDoubleXY extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;

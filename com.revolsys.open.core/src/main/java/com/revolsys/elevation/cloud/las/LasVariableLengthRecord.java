@@ -2,7 +2,8 @@ package com.revolsys.elevation.cloud.las;
 
 import java.util.Arrays;
 
-import com.revolsys.util.Exceptions;
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.util.Pair;
 
 public class LasVariableLengthRecord implements Cloneable {

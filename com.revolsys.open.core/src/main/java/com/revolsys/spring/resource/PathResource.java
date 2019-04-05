@@ -34,12 +34,12 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.jeometry.common.exception.Exceptions;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.channels.Channels;
-import com.revolsys.util.Exceptions;
 
 /**
  * {@link Resource} implementation for {@code com.revolsys.nio.file.Path} handles.

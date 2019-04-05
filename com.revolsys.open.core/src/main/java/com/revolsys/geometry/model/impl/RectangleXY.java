@@ -38,6 +38,11 @@ import java.util.function.Consumer;
 
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
@@ -49,11 +54,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.util.OutCode;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer3Double;
-import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.Function4Double;
 
 public class RectangleXY extends AbstractPolygon implements BoundingBox {
 
@@ -66,8 +66,8 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
     } else if (!geometryFactory.isSameCoordinateSystem(rectangle)) {
       throw new IllegalArgumentException(
         "Rectangle operations require the same coordinate system this != rectangle\n  "
-          + geometryFactory.getHorizontalCoordinateSystem() + "\n  "
-          + rectangle.getHorizontalCoordinateSystem());
+          + geometryFactory.getHorizontalCoordinateSystemName() + "\n  "
+          + rectangle.getHorizontalCoordinateSystemName());
     }
   }
 

@@ -18,9 +18,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.connection.Connection;
+import com.revolsys.connection.ConnectionRegistry;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
@@ -33,12 +37,9 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
-import com.revolsys.io.connection.Connection;
-import com.revolsys.io.connection.ConnectionRegistry;
-import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.Paths;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;

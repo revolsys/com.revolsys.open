@@ -10,7 +10,8 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.swing.listener.BaseMouseListener;
 
 public class ShowMenuMouseListener implements BaseMouseListener {

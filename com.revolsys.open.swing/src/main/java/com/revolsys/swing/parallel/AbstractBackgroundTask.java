@@ -2,7 +2,8 @@ package com.revolsys.swing.parallel;
 
 import javax.swing.SwingWorker.StateValue;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.swing.menu.MenuFactory;
 
 public abstract class AbstractBackgroundTask implements Runnable, BackgroundTask {

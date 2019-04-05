@@ -11,6 +11,7 @@ import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.ValueHolder;
 import com.revolsys.collection.map.MapEx;
@@ -22,7 +23,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
-import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.RsSwingServiceInitializer;

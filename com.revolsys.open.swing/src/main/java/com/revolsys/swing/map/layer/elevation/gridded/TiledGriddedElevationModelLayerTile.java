@@ -2,10 +2,11 @@ package com.revolsys.swing.map.layer.elevation.gridded;
 
 import java.io.FileNotFoundException;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.layer.tile.AbstractMapTile;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Strings;
 
 public class TiledGriddedElevationModelLayerTile extends AbstractMapTile<GriddedElevationModel> {

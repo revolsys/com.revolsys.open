@@ -10,7 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystemType;
+import org.jeometry.common.logging.Logs;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems.EpsgCoordinateSystemType;
 import org.jeometry.coordinatesystem.model.unit.UnitOfMeasure;
 
 import com.revolsys.collection.map.IntHashMap;
@@ -20,7 +21,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.PathName;
 import com.revolsys.io.channels.ChannelWriter;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
@@ -285,7 +285,7 @@ public final class EpsgCoordinateSystemsLoader {
         recordWriter.write(record);
         final int id = writeInt(writer, record, "coord_sys_code");
         final String type = writeCodeByte(writer, record, "coord_sys_type",
-          CoordinateSystemType.TYPE_NAMES);
+          EpsgCoordinateSystemType.TYPE_NAMES);
         writeDeprecated(writer, record);
 
         final MapEx coordinateSystem = new LinkedHashMapEx() //

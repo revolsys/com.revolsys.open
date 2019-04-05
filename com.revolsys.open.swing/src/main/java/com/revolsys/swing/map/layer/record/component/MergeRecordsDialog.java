@@ -24,6 +24,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.datatype.DataType;
@@ -33,7 +34,6 @@ import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.RecordGraph;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Panels;

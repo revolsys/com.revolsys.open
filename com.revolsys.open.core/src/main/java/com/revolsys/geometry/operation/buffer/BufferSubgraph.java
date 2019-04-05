@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
 
 import com.revolsys.geometry.geomgraph.DirectedEdge;
 import com.revolsys.geometry.geomgraph.DirectedEdgeStar;

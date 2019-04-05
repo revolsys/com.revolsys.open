@@ -4,10 +4,10 @@ import java.nio.file.Path;
 
 import javax.swing.JFileChooser;
 
-import com.revolsys.io.connection.ConnectionRegistry;
-import com.revolsys.io.file.FileConnectionManager;
-import com.revolsys.io.file.FolderConnection;
-import com.revolsys.io.file.FolderConnectionRegistry;
+import com.revolsys.connection.ConnectionRegistry;
+import com.revolsys.connection.file.FileConnectionManager;
+import com.revolsys.connection.file.FolderConnection;
+import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;

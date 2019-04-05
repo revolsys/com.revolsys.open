@@ -1,6 +1,7 @@
 package com.revolsys.parallel.process;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ChannelValueStore;
 import com.revolsys.parallel.channel.ClosedException;

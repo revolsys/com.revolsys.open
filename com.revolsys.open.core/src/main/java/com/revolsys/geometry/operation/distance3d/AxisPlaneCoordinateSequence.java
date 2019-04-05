@@ -33,11 +33,12 @@
 
 package com.revolsys.geometry.operation.distance3d;
 
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Function4Double;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.impl.AbstractLineString;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Function4Double;
 
 /**
  * A LineString wrapper which

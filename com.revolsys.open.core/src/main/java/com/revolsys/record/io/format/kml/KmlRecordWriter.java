@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -17,7 +19,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
@@ -195,7 +196,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
         }
 
       }
-      writeLookAt(record.getGeometry());
+      writeLookAt(geometry);
       if (Property.hasValue(this.styleUrl)) {
         this.writer.write("<styleUrl>");
         XmlWriter.writeElementContent(this.writer, this.styleUrl);

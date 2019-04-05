@@ -3,8 +3,9 @@ package com.revolsys.swing.map.layer.tile;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
 import com.revolsys.swing.map.view.ViewRenderer;

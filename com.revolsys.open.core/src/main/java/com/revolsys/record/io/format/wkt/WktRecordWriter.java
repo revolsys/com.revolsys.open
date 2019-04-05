@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -14,7 +16,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Exceptions;
 
 public class WktRecordWriter extends AbstractRecordWriter {
 

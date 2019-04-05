@@ -1,5 +1,8 @@
 package com.revolsys.geometry.model.segment;
 
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Function4Double;
+
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.HCoordinate;
@@ -20,8 +23,6 @@ import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Function4Double;
 import com.revolsys.util.number.Doubles;
 
 public interface LineSegment extends LineString {

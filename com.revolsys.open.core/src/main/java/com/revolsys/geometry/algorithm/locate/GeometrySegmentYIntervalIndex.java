@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.jeometry.common.function.Consumer4Double;
+
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.index.intervalrtree.SortedPackedIntervalRTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleXY;
-import com.revolsys.util.function.Consumer4Double;
 
 public class GeometrySegmentYIntervalIndex {
 

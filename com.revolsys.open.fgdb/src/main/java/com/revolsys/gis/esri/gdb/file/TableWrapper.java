@@ -1,5 +1,7 @@
 package com.revolsys.gis.esri.gdb.file;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.beans.ObjectException;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.esri.filegdb.jni.EnumRows;
@@ -14,7 +16,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.ValueHolderWrapper;
 
@@ -148,7 +149,12 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
   default FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {
     final TableReference tableReference = getTableReference();
-    return tableReference.query(sql, recycling);
+    final EnumRows rows = tableReference.query(sql, recycling);
+    if (rows == null) {
+      return null;
+    } else {
+      return new FileGdbEnumRowsIterator(this, rows);
+    }
   }
 
   default FileGdbEnumRowsIterator search(final Object typePath, final String fields,

@@ -40,7 +40,9 @@ import java.util.function.Consumer;
 
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
@@ -54,8 +56,6 @@ import com.revolsys.geometry.util.NumberUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer3Double;
 import com.revolsys.util.number.Doubles;
 
 /**

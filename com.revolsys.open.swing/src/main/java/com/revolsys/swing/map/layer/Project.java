@@ -19,10 +19,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -30,10 +31,8 @@ import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.file.FileNameExtensionFilter;
-import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
-import com.revolsys.logging.Logs;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.PathResource;
@@ -45,7 +44,6 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -651,7 +649,7 @@ public class Project extends LayerGroup {
     } else {
       // TODO really should be min scale
       double minDimension;
-      if (viewBoundingBox.getHorizontalCoordinateSystem() instanceof GeographicCoordinateSystem) {
+      if (viewBoundingBox.getGeometryFactory().isGeographics()) {
         minDimension = 0.000005;
       } else {
         minDimension = 0.5;
@@ -708,13 +706,9 @@ public class Project extends LayerGroup {
 
     BoundingBox boundingBox = getViewBoundingBox();
     if (!RectangleUtil.isEmpty(boundingBox)) {
-      BoundingBox defaultBoundingBox = null;
+      final BoundingBox defaultBoundingBox = getAreaBoundingBox();
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (geometryFactory != null) {
-        final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-        if (coordinateSystem != null) {
-          defaultBoundingBox = getAreaBoundingBox();
-        }
         boundingBox = boundingBox.bboxToCs(geometryFactory);
       }
       addToMap(map, "viewBoundingBox", boundingBox, defaultBoundingBox);

@@ -7,7 +7,8 @@ import java.awt.Window;
 
 import javax.swing.JDialog;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.swing.WindowManager;
 
 public class BaseDialog extends JDialog {

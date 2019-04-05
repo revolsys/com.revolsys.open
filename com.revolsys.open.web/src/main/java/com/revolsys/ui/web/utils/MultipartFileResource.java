@@ -3,10 +3,10 @@ package com.revolsys.ui.web.utils;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.jeometry.common.exception.Exceptions;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.revolsys.spring.resource.AbstractResource;
-import com.revolsys.util.Exceptions;
 
 public class MultipartFileResource extends AbstractResource {
 

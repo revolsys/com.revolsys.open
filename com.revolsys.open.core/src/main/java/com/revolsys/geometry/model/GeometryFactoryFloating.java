@@ -45,4 +45,11 @@ public class GeometryFactoryFloating extends GeometryFactory {
     final double offsetZ) {
     return new GeometryFactoryWithOffsets(this.instances, offsetX, 0, offsetY, 0, offsetZ, 0);
   }
+
+  @Override
+  public GeometryFactory newWithOffsetsAndScales(final double offsetX, final double scaleX,
+    final double offsetY, final double scaleY, final double offsetZ, final double scaleZ) {
+    return new GeometryFactoryWithOffsets(this.instances, offsetX, scaleX, offsetY, scaleY, offsetZ,
+      scaleZ);
+  }
 }

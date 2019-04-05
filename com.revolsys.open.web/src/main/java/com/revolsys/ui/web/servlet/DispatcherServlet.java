@@ -3,13 +3,13 @@ package com.revolsys.ui.web.servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jeometry.common.logging.Logs;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.WebUtils;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class DispatcherServlet extends org.springframework.web.servlet.DispatcherServlet {

@@ -48,10 +48,11 @@ import javax.measure.quantity.Length;
 
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
-import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.LineIntersector;
@@ -59,7 +60,6 @@ import com.revolsys.geometry.algorithm.LineStringLocation;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
-import com.revolsys.geometry.model.awtshape.LineStringShape;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
@@ -83,8 +83,6 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.function.Consumer3Double;
-import com.revolsys.util.function.Consumer4Double;
 import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
@@ -991,9 +989,11 @@ public interface LineString extends Lineal {
 
   @Override
   default double getLength(final Unit<Length> unit) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     double length = 0;
     final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-    if (coordinateSystem instanceof GeographicCoordinateSystem) {
+    if (geometryFactory.isGeographics()) {
+      final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
       final int vertexCount = getVertexCount();
       if (vertexCount > 1) {
         double lon0 = getX(0);
@@ -1001,16 +1001,15 @@ public interface LineString extends Lineal {
         for (int i = 1; i < vertexCount; i++) {
           final double lon1 = getX(i);
           final double lat1 = getY(i);
-          length += GeographicCoordinateSystem.distanceMetres(lon0, lat0, lon1, lat1);
+          length += geographicCoordinateSystem.distanceMetres(lon0, lat0, lon1, lat1);
           lon0 = lon1;
           lat0 = lat1;
         }
       }
       final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, Units.METRE);
       length = QuantityType.doubleValue(lengthMeasure, unit);
-    } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-      final Unit<Length> lengthUnit = projectedCoordinateSystem.getLengthUnit();
+    } else if (geometryFactory.isProjected()) {
+      final Unit<Length> lengthUnit = geometryFactory.getHorizontalLengthUnit();
 
       length = getLength();
       final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, lengthUnit);
@@ -2337,10 +2336,6 @@ public interface LineString extends Lineal {
     } else {
       return (G)this;
     }
-  }
-
-  default LineStringShape toShape() {
-    return new LineStringShape(this);
   }
 
   /**

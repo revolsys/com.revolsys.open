@@ -8,6 +8,7 @@ import java.net.URL;
 
 import javax.servlet.ServletContext;
 
+import org.jeometry.common.exception.Exceptions;
 import org.springframework.core.io.ContextResource;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
@@ -16,7 +17,6 @@ import org.springframework.web.util.WebUtils;
 
 import com.revolsys.spring.resource.AbstractResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 
 public class ServletContextResource extends AbstractResource implements ContextResource {
 

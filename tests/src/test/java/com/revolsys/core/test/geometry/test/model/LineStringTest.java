@@ -2,8 +2,6 @@ package com.revolsys.core.test.geometry.test.model;
 
 import java.util.List;
 
-import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
-import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.junit.Assert;
 import org.junit.Test;
@@ -84,11 +82,9 @@ public class LineStringTest {
 
     final GeometryFactory geometryFactory2;
     final int axisCount = geometryFactory.getAxisCount();
-    if (geometryFactory.getHorizontalCoordinateSystem() instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)geometryFactory
-        .getHorizontalCoordinateSystem();
-      final GeographicCoordinateSystem geographicCoordinateSystem = projectedCs
-        .getGeographicCoordinateSystem();
+    if (geometryFactory.isProjected()) {
+      final GeometryFactory geographicCoordinateSystem = geometryFactory
+        .getGeographicGeometryFactory();
       geometryFactory2 = GeometryFactory
         .floating(geographicCoordinateSystem.getHorizontalCoordinateSystemId(), axisCount);
     } else {

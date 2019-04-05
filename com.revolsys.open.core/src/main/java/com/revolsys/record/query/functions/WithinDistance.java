@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
@@ -13,7 +15,6 @@ import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.Exceptions;
 
 public class WithinDistance implements Condition {
   private QueryValue distanceValue;

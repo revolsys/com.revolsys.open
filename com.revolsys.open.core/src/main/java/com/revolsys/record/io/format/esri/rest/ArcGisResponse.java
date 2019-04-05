@@ -6,20 +6,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.logging.Logs;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.WrappedException;
 import com.revolsys.webservice.AbstractWebService;
 import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceResource;

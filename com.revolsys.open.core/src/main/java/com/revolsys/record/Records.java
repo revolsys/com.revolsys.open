@@ -14,6 +14,8 @@ import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.list.Lists;
 import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.datatype.DataType;
@@ -25,7 +27,6 @@ import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReader;

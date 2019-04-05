@@ -48,7 +48,11 @@ import javax.measure.quantity.Length;
 
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
-import org.jeometry.coordinatesystem.util.BiConsumerDouble;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
 
 import com.revolsys.datatype.DataTypeProxy;
 import com.revolsys.datatype.DataTypes;
@@ -77,10 +81,6 @@ import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.BiFunctionDouble;
-import com.revolsys.util.function.Consumer3Double;
-import com.revolsys.util.function.Consumer4Double;
-import com.revolsys.util.function.Function4Double;
 import com.revolsys.util.number.Doubles;
 
 /**

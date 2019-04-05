@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
-import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.coordinatesystem.model.Ellipsoid;
 import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 
 import com.revolsys.collection.map.MapEx;
@@ -40,12 +40,13 @@ public class Kml extends GeometryRecordReaderFactory
       final double maxY = boundingBox.getMaxY();
       final double centreY = boundingBox.getCentreY();
 
+      final Ellipsoid ellipsoid = boundingBox.getEllipsoid();
       double maxMetres = 0;
 
       for (final double y : new double[] {
         minY, centreY, maxY
       }) {
-        final double widthMetres = GeographicCoordinateSystem.distanceMetres(minX, y, maxX, y);
+        final double widthMetres = ellipsoid.distanceMetres(minX, y, maxX, y);
         if (widthMetres > maxMetres) {
           maxMetres = widthMetres;
         }
@@ -53,7 +54,7 @@ public class Kml extends GeometryRecordReaderFactory
       for (final double x : new double[] {
         minX, centreX, maxX
       }) {
-        final double heightMetres = GeographicCoordinateSystem.distanceMetres(x, minY, x, maxY);
+        final double heightMetres = ellipsoid.distanceMetres(x, minY, x, maxY);
         if (heightMetres > maxMetres) {
           maxMetres = heightMetres;
         }

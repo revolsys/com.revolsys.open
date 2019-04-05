@@ -4,8 +4,9 @@ import java.awt.Component;
 
 import javax.swing.Icon;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.swing.component.ComponentFactory;
-import com.revolsys.util.Exceptions;
 
 public class ComponentComponentFactory implements ComponentFactory<Component> {
   private final Component component;

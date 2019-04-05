@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
 import com.revolsys.swing.map.view.ViewRenderer;

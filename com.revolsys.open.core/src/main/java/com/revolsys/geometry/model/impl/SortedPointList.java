@@ -3,9 +3,10 @@ package com.revolsys.geometry.model.impl;
 import java.util.AbstractList;
 import java.util.Arrays;
 
+import org.jeometry.common.function.Function4;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.function.Function4;
 
 public class SortedPointList extends AbstractList<Point> {
   private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;

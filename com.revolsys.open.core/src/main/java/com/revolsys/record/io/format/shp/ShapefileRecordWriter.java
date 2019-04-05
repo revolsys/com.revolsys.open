@@ -23,6 +23,8 @@ package com.revolsys.record.io.format.shp;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.ClockDirection;
@@ -32,7 +34,6 @@ import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.ResourceEndianOutput;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xbase.XBaseFieldDefinition;
 import com.revolsys.record.io.format.xbase.XbaseRecordWriter;

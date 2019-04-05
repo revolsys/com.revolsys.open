@@ -7,9 +7,10 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;

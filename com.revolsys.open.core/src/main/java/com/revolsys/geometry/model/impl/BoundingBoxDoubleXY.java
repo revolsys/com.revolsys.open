@@ -38,8 +38,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 
 public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
-  private static final long serialVersionUID = 1L;
-
   public static BoundingBox newBoundingBoxDoubleXY(double minX, double minY, double maxX,
     double maxY) {
     if (minX > maxX) {

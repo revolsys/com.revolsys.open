@@ -19,8 +19,8 @@ import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
 import javax.swing.border.AbstractBorder;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystem;
 import org.jeometry.coordinatesystem.model.unit.Degree;
 
 import com.revolsys.awt.WebColors;
@@ -79,8 +79,6 @@ public class MapRulerBorder extends AbstractBorder {
   private Unit baseUnit;
 
   private int labelHeight;
-
-  private CoordinateSystem rulerCoordinateSystem;
 
   private GeometryFactory rulerGeometryFactory;
 
@@ -370,16 +368,17 @@ public class MapRulerBorder extends AbstractBorder {
       } else {
         this.rulerGeometryFactory = rulerGeometryFactory;
       }
-      this.rulerCoordinateSystem = this.rulerGeometryFactory.getHorizontalCoordinateSystem();
       this.steps = STEPS;
-      if (this.rulerCoordinateSystem != null) {
-        this.baseUnit = this.rulerCoordinateSystem.getUnit();
+      if (this.rulerGeometryFactory.isHasHorizontalCoordinateSystem()) {
+        final HorizontalCoordinateSystem rulerCoordinateSystem = this.rulerGeometryFactory
+          .getHorizontalCoordinateSystem();
+        this.baseUnit = rulerCoordinateSystem.getUnit();
         this.unitLabel = this.baseUnit.getSymbol();
         if (this.unitLabel == null) {
           this.unitLabel = this.baseUnit.getName();
         }
-        if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
-          final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)this.rulerCoordinateSystem;
+        if (this.rulerGeometryFactory.isGeographics()) {
+          final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)rulerCoordinateSystem;
           if (geoCs.getAngularUnit() instanceof Degree) {
             this.areaMinX = -180;
             this.areaMaxX = 180;

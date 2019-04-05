@@ -4,8 +4,7 @@ import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -18,7 +17,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathUtil;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
@@ -228,8 +226,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
 
   public void writeExtent(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      if (coordinateSystem != null) {
+      if (geometryFactory.isHasHorizontalCoordinateSystem()) {
         final BoundingBox boundingBox = geometryFactory.getAreaBoundingBox();
         this.out.startTag(EXTENT);
         this.out.attribute(XsiConstants.TYPE, ENVELOPE_N_TYPE);
@@ -360,11 +357,10 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
 
   public void writeSpatialReference(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-      if (coordinateSystem != null) {
+      if (geometryFactory.isHasHorizontalCoordinateSystem()) {
         final String wkt = geometryFactory.toWktCs();
         this.out.startTag(SPATIAL_REFERENCE);
-        if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+        if (geometryFactory.isProjected()) {
           this.out.attribute(XsiConstants.TYPE, PROJECTED_COORDINATE_SYSTEM_TYPE);
         } else {
           this.out.attribute(XsiConstants.TYPE, GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
@@ -383,7 +379,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
         this.out.element(Z_TOLERANCE, Doubles.toString(1.0 / scaleZ * 2.0));
         this.out.element(M_TOLERANCE, 1);
         this.out.element(HIGH_PRECISION, true);
-        this.out.element(WKID, coordinateSystem.getHorizontalCoordinateSystemId());
+        this.out.element(WKID, geometryFactory.getHorizontalCoordinateSystemId());
         this.out.endTag(SPATIAL_REFERENCE);
       }
     }

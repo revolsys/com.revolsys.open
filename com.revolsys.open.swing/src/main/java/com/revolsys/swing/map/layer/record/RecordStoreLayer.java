@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 
 import javax.swing.SwingWorker;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.iterator.Iterators;
 import com.revolsys.collection.map.MapEx;
@@ -29,7 +29,6 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
-import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -314,10 +313,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public BoundingBox getBoundingBox() {
     if (hasGeometryField()) {
-      final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-      if (coordinateSystem != null) {
-        return getAreaBoundingBox();
-      }
+      return getAreaBoundingBox();
     }
     return BoundingBox.empty();
   }

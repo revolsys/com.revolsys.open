@@ -13,8 +13,6 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 import javax.swing.JComponent;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
@@ -142,8 +140,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   }
 
   public Unit<Length> getScaleUnit(final double scale) {
-    final Unit<Length> lengthUnit = getGeometryFactory().getHorizontalCoordinateSystem()
-      .getLengthUnit();
+    final Unit<Length> lengthUnit = getGeometryFactory().getHorizontalLengthUnit();
     final Unit<Length> scaleUnit = lengthUnit.divide(scale);
     return scaleUnit;
   }
@@ -221,8 +218,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
   @Override
   protected void setGeometryFactoryPreEvent(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-    if (coordinateSystem != null) {
+    if (geometryFactory.isHasHorizontalCoordinateSystem()) {
       final BoundingBox areaBoundingBox = geometryFactory.getAreaBoundingBox();
       final double minX = areaBoundingBox.getMinX();
       final double maxX = areaBoundingBox.getMaxX();

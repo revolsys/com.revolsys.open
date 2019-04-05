@@ -34,15 +34,9 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
     return getImage(geometryFactory);
   }
 
-  public GeoreferencedImage getImage(final CoordinateSystem coordinateSystem) {
-    final GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
-    return projectedImage;
-  }
-
   public GeoreferencedImage getImage(final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-
-    return getImage(coordinateSystem);
+    return this.projectedImages.get(coordinateSystem);
   }
 
   protected abstract BufferedImage loadBuffferedImage();

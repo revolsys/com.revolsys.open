@@ -30,6 +30,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.function.Function3;
+import org.jeometry.common.logging.Logs;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
@@ -58,13 +62,9 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
-import com.revolsys.logging.Logs;
 import com.revolsys.ui.web.annotation.RequestAttribute;
 import com.revolsys.ui.web.utils.HttpServletUtils;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
-import com.revolsys.util.function.Function3;
 
 public class WebMethodHandler {
   private static final Map<Class<?>, WebParameterHandler> CLASS_HANDLERS = new HashMap<>();

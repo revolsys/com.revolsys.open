@@ -28,7 +28,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 
-import com.revolsys.util.Exceptions;
+import org.jeometry.common.exception.Exceptions;
 
 public class EndianMappedByteBuffer implements EndianInputOutput {
   private final MappedByteBuffer buffer;

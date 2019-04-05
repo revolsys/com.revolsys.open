@@ -22,8 +22,6 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.awt.WebColors;
@@ -558,9 +556,9 @@ public class MeasureOverlay extends AbstractOverlay {
       } else {
 
         Unit<Length> lengthUnit = Units.METRE;
-        final CoordinateSystem coordinateSystem = measureGeometry.getHorizontalCoordinateSystem();
-        if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-          lengthUnit = coordinateSystem.getLengthUnit();
+        final GeometryFactory geometryFactory = measureGeometry.getGeometryFactory();
+        if (geometryFactory.isProjected()) {
+          lengthUnit = geometryFactory.getHorizontalLengthUnit();
         }
         final double length = measureGeometry.getLength(lengthUnit);
 
