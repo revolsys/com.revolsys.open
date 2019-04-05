@@ -669,19 +669,23 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   }
 
   protected static GeometryFactories instances(final CoordinateSystem coordinateSystem) {
-    final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-    if (coordinateSystemId > 0) {
-      if (coordinateSystem.getAuthority() instanceof EpsgAuthority) {
-        return instances(coordinateSystemId);
+    if (coordinateSystem == null) {
+      return instances(0);
+    } else {
+      final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+      if (coordinateSystemId > 0) {
+        if (coordinateSystem.getAuthority() instanceof EpsgAuthority) {
+          return instances(coordinateSystemId);
+        }
       }
-    }
-    synchronized (INSTANCES_BY_COORDINATE_SYSTEM) {
-      GeometryFactories instances = INSTANCES_BY_COORDINATE_SYSTEM.get(coordinateSystem);
-      if (instances == null) {
-        instances = new GeometryFactories(coordinateSystem);
-        INSTANCES_BY_COORDINATE_SYSTEM.put(coordinateSystem, instances);
+      synchronized (INSTANCES_BY_COORDINATE_SYSTEM) {
+        GeometryFactories instances = INSTANCES_BY_COORDINATE_SYSTEM.get(coordinateSystem);
+        if (instances == null) {
+          instances = new GeometryFactories(coordinateSystem);
+          INSTANCES_BY_COORDINATE_SYSTEM.put(coordinateSystem, instances);
+        }
+        return instances;
       }
-      return instances;
     }
   }
 

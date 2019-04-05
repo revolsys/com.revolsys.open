@@ -74,6 +74,33 @@ public interface PointCloud<P extends Point>
     return Predicates.all();
   }
 
+  default GriddedElevationModel newGriddedElevationModel(final double gridCellSize,
+    final Predicate<? super P> filter) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+
+    final double scaleXy = 1 / gridCellSize;
+    final BoundingBox boundingBox = getBoundingBox();
+    final double minX = (int)Math.floor(boundingBox.getMinX() * scaleXy) / scaleXy;
+    final double minY = (int)Math.floor(boundingBox.getMinY() * scaleXy) / scaleXy;
+    final double maxX = (int)Math.ceil(boundingBox.getMaxX() * scaleXy) / scaleXy;
+    final double maxY = (int)Math.ceil(boundingBox.getMaxY() * scaleXy) / scaleXy;
+    final double width = maxX - minX;
+    final double height = maxY - minY;
+    final int gridWidth = (int)Math.ceil(width / gridCellSize);
+    final int gridHeight = (int)Math.ceil(height / gridCellSize);
+
+    final TriangulatedIrregularNetwork tin = newTriangulatedIrregularNetwork(filter);
+
+    final GeometryFactory targetGeometryFactory = geometryFactory.convertAxisCountAndScales(3,
+      scaleXy, scaleXy, 1000.0);
+
+    final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
+      targetGeometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize);
+
+    tin.forEachTriangle(elevationModel::setElevationsForTriangle);
+    return elevationModel;
+  }
+
   default GriddedElevationModel newGriddedElevationModel(final int gridCellSize) {
     final TriangulatedIrregularNetwork tin = newTriangulatedIrregularNetwork();
     final BoundingBox boundingBox = getBoundingBox();
@@ -103,7 +130,7 @@ public interface PointCloud<P extends Point>
   }
 
   default TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(
-    final Predicate<? super Point> filter) {
+    final Predicate<? super P> filter) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final QuadEdgeDelaunayTinBuilder tinBuilder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
     forEachPoint(point -> {
