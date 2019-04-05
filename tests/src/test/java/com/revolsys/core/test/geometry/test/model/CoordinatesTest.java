@@ -2,13 +2,14 @@ package com.revolsys.core.test.geometry.test.model;
 
 import java.util.Arrays;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
-import com.revolsys.util.number.Doubles;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;

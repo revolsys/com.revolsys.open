@@ -35,7 +35,6 @@ package com.revolsys.geometry.model.util;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.math.Angle;
 
 /**
  * Supports creating {@link AffineTransformation}s defined by various kinds of
@@ -88,7 +87,7 @@ public class AffineTransformationFactory {
     final Point rotPt = new PointDoubleXY(src0.getX() + dest1.getX() - dest0.getX(),
       src0.getY() + dest1.getY() - dest0.getY());
 
-    final double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
+    final double ang = Point.angleBetweenOriented(src1, src0, rotPt);
 
     final double srcDist = src1.distancePoint(src0);
     final double destDist = dest1.distancePoint(dest0);
@@ -145,7 +144,7 @@ public class AffineTransformationFactory {
     final Point dest0, final Point dest1) {
     final Point rotPt = new PointDoubleXY(dest1.getX() - dest0.getX(), dest1.getY() - dest0.getY());
 
-    final double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
+    final double ang = Point.angleBetweenOriented(src1, src0, rotPt);
 
     final double srcDist = src1.distancePoint(src0);
     final double destDist = dest1.distancePoint(dest0);

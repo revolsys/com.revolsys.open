@@ -1,8 +1,9 @@
 package com.revolsys.collection.range;
 
+import org.jeometry.common.number.Floats;
+
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Floats;
 
 public class FloatMinMax extends FloatRange implements Cloneable, Emptyable {
   public static FloatMinMax newWithIgnore(final float ignoreValue, final float... numbers) {

@@ -1,12 +1,13 @@
 package com.revolsys.geometry.model.impl;
 
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.Triangle;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;
 import org.jeometry.common.function.Function4Double;
+
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Triangle;
 
 public class TriangleLinearRing extends AbstractLineString implements LinearRing {
   private static final long serialVersionUID = 1L;

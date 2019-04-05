@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
@@ -14,8 +15,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.util.MathUtil;
-import com.revolsys.util.number.Doubles;
 
 public class WktWriter {
 
@@ -24,7 +23,7 @@ public class WktWriter {
       if (i > 0) {
         wkt.append(" ");
       }
-      MathUtil.append(wkt, point.getCoordinate(i));
+      Doubles.append(wkt, point.getCoordinate(i));
     }
   }
 

@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import javax.swing.JOptionPane;
 
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
@@ -36,7 +37,6 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public class GeoreferencedImageLayer extends AbstractLayer {
 

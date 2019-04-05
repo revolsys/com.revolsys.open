@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
@@ -24,7 +26,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.endian.EndianInput;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.util.MathUtil;
 
 public final class ShapefileGeometryUtil {
   public static final Map<String, Method> GEOMETRY_TYPE_READ_METHOD_MAP = new LinkedHashMap<>();

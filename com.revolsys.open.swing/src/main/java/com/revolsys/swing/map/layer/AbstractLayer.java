@@ -35,6 +35,7 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -85,7 +86,6 @@ import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
 import com.revolsys.util.ToolTipProxy;
-import com.revolsys.util.number.Doubles;
 import com.revolsys.value.ThreadBooleanValue;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties implements Layer,

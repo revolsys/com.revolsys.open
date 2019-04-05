@@ -56,14 +56,6 @@ import com.revolsys.util.Booleans;
 import com.revolsys.util.Dates;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.number.BigDecimals;
-import com.revolsys.util.number.BigIntegers;
-import com.revolsys.util.number.Bytes;
-import com.revolsys.util.number.Doubles;
-import com.revolsys.util.number.Floats;
-import com.revolsys.util.number.Integers;
-import com.revolsys.util.number.Longs;
-import com.revolsys.util.number.Shorts;
 
 // TODO manage data types by classloader and allow unloading of registered classes.
 public final class DataTypes {
@@ -84,7 +76,7 @@ public final class DataTypes {
   public static final DataType BOUNDING_BOX = new FunctionDataType("boolean", BoundingBox.class,
     BoundingBox::bboxGet);
 
-  public static final DataType BYTE = new Bytes();
+  public static final DataType BYTE = new ByteDataType();
 
   public static final DataType COLOR = new FunctionDataType("color", Color.class,
     value -> WebColors.toColor(value), WebColors::toString);
@@ -97,16 +89,16 @@ public final class DataTypes {
   public static final DataType DATE_TIME = new FunctionDataType("dateTime", Timestamp.class,
     value -> Dates.getTimestamp(value), Dates::toTimestampString, Dates::equalsNotNull);
 
-  public static final DataType DECIMAL = new BigDecimals();
+  public static final DataType DECIMAL = new BigDecimalDataType();
 
-  public static final DataType DOUBLE = new Doubles();
+  public static final DataType DOUBLE = new DoubleDataType();
 
   public static final DataType DURATION = new SimpleDataType("duration", Date.class);
 
   public static final DataType FILE = new FunctionDataType("File", File.class,
     value -> FileUtil.newFile(value));
 
-  public static final DataType FLOAT = new Floats();
+  public static final DataType FLOAT = new FloatDataType();
 
   public static final GeometryDataType<Geometry, GeometryCollectionImplEditor> GEOMETRY = new GeometryDataType<>(
     Geometry.class, value -> Geometry.newGeometry(value),
@@ -122,9 +114,9 @@ public final class DataTypes {
   public static final DataType IDENTIFIER = new FunctionDataType("identifier", Identifier.class,
     Identifier::newIdentifier);
 
-  public static final DataType INT = new Integers();
+  public static final DataType INT = new IntegerDataType();
 
-  public static final DataType BIG_INTEGER = new BigIntegers();
+  public static final DataType BIG_INTEGER = new BigIntegerDataType();
 
   public static final GeometryDataType<LineString, LineStringEditor> LINE_STRING = new GeometryDataType<>(
     LineString.class, value -> LineString.newLineString(value),
@@ -134,7 +126,7 @@ public final class DataTypes {
     LinearRing.class, value -> LinearRing.newLinearRing(value),
     value -> new LinearRingEditor(value));
 
-  public static final DataType LONG = new Longs();
+  public static final DataType LONG = new LongDataType();
 
   public static final DataType MEASURE = new FunctionDataType("measure", Quantity.class,
     QuantityType::newQuantity, QuantityType::toString);
@@ -165,7 +157,7 @@ public final class DataTypes {
 
   public static final DataType RECORD = new RecordDataType();
 
-  public static final DataType SHORT = new Shorts();
+  public static final DataType SHORT = new ShortDataType();
 
   public static final DataType SQL_DATE = new FunctionDataType("date", java.sql.Date.class,
     value -> Dates.getSqlDate(value), Dates::toSqlDateString, Dates::equalsNotNull);

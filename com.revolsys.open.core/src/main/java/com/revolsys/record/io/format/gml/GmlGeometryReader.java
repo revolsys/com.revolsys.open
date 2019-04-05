@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
@@ -27,7 +29,6 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.MathUtil;
 
 public class GmlGeometryReader extends AbstractIterator<Geometry> implements GeometryReader {
   public static final LineString parse(final String value, final String separator,
@@ -61,7 +62,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
       for (final String touple : touples) {
         final String[] values = coordinatePattern.split(touple);
         if (values.length > 0) {
-          final double[] coordinates = MathUtil.toDoubleArray(values);
+          final double[] coordinates = Doubles.toDoubleArray(values);
           axisCount = Math.max(axisCount, coordinates.length);
           listOfCoordinateArrays.add(coordinates);
         }

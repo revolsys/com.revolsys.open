@@ -2,8 +2,9 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.math.BigDecimal;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 /**

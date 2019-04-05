@@ -4,6 +4,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.Consumer;
 
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
+import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
@@ -15,13 +21,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
-import org.jeometry.common.function.BiConsumerDouble;
-import org.jeometry.common.function.BiFunctionDouble;
-import org.jeometry.common.function.Consumer3Double;
-import org.jeometry.common.function.Consumer4Double;
-import org.jeometry.common.function.Function4Double;
-
-import com.revolsys.util.number.Doubles;
 
 public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   implements LineString, LinealEditor {

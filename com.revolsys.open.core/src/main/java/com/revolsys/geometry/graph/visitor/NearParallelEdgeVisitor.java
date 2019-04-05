@@ -1,12 +1,13 @@
 package com.revolsys.geometry.graph.visitor;
 
+import org.jeometry.common.math.Angle;
+
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.EdgeVisitor;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.math.Angle;
 
 public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
 

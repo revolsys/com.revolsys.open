@@ -13,13 +13,13 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.math.MathUtil;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.swing.map.view.ViewRenderer;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 import tec.uom.se.quantity.Quantities;

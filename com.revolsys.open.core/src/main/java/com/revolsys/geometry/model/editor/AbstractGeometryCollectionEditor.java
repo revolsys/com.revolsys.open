@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
-import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.Consumer3Double;
 import org.jeometry.common.function.Consumer4Double;
 import org.jeometry.common.function.Function4Double;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.Geometry;

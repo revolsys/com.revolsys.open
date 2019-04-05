@@ -1,11 +1,8 @@
-package com.revolsys.util.number;
+package com.revolsys.datatype;
 
 import java.math.BigInteger;
 
-import com.revolsys.datatype.AbstractDataType;
-import com.revolsys.datatype.DataTypes;
-
-public class BigIntegers extends AbstractDataType {
+public class BigIntegerDataType extends AbstractDataType {
   public static boolean equalsNotNull(final BigInteger number1, final BigInteger number2) {
     if (number1.compareTo(number2) == 0) {
       return true;
@@ -30,7 +27,7 @@ public class BigIntegers extends AbstractDataType {
     }
   }
 
-  public BigIntegers() {
+  public BigIntegerDataType() {
     super("integer", BigInteger.class, false);
   }
 

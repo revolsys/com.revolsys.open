@@ -10,6 +10,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Integers;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
@@ -19,8 +21,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.number.Doubles;
-import com.revolsys.util.number.Integers;
 
 public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<GriddedElevationModel>
   implements GriddedElevationModelWriter {

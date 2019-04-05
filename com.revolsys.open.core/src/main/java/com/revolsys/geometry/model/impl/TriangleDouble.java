@@ -1,10 +1,11 @@
 package com.revolsys.geometry.model.impl;
 
+import org.jeometry.common.function.BiConsumerDouble;
+
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import org.jeometry.common.function.BiConsumerDouble;
 
 public class TriangleDouble extends AbstractTriangle {
   private static final long serialVersionUID = 7579865828939708871L;

@@ -32,6 +32,9 @@
  */
 package com.revolsys.geometry.operation.buffer;
 
+import org.jeometry.common.math.Angle;
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.HCoordinate;
@@ -45,8 +48,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
-import com.revolsys.math.Angle;
-import com.revolsys.util.MathUtil;
 
 /**
  * Generates segments which form an offset curve.

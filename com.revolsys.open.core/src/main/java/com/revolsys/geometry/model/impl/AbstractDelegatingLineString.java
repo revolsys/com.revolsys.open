@@ -2,6 +2,11 @@ package com.revolsys.geometry.model.impl;
 
 import java.util.function.Consumer;
 
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
@@ -10,11 +15,6 @@ import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import org.jeometry.common.function.BiConsumerDouble;
-import org.jeometry.common.function.BiFunctionDouble;
-import org.jeometry.common.function.Consumer3Double;
-import org.jeometry.common.function.Consumer4Double;
-import org.jeometry.common.function.Function4Double;
 
 public class AbstractDelegatingLineString extends AbstractLineString
   implements DelegatingLineString {

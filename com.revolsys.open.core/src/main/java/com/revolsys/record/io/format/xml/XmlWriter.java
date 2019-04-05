@@ -30,12 +30,13 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Floats;
+import org.jeometry.common.number.Numbers;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
-import com.revolsys.util.number.Numbers;
 
 /**
  * <p>
@@ -1251,7 +1252,7 @@ public class XmlWriter extends Writer {
    * @param value The value.
    */
   public void text(final float value) {
-    final String text = Numbers.toString(value);
+    final String text = Floats.toString(value);
     text(text);
   }
 

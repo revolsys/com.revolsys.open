@@ -1,6 +1,6 @@
 package com.revolsys.math.matrix;
 
-import com.revolsys.util.MathUtil;
+import org.jeometry.common.math.MathUtil;
 
 /** Singular Value Decomposition.
 <P>

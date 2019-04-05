@@ -32,13 +32,14 @@
  */
 package com.revolsys.geometry.algorithm;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.util.Triangles;
-import com.revolsys.util.MathUtil;
 
 /**
  * Computes the centroid of a {@link Geometry} of any dimension.

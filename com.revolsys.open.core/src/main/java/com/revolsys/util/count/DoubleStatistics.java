@@ -1,4 +1,4 @@
-package com.revolsys.util.number;
+package com.revolsys.util.count;
 
 import java.util.Map;
 import java.util.function.Supplier;

@@ -52,6 +52,12 @@ import java.util.zip.ZipFile;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.io.EsriCsWktWriter;
 import org.jeometry.coordinatesystem.io.WktCsParser;
 import org.jeometry.coordinatesystem.model.Area;
@@ -67,11 +73,6 @@ import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.jeometry.coordinatesystem.model.systems.EsriCoordinateSystems;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
-import org.jeometry.common.exception.WrappedException;
-import org.jeometry.common.function.BiConsumerDouble;
-import org.jeometry.common.function.BiFunctionDouble;
-import org.jeometry.common.function.Consumer3Double;
-import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.IntHashMap;
@@ -111,7 +112,6 @@ import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 import tec.uom.se.unit.Units;
@@ -2111,7 +2111,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
       } else if (object instanceof List<?>) {
         @SuppressWarnings("unchecked")
         final List<Number> list = (List<Number>)object;
-        final double[] coordinates = MathUtil.toDoubleArray(list);
+        final double[] coordinates = Doubles.toDoubleArray(list);
         lineBuilder.appendVertex(coordinates);
       } else if (object instanceof LineString) {
         final LineString LineString = (LineString)object;
@@ -2261,7 +2261,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     } else if (object instanceof List<?>) {
       @SuppressWarnings("unchecked")
       final List<Number> list = (List<Number>)object;
-      final double[] pointCoordinates = MathUtil.toDoubleArray(list);
+      final double[] pointCoordinates = Doubles.toDoubleArray(list);
       return point(pointCoordinates);
     } else if (object instanceof Point) {
       return point((Point)object);

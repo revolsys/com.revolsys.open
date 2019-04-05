@@ -40,6 +40,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.LineIntersector;
@@ -70,7 +72,6 @@ import com.revolsys.geometry.noding.SegmentString;
 import com.revolsys.geometry.noding.snapround.MCIndexSnapRounder;
 import com.revolsys.geometry.operation.overlay.OverlayNodeFactory;
 import com.revolsys.geometry.operation.overlay.PolygonBuilder;
-import com.revolsys.util.MathUtil;
 
 //import debug.*;
 

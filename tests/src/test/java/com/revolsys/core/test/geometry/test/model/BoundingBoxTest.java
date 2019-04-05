@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.measure.Unit;
 
+import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.junit.Assert;
@@ -27,7 +28,6 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.testapi.GeometryAssert;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;

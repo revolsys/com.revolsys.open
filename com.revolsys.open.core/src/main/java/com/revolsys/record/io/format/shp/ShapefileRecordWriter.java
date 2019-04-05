@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.math.MathUtil;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -40,7 +41,6 @@ import com.revolsys.record.io.format.xbase.XbaseRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.MathUtil;
 
 public class ShapefileRecordWriter extends XbaseRecordWriter {
 

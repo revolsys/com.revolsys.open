@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
@@ -17,7 +19,6 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public class OsmOverpassLayer extends AbstractRecordLayer {
   private static final int TILE_SCALE_X = 50;

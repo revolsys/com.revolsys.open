@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.Longs;
 
 import com.revolsys.datatype.DataTypes;
 
@@ -99,8 +100,8 @@ public class Uuid {
   }
 
   public static UUID toUuid(final byte[] bytes) {
-    final long l1 = MathUtil.toLong(bytes, 0);
-    final long l2 = MathUtil.toLong(bytes, 8);
+    final long l1 = Longs.toLong(bytes, 0);
+    final long l2 = Longs.toLong(bytes, 8);
     return new UUID(l1, l2);
   }
 

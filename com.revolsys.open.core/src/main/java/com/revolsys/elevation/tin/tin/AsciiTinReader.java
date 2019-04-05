@@ -3,13 +3,15 @@ package com.revolsys.elevation.tin.tin;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Integers;
+
 import com.revolsys.elevation.tin.CompactTriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.MathUtil;
 
 public class AsciiTinReader implements BaseCloseable {
   private final GeometryFactory geometryFactory;
@@ -52,7 +54,7 @@ public class AsciiTinReader implements BaseCloseable {
     final double[] vertexZCoordinates = new double[vertexCount];
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
       line = readLine();
-      final double[] coordinates = MathUtil.toDoubleArraySplit(line, " ");
+      final double[] coordinates = Doubles.toDoubleArraySplit(line, " ");
       vertexXCoordinates[vertexIndex] = coordinates[0];
       vertexYCoordinates[vertexIndex] = coordinates[1];
       vertexZCoordinates[vertexIndex] = coordinates[2];
@@ -75,7 +77,7 @@ public class AsciiTinReader implements BaseCloseable {
       triangleVertex2Indices = new int[triangleCount];
       for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++) {
         line = readLine();
-        final int[] indexes = MathUtil.toIntArraySplit(line, " ");
+        final int[] indexes = Integers.toIntArraySplit(line, " ");
         triangleVertex0Indices[triangleIndex] = indexes[0] - 1;
         triangleVertex1Indices[triangleIndex] = indexes[1] - 1;
         triangleVertex2Indices[triangleIndex] = indexes[2] - 1;

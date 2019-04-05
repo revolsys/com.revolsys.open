@@ -19,6 +19,8 @@ import javax.measure.quantity.Length;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.function.Consumer3;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.math.MathUtil;
+import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
 import com.revolsys.datatype.DataTypes;
@@ -30,10 +32,8 @@ import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.util.OutCode;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;

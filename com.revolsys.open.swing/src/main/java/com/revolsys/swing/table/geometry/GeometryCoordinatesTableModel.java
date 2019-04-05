@@ -12,6 +12,8 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.undo.UndoableEdit;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -26,7 +28,6 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.undo.UndoManager;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class GeometryCoordinatesTableModel extends AbstractTableModel {

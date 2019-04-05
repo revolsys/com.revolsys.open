@@ -1,10 +1,11 @@
 package com.revolsys.collection.range;
 
+import org.jeometry.common.number.Integers;
+import org.jeometry.common.number.Numbers;
+
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Parity;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Integers;
-import com.revolsys.util.number.Numbers;
 
 public class IntMinMax extends IntRange implements Cloneable, Emptyable {
   public IntMinMax() {

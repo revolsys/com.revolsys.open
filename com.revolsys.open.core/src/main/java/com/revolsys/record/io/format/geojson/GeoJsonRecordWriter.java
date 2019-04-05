@@ -3,6 +3,8 @@ package com.revolsys.record.io.format.geojson;
 import java.io.BufferedWriter;
 import java.io.Writer;
 
+import org.jeometry.common.math.Angle;
+import org.jeometry.common.math.MathUtil;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.geometry.model.ClockDirection;
@@ -17,13 +19,11 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
-import com.revolsys.math.Angle;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.cogojson.CogoJson;
 import com.revolsys.record.io.format.json.JsonWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.MathUtil;
 
 public class GeoJsonRecordWriter extends AbstractRecordWriter {
 

@@ -1,6 +1,6 @@
 package com.revolsys.math.matrix;
 
-import com.revolsys.util.MathUtil;
+import org.jeometry.common.math.MathUtil;
 
 /** Eigenvalues and eigenvectors of a real matrix.
 <P>

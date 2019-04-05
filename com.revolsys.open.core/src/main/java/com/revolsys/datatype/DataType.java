@@ -3,7 +3,7 @@ package com.revolsys.datatype;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.revolsys.util.MathUtil;
+import org.jeometry.common.math.MathUtil;
 
 public interface DataType {
   static boolean equal(final Object object1, final Object object2) {

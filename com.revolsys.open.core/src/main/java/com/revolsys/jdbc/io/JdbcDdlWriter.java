@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.common.number.Numbers;
+
 import com.revolsys.io.PathUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.ShortNameProperty;
@@ -14,7 +16,6 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
-import com.revolsys.util.number.Numbers;
 
 public abstract class JdbcDdlWriter implements Cloneable {
   private PrintWriter out;

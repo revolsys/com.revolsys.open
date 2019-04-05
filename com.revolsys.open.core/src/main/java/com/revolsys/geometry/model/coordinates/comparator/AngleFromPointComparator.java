@@ -2,8 +2,9 @@ package com.revolsys.geometry.model.coordinates.comparator;
 
 import java.util.Comparator;
 
+import org.jeometry.common.math.Angle;
+
 import com.revolsys.geometry.model.Point;
-import com.revolsys.math.Angle;
 
 public class AngleFromPointComparator implements Comparator<Point> {
 

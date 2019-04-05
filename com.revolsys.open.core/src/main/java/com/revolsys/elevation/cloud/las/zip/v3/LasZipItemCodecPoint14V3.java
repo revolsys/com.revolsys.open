@@ -12,6 +12,8 @@ package com.revolsys.elevation.cloud.las.zip.v3;
 
 import java.util.Arrays;
 
+import org.jeometry.common.number.Longs;
+
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoderByteArray;
 import com.revolsys.elevation.cloud.las.zip.ArithmeticEncoderByteArray;
@@ -25,7 +27,6 @@ import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticModel;
-import com.revolsys.util.number.Longs;
 
 public class LasZipItemCodecPoint14V3 implements LasZipItemCodec {
   private static final int FLAG_NUMBER_OF_RETURNS = 0b100;

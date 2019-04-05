@@ -3,7 +3,6 @@ package com.revolsys.geometry.util;
 import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.math.Angle;
 
 public interface Triangles {
 
@@ -298,13 +297,13 @@ public interface Triangles {
    * @return true if the triangle is acute
    */
   static boolean isAcute(final Point a, final Point b, final Point c) {
-    if (!Angle.isAcute(a, b, c)) {
+    if (!Point.isAcute(a, b, c)) {
       return false;
     }
-    if (!Angle.isAcute(b, c, a)) {
+    if (!Point.isAcute(b, c, a)) {
       return false;
     }
-    if (!Angle.isAcute(c, a, b)) {
+    if (!Point.isAcute(c, a, b)) {
       return false;
     }
     return true;

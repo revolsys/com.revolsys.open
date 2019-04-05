@@ -5,6 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
+import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
@@ -12,12 +18,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.util.MathUtil;
-import org.jeometry.common.function.BiConsumerDouble;
-import org.jeometry.common.function.BiFunctionDouble;
-import org.jeometry.common.function.Consumer3Double;
-import org.jeometry.common.function.Consumer4Double;
-import org.jeometry.common.function.Function4Double;
 
 public class LineStringDouble extends AbstractLineString {
   private static final long serialVersionUID = 7579865828939708871L;
@@ -102,7 +102,7 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   public LineStringDouble(final int axisCount, final List<? extends Number> coordinates) {
-    this(axisCount, MathUtil.toDoubleArray(coordinates));
+    this(axisCount, Doubles.toDoubleArray(coordinates));
   }
 
   public LineStringDouble(final int axisCount, final Point... points) {

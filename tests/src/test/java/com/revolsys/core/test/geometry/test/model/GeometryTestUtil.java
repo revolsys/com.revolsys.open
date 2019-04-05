@@ -3,6 +3,8 @@ package com.revolsys.core.test.geometry.test.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
@@ -16,7 +18,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.util.number.Doubles;
 
 public class GeometryTestUtil {
 

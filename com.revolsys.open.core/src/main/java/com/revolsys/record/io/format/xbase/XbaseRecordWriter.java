@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -31,7 +32,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 /**
  * <p>Xbase fields suffer a number of limitations:</p>

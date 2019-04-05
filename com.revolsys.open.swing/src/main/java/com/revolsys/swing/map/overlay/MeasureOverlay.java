@@ -22,6 +22,7 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.awt.WebColors;
@@ -43,7 +44,6 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
-import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;

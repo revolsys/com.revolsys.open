@@ -1,8 +1,9 @@
 package com.revolsys.collection.range;
 
+import org.jeometry.common.number.Numbers;
+
 import com.revolsys.beans.Classes;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Numbers;
 
 public class Ranges {
   private static boolean isNumeric(final RangeSet rangeSet) {

@@ -1,6 +1,6 @@
 package com.revolsys.collection.range;
 
-import com.revolsys.util.number.Doubles;
+import org.jeometry.common.number.Doubles;
 
 public class DoubleRange extends AbstractRange<Double> {
   private double from;

@@ -33,11 +33,12 @@
 
 package com.revolsys.geometry.algorithm.distance;
 
+import org.jeometry.common.math.MathUtil;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.util.MathUtil;
 
 /**
  * Contains a pair of points and the distance between them.

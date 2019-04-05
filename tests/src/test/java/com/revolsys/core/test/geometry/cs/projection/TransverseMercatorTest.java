@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.jeometry.common.math.Angle;
 import org.jeometry.coordinatesystem.model.Ellipsoid;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 import org.jeometry.coordinatesystem.operation.projection.CoordinatesProjection;
@@ -13,7 +14,6 @@ import org.jeometry.coordinatesystem.operation.projection.TransverseMercatorUsgs
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.math.Angle;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 

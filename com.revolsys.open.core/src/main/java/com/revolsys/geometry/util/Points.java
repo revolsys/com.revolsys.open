@@ -1,9 +1,10 @@
 package com.revolsys.geometry.util;
 
+import org.jeometry.common.math.Angle;
+
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.util.MathUtil;
 
 public class Points {
 
@@ -21,9 +22,9 @@ public class Points {
       } else {
         double angle = point1.angle2d(point2);
         if (yOffset > 0) {
-          angle += MathUtil.PI_OVER_2;
+          angle += Angle.PI_OVER_2;
         } else {
-          angle -= MathUtil.PI_OVER_2;
+          angle -= Angle.PI_OVER_2;
           yOffset = -yOffset;
         }
         final double x = point.getX() + Math.cos(angle) * yOffset;

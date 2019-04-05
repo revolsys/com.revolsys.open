@@ -25,6 +25,7 @@ import javax.swing.JComponent;
 import org.apache.commons.beanutils.MethodUtils;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Integers;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import com.revolsys.beans.NonWeakListener;
@@ -36,7 +37,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
-import com.revolsys.util.number.Integers;
 
 public interface Property {
   class NewValueListener<V> implements PropertyChangeListener, NonWeakListener {

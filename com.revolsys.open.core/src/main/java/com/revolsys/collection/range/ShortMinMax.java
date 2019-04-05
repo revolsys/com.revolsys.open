@@ -1,8 +1,9 @@
 package com.revolsys.collection.range;
 
+import org.jeometry.common.number.Shorts;
+
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Shorts;
 
 public class ShortMinMax extends ShortRange implements Cloneable, Emptyable {
   public static ShortMinMax newWithIgnore(final short ignoreValue, final short... numbers) {

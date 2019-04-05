@@ -1,6 +1,6 @@
 package com.revolsys.collection.range;
 
-import com.revolsys.util.number.Shorts;
+import org.jeometry.common.number.Shorts;
 
 public class ShortRange extends AbstractRange<Short> {
   private short from;
