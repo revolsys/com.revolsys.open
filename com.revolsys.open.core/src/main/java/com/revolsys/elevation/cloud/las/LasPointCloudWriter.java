@@ -26,11 +26,13 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
 
   private LasPointCloud pointCloud;
 
-  private Version version = LasVersion.VERSION_1_2;
+  private Version version;
 
   protected LasPointCloudHeader header;
 
   private boolean lasZip = false;
+
+  private long extendedVariablePosition;
 
   public LasPointCloudWriter(final LasPointCloud pointCloud, final Resource resource,
     final MapEx properties) {
@@ -51,6 +53,7 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     if (out != null) {
       out.flush();
       if (out.isSeekable()) {
+        this.extendedVariablePosition = out.position();
         out.seek(0);
         writeHeader();
       }
@@ -58,11 +61,6 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
       out.close();
     }
     this.pointCloud = null;
-  }
-
-  protected Map<Pair<String, Integer>, LasVariableLengthRecord> getLasProperties(
-    final LasPointCloudHeader header) {
-    return header.getLasProperties();
   }
 
   public LasPointFormat getPointFormat() {
@@ -79,18 +77,49 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
 
   public void open() {
     this.out = this.resource.newChannelWriter(8192, ByteOrder.LITTLE_ENDIAN);
+    if (!this.out.isSeekable()) {
+      throw new IllegalArgumentException(
+        "LAS files can only be written to seekable resources: " + this.resource);
+    }
     writeHeader();
   }
 
   protected void setPointCloud(final LasPointCloud pointCloud) {
     this.pointCloud = pointCloud;
     this.header = this.pointCloud.getHeader().clone();
-    this.header.setVersion(this.version);
+    if (this.version != null) {
+      this.header.setVersion(this.version);
+    }
     this.header.clear();
   }
 
   public void setVersion(final Version version) {
     this.version = version;
+  }
+
+  private void writeExtendedVariables(final Version version,
+    final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties) {
+    this.out.seek(this.extendedVariablePosition);
+    for (final LasVariableLengthRecord variable : lasProperties.values()) {
+      if (variable.isExtended()) {
+        this.out.putUnsignedShort(0);
+
+        final String userId = variable.getUserId();
+        this.out.putString(userId, 16);
+
+        final int recordId = variable.getRecordId();
+        this.out.putUnsignedShort(recordId);
+
+        final int valueLength = variable.getValueLength();
+        this.out.putUnsignedLong(valueLength);
+
+        final String description = variable.getDescription();
+        this.out.putString(description, 32);
+
+        final byte[] bytes = variable.getBytes();
+        this.out.putBytes(bytes);
+      }
+    }
   }
 
   protected void writeHeader() {
@@ -126,16 +155,22 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     if (!this.lasZip) {
       lasProperties.remove(LasZipHeader.KAY_LAS_ZIP);
     }
-    final int numberOfVariableLengthRecords = lasProperties.size();
+    int variableCount = 0;
+    int extendedVariableCount = 0;
     int variableLengthRecordsSize = 0;
-    for (final LasVariableLengthRecord record : lasProperties.values()) {
-      variableLengthRecordsSize += 54 + record.getValueLength();
+    for (final LasVariableLengthRecord variable : lasProperties.values()) {
+      if (variable.isExtended()) {
+        extendedVariableCount++;
+      } else {
+        variableCount++;
+        variableLengthRecordsSize += 54 + variable.getValueLength();
+      }
     }
 
     final long offsetToPointData = headerSize + variableLengthRecordsSize;
     this.out.putUnsignedInt(offsetToPointData);
 
-    this.out.putUnsignedInt(numberOfVariableLengthRecords);
+    this.out.putUnsignedInt(variableCount);
 
     final int pointFormatId = this.header.getPointFormatId();
     this.out.putUnsignedByte((short)pointFormatId);
@@ -175,10 +210,10 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
     }
 
     if (version.atLeast(LasVersion.VERSION_1_3)) {
-      this.out.putUnsignedLong(0); // startOfWaveformDataPacketRecord
+      this.out.putUnsignedLong(0); // TODO startOfWaveformDataPacketRecord
       if (version.atLeast(LasVersion.VERSION_1_4)) {
-        this.out.putUnsignedLong(0); // startOfFirstExtendedDataRecord
-        this.out.putUnsignedInt(0); // numberOfExtendedVariableLengthRecords
+        this.out.putUnsignedLong(this.extendedVariablePosition);
+        this.out.putUnsignedInt(extendedVariableCount);
         this.out.putUnsignedLong(pointCount);
         for (int i = 0; i < 15; i++) {
           final long count = pointCountByReturn[i];
@@ -187,22 +222,9 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
       }
     }
 
-    for (final LasVariableLengthRecord record : lasProperties.values()) {
-      this.out.putUnsignedShort(0);
-      final String userId = record.getUserId();
-      this.out.putString(userId, 16);
-
-      final int recordId = record.getRecordId();
-      this.out.putUnsignedShort(recordId);
-
-      final int valueLength = record.getValueLength();
-      this.out.putUnsignedShort(valueLength);
-
-      final String description = record.getDescription();
-      this.out.putString(description, 32);
-
-      final byte[] bytes = record.getBytes();
-      this.out.putBytes(bytes);
+    writeVariables(version, lasProperties);
+    if (this.extendedVariablePosition != 0 && version.atLeast(LasVersion.VERSION_1_4)) {
+      writeExtendedVariables(version, lasProperties);
     }
   }
 
@@ -222,6 +244,33 @@ public class LasPointCloudWriter extends BaseObjectWithProperties implements Bas
   public void writePoints(final Iterable<LasPoint> points) {
     for (final LasPoint point : points) {
       writePoint(point);
+    }
+  }
+
+  private void writeVariables(final Version version,
+    final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties) {
+    for (final LasVariableLengthRecord variable : lasProperties.values()) {
+      if (!variable.isExtended()) {
+        if (version == LasVersion.VERSION_1_0) {
+          this.out.putUnsignedShort(43707);
+        } else {
+          this.out.putUnsignedShort(0);
+        }
+        final String userId = variable.getUserId();
+        this.out.putString(userId, 16);
+
+        final int recordId = variable.getRecordId();
+        this.out.putUnsignedShort(recordId);
+
+        final int valueLength = variable.getValueLength();
+        this.out.putUnsignedShort(valueLength);
+
+        final String description = variable.getDescription();
+        this.out.putString(description, 32);
+
+        final byte[] bytes = variable.getBytes();
+        this.out.putBytes(bytes);
+      }
     }
   }
 }

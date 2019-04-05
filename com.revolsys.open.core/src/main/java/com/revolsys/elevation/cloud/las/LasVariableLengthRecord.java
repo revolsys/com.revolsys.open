@@ -19,6 +19,14 @@ public class LasVariableLengthRecord implements Cloneable {
 
   private final Pair<String, Integer> key;
 
+  private boolean extended;
+
+  public LasVariableLengthRecord(final LasPointCloud pointCloud, final boolean extended,
+    final Pair<String, Integer> key, final String description, final Object value) {
+    this(pointCloud, key, description, value);
+    this.extended = true;
+  }
+
   public LasVariableLengthRecord(final LasPointCloud pointCloud, final Pair<String, Integer> key,
     final String description, final Object value) {
     this(pointCloud.getHeader(), key, description);
@@ -34,6 +42,13 @@ public class LasVariableLengthRecord implements Cloneable {
     if (this.bytes == null) {
       throw new IllegalArgumentException(value + " is not valid for " + key);
     }
+  }
+
+  public LasVariableLengthRecord(final LasPointCloudHeader lasPointCloudHeader,
+    final boolean extended, final String userId, final int recordId, final String description,
+    final byte[] bytes) {
+    this(lasPointCloudHeader, userId, recordId, description, bytes);
+    this.extended = extended;
   }
 
   private LasVariableLengthRecord(final LasPointCloudHeader header, final Pair<String, Integer> key,
@@ -108,6 +123,10 @@ public class LasVariableLengthRecord implements Cloneable {
 
   public int getValueLength() {
     return this.bytes.length;
+  }
+
+  public boolean isExtended() {
+    return this.extended;
   }
 
   void setHeader(final LasPointCloudHeader header) {

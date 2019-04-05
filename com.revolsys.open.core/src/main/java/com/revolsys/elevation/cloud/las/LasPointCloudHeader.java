@@ -37,6 +37,8 @@ import com.revolsys.util.Pair;
 public class LasPointCloudHeader
   implements BoundingBoxProxy, Cloneable, GeometryFactoryProxy, MapSerializer {
 
+  private static final int GLOBAL_ENCODING_WKT = 0b10000;
+
   private static final Map<Pair<String, Integer>, LasVariableLengthRecordConverter> CONVERTER_FACTORY_BY_KEY = new HashMap<>();
 
   static {
@@ -148,7 +150,8 @@ public class LasPointCloudHeader
         final double minY = reader.getDouble();
         final double maxZ = reader.getDouble();
         final double minZ = reader.getDouble();
-
+        long startOfFirstExetendedDataRecord = 0;
+        long numberOfExtendedVariableLengthRecords = 0;
         if (this.headerSize > 227) {
 
           if (this.version.atLeast(LasVersion.VERSION_1_3)) {
@@ -158,8 +161,8 @@ public class LasPointCloudHeader
             // long support
             // needed
             if (this.version.atLeast(LasVersion.VERSION_1_4)) {
-              final long startOfFirstExetendedDataRecord = reader.getUnsignedLong();
-              final long numberOfExtendedVariableLengthRecords = reader.getUnsignedInt();
+              startOfFirstExetendedDataRecord = reader.getUnsignedLong();
+              numberOfExtendedVariableLengthRecords = reader.getUnsignedInt();
               this.pointCount = reader.getUnsignedLong();
               for (int i = 0; i < 15; i++) {
                 this.pointCountByReturn[i] = reader.getUnsignedLong();
@@ -178,6 +181,9 @@ public class LasPointCloudHeader
         final int skipCount = (int)(this.pointRecordsOffset - this.headerSize);
         reader.skipBytes(skipCount); // Skip to first point record
 
+        readExtendedVariableLengthRecords(reader, startOfFirstExetendedDataRecord,
+          numberOfExtendedVariableLengthRecords);
+
         this.recordDefinition = this.pointFormat.newRecordDefinition(this.geometryFactory);
 
       } else {
@@ -193,7 +199,7 @@ public class LasPointCloudHeader
     this.pointCloud = pointCloud;
     this.pointFormat = pointFormat;
     if (this.pointFormat.getId() > 5) {
-      this.globalEncoding |= 0b10000;
+      this.globalEncoding |= GLOBAL_ENCODING_WKT;
     }
     this.recordLength = pointFormat.getRecordLength();
     setGeometryFactory(geometryFactory);
@@ -213,6 +219,13 @@ public class LasPointCloudHeader
     final double y = lasPoint.getY();
     final double z = lasPoint.getZ();
     RectangleUtil.expand(this.bounds, 3, x, y, z);
+  }
+
+  public void addExtendedLasProperty(final Pair<String, Integer> key, final String description,
+    final Object value) {
+    final LasVariableLengthRecord property = new LasVariableLengthRecord(this.pointCloud, true, key,
+      description, value);
+    this.lasProperties.put(key, property);
   }
 
   public void addLasProperty(final Pair<String, Integer> key, final String description,
@@ -382,13 +395,43 @@ public class LasPointCloudHeader
     return this.pointFormat.newLasPoint(lasPointCloud, x, y, z);
   }
 
+  private void readExtendedVariableLengthRecords(final ChannelReader reader, final long position,
+    final long variableCount) throws IOException {
+    if (variableCount != 0 && reader.isSeekable()) {
+      final long currentPosition = reader.position();
+      reader.seek(position);
+      for (int i = 0; i < variableCount; i++) {
+        @SuppressWarnings("unused") // Ignore reserved value
+        final int reserved = reader.getUnsignedShort();
+        final String userId = reader.getUsAsciiString(16);
+        final int recordId = reader.getUnsignedShort();
+        final long valueLength = reader.getUnsignedLong();
+        final String description = reader.getUsAsciiString(32);
+        if ((int)valueLength != valueLength) {
+          throw new IllegalArgumentException("Extended variable length record " + userId + " "
+            + recordId + " has length " + valueLength + " > " + Integer.MAX_VALUE);
+        }
+        final byte[] bytes = reader.getBytes((int)valueLength);
+        final LasVariableLengthRecord property = new LasVariableLengthRecord(this, true, userId,
+          recordId, description, bytes);
+        addProperty(property);
+      }
+
+      for (final LasVariableLengthRecord property : this.lasProperties.values()) {
+        if (property.isExtended()) {
+          property.getValue();
+        }
+      }
+      reader.seek(currentPosition);
+    }
+  }
+
   private int readVariableLengthRecords(final ChannelReader reader,
     final long numberOfVariableLengthRecords) throws IOException {
     int byteCount = 0;
     for (int i = 0; i < numberOfVariableLengthRecords; i++) {
-      @SuppressWarnings("unused")
-      final int reserved = reader.getUnsignedShort(); // Ignore reserved
-                                                      // value;
+      @SuppressWarnings("unused") // Ignore reserved value
+      final int reserved = reader.getUnsignedShort();
       final String userId = reader.getUsAsciiString(16);
       final int recordId = reader.getUnsignedShort();
       final int valueLength = reader.getUnsignedShort();

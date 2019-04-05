@@ -4,8 +4,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloudHeader;
 import com.revolsys.elevation.cloud.las.LasPointCloudWriter;
-import com.revolsys.elevation.cloud.las.LasVersion;
-import com.revolsys.elevation.cloud.las.Version;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
@@ -19,8 +17,6 @@ public class LasZipPointCloudWriterFactory extends BaseObjectWithProperties {
 
   private final Resource resource;
 
-  private Version version = LasVersion.VERSION_1_2;
-
   private final LasPointCloud pointCloud;
 
   private final LasPointCloudHeader header;
@@ -31,7 +27,6 @@ public class LasZipPointCloudWriterFactory extends BaseObjectWithProperties {
     setProperties(properties);
     this.pointCloud = pointCloud;
     this.header = this.pointCloud.getHeader().clone();
-    this.header.setVersion(this.version);
     this.header.clear();
 
     this.lasZipHeader = LasZipHeader.getLasZipHeader(pointCloud);
@@ -78,7 +73,4 @@ public class LasZipPointCloudWriterFactory extends BaseObjectWithProperties {
     this.lasZipVersion = lasZipVersion;
   }
 
-  public void setVersion(final Version version) {
-    this.version = version;
-  }
 }
