@@ -9,7 +9,7 @@ import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;

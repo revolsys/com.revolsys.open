@@ -58,8 +58,8 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.util.WebUtils;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.ui.web.annotation.RequestAttribute;

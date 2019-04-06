@@ -3,13 +3,13 @@ package com.revolsys.geopackage;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
@@ -21,13 +21,13 @@ public class GeoPackageGeometryFieldAdder extends JdbcFieldAdder {
   private static final Map<String, DataType> DATA_TYPE_MAP = new HashMap<>();
 
   static {
-    DATA_TYPE_MAP.put("GEOMETRY", DataTypes.GEOMETRY);
-    DATA_TYPE_MAP.put("POINT", DataTypes.POINT);
-    DATA_TYPE_MAP.put("LINESTRING", DataTypes.LINE_STRING);
-    DATA_TYPE_MAP.put("POLYGON", DataTypes.POLYGON);
-    DATA_TYPE_MAP.put("MULTIPOINT", DataTypes.MULTI_POINT);
-    DATA_TYPE_MAP.put("MULTILINESTRING", DataTypes.MULTI_LINE_STRING);
-    DATA_TYPE_MAP.put("MULTIPOLYGON", DataTypes.MULTI_POLYGON);
+    DATA_TYPE_MAP.put("GEOMETRY", GeometryDataTypes.GEOMETRY);
+    DATA_TYPE_MAP.put("POINT", GeometryDataTypes.POINT);
+    DATA_TYPE_MAP.put("LINESTRING", GeometryDataTypes.LINE_STRING);
+    DATA_TYPE_MAP.put("POLYGON", GeometryDataTypes.POLYGON);
+    DATA_TYPE_MAP.put("MULTIPOINT", GeometryDataTypes.MULTI_POINT);
+    DATA_TYPE_MAP.put("MULTILINESTRING", GeometryDataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put("MULTIPOLYGON", GeometryDataTypes.MULTI_POLYGON);
   }
 
   public GeoPackageGeometryFieldAdder() {

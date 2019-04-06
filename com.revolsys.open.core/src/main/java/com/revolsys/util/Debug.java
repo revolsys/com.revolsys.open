@@ -2,6 +2,8 @@ package com.revolsys.util;
 
 import java.sql.Timestamp;
 
+import org.jeometry.common.date.Dates;
+
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;

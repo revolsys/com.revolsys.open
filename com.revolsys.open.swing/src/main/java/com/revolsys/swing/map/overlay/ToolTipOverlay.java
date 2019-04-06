@@ -7,7 +7,7 @@ import java.awt.geom.Point2D;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.swing.map.MapPanel;
 
 public class ToolTipOverlay extends AbstractOverlay {

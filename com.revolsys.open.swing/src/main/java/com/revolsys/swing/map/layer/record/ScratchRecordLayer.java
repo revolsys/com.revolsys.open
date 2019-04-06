@@ -3,9 +3,10 @@ package com.revolsys.swing.map.layer.record;
 import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.menu.MenuFactory;
@@ -40,7 +41,7 @@ public class ScratchRecordLayer extends ListRecordLayer {
 
   public ScratchRecordLayer(final Map<String, ? extends Object> config) {
     super(TYPE_NAME);
-    this.geometryType = DataTypes.GEOMETRY;
+    this.geometryType = GeometryDataTypes.GEOMETRY;
     setProperties(config);
   }
 
@@ -63,7 +64,7 @@ public class ScratchRecordLayer extends ListRecordLayer {
     this.geometryType = DataTypes.getDataType(geometryTypeName);
     if (this.geometryType == null
       || !Geometry.class.isAssignableFrom(this.geometryType.getJavaClass())) {
-      this.geometryType = DataTypes.GEOMETRY;
+      this.geometryType = GeometryDataTypes.GEOMETRY;
     }
   }
 

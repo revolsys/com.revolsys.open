@@ -14,8 +14,8 @@ import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
@@ -28,7 +28,7 @@ import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.RecordRowTable;
-import com.revolsys.util.Dates;
+import org.jeometry.common.date.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 

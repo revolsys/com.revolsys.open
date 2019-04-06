@@ -4,18 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.PathName;
 import com.revolsys.io.endian.EndianInput;
 import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.endian.EndianMappedByteBuffer;
@@ -350,34 +350,34 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
       recordDefinition.setPolygonRingDirection(ClockDirection.CLOCKWISE);
       this.recordDefinition = recordDefinition;
       if (recordDefinition.getGeometryFieldIndex() == -1) {
-        DataType geometryType = DataTypes.GEOMETRY;
+        DataType geometryType = GeometryDataTypes.GEOMETRY;
         switch (this.shapeType) {
           case ShapefileConstants.POINT_SHAPE:
           case ShapefileConstants.POINT_Z_SHAPE:
           case ShapefileConstants.POINT_M_SHAPE:
           case ShapefileConstants.POINT_ZM_SHAPE:
-            geometryType = DataTypes.POINT;
+            geometryType = GeometryDataTypes.POINT;
           break;
 
           case ShapefileConstants.POLYLINE_SHAPE:
           case ShapefileConstants.POLYLINE_Z_SHAPE:
           case ShapefileConstants.POLYLINE_M_SHAPE:
           case ShapefileConstants.POLYLINE_ZM_SHAPE:
-            geometryType = DataTypes.MULTI_LINE_STRING;
+            geometryType = GeometryDataTypes.MULTI_LINE_STRING;
           break;
 
           case ShapefileConstants.POLYGON_SHAPE:
           case ShapefileConstants.POLYGON_Z_SHAPE:
           case ShapefileConstants.POLYGON_M_SHAPE:
           case ShapefileConstants.POLYGON_ZM_SHAPE:
-            geometryType = DataTypes.MULTI_POLYGON;
+            geometryType = GeometryDataTypes.MULTI_POLYGON;
           break;
 
           case ShapefileConstants.MULTI_POINT_SHAPE:
           case ShapefileConstants.MULTI_POINT_Z_SHAPE:
           case ShapefileConstants.MULTI_POINT_M_SHAPE:
           case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
-            geometryType = DataTypes.MULTI_POINT;
+            geometryType = GeometryDataTypes.MULTI_POINT;
           break;
 
           default:

@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;

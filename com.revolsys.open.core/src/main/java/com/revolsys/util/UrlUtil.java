@@ -34,11 +34,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.net.UrlProxy;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 
@@ -522,9 +523,9 @@ public final class UrlUtil {
       return null;
     } else if (value instanceof URL) {
       return (URL)value;
-    } else if (value instanceof Resource) {
-      final Resource resource = (Resource)value;
-      return resource.getURL();
+    } else if (value instanceof UrlProxy) {
+      final UrlProxy proxy = (UrlProxy)value;
+      return proxy.getUrl();
     } else if (value instanceof File) {
       final File file = (File)value;
       return FileUtil.toUrl(file);

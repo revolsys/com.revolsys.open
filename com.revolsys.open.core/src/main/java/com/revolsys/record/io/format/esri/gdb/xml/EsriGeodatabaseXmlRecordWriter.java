@@ -4,13 +4,15 @@ import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.date.Dates;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
@@ -27,7 +29,6 @@ import com.revolsys.record.io.format.xml.XsiConstants;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Dates;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   implements EsriGeodatabaseXmlConstants {
@@ -113,15 +114,15 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
       if (this.fieldTypes.getFieldType(geometryDataType) != null) {
         hasGeometry = true;
 
-        if (geometryDataType.equals(DataTypes.POINT)) {
+        if (geometryDataType.equals(GeometryDataTypes.POINT)) {
           this.geometryType = GEOMETRY_TYPE_POINT;
-        } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.MULTI_POINT)) {
           this.geometryType = GEOMETRY_TYPE_MULTI_POINT;
-        } else if (geometryDataType.equals(DataTypes.LINE_STRING)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.LINE_STRING)) {
           this.geometryType = GEOMETRY_TYPE_POLYLINE;
-        } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.MULTI_LINE_STRING)) {
           this.geometryType = GEOMETRY_TYPE_POLYLINE;
-        } else if (geometryDataType.equals(DataTypes.POLYGON)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.POLYGON)) {
           this.geometryType = GEOMETRY_TYPE_POLYGON;
         } else {
           if (geometry instanceof Point) {

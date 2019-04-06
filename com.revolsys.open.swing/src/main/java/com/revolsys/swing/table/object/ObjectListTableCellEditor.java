@@ -7,7 +7,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.TableCellEditor;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 
 public class ObjectListTableCellEditor extends AbstractCellEditor implements TableCellEditor {
 

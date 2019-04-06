@@ -3,7 +3,7 @@ package com.revolsys.swing.undo;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class SwitchRecordFields extends AbstractUndoableEdit {

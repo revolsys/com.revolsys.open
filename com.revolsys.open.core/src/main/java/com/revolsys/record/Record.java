@@ -14,11 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
@@ -34,6 +33,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.RsCoreDataTypes;
 import com.revolsys.util.Strings;
 
 public interface Record
@@ -1159,7 +1159,7 @@ public interface Record
       Identifier.setIdentifier(this, idFieldNames, identifier);
     } else {
       final Identifier oldIdentifier = getIdentifier();
-      if (!DataTypes.IDENTIFIER.equals(oldIdentifier, identifier)) {
+      if (!RsCoreDataTypes.IDENTIFIER.equals(oldIdentifier, identifier)) {
         throw new IllegalStateException(
           "Cannot change the ID on a persisted record: " + identifier + "!=" + oldIdentifier);
       }

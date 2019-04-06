@@ -10,10 +10,10 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.Icons;
@@ -70,7 +70,7 @@ public class BoundingBoxGriddedElevationModelLayerRenderer
 
   @Override
   public DataType getGeometryType() {
-    return DataTypes.POLYGON;
+    return GeometryDataTypes.POLYGON;
   }
 
   @Override

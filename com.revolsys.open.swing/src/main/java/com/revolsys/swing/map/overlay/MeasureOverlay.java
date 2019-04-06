@@ -25,11 +25,11 @@ import javax.measure.quantity.Length;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -266,7 +266,7 @@ public class MeasureOverlay extends AbstractOverlay {
               final LineString line = geometryFactory.lineString(from, point);
               setMeasureGeometry(line);
             }
-          } else if (this.measureDataType == DataTypes.LINE_STRING) {
+          } else if (this.measureDataType == GeometryDataTypes.LINE_STRING) {
             if (measureGeometry instanceof LineString) {
               LineString line = (LineString)measureGeometry;
               final Point to = line.getToPoint();
@@ -429,7 +429,7 @@ public class MeasureOverlay extends AbstractOverlay {
         if (this.measureGeometry instanceof Point) {
           xorGeometry = geometryFactory.lineString(toPoint, point);
         } else {
-          if (toPoint.equals(fromPoint) || this.measureDataType == DataTypes.LINE_STRING) {
+          if (toPoint.equals(fromPoint) || this.measureDataType == GeometryDataTypes.LINE_STRING) {
             xorGeometry = newXorLine(geometryFactory, toPoint, point);
           } else {
             final Point p1 = geometryFactory.point(toPoint);
@@ -502,7 +502,7 @@ public class MeasureOverlay extends AbstractOverlay {
 
         Point textPoint;
         measureTextStyle.setTextHorizontalAlignment("right");
-        if (this.measureDataType == DataTypes.POLYGON && this.measureGeometry instanceof Polygon) {
+        if (this.measureDataType == GeometryDataTypes.POLYGON && this.measureGeometry instanceof Polygon) {
           measureTextStyle.setTextDx(Quantities.getQuantity(-5, CustomUnits.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n-1)");
           measureTextStyle.setTextVerticalAlignment("middle");
@@ -573,7 +573,7 @@ public class MeasureOverlay extends AbstractOverlay {
           label.append(lengthString);
           label.append(unitString);
 
-          if (this.measureDataType == DataTypes.POLYGON && measureGeometry instanceof Polygon) {
+          if (this.measureDataType == GeometryDataTypes.POLYGON && measureGeometry instanceof Polygon) {
             final String areaString = MEASURE_FORMAT.format(Doubles.makePrecise(100, area));
             label.append(" \n");
             label.append(areaString);

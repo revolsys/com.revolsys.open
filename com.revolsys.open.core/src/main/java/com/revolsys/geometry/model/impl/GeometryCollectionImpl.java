@@ -46,11 +46,11 @@ import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryDataType;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
@@ -257,7 +257,7 @@ public class GeometryCollectionImpl implements GeometryCollection {
 
   @Override
   public GeometryDataType<?, ?> getDataType() {
-    return DataTypes.GEOMETRY_COLLECTION;
+    return GeometryDataTypes.GEOMETRY_COLLECTION;
   }
 
   @SuppressWarnings("unchecked")

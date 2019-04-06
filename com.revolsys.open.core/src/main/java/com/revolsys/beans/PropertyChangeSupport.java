@@ -37,7 +37,7 @@ import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 
 /**
  * This is a utility class that can be used by beans that support bound

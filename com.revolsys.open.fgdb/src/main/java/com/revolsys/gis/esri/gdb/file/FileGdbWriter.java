@@ -3,8 +3,9 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;

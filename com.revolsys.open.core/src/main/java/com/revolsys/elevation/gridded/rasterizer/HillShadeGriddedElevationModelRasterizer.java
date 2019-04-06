@@ -2,9 +2,9 @@ package com.revolsys.elevation.gridded.rasterizer;
 
 import java.util.Map;
 
+import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.math.Angle;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.grid.Grid;

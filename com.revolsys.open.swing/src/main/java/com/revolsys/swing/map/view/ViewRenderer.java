@@ -12,7 +12,7 @@ import javax.measure.quantity.Length;
 import org.jeometry.coordinatesystem.model.Ellipsoid;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;

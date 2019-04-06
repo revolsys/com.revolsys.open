@@ -42,7 +42,6 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.MultiPointEditor;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPointVertex;
@@ -188,7 +187,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
 
   @Override
   default GeometryDataType<MultiPoint, MultiPointEditor> getDataType() {
-    return DataTypes.MULTI_POINT;
+    return GeometryDataTypes.MULTI_POINT;
   }
 
   @Override

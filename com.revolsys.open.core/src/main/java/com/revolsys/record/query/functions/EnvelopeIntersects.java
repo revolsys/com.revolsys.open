@@ -1,6 +1,7 @@
 package com.revolsys.record.query.functions;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;

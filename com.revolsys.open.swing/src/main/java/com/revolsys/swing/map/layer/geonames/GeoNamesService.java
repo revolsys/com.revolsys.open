@@ -11,13 +11,14 @@ import java.util.Map;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
-import com.revolsys.io.PathName;
+import org.jeometry.common.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.schema.RecordDefinition;
@@ -49,7 +50,7 @@ public class GeoNamesService {
     recordDefinition.addField("countryCode", DataTypes.STRING, false);
     recordDefinition.addField("countryName", DataTypes.STRING, false);
     recordDefinition.addField("timeZoneId", DataTypes.STRING, false);
-    recordDefinition.addField("geometry", DataTypes.POINT, false);
+    recordDefinition.addField("geometry", GeometryDataTypes.POINT, false);
     NAME_RECORD_DEFINITION = recordDefinition;
 
     final RecordDefinitionImpl wikipediaRecordDefinition = new RecordDefinitionImpl(
@@ -62,7 +63,7 @@ public class GeoNamesService {
     wikipediaRecordDefinition.addField("thumbnailImg", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("lang", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("population", DataTypes.INT, false);
-    wikipediaRecordDefinition.addField("geometry", DataTypes.POINT, false);
+    wikipediaRecordDefinition.addField("geometry", GeometryDataTypes.POINT, false);
 
     WIKIPEDIA_RECORD_DEFINITION = wikipediaRecordDefinition;
   }

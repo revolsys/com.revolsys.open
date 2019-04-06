@@ -3,7 +3,8 @@ package com.revolsys.elevation.gridded.rasterizer.gradient;
 import java.awt.Color;
 import java.util.Map;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;

@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.query.AbstractMultiQueryValue;
 import com.revolsys.record.query.Query;

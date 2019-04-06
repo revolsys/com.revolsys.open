@@ -33,9 +33,9 @@
 
 package com.revolsys.core.test.geometry.test.old.junit;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -67,7 +67,7 @@ public class MiscellaneousTest extends TestCase {
 
   public void testBoundaryOfEmptyGeometry() throws Exception {
     Assert.equals(this.geometryFactory.point().getBoundary().getDataType(),
-      DataTypes.GEOMETRY_COLLECTION);
+      GeometryDataTypes.GEOMETRY_COLLECTION);
     org.junit.Assert.assertTrue("Instanceof Point",
       this.geometryFactory.linearRing().getBoundary() instanceof Point);
     org.junit.Assert.assertTrue("instanceof Point",

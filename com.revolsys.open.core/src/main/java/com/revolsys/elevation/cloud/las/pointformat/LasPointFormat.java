@@ -3,11 +3,13 @@ package com.revolsys.elevation.cloud.las.pointformat;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.collection.map.IntHashMap;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.LasVersion;
 import com.revolsys.elevation.cloud.las.Version;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.record.code.Code;
@@ -196,7 +198,7 @@ public enum LasPointFormat implements Code {
       builder.addField("zT", DataTypes.FLOAT, true);
     }
 
-    builder.addField("geometry", DataTypes.POINT, true);
+    builder.addField("geometry", GeometryDataTypes.POINT, true);
     return builder.getRecordDefinition();
   }
 

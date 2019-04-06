@@ -22,7 +22,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.util.Booleans;
 
 public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer

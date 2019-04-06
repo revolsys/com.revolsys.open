@@ -2,7 +2,7 @@ package com.revolsys.swing.field;
 
 import java.util.List;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.util.Strings;

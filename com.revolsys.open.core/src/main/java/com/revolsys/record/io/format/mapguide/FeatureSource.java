@@ -6,14 +6,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -99,56 +101,56 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
                 if (geometryDataType != DataTypes.OBJECT) {
                   if (dataType == DataTypes.STRING) {
                     dataType = geometryDataType;
-                  } else if (dataType == DataTypes.GEOMETRY) {
-                  } else if (geometryDataType == DataTypes.GEOMETRY) {
-                    dataType = DataTypes.GEOMETRY;
-                  } else if (geometryDataType == DataTypes.GEOMETRY_COLLECTION) {
-                    dataType = DataTypes.GEOMETRY;
-                  } else if (dataType.equals(DataTypes.POINT)) {
-                    if (geometryDataType.equals(DataTypes.POINT)) {
-                    } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
-                      dataType = DataTypes.MULTI_POINT;
+                  } else if (dataType == GeometryDataTypes.GEOMETRY) {
+                  } else if (geometryDataType == GeometryDataTypes.GEOMETRY) {
+                    dataType = GeometryDataTypes.GEOMETRY;
+                  } else if (geometryDataType == GeometryDataTypes.GEOMETRY_COLLECTION) {
+                    dataType = GeometryDataTypes.GEOMETRY;
+                  } else if (dataType.equals(GeometryDataTypes.POINT)) {
+                    if (geometryDataType.equals(GeometryDataTypes.POINT)) {
+                    } else if (geometryDataType.equals(GeometryDataTypes.MULTI_POINT)) {
+                      dataType = GeometryDataTypes.MULTI_POINT;
                     } else {
-                      dataType = DataTypes.GEOMETRY;
+                      dataType = GeometryDataTypes.GEOMETRY;
                     }
-                  } else if (dataType.equals(DataTypes.MULTI_POINT)) {
-                    if (geometryDataType.equals(DataTypes.POINT)) {
-                    } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
+                  } else if (dataType.equals(GeometryDataTypes.MULTI_POINT)) {
+                    if (geometryDataType.equals(GeometryDataTypes.POINT)) {
+                    } else if (geometryDataType.equals(GeometryDataTypes.MULTI_POINT)) {
                     } else {
-                      dataType = DataTypes.GEOMETRY;
+                      dataType = GeometryDataTypes.GEOMETRY;
                     }
-                  } else if (dataType.equals(DataTypes.LINE_STRING)) {
-                    if (geometryDataType.equals(DataTypes.LINE_STRING)) {
-                    } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
-                      dataType = DataTypes.MULTI_LINE_STRING;
+                  } else if (dataType.equals(GeometryDataTypes.LINE_STRING)) {
+                    if (geometryDataType.equals(GeometryDataTypes.LINE_STRING)) {
+                    } else if (geometryDataType.equals(GeometryDataTypes.MULTI_LINE_STRING)) {
+                      dataType = GeometryDataTypes.MULTI_LINE_STRING;
                     } else {
-                      dataType = DataTypes.GEOMETRY;
+                      dataType = GeometryDataTypes.GEOMETRY;
                     }
-                  } else if (dataType.equals(DataTypes.MULTI_LINE_STRING)) {
-                    if (geometryDataType.equals(DataTypes.LINE_STRING)) {
-                    } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
+                  } else if (dataType.equals(GeometryDataTypes.MULTI_LINE_STRING)) {
+                    if (geometryDataType.equals(GeometryDataTypes.LINE_STRING)) {
+                    } else if (geometryDataType.equals(GeometryDataTypes.MULTI_LINE_STRING)) {
                     } else {
-                      dataType = DataTypes.GEOMETRY;
+                      dataType = GeometryDataTypes.GEOMETRY;
                     }
-                  } else if (dataType.equals(DataTypes.POLYGON)) {
-                    if (geometryDataType.equals(DataTypes.POLYGON)) {
-                    } else if (geometryDataType.equals(DataTypes.MULTI_POLYGON)) {
-                      dataType = DataTypes.MULTI_POLYGON;
+                  } else if (dataType.equals(GeometryDataTypes.POLYGON)) {
+                    if (geometryDataType.equals(GeometryDataTypes.POLYGON)) {
+                    } else if (geometryDataType.equals(GeometryDataTypes.MULTI_POLYGON)) {
+                      dataType = GeometryDataTypes.MULTI_POLYGON;
                     } else {
-                      dataType = DataTypes.GEOMETRY;
+                      dataType = GeometryDataTypes.GEOMETRY;
                     }
-                  } else if (dataType.equals(DataTypes.MULTI_POLYGON)) {
-                    if (geometryDataType.equals(DataTypes.POLYGON)) {
-                    } else if (geometryDataType.equals(DataTypes.MULTI_POLYGON)) {
+                  } else if (dataType.equals(GeometryDataTypes.MULTI_POLYGON)) {
+                    if (geometryDataType.equals(GeometryDataTypes.POLYGON)) {
+                    } else if (geometryDataType.equals(GeometryDataTypes.MULTI_POLYGON)) {
                     } else {
-                      dataType = DataTypes.GEOMETRY;
+                      dataType = GeometryDataTypes.GEOMETRY;
                     }
                   }
                 }
 
               }
               if (dataType == DataTypes.STRING) {
-                dataType = DataTypes.GEOMETRY;
+                dataType = GeometryDataTypes.GEOMETRY;
               }
               int axisCount = 2;
               if ("true".equals(getString(fieldElement, "@fdo:hasMeasure"))) {

@@ -7,13 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.coordinatesystem.model.Ellipsoid;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystemProxy;
 import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 import org.jeometry.coordinatesystem.operation.gridshift.HorizontalShiftOperation;
 
-import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.channels.ChannelReader;
@@ -327,7 +328,7 @@ public class GsbGridShiftFile {
   public void writeGridExtents() {
     final RecordDefinition recordDefinition = new RecordDefinitionBuilder() //
       .addField("name", DataTypes.STRING) //
-      .addField(DataTypes.POLYGON) //
+      .addField(GeometryDataTypes.POLYGON) //
       .setGeometryFactory(GeometryFactory.floating2d(this.fromCoordinateSystem))
       .getRecordDefinition();
     try (

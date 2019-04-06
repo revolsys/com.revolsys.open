@@ -12,9 +12,10 @@ import java.util.Set;
 
 import javax.swing.JComponent;
 
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.beans.Classes;
 import com.revolsys.collection.list.Lists;
-import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.CompareUtil;

@@ -3,10 +3,10 @@ package com.revolsys.core.test.io.test;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.common.io.PathName;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.util.Property;
 

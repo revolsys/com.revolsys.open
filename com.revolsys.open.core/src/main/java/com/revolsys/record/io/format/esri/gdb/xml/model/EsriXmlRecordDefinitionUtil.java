@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.collection.CollectionUtil;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -76,16 +78,16 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
       final GeometryType shapeType = featureClass.getShapeType();
       switch (shapeType) {
         case esriGeometryPoint:
-          dataType = DataTypes.POINT;
+          dataType = GeometryDataTypes.POINT;
         break;
         case esriGeometryMultipoint:
-          dataType = DataTypes.MULTI_POINT;
+          dataType = GeometryDataTypes.MULTI_POINT;
         break;
         case esriGeometryPolyline:
-          dataType = DataTypes.MULTI_LINE_STRING;
+          dataType = GeometryDataTypes.MULTI_LINE_STRING;
         break;
         case esriGeometryPolygon:
-          dataType = DataTypes.POLYGON;
+          dataType = GeometryDataTypes.POLYGON;
         break;
 
         default:
@@ -318,19 +320,19 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
       if (FIELD_TYPES.getFieldType(geometryDataType) != null) {
         hasGeometry = true;
         // TODO Z,m
-        if (geometryDataType.equals(DataTypes.POINT)) {
+        if (geometryDataType.equals(GeometryDataTypes.POINT)) {
           shapeType = GeometryType.esriGeometryPoint;
-        } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.MULTI_POINT)) {
           shapeType = GeometryType.esriGeometryMultipoint;
-        } else if (geometryDataType.equals(DataTypes.LINE_STRING)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.LINE_STRING)) {
           shapeType = GeometryType.esriGeometryPolyline;
-        } else if (geometryDataType.equals(DataTypes.LINEAR_RING)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.LINEAR_RING)) {
           shapeType = GeometryType.esriGeometryPolyline;
-        } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.MULTI_LINE_STRING)) {
           shapeType = GeometryType.esriGeometryPolyline;
-        } else if (geometryDataType.equals(DataTypes.POLYGON)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.POLYGON)) {
           shapeType = GeometryType.esriGeometryPolygon;
-        } else if (geometryDataType.equals(DataTypes.MULTI_POLYGON)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.MULTI_POLYGON)) {
           shapeType = GeometryType.esriGeometryPolygon;
         } else {
           throw new IllegalArgumentException("Unable to detect geometry type");

@@ -2,7 +2,7 @@ package com.revolsys.swing.map.layer;
 
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.BaseTreeNode;

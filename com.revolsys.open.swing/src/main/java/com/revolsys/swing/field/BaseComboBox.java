@@ -20,7 +20,7 @@ import javax.swing.text.JTextComponent;
 
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.swing.list.renderer.LambdaListCellRenderer;
 import com.revolsys.util.Strings;
 

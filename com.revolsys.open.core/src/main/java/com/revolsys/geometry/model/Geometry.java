@@ -46,6 +46,8 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.datatype.DataTypeProxy;
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;
@@ -55,8 +57,6 @@ import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
-import com.revolsys.datatype.DataTypeProxy;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.Centroid;
 import com.revolsys.geometry.algorithm.ConvexHull;
 import com.revolsys.geometry.algorithm.InteriorPointArea;
@@ -1508,7 +1508,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   @Override
   default GeometryDataType<?, ?> getDataType() {
-    return DataTypes.GEOMETRY;
+    return GeometryDataTypes.GEOMETRY;
   }
 
   /**

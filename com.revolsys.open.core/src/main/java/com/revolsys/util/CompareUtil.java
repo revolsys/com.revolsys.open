@@ -3,8 +3,9 @@ package com.revolsys.util;
 import java.text.Collator;
 import java.util.Comparator;
 
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.datatype.DataTypes;
 
 public class CompareUtil {
 

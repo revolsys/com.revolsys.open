@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;

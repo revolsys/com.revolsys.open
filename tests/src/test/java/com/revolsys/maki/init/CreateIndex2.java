@@ -25,7 +25,7 @@ public class CreateIndex2 {
     }
     final File symbolLibraryFile = new File(
       "src/main/resources/META-INF/com.revolsys.core.test.swing.map.symbol.SymbolLibrary.json");
-    MapObjectFactory.write(symbolLibraryFile, symbolLibrary);
+    symbolLibrary.writeToFile(symbolLibraryFile);
 
     final SymbolLibrary symbolLibrary2 = MapObjectFactory.toObject(symbolLibraryFile);
   }

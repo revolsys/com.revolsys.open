@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
-import org.jeometry.common.math.MathUtil;
-
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.util.Points;
 
 public class PointQuadTreeNode<T> {
   private PointQuadTreeNode<T> northEast;
@@ -121,7 +120,7 @@ public class PointQuadTreeNode<T> {
     final double maxX = boundingBox.getMaxX();
     final double minY = boundingBox.getMinY();
     final double maxY = boundingBox.getMaxY();
-    final double distance = MathUtil.distance(x, y, this.x, this.y);
+    final double distance = Points.distance(x, y, this.x, this.y);
     if (distance < maxDistance) {
       results.add(this.value);
     }

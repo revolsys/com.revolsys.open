@@ -13,10 +13,10 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
@@ -103,14 +103,14 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
 
     if (geometryField != null) {
       final DataType geometryDataType = geometryField.getDataType();
-      if (DataTypes.GEOMETRY_COLLECTION.equals(geometryDataType)) {
-        return DataTypes.GEOMETRY;
-      } else if (DataTypes.MULTI_POINT.equals(geometryDataType)) {
-        return DataTypes.POINT;
-      } else if (DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
-        return DataTypes.LINE_STRING;
-      } else if (DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
-        return DataTypes.POLYGON;
+      if (GeometryDataTypes.GEOMETRY_COLLECTION.equals(geometryDataType)) {
+        return GeometryDataTypes.GEOMETRY;
+      } else if (GeometryDataTypes.MULTI_POINT.equals(geometryDataType)) {
+        return GeometryDataTypes.POINT;
+      } else if (GeometryDataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+        return GeometryDataTypes.LINE_STRING;
+      } else if (GeometryDataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+        return GeometryDataTypes.POLYGON;
       } else {
         return geometryDataType;
       }
@@ -142,14 +142,14 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
       final GeometryStyle geometryStyle = getStyle();
       Shape shape = null;
       final DataType geometryDataType = layer.getGeometryType();
-      if (DataTypes.POINT.equals(geometryDataType)
-        || DataTypes.MULTI_POINT.equals(geometryDataType)) {
+      if (GeometryDataTypes.POINT.equals(geometryDataType)
+        || GeometryDataTypes.MULTI_POINT.equals(geometryDataType)) {
         return this.style.getMarker().newIcon(geometryStyle);
-      } else if (DataTypes.LINE_STRING.equals(geometryDataType)
-        || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+      } else if (GeometryDataTypes.LINE_STRING.equals(geometryDataType)
+        || GeometryDataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
         shape = new LineStringShape(GeometryStylePreview.getLineString(16));
-      } else if (DataTypes.POLYGON.equals(geometryDataType)
-        || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+      } else if (GeometryDataTypes.POLYGON.equals(geometryDataType)
+        || GeometryDataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         shape = getPolygonShape();
       } else {
         return ICON;
@@ -159,8 +159,8 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
       final Graphics2D graphics = image.createGraphics();
       graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-      if (DataTypes.POLYGON.equals(geometryDataType)
-        || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+      if (GeometryDataTypes.POLYGON.equals(geometryDataType)
+        || GeometryDataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         graphics.setPaint(geometryStyle.getPolygonFill());
         graphics.fill(shape);
       }

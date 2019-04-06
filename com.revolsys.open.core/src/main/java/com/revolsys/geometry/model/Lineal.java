@@ -36,7 +36,8 @@ package com.revolsys.geometry.model;
 import java.util.List;
 import java.util.function.Function;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.index.LineSegmentIndex;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;

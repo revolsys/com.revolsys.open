@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 
 public class JdbcByteFieldDefinition extends JdbcFieldDefinition {
   public JdbcByteFieldDefinition(final String dbName, final String name, final int sqlType,

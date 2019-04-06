@@ -6,8 +6,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Map;
 
-import com.revolsys.datatype.DataTypes;
-import com.revolsys.util.Dates;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.date.Dates;
+
 import com.revolsys.util.Property;
 
 public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {

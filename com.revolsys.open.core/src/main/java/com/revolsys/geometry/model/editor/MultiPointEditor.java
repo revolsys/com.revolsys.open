@@ -4,9 +4,9 @@ import java.util.function.Consumer;
 
 import org.jeometry.common.function.BiFunctionDouble;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
@@ -98,7 +98,7 @@ public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual,
 
   @Override
   public GeometryDataType<Point, PointEditor> getPartDataType() {
-    return DataTypes.POINT;
+    return GeometryDataTypes.POINT;
   }
 
   @Override

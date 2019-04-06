@@ -17,12 +17,14 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.date.Dates;
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.esri.filegdb.jni.EsriFileGdb;
 import com.revolsys.esri.filegdb.jni.Geodatabase;
 import com.revolsys.esri.filegdb.jni.Row;
@@ -52,7 +54,6 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.JdbcUtils;
@@ -97,7 +98,6 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.CloseableValueHolder;
-import com.revolsys.util.Dates;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.StringBuilders;

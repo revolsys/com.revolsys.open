@@ -14,19 +14,19 @@ import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.comparator.StringNumberComparator;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReader;
@@ -650,7 +650,7 @@ public interface Records {
   }
 
   static RecordDefinition newGeometryRecordDefinition() {
-    final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
+    final FieldDefinition geometryField = new FieldDefinition("geometry", GeometryDataTypes.GEOMETRY, true);
     return new RecordDefinitionImpl(PathName.newPathName("/Feature"), geometryField);
   }
 

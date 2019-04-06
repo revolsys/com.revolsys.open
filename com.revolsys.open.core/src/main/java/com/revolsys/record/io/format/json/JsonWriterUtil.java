@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jeometry.common.math.MathUtil;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.number.Doubles;
 import org.jeometry.common.number.Numbers;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.StringPrinter;
 
 public final class JsonWriterUtil {
@@ -165,9 +165,9 @@ public final class JsonWriterUtil {
       if ("NaN".equals(string)) {
         string = "null";
       } else if ("Infinity".equals(string)) {
-        string = MathUtil.MAX_DOUBLE_STRING;
+        string = Doubles.MAX_DOUBLE_STRING;
       } else if ("-Infinity".equals(string)) {
-        string = MathUtil.MIN_DOUBLE_STRING;
+        string = Doubles.MIN_DOUBLE_STRING;
       }
       out.write(string);
     } else if (value instanceof Collection) {

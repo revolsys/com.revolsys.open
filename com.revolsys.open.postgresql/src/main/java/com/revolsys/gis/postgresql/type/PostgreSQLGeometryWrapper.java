@@ -4,15 +4,15 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.function.Consumer3;
 import org.jeometry.common.number.Doubles;
 import org.postgresql.util.PGobject;
 
 import com.revolsys.beans.Classes;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -27,15 +27,15 @@ public class PostgreSQLGeometryWrapper extends PGobject {
 
   private static final Map<DataType, Consumer3<PrintWriter, Geometry, Integer>> WRITER_BY_TYPE = Maps
     .<DataType, Consumer3<PrintWriter, Geometry, Integer>> buildHash() //
-    .add(DataTypes.POINT, PostgreSQLGeometryWrapper::writePoint)
-    .add(DataTypes.LINE_STRING, PostgreSQLGeometryWrapper::writeLineString)
-    .add(DataTypes.LINEAR_RING, PostgreSQLGeometryWrapper::writeLinearRing)
-    .add(DataTypes.POLYGON, PostgreSQLGeometryWrapper::writePolygon)
-    .add(DataTypes.MULTI_POINT, PostgreSQLGeometryWrapper::writeMultiPoint)
-    .add(DataTypes.MULTI_LINE_STRING, PostgreSQLGeometryWrapper::writeMultiLineString)
-    .add(DataTypes.MULTI_POLYGON, PostgreSQLGeometryWrapper::writeMultiPolygon)
-    .add(DataTypes.GEOMETRY_COLLECTION, PostgreSQLGeometryWrapper::writeGeometry)
-    .add(DataTypes.GEOMETRY, PostgreSQLGeometryWrapper::writeGeometry)
+    .add(GeometryDataTypes.POINT, PostgreSQLGeometryWrapper::writePoint)
+    .add(GeometryDataTypes.LINE_STRING, PostgreSQLGeometryWrapper::writeLineString)
+    .add(GeometryDataTypes.LINEAR_RING, PostgreSQLGeometryWrapper::writeLinearRing)
+    .add(GeometryDataTypes.POLYGON, PostgreSQLGeometryWrapper::writePolygon)
+    .add(GeometryDataTypes.MULTI_POINT, PostgreSQLGeometryWrapper::writeMultiPoint)
+    .add(GeometryDataTypes.MULTI_LINE_STRING, PostgreSQLGeometryWrapper::writeMultiLineString)
+    .add(GeometryDataTypes.MULTI_POLYGON, PostgreSQLGeometryWrapper::writeMultiPolygon)
+    .add(GeometryDataTypes.GEOMETRY_COLLECTION, PostgreSQLGeometryWrapper::writeGeometry)
+    .add(GeometryDataTypes.GEOMETRY, PostgreSQLGeometryWrapper::writeGeometry)
     .getMap();
 
   public static void append(final StringBuilder wkt, final int axisCount, final Point point) {

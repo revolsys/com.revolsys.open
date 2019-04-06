@@ -5,7 +5,6 @@ import java.io.Serializable;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;
-import org.jeometry.common.math.MathUtil;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -13,6 +12,7 @@ import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.AbstractPoint;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.util.Property;
 
 public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Serializable {
@@ -67,7 +67,7 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
       final double y = point.getY();
       final double x1 = getX();
       final double y1 = this.y;
-      return MathUtil.distance(x1, y1, x, y);
+      return Points.distance(x1, y1, x, y);
     }
   }
 

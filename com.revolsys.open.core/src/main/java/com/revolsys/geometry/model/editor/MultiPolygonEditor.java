@@ -5,9 +5,9 @@ import java.util.function.Consumer;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Function4Double;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiPolygon;
@@ -85,7 +85,7 @@ public class MultiPolygonEditor
 
   @Override
   public GeometryDataType<Polygon, PolygonEditor> getPartDataType() {
-    return DataTypes.POLYGON;
+    return GeometryDataTypes.POLYGON;
   }
 
   @SuppressWarnings("unchecked")

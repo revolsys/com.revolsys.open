@@ -6,8 +6,10 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.Paths;
@@ -42,7 +44,7 @@ public class RecordWriterPerformanceTest {
   public static void main(final String[] args) {
     final Path basePath = Paths.getPath("target/test/performance/recordWriter");
     Paths.createDirectories(basePath);
-    final RecordDefinition recordDefinition = newRecordDefinition(DataTypes.POINT);
+    final RecordDefinition recordDefinition = newRecordDefinition(GeometryDataTypes.POINT);
 
     // writeRecords(basePath, recordDefinition, new Json());
 

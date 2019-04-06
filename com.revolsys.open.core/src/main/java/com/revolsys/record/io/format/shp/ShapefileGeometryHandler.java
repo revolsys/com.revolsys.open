@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.function.Function3;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -122,7 +122,7 @@ public final class ShapefileGeometryHandler {
     final boolean hasZ = axisCount > 2;
     final boolean hasM = axisCount > 3;
 
-    if (DataTypes.POINT.equals(dataType)) {
+    if (GeometryDataTypes.POINT.equals(dataType)) {
       if (hasM) {
         return ShapefileConstants.POINT_ZM_SHAPE;
       } else if (hasZ) {
@@ -134,7 +134,7 @@ public final class ShapefileGeometryHandler {
       } else {
         return ShapefileConstants.POINT_SHAPE;
       }
-    } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+    } else if (GeometryDataTypes.MULTI_POINT.equals(dataType)) {
       if (hasM) {
         return ShapefileConstants.MULTI_POINT_ZM_SHAPE;
       } else if (hasZ) {
@@ -146,8 +146,8 @@ public final class ShapefileGeometryHandler {
       } else {
         return ShapefileConstants.MULTI_POINT_SHAPE;
       }
-    } else if (DataTypes.LINEAR_RING.equals(dataType) || DataTypes.LINE_STRING.equals(dataType)
-      || DataTypes.MULTI_LINE_STRING.equals(dataType)) {
+    } else if (GeometryDataTypes.LINEAR_RING.equals(dataType) || GeometryDataTypes.LINE_STRING.equals(dataType)
+      || GeometryDataTypes.MULTI_LINE_STRING.equals(dataType)) {
       if (hasM) {
         return ShapefileConstants.POLYLINE_ZM_SHAPE;
       } else if (hasZ) {
@@ -159,7 +159,7 @@ public final class ShapefileGeometryHandler {
       } else {
         return ShapefileConstants.POLYLINE_SHAPE;
       }
-    } else if (DataTypes.POLYGON.equals(dataType) || DataTypes.MULTI_POLYGON.equals(dataType)) {
+    } else if (GeometryDataTypes.POLYGON.equals(dataType) || GeometryDataTypes.MULTI_POLYGON.equals(dataType)) {
       if (hasM) {
         return ShapefileConstants.POLYGON_ZM_SHAPE;
       } else if (hasZ) {

@@ -4,10 +4,11 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.connection.AbstractConnection;
-import com.revolsys.datatype.DataType;
 import com.revolsys.io.file.Paths;
 import com.revolsys.util.Property;
 

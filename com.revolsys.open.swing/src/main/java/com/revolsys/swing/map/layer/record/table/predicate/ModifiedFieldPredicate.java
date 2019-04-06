@@ -8,8 +8,8 @@ import javax.swing.JComponent;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
-import com.revolsys.awt.WebColors;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;

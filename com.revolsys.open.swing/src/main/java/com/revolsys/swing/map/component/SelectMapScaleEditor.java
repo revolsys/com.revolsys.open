@@ -9,7 +9,7 @@ import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 
 public class SelectMapScaleEditor implements ComboBoxEditor {
   final ObjectToStringConverter stringConverter;

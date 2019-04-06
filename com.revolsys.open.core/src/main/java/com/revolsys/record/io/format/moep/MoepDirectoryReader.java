@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
 
+import org.jeometry.common.date.Dates;
+
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.record.ArrayRecord;
@@ -13,7 +15,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Dates;
 
 public class MoepDirectoryReader extends RecordDirectoryReader implements RecordDefinitionFactory {
 

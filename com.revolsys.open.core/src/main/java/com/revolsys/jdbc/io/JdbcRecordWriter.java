@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,6 @@ import org.springframework.dao.DataAccessException;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;

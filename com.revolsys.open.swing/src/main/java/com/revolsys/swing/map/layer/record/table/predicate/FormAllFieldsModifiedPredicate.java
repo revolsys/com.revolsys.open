@@ -9,8 +9,8 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
-import com.revolsys.awt.WebColors;
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;

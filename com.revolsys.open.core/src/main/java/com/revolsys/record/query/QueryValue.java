@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.jeometry.common.datatype.DataTypes;
+
 import com.akiban.sql.parser.BetweenOperatorNode;
 import com.akiban.sql.parser.BinaryArithmeticOperatorNode;
 import com.akiban.sql.parser.BinaryLogicalOperatorNode;
@@ -33,7 +35,6 @@ import com.akiban.sql.parser.StaticMethodCallNode;
 import com.akiban.sql.parser.UserTypeConstantNode;
 import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;

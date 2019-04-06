@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 
 import org.jeometry.common.function.Consumer4Double;
 import org.jeometry.common.function.Function4Double;
-import org.jeometry.common.math.MathUtil;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
@@ -20,6 +19,7 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.TriangleLinearRing;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.geometry.util.Triangles;
 
 public interface Triangle extends Polygon {
@@ -118,7 +118,7 @@ public interface Triangle extends Polygon {
 
   static double getCircumcircleRadius(final double centreX, final double centreY, final double x3,
     final double y3) {
-    return MathUtil.distance(centreX, centreY, x3, y3);
+    return Points.distance(centreX, centreY, x3, y3);
     // final double xDistanceSquared = (x3 - centreX) * (x3 - centreX);
     // final double yDistanceSquared = (y3 - centreY) * (y3 - centreY);
     // final double radiusSquared = xDistanceSquared + yDistanceSquared;
@@ -275,7 +275,7 @@ public interface Triangle extends Polygon {
       final double centreY = centre[Y];
 
       final double circumcircleRadius = getCircumcircleRadius(centreX, centreY, x3, y3);
-      final double distanceFromCentre = MathUtil.distance(centreX, centreY, x, y);
+      final double distanceFromCentre = Points.distance(centreX, centreY, x, y);
       return distanceFromCentre < circumcircleRadius + 0.0001;
 
     } catch (final NotRepresentableException e) {
@@ -574,9 +574,9 @@ public interface Triangle extends Polygon {
     final double x3 = getCoordinate(2, X);
     final double y3 = getCoordinate(2, Y);
 
-    final double len0 = MathUtil.distance(x2, y2, x3, y3);
-    final double len1 = MathUtil.distance(x1, y1, x3, y3);
-    final double len2 = MathUtil.distance(x1, y1, x2, y2);
+    final double len0 = Points.distance(x2, y2, x3, y3);
+    final double len1 = Points.distance(x1, y1, x3, y3);
+    final double len2 = Points.distance(x1, y1, x2, y2);
     final double circum = len0 + len1 + len2;
 
     final double inCentreX = (len0 * x1 + len1 * x2 + len2 * x3) / circum;

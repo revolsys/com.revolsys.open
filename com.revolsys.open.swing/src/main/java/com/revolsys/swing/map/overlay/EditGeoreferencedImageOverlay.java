@@ -15,7 +15,7 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

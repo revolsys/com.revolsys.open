@@ -21,12 +21,13 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.net.UrlProxy;
 
 import com.revolsys.connection.file.FileConnectionManager;
 import com.revolsys.connection.file.FolderConnectionRegistry;
-import com.revolsys.datatype.DataType;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
@@ -56,7 +57,6 @@ import com.revolsys.swing.tree.node.FunctionChildrenTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
 import com.revolsys.util.Property;
-import com.revolsys.util.UrlProxy;
 
 public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   private static JFileChooser chooser;

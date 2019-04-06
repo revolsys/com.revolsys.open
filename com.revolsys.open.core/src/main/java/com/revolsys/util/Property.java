@@ -23,6 +23,8 @@ import java.util.function.Consumer;
 import javax.swing.JComponent;
 
 import org.apache.commons.beanutils.MethodUtils;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Integers;
@@ -33,8 +35,6 @@ import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.beans.ProxyPropertyChangeListener;
 import com.revolsys.beans.WeakPropertyChangeListener;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
 

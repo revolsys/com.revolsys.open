@@ -14,7 +14,7 @@ import javax.swing.JComponent;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Polygon;

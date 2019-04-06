@@ -8,7 +8,7 @@ import javax.swing.JTable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;

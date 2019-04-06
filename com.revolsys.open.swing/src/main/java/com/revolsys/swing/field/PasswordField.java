@@ -9,9 +9,9 @@ import javax.swing.JTextField;
 
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.awt.WebColors;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;

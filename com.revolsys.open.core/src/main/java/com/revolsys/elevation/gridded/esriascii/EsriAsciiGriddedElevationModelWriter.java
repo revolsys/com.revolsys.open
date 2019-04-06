@@ -9,11 +9,11 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.common.number.Integers;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.geometry.model.BoundingBox;

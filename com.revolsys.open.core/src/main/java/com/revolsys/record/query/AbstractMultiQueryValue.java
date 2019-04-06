@@ -6,9 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.exception.Exceptions;
-
-import com.revolsys.datatype.DataType;
 
 public abstract class AbstractMultiQueryValue implements QueryValue {
 

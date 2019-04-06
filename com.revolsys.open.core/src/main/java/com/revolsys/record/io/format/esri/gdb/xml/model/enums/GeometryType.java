@@ -1,25 +1,26 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model.enums;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+
+import com.revolsys.geometry.model.GeometryDataTypes;
 
 public enum GeometryType {
-  esriGeometryAny(DataTypes.GEOMETRY), //
-  esriGeometryBag(DataTypes.GEOMETRY_COLLECTION), //
+  esriGeometryAny(GeometryDataTypes.GEOMETRY), //
+  esriGeometryBag(GeometryDataTypes.GEOMETRY_COLLECTION), //
   esriGeometryBezier3Curve(null), //
   esriGeometryCircularArc(null), //
   esriGeometryEllipticArc(null), //
-  esriGeometryEnvelope(DataTypes.BOUNDING_BOX), //
-  esriGeometryLine(DataTypes.LINE_STRING), //
+  esriGeometryEnvelope(GeometryDataTypes.BOUNDING_BOX), //
+  esriGeometryLine(GeometryDataTypes.LINE_STRING), //
   esriGeometryMultiPatch(null), //
-  esriGeometryMultipoint(DataTypes.MULTI_POINT), //
+  esriGeometryMultipoint(GeometryDataTypes.MULTI_POINT), //
   esriGeometryNull(null), //
-  esriGeometryPath(DataTypes.LINE_STRING), //
-  esriGeometryPoint(DataTypes.POINT), //
-  esriGeometryPolygon(DataTypes.MULTI_POLYGON), //
-  esriGeometryPolyline(DataTypes.MULTI_LINE_STRING), //
+  esriGeometryPath(GeometryDataTypes.LINE_STRING), //
+  esriGeometryPoint(GeometryDataTypes.POINT), //
+  esriGeometryPolygon(GeometryDataTypes.MULTI_POLYGON), //
+  esriGeometryPolyline(GeometryDataTypes.MULTI_LINE_STRING), //
   esriGeometryRay(null), //
-  esriGeometryRing(DataTypes.LINEAR_RING), //
+  esriGeometryRing(GeometryDataTypes.LINEAR_RING), //
   esriGeometrySphere(null), //
   esriGeometryTriangleFan(null), //
   esriGeometryTriangles(null), //

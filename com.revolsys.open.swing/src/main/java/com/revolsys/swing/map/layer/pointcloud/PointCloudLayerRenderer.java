@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.layer.pointcloud;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.geometry.model.BoundingBox;

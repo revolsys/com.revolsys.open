@@ -3,7 +3,8 @@ package com.revolsys.fgdb.test.field;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 

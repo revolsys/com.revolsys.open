@@ -34,6 +34,8 @@ import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
 import org.springframework.expression.EvaluationContext;
@@ -48,14 +50,11 @@ import com.revolsys.collection.EmptyReference;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.MapSerializerMap;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Borders;
@@ -963,7 +962,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   protected boolean saveSettingsDo(final java.nio.file.Path directory) {
     final String settingsFileName = getSettingsFileName();
     final java.nio.file.Path settingsFile = directory.resolve(settingsFileName);
-    MapObjectFactory.write(settingsFile, this);
+    writeToFile(settingsFile);
     return true;
   }
 

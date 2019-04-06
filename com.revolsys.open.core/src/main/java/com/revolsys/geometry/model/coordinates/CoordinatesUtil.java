@@ -1,7 +1,6 @@
 package com.revolsys.geometry.model.coordinates;
 
 import org.jeometry.common.math.Angle;
-import org.jeometry.common.math.MathUtil;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.model.LineString;
@@ -9,6 +8,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.util.Trig;
 
 public interface CoordinatesUtil {
@@ -25,7 +25,7 @@ public interface CoordinatesUtil {
       } else if (Double.isNaN(value2) || Double.isNaN(value2)) {
         value = value1;
       } else {
-        value = MathUtil.avg(value1, value2);
+        value = Doubles.avg(value1, value2);
       }
       coordinates[i] = value;
     }
@@ -63,9 +63,9 @@ public interface CoordinatesUtil {
       min = x2;
     }
 
-    final double distance1 = MathUtil.distance(min, min, x1, y1);
+    final double distance1 = Points.distance(min, min, x1, y1);
 
-    final double distance2 = MathUtil.distance(min, min, x2, y2);
+    final double distance2 = Points.distance(min, min, x2, y2);
     final int distanceCompare = Double.compare(distance1, distance2);
     if (distanceCompare == 0) {
       final int xCompare = Double.compare(x1, x2);
@@ -97,9 +97,9 @@ public interface CoordinatesUtil {
     final double y1 = point1.getY();
     final double x2 = point2.getX();
     final double y2 = point2.getY();
-    final double distance1 = MathUtil.distance(0, 0, x1, y1);
+    final double distance1 = Points.distance(0, 0, x1, y1);
 
-    final double distance2 = MathUtil.distance(0, 0, x2, y2);
+    final double distance2 = Points.distance(0, 0, x2, y2);
     final int distanceCompare = Double.compare(distance1, distance2);
     if (distanceCompare == 0) {
       final int yCompare = Double.compare(y1, y2);
@@ -145,7 +145,7 @@ public interface CoordinatesUtil {
 
   static double getElevation(final double x1, final double y1, final double z1, final double x2,
     final double y2, final double z2, final double x, final double y) {
-    final double fraction = MathUtil.distance(x, y, x1, y1) / MathUtil.distance(x1, y1, x2, y2);
+    final double fraction = Points.distance(x, y, x1, y1) / Points.distance(x1, y1, x2, y2);
     final double z = z1 + (z2 - z1) * fraction;
     return z;
   }

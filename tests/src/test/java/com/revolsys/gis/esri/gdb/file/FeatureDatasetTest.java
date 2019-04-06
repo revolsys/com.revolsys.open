@@ -2,13 +2,14 @@ package com.revolsys.gis.esri.gdb.file;
 
 import java.io.File;
 
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.io.PathName;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -22,7 +23,7 @@ public class FeatureDatasetTest {
     final RecordDefinitionImpl newMetaData = new RecordDefinitionImpl(typePath);
     newMetaData.addField("id", DataTypes.INT, false);
     newMetaData.addField("name", DataTypes.STRING, 255, false);
-    newMetaData.addField("geometry", DataTypes.POINT, true);
+    newMetaData.addField("geometry", GeometryDataTypes.POINT, true);
     newMetaData.setIdFieldName("id");
     final GeometryFactory geometryFactory = GeometryFactory.floating2d(4326);
     newMetaData.setGeometryFactory(geometryFactory);

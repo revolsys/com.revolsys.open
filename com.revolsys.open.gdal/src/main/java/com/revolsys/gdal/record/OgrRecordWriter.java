@@ -10,10 +10,10 @@ import org.gdal.ogr.FeatureDefn;
 import org.gdal.ogr.FieldDefn;
 import org.gdal.ogr.GeomFieldDefn;
 import org.gdal.ogr.Layer;
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Integers;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;

@@ -3,7 +3,7 @@ package com.revolsys.ui.html.serializer.key;
 import java.util.Date;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.Dates;
+import org.jeometry.common.date.Dates;
 import com.revolsys.util.Property;
 
 /**

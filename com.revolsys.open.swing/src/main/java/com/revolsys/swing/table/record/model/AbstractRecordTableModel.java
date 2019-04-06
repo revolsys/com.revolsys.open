@@ -9,7 +9,7 @@ import java.util.Set;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.Code;

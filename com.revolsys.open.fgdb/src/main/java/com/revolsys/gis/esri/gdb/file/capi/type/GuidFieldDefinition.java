@@ -2,7 +2,8 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import java.util.WeakHashMap;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.esri.filegdb.jni.Guid;
 import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.record.Record;

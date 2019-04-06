@@ -6,12 +6,12 @@ import java.util.function.Consumer;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;
-import org.jeometry.common.math.MathUtil;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.util.Property;
 
 public class PointDoubleXY extends AbstractPoint implements Serializable {
@@ -73,7 +73,7 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
       final double y = point.getY();
       final double x1 = this.x;
       final double y1 = this.y;
-      return MathUtil.distance(x1, y1, x, y);
+      return Points.distance(x1, y1, x, y);
     }
   }
 

@@ -16,6 +16,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import org.jeometry.common.date.Dates;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
@@ -31,7 +32,6 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Dates;
 
 public class GpxIterator extends BaseObjectWithProperties
   implements Iterator<Record>, RecordReader {

@@ -2,7 +2,7 @@ package com.revolsys.swing.table;
 
 import org.jdesktop.swingx.renderer.StringValue;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 
 public class StringConverterValue implements StringValue {
 

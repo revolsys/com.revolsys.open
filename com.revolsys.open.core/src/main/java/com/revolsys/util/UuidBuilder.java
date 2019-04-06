@@ -5,9 +5,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
 
 public class UuidBuilder {

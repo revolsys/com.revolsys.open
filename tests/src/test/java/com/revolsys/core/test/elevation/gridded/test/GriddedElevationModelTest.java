@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.jeometry.common.date.Dates;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,7 +12,6 @@ import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevationModel;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.util.Dates;
 
 public abstract class GriddedElevationModelTest {
 

@@ -5,10 +5,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.util.Property;
@@ -115,7 +116,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       if (geometry.isEmpty()) {
         return null;
       } else {
-        final DataType dataType = DataTypes.GEOMETRY;
+        final DataType dataType = GeometryDataTypes.GEOMETRY;
         return new PostgreSQLGeometryWrapper(dataType, this.geometryFactory, geometry);
       }
     } else if (object instanceof BoundingBox) {

@@ -4,7 +4,6 @@ import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
 import org.jeometry.common.math.Angle;
-import org.jeometry.common.math.MathUtil;
 
 import com.revolsys.geometry.event.CoordinateEventListenerList;
 import com.revolsys.geometry.graph.Edge;
@@ -15,6 +14,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.util.Points;
 
 public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
 
@@ -61,7 +61,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
       for (int i = 1; i < vertexCount; i++) {
         final double x2 = line.getX(i);
         final double y2 = line.getY(i);
-        final double distance = MathUtil.distance(x1, y1, x2, y2);
+        final double distance = Points.distance(x1, y1, x2, y2);
         if (distance < this.minDistance) {
           final double previousAngle = getAngle(edge, line, i - 1);
           final double angle = getAngle(edge, line, i);

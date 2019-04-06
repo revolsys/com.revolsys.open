@@ -2,8 +2,9 @@ package com.revolsys.core.test.gis.data.query;
 
 import java.util.Arrays;
 
-import com.revolsys.datatype.DataTypes;
-import com.revolsys.io.PathName;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;

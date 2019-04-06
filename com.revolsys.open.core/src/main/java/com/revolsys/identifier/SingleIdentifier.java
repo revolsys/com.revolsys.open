@@ -3,8 +3,9 @@ package com.revolsys.identifier;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.util.CompareUtil;
 
 public class SingleIdentifier implements Identifier, Comparable<Object> {

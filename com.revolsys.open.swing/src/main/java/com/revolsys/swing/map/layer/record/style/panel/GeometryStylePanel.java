@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer;
@@ -48,23 +48,23 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
       previewContainer.add(this.previews);
       panel.add(previewContainer, BorderLayout.EAST);
 
-      if (DataTypes.GEOMETRY.equals(this.geometryDataType)) {
+      if (GeometryDataTypes.GEOMETRY.equals(this.geometryDataType)) {
         addMarkerStylePanel(stylePanels, this.geometryStyle);
         addLineStylePanel(stylePanels, this.geometryStyle);
         addPolygonStylePanel(stylePanels, this.geometryStyle);
         this.previews.add(new MarkerStylePreview(this.geometryStyle));
-        addGeometryPreview(DataTypes.LINE_STRING);
-        addGeometryPreview(DataTypes.POLYGON);
-      } else if (DataTypes.POINT.equals(this.geometryDataType)) {
+        addGeometryPreview(GeometryDataTypes.LINE_STRING);
+        addGeometryPreview(GeometryDataTypes.POLYGON);
+      } else if (GeometryDataTypes.POINT.equals(this.geometryDataType)) {
         addMarkerStylePanel(stylePanels, this.geometryStyle);
         this.previews.add(new MarkerStylePreview(this.geometryStyle));
-      } else if (DataTypes.LINE_STRING.equals(this.geometryDataType)) {
+      } else if (GeometryDataTypes.LINE_STRING.equals(this.geometryDataType)) {
         addLineStylePanel(stylePanels, this.geometryStyle);
-        addGeometryPreview(DataTypes.LINE_STRING);
-      } else if (DataTypes.POLYGON.equals(this.geometryDataType)) {
+        addGeometryPreview(GeometryDataTypes.LINE_STRING);
+      } else if (GeometryDataTypes.POLYGON.equals(this.geometryDataType)) {
         addLineStylePanel(stylePanels, this.geometryStyle);
         addPolygonStylePanel(stylePanels, this.geometryStyle);
-        addGeometryPreview(DataTypes.POLYGON);
+        addGeometryPreview(GeometryDataTypes.POLYGON);
       }
     }
   }

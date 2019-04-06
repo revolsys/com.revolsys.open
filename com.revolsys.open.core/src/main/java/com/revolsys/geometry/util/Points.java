@@ -8,6 +8,32 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 public class Points {
 
+  /**
+   * Calculate the distance between two coordinates.
+   *
+   * @param x1 The first x coordinate.
+   * @param y1 The first y coordinate.
+   * @param x2 The second x coordinate.
+   * @param y2 The second y coordinate.
+   * @return The distance.
+   */
+  public static double distance(final double x1, final double y1, final double x2,
+    final double y2) {
+    final double dx = x2 - x1;
+    final double dy = y2 - y1;
+    final double distanceSquared = dx * dx + dy * dy;
+    final double distance = Math.sqrt(distanceSquared);
+    return distance;
+  }
+
+  public static double distanceInt(final int x1, final int y1, final int x2, final int y2) {
+    final long dx = x2 - x1;
+    final int dy = y2 - y1;
+    final long distanceSquared = dx * dx + dy * dy;
+    final double distance = Math.sqrt(distanceSquared);
+    return distance;
+  }
+
   public static Point pointOffset(final Point point1, final Point point2, final double xOffset,
     double yOffset) {
     final double distance = point1.distancePoint(point2);

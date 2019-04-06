@@ -6,7 +6,8 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collections;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;

@@ -5,10 +5,10 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.Dates;
+import org.jeometry.common.date.Dates;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;

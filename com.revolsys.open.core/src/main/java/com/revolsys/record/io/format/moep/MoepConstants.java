@@ -1,7 +1,9 @@
 package com.revolsys.record.io.format.moep;
 
-import com.revolsys.datatype.DataTypes;
-import com.revolsys.io.PathName;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.io.PathName;
+
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
@@ -84,7 +86,7 @@ public final class MoepConstants {
     type.addField(RETIRE_INTEGRATION_DATE, DataTypes.DATE, false);
     type.addField(RETIRE_REVISION_KEY, DataTypes.STRING, 10, false);
     type.addField(RETIRE_SPECIFICATIONS_RELEASE, DataTypes.STRING, 10, false);
-    type.addField(GEOMETRY, DataTypes.GEOMETRY, true);
+    type.addField(GEOMETRY, GeometryDataTypes.GEOMETRY, true);
     type.setGeometryFieldName(GEOMETRY);
     return type;
   }

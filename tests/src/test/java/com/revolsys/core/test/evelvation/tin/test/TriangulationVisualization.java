@@ -14,7 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
@@ -197,7 +198,7 @@ public class TriangulationVisualization {
   // final RecordDefinition extentRecordDefinition = new
   // RecordDefinitionBuilder("extents") //
   // .addField("LETTER_BLOCK", DataTypes.STRING) //
-  // .addField("POLYGON", DataTypes.POLYGON) //
+  // .addField("POLYGON", GeometryDataTypes.POLYGON) //
   // .setGeometryFactory(geometryFactory) //
   // .getRecordDefinition();
   // final Path trim25kDirectory = config.getTrim25mAlbersDirectory();

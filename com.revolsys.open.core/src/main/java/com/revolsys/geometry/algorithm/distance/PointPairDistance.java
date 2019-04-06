@@ -33,12 +33,11 @@
 
 package com.revolsys.geometry.algorithm.distance;
 
-import org.jeometry.common.math.MathUtil;
-
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.util.Points;
 
 /**
  * Contains a pair of points and the distance between them.
@@ -107,7 +106,7 @@ public class PointPairDistance {
   }
 
   public void setMaximum(final double x1, final double y1, final double x2, final double y2) {
-    final double distance = MathUtil.distance(x1, y1, x2, y2);
+    final double distance = Points.distance(x1, y1, x2, y2);
     if (this.isNull || distance > this.distance) {
       initialize(x1, y1, x2, y2, distance);
     }
@@ -132,7 +131,7 @@ public class PointPairDistance {
   }
 
   public void setMinimum(final double x1, final double y1, final double x2, final double y2) {
-    final double distance = MathUtil.distance(x1, y1, x2, y2);
+    final double distance = Points.distance(x1, y1, x2, y2);
     if (distance < this.distance) {
       initialize(x1, y1, x2, y2, distance);
     }

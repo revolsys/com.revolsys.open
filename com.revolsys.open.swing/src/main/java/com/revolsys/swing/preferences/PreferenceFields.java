@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.swing.field.Field;
 import com.revolsys.util.PreferenceKey;
 

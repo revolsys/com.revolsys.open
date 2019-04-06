@@ -3,9 +3,8 @@ package com.revolsys.identifier;
 import java.util.Collections;
 import java.util.List;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.number.Longs;
-
-import com.revolsys.datatype.DataType;
 
 public final class IntegerIdentifier extends Number implements Identifier, Comparable<Object> {
   private static final long serialVersionUID = 1L;

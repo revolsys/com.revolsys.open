@@ -23,16 +23,18 @@ import org.gdal.ogr.Layer;
 import org.gdal.ogr.ogr;
 import org.gdal.ogr.ogrConstants;
 import org.gdal.osr.SpatialReference;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.date.Dates;
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.gdal.Gdal;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.property.FieldProperties;
@@ -57,7 +59,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.StringBuilders;
 
@@ -320,21 +321,21 @@ public class OgrRecordStore extends AbstractRecordStore {
     int type;
     final DataType dataType = field.getDataType();
 
-    if (DataTypes.POINT.equals(dataType)) {
+    if (GeometryDataTypes.POINT.equals(dataType)) {
       type = 1;
-    } else if (DataTypes.LINE_STRING.equals(dataType)) {
+    } else if (GeometryDataTypes.LINE_STRING.equals(dataType)) {
       type = 2;
-    } else if (DataTypes.POLYGON.equals(dataType)) {
+    } else if (GeometryDataTypes.POLYGON.equals(dataType)) {
       type = 3;
-    } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+    } else if (GeometryDataTypes.MULTI_POINT.equals(dataType)) {
       type = 4;
-    } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
+    } else if (GeometryDataTypes.MULTI_LINE_STRING.equals(dataType)) {
       type = 5;
-    } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+    } else if (GeometryDataTypes.MULTI_POINT.equals(dataType)) {
       type = 6;
-    } else if (DataTypes.GEOMETRY_COLLECTION.equals(dataType)) {
+    } else if (GeometryDataTypes.GEOMETRY_COLLECTION.equals(dataType)) {
       type = 7;
-    } else if (DataTypes.LINEAR_RING.equals(dataType)) {
+    } else if (GeometryDataTypes.LINEAR_RING.equals(dataType)) {
       type = 101;
     } else {
       throw new IllegalArgumentException("Unsupported geometry type " + dataType + " for " + field);
@@ -639,60 +640,60 @@ public class OgrRecordStore extends AbstractRecordStore {
       int axisCount = 2;
       switch (geometryFieldType) {
         case 1:
-          geometryFieldDataType = DataTypes.POINT;
+          geometryFieldDataType = GeometryDataTypes.POINT;
         break;
         case 2:
-          geometryFieldDataType = DataTypes.LINE_STRING;
+          geometryFieldDataType = GeometryDataTypes.LINE_STRING;
         break;
         case 3:
-          geometryFieldDataType = DataTypes.POLYGON;
+          geometryFieldDataType = GeometryDataTypes.POLYGON;
         break;
         case 4:
-          geometryFieldDataType = DataTypes.MULTI_POINT;
+          geometryFieldDataType = GeometryDataTypes.MULTI_POINT;
         break;
         case 5:
-          geometryFieldDataType = DataTypes.MULTI_LINE_STRING;
+          geometryFieldDataType = GeometryDataTypes.MULTI_LINE_STRING;
         break;
         case 6:
-          geometryFieldDataType = DataTypes.MULTI_POLYGON;
+          geometryFieldDataType = GeometryDataTypes.MULTI_POLYGON;
         break;
         case 7:
-          geometryFieldDataType = DataTypes.GEOMETRY_COLLECTION;
+          geometryFieldDataType = GeometryDataTypes.GEOMETRY_COLLECTION;
         break;
         case 101:
-          geometryFieldDataType = DataTypes.LINEAR_RING;
+          geometryFieldDataType = GeometryDataTypes.LINEAR_RING;
         break;
         case 0x80000000 + 1:
-          geometryFieldDataType = DataTypes.POINT;
+          geometryFieldDataType = GeometryDataTypes.POINT;
           axisCount = 3;
         break;
         case 0x80000000 + 2:
-          geometryFieldDataType = DataTypes.LINE_STRING;
+          geometryFieldDataType = GeometryDataTypes.LINE_STRING;
           axisCount = 3;
         break;
         case 0x80000000 + 3:
-          geometryFieldDataType = DataTypes.POLYGON;
+          geometryFieldDataType = GeometryDataTypes.POLYGON;
           axisCount = 3;
         break;
         case 0x80000000 + 4:
-          geometryFieldDataType = DataTypes.MULTI_POINT;
+          geometryFieldDataType = GeometryDataTypes.MULTI_POINT;
           axisCount = 3;
         break;
         case 0x80000000 + 5:
-          geometryFieldDataType = DataTypes.MULTI_LINE_STRING;
+          geometryFieldDataType = GeometryDataTypes.MULTI_LINE_STRING;
           axisCount = 3;
         break;
         case 0x80000000 + 6:
-          geometryFieldDataType = DataTypes.MULTI_POLYGON;
+          geometryFieldDataType = GeometryDataTypes.MULTI_POLYGON;
           axisCount = 3;
         break;
         case 0x80000000 + 7:
-          geometryFieldDataType = DataTypes.GEOMETRY_COLLECTION;
+          geometryFieldDataType = GeometryDataTypes.GEOMETRY_COLLECTION;
           axisCount = 3;
         break;
 
         default:
-          geometryFieldDataType = DataTypes.GEOMETRY;
+          geometryFieldDataType = GeometryDataTypes.GEOMETRY;
         break;
       }
       final SpatialReference spatialReference = fieldDefinition.GetSpatialRef();

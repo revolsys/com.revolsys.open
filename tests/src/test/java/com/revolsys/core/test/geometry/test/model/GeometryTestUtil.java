@@ -3,12 +3,12 @@ package com.revolsys.core.test.geometry.test.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.number.Doubles;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -52,17 +52,17 @@ public class GeometryTestUtil {
   @SuppressWarnings("unchecked")
   public static <G extends Geometry> G geometry(final GeometryFactory geometryFactory,
     final DataType geometryType, final int axisCount, final int partCount, final int ringCount) {
-    if (DataTypes.POINT.equals(geometryType)) {
+    if (GeometryDataTypes.POINT.equals(geometryType)) {
       return (G)point(geometryFactory, axisCount);
-    } else if (DataTypes.MULTI_POINT.equals(geometryType)) {
+    } else if (GeometryDataTypes.MULTI_POINT.equals(geometryType)) {
       return (G)multiPoint(geometryFactory, axisCount, partCount);
-    } else if (DataTypes.LINE_STRING.equals(geometryType)) {
+    } else if (GeometryDataTypes.LINE_STRING.equals(geometryType)) {
       return (G)lineString(geometryFactory, axisCount);
-    } else if (DataTypes.MULTI_LINE_STRING.equals(geometryType)) {
+    } else if (GeometryDataTypes.MULTI_LINE_STRING.equals(geometryType)) {
       return (G)multiLineString(geometryFactory, axisCount, partCount);
-    } else if (DataTypes.POLYGON.equals(geometryType)) {
+    } else if (GeometryDataTypes.POLYGON.equals(geometryType)) {
       return (G)polygon(geometryFactory, axisCount, ringCount);
-    } else if (DataTypes.MULTI_POLYGON.equals(geometryType)) {
+    } else if (GeometryDataTypes.MULTI_POLYGON.equals(geometryType)) {
       return (G)multiPolygon(geometryFactory, axisCount, partCount, ringCount);
     } else {
       return null;
@@ -72,29 +72,29 @@ public class GeometryTestUtil {
   public static Geometry geometry(final GeometryFactory geometryFactory,
     final DataType geometryDataType, final int geometryCount, final int ringCount,
     final int vertexCount, final double delta) {
-    if (DataTypes.POINT.equals(geometryDataType)) {
+    if (GeometryDataTypes.POINT.equals(geometryDataType)) {
       if (geometryCount == 0) {
         return geometryFactory.point();
       } else {
         return point(geometryFactory, delta);
       }
-    } else if (DataTypes.MULTI_POINT.equals(geometryDataType)) {
+    } else if (GeometryDataTypes.MULTI_POINT.equals(geometryDataType)) {
       return multiPoint(geometryFactory, geometryCount, delta);
-    } else if (DataTypes.LINE_STRING.equals(geometryDataType)) {
+    } else if (GeometryDataTypes.LINE_STRING.equals(geometryDataType)) {
       if (geometryCount == 0) {
         return geometryFactory.lineString();
       } else {
         return lineString(geometryFactory, vertexCount, delta);
       }
-    } else if (DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+    } else if (GeometryDataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
       return multiLineString(geometryFactory, geometryCount, vertexCount, delta);
-    } else if (DataTypes.POLYGON.equals(geometryDataType)) {
+    } else if (GeometryDataTypes.POLYGON.equals(geometryDataType)) {
       if (geometryCount == 0) {
         return geometryFactory.polygon();
       } else {
         return polygon(geometryFactory, ringCount, delta);
       }
-    } else if (DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+    } else if (GeometryDataTypes.MULTI_POLYGON.equals(geometryDataType)) {
       return multiPolygon(geometryFactory, ringCount, vertexCount, delta);
     } else {
       throw new IllegalArgumentException("Cannot create " + geometryDataType);

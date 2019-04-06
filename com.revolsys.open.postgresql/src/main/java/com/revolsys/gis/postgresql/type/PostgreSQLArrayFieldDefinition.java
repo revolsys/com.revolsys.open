@@ -8,8 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.datatype.CollectionDataType;
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.CollectionDataType;
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 
 public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {

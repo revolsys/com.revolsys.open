@@ -3,7 +3,7 @@ package com.revolsys.swing.builder;
 import java.text.DateFormat;
 import java.util.Date;
 
-import com.revolsys.util.Dates;
+import org.jeometry.common.date.Dates;
 
 public class DateTimeUiBuilder extends AbstractUiBuilder {
 

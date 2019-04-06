@@ -3,9 +3,11 @@ package com.revolsys.oracle.recordstore;
 import java.io.PrintWriter;
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathUtil;
@@ -60,17 +62,17 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       final String name = geometryField.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryField.getDataType();
-      if (dataType == DataTypes.POINT) {
+      if (dataType == GeometryDataTypes.POINT) {
         geometryType = "POINT";
-      } else if (dataType == DataTypes.LINE_STRING) {
+      } else if (dataType == GeometryDataTypes.LINE_STRING) {
         geometryType = "LINESTRING";
-      } else if (dataType == DataTypes.POLYGON) {
+      } else if (dataType == GeometryDataTypes.POLYGON) {
         geometryType = "POLYGON";
-      } else if (dataType == DataTypes.MULTI_POINT) {
+      } else if (dataType == GeometryDataTypes.MULTI_POINT) {
         geometryType = "MULTIPOINT";
-      } else if (dataType == DataTypes.MULTI_LINE_STRING) {
+      } else if (dataType == GeometryDataTypes.MULTI_LINE_STRING) {
         geometryType = "MULTILINESTRING";
-      } else if (dataType == DataTypes.MULTI_POLYGON) {
+      } else if (dataType == GeometryDataTypes.MULTI_POLYGON) {
         geometryType = "MULTIPOLYGON";
       }
       out.print("select addgeometrycolumn('");

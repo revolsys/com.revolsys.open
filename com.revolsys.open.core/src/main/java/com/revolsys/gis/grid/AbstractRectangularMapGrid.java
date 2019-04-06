@@ -1,6 +1,8 @@
 package com.revolsys.gis.grid;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
+
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
@@ -26,7 +28,7 @@ public abstract class AbstractRectangularMapGrid extends BaseObjectWithPropertie
       this.recordDefinition = new RecordDefinitionBuilder(this.name)//
         .addField("name", DataTypes.STRING)//
         .addField("formattedName", DataTypes.STRING)//
-        .addField("polygon", DataTypes.POLYGON)//
+        .addField("polygon", GeometryDataTypes.POLYGON)//
         .getRecordDefinition();
     }
     return this.recordDefinition;

@@ -13,7 +13,7 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
 

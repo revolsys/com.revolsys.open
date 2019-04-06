@@ -16,20 +16,20 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.function.Consumer3;
 import org.jeometry.common.logging.Logs;
-import org.jeometry.common.math.MathUtil;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.util.OutCode;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
@@ -657,7 +657,7 @@ public interface BoundingBox
     final double y1 = getCentreY();
     final double x2 = boundingBox.getCentreX();
     final double y2 = boundingBox.getCentreY();
-    return MathUtil.distance(x1, y1, x2, y2);
+    return Points.distance(x1, y1, x2, y2);
   }
 
   default double edgeDeltas() {

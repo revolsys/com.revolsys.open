@@ -41,7 +41,6 @@ import java.util.function.Function;
 import javax.measure.Unit;
 import javax.measure.quantity.Area;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.MultiLineStringEditor;
 import com.revolsys.geometry.model.prep.PreparedMultiLineString;
@@ -162,7 +161,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
 
   @Override
   default GeometryDataType<MultiLineString, MultiLineStringEditor> getDataType() {
-    return DataTypes.MULTI_LINE_STRING;
+    return GeometryDataTypes.MULTI_LINE_STRING;
   }
 
   @Override

@@ -5,9 +5,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.io.PathName;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.record.AbstractRecord;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.format.xml.StaxReader;
@@ -29,7 +31,7 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
     recordDefinition.addField("user", DataTypes.STRING);
     recordDefinition.addField("uid", DataTypes.INT);
     recordDefinition.addField("tags", DataTypes.MAP);
-    recordDefinition.addField("geometry", DataTypes.GEOMETRY);
+    recordDefinition.addField("geometry", GeometryDataTypes.GEOMETRY);
     recordDefinition.setGeometryFieldName("geometry");
     recordDefinition.setGeometryFactory(WGS84_2D);
     RECORD_DEFINITION = recordDefinition;

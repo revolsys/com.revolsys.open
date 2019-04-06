@@ -1,8 +1,9 @@
 package com.revolsys.record.schema;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 
 public class RecordDefinitionBuilder {
 

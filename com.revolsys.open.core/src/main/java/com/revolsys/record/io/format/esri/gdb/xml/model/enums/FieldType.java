@@ -1,7 +1,9 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model.enums;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+
+import com.revolsys.geometry.model.GeometryDataTypes;
 
 public enum FieldType {
   /** Binary Large Object. */
@@ -14,7 +16,7 @@ public enum FieldType {
   esriFieldTypeDouble(DataTypes.DOUBLE),
 
   /** Geometry. */
-  esriFieldTypeGeometry(DataTypes.GEOMETRY),
+  esriFieldTypeGeometry(GeometryDataTypes.GEOMETRY),
 
   /** ESRI Global ID. */
   esriFieldTypeGlobalID(DataTypes.UUID),

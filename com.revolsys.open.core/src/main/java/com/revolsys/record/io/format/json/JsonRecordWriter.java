@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Numbers;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;

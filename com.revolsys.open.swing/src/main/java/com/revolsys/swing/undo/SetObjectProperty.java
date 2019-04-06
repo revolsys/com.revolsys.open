@@ -1,6 +1,6 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.util.Property;
 
 public class SetObjectProperty extends AbstractUndoableEdit {

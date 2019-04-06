@@ -7,8 +7,10 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.date.Dates;
+
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
@@ -18,7 +20,6 @@ import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 

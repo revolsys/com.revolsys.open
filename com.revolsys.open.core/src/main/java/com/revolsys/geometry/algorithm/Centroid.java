@@ -32,13 +32,12 @@
  */
 package com.revolsys.geometry.algorithm;
 
-import org.jeometry.common.math.MathUtil;
-
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.geometry.util.Triangles;
 
 /**
@@ -163,7 +162,7 @@ public class Centroid {
         final double x2 = line.getX(vertexIndex);
         final double y2 = line.getY(vertexIndex);
         addTriangle(x, y, x1, y1, x2, y2, isPositiveArea);
-        final double segmentLength = MathUtil.distance(x1, y1, x2, y2);
+        final double segmentLength = Points.distance(x1, y1, x2, y2);
         if (segmentLength > 0.0) {
           lineLength += segmentLength;
 
@@ -199,7 +198,7 @@ public class Centroid {
       for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
         final double x2 = line.getX(vertexIndex);
         final double y2 = line.getY(vertexIndex);
-        final double segmentLength = MathUtil.distance(x1, y1, x2, y2);
+        final double segmentLength = Points.distance(x1, y1, x2, y2);
         if (segmentLength > 0.0) {
           lineLength += segmentLength;
 
@@ -246,7 +245,7 @@ public class Centroid {
         final double x2 = line.getX(vertexIndex);
         final double y2 = line.getY(vertexIndex);
         addTriangle(x, y, x1, y1, x2, y2, isPositiveArea);
-        final double segmentLength = MathUtil.distance(x1, y1, x2, y2);
+        final double segmentLength = Points.distance(x1, y1, x2, y2);
         if (segmentLength > 0.0) {
           lineLength += segmentLength;
 

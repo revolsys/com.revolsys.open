@@ -46,18 +46,17 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.Consumer3Double;
 import org.jeometry.common.function.Consumer4Double;
 import org.jeometry.common.math.Angle;
-import org.jeometry.common.math.MathUtil;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.LineStringLocation;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
@@ -81,6 +80,7 @@ import com.revolsys.geometry.operation.BoundaryOp;
 import com.revolsys.geometry.operation.RectangleIntersection;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
@@ -141,7 +141,7 @@ public interface LineString extends Lineal {
     for (int vertexIndex = 1; vertexIndex < lastVertexIndex; vertexIndex++) {
       final double x2 = getX(vertexIndex);
       final double y2 = getY(vertexIndex);
-      if (MathUtil.distance(x1, y1, x2, y2) < maxDistance) {
+      if (Points.distance(x1, y1, x2, y2) < maxDistance) {
         // Skip vertex
       } else {
         newLine.appendVertex(x2, y2);
@@ -156,7 +156,7 @@ public interface LineString extends Lineal {
     }
     final double xn = getX(lastVertexIndex);
     final double yn = getY(lastVertexIndex);
-    if (lastVertexIndex > 2 && MathUtil.distance(x1, y1, xn, yn) < maxDistance) {
+    if (lastVertexIndex > 2 && Points.distance(x1, y1, xn, yn) < maxDistance) {
       final int newVertexIndex = newLine.getLastVertexIndex();
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         final double coordinate = getCoordinate(lastVertexIndex, axisIndex);
@@ -427,11 +427,11 @@ public interface LineString extends Lineal {
           if (x1 == x && y1 == y) {
             return distanceAlongSegments;
           } else {
-            final double segmentLength = MathUtil.distance(x1, y1, x2, y2);
+            final double segmentLength = Points.distance(x1, y1, x2, y2);
             final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
             final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
             if (distance < resolutionXy) {
-              return distanceAlongSegments + MathUtil.distance(x1, y1, x, y);
+              return distanceAlongSegments + Points.distance(x1, y1, x, y);
             } else if (distance < closestDistance) {
               closestDistance = distance;
               if (projectionFactor == 0) {
@@ -466,7 +466,7 @@ public interface LineString extends Lineal {
   default double distanceVertex(final int index, final double x, final double y) {
     final double x1 = getX(index);
     final double y1 = getY(index);
-    return MathUtil.distance(x1, y1, x, y);
+    return Points.distance(x1, y1, x, y);
   }
 
   default double distanceVertex(final int index, final Point point) {
@@ -688,7 +688,7 @@ public interface LineString extends Lineal {
         final AbstractVertex closestVertex = getVertex(0);
         return new Pair<>(closestVertex, 0.0);
       } else {
-        double closestDistance = geometryFactory.makePrecise(0, MathUtil.distance(x, y, x1, y1));
+        double closestDistance = geometryFactory.makePrecise(0, Points.distance(x, y, x1, y1));
 
         final int vertexCount = getVertexCount();
         for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
@@ -699,7 +699,7 @@ public interface LineString extends Lineal {
             return new Pair<>(closestVertex, 0.0);
           } else {
             final double toDistance = geometryFactory.makePrecise(0,
-              MathUtil.distance(x, y, x2, y2));
+              Points.distance(x, y, x2, y2));
             if (toDistance <= closestDistance) {
               if (!closestIsVertex || toDistance < closestDistance) {
                 closestIndex = vertexIndex;
@@ -941,7 +941,7 @@ public interface LineString extends Lineal {
 
   @Override
   default GeometryDataType<LineString, LineStringEditor> getDataType() {
-    return DataTypes.LINE_STRING;
+    return GeometryDataTypes.LINE_STRING;
   }
 
   @Override
@@ -1181,7 +1181,7 @@ public interface LineString extends Lineal {
           final double y2 = getY(vertexIndex);
 
           final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
-          final double segmentLength = MathUtil.distance(x1, y1, x2, y2);
+          final double segmentLength = Points.distance(x1, y1, x2, y2);
           final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
           final boolean isEnd = vertexIndex == vertexCount - 1;
           if (vertexIndex == 1) {
@@ -2420,7 +2420,7 @@ public interface LineString extends Lineal {
     final double y1 = points.getY(i1);
     final double x2 = points.getX(i2);
     final double y2 = points.getY(i2);
-    if (MathUtil.distance(x1, y1, x2, y2) == 0) { // TODO
+    if (Points.distance(x1, y1, x2, y2) == 0) { // TODO
       if (start) {
         if (i2 + 1 < points.getVertexCount()) {
           return getAngle(points, i1, i2 + 1, start);

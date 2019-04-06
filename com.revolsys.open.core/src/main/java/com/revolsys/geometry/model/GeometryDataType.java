@@ -3,8 +3,9 @@ package com.revolsys.geometry.model;
 import java.util.Collection;
 import java.util.function.Function;
 
+import org.jeometry.common.datatype.AbstractDataType;
+
 import com.revolsys.beans.Classes;
-import com.revolsys.datatype.AbstractDataType;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 
 public class GeometryDataType<G extends Geometry, GE extends GeometryEditor<?>>

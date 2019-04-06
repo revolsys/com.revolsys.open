@@ -46,8 +46,8 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.connection.file.FileConnectionManager;
 import com.revolsys.connection.file.FolderConnectionRegistry;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
@@ -728,13 +728,13 @@ public class ProjectFrame extends BaseFrame {
 
     tools.addCheckboxMenuItem("map",
       new RunnableAction("Measure Length", Icons.getIcon("ruler_line"),
-        () -> measureOverlay.toggleMeasureMode(DataTypes.LINE_STRING)),
-      new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", DataTypes.LINE_STRING));
+        () -> measureOverlay.toggleMeasureMode(GeometryDataTypes.LINE_STRING)),
+      new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", GeometryDataTypes.LINE_STRING));
 
     tools.addCheckboxMenuItem("map",
       new RunnableAction("Measure Area", Icons.getIcon("ruler_polygon"),
-        () -> measureOverlay.toggleMeasureMode(DataTypes.POLYGON)),
-      new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", DataTypes.POLYGON));
+        () -> measureOverlay.toggleMeasureMode(GeometryDataTypes.POLYGON)),
+      new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", GeometryDataTypes.POLYGON));
 
     tools.addMenuItem("script", "Run Script...", "script_go", this::actionRunScript);
     return tools;

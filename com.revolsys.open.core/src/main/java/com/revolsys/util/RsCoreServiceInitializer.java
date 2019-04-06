@@ -1,11 +1,18 @@
 package com.revolsys.util;
 
+import java.util.Map;
+
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.datatype.ObjectDataType;
+
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.grid.CustomRectangularMapGrid;
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.io.RecordReaderFactory;
@@ -19,6 +26,23 @@ import com.revolsys.record.schema.RecordStore;
 public class RsCoreServiceInitializer implements ServiceInitializer {
   @Override
   public void initializeService() {
+    DataTypes.registerDataTypes(RsCoreDataTypes.class);
+    DataTypes.registerDataTypes(GeometryDataTypes.class);
+    ObjectDataType.setToObjectFunction(value -> {
+      if (value instanceof Map<?, ?>) {
+        @SuppressWarnings("unchecked")
+        final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
+        final String type = MapObjectFactory.getType(map);
+        if (type != null) {
+          final Object object = MapObjectFactory.toObject(map);
+          if (object != null) {
+            return object;
+          }
+        }
+      }
+      return value;
+    });
+
     MapObjectFactoryRegistry.newFactory("geometryFactory", "Geometry Factory", config -> {
       return GeometryFactory.newGeometryFactory(config);
     });

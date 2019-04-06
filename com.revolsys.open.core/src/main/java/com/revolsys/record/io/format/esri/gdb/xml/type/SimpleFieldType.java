@@ -1,6 +1,7 @@
 package com.revolsys.record.io.format.esri.gdb.xml.type;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.xml.XmlWriter;
 

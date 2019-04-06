@@ -2,17 +2,17 @@ package com.revolsys.oracle.test;
 
 import java.util.Collections;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.io.PathName;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.core.test.geometry.test.model.GeometryTestUtil;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
@@ -64,7 +64,7 @@ public class GeometryTest {
   @Test
   public void lineString() {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
-      doWriteTest(DataTypes.LINE_STRING, axisCount, 1, 1);
+      doWriteTest(GeometryDataTypes.LINE_STRING, axisCount, 1, 1);
     }
   }
 
@@ -72,7 +72,7 @@ public class GeometryTest {
   public void multiLineString() {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
       for (int partCount = 1; partCount < 4; partCount++) {
-        doWriteTest(DataTypes.MULTI_LINE_STRING, axisCount, partCount, 1);
+        doWriteTest(GeometryDataTypes.MULTI_LINE_STRING, axisCount, partCount, 1);
       }
     }
   }
@@ -81,7 +81,7 @@ public class GeometryTest {
   public void multiPoint() {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
       for (int partCount = 1; partCount < 4; partCount++) {
-        doWriteTest(DataTypes.MULTI_POINT, axisCount, partCount, 1);
+        doWriteTest(GeometryDataTypes.MULTI_POINT, axisCount, partCount, 1);
       }
     }
   }
@@ -91,7 +91,7 @@ public class GeometryTest {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
       for (int partCount = 1; partCount < 4; partCount++) {
         for (int ringCount = 1; ringCount < 4; ringCount++) {
-          doWriteTest(DataTypes.MULTI_POLYGON, axisCount, partCount, ringCount);
+          doWriteTest(GeometryDataTypes.MULTI_POLYGON, axisCount, partCount, ringCount);
         }
       }
     }
@@ -100,7 +100,7 @@ public class GeometryTest {
   @Test
   public void point() {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
-      doWriteTest(DataTypes.POINT, axisCount, 1, 1);
+      doWriteTest(GeometryDataTypes.POINT, axisCount, 1, 1);
     }
   }
 
@@ -108,7 +108,7 @@ public class GeometryTest {
   public void polygon() {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
       for (int ringCount = 1; ringCount < 4; ringCount++) {
-        doWriteTest(DataTypes.POLYGON, axisCount, 1, ringCount);
+        doWriteTest(GeometryDataTypes.POLYGON, axisCount, 1, ringCount);
       }
     }
   }

@@ -3,8 +3,8 @@ package com.revolsys.record;
 import java.util.Collection;
 import java.util.Map;
 
-import com.revolsys.datatype.AbstractDataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.AbstractDataType;
+import org.jeometry.common.datatype.DataTypes;
 
 public class RecordDataType extends AbstractDataType {
   public RecordDataType() {

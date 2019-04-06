@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.MultiPolygonEditor;
 import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 import com.revolsys.geometry.model.segment.MultiPolygonSegment;
@@ -121,7 +120,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
 
   @Override
   default GeometryDataType<MultiPolygon, MultiPolygonEditor> getDataType() {
-    return DataTypes.MULTI_POLYGON;
+    return GeometryDataTypes.MULTI_POLYGON;
   }
 
   @Override

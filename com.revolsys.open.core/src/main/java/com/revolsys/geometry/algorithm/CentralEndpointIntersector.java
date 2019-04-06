@@ -32,10 +32,9 @@
  */
 package com.revolsys.geometry.algorithm;
 
-import org.jeometry.common.math.MathUtil;
-
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.util.Points;
 
 /**
  * Computes an approximate intersection of two line segments
@@ -78,7 +77,7 @@ public class CentralEndpointIntersector {
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
       final double x = coordinates[coordinateIndex++];
       final double y = coordinates[coordinateIndex++];
-      final double distance = MathUtil.distance(averageX, averageY, x, y);
+      final double distance = Points.distance(averageX, averageY, x, y);
       if (distance < minDistance) {
         minDistance = distance;
         intersectionX = x;

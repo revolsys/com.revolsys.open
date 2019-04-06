@@ -3,7 +3,7 @@ package com.revolsys.swing.map.layer.record;
 import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.io.PathName;
+import org.jeometry.common.io.PathName;
 import com.revolsys.record.query.Query;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.parallel.AbstractSwingWorker;

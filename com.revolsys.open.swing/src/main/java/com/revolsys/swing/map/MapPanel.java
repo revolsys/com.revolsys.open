@@ -35,9 +35,9 @@ import javax.swing.undo.UndoableEdit;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jeometry.common.number.Doubles;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.index.RecordSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;

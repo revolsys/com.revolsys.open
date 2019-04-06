@@ -21,7 +21,7 @@ import javax.swing.SortOrder;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;

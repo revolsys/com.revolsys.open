@@ -21,7 +21,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
 import com.revolsys.collection.EmptyReference;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.MenuFactory;

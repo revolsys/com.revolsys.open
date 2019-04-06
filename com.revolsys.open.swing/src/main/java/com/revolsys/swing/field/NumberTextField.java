@@ -13,9 +13,9 @@ import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.BigDecimals;
 import org.jeometry.common.number.Numbers;
 
-import com.revolsys.awt.WebColors;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.MenuFactory;

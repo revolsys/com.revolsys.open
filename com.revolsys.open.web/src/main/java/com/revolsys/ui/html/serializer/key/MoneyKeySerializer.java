@@ -1,8 +1,7 @@
 package com.revolsys.ui.html.serializer.key;
 
 import java.math.BigDecimal;
-
-import org.jeometry.common.math.MathUtil;
+import java.math.RoundingMode;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.Property;
@@ -13,6 +12,29 @@ import com.revolsys.util.Property;
  * @author Paul Austin
  */
 public class MoneyKeySerializer extends AbstractKeySerializer {
+
+  /**
+   * Convert a BigDecimal amount to a currency string prefixed by the "$" sign.
+   *
+   * @param amount The BigDecimal amount.
+   * @return The currency String
+   */
+  static String currencyToString(final BigDecimal amount) {
+    if (amount != null) {
+      return "$" + getCurrency(amount);
+    } else {
+      return null;
+    }
+  }
+
+  static BigDecimal getCurrency(final BigDecimal amount) {
+    if (amount != null) {
+      return amount.setScale(2, RoundingMode.HALF_UP);
+    } else {
+      return null;
+    }
+  }
+
   public MoneyKeySerializer() {
   }
 
@@ -33,7 +55,7 @@ public class MoneyKeySerializer extends AbstractKeySerializer {
   public void serialize(final XmlWriter out, final Object object) {
     final BigDecimal value = (BigDecimal)Property.get(object, getName());
     if (value != null) {
-      out.text(MathUtil.currencyToString(value));
+      out.text(currencyToString(value));
     } else {
       out.text("-");
     }

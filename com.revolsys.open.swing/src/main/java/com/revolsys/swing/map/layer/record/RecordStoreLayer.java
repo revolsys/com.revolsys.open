@@ -27,7 +27,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.io.PathName;
+import org.jeometry.common.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;

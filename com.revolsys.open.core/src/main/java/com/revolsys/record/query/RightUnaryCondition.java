@@ -1,6 +1,7 @@
 package com.revolsys.record.query;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.record.schema.RecordStore;
 
 public class RightUnaryCondition extends AbstractUnaryQueryValue implements Condition {

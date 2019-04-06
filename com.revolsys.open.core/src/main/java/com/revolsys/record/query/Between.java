@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.CompareUtil;

@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;

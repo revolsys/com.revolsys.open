@@ -36,7 +36,7 @@ import org.jeometry.common.number.Doubles;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

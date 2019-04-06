@@ -2,7 +2,8 @@ package com.revolsys.record.io.format.gml.type;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;

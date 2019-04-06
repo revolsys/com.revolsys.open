@@ -2,7 +2,7 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.util.Collection;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;

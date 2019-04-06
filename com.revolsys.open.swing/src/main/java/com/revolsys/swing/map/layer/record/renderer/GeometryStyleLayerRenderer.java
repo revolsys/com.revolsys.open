@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;

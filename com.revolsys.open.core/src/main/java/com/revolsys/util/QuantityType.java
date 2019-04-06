@@ -3,9 +3,8 @@ package com.revolsys.util;
 import javax.measure.Quantity;
 import javax.measure.Unit;
 
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
-
-import com.revolsys.datatype.DataTypes;
 
 import tec.uom.se.quantity.Quantities;
 

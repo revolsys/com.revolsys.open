@@ -40,7 +40,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.jeometry.common.math.MathUtil;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
@@ -425,7 +425,7 @@ public class Buffer {
   private static double precisionScaleFactor(final Geometry geometry, final double distance,
     final int maxPrecisionDigits) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
-    final double envMax = MathUtil.max(Math.abs(boundingBox.getMaxX()),
+    final double envMax = Doubles.max(Math.abs(boundingBox.getMaxX()),
       Math.abs(boundingBox.getMaxY()), Math.abs(boundingBox.getMinX()),
       Math.abs(boundingBox.getMinY()));
 

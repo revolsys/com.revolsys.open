@@ -28,13 +28,14 @@ import javax.swing.undo.UndoableEdit;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -357,15 +358,16 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   public GeometryDataType<?, ?> getGeometryPartDataType(final DataType dataType) {
-    if (Arrays.asList(DataTypes.POINT, DataTypes.MULTI_POINT).contains(dataType)) {
-      return DataTypes.POINT;
-    } else if (Arrays.asList(DataTypes.LINE_STRING, DataTypes.MULTI_LINE_STRING)
+    if (Arrays.asList(GeometryDataTypes.POINT, GeometryDataTypes.MULTI_POINT).contains(dataType)) {
+      return GeometryDataTypes.POINT;
+    } else if (Arrays.asList(GeometryDataTypes.LINE_STRING, GeometryDataTypes.MULTI_LINE_STRING)
       .contains(dataType)) {
-      return DataTypes.LINE_STRING;
-    } else if (Arrays.asList(DataTypes.POLYGON, DataTypes.MULTI_POLYGON).contains(dataType)) {
-      return DataTypes.POLYGON;
+      return GeometryDataTypes.LINE_STRING;
+    } else if (Arrays.asList(GeometryDataTypes.POLYGON, GeometryDataTypes.MULTI_POLYGON)
+      .contains(dataType)) {
+      return GeometryDataTypes.POLYGON;
     } else {
-      return DataTypes.GEOMETRY;
+      return GeometryDataTypes.GEOMETRY;
     }
   }
 
@@ -451,8 +453,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       previousPointOffset = -1;
     }
     final GeometryFactory geometryFactory = location.getGeometryFactory();
-    if (DataTypes.GEOMETRY.equals(geometryPartDataType)) {
-    } else if (DataTypes.POINT.equals(geometryPartDataType)) {
+    if (GeometryDataTypes.GEOMETRY.equals(geometryPartDataType)) {
+    } else if (GeometryDataTypes.POINT.equals(geometryPartDataType)) {
     } else {
       final Point point = getPoint(geometryFactory, event);
 
@@ -460,8 +462,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       Point previousPoint = null;
       Point nextPoint = null;
 
-      if (DataTypes.LINE_STRING.equals(geometryPartDataType)
-        || DataTypes.POLYGON.equals(geometryPartDataType)) {
+      if (GeometryDataTypes.LINE_STRING.equals(geometryPartDataType)
+        || GeometryDataTypes.POLYGON.equals(geometryPartDataType)) {
         if (previousPointOffset == 0) {
           previousPoint = vertex;
         } else {
@@ -634,7 +636,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           ));
 
           event.consume();
-          if (DataTypes.POINT.equals(this.addGeometryEditor.getDataType())) {
+          if (GeometryDataTypes.POINT.equals(this.addGeometryEditor.getDataType())) {
             if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
               modeAddGeometryCompleted();
             }
@@ -808,16 +810,16 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     final int[] firstVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
     Geometry xorGeometry = null;
 
-    if (DataTypes.POINT.equals(this.addGeometryPartDataType)) {
+    if (GeometryDataTypes.POINT.equals(this.addGeometryPartDataType)) {
     } else {
       final Vertex firstVertex = this.addGeometryEditor.getVertex(firstVertexId);
       final Vertex toVertex = this.addGeometryEditor.getToVertex(firstVertexId);
 
       final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
       if (toVertex != null && !toVertex.isEmpty()) {
-        if (DataTypes.LINE_STRING.equals(this.addGeometryPartDataType)) {
+        if (GeometryDataTypes.LINE_STRING.equals(this.addGeometryPartDataType)) {
           xorGeometry = newXorLine(geometryFactory, toVertex, point);
-        } else if (DataTypes.POLYGON.equals(this.addGeometryPartDataType)) {
+        } else if (GeometryDataTypes.POLYGON.equals(this.addGeometryPartDataType)) {
           if (toVertex.equals(firstVertex)) {
             xorGeometry = newXorLine(geometryFactory, toVertex, point);
           } else {
@@ -1201,7 +1203,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected UndoableEdit setGeometry(final CloseLocation location, final Geometry newGeometry) {
     if (isOverlayAction(ACTION_ADD_GEOMETRY)
       || isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
-      if (DataTypes.GEOMETRY.equals(newGeometry, this.addGeometryEditor)) {
+      if (GeometryDataTypes.GEOMETRY.equals(newGeometry, this.addGeometryEditor)) {
         return null;
       } else {
         // TODO

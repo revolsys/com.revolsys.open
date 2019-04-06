@@ -4,7 +4,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.jeometry.common.math.Angle;
-import org.jeometry.common.math.MathUtil;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
@@ -19,6 +18,7 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.geometry.util.RectangleUtil;
 
 public class LineSegmentUtil {
@@ -29,8 +29,8 @@ public class LineSegmentUtil {
     if (factor > 0 && factor < 1) {
       return project(x1, y1, x2, y2, factor);
     }
-    final double dist0 = MathUtil.distance(x1, y1, x, y);
-    final double dist1 = MathUtil.distance(x2, y2, x, y);
+    final double dist0 = Points.distance(x1, y1, x, y);
+    final double dist1 = Points.distance(x2, y2, x, y);
     if (dist0 < dist1) {
       return new PointDoubleXY(x1, y1);
     }
@@ -124,7 +124,7 @@ public class LineSegmentUtil {
           line2y1);
         final double distance4 = distanceLinePoint(line1x1, line1y1, line1x2, line1y2, line2x2,
           line2y2);
-        return MathUtil.min(distance1, distance2, distance3, distance4);
+        return Doubles.min(distance1, distance2, distance3, distance4);
       } else {
         // segments intersect
         return 0.0;
@@ -193,7 +193,7 @@ public class LineSegmentUtil {
   public static double distanceLinePoint(final int x1, final int y1, final int x2, final int y2,
     final int x, final int y) {
     if (x1 == x2 && y1 == y2) {
-      return MathUtil.distanceInt(x, y, x1, y1);
+      return Points.distanceInt(x, y, x1, y1);
     } else {
       final long dxx1 = x - x1;
       final long dx2x1 = x2 - x1;
@@ -204,9 +204,9 @@ public class LineSegmentUtil {
       final double ratio = (dxx1 * dx2x1 + dyy1 * dy2y1) / (d2x1sq + dy2y1sq);
 
       if (ratio <= 0.0) {
-        return MathUtil.distanceInt(x, y, x1, y1);
+        return Points.distanceInt(x, y, x1, y1);
       } else if (ratio >= 1.0) {
-        return MathUtil.distanceInt(x, y, x2, y2);
+        return Points.distanceInt(x, y, x2, y2);
       } else {
         final long dy1y = y1 - y;
         final int dx1x = x1 - x;

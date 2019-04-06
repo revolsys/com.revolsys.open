@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.oracle.recordstore.esri.ArcSdeConstants;
 import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryFieldDefinition;
@@ -42,7 +42,7 @@ public class PackedGeometry {
       final Geometry geometry2 = PackedCoordinateUtil.getGeometry(data, geometryFactory,
         geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
       System.out.println(WktWriter.toString(geometry));
-      if (!DataTypes.GEOMETRY.equals(geometry, geometry2, Collections.<String> emptyList())) {
+      if (!GeometryDataTypes.GEOMETRY.equals(geometry, geometry2, Collections.<String> emptyList())) {
         System.err.println(WktWriter.toString(geometry2));
         throw new RuntimeException("Geometry not equal");
       }

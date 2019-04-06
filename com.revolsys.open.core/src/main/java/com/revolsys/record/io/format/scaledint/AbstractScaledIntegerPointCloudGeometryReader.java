@@ -7,8 +7,8 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.channels.ChannelReader;
@@ -104,7 +104,7 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
   public RecordDefinition newRecordDefinition(final String name) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final RecordDefinition recordDefinition = new RecordDefinitionBuilder(name) //
-      .addField("POINT", DataTypes.POINT) //
+      .addField("POINT", GeometryDataTypes.POINT) //
       .setGeometryFactory(geometryFactory) //
       .getRecordDefinition();
     return recordDefinition;

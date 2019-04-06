@@ -3,7 +3,7 @@ package com.revolsys.fgdb.test.field;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 
 public class FloatField extends FgdbField {
   public FloatField(final String name, final boolean required) {

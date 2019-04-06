@@ -20,6 +20,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.w3c.dom.Document;
@@ -31,7 +32,6 @@ import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -441,7 +441,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     try {
       final Resource resource = this.imageResource;
       final Resource rgResource = resource.newResourceAddExtension("rgobject");
-      MapObjectFactory.write(rgResource, this);
+      this.writeToFile(rgResource);
       setHasChanges(false);
       return true;
     } catch (final Throwable e) {

@@ -33,7 +33,6 @@
 package com.revolsys.geometry.operation.buffer;
 
 import org.jeometry.common.math.Angle;
-import org.jeometry.common.math.MathUtil;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
@@ -48,6 +47,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
+import com.revolsys.geometry.util.Points;
 
 /**
  * Generates segments which form an offset curve.
@@ -333,7 +333,7 @@ class OffsetSegmentGenerator {
        * points
        */
       this.hasNarrowConcaveAngle = true;
-      if (MathUtil.distance(x01, y01, x10, y10) < this.distance
+      if (Points.distance(x01, y01, x10, y10) < this.distance
         * INSIDE_TURN_VERTEX_SNAP_DISTANCE_FACTOR) {
         this.segList.addPoint(x01, y01);
       } else {
@@ -520,7 +520,7 @@ class OffsetSegmentGenerator {
       if (distance <= 0.0) {
         mitreRatio = 1;
       } else {
-        mitreRatio = MathUtil.distance(intPtX, intPtY, x, y) / Math.abs(distance);
+        mitreRatio = Points.distance(intPtX, intPtY, x, y) / Math.abs(distance);
       }
       if (mitreRatio > this.bufParams.getMitreLimit()) {
         isMitreWithinLimit = false;
@@ -585,7 +585,7 @@ class OffsetSegmentGenerator {
      * where the two segments are almost parallel
      * (which is hard to compute a robust intersection for).
      */
-    if (MathUtil.distance(x01, y01, x10, y10) < this.distance * OFFSET_SEGMENT_SEPARATION_FACTOR) {
+    if (Points.distance(x01, y01, x10, y10) < this.distance * OFFSET_SEGMENT_SEPARATION_FACTOR) {
       this.segList.addPoint(x01, y01);
       return;
     }

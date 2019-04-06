@@ -38,16 +38,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;
 import org.jeometry.common.math.Angle;
-import org.jeometry.common.math.MathUtil;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.PointEditor;
@@ -56,6 +55,7 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.NumberUtil;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.util.Property;
 
 /**
@@ -445,14 +445,14 @@ public interface Point extends Punctual, Serializable, BoundingBox {
   default double distance(final double x, final double y) {
     final double x1 = this.getX();
     final double y1 = this.getY();
-    return MathUtil.distance(x1, y1, x, y);
+    return Points.distance(x1, y1, x, y);
   }
 
   @Override
   default double distance(final double x, final double y, final double terminateDistance) {
     final double x1 = this.getX();
     final double y1 = this.getY();
-    return MathUtil.distance(x1, y1, x, y);
+    return Points.distance(x1, y1, x, y);
   }
 
   @Override
@@ -512,7 +512,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
       final double y = point.getY();
       final double x1 = this.getX();
       final double y1 = this.getY();
-      return MathUtil.distance(x1, y1, x, y);
+      return Points.distance(x1, y1, x, y);
     }
   }
 
@@ -776,7 +776,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
 
   @Override
   default GeometryDataType<Point, PointEditor> getDataType() {
-    return DataTypes.POINT;
+    return GeometryDataTypes.POINT;
   }
 
   @Override

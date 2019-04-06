@@ -1,6 +1,6 @@
 package com.revolsys.raster;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 
 public abstract class AbstractBand implements Band {
   private DataType dataType;

@@ -23,7 +23,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.NamedLinkedHashMapEx;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;

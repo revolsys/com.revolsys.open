@@ -3,7 +3,7 @@ package com.revolsys.fgdb.test.field;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 
 public class DoubleField extends FgdbField {
   public DoubleField(final String name, final boolean required) {

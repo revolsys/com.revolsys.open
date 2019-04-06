@@ -32,12 +32,11 @@
  */
 package com.revolsys.geometry.operation.buffer;
 
-import org.jeometry.common.math.MathUtil;
-
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.editor.LineStringEditor;
+import com.revolsys.geometry.util.Points;
 
 /**
  * A dynamic list of the vertices in a constructed offset curve.
@@ -144,7 +143,7 @@ class OffsetSegmentString extends LineStringEditor {
       } else if (this.minimimVertexDistance == 0) {
         return false;
       } else {
-        final double distance = MathUtil.distance(x, y, lastX, lastY);
+        final double distance = Points.distance(x, y, lastX, lastY);
         if (distance < this.minimimVertexDistance) {
           return true;
         } else {

@@ -52,6 +52,7 @@ import java.util.zip.ZipFile;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
@@ -79,8 +80,6 @@ import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.model.editor.LineStringEditor;
@@ -196,7 +195,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
 
     @Override
     public GeometryDataType<?, ?> getDataType() {
-      return DataTypes.GEOMETRY_COLLECTION;
+      return GeometryDataTypes.GEOMETRY_COLLECTION;
     }
 
     @Override
@@ -963,7 +962,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
         geometryList.add(geometry);
         DataType geometryDataType = geometry.getDataType();
         if (geometry instanceof LinearRing) {
-          geometryDataType = DataTypes.LINE_STRING;
+          geometryDataType = GeometryDataTypes.LINE_STRING;
         }
         if (collectionDataType == null) {
           collectionDataType = geometryDataType;
@@ -985,11 +984,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
       return geometryCollection(geometryList);
     } else if (geometryList.size() == 1) {
       return geometryList.iterator().next();
-    } else if (DataTypes.POINT.equals(collectionDataType)) {
+    } else if (GeometryDataTypes.POINT.equals(collectionDataType)) {
       return punctual(geometryList);
-    } else if (DataTypes.LINE_STRING.equals(collectionDataType)) {
+    } else if (GeometryDataTypes.LINE_STRING.equals(collectionDataType)) {
       return lineal(geometryList);
-    } else if (DataTypes.POLYGON.equals(collectionDataType)) {
+    } else if (GeometryDataTypes.POLYGON.equals(collectionDataType)) {
       return polygonal(geometryList);
     } else {
       throw new IllegalArgumentException("Unknown geometry type " + collectionDataType);
@@ -1134,11 +1133,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
       final Set<DataType> dataTypes = getGeometryDataTypes(geometryList);
       if (dataTypes.size() == 1) {
         final DataType dataType = CollectionUtil.get(dataTypes, 0);
-        if (dataType.equals(DataTypes.POINT)) {
+        if (dataType.equals(GeometryDataTypes.POINT)) {
           return (V)punctual(geometryList);
-        } else if (dataType.equals(DataTypes.LINE_STRING)) {
+        } else if (dataType.equals(GeometryDataTypes.LINE_STRING)) {
           return (V)lineal(geometryList);
-        } else if (dataType.equals(DataTypes.POLYGON)) {
+        } else if (dataType.equals(GeometryDataTypes.POLYGON)) {
           return (V)polygonal(geometryList);
         }
       }
@@ -1292,11 +1291,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
         return (G)geometryCollection();
       } else if (geometryList.size() == 1) {
         return (G)geometryList.get(0);
-      } else if (dataType == DataTypes.POINT) {
+      } else if (dataType == GeometryDataTypes.POINT) {
         return (G)punctual(geometryList);
-      } else if (dataType == DataTypes.LINE_STRING) {
+      } else if (dataType == GeometryDataTypes.LINE_STRING) {
         return (G)lineal(geometryList);
-      } else if (dataType == DataTypes.POLYGON) {
+      } else if (dataType == GeometryDataTypes.POLYGON) {
         return (G)polygonal(geometryList);
       } else {
         final Geometry[] geometryArray = new Geometry[geometryList.size()];

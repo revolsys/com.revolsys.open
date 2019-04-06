@@ -273,16 +273,16 @@ public class FgdbReader {
   // case 0:
   // break;
   // case 1:
-  // this.geometryType = DataTypes.POINT;
+  // this.geometryType = GeometryDataTypes.POINT;
   // break;
   // case 2:
-  // this.geometryType = DataTypes.MULTI_POINT;
+  // this.geometryType = GeometryDataTypes.MULTI_POINT;
   // break;
   // case 3:
-  // this.geometryType = DataTypes.MULTI_LINE_STRING;
+  // this.geometryType = GeometryDataTypes.MULTI_LINE_STRING;
   // break;
   // case 4:
-  // this.geometryType = DataTypes.MULTI_POLYGON;
+  // this.geometryType = GeometryDataTypes.MULTI_POLYGON;
   // break;
   //
   // default:

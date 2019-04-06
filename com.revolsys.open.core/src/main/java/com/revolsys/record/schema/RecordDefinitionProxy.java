@@ -3,10 +3,11 @@ package com.revolsys.record.schema;
 import java.util.Collections;
 import java.util.List;
 
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
-import com.revolsys.io.PathName;
-import com.revolsys.io.PathNameProxy;
+import org.jeometry.common.io.PathNameProxy;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.util.IconNameProxy;

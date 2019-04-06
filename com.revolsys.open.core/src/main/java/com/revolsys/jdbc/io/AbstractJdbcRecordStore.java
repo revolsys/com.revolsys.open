@@ -22,7 +22,10 @@ import java.util.UUID;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -31,10 +34,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;

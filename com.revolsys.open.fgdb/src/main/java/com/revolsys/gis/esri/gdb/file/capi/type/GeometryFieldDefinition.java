@@ -8,13 +8,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.function.Function3;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
@@ -35,10 +35,10 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
     false);
 
   static {
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPoint, DataTypes.POINT);
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryMultipoint, DataTypes.MULTI_POINT);
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolyline, DataTypes.MULTI_LINE_STRING);
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon, DataTypes.MULTI_POLYGON);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPoint, GeometryDataTypes.POINT);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryMultipoint, GeometryDataTypes.MULTI_POINT);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolyline, GeometryDataTypes.MULTI_LINE_STRING);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon, GeometryDataTypes.MULTI_POLYGON);
   }
 
   private static final Integer MINUS1 = -1;
@@ -50,7 +50,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
   private Function3<GeometryFactory, ByteBuffer, Integer, Geometry> readFunction;
 
   public GeometryFieldDefinition(final int fieldNumber, final Field field) {
-    super(fieldNumber, field.getName(), DataTypes.GEOMETRY,
+    super(fieldNumber, field.getName(), GeometryDataTypes.GEOMETRY,
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
     final GeometryDef geometryDef = field.getGeometryDef();
     if (geometryDef == null) {
@@ -118,17 +118,17 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
     final int geometryType = buffer.getInt();
     if (geometryType == 0) {
       final DataType dataType = getDataType();
-      if (DataTypes.POINT.equals(dataType)) {
+      if (GeometryDataTypes.POINT.equals(dataType)) {
         return this.geometryFactory.point();
-      } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+      } else if (GeometryDataTypes.MULTI_POINT.equals(dataType)) {
         return this.geometryFactory.point();
-      } else if (DataTypes.LINE_STRING.equals(dataType)) {
+      } else if (GeometryDataTypes.LINE_STRING.equals(dataType)) {
         return this.geometryFactory.lineString();
-      } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
+      } else if (GeometryDataTypes.MULTI_LINE_STRING.equals(dataType)) {
         return this.geometryFactory.lineString();
-      } else if (DataTypes.POLYGON.equals(dataType)) {
+      } else if (GeometryDataTypes.POLYGON.equals(dataType)) {
         return this.geometryFactory.polygon();
-      } else if (DataTypes.MULTI_POLYGON.equals(dataType)) {
+      } else if (GeometryDataTypes.MULTI_POLYGON.equals(dataType)) {
         return this.geometryFactory.polygon();
       } else {
         return null;

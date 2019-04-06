@@ -1,7 +1,8 @@
 package com.revolsys.record.io.format.gml.type;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.record.io.format.xml.XmlWriter;
 
 public class SimpleFieldType extends AbstractGmlFieldType {

@@ -3,10 +3,10 @@ package com.revolsys.collection.range;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.number.Numbers;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.datatype.DataType;
 import com.revolsys.util.Emptyable;
 
 public abstract class AbstractRange<V>

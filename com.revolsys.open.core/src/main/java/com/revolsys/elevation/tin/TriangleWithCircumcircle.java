@@ -1,13 +1,12 @@
 package com.revolsys.elevation.tin;
 
-import org.jeometry.common.math.MathUtil;
-
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.Circle;
 import com.revolsys.geometry.model.impl.TriangleDoubleXYZ;
+import com.revolsys.geometry.util.Points;
 
 public class TriangleWithCircumcircle extends TriangleDoubleXYZ {
   private static final long serialVersionUID = 1L;
@@ -91,7 +90,7 @@ public class TriangleWithCircumcircle extends TriangleDoubleXYZ {
 
   @Override
   public boolean circumcircleContains(final double x, final double y) {
-    final double distanceFromCentre = MathUtil.distance(this.centreX, this.centreY, x, y);
+    final double distanceFromCentre = Points.distance(this.centreX, this.centreY, x, y);
     return distanceFromCentre < this.radius + 0.0001;
   }
 

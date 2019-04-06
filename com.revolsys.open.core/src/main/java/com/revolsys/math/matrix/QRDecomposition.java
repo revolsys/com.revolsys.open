@@ -1,6 +1,6 @@
 package com.revolsys.math.matrix;
 
-import org.jeometry.common.math.MathUtil;
+import org.jeometry.common.number.Doubles;
 
 /** QR Decomposition.
 <P>
@@ -64,7 +64,7 @@ public class QRDecomposition implements java.io.Serializable {
       // Compute 2-norm of k-th column without under/overflow.
       double nrm = 0;
       for (int i = k; i < this.m; i++) {
-        nrm = MathUtil.hypot(nrm, this.QR[i][k]);
+        nrm = Doubles.hypot(nrm, this.QR[i][k]);
       }
 
       if (nrm != 0.0) {

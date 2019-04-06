@@ -9,8 +9,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Map;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.record.Record;

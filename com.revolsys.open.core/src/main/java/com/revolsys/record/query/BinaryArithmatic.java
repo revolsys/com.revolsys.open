@@ -1,7 +1,8 @@
 package com.revolsys.record.query;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.record.schema.RecordStore;
 
 public abstract class BinaryArithmatic extends AbstractBinaryQueryValue {

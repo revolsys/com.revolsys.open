@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.junit.Assert;
@@ -12,16 +15,14 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.revolsys.core.test.geometry.test.model.GeometryTestUtil;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.GeometryRecordReader;
@@ -47,9 +48,9 @@ import junit.framework.TestSuite;
 public class RecordIoTestSuite {
   public static void addGeometryTestSuites(final TestSuite suite, final String namePrefix,
     final GeometryTestFunction<GeometryFactory, Geometry, DataType> testFunction) {
-    final List<DataType> geometryDataTypes = Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING,
-      DataTypes.POLYGON, DataTypes.MULTI_POINT, DataTypes.MULTI_LINE_STRING,
-      DataTypes.MULTI_POLYGON);
+    final List<DataType> geometryDataTypes = Arrays.asList(GeometryDataTypes.POINT, GeometryDataTypes.LINE_STRING,
+      GeometryDataTypes.POLYGON, GeometryDataTypes.MULTI_POINT, GeometryDataTypes.MULTI_LINE_STRING,
+      GeometryDataTypes.MULTI_POLYGON);
     for (final DataType dataType : geometryDataTypes) {
       final TestSuite dataTypeSuite = new TestSuite(namePrefix + " " + dataType.toString());
       suite.addTest(dataTypeSuite);

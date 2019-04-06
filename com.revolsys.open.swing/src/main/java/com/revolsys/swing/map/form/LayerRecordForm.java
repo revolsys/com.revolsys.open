@@ -49,13 +49,14 @@ import javax.swing.undo.UndoableEdit;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
@@ -548,8 +549,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     // Geometry manipulation
     if (hasGeometry) {
       final DataType geometryDataType = geometryField.getDataType();
-      if (geometryDataType == DataTypes.LINE_STRING
-        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+      if (geometryDataType == GeometryDataTypes.LINE_STRING
+        || geometryDataType == GeometryDataTypes.MULTI_LINE_STRING) {
         if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME, FLIP_RECORD_ICON, editable,
             this::flipRecordOrientation);

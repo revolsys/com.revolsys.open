@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
 
 public class ListElement extends Element {

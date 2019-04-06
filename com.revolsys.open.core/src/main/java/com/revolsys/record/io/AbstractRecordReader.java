@@ -4,13 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.format.csv.GeometryFieldDefinition;
@@ -27,7 +29,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
 
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
-  private DataType geometryType = DataTypes.GEOMETRY;
+  private DataType geometryType = GeometryDataTypes.GEOMETRY;
 
   private boolean hasPointFields;
 
@@ -118,7 +120,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
       && Property.hasValue(this.pointYFieldName);
     if (this.hasPointFields) {
 
-      this.geometryType = DataTypes.POINT;
+      this.geometryType = GeometryDataTypes.POINT;
     } else {
       this.pointXFieldName = null;
       this.pointYFieldName = null;
@@ -134,37 +136,37 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
           type = this.geometryType;
           isGeometryField = true;
         } else if ("GEOMETRY".equalsIgnoreCase(fieldName)) {
-          type = DataTypes.GEOMETRY;
+          type = GeometryDataTypes.GEOMETRY;
           isGeometryField = true;
         } else if ("SHAPE".equalsIgnoreCase(fieldName)) {
-          type = DataTypes.GEOMETRY;
+          type = GeometryDataTypes.GEOMETRY;
           isGeometryField = true;
         } else if ("GEOMETRYCOLLECTION".equalsIgnoreCase(fieldName)
           || "GEOMETRY_COLLECTION".equalsIgnoreCase(fieldName)) {
-          type = DataTypes.GEOMETRY_COLLECTION;
+          type = GeometryDataTypes.GEOMETRY_COLLECTION;
           isGeometryField = true;
         } else if ("POINT".equalsIgnoreCase(fieldName)) {
-          type = DataTypes.POINT;
+          type = GeometryDataTypes.POINT;
           isGeometryField = true;
         } else if ("MULTI_POINT".equalsIgnoreCase(fieldName)
           || "MULTIPOINT".equalsIgnoreCase(fieldName)) {
-          type = DataTypes.MULTI_POINT;
+          type = GeometryDataTypes.MULTI_POINT;
           isGeometryField = true;
         } else if ("LINE_STRING".equalsIgnoreCase(fieldName)
           || "LINESTRING".equalsIgnoreCase(fieldName) || "LINE".equalsIgnoreCase(fieldName)) {
-          type = DataTypes.LINE_STRING;
+          type = GeometryDataTypes.LINE_STRING;
           isGeometryField = true;
         } else if ("MULTI_LINESTRING".equalsIgnoreCase(fieldName)
           || "MULTILINESTRING".equalsIgnoreCase(fieldName)
           || "MULTILINE".equalsIgnoreCase(fieldName) || "MULTI_LINE".equalsIgnoreCase(fieldName)) {
-          type = DataTypes.MULTI_LINE_STRING;
+          type = GeometryDataTypes.MULTI_LINE_STRING;
           isGeometryField = true;
         } else if ("POLYGON".equalsIgnoreCase(fieldName)) {
-          type = DataTypes.POLYGON;
+          type = GeometryDataTypes.POLYGON;
           isGeometryField = true;
         } else if ("MULTI_POLYGON".equalsIgnoreCase(fieldName)
           || "MULTIPOLYGON".equalsIgnoreCase(fieldName)) {
-          type = DataTypes.MULTI_POLYGON;
+          type = GeometryDataTypes.MULTI_POLYGON;
           isGeometryField = true;
         } else {
           type = DataTypes.STRING;

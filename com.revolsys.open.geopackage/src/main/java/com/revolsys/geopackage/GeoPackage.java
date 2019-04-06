@@ -16,7 +16,6 @@ import org.sqlite.SQLiteJDBCLoader;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
@@ -26,6 +25,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
+import com.revolsys.util.RsCoreDataTypes;
 
 /**
  * jdbc:sqlite:[file]
@@ -49,7 +49,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
   public static final String JDBC_PREFIX = "jdbc:sqlite:";
 
   private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //
-    new FieldDefinition("file", DataTypes.FILE, 50, true) //
+    new FieldDefinition("file", RsCoreDataTypes.FILE, 50, true) //
   );
 
   @Override

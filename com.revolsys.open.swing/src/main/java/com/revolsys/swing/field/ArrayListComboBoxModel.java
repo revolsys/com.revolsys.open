@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import javax.swing.MutableComboBoxModel;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.swing.list.ArrayListModel;
 
 public class ArrayListComboBoxModel<T> extends ArrayListModel<T>

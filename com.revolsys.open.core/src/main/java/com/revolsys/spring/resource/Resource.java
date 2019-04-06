@@ -31,10 +31,12 @@ import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.jeometry.common.datatype.DataTypes;
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.io.FileProxy;
+import org.jeometry.common.net.UrlProxy;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.channels.ChannelReader;
@@ -43,7 +45,7 @@ import com.revolsys.io.file.Paths;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Property;
 
-public interface Resource extends org.springframework.core.io.Resource {
+public interface Resource extends org.springframework.core.io.Resource, FileProxy, UrlProxy {
   static String CLASSPATH_URL_PREFIX = "classpath:";
 
   ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<>();
@@ -327,6 +329,7 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
+  @Override
   default File getOrDownloadFile() {
     try {
       return getFile();
@@ -334,7 +337,7 @@ public interface Resource extends org.springframework.core.io.Resource {
       if (exists()) {
         final String baseName = getBaseName();
         final String fileNameExtension = getFileNameExtension();
-        final File file = FileUtil.newTempFile(baseName, fileNameExtension);
+        final File file = FileUtil.newTempFile(baseName, "." + fileNameExtension);
         try (
           InputStream inputStream = getInputStream()) {
           FileUtil.copy(inputStream, file);
@@ -370,6 +373,7 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
+  @Override
   default URI getUri() {
     try {
       return getURI();
@@ -385,6 +389,11 @@ public interface Resource extends org.springframework.core.io.Resource {
     } else {
       return uri.toString();
     }
+  }
+
+  @Override
+  default URL getUrl() {
+    return getURL();
   }
 
   @Override

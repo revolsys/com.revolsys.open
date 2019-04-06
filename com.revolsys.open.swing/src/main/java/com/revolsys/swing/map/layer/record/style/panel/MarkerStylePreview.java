@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.swing.map.Graphics2DViewport;
 import com.revolsys.swing.map.ImageViewport;

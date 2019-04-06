@@ -10,7 +10,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.beans.Classes;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.io.PathName;
+import org.jeometry.common.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;

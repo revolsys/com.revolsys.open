@@ -4,12 +4,13 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.jeometry.common.datatype.DataTypes;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -86,7 +87,7 @@ public class DirectionalFieldsTest {
     TABLE.addField(START_RIGHT_TURN, DataTypes.STRING, false);
     TABLE.addField(END_LEFT_TURN, DataTypes.STRING, false);
     TABLE.addField(END_RIGHT_TURN, DataTypes.STRING, false);
-    TABLE.addField("LINE", DataTypes.LINE_STRING, true);
+    TABLE.addField("LINE", GeometryDataTypes.LINE_STRING, true);
 
     DIRECTIONAL_ATTRIBUTES = DirectionalFields.getProperty(TABLE);
     DIRECTIONAL_ATTRIBUTES.addDirectionalFieldValues(DIRECTIONAL, DIRECTIONAL_VALUES);

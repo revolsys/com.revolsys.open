@@ -2,7 +2,8 @@ package com.revolsys.identifier;
 
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
+
 import com.revolsys.util.Strings;
 
 public abstract class AbstractIdentifier implements Identifier {

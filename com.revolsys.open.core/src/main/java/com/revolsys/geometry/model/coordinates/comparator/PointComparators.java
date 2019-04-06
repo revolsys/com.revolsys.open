@@ -3,9 +3,8 @@ package com.revolsys.geometry.model.coordinates.comparator;
 import java.util.Comparator;
 import java.util.List;
 
-import org.jeometry.common.math.MathUtil;
-
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.util.Points;
 
 public interface PointComparators {
 
@@ -96,8 +95,8 @@ public interface PointComparators {
       final double y1 = c1.getY();
       final double x2 = c2.getX();
       final double y2 = c2.getY();
-      final double distance1 = MathUtil.distance(originX, originY, x1, y1);
-      final double distance2 = MathUtil.distance(originX, originY, x2, y2);
+      final double distance1 = Points.distance(originX, originY, x1, y1);
+      final double distance2 = Points.distance(originX, originY, x2, y2);
       int compare = Double.compare(distance1, distance2);
       if (compare == 0) {
         compare = Double.compare(y1, y2);

@@ -8,8 +8,8 @@ import java.awt.Graphics2D;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
@@ -68,9 +68,9 @@ public class GeometryStylePreview extends JPanel {
     this.geometryStyle = geometryStyle;
     this.geometryDataType = geometryDataType;
     this.polygon = polygon;
-    if (DataTypes.LINE_STRING.equals(geometryDataType)) {
+    if (GeometryDataTypes.LINE_STRING.equals(geometryDataType)) {
 
-    } else if (DataTypes.POLYGON.equals(geometryDataType)) {
+    } else if (GeometryDataTypes.POLYGON.equals(geometryDataType)) {
       this.line = this.polygon.getShell();
     }
 
@@ -81,7 +81,7 @@ public class GeometryStylePreview extends JPanel {
     super.paintComponent(g);
     final Graphics2D graphics = (Graphics2D)g;
     final Graphics2DViewRender view = new Graphics2DViewRender(graphics, 100, 100);
-    if (DataTypes.POLYGON.equals(this.geometryDataType)) {
+    if (GeometryDataTypes.POLYGON.equals(this.geometryDataType)) {
       view.drawGeometry(this.polygon, this.geometryStyle);
     } else {
       view.drawGeometry(this.line, this.geometryStyle);

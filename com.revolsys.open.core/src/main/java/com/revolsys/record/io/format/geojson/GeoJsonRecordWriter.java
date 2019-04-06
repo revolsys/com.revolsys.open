@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.Writer;
 
 import org.jeometry.common.math.Angle;
-import org.jeometry.common.math.MathUtil;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.geometry.model.ClockDirection;
@@ -17,6 +16,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
@@ -99,7 +99,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
         final double currentX = x;
         final double previousX = line.getX(i - 1);
         final double previousY = line.getY(i - 1);
-        x = MathUtil.distance(previousX, previousY, currentX, y);
+        x = Points.distance(previousX, previousY, currentX, y);
         y = Angle.angleNorthDegrees(previousX, previousY, currentX, y);
       }
 

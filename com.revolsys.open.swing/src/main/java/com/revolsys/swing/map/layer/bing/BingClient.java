@@ -14,7 +14,7 @@ import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.io.format.json.Json;

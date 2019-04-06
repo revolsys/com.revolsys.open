@@ -3,7 +3,6 @@ package com.revolsys.geometry.model.segment;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Function4Double;
 import org.jeometry.common.math.Angle;
-import org.jeometry.common.math.MathUtil;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
@@ -22,6 +21,7 @@ import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Property;
 
@@ -247,7 +247,7 @@ public interface LineSegment extends LineString {
     final double x2 = getX(1);
     final double y2 = getY(1);
     if (x1 == x2 && y1 == y2) {
-      return MathUtil.distance(x, y, x1, y1);
+      return Points.distance(x, y, x1, y1);
     } else {
       final double dxx1 = x - x1;
       final double dx2x1 = x2 - x1;
@@ -258,9 +258,9 @@ public interface LineSegment extends LineString {
       final double r = (dxx1 * dx2x1 + dyy1 * dy2y1) / (d2x1sq + dy2y1sq);
 
       if (r <= 0.0) {
-        return MathUtil.distance(x, y, x1, y1);
+        return Points.distance(x, y, x1, y1);
       } else if (r >= 1.0) {
-        return MathUtil.distance(x, y, x2, y2);
+        return Points.distance(x, y, x2, y2);
       } else {
         final double dy1y = y1 - y;
         final double dx1x = x1 - x;
@@ -550,9 +550,9 @@ public interface LineSegment extends LineString {
       } else if (intersectionCount == 1) {
         return geometryFactory.point(coordinates);
       } else if (intersectionCount == 2) {
-        final double distance1 = MathUtil.distance(line1x1, line1y1, coordinates[0],
+        final double distance1 = Points.distance(line1x1, line1y1, coordinates[0],
           coordinates[1]);
-        final double distance2 = MathUtil.distance(line1x1, line1y1, coordinates[axisCount],
+        final double distance2 = Points.distance(line1x1, line1y1, coordinates[axisCount],
           coordinates[axisCount + 1]);
         if (distance1 > distance2) {
           CoordinatesListUtil.switchCoordinates(coordinates, axisCount, 0, 1);
@@ -573,7 +573,7 @@ public interface LineSegment extends LineString {
     final double y1 = getY(0);
     final double x2 = getX(1);
     final double y2 = getY(1);
-    return MathUtil.distance(x1, y1, x2, y2);
+    return Points.distance(x1, y1, x2, y2);
   }
 
   default double getOrientaton() {

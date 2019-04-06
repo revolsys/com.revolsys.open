@@ -9,16 +9,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jeometry.common.math.MathUtil;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypeProxy;
+import org.jeometry.common.datatype.DataTypes;
 
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypeProxy;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.identifier.Identifier;
@@ -115,19 +114,16 @@ public class FieldDefinition extends BaseObjectWithProperties
     this.length = Maps.getInteger(properties, "length", 0);
     this.scale = Maps.getInteger(properties, "scale", 0);
     this.minValue = properties.get("minValue");
+    final DataType dataType = this.type;
     if (this.minValue == null) {
-      this.minValue = MathUtil.getMinValue(getTypeClass());
+      this.minValue = dataType.getMinValue();
     } else {
-      final DataType dataType = this.type;
-      final Object value = this.minValue;
-      this.minValue = dataType.toString(value);
+      this.minValue = dataType.toObject(this.minValue);
     }
     if (this.maxValue == null) {
-      this.maxValue = MathUtil.getMaxValue(getTypeClass());
+      this.maxValue = dataType.getMaxValue();
     } else {
-      final DataType dataType = this.type;
-      final Object value = this.maxValue;
-      this.maxValue = dataType.toString(value);
+      this.maxValue = dataType.toObject(this.maxValue);
     }
   }
 
@@ -255,8 +251,8 @@ public class FieldDefinition extends BaseObjectWithProperties
       this.scale = scale;
     }
     this.description = description;
-    this.minValue = MathUtil.getMinValue(getTypeClass());
-    this.maxValue = MathUtil.getMaxValue(getTypeClass());
+    this.minValue = type.getMinValue();
+    this.maxValue = type.getMaxValue();
   }
 
   /**
@@ -285,9 +281,8 @@ public class FieldDefinition extends BaseObjectWithProperties
       this.scale = scale;
     }
     this.description = description;
-    final Class<?> typeClass = getTypeClass();
-    this.minValue = MathUtil.getMinValue(typeClass);
-    this.maxValue = MathUtil.getMaxValue(typeClass);
+    this.minValue = type.getMinValue();
+    this.maxValue = type.getMaxValue();
     setProperties(properties);
   }
 

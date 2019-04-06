@@ -11,7 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.ToolTipProxy;

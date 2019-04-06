@@ -26,7 +26,7 @@ import javax.swing.WindowConstants;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;

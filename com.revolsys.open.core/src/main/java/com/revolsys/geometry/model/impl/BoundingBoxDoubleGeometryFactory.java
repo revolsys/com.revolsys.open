@@ -34,7 +34,7 @@ package com.revolsys.geometry.model.impl;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
-import org.jeometry.common.math.MathUtil;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -169,10 +169,10 @@ public class BoundingBoxDoubleGeometryFactory extends BaseBoundingBox {
       final double maxX = getMaxX();
       final double maxY = getMaxY();
       int result = 17;
-      result = 37 * result + MathUtil.hashCode(minX);
-      result = 37 * result + MathUtil.hashCode(maxX);
-      result = 37 * result + MathUtil.hashCode(minY);
-      result = 37 * result + MathUtil.hashCode(maxY);
+      result = 37 * result + Doubles.hashCode(minX);
+      result = 37 * result + Doubles.hashCode(maxX);
+      result = 37 * result + Doubles.hashCode(minY);
+      result = 37 * result + Doubles.hashCode(maxY);
       return result;
     }
   }

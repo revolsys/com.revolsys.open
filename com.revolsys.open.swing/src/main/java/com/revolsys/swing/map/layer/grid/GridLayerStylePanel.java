@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
 
-import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.field.Field;
@@ -45,7 +45,7 @@ public class GridLayerStylePanel extends BaseStylePanel implements PropertyChang
 
     this.previews = Panels.titledTransparentVerticalLayout("Preview", 5);
     final GeometryStylePreview geometryPreview = new GeometryStylePreview(this.geometryStyle,
-      DataTypes.POLYGON, GeometryFactory.DEFAULT_2D.newRectangleCorners(19, 19, 60, 60));
+      GeometryDataTypes.POLYGON, GeometryFactory.DEFAULT_2D.newRectangleCorners(19, 19, 60, 60));
     this.previews.add(geometryPreview);
     this.previews.add(new TextStylePreview(this.textStyle));
 

@@ -12,11 +12,11 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;

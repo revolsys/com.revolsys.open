@@ -11,9 +11,10 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;

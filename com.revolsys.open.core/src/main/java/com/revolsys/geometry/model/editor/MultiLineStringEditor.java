@@ -5,9 +5,9 @@ import java.util.function.Consumer;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Function4Double;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -149,7 +149,7 @@ public class MultiLineStringEditor
 
   @Override
   public GeometryDataType<LineString, LineStringEditor> getPartDataType() {
-    return DataTypes.LINE_STRING;
+    return GeometryDataTypes.LINE_STRING;
   }
 
   @SuppressWarnings("unchecked")

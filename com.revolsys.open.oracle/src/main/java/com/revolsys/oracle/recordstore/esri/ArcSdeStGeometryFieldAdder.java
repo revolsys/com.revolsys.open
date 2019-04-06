@@ -1,10 +1,10 @@
 package com.revolsys.oracle.recordstore.esri;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;

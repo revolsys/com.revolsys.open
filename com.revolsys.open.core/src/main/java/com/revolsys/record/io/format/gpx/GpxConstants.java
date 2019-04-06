@@ -2,12 +2,13 @@ package com.revolsys.record.io.format.gpx;
 
 import javax.xml.namespace.QName;
 
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.io.PathName;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public final class GpxConstants {
@@ -91,13 +92,13 @@ public final class GpxConstants {
     addField("pdop", DataTypes.DOUBLE, false);
     addField("ageofdgpsdata", DataTypes.DOUBLE, false);
     addField("dgpsid", DataTypes.STRING, false);
-    GPX_TYPE.addField("location", DataTypes.GEOMETRY, true);
+    GPX_TYPE.addField("location", GeometryDataTypes.GEOMETRY, true);
     GPX_TYPE.setGeometryFactory(GEOMETRY_FACTORY);
-    GPX_WAYPOINT.addField("geometry", DataTypes.POINT, true);
+    GPX_WAYPOINT.addField("geometry", GeometryDataTypes.POINT, true);
     GPX_WAYPOINT.setGeometryFactory(GEOMETRY_FACTORY);
-    GPX_TRACK.addField("geometry", DataTypes.GEOMETRY, true);
+    GPX_TRACK.addField("geometry", GeometryDataTypes.GEOMETRY, true);
     GPX_TRACK.setGeometryFactory(GEOMETRY_FACTORY);
-    GPX_ROUTE.addField("geometry", DataTypes.LINE_STRING, true);
+    GPX_ROUTE.addField("geometry", GeometryDataTypes.LINE_STRING, true);
     GPX_ROUTE.setGeometryFactory(GEOMETRY_FACTORY);
   }
 

@@ -5,12 +5,11 @@ import java.util.LinkedList;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
+import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.function.Consumer3Double;
-import org.jeometry.common.math.MathUtil;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
@@ -23,6 +22,7 @@ import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
 public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
+
   String GEOMETRY_FACTORY = "geometryFactory";
 
   int NULL_COLOUR = WebColors.colorToRGB(0, 0, 0, 0);
@@ -42,6 +42,34 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
       }
     }
     polygons.add(notNullRectangle);
+  }
+
+  public static double bilinearInterpolation(final double q11, final double q12, final double q21,
+    final double q22, final double x1, final double x2, final double y1, final double y2,
+    final double x, final double y) {
+    final double x2x1 = x2 - x1;
+    final double y2y1 = y2 - y1;
+    final double x2x = x2 - x;
+    final double y2y = y2 - y;
+    final double yy1 = y - y1;
+    final double xx1 = x - x1;
+    return 1.0 / (x2x1 * y2y1)
+      * (q11 * x2x * y2y + q21 * xx1 * y2y + q12 * x2x * yy1 + q22 * xx1 * yy1);
+  }
+
+  /**
+   *
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param a
+   * @param b
+   * @param c
+   * @param d
+   * @param t The va
+   * @return
+   */
+  public static double cubicInterpolate(final double a, final double b, final double c,
+    final double d, final double t) {
+    return b + 0.5 * t * (c - a + t * (2 * a - 5 * b + 4 * c - d + t * (3 * (b - c) + d - a)));
   }
 
   static int getGridCellX(final double minX, final double gridCellSize, final double x) {
@@ -427,7 +455,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     final double z3 = getValueCubic(gridX, gridY + 1, xPercent);
     final double z4 = getValueCubic(gridX, gridY + 2, xPercent);
 
-    return MathUtil.cubicInterpolate(z1, z2, z3, z4, yPercent);
+    return cubicInterpolate(z1, z2, z3, z4, yPercent);
   }
 
   /**
@@ -477,7 +505,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
     final double z2 = getValue(gridX, gridY);
     final double z3 = getValue(gridX + 1, gridY);
     final double z4 = getValue(gridX + 2, gridY);
-    return MathUtil.cubicInterpolate(z1, z2, z3, z4, xPercent);
+    return cubicInterpolate(z1, z2, z3, z4, xPercent);
   }
 
   double getValueFast(int gridX, int gridY);

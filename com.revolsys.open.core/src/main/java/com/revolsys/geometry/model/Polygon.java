@@ -42,7 +42,8 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataTypes;
+
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.model.editor.AbstractGeometryCollectionEditor;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
@@ -337,7 +338,7 @@ public interface Polygon extends Polygonal {
 
   @Override
   default GeometryDataType<Polygon, PolygonEditor> getDataType() {
-    return DataTypes.POLYGON;
+    return GeometryDataTypes.POLYGON;
   }
 
   @Override

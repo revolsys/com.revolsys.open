@@ -46,13 +46,13 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.index.RecordSpatialIndex;
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.rstartree.RStarTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -60,7 +60,7 @@ import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathName;
+import org.jeometry.common.io.PathName;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -1680,8 +1680,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
         editMenu.setEnableCheck(LayerRecordMenu.enableCheck(notDeleted));
         final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
-        if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        if (geometryDataType == GeometryDataTypes.LINE_STRING
+          || geometryDataType == GeometryDataTypes.MULTI_LINE_STRING) {
           if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
             LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_RECORD_NAME,
               LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck,
@@ -1807,13 +1807,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (isCanAddRecords()) {
       if (isCanDeleteRecords()) {
         final DataType geometryType = getGeometryType();
-        if (DataTypes.POINT.equals(geometryType)) {
+        if (GeometryDataTypes.POINT.equals(geometryType)) {
           return false;
-        } else if (DataTypes.MULTI_POINT.equals(geometryType)) {
+        } else if (GeometryDataTypes.MULTI_POINT.equals(geometryType)) {
           return false;
-        } else if (DataTypes.POLYGON.equals(geometryType)) {
+        } else if (GeometryDataTypes.POLYGON.equals(geometryType)) {
           return false;
-        } else if (DataTypes.MULTI_POLYGON.equals(geometryType)) {
+        } else if (GeometryDataTypes.MULTI_POLYGON.equals(geometryType)) {
           return false;
         }
         final List<LayerRecord> mergeableSelectedRecords = getMergeableSelectedRecords();

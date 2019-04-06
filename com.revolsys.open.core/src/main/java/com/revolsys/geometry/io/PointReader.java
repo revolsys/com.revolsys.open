@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
@@ -56,7 +56,7 @@ public interface PointReader extends Reader<Point>, GeometryFactoryProxy {
   default RecordDefinition newRecordDefinition(final String name) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final RecordDefinition recordDefinition = new RecordDefinitionBuilder(name) //
-      .addField("POINT", DataTypes.POINT) //
+      .addField("POINT", GeometryDataTypes.POINT) //
       .setGeometryFactory(geometryFactory) //
       .getRecordDefinition();
     return recordDefinition;

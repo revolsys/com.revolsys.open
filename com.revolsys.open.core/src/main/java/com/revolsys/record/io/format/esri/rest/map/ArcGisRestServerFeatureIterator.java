@@ -9,15 +9,15 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 
+import org.jeometry.common.datatype.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -41,12 +41,12 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
   private static Map<DataType, BiFunction<GeometryFactory, MapEx, Geometry>> GEOMETRY_CONVERTER_BY_TYPE = new HashMap<>();
 
   static {
-    GEOMETRY_CONVERTER_BY_TYPE.put(DataTypes.POINT, ArcGisRestServerFeatureIterator::parsePoint);
-    GEOMETRY_CONVERTER_BY_TYPE.put(DataTypes.MULTI_POINT,
+    GEOMETRY_CONVERTER_BY_TYPE.put(GeometryDataTypes.POINT, ArcGisRestServerFeatureIterator::parsePoint);
+    GEOMETRY_CONVERTER_BY_TYPE.put(GeometryDataTypes.MULTI_POINT,
       ArcGisRestServerFeatureIterator::parseMultiPoint);
-    GEOMETRY_CONVERTER_BY_TYPE.put(DataTypes.MULTI_LINE_STRING,
+    GEOMETRY_CONVERTER_BY_TYPE.put(GeometryDataTypes.MULTI_LINE_STRING,
       ArcGisRestServerFeatureIterator::parseMultiLineString);
-    GEOMETRY_CONVERTER_BY_TYPE.put(DataTypes.MULTI_POLYGON,
+    GEOMETRY_CONVERTER_BY_TYPE.put(GeometryDataTypes.MULTI_POLYGON,
       ArcGisRestServerFeatureIterator::parseMultiPolygon);
   }
 

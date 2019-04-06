@@ -9,8 +9,8 @@ import javax.swing.JFormattedTextField;
 
 import org.jdesktop.swingx.JXDatePicker;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.util.Property;
 
 public class DateField extends JXDatePicker implements Field, PropertyChangeListener {

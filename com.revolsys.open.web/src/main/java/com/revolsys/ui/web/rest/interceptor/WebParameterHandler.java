@@ -5,7 +5,7 @@ import java.util.function.BiFunction;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.datatype.DataType;
 
 public interface WebParameterHandler {
   static WebParameterHandler fixed(final Object value) {

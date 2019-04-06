@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.jeometry.common.function.Function3;
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.io.PathName;
 import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestService;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;

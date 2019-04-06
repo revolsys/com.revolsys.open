@@ -3,7 +3,7 @@ package com.revolsys.propertyeditor;
 import java.beans.PropertyEditorSupport;
 import java.sql.Date;
 
-import com.revolsys.util.Dates;
+import org.jeometry.common.date.Dates;
 
 public class SqlDateEditor extends PropertyEditorSupport {
   private final String pattern;
