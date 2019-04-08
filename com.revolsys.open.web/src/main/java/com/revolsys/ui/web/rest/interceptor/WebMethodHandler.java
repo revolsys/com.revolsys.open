@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.function.Function3;
@@ -58,8 +60,6 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.util.WebUtils;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.ui.web.annotation.RequestAttribute;

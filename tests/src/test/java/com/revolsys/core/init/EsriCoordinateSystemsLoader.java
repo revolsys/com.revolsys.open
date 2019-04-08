@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.coordinatesystem.io.WktCsParser;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.Ellipsoid;

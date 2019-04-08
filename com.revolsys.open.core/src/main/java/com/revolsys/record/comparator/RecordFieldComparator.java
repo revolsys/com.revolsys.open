@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.jeometry.common.compare.CompareUtil;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
-import com.revolsys.util.CompareUtil;
 
 public class RecordFieldComparator implements Comparator<Record> {
   private List<String> fieldNames;

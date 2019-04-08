@@ -13,13 +13,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import org.jdesktop.swingx.VerticalLayout;
-
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.io.IoFactory;
 import com.revolsys.jdbc.exception.DatabaseNotFoundException;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;

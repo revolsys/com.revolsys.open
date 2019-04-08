@@ -1,6 +1,6 @@
 package com.revolsys.raster;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 public interface Band {
 

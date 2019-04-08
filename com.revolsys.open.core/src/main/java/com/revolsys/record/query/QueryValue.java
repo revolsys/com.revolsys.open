@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 
 import com.akiban.sql.parser.BetweenOperatorNode;
 import com.akiban.sql.parser.BinaryArithmeticOperatorNode;

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Numbers;
 

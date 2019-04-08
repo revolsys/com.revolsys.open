@@ -1,6 +1,7 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model;
 
-import com.revolsys.identifier.Identifier;
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 

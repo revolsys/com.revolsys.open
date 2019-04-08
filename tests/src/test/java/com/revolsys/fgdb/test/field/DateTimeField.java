@@ -3,7 +3,7 @@ package com.revolsys.fgdb.test.field;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 
 public class DateTimeField extends FgdbField {
   public DateTimeField(final String name, final boolean required) {

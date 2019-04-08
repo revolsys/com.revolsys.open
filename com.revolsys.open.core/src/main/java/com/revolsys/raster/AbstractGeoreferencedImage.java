@@ -20,7 +20,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.w3c.dom.Document;
@@ -37,7 +37,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.DomUtil;
 import com.revolsys.spring.resource.Resource;

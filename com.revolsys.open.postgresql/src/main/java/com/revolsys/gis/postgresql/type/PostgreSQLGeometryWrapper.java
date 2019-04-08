@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.function.Consumer3;
 import org.jeometry.common.number.Doubles;
 import org.postgresql.util.PGobject;

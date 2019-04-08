@@ -8,10 +8,10 @@ import java.awt.event.FocusListener;
 import javax.swing.JEditorPane;
 import javax.swing.text.Element;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.MenuFactory;
 

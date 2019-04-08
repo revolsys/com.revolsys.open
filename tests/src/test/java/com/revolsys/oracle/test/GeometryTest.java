@@ -2,7 +2,8 @@ package com.revolsys.oracle.test;
 
 import java.util.Collections;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,7 +13,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;

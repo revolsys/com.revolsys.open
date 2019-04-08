@@ -3,7 +3,7 @@ package com.revolsys.record.io;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractReader;

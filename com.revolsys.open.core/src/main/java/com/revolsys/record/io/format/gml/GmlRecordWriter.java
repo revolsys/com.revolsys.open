@@ -4,7 +4,7 @@ import java.io.Writer;
 
 import javax.xml.namespace.QName;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;

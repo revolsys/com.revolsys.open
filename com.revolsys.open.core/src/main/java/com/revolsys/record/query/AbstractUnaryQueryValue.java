@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;

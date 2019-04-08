@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;

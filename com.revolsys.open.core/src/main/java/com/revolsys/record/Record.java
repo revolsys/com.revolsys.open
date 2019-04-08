@@ -14,7 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.compare.CompareUtil;
+import org.jeometry.common.data.identifier.Identifiable;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.identifier.ListIdentifier;
+import org.jeometry.common.data.identifier.TypedIdentifier;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
@@ -22,18 +28,12 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.identifier.Identifiable;
-import com.revolsys.identifier.Identifier;
-import com.revolsys.identifier.ListIdentifier;
-import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
-import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.RsCoreDataTypes;
 import com.revolsys.util.Strings;
 
 public interface Record
@@ -1159,7 +1159,7 @@ public interface Record
       Identifier.setIdentifier(this, idFieldNames, identifier);
     } else {
       final Identifier oldIdentifier = getIdentifier();
-      if (!RsCoreDataTypes.IDENTIFIER.equals(oldIdentifier, identifier)) {
+      if (!DataTypes.IDENTIFIER.equals(oldIdentifier, identifier)) {
         throw new IllegalStateException(
           "Cannot change the ID on a persisted record: " + identifier + "!=" + oldIdentifier);
       }

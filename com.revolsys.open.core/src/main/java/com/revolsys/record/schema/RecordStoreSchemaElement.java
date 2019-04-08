@@ -1,10 +1,10 @@
 package com.revolsys.record.schema;
 
 import org.jeometry.common.io.PathName;
+import org.jeometry.common.io.PathNameProxy;
 
 import com.revolsys.collection.NameProxy;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
-import org.jeometry.common.io.PathNameProxy;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.util.IconNameProxy;
 

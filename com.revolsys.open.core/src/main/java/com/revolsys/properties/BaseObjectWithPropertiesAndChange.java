@@ -2,7 +2,7 @@ package com.revolsys.properties;
 
 import java.util.Map;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupport;

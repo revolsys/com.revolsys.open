@@ -17,13 +17,13 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.jeometry.common.data.type.DataTypes;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.NamedLinkedHashMapEx;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;

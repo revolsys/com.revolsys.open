@@ -4,8 +4,8 @@ import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.date.Dates;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;

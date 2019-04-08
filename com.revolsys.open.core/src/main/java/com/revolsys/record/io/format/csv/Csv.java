@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;

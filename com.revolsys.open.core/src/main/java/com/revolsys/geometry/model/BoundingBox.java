@@ -16,7 +16,7 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.function.Consumer3;
 import org.jeometry.common.logging.Logs;

@@ -9,9 +9,10 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.jeometry.common.datatype.CollectionDataType;
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.CollectionDataType;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.postgresql.jdbc.PgConnection;
 
 import com.revolsys.collection.ResultPager;
@@ -23,7 +24,6 @@ import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLJdbcBlobFieldDefinition;
 import com.revolsys.gis.postgresql.type.PostgreSQLOidFieldDefinition;
 import com.revolsys.gis.postgresql.type.PostgreSQLTidWrapper;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;

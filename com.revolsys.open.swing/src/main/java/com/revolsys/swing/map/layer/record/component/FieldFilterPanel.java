@@ -23,11 +23,11 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.JXSearchField;
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
-import org.jeometry.common.awt.WebColors;
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;

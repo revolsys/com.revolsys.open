@@ -3,11 +3,11 @@ package com.revolsys.record.comparator;
 import java.util.Comparator;
 import java.util.List;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.compare.CompareUtil;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.CompareUtil;
 
 /**
  * The EqualAttributeCountComparator compares the number of attributes of the

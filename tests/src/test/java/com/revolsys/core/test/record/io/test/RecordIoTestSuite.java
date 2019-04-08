@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
@@ -48,9 +48,9 @@ import junit.framework.TestSuite;
 public class RecordIoTestSuite {
   public static void addGeometryTestSuites(final TestSuite suite, final String namePrefix,
     final GeometryTestFunction<GeometryFactory, Geometry, DataType> testFunction) {
-    final List<DataType> geometryDataTypes = Arrays.asList(GeometryDataTypes.POINT, GeometryDataTypes.LINE_STRING,
-      GeometryDataTypes.POLYGON, GeometryDataTypes.MULTI_POINT, GeometryDataTypes.MULTI_LINE_STRING,
-      GeometryDataTypes.MULTI_POLYGON);
+    final List<DataType> geometryDataTypes = Arrays.asList(GeometryDataTypes.POINT,
+      GeometryDataTypes.LINE_STRING, GeometryDataTypes.POLYGON, GeometryDataTypes.MULTI_POINT,
+      GeometryDataTypes.MULTI_LINE_STRING, GeometryDataTypes.MULTI_POLYGON);
     for (final DataType dataType : geometryDataTypes) {
       final TestSuite dataTypeSuite = new TestSuite(namePrefix + " " + dataType.toString());
       suite.addTest(dataTypeSuite);

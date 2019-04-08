@@ -9,10 +9,10 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingWorker;
 
+import org.jeometry.common.date.Dates;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.swing.SwingUtil;
-import org.jeometry.common.date.Dates;
 
 public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V>
   implements BackgroundTask {

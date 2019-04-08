@@ -6,9 +6,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jeometry.common.compare.CompareUtil;
 import org.springframework.util.PathMatcher;
-
-import com.revolsys.util.CompareUtil;
 
 public class UriTemplatePathMatcher implements PathMatcher {
 

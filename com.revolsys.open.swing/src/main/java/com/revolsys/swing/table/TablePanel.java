@@ -20,8 +20,9 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.EmptyReference;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.MenuFactory;

@@ -729,7 +729,8 @@ public class ProjectFrame extends BaseFrame {
     tools.addCheckboxMenuItem("map",
       new RunnableAction("Measure Length", Icons.getIcon("ruler_line"),
         () -> measureOverlay.toggleMeasureMode(GeometryDataTypes.LINE_STRING)),
-      new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", GeometryDataTypes.LINE_STRING));
+      new ObjectPropertyEnableCheck(measureOverlay, "measureDataType",
+        GeometryDataTypes.LINE_STRING));
 
     tools.addCheckboxMenuItem("map",
       new RunnableAction("Measure Area", Icons.getIcon("ruler_polygon"),

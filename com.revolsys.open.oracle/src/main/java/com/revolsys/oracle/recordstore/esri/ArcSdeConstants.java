@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
@@ -77,7 +77,8 @@ public final class ArcSdeConstants {
     GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.POINT, ST_GEOMETRY_POINT);
     GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.MULTI_POINT, ST_GEOMETRY_MULTI_POINT);
     GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.LINE_STRING, ST_GEOMETRY_LINESTRING);
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.MULTI_LINE_STRING, ST_GEOMETRY_MULTI_LINESTRING);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.MULTI_LINE_STRING,
+      ST_GEOMETRY_MULTI_LINESTRING);
     GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.POLYGON, ST_GEOMETRY_POLYGON);
     GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.MULTI_POLYGON, ST_GEOMETRY_MULTI_POLYGON);
   }

@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 

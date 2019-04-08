@@ -12,7 +12,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 
 public class FontChooserField extends ComboBox<String> {
   private static final String[] FONT_NAMES = getFontNames();

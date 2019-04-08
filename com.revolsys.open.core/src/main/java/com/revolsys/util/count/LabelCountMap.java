@@ -8,10 +8,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathNameProxy;
 import org.jeometry.common.logging.Logs;
 
-import org.jeometry.common.io.PathNameProxy;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;

@@ -6,10 +6,11 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.collection.map.LongHashMap;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;

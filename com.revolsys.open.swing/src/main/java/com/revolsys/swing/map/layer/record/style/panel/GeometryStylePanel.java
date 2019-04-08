@@ -9,8 +9,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.data.type.DataType;
 
-import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.field.Field;

@@ -3,7 +3,8 @@ package com.revolsys.elevation.cloud.las.pointformat;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.identifier.Code;
+import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
@@ -12,7 +13,6 @@ import com.revolsys.elevation.cloud.las.Version;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.record.code.Code;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
 

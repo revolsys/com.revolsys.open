@@ -4,7 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;

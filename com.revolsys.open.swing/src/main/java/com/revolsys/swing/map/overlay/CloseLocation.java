@@ -1,13 +1,14 @@
 package com.revolsys.swing.map.overlay;
 
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.collection.list.Lists;
-import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;

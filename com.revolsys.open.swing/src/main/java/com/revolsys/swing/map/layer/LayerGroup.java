@@ -18,6 +18,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.Parent;
@@ -25,8 +28,6 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.connection.Connection;
 import com.revolsys.connection.ConnectionRegistry;
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
@@ -36,7 +37,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import org.jeometry.common.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.filter.FileNameExtensionFilter;
@@ -79,9 +79,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       final MenuFactory scratchMenu = new MenuFactory("Add Scratch Layer");
       scratchMenu.setIconName("map:add");
 
-      for (final DataType dataType : Arrays.asList(GeometryDataTypes.POINT, GeometryDataTypes.LINE_STRING,
-        GeometryDataTypes.POLYGON, GeometryDataTypes.MULTI_POINT, GeometryDataTypes.MULTI_LINE_STRING,
-        GeometryDataTypes.MULTI_POLYGON, GeometryDataTypes.GEOMETRY, GeometryDataTypes.GEOMETRY_COLLECTION)) {
+      for (final DataType dataType : Arrays.asList(GeometryDataTypes.POINT,
+        GeometryDataTypes.LINE_STRING, GeometryDataTypes.POLYGON, GeometryDataTypes.MULTI_POINT,
+        GeometryDataTypes.MULTI_LINE_STRING, GeometryDataTypes.MULTI_POLYGON,
+        GeometryDataTypes.GEOMETRY, GeometryDataTypes.GEOMETRY_COLLECTION)) {
         String iconName;
         if (dataType.equals(GeometryDataTypes.GEOMETRY_COLLECTION)) {
           iconName = "table_geometry";

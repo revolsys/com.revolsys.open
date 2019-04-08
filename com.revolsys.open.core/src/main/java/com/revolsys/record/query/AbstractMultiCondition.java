@@ -2,7 +2,7 @@ package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.record.schema.RecordStore;
 

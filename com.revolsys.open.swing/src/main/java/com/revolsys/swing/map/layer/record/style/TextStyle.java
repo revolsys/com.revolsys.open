@@ -24,13 +24,13 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
-import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.record.Record;

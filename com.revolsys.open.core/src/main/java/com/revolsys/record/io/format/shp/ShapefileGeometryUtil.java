@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -172,7 +172,8 @@ public final class ShapefileGeometryUtil {
       } else {
         return ShapefileConstants.MULTI_POINT_SHAPE;
       }
-    } else if (GeometryDataTypes.LINEAR_RING.equals(dataType) || GeometryDataTypes.LINE_STRING.equals(dataType)
+    } else if (GeometryDataTypes.LINEAR_RING.equals(dataType)
+      || GeometryDataTypes.LINE_STRING.equals(dataType)
       || GeometryDataTypes.MULTI_LINE_STRING.equals(dataType)) {
       if (hasM) {
         return ShapefileConstants.POLYLINE_ZM_SHAPE;
@@ -185,7 +186,8 @@ public final class ShapefileGeometryUtil {
       } else {
         return ShapefileConstants.POLYLINE_SHAPE;
       }
-    } else if (GeometryDataTypes.POLYGON.equals(dataType) || GeometryDataTypes.MULTI_POLYGON.equals(dataType)) {
+    } else if (GeometryDataTypes.POLYGON.equals(dataType)
+      || GeometryDataTypes.MULTI_POLYGON.equals(dataType)) {
       if (hasM) {
         return ShapefileConstants.POLYGON_ZM_SHAPE;
       } else if (hasZ) {

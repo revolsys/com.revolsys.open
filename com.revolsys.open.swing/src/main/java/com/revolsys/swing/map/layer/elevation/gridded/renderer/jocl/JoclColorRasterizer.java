@@ -2,8 +2,9 @@ package com.revolsys.swing.map.layer.elevation.gridded.renderer.jocl;
 
 import java.util.List;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.ColorGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.GeometryFactory;

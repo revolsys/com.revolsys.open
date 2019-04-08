@@ -33,11 +33,11 @@ import javax.swing.border.BevelBorder;
 import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.JXBusyLabel;
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.number.Doubles;
 
-import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.Maps;
-import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.index.RecordSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;

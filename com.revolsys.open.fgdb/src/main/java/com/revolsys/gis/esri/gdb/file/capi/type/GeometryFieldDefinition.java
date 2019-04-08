@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.function.Function3;
 
@@ -36,9 +36,12 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   static {
     GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPoint, GeometryDataTypes.POINT);
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryMultipoint, GeometryDataTypes.MULTI_POINT);
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolyline, GeometryDataTypes.MULTI_LINE_STRING);
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon, GeometryDataTypes.MULTI_POLYGON);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryMultipoint,
+      GeometryDataTypes.MULTI_POINT);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolyline,
+      GeometryDataTypes.MULTI_LINE_STRING);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon,
+      GeometryDataTypes.MULTI_POLYGON);
   }
 
   private static final Integer MINUS1 = -1;

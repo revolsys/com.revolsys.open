@@ -8,13 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystem;
 import org.jeometry.coordinatesystem.model.VerticalCoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
-
-import com.revolsys.identifier.Identifier;
 
 public class EpsgCoordinateSystemsCodeTable implements CodeTable {
 

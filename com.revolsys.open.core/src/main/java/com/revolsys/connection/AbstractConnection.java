@@ -3,7 +3,7 @@ package com.revolsys.connection;
 import java.nio.file.Path;
 import java.util.Map;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.LinkedHashMapEx;

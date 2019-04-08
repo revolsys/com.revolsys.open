@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;

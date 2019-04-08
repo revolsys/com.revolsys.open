@@ -2,7 +2,7 @@ package com.revolsys.util;
 
 import java.util.Collection;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 
 public interface StringBuilders {
 

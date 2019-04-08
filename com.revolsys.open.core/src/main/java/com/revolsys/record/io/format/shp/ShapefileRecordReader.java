@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 

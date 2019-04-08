@@ -23,8 +23,8 @@ import javax.swing.Timer;
 
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.table.TableColumnExt;
-
 import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.TabbedPane;

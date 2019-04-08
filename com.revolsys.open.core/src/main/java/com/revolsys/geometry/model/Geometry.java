@@ -46,8 +46,8 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
-import org.jeometry.common.datatype.DataTypeProxy;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypeProxy;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;

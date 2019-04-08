@@ -3,8 +3,8 @@ package com.revolsys.fgdb.test;
 import java.io.File;
 import java.util.List;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.junit.Assert;
 

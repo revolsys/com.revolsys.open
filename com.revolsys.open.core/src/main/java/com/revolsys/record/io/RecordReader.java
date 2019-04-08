@@ -5,11 +5,12 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;

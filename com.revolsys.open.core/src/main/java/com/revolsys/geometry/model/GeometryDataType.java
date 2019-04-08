@@ -3,7 +3,7 @@ package com.revolsys.geometry.model;
 import java.util.Collection;
 import java.util.function.Function;
 
-import org.jeometry.common.datatype.AbstractDataType;
+import org.jeometry.common.data.type.AbstractDataType;
 
 import com.revolsys.beans.Classes;
 import com.revolsys.geometry.model.editor.GeometryEditor;

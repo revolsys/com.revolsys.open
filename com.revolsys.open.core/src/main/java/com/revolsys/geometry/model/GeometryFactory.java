@@ -52,7 +52,7 @@ import java.util.zip.ZipFile;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;

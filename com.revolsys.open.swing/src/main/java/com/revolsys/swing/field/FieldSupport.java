@@ -6,7 +6,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.border.Border;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.swing.border.IconBorder;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;

@@ -2,7 +2,8 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlAttr;

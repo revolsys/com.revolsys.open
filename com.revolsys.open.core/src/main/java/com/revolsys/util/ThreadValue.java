@@ -1,6 +1,6 @@
 package com.revolsys.util;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.value.ValueHolder;
 

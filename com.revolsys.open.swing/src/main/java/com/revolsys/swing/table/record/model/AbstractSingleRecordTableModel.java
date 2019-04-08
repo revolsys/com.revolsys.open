@@ -6,11 +6,11 @@ import java.util.Map;
 import javax.swing.JTable;
 
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jeometry.common.compare.NumericComparator;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.comparator.NumericComparator;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.menu.BaseJPopupMenu;

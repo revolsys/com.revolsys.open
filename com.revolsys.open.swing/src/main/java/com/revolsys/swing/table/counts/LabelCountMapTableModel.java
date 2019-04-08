@@ -20,9 +20,9 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.table.TableColumnExt;
-
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.io.PathNameProxy;
+
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;

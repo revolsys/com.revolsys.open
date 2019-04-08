@@ -1,6 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.esri.filegdb.jni.Guid;
 import com.revolsys.esri.filegdb.jni.Row;

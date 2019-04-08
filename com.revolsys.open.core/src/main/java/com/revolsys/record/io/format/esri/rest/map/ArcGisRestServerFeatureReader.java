@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 
@@ -40,7 +40,8 @@ public class ArcGisRestServerFeatureReader extends AbstractRecordReader {
   private static Map<DataType, BiFunction<GeometryFactory, MapEx, Geometry>> GEOMETRY_CONVERTER_BY_TYPE = new HashMap<>();
 
   static {
-    GEOMETRY_CONVERTER_BY_TYPE.put(GeometryDataTypes.POINT, ArcGisRestServerFeatureReader::parsePoint);
+    GEOMETRY_CONVERTER_BY_TYPE.put(GeometryDataTypes.POINT,
+      ArcGisRestServerFeatureReader::parsePoint);
     GEOMETRY_CONVERTER_BY_TYPE.put(GeometryDataTypes.MULTI_POINT,
       ArcGisRestServerFeatureReader::parseMultiPoint);
     GEOMETRY_CONVERTER_BY_TYPE.put(GeometryDataTypes.MULTI_LINE_STRING,

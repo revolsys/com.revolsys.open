@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.function.Consumer4Double;
 import org.jeometry.common.function.Function4Double;
 

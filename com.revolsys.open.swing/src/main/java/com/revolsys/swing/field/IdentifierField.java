@@ -1,7 +1,7 @@
 package com.revolsys.swing.field;
 
-import com.revolsys.identifier.Identifier;
-import com.revolsys.identifier.TypedIdentifier;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.identifier.TypedIdentifier;
 
 public class IdentifierField extends TextField {
   private static final long serialVersionUID = 1L;

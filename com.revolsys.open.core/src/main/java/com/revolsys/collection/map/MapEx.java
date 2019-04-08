@@ -6,12 +6,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
-
-import com.revolsys.identifier.Identifier;
-import com.revolsys.util.Property;
-import com.revolsys.util.Strings;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 
 public interface MapEx extends MapDefault<String, Object> {
   static final MapEx EMPTY = new MapEx() {
@@ -75,10 +72,10 @@ public interface MapEx extends MapDefault<String, Object> {
 
   default <E extends Enum<E>> E getEnum(final Class<E> enumType, final CharSequence fieldName) {
     final String value = getString(fieldName);
-    if (Property.hasValue(value)) {
-      return Enum.valueOf(enumType, value);
-    } else {
+    if (value == null) {
       return null;
+    } else {
+      return Enum.valueOf(enumType, value);
     }
   }
 
@@ -159,16 +156,20 @@ public interface MapEx extends MapDefault<String, Object> {
 
   default String getString(final CharSequence name, final String defaultValue) {
     final String value = getString(name);
-    if (Property.hasValue(value)) {
-      return value;
-    } else {
+    if (value == null) {
       return defaultValue;
+    } else {
+      return value;
     }
   }
 
   default String getUpperString(final CharSequence fieldName) {
     final String string = getString(fieldName);
-    return Strings.upperCase(string);
+    if (string == null) {
+      return null;
+    } else {
+      return string.toUpperCase();
+    }
   }
 
   /**
@@ -217,6 +218,6 @@ public interface MapEx extends MapDefault<String, Object> {
 
   default boolean hasValue(final CharSequence name) {
     final Object value = getValue(name);
-    return Property.hasValue(value);
+    return value != null;
   }
 }

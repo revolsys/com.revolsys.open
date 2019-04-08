@@ -17,12 +17,12 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.DelegatingConnection;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.sqlite.SQLiteConnection;
 import org.sqlite.core.DB;
 
-import com.revolsys.identifier.Identifier;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;

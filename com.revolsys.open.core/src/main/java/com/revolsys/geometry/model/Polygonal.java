@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;

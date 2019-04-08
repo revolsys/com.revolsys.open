@@ -1,6 +1,6 @@
 package com.revolsys.record.io.format.moep;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.geometry.model.GeometryDataTypes;

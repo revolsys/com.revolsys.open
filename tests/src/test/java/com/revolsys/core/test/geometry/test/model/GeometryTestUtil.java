@@ -3,7 +3,7 @@ package com.revolsys.core.test.geometry.test.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.model.BoundingBox;

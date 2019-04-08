@@ -4,7 +4,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.swing.field.Field;
 import com.revolsys.util.PreferenceKey;
 

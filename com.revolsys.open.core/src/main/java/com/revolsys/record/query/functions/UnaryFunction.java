@@ -1,6 +1,6 @@
 package com.revolsys.record.query.functions;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.record.query.AbstractUnaryQueryValue;
 import com.revolsys.record.query.Query;

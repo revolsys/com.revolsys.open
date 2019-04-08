@@ -13,9 +13,9 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import org.jeometry.common.awt.WebColors;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
-import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;

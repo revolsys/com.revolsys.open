@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record;
 
-import com.revolsys.identifier.Identifier;
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.record.RecordState;
 
 public class NewProxyLayerRecord extends AbstractProxyLayerRecord {

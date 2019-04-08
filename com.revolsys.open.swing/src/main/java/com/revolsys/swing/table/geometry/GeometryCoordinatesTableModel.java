@@ -12,9 +12,9 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.undo.UndoableEdit;
 
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.math.MathUtil;
 
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;

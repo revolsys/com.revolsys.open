@@ -8,17 +8,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
-import org.jeometry.common.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.schema.RecordDefinition;

@@ -14,7 +14,9 @@ import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.compare.CompareUtil;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
@@ -26,7 +28,6 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReader;
@@ -36,7 +37,6 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -650,7 +650,8 @@ public interface Records {
   }
 
   static RecordDefinition newGeometryRecordDefinition() {
-    final FieldDefinition geometryField = new FieldDefinition("geometry", GeometryDataTypes.GEOMETRY, true);
+    final FieldDefinition geometryField = new FieldDefinition("geometry",
+      GeometryDataTypes.GEOMETRY, true);
     return new RecordDefinitionImpl(PathName.newPathName("/Feature"), geometryField);
   }
 

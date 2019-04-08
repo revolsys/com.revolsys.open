@@ -32,11 +32,11 @@ import java.util.TreeMap;
 import javax.swing.JComponent;
 import javax.swing.undo.UndoableEdit;
 
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.Maps;
-import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

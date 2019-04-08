@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 public class ParameterInfo {
   private final Map<Object, Object> allowedValues = new LinkedHashMap<>();

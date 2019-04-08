@@ -24,10 +24,10 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.CollectionUtil;
-import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.RecordGraph;

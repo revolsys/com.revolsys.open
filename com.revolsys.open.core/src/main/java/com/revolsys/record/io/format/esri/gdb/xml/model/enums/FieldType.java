@@ -1,7 +1,7 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model.enums;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.geometry.model.GeometryDataTypes;
 

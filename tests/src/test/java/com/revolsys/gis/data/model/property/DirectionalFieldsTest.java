@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;

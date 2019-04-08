@@ -42,7 +42,8 @@ public class PackedGeometry {
       final Geometry geometry2 = PackedCoordinateUtil.getGeometry(data, geometryFactory,
         geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
       System.out.println(WktWriter.toString(geometry));
-      if (!GeometryDataTypes.GEOMETRY.equals(geometry, geometry2, Collections.<String> emptyList())) {
+      if (!GeometryDataTypes.GEOMETRY.equals(geometry, geometry2,
+        Collections.<String> emptyList())) {
         System.err.println(WktWriter.toString(geometry2));
         throw new RuntimeException("Geometry not equal");
       }

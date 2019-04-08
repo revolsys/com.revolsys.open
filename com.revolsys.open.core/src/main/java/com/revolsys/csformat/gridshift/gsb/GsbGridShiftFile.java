@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.coordinatesystem.model.Ellipsoid;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystemProxy;

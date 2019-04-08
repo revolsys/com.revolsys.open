@@ -3,7 +3,7 @@ package com.revolsys.beans.propertyeditor;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 
-import com.revolsys.identifier.Identifier;
+import org.jeometry.common.data.identifier.Identifier;
 
 public class IdentifierEditor extends PropertyEditorSupport {
   public static final PropertyEditor INSTANCE = new IdentifierEditor();

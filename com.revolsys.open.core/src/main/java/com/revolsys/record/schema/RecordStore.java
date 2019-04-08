@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.date.Dates;
 import org.jeometry.common.io.PathName;
 import org.springframework.beans.DirectFieldAccessor;
@@ -21,7 +22,6 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;

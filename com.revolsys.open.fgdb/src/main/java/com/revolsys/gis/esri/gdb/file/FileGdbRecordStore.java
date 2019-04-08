@@ -17,8 +17,10 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PreDestroy;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.identifier.SingleIdentifier;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.date.Dates;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
@@ -50,8 +52,6 @@ import com.revolsys.gis.esri.gdb.file.capi.type.OidFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.ShortFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.StringFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.XmlFieldDefinition;
-import com.revolsys.identifier.Identifier;
-import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;

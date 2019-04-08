@@ -10,21 +10,17 @@ import java.util.Set;
 
 import javax.measure.Quantity;
 
-import org.jeometry.common.datatype.CollectionDataType;
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
-import org.jeometry.common.datatype.FunctionDataType;
-import org.jeometry.common.datatype.ListDataType;
+import org.jeometry.common.data.type.CollectionDataType;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.data.type.FunctionDataType;
+import org.jeometry.common.data.type.ListDataType;
 import org.jeometry.common.io.FileProxy;
 
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.code.CodeDataType;
 
 public class RsCoreDataTypes {
-
-  public static final DataType IDENTIFIER = new FunctionDataType("identifier", Identifier.class,
-    Identifier::newIdentifier);
 
   public static final DataType FILE = new FunctionDataType("File", File.class, value -> {
     if (value == null) {

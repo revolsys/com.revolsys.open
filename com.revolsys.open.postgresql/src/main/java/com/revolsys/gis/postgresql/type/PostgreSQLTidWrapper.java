@@ -2,7 +2,7 @@ package com.revolsys.gis.postgresql.type;
 
 import java.sql.SQLException;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.postgresql.util.PGobject;
 
 public class PostgreSQLTidWrapper extends PGobject {

@@ -19,11 +19,11 @@ import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
 import javax.swing.border.AbstractBorder;
 
+import org.jeometry.common.awt.WebColors;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystem;
 import org.jeometry.coordinatesystem.model.unit.Degree;
 
-import org.jeometry.common.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;

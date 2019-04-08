@@ -23,8 +23,8 @@ import java.util.function.Consumer;
 import javax.swing.JComponent;
 
 import org.apache.commons.beanutils.MethodUtils;
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Integers;

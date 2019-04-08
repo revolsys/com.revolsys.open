@@ -37,7 +37,7 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 

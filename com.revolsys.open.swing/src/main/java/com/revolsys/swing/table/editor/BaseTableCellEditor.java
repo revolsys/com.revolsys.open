@@ -21,9 +21,9 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTable;
-
 import org.jeometry.common.awt.WebColors;
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.listener.MouseListeners;

@@ -2,14 +2,14 @@ package com.revolsys.gis.esri.gdb.file;
 
 import java.io.File;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;

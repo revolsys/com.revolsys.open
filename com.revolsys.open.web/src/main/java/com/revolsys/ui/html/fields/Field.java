@@ -21,7 +21,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;

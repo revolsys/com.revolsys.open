@@ -4,7 +4,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Set;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.set.Sets;

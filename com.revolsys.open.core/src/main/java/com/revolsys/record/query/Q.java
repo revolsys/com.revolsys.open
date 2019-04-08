@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;

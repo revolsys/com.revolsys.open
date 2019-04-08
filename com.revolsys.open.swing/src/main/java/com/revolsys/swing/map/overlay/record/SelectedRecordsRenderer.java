@@ -3,6 +3,7 @@ package com.revolsys.swing.map.overlay.record;
 import java.awt.Color;
 
 import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Punctual;

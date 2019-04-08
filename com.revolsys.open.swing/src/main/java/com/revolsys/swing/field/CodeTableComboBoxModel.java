@@ -9,8 +9,8 @@ import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 
 import org.jdesktop.swingx.autocomplete.ComboBoxCellEditor;
+import org.jeometry.common.data.identifier.Identifier;
 
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;

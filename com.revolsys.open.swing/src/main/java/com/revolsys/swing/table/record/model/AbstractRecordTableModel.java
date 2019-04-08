@@ -8,11 +8,12 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.data.identifier.Code;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.identifier.Identifier;
-import com.revolsys.record.code.Code;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;

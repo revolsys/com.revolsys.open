@@ -26,16 +26,15 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.jeometry.common.datatype.CollectionDataType;
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
-import org.jeometry.common.datatype.EnumerationDataType;
-import org.jeometry.common.datatype.SimpleDataType;
-import org.jeometry.common.io.PathName;
-
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.jeometry.common.data.type.CollectionDataType;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.data.type.EnumerationDataType;
+import org.jeometry.common.data.type.SimpleDataType;
+import org.jeometry.common.io.PathName;
 
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.record.Record;

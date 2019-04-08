@@ -2,7 +2,7 @@ package com.revolsys.geometry.graph.filter;
 
 import java.util.function.Predicate;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.properties.ObjectWithProperties;
 

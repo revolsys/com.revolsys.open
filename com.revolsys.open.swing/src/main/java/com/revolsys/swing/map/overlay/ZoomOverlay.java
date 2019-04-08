@@ -17,7 +17,8 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.Icons;

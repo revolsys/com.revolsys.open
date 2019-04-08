@@ -11,8 +11,9 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.collection.map.MapEx;
-import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.raster.BufferedGeoreferencedImage;

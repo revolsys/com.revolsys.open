@@ -7,9 +7,10 @@ import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import org.jeometry.common.datatype.DataType;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;

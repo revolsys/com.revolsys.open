@@ -26,12 +26,12 @@ import java.util.TreeMap;
 import javax.swing.JOptionPane;
 import javax.swing.undo.UndoableEdit;
 
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
-import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.Maps;
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataType;

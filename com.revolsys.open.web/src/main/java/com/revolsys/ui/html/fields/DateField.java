@@ -4,10 +4,11 @@ import java.sql.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.date.Dates;
+
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import org.jeometry.common.date.Dates;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;

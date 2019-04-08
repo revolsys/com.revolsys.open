@@ -2,8 +2,8 @@ package com.revolsys.record.io.format.gpx;
 
 import javax.xml.namespace.QName;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 

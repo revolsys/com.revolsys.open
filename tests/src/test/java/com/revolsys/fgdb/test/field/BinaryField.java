@@ -3,7 +3,7 @@ package com.revolsys.fgdb.test.field;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 
 public class BinaryField extends FgdbField {
   public BinaryField(final String name, final int length, final boolean required) {

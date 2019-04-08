@@ -23,8 +23,8 @@ package com.revolsys.record.io.format.shp;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import org.jeometry.common.datatype.DataType;
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Integers;
 import org.jeometry.common.number.Shorts;

@@ -10,10 +10,11 @@ import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.revolsys.collection.ResultPager;
-import org.jeometry.common.datatype.DataType;
-import com.revolsys.identifier.Identifier;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
+
+import com.revolsys.collection.ResultPager;
 import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;

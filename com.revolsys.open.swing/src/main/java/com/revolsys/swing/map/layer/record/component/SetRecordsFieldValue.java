@@ -5,6 +5,7 @@ import java.awt.Component;
 import javax.swing.JPanel;
 
 import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.field.Field;

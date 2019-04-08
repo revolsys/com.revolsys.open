@@ -21,7 +21,7 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.net.UrlProxy;

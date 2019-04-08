@@ -14,7 +14,7 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 

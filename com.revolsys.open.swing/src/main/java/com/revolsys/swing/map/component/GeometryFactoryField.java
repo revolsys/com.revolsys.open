@@ -8,9 +8,9 @@ import java.util.function.Consumer;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.swing.component.BasePanel;

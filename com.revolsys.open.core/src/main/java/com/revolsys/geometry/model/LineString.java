@@ -46,7 +46,7 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.Consumer3Double;
 import org.jeometry.common.function.Consumer4Double;
@@ -104,6 +104,33 @@ import tec.uom.se.unit.Units;
  * @version 1.7
  */
 public interface LineString extends Lineal {
+  /**
+   * Code taken from DRA FME scripts to calculate angles.
+   *
+   * @param points
+   * @param i1
+   * @param i2
+   * @return
+   */
+  static double getAngle(final LineString points, final int i1, final int i2, final boolean start) {
+    final double x1 = points.getX(i1);
+    final double y1 = points.getY(i1);
+    final double x2 = points.getX(i2);
+    final double y2 = points.getY(i2);
+    if (Points.distance(x1, y1, x2, y2) == 0) { // TODO
+      if (start) {
+        if (i2 + 1 < points.getVertexCount()) {
+          return getAngle(points, i1, i2 + 1, start);
+        }
+      } else {
+        if (i1 - 1 > 0) {
+          return getAngle(points, i1 - 1, i2, start);
+        }
+      }
+    }
+    return Angle.angleNorthDegrees(x1, y1, x2, y2);
+  }
+
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G newLineString(final Object value) {
     if (value == null) {
@@ -698,8 +725,7 @@ public interface LineString extends Lineal {
             final AbstractVertex closestVertex = getVertex(vertexIndex);
             return new Pair<>(closestVertex, 0.0);
           } else {
-            final double toDistance = geometryFactory.makePrecise(0,
-              Points.distance(x, y, x2, y2));
+            final double toDistance = geometryFactory.makePrecise(0, Points.distance(x, y, x2, y2));
             if (toDistance <= closestDistance) {
               if (!closestIsVertex || toDistance < closestDistance) {
                 closestIndex = vertexIndex;
@@ -2405,32 +2431,5 @@ public interface LineString extends Lineal {
   @Override
   default LineStringVertex vertices() {
     return new LineStringVertex(this, -1);
-  }
-
-  /**
-   * Code taken from DRA FME scripts to calculate angles.
-   *
-   * @param points
-   * @param i1
-   * @param i2
-   * @return
-   */
-  static double getAngle(final LineString points, final int i1, final int i2, final boolean start) {
-    final double x1 = points.getX(i1);
-    final double y1 = points.getY(i1);
-    final double x2 = points.getX(i2);
-    final double y2 = points.getY(i2);
-    if (Points.distance(x1, y1, x2, y2) == 0) { // TODO
-      if (start) {
-        if (i2 + 1 < points.getVertexCount()) {
-          return getAngle(points, i1, i2 + 1, start);
-        }
-      } else {
-        if (i1 - 1 > 0) {
-          return getAngle(points, i1 - 1, i2, start);
-        }
-      }
-    }
-    return Angle.angleNorthDegrees(x1, y1, x2, y2);
   }
 }

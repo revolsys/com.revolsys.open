@@ -11,7 +11,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 
-import com.revolsys.comparator.NumericComparator;
+import org.jeometry.common.compare.NumericComparator;
+
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.LineString;

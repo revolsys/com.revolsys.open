@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.NameProxy;
 import com.revolsys.io.AbstractRecordWriter;

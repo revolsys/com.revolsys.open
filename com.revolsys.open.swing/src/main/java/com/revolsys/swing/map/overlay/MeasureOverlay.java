@@ -22,12 +22,12 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
-import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.Maps;
-import org.jeometry.common.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -502,7 +502,8 @@ public class MeasureOverlay extends AbstractOverlay {
 
         Point textPoint;
         measureTextStyle.setTextHorizontalAlignment("right");
-        if (this.measureDataType == GeometryDataTypes.POLYGON && this.measureGeometry instanceof Polygon) {
+        if (this.measureDataType == GeometryDataTypes.POLYGON
+          && this.measureGeometry instanceof Polygon) {
           measureTextStyle.setTextDx(Quantities.getQuantity(-5, CustomUnits.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n-1)");
           measureTextStyle.setTextVerticalAlignment("middle");
@@ -573,7 +574,8 @@ public class MeasureOverlay extends AbstractOverlay {
           label.append(lengthString);
           label.append(unitString);
 
-          if (this.measureDataType == GeometryDataTypes.POLYGON && measureGeometry instanceof Polygon) {
+          if (this.measureDataType == GeometryDataTypes.POLYGON
+            && measureGeometry instanceof Polygon) {
             final String areaString = MEASURE_FORMAT.format(Doubles.makePrecise(100, area));
             label.append(" \n");
             label.append(areaString);

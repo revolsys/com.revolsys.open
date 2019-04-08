@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;

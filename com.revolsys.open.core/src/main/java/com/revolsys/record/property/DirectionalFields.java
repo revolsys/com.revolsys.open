@@ -11,10 +11,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.jeometry.common.datatype.DataType;
-
 import java.util.Set;
+
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.graph.Edge;

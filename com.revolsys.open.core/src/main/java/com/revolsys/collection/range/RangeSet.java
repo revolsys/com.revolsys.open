@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.jeometry.common.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.iterator.MultiIterator;
 import com.revolsys.collection.list.Lists;

@@ -10,7 +10,8 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
-import org.jeometry.common.datatype.DataTypes;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.io.WktCsParser;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
@@ -22,7 +23,6 @@ import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;

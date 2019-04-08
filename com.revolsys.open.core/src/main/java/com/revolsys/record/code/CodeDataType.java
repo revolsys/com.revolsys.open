@@ -2,7 +2,8 @@ package com.revolsys.record.code;
 
 import java.util.function.Function;
 
-import org.jeometry.common.datatype.AbstractDataType;
+import org.jeometry.common.data.identifier.Code;
+import org.jeometry.common.data.type.AbstractDataType;
 
 public class CodeDataType extends AbstractDataType {
   private Function<Object, Object> toObjectFunction;

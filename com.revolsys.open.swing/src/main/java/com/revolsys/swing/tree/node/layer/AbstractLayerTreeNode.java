@@ -6,6 +6,7 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.JTree;
 
 import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.menu.MenuFactory;

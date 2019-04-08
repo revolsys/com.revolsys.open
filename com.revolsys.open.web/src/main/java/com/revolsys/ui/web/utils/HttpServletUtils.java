@@ -13,13 +13,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jeometry.common.data.type.DataTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 
-import org.jeometry.common.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.util.Property;

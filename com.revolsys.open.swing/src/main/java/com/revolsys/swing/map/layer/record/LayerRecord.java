@@ -3,8 +3,9 @@ package com.revolsys.swing.map.layer.record;
 import java.beans.PropertyChangeEvent;
 import java.util.List;
 
-import org.jeometry.common.datatype.DataType;
-import com.revolsys.identifier.Identifier;
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
