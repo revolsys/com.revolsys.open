@@ -507,6 +507,12 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     return fixed(wkt, 3, scaleX, scaleY, scaleZ);
   }
 
+  public static GeometryFactory floating(final CoordinateSystem coordinateSystem,
+    final int axisCount) {
+    final GeometryFactories instances = instances(coordinateSystem);
+    return instances.floating(axisCount);
+  }
+
   /**
    * <p>
    * Get a GeometryFactory with the coordinate system, number of axis and a
@@ -575,6 +581,10 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
 
   public static GeometryFactory floating2d(final String wkt) {
     return floating(wkt, 2);
+  }
+
+  public static GeometryFactory floating3d(final CoordinateSystem coordinateSystem) {
+    return floating(coordinateSystem, 3);
   }
 
   /**
@@ -2530,10 +2540,6 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     }
   }
 
-  public GeometryFactory to2dFloating() {
-    return this.instances.floating(this.axisCount);
-  }
-
   @Override
   public double toDoubleX(final int x) {
     return x;
@@ -2547,6 +2553,14 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   @Override
   public double toDoubleZ(final int z) {
     return z;
+  }
+
+  public GeometryFactory toFloating2d() {
+    return this.instances.floating(2);
+  }
+
+  public GeometryFactory toFloating3d() {
+    return this.instances.floating(3);
   }
 
   @Override

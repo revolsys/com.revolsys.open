@@ -338,7 +338,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
       if (geometryFactory == null) {
         return getViewportGeometryFactory2d();
       } else {
-        return geometryFactory.to2dFloating();
+        return geometryFactory.toFloating2d();
       }
     }
     return geometryFactory;

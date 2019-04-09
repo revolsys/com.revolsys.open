@@ -1325,7 +1325,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (point.isEmpty()) {
       return new Pair<>();
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory().to2dFloating();
+      final GeometryFactory geometryFactory = getGeometryFactory().toFloating2d();
       point = point.convertGeometry(geometryFactory);
       final double x = point.getX();
       final double y = point.getY();

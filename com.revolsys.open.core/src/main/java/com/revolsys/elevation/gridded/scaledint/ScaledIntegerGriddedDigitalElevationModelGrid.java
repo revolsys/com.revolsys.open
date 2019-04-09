@@ -34,6 +34,8 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
 
     private final Path path;
 
+    private boolean exists = true;
+
     public FileChannelHolder(final int tileX, final int tileY, final Path path) throws IOException {
       this.tileX = tileX;
       this.tileY = tileY;
@@ -78,7 +80,12 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
     }
 
     public FileChannel newChannel() throws IOException {
-      return FileChannel.open(this.path, StandardOpenOption.READ);
+      try {
+        return FileChannel.open(this.path, StandardOpenOption.READ);
+      } catch (final Exception e) {
+        this.exists = false;
+        return null;
+      }
     }
 
     public FileChannelHolder open() {
@@ -249,11 +256,15 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
         + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
       try (
         FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
-        final int elevationInt = channelHolder.getInt(offset);
-        if (elevationInt == Integer.MIN_VALUE) {
-          return Double.NaN;
+        if (channelHolder.exists) {
+          final int elevationInt = channelHolder.getInt(offset);
+          if (elevationInt == Integer.MIN_VALUE) {
+            return Double.NaN;
+          } else {
+            return elevationInt / this.scaleZ;
+          }
         } else {
-          return elevationInt / this.scaleZ;
+          return Double.NaN;
         }
       }
     } catch (final NoSuchFileException e) {
@@ -277,11 +288,15 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
         + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
       try (
         FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
-        final int elevationInt = channelHolder.getInt(offset);
-        if (elevationInt == Integer.MIN_VALUE) {
-          return Double.NaN;
+        if (channelHolder.exists) {
+          final int elevationInt = channelHolder.getInt(offset);
+          if (elevationInt == Integer.MIN_VALUE) {
+            return Double.NaN;
+          } else {
+            return elevationInt / this.scaleZ;
+          }
         } else {
-          return elevationInt / this.scaleZ;
+          return Double.NaN;
         }
       }
     } catch (final NoSuchFileException e) {

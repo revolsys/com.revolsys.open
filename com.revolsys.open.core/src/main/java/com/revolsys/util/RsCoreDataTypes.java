@@ -28,7 +28,7 @@ public class RsCoreDataTypes {
     } else {
       File file = null;
       if (value instanceof File) {
-        return FileUtil.getFile((File)value);
+        file = (File)value;
       } else if (value instanceof URL) {
         return FileUtil.getFile((URL)value);
       } else if (value instanceof URI) {

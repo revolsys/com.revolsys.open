@@ -699,7 +699,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
         this.geometryFactory = geometryFactory;
       }
 
-      this.geometryFactory2d = this.geometryFactory.to2dFloating();
+      this.geometryFactory2d = this.geometryFactory.toFloating2d();
       if (geometryFactory.isGeographics()) {
         this.unitsPerPixelList = GEOGRAPHIC_UNITS_PER_PIXEL;
       } else {

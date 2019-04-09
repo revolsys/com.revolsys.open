@@ -31,7 +31,7 @@
     <dependency>
       <groupId>com.revolsys.jocl</groupId>
       <artifactId>com.revolsys.jocl</artifactId>
-      <version>2.0.1-alpha1</version>
+      <version>2.0.1-alpha2</version>
     </dependency>
     <dependency>
       <groupId>com.revolsys.open</groupId>
