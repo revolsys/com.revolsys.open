@@ -553,7 +553,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       final TableReference table = getTableReference(recordDefinition);
       if (boundingBox == null) {
         if (whereClause.length() == 0) {
-          return table.valueFunction(Table::getRowCount, 0);
+          return table.valueFunctionSync(Table::getRowCount, 0);
         } else {
           final StringBuilder sql = new StringBuilder();
           sql.append("SELECT OBJECTID FROM ");

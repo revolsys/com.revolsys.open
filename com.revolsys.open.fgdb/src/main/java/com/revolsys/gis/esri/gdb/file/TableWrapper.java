@@ -142,26 +142,33 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
     return tableReference.isLocked();
   }
 
-  default Row nextRow(final EnumRows rows) {
-    final TableReference tableReference = getTableReference();
-    return tableReference.nextRow(rows);
-  }
-
   default FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {
     final TableReference tableReference = getTableReference();
     final EnumRows rows = tableReference.query(sql, recycling);
-    if (rows == null) {
-      return null;
-    } else {
-      return new FileGdbEnumRowsIterator(this, rows);
-    }
+    return new FileGdbEnumRowsIterator(this, rows);
   }
 
   default FileGdbEnumRowsIterator search(final Object typePath, final String fields,
     final String whereClause, final boolean recycling) {
     final TableReference tableReference = getTableReference();
-    final EnumRows rows = tableReference
-      .valueFunctionSync(table -> searchDo(table, typePath, fields, whereClause, recycling));
+    final EnumRows rows = tableReference.valueFunctionSync(table -> {
+      try {
+        return table.search(fields, whereClause, recycling);
+      } catch (final Throwable e) {
+        if (!isClosed()) {
+          final StringBuilder logQuery = new StringBuilder("ERROR executing query SELECT ");
+          logQuery.append(fields);
+          logQuery.append(" FROM ");
+          logQuery.append(typePath);
+          if (Property.hasValue(whereClause)) {
+            logQuery.append(" WHERE ");
+            logQuery.append(whereClause);
+          }
+          throw Exceptions.wrap(logQuery.toString(), e);
+        }
+      }
+      return null;
+    });
     return new FileGdbEnumRowsIterator(this, rows);
   }
 
@@ -200,27 +207,6 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
     return new FileGdbEnumRowsIterator(this, rows);
   }
 
-  private EnumRows searchDo(final Table table, final Object typePath, final String fields,
-    final String whereClause, final boolean recycling) {
-    try {
-      return table.search(fields, whereClause, recycling);
-    } catch (final Throwable e) {
-      if (!isClosed()) {
-        final StringBuilder logQuery = new StringBuilder("ERROR executing query SELECT ");
-        logQuery.append(fields);
-        logQuery.append(" FROM ");
-        logQuery.append(typePath);
-        if (Property.hasValue(whereClause)) {
-          logQuery.append(" WHERE ");
-          logQuery.append(whereClause);
-        }
-        throw Exceptions.wrap(logQuery.toString(), e);
-      }
-
-    }
-    return null;
-  }
-
   default void setLoadOnlyMode(final boolean loadOnly) {
     final TableReference tableReference = getTableReference();
     tableReference.setLoadOnlyMode(loadOnly);
@@ -240,22 +226,22 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
       final PathName typePath = sourceRecordDefinition.getPathName();
       final String whereClause = "OBJECTID=" + objectId;
-      try (
-        final FileGdbEnumRowsIterator rows = search(typePath, "*", whereClause, false)) {
-        for (final Row row : rows) {
-          try {
-            for (final FieldDefinition field : recordDefinition.getFields()) {
-              final String name = field.getName();
-              try {
-                final Object value = record.getValue(name);
-                final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-                esriField.setUpdateValue(record, row, value);
-              } catch (final Throwable e) {
-                throw new ObjectPropertyException(record, name, e);
+      final TableReference tableReference = getTableReference();
+      tableReference.valueConsumeSync(table -> {
+        try (
+          final FileGdbEnumRowsIterator rows = search(typePath, "*", whereClause, false)) {
+          for (final Row row : rows) {
+            try {
+              for (final FieldDefinition field : recordDefinition.getFields()) {
+                final String name = field.getName();
+                try {
+                  final Object value = record.getValue(name);
+                  final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+                  esriField.setUpdateValue(record, row, value);
+                } catch (final Throwable e) {
+                  throw new ObjectPropertyException(record, name, e);
+                }
               }
-            }
-            final TableReference tableReference = getTableReference();
-            tableReference.valueConsumeSync(table -> {
               final boolean loadOnly = isLocked();
               if (loadOnly) {
                 setLoadOnlyMode(false);
@@ -264,20 +250,20 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
               if (loadOnly) {
                 setLoadOnlyMode(true);
               }
-            });
-            record.setState(RecordState.PERSISTED);
-            recordStore.addStatistic("Update", record);
-          } catch (final ObjectException e) {
-            if (e.getObject() == record) {
-              throw e;
-            } else {
+              record.setState(RecordState.PERSISTED);
+              recordStore.addStatistic("Update", record);
+            } catch (final ObjectException e) {
+              if (e.getObject() == record) {
+                throw e;
+              } else {
+                throw new ObjectException(record, e);
+              }
+            } catch (final Throwable e) {
               throw new ObjectException(record, e);
             }
-          } catch (final Throwable e) {
-            throw new ObjectException(record, e);
           }
         }
-      }
+      });
     }
   }
 

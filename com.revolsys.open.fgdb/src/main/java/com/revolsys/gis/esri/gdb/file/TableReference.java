@@ -8,7 +8,6 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.esri.filegdb.jni.EnumRows;
 import com.revolsys.esri.filegdb.jni.Geodatabase;
-import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.util.CloseableValueHolder;
 import com.revolsys.util.ValueHolder;
@@ -126,17 +125,7 @@ public class TableReference extends CloseableValueHolder<Table> {
     return new EsriFileGdbTableConnection();
   }
 
-  Row nextRow(final EnumRows rows) {
-    if (rows == null) {
-      return null;
-    } else {
-      synchronized (this.geodatabase) {
-        return rows.next();
-      }
-    }
-  }
-
-  EnumRows query(final String sql, final boolean recycling) {
+  synchronized EnumRows query(final String sql, final boolean recycling) {
     return this.geodatabase.valueFunctionSync(geodatabase -> geodatabase.query(sql, recycling));
   }
 
