@@ -105,7 +105,7 @@ public class ArcGisRestServerTileCacheLayer
         try {
           final double metresPerPixel = view.getMetresPerPixel();
           final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
-          final double resolution = getResolution(view);
+          final double resolution = mapService.getResolution(zoomLevel);
           if (resolution > 0) {
             final BoundingBox viewBoundingBox = view.getBoundingBox();
             final BoundingBox maxBoundingBox = getBoundingBox();

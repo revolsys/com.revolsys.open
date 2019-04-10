@@ -100,6 +100,29 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     this.overviewSizes.add(size);
   }
 
+  public void addTiePoint(final int sourcePixelX, final int sourcePixelY, final Point targetPoint) {
+    final MappedLocation mappedLocation = new MappedLocation(sourcePixelX, sourcePixelY,
+      targetPoint);
+    addTiePoint(mappedLocation);
+  }
+
+  public void addTiePoint(final MappedLocation mappedLocation) {
+    mappedLocation.removePropertyChangeListener(this);
+    this.tiePoints.add(mappedLocation);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    mappedLocation.setGeometryFactory(geometryFactory);
+    mappedLocation.addPropertyChangeListener(this);
+    setHasChanges(true);
+  }
+
+  @Override
+  public void addTiePointsForBoundingBox() {
+    addTiePoint(0, 0, this.boundingBox.getBottomLeftPoint());
+    addTiePoint(this.imageWidth, 0, this.boundingBox.getBottomRightPoint());
+    addTiePoint(this.imageWidth, this.imageHeight, this.boundingBox.getTopRightPoint());
+    addTiePoint(0, this.imageHeight, this.boundingBox.getTopLeftPoint());
+  }
+
   @Override
   public void deleteTiePoint(final MappedLocation tiePoint) {
     if (this.tiePoints.remove(tiePoint)) {

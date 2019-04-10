@@ -14,9 +14,9 @@ import com.revolsys.util.Property;
 
 public class WebMercatorTileCacheClient {
   private static final double[] METRES_PER_PIXEL = {
-    78271.517, 39135.7585, 19567.8792, 9783.9396, 4891.9698, 2445.9849, 1222.9925, 611.4962,
-    305.7481, 152.8741, 76.437, 38.2185, 19.1093, 9.5546, 4.7773, 2.3887, 1.1943, 0.5972, 0.2986,
-    0.1493, 0.0746
+    156543, 78271.52, 39135.76, 19567.88, 9783.94, 4891.97, 2445.98, 1222.99, 611.4962, 305.7481,
+    152.8741, 76.437, 38.2185, 19.1093, 9.5546, 4.7773, 2.3887, 1.1943, 0.5972, 0.2986, 0.1493,
+    0.0746, 0.0373, 0.0187
   };
 
   private final String serverUrl;
@@ -105,23 +105,20 @@ public class WebMercatorTileCacheClient {
   }
 
   public int getZoomLevel(final double metresPerPixel) {
-    double previousLevelMetresPerPixel = METRES_PER_PIXEL[0];
     for (int i = 0; i < METRES_PER_PIXEL.length; i++) {
       final double levelMetresPerPixel = METRES_PER_PIXEL[i];
       if (metresPerPixel > levelMetresPerPixel) {
         if (i == 0) {
           return 0;
         } else {
-          final double range = levelMetresPerPixel - previousLevelMetresPerPixel;
-          final double ratio = (metresPerPixel - previousLevelMetresPerPixel) / range;
-          if (ratio < 0.8) {
+          final double ratio = levelMetresPerPixel / metresPerPixel;
+          if (ratio < 0.95) {
             return i - 1;
           } else {
             return i;
           }
         }
       }
-      previousLevelMetresPerPixel = levelMetresPerPixel;
     }
     return METRES_PER_PIXEL.length - 1;
   }

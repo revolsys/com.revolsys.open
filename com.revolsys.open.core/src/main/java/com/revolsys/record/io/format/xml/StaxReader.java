@@ -339,6 +339,10 @@ public class StaxReader extends StreamReaderDelegate implements BaseCloseable {
    */
   public void requireLocalName(final QName element) {
     final String localPart = element.getLocalPart();
+    requireLocalName(localPart);
+  }
+
+  public void requireLocalName(final String localPart) {
     require(XMLStreamConstants.START_ELEMENT, null, localPart);
   }
 

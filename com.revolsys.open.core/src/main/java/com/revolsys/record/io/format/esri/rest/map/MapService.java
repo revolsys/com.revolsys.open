@@ -179,10 +179,8 @@ public class MapService extends ArcGisRestAbstractLayerService {
         if (levelOfDetail == previousLevel) {
           return levelOfDetail.getLevel();
         } else {
-          final double previousLevelMetresPerPixel = previousLevel.getResolution();
-          final double range = levelMetresPerPixel - previousLevelMetresPerPixel;
-          final double ratio = (metresPerPixel - previousLevelMetresPerPixel) / range;
-          if (ratio < 0.8) {
+          final double ratio = levelMetresPerPixel / metresPerPixel;
+          if (ratio < 0.95) {
             return previousLevel.getLevel();
           } else {
             return levelOfDetail.getLevel();

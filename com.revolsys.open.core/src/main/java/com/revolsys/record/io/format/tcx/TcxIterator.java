@@ -15,7 +15,7 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
-import com.revolsys.record.io.format.gpx.GpxConstants;
+import com.revolsys.record.io.format.gpx.GpxIterator;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
@@ -79,7 +79,7 @@ public class TcxIterator extends BaseObjectWithProperties
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    return GpxConstants.GPX_TYPE;
+    return GpxIterator.GPX_TYPE;
   }
 
   public String getSchemaName() {

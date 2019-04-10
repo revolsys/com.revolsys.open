@@ -109,6 +109,8 @@ public interface GeoreferencedImage
     return IoFactory.isAvailable(GeoreferencedImageReadFactory.class, path);
   }
 
+  void addTiePointsForBoundingBox();
+
   default void cancelChanges() {
   }
 

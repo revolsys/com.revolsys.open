@@ -66,7 +66,7 @@ public class WebMercatorTileCacheLayer
     try {
       final double metresPerPixel = view.getMetresPerPixel();
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
-      final double resolution = getResolution(view);
+      final double resolution = this.client.getResolution(zoomLevel);
       final BoundingBox geographicBoundingBox = view.getBoundingBox()
         .bboxToCs(GEOMETRY_FACTORY)
         .bboxIntersection(MAX_BOUNDING_BOX);
