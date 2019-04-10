@@ -103,12 +103,12 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
         try {
           final double metresPerPixel = viewport.getUnitsPerPixel();
           final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
-          final double resolution = getResolution(viewport);
+          final double resolution = mapService.getResolution(zoomLevel);
           if (resolution > 0) {
             final BoundingBox viewBoundingBox = viewport.getBoundingBox();
             final BoundingBox maxBoundingBox = getBoundingBox();
-            final BoundingBox boundingBox = viewBoundingBox.convert(this.geometryFactory)
-              .intersection(maxBoundingBox);
+            final BoundingBox boundingBox = viewBoundingBox.bboxToCs(this.geometryFactory)
+              .bboxIntersection(maxBoundingBox);
             final double minX = boundingBox.getMinX();
             final double minY = boundingBox.getMinY();
             final double maxX = boundingBox.getMaxX();

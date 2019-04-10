@@ -117,15 +117,21 @@ public class MapService extends ArcGisRestAbstractLayerService {
 
   public BufferedImage getTileImage(final int zoomLevel, final int tileX, final int tileY) {
     final String url = getTileUrl(zoomLevel, tileX, tileY);
-    try {
+    boolean retry = true;
+    while (true) {
+      try {
 
-      final URLConnection connection = new URL(url).openConnection();
-      final InputStream in = connection.getInputStream();
-      return ImageIO.read(in);
-    } catch (final FileNotFoundException e) {
-      return null;
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
+        final URLConnection connection = new URL(url).openConnection();
+        final InputStream in = connection.getInputStream();
+        return ImageIO.read(in);
+      } catch (final FileNotFoundException e) {
+        return null;
+      } catch (final IOException e) {
+        if (!retry) {
+          throw Exceptions.wrap(e);
+        }
+      }
+      retry = false;
     }
   }
 
@@ -173,10 +179,8 @@ public class MapService extends ArcGisRestAbstractLayerService {
         if (levelOfDetail == previousLevel) {
           return levelOfDetail.getLevel();
         } else {
-          final double previousLevelMetresPerPixel = previousLevel.getResolution();
-          final double range = levelMetresPerPixel - previousLevelMetresPerPixel;
-          final double ratio = (metresPerPixel - previousLevelMetresPerPixel) / range;
-          if (ratio < 0.8) {
+          final double ratio = levelMetresPerPixel / metresPerPixel;
+          if (ratio < 0.95) {
             return previousLevel.getLevel();
           } else {
             return levelOfDetail.getLevel();

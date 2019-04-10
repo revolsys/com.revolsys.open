@@ -1039,6 +1039,14 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
 
   int getAxisCount();
 
+  default Point getBottomLeftPoint() {
+    return getGeometryFactory().point(getMinX(), getMinY());
+  }
+
+  default Point getBottomRightPoint() {
+    return getGeometryFactory().point(getMaxX(), getMinY());
+  }
+
   @Override
   default BoundingBox getBoundingBox() {
     return this;

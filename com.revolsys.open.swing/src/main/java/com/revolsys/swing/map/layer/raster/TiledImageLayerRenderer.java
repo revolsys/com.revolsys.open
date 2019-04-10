@@ -93,15 +93,17 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
           if (cachedTile == null) {
             cachedTile = mapTile;
             this.cachedTiles.put(cachedTile, cachedTile);
-            final Runnable task = new TileLoadTask(this, cancellable, geometryFactory, cachedTile);
+            final Runnable task = new TileLoadTask(this, cancellable, geometryFactory, cachedTile,
+              resolution);
             tasks.add(task);
           }
         }
         if (!cancellable.isCancelled()) {
-          final GeoreferencedImage image = cachedTile.getImage(geometryFactory);
+          final GeoreferencedImage image = cachedTile.getImage(geometryFactory, resolution);
           final Graphics2D graphics = viewport.getGraphics();
           if (graphics != null) {
-            GeoreferencedImageLayerRenderer.render(viewport, graphics, image, false);
+            final boolean useTransform = mapTile.isProjectionRequired(geometryFactory);
+            GeoreferencedImageLayerRenderer.render(viewport, graphics, image, useTransform);
           }
         }
       }

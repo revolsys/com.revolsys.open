@@ -11,12 +11,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
@@ -108,6 +106,8 @@ public interface GeoreferencedImage
     return IoFactory.isAvailable(GeoreferencedImageReadFactory.class, path);
   }
 
+  void addTiePointsForBoundingBox();
+
   default void cancelChanges() {
   }
 
@@ -117,7 +117,7 @@ public interface GeoreferencedImage
     final int viewWidth, final int viewHeight, final boolean useTransform,
     final Object interpolationMethod) {
     final BoundingBox imageBoundingBox = getBoundingBox();
-    if (viewBoundingBox.intersects(imageBoundingBox) && viewWidth > 0 && viewHeight > 0) {
+    if (viewBoundingBox.bboxIntersects(imageBoundingBox) && viewWidth > 0 && viewHeight > 0) {
       final RenderedImage renderedImage = getRenderedImage();
       drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth, viewHeight,
         useTransform, interpolationMethod);
@@ -132,7 +132,8 @@ public interface GeoreferencedImage
       final int imageHeight = renderedImage.getHeight();
       if (imageWidth > 0 && imageHeight > 0) {
 
-        imageBoundingBox = imageBoundingBox.convert(viewBoundingBox.getGeometryFactory());
+        final GeometryFactory viewGeometryFactory = viewBoundingBox.getGeometryFactory();
+        imageBoundingBox = imageBoundingBox.bboxToCs(viewGeometryFactory);
         final AffineTransform transform = graphics.getTransform();
         try {
           final double scaleFactor = viewWidth / viewBoundingBox.getWidth();
@@ -180,6 +181,7 @@ public interface GeoreferencedImage
             }
           }
         } catch (final Throwable e) {
+          e.printStackTrace();
         } finally {
           graphics.setTransform(transform);
         }
@@ -244,11 +246,23 @@ public interface GeoreferencedImage
 
   int[] getDpi();
 
-  GeoreferencedImage getImage(final CoordinateSystem coordinateSystem);
-
-  GeoreferencedImage getImage(final CoordinateSystem coordinateSystem, final double resolution);
-
   GeoreferencedImage getImage(final GeometryFactory geometryFactory);
+
+  default GeoreferencedImage getImage(final GeometryFactory geometryFactory,
+    final double resolution) {
+    final int imageSrid = getHorizontalCoordinateSystemId();
+    if (imageSrid > 0 && imageSrid != geometryFactory.getHorizontalCoordinateSystemId()) {
+      final BoundingBox boundingBox = getBoundingBox();
+      final ProjectionImageFilter filter = new ProjectionImageFilter(boundingBox, geometryFactory,
+        resolution);
+
+      final BufferedImage newImage = filter.filter(getBufferedImage());
+
+      final BoundingBox destBoundingBox = filter.getDestBoundingBox();
+      return new BufferedGeoreferencedImage(destBoundingBox, newImage);
+    }
+    return this;
+  }
 
   default double getImageAspectRatio() {
     final int imageWidth = getImageWidth();
@@ -281,7 +295,7 @@ public interface GeoreferencedImage
   }
 
   default boolean hasGeometryFactory() {
-    return getGeometryFactory().getCoordinateSystemId() > 0;
+    return getGeometryFactory().getHorizontalCoordinateSystemId() > 0;
   }
 
   boolean isHasChanages();
@@ -308,8 +322,7 @@ public interface GeoreferencedImage
 
     final int imageHeight = getImageHeight();
     final double minY = maxY + pixelHeight * imageHeight;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, minX, maxY, maxX,
-      minY);
+    final BoundingBox boundingBox = geometryFactory.newBoundingBox(minX, maxY, maxX, minY);
     setBoundingBox(boundingBox);
   }
 

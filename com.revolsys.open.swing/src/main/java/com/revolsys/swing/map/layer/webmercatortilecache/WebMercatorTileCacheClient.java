@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.Property;
 
 public class WebMercatorTileCacheClient {
@@ -35,8 +34,9 @@ public class WebMercatorTileCacheClient {
     final double lat1 = getLatitude(zoomLevel, tileY);
     final double lon2 = getLongitude(zoomLevel, tileX + 1);
     final double lat2 = getLatitude(zoomLevel, tileY + 1);
-    return new BoundingBoxDoubleGf(GeometryFactory.wgs84(), 2, lon1, lat1, lon2, lat2)
-      .convert(GeometryFactory.worldMercator());
+    return GeometryFactory.wgs84()
+      .newBoundingBox(lon1, lat1, lon2, lat2)
+      .bboxToCs(GeometryFactory.worldMercator());
   }
 
   protected BufferedImage getImage(final String url) {
@@ -105,23 +105,20 @@ public class WebMercatorTileCacheClient {
   }
 
   public int getZoomLevel(final double metresPerPixel) {
-    double previousLevelMetresPerPixel = METRES_PER_PIXEL[0];
     for (int i = 0; i < METRES_PER_PIXEL.length; i++) {
       final double levelMetresPerPixel = METRES_PER_PIXEL[i];
       if (metresPerPixel > levelMetresPerPixel) {
         if (i == 0) {
           return 0;
         } else {
-          final double range = levelMetresPerPixel - previousLevelMetresPerPixel;
-          final double ratio = (metresPerPixel - previousLevelMetresPerPixel) / range;
-          if (ratio < 0.8) {
+          final double ratio = levelMetresPerPixel / metresPerPixel;
+          if (ratio < 0.95) {
             return i - 1;
           } else {
             return i;
           }
         }
       }
-      previousLevelMetresPerPixel = levelMetresPerPixel;
     }
     return METRES_PER_PIXEL.length - 1;
   }

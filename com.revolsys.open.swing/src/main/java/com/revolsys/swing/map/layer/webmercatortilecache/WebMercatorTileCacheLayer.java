@@ -8,7 +8,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -23,8 +22,8 @@ import com.revolsys.util.Property;
 public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
-  private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2,
-    -180, -85, 180, 85);
+  private static final BoundingBox MAX_BOUNDING_BOX = GEOMETRY_FACTORY.newBoundingBox(-180, -85,
+    180, 85);
 
   private WebMercatorTileCacheClient client;
 
@@ -65,10 +64,10 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
     try {
       final double metresPerPixel = viewport.getUnitsPerPixel();
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
-      final double resolution = getResolution(viewport);
+      final double resolution = this.client.getResolution(zoomLevel);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
-        .convert(GEOMETRY_FACTORY)
-        .intersection(MAX_BOUNDING_BOX);
+        .bboxToCs(GEOMETRY_FACTORY)
+        .bboxIntersection(MAX_BOUNDING_BOX);
       final double minX = geographicBoundingBox.getMinX();
       final double minY = geographicBoundingBox.getMinY();
       final double maxX = geographicBoundingBox.getMaxX();

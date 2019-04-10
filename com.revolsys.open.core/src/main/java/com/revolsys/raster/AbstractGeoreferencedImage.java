@@ -1,7 +1,6 @@
 package com.revolsys.raster;
 
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
@@ -88,7 +87,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   private List<Dimension> overviewSizes = new ArrayList<>();
 
-  private final Map<CoordinateSystem, AbstractGeoreferencedImage> projectedImages = new HashMap<>();
+  private final Map<CoordinateSystem, GeoreferencedImage> projectedImages = new HashMap<>();
 
   private RenderedImage renderedImage;
 
@@ -102,6 +101,50 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   protected void addOverviewSize(final int width, final int height) {
     final Dimension size = new Dimension(width, height);
     this.overviewSizes.add(size);
+  }
+
+  public void addTiePoint(final int sourcePixelX, final int sourcePixelY, final double x,
+    final double y) {
+    final MappedLocation mappedLocation = new MappedLocation(sourcePixelX, sourcePixelY,
+      this.geometryFactory, x, y);
+    addTiePoint(mappedLocation);
+  }
+
+  public void addTiePoint(final MappedLocation mappedLocation) {
+    mappedLocation.removePropertyChangeListener(this);
+    this.tiePoints.add(mappedLocation);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    mappedLocation.setGeometryFactory(geometryFactory);
+    mappedLocation.addPropertyChangeListener(this);
+    setHasChanges(true);
+  }
+
+  @Override
+  public void addTiePointsForBoundingBox() {
+    final double minX = this.boundingBox.getMinX();
+    final double minY = this.boundingBox.getMinY();
+    final double maxX = this.boundingBox.getMaxX();
+    final double maxY = this.boundingBox.getMaxY();
+
+    final int midImageX = this.imageWidth / 2;
+    final int midImageY = this.imageHeight / 2;
+    final double midX = minX + (maxX - minX) * midImageX / this.imageWidth;
+    final double midY = minY + (maxY - minY) * midImageY / this.imageHeight;
+
+    // Bottom
+    addTiePoint(0, 0, minX, minY);
+    addTiePoint(midImageX, 0, midX, minY);
+    addTiePoint(this.imageWidth, 0, maxX, minY);
+
+    // Middle
+    addTiePoint(0, midImageY, minX, midY);
+    addTiePoint(midImageX, midImageY, midX, midY);
+    addTiePoint(this.imageWidth, midImageY, maxX, midY);
+
+    // Top
+    addTiePoint(0, this.imageHeight, minX, maxY);
+    addTiePoint(midImageX, this.imageHeight, midX, maxY);
+    addTiePoint(this.imageWidth, this.imageHeight, maxX, maxY);
   }
 
   @Override
@@ -161,42 +204,20 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   }
 
   @Override
-  public AbstractGeoreferencedImage getImage(final CoordinateSystem coordinateSystem) {
+  public GeoreferencedImage getImage(final GeometryFactory geometryFactory) {
+    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
     synchronized (this.projectedImages) {
-      if (coordinateSystem.equals(getCoordinateSystem())) {
+      if (coordinateSystem.equals(getHorizontalCoordinateSystem())) {
         return this;
       } else {
-        AbstractGeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
+        GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
         if (projectedImage == null) {
-          projectedImage = getImage(coordinateSystem, this.resolution);
+          projectedImage = getImage(geometryFactory, this.resolution);
           this.projectedImages.put(coordinateSystem, projectedImage);
         }
         return projectedImage;
       }
     }
-  }
-
-  @Override
-  public AbstractGeoreferencedImage getImage(final CoordinateSystem coordinateSystem,
-    final double resolution) {
-    final int imageSrid = getGeometryFactory().getCoordinateSystemId();
-    if (imageSrid > 0 && imageSrid != coordinateSystem.getCoordinateSystemId()) {
-      final BoundingBox boundingBox = getBoundingBox();
-      final ProjectionImageFilter filter = new ProjectionImageFilter(boundingBox, coordinateSystem,
-        resolution);
-
-      final BufferedImage newImage = filter.filter(getBufferedImage());
-
-      final BoundingBox destBoundingBox = filter.getDestBoundingBox();
-      return new BufferedGeoreferencedImage(destBoundingBox, newImage);
-    }
-    return this;
-  }
-
-  @Override
-  public AbstractGeoreferencedImage getImage(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    return getImage(coordinateSystem);
   }
 
   @Override
@@ -415,10 +436,6 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
           setResolution(pixelWidth);
           // TODO rotation using a warp filter
           setBoundingBox(x1, y1, pixelWidth, pixelHeight);
-          // worldWarpFilter = new WarpAffineFilter(new BoundingBoxDoubleGf(
-          // getGeometryFactory(), 0, 0, imageWidth, imageHeight), imageWidth,
-          // imageHeight, x1, y1, pixelWidth, -pixelHeight, xRotation,
-          // yRotation);
         }
       } catch (final IOException e) {
         Logs.error(this, "Error reading world file " + worldFile, e);

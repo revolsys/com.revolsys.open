@@ -16,15 +16,20 @@ public abstract class MapTile implements GeometryFactoryProxy {
 
   private final int height;
 
-  private final Map<CoordinateSystem, GeoreferencedImage> projectedImages = new HashMap<>();
-
   private final double resolution;
 
   private final int width;
 
+  private GeoreferencedImage image;
+
+  private final Map<CoordinateSystem, GeoreferencedImage> projectedImages = new HashMap<>();
+
+  private final GeometryFactory geometryFactory;
+
   public MapTile(final BoundingBox boundingBox, final int width, final int height,
     final double resolution) {
     this.boundingBox = boundingBox;
+    this.geometryFactory = boundingBox.getGeometryFactory();
     this.width = width;
     this.height = height;
     this.resolution = resolution;
@@ -53,19 +58,17 @@ public abstract class MapTile implements GeometryFactoryProxy {
   }
 
   public GeoreferencedImage getImage() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return getImage(geometryFactory);
+    return this.image;
   }
 
-  public GeoreferencedImage getImage(final CoordinateSystem coordinateSystem) {
-    final GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
-    return projectedImage;
-  }
-
-  public GeoreferencedImage getImage(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-
-    return getImage(coordinateSystem);
+  public GeoreferencedImage getImage(final GeometryFactory geometryFactory,
+    final double resolution) {
+    if (resolution > 500 && this.geometryFactory.isProjectionRequired(geometryFactory)) {
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
+      return this.projectedImages.get(coordinateSystem);
+    } else {
+      return getImage();
+    }
   }
 
   public double getResolution() {
@@ -88,28 +91,30 @@ public abstract class MapTile implements GeometryFactoryProxy {
     }
   }
 
-  public GeoreferencedImage loadImage(final CoordinateSystem coordinateSystem) {
+  public GeoreferencedImage loadImage(final GeometryFactory geometryFactory,
+    final double resolution) {
     synchronized (this.projectedImages) {
-      GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
-      if (projectedImage == null) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        GeoreferencedImage image = getImage();
-        if (image == null) {
-          image = loadImage();
-          this.projectedImages.put(geometryFactory.getCoordinateSystem(), image);
-        }
-        if (image != null) {
-          projectedImage = image.getImage(coordinateSystem, this.resolution);
+      if (this.image == null) {
+        this.image = loadImage();
+      }
+    }
+    if (this.image != null && this.geometryFactory.isProjectionRequired(geometryFactory)) {
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
+      synchronized (this.projectedImages) {
+        GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
+        if (projectedImage == null) {
+          if (resolution > 500) {
+            projectedImage = this.image.getImage(geometryFactory, getResolution());
+          } else {
+            projectedImage = this.image;
+          }
           this.projectedImages.put(coordinateSystem, projectedImage);
         }
+        return projectedImage;
       }
-      return projectedImage;
+    } else {
+      return this.image;
     }
-  }
-
-  public GeoreferencedImage loadImage(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    return loadImage(coordinateSystem);
   }
 
 }
