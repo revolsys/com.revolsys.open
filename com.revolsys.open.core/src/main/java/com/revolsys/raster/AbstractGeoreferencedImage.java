@@ -100,9 +100,10 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     this.overviewSizes.add(size);
   }
 
-  public void addTiePoint(final int sourcePixelX, final int sourcePixelY, final Point targetPoint) {
+  public void addTiePoint(final int sourcePixelX, final int sourcePixelY, final double x,
+    final double y) {
     final MappedLocation mappedLocation = new MappedLocation(sourcePixelX, sourcePixelY,
-      targetPoint);
+      this.geometryFactory, x, y);
     addTiePoint(mappedLocation);
   }
 
@@ -117,10 +118,30 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   @Override
   public void addTiePointsForBoundingBox() {
-    addTiePoint(0, 0, this.boundingBox.getBottomLeftPoint());
-    addTiePoint(this.imageWidth, 0, this.boundingBox.getBottomRightPoint());
-    addTiePoint(this.imageWidth, this.imageHeight, this.boundingBox.getTopRightPoint());
-    addTiePoint(0, this.imageHeight, this.boundingBox.getTopLeftPoint());
+    final double minX = this.boundingBox.getMinX();
+    final double minY = this.boundingBox.getMinY();
+    final double maxX = this.boundingBox.getMaxX();
+    final double maxY = this.boundingBox.getMaxY();
+
+    final int midImageX = this.imageWidth / 2;
+    final int midImageY = this.imageHeight / 2;
+    final double midX = minX + (maxX - minX) * midImageX / this.imageWidth;
+    final double midY = minY + (maxY - minY) * midImageY / this.imageHeight;
+
+    // Bottom
+    addTiePoint(0, 0, minX, minY);
+    addTiePoint(midImageX, 0, midX, minY);
+    addTiePoint(this.imageWidth, 0, maxX, minY);
+
+    // Middle
+    addTiePoint(0, midImageY, minX, midY);
+    addTiePoint(midImageX, midImageY, midX, midY);
+    addTiePoint(this.imageWidth, midImageY, maxX, midY);
+
+    // Top
+    addTiePoint(0, this.imageHeight, minX, maxY);
+    addTiePoint(midImageX, this.imageHeight, midX, maxY);
+    addTiePoint(this.imageWidth, this.imageHeight, maxX, maxY);
   }
 
   @Override

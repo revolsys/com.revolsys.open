@@ -14,12 +14,16 @@ public class TileLoadTask<D, T extends AbstractMapTile<D>> implements Runnable {
 
   private final Cancellable cancellable;
 
+  private final double resolution;
+
   public TileLoadTask(final AbstractTiledLayerRenderer<D, T> renderer,
-    final Cancellable cancellable, final GeometryFactory geometryFactory, final T mapTile) {
+    final Cancellable cancellable, final GeometryFactory geometryFactory, final T mapTile,
+    final double resolution) {
     this.renderer = renderer;
     this.cancellable = cancellable;
     this.geometryFactory = geometryFactory;
     this.mapTile = mapTile;
+    this.resolution = resolution;
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -38,7 +42,7 @@ public class TileLoadTask<D, T extends AbstractMapTile<D>> implements Runnable {
   public void run() {
     try {
       if (!this.cancellable.isCancelled()) {
-        this.mapTile.loadData(this.geometryFactory);
+        this.mapTile.loadData(this.geometryFactory, this.resolution);
       }
       if (!this.cancellable.isCancelled()) {
         this.renderer.setLoaded(this);
