@@ -20,14 +20,12 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
   }
 
   @Override
-  protected void closeDo() {
-    synchronized (this) {
-      closeObject();
-      final TableWrapper table = this.table;
-      if (table != null) {
-        if (!this.closed) {
-          this.rows = table.closeRows(this.rows);
-        }
+  protected synchronized void closeDo() {
+    closeObject();
+    final TableWrapper table = this.table;
+    if (table != null) {
+      if (!this.closed) {
+        this.rows = table.closeRows(this.rows);
       }
     }
   }
@@ -40,14 +38,15 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
   }
 
   @Override
-  protected Row getNext() {
+  protected synchronized Row getNext() {
     closeObject();
-    final Row row = this.table.nextRow(this.rows);
-    if (row == null) {
-      throw new NoSuchElementException();
-    } else {
-      return row;
+    if (this.rows != null) {
+      final Row row = this.table.valueFunctionSync(table -> this.rows.next());
+      if (row != null) {
+        return row;
+      }
     }
+    throw new NoSuchElementException();
   }
 
   @Override
