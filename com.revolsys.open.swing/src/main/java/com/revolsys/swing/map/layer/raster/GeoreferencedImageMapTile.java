@@ -31,7 +31,7 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
 
   public GeoreferencedImage getImage(final GeometryFactory geometryFactory,
     final double resolution) {
-    if (resolution > 500) {
+    if (resolution > 500 && isProjectionRequired(geometryFactory)) {
       final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
       return this.projectedImages.get(coordinateSystem);
     } else {
@@ -42,19 +42,20 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
   protected abstract BufferedImage loadBuffferedImage();
 
   @Override
-  public GeoreferencedImage loadData(final GeometryFactory geometryFactory,
+  protected GeoreferencedImage loadData(final GeometryFactory geometryFactory,
     final double resolution) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
+    GeoreferencedImage image;
     synchronized (this.projectedImages) {
-      GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
-      if (projectedImage == null) {
-        final GeometryFactory geometryFactoryThis = getGeometryFactory();
-        GeoreferencedImage image = getData();
-        if (image == null) {
-          image = loadData();
-          this.projectedImages.put(geometryFactoryThis.getHorizontalCoordinateSystem(), image);
-        }
-        if (image != null) {
+      image = getData();
+      if (image == null) {
+        image = loadData();
+      }
+    }
+    if (image != null && isProjectionRequired(geometryFactory)) {
+      final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
+      synchronized (this.projectedImages) {
+        GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
+        if (projectedImage == null) {
           if (resolution > 500) {
             projectedImage = image.getImage(geometryFactory, getResolution());
           } else {
@@ -62,8 +63,10 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
           }
           this.projectedImages.put(coordinateSystem, projectedImage);
         }
+        return projectedImage;
       }
-      return projectedImage;
+    } else {
+      return image;
     }
   }
 
