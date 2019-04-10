@@ -981,9 +981,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     if (exists) {
       this.errorMessage = null;
     }
-    final boolean old = this.exists;
     this.exists = exists;
-    firePropertyChange("exists", old, this.exists);
+    firePropertyChange("exists", !this.exists, this.exists);
   }
 
   public final void setGeometryFactory(final GeometryFactory geometryFactory) {

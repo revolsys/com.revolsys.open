@@ -59,7 +59,9 @@ public abstract class AbstractLayerTreeNode extends ListTreeNode implements Open
       if (map != null) {
         final double scale = map.getScale();
         if (layer.getRenderer() != null && !layer.isVisible(scale)) {
-          renderer.setForeground(WebColors.Gray);
+          if (!selected) {
+            renderer.setForeground(WebColors.Gray);
+          }
         }
       }
     }
