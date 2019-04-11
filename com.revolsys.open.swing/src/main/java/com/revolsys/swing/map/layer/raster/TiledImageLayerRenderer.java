@@ -101,8 +101,8 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
         if (!cancellable.isCancelled()) {
           final GeoreferencedImage image = cachedTile.getImage(geometryFactory, resolution);
           final Graphics2D graphics = viewport.getGraphics();
-          if (graphics != null) {
-            final boolean useTransform = mapTile.isProjectionRequired(geometryFactory);
+          if (graphics != null && image != null) {
+            final boolean useTransform = image.isProjectionRequired(geometryFactory);
             GeoreferencedImageLayerRenderer.render(viewport, graphics, image, useTransform);
           }
         }

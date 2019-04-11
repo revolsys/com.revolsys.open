@@ -77,11 +77,11 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
 
   public MappedLocation(final int sourcePixelX, final int sourcePixelY,
     final GeometryFactory geometryFactory, final double x, final double y) {
-    this(new PointDouble(sourcePixelX, sourcePixelY), geometryFactory.point(x, y));
+    this(new PointDouble(2, sourcePixelX, sourcePixelY), geometryFactory.point(x, y));
   }
 
   public MappedLocation(final int sourcePixelX, final int sourcePixelY, final Point targetPoint) {
-    this(new PointDouble(sourcePixelX, sourcePixelY), targetPoint);
+    this(new PointDouble(2, sourcePixelX, sourcePixelY), targetPoint);
   }
 
   public MappedLocation(final Map<String, Object> map) {

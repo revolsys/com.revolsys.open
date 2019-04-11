@@ -87,7 +87,10 @@ public abstract class MapTile implements GeometryFactoryProxy {
       return null;
     } else {
       final BoundingBox boundingBox = getBoundingBox();
-      return new BufferedGeoreferencedImage(boundingBox, bufferedImage);
+      final BufferedGeoreferencedImage image = new BufferedGeoreferencedImage(boundingBox,
+        bufferedImage);
+      image.addTiePointsForBoundingBox();
+      return image;
     }
   }
 
