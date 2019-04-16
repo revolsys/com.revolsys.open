@@ -1,6 +1,5 @@
 package com.revolsys.swing.map;
 
-import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
@@ -18,7 +17,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
@@ -72,14 +71,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     final double y2 = y1 + height;
     final BoundingBox boundingBox = getGeometryFactory().newBoundingBox(x1, y1, x2, y2);
     return boundingBox;
-  }
-
-  public Cursor getCursor() {
-    if (this.component == null) {
-      return null;
-    } else {
-      return this.component.getCursor();
-    }
   }
 
   public double getMaxScale() {
@@ -158,8 +149,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     double modelHeight = validBoundingBox.getHeight();
 
     /*
-     * If the new bounding box has a zero width and height, expand it by 50 view
-     * units.
+     * If the new bounding box has a zero width and height, expand it by 50 view units.
      */
     if (modelWidth == 0 && modelHeight == 0) {
       final double delta = getModelUnitsPerViewUnit() * 50;
@@ -191,8 +181,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   }
 
   @Override
-  public Graphics2DViewRender newViewRenderer() {
-    return new Graphics2DViewRender(this);
+  public Graphics2DViewRenderer newViewRenderer() {
+    return new Graphics2DViewRenderer(this);
   }
 
   @Override

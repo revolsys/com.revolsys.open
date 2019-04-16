@@ -13,7 +13,7 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 public class TextStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -40,7 +40,7 @@ public class TextStylePreview extends JPanel {
     graphics.drawLine(0, 50, 100, 50);
     graphics.translate(50, 50);
     try {
-      final Graphics2DViewRender view = new Graphics2DViewRender(graphics, 100, 100);
+      final Graphics2DViewRenderer view = new Graphics2DViewRenderer(graphics, 100, 100);
       view.newTextStyleViewRenderer(this.textStyle)//
         .drawText("Text", new PointDoubleXY(0, 0));
     } catch (final Throwable e) {

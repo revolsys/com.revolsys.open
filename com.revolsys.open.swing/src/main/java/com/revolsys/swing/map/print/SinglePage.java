@@ -23,7 +23,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
 
 public class SinglePage extends Graphics2DViewport implements Pageable, Printable {
@@ -135,7 +135,7 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
   public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex)
     throws PrinterException {
     if (pageIndex == 0) {
-      final Graphics2DViewRender view = newViewRenderer(graphics);
+      final Graphics2DViewRenderer view = newViewRenderer(graphics);
 
       final int translateX = (int)pageFormat.getImageableX();
       final int translateY = (int)pageFormat.getImageableY();
@@ -152,7 +152,7 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
     }
   }
 
-  private void render(final Graphics2DViewRender view, final Layer layer) {
+  private void render(final Graphics2DViewRenderer view, final Layer layer) {
     if (layer != null && layer.isExists() && layer.isVisible()) {
       final LayerRenderer<Layer> renderer = layer.getRenderer();
       if (renderer != null) {

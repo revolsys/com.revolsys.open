@@ -25,7 +25,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.PreferenceKey;
@@ -222,7 +222,7 @@ public class ZoomOverlay extends AbstractOverlay {
   }
 
   @Override
-  protected void paintComponent(final Graphics2DViewRender viewport, final Graphics2D graphics) {
+  protected void paintComponent(final Graphics2DViewRenderer viewport, final Graphics2D graphics) {
     drawBox(graphics, this.zoomBoxX1, this.zoomBoxY1, this.zoomBoxX2, this.zoomBoxY2,
       Color.DARK_GRAY, ZOOM_BOX_STROKE, TRANS_BG);
     if (this.panX1 != -1 && this.panImage != null) {

@@ -17,7 +17,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 public class GeometryStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -81,7 +81,7 @@ public class GeometryStylePreview extends JPanel {
   protected void paintComponent(final Graphics g) {
     super.paintComponent(g);
     final Graphics2D graphics = (Graphics2D)g;
-    final Graphics2DViewRender view = new Graphics2DViewRender(graphics, 100, 100);
+    final Graphics2DViewRenderer view = new Graphics2DViewRenderer(graphics, 100, 100);
     if (GeometryDataTypes.POLYGON.equals(this.geometryDataType)) {
       view.drawGeometry(this.polygon, this.geometryStyle);
     } else {

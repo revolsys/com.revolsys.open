@@ -25,7 +25,7 @@ import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.symbol.Symbol;
 import com.revolsys.swing.map.symbol.SymbolLibrary;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 public class ShapeMarker extends AbstractMarker {
   private static final Map<String, Shape> SHAPES = new TreeMap<>();
@@ -247,7 +247,7 @@ public class ShapeMarker extends AbstractMarker {
 
     try (
       final ImageViewport viewport = new ImageViewport(16, 16)) {
-      final Graphics2DViewRender view = viewport.newViewRenderer();
+      final Graphics2DViewRenderer view = viewport.newViewRenderer();
       final Graphics2D graphics = view.getGraphics();
       graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
@@ -269,7 +269,7 @@ public class ShapeMarker extends AbstractMarker {
   }
 
   @Override
-  public void render(final Graphics2DViewRender view, final Graphics2D graphics,
+  public void render(final Graphics2DViewRenderer view, final Graphics2D graphics,
     final MarkerStyle style, final double modelX, final double modelY, double orientation) {
 
     try (

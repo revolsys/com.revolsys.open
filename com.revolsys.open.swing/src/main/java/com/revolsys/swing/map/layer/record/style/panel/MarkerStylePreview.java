@@ -16,14 +16,14 @@ import com.revolsys.swing.map.Graphics2DViewport;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 public class MarkerStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
 
   private final MarkerStyle markerStyle;
 
-  private final Graphics2DViewRender view;
+  private final Graphics2DViewRenderer view;
 
   public MarkerStylePreview(final MarkerStyle markerStyle) {
     final Dimension size = new Dimension(101, 101);
@@ -48,7 +48,7 @@ public class MarkerStylePreview extends JPanel {
 
     try (
       final ImageViewport viewport = new ImageViewport(101, 101)) {
-      final Graphics2DViewRender view = viewport.newViewRenderer();
+      final Graphics2DViewRenderer view = viewport.newViewRenderer();
       final Graphics2D viewGraphics = view.getGraphics();
       final Marker marker = this.markerStyle.getMarker();
       try {

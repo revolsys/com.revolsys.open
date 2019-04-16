@@ -39,7 +39,7 @@ import com.revolsys.swing.map.overlay.record.SelectRecordsOverlay;
 import com.revolsys.swing.map.overlay.record.SelectedRecordsRenderer;
 import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.undo.ListAddUndo;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.Booleans;
@@ -953,7 +953,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
   }
 
   @Override
-  protected void paintComponent(final Graphics2DViewRender view, final Graphics2D graphics) {
+  protected void paintComponent(final Graphics2DViewRenderer view, final Graphics2D graphics) {
     super.paintComponent(view, graphics);
     final GeoreferencedImageLayer layer = this.layer;
     final GeoreferencedImage image = this.image;

@@ -24,7 +24,6 @@ import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.field.FunctionStringConverter;
-import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.parallel.Invoke;
@@ -44,7 +43,7 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
   private static final long serialVersionUID = 1L;
 
   private static DefaultComboBoxModel<Double> newModel(final MapPanel map) {
-    final ComponentViewport2D viewport = map.getViewport();
+    final Viewport2D viewport = map.getViewport();
     return newModel(viewport);
   }
 

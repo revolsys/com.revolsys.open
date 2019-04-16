@@ -47,7 +47,7 @@ import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.VertexStyleRenderer;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.map.view.ViewRenderer;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
@@ -246,7 +246,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   @Override
-  public void paintComponent(final Graphics2DViewRender view, final Graphics2D graphics) {
+  public void paintComponent(final Graphics2DViewRenderer view, final Graphics2D graphics) {
     final GeoreferencedImage imageSelected = this.imageSelected.getResource();
     view.drawImage(imageSelected, false);
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();

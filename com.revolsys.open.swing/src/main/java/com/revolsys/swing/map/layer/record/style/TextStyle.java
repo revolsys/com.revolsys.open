@@ -35,6 +35,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.Strings;
@@ -219,7 +220,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       graphics.setStroke(outlineStroke);
       final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
       final TextLayout textLayout = new TextLayout(text, font, fontRenderContext);
-      final Shape outlineShape = textLayout.getOutline(ViewRenderer.IDENTITY_TRANSFORM);
+      final Shape outlineShape = textLayout.getOutline(Graphics2DViewRenderer.IDENTITY_TRANSFORM);
       graphics.draw(outlineShape);
       graphics.setStroke(savedStroke);
     }

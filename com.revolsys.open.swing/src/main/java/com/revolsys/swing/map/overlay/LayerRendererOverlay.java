@@ -32,7 +32,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
@@ -54,7 +54,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
 
   private boolean showAreaBoundingBox = false;
 
-  private Graphics2DViewRender view;
+  private Graphics2DViewRenderer view;
 
   private BackgroundRefreshResource<GeoreferencedImage> cachedImage = new BackgroundRefreshResource<>(
     "Render Layers", this::refreshImage);
@@ -73,7 +73,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
     this.cachedImage.addPropertyChangeListener(this);
   }
 
-  public void dispose() {
+  public void destroy() {
     if (this.layer != null) {
       Property.removeListener(this.layer, this);
       this.layer = null;

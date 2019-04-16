@@ -29,7 +29,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.view.ViewRenderer;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 
@@ -499,8 +499,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   public abstract ViewRenderer newViewRenderer();
 
-  public Graphics2DViewRender newViewRenderer(final Graphics graphics) {
-    return new Graphics2DViewRender(this, (Graphics2D)graphics);
+  public Graphics2DViewRenderer newViewRenderer(final Graphics graphics) {
+    return new Graphics2DViewRenderer(this, (Graphics2D)graphics);
   }
 
   public BoundingBox setBoundingBox(BoundingBox boundingBox) {
@@ -835,13 +835,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     final double[] ordinates = new double[] {
       x, y
     };
-    final AffineTransform transform = getModelToScreenTransform();
-    if (transform == null) {
-      return ordinates;
-    } else {
-      transform.transform(ordinates, 0, ordinates, 0, 1);
-      return ordinates;
-    }
+    return ordinates;
   }
 
   public Point2D toViewPoint(final double x, final double y) {

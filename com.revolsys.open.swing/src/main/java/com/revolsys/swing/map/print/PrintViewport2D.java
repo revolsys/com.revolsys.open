@@ -11,7 +11,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.view.ViewRenderer;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 import systems.uom.common.USCustomary;
 
@@ -71,6 +71,6 @@ public class PrintViewport2D extends Viewport2D {
 
   @Override
   public ViewRenderer newViewRenderer() {
-    return new Graphics2DViewRender(this, this.graphics);
+    return new Graphics2DViewRenderer(this, this.graphics);
   }
 }
