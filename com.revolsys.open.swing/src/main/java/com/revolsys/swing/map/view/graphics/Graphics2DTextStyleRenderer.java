@@ -25,14 +25,13 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.view.TextStyleViewRenderer;
-import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 
 import tec.uom.se.quantity.Quantities;
 
 public class Graphics2DTextStyleRenderer extends TextStyleViewRenderer {
 
-  private final Graphics2DViewRender view;
+  private final Graphics2DViewRenderer view;
 
   private final Graphics2D graphics;
 
@@ -42,7 +41,7 @@ public class Graphics2DTextStyleRenderer extends TextStyleViewRenderer {
 
   private final double dy;
 
-  public Graphics2DTextStyleRenderer(final Graphics2DViewRender view, final TextStyle style) {
+  public Graphics2DTextStyleRenderer(final Graphics2DViewRenderer view, final TextStyle style) {
     super(style);
     this.view = view;
     this.graphics = view.getGraphics();
@@ -56,7 +55,7 @@ public class Graphics2DTextStyleRenderer extends TextStyleViewRenderer {
 
   @Override
   public void drawText(final String label, final Geometry geometry) {
-    final Graphics2DViewRender view = this.view;
+    final Graphics2DViewRenderer view = this.view;
     double dx = this.dx;
     double dy = this.dy;
     if (Property.hasValue(label) && geometry != null) {
@@ -187,7 +186,8 @@ public class Graphics2DTextStyleRenderer extends TextStyleViewRenderer {
               final Font font = graphics.getFont();
               final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
               final TextLayout textLayout = new TextLayout(line, font, fontRenderContext);
-              final Shape outlineShape = textLayout.getOutline(ViewRenderer.IDENTITY_TRANSFORM);
+              final Shape outlineShape = textLayout
+                .getOutline(Graphics2DViewRenderer.IDENTITY_TRANSFORM);
               graphics.draw(outlineShape);
               graphics.setStroke(savedStroke);
             }

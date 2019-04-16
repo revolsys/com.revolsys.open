@@ -13,11 +13,11 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Property;
 
 public abstract class AbstractMarker extends BaseObjectWithPropertiesAndChange implements Marker {
-  public static void translateMarker(final Graphics2DViewRender view, final Graphics2D graphics,
+  public static void translateMarker(final Graphics2DViewRenderer view, final Graphics2D graphics,
     final MarkerStyle style, final double x, final double y, final double width,
     final double height, double orientation) {
     view.translateModelToViewCoordinates(x, y);

@@ -49,7 +49,9 @@ import com.revolsys.util.Property;
 
 import tec.uom.se.quantity.Quantities;
 
-public class Graphics2DViewRender extends ViewRenderer {
+public class Graphics2DViewRenderer extends ViewRenderer {
+
+  public static final AffineTransform IDENTITY_TRANSFORM = new AffineTransform();
 
   private Graphics2D graphics;
 
@@ -61,7 +63,13 @@ public class Graphics2DViewRender extends ViewRenderer {
 
   private final PolygonShape polygonShape = new PolygonShape();
 
-  public Graphics2DViewRender(final Graphics2D graphics, final int width, final int height) {
+  protected AffineTransform canvasOriginalTransform = IDENTITY_TRANSFORM;
+
+  protected AffineTransform canvasModelTransform = IDENTITY_TRANSFORM;
+
+  protected AffineTransform modelToScreenTransform;
+
+  public Graphics2DViewRenderer(final Graphics2D graphics, final int width, final int height) {
     super(null);
     this.geometryFactory = GeometryFactory.DEFAULT_2D;
     this.viewWidthPixels = width;
@@ -69,11 +77,11 @@ public class Graphics2DViewRender extends ViewRenderer {
     setGraphics(graphics);
   }
 
-  public Graphics2DViewRender(final Viewport2D viewport) {
+  public Graphics2DViewRenderer(final Viewport2D viewport) {
     this(viewport, null);
   }
 
-  public Graphics2DViewRender(final Viewport2D viewport, final Graphics2D graphics) {
+  public Graphics2DViewRenderer(final Viewport2D viewport, final Graphics2D graphics) {
     super(viewport);
     setGraphics(graphics);
   }
@@ -370,7 +378,7 @@ public class Graphics2DViewRender extends ViewRenderer {
                   final Font font = this.graphics.getFont();
                   final FontRenderContext fontRenderContext = this.graphics.getFontRenderContext();
                   final TextLayout textLayout = new TextLayout(line, font, fontRenderContext);
-                  final Shape outlineShape = textLayout.getOutline(ViewRenderer.IDENTITY_TRANSFORM);
+                  final Shape outlineShape = textLayout.getOutline(IDENTITY_TRANSFORM);
                   this.graphics.draw(outlineShape);
                   this.graphics.setStroke(savedStroke);
                 }
@@ -446,6 +454,27 @@ public class Graphics2DViewRender extends ViewRenderer {
     updateFields();
   }
 
+  @Override
+  public double[] toViewCoordinates(final double x, final double y) {
+    final double[] ordinates = new double[] {
+      x, y
+    };
+    final AffineTransform transform = this.modelToScreenTransform;
+    if (transform == null) {
+      return ordinates;
+    } else {
+      transform.transform(ordinates, 0, ordinates, 0, 1);
+      return ordinates;
+    }
+  }
+
+  @Override
+  public void toViewCoordinates(final double[] coordinates) {
+    if (!this.modelToScreenTransform.isIdentity()) {
+      this.modelToScreenTransform.transform(coordinates, 0, coordinates, 0, 1);
+    }
+  }
+
   public void translateModelToViewCoordinates(final double modelX, final double modelY) {
     final double[] viewCoordinates = toViewCoordinates(modelX, modelY);
     final double viewX = viewCoordinates[0];
@@ -464,6 +493,19 @@ public class Graphics2DViewRender extends ViewRenderer {
       }
     }
     super.updateFields();
+
+    if (this.viewport == null) {
+      this.modelToScreenTransform = IDENTITY_TRANSFORM;
+    } else {
+      this.modelToScreenTransform = this.viewport.getModelToScreenTransform();
+    }
+    if (this.modelToScreenTransform == null) {
+      this.canvasModelTransform = IDENTITY_TRANSFORM;
+    } else {
+      final AffineTransform transform = (AffineTransform)this.canvasOriginalTransform.clone();
+      transform.concatenate(this.modelToScreenTransform);
+      this.canvasModelTransform = transform;
+    }
     this.useModelTransform = new ResetAffineTransform(this.graphics, this.canvasOriginalTransform,
       this.canvasModelTransform);
     this.useViewTransform = new ResetAffineTransform(this.graphics, this.canvasOriginalTransform,

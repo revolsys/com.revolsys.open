@@ -3,14 +3,14 @@ package com.revolsys.swing.map.component;
 import java.beans.PropertyChangeListener;
 
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 
 public class SelectMapCoordinateSystem extends GeometryFactoryField {
   private static final long serialVersionUID = 1L;
 
-  private ComponentViewport2D viewport;
+  private Viewport2D viewport;
 
   private PropertyChangeListener geometryFactoryListener;
 

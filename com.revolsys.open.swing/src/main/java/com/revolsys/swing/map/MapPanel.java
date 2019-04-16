@@ -421,7 +421,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     setDropTarget(null);
     Property.removeAllListeners(this);
     setDropTarget(null);
-    this.layerOverlay.dispose();
+    this.layerOverlay.destroy();
     for (final Component overlay : this.layeredPane.getComponents()) {
       if (overlay instanceof AbstractOverlay) {
         final AbstractOverlay abstractOverlay = (AbstractOverlay)overlay;
@@ -453,7 +453,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   @Override
   protected void finalize() throws Throwable {
-    this.layerOverlay.dispose();
+    this.layerOverlay.destroy();
     super.finalize();
   }
 

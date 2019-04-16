@@ -43,7 +43,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;
@@ -485,7 +485,7 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   @Override
-  protected void paintComponent(final Graphics2DViewRender view, final Graphics2D graphics) {
+  protected void paintComponent(final Graphics2DViewRenderer view, final Graphics2D graphics) {
     if (!this.measureGeometry.isEmpty()) {
       final GeometryFactory geometryFactory = getGeometryFactory2d();
       MEASURE_RENDERER.paintSelected(view, graphics, geometryFactory, this.measureGeometry);

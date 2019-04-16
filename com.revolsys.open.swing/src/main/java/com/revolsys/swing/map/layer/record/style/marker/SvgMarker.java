@@ -18,7 +18,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.symbol.Symbol;
 import com.revolsys.swing.map.symbol.SymbolLibrary;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 public class SvgMarker extends AbstractMarker {
 
@@ -87,7 +87,7 @@ public class SvgMarker extends AbstractMarker {
   }
 
   @Override
-  public void render(final Graphics2DViewRender view, final Graphics2D graphics,
+  public void render(final Graphics2DViewRenderer view, final Graphics2D graphics,
     final MarkerStyle style, final double modelX, final double modelY, double orientation) {
     final TranscoderInput transcoderInput = this.transcoderInput;
     if (transcoderInput != null) {

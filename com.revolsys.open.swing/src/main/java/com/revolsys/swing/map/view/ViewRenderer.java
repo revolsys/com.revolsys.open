@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.view;
 
-import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,8 +48,6 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   private static final Pattern PATTERN_VERTEX_INDEX = Pattern.compile("vertex\\((.*)\\)");
 
-  public static final AffineTransform IDENTITY_TRANSFORM = new AffineTransform();
-
   private static PointDoubleXYOrientation getPointWithOrientationCentre(
     final GeometryFactory geometryFactory2dFloating, final Geometry geometry) {
     double orientation = 0;
@@ -87,12 +84,6 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
   protected int viewWidthPixels;
 
   protected int viewHeightPixels;
-
-  protected AffineTransform canvasOriginalTransform = IDENTITY_TRANSFORM;
-
-  protected AffineTransform canvasModelTransform = IDENTITY_TRANSFORM;
-
-  protected AffineTransform modelToScreenTransform;
 
   private final double[] coordinates = new double[2];
 
@@ -444,30 +435,18 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
   }
 
   public void toViewCoordinates(final double[] coordinates) {
-    if (!this.modelToScreenTransform.isIdentity()) {
-      this.modelToScreenTransform.transform(coordinates, 0, coordinates, 0, 1);
-    }
   }
 
   protected void updateFields() {
     if (this.viewport == null) {
       this.boundingBox = new BoundingBoxDoubleXY(0, 0, this.viewWidthPixels, this.viewHeightPixels);
-      this.modelToScreenTransform = IDENTITY_TRANSFORM;
       this.modelUnitsPerViewUnit = 1;
     } else {
       this.geometryFactory = this.viewport.getGeometryFactory2dFloating();
       this.boundingBox = this.viewport.getBoundingBox();
       this.viewWidthPixels = this.viewport.getViewWidthPixels();
       this.viewHeightPixels = this.viewport.getViewHeightPixels();
-      this.modelToScreenTransform = this.viewport.getModelToScreenTransform();
       this.modelUnitsPerViewUnit = this.viewport.getModelUnitsPerViewUnit();
-    }
-    if (this.modelToScreenTransform == null) {
-      this.canvasModelTransform = IDENTITY_TRANSFORM;
-    } else {
-      final AffineTransform transform = (AffineTransform)this.canvasOriginalTransform.clone();
-      transform.concatenate(this.modelToScreenTransform);
-      this.canvasModelTransform = transform;
     }
   }
 }

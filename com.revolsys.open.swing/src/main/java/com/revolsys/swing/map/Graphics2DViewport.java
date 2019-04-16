@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 public class Graphics2DViewport extends Viewport2D implements BaseCloseable {
   private Graphics2D graphics;
@@ -36,8 +36,8 @@ public class Graphics2DViewport extends Viewport2D implements BaseCloseable {
   }
 
   @Override
-  public Graphics2DViewRender newViewRenderer() {
-    return new Graphics2DViewRender(this, this.graphics);
+  public Graphics2DViewRenderer newViewRenderer() {
+    return new Graphics2DViewRenderer(this, this.graphics);
   }
 
   protected void setGraphics(final Graphics2D graphics) {

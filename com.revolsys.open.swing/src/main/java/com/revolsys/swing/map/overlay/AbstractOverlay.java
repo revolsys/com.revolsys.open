@@ -55,7 +55,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
@@ -100,7 +100,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   private ComponentViewport2D viewport;
 
-  private Graphics2DViewRender view;
+  private Graphics2DViewRenderer view;
 
   private Geometry xorGeometry;
 
@@ -602,7 +602,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     paintComponent(this.view, graphics);
   }
 
-  protected void paintComponent(final Graphics2DViewRender viewport, final Graphics2D graphics) {
+  protected void paintComponent(final Graphics2DViewRenderer viewport, final Graphics2D graphics) {
     super.paintComponent(graphics);
   }
 

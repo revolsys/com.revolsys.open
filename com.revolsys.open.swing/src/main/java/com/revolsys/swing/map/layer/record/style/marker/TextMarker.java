@@ -21,7 +21,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Fonts;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 public class TextMarker extends AbstractMarker {
   private String text = "?";
@@ -118,7 +118,7 @@ public class TextMarker extends AbstractMarker {
   }
 
   @Override
-  public void render(final Graphics2DViewRender view, final Graphics2D graphics,
+  public void render(final Graphics2DViewRenderer view, final Graphics2D graphics,
     final MarkerStyle style, final double modelX, final double modelY, double orientation) {
     try (
       BaseCloseable transformCloseable = view.useViewCoordinates()) {

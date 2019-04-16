@@ -66,7 +66,7 @@ import com.revolsys.swing.map.overlay.record.geometryeditor.DeleteVertexUndoEdit
 import com.revolsys.swing.map.overlay.record.geometryeditor.InsertVertexUndoEdit;
 import com.revolsys.swing.map.overlay.record.geometryeditor.MoveGeometryUndoEdit;
 import com.revolsys.swing.map.overlay.record.geometryeditor.SetVertexUndoEdit;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRender;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
 
@@ -1096,7 +1096,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   @Override
-  public void paintComponent(final Graphics2DViewRender view, final Graphics2D graphics) {
+  public void paintComponent(final Graphics2DViewRenderer view, final Graphics2D graphics) {
     final GeometryFactory geometryFactory2dFloating = getViewportGeometryFactory2d();
     if (isOverlayAction(ACTION_MOVE_GEOMETRY) && this.moveGeometryStart != null) {
       for (final CloseLocation location : this.moveGeometryLocations) {
