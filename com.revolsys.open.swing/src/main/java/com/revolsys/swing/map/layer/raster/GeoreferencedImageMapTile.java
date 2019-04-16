@@ -43,7 +43,7 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
 
   @Override
   protected GeoreferencedImage loadData(final GeometryFactory geometryFactory,
-    final double resolution) {
+    final double layerResolution, final double viewResolution) {
     GeoreferencedImage image;
     synchronized (this.projectedImages) {
       image = getData();
@@ -56,8 +56,8 @@ public abstract class GeoreferencedImageMapTile extends AbstractMapTile<Georefer
       synchronized (this.projectedImages) {
         GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
         if (projectedImage == null) {
-          if (resolution > 500) {
-            projectedImage = image.getImage(geometryFactory, getResolution());
+          if (viewResolution > 500) {
+            projectedImage = image.getImage(geometryFactory, viewResolution);
           } else {
             projectedImage = image;
           }

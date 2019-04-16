@@ -34,7 +34,9 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
 
   private final List<Runnable> loadingTasks = new ArrayList<>();
 
-  private double resolution;
+  private double layerResolution;
+
+  private double viewResolution;
 
   public AbstractTiledLayerRenderer(final String type, final AbstractTiledLayer<D, T> layer) {
     super(type, layer);
@@ -59,8 +61,12 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     return this.cachedTiles.get(mapTile);
   }
 
-  public double getResolution() {
-    return this.resolution;
+  public double getLayerResolution() {
+    return this.layerResolution;
+  }
+
+  public double getViewResolution() {
+    return this.viewResolution;
   }
 
   @Override
@@ -91,10 +97,13 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
   @Override
   public void render(final ViewRenderer view, final AbstractTiledLayer<D, T> layer) {
     final GeometryFactory viewportGeometryFactory = view.getGeometryFactory();
+    final double viewResolution = view.getMetresPerPixel();
     final double layerResolution = layer.getResolution(view);
     synchronized (this.cachedTiles) {
-      if (layerResolution != this.resolution || viewportGeometryFactory != this.geometryFactory) {
-        this.resolution = layerResolution;
+      if (viewResolution != this.viewResolution
+        || viewportGeometryFactory != this.geometryFactory) {
+        this.layerResolution = layerResolution;
+        this.viewResolution = viewResolution;
         this.geometryFactory = viewportGeometryFactory;
         clearCachedTiles();
       }
@@ -111,7 +120,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
           cachedTile = mapTile;
           this.cachedTiles.put(cachedTile, cachedTile);
           final Runnable task = new TileLoadTask<>(this, cancellable, viewportGeometryFactory,
-            cachedTile, this.resolution);
+            cachedTile, this.layerResolution, this.viewResolution);
           tasks.add(task);
         }
         iterator.set(cachedTile);

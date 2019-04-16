@@ -63,7 +63,8 @@ public abstract class AbstractMapTile<D> implements GeometryFactoryProxy {
     return data;
   }
 
-  protected D loadData(final GeometryFactory geometryFactory, final double resolution) {
+  protected D loadData(final GeometryFactory geometryFactory, final double layerResolution,
+    final double viewResolution) {
     return loadData();
   }
 

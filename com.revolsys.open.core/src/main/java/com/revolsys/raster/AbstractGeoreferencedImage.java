@@ -498,6 +498,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     if (!DataType.equal(boundingBox, this.boundingBox)) {
       setGeometryFactory(boundingBox.getGeometryFactory());
       this.boundingBox = boundingBox;
+      updateResolution();
       setHasChanges(true);
     }
   }
@@ -534,6 +535,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   protected void setImageWidth(final int imageWidth) {
     this.imageWidth = imageWidth;
+    updateResolution();
   }
 
   protected void setOverviewSizes(final List<Dimension> overviewSizes) {
@@ -585,6 +587,12 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
       return super.toString();
     } else {
       return this.imageResource.toString();
+    }
+  }
+
+  private void updateResolution() {
+    if (!this.boundingBox.isBboxEmpty() && this.imageWidth > 0) {
+      setResolution(this.boundingBox.getWidth() / this.imageWidth);
     }
   }
 }

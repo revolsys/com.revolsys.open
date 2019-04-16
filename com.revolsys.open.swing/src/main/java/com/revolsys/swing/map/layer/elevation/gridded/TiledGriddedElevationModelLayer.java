@@ -91,7 +91,7 @@ public class TiledGriddedElevationModelLayer
 
   protected GriddedElevationModel getElevationModel(final double x, final double y) {
     final TiledMultipleGriddedElevationModelLayerRenderer renderer = getRenderer();
-    final int resolution = (int)renderer.getResolution();
+    final int resolution = (int)renderer.getLayerResolution();
     if (resolution > 0) {
       final int tileSize = resolution * this.tileSizePixels;
       final int tileX = (int)Math.floor(x / tileSize) * tileSize;

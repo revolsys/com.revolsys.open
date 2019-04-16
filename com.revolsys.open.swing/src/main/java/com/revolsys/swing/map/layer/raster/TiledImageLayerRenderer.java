@@ -24,8 +24,8 @@ public class TiledImageLayerRenderer<T extends GeoreferencedImageMapTile>
   protected void renderTile(final ViewRenderer view, final Cancellable cancellable, final T tile) {
     final GeometryFactory viewportGeometryFactory = view.getGeometryFactory();
     final boolean useTransform = tile.isProjectionRequired(viewportGeometryFactory);
-    final GeoreferencedImage image = tile.getImage(viewportGeometryFactory,
-      view.getMetresPerPixel());
+    final double viewResolution = getViewResolution();
+    final GeoreferencedImage image = tile.getImage(viewportGeometryFactory, viewResolution);
     view.drawImage(image, useTransform);
   }
 
