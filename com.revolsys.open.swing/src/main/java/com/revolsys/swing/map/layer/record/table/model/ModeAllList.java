@@ -24,12 +24,6 @@ public class ModeAllList extends ModeAbstractCached {
         this::recordsDeleted) //
     );
 
-    for (final String propertyName : new String[] {
-      "filter", AbstractRecordLayer.RECORDS_CHANGED
-    }) {
-      addListeners( //
-        Property.addListenerRunnable(layer, propertyName, this::refresh));
-    }
     super.activate();
   }
 

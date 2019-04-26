@@ -54,6 +54,19 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     final AbstractRecordLayer layer = getLayer();
     final PropertyChangeListener recordFieldListener = this::recordFieldChanged;
     layer.addPropertyChangeListener(recordFieldListener);
+
+    addListeners( //
+      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
+        this::recordsDeleted) //
+    );
+
+    for (final String propertyName : new String[] {
+      "filter", AbstractRecordLayer.RECORDS_CHANGED
+    }) {
+      addListeners( //
+        Property.addListenerRunnable(layer, propertyName, this::refresh));
+    }
+
     addListeners( //
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_UPDATED,
         this::recordUpdated), //
