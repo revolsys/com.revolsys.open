@@ -10,7 +10,7 @@
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>GBA-SNAPSHOT</version>
+    <version>GBA-2.1.7-RELEASE</version>
   </parent>
 
   <url>https://github.com/mapbox/maki</url>
