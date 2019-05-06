@@ -2,56 +2,40 @@ package com.revolsys.swing.map.overlay.record;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
 import java.util.List;
 
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.layer.record.style.marker.GeometryMarker;
 import com.revolsys.swing.map.view.ViewRenderer;
+
+import tec.uom.se.quantity.Quantities;
 
 public class SelectedRecordsVertexRenderer {
 
-  public static GeneralPath firstVertexShape() {
-    final GeneralPath path = new GeneralPath(new Ellipse2D.Double(0, 0, 11, 11));
-    path.moveTo(5, 4);
-    path.lineTo(6, 5);
-    path.lineTo(5, 6);
-    path.lineTo(4, 5);
-    path.lineTo(5, 4);
-    return path;
-  }
+  public static final String FIRST_VERTEX_SHAPE = "ellipse";
 
-  public static GeneralPath lastVertexShape() {
-    final GeneralPath path = new GeneralPath();
-    path.moveTo(0, 0);
-    path.lineTo(10, 5);
-    path.lineTo(0, 10);
-    path.lineTo(0, 0);
-    path.closePath();
-    return path;
-  }
+  public static String LAST_VERTEX_SHAPE = "solidArrow";
 
-  public static GeneralPath vertexShape() {
-    final GeneralPath path = new GeneralPath();
-    path.moveTo(5, 0);
-    path.lineTo(10, 5);
-    path.lineTo(5, 10);
-    path.lineTo(0, 10);
-    path.lineTo(0, 0);
-    path.closePath();
-    path.moveTo(5, 4);
-    path.lineTo(6, 5);
-    path.lineTo(5, 6);
-    path.lineTo(4, 5);
-    path.lineTo(5, 4);
-    return path;
-  }
+  public static String CENTRE_SHAPE = "crossLine";
+
+  public static BiFunctionDouble<Geometry> VERTEX_SHAPE = (width, height) -> {
+    return GeometryMarker.GEOMETRY_FACTORY.polygon(GeometryMarker.GEOMETRY_FACTORY.linearRing(2 //
+    , 0.0, 0.0 //
+    , 0.0, height //
+    , width * 2 / 3, height //
+    , width, height * 0.5 //
+    , width * 2 / 3, 0 //
+    , 0.0, 0.0 //
+    ));
+  };
 
   private final MarkerStyle firstVertexStyle;
 
@@ -61,24 +45,26 @@ public class SelectedRecordsVertexRenderer {
 
   private final MarkerStyle vertexStyle;
 
+  private final MarkerStyle centreStyle = MarkerStyle.marker(CENTRE_SHAPE, 3, WebColors.Black, 1,
+    WebColors.Black);
+
   public SelectedRecordsVertexRenderer(final Color color, final boolean opaque) {
     final Color fillColor = color;
 
     this.highlightStyle = GeometryStyle.polygon(WebColors.Black, 1, fillColor) //
-      .setMarker("ellipse", 9, WebColors.Black, 1, fillColor);
+      .setMarker(FIRST_VERTEX_SHAPE, 9, WebColors.Black, 1, fillColor);
 
-    final GeneralPath vertexShape = vertexShape();
-    this.vertexStyle = MarkerStyle.marker(vertexShape, 9, WebColors.Black, 1, color);
+    this.vertexStyle = MarkerStyle.marker(VERTEX_SHAPE, 9, WebColors.Black, 1, color);
     this.vertexStyle.setMarkerOrientationType("auto");
+    this.vertexStyle.setMarkerWidth(Quantities.getQuantity(11, CustomUnits.PIXEL));
 
-    final GeneralPath firstVertexShape = firstVertexShape();
-    this.firstVertexStyle = MarkerStyle.marker(firstVertexShape, 9, WebColors.Black, 1, color);
+    // final GeneralPath firstVertexShape = firstVertexShape();
+    this.firstVertexStyle = MarkerStyle.marker(FIRST_VERTEX_SHAPE, 9, WebColors.Black, 1, color);
     this.firstVertexStyle.setMarkerOrientationType("auto");
     this.firstVertexStyle.setMarkerPlacementType("vertex(0)");
     this.firstVertexStyle.setMarkerHorizontalAlignment("center");
 
-    final GeneralPath lastVertexShape = lastVertexShape();
-    this.lastVertexStyle = MarkerStyle.marker(lastVertexShape, 9, WebColors.Black, 1, color);
+    this.lastVertexStyle = MarkerStyle.marker(LAST_VERTEX_SHAPE, 9, WebColors.Black, 1, color);
     this.lastVertexStyle.setMarkerOrientationType("auto");
     this.lastVertexStyle.setMarkerPlacementType("vertex(n)");
     this.lastVertexStyle.setMarkerHorizontalAlignment("right");
@@ -89,12 +75,13 @@ public class SelectedRecordsVertexRenderer {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = view.getGeometry(geometry);
 
-      view.drawGeometryOutline(geometry, this.highlightStyle);
+      view.drawGeometryOutline(this.highlightStyle, geometry);
 
       if (geometry != null && !geometry.isEmpty()) {
         final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
         for (final LineString line : lines) {
-          view.drawMarkers(line, this.firstVertexStyle, this.lastVertexStyle, this.vertexStyle);
+          view.drawMarkers(line, this.firstVertexStyle, this.lastVertexStyle, this.vertexStyle,
+            this.centreStyle);
         }
       }
     }

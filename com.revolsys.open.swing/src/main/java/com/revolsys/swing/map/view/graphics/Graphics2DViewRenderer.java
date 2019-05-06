@@ -14,8 +14,10 @@ import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.util.List;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
@@ -30,6 +32,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
@@ -45,6 +48,7 @@ import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.view.TextStyleViewRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 
 import tec.uom.se.quantity.Quantities;
@@ -101,7 +105,7 @@ public class Graphics2DViewRenderer extends ViewRenderer {
         final Geometry convertedGeometry = geometry.as2d(viewGeometryFactory);
         if (convertedGeometry instanceof Point) {
           final Point point = (Point)convertedGeometry;
-          drawMarker(point, style, 0);
+          drawMarker(style, point, 0);
         } else if (convertedGeometry instanceof LineString) {
           final LineString line = (LineString)convertedGeometry;
           final LineStringShape shape = this.lineStringShape;
@@ -124,12 +128,12 @@ public class Graphics2DViewRenderer extends ViewRenderer {
   }
 
   @Override
-  public void drawGeometryOutline(final Geometry geometry, final GeometryStyle style) {
+  public void drawGeometryOutline(final GeometryStyle style, final Geometry geometry) {
     if (this.boundingBox.bboxIntersects(geometry)) {
       if (geometry.isGeometryCollection()) {
         for (int i = 0; i < geometry.getGeometryCount(); i++) {
           final Geometry part = geometry.getGeometry(i);
-          drawGeometryOutline(part, style);
+          drawGeometryOutline(style, part);
         }
       } else {
         this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -138,7 +142,7 @@ public class Graphics2DViewRenderer extends ViewRenderer {
         final Geometry convertedGeometry = geometry.as2d(viewGeometryFactory);
         if (convertedGeometry instanceof Point) {
           final Point point = (Point)convertedGeometry;
-          drawMarker(point, style, 0);
+          drawMarker(style, point, 0);
         } else if (convertedGeometry instanceof LineString) {
           final LineString line = (LineString)convertedGeometry;
           final LineStringShape shape = this.lineStringShape;
@@ -189,23 +193,98 @@ public class Graphics2DViewRenderer extends ViewRenderer {
       try (
         BaseCloseable transformCloseable = useViewCoordinates()) {
         final BoundingBox viewBoundingBox = getBoundingBox();
-        final int viewWidth = getViewWidthPixels();
-        final int viewHeight = getViewHeightPixels();
+        final int viewWidth = (int)Math.ceil(getViewWidthPixels());
+        final int viewHeight = (int)Math.ceil(getViewHeightPixels());
         image.drawImage(this.graphics, viewBoundingBox, viewWidth, viewHeight, useTransform,
           interpolationMethod);
       }
     }
   }
 
+  @Override
+  public void drawLines(final GeometryStyle style, final Iterable<LineString> lines) {
+    final LineStringShape shape = this.lineStringShape;
+    final Graphics2D graphics = this.graphics;
+    final Color originalColor = graphics.getColor();
+    final Stroke originalStroke = graphics.getStroke();
+    try (
+      BaseCloseable useModelCoordinates = useModelCoordinates()) {
+      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+      final Color color = style.getLineColor();
+      graphics.setColor(color);
+
+      final Quantity<Length> lineWidth = style.getLineWidth();
+      final Unit<Length> unit = lineWidth.getUnit();
+      final float width = (float)toModelValue(lineWidth);
+
+      final float dashOffset = (float)toModelValue(
+        Quantities.getQuantity(style.getLineDashOffset(), unit));
+
+      final float[] dashArray;
+      final List<Double> lineDashArray = style.getLineDashArray();
+      final int dashArraySize = lineDashArray.size();
+      if (dashArraySize == 0) {
+        dashArray = null;
+      } else {
+        dashArray = new float[dashArraySize];
+        for (int i = 0; i < dashArray.length; i++) {
+          final Double dashDouble = lineDashArray.get(i);
+          final float dashFloat = (float)toModelValue(Quantities.getQuantity(dashDouble, unit));
+          dashArray[i] = dashFloat;
+        }
+      }
+
+      final int lineCap = style.getLineCap().getAwtValue();
+      final int lineJoin = style.getLineJoin().getAwtValue();
+      final BasicStroke basicStroke = new BasicStroke(width, lineCap, lineJoin,
+        style.getLineMiterlimit(), dashArray, dashOffset);
+      graphics.setStroke(basicStroke);
+
+      for (final LineString line : lines) {
+        try {
+          shape.setGeometry(line);
+          this.graphics.draw(shape);
+        } catch (final TopologyException e) {
+        }
+      }
+    } finally {
+      shape.clearGeometry();
+      graphics.setColor(originalColor);
+      graphics.setStroke(originalStroke);
+    }
+  }
+
+  @Override
+  public void drawMarker(final Geometry geometry) {
+    if (geometry.isGeometryCollection()) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
+        final Geometry part = geometry.getGeometry(i);
+        drawMarker(part);
+      }
+    } else if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      final LineStringShape shape = this.lineStringShape;
+      shape.setGeometry(line);
+      this.graphics.draw(shape);
+      shape.clearGeometry();
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      final PolygonShape shape = this.polygonShape;
+      shape.setGeometry(polygon);
+      this.graphics.draw(shape);
+      shape.clearGeometry();
+    }
+  }
+
   /**
    * Point must be in the same geometry factory as the view.
-   *
-   * @param viewport
-   * @param point
    * @param style
+   * @param point
+   * @param viewport
    */
   @Override
-  public void drawMarker(Point point, final MarkerStyle style, final double orientation) {
+  public void drawMarker(final MarkerStyle style, Point point, final double orientation) {
     point = getGeometry(point);
     if (Property.hasValue(point)) {
       final Paint paint = this.graphics.getPaint();
@@ -260,34 +339,34 @@ public class Graphics2DViewRenderer extends ViewRenderer {
             }
             orientation += style.getTextOrientation();
 
-            final Paint paint = this.graphics.getPaint();
-            final Composite composite = this.graphics.getComposite();
-            try {
-              this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            final Graphics2D graphics = this.graphics;
+            final Paint paint = graphics.getPaint();
+            final Composite composite = graphics.getComposite();
+            try (
+              BaseCloseable transformClosable = useViewCoordinates()) {
+              graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-              this.graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+              graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
               final double x = point.getX();
               final double y = point.getY();
-              final double[] location = this.toViewCoordinates(x, y);
+              final double[] location = toViewCoordinates(x, y);
 
-              final AffineTransform savedTransform = this.graphics.getTransform();
-
-              style.setTextStyle(this, this.graphics);
+              style.setTextStyle(this, graphics);
 
               final Quantity<Length> textDx = style.getTextDx();
-              double dx = this.toDisplayValue(textDx);
+              double dx = toDisplayValue(textDx);
 
               final Quantity<Length> textDy = style.getTextDy();
-              double dy = -this.toDisplayValue(textDy);
+              double dy = -toDisplayValue(textDy);
 
-              final FontMetrics fontMetrics = this.graphics.getFontMetrics();
+              final FontMetrics fontMetrics = graphics.getFontMetrics();
 
               double maxWidth = 0;
               final String[] lines = label.split("[\\r\\n]");
               for (final String line : lines) {
-                final Rectangle2D bounds = fontMetrics.getStringBounds(line, this.graphics);
+                final Rectangle2D bounds = fontMetrics.getStringBounds(line, graphics);
                 final double width = bounds.getWidth();
                 maxWidth = Math.max(width, maxWidth);
               }
@@ -314,7 +393,7 @@ public class Graphics2DViewRenderer extends ViewRenderer {
                   dx = 0;
                   horizontalAlignment = "left";
                 }
-                final int viewWidth = this.getViewWidthPixels();
+                final double viewWidth = this.getViewWidthPixels();
                 if (screenX + maxWidth > viewWidth) {
                   screenX = (int)(viewWidth - maxWidth - 1);
                   dx = 0;
@@ -324,45 +403,45 @@ public class Graphics2DViewRenderer extends ViewRenderer {
                   screenY = 1;
                   dy = 0;
                 }
-                final int viewHeight = this.getViewHeightPixels();
+                final double viewHeight = this.getViewHeightPixels();
                 if (screenY > viewHeight) {
                   screenY = viewHeight - 1 - maxHeight;
                   dy = 0;
                 }
               }
-              this.graphics.translate(screenX, screenY);
+              graphics.translate(screenX, screenY);
               if (orientation != 0) {
-                this.graphics.rotate(-Math.toRadians(orientation), 0, 0);
+                graphics.rotate(-Math.toRadians(orientation), 0, 0);
               }
-              this.graphics.translate(dx, dy);
+              graphics.translate(dx, dy);
               for (final String line : lines) {
-                this.graphics.translate(0, ascent);
-                final AffineTransform lineTransform = this.graphics.getTransform();
-                final Rectangle2D bounds = fontMetrics.getStringBounds(line, this.graphics);
+                graphics.translate(0, ascent);
+                final AffineTransform lineTransform = graphics.getTransform();
+                final Rectangle2D bounds = fontMetrics.getStringBounds(line, graphics);
                 final double width = bounds.getWidth();
                 final double height = bounds.getHeight();
 
                 if ("right".equals(horizontalAlignment)) {
-                  this.graphics.translate(-width, 0);
+                  graphics.translate(-width, 0);
                 } else if ("center".equals(horizontalAlignment)
                   || "auto".equals(horizontalAlignment)) {
-                  this.graphics.translate(-width / 2, 0);
+                  graphics.translate(-width / 2, 0);
                 }
-                this.graphics.translate(dx, 0);
+                graphics.translate(dx, 0);
 
-                this.graphics.scale(1, 1);
+                graphics.scale(1, 1);
                 if (Math.abs(orientation) > 90) {
-                  this.graphics.rotate(Math.PI, maxWidth / 2, -height / 4);
+                  graphics.rotate(Math.PI, maxWidth / 2, -height / 4);
                 }
 
                 final int textBoxOpacity = style.getTextBoxOpacity();
                 final Color textBoxColor = style.getTextBoxColor();
                 if (textBoxOpacity > 0 && textBoxColor != null) {
-                  this.graphics.setPaint(textBoxColor);
+                  graphics.setPaint(textBoxColor);
                   final double cornerSize = Math.max(height / 2, 5);
                   final RoundRectangle2D.Double box = new RoundRectangle2D.Double(bounds.getX() - 3,
                     bounds.getY() - 1, width + 6, height + 2, cornerSize, cornerSize);
-                  this.graphics.fill(box);
+                  graphics.fill(box);
                 }
 
                 final double radius = style.getTextHaloRadius();
@@ -370,43 +449,98 @@ public class Graphics2DViewRenderer extends ViewRenderer {
                 final double textHaloRadius = this
                   .toDisplayValue(Quantities.getQuantity(radius, unit));
                 if (textHaloRadius > 0) {
-                  final Stroke savedStroke = this.graphics.getStroke();
+                  final Stroke savedStroke = graphics.getStroke();
                   final Stroke outlineStroke = new BasicStroke((float)(textHaloRadius + 1),
                     BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
-                  this.graphics.setColor(style.getTextHaloFill());
-                  this.graphics.setStroke(outlineStroke);
-                  final Font font = this.graphics.getFont();
-                  final FontRenderContext fontRenderContext = this.graphics.getFontRenderContext();
+                  graphics.setColor(style.getTextHaloFill());
+                  graphics.setStroke(outlineStroke);
+                  final Font font = graphics.getFont();
+                  final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
                   final TextLayout textLayout = new TextLayout(line, font, fontRenderContext);
                   final Shape outlineShape = textLayout.getOutline(IDENTITY_TRANSFORM);
-                  this.graphics.draw(outlineShape);
-                  this.graphics.setStroke(savedStroke);
+                  graphics.draw(outlineShape);
+                  graphics.setStroke(savedStroke);
                 }
 
-                this.graphics.setColor(style.getTextFill());
+                graphics.setColor(style.getTextFill());
                 if (textBoxOpacity > 0 && textBoxOpacity < 255) {
-                  this.graphics.setComposite(AlphaComposite.SrcOut);
-                  this.graphics.drawString(line, (float)0, (float)0);
-                  this.graphics.setComposite(AlphaComposite.DstOver);
-                  this.graphics.drawString(line, (float)0, (float)0);
+                  graphics.setComposite(AlphaComposite.SrcOut);
+                  graphics.drawString(line, (float)0, (float)0);
+                  graphics.setComposite(AlphaComposite.DstOver);
+                  graphics.drawString(line, (float)0, (float)0);
 
                 } else {
-                  this.graphics.setComposite(AlphaComposite.SrcOver);
-                  this.graphics.drawString(line, (float)0, (float)0);
+                  graphics.setComposite(AlphaComposite.SrcOver);
+                  graphics.drawString(line, (float)0, (float)0);
                 }
 
-                this.graphics.setTransform(lineTransform);
-                this.graphics.translate(0, leading + descent);
+                graphics.setTransform(lineTransform);
+                graphics.translate(0, leading + descent);
               }
-              this.graphics.setTransform(savedTransform);
-
             } finally {
-              this.graphics.setPaint(paint);
-              this.graphics.setComposite(composite);
+              graphics.setPaint(paint);
+              graphics.setComposite(composite);
             }
           }
         }
       }
+    }
+  }
+
+  @Override
+  public void fillMarker(final Geometry geometry) {
+    if (geometry.isGeometryCollection()) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
+        final Geometry part = geometry.getGeometry(i);
+        fillMarker(part);
+      }
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      final PolygonShape shape = this.polygonShape;
+      shape.setGeometry(polygon);
+      this.graphics.fill(shape);
+      shape.clearGeometry();
+    }
+  }
+
+  @Override
+  public void fillPolygons(final GeometryStyle style, final Iterable<Polygon> polygons) {
+    final Graphics2D graphics = this.graphics;
+    final PolygonShape shape = this.polygonShape;
+    final Paint originalPaint = graphics.getPaint();
+    try (
+      BaseCloseable useModelCoordinates = useModelCoordinates()) {
+      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+      graphics.setPaint(style.getPolygonFill());
+      // final Graphic fillPattern = fill.getPattern();
+      // if (fillPattern != null) {
+      // TODO fillPattern
+      // double width = fillPattern.getWidth();
+      // double height = fillPattern.getHeight();
+      // Rectangle2D.Double patternRect;
+      // // TODO units
+      // // if (isUseModelUnits()) {
+      // // patternRect = new Rectangle2D.Double(0, 0, width
+      // // * viewport.getModelUnitsPerViewUnit(), height
+      // // * viewport.getModelUnitsPerViewUnit());
+      // // } else {
+      // patternRect = new Rectangle2D.Double(0, 0, width, height);
+      // // }
+      // graphics.setPaint(new TexturePaint(fillPattern, patternRect));
+
+      // }
+      for (final Polygon polygon : polygons) {
+        try {
+          shape.setGeometry(polygon);
+          graphics.fill(shape);
+        } catch (final TopologyException e) {
+          Debug.noOp();
+        }
+      }
+    } finally {
+      shape.clearGeometry();
+      graphics.setPaint(originalPaint);
     }
   }
 
@@ -449,6 +583,57 @@ public class Graphics2DViewRenderer extends ViewRenderer {
     return new Graphics2DTextStyleRenderer(this, textStyle);
   }
 
+  @Override
+  public void renderEllipse(final MarkerStyle style, final double modelX, final double modelY,
+    double orientation) {
+    try (
+      BaseCloseable closable = useViewCoordinates()) {
+      final Quantity<Length> markerWidth = style.getMarkerWidth();
+      final double mapWidth = toDisplayValue(markerWidth);
+      final Quantity<Length> markerHeight = style.getMarkerHeight();
+      final double mapHeight = toDisplayValue(markerHeight);
+      final String orientationType = style.getMarkerOrientationType();
+      if ("none".equals(orientationType)) {
+        orientation = 0;
+      }
+
+      translateMarker(style, modelX, modelY, mapWidth, mapHeight, orientation);
+
+      final Ellipse2D ellipse = new Ellipse2D.Double(0, 0, mapWidth, mapHeight);
+      if (style.setMarkerFillStyle(this, this.graphics)) {
+        this.graphics.fill(ellipse);
+      }
+      if (style.setMarkerLineStyle(this, this.graphics)) {
+        this.graphics.draw(ellipse);
+      }
+    }
+  }
+
+  public void renderRectangle(final MarkerStyle style, final double modelX, final double modelY,
+    double orientation) {
+    try (
+      BaseCloseable closable = useViewCoordinates()) {
+      final Quantity<Length> markerWidth = style.getMarkerWidth();
+      final double mapWidth = toDisplayValue(markerWidth);
+      final Quantity<Length> markerHeight = style.getMarkerHeight();
+      final double mapHeight = toDisplayValue(markerHeight);
+      final String orientationType = style.getMarkerOrientationType();
+      if ("none".equals(orientationType)) {
+        orientation = 0;
+      }
+
+      translateMarker(style, modelX, modelY, mapWidth, mapHeight, orientation);
+
+      final Rectangle2D rectangle = new Rectangle2D.Double(0, 0, mapWidth, mapHeight);
+      if (style.setMarkerFillStyle(this, this.graphics)) {
+        this.graphics.fill(rectangle);
+      }
+      if (style.setMarkerLineStyle(this, this.graphics)) {
+        this.graphics.draw(rectangle);
+      }
+    }
+  }
+
   public void setGraphics(final Graphics2D graphics) {
     this.graphics = graphics;
     updateFields();
@@ -473,6 +658,34 @@ public class Graphics2DViewRenderer extends ViewRenderer {
     if (!this.modelToScreenTransform.isIdentity()) {
       this.modelToScreenTransform.transform(coordinates, 0, coordinates, 0, 1);
     }
+  }
+
+  public void translateMarker(final MarkerStyle style, final double x, final double y,
+    final double width, final double height, double orientation) {
+    translateModelToViewCoordinates(x, y);
+    final double markerOrientation = style.getMarkerOrientation();
+    orientation = -orientation + markerOrientation;
+    if (orientation != 0) {
+      this.graphics.rotate(Math.toRadians(orientation));
+    }
+
+    final Quantity<Length> deltaX = style.getMarkerDx();
+    final Quantity<Length> deltaY = style.getMarkerDy();
+    double dx = toDisplayValue(deltaX);
+    double dy = toDisplayValue(deltaY);
+    final String verticalAlignment = style.getMarkerVerticalAlignment();
+    if ("bottom".equals(verticalAlignment)) {
+      dy -= height;
+    } else if ("auto".equals(verticalAlignment) || "middle".equals(verticalAlignment)) {
+      dy -= height / 2;
+    }
+    final String horizontalAlignment = style.getMarkerHorizontalAlignment();
+    if ("right".equals(horizontalAlignment)) {
+      dx -= width;
+    } else if ("auto".equals(horizontalAlignment) || "center".equals(horizontalAlignment)) {
+      dx -= width / 2;
+    }
+    this.graphics.translate(dx, dy);
   }
 
   public void translateModelToViewCoordinates(final double modelX, final double modelY) {

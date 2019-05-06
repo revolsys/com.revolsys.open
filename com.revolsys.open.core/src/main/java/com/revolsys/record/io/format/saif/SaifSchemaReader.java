@@ -47,7 +47,6 @@ import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.record.schema.RecordDefinitionFactoryImpl;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.RsCoreDataTypes;
 
 public class SaifSchemaReader {
 
@@ -73,8 +72,8 @@ public class SaifSchemaReader {
     addType("/Real32", DataTypes.FLOAT);
     addType("/Real64", DataTypes.DOUBLE);
     addType("/Real80", DataTypes.DECIMAL);
-    addType("/List", RsCoreDataTypes.LIST);
-    addType("/Set", RsCoreDataTypes.SET);
+    addType("/List", DataTypes.LIST);
+    addType("/Set", DataTypes.SET);
     addType("/AggregateType", new SimpleDataType("AggregateType", Object.class));
     addType("/PrimitiveType", new SimpleDataType("PrimitiveType", Object.class));
     addType("/Enumeration", new SimpleDataType("Enumeration", Object.class));

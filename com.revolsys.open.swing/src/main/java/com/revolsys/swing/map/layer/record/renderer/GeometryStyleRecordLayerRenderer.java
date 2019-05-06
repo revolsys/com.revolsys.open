@@ -7,6 +7,7 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -15,9 +16,9 @@ import javax.swing.ImageIcon;
 import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
@@ -30,7 +31,7 @@ import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePreview;
 import com.revolsys.swing.map.view.ViewRenderer;
 
-public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRenderer
+public class GeometryStyleRecordLayerRenderer extends AbstractGeometryRecordLayerRenderer
   implements GeometryStyleLayerRenderer<AbstractRecordLayer> {
 
   private static final Icon ICON = Icons.getIcon("style_geometry");
@@ -190,10 +191,27 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
   }
 
   @Override
-  public void renderRecord(final ViewRenderer view, final BoundingBox visibleArea,
-    final AbstractRecordLayer layer, final LayerRecord record) {
-    final Geometry geometry = record.getGeometry();
-    view.drawGeometry(geometry, this.style);
+  protected void renderRecord(final ViewRenderer view, final AbstractRecordLayer layer,
+    final LayerRecord record, final Geometry geometry) {
+  }
+
+  @Override
+  protected void renderRecordsDo(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
+    if (!records.isEmpty()) {
+      final boolean draw = this.style.getLineOpacity() > 0;
+      final boolean fill = this.style.getPolygonFillOpacity() > 0;
+      try (
+        BaseCloseable geometryListCloseable = view.drawGeometriesCloseable(this.style, true, draw,
+          fill)) {
+        for (final LayerRecord record : view.cancellable(records)) {
+          if (isVisible(record)) {
+            final Geometry geometry = record.getGeometry();
+            view.addGeometry(geometry);
+          }
+        }
+      }
+    }
   }
 
   @Override

@@ -36,6 +36,11 @@ public class ImageMarker extends AbstractMarker {
   }
 
   @Override
+  public String getTypeName() {
+    return "markerImage";
+  }
+
+  @Override
   public void render(final Graphics2DViewRenderer view, final Graphics2D graphics,
     final MarkerStyle style, final double modelX, final double modelY, double orientation) {
     if (this.image != null) {
@@ -50,7 +55,7 @@ public class ImageMarker extends AbstractMarker {
         if ("none".equals(orientationType)) {
           orientation = 0;
         }
-        translateMarker(view, graphics, style, modelX, modelY, mapWidth, mapHeight, orientation);
+        view.translateMarker(style, modelX, modelY, mapWidth, mapHeight, orientation);
 
         final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
           mapWidth / this.image.getWidth(null), mapHeight / this.image.getHeight(null));

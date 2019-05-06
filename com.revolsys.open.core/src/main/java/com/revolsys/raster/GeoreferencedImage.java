@@ -201,6 +201,17 @@ public interface GeoreferencedImage
   }
 
   default AffineTransform getAffineTransformation(final BoundingBox boundingBox) {
+    final double[] affineTransformMatrix = getAffineTransformationMatrix(boundingBox);
+    final double translateX = affineTransformMatrix[2];
+    final double translateY = affineTransformMatrix[5];
+    final double scaleX = affineTransformMatrix[0];
+    final double scaleY = affineTransformMatrix[4];
+    final double shearX = affineTransformMatrix[1];
+    final double shearY = affineTransformMatrix[3];
+    return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX, translateY);
+  }
+
+  default double[] getAffineTransformationMatrix(final BoundingBox boundingBox) {
     final List<MappedLocation> mappings = new ArrayList<>(getTiePoints());
     if (mappings.isEmpty()) {
       if (!isSameCoordinateSystem(boundingBox)) {
@@ -231,19 +242,16 @@ public interface GeoreferencedImage
       final Point targetPixel = tiePoint.getTargetPixel(boundingBox, imageWidth, imageHeight);
       final double translateX = targetPixel.getX() - sourcePixel.getX();
       final double translateY = sourcePixel.getY() - targetPixel.getY();
-      return new AffineTransform(1, 0, 0, 1, translateX, translateY);
+      return new double[] {
+        1, 0, translateX, 0, 1, translateY
+      };
     } else if (count < 3) {
-      return new AffineTransform();
+      return new double[] {
+        1, 0, 0, 0, 1, 0
+      };
     }
-    final double[] affineTransformMatrix = calculateLSM(boundingBox, imageWidth, imageHeight,
+    return calculateLSM(boundingBox, imageWidth, imageHeight,
       mappings);
-    final double translateX = affineTransformMatrix[2];
-    final double translateY = affineTransformMatrix[5];
-    final double scaleX = affineTransformMatrix[0];
-    final double scaleY = affineTransformMatrix[4];
-    final double shearX = affineTransformMatrix[1];
-    final double shearY = affineTransformMatrix[3];
-    return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX, translateY);
   }
 
   BoundingBox getBoundingBox();

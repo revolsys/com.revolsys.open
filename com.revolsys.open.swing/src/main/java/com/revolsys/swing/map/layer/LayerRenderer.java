@@ -76,4 +76,6 @@ public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
   void setParent(LayerRenderer<?> parent);
 
   void setVisible(boolean visible);
+
+  boolean isVisible(final ViewRenderer view);
 }

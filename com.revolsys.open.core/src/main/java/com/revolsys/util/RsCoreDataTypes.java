@@ -4,17 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 import javax.measure.Quantity;
 
-import org.jeometry.common.data.type.CollectionDataType;
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.data.type.FunctionDataType;
-import org.jeometry.common.data.type.ListDataType;
 import org.jeometry.common.io.FileProxy;
 
 import com.revolsys.io.FileUtil;
@@ -54,16 +48,6 @@ public class RsCoreDataTypes {
   });
 
   public static final DataType CODE = new CodeDataType();
-
-  public static final DataType COLLECTION = new CollectionDataType("Collection", Collection.class,
-    DataTypes.OBJECT);
-
-  public static final DataType LIST = new ListDataType(List.class, DataTypes.OBJECT);
-
-  public static final DataType SET = new CollectionDataType("Set", Set.class, DataTypes.OBJECT);
-
-  public static final DataType RELATION = new CollectionDataType("Relation", Collection.class,
-    DataTypes.OBJECT);
 
   public static final DataType MEASURE = new FunctionDataType("measure", Quantity.class,
     QuantityType::newQuantity, QuantityType::toString);

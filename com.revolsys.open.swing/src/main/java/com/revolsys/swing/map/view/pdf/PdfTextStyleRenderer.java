@@ -95,7 +95,7 @@ public class PdfTextStyleRenderer extends TextStyleViewRenderer {
                 dx = 0;
                 horizontalAlignment = "left";
               }
-              final int viewWidth = this.view.getViewWidthPixels();
+              final double viewWidth = this.view.getViewWidthPixels();
               if (screenX + maxWidth > viewWidth) {
                 screenX = (int)(viewWidth - maxWidth - 1);
                 dx = 0;
@@ -105,7 +105,7 @@ public class PdfTextStyleRenderer extends TextStyleViewRenderer {
                 screenY = 1;
                 dy = 0;
               }
-              final int viewHeight = this.view.getViewHeightPixels();
+              final double viewHeight = this.view.getViewHeightPixels();
               if (screenY > viewHeight) {
                 screenY = viewHeight - 1 - maxHeight;
                 dy = 0;

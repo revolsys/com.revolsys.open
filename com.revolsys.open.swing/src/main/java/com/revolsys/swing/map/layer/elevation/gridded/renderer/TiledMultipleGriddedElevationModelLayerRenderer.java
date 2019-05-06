@@ -223,8 +223,7 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
       final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
       for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
         .cancellable(renderers)) {
-        final long scaleForVisible = (long)view.getScaleForVisible();
-        if (renderer.isVisible(scaleForVisible)) {
+        if (renderer.isVisible(view)) {
           renderer.setElevationModel(elevationModel);
           image.setBoundingBox(tile.getBoundingBox());
           renderer.render(view, layer, image);
@@ -238,11 +237,10 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
     final List<TiledGriddedElevationModelLayerTile> mapTiles) {
     final TiledGriddedElevationModelLayer layer = getLayer();
     final BufferedGeoreferencedImage image = layer.newRenderImage();
-    final long scaleForVisible = (long)view.getScaleForVisible();
     final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
     for (final AbstractGriddedElevationModelLayerRenderer renderer : cancellable
       .cancellable(renderers)) {
-      if (renderer.isVisible(scaleForVisible)) {
+      if (renderer.isVisible(view)) {
         for (final TiledGriddedElevationModelLayerTile tile : cancellable.cancellable(mapTiles)) {
           final GriddedElevationModel elevationModel = tile.getElevationModel();
           if (elevationModel != null) {

@@ -7,19 +7,19 @@ import java.util.function.BiFunction;
 
 import javax.sql.DataSource;
 
-import org.jeometry.common.logging.Logs;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLErrorCodesFactory;
 
 import com.revolsys.jdbc.io.DataSourceImpl;
+import com.revolsys.log.LogAppender;
 import com.revolsys.util.Property;
 
 public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator {
   private static final Map<String, BiFunction<String, SQLException, DataAccessException>> ERROR_CODE_TO_FUNCTION = new HashMap<>();
 
   static {
-    Logs.setLevel(SQLErrorCodesFactory.class.getName(), "ERROR");
+    LogAppender.setLevel(SQLErrorCodesFactory.class.getName(), "ERROR");
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28000",
       UsernameOrPasswordInvalidException::new);
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28P01",

@@ -32,6 +32,8 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
@@ -50,7 +52,7 @@ public class PdfViewRenderer extends ViewRenderer {
 
   private int styleId = 0;
 
-  private final Map<GeometryStyle, String> styleNames = new HashMap<>();
+  private final Map<MarkerStyle, String> styleNames = new HashMap<>();
 
   private final PDPage page;
 
@@ -58,6 +60,7 @@ public class PdfViewRenderer extends ViewRenderer {
     super(viewport);
     this.contentStream = contentStream;
     this.page = viewport.getPage();
+    setShowHiddenRecords(true);
     updateFields();
   }
 
@@ -74,7 +77,7 @@ public class PdfViewRenderer extends ViewRenderer {
         if (part instanceof LineString) {
           final LineString line = (LineString)part;
 
-          drawLine(line);
+          drawLinePdf(line);
           this.contentStream.stroke();
         } else if (part instanceof Polygon) {
           final Polygon polygon = (Polygon)part;
@@ -85,13 +88,13 @@ public class PdfViewRenderer extends ViewRenderer {
               if (ring.isClockwise()) {
                 drawLineReverse(ring);
               } else {
-                drawLine(ring);
+                drawLinePdf(ring);
               }
             } else {
               if (ring.isCounterClockwise()) {
                 drawLineReverse(ring);
               } else {
-                drawLine(ring);
+                drawLinePdf(ring);
               }
             }
             this.contentStream.closeSubPath();
@@ -100,7 +103,7 @@ public class PdfViewRenderer extends ViewRenderer {
           this.contentStream.fill(PathIterator.WIND_NON_ZERO);
           for (final LinearRing ring : polygon.rings()) {
 
-            drawLine(ring);
+            drawLinePdf(ring);
             this.contentStream.stroke();
           }
         }
@@ -116,7 +119,7 @@ public class PdfViewRenderer extends ViewRenderer {
   }
 
   @Override
-  public void drawGeometryOutline(final Geometry geometry, final GeometryStyle style) {
+  public void drawGeometryOutline(final GeometryStyle style, final Geometry geometry) {
     try {
       this.contentStream.saveGraphicsState();
       setGeometryStyle(style);
@@ -128,7 +131,7 @@ public class PdfViewRenderer extends ViewRenderer {
         if (part instanceof LineString) {
           final LineString line = (LineString)part;
 
-          drawLine(line);
+          drawLinePdf(line);
           this.contentStream.stroke();
         } else if (part instanceof Polygon) {
           final Polygon polygon = (Polygon)part;
@@ -139,13 +142,13 @@ public class PdfViewRenderer extends ViewRenderer {
               if (ring.isClockwise()) {
                 drawLineReverse(ring);
               } else {
-                drawLine(ring);
+                drawLinePdf(ring);
               }
             } else {
               if (ring.isCounterClockwise()) {
                 drawLineReverse(ring);
               } else {
-                drawLine(ring);
+                drawLinePdf(ring);
               }
             }
             this.contentStream.closeSubPath();
@@ -153,7 +156,7 @@ public class PdfViewRenderer extends ViewRenderer {
           }
           for (final LinearRing ring : polygon.rings()) {
 
-            drawLine(ring);
+            drawLinePdf(ring);
             this.contentStream.stroke();
           }
         }
@@ -185,7 +188,7 @@ public class PdfViewRenderer extends ViewRenderer {
     // TODO Auto-generated method stub
   }
 
-  private void drawLine(final LineString line) throws IOException {
+  private void drawLinePdf(final LineString line) throws IOException {
     for (int i = 0; i < line.getVertexCount(); i++) {
       final double modelX = line.getX(i);
       final double modelY = line.getY(i);
@@ -217,7 +220,54 @@ public class PdfViewRenderer extends ViewRenderer {
   }
 
   @Override
-  public void drawMarker(final Point point, final MarkerStyle style, final double orientation) {
+  public void drawLines(final GeometryStyle style, final Iterable<LineString> lines) {
+    try {
+      this.contentStream.saveGraphicsState();
+      setGeometryStyle(style);
+      this.contentStream.setStrokingColor(style.getLineColor());
+
+      for (final LineString line : lines) {
+        drawLinePdf(line);
+      }
+    } catch (final IOException e) {
+    } finally {
+      try {
+        this.contentStream.restoreGraphicsState();
+      } catch (final IOException e) {
+      }
+    }
+  }
+
+  @Override
+  public void drawMarker(final Geometry geometry) {
+    if (geometry.isGeometryCollection()) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
+        final Geometry part = geometry.getGeometry(i);
+        drawMarker(part);
+      }
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      try {
+        this.contentStream.saveGraphicsState();
+        // setGeometryStyle(style);
+        // this.contentStream.setStrokingColor(style.getLineColor());
+        // TODO
+        for (final LineString line : polygon.getRings()) {
+          drawLinePdf(line);
+        }
+      } catch (final IOException e) {
+      } finally {
+        try {
+          this.contentStream.restoreGraphicsState();
+        } catch (final IOException e) {
+        }
+      }
+
+    }
+  }
+
+  @Override
+  public void drawMarker(final MarkerStyle style, final Point point, final double orientation) {
     // TODO Auto-generated method stub
   }
 
@@ -281,7 +331,7 @@ public class PdfViewRenderer extends ViewRenderer {
                 dx = 0;
                 horizontalAlignment = "left";
               }
-              final int viewWidth = getViewWidthPixels();
+              final double viewWidth = getViewWidthPixels();
               if (screenX + maxWidth > viewWidth) {
                 screenX = (int)(viewWidth - maxWidth - 1);
                 dx = 0;
@@ -291,7 +341,7 @@ public class PdfViewRenderer extends ViewRenderer {
                 screenY = 1;
                 dy = 0;
               }
-              final int viewHeight = getViewHeightPixels();
+              final double viewHeight = getViewHeightPixels();
               if (screenY > viewHeight) {
                 screenY = viewHeight - 1 - maxHeight;
                 dy = 0;
@@ -376,6 +426,48 @@ public class PdfViewRenderer extends ViewRenderer {
     }
   }
 
+  @Override
+  public void fillMarker(final Geometry geometry) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void fillPolygons(final GeometryStyle style, final Iterable<Polygon> polygons) {
+    try {
+      this.contentStream.saveGraphicsState();
+      this.contentStream.setNonStrokingColor(style.getPolygonFill());
+
+      for (final Polygon polygon : polygons) {
+        int i = 0;
+        for (final LinearRing ring : polygon.rings()) {
+          if (i == 0) {
+            if (ring.isClockwise()) {
+              drawLineReverse(ring);
+            } else {
+              drawLinePdf(ring);
+            }
+          } else {
+            if (ring.isCounterClockwise()) {
+              drawLineReverse(ring);
+            } else {
+              drawLinePdf(ring);
+            }
+          }
+          this.contentStream.closeSubPath();
+          i++;
+        }
+        this.contentStream.fill(PathIterator.WIND_NON_ZERO);
+      }
+    } catch (final IOException e) {
+    } finally {
+      try {
+        this.contentStream.restoreGraphicsState();
+      } catch (final IOException e) {
+      }
+    }
+  }
+
   public Canvas getCanvas() {
     return this.canvas;
   }
@@ -390,8 +482,20 @@ public class PdfViewRenderer extends ViewRenderer {
   }
 
   @Override
+  public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
+    return false;
+  }
+
+  @Override
   public TextStyleViewRenderer newTextStyleViewRenderer(final TextStyle textStyle) {
     return new PdfTextStyleRenderer(this, textStyle);
+  }
+
+  @Override
+  public void renderEllipse(final MarkerStyle style, final double modelX, final double modelY,
+    final double orientation) {
+    // TODO Auto-generated method stub
+
   }
 
   private void setGeometryStyle(final GeometryStyle style) throws IOException {
@@ -460,6 +564,34 @@ public class PdfViewRenderer extends ViewRenderer {
       }
 
       final int polygonFillOpacity = style.getPolygonFillOpacity();
+      if (polygonFillOpacity != 255) {
+        graphicsState.setNonStrokingAlphaConstant(polygonFillOpacity / 255f);
+      }
+
+      final PDResources resources = this.page.getResources();
+      resources.add(graphicsState);
+
+      this.styleNames.put(style, styleName);
+    }
+    this.contentStream.appendRawCommands("/" + styleName + " gs\n");
+  }
+
+  private void setMarkerStyle(final MarkerStyle style) throws IOException {
+    String styleName = this.styleNames.get(style);
+    if (styleName == null) {
+      styleName = "rgStyle" + this.styleId++;
+
+      final PDExtendedGraphicsState graphicsState = new PDExtendedGraphicsState();
+
+      final int lineOpacity = style.getMarkerLineOpacity();
+      if (lineOpacity != 255) {
+        graphicsState.setStrokingAlphaConstant(lineOpacity / 255f);
+      }
+
+      final Quantity<Length> lineWidth = style.getMarkerLineWidth();
+      graphicsState.setLineWidth((float)toDisplayValue(lineWidth));
+
+      final int polygonFillOpacity = style.getMarkerFillOpacity();
       if (polygonFillOpacity != 255) {
         graphicsState.setNonStrokingAlphaConstant(polygonFillOpacity / 255f);
       }

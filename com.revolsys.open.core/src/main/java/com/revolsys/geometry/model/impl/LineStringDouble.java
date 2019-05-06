@@ -212,6 +212,25 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   @Override
+  public void forEachLineVertex(final BiConsumerDouble firstPointAction,
+    final BiConsumerDouble action) {
+    final int vertexCount = this.vertexCount;
+    final int axisIgnoreCount = this.axisCount - 2;
+    final double[] coordinates = this.coordinates;
+    int coordinateIndex = 0;
+    final double x1 = coordinates[coordinateIndex++];
+    final double y1 = coordinates[coordinateIndex++];
+    firstPointAction.accept(x1, y1);
+    coordinateIndex += axisIgnoreCount;
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = coordinates[coordinateIndex++];
+      final double y = coordinates[coordinateIndex++];
+      action.accept(x, y);
+      coordinateIndex += axisIgnoreCount;
+    }
+  }
+
+  @Override
   public void forEachSegment(final Consumer4Double action) {
     final int vertexCount = this.vertexCount;
     final int axisCount = this.axisCount;

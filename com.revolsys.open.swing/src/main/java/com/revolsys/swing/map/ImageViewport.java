@@ -32,8 +32,9 @@ public class ImageViewport extends Graphics2DViewport {
   }
 
   public ImageViewport(final Viewport2D parentViewport, final int imageType) {
-    this(parentViewport.getProject(), parentViewport.getViewWidthPixels(),
-      parentViewport.getViewHeightPixels(), parentViewport.getBoundingBox(), imageType);
+    this(parentViewport.getProject(), (int)Math.ceil(parentViewport.getViewWidthPixels()),
+      (int)Math.ceil(parentViewport.getViewHeightPixels()), parentViewport.getBoundingBox(),
+      imageType);
   }
 
   public BufferedGeoreferencedImage getGeoreferencedImage() {

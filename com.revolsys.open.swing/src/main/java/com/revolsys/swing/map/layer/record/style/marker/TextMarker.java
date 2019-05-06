@@ -63,6 +63,11 @@ public class TextMarker extends AbstractMarker {
   }
 
   @Override
+  public String getTypeName() {
+    return "markerText";
+  }
+
+  @Override
   public int hashCode() {
     return getText().hashCode();
   }
@@ -196,7 +201,6 @@ public class TextMarker extends AbstractMarker {
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
-    addTypeToMap(map, "markerText");
     addToMap(map, "textFaceName", this.textFaceName);
     addToMap(map, "text", this.text);
     return map;

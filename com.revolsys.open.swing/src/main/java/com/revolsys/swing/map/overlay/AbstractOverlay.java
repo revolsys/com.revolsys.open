@@ -60,7 +60,7 @@ import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
-public class AbstractOverlay extends JComponent implements PropertyChangeListener,
+public class AbstractOverlay extends JComponent implements MapOverlay, PropertyChangeListener,
   BaseMouseListener, BaseMouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = Icons.getCursor("cursor_line_node_add", 8, 6);
 

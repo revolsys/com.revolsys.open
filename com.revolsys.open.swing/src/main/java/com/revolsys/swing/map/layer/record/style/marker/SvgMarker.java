@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.record.style.marker;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 
 import javax.measure.Quantity;
@@ -12,84 +13,81 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.jeometry.common.logging.Logs;
 import org.w3c.dom.Document;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
-import com.revolsys.swing.map.symbol.Symbol;
-import com.revolsys.swing.map.symbol.SymbolLibrary;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.util.CaseConverter;
 
 public class SvgMarker extends AbstractMarker {
 
-  private Icon icon;
+  private WeakReference<Icon> icon = new WeakReference<>(null);
 
-  private Document document;
+  private WeakReference<TranscoderInput> transcoderInput = new WeakReference<>(null);
 
-  private TranscoderInput transcoderInput;
-
-  private Symbol symbol;
-
-  public SvgMarker() {
+  public SvgMarker(final Map<String, ? extends Object> properties) {
+    super(properties);
   }
 
-  // protected void changeAttribute(final SVGElement element, final String
-  // attrName,
-  // final String oldValue, final String value) throws SVGException {
-  // if (element.hasAttribute(attrName, AnimationElement.AT_CSS)) {
-  // final StyleAttribute style = new StyleAttribute(attrName);
-  // if (element.getStyle(style, false)) {
-  // final String currentValue = style.getStringValue();
-  // if (currentValue.equalsIgnoreCase(oldValue)) {
-  // element.setAttribute(attrName, AnimationElement.AT_CSS, value);
-  // }
-  // }
-  // }
-  // for (int i = 0; i < element.getNumChildren(); i++) {
-  // final SVGElement child = element.getChild(i);
-  // changeAttribute(child, attrName, oldValue, value);
-  // }
-  // }
-
-  public SvgMarker(final Map<String, ? extends Object> config) {
-    setProperties(config);
+  public SvgMarker(final String name) {
+    this(name, CaseConverter.toCapitalizedWords(name));
   }
 
-  public SvgMarker(final String markerType) {
-    super(markerType);
+  public SvgMarker(final String name, final String title) {
+    super(name, title);
+  }
+
+  private synchronized TranscoderInput getTranscoderInput() {
+    TranscoderInput input = this.transcoderInput.get();
+    if (input == null) {
+      final Resource resource = new ClassPathResource(getName() + ".svg");
+      try {
+        final String uri = resource.getUriString();
+        final Document document = SvgUtil.newDocument(uri);
+        input = new TranscoderInput(document);
+        input.setURI(uri);
+      } catch (final Throwable e) {
+        Logs.error(this, "Cannot open :" + resource, e);
+      }
+      this.transcoderInput = new WeakReference<>(input);
+    }
+    return input;
   }
 
   @Override
-  public boolean isUseMarkerType() {
+  public String getTypeName() {
+    return "markerSvg";
+  }
+
+  @Override
+  public boolean isUseMarkerName() {
     return true;
   }
 
   @Override
-  public Icon newIcon(final MarkerStyle style) {
-    return this.icon;
-  }
-
-  @Override
-  protected void postSetMarkerType() {
-    final String markerType = getMarkerType();
-    this.symbol = SymbolLibrary.findSymbol(markerType);
-    final Resource resource = new ClassPathResource(markerType + ".svg");
-    try {
-      final String uri = resource.getUriString();
-      this.document = SvgUtil.newDocument(uri);
-      this.transcoderInput = new TranscoderInput(this.document);
-      this.transcoderInput.setURI(uri);
-      this.icon = new SvgIcon(this.document, 16, 16);
-    } catch (final Throwable e) {
-      this.document = null;
-      Logs.error(this, "Cannot open :" + resource, e);
+  public synchronized Icon newIcon(final MarkerStyle style) {
+    Icon icon = this.icon.get();
+    if (icon == null) {
+      final Resource resource = new ClassPathResource(getName() + ".svg");
+      try {
+        final String uri = resource.getUriString();
+        final Document document = SvgUtil.newDocument(uri);
+        icon = new SvgIcon(document, 16, 16);
+      } catch (final Throwable e) {
+        Logs.error(this, "Cannot open :" + resource, e);
+      }
+      this.icon = new WeakReference<Icon>(icon);
     }
+
+    return icon;
   }
 
   @Override
   public void render(final Graphics2DViewRenderer view, final Graphics2D graphics,
     final MarkerStyle style, final double modelX, final double modelY, double orientation) {
-    final TranscoderInput transcoderInput = this.transcoderInput;
+    final TranscoderInput transcoderInput = getTranscoderInput();
     if (transcoderInput != null) {
       try (
         BaseCloseable closable = view.useViewCoordinates()) {
@@ -165,11 +163,9 @@ public class SvgMarker extends AbstractMarker {
   }
 
   @Override
-  public String toString() {
-    if (this.symbol == null) {
-      return super.toString();
-    } else {
-      return this.symbol.getTitle();
-    }
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
+
+    return map;
   }
 }

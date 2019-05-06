@@ -31,7 +31,7 @@ public class SelectedRecordsRenderer {
     if (Property.hasValue(geometry)) {
       view.drawGeometry(geometry, this.highlightStyle);
       if (!(geometry instanceof Punctual)) {
-        view.drawGeometryOutline(geometry, this.lineStyle);
+        view.drawGeometryOutline(this.lineStyle, geometry);
       }
     }
   }

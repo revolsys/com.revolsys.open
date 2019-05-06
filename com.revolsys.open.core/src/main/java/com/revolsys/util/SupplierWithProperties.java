@@ -1,4 +1,4 @@
-package org.jeometry.common.function;
+package com.revolsys.util;
 
 import java.util.Map;
 import java.util.function.Supplier;

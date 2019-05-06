@@ -71,11 +71,11 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
   private static final GeometryStyle STYLE_BOX_OUTLINE = GeometryStyle.line(Color.GREEN, 3);
 
-  private static final MarkerStyle STYLE_VERTEX_FIRST_POINT = MarkerStyle
-    .marker(SelectedRecordsVertexRenderer.firstVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
+  private static final MarkerStyle STYLE_VERTEX_FIRST_POINT = MarkerStyle.marker("ellipse", 9,
+    COLOR_OUTLINE, 1, COLOR_SELECT);
 
   private static final MarkerStyle STYLE_VERTEX_LAST_POINT = MarkerStyle
-    .marker(SelectedRecordsVertexRenderer.lastVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
+    .marker(SelectedRecordsVertexRenderer.LAST_VERTEX_SHAPE, 9, COLOR_OUTLINE, 1, COLOR_SELECT);
 
   static {
     STYLE_VERTEX_FIRST_POINT.setMarkerOrientationType("auto");
@@ -360,8 +360,9 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         final BufferedImage image = imageViewport.getImage();
         final Graphics2D graphics = (Graphics2D)image.getGraphics();
 
-        this.image.drawImage(graphics, viewBoundingBox, viewport.getViewWidthPixels(),
-          viewport.getViewHeightPixels(), !this.layer.isShowOriginalImage(),
+        this.image.drawImage(graphics, viewBoundingBox,
+          (int)Math.ceil(viewport.getViewWidthPixels()),
+          (int)Math.ceil(viewport.getViewHeightPixels()), !this.layer.isShowOriginalImage(),
           RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         viewRenderer.drawImage(this.image, !this.layer.isShowOriginalImage());
         this.cachedImage = new BufferedGeoreferencedImage(imageViewport.getBoundingBox(), image);
@@ -984,7 +985,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_OFF);
 
-        view.drawGeometryOutline(imageBoundary, STYLE_BOX_OUTLINE);
+        view.drawGeometryOutline(STYLE_BOX_OUTLINE, imageBoundary);
 
         view.drawMarkerVertices(imageBoundary, STYLE_BOX_CORNER);
 

@@ -1,7 +1,6 @@
 package com.revolsys.swing.map;
 
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
@@ -109,27 +108,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     return width;
   }
 
-  /**
-   * Get the rectangle in view units for the pair of coordinates in view units.
-   * The bounding box will be clipped to the view's dimensions.
-   *
-   * @param x1 The first x value.
-   * @param y1 The first y value.
-   * @param x2 The second x value.
-   * @param y2 The second y value.
-   * @return The rectangle.
-   */
-  public Rectangle getRectangle(final int x1, final int y1, final int x2, final int y2) {
-    final int x3 = Math.min(getViewWidthPixels() - 1, Math.max(0, x2));
-    final int y3 = Math.min(getViewHeightPixels() - 1, Math.max(0, y2));
-
-    final int x = Math.min(x1, x3);
-    final int y = Math.min(y1, y3);
-    final int width = Math.abs(x1 - x3);
-    final int height = Math.abs(y1 - y3);
-    return new Rectangle(x, y, width, height);
-  }
-
   public Unit<Length> getScaleUnit(final double scale) {
     final Unit<Length> lengthUnit = getGeometryFactory().getHorizontalLengthUnit();
     final Unit<Length> scaleUnit = lengthUnit.divide(scale);
@@ -149,7 +127,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     double modelHeight = validBoundingBox.getHeight();
 
     /*
-     * If the new bounding box has a zero width and height, expand it by 50 view units.
+     * If the new bounding box has a zero width and height, expand it by 50 view
+     * units.
      */
     if (modelWidth == 0 && modelHeight == 0) {
       final double delta = getModelUnitsPerViewUnit() * 50;
@@ -202,10 +181,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     }
   }
 
-  public void repaint() {
-    this.component.repaint();
-  }
-
   @Override
   protected void setGeometryFactoryPreEvent(final GeometryFactory geometryFactory) {
     if (geometryFactory.isHasHorizontalCoordinateSystem()) {
@@ -255,7 +230,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
   @Override
   public void update() {
-    repaint();
+    this.component.repaint();
   }
 
   private void updateCachedFields() {
@@ -274,7 +249,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
       setViewHeight(viewHeight);
       setBoundingBox(getBoundingBox());
 
-      this.component.repaint();
+      update();
     }
   }
 

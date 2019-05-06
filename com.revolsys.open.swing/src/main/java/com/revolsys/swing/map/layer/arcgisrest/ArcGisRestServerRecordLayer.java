@@ -27,7 +27,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.FilterMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
@@ -96,7 +96,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     setProperties(properties);
   }
 
-  private void addTextRenderer(final AbstractMultipleRenderer renderers,
+  private void addTextRenderer(final AbstractMultipleRecordLayerRenderer renderers,
     final MapEx labelProperties) {
     final TextStyle textStyle = new TextStyle();
     final String alignment = labelProperties.getString("labelPlacement");

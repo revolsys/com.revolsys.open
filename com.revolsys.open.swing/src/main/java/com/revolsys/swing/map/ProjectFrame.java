@@ -534,7 +534,7 @@ public class ProjectFrame extends BaseFrame {
     this.project.setPropertyWeak(PROJECT_FRAME, this);
     setConnectionRegistries();
 
-    newMapPanel();
+    this.mapPanel = newMapPanel();
 
     this.leftTabs.setMinimumSize(new Dimension(100, 300));
     this.leftTabs.setPreferredSize(new Dimension(300, 700));
@@ -649,12 +649,12 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected MapPanel newMapPanel() {
-    this.mapPanel = new MapPanel(this.preferences, this.project);
+    final MapPanel mapPanel = new MapPanel(this.preferences, this.project);
     if (OS.isMac()) {
       // Make border on right/bottom to match the JTabbedPane UI on a mac
-      this.mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 9, 9));
+      mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 9, 9));
     }
-    return this.mapPanel;
+    return mapPanel;
   }
 
   @Override

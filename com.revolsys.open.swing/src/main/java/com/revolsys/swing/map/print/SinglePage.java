@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.print;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
 import java.awt.print.Pageable;
 import java.awt.print.Paper;
@@ -21,8 +22,6 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
 
@@ -31,8 +30,8 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
   public static void print() {
     final Project project = Project.get();
     final Viewport2D viewport = project.getViewport();
-    final int viewWidth = viewport.getViewWidthPixels();
-    final int viewHeight = viewport.getViewHeightPixels();
+    final double viewWidth = viewport.getViewWidthPixels();
+    final double viewHeight = viewport.getViewHeightPixels();
     final BoundingBox boundingBox = viewport.getBoundingBox();
     final double scaleForVisible = viewport.getScaleForVisible();
 
@@ -69,8 +68,8 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
 
   private final double scaleForVisible;
 
-  public SinglePage(final Project project, final BoundingBox boundingBox, final int viewWidth,
-    final int viewHeight, final double scaleForVisible) {
+  public SinglePage(final Project project, final BoundingBox boundingBox, final double viewWidth,
+    final double viewHeight, final double scaleForVisible) {
     super(project, viewWidth, viewHeight, boundingBox);
     this.scaleForVisible = scaleForVisible;
   }
@@ -84,8 +83,8 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
   public PageFormat getPageFormat(final int pageIndex) {
     final PageFormat pageFormat = new PageFormat();
     final Paper paper = new Paper();
-    final int viewWidth = getViewWidthPixels();
-    final int viewHeight = getViewHeightPixels();
+    final double viewWidth = getViewWidthPixels();
+    final double viewHeight = getViewHeightPixels();
     double width;
     double height;
     if (viewWidth > viewHeight) {
@@ -127,8 +126,10 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
   }
 
   @Override
-  public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
-    return false;
+  public Graphics2DViewRenderer newViewRenderer(final Graphics graphics) {
+    final Graphics2DViewRenderer renderer = new Graphics2DViewRenderer(this, (Graphics2D)graphics);
+    renderer.setShowHiddenRecords(true);
+    return renderer;
   }
 
   @Override

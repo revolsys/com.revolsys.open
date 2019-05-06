@@ -9,7 +9,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
@@ -20,7 +19,7 @@ import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.layer.record.style.panel.TextStylePanel;
 import com.revolsys.swing.map.view.ViewRenderer;
 
-public class TextStyleRenderer extends AbstractRecordLayerRenderer {
+public class TextStyleRenderer extends AbstractGeometryRecordLayerRenderer {
 
   private static final Icon ICON = Icons.getIcon("style_text");
 
@@ -89,9 +88,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public void renderRecord(final ViewRenderer view, final BoundingBox visibleArea,
-    final AbstractRecordLayer layer, final LayerRecord record) {
-    final Geometry geometry = record.getGeometry();
+  protected void renderRecord(final ViewRenderer view, final AbstractRecordLayer layer,
+    final LayerRecord record, final Geometry geometry) {
     view.drawText(record, geometry, this.style);
   }
 

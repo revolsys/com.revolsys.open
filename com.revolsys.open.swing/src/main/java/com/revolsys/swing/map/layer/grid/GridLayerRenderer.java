@@ -18,8 +18,6 @@ import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Polygon;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
 import com.revolsys.swing.Icons;
@@ -164,12 +162,9 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
           final BoundingBox tileBoundingBox = tile.getBoundingBox();
           final BoundingBox intersectBoundingBox = boundingBox.bboxIntersection(tileBoundingBox);
           if (!intersectBoundingBox.isEmpty()) {
-
-            final GeometryFactory geometryFactory = view.getGeometryFactory();
-            final Polygon polygon = tile.getPolygon(geometryFactory, 50);
-            view.drawGeometryOutline(polygon, this.geometryStyle);
+            view.drawBboxOutline(this.geometryStyle, tileBoundingBox);
             final String label = tile.getFormattedName();
-            textStyle.drawText(label, polygon);
+            textStyle.drawText(label, tileBoundingBox.toRectangle());
           }
         }
       }

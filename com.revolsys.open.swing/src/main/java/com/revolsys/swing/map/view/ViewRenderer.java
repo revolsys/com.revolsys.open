@@ -1,6 +1,9 @@
 package com.revolsys.swing.map.view;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,20 +20,26 @@ import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.util.Cancellable;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 
@@ -75,15 +84,17 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     return new PointDoubleXYOrientation(point, orientation);
   }
 
+  private boolean showHiddenRecords;
+
   protected Viewport2D viewport;
 
   private Cancellable cancellable = Cancellable.FALSE;
 
   protected GeometryFactory geometryFactory;
 
-  protected int viewWidthPixels;
+  protected double viewWidthPixels;
 
-  protected int viewHeightPixels;
+  protected double viewHeightPixels;
 
   private final double[] coordinates = new double[2];
 
@@ -91,21 +102,101 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   protected BoundingBox boundingBox = BoundingBox.empty();
 
+  private final List<Point> points = new ArrayList<>();
+
+  private final List<LineString> lines = new ArrayList<>();
+
+  private final List<Polygon> polygons = new ArrayList<>();
+
+  private final BaseCloseable geometryListCloseable = () -> {
+    this.points.clear();
+    this.lines.clear();
+    this.polygons.clear();
+  };
+
+  private boolean linesAdd;
+
+  private boolean polygonsAdd;
+
+  private boolean pointsAdd;
+
+  private GeometryStyle geometryStyle;
+
+  private final BaseCloseable drawGeometriesCloseable = () -> {
+    try {
+      if (this.linesAdd) {
+        drawLines(this.geometryStyle, this.lines);
+      }
+      if (this.polygonsAdd) {
+        fillPolygons(this.geometryStyle, this.polygons);
+      }
+      if (this.pointsAdd) {
+        drawMarkers(this.geometryStyle);
+      }
+    } finally {
+      this.geometryStyle = null;
+      this.geometryListCloseable.close();
+    }
+  };
+
   public ViewRenderer(final Viewport2D viewport) {
     setViewport(viewport);
   }
 
+  public void addGeometry(final Geometry geometry) {
+    if (geometry != null) {
+      try {
+        if (geometry.isGeometryCollection()) {
+          geometry.forEachGeometry(this::addGeometry);
+        } else {
+          if (geometry instanceof Point) {
+            if (this.pointsAdd) {
+              this.points.add((Point)geometry.as2d(this.geometryFactory));
+            }
+          } else if (geometry instanceof LineString) {
+            if (this.linesAdd) {
+              this.lines.add((LineString)geometry.as2d(this.geometryFactory));
+            }
+          } else if (geometry instanceof Polygon) {
+            final Polygon polygon = (Polygon)geometry.as2d(this.geometryFactory);
+            if (this.linesAdd) {
+              this.lines.addAll(polygon.getRings());
+            }
+            if (this.polygonsAdd) {
+              this.polygons.add(polygon);
+            }
+          } else {
+            Debug.noOp();
+          }
+        }
+      } catch (final TopologyException e) {
+      }
+    }
+  }
+
+  public void drawBboxOutline(final GeometryStyle style, final BoundingBoxProxy boundingBox) {
+    final LinearRing ring = boundingBox.getBoundingBox().toLinearRing(this.geometryFactory, 50, 50);
+    drawLine(style, ring);
+  }
+
   public void drawDifferentCoordinateSystem(final BoundingBox boundingBox) {
     if (!isSameCoordinateSystem(boundingBox)) {
-      Polygon polygon = boundingBox.toPolygon(0);
-      polygon = polygon.as2d(this.geometryFactory);
-      drawGeometryOutline(polygon, STYLE_DIFFERENT_COORDINATE_SYSTEM);
+      drawBboxOutline(STYLE_DIFFERENT_COORDINATE_SYSTEM, boundingBox);
     }
+  }
+
+  public BaseCloseable drawGeometriesCloseable(final GeometryStyle geometryStyle,
+    final boolean pointsAdd, final boolean linesAdd, final boolean polygonsAdd) {
+    this.geometryStyle = geometryStyle;
+    this.pointsAdd = pointsAdd;
+    this.linesAdd = linesAdd;
+    this.polygonsAdd = polygonsAdd;
+    return this.drawGeometriesCloseable;
   }
 
   public abstract void drawGeometry(Geometry geometry, GeometryStyle geometryStyle);
 
-  public abstract void drawGeometryOutline(Geometry geometry, GeometryStyle geometryStyle);
+  public abstract void drawGeometryOutline(GeometryStyle geometryStyle, Geometry geometry);
 
   public abstract void drawImage(GeoreferencedImage image, boolean useTransform);
 
@@ -114,6 +205,18 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   public abstract void drawImage(GeoreferencedImage image, boolean useTransform,
     Object interpolationMethod);
+
+  public void drawLine(final GeometryStyle style, final LineString line) {
+    drawLines(style, Collections.singletonList(line));
+  }
+
+  public void drawLines(final GeometryStyle style) {
+    drawLines(style, this.lines);
+  }
+
+  public abstract void drawLines(GeometryStyle style, Iterable<LineString> lines);
+
+  public abstract void drawMarker(Geometry geometry);
 
   public void drawMarker(final Geometry geometry, final MarkerStyle style) {
     if (geometry != null) {
@@ -126,13 +229,13 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
           final Geometry part = geometry.getGeometry(i);
           if (part instanceof Point) {
             final Point point = (Point)part;
-            drawMarker(point, style, 0);
+            drawMarker(style, point, 0);
           } else if (part instanceof LineString) {
             final LineString line = (LineString)part;
             drawMarker(line, style);
           } else if (part instanceof Polygon) {
             final Polygon polygon = (Polygon)part;
-            drawMarker(polygon, style);
+            drawMarker(style, polygon);
           }
         }
       }
@@ -143,32 +246,42 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     final PointDoubleXYOrientation point = getMarkerLocation(line, style);
     if (point != null) {
       final double orientation = point.getOrientation();
-      drawMarker(point, style, orientation);
+      drawMarker(style, point, orientation);
     }
   }
 
-  public abstract void drawMarker(Point point, final MarkerStyle style, final double orientation);
+  public abstract void drawMarker(final MarkerStyle style, Point point, final double orientation);
 
-  private void drawMarker(final Polygon polygon, final MarkerStyle style) {
+  private void drawMarker(final MarkerStyle style, final Polygon polygon) {
     final Point point = polygon.getPointWithin();
-    drawMarker(point, style, 0);
+    drawMarker(style, point, 0);
+  }
+
+  public void drawMarkers(final GeometryStyle style) {
+    for (final Point point : this.points) {
+      drawMarker(style, point, 0);
+    }
   }
 
   public void drawMarkers(LineString line, final MarkerStyle styleFirst,
-    final MarkerStyle styleLast, final MarkerStyle styleVertex) {
+    final MarkerStyle styleLast, final MarkerStyle styleVertex, final MarkerStyle centreStyle) {
     if (line != null) {
       line = line.convertGeometry(this.geometryFactory);
       for (final Vertex vertex : line.vertices()) {
         MarkerStyle style;
+        final boolean to = vertex.isTo();
         if (vertex.isFrom()) {
           style = styleFirst;
-        } else if (vertex.isTo()) {
+        } else if (to) {
           style = styleLast;
         } else {
           style = styleVertex;
         }
         final double orientation = vertex.getOrientaton();
-        drawMarker(vertex, style, orientation);
+        drawMarker(style, vertex, orientation);
+        if (!to) {
+          drawMarker(centreStyle, vertex, 0);
+        }
       }
     }
   }
@@ -180,13 +293,13 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
       if ("none".equals(orientationType)) {
         for (final Segment segment : geometry.segments()) {
           final Point point = segment.midPoint();
-          drawMarker(point, style, 0);
+          drawMarker(style, point, 0);
         }
       } else {
         for (final Segment segment : geometry.segments()) {
           final Point point = segment.midPoint();
           final double orientation = segment.getOrientaton();
-          drawMarker(point, style, orientation);
+          drawMarker(style, point, orientation);
         }
       }
     }
@@ -198,18 +311,34 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
       final String orientationType = style.getMarkerOrientationType();
       if ("none".equals(orientationType)) {
         for (final Vertex vertex : geometry.vertices()) {
-          drawMarker(vertex, style, 0);
+          drawMarker(style, vertex, 0);
         }
       } else {
         for (final Vertex vertex : geometry.vertices()) {
           final double orientation = vertex.getOrientaton();
-          drawMarker(vertex, style, orientation);
+          drawMarker(style, vertex, orientation);
         }
       }
     }
-  };
+  }
 
   public abstract void drawText(Record record, Geometry geometry, TextStyle style);
+
+  public abstract void fillMarker(Geometry geometry);
+
+  public void fillPolygons(final GeometryStyle style) {
+    fillPolygons(style, this.polygons);
+  }
+
+  public abstract void fillPolygons(GeometryStyle style, final Iterable<Polygon> polygon);
+
+  public BaseCloseable geometryListCloseable(final boolean pointsAdd, final boolean linesAdd,
+    final boolean polygonsAdd) {
+    this.pointsAdd = pointsAdd;
+    this.linesAdd = linesAdd;
+    this.polygonsAdd = polygonsAdd;
+    return this.geometryListCloseable;
+  }
 
   @Override
   public BoundingBox getBoundingBox() {
@@ -360,7 +489,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     return this.viewport.getScaleForVisible();
   }
 
-  public int getViewHeightPixels() {
+  public double getViewHeightPixels() {
     return this.viewHeightPixels;
   }
 
@@ -368,7 +497,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     return this.viewport;
   }
 
-  public int getViewWidthPixels() {
+  public double getViewWidthPixels() {
     return this.viewWidthPixels;
   }
 
@@ -377,7 +506,18 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     return this.cancellable.isCancelled();
   }
 
+  public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
+    return layer.isHidden(record);
+  }
+
+  public boolean isShowHiddenRecords() {
+    return this.showHiddenRecords;
+  }
+
   public abstract TextStyleViewRenderer newTextStyleViewRenderer(TextStyle textStyle);
+
+  public abstract void renderEllipse(MarkerStyle style, double modelX, double modelY,
+    double orientation);
 
   public void setCancellable(Cancellable cancellable) {
     if (cancellable == null) {
@@ -385,6 +525,10 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     } else {
       this.cancellable = cancellable;
     }
+  }
+
+  public void setShowHiddenRecords(final boolean showHiddenRecords) {
+    this.showHiddenRecords = showHiddenRecords;
   }
 
   public void setViewport(final Viewport2D viewport) {

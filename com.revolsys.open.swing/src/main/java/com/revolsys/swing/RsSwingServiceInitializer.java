@@ -31,11 +31,10 @@ import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MultipleRecordRenderer;
 import com.revolsys.swing.map.layer.record.renderer.ScaleMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
-import com.revolsys.swing.map.layer.record.style.marker.SvgMarker;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerLibrary;
 import com.revolsys.swing.map.layer.record.style.marker.TextMarker;
 import com.revolsys.swing.map.layer.webmercatortilecache.WebMercatorTileCache;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
-import com.revolsys.swing.map.symbol.SymbolLibrary;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.ServiceInitializer;
@@ -48,12 +47,11 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
 
   private static void markers() {
     MapObjectFactoryRegistry.newFactory("markerText", "Marker Font and Text", TextMarker::new);
-    MapObjectFactoryRegistry.newFactory("markerSvg", "Marker SVG", SvgMarker::new);
   }
 
   @Override
   public void initializeService() {
-    SymbolLibrary.factoryInit();
+    MarkerLibrary.factoryInit();
     markers();
     layerRenderers();
     layers();

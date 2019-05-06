@@ -5,10 +5,6 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import org.jeometry.common.logging.Logs;
-
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -19,7 +15,7 @@ import com.revolsys.swing.map.view.ViewRenderer;
  * Use the first renderer which is visible at the current scale, ignore all
  * others. Changes when the scale changes.
  */
-public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
+public class ScaleMultipleRenderer extends AbstractMultipleRecordLayerRenderer {
   private static final Icon ICON = Icons.getIcon("style_scale");
 
   private transient long lastScale = 0;
@@ -76,64 +72,20 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public void render(final ViewRenderer view, final AbstractRecordLayer layer) {
-    if (layer.hasGeometryField()) {
-      final AbstractRecordLayerRenderer renderer = getRenderer(view);
-      if (renderer != null) {
-        renderer.render(view, layer);
-      }
-    }
-  }
-
-  // NOTE: Needed for filter styles
-  @Override
-  public void renderRecord(final ViewRenderer view, final BoundingBox visibleArea,
-    final AbstractRecordLayer layer, final LayerRecord record) {
-    final AbstractRecordLayerRenderer renderer = getRenderer(view);
-    if (renderer != null) {
-      if (isVisible(record)) {
-        try {
-          renderer.renderRecord(view, visibleArea, layer, record);
-        } catch (final TopologyException e) {
-        } catch (final Throwable e) {
-          Logs.error(this, "Unabled to render " + layer.getName() + " #" + record.getIdentifier(),
-            e);
-        }
-      }
-    }
-  }
-
-  @Override
-  // NOTE: Needed for multiple styles
-  protected void renderRecords(final ViewRenderer view, final AbstractRecordLayer layer,
+  protected void renderMultipleRecords(final ViewRenderer view, final AbstractRecordLayer layer,
     final List<LayerRecord> records) {
-    final BoundingBox visibleArea = view.getBoundingBox();
     final AbstractRecordLayerRenderer renderer = getRenderer(view);
     if (renderer != null) {
-      for (final LayerRecord record : view.cancellable(records)) {
-        if (isVisible(record)) {
-          try {
-            renderer.renderRecord(view, visibleArea, layer, record);
-          } catch (final TopologyException e) {
-          }
-        }
-      }
+      renderer.renderRecords(view, layer, records);
     }
   }
 
   @Override
-  public void renderSelectedRecord(final ViewRenderer view, final AbstractRecordLayer layer,
-    final LayerRecord object) {
+  protected void renderMultipleSelectedRecords(final ViewRenderer view,
+    final AbstractRecordLayer layer, final List<LayerRecord> records) {
     final AbstractRecordLayerRenderer renderer = getRenderer(view);
     if (renderer != null) {
-      if (isVisible(object)) {
-        try {
-          renderer.renderSelectedRecord(view, layer, object);
-        } catch (final Throwable e) {
-          Logs.error(this, "Unabled to render " + layer.getName() + " #" + object.getIdentifier(),
-            e);
-        }
-      }
+      renderer.renderSelectedRecords(view, layer, records);
     }
   }
 }

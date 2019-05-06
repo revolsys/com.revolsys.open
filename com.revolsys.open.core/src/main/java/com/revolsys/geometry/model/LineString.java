@@ -765,6 +765,21 @@ public interface LineString extends Lineal {
     return findClosestGeometryComponent(point.getX(), point.getY());
   }
 
+  default void forEachLineVertex(final BiConsumerDouble firstPointAction,
+    final BiConsumerDouble action) {
+    if (!isEmpty()) {
+      final int vertexCount = getVertexCount();
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      firstPointAction.accept(x1, y1);
+      for (int i = 0; i < vertexCount; i++) {
+        final double x = getX(i);
+        final double y = getY(i);
+        action.accept(x, y);
+      }
+    }
+  }
+
   @Override
   default void forEachSegment(final Consumer4Double action) {
     final int vertexCount = getVertexCount();
@@ -782,7 +797,8 @@ public interface LineString extends Lineal {
   @Override
   default void forEachVertex(final BiConsumerDouble action) {
     if (!isEmpty()) {
-      for (int i = 0; i < 2; i++) {
+      final int vertexCount = getVertexCount();
+      for (int i = 0; i < vertexCount; i++) {
         final double x1 = getX(i);
         final double y1 = getY(i);
         action.accept(x1, y1);

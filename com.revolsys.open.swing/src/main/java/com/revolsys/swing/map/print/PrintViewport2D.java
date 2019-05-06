@@ -60,13 +60,13 @@ public class PrintViewport2D extends Viewport2D {
   }
 
   @Override
-  public int getViewHeightPixels() {
-    return (int)this.contentRect.getHeight();
+  public double getViewHeightPixels() {
+    return this.contentRect.getHeight();
   }
 
   @Override
-  public int getViewWidthPixels() {
-    return (int)this.contentRect.getWidth();
+  public double getViewWidthPixels() {
+    return this.contentRect.getWidth();
   }
 
   @Override

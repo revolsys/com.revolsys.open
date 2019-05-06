@@ -30,8 +30,8 @@ public class SaveAsPdf {
 
       final Viewport2D viewport = project.getViewport();
       BoundingBox boundingBox = viewport.getBoundingBox();
-      final int width = viewport.getViewWidthPixels();
-      final int height = viewport.getViewHeightPixels();
+      final int width = (int)Math.ceil(viewport.getViewWidthPixels());
+      final int height = (int)Math.ceil(viewport.getViewHeightPixels());
 
       final int srid = boundingBox.getHorizontalCoordinateSystemId();
       if (srid == 3857) {

@@ -5,8 +5,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.jeometry.common.function.SupplierWithProperties;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.io.GeometryReader;
@@ -21,6 +19,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
+import com.revolsys.util.SupplierWithProperties;
 
 public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFactory {
   @SuppressWarnings("unchecked")

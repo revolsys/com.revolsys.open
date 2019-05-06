@@ -108,7 +108,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.component.MergeRecordsDialog;
 import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
-import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MultipleRecordRenderer;
@@ -470,9 +470,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public int addRenderer(final LayerRenderer<?> child, final int index) {
     final AbstractRecordLayerRenderer oldRenderer = getRenderer();
-    AbstractMultipleRenderer rendererGroup;
-    if (oldRenderer instanceof AbstractMultipleRenderer) {
-      rendererGroup = (AbstractMultipleRenderer)oldRenderer;
+    AbstractMultipleRecordLayerRenderer rendererGroup;
+    if (oldRenderer instanceof AbstractMultipleRecordLayerRenderer) {
+      rendererGroup = (AbstractMultipleRecordLayerRenderer)oldRenderer;
     } else {
       final AbstractRecordLayer layer = oldRenderer.getLayer();
       rendererGroup = new MultipleRecordRenderer(layer);

@@ -39,7 +39,8 @@ import com.revolsys.util.Property;
 /**
  * <p>A lightweight component that users the {@link Layer}'s {@link LayerRenderer} to render the layer.</p>
  */
-public class LayerRendererOverlay extends JComponent implements PropertyChangeListener {
+public class LayerRendererOverlay extends JComponent
+  implements LayerMapOverlay, PropertyChangeListener {
   private static final Collection<String> IGNORE_PROPERTY_NAMES = new HashSet<>(Arrays
     .asList("selectionCount", "hasHighlightedRecords", "highlightedCount", "scale", "loaded"));
 
@@ -140,6 +141,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
     }
   }
 
+  @Override
   public void redraw() {
     final Container parent = getParent();
     if (getWidth() > 0 && getHeight() > 0) {
@@ -160,8 +162,8 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
   private GeoreferencedImage refreshImage(final Cancellable cancellable) {
     final Viewport2D viewport = getViewport();
     final BoundingBox boundingBox = viewport.getBoundingBox();
-    final int imageWidth = viewport.getViewWidthPixels();
-    final int imageHeight = viewport.getViewHeightPixels();
+    final int imageWidth = (int)Math.ceil(viewport.getViewWidthPixels());
+    final int imageHeight = (int)Math.ceil(viewport.getViewHeightPixels());
     final GeoreferencedImage referencedImage = new BufferedGeoreferencedImage(boundingBox,
       imageWidth, imageHeight);
     try {

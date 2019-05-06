@@ -2,10 +2,10 @@ package com.revolsys.core.test.util;
 
 import java.util.List;
 
-import org.jeometry.common.logging.Logs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.log.LogAppender;
 import com.revolsys.record.Record;
 import com.revolsys.util.Strings;
 
@@ -13,8 +13,8 @@ public class TestUtil {
 
   public static void enableInfo(final Class<?> clazz) {
     final String name = clazz.getName();
-    Logs.setLevel(name, "INFO");
-    Logs.setLevel(null, "INFO");
+    LogAppender.setLevel(name, "INFO");
+    LogAppender.setLevel(null, "INFO");
   }
 
   public static void logValues(final Class<?> clazz, final Record record) {

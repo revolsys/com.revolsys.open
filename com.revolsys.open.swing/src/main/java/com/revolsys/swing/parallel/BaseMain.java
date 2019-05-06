@@ -56,20 +56,15 @@ public class BaseMain implements UncaughtExceptionHandler {
   }
 
   public void logError(final Throwable e) {
-
-    final LogEvent event = Log4jLogEvent.newBuilder()//
-      .setLoggerName(getClass().getName()) //
-      .setLevel(Level.ERROR) //
-      .setMessage(new SimpleMessage("Unable to start application".toString())) //
-      .setThrown(e)
-      .build();
-
-    final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-    final String threadName = Thread.currentThread().getName();
-    final String stackTrace = Strings.toString("\n", e.getStackTrace());
-    LoggingEventPanel.showDialog(null, timestamp, Level.ERROR, getClass().getName(),
-      "Unable to start application", threadName, stackTrace);
-    Logs.error(this, "Unable to start application " + this.name, e);
+    try {
+      final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+      final String threadName = Thread.currentThread().getName();
+      final String stackTrace = e.getMessage() + "\n" + Strings.toString("\n", e.getStackTrace());
+      LoggingEventPanel.showDialog(null, timestamp, Level.ERROR, getClass().getName(),
+        "Unable to start application:" + e.getMessage(), threadName, stackTrace);
+    } finally {
+      Logs.error(this, "Unable to start application " + this.name, e);
+    }
   }
 
   protected void preRunDo() throws Throwable {

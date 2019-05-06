@@ -175,6 +175,12 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   }
 
   @Override
+  public boolean isVisible(final ViewRenderer view) {
+    final double scaleForVisible = view.getScaleForVisible();
+     return isVisible(scaleForVisible);
+  }
+
+  @Override
   public Form newStylePanel() {
     return new BaseStylePanel(this, true);
   }
@@ -188,8 +194,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   public final void render(final ViewRenderer view) {
     final T layer = getLayer();
     if (layer != null) {
-      final double scaleForVisible = view.getScaleForVisible();
-      if (isVisible(scaleForVisible)) {
+      if (isVisible(view)) {
         render(view, layer);
       }
     }

@@ -16,15 +16,16 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRenderer
+public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecordLayerRenderer
   implements MultipleLayerRenderer<AbstractRecordLayer, AbstractRecordLayerRenderer> {
   static {
-    MenuFactory.addMenuInitializer(AbstractMultipleRenderer.class, menu -> {
+    MenuFactory.addMenuInitializer(AbstractMultipleRecordLayerRenderer.class, menu -> {
 
       addAddMenuItem(menu, "Geometry", GeometryStyleRecordLayerRenderer::new);
       addAddMenuItem(menu, "Text", TextStyleRenderer::new);
@@ -34,20 +35,20 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
       addAddMenuItem(menu, "Scale", ScaleMultipleRenderer::new);
 
       addConvertMenuItem(menu, "Multiple", MultipleRecordRenderer.class,
-        AbstractMultipleRenderer::convertToMultipleStyle);
+        AbstractMultipleRecordLayerRenderer::convertToMultipleStyle);
       addConvertMenuItem(menu, "Filter", FilterMultipleRenderer.class,
-        AbstractMultipleRenderer::convertToFilterStyle);
+        AbstractMultipleRecordLayerRenderer::convertToFilterStyle);
       addConvertMenuItem(menu, "Scale", ScaleMultipleRenderer.class,
-        AbstractMultipleRenderer::convertToScaleStyle);
+        AbstractMultipleRecordLayerRenderer::convertToScaleStyle);
     });
   }
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
-    final BiFunction<AbstractRecordLayer, AbstractMultipleRenderer, AbstractRecordLayerRenderer> rendererFactory) {
+    final BiFunction<AbstractRecordLayer, AbstractMultipleRecordLayerRenderer, AbstractRecordLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type + ":add").toLowerCase();
     final String name = "Add " + type + " Style";
     Menus.addMenuItem(menu, "add", name, iconName,
-      (final AbstractMultipleRenderer parentRenderer) -> {
+      (final AbstractMultipleRecordLayerRenderer parentRenderer) -> {
         final AbstractRecordLayer layer = parentRenderer.getLayer();
         final AbstractRecordLayerRenderer newRenderer = rendererFactory.apply(layer,
           parentRenderer);
@@ -56,10 +57,10 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   }
 
   protected static void addConvertMenuItem(final MenuFactory menu, final String type,
-    final Class<?> rendererClass, final Consumer<AbstractMultipleRenderer> consumer) {
+    final Class<?> rendererClass, final Consumer<AbstractMultipleRecordLayerRenderer> consumer) {
     final String iconName = ("style_" + type + "_go").toLowerCase();
-    final Predicate<AbstractMultipleRenderer> enabledFilter = (
-      final AbstractMultipleRenderer renderer) -> {
+    final Predicate<AbstractMultipleRecordLayerRenderer> enabledFilter = (
+      final AbstractMultipleRecordLayerRenderer renderer) -> {
       return renderer.getClass() != rendererClass;
     };
     final String name = "Convert to " + type + " Style";
@@ -68,13 +69,13 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
 
   private List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();
 
-  public AbstractMultipleRenderer(final String type, final AbstractRecordLayer layer,
+  public AbstractMultipleRecordLayerRenderer(final String type, final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
     super(type, "Styles", layer, parent);
 
   }
 
-  public AbstractMultipleRenderer(final String type, final String name) {
+  public AbstractMultipleRecordLayerRenderer(final String type, final String name) {
     super(type, name);
   }
 
@@ -114,8 +115,8 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   }
 
   @Override
-  public AbstractMultipleRenderer clone() {
-    final AbstractMultipleRenderer clone = (AbstractMultipleRenderer)super.clone();
+  public AbstractMultipleRecordLayerRenderer clone() {
+    final AbstractMultipleRecordLayerRenderer clone = (AbstractMultipleRecordLayerRenderer)super.clone();
     clone.renderers = JavaBeanUtil.clone(this.renderers);
     for (final AbstractRecordLayerRenderer renderer : clone.renderers) {
       renderer.setParent(clone);
@@ -126,7 +127,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   public FilterMultipleRenderer convertToFilterStyle() {
     final AbstractRecordLayer layer = getLayer();
     final List<AbstractRecordLayerRenderer> renderers = getRenderers();
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
     final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent);
@@ -145,7 +146,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   public MultipleRecordRenderer convertToMultipleStyle() {
     final AbstractRecordLayer layer = getLayer();
     final List<AbstractRecordLayerRenderer> renderers = getRenderers();
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
     final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(layer, parent);
@@ -165,7 +166,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   public ScaleMultipleRenderer convertToScaleStyle() {
     final AbstractRecordLayer layer = getLayer();
     final List<AbstractRecordLayerRenderer> renderers = getRenderers();
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
     final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent);
@@ -179,6 +180,13 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     }
     replace(layer, parent, newRenderer);
     return newRenderer;
+  }
+
+  private List<LayerRecord> filterRecords(final ViewRenderer view, List<LayerRecord> records) {
+    if (isHasFilter()) {
+      records = Lists.filter(view.cancellable(records), this::isFilterAccept);
+    }
+    return records;
   }
 
   @Override
@@ -233,6 +241,31 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
         firePropertyChange("renderers", index, renderer, null);
       }
       return index;
+    }
+  }
+
+  protected abstract void renderMultipleRecords(final ViewRenderer view,
+    final AbstractRecordLayer layer, final List<LayerRecord> records);
+
+  protected abstract void renderMultipleSelectedRecords(final ViewRenderer view,
+    final AbstractRecordLayer layer, final List<LayerRecord> records);
+
+  @Override
+  protected final void renderRecords(final ViewRenderer view, final AbstractRecordLayer layer,
+    List<LayerRecord> records) {
+    if (isVisible(view)) {
+      records = filterRecords(view, records);
+      renderMultipleRecords(view, layer, records);
+    }
+  }
+
+  @Override
+  protected final void renderSelectedRecordsDo(final ViewRenderer view,
+    final AbstractRecordLayer layer, List<LayerRecord> records) {
+    if (isVisible(view)) {
+      records = filterRecords(view, records);
+
+      renderMultipleSelectedRecords(view, layer, records);
     }
   }
 

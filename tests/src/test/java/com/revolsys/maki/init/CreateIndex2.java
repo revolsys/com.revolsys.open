@@ -8,25 +8,27 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
-import com.revolsys.swing.map.symbol.SymbolLibrary;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerLibrary;
+import com.revolsys.swing.map.layer.record.style.marker.SvgMarker;
 
 public class CreateIndex2 {
   public static void main(final String[] args) {
-    SymbolLibrary.findSymbol("maki/police");
+    MarkerLibrary.findMarker("maki/police");
     final Resource makiFile = new UrlResource("https://www.mapbox.com/maki/www/maki.json");
     final List<MapEx> symbolList = Json.toMapList(makiFile);
 
-    final SymbolLibrary symbolLibrary = new SymbolLibrary("maki", "Maki");
+    final MarkerLibrary library = new MarkerLibrary("maki", "Maki");
 
     for (final MapEx symbolMap : symbolList) {
       final String name = "maki/" + symbolMap.getString("icon");
       final String title = symbolMap.getString("name");
-      symbolLibrary.addSymbolSvg(name, title);
+      final SvgMarker symbol = new SvgMarker(name, title);
+      library.addSymbol(symbol);
     }
-    final File symbolLibraryFile = new File(
-      "src/main/resources/META-INF/com.revolsys.core.test.swing.map.symbol.SymbolLibrary.json");
-    symbolLibrary.writeToFile(symbolLibraryFile);
+    final File libraryFile = new File(
+      "../com.revolsys.open.maki/src/main/resources/META-INF/com.revolsys.swing.map.symbol.MarkerLibrary.json");
+    library.writeToFile(libraryFile);
 
-    final SymbolLibrary symbolLibrary2 = MapObjectFactory.toObject(symbolLibraryFile);
+    final MarkerLibrary library2 = MapObjectFactory.toObject(libraryFile);
   }
 }

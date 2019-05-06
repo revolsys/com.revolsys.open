@@ -228,8 +228,8 @@ public class ZoomOverlay extends AbstractOverlay {
     if (this.panX1 != -1 && this.panImage != null) {
       final int dx = this.panX2 - this.panX1;
       final int dy = this.panY2 - this.panY1;
-      final int width = viewport.getViewWidthPixels();
-      final int height = viewport.getViewHeightPixels();
+      final int width = (int)Math.ceil(viewport.getViewWidthPixels());
+      final int height = (int)Math.ceil(viewport.getViewHeightPixels());
       graphics.setColor(Color.WHITE);
       graphics.fillRect(0, 0, width, height);
 
@@ -305,8 +305,8 @@ public class ZoomOverlay extends AbstractOverlay {
       if (pan) {
         if (setOverlayAction(ACTION_PAN)) {
           final Viewport2D viewport = getViewport();
-          final int width = viewport.getViewWidthPixels();
-          final int height = viewport.getViewHeightPixels();
+          final int width = (int)Math.ceil(viewport.getViewWidthPixels());
+          final int height = (int)Math.ceil(viewport.getViewHeightPixels());
           if (width > 0 && height > 0) {
             final JComponent parent = (JComponent)getParent();
             this.panImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);

@@ -79,7 +79,9 @@ import com.revolsys.swing.map.listener.FileDropTargetListener;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.CloseLocation;
 import com.revolsys.swing.map.overlay.EditGeoreferencedImageOverlay;
+import com.revolsys.swing.map.overlay.LayerMapOverlay;
 import com.revolsys.swing.map.overlay.LayerRendererOverlay;
+import com.revolsys.swing.map.overlay.MapOverlay;
 import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.swing.map.overlay.ToolTipOverlay;
@@ -130,13 +132,13 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private BaseMapLayerGroup baseMapLayers;
 
-  private LayerRendererOverlay baseMapOverlay;
+  private LayerMapOverlay baseMapOverlay;
 
   private FileDropTargetListener fileDropListener;
 
   private final JLayeredPane layeredPane;
 
-  private LayerRendererOverlay layerOverlay;
+  private LayerMapOverlay layerOverlay;
 
   private BasePanel leftStatusBar = new BasePanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
 
@@ -240,12 +242,12 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
     this.baseMapOverlay = new LayerRendererOverlay(this);
     this.baseMapOverlay.setLayer(NullLayer.INSTANCE);
-    this.layeredPane.add(this.baseMapOverlay, Integer.valueOf(0));
+    this.layeredPane.add((JComponent)this.baseMapOverlay, Integer.valueOf(0));
     Property.addListener(this.baseMapOverlay, "layer", this);
 
-    this.layerOverlay = new LayerRendererOverlay(this, project);
+    this.layerOverlay = newLayerOverlay();
     this.layerOverlay.setShowAreaBoundingBox(project.getProperty("showAreaBoundingBox", true));
-    this.layeredPane.add(this.layerOverlay, Integer.valueOf(1));
+    this.layeredPane.add((JComponent)this.layerOverlay, Integer.valueOf(1));
 
     Property.addListener(this.baseMapLayers, this);
     Property.addListener(project, this);
@@ -275,8 +277,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     this.selectCoordinateSystem.addGeometryFactory(srid);
   }
 
-  public void addMapOverlay(final int zIndex, final JComponent overlay) {
-    this.layeredPane.add(overlay, Integer.valueOf(zIndex));
+  public void addMapOverlay(final int zIndex, final MapOverlay overlay) {
+    this.layeredPane.add((JComponent)overlay, Integer.valueOf(zIndex));
     if (overlay instanceof PropertyChangeListener) {
       final PropertyChangeListener listener = (PropertyChangeListener)overlay;
       Property.addListener(this, listener);
@@ -286,7 +288,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     Property.addListener(overlay, this);
   }
 
-  public void addMapOverlay(final JComponent overlay) {
+  public void addMapOverlay(final MapOverlay overlay) {
     final int zIndex = 100 * this.overlayIndex++;
     addMapOverlay(zIndex, overlay);
   }
@@ -504,7 +506,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.baseMapLayers;
   }
 
-  public LayerRendererOverlay getBaseMapOverlay() {
+  public LayerMapOverlay getBaseMapOverlay() {
     return this.baseMapOverlay;
   }
 
@@ -529,7 +531,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.viewport.getGeometryFactory();
   }
 
-  public LayerRendererOverlay getLayerOverlay() {
+  public MapOverlay getLayerOverlay() {
     return this.layerOverlay;
   }
 
@@ -701,6 +703,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public void moveToFront(final JComponent overlay) {
     this.layeredPane.moveToFront(overlay);
+  }
+
+  protected LayerMapOverlay newLayerOverlay() {
+    return new LayerRendererOverlay(this, this.project);
   }
 
   protected void newStatusBar() {
@@ -1200,10 +1206,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       final double width = boundingBox.getWidth();
       final double height = boundingBox.getHeight();
 
-      final int viewWidthPixels = viewport.getViewWidthPixels();
+      final double viewWidthPixels = viewport.getViewWidthPixels();
       final double newWidth = viewWidthPixels * newUnitsPerPixel;
 
-      final int viewHeightPixels = viewport.getViewHeightPixels();
+      final double viewHeightPixels = viewport.getViewHeightPixels();
       final double newHeight = viewHeightPixels * newUnitsPerPixel;
 
       final double x = mapPoint.getX();

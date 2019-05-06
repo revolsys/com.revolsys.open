@@ -1094,6 +1094,128 @@ public interface BoundingBox
     }
   }
 
+  default LinearRing toLinearRing() {
+    final double minX = getMinX();
+    final double minY = getMinY();
+    final double maxX = getMaxX();
+    final double maxY = getMaxY();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.linearRing(2, //
+      minX, minY, //
+      maxX, minY, //
+      maxX, maxY, //
+      minX, maxY, //
+      minX, minY //
+    );
+  }
+
+  default LinearRing toLinearRing(GeometryFactory geometryFactory, int numX, int numY) {
+    if (isEmpty()) {
+      return geometryFactory.linearRing();
+    } else {
+      final GeometryFactory factory = getGeometryFactory();
+      if (geometryFactory == null) {
+        if (factory == null) {
+          geometryFactory = GeometryFactory.floating2d(0);
+        } else {
+          geometryFactory = factory;
+        }
+      }
+      if (numX == 0 && numY == 0) {
+        return toLinearRing();
+      } else {
+        try {
+          double minStep = 0.00001;
+          if (factory.isProjected()) {
+            minStep = 1;
+          } else {
+            minStep = 0.00001;
+          }
+
+          double xStep;
+          final double width = getWidth();
+          if (!Double.isFinite(width)) {
+            return geometryFactory.linearRing();
+          } else if (numX <= 1) {
+            numX = 1;
+            xStep = width;
+          } else {
+            xStep = width / numX;
+            if (xStep < minStep) {
+              xStep = minStep;
+            }
+            numX = Math.max(1, (int)Math.ceil(width / xStep));
+          }
+
+          double yStep;
+          if (numY <= 1) {
+            numY = 1;
+            yStep = getHeight();
+          } else {
+            yStep = getHeight() / numY;
+            if (yStep < minStep) {
+              yStep = minStep;
+            }
+            numY = Math.max(1, (int)Math.ceil(getHeight() / yStep));
+          }
+
+          final double minX = getMinX();
+          final double maxX = getMaxX();
+          final double minY = getMinY();
+          final double maxY = getMaxY();
+          final int coordinateCount = 1 + 2 * (numX + numY);
+          final double[] coordinates = new double[coordinateCount * 2];
+          int i = 0;
+
+          coordinates[i++] = minX;
+          coordinates[i++] = minY;
+          for (int j = 1; j < numX; j++) {
+            final double x = minX + j * xStep;
+            coordinates[i++] = x;
+            coordinates[i++] = minY;
+          }
+          coordinates[i++] = maxX;
+          coordinates[i++] = minY;
+
+          for (int j = 1; j < numY; j++) {
+            final double y = minY + j * yStep;
+            coordinates[i++] = maxX;
+            coordinates[i++] = y;
+          }
+          coordinates[i++] = maxX;
+          coordinates[i++] = maxY;
+
+          for (int j = numX - 1; j > 0; j--) {
+            final double x = minX + j * xStep;
+            coordinates[i++] = x;
+            coordinates[i++] = maxY;
+          }
+
+          coordinates[i++] = minX;
+          coordinates[i++] = maxY;
+
+          for (int j = numY - 1; j > 0; j--) {
+            final double y = minY + j * yStep;
+            coordinates[i++] = minX;
+            coordinates[i++] = y;
+          }
+          coordinates[i++] = minX;
+          coordinates[i++] = minY;
+
+          final LinearRing ring = factory.linearRing(2, coordinates);
+          if (geometryFactory == null) {
+            return ring;
+          } else {
+            return ring.as2d(geometryFactory);
+          }
+        } catch (final IllegalArgumentException e) {
+          Logs.error(this, "Unable to convert to linearRing: " + this, e);
+          return geometryFactory.linearRing();
+        }
+      }
+    }
+  }
+
   default Polygon toPolygon(final GeometryFactory factory) {
     return toPolygon(factory, 100, 100);
   }

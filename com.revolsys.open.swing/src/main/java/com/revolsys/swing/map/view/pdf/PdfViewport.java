@@ -22,8 +22,6 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.io.format.pdf.PdfUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.view.ViewRenderer;
 
 public class PdfViewport extends Viewport2D implements BaseCloseable {
@@ -126,11 +124,6 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
 
   public PDPage getPage() {
     return this.page;
-  }
-
-  @Override
-  public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
-    return false;
   }
 
   @Override

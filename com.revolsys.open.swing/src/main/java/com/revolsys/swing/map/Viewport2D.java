@@ -26,8 +26,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Property;
@@ -117,9 +115,9 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   private double unitsPerPixel;
 
-  private int viewHeight;
+  private double viewHeight;
 
-  private int viewWidth;
+  private double viewWidth;
 
   private double hotspotMapUnits = 6;
 
@@ -138,7 +136,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     this(project, 0, 0, project.getViewBoundingBox());
   }
 
-  public Viewport2D(final Project project, final int width, final int height,
+  public Viewport2D(final Project project, final double width, final double height,
     BoundingBox boundingBox) {
     this.project = new WeakReference<>(project);
     this.viewWidth = width;
@@ -359,12 +357,12 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   public double getViewAspectRatio() {
-    final int viewWidthPixels = getViewWidthPixels();
-    final int viewHeightPixels = getViewHeightPixels();
+    final double viewWidthPixels = getViewWidthPixels();
+    final double viewHeightPixels = getViewHeightPixels();
     if (viewHeightPixels == 0) {
       return 0;
     } else {
-      return (double)viewWidthPixels / viewHeightPixels;
+      return viewWidthPixels / viewHeightPixels;
     }
   }
 
@@ -376,7 +374,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return Quantities.getQuantity(width, getScreenUnit());
   }
 
-  public int getViewHeightPixels() {
+  public double getViewHeightPixels() {
     return this.viewHeight;
   }
 
@@ -388,7 +386,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return Quantities.getQuantity(width, getScreenUnit());
   }
 
-  public int getViewWidthPixels() {
+  public double getViewWidthPixels() {
     return this.viewWidth;
   }
 
@@ -466,10 +464,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return Double.isFinite(value1) && value1 > 0 && Math.abs(1 - value2 / value1) >= 1e-2;
   }
 
-  public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
-    return layer.isHidden(record);
-  }
-
   public boolean isInitialized() {
     return this.initialized;
   }
@@ -512,8 +506,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
         double width = newBoundingBox.getWidth();
         final double height = newBoundingBox.getHeight();
 
-        final int viewWidthPixels = getViewWidthPixels();
-        final int viewHeightPixels = getViewHeightPixels();
+        final double viewWidthPixels = getViewWidthPixels();
+        final double viewHeightPixels = getViewHeightPixels();
         double unitsPerPixel;
         if (viewWidthPixels > 0) {
           final double viewAspectRatio = getViewAspectRatio();
@@ -574,8 +568,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     final double oldUnitsPerPixel = getUnitsPerPixel();
     final BoundingBox oldBoundingBox = this.boundingBox;
     synchronized (this) {
-      final int viewWidthPixels = getViewWidthPixels();
-      final int viewHeightPixels = getViewHeightPixels();
+      final double viewWidthPixels = getViewWidthPixels();
+      final double viewHeightPixels = getViewHeightPixels();
 
       if (Double.isFinite(unitsPerPixel)) {
         if (unitsPerPixel < this.minUnitsPerPixel) {
@@ -647,8 +641,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   private BoundingBox setCentreFromUnitsPerPixel(final Point centre, final double unitsPerPixel) {
-    final int viewWidthPixels = getViewWidthPixels();
-    final int viewHeightPixels = getViewHeightPixels();
+    final double viewWidthPixels = getViewWidthPixels();
+    final double viewHeightPixels = getViewHeightPixels();
 
     final int minXPixelOffset = (int)Math.ceil(viewWidthPixels / 2.0);
     final int minYPixelOffset = (int)Math.ceil(viewHeightPixels / 2.0);
@@ -763,11 +757,11 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     }
   }
 
-  protected void setViewHeight(final int height) {
+  protected void setViewHeight(final double height) {
     this.viewHeight = height;
   }
 
-  protected void setViewWidth(final int width) {
+  protected void setViewWidth(final double width) {
     this.viewWidth = width;
   }
 

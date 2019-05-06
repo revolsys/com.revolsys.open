@@ -9,10 +9,10 @@ import javax.swing.Icon;
 
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.predicate.Predicates;
@@ -63,6 +63,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     });
   }
 
+  private static Predicate<Record> DEFAULT_FILTER = Predicates.all();
+
   public static Predicate<Record> getFilter(final RecordDefinitionProxy recordDefinitionProxy,
     final Map<String, ? extends Object> properties) {
     @SuppressWarnings("unchecked")
@@ -106,7 +108,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
-  private Predicate<Record> filter = Predicates.all();
+  private Predicate<Record> filter = DEFAULT_FILTER;
 
   public AbstractRecordLayerRenderer(final String type, final String name) {
     super(type, name);
@@ -126,8 +128,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   public void delete() {
     final LayerRenderer<?> parent = getParent();
-    if (parent instanceof AbstractMultipleRenderer) {
-      final AbstractMultipleRenderer multiple = (AbstractMultipleRenderer)parent;
+    if (parent instanceof AbstractMultipleRecordLayerRenderer) {
+      final AbstractMultipleRecordLayerRenderer multiple = (AbstractMultipleRecordLayerRenderer)parent;
       multiple.removeRenderer(this);
     }
   }
@@ -159,6 +161,10 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
+  public boolean isHasFilter() {
+    return this.filter != DEFAULT_FILTER;
+  }
+
   @Override
   public boolean isHasParent() {
     return getParent() != null;
@@ -173,6 +179,12 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
+  @Override
+  public boolean isVisible(final ViewRenderer view) {
+    final long scaleForVisible = (long)view.getScaleForVisible();
+    return isVisible(scaleForVisible);
+  }
+
   public Icon newIcon() {
     return getIcon();
   }
@@ -183,51 +195,39 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   }
 
   @Override
-  public void render(final ViewRenderer view, final AbstractRecordLayer layer) {
+  public final void render(final ViewRenderer view, final AbstractRecordLayer layer) {
     if (layer.hasGeometryField()) {
       final BoundingBox boundingBox = view.getBoundingBox();
-      final List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
+      List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
+      if (!view.isShowHiddenRecords()) {
+        final Predicate<LayerRecord> filter = record -> {
+          return !layer.isHidden(record);
+        };
+        records = Lists.filter(view.cancellable(records), filter);
+      }
       renderRecords(view, layer, records);
     }
   }
 
-  public void renderRecord(final ViewRenderer view, final BoundingBox visibleArea,
-    final AbstractRecordLayer layer, final LayerRecord record) {
-  }
+  protected abstract void renderRecords(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records);
 
-  protected void renderRecords(final ViewRenderer view, final AbstractRecordLayer layer,
-    final List<LayerRecord> records) {
-    final BoundingBox visibleArea = view.getBoundingBox();
-    for (final LayerRecord record : view.cancellable(records)) {
-      if (record != null) {
-        if (isVisible(record) && !layer.isHidden(record)) {
-          try {
-            renderRecord(view, visibleArea, layer, record);
-          } catch (final TopologyException e) {
-          } catch (final Throwable e) {
-            if (!view.isCancelled()) {
-              Logs.error(this,
-                "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
-            }
-          }
-        }
-      }
+  public final void renderSelectedRecords(final ViewRenderer view, final AbstractRecordLayer layer,
+    List<LayerRecord> records) {
+    if (layer.hasGeometryField()) {
+      records = Lists.filter(view.cancellable(records), record -> {
+        return !layer.isDeleted(record);
+      });
+      renderSelectedRecordsDo(view, layer, records);
     }
   }
 
-  public void renderSelectedRecord(final ViewRenderer view, final AbstractRecordLayer layer,
-    final LayerRecord record) {
-    final BoundingBox boundingBox = view.getBoundingBox();
-    if (isVisible(record)) {
-      try {
-        renderRecord(view, boundingBox, layer, record);
-      } catch (final TopologyException e) {
-      }
-    }
-  }
+  protected abstract void renderSelectedRecordsDo(final ViewRenderer view,
+    final AbstractRecordLayer layer, final List<LayerRecord> records);
 
-  protected void replace(final AbstractLayer layer, final AbstractMultipleRenderer parent,
-    final AbstractMultipleRenderer newRenderer) {
+  protected void replace(final AbstractLayer layer,
+    final AbstractMultipleRecordLayerRenderer parent,
+    final AbstractMultipleRecordLayerRenderer newRenderer) {
     if (parent == null) {
       if (isEditing()) {
         newRenderer.setEditing(true);
@@ -249,7 +249,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   @Override
   public void setName(final String name) {
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     String newName = name;
     if (parent != null) {
       int i = 1;
@@ -268,13 +268,12 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   }
 
   public void setQueryFilter(final String query) {
-    if (this.filter instanceof RecordDefinitionSqlFilter
-      || this.filter == Predicates.<Record> all()) {
+    if (this.filter instanceof RecordDefinitionSqlFilter || this.filter == DEFAULT_FILTER) {
       Predicate<Record> filter;
       if (Property.hasValue(query)) {
         filter = new RecordDefinitionSqlFilter(this, query);
       } else {
-        filter = Predicates.all();
+        filter = DEFAULT_FILTER;
       }
       setFilter(filter);
     }
@@ -289,15 +288,15 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     return map;
   }
 
-  protected void wrap(final AbstractLayer layer, final AbstractMultipleRenderer parent,
-    final AbstractMultipleRenderer newRenderer) {
+  protected void wrap(final AbstractLayer layer, final AbstractMultipleRecordLayerRenderer parent,
+    final AbstractMultipleRecordLayerRenderer newRenderer) {
     newRenderer.addRenderer(this.clone());
     replace(layer, parent, newRenderer);
   }
 
   public FilterMultipleRenderer wrapWithFilterStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
@@ -305,7 +304,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   public MultipleRecordRenderer wrapWithMultipleStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
@@ -313,7 +312,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   public ScaleMultipleRenderer wrapWithScaleStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;

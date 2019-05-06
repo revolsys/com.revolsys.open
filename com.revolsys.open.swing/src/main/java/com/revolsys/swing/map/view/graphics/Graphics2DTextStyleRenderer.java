@@ -124,7 +124,7 @@ public class Graphics2DTextStyleRenderer extends TextStyleViewRenderer {
               dx = 0;
               horizontalAlignment = "left";
             }
-            final int viewWidth = view.getViewWidthPixels();
+            final double viewWidth = view.getViewWidthPixels();
             if (screenX + maxWidth > viewWidth) {
               screenX = (int)(viewWidth - maxWidth - 1);
               dx = 0;
@@ -134,7 +134,7 @@ public class Graphics2DTextStyleRenderer extends TextStyleViewRenderer {
               screenY = 1;
               dy = 0;
             }
-            final int viewHeight = view.getViewHeightPixels();
+            final double viewHeight = view.getViewHeightPixels();
             if (screenY > viewHeight) {
               screenY = viewHeight - 1 - maxHeight;
               dy = 0;

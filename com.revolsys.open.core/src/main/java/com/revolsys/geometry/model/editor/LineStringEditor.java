@@ -393,6 +393,29 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   }
 
   @Override
+  public void forEachLineVertex(final BiConsumerDouble firstPointAction,
+    final BiConsumerDouble action) {
+    if (this.coordinates == null) {
+      this.line.forEachLineVertex(firstPointAction, action);
+    } else {
+      final int vertexCount = this.vertexCount;
+      final int axisIgnoreCount = this.axisCount - 2;
+      final double[] coordinates = this.coordinates;
+      int coordinateIndex = 0;
+      final double x1 = coordinates[coordinateIndex++];
+      final double y1 = coordinates[coordinateIndex++];
+      firstPointAction.accept(x1, y1);
+      coordinateIndex += axisIgnoreCount;
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x = coordinates[coordinateIndex++];
+        final double y = coordinates[coordinateIndex++];
+        action.accept(x, y);
+        coordinateIndex += axisIgnoreCount;
+      }
+    }
+  }
+
+  @Override
   public void forEachSegment(final Consumer4Double action) {
     if (this.coordinates == null) {
       this.line.forEachSegment(action);

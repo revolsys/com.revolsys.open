@@ -233,6 +233,20 @@ public interface Lists {
     };
   }
 
+  static <V> List<V> filter(final Iterable<V> list, final Predicate<? super V> filter) {
+    if (list == null) {
+      return Collections.emptyList();
+    } else {
+      final List<V> newList = new ArrayList<>();
+      for (final V value : list) {
+        if (filter.test(value)) {
+          newList.add(value);
+        }
+      }
+      return newList;
+    }
+  }
+
   static int getClassCount(final List<?> list, final Class<?> clazz) {
     int count = 0;
     for (int i = 0; i < list.size(); i++) {

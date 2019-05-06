@@ -54,6 +54,8 @@ public class GeometryFactoryField extends BaseComboBox<Integer> implements ItemL
     GeometryFactory geometryFactory = null;
     if (value instanceof GeometryFactory) {
       geometryFactory = (GeometryFactory)value;
+    } else if (value instanceof Integer) {
+      geometryFactory = GeometryFactory.floating3d((Integer)value);
     } else if (value != null) {
       try {
         final int coordinateSystemId = Integer.parseInt(DataTypes.toString(value));

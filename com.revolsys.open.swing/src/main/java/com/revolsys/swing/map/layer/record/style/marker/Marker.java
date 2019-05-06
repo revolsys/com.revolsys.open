@@ -9,11 +9,19 @@ import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 public interface Marker extends MapSerializer {
-  default String getMarkerType() {
+  default Icon getIcon() {
     return null;
   }
 
-  default boolean isUseMarkerType() {
+  default String getName() {
+    return null;
+  }
+
+  default String getTitle() {
+    return null;
+  }
+
+  default boolean isUseMarkerName() {
     return false;
   }
 

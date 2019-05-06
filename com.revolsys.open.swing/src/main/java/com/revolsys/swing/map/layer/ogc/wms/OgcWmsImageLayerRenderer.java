@@ -53,8 +53,8 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
           }
         }
         if (reload) {
-          final int imageWidth = view.getViewWidthPixels();
-          final int imageHeight = view.getViewHeightPixels();
+          final int imageWidth = (int)Math.ceil(view.getViewWidthPixels());
+          final int imageHeight = (int)Math.ceil(view.getViewHeightPixels());
           final OgcWmsImageLayerSwingWorker worker = new OgcWmsImageLayerSwingWorker(this, view,
             queryBoundingBox, imageWidth, imageHeight);
           synchronized (this) {

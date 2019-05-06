@@ -1133,7 +1133,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
               WebColors.Blue);
             final double orientation = location.getSegment().getOrientaton();
             final Point pointOnLine = location.getViewportPoint();
-            view.drawMarker(pointOnLine, style, orientation);
+            view.drawMarker(style, pointOnLine, orientation);
           } else {
             GEOMETRY_CLOSE_VERTEX_RENDERER.paintSelected(view, graphics, geometryFactory2dFloating,
               vertex);

@@ -19,8 +19,8 @@ import org.apache.logging.log4j.core.impl.ThrowableProxy;
 import org.apache.logging.log4j.message.Message;
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 import org.jdesktop.swingx.table.TableColumnExt;
-import org.jeometry.common.logging.Logs;
 
+import com.revolsys.log.LogAppender;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.dnd.ClipboardUtil;
@@ -103,7 +103,7 @@ public class Log4jTableModel extends AbstractTableModel {
   private boolean hasNewErrors = false;
 
   public Log4jTableModel() {
-    Logs.addRootAppender(this.appender);
+    LogAppender.addRootAppender(this.appender);
     final MenuFactory menu = getMenu();
     menu.addMenuItem("all", "Delete all messages", "delete", this::clear);
     addMenuItem("selected", "Delete selected messages", "delete", (final BaseJTable table) -> {

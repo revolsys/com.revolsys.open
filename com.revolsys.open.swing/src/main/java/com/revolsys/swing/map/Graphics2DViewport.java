@@ -3,6 +3,7 @@ package com.revolsys.swing.map;
 import java.awt.Graphics2D;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
@@ -13,11 +14,16 @@ public class Graphics2DViewport extends Viewport2D implements BaseCloseable {
   public Graphics2DViewport() {
   }
 
+  public Graphics2DViewport(final Graphics2D graphics, final double width, final double height) {
+    super(null, width, height, new BoundingBoxDoubleXY(0, 0, width, height));
+    this.graphics = graphics;
+  }
+
   public Graphics2DViewport(final Project project) {
     super(project);
   }
 
-  public Graphics2DViewport(final Project project, final int width, final int height,
+  public Graphics2DViewport(final Project project, final double width, final double height,
     final BoundingBox boundingBox) {
     super(project, width, height, boundingBox);
   }

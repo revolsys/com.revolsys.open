@@ -20,11 +20,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.MapContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.Logger;
-import org.apache.logging.log4j.core.appender.FileAppender;
-import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.jeometry.common.logging.Logs;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.MethodInvocationException;
@@ -37,6 +32,7 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
 import com.revolsys.collection.map.ThreadSharedProperties;
+import com.revolsys.log.LogAppender;
 import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.ManifestUtil;
@@ -292,17 +288,11 @@ public class ScriptTool {
 
     if (this.logFile != null) {
 
-      final Logger rootLogger = (Logger)LogManager.getRootLogger();
       try {
-        final PatternLayout layout = PatternLayout.newBuilder().withPattern("%d\t%p\t%m%n").build();
-        final Appender appender = FileAppender.newBuilder() //
-          .withLayout(layout) //
-          .withFileName(this.logFile.getAbsolutePath()) //
-          .withAppend(false) //
-          .build();
-        rootLogger.addAppender(appender);
+        LogAppender.addRootFileAppender(this.logFile, "%d\t%p\t%m%n", false);
+
       } catch (final Exception e) {
-        Logs.addRootAppender("%p\t%m%n");
+        LogAppender.addRootAppender("%p\t%m%n");
         Logs.error(this, "Cannot find log file " + this.logFile, e);
       }
 

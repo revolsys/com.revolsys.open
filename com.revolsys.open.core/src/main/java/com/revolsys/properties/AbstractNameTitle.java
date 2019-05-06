@@ -35,8 +35,13 @@ public abstract class AbstractNameTitle extends BaseObjectWithPropertiesAndChang
     return this.title;
   }
 
-  public String getTypeName() {
-    return "symbolGroup";
+  @Override
+  public int hashCode() {
+    if (this.name != null) {
+      return this.name.hashCode();
+    } else {
+      return super.hashCode();
+    }
   }
 
   public void setName(final String name) {

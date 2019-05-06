@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.symbol;
+package com.revolsys.swing.map.layer.record.style.marker;
 
 import java.util.Map;
 
@@ -6,42 +6,41 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.AbstractNameTitle;
 
-public abstract class AbstractSymbolElement extends AbstractNameTitle implements MapSerializer {
+public abstract class AbstractMarkerGroupElement extends AbstractNameTitle implements MapSerializer {
 
-  private SymbolGroup parent;
+  private MarkerGroup parent;
 
-  public AbstractSymbolElement() {
+  public AbstractMarkerGroupElement() {
   }
 
-  public AbstractSymbolElement(final Map<String, ? extends Object> properties) {
+  public AbstractMarkerGroupElement(final Map<String, ? extends Object> properties) {
     setProperties(properties);
   }
 
-  public AbstractSymbolElement(final String name) {
+  public AbstractMarkerGroupElement(final String name) {
     super(name);
   }
 
-  public AbstractSymbolElement(final String name, final String title) {
+  public AbstractMarkerGroupElement(final String name, final String title) {
     super(name, title);
   }
 
-  public SymbolGroup getParent() {
+  public MarkerGroup getParent() {
     return this.parent;
   }
 
-  public SymbolLibrary getSymbolLibrary() {
-    final SymbolGroup parent = getParent();
+  public MarkerLibrary getMarkerLibrary() {
+    final MarkerGroup parent = getParent();
     if (parent == null) {
       return null;
     } else {
-      return parent.getSymbolLibrary();
+      return parent.getMarkerLibrary();
     }
   }
 
-  @Override
   public abstract String getTypeName();
 
-  public void setParent(final SymbolGroup parent) {
+  public void setParent(final MarkerGroup parent) {
     this.parent = parent;
   }
 

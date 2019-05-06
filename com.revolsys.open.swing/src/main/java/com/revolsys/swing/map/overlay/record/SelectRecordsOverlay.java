@@ -43,7 +43,7 @@ import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.BackgroundRefreshResource;
 import com.revolsys.swing.map.overlay.CloseLocation;
-import com.revolsys.swing.map.overlay.LayerRendererOverlay;
+import com.revolsys.swing.map.overlay.MapOverlay;
 import com.revolsys.swing.map.overlay.VertexStyleRenderer;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.map.view.ViewRenderer;
@@ -127,7 +127,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   public void addSelectedRecords(final BoundingBox boundingBox) {
     final LayerGroup project = getProject();
     addSelectedRecords(project, boundingBox);
-    final LayerRendererOverlay overlay = getMap().getLayerOverlay();
+    final MapOverlay overlay = getMap().getLayerOverlay();
     overlay.redraw();
   }
 
@@ -293,6 +293,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
+  @Override
   public void redraw() {
     this.imageSelected.refresh();
   }
@@ -312,13 +313,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
         if (recordLayer.isSelectable()) {
           final List<LayerRecord> selectedRecords = recordLayer.getSelectedRecords();
-          for (final LayerRecord record : selectedRecords) {
-            if (record != null && recordLayer.isVisible(record)) {
-              if (!recordLayer.isDeleted(record)) {
-                layerRenderer.renderSelectedRecord(view, recordLayer, record);
-              }
-            }
-          }
+          layerRenderer.renderSelectedRecords(view, recordLayer, selectedRecords);
         }
       }
     }
@@ -327,8 +322,8 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private GeoreferencedImage refreshImageSelected(final Cancellable cancellable) {
     final Viewport2D viewport = getViewport();
     if (viewport != null) {
-      final int width = viewport.getViewWidthPixels();
-      final int height = viewport.getViewHeightPixels();
+      final double width = viewport.getViewWidthPixels();
+      final double height = viewport.getViewHeightPixels();
       if (width > 0 && height > 0) {
         try (
           final ImageViewport imageViewport = new ImageViewport(viewport,
@@ -447,7 +442,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       BaseCloseable closeable = this.selectingRecords.closeable(true)) {
       final LayerGroup project = getProject();
       selectRecords(project, boundingBox);
-      final LayerRendererOverlay overlay = getMap().getLayerOverlay();
+      final MapOverlay overlay = getMap().getLayerOverlay();
       overlay.redraw();
       redrawAndRepaint();
     }
@@ -513,7 +508,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   public void unSelectRecords(final BoundingBox boundingBox) {
     final LayerGroup project = getProject();
     unSelectRecords(project, boundingBox);
-    final LayerRendererOverlay overlay = getMap().getLayerOverlay();
+    final MapOverlay overlay = getMap().getLayerOverlay();
     overlay.redraw();
   }
 

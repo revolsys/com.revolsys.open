@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.jeometry.common.function.SupplierWithProperties;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
@@ -22,6 +21,7 @@ import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.record.query.Query;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
+import com.revolsys.util.SupplierWithProperties;
 import com.revolsys.webservice.WebServiceResource;
 
 public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
