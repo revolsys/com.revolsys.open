@@ -4,26 +4,20 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Fonts;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class TextMarker extends AbstractMarker {
+
   private String text = "?";
 
   private Font font;
@@ -123,65 +117,8 @@ public class TextMarker extends AbstractMarker {
   }
 
   @Override
-  public void render(final Graphics2DViewRenderer view, final Graphics2D graphics,
-    final MarkerStyle style, final double modelX, final double modelY, double orientation) {
-    try (
-      BaseCloseable transformCloseable = view.useViewCoordinates()) {
-      final Quantity<Length> markerHeight = style.getMarkerHeight();
-      final double mapHeight = view.toDisplayValue(markerHeight);
-      final String orientationType = style.getMarkerOrientationType();
-      if ("none".equals(orientationType)) {
-        orientation = 0;
-      }
-      final int fontSize = (int)mapHeight;
-      if (this.font == null || this.font.getSize() != fontSize) {
-        this.font = Fonts.newFont(this.textFaceName, 0, fontSize);
-      }
-
-      final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
-      final GlyphVector glyphVector = this.font.createGlyphVector(fontRenderContext, this.text);
-      final Shape shape = glyphVector.getOutline();
-      final GeneralPath newShape = new GeneralPath(shape);
-      final Rectangle2D bounds = newShape.getBounds2D();
-      final double shapeWidth = bounds.getWidth();
-      final double shapeHeight = bounds.getHeight();
-
-      view.translateModelToViewCoordinates(modelX, modelY);
-      final double markerOrientation = style.getMarkerOrientation();
-      orientation = -orientation + markerOrientation;
-      if (orientation != 0) {
-        graphics.rotate(Math.toRadians(orientation));
-      }
-
-      final Quantity<Length> deltaX = style.getMarkerDx();
-      final Quantity<Length> deltaY = style.getMarkerDy();
-      double dx = view.toDisplayValue(deltaX);
-      double dy = view.toDisplayValue(deltaY);
-      dy -= bounds.getY();
-      final String verticalAlignment = style.getMarkerVerticalAlignment();
-      if ("bottom".equals(verticalAlignment)) {
-        dy -= shapeHeight;
-      } else if ("auto".equals(verticalAlignment) || "middle".equals(verticalAlignment)) {
-        dy -= shapeHeight / 2.0;
-      }
-      final String horizontalAlignment = style.getMarkerHorizontalAlignment();
-      if ("right".equals(horizontalAlignment)) {
-        dx -= shapeWidth;
-      } else if ("auto".equals(horizontalAlignment) || "center".equals(horizontalAlignment)) {
-        dx -= shapeWidth / 2;
-      }
-      graphics.translate(dx, dy);
-
-      if (style.setMarkerFillStyle(view, graphics)) {
-
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-          RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-          RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-        graphics.setFont(this.font);
-        graphics.drawString(this.text, 0, 0);
-      }
-    }
+  public MarkerRenderer newMarkerRenderer(final ViewRenderer view, final MarkerStyle style) {
+    return view.newMarkerRendererText(this, style);
   }
 
   public void setText(final String text) {

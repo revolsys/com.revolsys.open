@@ -22,8 +22,6 @@ public class Graphics2DTranscoder extends SVGAbstractTranscoder {
   @Override
   protected void transcode(final Document document, final String uri, final TranscoderOutput output)
     throws TranscoderException {
-
-    // Sets up root, curTxf & curAoi
     super.transcode(document, uri, output);
     this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);

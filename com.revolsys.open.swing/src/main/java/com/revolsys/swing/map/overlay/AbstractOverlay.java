@@ -6,7 +6,6 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Shape;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -14,8 +13,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -32,6 +29,7 @@ import java.util.TreeMap;
 import javax.swing.JComponent;
 import javax.swing.undo.UndoableEdit;
 
+import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.number.Doubles;
 
@@ -55,6 +53,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.Booleans;
@@ -272,15 +271,10 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
         graphics.setXORMode(Color.WHITE);
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
-          final Point2D screenPoint = this.viewport.toViewPoint(point);
+          final MarkerStyle markerStyle = MarkerStyle.marker("circle", getHotspotPixels() * 2,
+            WebColors.Blue, 0, WebColors.Blue);
 
-          final double x = screenPoint.getX() - getHotspotPixels();
-          final double y = screenPoint.getY() - getHotspotPixels();
-          final int diameter = 2 * getHotspotPixels();
-          final Shape shape = new Ellipse2D.Double(x, y, diameter, diameter);
-
-          graphics.setPaint(new Color(0, 0, 255));
-          graphics.fill(shape);
+          this.view.renderMarker(markerStyle, point);
         } else {
           XOR_LINE_STYLE.setLineCap(LineCap.BUTT);
           this.view.drawGeometry(geometry, XOR_LINE_STYLE);

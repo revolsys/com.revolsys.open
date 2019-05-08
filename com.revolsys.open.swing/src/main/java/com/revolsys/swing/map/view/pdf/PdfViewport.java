@@ -111,6 +111,10 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     }
   }
 
+  public PDDocument getDocument() {
+    return this.document;
+  }
+
   protected PDFont getFont(final String path) throws IOException {
     PDFont font = this.fonts.get(path);
     if (font == null) {

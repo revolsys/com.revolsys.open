@@ -1,12 +1,20 @@
 package com.revolsys.swing.map.layer.record.style.marker;
 
-import java.awt.Graphics2D;
-
+import javax.measure.quantity.Length;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
+
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
+
+import tec.uom.se.ComparableQuantity;
+import tec.uom.se.quantity.Quantities;
 
 public interface Marker extends MapSerializer {
   default Icon getIcon() {
@@ -25,8 +33,27 @@ public interface Marker extends MapSerializer {
     return false;
   }
 
-  Icon newIcon(MarkerStyle style);
+  default Icon newIcon(MarkerStyle style) {
+    style = style.clone();
+    final ComparableQuantity<Length> size = Quantities.getQuantity(15, CustomUnits.PIXEL);
+    style.setMarkerWidth(size);
+    style.setMarkerHeight(size);
+    try (
+      final ImageViewport viewport = new ImageViewport(16, 16)) {
+      final ViewRenderer view = viewport.newViewRenderer();
+      final MarkerRenderer markerRenderer = newMarkerRenderer(view, style);
+      markerRenderer.renderMarkerPoint(new PointDoubleXY(8, 8));
+      return new ImageIcon(viewport.getImage());
+    }
+  }
 
-  void render(Graphics2DViewRenderer view, Graphics2D graphics, MarkerStyle style, double modelX,
-    double modelY, double orientation);
+  MarkerRenderer newMarkerRenderer(ViewRenderer view, MarkerStyle style);
+
+  default void renderPoints(final ViewRenderer view, final MarkerStyle style,
+    final Iterable<? extends Point> points) {
+    try (
+      MarkerRenderer markerRenderer = newMarkerRenderer(view, style)) {
+      markerRenderer.renderMarkers(points);
+    }
+  }
 }

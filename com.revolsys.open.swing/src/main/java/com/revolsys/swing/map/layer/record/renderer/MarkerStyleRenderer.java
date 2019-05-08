@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
 import java.beans.PropertyChangeEvent;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -13,6 +14,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.layer.record.style.panel.MarkerStylePanel;
 import com.revolsys.swing.map.view.ViewRenderer;
 
@@ -82,7 +84,22 @@ public class MarkerStyleRenderer extends AbstractGeometryRecordLayerRenderer {
   @Override
   protected void renderRecord(final ViewRenderer view, final AbstractRecordLayer layer,
     final LayerRecord record, final Geometry geometry) {
-    view.drawMarker(geometry, this.style);
+  }
+
+  @Override
+  protected void renderRecordsDo(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
+    if (!records.isEmpty()) {
+      try (
+        MarkerRenderer renderer = this.style.newMarkerRenderer(view)) {
+        for (final LayerRecord record : view.cancellable(records)) {
+          if (isVisible(record)) {
+            final Geometry geometry = record.getGeometry();
+            renderer.renderMarkerGeometry(geometry);
+          }
+        }
+      }
+    }
   }
 
   @Override

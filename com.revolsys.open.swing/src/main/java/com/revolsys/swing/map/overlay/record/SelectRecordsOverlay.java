@@ -256,11 +256,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       for (final LayerRecord record : closeSelectedRecords) {
         final Geometry geometry = record.getGeometry();
         if (record.isHighlighted()) {
-          this.highlightVertexRenderer.paintSelected(view, graphics, viewportGeometryFactory,
-            geometry);
+          this.highlightVertexRenderer.paintSelected(view, geometry);
         } else {
-          this.selectVertexRenderer.paintSelected(view, graphics, viewportGeometryFactory,
-            geometry);
+          this.selectVertexRenderer.paintSelected(view, geometry);
         }
       }
     }

@@ -232,6 +232,15 @@ public interface GeometryCollection extends Geometry {
   void forEachGeometry(Consumer<Geometry> action);
 
   @Override
+  default <G extends Geometry> void forEachGeometryComponent(final Class<G> geometryClass,
+    final Consumer<G> action) {
+    Geometry.super.forEachGeometryComponent(geometryClass, action);
+    for (final Geometry geometry : geometries()) {
+      geometry.forEachGeometryComponent(geometryClass, action);
+    }
+  }
+
+  @Override
   default Iterable<Geometry> geometries() {
     return getGeometries();
   }

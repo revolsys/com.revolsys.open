@@ -1,24 +1,16 @@
 package com.revolsys.swing.map.layer.record.style.marker;
 
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.util.List;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 import org.jeometry.common.function.BiFunctionDouble;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.BaseCloseable;
-import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class GeometryMarker extends AbstractMarker {
+
   private static final MarkerLibrary LIBRARY = MarkerLibrary.newLibrary("shapes", "Shapes");
 
   static {
@@ -199,57 +191,13 @@ public class GeometryMarker extends AbstractMarker {
     return true;
   }
 
-  @Override
-  public Icon newIcon(final MarkerStyle style) {
-    final Geometry geometry = newMarker(15, 15);
-
-    try (
-      final ImageViewport viewport = new ImageViewport(16, 16)) {
-      final Graphics2DViewRenderer view = viewport.newViewRenderer();
-      final Graphics2D graphics = view.getGraphics();
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      if (style.setMarkerFillStyle(view, graphics)) {
-        view.fillMarker(geometry);
-      }
-      if (style.setMarkerLineStyle(view, graphics)) {
-        view.drawMarker(geometry);
-      }
-      graphics.dispose();
-      return new ImageIcon(viewport.getImage());
-    }
-  }
-
   public Geometry newMarker(final double width, final double height) {
     return this.newMarkerFunction.accept(width, height);
   }
 
   @Override
-  public void render(final Graphics2DViewRenderer view, final Graphics2D graphics,
-    final MarkerStyle style, final double modelX, final double modelY, double orientation) {
-    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-    try (
-      BaseCloseable closable = view.useViewCoordinates()) {
-      final Quantity<Length> markerWidth = style.getMarkerWidth();
-      final double mapWidth = view.toDisplayValue(markerWidth);
-      final Quantity<Length> markerHeight = style.getMarkerHeight();
-      final double mapHeight = view.toDisplayValue(markerHeight);
-      final String orientationType = style.getMarkerOrientationType();
-      if ("none".equals(orientationType)) {
-        orientation = 0;
-      }
-
-      view.translateMarker(style, modelX, modelY, mapWidth, mapHeight, orientation);
-
-      final Geometry geometry = newMarker(mapWidth, mapHeight);
-
-      if (style.setMarkerFillStyle(view, graphics)) {
-        view.fillMarker(geometry);
-      }
-      if (style.setMarkerLineStyle(view, graphics)) {
-        view.drawMarker(geometry);
-      }
-    }
+  public MarkerRenderer newMarkerRenderer(final ViewRenderer view, final MarkerStyle style) {
+    return view.newMarkerRendererGeometry(this, style);
   }
 
 }

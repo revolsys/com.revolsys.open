@@ -4,9 +4,11 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -17,27 +19,45 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
 import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.PDLineDashPattern;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
+import org.apache.pdfbox.util.Matrix;
+import org.jeometry.common.exception.Exceptions;
+import org.w3c.dom.Document;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
+import com.revolsys.swing.Fonts;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
+import com.revolsys.swing.map.layer.record.style.marker.AbstractMarkerRenderer;
+import com.revolsys.swing.map.layer.record.style.marker.GeometryMarker;
+import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
+import com.revolsys.swing.map.layer.record.style.marker.SvgBufferedImageTranscoder;
+import com.revolsys.swing.map.layer.record.style.marker.SvgMarker;
+import com.revolsys.swing.map.layer.record.style.marker.TextMarker;
 import com.revolsys.swing.map.view.TextStyleViewRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
@@ -45,6 +65,242 @@ import com.revolsys.util.Property;
 import tec.uom.se.quantity.Quantities;
 
 public class PdfViewRenderer extends ViewRenderer {
+  private abstract class PdfMarkerRenderer extends AbstractMarkerRenderer {
+    protected final Matrix matrix = new Matrix();
+
+    private final double minX;
+
+    private final double minY;
+
+    private final double modelUnitsPerViewUnit;
+
+    public PdfMarkerRenderer(final MarkerStyle style) {
+      super(PdfViewRenderer.this, style);
+      this.minX = PdfViewRenderer.this.boundingBox.getMinX();
+      this.minY = PdfViewRenderer.this.boundingBox.getMinY();
+      this.modelUnitsPerViewUnit = PdfViewRenderer.this.viewport.getModelUnitsPerViewUnit();
+    }
+
+    @Override
+    protected void renderMarkerDo() {
+      try {
+        final PDPageContentStream contentStream = PdfViewRenderer.this.contentStream;
+        contentStream.saveGraphicsState();
+        setMarkerStyle(this.style);
+
+        contentStream.setStrokingColor(this.style.getMarkerLineColor());
+        contentStream.setNonStrokingColor(this.style.getMarkerFill());
+
+        contentStream.transform(this.matrix);
+        renderMarkerDo(contentStream);
+
+        if (this.fill) {
+          if (this.stroke) {
+            contentStream.fillAndStroke();
+          } else {
+            contentStream.fill();
+          }
+        } else {
+          if (this.stroke) {
+            contentStream.stroke();
+          }
+        }
+
+        contentStream.restoreGraphicsState();
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    }
+
+    protected void renderMarkerDo(final PDPageContentStream contentStream) throws IOException {
+
+    }
+
+    @Override
+    protected void translateDo(final double x, final double y, final double orientation,
+      final double dx, final double dy) {
+      final float viewX = (float)((x - this.minX) / this.modelUnitsPerViewUnit);
+      final float viewY = (float)((y - this.minY) / this.modelUnitsPerViewUnit);
+
+      this.matrix.reset();
+      this.matrix.translate(viewX, viewY);
+      if (orientation != 0) {
+        this.matrix.rotate(Math.toRadians(360 - orientation));
+      }
+      this.matrix.translate((float)dx, (float)dy);
+    }
+  }
+
+  private class PdfMarkerRendererEllipse extends PdfMarkerRenderer {
+
+    public PdfMarkerRendererEllipse(final MarkerStyle style) {
+      super(style);
+    }
+
+    @Override
+    protected void renderMarkerDo() {
+    }
+  }
+
+  private class PdfMarkerRendererGeometry extends PdfMarkerRenderer {
+    private final Geometry geometry;
+
+    public PdfMarkerRendererGeometry(final GeometryMarker marker, final MarkerStyle style) {
+      super(style);
+      this.geometry = marker.newMarker(this.mapWidth, this.mapHeight);
+    }
+
+    @Override
+    protected void renderMarkerDo(final PDPageContentStream contentStream) throws IOException {
+      renderMarkerGeometryDo(contentStream, this.geometry);
+    }
+
+    private void renderMarkerGeometryDo(final PDPageContentStream contentStream,
+      final Geometry geometry) throws IOException {
+
+      if (geometry.isGeometryCollection()) {
+        for (int i = 0; i < geometry.getGeometryCount(); i++) {
+          final Geometry part = geometry.getGeometry(i);
+          renderMarkerGeometryDo(contentStream, part);
+        }
+      } else if (geometry instanceof LineString) {
+        final LineString line = (LineString)geometry;
+        drawLine(contentStream, line);
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        drawPolygon(contentStream, polygon);
+      }
+    }
+  }
+
+  private class PdfMarkerRendererImage extends PdfMarkerRenderer {
+    private final Image image;
+
+    public PdfMarkerRendererImage(final ImageMarker imageMarker, final MarkerStyle style) {
+      super(style);
+      this.image = imageMarker.getImage();
+    }
+
+    @Override
+    protected void renderMarkerDo() {
+      if (this.image != null) {
+        renderMarkerImage(this.image, this.mapWidth, this.mapHeight);
+      }
+    }
+  }
+
+  private class PdfMarkerRendererRectangle extends PdfMarkerRenderer {
+
+    public PdfMarkerRendererRectangle(final MarkerStyle style) {
+      super(style);
+    }
+
+    @Override
+    protected void renderMarkerDo(final PDPageContentStream contentStream) throws IOException {
+      contentStream.addRect(0, 0, (float)this.mapWidth, (float)this.mapHeight);
+    }
+  }
+
+  private class PdfMarkerRendererSvg extends PdfMarkerRenderer {
+
+    private final BufferedImage image;
+
+    public PdfMarkerRendererSvg(final SvgMarker marker, final MarkerStyle style) {
+      super(style);
+      final Document document = marker.getDocument();
+      if (document == null) {
+        this.image = null;
+      } else {
+        final String uri = marker.getUri();
+        this.image = SvgBufferedImageTranscoder.newImage(document, uri,
+          (int)Math.round(this.mapWidth), (int)Math.round(this.mapHeight));
+      }
+    }
+
+    @Override
+    protected void renderMarkerDo() {
+      // if (this.image != null) {
+      // PdfViewRenderer.this.graphics.drawImage(this.image, 0, 0, null);
+      // }
+    }
+  }
+
+  private class PdfMarkerRendererText extends PdfMarkerRenderer {
+
+    private final Font font;
+
+    private final String text;
+
+    public PdfMarkerRendererText(final TextMarker textMarker, final MarkerStyle style) {
+      super(style);
+      final int fontSize = (int)this.mapHeight;
+      this.font = Fonts.newFont(textMarker.getTextFaceName(), 0, fontSize);
+      this.text = textMarker.getText();
+    }
+
+    @Override
+    public void renderMarker(final double modelX, final double modelY, final double orientation) {
+      // final MarkerStyle style = this.style;
+      // // TODO
+      // final Graphics2D graphics = getGraphics();
+      // try (
+      // BaseCloseable transformCloseable = useViewCoordinates()) {
+      // final String orientationType = style.getMarkerOrientationType();
+      // if ("none".equals(orientationType)) {
+      // orientation = 0;
+      // }
+      //
+      // final FontRenderContext fontRenderContext =
+      // graphics.getFontRenderContext();
+      // final GlyphVector glyphVector =
+      // this.font.createGlyphVector(fontRenderContext, this.text);
+      // final Shape shape = glyphVector.getOutline();
+      // final GeneralPath newShape = new GeneralPath(shape);
+      // final Rectangle2D bounds = newShape.getBounds2D();
+      // final double shapeWidth = bounds.getWidth();
+      // final double shapeHeight = bounds.getHeight();
+      //
+      // translateModelToViewCoordinates(modelX, modelY);
+      // final double markerOrientation = style.getMarkerOrientation();
+      // orientation = -orientation + markerOrientation;
+      // if (orientation != 0) {
+      // graphics.rotate(Math.toRadians(orientation));
+      // }
+      //
+      // final Quantity<Length> deltaX = style.getMarkerDx();
+      // final Quantity<Length> deltaY = style.getMarkerDy();
+      // double dx = toDisplayValue(deltaX);
+      // double dy = toDisplayValue(deltaY);
+      // dy -= bounds.getY();
+      // final String verticalAlignment = style.getMarkerVerticalAlignment();
+      // if ("bottom".equals(verticalAlignment)) {
+      // dy -= shapeHeight;
+      // } else if ("auto".equals(verticalAlignment) ||
+      // "middle".equals(verticalAlignment)) {
+      // dy -= shapeHeight / 2.0;
+      // }
+      // final String horizontalAlignment =
+      // style.getMarkerHorizontalAlignment();
+      // if ("right".equals(horizontalAlignment)) {
+      // dx -= shapeWidth;
+      // } else if ("auto".equals(horizontalAlignment) ||
+      // "center".equals(horizontalAlignment)) {
+      // dx -= shapeWidth / 2;
+      // }
+      // graphics.translate(dx, dy);
+      //
+      // if (style.setMarkerFillStyle(PdfViewRenderer.this, graphics)) {
+      //
+      // graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+      // RenderingHints.VALUE_ANTIALIAS_ON);
+      // graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+      // RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+      // graphics.setFont(this.font);
+      // graphics.drawString(this.text, 0, 0);
+      // }
+      // }
+    }
+  }
 
   private final PDPageContentStream contentStream;
 
@@ -56,63 +312,60 @@ public class PdfViewRenderer extends ViewRenderer {
 
   private final PDPage page;
 
+  private boolean useViewCoordinates;
+
+  private final BaseCloseable useViewCoordinatesCloseable = () -> {
+    this.useViewCoordinates = false;
+  };
+
+  private final double[] coordinates = new double[2];
+
+  private final PDDocument document;
+
   public PdfViewRenderer(final PdfViewport viewport, final PDPageContentStream contentStream) {
     super(viewport);
     this.contentStream = contentStream;
     this.page = viewport.getPage();
+    this.document = viewport.getDocument();
     setShowHiddenRecords(true);
     updateFields();
   }
 
   @Override
+  public BaseCloseable applyMarkerStyle(final MarkerStyle style) {
+    // TODO Auto-generated method stub
+    return () -> {
+    };
+  }
+
+  @Override
   public void drawGeometry(final Geometry geometry, final GeometryStyle style) {
+    final PDPageContentStream contentStream = this.contentStream;
     try {
-      this.contentStream.saveGraphicsState();
+      contentStream.saveGraphicsState();
       setGeometryStyle(style);
-      this.contentStream.setNonStrokingColor(style.getPolygonFill());
-      this.contentStream.setStrokingColor(style.getLineColor());
+      contentStream.setNonStrokingColor(style.getPolygonFill());
+      contentStream.setStrokingColor(style.getLineColor());
 
       for (Geometry part : geometry.geometries()) {
         part = part.convertGeometry(getGeometryFactory());
         if (part instanceof LineString) {
           final LineString line = (LineString)part;
 
-          drawLinePdf(line);
-          this.contentStream.stroke();
+          drawLine(contentStream, line);
+          contentStream.stroke();
         } else if (part instanceof Polygon) {
           final Polygon polygon = (Polygon)part;
 
-          int i = 0;
-          for (final LinearRing ring : polygon.rings()) {
-            if (i == 0) {
-              if (ring.isClockwise()) {
-                drawLineReverse(ring);
-              } else {
-                drawLinePdf(ring);
-              }
-            } else {
-              if (ring.isCounterClockwise()) {
-                drawLineReverse(ring);
-              } else {
-                drawLinePdf(ring);
-              }
-            }
-            this.contentStream.closeSubPath();
-            i++;
-          }
-          this.contentStream.fill(PathIterator.WIND_NON_ZERO);
-          for (final LinearRing ring : polygon.rings()) {
-
-            drawLinePdf(ring);
-            this.contentStream.stroke();
-          }
+          drawPolygon(contentStream, polygon);
+          contentStream.fillAndStroke();
         }
       }
 
     } catch (final IOException e) {
     } finally {
       try {
-        this.contentStream.restoreGraphicsState();
+        contentStream.restoreGraphicsState();
       } catch (final IOException e) {
       }
     }
@@ -120,52 +373,33 @@ public class PdfViewRenderer extends ViewRenderer {
 
   @Override
   public void drawGeometryOutline(final GeometryStyle style, final Geometry geometry) {
+    final PDPageContentStream contentStream = this.contentStream;
     try {
-      this.contentStream.saveGraphicsState();
+      contentStream.saveGraphicsState();
       setGeometryStyle(style);
-      this.contentStream.setNonStrokingColor(style.getPolygonFill());
-      this.contentStream.setStrokingColor(style.getLineColor());
+      contentStream.setNonStrokingColor(style.getPolygonFill());
+      contentStream.setStrokingColor(style.getLineColor());
 
       for (Geometry part : geometry.geometries()) {
         part = part.convertGeometry(getGeometryFactory());
         if (part instanceof LineString) {
           final LineString line = (LineString)part;
 
-          drawLinePdf(line);
-          this.contentStream.stroke();
+          drawLine(contentStream, line);
+          contentStream.stroke();
         } else if (part instanceof Polygon) {
           final Polygon polygon = (Polygon)part;
 
-          int i = 0;
           for (final LinearRing ring : polygon.rings()) {
-            if (i == 0) {
-              if (ring.isClockwise()) {
-                drawLineReverse(ring);
-              } else {
-                drawLinePdf(ring);
-              }
-            } else {
-              if (ring.isCounterClockwise()) {
-                drawLineReverse(ring);
-              } else {
-                drawLinePdf(ring);
-              }
-            }
-            this.contentStream.closeSubPath();
-            i++;
+            drawLine(contentStream, ring);
           }
-          for (final LinearRing ring : polygon.rings()) {
-
-            drawLinePdf(ring);
-            this.contentStream.stroke();
-          }
+          contentStream.stroke();
         }
       }
-
     } catch (final IOException e) {
     } finally {
       try {
-        this.contentStream.restoreGraphicsState();
+        contentStream.restoreGraphicsState();
       } catch (final IOException e) {
       }
     }
@@ -173,102 +407,163 @@ public class PdfViewRenderer extends ViewRenderer {
 
   @Override
   public void drawImage(final GeoreferencedImage image, final boolean useTransform) {
-    // TODO Auto-generated method stub
+    drawImage(image, useTransform, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
   }
 
   @Override
   public void drawImage(final GeoreferencedImage image, final boolean useTransform,
     final double alpha, final Object interpolationMethod) {
-    // TODO Auto-generated method stub
+    // if (image != null) {
+    // final Composite composite = this.graphics.getComposite();
+    // try {
+    // AlphaComposite alphaComposite = AlphaComposite.SrcOver;
+    // if (alpha < 1) {
+    // alphaComposite = alphaComposite.derive((float)alpha);
+    // }
+    // this.graphics.setComposite(alphaComposite);
+    // drawImage(image, useTransform, interpolationMethod);
+    // } finally {
+    // this.graphics.setComposite(composite);
+    // }
+    // }
   }
 
   @Override
   public void drawImage(final GeoreferencedImage image, final boolean useTransform,
     final Object interpolationMethod) {
-    // TODO Auto-generated method stub
+    if (image != null) {
+      try (
+        BaseCloseable transformCloseable = useViewCoordinates()) {
+        final BoundingBox viewBoundingBox = getBoundingBox();
+        final int viewWidth = (int)Math.ceil(getViewWidthPixels());
+        final int viewHeight = (int)Math.ceil(getViewHeightPixels());
+        image.drawImage((renderedImage, imageBoundingBox, geoTransform) -> {
+          try {
+            final int imageWidth = renderedImage.getWidth();
+            final int imageHeight = renderedImage.getHeight();
+            final GeometryFactory viewGeometryFactory = viewBoundingBox.getGeometryFactory();
+            imageBoundingBox = imageBoundingBox.bboxToCs(viewGeometryFactory);
+            final double scaleFactor = viewWidth / viewBoundingBox.getWidth();
+
+            final double imageMinX = imageBoundingBox.getMinX();
+            final double viewMinX = viewBoundingBox.getMinX();
+            final double screenX = (imageMinX - viewMinX) * scaleFactor;
+
+            final double imageMinY = imageBoundingBox.getMinY();
+            final double viewMinY = viewBoundingBox.getMinY();
+            final double screenY = (imageMinY - viewMinY) * scaleFactor;
+
+            final double imageModelWidth = imageBoundingBox.getWidth();
+            final int imageScreenWidth = (int)Math.ceil(imageModelWidth * scaleFactor);
+
+            final double imageModelHeight = imageBoundingBox.getHeight();
+            final int imageScreenHeight = (int)Math.ceil(imageModelHeight * scaleFactor);
+
+            if (imageScreenWidth > 0 && imageScreenHeight > 0) {
+              if (imageScreenWidth > 0 && imageScreenHeight > 0) {
+                final double scaleX = (double)imageScreenWidth / imageWidth;
+                final double scaleY = (double)imageScreenHeight / imageHeight;
+                final AffineTransform imageTransform = new AffineTransform(scaleX, 0, 0, scaleY,
+                  screenX, screenY);
+
+                if (useTransform) {
+                  imageTransform.concatenate(geoTransform);
+                }
+                final Matrix matrix = new Matrix(imageTransform);
+                final PDImageXObject pdfImage = LosslessFactory.createFromImage(this.document,
+                  (BufferedImage)renderedImage);
+                final PDPageContentStream contentStream = this.contentStream;
+                contentStream.saveGraphicsState();
+                contentStream.transform(matrix);
+                contentStream.drawImage(pdfImage, 0f, 0f);
+                contentStream.restoreGraphicsState();
+              }
+            }
+
+          } catch (final IOException e) {
+            throw Exceptions.wrap(e);
+          }
+        }, viewBoundingBox, viewWidth, viewHeight, useTransform);
+      }
+    }
   }
 
-  private void drawLinePdf(final LineString line) throws IOException {
+  private void drawLine(final PDPageContentStream contentStream, final LineString line)
+    throws IOException {
     for (int i = 0; i < line.getVertexCount(); i++) {
       final double modelX = line.getX(i);
       final double modelY = line.getY(i);
       final double[] viewCoordinates = toViewCoordinates(modelX, modelY);
       final float viewX = (float)viewCoordinates[0];
-      final float viewY = (float)(getViewHeightPixels() - viewCoordinates[1]);
+      final float viewY = (float)viewCoordinates[1];
       if (i == 0) {
-        this.contentStream.moveTo(viewX, viewY);
+        contentStream.moveTo(viewX, viewY);
       } else {
-        this.contentStream.lineTo(viewX, viewY);
+        contentStream.lineTo(viewX, viewY);
       }
     }
   }
 
-  private void drawLineReverse(final LineString line) throws IOException {
+  private void drawLineReverse(final PDPageContentStream contentStream, final LineString line)
+    throws IOException {
     final int toVertexIndex = line.getVertexCount() - 1;
     for (int i = toVertexIndex; i >= 0; i--) {
       final double modelX = line.getX(i);
       final double modelY = line.getY(i);
       final double[] viewCoordinates = toViewCoordinates(modelX, modelY);
       final float viewX = (float)viewCoordinates[0];
-      final float viewY = (float)(getViewHeightPixels() - viewCoordinates[1]);
+      final float viewY = (float)viewCoordinates[1];
       if (i == toVertexIndex) {
-        this.contentStream.moveTo(viewX, viewY);
+        contentStream.moveTo(viewX, viewY);
       } else {
-        this.contentStream.lineTo(viewX, viewY);
+        contentStream.lineTo(viewX, viewY);
       }
     }
   }
 
   @Override
   public void drawLines(final GeometryStyle style, final Iterable<LineString> lines) {
+    final PDPageContentStream contentStream = this.contentStream;
     try {
-      this.contentStream.saveGraphicsState();
+      contentStream.saveGraphicsState();
       setGeometryStyle(style);
-      this.contentStream.setStrokingColor(style.getLineColor());
+      contentStream.setStrokingColor(style.getLineColor());
 
       for (final LineString line : lines) {
-        drawLinePdf(line);
+        drawLine(contentStream, line);
+        contentStream.stroke();
       }
+      contentStream.restoreGraphicsState();
     } catch (final IOException e) {
-    } finally {
-      try {
-        this.contentStream.restoreGraphicsState();
-      } catch (final IOException e) {
-      }
-    }
-  }
-
-  @Override
-  public void drawMarker(final Geometry geometry) {
-    if (geometry.isGeometryCollection()) {
-      for (int i = 0; i < geometry.getGeometryCount(); i++) {
-        final Geometry part = geometry.getGeometry(i);
-        drawMarker(part);
-      }
-    } else if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
-      try {
-        this.contentStream.saveGraphicsState();
-        // setGeometryStyle(style);
-        // this.contentStream.setStrokingColor(style.getLineColor());
-        // TODO
-        for (final LineString line : polygon.getRings()) {
-          drawLinePdf(line);
-        }
-      } catch (final IOException e) {
-      } finally {
-        try {
-          this.contentStream.restoreGraphicsState();
-        } catch (final IOException e) {
-        }
-      }
-
+      throw Exceptions.wrap(e);
     }
   }
 
   @Override
   public void drawMarker(final MarkerStyle style, final Point point, final double orientation) {
     // TODO Auto-generated method stub
+  }
+
+  private void drawPolygon(final PDPageContentStream contentStream, final Polygon polygon)
+    throws IOException {
+    int i = 0;
+    for (final LinearRing ring : polygon.rings()) {
+      if (i == 0) {
+        if (ring.isClockwise()) {
+          drawLineReverse(contentStream, ring);
+        } else {
+          drawLine(contentStream, ring);
+        }
+      } else {
+        if (ring.isCounterClockwise()) {
+          drawLineReverse(contentStream, ring);
+        } else {
+          drawLine(contentStream, ring);
+        }
+      }
+      // contentStream.closePath();
+      i++;
+    }
   }
 
   @Override
@@ -282,21 +577,24 @@ public class PdfViewRenderer extends ViewRenderer {
         if (point != null) {
           final double orientation = point.getOrientation();
 
-          this.contentStream.saveGraphicsState();
+          final PDPageContentStream contentStream = this.contentStream;
+          contentStream.saveGraphicsState();
           try {
             // style.setTextStyle(viewport, graphics);
 
             final double x = point.getX();
             final double y = point.getY();
-            final double[] location = toViewCoordinates(x, y);
+            final double modelUnitsPerViewUnit = this.viewport.getModelUnitsPerViewUnit();
+            double viewX = (x - this.boundingBox.getMinX()) / modelUnitsPerViewUnit;
+            double viewY = (y - this.boundingBox.getMinY()) / modelUnitsPerViewUnit;
 
             // style.setTextStyle(viewport, graphics);
 
             final Quantity<Length> textDx = style.getTextDx();
-            double dx = this.toDisplayValue(textDx);
+            float dx = (float)this.toDisplayValue(textDx);
 
             final Quantity<Length> textDy = style.getTextDy();
-            double dy = -this.toDisplayValue(textDy);
+            float dy = (float)this.toDisplayValue(textDy);
             final Font font = style.getFont(this);
             final FontMetrics fontMetrics = this.canvas.getFontMetrics(font);
 
@@ -315,63 +613,65 @@ public class PdfViewRenderer extends ViewRenderer {
               + (lines.length - 1) * leading;
             final String verticalAlignment = style.getTextVerticalAlignment();
             if ("top".equals(verticalAlignment)) {
+              dy -= maxHeight;
             } else if ("middle".equals(verticalAlignment)) {
               dy -= maxHeight / 2;
             } else {
-              dy -= maxHeight;
             }
 
             String horizontalAlignment = style.getTextHorizontalAlignment();
-            double screenX = location[0];
-            double screenY = getViewHeightPixels() - location[1];
             final String textPlacement = style.getTextPlacementType();
             if ("auto".equals(textPlacement)) {
-              if (screenX < 0) {
-                screenX = 1;
+              if (viewX < 0) {
+                viewX = 1;
                 dx = 0;
                 horizontalAlignment = "left";
               }
               final double viewWidth = getViewWidthPixels();
-              if (screenX + maxWidth > viewWidth) {
-                screenX = (int)(viewWidth - maxWidth - 1);
+              if (viewX + maxWidth > viewWidth) {
+                viewX = (int)(viewWidth - maxWidth - 1);
                 dx = 0;
                 horizontalAlignment = "left";
               }
-              if (screenY < maxHeight) {
-                screenY = 1;
+              if (viewY < maxHeight) {
+                viewY = 1;
                 dy = 0;
               }
               final double viewHeight = getViewHeightPixels();
-              if (screenY > viewHeight) {
-                screenY = viewHeight - 1 - maxHeight;
+              if (viewY > viewHeight) {
+                viewY = viewHeight - 1 - maxHeight;
                 dy = 0;
               }
             }
-            AffineTransform transform = new AffineTransform();
-            transform.translate(screenX, screenY);
+            Matrix transform = Matrix.getTranslateInstance((float)viewX, (float)viewY);
             if (orientation != 0) {
-              transform.rotate(-Math.toRadians(orientation), 0, 0);
+              transform.rotate((float)Math.toRadians(orientation));
             }
             transform.translate(dx, dy);
 
             for (final String line : lines) {
-              transform.translate(0, ascent);
-              final AffineTransform lineTransform = new AffineTransform(transform);
+              // transform.translate(0, ascent);
+              final Matrix lineTransform = transform.clone();
               final Rectangle2D bounds = fontMetrics.getStringBounds(line,
                 this.canvas.getGraphics());
-              final double width = bounds.getWidth();
-              final double height = bounds.getHeight();
+              final float width = (float)bounds.getWidth();
+              final float height = (float)bounds.getHeight();
 
               if ("right".equals(horizontalAlignment)) {
-                transform.translate(-width, 0);
-              } else if ("center".equals(horizontalAlignment)) {
-                transform.translate(-width / 2, 0);
+                transform.translate(-width, 0f);
+              } else if ("center".equals(horizontalAlignment)
+                || "auto".equals(horizontalAlignment)) {
+                transform.translate(-width / 2, 0f);
               }
               transform.translate(dx, 0);
 
               transform.scale(1, 1);
               if (Math.abs(orientation) > 90) {
-                transform.rotate(Math.PI, maxWidth / 2, -height / 4);
+                final float anchorX = (float)maxWidth / 2;
+                final float anchorY = -height / 4;
+                transform.translate(anchorX, anchorY);
+                transform.rotate(Math.PI);
+                transform.translate(-anchorX, -anchorY);
               }
               /*
                * final double textHaloRadius = Viewport2D.toDisplayValue(this,
@@ -392,32 +692,29 @@ public class PdfViewRenderer extends ViewRenderer {
                */
               final Color textBoxColor = style.getTextBoxColor();
               if (textBoxColor != null) {
-                this.contentStream.setNonStrokingColor(textBoxColor);
-                final double cornerSize = Math.max(height / 2, 5);
-                // final RoundRectangle2D.Double box = new
-                // RoundRectangle2D.Double(
-                // bounds.getX() - 3, bounds.getY() - 1, width + 6, height + 2,
-                // cornerSize, cornerSize);
-                this.contentStream.fillRect((float)bounds.getX() - 3, (float)bounds.getY() - 1,
-                  (float)width + 6, (float)height + 2);
+                // contentStream.transform(transform);
+                // contentStream.setNonStrokingColor(textBoxColor);
+                // contentStream.addRect((float)bounds.getX() - 3,
+                // (float)bounds.getY() - 1, width + 6,
+                // height + 2);
+                // contentStream.fill();
               }
-              this.contentStream.setNonStrokingColor(style.getTextFill());
+              contentStream.setNonStrokingColor(style.getTextFill());
 
-              this.contentStream.beginText();
-              final PDFont pdfFont = getViewport()
-                .getFont("/org/apache/pdfbox/resources/ttf/ArialMT.ttf");
+              contentStream.beginText();
+              final PDFont pdfFont = PDType1Font.HELVETICA;
 
-              this.contentStream.setFont(pdfFont, font.getSize2D());
-              this.contentStream.setTextMatrix(transform);
-              this.contentStream.drawString(line);
-              this.contentStream.endText();
+              contentStream.setFont(pdfFont, font.getSize2D());
+              contentStream.setTextMatrix(transform);
+              contentStream.showText(line);
+              contentStream.endText();
 
               transform = lineTransform;
               transform.translate(0, leading + descent);
             }
 
           } finally {
-            this.contentStream.restoreGraphicsState();
+            contentStream.restoreGraphicsState();
           }
         }
       }
@@ -427,42 +724,21 @@ public class PdfViewRenderer extends ViewRenderer {
   }
 
   @Override
-  public void fillMarker(final Geometry geometry) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public void fillPolygons(final GeometryStyle style, final Iterable<Polygon> polygons) {
+    final PDPageContentStream contentStream = this.contentStream;
     try {
-      this.contentStream.saveGraphicsState();
-      this.contentStream.setNonStrokingColor(style.getPolygonFill());
+      contentStream.saveGraphicsState();
+      setGeometryStyle(style);
+      contentStream.setNonStrokingColor(style.getPolygonFill());
 
       for (final Polygon polygon : polygons) {
-        int i = 0;
-        for (final LinearRing ring : polygon.rings()) {
-          if (i == 0) {
-            if (ring.isClockwise()) {
-              drawLineReverse(ring);
-            } else {
-              drawLinePdf(ring);
-            }
-          } else {
-            if (ring.isCounterClockwise()) {
-              drawLineReverse(ring);
-            } else {
-              drawLinePdf(ring);
-            }
-          }
-          this.contentStream.closeSubPath();
-          i++;
-        }
-        this.contentStream.fill(PathIterator.WIND_NON_ZERO);
+        drawPolygon(contentStream, polygon);
       }
+      contentStream.fill();
     } catch (final IOException e) {
     } finally {
       try {
-        this.contentStream.restoreGraphicsState();
+        contentStream.restoreGraphicsState();
       } catch (final IOException e) {
       }
     }
@@ -487,13 +763,39 @@ public class PdfViewRenderer extends ViewRenderer {
   }
 
   @Override
+  public MarkerRenderer newMarkerRendererEllipse(final MarkerStyle style) {
+    return new PdfMarkerRendererEllipse(style);
+  }
+
+  @Override
+  public MarkerRenderer newMarkerRendererGeometry(final GeometryMarker geometryMarker,
+    final MarkerStyle style) {
+    return new PdfMarkerRendererGeometry(geometryMarker, style);
+  }
+
+  @Override
+  public MarkerRenderer newMarkerRendererImage(final ImageMarker imageMarker,
+    final MarkerStyle style) {
+    return new PdfMarkerRendererImage(imageMarker, style);
+  }
+
+  @Override
+  public MarkerRenderer newMarkerRendererRectangle(final MarkerStyle style) {
+    return new PdfMarkerRendererRectangle(style);
+  }
+
+  @Override
+  public MarkerRenderer newMarkerRendererSvg(final SvgMarker svgMarker, final MarkerStyle style) {
+    return new PdfMarkerRendererSvg(svgMarker, style);
+  }
+
+  @Override
   public TextStyleViewRenderer newTextStyleViewRenderer(final TextStyle textStyle) {
     return new PdfTextStyleRenderer(this, textStyle);
   }
 
   @Override
-  public void renderEllipse(final MarkerStyle style, final double modelX, final double modelY,
-    final double orientation) {
+  public void renderMarkerImage(final Image image, final double mapWidth, final double mapHeight) {
     // TODO Auto-generated method stub
 
   }
@@ -602,6 +904,33 @@ public class PdfViewRenderer extends ViewRenderer {
       this.styleNames.put(style, styleName);
     }
     this.contentStream.appendRawCommands("/" + styleName + " gs\n");
+  }
+
+  public double[] toViewCoordinates(final double x, final double y) {
+    final double[] coordinates = this.coordinates;
+    if (this.useViewCoordinates) {
+      coordinates[0] = x;
+      coordinates[1] = y;
+    } else {
+      final double modelUnitsPerViewUnit = this.viewport.getModelUnitsPerViewUnit();
+      final double viewX = (x - this.boundingBox.getMinX()) / modelUnitsPerViewUnit;
+      final double viewY = (y - this.boundingBox.getMinY()) / modelUnitsPerViewUnit;
+      coordinates[0] = viewX;
+      coordinates[1] = viewY;
+    }
+    return coordinates;
+  }
+
+  @Override
+  public void translateModelToViewCoordinates(final double modelX, final double modelY) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public BaseCloseable useViewCoordinates() {
+    this.useViewCoordinates = true;
+    return this.useViewCoordinatesCloseable;
   }
 
 }

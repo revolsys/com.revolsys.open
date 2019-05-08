@@ -2,7 +2,6 @@ package com.revolsys.raster;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -12,11 +11,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jeometry.common.logging.Logs;
+import org.jeometry.common.function.Consumer3;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.IoFactory;
@@ -25,7 +24,7 @@ import com.revolsys.math.matrix.Matrix;
 import com.revolsys.spring.resource.Resource;
 
 public interface GeoreferencedImage
-  extends GeometryFactoryProxy, MapSerializer, PropertyChangeListener {
+  extends BoundingBoxProxy, MapSerializer, PropertyChangeListener {
   static double[] calculateLSM(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight, final List<MappedLocation> mappings) {
     final Matrix A = getAMatrix(mappings, imageHeight);
@@ -116,88 +115,44 @@ public interface GeoreferencedImage
 
   void deleteTiePoint(MappedLocation tiePoint);
 
-  default void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
-    final int viewWidth, final int viewHeight, final boolean useTransform,
-    final Object interpolationMethod) {
+  default void drawImage(final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
+    final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
+    final boolean useTransform) {
     final BoundingBox imageBoundingBox = getBoundingBox();
     if (viewBoundingBox.bboxIntersects(imageBoundingBox) && viewWidth > 0 && viewHeight > 0) {
       final RenderedImage renderedImage = getRenderedImage();
-      drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth, viewHeight,
-        useTransform, interpolationMethod);
+      drawRenderedImage(renderer, renderedImage, viewBoundingBox, viewWidth, viewHeight,
+        useTransform);
     }
   }
 
-  default void drawRenderedImage(final RenderedImage renderedImage, BoundingBox imageBoundingBox,
-    final Graphics2D graphics, final BoundingBox viewBoundingBox, final int viewWidth,
-    final boolean useTransform, final Object interpolationMethod) {
+  default void drawRenderedImage(
+    final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
+    final RenderedImage renderedImage, final BoundingBox imageBoundingBox,
+    final BoundingBox viewBoundingBox, final int viewWidth, final boolean useTransform) {
     if (renderedImage != null) {
       final int imageWidth = renderedImage.getWidth();
       final int imageHeight = renderedImage.getHeight();
       if (imageWidth > 0 && imageHeight > 0) {
-
-        final GeometryFactory viewGeometryFactory = viewBoundingBox.getGeometryFactory();
-        imageBoundingBox = imageBoundingBox.bboxToCs(viewGeometryFactory);
-        final AffineTransform transform = graphics.getTransform();
-        try {
-          final double scaleFactor = viewWidth / viewBoundingBox.getWidth();
-
-          final double imageMinX = imageBoundingBox.getMinX();
-          final double viewMinX = viewBoundingBox.getMinX();
-          final double screenX = (imageMinX - viewMinX) * scaleFactor;
-
-          final double imageMaxY = imageBoundingBox.getMaxY();
-          final double viewMaxY = viewBoundingBox.getMaxY();
-          final double screenY = -(imageMaxY - viewMaxY) * scaleFactor;
-
-          final double imageModelWidth = imageBoundingBox.getWidth();
-          final int imageScreenWidth = (int)Math.ceil(imageModelWidth * scaleFactor);
-
-          final double imageModelHeight = imageBoundingBox.getHeight();
-          final int imageScreenHeight = (int)Math.ceil(imageModelHeight * scaleFactor);
-
-          if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-            if (interpolationMethod != null) {
-              graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-            }
-            if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-
-              graphics.translate(screenX, screenY);
-              if (renderedImage instanceof BufferedImage && !useTransform) {
-                final BufferedImage bufferedImage = (BufferedImage)renderedImage;
-                try {
-                  graphics.drawImage(bufferedImage, 0, 0, imageScreenWidth, imageScreenHeight,
-                    null);
-                } catch (final Throwable e) {
-                  Logs.error(this, imageScreenWidth + "x" + imageScreenHeight, e);
-                }
-              } else {
-                final double scaleX = (double)imageScreenWidth / imageWidth;
-                final double scaleY = (double)imageScreenHeight / imageHeight;
-                final AffineTransform imageTransform = new AffineTransform(scaleX, 0, 0, scaleY, 0,
-                  0);
-                if (useTransform) {
-                  final AffineTransform geoTransform = getAffineTransformation(imageBoundingBox);
-                  imageTransform.concatenate(geoTransform);
-                }
-                graphics.drawRenderedImage(renderedImage, imageTransform);
-              }
-            }
-          }
-        } catch (final Throwable e) {
-          e.printStackTrace();
-        } finally {
-          graphics.setTransform(transform);
+        final AffineTransform geoTransform;
+        if (useTransform) {
+          geoTransform = getAffineTransformation(imageBoundingBox);
+        } else {
+          geoTransform = new AffineTransform();
         }
+
+        renderer.accept(renderedImage, imageBoundingBox, geoTransform);
       }
     }
   }
 
-  default void drawRenderedImage(final RenderedImage renderedImage, final Graphics2D graphics,
-    final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
-    final boolean useTransform, final Object interpolationMethod) {
+  default void drawRenderedImage(
+    final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
+    final RenderedImage renderedImage, final BoundingBox viewBoundingBox, final int viewWidth,
+    final int viewHeight, final boolean useTransform) {
     final BoundingBox imageBoundingBox = getBoundingBox();
-    drawRenderedImage(renderedImage, imageBoundingBox, graphics, viewBoundingBox, viewWidth,
-      useTransform, interpolationMethod);
+    drawRenderedImage(renderer, renderedImage, imageBoundingBox, viewBoundingBox, viewWidth,
+      useTransform);
   }
 
   default AffineTransform getAffineTransformation(final BoundingBox boundingBox) {
@@ -250,11 +205,8 @@ public interface GeoreferencedImage
         1, 0, 0, 0, 1, 0
       };
     }
-    return calculateLSM(boundingBox, imageWidth, imageHeight,
-      mappings);
+    return calculateLSM(boundingBox, imageWidth, imageHeight, mappings);
   }
-
-  BoundingBox getBoundingBox();
 
   default BufferedImage getBufferedImage() {
     final RenderedImage renderedImage = getRenderedImage();

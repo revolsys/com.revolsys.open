@@ -1352,6 +1352,14 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     action.accept(this);
   }
 
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> void forEachGeometryComponent(final Class<G> geometryClass,
+    final Consumer<G> action) {
+    if (geometryClass.isAssignableFrom(getClass())) {
+      action.accept((G)this);
+    }
+  }
+
   default void forEachPolygon(final Consumer<Polygon> action) {
   }
 

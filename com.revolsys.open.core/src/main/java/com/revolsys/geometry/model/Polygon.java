@@ -251,6 +251,15 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
+  default <G extends Geometry> void forEachGeometryComponent(final Class<G> geometryClass,
+    final Consumer<G> action) {
+    Polygonal.super.forEachGeometryComponent(geometryClass, action);
+    for (final LinearRing ring : rings()) {
+      ring.forEachGeometryComponent(geometryClass, action);
+    }
+  }
+
+  @Override
   default void forEachPolygon(final Consumer<Polygon> action) {
     if (!isEmpty()) {
       action.accept(this);

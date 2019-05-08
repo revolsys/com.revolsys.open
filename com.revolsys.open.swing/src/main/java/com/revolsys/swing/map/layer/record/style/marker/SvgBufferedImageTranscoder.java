@@ -6,11 +6,21 @@ import org.apache.batik.gvt.renderer.ConcreteImageRendererFactory;
 import org.apache.batik.gvt.renderer.ImageRenderer;
 import org.apache.batik.gvt.renderer.ImageRendererFactory;
 import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
+import org.jeometry.common.exception.Exceptions;
+import org.w3c.dom.Document;
 
 public class SvgBufferedImageTranscoder extends ImageTranscoder {
+
   private static final ImageRendererFactory RENDERER_FACTORY = new ConcreteImageRendererFactory();
+
+  public static BufferedImage newImage(final Document document, final String uri, final int width,
+    final int height) {
+    final SvgBufferedImageTranscoder transcoder = new SvgBufferedImageTranscoder(width, height);
+    return transcoder.newImage(document, uri);
+  }
 
   private BufferedImage image;
 
@@ -32,6 +42,17 @@ public class SvgBufferedImageTranscoder extends ImageTranscoder {
 
   public BufferedImage getImage() {
     return this.image;
+  }
+
+  public BufferedImage newImage(final Document document, final String uri) {
+    try {
+      final TranscoderInput transcoderInput = new TranscoderInput(document);
+      transcoderInput.setURI(uri);
+      transcode(transcoderInput, null);
+      return this.image;
+    } catch (final TranscoderException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override

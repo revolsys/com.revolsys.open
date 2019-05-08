@@ -1,20 +1,17 @@
 package com.revolsys.swing.map.layer.record.style.marker;
 
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
-import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
-import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class ImageMarker extends AbstractMarker {
 
@@ -35,32 +32,24 @@ public class ImageMarker extends AbstractMarker {
     }
   }
 
+  public Image getImage() {
+    return this.image;
+  }
+
   @Override
   public String getTypeName() {
     return "markerImage";
   }
 
   @Override
-  public void render(final Graphics2DViewRenderer view, final Graphics2D graphics,
-    final MarkerStyle style, final double modelX, final double modelY, double orientation) {
-    if (this.image != null) {
-      try (
-        BaseCloseable closable = view.useViewCoordinates()) {
-        final Quantity<Length> markerWidth = style.getMarkerWidth();
-        final double mapWidth = view.toDisplayValue(markerWidth);
-        final Quantity<Length> markerHeight = style.getMarkerHeight();
-        final double mapHeight = view.toDisplayValue(markerHeight);
-
-        final String orientationType = style.getMarkerOrientationType();
-        if ("none".equals(orientationType)) {
-          orientation = 0;
-        }
-        view.translateMarker(style, modelX, modelY, mapWidth, mapHeight, orientation);
-
-        final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
-          mapWidth / this.image.getWidth(null), mapHeight / this.image.getHeight(null));
-        graphics.drawImage(this.image, shapeTransform, null);
-      }
-    }
+  public Icon newIcon(final MarkerStyle style) {
+    final Image newImage = this.image.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+    return new ImageIcon(newImage);
   }
+
+  @Override
+  public MarkerRenderer newMarkerRenderer(final ViewRenderer view, final MarkerStyle style) {
+    return view.newMarkerRendererImage(this, style);
+  }
+
 }

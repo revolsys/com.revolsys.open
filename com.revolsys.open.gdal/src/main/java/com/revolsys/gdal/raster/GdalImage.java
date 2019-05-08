@@ -1,14 +1,15 @@
 package com.revolsys.gdal.raster;
 
 import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.util.List;
 
 import org.gdal.gdal.Band;
 import org.gdal.gdal.Dataset;
+import org.jeometry.common.function.Consumer3;
 
 import com.revolsys.gdal.Gdal;
 import com.revolsys.geometry.model.BoundingBox;
@@ -42,9 +43,9 @@ public class GdalImage extends AbstractGeoreferencedImage {
   }
 
   @Override
-  public void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
-    final int viewWidth, final int viewHeight, final boolean useTransform,
-    final Object interpolationMethod) {
+  public void drawImage(final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
+    final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
+    final boolean useTransform) {
     try {
       final Dataset dataset = getDataset();
 
@@ -87,8 +88,8 @@ public class GdalImage extends AbstractGeoreferencedImage {
       final BufferedImage bufferedImage = Gdal.getBufferedImage(dataset, bestOverviewIdx, clipXoff,
         clipYoff, clipWidth, clipHeight, targetWidth, targetHeight);
 
-      super.drawRenderedImage(bufferedImage, clipBoundingBox, graphics, viewBoundingBox, viewWidth,
-        useTransform, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      super.drawRenderedImage(renderer, bufferedImage, clipBoundingBox, viewBoundingBox, viewWidth,
+        useTransform);
 
     } catch (final Throwable e) {
       e.printStackTrace();

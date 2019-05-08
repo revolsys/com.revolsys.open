@@ -134,7 +134,7 @@ public class LogAppender {
       .build();
   }
 
-  private static PatternLayout newLayout(final String pattern) {
+  public static PatternLayout newLayout(final String pattern) {
     return PatternLayout.newBuilder() //
       .withPattern(pattern)//
       .build();

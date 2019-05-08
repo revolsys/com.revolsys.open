@@ -3,7 +3,6 @@ package com.revolsys.swing.map;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -823,27 +822,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   public Point toModelPointRounded(GeometryFactory geometryFactory, final int x, final int y) {
     geometryFactory = getRoundedGeometryFactory(geometryFactory);
     return toModelPoint(geometryFactory, x, y);
-  }
-
-  public double[] toViewCoordinates(final double x, final double y) {
-    final double[] ordinates = new double[] {
-      x, y
-    };
-    return ordinates;
-  }
-
-  public Point2D toViewPoint(final double x, final double y) {
-    final double[] coordinates = toViewCoordinates(x, y);
-    final double viewX = coordinates[0];
-    final double viewY = coordinates[1];
-    return new Point2D.Double(viewX, viewY);
-  }
-
-  public Point2D toViewPoint(Point point) {
-    point = this.geometryFactory2d.project(point);
-    final double x = point.getX();
-    final double y = point.getY();
-    return toViewPoint(x, y);
   }
 
   public void update() {

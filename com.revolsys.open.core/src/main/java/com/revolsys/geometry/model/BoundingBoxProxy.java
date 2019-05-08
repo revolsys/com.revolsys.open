@@ -113,6 +113,22 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
     }
   }
 
+  default BoundingBox bboxToCs(final GeometryFactoryProxy geometryFactory) {
+    final BoundingBox boundingBox = getBoundingBox();
+    if (geometryFactory == null || boundingBox.isEmpty()) {
+      return boundingBox;
+    } else if (isHasHorizontalCoordinateSystem()) {
+      if (!isProjectionRequired(geometryFactory)) {
+        return boundingBox;
+      }
+    } else if (!geometryFactory.isHasHorizontalCoordinateSystem()) {
+      return boundingBox;
+    }
+    return bboxEditor() //
+      .setGeometryFactory(geometryFactory) //
+      .newBoundingBox();
+  }
+
   default <R> R bboxWith(final BoundingBoxProxy boundingBox,
     final BiFunction<BoundingBox, BoundingBox, R> action, final R emptyValue) {
     final BoundingBox boundingBox1 = getBoundingBox();

@@ -1,19 +1,19 @@
 package com.revolsys.swing.map.overlay.record;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.util.List;
 
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.vertex.AbstractVertex;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.GeometryMarker;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 
 import tec.uom.se.quantity.Quantities;
@@ -70,19 +70,41 @@ public class SelectedRecordsVertexRenderer {
     this.lastVertexStyle.setMarkerHorizontalAlignment("right");
   }
 
-  public void paintSelected(final ViewRenderer view, final Graphics2D graphics,
-    final GeometryFactory viewportGeometryFactory, Geometry geometry) {
+  public void paintSelected(final ViewRenderer view, Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = view.getGeometry(geometry);
 
       view.drawGeometryOutline(this.highlightStyle, geometry);
 
       if (geometry != null && !geometry.isEmpty()) {
-        final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
-        for (final LineString line : lines) {
-          view.drawMarkers(line, this.firstVertexStyle, this.lastVertexStyle, this.vertexStyle,
-            this.centreStyle);
-        }
+        geometry.forEachGeometryComponent(LineString.class, line -> {
+          if (line != null) {
+            line = view.convertGeometry(line);
+            try (
+              MarkerRenderer centreRenderer = this.centreStyle.newMarkerRenderer(view)) {
+              try (
+                MarkerRenderer vertexRenderer = this.firstVertexStyle.newMarkerRenderer(view)) {
+                final AbstractVertex vertex = line.getVertex(0);
+                vertexRenderer.renderMarkerVertex(vertex);
+                centreRenderer.renderMarkerVertex(vertex);
+              }
+              try (
+                MarkerRenderer vertexRenderer = this.vertexStyle.newMarkerRenderer(view)) {
+                for (final Vertex vertex : line.vertices()) {
+                  if (!vertex.isFrom() && !vertex.isTo()) {
+                    vertexRenderer.renderMarkerVertex(vertex);
+                    centreRenderer.renderMarkerVertex(vertex);
+                  }
+                }
+              }
+              try (
+                MarkerRenderer vertexRenderer = this.lastVertexStyle.newMarkerRenderer(view)) {
+                final AbstractVertex vertex = line.getVertex(line.getLastVertexIndex());
+                vertexRenderer.renderMarkerVertex(vertex);
+              }
+            }
+          }
+        });
       }
     }
   }

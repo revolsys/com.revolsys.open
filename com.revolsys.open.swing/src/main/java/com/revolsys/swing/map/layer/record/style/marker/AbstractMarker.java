@@ -45,11 +45,6 @@ public abstract class AbstractMarker extends AbstractMarkerGroupElement implemen
   }
 
   @Override
-  public Icon newIcon(final MarkerStyle style) {
-    return null;
-  }
-
-  @Override
   public String toString() {
     final String name = getName();
     if (Property.hasValue(name)) {

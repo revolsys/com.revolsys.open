@@ -59,7 +59,7 @@ public class VertexStyleRenderer {
       final double orientation = vertex.getOrientaton();
       view.drawMarker(style, vertex, orientation);
       if (!to) {
-        view.drawMarker(this.centreStyle, vertex, 0);
+        view.renderMarker(this.centreStyle, vertex);
       }
     }
   }

@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.view;
 
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,11 +34,19 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
+import com.revolsys.swing.map.layer.record.style.marker.GeometryMarker;
+import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
+import com.revolsys.swing.map.layer.record.style.marker.Marker;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
+import com.revolsys.swing.map.layer.record.style.marker.SvgMarker;
+import com.revolsys.swing.map.layer.record.style.marker.TextMarker;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
@@ -96,8 +105,6 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   protected double viewHeightPixels;
 
-  private final double[] coordinates = new double[2];
-
   private double modelUnitsPerViewUnit;
 
   protected BoundingBox boundingBox = BoundingBox.empty();
@@ -131,7 +138,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
         fillPolygons(this.geometryStyle, this.polygons);
       }
       if (this.pointsAdd) {
-        drawMarkers(this.geometryStyle);
+        renderMarkers(this.geometryStyle, this.points);
       }
     } finally {
       this.geometryStyle = null;
@@ -173,6 +180,8 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
       }
     }
   }
+
+  public abstract BaseCloseable applyMarkerStyle(MarkerStyle style);
 
   public void drawBboxOutline(final GeometryStyle style, final BoundingBoxProxy boundingBox) {
     final LinearRing ring = boundingBox.getBoundingBox().toLinearRing(this.geometryFactory, 50, 50);
@@ -216,52 +225,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   public abstract void drawLines(GeometryStyle style, Iterable<LineString> lines);
 
-  public abstract void drawMarker(Geometry geometry);
-
-  public void drawMarker(final Geometry geometry, final MarkerStyle style) {
-    if (geometry != null) {
-      if ("vertices".equals(style.getMarkerPlacementType())) {
-        drawMarkerVertices(geometry, style);
-      } else if ("segments".equals(style.getMarkerPlacementType())) {
-        drawMarkerSegments(geometry, style);
-      } else {
-        for (int i = 0; i < geometry.getGeometryCount(); i++) {
-          final Geometry part = geometry.getGeometry(i);
-          if (part instanceof Point) {
-            final Point point = (Point)part;
-            drawMarker(style, point, 0);
-          } else if (part instanceof LineString) {
-            final LineString line = (LineString)part;
-            drawMarker(line, style);
-          } else if (part instanceof Polygon) {
-            final Polygon polygon = (Polygon)part;
-            drawMarker(style, polygon);
-          }
-        }
-      }
-    }
-  }
-
-  private void drawMarker(final LineString line, final MarkerStyle style) {
-    final PointDoubleXYOrientation point = getMarkerLocation(line, style);
-    if (point != null) {
-      final double orientation = point.getOrientation();
-      drawMarker(style, point, orientation);
-    }
-  }
-
   public abstract void drawMarker(final MarkerStyle style, Point point, final double orientation);
-
-  private void drawMarker(final MarkerStyle style, final Polygon polygon) {
-    final Point point = polygon.getPointWithin();
-    drawMarker(style, point, 0);
-  }
-
-  public void drawMarkers(final GeometryStyle style) {
-    for (final Point point : this.points) {
-      drawMarker(style, point, 0);
-    }
-  }
 
   public void drawMarkers(LineString line, final MarkerStyle styleFirst,
     final MarkerStyle styleLast, final MarkerStyle styleVertex, final MarkerStyle centreStyle) {
@@ -280,55 +244,13 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
         final double orientation = vertex.getOrientaton();
         drawMarker(style, vertex, orientation);
         if (!to) {
-          drawMarker(centreStyle, vertex, 0);
-        }
-      }
-    }
-  }
-
-  public void drawMarkerSegments(Geometry geometry, final MarkerStyle style) {
-    geometry = getGeometry(geometry);
-    if (Property.hasValue(geometry)) {
-      final String orientationType = style.getMarkerOrientationType();
-      if ("none".equals(orientationType)) {
-        for (final Segment segment : geometry.segments()) {
-          final Point point = segment.midPoint();
-          drawMarker(style, point, 0);
-        }
-      } else {
-        for (final Segment segment : geometry.segments()) {
-          final Point point = segment.midPoint();
-          final double orientation = segment.getOrientaton();
-          drawMarker(style, point, orientation);
-        }
-      }
-    }
-  }
-
-  public void drawMarkerVertices(Geometry geometry, final MarkerStyle style) {
-    geometry = getGeometry(geometry);
-    if (Property.hasValue(geometry)) {
-      final String orientationType = style.getMarkerOrientationType();
-      if ("none".equals(orientationType)) {
-        for (final Vertex vertex : geometry.vertices()) {
-          drawMarker(style, vertex, 0);
-        }
-      } else {
-        for (final Vertex vertex : geometry.vertices()) {
-          final double orientation = vertex.getOrientaton();
-          drawMarker(style, vertex, orientation);
+          renderMarker(centreStyle, vertex);
         }
       }
     }
   }
 
   public abstract void drawText(Record record, Geometry geometry, TextStyle style);
-
-  public abstract void fillMarker(Geometry geometry);
-
-  public void fillPolygons(final GeometryStyle style) {
-    fillPolygons(style, this.polygons);
-  }
 
   public abstract void fillPolygons(GeometryStyle style, final Iterable<Polygon> polygon);
 
@@ -514,10 +436,40 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     return this.showHiddenRecords;
   }
 
+  public abstract MarkerRenderer newMarkerRendererEllipse(MarkerStyle style);
+
+  public abstract MarkerRenderer newMarkerRendererGeometry(GeometryMarker geometryMarker,
+    MarkerStyle style);
+
+  public abstract MarkerRenderer newMarkerRendererImage(ImageMarker imageMarker, MarkerStyle style);
+
+  public abstract MarkerRenderer newMarkerRendererRectangle(MarkerStyle style);
+
+  public abstract MarkerRenderer newMarkerRendererSvg(SvgMarker svgMarker, MarkerStyle style);
+
+  public MarkerRenderer newMarkerRendererText(final TextMarker textMarker,
+    final MarkerStyle style) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   public abstract TextStyleViewRenderer newTextStyleViewRenderer(TextStyle textStyle);
 
-  public abstract void renderEllipse(MarkerStyle style, double modelX, double modelY,
-    double orientation);
+  public void renderLayer(final Layer layer) {
+    final LayerRenderer<? extends Layer> renderer = layer.getRenderer();
+    renderer.render(this);
+  }
+
+  public void renderMarker(final MarkerStyle markerStyle, final Point point) {
+    renderMarkers(markerStyle, Collections.singleton(point));
+  }
+
+  public abstract void renderMarkerImage(Image image, double mapWidth, double mapHeight);
+
+  public void renderMarkers(final MarkerStyle markerStyle, final Iterable<? extends Point> points) {
+    final Marker marker = markerStyle.getMarker();
+    marker.renderPoints(this, markerStyle, points);
+  }
 
   public void setCancellable(Cancellable cancellable) {
     if (cancellable == null) {
@@ -571,15 +523,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     return convertedValue;
   }
 
-  public double[] toViewCoordinates(final double modelX, final double modelY) {
-    this.coordinates[0] = modelX;
-    this.coordinates[1] = modelY;
-    toViewCoordinates(this.coordinates);
-    return this.coordinates;
-  }
-
-  public void toViewCoordinates(final double[] coordinates) {
-  }
+  public abstract void translateModelToViewCoordinates(final double modelX, final double modelY);
 
   protected void updateFields() {
     if (this.viewport == null) {
@@ -593,4 +537,6 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
       this.modelUnitsPerViewUnit = this.viewport.getModelUnitsPerViewUnit();
     }
   }
+
+  public abstract BaseCloseable useViewCoordinates();
 }

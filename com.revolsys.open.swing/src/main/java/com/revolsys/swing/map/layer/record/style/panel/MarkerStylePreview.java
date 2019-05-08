@@ -45,7 +45,7 @@ public class MarkerStylePreview extends JPanel {
     try (
       final Graphics2DViewport viewport = new Graphics2DViewport(graphics, 101, 101)) {
       final Graphics2DViewRenderer view = viewport.newViewRenderer();
-      view.drawMarker(this.markerStyle, this.point, 0);
+      view.renderMarker(this.markerStyle, this.point);
     }
   }
 }

@@ -35,6 +35,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.overlay.record.SelectRecordsOverlay;
 import com.revolsys.swing.map.overlay.record.SelectedRecordsRenderer;
 import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
@@ -358,12 +359,13 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         final ViewRenderer viewRenderer = imageViewport.newViewRenderer();
 
         final BufferedImage image = imageViewport.getImage();
-        final Graphics2D graphics = (Graphics2D)image.getGraphics();
+        // final Graphics2D graphics = (Graphics2D)image.getGraphics();
 
-        this.image.drawImage(graphics, viewBoundingBox,
-          (int)Math.ceil(viewport.getViewWidthPixels()),
-          (int)Math.ceil(viewport.getViewHeightPixels()), !this.layer.isShowOriginalImage(),
-          RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        // this.image.drawImage(graphics, viewBoundingBox,
+        // (int)Math.ceil(viewport.getViewWidthPixels()),
+        // (int)Math.ceil(viewport.getViewHeightPixels()),
+        // !this.layer.isShowOriginalImage(),
+        // RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         viewRenderer.drawImage(this.image, !this.layer.isShowOriginalImage());
         this.cachedImage = new BufferedGeoreferencedImage(imageViewport.getBoundingBox(), image);
       }
@@ -987,7 +989,10 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
         view.drawGeometryOutline(STYLE_BOX_OUTLINE, imageBoundary);
 
-        view.drawMarkerVertices(imageBoundary, STYLE_BOX_CORNER);
+        try (
+          MarkerRenderer markerRenderer = STYLE_BOX_CORNER.newMarkerRenderer(view)) {
+          markerRenderer.renderMarkerVertices(imageBoundary);
+        }
 
         final List<MappedLocation> tiePoints = image.getTiePoints();
         final int tiePointCount = tiePoints.size();
@@ -1006,8 +1011,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
               !showOriginalImage);
             if (line != null) {
               line = line.convertGeometry(viewportGeometryFactory);
-              TIE_POINT_VERTEX_RENDERER.paintSelected(view, graphics, viewportGeometryFactory,
-                line);
+              TIE_POINT_VERTEX_RENDERER.paintSelected(view, line);
             }
           }
         }

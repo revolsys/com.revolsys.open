@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.record.style;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.HashSet;
@@ -32,6 +31,7 @@ import com.revolsys.swing.map.layer.record.style.marker.GeometryMarker;
 import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.layer.record.style.marker.MarkerLibrary;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -279,6 +279,10 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     return this.marker.newIcon(this);
   }
 
+  public MarkerRenderer newMarkerRenderer(final ViewRenderer view) {
+    return this.marker.newMarkerRenderer(view, this);
+  }
+
   public void setMarker(final Marker marker) {
     final Marker oldMarker = this.marker;
     final String oldMarkerType = this.markerType;
@@ -480,24 +484,6 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
       this.markerLineColor = WebColors.newAlpha(this.markerLineColor, this.markerLineOpacity);
       firePropertyChange("markerLineColor", oldMarkerLineColor, this.markerLineColor);
       firePropertyChange("markerLineOpacity", oldMarkerLineOpacity, this.markerLineOpacity);
-    }
-  }
-
-  public boolean setMarkerLineStyle(final ViewRenderer view, final Graphics2D graphics) {
-    final Color color = getMarkerLineColor();
-    if (color.getAlpha() == 0) {
-      return false;
-    } else {
-      graphics.setColor(color);
-      final Quantity<Length> measure = this.markerLineWidth;
-      final float width = (float)view.toDisplayValue(measure);
-      if (width <= 0) {
-        return false;
-      } else {
-        final BasicStroke basicStroke = new BasicStroke(width);
-        graphics.setStroke(basicStroke);
-        return true;
-      }
     }
   }
 

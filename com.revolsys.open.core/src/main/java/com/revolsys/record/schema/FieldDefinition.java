@@ -266,10 +266,13 @@ public class FieldDefinition extends BaseObjectWithProperties
    *          field.
    * @param properties The meta data properties about the field.
    */
-  public FieldDefinition(final String name, final DataType type, final Integer length,
+  public FieldDefinition(final String name, DataType type, final Integer length,
     final Integer scale, final Boolean required, final String description,
     final Map<String, Object> properties) {
     setName(name);
+    if (type == null) {
+      type = DataTypes.OBJECT;
+    }
     this.type = type;
     if (required != null) {
       this.required = required;

@@ -15,9 +15,8 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.Layer;
-import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class SaveAsPdf {
 
@@ -43,8 +42,9 @@ public class SaveAsPdf {
       try (
         PdfViewport pdfViewport = new PdfViewport(document, page, project, width, height,
           boundingBox)) {
-        final LayerRenderer<? extends Layer> renderer = project.getRenderer();
-        renderer.render(pdfViewport.newViewRenderer());
+        final ViewRenderer view = pdfViewport.newViewRenderer();
+        view.renderLayer(project.getBaseMapLayers());
+        view.renderLayer(project);
       }
       document.addPage(page);
 

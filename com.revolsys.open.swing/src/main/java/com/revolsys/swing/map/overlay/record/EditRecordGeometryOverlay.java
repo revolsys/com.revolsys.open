@@ -56,6 +56,7 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
@@ -134,6 +135,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   private Point moveGeometryStart;
 
   private GeometryEditor<?> addGeometryEditor;
+
+  private final MarkerStyle GEOMETRY_INSERT_VERTEX_STYLE = MarkerStyle.marker("xLine", 9,
+    WebColors.Blue, 3, WebColors.Blue);
 
   public EditRecordGeometryOverlay(final MapPanel map) {
     super(map);
@@ -1108,13 +1112,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         final double deltaY = to.getY() - from.getY();
         geometry = geometry.edit(editor -> editor.move(deltaX, deltaY));
         GEOMETRY_RENDERER.paintSelected(view, geometryFactory2dFloating, geometry);
-        GEOMETRY_VERTEX_RENDERER.paintSelected(view, graphics, geometryFactory2dFloating, geometry);
+        GEOMETRY_VERTEX_RENDERER.paintSelected(view, geometry);
       }
     } else if (this.addGeometryEditor != null) {
       final Geometry addGeometry = this.addGeometryEditor.getCurrentGeometry();
       GEOMETRY_RENDERER.paintSelected(view, geometryFactory2dFloating, addGeometry);
-      GEOMETRY_VERTEX_RENDERER.paintSelected(view, graphics, geometryFactory2dFloating,
-        addGeometry);
+      GEOMETRY_VERTEX_RENDERER.paintSelected(view, addGeometry);
     }
     if (this.moveGeometryStart == null) {
       final List<CloseLocation> mouseOverLocations = getMouseOverLocations();
@@ -1124,16 +1127,18 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       }
       for (final CloseLocation location : mouseOverLocations) {
         final Geometry geometry = location.getGeometry();
-        GEOMETRY_VERTEX_RENDERER.paintSelected(view, graphics, geometryFactory2dFloating, geometry);
+        GEOMETRY_VERTEX_RENDERER.paintSelected(view, geometry);
         if (!isOverlayAction(ACTION_MOVE_GEOMETRY) && !this.addGeometryEditVerticesStart
           && !this.editGeometryVerticesStart) {
           final Vertex vertex = location.getVertex();
           if (vertex == null) {
-            final MarkerStyle style = MarkerStyle.marker("xLine", 9, WebColors.Blue, 3,
-              WebColors.Blue);
             final double orientation = location.getSegment().getOrientaton();
             final Point pointOnLine = location.getViewportPoint();
-            view.drawMarker(style, pointOnLine, orientation);
+            try (
+              MarkerRenderer markerRenderer = this.GEOMETRY_INSERT_VERTEX_STYLE
+                .newMarkerRenderer(view)) {
+              markerRenderer.renderMarkerPoint(pointOnLine, orientation);
+            }
           } else {
             GEOMETRY_CLOSE_VERTEX_RENDERER.paintSelected(view, graphics, geometryFactory2dFloating,
               vertex);

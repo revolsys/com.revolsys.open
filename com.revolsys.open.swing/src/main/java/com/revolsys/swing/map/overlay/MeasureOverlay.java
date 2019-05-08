@@ -487,8 +487,7 @@ public class MeasureOverlay extends AbstractOverlay {
   @Override
   protected void paintComponent(final Graphics2DViewRenderer view, final Graphics2D graphics) {
     if (!this.measureGeometry.isEmpty()) {
-      final GeometryFactory geometryFactory = getGeometryFactory2d();
-      MEASURE_RENDERER.paintSelected(view, graphics, geometryFactory, this.measureGeometry);
+      MEASURE_RENDERER.paintSelected(view, this.measureGeometry);
       if (this.measureGeometry instanceof Polygon) {
         final Polygon polygon = (Polygon)this.measureGeometry;
         view.drawGeometry(polygon, POLYGON_STYLE);
