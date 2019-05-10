@@ -382,6 +382,7 @@ public class PdfViewRenderer extends ViewRenderer {
     this.document = viewport.getDocument();
     setShowHiddenRecords(true);
     updateFields();
+    setBackgroundDrawingEnabled(false);
   }
 
   public void addPDOptionalContentGroup(final Layer layer, final PDOptionalContentGroup group) {
@@ -468,19 +469,22 @@ public class PdfViewRenderer extends ViewRenderer {
   @Override
   public void drawImage(final GeoreferencedImage image, final boolean useTransform,
     final double alpha, final Object interpolationMethod) {
-    // if (image != null) {
-    // final Composite composite = this.graphics.getComposite();
-    // try {
-    // AlphaComposite alphaComposite = AlphaComposite.SrcOver;
-    // if (alpha < 1) {
-    // alphaComposite = alphaComposite.derive((float)alpha);
-    // }
-    // this.graphics.setComposite(alphaComposite);
-    // drawImage(image, useTransform, interpolationMethod);
-    // } finally {
-    // this.graphics.setComposite(composite);
-    // }
-    // }
+    if (image != null) {
+      try {
+        final PDPageContentStream contentStream = this.contentStream;
+        contentStream.saveGraphicsState();
+        final PDExtendedGraphicsState graphicsState = new PDExtendedGraphicsState();
+        graphicsState.setNonStrokingAlphaConstant((float)alpha);
+        contentStream.setGraphicsStateParameters(graphicsState);
+
+        drawImage(image, useTransform, interpolationMethod);
+
+        contentStream.restoreGraphicsState();
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    }
+
   }
 
   @Override
@@ -515,24 +519,22 @@ public class PdfViewRenderer extends ViewRenderer {
             final int imageScreenHeight = (int)Math.ceil(imageModelHeight * scaleFactor);
 
             if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-              if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-                final double scaleX = (double)imageScreenWidth / imageWidth;
-                final double scaleY = (double)imageScreenHeight / imageHeight;
-                final AffineTransform imageTransform = new AffineTransform(scaleX, 0, 0, scaleY,
-                  screenX, screenY);
+              final double scaleX = (double)imageScreenWidth / imageWidth;
+              final double scaleY = (double)imageScreenHeight / imageHeight;
+              final AffineTransform imageTransform = new AffineTransform(scaleX, 0, 0, scaleY,
+                screenX, screenY);
 
-                if (useTransform) {
-                  imageTransform.concatenate(geoTransform);
-                }
-                final Matrix matrix = new Matrix(imageTransform);
-                final PDImageXObject pdfImage = LosslessFactory.createFromImage(this.document,
-                  (BufferedImage)renderedImage);
-                final PDPageContentStream contentStream = this.contentStream;
-                contentStream.saveGraphicsState();
-                contentStream.transform(matrix);
-                contentStream.drawImage(pdfImage, 0f, 0f);
-                contentStream.restoreGraphicsState();
+              if (useTransform) {
+                imageTransform.concatenate(geoTransform);
               }
+              final Matrix matrix = new Matrix(imageTransform);
+              final PDImageXObject pdfImage = LosslessFactory.createFromImage(this.document,
+                (BufferedImage)renderedImage);
+              final PDPageContentStream contentStream = this.contentStream;
+              contentStream.saveGraphicsState();
+              contentStream.transform(matrix);
+              contentStream.drawImage(pdfImage, 0f, 0f);
+              contentStream.restoreGraphicsState();
             }
 
           } catch (final IOException e) {

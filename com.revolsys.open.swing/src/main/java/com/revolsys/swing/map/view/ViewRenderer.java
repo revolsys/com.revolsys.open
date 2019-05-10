@@ -94,6 +94,8 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     return new PointDoubleXYOrientation(point, orientation);
   }
 
+  private boolean backgroundDrawingEnabled = true;
+
   private boolean showHiddenRecords;
 
   protected Viewport2D viewport;
@@ -428,6 +430,10 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     return this.viewWidthPixels;
   }
 
+  public boolean isBackgroundDrawingEnabled() {
+    return this.backgroundDrawingEnabled;
+  }
+
   @Override
   public boolean isCancelled() {
     return this.cancellable.isCancelled();
@@ -488,6 +494,10 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     final Collection<? extends Point> points) {
     final Marker marker = markerStyle.getMarker();
     marker.renderPoints(this, markerStyle, points);
+  }
+
+  public void setBackgroundDrawingEnabled(final boolean backgroundDrawingEnabled) {
+    this.backgroundDrawingEnabled = backgroundDrawingEnabled;
   }
 
   public void setCancellable(Cancellable cancellable) {

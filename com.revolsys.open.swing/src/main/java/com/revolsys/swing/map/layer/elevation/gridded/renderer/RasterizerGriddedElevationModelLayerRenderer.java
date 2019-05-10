@@ -203,7 +203,6 @@ public class RasterizerGriddedElevationModelLayerRenderer
               this.redraw = true;
             }
           }
-          final BoundingBox boundingBox = layer.getBoundingBox();
           if (this.joclRasterizer != null) {
             final BoundingBox modelBoundingBox = elevationModel.getBoundingBox();
             image.setBoundingBox(modelBoundingBox);
@@ -212,7 +211,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
               this.joclRasterizer.rasterize(elevationModel, bufferedImage);
             }
             view.drawImage(image, true, this.opacity, null);
-          } else if (!this.redrawInBackground) {
+          } else if (!this.redrawInBackground || !view.isBackgroundDrawingEnabled()) {
             this.rasterizer.rasterize(image);
             view.drawImage(image, true, this.opacity, null);
           } else if (this.image.hasImage() && !(this.image.isCached() && this.redraw)) {
@@ -234,6 +233,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
               }
             }
           }
+          final BoundingBox boundingBox = layer.getBoundingBox();
           view.drawDifferentCoordinateSystem(boundingBox);
         }
       }

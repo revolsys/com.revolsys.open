@@ -26,6 +26,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.parallel.Invoke;
 
 public class SaveAsPdf {
 
@@ -126,50 +127,53 @@ public class SaveAsPdf {
     final Project project = Project.get();
     final String directory = "/Users/paustin/Downloads/";
     final File file = new File(directory, project.getName() + ".pdf");
-    try {
-      final PDDocument document = new PDDocument();
+    Invoke.background("Save " + file, () -> {
 
-      final Viewport2D viewport = project.getViewport();
-      BoundingBox boundingBox = viewport.getBoundingBox();
-      final int width = (int)Math.ceil(viewport.getViewWidthPixels());
-      final int height = (int)Math.ceil(viewport.getViewHeightPixels());
+      try {
+        final PDDocument document = new PDDocument();
 
-      final int srid = boundingBox.getHorizontalCoordinateSystemId();
-      if (srid == 3857) {
-        boundingBox = boundingBox.bboxEdit(editor -> editor
-          .setGeometryFactory(viewport.getGeometryFactory().getGeographicGeometryFactory()));
+        final Viewport2D viewport = project.getViewport();
+        BoundingBox boundingBox = viewport.getBoundingBox();
+        final int width = (int)Math.ceil(viewport.getViewWidthPixels());
+        final int height = (int)Math.ceil(viewport.getViewHeightPixels());
+
+        final int srid = boundingBox.getHorizontalCoordinateSystemId();
+        if (srid == 3857) {
+          boundingBox = boundingBox.bboxEdit(editor -> editor
+            .setGeometryFactory(viewport.getGeometryFactory().getGeographicGeometryFactory()));
+        }
+        final PDRectangle pageSize = new PDRectangle(width, height);
+        final PDPage page = new PDPage(pageSize);
+
+        try (
+          PdfViewport pdfViewport = new PdfViewport(document, page, project, width, height,
+            boundingBox)) {
+          final PdfViewRenderer view = pdfViewport.newViewRenderer();
+          createLayerTree(view, document, project);
+          view.renderLayer(project.getBaseMapLayers());
+          view.renderLayer(project);
+        }
+        document.addPage(page);
+
+        final PDDocumentCatalog catalog = document.getDocumentCatalog();
+        final PDMetadata metadata = new PDMetadata(document);
+        catalog.setMetadata(metadata);
+
+        // jempbox version
+        final XMPMetadata xmpMetadata = XMPMetadata.createXMPMetadata();
+        final DublinCoreSchema dcSchema = xmpMetadata.createAndAddDublinCoreSchema();
+
+        dcSchema.setAboutAsSimple("");
+
+        final XmpSerializer serializer = new XmpSerializer();
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        serializer.serialize(xmpMetadata, baos, false);
+        metadata.importXMPMetadata(baos.toByteArray());
+
+        document.save(file);
+      } catch (final Throwable e) {
+        Logs.error(SaveAsPdf.class, "Unable to create PDF " + file, e);
       }
-      final PDRectangle pageSize = new PDRectangle(width, height);
-      final PDPage page = new PDPage(pageSize);
-
-      try (
-        PdfViewport pdfViewport = new PdfViewport(document, page, project, width, height,
-          boundingBox)) {
-        final PdfViewRenderer view = pdfViewport.newViewRenderer();
-        createLayerTree(view, document, project);
-        view.renderLayer(project.getBaseMapLayers());
-        view.renderLayer(project);
-      }
-      document.addPage(page);
-
-      final PDDocumentCatalog catalog = document.getDocumentCatalog();
-      final PDMetadata metadata = new PDMetadata(document);
-      catalog.setMetadata(metadata);
-
-      // jempbox version
-      final XMPMetadata xmpMetadata = XMPMetadata.createXMPMetadata();
-      final DublinCoreSchema dcSchema = xmpMetadata.createAndAddDublinCoreSchema();
-
-      dcSchema.setAboutAsSimple("");
-
-      final XmpSerializer serializer = new XmpSerializer();
-      final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      serializer.serialize(xmpMetadata, baos, false);
-      metadata.importXMPMetadata(baos.toByteArray());
-
-      document.save(file);
-    } catch (final Throwable e) {
-      Logs.error(SaveAsPdf.class, "Unable to create PDF " + file, e);
-    }
+    });
   }
 }
