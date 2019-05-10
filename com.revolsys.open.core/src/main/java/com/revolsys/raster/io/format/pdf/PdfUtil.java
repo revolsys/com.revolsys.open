@@ -68,7 +68,9 @@ public class PdfUtil {
       final float y2 = getFloat(bbox, 3);
       final float x = Math.min(x1, x2);
       final float y = Math.min(y1, y2);
-      return new Rectangle2D.Float(x, y, Math.abs(x1 - x2), Math.abs(y1 - y2));
+      float width = Math.abs(x1 - x2);
+      float height = Math.abs(y1 - y2);
+      return new Rectangle2D.Float(x, y, width, height);
     }
   }
 

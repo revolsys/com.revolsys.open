@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer;
 import java.awt.Window;
 import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,14 @@ import com.revolsys.util.Booleans;
 public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
   ObjectWithProperties, PropertyChangeListener, Comparable<Layer>, MapSerializer, Child<LayerGroup>,
   Cloneable, BoundingBoxProxy {
+
+  default void addParent(final List<Layer> path) {
+    final LayerGroup parent = getLayerGroup();
+    if (parent != null) {
+      path.add(0, parent);
+      parent.addParent(path);
+    }
+  }
 
   default void addVisibleBbox(final BoundingBoxEditor boundingBox) {
     if (isExists() && isVisible()) {
@@ -82,7 +91,12 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
    */
   String getPath();
 
-  List<Layer> getPathList();
+  default List<Layer> getPathList() {
+    final List<Layer> path = new ArrayList<>();
+    path.add(this);
+    addParent(path);
+    return path;
+  }
 
   Project getProject();
 

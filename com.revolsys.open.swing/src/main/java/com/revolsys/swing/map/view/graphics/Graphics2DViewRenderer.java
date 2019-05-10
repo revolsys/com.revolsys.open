@@ -21,6 +21,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.List;
 
 import javax.measure.Quantity;
@@ -105,15 +106,20 @@ public class Graphics2DViewRenderer extends ViewRenderer {
   private class MarkerRendererImage extends Graphics2DMarkerRenderer {
     private final Image image;
 
+    private final AffineTransform imageTransform;
+
     public MarkerRendererImage(final ImageMarker imageMarker, final MarkerStyle style) {
       super(style);
       this.image = imageMarker.getImage();
+      this.imageTransform = AffineTransform.getScaleInstance(
+        this.mapWidth / this.image.getWidth(null), this.mapHeight / this.image.getHeight(null));
     }
 
     @Override
     protected void renderMarkerDo() {
-      if (this.image != null) {
-        renderMarkerImage(this.image, this.mapWidth, this.mapHeight);
+      final Image image = this.image;
+      if (image != null) {
+        Graphics2DViewRenderer.this.graphics.drawImage(image, this.imageTransform, null);
       }
     }
   }
@@ -478,72 +484,58 @@ public class Graphics2DViewRenderer extends ViewRenderer {
   }
 
   @Override
-  public void drawLines(final GeometryStyle style, final Iterable<LineString> lines) {
-    final LineStringShape shape = this.lineStringShape;
-    final Graphics2D graphics = this.graphics;
-    final Color originalColor = graphics.getColor();
-    final Stroke originalStroke = graphics.getStroke();
-    try (
-      BaseCloseable useModelCoordinates = useModelCoordinates()) {
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-      final Color color = style.getLineColor();
-      graphics.setColor(color);
-
-      final Quantity<Length> lineWidth = style.getLineWidth();
-      final Unit<Length> unit = lineWidth.getUnit();
-      final float width = (float)toModelValue(lineWidth);
-
-      final float dashOffset = (float)toModelValue(
-        Quantities.getQuantity(style.getLineDashOffset(), unit));
-
-      final float[] dashArray;
-      final List<Double> lineDashArray = style.getLineDashArray();
-      final int dashArraySize = lineDashArray.size();
-      if (dashArraySize == 0) {
-        dashArray = null;
-      } else {
-        dashArray = new float[dashArraySize];
-        for (int i = 0; i < dashArray.length; i++) {
-          final Double dashDouble = lineDashArray.get(i);
-          final float dashFloat = (float)toModelValue(Quantities.getQuantity(dashDouble, unit));
-          dashArray[i] = dashFloat;
-        }
-      }
-
-      final int lineCap = style.getLineCap().getAwtValue();
-      final int lineJoin = style.getLineJoin().getAwtValue();
-      final BasicStroke basicStroke = new BasicStroke(width, lineCap, lineJoin,
-        style.getLineMiterlimit(), dashArray, dashOffset);
-      graphics.setStroke(basicStroke);
-
-      for (final LineString line : lines) {
-        try {
-          shape.setGeometry(line);
-          this.graphics.draw(shape);
-        } catch (final TopologyException e) {
-        }
-      }
-    } finally {
-      shape.clearGeometry();
-      graphics.setColor(originalColor);
-      graphics.setStroke(originalStroke);
-    }
-  }
-
-  /**
-   * Point must be in the same geometry factory as the view.
-   * @param style
-   * @param point
-   * @param viewport
-   */
-  @Override
-  public void drawMarker(final MarkerStyle style, Point point, final double orientation) {
-    point = getGeometry(point);
-    if (Property.hasValue(point)) {
+  public void drawLines(final GeometryStyle style, final Collection<LineString> lines) {
+    if (!lines.isEmpty()) {
+      final LineStringShape shape = this.lineStringShape;
+      final Graphics2D graphics = this.graphics;
+      final Color originalColor = graphics.getColor();
+      final Stroke originalStroke = graphics.getStroke();
       try (
-        MarkerRenderer renderer = style.newMarkerRenderer(this)) {
-        renderer.renderMarkerPoint(point, orientation);
+        BaseCloseable useModelCoordinates = useModelCoordinates()) {
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+          RenderingHints.VALUE_ANTIALIAS_ON);
+
+        final Color color = style.getLineColor();
+        graphics.setColor(color);
+
+        final Quantity<Length> lineWidth = style.getLineWidth();
+        final Unit<Length> unit = lineWidth.getUnit();
+        final float width = (float)toModelValue(lineWidth);
+
+        final float dashOffset = (float)toModelValue(
+          Quantities.getQuantity(style.getLineDashOffset(), unit));
+
+        final float[] dashArray;
+        final List<Double> lineDashArray = style.getLineDashArray();
+        final int dashArraySize = lineDashArray.size();
+        if (dashArraySize == 0) {
+          dashArray = null;
+        } else {
+          dashArray = new float[dashArraySize];
+          for (int i = 0; i < dashArray.length; i++) {
+            final Double dashDouble = lineDashArray.get(i);
+            final float dashFloat = (float)toModelValue(Quantities.getQuantity(dashDouble, unit));
+            dashArray[i] = dashFloat;
+          }
+        }
+
+        final int lineCap = style.getLineCap().getAwtValue();
+        final int lineJoin = style.getLineJoin().getAwtValue();
+        final BasicStroke basicStroke = new BasicStroke(width, lineCap, lineJoin,
+          style.getLineMiterlimit(), dashArray, dashOffset);
+        graphics.setStroke(basicStroke);
+
+        for (final LineString line : lines) {
+          try {
+            shape.setGeometry(line);
+            this.graphics.draw(shape);
+          } catch (final TopologyException e) {
+          }
+        }
+      } finally {
+        shape.clearGeometry();
+        graphics.setColor(originalColor);
+        graphics.setStroke(originalStroke);
       }
     }
   }
@@ -771,43 +763,46 @@ public class Graphics2DViewRenderer extends ViewRenderer {
   }
 
   @Override
-  public void fillPolygons(final GeometryStyle style, final Iterable<Polygon> polygons) {
-    final Graphics2D graphics = this.graphics;
-    final PolygonShape shape = this.polygonShape;
-    final Paint originalPaint = graphics.getPaint();
-    try (
-      BaseCloseable useModelCoordinates = useModelCoordinates()) {
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+  public void fillPolygons(final GeometryStyle style, final Collection<Polygon> polygons) {
+    if (!polygons.isEmpty()) {
+      final Graphics2D graphics = this.graphics;
+      final PolygonShape shape = this.polygonShape;
+      final Paint originalPaint = graphics.getPaint();
+      try (
+        BaseCloseable useModelCoordinates = useModelCoordinates()) {
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+          RenderingHints.VALUE_ANTIALIAS_ON);
 
-      graphics.setPaint(style.getPolygonFill());
-      // final Graphic fillPattern = fill.getPattern();
-      // if (fillPattern != null) {
-      // TODO fillPattern
-      // double width = fillPattern.getWidth();
-      // double height = fillPattern.getHeight();
-      // Rectangle2D.Double patternRect;
-      // // TODO units
-      // // if (isUseModelUnits()) {
-      // // patternRect = new Rectangle2D.Double(0, 0, width
-      // // * viewport.getModelUnitsPerViewUnit(), height
-      // // * viewport.getModelUnitsPerViewUnit());
-      // // } else {
-      // patternRect = new Rectangle2D.Double(0, 0, width, height);
-      // // }
-      // graphics.setPaint(new TexturePaint(fillPattern, patternRect));
+        graphics.setPaint(style.getPolygonFill());
+        // final Graphic fillPattern = fill.getPattern();
+        // if (fillPattern != null) {
+        // TODO fillPattern
+        // double width = fillPattern.getWidth();
+        // double height = fillPattern.getHeight();
+        // Rectangle2D.Double patternRect;
+        // // TODO units
+        // // if (isUseModelUnits()) {
+        // // patternRect = new Rectangle2D.Double(0, 0, width
+        // // * viewport.getModelUnitsPerViewUnit(), height
+        // // * viewport.getModelUnitsPerViewUnit());
+        // // } else {
+        // patternRect = new Rectangle2D.Double(0, 0, width, height);
+        // // }
+        // graphics.setPaint(new TexturePaint(fillPattern, patternRect));
 
-      // }
-      for (final Polygon polygon : polygons) {
-        try {
-          shape.setGeometry(polygon);
-          graphics.fill(shape);
-        } catch (final TopologyException e) {
-          Debug.noOp();
+        // }
+        for (final Polygon polygon : polygons) {
+          try {
+            shape.setGeometry(polygon);
+            graphics.fill(shape);
+          } catch (final TopologyException e) {
+            Debug.noOp();
+          }
         }
+      } finally {
+        shape.clearGeometry();
+        graphics.setPaint(originalPaint);
       }
-    } finally {
-      shape.clearGeometry();
-      graphics.setPaint(originalPaint);
     }
   }
 
@@ -885,14 +880,6 @@ public class Graphics2DViewRenderer extends ViewRenderer {
     return new Graphics2DTextStyleRenderer(this, textStyle);
   }
 
-  @Override
-  public void renderMarkerImage(final Image image, final double mapWidth, final double mapHeight) {
-    final AffineTransform shapeTransform = AffineTransform
-      .getScaleInstance(mapWidth / image.getWidth(null), mapHeight / image.getHeight(null));
-    this.graphics.drawImage(image, shapeTransform, null);
-
-  }
-
   public void setGraphics(final Graphics2D graphics) {
     this.graphics = graphics;
     updateFields();
@@ -915,7 +902,6 @@ public class Graphics2DViewRenderer extends ViewRenderer {
     }
   }
 
-  @Override
   public void translateModelToViewCoordinates(final double modelX, final double modelY) {
     final double[] viewCoordinates = toViewCoordinates(modelX, modelY);
     final double viewX = viewCoordinates[0];

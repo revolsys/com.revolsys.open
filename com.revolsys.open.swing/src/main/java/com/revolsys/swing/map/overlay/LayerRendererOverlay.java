@@ -74,6 +74,7 @@ public class LayerRendererOverlay extends JComponent
     this.cachedImage.addPropertyChangeListener(this);
   }
 
+  @Override
   public void destroy() {
     if (this.layer != null) {
       Property.removeListener(this.layer, this);
@@ -85,6 +86,7 @@ public class LayerRendererOverlay extends JComponent
     this.view = null;
   }
 
+  @Override
   public Layer getLayer() {
     return this.layer;
   }
@@ -153,6 +155,7 @@ public class LayerRendererOverlay extends JComponent
     }
   }
 
+  @Override
   public void refresh() {
     if (this.layer != null) {
       this.layer.refresh();
@@ -175,12 +178,7 @@ public class LayerRendererOverlay extends JComponent
               boundingBox)) {
             final ViewRenderer view = imageViewport.newViewRenderer();
             view.setCancellable(cancellable);
-            if (this.layer != null && this.layer.isExists() && this.layer.isVisible()) {
-              final LayerRenderer<Layer> renderer = this.layer.getRenderer();
-              if (renderer != null) {
-                renderer.render(view);
-              }
-            }
+            view.renderLayer(this.layer);
             if (isShowAreaBoundingBox()) {
               final BoundingBox areaBoundingBox = boundingBox.getAreaBoundingBox();
               if (!areaBoundingBox.isEmpty()) {
@@ -210,6 +208,7 @@ public class LayerRendererOverlay extends JComponent
     }
   }
 
+  @Override
   public void setLayer(final Layer layer) {
     final Layer old = this.layer;
     if (old != layer) {
@@ -235,6 +234,7 @@ public class LayerRendererOverlay extends JComponent
     }
   }
 
+  @Override
   public void setShowAreaBoundingBox(final boolean showAreaBoundingBox) {
     this.showAreaBoundingBox = showAreaBoundingBox;
     redraw();

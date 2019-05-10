@@ -197,8 +197,7 @@ public class MapPrintable implements Printable {
       new Rectangle2D.Double(0, 0, this.contentRect.getWidth(), this.contentRect.getHeight()));
 
     final LayerGroup map = viewport.getProject();
-
-    map.getRenderer().render(viewRenderer);
+    viewRenderer.renderLayer(map);
 
     final double unit = viewport.getModelUnitsPerViewUnit();
     final float lineWidth = (float)(unit * this.millimetre / 5);

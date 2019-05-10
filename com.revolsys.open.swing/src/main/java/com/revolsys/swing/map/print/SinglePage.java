@@ -20,7 +20,6 @@ import com.revolsys.swing.map.Graphics2DViewport;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
-import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
@@ -144,21 +143,12 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
       final Project project = getProject();
       final MapPanel mapPanel = project.getMapPanel();
       final Layer baseMapLayer = mapPanel.getBaseMapLayer();
-      render(view, baseMapLayer);
+      view.renderLayer(baseMapLayer);
 
-      render(view, project);
+      view.renderLayer(project);
       return PAGE_EXISTS;
     } else {
       return NO_SUCH_PAGE;
-    }
-  }
-
-  private void render(final Graphics2DViewRenderer view, final Layer layer) {
-    if (layer != null && layer.isExists() && layer.isVisible()) {
-      final LayerRenderer<Layer> renderer = layer.getRenderer();
-      if (renderer != null) {
-        renderer.render(view);
-      }
     }
   }
 

@@ -214,14 +214,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     setProperty("bottomTabOpen", config);
   }
 
-  protected void addParent(final List<Layer> path) {
-    final LayerGroup parent = getLayerGroup();
-    if (parent != null) {
-      path.add(0, parent);
-      parent.addParent(path);
-    }
-  }
-
   public int addRenderer(final LayerRenderer<?> child) {
     return addRenderer(child, 0);
   }
@@ -447,14 +439,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
         return path + "/" + getName();
       }
     }
-  }
-
-  @Override
-  public List<Layer> getPathList() {
-    final List<Layer> path = new ArrayList<>();
-    path.add(this);
-    addParent(path);
-    return path;
   }
 
   public Map<String, Object> getPluginConfig(final String pluginName) {

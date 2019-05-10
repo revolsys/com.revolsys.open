@@ -1,8 +1,8 @@
 package com.revolsys.swing.map.view;
 
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -13,6 +13,7 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.Ellipsoid;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
@@ -219,13 +220,17 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     drawLines(style, Collections.singletonList(line));
   }
 
-  public void drawLines(final GeometryStyle style) {
-    drawLines(style, this.lines);
+  public abstract void drawLines(GeometryStyle style, Collection<LineString> lines);
+
+  public void drawMarker(final MarkerStyle style, Point point, final double orientation) {
+    point = getGeometry(point);
+    if (Property.hasValue(point)) {
+      try (
+        MarkerRenderer renderer = style.newMarkerRenderer(this)) {
+        renderer.renderMarkerPoint(point, orientation);
+      }
+    }
   }
-
-  public abstract void drawLines(GeometryStyle style, Iterable<LineString> lines);
-
-  public abstract void drawMarker(final MarkerStyle style, Point point, final double orientation);
 
   public void drawMarkers(LineString line, final MarkerStyle styleFirst,
     final MarkerStyle styleLast, final MarkerStyle styleVertex, final MarkerStyle centreStyle) {
@@ -252,7 +257,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   public abstract void drawText(Record record, Geometry geometry, TextStyle style);
 
-  public abstract void fillPolygons(GeometryStyle style, final Iterable<Polygon> polygon);
+  public abstract void fillPolygons(GeometryStyle style, final Collection<Polygon> polygon);
 
   public BaseCloseable geometryListCloseable(final boolean pointsAdd, final boolean linesAdd,
     final boolean polygonsAdd) {
@@ -455,8 +460,23 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   public abstract TextStyleViewRenderer newTextStyleViewRenderer(TextStyle textStyle);
 
-  public void renderLayer(final Layer layer) {
-    final LayerRenderer<? extends Layer> renderer = layer.getRenderer();
+  public final void renderLayer(final Layer layer) {
+    final double scaleForVisible = getScaleForVisible();
+    if (layer != null && layer.isExists() && layer.isVisible(scaleForVisible)) {
+      final LayerRenderer<? extends Layer> renderer = layer.getRenderer();
+      if (renderer != null && renderer.isVisible(this)) {
+        try {
+          renderLayerDo(layer, renderer);
+        } catch (final Throwable e) {
+          if (!isCancelled()) {
+            Logs.error(this, "Error rendering layer: " + renderer.getLayer(), e);
+          }
+        }
+      }
+    }
+  }
+
+  protected void renderLayerDo(final Layer layer, final LayerRenderer<?> renderer) {
     renderer.render(this);
   }
 
@@ -464,9 +484,8 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     renderMarkers(markerStyle, Collections.singleton(point));
   }
 
-  public abstract void renderMarkerImage(Image image, double mapWidth, double mapHeight);
-
-  public void renderMarkers(final MarkerStyle markerStyle, final Iterable<? extends Point> points) {
+  public void renderMarkers(final MarkerStyle markerStyle,
+    final Collection<? extends Point> points) {
     final Marker marker = markerStyle.getMarker();
     marker.renderPoints(this, markerStyle, points);
   }
@@ -522,8 +541,6 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     }
     return convertedValue;
   }
-
-  public abstract void translateModelToViewCoordinates(final double modelX, final double modelY);
 
   protected void updateFields() {
     if (this.viewport == null) {

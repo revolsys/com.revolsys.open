@@ -10,6 +10,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,16 +19,14 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.graphics.PDLineDashPattern;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.graphics.optionalcontent.PDOptionalContentGroup;
 import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
 import org.apache.pdfbox.util.Matrix;
 import org.jeometry.common.exception.Exceptions;
@@ -38,13 +37,13 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
-import com.revolsys.swing.Fonts;
+import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
@@ -65,6 +64,7 @@ import com.revolsys.util.Property;
 import tec.uom.se.quantity.Quantities;
 
 public class PdfViewRenderer extends ViewRenderer {
+
   private abstract class PdfMarkerRenderer extends AbstractMarkerRenderer {
     protected final Matrix matrix = new Matrix();
 
@@ -86,11 +86,6 @@ public class PdfViewRenderer extends ViewRenderer {
       try {
         final PDPageContentStream contentStream = PdfViewRenderer.this.contentStream;
         contentStream.saveGraphicsState();
-        setMarkerStyle(this.style);
-
-        contentStream.setStrokingColor(this.style.getMarkerLineColor());
-        contentStream.setNonStrokingColor(this.style.getMarkerFill());
-
         contentStream.transform(this.matrix);
         renderMarkerDo(contentStream);
 
@@ -116,6 +111,7 @@ public class PdfViewRenderer extends ViewRenderer {
 
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void translateDo(final double x, final double y, final double orientation,
       final double dx, final double dy) {
@@ -184,7 +180,7 @@ public class PdfViewRenderer extends ViewRenderer {
     @Override
     protected void renderMarkerDo() {
       if (this.image != null) {
-        renderMarkerImage(this.image, this.mapWidth, this.mapHeight);
+        // TODO renderMarkerImage(this.image, this.mapWidth, this.mapHeight);
       }
     }
   }
@@ -203,39 +199,50 @@ public class PdfViewRenderer extends ViewRenderer {
 
   private class PdfMarkerRendererSvg extends PdfMarkerRenderer {
 
-    private final BufferedImage image;
+    private final PDImageXObject pdfImage;
 
     public PdfMarkerRendererSvg(final SvgMarker marker, final MarkerStyle style) {
       super(style);
       final Document document = marker.getDocument();
       if (document == null) {
-        this.image = null;
+        this.pdfImage = null;
       } else {
         final String uri = marker.getUri();
-        this.image = SvgBufferedImageTranscoder.newImage(document, uri,
+        final BufferedImage bufferedImage = SvgBufferedImageTranscoder.newImage(document, uri,
           (int)Math.round(this.mapWidth), (int)Math.round(this.mapHeight));
+
+        try {
+          this.pdfImage = LosslessFactory.createFromImage(PdfViewRenderer.this.document,
+            bufferedImage);
+        } catch (final IOException e) {
+          throw Exceptions.wrap(e);
+        }
       }
     }
 
     @Override
     protected void renderMarkerDo() {
-      // if (this.image != null) {
-      // PdfViewRenderer.this.graphics.drawImage(this.image, 0, 0, null);
-      // }
+      if (this.pdfImage != null) {
+        try {
+          PdfViewRenderer.this.contentStream.drawImage(this.pdfImage, 0f, 0f);
+        } catch (final IOException e) {
+          throw Exceptions.wrap(e);
+        }
+      }
     }
   }
 
   private class PdfMarkerRendererText extends PdfMarkerRenderer {
 
-    private final Font font;
-
-    private final String text;
+    // private final Font font;
+    //
+    // private final String text;
 
     public PdfMarkerRendererText(final TextMarker textMarker, final MarkerStyle style) {
       super(style);
-      final int fontSize = (int)this.mapHeight;
-      this.font = Fonts.newFont(textMarker.getTextFaceName(), 0, fontSize);
-      this.text = textMarker.getText();
+      // final int fontSize = (int)this.mapHeight;
+      // this.font = Fonts.newFont(textMarker.getTextFaceName(), 0, fontSize);
+      // this.text = textMarker.getText();
     }
 
     @Override
@@ -302,15 +309,66 @@ public class PdfViewRenderer extends ViewRenderer {
     }
   }
 
-  private final PDPageContentStream contentStream;
+  private class PdfMarkerStyleCloseable implements BaseCloseable {
+
+    @Override
+    public void close() {
+      try {
+        PdfViewRenderer.this.contentStream.restoreGraphicsState();
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    }
+
+    public BaseCloseable reset(final MarkerStyle style) {
+      try {
+        final PDPageContentStream contentStream = PdfViewRenderer.this.contentStream;
+        contentStream.saveGraphicsState();
+        PDExtendedGraphicsState graphicsState = PdfViewRenderer.this.graphicsStateByMarkerStyle
+          .get(style);
+        if (graphicsState == null) {
+          graphicsState = new PDExtendedGraphicsState();
+
+          final int lineOpacity = style.getMarkerLineOpacity();
+          if (lineOpacity != 255) {
+            graphicsState.setStrokingAlphaConstant(lineOpacity / 255f);
+          }
+
+          final Quantity<Length> lineWidth = style.getMarkerLineWidth();
+          graphicsState.setLineWidth((float)toDisplayValue(lineWidth));
+
+          final int polygonFillOpacity = style.getMarkerFillOpacity();
+          if (polygonFillOpacity != 255) {
+            graphicsState.setNonStrokingAlphaConstant(polygonFillOpacity / 255f);
+          }
+
+          PdfViewRenderer.this.graphicsStateByMarkerStyle.put(style, graphicsState);
+        }
+        contentStream.setGraphicsStateParameters(graphicsState);
+        contentStream.setStrokingColor(style.getMarkerLineColor());
+        contentStream.setNonStrokingColor(style.getMarkerFill());
+        return this;
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    }
+  }
 
   private final Canvas canvas = new Canvas();
 
-  private int styleId = 0;
+  private final PDPageContentStream contentStream;
 
-  private final Map<MarkerStyle, String> styleNames = new HashMap<>();
+  private final double[] coordinates = new double[2];
 
-  private final PDPage page;
+  private final PDDocument document;
+
+  private final Map<GeometryStyle, PDExtendedGraphicsState> graphicsStateByGeometryStyle = new HashMap<>();
+
+  private final Map<MarkerStyle, PDExtendedGraphicsState> graphicsStateByMarkerStyle = new HashMap<>();
+
+  private final PdfMarkerStyleCloseable markerStyleCloseable = new PdfMarkerStyleCloseable();
+
+  private final Map<Layer, PDOptionalContentGroup> optionalContentGroups = new HashMap<>();
 
   private boolean useViewCoordinates;
 
@@ -318,24 +376,21 @@ public class PdfViewRenderer extends ViewRenderer {
     this.useViewCoordinates = false;
   };
 
-  private final double[] coordinates = new double[2];
-
-  private final PDDocument document;
-
   public PdfViewRenderer(final PdfViewport viewport, final PDPageContentStream contentStream) {
     super(viewport);
     this.contentStream = contentStream;
-    this.page = viewport.getPage();
     this.document = viewport.getDocument();
     setShowHiddenRecords(true);
     updateFields();
   }
 
+  public void addPDOptionalContentGroup(final Layer layer, final PDOptionalContentGroup group) {
+    this.optionalContentGroups.put(layer, group);
+  }
+
   @Override
   public BaseCloseable applyMarkerStyle(final MarkerStyle style) {
-    // TODO Auto-generated method stub
-    return () -> {
-    };
+    return this.markerStyleCloseable.reset(style);
   }
 
   @Override
@@ -522,26 +577,23 @@ public class PdfViewRenderer extends ViewRenderer {
   }
 
   @Override
-  public void drawLines(final GeometryStyle style, final Iterable<LineString> lines) {
-    final PDPageContentStream contentStream = this.contentStream;
-    try {
-      contentStream.saveGraphicsState();
-      setGeometryStyle(style);
-      contentStream.setStrokingColor(style.getLineColor());
+  public void drawLines(final GeometryStyle style, final Collection<LineString> lines) {
+    if (!lines.isEmpty()) {
+      final PDPageContentStream contentStream = this.contentStream;
+      try {
+        contentStream.saveGraphicsState();
+        setGeometryStyle(style);
+        contentStream.setStrokingColor(style.getLineColor());
 
-      for (final LineString line : lines) {
-        drawLine(contentStream, line);
-        contentStream.stroke();
+        for (final LineString line : lines) {
+          drawLine(contentStream, line);
+          contentStream.stroke();
+        }
+        contentStream.restoreGraphicsState();
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
       }
-      contentStream.restoreGraphicsState();
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
     }
-  }
-
-  @Override
-  public void drawMarker(final MarkerStyle style, final Point point, final double orientation) {
-    // TODO Auto-generated method stub
   }
 
   private void drawPolygon(final PDPageContentStream contentStream, final Polygon polygon)
@@ -724,22 +776,24 @@ public class PdfViewRenderer extends ViewRenderer {
   }
 
   @Override
-  public void fillPolygons(final GeometryStyle style, final Iterable<Polygon> polygons) {
-    final PDPageContentStream contentStream = this.contentStream;
-    try {
-      contentStream.saveGraphicsState();
-      setGeometryStyle(style);
-      contentStream.setNonStrokingColor(style.getPolygonFill());
-
-      for (final Polygon polygon : polygons) {
-        drawPolygon(contentStream, polygon);
-      }
-      contentStream.fill();
-    } catch (final IOException e) {
-    } finally {
+  public void fillPolygons(final GeometryStyle style, final Collection<Polygon> polygons) {
+    if (!polygons.isEmpty()) {
+      final PDPageContentStream contentStream = this.contentStream;
       try {
-        contentStream.restoreGraphicsState();
+        contentStream.saveGraphicsState();
+        setGeometryStyle(style);
+        contentStream.setNonStrokingColor(style.getPolygonFill());
+
+        for (final Polygon polygon : polygons) {
+          drawPolygon(contentStream, polygon);
+        }
+        contentStream.fill();
       } catch (final IOException e) {
+      } finally {
+        try {
+          contentStream.restoreGraphicsState();
+        } catch (final IOException e) {
+        }
       }
     }
   }
@@ -750,6 +804,10 @@ public class PdfViewRenderer extends ViewRenderer {
 
   public PDPageContentStream getContentStream() {
     return this.contentStream;
+  }
+
+  public PDOptionalContentGroup getPDOptionalContentGroup(final Layer layer) {
+    return this.optionalContentGroups.get(layer);
   }
 
   @Override
@@ -790,22 +848,38 @@ public class PdfViewRenderer extends ViewRenderer {
   }
 
   @Override
+  public MarkerRenderer newMarkerRendererText(final TextMarker textMarker,
+    final MarkerStyle style) {
+    return new PdfMarkerRendererText(textMarker, style);
+  }
+
+  @Override
   public TextStyleViewRenderer newTextStyleViewRenderer(final TextStyle textStyle) {
     return new PdfTextStyleRenderer(this, textStyle);
   }
 
   @Override
-  public void renderMarkerImage(final Image image, final double mapWidth, final double mapHeight) {
-    // TODO Auto-generated method stub
+  protected void renderLayerDo(final Layer layer, final LayerRenderer<?> renderer) {
+    try {
 
+      final PDOptionalContentGroup contentGroup = getPDOptionalContentGroup(layer);
+
+      if (contentGroup != null) {
+        this.contentStream.beginMarkedContent(COSName.OC, contentGroup);
+      }
+      renderer.render(this);
+      if (contentGroup != null) {
+        this.contentStream.endMarkedContent();
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   private void setGeometryStyle(final GeometryStyle style) throws IOException {
-    String styleName = this.styleNames.get(style);
-    if (styleName == null) {
-      styleName = "rgStyle" + this.styleId++;
-
-      final PDExtendedGraphicsState graphicsState = new PDExtendedGraphicsState();
+    PDExtendedGraphicsState graphicsState = this.graphicsStateByGeometryStyle.get(style);
+    if (graphicsState == null) {
+      graphicsState = new PDExtendedGraphicsState();
 
       final int lineOpacity = style.getLineOpacity();
       if (lineOpacity != 255) {
@@ -834,12 +908,14 @@ public class PdfViewRenderer extends ViewRenderer {
             dashArray[i] = dashArray[i - 1];
           }
         }
-        final int offset = (int)toDisplayValue(
-          Quantities.getQuantity(style.getLineDashOffset(), unit));
-        final COSArray dashCosArray = new COSArray();
-        dashCosArray.setFloatArray(dashArray);
-        final PDLineDashPattern pattern = new PDLineDashPattern(dashCosArray, offset);
-        graphicsState.setLineDashPattern(pattern);
+        // TODO dash array disabled due to bug in PDFbox
+        // final int offset = (int)toDisplayValue(
+        // Quantities.getQuantity(style.getLineDashOffset(), unit));
+        // final COSArray dashCosArray = new COSArray();
+        // dashCosArray.setFloatArray(dashArray);
+        // final PDLineDashPattern pattern = new PDLineDashPattern(dashCosArray,
+        // offset);
+        // graphicsState.setLineDashPattern(pattern);
       }
       switch (style.getLineCap()) {
         case BUTT:
@@ -870,40 +946,9 @@ public class PdfViewRenderer extends ViewRenderer {
         graphicsState.setNonStrokingAlphaConstant(polygonFillOpacity / 255f);
       }
 
-      final PDResources resources = this.page.getResources();
-      resources.add(graphicsState);
-
-      this.styleNames.put(style, styleName);
+      this.graphicsStateByGeometryStyle.put(style, graphicsState);
     }
-    this.contentStream.appendRawCommands("/" + styleName + " gs\n");
-  }
-
-  private void setMarkerStyle(final MarkerStyle style) throws IOException {
-    String styleName = this.styleNames.get(style);
-    if (styleName == null) {
-      styleName = "rgStyle" + this.styleId++;
-
-      final PDExtendedGraphicsState graphicsState = new PDExtendedGraphicsState();
-
-      final int lineOpacity = style.getMarkerLineOpacity();
-      if (lineOpacity != 255) {
-        graphicsState.setStrokingAlphaConstant(lineOpacity / 255f);
-      }
-
-      final Quantity<Length> lineWidth = style.getMarkerLineWidth();
-      graphicsState.setLineWidth((float)toDisplayValue(lineWidth));
-
-      final int polygonFillOpacity = style.getMarkerFillOpacity();
-      if (polygonFillOpacity != 255) {
-        graphicsState.setNonStrokingAlphaConstant(polygonFillOpacity / 255f);
-      }
-
-      final PDResources resources = this.page.getResources();
-      resources.add(graphicsState);
-
-      this.styleNames.put(style, styleName);
-    }
-    this.contentStream.appendRawCommands("/" + styleName + " gs\n");
+    this.contentStream.setGraphicsStateParameters(graphicsState);
   }
 
   public double[] toViewCoordinates(final double x, final double y) {
@@ -919,12 +964,6 @@ public class PdfViewRenderer extends ViewRenderer {
       coordinates[1] = viewY;
     }
     return coordinates;
-  }
-
-  @Override
-  public void translateModelToViewCoordinates(final double modelX, final double modelY) {
-    // TODO Auto-generated method stub
-
   }
 
   @Override

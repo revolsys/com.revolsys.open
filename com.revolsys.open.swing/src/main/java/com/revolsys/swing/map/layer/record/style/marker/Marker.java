@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer.record.style.marker;
 
+import java.util.Collection;
+
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -50,10 +52,12 @@ public interface Marker extends MapSerializer {
   MarkerRenderer newMarkerRenderer(ViewRenderer view, MarkerStyle style);
 
   default void renderPoints(final ViewRenderer view, final MarkerStyle style,
-    final Iterable<? extends Point> points) {
-    try (
-      MarkerRenderer markerRenderer = newMarkerRenderer(view, style)) {
-      markerRenderer.renderMarkers(points);
+    final Collection<? extends Point> points) {
+    if (!points.isEmpty()) {
+      try (
+        MarkerRenderer markerRenderer = newMarkerRenderer(view, style)) {
+        markerRenderer.renderMarkers(points);
+      }
     }
   }
 }

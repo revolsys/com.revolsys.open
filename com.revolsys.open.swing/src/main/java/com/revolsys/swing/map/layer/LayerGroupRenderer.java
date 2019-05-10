@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jeometry.common.logging.Logs;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.swing.map.view.ViewRenderer;
 
@@ -23,16 +21,7 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
 
       for (final Layer childLayer : view.cancellable(layers)) {
         if (childLayer.isVisible(scaleForVisible)) {
-          try {
-            final LayerRenderer<Layer> renderer = childLayer.getRenderer();
-            if (renderer != null) {
-              renderer.render(view);
-            }
-          } catch (final Throwable e) {
-            if (!view.isCancelled()) {
-              Logs.error(this, "Error rendering layer: " + childLayer, e);
-            }
-          }
+          view.renderLayer(childLayer);
         }
       }
     }
