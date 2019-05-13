@@ -7,8 +7,8 @@ import com.revolsys.io.Writer;
 import com.revolsys.spring.resource.Resource;
 
 public interface GriddedElevationModelWriter extends Writer<GriddedElevationModel> {
-  static boolean isWritable(final Object source) {
-    return IoFactory.isAvailable(GriddedElevationModelWriterFactory.class, source);
+  static boolean isWritable(final Object target) {
+    return IoFactory.isAvailable(GriddedElevationModelWriterFactory.class, target);
   }
 
   static GriddedElevationModelWriter newGriddedElevationModelWriter(final Object target,

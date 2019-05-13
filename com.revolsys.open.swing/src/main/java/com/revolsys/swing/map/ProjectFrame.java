@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -46,6 +47,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.connection.file.FileConnectionManager;
 import com.revolsys.connection.file.FolderConnectionRegistry;
+import com.revolsys.gdal.raster.GdalImageFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -53,6 +55,7 @@ import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.filter.FileNameExtensionFilter;
+import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
@@ -65,10 +68,12 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.component.DnDTabbedPane;
 import com.revolsys.swing.component.TabClosableTitle;
+import com.revolsys.swing.io.SwingIo;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.raster.SaveAsGeoreferencedImage;
 import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.print.SinglePage;
 import com.revolsys.swing.map.view.pdf.SaveAsPdf;
@@ -266,12 +271,22 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  private void actionRunScript() {
-    final File logDirectory = getLogDirectory();
-    ScriptRunner.runScriptProcess(this);
+  private void actionProjectExport() {
+    final String baseName = this.project.getName();
+    final Predicate<GeoreferencedImageReadFactory> filter = fileFilter -> {
+      return !(fileFilter instanceof GdalImageFactory);
+    };
+    SwingIo.exportToFile("Export Project", "com.revolsys.swing.map.project.export",
+      GeoreferencedImageReadFactory.class, filter, "pdf", true, baseName, file -> {
+        if ("pdf".equals(FileUtil.getFileNameExtension(file))) {
+          SaveAsPdf.save(file, this.project);
+        } else {
+          SaveAsGeoreferencedImage.save(file, this.project);
+        }
+      });
   }
 
-  public void actionSaveProjectAs() {
+  private void actionProjectSaveAs() {
     final Path path = this.project.saveAllSettingsAs();
     if (path != null) {
       addToRecentProjects(path);
@@ -280,6 +295,10 @@ public class ProjectFrame extends BaseFrame {
         setTitle(project.getName() + " - " + getFrameTitle());
       });
     }
+  }
+
+  private void actionRunScript() {
+    ScriptRunner.runScriptProcess(this);
   }
 
   public void addBottomTab(final ProjectFramePanel panel, final Map<String, Object> config) {
@@ -696,16 +715,16 @@ public class ProjectFrame extends BaseFrame {
       if (this.project.isSaved()) {
         this.project.saveAllSettings();
       } else {
-        actionSaveProjectAs();
+        actionProjectSaveAs();
       }
     }).setAcceleratorControlKey(KeyEvent.VK_S);
 
     file
       .addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
-        this::actionSaveProjectAs)
+        this::actionProjectSaveAs)
       .setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
-    file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", SaveAsPdf::save);
+    file.addMenuItemTitleIcon("save", "Export Map...", "disk:export", this::actionProjectExport);
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage::print)
       .setAcceleratorControlKey(KeyEvent.VK_P);

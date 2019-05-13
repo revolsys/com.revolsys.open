@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.jeometry.common.function.Consumer3;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -314,4 +315,21 @@ public interface GeoreferencedImage
   void setRenderedImage(final RenderedImage image);
 
   void setTiePoints(final List<MappedLocation> tiePoints);
+
+  default void writeImage(final Object target) {
+    writeImage(target, MapEx.EMPTY);
+  }
+
+  default void writeImage(final Object target, final MapEx properties) {
+    try (
+      GeoreferencedImageWriter writer = GeoreferencedImageWriter.newGeoreferencedImageWriter(target,
+        properties)) {
+      if (writer == null) {
+        throw new IllegalArgumentException("No image writer exists for " + target);
+      } else {
+        writer.write(this);
+      }
+    }
+
+  }
 }
