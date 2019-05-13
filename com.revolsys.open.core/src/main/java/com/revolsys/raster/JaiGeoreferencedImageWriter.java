@@ -1,9 +1,10 @@
 package com.revolsys.raster;
 
+import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.imageio.ImageIO;
+import javax.media.jai.JAI;
 
 import org.jeometry.common.exception.Exceptions;
 
@@ -24,7 +25,10 @@ public class JaiGeoreferencedImageWriter implements GeoreferencedImageWriter {
   public void write(final GeoreferencedImage image) {
     try (
       OutputStream out = this.resource.newBufferedOutputStream()) {
-      ImageIO.write(image.getRenderedImage(), this.formatName, out);
+      final RenderedImage renderedImage = image.getRenderedImage();
+      // ImageIO.write(renderedImage, this.formatName, out);
+      final String fileName = this.resource.getFile().getAbsolutePath();
+      JAI.create("filestore", renderedImage, fileName, this.formatName);
     } catch (final IOException e) {
       throw Exceptions.wrap("Unable to write: " + this.resource, e);
     }

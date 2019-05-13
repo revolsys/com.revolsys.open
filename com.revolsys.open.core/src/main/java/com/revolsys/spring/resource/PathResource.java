@@ -308,6 +308,11 @@ public class PathResource extends AbstractResource implements WritableResource {
     return this.path.hashCode();
   }
 
+  @Override
+  public boolean isFile() {
+    return true;
+  }
+
   /**
    * This implementation checks whether the underlying file is marked as readable
    * (and corresponds to an actual file with content, not to a directory).

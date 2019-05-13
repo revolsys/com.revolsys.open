@@ -5,7 +5,7 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.raster.GeoreferencedImageWriter;
 import com.revolsys.raster.GeoreferencedImageWriterFactory;
-import com.revolsys.raster.JaiGeoreferencedImageWriter;
+import com.revolsys.raster.ImageIoGeoreferencedImageWriter;
 import com.revolsys.spring.resource.Resource;
 
 public class GifImageFactory extends AbstractIoFactory
@@ -23,6 +23,6 @@ public class GifImageFactory extends AbstractIoFactory
 
   @Override
   public GeoreferencedImageWriter newGeoreferencedImageWriter(final Resource resource) {
-    return new JaiGeoreferencedImageWriter(resource, "GIF");
+    return new ImageIoGeoreferencedImageWriter(resource, "GIF");
   }
 }
