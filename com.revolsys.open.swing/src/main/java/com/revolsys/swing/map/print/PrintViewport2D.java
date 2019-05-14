@@ -4,16 +4,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.print.PageFormat;
 
-import javax.measure.Unit;
-import javax.measure.quantity.Length;
-
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
-
-import systems.uom.common.USCustomary;
 
 public class PrintViewport2D extends Viewport2D {
   private final Rectangle2D contentRect;
@@ -50,13 +45,9 @@ public class PrintViewport2D extends Viewport2D {
     setBoundingBox(newBoundingBox);
   }
 
-  /**
-   * Get the unit of measure for the printable page. All measurements are in
-   * 1/72 inch.
-   */
   @Override
-  public Unit<Length> getScreenUnit() {
-    return USCustomary.INCH.divide(this.dpi);
+  public double getMetresPerPixel() {
+    return 0.0254 / this.dpi;
   }
 
   @Override

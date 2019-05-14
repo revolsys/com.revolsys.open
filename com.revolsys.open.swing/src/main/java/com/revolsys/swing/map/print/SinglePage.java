@@ -74,6 +74,11 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
   }
 
   @Override
+  public double getMetresPerPixel() {
+    return 2.54e-3 / 72;
+  }
+
+  @Override
   public int getNumberOfPages() {
     return 1;
   }
@@ -117,11 +122,6 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
   @Override
   public double getScaleForVisible() {
     return this.scaleForVisible;
-  }
-
-  @Override
-  public int getScreenResolution() {
-    return 72;
   }
 
   @Override

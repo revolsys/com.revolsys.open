@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.measure.Quantity;
-import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
 import org.jeometry.common.data.type.DataType;
@@ -30,7 +29,6 @@ import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 
-import systems.uom.common.USCustomary;
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;
 
@@ -40,10 +38,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   private static final int HOTSPOT_PIXELS = 10;
 
-  public static final List<Long> SCALES = Arrays.asList(500000000L, 250000000L, 100000000L,
-    50000000L, 25000000L, 10000000L, 5000000L, 2500000L, 1000000L, 500000L, 250000L, 100000L,
-    50000L, 25000L, 10000L, 5000L, 2500L, 1000L, 500L, 250L, 100L, 50L, 25L, 10L, 5L, 1L);
-
   private static List<Double> GEOGRAPHIC_UNITS_PER_PIXEL = Arrays.asList(5.0, 2.0, 1.0, 0.5, 0.2,
     0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001, 0.0005, 0.0002, 0.0001, 0.00005, 0.00002, 0.00001,
     0.000005, 0.000002, 0.000001, 0.0000005, 0.0000002, 0.0000001);
@@ -51,6 +45,10 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   private static List<Double> PROJECTED_UNITS_PER_PIXEL = Arrays.asList(500000.0, 200000.0,
     100000.0, 50000.0, 20000.0, 10000.0, 5000.0, 2000.0, 1000.0, 500.0, 200.0, 100.0, 50.0, 20.0,
     10.0, 5.0, 2.0, 1.0, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001);
+
+  public static final List<Long> SCALES = newScales(PROJECTED_UNITS_PER_PIXEL);
+
+  private static final double PIXEL_SIZE_METRES = 2.5e-4;
 
   public static double getScale(final Quantity<Length> viewWidth,
     final Quantity<Length> modelWidth) {
@@ -62,6 +60,16 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
       final double scale = width2 / width1;
       return scale;
     }
+  }
+
+  private static List<Long> newScales(final List<Double> resolutions) {
+    final List<Long> scales = new ArrayList<>(resolutions.size());
+    for (final double resolution : resolutions) {
+
+      final long scale = (long)Math.ceil(resolution * 4000);
+      scales.add(scale);
+    }
+    return scales;
   }
 
   public static AffineTransform newScreenToModelTransform(final BoundingBox boundingBox,
@@ -247,6 +255,10 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return this.originY;
   }
 
+  public double getPixelSizeMetres() {
+    return PIXEL_SIZE_METRES;
+  }
+
   public double getPixelsPerXUnit() {
     return this.pixelsPerXUnit;
   }
@@ -310,10 +322,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return this.scale;
   }
 
-  public double getScaleForUnitsPerPixel(final double unitsPerPixel) {
-    return unitsPerPixel * getScreenResolution() / 0.0254;
-  }
-
   /**
    * Get the scale which dictates if a layer or renderer is visible. This is used when printing
    * to ensure the same layers and renderers are used for printing as is shown on the screen.
@@ -328,19 +336,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return this.scales;
   }
 
-  public int getScreenResolution() {
-    // final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-    // final int screenResolution = defaultToolkit.getScreenResolution();
-    return 96;
-  }
-
   public AffineTransform getScreenToModelTransform() {
     return this.screenToModelTransform;
-  }
-
-  public Unit<Length> getScreenUnit() {
-    final int screenResolution = getScreenResolution();
-    return USCustomary.INCH.divide(screenResolution);
   }
 
   public double getUnitsPerPixel() {
@@ -348,7 +345,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   public double getUnitsPerPixel(final double scale) {
-    return scale * 0.0254 / getScreenResolution();
+    return scale * getMetresPerPixel();
   }
 
   public List<Double> getUnitsPerPixelList() {
@@ -370,7 +367,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     if (width < 0) {
       width = 0;
     }
-    return Quantities.getQuantity(width, getScreenUnit());
+    final double pixelSizeMetres = getPixelSizeMetres();
+    return Quantities.getQuantity(width * pixelSizeMetres, Units.METRE);
   }
 
   public double getViewHeightPixels() {
@@ -382,7 +380,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     if (width < 0) {
       width = 0;
     }
-    return Quantities.getQuantity(width, getScreenUnit());
+    final double pixelSizeMetres = getPixelSizeMetres();
+    return Quantities.getQuantity(width * pixelSizeMetres, Units.METRE);
   }
 
   public double getViewWidthPixels() {
@@ -574,8 +573,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
         if (unitsPerPixel < this.minUnitsPerPixel) {
           unitsPerPixel = this.minUnitsPerPixel;
         }
-        final double pixelSizeMetres = QuantityType
-          .doubleValue(Quantities.getQuantity(1, getScreenUnit()), Units.METRE);
+        final double pixelSizeMetres = getPixelSizeMetres();
         this.unitsPerPixel = unitsPerPixel;
         setModelToScreenTransform(
           newModelToScreenTransform(boundingBox, viewWidthPixels, viewHeightPixels));

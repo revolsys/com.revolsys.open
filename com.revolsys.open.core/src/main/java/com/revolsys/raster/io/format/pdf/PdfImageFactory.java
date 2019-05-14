@@ -22,7 +22,6 @@ public class PdfImageFactory extends AbstractIoFactory
 
   @Override
   public GeoreferencedImageWriter newGeoreferencedImageWriter(final Resource resource) {
-    // TODO Auto-generated method stub
-    return null;
+    return new PdfImageWriter(resource);
   }
 }

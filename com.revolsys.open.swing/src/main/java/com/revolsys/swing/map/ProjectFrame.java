@@ -24,7 +24,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -36,6 +35,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -47,7 +47,6 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.connection.file.FileConnectionManager;
 import com.revolsys.connection.file.FolderConnectionRegistry;
-import com.revolsys.gdal.raster.GdalImageFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -55,7 +54,7 @@ import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.filter.FileNameExtensionFilter;
-import com.revolsys.raster.GeoreferencedImageReadFactory;
+import com.revolsys.raster.GeoreferencedImageWriterFactory;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
@@ -83,6 +82,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.scripting.ScriptRunner;
+import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.node.ListTreeNode;
@@ -170,6 +170,8 @@ public class ProjectFrame extends BaseFrame {
 
   private JSplitPane leftRightSplit;
 
+  private final ToolBar leftToolBar = new ToolBar();
+
   private TabbedPane leftTabs = new TabbedPane();
 
   private MapPanel mapPanel;
@@ -238,14 +240,33 @@ public class ProjectFrame extends BaseFrame {
     loadProject();
   }
 
-  private void actionNewProject() {
+  private void actionProjectExport() {
+    final String baseName = this.project.getName();
+    SwingIo.exportToFile("Export Project", "com.revolsys.swing.map.project.export",
+      GeoreferencedImageWriterFactory.class, "pdf", baseName, file -> {
+        if ("pdf".equals(FileUtil.getFileNameExtension(file))) {
+          SaveAsPdf.save(file, this.project);
+        } else {
+          SaveAsGeoreferencedImage.save(file, this.project);
+        }
+      });
+  }
+
+  private void actionProjectNew() {
     if (this.project != null && this.project.saveWithPrompt()) {
       this.project.reset();
       super.setTitle("NEW - " + this.frameTitle);
     }
   }
 
-  private void actionOpenProject() {
+  private void actionProjectNewFromTemplate() {
+    if (this.project != null) {
+      this.project.actionImportProject("New Project from Template", true);
+    }
+
+  }
+
+  private void actionProjectOpen() {
     if (this.project != null && this.project.saveWithPrompt()) {
 
       final JFileChooser fileChooser = SwingUtil.newFileChooser("Open Project", this.preferences,
@@ -271,19 +292,12 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  private void actionProjectExport() {
-    final String baseName = this.project.getName();
-    final Predicate<GeoreferencedImageReadFactory> filter = fileFilter -> {
-      return !(fileFilter instanceof GdalImageFactory);
-    };
-    SwingIo.exportToFile("Export Project", "com.revolsys.swing.map.project.export",
-      GeoreferencedImageReadFactory.class, filter, "pdf", true, baseName, file -> {
-        if ("pdf".equals(FileUtil.getFileNameExtension(file))) {
-          SaveAsPdf.save(file, this.project);
-        } else {
-          SaveAsGeoreferencedImage.save(file, this.project);
-        }
-      });
+  private void actionProjectSave() {
+    if (this.project.isSaved()) {
+      this.project.saveAllSettings();
+    } else {
+      actionProjectSaveAs();
+    }
   }
 
   private void actionProjectSaveAs() {
@@ -380,6 +394,22 @@ public class ProjectFrame extends BaseFrame {
       final JMenu menu = menuFactory.newComponent();
       menuBar.add(menu, menuBar.getMenuCount() - 1);
     }
+  }
+
+  protected void addMenuItemAndToolBarButton(final MenuFactory menu, final ToolBar toolBar,
+    final String groupName, final String name, final String iconName, final Runnable runnable) {
+    toolBar.addButton(groupName, name, iconName, runnable);
+
+    menu.addMenuItemTitleIcon(groupName, name, iconName, runnable);
+  }
+
+  protected void addMenuItemAndToolBarButton(final MenuFactory menu, final ToolBar toolBar,
+    final String groupName, final String name, final String iconName, final Runnable runnable,
+    final int acceleratorControlKey) {
+    toolBar.addButton(groupName, name, iconName, runnable);
+
+    final RunnableAction menuItem = menu.addMenuItemTitleIcon(groupName, name, iconName, runnable);
+    menuItem.setAcceleratorControlKey(acceleratorControlKey);
   }
 
   private void addToRecentProjects(final Path projectPath) {
@@ -539,6 +569,10 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
+  protected void initLeftToolbar(final ToolBar toolBar) {
+
+  }
+
   @Override
   protected void initUi() {
     setMinimumSize(new Dimension(600, 500));
@@ -558,9 +592,13 @@ public class ProjectFrame extends BaseFrame {
     this.leftTabs.setMinimumSize(new Dimension(100, 300));
     this.leftTabs.setPreferredSize(new Dimension(300, 700));
 
+    final JPanel leftPanel = new JPanel(new BorderLayout());
+    leftPanel.add(this.leftToolBar, BorderLayout.NORTH);
+    leftPanel.add(this.leftTabs, BorderLayout.CENTER);
+
     this.mapPanel.setMinimumSize(new Dimension(300, 300));
     this.mapPanel.setPreferredSize(new Dimension(700, 700));
-    this.leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.leftTabs, this.mapPanel);
+    this.leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, this.mapPanel);
 
     this.leftRightSplit.setBorder(BorderFactory.createEmptyBorder());
     this.bottomTabs.setBorder(BorderFactory.createEmptyBorder());
@@ -585,6 +623,7 @@ public class ProjectFrame extends BaseFrame {
 
     add(this.topBottomSplit, BorderLayout.CENTER);
 
+    initLeftToolbar(this.leftToolBar);
     newTabLeftTableOfContents();
     newTabLeftCatalogPanel();
 
@@ -695,39 +734,34 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory newMenuFile() {
     final MenuFactory file = new MenuFactory("File");
 
-    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout:add", this::actionNewProject)
+    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout:add", this::actionProjectNew)
       .setAcceleratorControlKey(KeyEvent.VK_N);
 
-    file.addMenuItemTitleIcon("projectOpen", "New Project...", "layout:add", () -> {
-      if (this.project != null) {
-        this.project.actionImportProject("New Project from Template", true);
-      }
-    }).setAcceleratorShiftControlKey(KeyEvent.VK_N);
+    file
+      .addMenuItemTitleIcon("projectOpen", "New Project...", "layout:add",
+        this::actionProjectNewFromTemplate)
+      .setAcceleratorShiftControlKey(KeyEvent.VK_N);
 
     file
-      .addMenuItemTitleIcon("projectOpen", "Open Project...", "layout:add", this::actionOpenProject)
+      .addMenuItemTitleIcon("projectOpen", "Open Project...", "layout:add", this::actionProjectOpen)
       .setAcceleratorControlKey(KeyEvent.VK_O);
 
     file.addComponent("projectOpen", this.openRecentMenu);
     updateRecentMenu();
 
-    file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save", () -> {
-      if (this.project.isSaved()) {
-        this.project.saveAllSettings();
-      } else {
-        actionProjectSaveAs();
-      }
-    }).setAcceleratorControlKey(KeyEvent.VK_S);
+    addMenuItemAndToolBarButton(file, this.leftToolBar, "projectSave", "Save Project",
+      "layout_save", this::actionProjectSave, KeyEvent.VK_S);
 
     file
       .addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
         this::actionProjectSaveAs)
       .setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
-    file.addMenuItemTitleIcon("save", "Export Map...", "disk:export", this::actionProjectExport);
+    addMenuItemAndToolBarButton(file, this.leftToolBar, "projectSave", "Export Map...",
+      "disk:export", this::actionProjectExport);
 
-    file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage::print)
-      .setAcceleratorControlKey(KeyEvent.VK_P);
+    addMenuItemAndToolBarButton(file, this.leftToolBar, "print", "Print", "printer",
+      SinglePage::print, KeyEvent.VK_P);
 
     if (OS.isWindows()) {
       file.addMenuItemTitleIcon("exit", "Exit", null, this::exit)
