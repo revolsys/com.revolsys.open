@@ -77,20 +77,6 @@ public class TiffImage extends AbstractGeoreferencedImage {
   public static final int TAG_Y_RESOLUTION = 283;
 
   static {
-    // try {
-    // final OperationRegistry reg =
-    // JAI.getDefaultInstance().getOperationRegistry();
-    // ImageCodec.unregisterCodec("tiff");
-    // reg.unregisterOperationDescriptor("tiff");
-    //
-    // ImageCodec.registerCodec(new XTIFFCodec());
-    // final XTIFFDescriptor descriptor = new XTIFFDescriptor();
-    //
-    // reg.registerDescriptor(descriptor);
-    //
-    // } catch (final Throwable t) {
-    // }
-
     addProjection(1, "Transverse_Mercator");
     // CT_TransvMercator_Modified_Alaska = 2
     // CT_ObliqueMercator = 3

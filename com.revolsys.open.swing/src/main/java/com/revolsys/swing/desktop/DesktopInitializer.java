@@ -52,7 +52,6 @@ public class DesktopInitializer {
         final PreferencesDialog preferencesDialog = new PreferencesDialog();
         preferencesDialog.showPanel();
       });
-      System.setProperty("com.sun.media.jai.disableMediaLib", "true");
     }
 
   }
