@@ -16,12 +16,13 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.raster.JaiGeoreferencedImage;
+import com.revolsys.raster.AbstractGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 
-public class PdfImage extends JaiGeoreferencedImage {
+public class PdfImage extends AbstractGeoreferencedImage {
 
   public PdfImage(final Resource imageResource) {
+    super("pfw");
     setImageResource(imageResource);
     setRenderedImage(newBufferedImage());
     if (!hasGeometryFactory()) {
@@ -33,8 +34,11 @@ public class PdfImage extends JaiGeoreferencedImage {
   }
 
   @Override
-  public String getWorldFileExtension() {
-    return "pfw";
+  public void cancelChanges() {
+    if (getImageResource() != null) {
+      loadImageMetaData();
+      setHasChanges(false);
+    }
   }
 
   protected BufferedImage newBufferedImage() {

@@ -14,6 +14,7 @@ import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.raster.commonsimaging.CommonsImagingServiceInitializer;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
@@ -97,6 +98,7 @@ public class RsCoreServiceInitializer implements ServiceInitializer {
     IoFactoryRegistry.addFactory(new ScaledIntegerPointCloud());
     GriddedElevationModel.serviceInit();
     TriangulatedIrregularNetwork.serviceInit();
+    CommonsImagingServiceInitializer.serviceInit();
   }
 
   @Override

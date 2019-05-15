@@ -3,7 +3,9 @@ package com.revolsys.swing.map.layer.raster;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.beans.PropertyChangeEvent;
+import java.io.File;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.swing.JOptionPane;
@@ -23,6 +25,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
+import com.revolsys.raster.GeoreferencedImageWriterFactory;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
@@ -30,6 +33,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.io.SwingIo;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
@@ -62,6 +66,9 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
       Menus.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Fit to Screen", "arrow_out",
         editable, GeoreferencedImageLayer::fitToViewport, true);
+
+      Menus.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Save As...", "disk",
+        GeoreferencedImageLayer::saveAs, true);
 
       menu.deleteMenuItem("refresh", "Refresh");
     });
@@ -283,6 +290,13 @@ public class GeoreferencedImageLayer extends AbstractLayer {
         image.saveChanges();
       }
     }
+  }
+
+  public void saveAs() {
+    final String baseName = this.resource.getBaseName();
+    final Consumer<File> action = file -> this.image.writeImage(file);
+    SwingIo.exportToFile("Gridded Elevation Model", "com.revolsys.swing.io.image.export",
+      GeoreferencedImageWriterFactory.class, "tiff", baseName, action);
   }
 
   protected void saveImageChanges() {

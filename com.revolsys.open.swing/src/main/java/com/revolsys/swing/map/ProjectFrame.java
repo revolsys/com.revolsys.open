@@ -757,8 +757,8 @@ public class ProjectFrame extends BaseFrame {
         this::actionProjectSaveAs)
       .setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
-    addMenuItemAndToolBarButton(file, this.leftToolBar, "projectSave", "Export Map...",
-      "disk:export", this::actionProjectExport);
+    addMenuItemAndToolBarButton(file, this.leftToolBar, "projectSave", "Export Map...", "map:save",
+      this::actionProjectExport);
 
     addMenuItemAndToolBarButton(file, this.leftToolBar, "print", "Print", "printer",
       SinglePage::print, KeyEvent.VK_P);

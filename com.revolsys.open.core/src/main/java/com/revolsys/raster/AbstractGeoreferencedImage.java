@@ -92,7 +92,14 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   private final PropertyChangeArrayList<MappedLocation> tiePoints = new PropertyChangeArrayList<>();
 
+  private String worldFileExtension = "tfw";
+
   public AbstractGeoreferencedImage() {
+  }
+
+  public AbstractGeoreferencedImage(final String worldFileExtension) {
+    this();
+    this.worldFileExtension = worldFileExtension;
   }
 
   protected void addOverviewSize(final int width, final int height) {
@@ -191,7 +198,10 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     return this.dpi;
   }
 
-  public File getFile() {
+  public synchronized File getFile() {
+    if (this.file == null) {
+      this.file = Resource.getOrDownloadFile(this.imageResource);
+    }
     return this.file;
   }
 
@@ -264,7 +274,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   @Override
   public String getWorldFileExtension() {
-    return "tfw";
+    return this.worldFileExtension;
   }
 
   @Override
@@ -530,7 +540,6 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   protected void setImageResource(final Resource imageResource) {
     this.imageResource = imageResource;
-    this.file = Resource.getOrDownloadFile(this.imageResource);
   }
 
   protected void setImageWidth(final int imageWidth) {

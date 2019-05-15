@@ -2,22 +2,17 @@ package com.revolsys.swing.map.layer.bing;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.imageio.ImageIO;
-
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.raster.BufferedImages;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
@@ -99,13 +94,7 @@ public class BingClient {
     if (url == null) {
       return null;
     } else {
-      try {
-        final URLConnection connection = new URL(url).openConnection();
-        final InputStream in = connection.getInputStream();
-        return ImageIO.read(in);
-      } catch (final IOException e) {
-        throw new RuntimeException("Unable to download image from: " + url, e);
-      }
+      return BufferedImages.readImageIo(url);
     }
   }
 
@@ -114,13 +103,7 @@ public class BingClient {
     final Integer width, final Integer height, final double scale) {
     final String url = getMapUrl(imagerySet, mapLayer, format, minX, minY, maxX, maxY, width,
       height);
-    try {
-      final URLConnection connection = new URL(url).openConnection();
-      final InputStream in = connection.getInputStream();
-      return ImageIO.read(in);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to download image from: " + url, e);
-    }
+    return BufferedImages.readImageIo(url);
   }
 
   public int getMapSizePixels(final int zoomLevel) {

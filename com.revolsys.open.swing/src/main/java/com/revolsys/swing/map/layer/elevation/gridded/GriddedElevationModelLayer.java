@@ -133,11 +133,6 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
       .setIconName("gridded_dem", "magnifier");
   }
 
-  private static void saveAs(final String baseName, final Consumer<File> exportAction) {
-    SwingIo.exportToFile("Gridded Elevation Model", "com.revolsys.swing.io.gridded_dem.export",
-      GriddedElevationModelWriterFactory.class, "asc", baseName, exportAction);
-  }
-
   private GriddedElevationModel elevationModel;
 
   private Resource resource;
@@ -339,8 +334,10 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
   }
 
   public void saveAs() {
-    saveAs(this.resource.getBaseName(),
-      file -> this.elevationModel.writeGriddedElevationModel(file));
+    final String baseName = this.resource.getBaseName();
+    final Consumer<File> action = file -> this.elevationModel.writeGriddedElevationModel(file);
+    SwingIo.exportToFile("Gridded Elevation Model", "com.revolsys.swing.io.gridded_dem.export",
+      GriddedElevationModelWriterFactory.class, "asc", baseName, action);
   }
 
   protected void saveImageChanges() {

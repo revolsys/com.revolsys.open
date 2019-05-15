@@ -1,14 +1,12 @@
 package com.revolsys.gis.wms;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -21,6 +19,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.capabilities.WmsCapabilities;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
 import com.revolsys.raster.BufferedGeoreferencedImage;
+import com.revolsys.raster.BufferedImages;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
@@ -105,16 +104,11 @@ public class WmsClient extends AbstractWebService<WmsLayerDefinition>
     final String srid, final BoundingBox boundingBox, final String format, final int width,
     final int height) {
     final UrlResource mapUrl = getMapUrl(layers, styles, srid, boundingBox, format, width, height);
-    try (
-      final InputStream in = mapUrl.getInputStream()) {
-      final BufferedImage image = ImageIO.read(in);
-      if (image == null) {
-        return new BufferedGeoreferencedImage(boundingBox, width, height);
-      } else {
-        return new BufferedGeoreferencedImage(boundingBox, image);
-      }
-    } catch (final IOException e) {
-      throw Exceptions.wrap("Error loading: " + mapUrl, e);
+    final BufferedImage image = BufferedImages.readImageIo(mapUrl);
+    if (image == null) {
+      return new BufferedGeoreferencedImage(boundingBox, width, height);
+    } else {
+      return new BufferedGeoreferencedImage(boundingBox, image);
     }
   }
 

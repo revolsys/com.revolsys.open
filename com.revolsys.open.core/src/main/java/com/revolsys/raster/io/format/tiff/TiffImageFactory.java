@@ -5,7 +5,6 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.raster.GeoreferencedImageWriter;
 import com.revolsys.raster.GeoreferencedImageWriterFactory;
-import com.revolsys.raster.ImageIoGeoreferencedImageWriter;
 import com.revolsys.spring.resource.Resource;
 
 public class TiffImageFactory extends AbstractIoFactory
@@ -18,13 +17,13 @@ public class TiffImageFactory extends AbstractIoFactory
   }
 
   @Override
-  public GeoreferencedImage loadImage(final Resource resource) {
+  public GeoreferencedImage readGeoreferencedImage(final Resource resource) {
     return new TiffImage(resource);
   }
 
   @Override
   public GeoreferencedImageWriter newGeoreferencedImageWriter(final Resource resource) {
-    return new ImageIoGeoreferencedImageWriter(resource, "TIFF");
+    return new TiffGeoreferencedImageWriter(resource);
   }
 
 }

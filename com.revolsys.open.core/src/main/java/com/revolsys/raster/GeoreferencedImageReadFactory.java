@@ -11,7 +11,7 @@ public interface GeoreferencedImageReadFactory extends ReadIoFactory {
     if (factory == null) {
       return null;
     } else {
-      final GeoreferencedImage reader = factory.loadImage(resource);
+      final GeoreferencedImage reader = factory.readGeoreferencedImage(resource);
       return reader;
     }
   }
@@ -21,5 +21,5 @@ public interface GeoreferencedImageReadFactory extends ReadIoFactory {
     return true;
   }
 
-  GeoreferencedImage loadImage(Resource resource);
+  GeoreferencedImage readGeoreferencedImage(Resource resource);
 }

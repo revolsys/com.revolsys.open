@@ -23,7 +23,7 @@ public class GdalImageFactory extends AbstractIoFactory implements Georeferenced
   }
 
   @Override
-  public GeoreferencedImage loadImage(final Resource resource) {
+  public GeoreferencedImage readGeoreferencedImage(final Resource resource) {
     return new GdalImage(this, resource);
   }
 

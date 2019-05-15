@@ -1,35 +1,25 @@
 package com.revolsys.swing.map.layer.record.style.marker;
 
 import java.awt.Image;
-import java.io.IOException;
-import java.io.InputStream;
 
-import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import com.revolsys.io.FileUtil;
+import com.revolsys.raster.BufferedImages;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.view.ViewRenderer;
 
 public class ImageMarker extends AbstractMarker {
 
-  private Image image;
+  private final Image image;
 
   public ImageMarker(final Image image) {
     this.image = image;
   }
 
   public ImageMarker(final Resource resource) {
-    final InputStream in = resource.getInputStream();
-    try {
-      this.image = ImageIO.read(in);
-    } catch (final IOException e) {
-      throw new IllegalArgumentException("Unable to read file: " + resource);
-    } finally {
-      FileUtil.closeSilent(in);
-    }
+    this.image = BufferedImages.readBufferedImage(resource);
   }
 
   public Image getImage() {

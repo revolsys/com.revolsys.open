@@ -1,4 +1,4 @@
-package com.revolsys.raster;
+package com.revolsys.raster.imagio;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -14,6 +14,8 @@ import javax.imageio.stream.ImageOutputStream;
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.exception.Exceptions;
 
+import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.raster.GeoreferencedImageWriter;
 import com.revolsys.spring.resource.Resource;
 
 public class ImageIoGeoreferencedImageWriter implements GeoreferencedImageWriter {
@@ -22,9 +24,13 @@ public class ImageIoGeoreferencedImageWriter implements GeoreferencedImageWriter
 
   private final String formatName;
 
-  public ImageIoGeoreferencedImageWriter(final Resource resource, final String formatName) {
+  private final String worldFileExtension;
+
+  public ImageIoGeoreferencedImageWriter(final Resource resource, final String formatName,
+    final String worldFileExtension) {
     this.resource = resource;
     this.formatName = formatName;
+    this.worldFileExtension = worldFileExtension;
   }
 
   private ImageWriter getWriter(final RenderedImage renderedImage) {
@@ -52,6 +58,8 @@ public class ImageIoGeoreferencedImageWriter implements GeoreferencedImageWriter
   public void write(final GeoreferencedImage image) {
     final Resource resource = this.resource;
     RenderedImage renderedImage = image.getRenderedImage();
+    image.writePrjFile(resource);
+    GeoreferencedImageWriter.writeWorldFile(this.resource, this.worldFileExtension, image);
 
     ImageWriter writer = getWriter(renderedImage);
     if (writer == null) {

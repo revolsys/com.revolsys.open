@@ -215,7 +215,6 @@ public interface GeoreferencedImage
       return null;
     } else if (renderedImage instanceof BufferedImage) {
       return (BufferedImage)renderedImage;
-
     } else {
       final int width = getImageWidth();
       final int height = getImageHeight();
