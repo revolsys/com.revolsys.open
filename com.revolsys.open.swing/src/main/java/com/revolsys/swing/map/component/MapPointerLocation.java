@@ -71,13 +71,13 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener {
   }
 
   public void setGeometryFactory(GeometryFactory geometryFactory) {
-    if (this.geographics && geometryFactory.isGeographics()) {
+    if (this.geographics && geometryFactory.isGeographic()) {
       setVisible(false);
     } else {
       setVisible(true);
     }
     geometryFactory = geometryFactory.convertAxisCount(2);
-    if (geometryFactory.isGeographics()) {
+    if (geometryFactory.isGeographic()) {
       geometryFactory = geometryFactory.convertScales(10000000.0, 10000000.0);
     } else if (this.geographics) {
       geometryFactory = geometryFactory.getGeographicGeometryFactory();
@@ -106,7 +106,7 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener {
         final String textX = Doubles.toString(projectedX);
         final double projectedY = mapLocation.getY();
         final String textY = Doubles.toString(projectedY);
-        if (this.geometryFactory.isGeographics()) {
+        if (this.geometryFactory.isGeographic()) {
           text = this.title + ": " + textY + ", " + textX;
         } else {
           text = this.title + ": " + textX + ", " + textY;

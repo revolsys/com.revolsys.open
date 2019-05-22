@@ -23,97 +23,22 @@ import org.jeometry.coordinatesystem.model.CoordinateOperationMethod;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.model.ParameterName;
-import org.jeometry.coordinatesystem.model.ParameterNames;
 import org.jeometry.coordinatesystem.model.ParameterValue;
 import org.jeometry.coordinatesystem.model.ParameterValueNumber;
 import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 import org.jeometry.coordinatesystem.model.unit.LinearUnit;
 
-import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.AbstractGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 
-public class TiffImage extends AbstractGeoreferencedImage {
-  /** ProjFalseEastingGeoKey (1024) */
-  public static final int MODEL_TYPE_KEY = 1024;
-
-  /** ProjFalseEastingGeoKey (3082) */
-  public static final int FALSE_EASTING_KEY = 3082;
-
-  /** ProjFalseNorthingGeoKey (3083) */
-  public static final int FALSE_NORTHING_KEY = 3083;
-
-  /** GeographicTypeGeoKey (2048) */
-  public static final int GEOGRAPHIC_COORDINATE_SYSTEM_ID = 2048;
-
-  /** ProjNatOriginLatGeoKey (3081) */
-  public static final int LATITUDE_OF_CENTER_2_KEY = 3081;
-
-  /** ProjLinearUnitsGeoKey (3076) */
-  public static final int LINEAR_UNIT_ID = 3076;
-
-  /** ProjNatOriginLongGeoKey (3080) */
-  public static final int LONGITUDE_OF_CENTER_2_KEY = 3080;
-
-  /** ProjectedCSTypeGeoKey (3072) */
-  public static final int PROJECTED_COORDINATE_SYSTEM_ID = 3072;
-
-  /** ProjCoordTransGeoKey (3075) */
-  public static final int PROJECTION_ID = 3075;
-
-  private static IntHashMap<CoordinateOperationMethod> PROJECTION_BY_ID = new IntHashMap<>();
-
-  /** ProjStdParallel1GeoKey (3078) */
-  public static final int STANDARD_PARALLEL_1_KEY = 3078;
-
-  /** ProjStdParallel2GeoKey (3079) */
-  public static final int STANDARD_PARALLEL_2_KEY = 3079;
+public class TiffImage extends AbstractGeoreferencedImage implements GeoTiffConstants {
 
   public static final int TAG_X_RESOLUTION = 282;
 
   public static final int TAG_Y_RESOLUTION = 283;
-
-  static {
-    addProjection(1, "Transverse_Mercator");
-    // CT_TransvMercator_Modified_Alaska = 2
-    // CT_ObliqueMercator = 3
-    // CT_ObliqueMercator_Laborde = 4
-    // CT_ObliqueMercator_Rosenmund = 5
-    // CT_ObliqueMercator_Spherical = 6
-    addProjection(7, "Mercator");
-    addProjection(8, "Lambert_Conic_Conformal_(2SP)");
-    addProjection(9, "Lambert_Conic_Conformal_(1SP)");
-    // CT_LambertAzimEqualArea = 10
-    addProjection(11, "Albers_Equal_Area");
-    // CT_AzimuthalEquidistant = 12
-    // CT_EquidistantConic = 13
-    // CT_Stereographic = 14
-    // CT_PolarStereographic = 15
-    // CT_ObliqueStereographic = 16
-    // CT_Equirectangular = 17
-    // CT_CassiniSoldner = 18
-    // CT_Gnomonic = 19
-    // CT_MillerCylindrical = 20
-    // CT_Orthographic = 21
-    // CT_Polyconic = 22
-    // CT_Robinson = 23
-    // CT_Sinusoidal = 24
-    // CT_VanDerGrinten = 25
-    // CT_NewZealandMapGrid = 26
-    // CT_TransvMercator_SouthOriented= 27
-
-    // registerCoordinatesProjection("Popular_Visualisation_Pseudo_Mercator",
-    // WebMercator.class);
-    // registerCoordinatesProjection("Mercator_(1SP)", Mercator1SP.class);
-    // registerCoordinatesProjection("Mercator_(2SP)", Mercator2SP.class);
-    // registerCoordinatesProjection("Mercator_(1SP)_(Spherical)",
-    // Mercator1SPSpherical.class);
-    // registerCoordinatesProjection("Lambert_Conic_Conformal_(2SP_Belgium)",
-    // LambertConicConformal.class);
-  }
 
   public static void addDoubleParameter(final Map<ParameterName, ParameterValue> parameters,
     final ParameterName name, final Map<Integer, Object> geoKeys, final int key) {
@@ -123,18 +48,11 @@ public class TiffImage extends AbstractGeoreferencedImage {
     }
   }
 
-  private static void addProjection(final int id, final String name) {
-    final CoordinateOperationMethod coordinateOperationMethod = new CoordinateOperationMethod(name);
-    PROJECTION_BY_ID.put(id, coordinateOperationMethod);
-  }
-
   public static GeometryFactory getGeometryFactory(final Map<Integer, Object> geoKeys) {
-    final int projectedCoordinateSystemId = Maps.getInteger(geoKeys, PROJECTED_COORDINATE_SYSTEM_ID,
-      0);
-    final int geographicCoordinateSystemId = Maps.getInteger(geoKeys,
-      GEOGRAPHIC_COORDINATE_SYSTEM_ID, 0);
+    final int projectedCoordinateSystemId = Maps.getInteger(geoKeys, ProjectedCSTypeGeoKey, 0);
+    final int geographicCoordinateSystemId = Maps.getInteger(geoKeys, GeographicTypeGeoKey, 0);
 
-    switch (Maps.getInteger(geoKeys, MODEL_TYPE_KEY, 0)) {
+    switch (Maps.getInteger(geoKeys, GTModelTypeGeoKey, 0)) {
       case 1: // Projected
         if (projectedCoordinateSystemId <= 0) {
           return null;
@@ -144,18 +62,7 @@ public class TiffImage extends AbstractGeoreferencedImage {
           final String name = "unknown";
           final CoordinateOperationMethod coordinateOperationMethod = getProjection(geoKeys);
 
-          final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
-          addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_1, geoKeys,
-            STANDARD_PARALLEL_1_KEY);
-          addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_2, geoKeys,
-            STANDARD_PARALLEL_2_KEY);
-          addDoubleParameter(parameters, ParameterNames.CENTRAL_MERIDIAN, geoKeys,
-            LONGITUDE_OF_CENTER_2_KEY);
-          addDoubleParameter(parameters, ParameterNames.LATITUDE_OF_ORIGIN, geoKeys,
-            LATITUDE_OF_CENTER_2_KEY);
-          addDoubleParameter(parameters, ParameterNames.FALSE_EASTING, geoKeys, FALSE_EASTING_KEY);
-          addDoubleParameter(parameters, ParameterNames.FALSE_NORTHING, geoKeys,
-            FALSE_NORTHING_KEY);
+          final Map<ParameterName, ParameterValue> parameters = TiffProjectionParameterName.getProjectionParameters(geoKeys);
 
           final LinearUnit linearUnit = getLinearUnit(geoKeys);
           final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(0, name,
@@ -187,13 +94,13 @@ public class TiffImage extends AbstractGeoreferencedImage {
   }
 
   public static LinearUnit getLinearUnit(final Map<Integer, Object> geoKeys) {
-    final int linearUnitId = Maps.getInteger(geoKeys, LINEAR_UNIT_ID, 0);
+    final int linearUnitId = Maps.getInteger(geoKeys, ProjLinearUnitsGeoKey, 0);
     return EpsgCoordinateSystems.getUnit(linearUnitId);
   }
 
   public static CoordinateOperationMethod getProjection(final Map<Integer, Object> geoKeys) {
-    final int projectionId = Maps.getInteger(geoKeys, PROJECTION_ID, 0);
-    return PROJECTION_BY_ID.get(projectionId);
+    final int projectionId = Maps.getInteger(geoKeys, ProjCoordTransGeoKey, 0);
+    return TiffCoordinateTransformationCode.getCoordinateOperationMethod(projectionId);
   }
 
   public TiffImage(final Resource imageResource) {
@@ -241,11 +148,11 @@ public class TiffImage extends AbstractGeoreferencedImage {
     } else {
       doubleParams = doubleParamsField.getDoubleArrayValue();
     }
-    String[] asciiParams;
+    String asciiParams;
     if (asciiParamsField == null) {
-      asciiParams = new String[0];
+      asciiParams = "";
     } else {
-      asciiParams = asciiParamsField.getStringValue().split("\\|");
+      asciiParams = asciiParamsField.getStringValue();
     }
 
     if (keysField != null) {
@@ -253,7 +160,6 @@ public class TiffImage extends AbstractGeoreferencedImage {
       for (int i = 4; i < keys.length; i += 4) {
         final int keyId = keys[i];
         final int tiffTag = keys[i + 1];
-        @SuppressWarnings("unused")
         final int valueCount = keys[i + 2];
         final int valueOrOffset = keys[i + 3];
 
@@ -263,7 +169,7 @@ public class TiffImage extends AbstractGeoreferencedImage {
             value = doubleParams[valueOrOffset];
           break;
           case 34737: // ASCII
-            value = asciiParams[valueOrOffset];
+            value = asciiParams.substring(valueOrOffset, valueOrOffset + valueCount - 1);
           break;
 
           default:

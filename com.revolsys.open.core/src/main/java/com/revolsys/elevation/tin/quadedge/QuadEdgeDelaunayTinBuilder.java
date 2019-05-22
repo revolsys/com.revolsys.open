@@ -87,7 +87,7 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
       this.geometryFactory = geometryFactory.convertAxisCount(3);
       this.scaleY = geometryFactory.getScaleY();
       if (this.scaleY <= 0) {
-        if (geometryFactory.isGeographics()) {
+        if (geometryFactory.isGeographic()) {
           this.scaleY = 10000000;
         } else {
           this.scaleY = 1000;
@@ -95,7 +95,7 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
       }
       this.scaleX = geometryFactory.getScaleX();
       if (this.scaleX <= 0) {
-        if (geometryFactory.isGeographics()) {
+        if (geometryFactory.isGeographic()) {
           this.scaleX = 10000000;
         } else {
           this.scaleX = 1000;

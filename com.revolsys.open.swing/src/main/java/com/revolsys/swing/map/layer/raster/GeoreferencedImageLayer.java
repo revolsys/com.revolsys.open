@@ -105,7 +105,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       final Resource imageResource = Resource.getResource(this.url);
       if (imageResource.exists()) {
         try {
-          image = GeoreferencedImageReadFactory.loadGeoreferencedImage(imageResource);
+          image = GeoreferencedImage.newGeoreferencedImage(imageResource);
           if (image == null) {
             Logs.error(GeoreferencedImageLayer.class, "Cannot load image: " + this.url);
           }

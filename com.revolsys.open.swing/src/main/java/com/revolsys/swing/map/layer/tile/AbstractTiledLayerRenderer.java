@@ -126,7 +126,9 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
         iterator.set(cachedTile);
       }
     }
-    renderTiles(view, cancellable, mapTiles);
+    if (!mapTiles.isEmpty()) {
+      renderTiles(view, cancellable, mapTiles);
+    }
     synchronized (this.loadingTasks) {
       this.loadingTasks.addAll(tasks);
       tileLoaderManager.setDescription("Load tiles: " + layer.getPath());

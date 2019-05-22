@@ -1,10 +1,10 @@
 package com.revolsys.swing.map.layer.tile;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.GeometryFactoryProxy;
 
-public abstract class AbstractMapTile<D> implements GeometryFactoryProxy {
+public abstract class AbstractMapTile<D> implements BoundingBoxProxy {
   private final BoundingBox boundingBox;
 
   private final int height;
@@ -32,6 +32,7 @@ public abstract class AbstractMapTile<D> implements GeometryFactoryProxy {
     return false;
   }
 
+  @Override
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
   }

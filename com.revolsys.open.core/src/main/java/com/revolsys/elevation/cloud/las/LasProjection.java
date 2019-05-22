@@ -10,7 +10,6 @@ import org.jeometry.coordinatesystem.model.CoordinateOperationMethod;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.model.ParameterName;
-import org.jeometry.coordinatesystem.model.ParameterNames;
 import org.jeometry.coordinatesystem.model.ParameterValue;
 import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
@@ -22,7 +21,9 @@ import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
+import com.revolsys.raster.io.format.tiff.GeoTiffConstants;
 import com.revolsys.raster.io.format.tiff.TiffImage;
+import com.revolsys.raster.io.format.tiff.TiffProjectionParameterName;
 import com.revolsys.util.Pair;
 
 public class LasProjection {
@@ -75,16 +76,14 @@ public class LasProjection {
       }
     }
     CoordinateSystem coordinateSystem = null;
-    int coordinateSystemId = Maps.getInteger(properties, TiffImage.PROJECTED_COORDINATE_SYSTEM_ID,
-      0);
+    int coordinateSystemId = Maps.getInteger(properties, GeoTiffConstants.ProjectedCSTypeGeoKey, 0);
     if (coordinateSystemId == 0) {
-      coordinateSystemId = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID,
-        0);
+      coordinateSystemId = Maps.getInteger(properties, GeoTiffConstants.GeographicTypeGeoKey, 0);
       if (coordinateSystemId != 0) {
         coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
       }
     } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
-      final int geoSrid = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID, 0);
+      final int geoSrid = Maps.getInteger(properties, GeoTiffConstants.GeographicTypeGeoKey, 0);
       if (geoSrid != 0) {
         if (geoSrid > 0 && geoSrid < 32767) {
           final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
@@ -93,19 +92,8 @@ public class LasProjection {
           final CoordinateOperationMethod coordinateOperationMethod = TiffImage
             .getProjection(properties);
 
-          final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
-          TiffImage.addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_1, properties,
-            TiffImage.STANDARD_PARALLEL_1_KEY);
-          TiffImage.addDoubleParameter(parameters, ParameterNames.STANDARD_PARALLEL_2, properties,
-            TiffImage.STANDARD_PARALLEL_2_KEY);
-          TiffImage.addDoubleParameter(parameters, ParameterNames.CENTRAL_MERIDIAN, properties,
-            TiffImage.LONGITUDE_OF_CENTER_2_KEY);
-          TiffImage.addDoubleParameter(parameters, ParameterNames.LATITUDE_OF_ORIGIN, properties,
-            TiffImage.LATITUDE_OF_CENTER_2_KEY);
-          TiffImage.addDoubleParameter(parameters, ParameterNames.FALSE_EASTING, properties,
-            TiffImage.FALSE_EASTING_KEY);
-          TiffImage.addDoubleParameter(parameters, ParameterNames.FALSE_NORTHING, properties,
-            TiffImage.FALSE_NORTHING_KEY);
+          final Map<ParameterName, ParameterValue> parameters = TiffProjectionParameterName
+            .getProjectionParameters(properties);
 
           final LinearUnit linearUnit = TiffImage.getLinearUnit(properties);
           final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
@@ -173,9 +161,9 @@ public class LasProjection {
         final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
         int keyId;
         if (geometryFactory.isProjected()) {
-          keyId = TiffImage.PROJECTED_COORDINATE_SYSTEM_ID;
+          keyId = GeoTiffConstants.ProjectedCSTypeGeoKey;
         } else {
-          keyId = TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID;
+          keyId = GeoTiffConstants.GeographicTypeGeoKey;
         }
 
         final ByteArrayOutputStream byteOut = new ByteArrayOutputStream(1024);

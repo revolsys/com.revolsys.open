@@ -524,7 +524,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
       convertedValue = QuantityType.doubleValue(value, CustomUnits.PIXEL);
     } else {
       convertedValue = QuantityType.doubleValue(value, Units.METRE);
-      if (this.geometryFactory.isGeographics()) {
+      if (this.geometryFactory.isGeographic()) {
         final Ellipsoid ellipsoid = this.geometryFactory.getEllipsoid();
         final double radius = ellipsoid.getSemiMajorAxis();
         convertedValue = Math.toDegrees(convertedValue / radius);
@@ -543,7 +543,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
       convertedValue *= this.modelUnitsPerViewUnit;
     } else {
       convertedValue = QuantityType.doubleValue(value, Units.METRE);
-      if (this.geometryFactory.isGeographics()) {
+      if (this.geometryFactory.isGeographic()) {
         final Ellipsoid ellipsoid = this.geometryFactory.getEllipsoid();
         final double radius = ellipsoid.getSemiMajorAxis();
         convertedValue = Math.toDegrees(convertedValue / radius);

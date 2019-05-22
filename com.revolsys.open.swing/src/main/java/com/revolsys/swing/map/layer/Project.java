@@ -649,7 +649,7 @@ public class Project extends LayerGroup {
     } else {
       // TODO really should be min scale
       double minDimension;
-      if (viewBoundingBox.getGeometryFactory().isGeographics()) {
+      if (viewBoundingBox.getGeometryFactory().isGeographic()) {
         minDimension = 0.000005;
       } else {
         minDimension = 0.5;

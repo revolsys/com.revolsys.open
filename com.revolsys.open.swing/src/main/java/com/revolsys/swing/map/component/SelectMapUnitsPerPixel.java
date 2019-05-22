@@ -13,14 +13,13 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Vector;
 
-import javax.measure.Unit;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 
 import org.jeometry.common.data.type.DataTypes;
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystem;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.field.FunctionStringConverter;
@@ -28,8 +27,6 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-
-import si.uom.NonSI;
 
 public class SelectMapUnitsPerPixel extends JComboBox<Double>
   implements ItemListener, PropertyChangeListener, ActionListener {
@@ -54,7 +51,7 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
 
   private final Viewport2D viewport;
 
-  private String unitString = "m";
+  private String unitLabel = "m";
 
   private NumberFormat format;
 
@@ -85,9 +82,15 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
   public void actionPerformed(final ActionEvent e) {
     try {
       final Object item = getSelectedItem();
-      String string = DataTypes.toString(item);
-      string = string.replaceAll("([^0-9\\.])+", "");
-      final double unitsPerPixel = Double.parseDouble(string);
+      double unitsPerPixel;
+      if (item instanceof Double) {
+        unitsPerPixel = (Double)item;
+
+      } else {
+        String string = DataTypes.toString(item);
+        string = string.replaceAll("([^0-9\\.])+", "");
+        unitsPerPixel = Double.parseDouble(string);
+      }
       this.viewport.setUnitsPerPixel(unitsPerPixel);
     } catch (final Throwable t) {
     }
@@ -97,7 +100,7 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
     if (value instanceof Number) {
       final Number number = (Number)value;
       final double doubleValue = number.doubleValue();
-      return this.format.format(doubleValue) + this.unitString;
+      return this.format.format(doubleValue) + this.unitLabel;
     } else {
       return "Unknown";
     }
@@ -129,21 +132,17 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
       if (geometryFactory == null) {
         toolTip = "Map Resolution (m/pixel)";
       } else {
-        final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-        this.projected = !geometryFactory.isGeographics();
+        final HorizontalCoordinateSystem coordinateSystem = geometryFactory
+          .getHorizontalCoordinateSystem();
+        this.projected = !geometryFactory.isGeographic();
         if (this.projected) {
           this.format = new DecimalFormat("#,###.###", FORMAT_SYMBOLS);
 
         } else {
           this.format = new DecimalFormat("#,###.#######", FORMAT_SYMBOLS);
         }
-        final Unit<?> unit = coordinateSystem.getUnit();
-        if (unit == NonSI.DEGREE_ANGLE) {
-          this.unitString = "°";
-        } else {
-          this.unitString = unit.getSymbol();
-        }
-        toolTip = "Map Resolution (" + unit + "/pixel)";
+        this.unitLabel = coordinateSystem.getUnitLabel();
+        toolTip = "Map Resolution (" + this.unitLabel + "/pixel)";
       }
       final ComboBoxModel<Double> model = newModel(this.viewport);
 

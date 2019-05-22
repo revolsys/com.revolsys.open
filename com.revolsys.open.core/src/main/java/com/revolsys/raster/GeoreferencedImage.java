@@ -17,6 +17,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.IoFactory;
@@ -107,6 +108,18 @@ public interface GeoreferencedImage
 
   static boolean isReadable(final Path path) {
     return IoFactory.isAvailable(GeoreferencedImageReadFactory.class, path);
+  }
+
+  static GeoreferencedImage newGeoreferencedImage(final Object source) {
+    final Resource resource = Resource.getResource(source);
+    final GeoreferencedImageReadFactory factory = IoFactory
+      .factory(GeoreferencedImageReadFactory.class, resource);
+    if (factory == null) {
+      return null;
+    } else {
+      final GeoreferencedImage reader = factory.readGeoreferencedImage(resource);
+      return reader;
+    }
   }
 
   void addTiePointsForBoundingBox();
@@ -231,7 +244,7 @@ public interface GeoreferencedImage
 
   GeoreferencedImage getImage(final GeometryFactory geometryFactory);
 
-  default GeoreferencedImage getImage(final GeometryFactory geometryFactory,
+  default GeoreferencedImage getImage(final GeometryFactoryProxy geometryFactory,
     final double resolution) {
     final int imageSrid = getHorizontalCoordinateSystemId();
     if (imageSrid > 0 && imageSrid != geometryFactory.getHorizontalCoordinateSystemId()) {

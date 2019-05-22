@@ -367,7 +367,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
     }
   }
 
-  default Point convertPoint2d(final GeometryFactory geometryFactory) {
+  default Point convertPoint2d(final GeometryFactoryProxy geometryFactory) {
     if (isEmpty()) {
       return this;
     } else {

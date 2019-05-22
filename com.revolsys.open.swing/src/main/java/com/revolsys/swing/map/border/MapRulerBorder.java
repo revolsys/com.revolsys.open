@@ -75,9 +75,6 @@ public class MapRulerBorder extends AbstractBorder {
 
   private double areaMinY;
 
-  @SuppressWarnings("rawtypes")
-  private Unit baseUnit;
-
   private int labelHeight;
 
   private GeometryFactory rulerGeometryFactory;
@@ -372,12 +369,8 @@ public class MapRulerBorder extends AbstractBorder {
       if (this.rulerGeometryFactory.isHasHorizontalCoordinateSystem()) {
         final HorizontalCoordinateSystem rulerCoordinateSystem = this.rulerGeometryFactory
           .getHorizontalCoordinateSystem();
-        this.baseUnit = rulerCoordinateSystem.getUnit();
-        this.unitLabel = this.baseUnit.getSymbol();
-        if (this.unitLabel == null) {
-          this.unitLabel = this.baseUnit.getName();
-        }
-        if (this.rulerGeometryFactory.isGeographics()) {
+        this.unitLabel = rulerCoordinateSystem.getUnitLabel();
+        if (this.rulerGeometryFactory.isGeographic()) {
           final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)rulerCoordinateSystem;
           if (geoCs.getAngularUnit() instanceof Degree) {
             this.areaMinX = -180;
@@ -385,7 +378,6 @@ public class MapRulerBorder extends AbstractBorder {
             this.areaMinY = -90;
             this.areaMaxY = 90;
             this.steps = GEOGRAPHICS_STEPS;
-            this.unitLabel = "°";
           }
         } else {
           final BoundingBox areaBoundingBox = this.rulerGeometryFactory.getAreaBoundingBox();

@@ -26,7 +26,7 @@ public class GeometryTestUtil {
     final double[] coordinates = new double[axisCount];
     double x;
     double y;
-    if (!geometryFactory.isHasHorizontalCoordinateSystem() || geometryFactory.isGeographics()) {
+    if (!geometryFactory.isHasHorizontalCoordinateSystem() || geometryFactory.isGeographic()) {
       x = -123.123456;
       y = 52.123456;
     } else {

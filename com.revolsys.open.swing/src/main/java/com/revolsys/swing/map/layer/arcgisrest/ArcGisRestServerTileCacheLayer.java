@@ -38,8 +38,6 @@ public class ArcGisRestServerTileCacheLayer
 
   private String password;
 
-  private GeometryFactory geometryFactory;
-
   private final Object initSync = new Object();
 
   private MapService mapService;
@@ -109,7 +107,7 @@ public class ArcGisRestServerTileCacheLayer
           if (resolution > 0) {
             final BoundingBox viewBoundingBox = view.getBoundingBox();
             final BoundingBox maxBoundingBox = getBoundingBox();
-            final BoundingBox boundingBox = viewBoundingBox.bboxToCs(this.geometryFactory)
+            final BoundingBox boundingBox = viewBoundingBox.bboxToCs(this)
               .bboxIntersection(maxBoundingBox);
             final double minX = boundingBox.getMinX();
             final double minY = boundingBox.getMinY();
@@ -194,7 +192,8 @@ public class ArcGisRestServerTileCacheLayer
               Logs.info(this, this.url + " does not contain a tileInfo definition.");
               return false;
             } else {
-              this.geometryFactory = tileInfo.getGeometryFactory();
+              final GeometryFactory geometryFactory = tileInfo.getGeometryFactory();
+              setGeometryFactory(geometryFactory);
               final BoundingBox boundingBox = this.mapService.getFullExtent();
               setBoundingBox(boundingBox);
               return true;

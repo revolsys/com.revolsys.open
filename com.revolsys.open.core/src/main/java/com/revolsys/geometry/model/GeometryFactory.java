@@ -1365,7 +1365,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   }
 
   public GeometryFactory getGeographicGeometryFactory() {
-    if (isGeographics()) {
+    if (isGeographic()) {
       return this;
     } else if (isProjected()) {
       final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)this.horizontalCoordinateSystem;
@@ -1627,7 +1627,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     return true;
   }
 
-  public boolean isGeographics() {
+  public boolean isGeocentric() {
+    return this.horizontalCoordinateSystemType.isGeocentric();
+  }
+
+  public boolean isGeographic() {
     return this.horizontalCoordinateSystemType.isGeographic();
   }
 

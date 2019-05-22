@@ -1089,7 +1089,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     if (!this.settingScale && this.viewport != null && Double.isFinite(scale) && scale > 0) {
       try {
         this.settingScale = true;
-        if (!getGeometryFactory().isGeographics()) {
+        if (!getGeometryFactory().isGeographic()) {
           scale = Doubles.makePrecise(10.0, scale);
         }
         if (scale >= 0.1) {

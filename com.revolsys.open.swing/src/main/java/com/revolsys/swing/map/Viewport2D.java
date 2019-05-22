@@ -647,10 +647,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     final double centreX = centre.getX();
     final double centreY = centre.getY();
 
-    final double minX = Math.floor((centreX - minXPixelOffset * unitsPerPixel) / unitsPerPixel)
-      * unitsPerPixel;
-    final double minY = Math.floor((centreY - minYPixelOffset * unitsPerPixel) / unitsPerPixel)
-      * unitsPerPixel;
+    final double minX = Math.floor(centreX / unitsPerPixel - minXPixelOffset) * unitsPerPixel;
+    final double minY = Math.floor(centreY / unitsPerPixel - minYPixelOffset) * unitsPerPixel;
 
     final GeometryFactory geometryFactory = getGeometryFactory();
 
@@ -691,7 +689,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
       }
 
       this.geometryFactory2d = this.geometryFactory.toFloating2d();
-      if (geometryFactory.isGeographics()) {
+      if (geometryFactory.isGeographic()) {
         this.unitsPerPixelList = GEOGRAPHIC_UNITS_PER_PIXEL;
       } else {
         this.unitsPerPixelList = PROJECTED_UNITS_PER_PIXEL;

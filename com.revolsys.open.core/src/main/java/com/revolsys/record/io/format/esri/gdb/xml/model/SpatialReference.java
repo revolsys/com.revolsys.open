@@ -9,7 +9,7 @@ public class SpatialReference implements GeometryFactoryProxy {
 
   public static SpatialReference get(final GeometryFactory geometryFactory, final String wkt) {
     if (geometryFactory != null) {
-      if (geometryFactory.isGeographics()) {
+      if (geometryFactory.isGeographic()) {
         return new EsriGdbGeographicCoordinateSystem(geometryFactory, wkt);
       } else if (geometryFactory.isProjected()) {
         return new EsriGdbProjectedCoordinateSystem(geometryFactory, wkt);

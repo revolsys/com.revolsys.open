@@ -1035,7 +1035,7 @@ public interface LineString extends Lineal {
     final GeometryFactory geometryFactory = getGeometryFactory();
     double length = 0;
     final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-    if (geometryFactory.isGeographics()) {
+    if (geometryFactory.isGeographic()) {
       final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
       final int vertexCount = getVertexCount();
       if (vertexCount > 1) {
@@ -1209,7 +1209,7 @@ public interface LineString extends Lineal {
       double distanceAlong = 0;
       Side side = null;
       final double resolutionXy;
-      if (geometryFactory.isGeographics()) {
+      if (geometryFactory.isGeographic()) {
         resolutionXy = 0.0000001;
       } else {
         resolutionXy = 0.001;
@@ -1388,7 +1388,7 @@ public interface LineString extends Lineal {
       final GeometryFactory geometryFactory = getGeometryFactory();
       double closestDistance = Double.MAX_VALUE;
       final double resolutionXy;
-      if (geometryFactory.isGeographics()) {
+      if (geometryFactory.isGeographic()) {
         resolutionXy = 0.0000001;
       } else {
         resolutionXy = 0.001;
