@@ -15,14 +15,14 @@ import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.BooleanCancellable;
 import com.revolsys.util.Cancellable;
 
-public class TiledImageLayerRenderer<T extends GeoreferencedImageMapTile>
+public class TiledGeoreferencedImageLayerRenderer<T extends GeoreferencedImageMapTile>
   extends AbstractTiledLayerRenderer<GeoreferencedImage, T> implements PropertyChangeListener {
 
-  public TiledImageLayerRenderer(final AbstractTiledImageLayer<T> layer) {
+  public TiledGeoreferencedImageLayerRenderer(final AbstractTiledImageLayer<T> layer) {
     super("tiledImage", layer);
   }
 
-  public TiledImageLayerRenderer(final String type, final String name) {
+  public TiledGeoreferencedImageLayerRenderer(final String type, final String name) {
     super(type, name);
   }
 
@@ -50,8 +50,7 @@ public class TiledImageLayerRenderer<T extends GeoreferencedImageMapTile>
         final Graphics2DViewRenderer imageView = imageViewport.newViewRenderer();
         super.renderTiles(imageView, cancellable, mapTiles);
         final GeoreferencedImage mergedImage = imageViewport.getGeoreferencedImage();
-        final double viewResolution = getViewResolution();
-        final GeoreferencedImage projectedImage = mergedImage.getImage(view, viewResolution);
+        final GeoreferencedImage projectedImage = mergedImage.imageToCs(view);
         view.drawImage(projectedImage, false);
       }
     } else {

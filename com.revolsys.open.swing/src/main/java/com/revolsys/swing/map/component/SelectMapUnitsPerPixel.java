@@ -39,14 +39,13 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
 
   private static final long serialVersionUID = 1L;
 
-  private static DefaultComboBoxModel<Double> newModel(final MapPanel map) {
-    final Viewport2D viewport = map.getViewport();
-    return newModel(viewport);
+  private static DefaultComboBoxModel<Double> newModel(final List<Double> unitsPerPixelList) {
+    return new DefaultComboBoxModel<>(new Vector<>(unitsPerPixelList));
   }
 
   private static DefaultComboBoxModel<Double> newModel(final Viewport2D viewport) {
     final List<Double> unitsPerPixelList = viewport.getUnitsPerPixelList();
-    return new DefaultComboBoxModel<>(new Vector<>(unitsPerPixelList));
+    return newModel(unitsPerPixelList);
   }
 
   private final Viewport2D viewport;
@@ -57,8 +56,13 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
 
   private boolean projected;
 
+  private List<Double> unitsPerPixelList;
+
   public SelectMapUnitsPerPixel(final MapPanel map) {
-    super(newModel(map));
+    super(newModel(map.getViewport()));
+    final Viewport2D viewport = map.getViewport();
+    this.unitsPerPixelList = viewport.getUnitsPerPixelList();
+
     this.format = new DecimalFormat("#,###.###", FORMAT_SYMBOLS);
 
     this.viewport = map.getViewport();
@@ -144,12 +148,17 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
         this.unitLabel = coordinateSystem.getUnitLabel();
         toolTip = "Map Resolution (" + this.unitLabel + "/pixel)";
       }
-      final ComboBoxModel<Double> model = newModel(this.viewport);
 
       Invoke.later(() -> {
         setToolTipText(toolTip);
-        if (model != getModel()) {
+        final List<Double> unitsPerPixelList = this.viewport.getUnitsPerPixelList();
+
+        if (!unitsPerPixelList.equals(unitsPerPixelList)) {
+          this.unitsPerPixelList = unitsPerPixelList;
+          final ComboBoxModel<Double> model = newModel(unitsPerPixelList);
           setModel(model);
+          final double unitsPerPixel = this.viewport.getUnitsPerPixel();
+          setSelectedItem(unitsPerPixel);
         }
       });
     }

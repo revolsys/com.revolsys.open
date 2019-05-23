@@ -64,11 +64,6 @@ public abstract class AbstractMapTile<D> implements BoundingBoxProxy {
     return data;
   }
 
-  protected D loadData(final GeometryFactory geometryFactory, final double layerResolution,
-    final double viewResolution) {
-    return loadData();
-  }
-
   protected abstract D loadDataDo();
 
   protected void setData(final D data) {

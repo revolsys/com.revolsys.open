@@ -83,7 +83,8 @@ public class PdfImage extends AbstractGeoreferencedImage {
           }
           final BoundingBox boundingBox = PdfUtil.getViewportBoundingBox(viewport);
           setBoundingBox(boundingBox);
-          setResolution(boundingBox.getWidth() / image.getWidth());
+          setResolutionX(boundingBox.getWidth() / image.getWidth());
+          setResolutionY(boundingBox.getHeight() / image.getHeight());
         }
         return image;
       }

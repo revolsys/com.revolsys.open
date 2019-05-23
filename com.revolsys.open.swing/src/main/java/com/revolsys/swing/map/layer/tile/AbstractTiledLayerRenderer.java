@@ -119,8 +119,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
         if (cachedTile == null) {
           cachedTile = mapTile;
           this.cachedTiles.put(cachedTile, cachedTile);
-          final Runnable task = new TileLoadTask<>(this, cancellable, viewportGeometryFactory,
-            cachedTile, this.layerResolution, this.viewResolution);
+          final Runnable task = new TileLoadTask<>(this, cancellable, cachedTile);
           tasks.add(task);
         }
         iterator.set(cachedTile);

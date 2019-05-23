@@ -25,6 +25,7 @@ import org.jeometry.coordinatesystem.model.unit.AngularUnit;
 import org.jeometry.coordinatesystem.model.unit.LinearUnit;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.raster.GeoreferencedImage;
@@ -126,8 +127,8 @@ public class TiffGeoreferencedImageWriter extends AbstractWriter<GeoreferencedIm
           private void addGeoKeyString(final int keyId, final String value) {
             if (value != null && value.length() > 0) {
               final int offset = this.geoAsciiParams.length();
-              final int stringLength = value.length() - 1;
-              addGeoKey(keyId, 34737, offset, stringLength);
+              final int stringLength = value.length() + 1;
+              addGeoKey(keyId, 34737, stringLength, offset);
               this.geoAsciiParams.append(value);
               this.geoAsciiParams.append('|');
             }
@@ -177,10 +178,29 @@ public class TiffGeoreferencedImageWriter extends AbstractWriter<GeoreferencedIm
             }
           }
 
+          private void addTransformation(final TiffOutputDirectory rootDirectory)
+            throws ImageWriteException {
+            final BoundingBox boundingBox = image.getBoundingBox();
+            final double minX = boundingBox.getMinX();
+            final double maxY = boundingBox.getMaxY();
+            final double[] tiePoints = {
+              0, 0, 0, //
+              minX, maxY, 0//
+            };
+            rootDirectory.add(GeoTiffTagConstants.EXIF_TAG_MODEL_TIEPOINT_TAG, tiePoints);
+            final double resolutionX = image.getResolutionX();
+            final double resolutionY = image.getResolutionY();
+            final double[] pixelScale = {
+              resolutionX, resolutionY, 0
+            };
+            rootDirectory.add(GeoTiffTagConstants.EXIF_TAG_MODEL_PIXEL_SCALE_TAG, pixelScale);
+          }
+
           @Override
           public void write(final OutputStream os, final TiffOutputSet outputSet)
             throws IOException, ImageWriteException {
             final TiffOutputDirectory rootDirectory = outputSet.getRootDirectory();
+            addTransformation(rootDirectory);
             final GeometryFactory geometryFactory = image.getGeometryFactory();
             if (geometryFactory.isProjected()) {
               addProjectedCoordinateSystem(geometryFactory);

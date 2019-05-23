@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jeometry.common.function.Consumer3;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
@@ -125,6 +126,16 @@ public interface GeoreferencedImage
   void addTiePointsForBoundingBox();
 
   default void cancelChanges() {
+  }
+
+  default void copyModelPoint(final CoordinatesOperationPoint point, final double imageX,
+    final double imageY) {
+    final BoundingBox boundingBox = getBoundingBox();
+    final double resolutionX = getResolutionX();
+    final double resolutionY = getResolutionY();
+    final double x = boundingBox.getMinX() + imageX * resolutionX;
+    final double y = boundingBox.getMaxY() - imageY * resolutionY;
+    point.setPoint(x, y);
   }
 
   void deleteTiePoint(MappedLocation tiePoint);
@@ -242,8 +253,6 @@ public interface GeoreferencedImage
 
   int[] getDpi();
 
-  GeoreferencedImage getImage(final GeometryFactory geometryFactory);
-
   default GeoreferencedImage getImage(final GeometryFactoryProxy geometryFactory,
     final double resolution) {
     final int imageSrid = getHorizontalCoordinateSystemId();
@@ -280,7 +289,9 @@ public interface GeoreferencedImage
 
   RenderedImage getRenderedImage();
 
-  double getResolution();
+  double getResolutionX();
+
+  double getResolutionY();
 
   List<MappedLocation> getTiePoints();
 
@@ -292,6 +303,14 @@ public interface GeoreferencedImage
 
   default boolean hasGeometryFactory() {
     return getGeometryFactory().getHorizontalCoordinateSystemId() > 0;
+  }
+
+  default GeoreferencedImage imageToCs(final GeometryFactoryProxy geometryFactory) {
+    if (isSameCoordinateSystem(geometryFactory)) {
+      return this;
+    } else {
+      return new ImageProjector(this, geometryFactory).newImage();
+    }
   }
 
   boolean isHasChanages();
@@ -327,6 +346,17 @@ public interface GeoreferencedImage
   void setRenderedImage(final RenderedImage image);
 
   void setTiePoints(final List<MappedLocation> tiePoints);
+
+  default void toImagePoint(final CoordinatesOperationPoint point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    final double resolutionX = getResolutionX();
+    final double resolutionY = getResolutionY();
+    final BoundingBox boundingBox = getBoundingBox();
+    final double imageX = (x - boundingBox.getMinX()) / resolutionX;
+    final double imageY = (boundingBox.getMaxY() - y) / resolutionY;
+    point.setPoint(imageX, imageY);
+  }
 
   default void writeImage(final Object target) {
     writeImage(target, MapEx.EMPTY);

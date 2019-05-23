@@ -62,7 +62,8 @@ public class TiffImage extends AbstractGeoreferencedImage implements GeoTiffCons
           final String name = "unknown";
           final CoordinateOperationMethod coordinateOperationMethod = getProjection(geoKeys);
 
-          final Map<ParameterName, ParameterValue> parameters = TiffProjectionParameterName.getProjectionParameters(geoKeys);
+          final Map<ParameterName, ParameterValue> parameters = TiffProjectionParameterName
+            .getProjectionParameters(geoKeys);
 
           final LinearUnit linearUnit = getLinearUnit(geoKeys);
           final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(0, name,
@@ -224,13 +225,14 @@ public class TiffImage extends AbstractGeoreferencedImage implements GeoTiffCons
         return false;
       } else {
         final double[] geoTransformValues = geoTransform.getDoubleArrayValue();
-        final double x1 = geoTransformValues[3];
-        final double y1 = geoTransformValues[7];
         final double pixelWidth = geoTransformValues[0];
-        final double pixelHeight = geoTransformValues[5];
-        final double xRotation = geoTransformValues[4];
         final double yRotation = geoTransformValues[1];
-        setResolution(pixelWidth);
+        final double x1 = geoTransformValues[3];
+        final double xRotation = geoTransformValues[4];
+        final double pixelHeight = geoTransformValues[5];
+        final double y1 = geoTransformValues[7];
+        setResolutionX(pixelWidth);
+        setResolutionY(pixelHeight);
         // TODO rotation
         setBoundingBox(x1, y1, pixelWidth, pixelHeight);
         return true;
@@ -257,7 +259,8 @@ public class TiffImage extends AbstractGeoreferencedImage implements GeoTiffCons
         final double[] pixelScaleValues = pixelScale.getDoubleArrayValue();
         final double pixelWidth = pixelScaleValues[0];
         final double pixelHeight = pixelScaleValues[1];
-        setResolution(pixelWidth);
+        setResolutionX(pixelWidth);
+        setResolutionY(pixelHeight);
         setBoundingBox(x1, y1, pixelWidth, -pixelHeight);
         return true;
       }

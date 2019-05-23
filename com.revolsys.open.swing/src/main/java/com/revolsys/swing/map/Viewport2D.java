@@ -173,7 +173,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     final List<Double> values = this.unitsPerPixelList;
     for (int i = values.size() - 1; i >= 0; i--) {
       final double nextValue = values.get(i);
-      if (nextValue > unitsPerPixel || Math.abs(1 - unitsPerPixel / nextValue) < 0.1) {
+      final double percent = Math.abs(1 - unitsPerPixel / nextValue);
+      if (nextValue > unitsPerPixel || percent < 0.1) {
         return nextValue;
       }
     }
@@ -496,7 +497,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   public BoundingBox setBoundingBox(BoundingBox boundingBox) {
-    if (boundingBox != null && !boundingBox.isEmpty()) {
+    if (boundingBox != null && !boundingBox.isEmpty() && !this.boundingBox.equals(boundingBox)) {
       final GeometryFactory geometryFactory = getGeometryFactory2dFloating();
       boundingBox = boundingBox.bboxToCs(geometryFactory);
       if (!boundingBox.isEmpty()) {

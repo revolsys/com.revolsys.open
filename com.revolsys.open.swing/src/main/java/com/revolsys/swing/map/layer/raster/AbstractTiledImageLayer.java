@@ -12,8 +12,8 @@ public abstract class AbstractTiledImageLayer<T extends GeoreferencedImageMapTil
   }
 
   @Override
-  protected TiledImageLayerRenderer<T> newRenderer() {
-    return new TiledImageLayerRenderer<>(this);
+  protected TiledGeoreferencedImageLayerRenderer<T> newRenderer() {
+    return new TiledGeoreferencedImageLayerRenderer<>(this);
   }
 
 }

@@ -44,12 +44,13 @@ public interface GeoreferencedImageWriter extends Writer<GeoreferencedImage> {
         final BoundingBox boundingBox = image.getBoundingBox();
         final double minX = boundingBox.getMinX();
         final double maxY = boundingBox.getMaxY();
-        final double resolution = image.getResolution();
+        final double resolutionX = image.getResolutionX();
+        final double resolutionY = image.getResolutionY();
 
-        println(writer, resolution);
+        println(writer, resolutionX);
         println(writer, 0);
         println(writer, 0);
-        println(writer, -resolution);
+        println(writer, -resolutionY);
         println(writer, minX);
         println(writer, maxY);
       }

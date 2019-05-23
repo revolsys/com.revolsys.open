@@ -4,6 +4,7 @@ import java.awt.RenderingHints;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
@@ -27,8 +28,15 @@ public class GeoreferencedImageLayerRenderer
             boundingBox = layer.fitToViewport();
           }
           if (!view.isCancelled()) {
-            view.drawImage(image, true, layer.getOpacity() / 255.0,
-              RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            final GeometryFactory viewGeometryFactory = view.getGeometryFactory();
+            if (image.isSameCoordinateSystem(viewGeometryFactory)) {
+              view.drawImage(image, true, layer.getOpacity() / 255.0,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            } else {
+              final GeoreferencedImage projectedImage = image.imageToCs(viewGeometryFactory);
+              view.drawImage(projectedImage, false, layer.getOpacity() / 255.0,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            }
           }
           if (!view.isCancelled()) {
             view.drawDifferentCoordinateSystem(boundingBox);
