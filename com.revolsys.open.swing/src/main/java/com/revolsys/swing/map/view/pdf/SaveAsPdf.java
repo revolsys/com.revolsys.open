@@ -23,6 +23,7 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.ViewportCacheBoundingBox;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -126,14 +127,15 @@ public class SaveAsPdf {
       final PDDocument document = new PDDocument();
 
       final Viewport2D viewport = project.getViewport();
-      BoundingBox boundingBox = viewport.getBoundingBox();
-      final int width = (int)Math.ceil(viewport.getViewWidthPixels());
-      final int height = (int)Math.ceil(viewport.getViewHeightPixels());
+      final ViewportCacheBoundingBox cacheBoundingBox = viewport.getCacheBoundingBox();
+      BoundingBox boundingBox = cacheBoundingBox.getBoundingBox();
+      final int width = cacheBoundingBox.getViewWidthPixels();
+      final int height = cacheBoundingBox.getViewHeightPixels();
 
       final int srid = boundingBox.getHorizontalCoordinateSystemId();
       if (srid == 3857) {
-        boundingBox = boundingBox.bboxEdit(editor -> editor
-          .setGeometryFactory(viewport.getGeometryFactory().getGeographicGeometryFactory()));
+        boundingBox = boundingBox.bboxEdit(editor -> editor.setGeometryFactory(
+          cacheBoundingBox.getGeometryFactory().getGeographicGeometryFactory()));
       }
       final PDRectangle pageSize = new PDRectangle(width, height);
       final PDPage page = new PDPage(pageSize);

@@ -136,6 +136,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   private double maxUnitsPerPixel;
 
+  protected ViewportCacheBoundingBox cacheBoundingBox = new ViewportCacheBoundingBox();
+
   public Viewport2D() {
   }
 
@@ -165,8 +167,22 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     setBoundingBox(boundingBox);
   }
 
+  protected Viewport2D(final Viewport2D parentViewport) {
+    final ViewportCacheBoundingBox cacheBoundingBox = parentViewport.getCacheBoundingBox();
+    this.project = new WeakReference<>(parentViewport.getProject());
+    this.viewWidth = cacheBoundingBox.getViewWidthPixels();
+    this.viewHeight = cacheBoundingBox.getViewHeightPixels();
+    setGeometryFactory(this.boundingBox.getGeometryFactory());
+    this.boundingBox = cacheBoundingBox.getBoundingBox();
+    this.cacheBoundingBox = cacheBoundingBox;
+  }
+
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
+  }
+
+  public ViewportCacheBoundingBox getCacheBoundingBox() {
+    return this.cacheBoundingBox;
   }
 
   public double getClosestUnitsPerPixel(final double unitsPerPixel) {
@@ -268,10 +284,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return this.pixelsPerYUnit;
   }
 
-  protected double getPixelsPerYUnit(final double viewHeight, final double mapHeight) {
-    return -viewHeight / mapHeight;
-  }
-
   public Project getProject() {
     if (this.project == null) {
       return null;
@@ -323,16 +335,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return this.scale;
   }
 
-  /**
-   * Get the scale which dictates if a layer or renderer is visible. This is used when printing
-   * to ensure the same layers and renderers are used for printing as is shown on the screen.
-   *
-   * @return
-   */
-  public double getScaleForVisible() {
-    return getScale();
-  }
-
   public List<Long> getScales() {
     return this.scales;
   }
@@ -374,15 +376,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   public double getViewHeightPixels() {
     return this.viewHeight;
-  }
-
-  public Quantity<Length> getViewWidthLength() {
-    double width = getViewWidthPixels();
-    if (width < 0) {
-      width = 0;
-    }
-    final double pixelSizeMetres = getPixelSizeMetres();
-    return Quantities.getQuantity(width * pixelSizeMetres, Units.METRE);
   }
 
   public double getViewWidthPixels() {
@@ -479,7 +472,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     this.hotspotMapUnits = HOTSPOT_PIXELS / this.pixelsPerXUnit;
 
     final double mapHeight = boundingBox.getHeight();
-    this.pixelsPerYUnit = getPixelsPerYUnit(viewHeight, mapHeight);
+    this.pixelsPerYUnit = -viewHeight / mapHeight;
 
     this.originX = boundingBox.getMinX();
     this.originY = boundingBox.getMaxY();
@@ -497,7 +490,8 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   public BoundingBox setBoundingBox(BoundingBox boundingBox) {
-    if (boundingBox != null && !boundingBox.isEmpty() && !this.boundingBox.equals(boundingBox)) {
+    if (boundingBox != null && !boundingBox.isEmpty()
+      && (!this.boundingBox.equals(boundingBox) || this.unitsPerPixel == 0)) {
       final GeometryFactory geometryFactory = getGeometryFactory2dFloating();
       boundingBox = boundingBox.bboxToCs(geometryFactory);
       if (!boundingBox.isEmpty()) {
@@ -562,45 +556,13 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     }
   }
 
-  private void setBoundingBoxAndUnitsPerPixel(final BoundingBox boundingBox, double unitsPerPixel) {
+  private void setBoundingBoxAndUnitsPerPixel(final BoundingBox boundingBox,
+    final double unitsPerPixel) {
     final double oldScale = getScale();
     final double oldUnitsPerPixel = getUnitsPerPixel();
     final BoundingBox oldBoundingBox = this.boundingBox;
     synchronized (this) {
-      final double viewWidthPixels = getViewWidthPixels();
-      final double viewHeightPixels = getViewHeightPixels();
-
-      if (Double.isFinite(unitsPerPixel)) {
-        if (unitsPerPixel < this.minUnitsPerPixel) {
-          unitsPerPixel = this.minUnitsPerPixel;
-        }
-        final double pixelSizeMetres = getPixelSizeMetres();
-        this.unitsPerPixel = unitsPerPixel;
-        setModelToScreenTransform(
-          newModelToScreenTransform(boundingBox, viewWidthPixels, viewHeightPixels));
-        this.screenToModelTransform = newScreenToModelTransform(boundingBox, viewWidthPixels,
-          viewHeightPixels);
-        final Quantity<Length> modelWidthLength = boundingBox.getWidthLength();
-        double modelWidthMetres;
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        if (geometryFactory.isProjected()) {
-          modelWidthMetres = QuantityType.doubleValue(modelWidthLength, Units.METRE);
-        } else {
-          final double minX = boundingBox.getMinX();
-          final double centreY = boundingBox.getCentreY();
-          final double maxX = boundingBox.getMaxX();
-          final Ellipsoid ellipsoid = geometryFactory.getEllipsoid();
-          modelWidthMetres = ellipsoid.distanceMetres(minX, centreY, maxX, centreY);
-        }
-        this.metresPerPixel = modelWidthMetres / viewWidthPixels;
-        this.scale = this.metresPerPixel / pixelSizeMetres;
-      } else {
-        this.metresPerPixel = 0;
-        this.unitsPerPixel = 0;
-        setModelToScreenTransform(null);
-        this.screenToModelTransform = null;
-        this.scale = 0;
-      }
+      setUnitsPerPixelInternal(boundingBox, unitsPerPixel);
       setBoundingBoxInternal(boundingBox);
     }
     if (this.unitsPerPixel > 0) {
@@ -618,8 +580,9 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return setCentreFromScale(centre, scale);
   }
 
-  protected void setBoundingBoxInternal(final BoundingBox boundingBox) {
+  private synchronized void setBoundingBoxInternal(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
+    this.cacheBoundingBox = new ViewportCacheBoundingBox(this);
   }
 
   public void setCentre(Point centre) {
@@ -634,7 +597,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   private BoundingBox setCentreFromScale(final Point centre, final double scale) {
-    final double unitsPerPixel = getUnitsPerPixel(scale);
+    final double unitsPerPixel = scale * getPixelSizeMetres();
     return setCentreFromUnitsPerPixel(centre, unitsPerPixel);
   }
 
@@ -753,11 +716,47 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     }
   }
 
-  protected void setViewHeight(final double height) {
+  private void setUnitsPerPixelInternal(final BoundingBox boundingBox, double unitsPerPixel) {
+    if (Double.isFinite(unitsPerPixel)) {
+      final double viewWidthPixels = getViewWidthPixels();
+      final double viewHeightPixels = getViewHeightPixels();
+      if (unitsPerPixel < this.minUnitsPerPixel) {
+        unitsPerPixel = this.minUnitsPerPixel;
+      }
+      final double pixelSizeMetres = getPixelSizeMetres();
+      this.unitsPerPixel = unitsPerPixel;
+      setModelToScreenTransform(
+        newModelToScreenTransform(boundingBox, viewWidthPixels, viewHeightPixels));
+      this.screenToModelTransform = newScreenToModelTransform(boundingBox, viewWidthPixels,
+        viewHeightPixels);
+      final Quantity<Length> modelWidthLength = boundingBox.getWidthLength();
+      double modelWidthMetres;
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (geometryFactory.isProjected()) {
+        modelWidthMetres = QuantityType.doubleValue(modelWidthLength, Units.METRE);
+      } else {
+        final double minX = boundingBox.getMinX();
+        final double centreY = boundingBox.getCentreY();
+        final double maxX = boundingBox.getMaxX();
+        final Ellipsoid ellipsoid = geometryFactory.getEllipsoid();
+        modelWidthMetres = ellipsoid.distanceMetres(minX, centreY, maxX, centreY);
+      }
+      this.metresPerPixel = modelWidthMetres / viewWidthPixels;
+      this.scale = this.metresPerPixel / pixelSizeMetres;
+    } else {
+      this.metresPerPixel = 0;
+      this.unitsPerPixel = 0;
+      setModelToScreenTransform(null);
+      this.screenToModelTransform = null;
+      this.scale = 0;
+    }
+  }
+
+  protected synchronized void setViewHeight(final double height) {
     this.viewHeight = height;
   }
 
-  protected void setViewWidth(final double width) {
+  protected synchronized void setViewWidth(final double width) {
     this.viewWidth = width;
   }
 

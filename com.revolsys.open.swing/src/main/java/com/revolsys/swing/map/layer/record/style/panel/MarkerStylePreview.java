@@ -12,9 +12,9 @@ import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.swing.map.Graphics2DViewport;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewport;
 
 public class MarkerStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;

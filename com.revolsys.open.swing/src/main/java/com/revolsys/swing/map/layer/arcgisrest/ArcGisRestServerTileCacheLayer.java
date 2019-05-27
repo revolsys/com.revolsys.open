@@ -101,8 +101,8 @@ public class ArcGisRestServerTileCacheLayer
     if (mapService != null) {
       if (!isHasError()) {
         try {
-          final double metresPerPixel = view.getMetresPerPixel();
-          final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
+          final double viewResolution = view.getMetresPerPixel();
+          final int zoomLevel = mapService.getZoomLevel(viewResolution);
           final double resolution = mapService.getResolution(zoomLevel);
           if (resolution > 0) {
             final BoundingBox viewBoundingBox = view.getBoundingBox();
@@ -229,6 +229,11 @@ public class ArcGisRestServerTileCacheLayer
     SwingUtil.addLabelledReadOnlyTextField(panel, "Service Path", this.servicePath);
     GroupLayouts.makeColumns(panel, panel.getComponentCount() / 2, true);
     return panel;
+  }
+
+  @Override
+  protected ArcGisRestTileCacheLayerRenderer newRenderer() {
+    return new ArcGisRestTileCacheLayerRenderer(this);
   }
 
   @Override

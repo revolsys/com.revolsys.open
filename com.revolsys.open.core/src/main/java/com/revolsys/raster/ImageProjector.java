@@ -17,68 +17,77 @@ import com.revolsys.geometry.model.Point;
 
 public class ImageProjector {
 
-  private static void gauss(final double[][] matrix, final int[] l) {
-    /****************************************************
-        a is a n x n matrix and l is an int array of length n
-        l is used as an index array that will determine the order of
-        elimination of coefficients
-        All array indexes are assumed to start at 0
-    ******************************************************/
-    final double[] scalingFactor = new double[3]; // scaling factor
-    int i = 0;
-    int j = 0;
-    for (i = 0; i < 3; ++i) {
-      l[i] = i;
-      double scaleMax = 0;
-      for (j = 0; j < 3; ++j) {
-        scaleMax = Math.max(scaleMax, Math.abs(matrix[i][j]));
-      }
-      scalingFactor[i] = scaleMax;
+  private static int[] gauss(final double[][] matrix) {
+    final int[] indeces = {
+      0, 1, 2
+    };
+    final double[] scalingFactor = new double[3];
+    for (int i = 0; i < 3; i++) {
+      scalingFactor[i] = maxAbs(matrix[i]);
     }
 
-    i = 2;
-    for (int k = 0; k < 2; ++k) {
+    int j = 2;
+    for (int k = 0; k < 2; k++) {
       --j;
-      double rmax = 0;
-      for (i = k; i < 3; ++i) {
-        final double r = Math.abs(matrix[l[i]][k] / scalingFactor[l[i]]);
-        if (r > rmax) {
-          rmax = r;
+      double maxR = 0;
+      for (int i = k; i < 3; i++) {
+        final int indexI = indeces[i];
+        final double r = Math.abs(matrix[indexI][k] / scalingFactor[indexI]);
+        if (r > maxR) {
+          maxR = r;
           j = i;
         }
       }
-      final int temp = l[j];
-      l[j] = l[k];
-      l[k] = temp;
-      for (i = k + 1; i < 3; ++i) {
-        final double xmult = matrix[l[i]][k] / matrix[l[k]][k];
-        matrix[l[i]][k] = xmult;
-        for (j = k + 1; j < 3; ++j) {
-          matrix[l[i]][j] = matrix[l[i]][j] - xmult * matrix[l[k]][j];
+      final int temp = indeces[j];
+      indeces[j] = indeces[k];
+      indeces[k] = temp;
+      final int indexK = indeces[k];
+      final double[] rowK = matrix[indexK];
+      for (int i = k + 1; i < 3; i++) {
+        final int indexI = indeces[i];
+        final double[] rowI = matrix[indexI];
+        final double xmult = rowI[k] / rowK[k];
+        rowI[k] = xmult;
+        for (j = k + 1; j < 3; j++) {
+          rowI[j] = rowI[j] - xmult * rowK[j];
         }
       }
     }
+    return indeces;
   }
 
-  private static void solve(final double[][] a, final int[] l, final double[] b, final double[] x) {
-    /*********************************************************
-       a and l have previously been passed to Gauss() b is the product of
-       a and x. x is the 1x3 matrix of coefficients to solve for
-    *************************************************************/
-    for (int k = 0; k < 2; ++k) {
-      for (int i = k + 1; i < 3; ++i) {
-        b[l[i]] -= a[l[i]][k] * b[l[k]];
+  private static double maxAbs(final double[] values) {
+    double max = 0;
+    for (final double value : values) {
+      final double absValue = Math.abs(value);
+      if (absValue > max) {
+        max = absValue;
       }
     }
-    x[2] = b[l[2]] / a[l[2]][2];
+    return max;
+  }
+
+  private static double[] solve(final double[][] matrix, final int[] indices, final double[] b) {
+    final double[] x = new double[3];
+    for (int k = 0; k < 2; k++) {
+      final int indexK = indices[k];
+      for (int i = k + 1; i < 3; i++) {
+        final int indexI = indices[i];
+        b[indexI] -= matrix[indexI][k] * b[indexK];
+      }
+    }
+    final int indexLast = indices[2];
+    x[2] = b[indexLast] / matrix[indexLast][2];
 
     for (int i = 1; i >= 0; --i) {
-      double sum = b[l[i]];
-      for (int j = i + 1; j < 3; ++j) {
-        sum = sum - a[l[i]][j] * x[j];
+      final int index = indices[i];
+      double sum = b[index];
+      for (int j = i + 1; j < 3; j++) {
+        sum = sum - matrix[index][j] * x[j];
       }
-      x[i] = sum / a[l[i]][i];
+      x[i] = sum / matrix[index][i];
     }
+    return x;
   }
 
   private final GeoreferencedImage sourceImage;
@@ -99,6 +108,10 @@ public class ImageProjector {
 
   private GeometryFactory targetGeometryFactory;
 
+  private final AffineTransform transform = new AffineTransform();
+
+  private final int step = 50;
+
   public ImageProjector(final GeoreferencedImage sourceImage,
     final GeometryFactoryProxy targetGeometryFactory) {
     this.sourceImage = sourceImage;
@@ -109,15 +122,14 @@ public class ImageProjector {
   public void drawImage(final Graphics2D graphics) {
     this.g2 = graphics;
 
-    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-      RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+      RenderingHints.VALUE_INTERPOLATION_BILINEAR);
     final Shape clip = graphics.getClip();
 
     final int imageWidth = this.sourceImage.getImageWidth();
     final int imageHeight = this.sourceImage.getImageHeight();
 
-    final int step = 50;
+    final int step = this.step;
     for (int imageY = 0; imageY < imageHeight; imageY += step) {
       final int imageY2 = Math.min(imageHeight - 1, imageY + step);
       for (int imageX = 0; imageX < imageWidth; imageX += step) {
@@ -146,6 +158,7 @@ public class ImageProjector {
       final double targetImageY = point.y;
       targetTriangle.setPoint(i, targetImageX, targetImageY);
     }
+
     final double[][] a = new double[3][3];
     for (int i = 0; i < 3; ++i) {
       a[i][0] = sourceTriangle.getX(i);
@@ -153,27 +166,18 @@ public class ImageProjector {
       a[i][2] = 1.0;
     }
 
-    final int l[] = new int[3];
-    gauss(a, l);
+    final int l[] = gauss(a);
 
-    final double[] bx = new double[3];
-    final double[] by = new double[3];
-    for (int i = 0; i < 3; ++i) {
-      bx[i] = targetTriangle.getX(i);
-      by[i] = targetTriangle.getY(i);
-    }
+    final double[] bx = targetTriangle.xCoordinates.clone();
+    final double[] x = solve(a, l, bx);
 
-    final double[] x = new double[3];
-    solve(a, l, bx, x);
+    final double[] by = targetTriangle.yCoordinates.clone();
+    final double[] y = solve(a, l, by);
 
-    final double[] y = new double[3];
-    solve(a, l, by, y);
-
-    final AffineTransform af = new AffineTransform(x[0], y[0], x[1], y[1], x[2], y[2]);
-
+    this.transform.setTransform(x[0], y[0], x[1], y[1], x[2], y[2]);
     final Graphics2D g2 = this.g2;
     g2.setClip(targetTriangle);
-    g2.drawImage(this.sourceBufferdImage, af, null);
+    g2.drawImage(this.sourceBufferdImage, this.transform, null);
   }
 
   private double getResolution(final double originalDistance, final double distance1,

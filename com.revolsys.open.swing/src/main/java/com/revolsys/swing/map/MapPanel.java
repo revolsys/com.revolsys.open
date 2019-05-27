@@ -1196,6 +1196,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
           newScale = this.viewport.getZoomOutScale(oldScale, steps);
         }
         if (newScale > 0 && Math.abs(newScale - oldScale) > 0.0001) {
+          setScale(newScale);
           return;
         } else {
           newUnitsPerPixel = this.viewport.getUnitsPerPixel(newScale);

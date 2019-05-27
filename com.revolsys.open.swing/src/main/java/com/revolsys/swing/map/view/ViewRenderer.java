@@ -26,7 +26,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
@@ -35,6 +34,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.ViewportCacheBoundingBox;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -56,16 +56,16 @@ import com.revolsys.util.QuantityType;
 import tec.uom.se.unit.Units;
 
 public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
-  private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle
-    .line(WebColors.Red, 1)
-    .setLineDashArray(Arrays.asList(10));
-
   private static final Pattern PATTERN_INDEX_FROM_END = Pattern
     .compile("n(?:\\s*-\\s*(\\d+)\\s*)?");
 
   private static final Pattern PATTERN_SEGMENT_INDEX = Pattern.compile("segment\\((.*)\\)");
 
   private static final Pattern PATTERN_VERTEX_INDEX = Pattern.compile("vertex\\((.*)\\)");
+
+  private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle
+    .line(WebColors.Red, 1)
+    .setLineDashArray(Arrays.asList(10));
 
   private static PointDoubleXYOrientation getPointWithOrientationCentre(
     final GeometryFactory geometryFactory2dFloating, final Geometry geometry) {
@@ -96,41 +96,11 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   private boolean backgroundDrawingEnabled = true;
 
-  private boolean showHiddenRecords;
-
-  protected Viewport2D viewport;
-
-  private Cancellable cancellable = Cancellable.FALSE;
-
-  protected GeometryFactory geometryFactory;
-
-  protected double viewWidthPixels;
-
-  protected double viewHeightPixels;
-
-  private double modelUnitsPerViewUnit;
-
   protected BoundingBox boundingBox = BoundingBox.empty();
 
-  private final List<Point> points = new ArrayList<>();
+  private ViewportCacheBoundingBox cacheBoundingBox;
 
-  private final List<LineString> lines = new ArrayList<>();
-
-  private final List<Polygon> polygons = new ArrayList<>();
-
-  private final BaseCloseable geometryListCloseable = () -> {
-    this.points.clear();
-    this.lines.clear();
-    this.polygons.clear();
-  };
-
-  private boolean linesAdd;
-
-  private boolean polygonsAdd;
-
-  private boolean pointsAdd;
-
-  private GeometryStyle geometryStyle;
+  private Cancellable cancellable = Cancellable.FALSE;
 
   private final BaseCloseable drawGeometriesCloseable = () -> {
     try {
@@ -149,8 +119,57 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     }
   };
 
+  protected GeometryFactory geometryFactory;
+
+  private final BaseCloseable geometryListCloseable = () -> {
+    this.points.clear();
+    this.lines.clear();
+    this.polygons.clear();
+  };
+
+  private GeometryStyle geometryStyle;
+
+  private final boolean hasProject;
+
+  private final List<LineString> lines = new ArrayList<>();
+
+  private boolean linesAdd;
+
+  private double modelUnitsPerViewUnit;
+
+  private final List<Point> points = new ArrayList<>();
+
+  private boolean pointsAdd;
+
+  private final List<Polygon> polygons = new ArrayList<>();
+
+  private boolean polygonsAdd;
+
+  private double scale;
+
+  private double scaleForVisible = 1;
+
+  private boolean showHiddenRecords;
+
+  protected double viewHeightPixels;
+
+  protected Viewport2D viewport;
+
+  protected double viewWidthPixels;
+
+  public ViewRenderer(final int width, final int height) {
+    this(new ViewportCacheBoundingBox(width, height), false);
+  }
+
   public ViewRenderer(final Viewport2D viewport) {
-    setViewport(viewport);
+    this.viewport = viewport;
+    this.hasProject = viewport.getProject() != null;
+    setCacheBoundingBox(viewport.getCacheBoundingBox());
+  }
+
+  public ViewRenderer(final ViewportCacheBoundingBox cacheBoundingBox, final boolean hasProject) {
+    this.hasProject = hasProject;
+    setCacheBoundingBox(cacheBoundingBox);
   }
 
   public void addGeometry(final Geometry geometry) {
@@ -315,17 +334,20 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
   }
 
   public double getMetresPerPixel() {
-    return this.viewport.getMetresPerPixel();
+    return this.cacheBoundingBox.getMetresPerPixel();
+  }
+
+  public double getModelUnitsPerViewUnit() {
+    return this.modelUnitsPerViewUnit;
   }
 
   public PointDoubleXYOrientation getPointWithOrientation(final Geometry geometry,
     final String placementType) {
-    if (this.viewport == null) {
+    if (!hasViewport()) {
       return new PointDoubleXYOrientation(0.0, 0.0, 0);
     } else {
-      final GeometryFactory viewportGeometryFactory2d = this.viewport
-        .getGeometryFactory2dFloating();
-      if (viewportGeometryFactory2d != null && geometry != null && !geometry.isEmpty()) {
+      final GeometryFactory geometryFactory = this.geometryFactory;
+      if (geometryFactory != null && geometry != null && !geometry.isEmpty()) {
         Point point = null;
         double orientation = 0;
         if (geometry instanceof Point) {
@@ -337,8 +359,8 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
             final int vertexIndex = getIndex(vertexIndexMatcher);
             if (vertexIndex >= -vertexCount && vertexIndex < vertexCount) {
               final Vertex vertex = geometry.getVertex(vertexIndex);
-              orientation = vertex.getOrientaton(viewportGeometryFactory2d);
-              point = vertex.convertGeometry(viewportGeometryFactory2d);
+              orientation = vertex.getOrientaton(geometryFactory);
+              point = vertex.convertGeometry(geometryFactory);
             }
           } else {
             final Matcher segmentIndexMatcher = PATTERN_SEGMENT_INDEX.matcher(placementType);
@@ -347,7 +369,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
               if (segmentCount > 0) {
                 final int index = getIndex(segmentIndexMatcher);
                 LineSegment segment = geometry.getSegment(index);
-                segment = segment.convertGeometry(viewportGeometryFactory2d);
+                segment = segment.convertGeometry(geometryFactory);
                 if (segment != null) {
                   point = segment.midPoint();
                   orientation = segment.getOrientaton();
@@ -355,7 +377,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
               }
             } else {
               PointDoubleXYOrientation pointDoubleXYOrientation = getPointWithOrientationCentre(
-                viewportGeometryFactory2d, geometry);
+                geometryFactory, geometry);
               if (!this.boundingBox.bboxCovers(pointDoubleXYOrientation)) {
                 try {
                   final Geometry clippedGeometry = geometry.intersectionBbox(this.boundingBox);
@@ -368,8 +390,8 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
                         final double area = part.getArea();
                         if (area > maxArea) {
                           maxArea = area;
-                          pointDoubleXYOrientation = getPointWithOrientationCentre(
-                            viewportGeometryFactory2d, part);
+                          pointDoubleXYOrientation = getPointWithOrientationCentre(geometryFactory,
+                            part);
                         }
                       } else if (part instanceof LineString) {
                         if (maxArea == 0 && "auto".equals(placementType)) {
@@ -377,13 +399,13 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
                           if (length > maxLength) {
                             maxLength = length;
                             pointDoubleXYOrientation = getPointWithOrientationCentre(
-                              viewportGeometryFactory2d, part);
+                              geometryFactory, part);
                           }
                         }
                       } else if (part instanceof Point) {
                         if (maxArea == 0 && maxLength == 0 && "auto".equals(placementType)) {
-                          pointDoubleXYOrientation = getPointWithOrientationCentre(
-                            viewportGeometryFactory2d, part);
+                          pointDoubleXYOrientation = getPointWithOrientationCentre(geometryFactory,
+                            part);
                         }
                       }
                     }
@@ -397,7 +419,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
         }
         if (Property.hasValue(point)) {
           if (this.boundingBox.bboxCovers(point)) {
-            point = point.convertPoint2d(viewportGeometryFactory2d);
+            point = point.convertPoint2d(geometryFactory);
             return new PointDoubleXYOrientation(point, orientation);
           }
         }
@@ -407,27 +429,23 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
   }
 
   public double getScale() {
-    if (this.viewport == null) {
-      return 1;
-    } else {
-      return this.viewport.getScale();
-    }
+    return getScale();
   }
 
   public double getScaleForVisible() {
-    return this.viewport.getScaleForVisible();
+    return this.scaleForVisible;
   }
 
   public double getViewHeightPixels() {
     return this.viewHeightPixels;
   }
 
-  public Viewport2D getViewport() {
-    return this.viewport;
-  }
-
   public double getViewWidthPixels() {
     return this.viewWidthPixels;
+  }
+
+  public boolean hasViewport() {
+    return this.viewport != null;
   }
 
   public boolean isBackgroundDrawingEnabled() {
@@ -445,6 +463,10 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   public boolean isShowHiddenRecords() {
     return this.showHiddenRecords;
+  }
+
+  public boolean isViewValid() {
+    return this.viewWidthPixels > 0 && this.viewHeightPixels > 0 && this.hasProject;
   }
 
   public abstract MarkerRenderer newMarkerRendererEllipse(MarkerStyle style);
@@ -500,6 +522,17 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     this.backgroundDrawingEnabled = backgroundDrawingEnabled;
   }
 
+  protected void setCacheBoundingBox(final ViewportCacheBoundingBox cacheBoundingBox) {
+    this.cacheBoundingBox = cacheBoundingBox;
+    this.geometryFactory = this.cacheBoundingBox.getGeometryFactory2dFloating();
+    this.boundingBox = this.cacheBoundingBox.getBoundingBox();
+    this.viewWidthPixels = this.cacheBoundingBox.getViewWidthPixels();
+    this.viewHeightPixels = this.cacheBoundingBox.getViewHeightPixels();
+    this.modelUnitsPerViewUnit = this.cacheBoundingBox.getModelUnitsPerViewUnit();
+    this.scale = this.cacheBoundingBox.getScale();
+    this.scaleForVisible = this.scale;
+  }
+
   public void setCancellable(Cancellable cancellable) {
     if (cancellable == null) {
       cancellable = Cancellable.FALSE;
@@ -508,13 +541,12 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     }
   }
 
-  public void setShowHiddenRecords(final boolean showHiddenRecords) {
-    this.showHiddenRecords = showHiddenRecords;
+  public void setScaleForVisible(final double scaleForVisible) {
+    this.scaleForVisible = scaleForVisible;
   }
 
-  public void setViewport(final Viewport2D viewport) {
-    this.viewport = viewport;
-    updateFields();
+  public void setShowHiddenRecords(final boolean showHiddenRecords) {
+    this.showHiddenRecords = showHiddenRecords;
   }
 
   public double toDisplayValue(final Quantity<Length> value) {
@@ -550,19 +582,6 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
       }
     }
     return convertedValue;
-  }
-
-  protected void updateFields() {
-    if (this.viewport == null) {
-      this.boundingBox = new BoundingBoxDoubleXY(0, 0, this.viewWidthPixels, this.viewHeightPixels);
-      this.modelUnitsPerViewUnit = 1;
-    } else {
-      this.geometryFactory = this.viewport.getGeometryFactory2dFloating();
-      this.boundingBox = this.viewport.getBoundingBox();
-      this.viewWidthPixels = this.viewport.getViewWidthPixels();
-      this.viewHeightPixels = this.viewport.getViewHeightPixels();
-      this.modelUnitsPerViewUnit = this.viewport.getModelUnitsPerViewUnit();
-    }
   }
 
   public abstract BaseCloseable useViewCoordinates();

@@ -9,6 +9,7 @@ import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.io.PathName;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -17,6 +18,8 @@ import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
+import com.revolsys.util.Strings;
+import com.revolsys.util.UrlUtil;
 
 public class MapService extends ArcGisRestAbstractLayerService {
   public static MapService getMapService(String url) {
@@ -35,6 +38,8 @@ public class MapService extends ArcGisRestAbstractLayerService {
   private String supportedImageFormatTypes;
 
   private boolean singleFusedMapCache;
+
+  private boolean exportTilesAllowed;
 
   private int maxImageHeight;
 
@@ -69,6 +74,42 @@ public class MapService extends ArcGisRestAbstractLayerService {
 
     final GeometryFactory geometryFactory = tileInfo.getGeometryFactory();
     return geometryFactory.newBoundingBox(x1, y1, x2, y2);
+  }
+
+  public BufferedImage getExportImage(final BoundingBox boundingBox, final int imageWidth,
+    final int imageHeight) {
+    final String url = getExportUrl(boundingBox, imageWidth, imageHeight);
+    boolean retry = true;
+    while (true) {
+      try {
+        return BufferedImages.readImageIo(url);
+      } catch (final WrappedException e) {
+        if (Exceptions.isException(e, FileNotFoundException.class)) {
+          return null;
+        } else if (!retry) {
+          throw Exceptions.wrap(e);
+        }
+      }
+      retry = false;
+    }
+  }
+
+  public String getExportUrl(final BoundingBox boundingBox, final int imageWidth,
+    final int imageHeight) {
+    final MapEx parameters = new LinkedHashMapEx();
+    final String bbox = Strings.toString(",", boundingBox.getMinX(), boundingBox.getMinY(),
+      boundingBox.getMaxX(), boundingBox.getMaxY());
+    parameters.put("bbox", bbox);
+    parameters.put("bboxSR", boundingBox.getCoordinateSystemId());
+    parameters.put("imageSR", boundingBox.getCoordinateSystemId());
+    parameters.put("size", imageWidth + "," + imageHeight);
+    parameters.put("transparent", "true");
+    parameters.put("dpi", "144");
+    parameters.put("scale", 20000000);
+    parameters.put("f", "image");
+
+    return UrlUtil.getUrl(getServiceUrl() + "/export/", parameters);
+
   }
 
   @Override
@@ -163,18 +204,18 @@ public class MapService extends ArcGisRestAbstractLayerService {
     return tileY;
   }
 
-  public int getZoomLevel(final double metresPerPixel) {
+  public int getZoomLevel(final double resolution) {
     final TileInfo tileInfo = getTileInfo();
     final List<LevelOfDetail> levelOfDetails = tileInfo.getLevelOfDetails();
     LevelOfDetail previousLevel = levelOfDetails.get(0);
     for (final LevelOfDetail levelOfDetail : levelOfDetails) {
-      final double levelMetresPerPixel = levelOfDetail.getResolution();
-      if (metresPerPixel > levelMetresPerPixel) {
+      final double levelResolution = levelOfDetail.getResolution();
+      if (resolution > levelResolution) {
         if (levelOfDetail == previousLevel) {
           return levelOfDetail.getLevel();
         } else {
-          final double ratio = levelMetresPerPixel / metresPerPixel;
-          if (ratio < 0.9) {
+          final double ratio = levelResolution / resolution;
+          if (ratio < 0.95) {
             return previousLevel.getLevel();
           } else {
             return levelOfDetail.getLevel();
@@ -197,12 +238,20 @@ public class MapService extends ArcGisRestAbstractLayerService {
     super.initChildren(properties, children, rootLayersByName);
   }
 
+  public boolean isExportTilesAllowed() {
+    return this.exportTilesAllowed;
+  }
+
   public boolean isSingleFusedMapCache() {
     return this.singleFusedMapCache;
   }
 
   public boolean isSupportsDynamicLayers() {
     return this.supportsDynamicLayers;
+  }
+
+  public void setExportTilesAllowed(final boolean exportTilesAllowed) {
+    this.exportTilesAllowed = exportTilesAllowed;
   }
 
   public void setMapName(final String mapName) {

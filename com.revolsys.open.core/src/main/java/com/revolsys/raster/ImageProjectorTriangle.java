@@ -9,11 +9,11 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 
- class ImageProjectorTriangle implements Shape {
+class ImageProjectorTriangle implements Shape {
 
-  private final double[] xCoordinates;
+  protected final double[] xCoordinates;
 
-  private final double[] yCoordinates;
+  protected final double[] yCoordinates;
 
   public ImageProjectorTriangle() {
     this.xCoordinates = new double[3];

@@ -45,6 +45,7 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Fonts;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.ViewportCacheBoundingBox;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.shape.LineStringShape;
 import com.revolsys.swing.map.layer.record.renderer.shape.PolygonShape;
@@ -307,11 +308,8 @@ public class Graphics2DViewRenderer extends ViewRenderer {
   private final double[] coordinates = new double[2];
 
   public Graphics2DViewRenderer(final Graphics2D graphics, final int width, final int height) {
-    super(null);
-    this.geometryFactory = GeometryFactory.DEFAULT_2D;
-    this.viewWidthPixels = width;
-    this.viewHeightPixels = height;
-    setGraphics(graphics);
+    super(width, height);
+    setGraphics(null, graphics);
   }
 
   public Graphics2DViewRenderer(final Viewport2D viewport) {
@@ -320,7 +318,7 @@ public class Graphics2DViewRenderer extends ViewRenderer {
 
   public Graphics2DViewRenderer(final Viewport2D viewport, final Graphics2D graphics) {
     super(viewport);
-    setGraphics(graphics);
+    setGraphics(viewport, graphics);
   }
 
   @Override
@@ -880,9 +878,54 @@ public class Graphics2DViewRenderer extends ViewRenderer {
     return new Graphics2DTextStyleRenderer(this, textStyle);
   }
 
-  public void setGraphics(final Graphics2D graphics) {
+  @Override
+  protected void setCacheBoundingBox(final ViewportCacheBoundingBox cacheBoundingBox) {
+    if (this.graphics == null) {
+      this.canvasOriginalTransform = IDENTITY_TRANSFORM;
+    } else {
+      this.canvasOriginalTransform = this.graphics.getTransform();
+      if (this.canvasOriginalTransform == null) {
+        this.canvasOriginalTransform = IDENTITY_TRANSFORM;
+      }
+    }
+    super.setCacheBoundingBox(cacheBoundingBox);
+
+    if (hasViewport()) {
+      final double mapWidth = this.boundingBox.getWidth();
+      final double pixelsPerXUnit = this.viewWidthPixels / mapWidth;
+
+      final double mapHeight = this.boundingBox.getHeight();
+      final double pixelsPerYUnit = -this.viewHeightPixels / mapHeight;
+
+      final double originX = this.boundingBox.getMinX();
+      final double originY = this.boundingBox.getMaxY();
+      final AffineTransform modelToScreenTransform = AffineTransform
+        .getScaleInstance(pixelsPerXUnit, pixelsPerYUnit);
+      modelToScreenTransform.translate(-originX, -originY);
+      this.modelToScreenTransform = modelToScreenTransform;
+    } else {
+      this.modelToScreenTransform = IDENTITY_TRANSFORM;
+    }
+    if (this.modelToScreenTransform == null) {
+      this.canvasModelTransform = IDENTITY_TRANSFORM;
+    } else {
+      final AffineTransform transform = (AffineTransform)this.canvasOriginalTransform.clone();
+      transform.concatenate(this.modelToScreenTransform);
+      this.canvasModelTransform = transform;
+    }
+    this.useModelTransform = new ResetAffineTransform(this.graphics, this.canvasOriginalTransform,
+      this.canvasModelTransform);
+    this.useViewTransform = new ResetAffineTransform(this.graphics, this.canvasOriginalTransform,
+      this.canvasOriginalTransform);
+  }
+
+  public void setGraphics(final Viewport2D viewport, final Graphics2D graphics) {
     this.graphics = graphics;
-    updateFields();
+    if (viewport == null) {
+      setCacheBoundingBox(new ViewportCacheBoundingBox(100, 100));
+    } else {
+      setCacheBoundingBox(viewport.getCacheBoundingBox());
+    }
   }
 
   private double[] toViewCoordinates(final double x, final double y) {
@@ -907,36 +950,6 @@ public class Graphics2DViewRenderer extends ViewRenderer {
     final double viewX = viewCoordinates[0];
     final double viewY = viewCoordinates[1];
     this.graphics.translate(viewX, viewY);
-  }
-
-  @Override
-  protected void updateFields() {
-    if (this.graphics == null) {
-      this.canvasOriginalTransform = IDENTITY_TRANSFORM;
-    } else {
-      this.canvasOriginalTransform = this.graphics.getTransform();
-      if (this.canvasOriginalTransform == null) {
-        this.canvasOriginalTransform = IDENTITY_TRANSFORM;
-      }
-    }
-    super.updateFields();
-
-    if (this.viewport == null) {
-      this.modelToScreenTransform = IDENTITY_TRANSFORM;
-    } else {
-      this.modelToScreenTransform = this.viewport.getModelToScreenTransform();
-    }
-    if (this.modelToScreenTransform == null) {
-      this.canvasModelTransform = IDENTITY_TRANSFORM;
-    } else {
-      final AffineTransform transform = (AffineTransform)this.canvasOriginalTransform.clone();
-      transform.concatenate(this.modelToScreenTransform);
-      this.canvasModelTransform = transform;
-    }
-    this.useModelTransform = new ResetAffineTransform(this.graphics, this.canvasOriginalTransform,
-      this.canvasModelTransform);
-    this.useViewTransform = new ResetAffineTransform(this.graphics, this.canvasOriginalTransform,
-      this.canvasOriginalTransform);
   }
 
   public BaseCloseable useModelCoordinates() {

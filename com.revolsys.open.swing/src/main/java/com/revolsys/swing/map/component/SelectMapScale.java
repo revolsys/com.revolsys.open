@@ -73,8 +73,8 @@ public class SelectMapScale extends JComboBox<Long>
       if (e.getStateChange() == ItemEvent.SELECTED) {
         double scale = map.getScale();
         final Object value = e.getItem();
-        if (value instanceof Double) {
-          scale = (Double)value;
+        if (value instanceof Number) {
+          scale = ((Number)value).doubleValue();
         }
         map.setScale(scale);
       }

@@ -592,7 +592,7 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
   @Override
   protected final void paintComponent(final Graphics g) {
     final Graphics2D graphics = (Graphics2D)g;
-    this.view.setGraphics(graphics);
+    this.view.setGraphics(this.viewport, graphics);
     paintComponent(this.view, graphics);
   }
 

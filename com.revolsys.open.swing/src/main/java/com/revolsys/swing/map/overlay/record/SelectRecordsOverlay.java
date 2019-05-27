@@ -320,13 +320,11 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private GeoreferencedImage refreshImageSelected(final Cancellable cancellable) {
     final Viewport2D viewport = getViewport();
     if (viewport != null) {
-      final double width = viewport.getViewWidthPixels();
-      final double height = viewport.getViewHeightPixels();
-      if (width > 0 && height > 0) {
-        try (
-          final ImageViewport imageViewport = new ImageViewport(viewport,
-            BufferedImage.TYPE_INT_ARGB_PRE);) {
-          final ViewRenderer view = imageViewport.newViewRenderer();
+      try (
+        final ImageViewport imageViewport = new ImageViewport(viewport,
+          BufferedImage.TYPE_INT_ARGB_PRE);) {
+        final ViewRenderer view = imageViewport.newViewRenderer();
+        if (view.isViewValid()) {
           final Project project = getProject();
           refreshImageRenderer(view, project);
           refreshImageSelectedAndHighlighted(view, project);

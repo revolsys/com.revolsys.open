@@ -78,7 +78,7 @@ public class PdfViewRenderer extends ViewRenderer {
       super(PdfViewRenderer.this, style);
       this.minX = PdfViewRenderer.this.boundingBox.getMinX();
       this.minY = PdfViewRenderer.this.boundingBox.getMinY();
-      this.modelUnitsPerViewUnit = PdfViewRenderer.this.viewport.getModelUnitsPerViewUnit();
+      this.modelUnitsPerViewUnit = getModelUnitsPerViewUnit();
     }
 
     @Override
@@ -381,7 +381,6 @@ public class PdfViewRenderer extends ViewRenderer {
     this.contentStream = contentStream;
     this.document = viewport.getDocument();
     setShowHiddenRecords(true);
-    updateFields();
     setBackgroundDrawingEnabled(false);
   }
 
@@ -638,7 +637,7 @@ public class PdfViewRenderer extends ViewRenderer {
 
             final double x = point.getX();
             final double y = point.getY();
-            final double modelUnitsPerViewUnit = this.viewport.getModelUnitsPerViewUnit();
+            final double modelUnitsPerViewUnit = getModelUnitsPerViewUnit();
             double viewX = (x - this.boundingBox.getMinX()) / modelUnitsPerViewUnit;
             double viewY = (y - this.boundingBox.getMinY()) / modelUnitsPerViewUnit;
 
@@ -808,13 +807,12 @@ public class PdfViewRenderer extends ViewRenderer {
     return this.contentStream;
   }
 
-  public PDOptionalContentGroup getPDOptionalContentGroup(final Layer layer) {
-    return this.optionalContentGroups.get(layer);
+  public final PDFont getFont(final String path) throws IOException {
+    return ((PdfViewport)this.viewport).getFont(path);
   }
 
-  @Override
-  public PdfViewport getViewport() {
-    return (PdfViewport)super.getViewport();
+  public PDOptionalContentGroup getPDOptionalContentGroup(final Layer layer) {
+    return this.optionalContentGroups.get(layer);
   }
 
   @Override
@@ -959,7 +957,7 @@ public class PdfViewRenderer extends ViewRenderer {
       coordinates[0] = x;
       coordinates[1] = y;
     } else {
-      final double modelUnitsPerViewUnit = this.viewport.getModelUnitsPerViewUnit();
+      final double modelUnitsPerViewUnit = getModelUnitsPerViewUnit();
       final double viewX = (x - this.boundingBox.getMinX()) / modelUnitsPerViewUnit;
       final double viewY = (y - this.boundingBox.getMinY()) / modelUnitsPerViewUnit;
       coordinates[0] = viewX;

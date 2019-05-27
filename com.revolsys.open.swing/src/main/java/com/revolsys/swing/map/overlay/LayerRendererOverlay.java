@@ -3,7 +3,6 @@ package com.revolsys.swing.map.overlay;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
@@ -49,13 +48,14 @@ public class LayerRendererOverlay extends JComponent
   private static final GeometryStyle STYLE_AREA = GeometryStyle.polygon(WebColors.FireBrick, 1,
     WebColors.newAlpha(WebColors.FireBrick, 16));
 
+  private static final GeoreferencedImage EMPTY_IMAGE = new BufferedGeoreferencedImage(
+    BoundingBox.empty(), 0, 0);
+
   private Layer layer;
 
   private ComponentViewport2D viewport;
 
   private boolean showAreaBoundingBox = false;
-
-  private Graphics2DViewRenderer view;
 
   private BackgroundRefreshResource<GeoreferencedImage> cachedImage = new BackgroundRefreshResource<>(
     "Render Layers", this::refreshImage);
@@ -66,7 +66,6 @@ public class LayerRendererOverlay extends JComponent
 
   public LayerRendererOverlay(final MapPanel mapPanel, final Layer layer) {
     this.viewport = mapPanel.getViewport();
-    this.view = this.viewport.newViewRenderer();
 
     setLayer(layer);
     Property.addListener(this.viewport, this);
@@ -83,24 +82,11 @@ public class LayerRendererOverlay extends JComponent
     Property.removeAllListeners(this);
     this.cachedImage = null;
     this.viewport = null;
-    this.view = null;
   }
 
   @Override
   public Layer getLayer() {
     return this.layer;
-  }
-
-  public Project getProject() {
-    return this.layer.getProject();
-  }
-
-  public Viewport2D getViewport() {
-    return this.viewport;
-  }
-
-  public boolean isShowAreaBoundingBox() {
-    return this.showAreaBoundingBox;
   }
 
   @Override
@@ -113,8 +99,8 @@ public class LayerRendererOverlay extends JComponent
         }
       } else {
         final Graphics2D graphics = (Graphics2D)g;
-        this.view.setGraphics(graphics);
-        this.view.drawImage(image, false);
+        final Graphics2DViewRenderer view = this.viewport.newViewRenderer(graphics);
+        view.drawImage(image, false);
       }
     }
   }
@@ -163,49 +149,38 @@ public class LayerRendererOverlay extends JComponent
   }
 
   private GeoreferencedImage refreshImage(final Cancellable cancellable) {
-    final Viewport2D viewport = getViewport();
-    final BoundingBox boundingBox = viewport.getBoundingBox();
-    final int imageWidth = (int)Math.ceil(viewport.getViewWidthPixels());
-    final int imageHeight = (int)Math.ceil(viewport.getViewHeightPixels());
-    final GeoreferencedImage referencedImage = new BufferedGeoreferencedImage(boundingBox,
-      imageWidth, imageHeight);
-    try {
-      if (this.layer != null) {
-        final Project project = getProject();
-        if (imageWidth > 0 && imageHeight > 0 && project != null) {
-          try (
-            final ImageViewport imageViewport = new ImageViewport(project, imageWidth, imageHeight,
-              boundingBox)) {
-            final ViewRenderer view = imageViewport.newViewRenderer();
-            view.setCancellable(cancellable);
-            view.renderLayer(this.layer);
-            if (isShowAreaBoundingBox()) {
-              final BoundingBox areaBoundingBox = boundingBox.getAreaBoundingBox();
-              if (!areaBoundingBox.isEmpty()) {
-                final Polygon viewportPolygon = boundingBox
-                  .bboxEdit(editor -> editor.expandPercent(0.1))
-                  .toPolygon(0);
-                final Polygon areaPolygon = areaBoundingBox
-                  .bboxEdit(editor -> editor.expandDelta(imageViewport.getUnitsPerPixel()))
-                  .toPolygon(0);
-                final Geometry drawPolygon = viewportPolygon.difference(areaPolygon);
-                view.drawGeometry(drawPolygon, STYLE_AREA);
-              }
-            }
-            if (!cancellable.isCancelled()) {
-              final BufferedImage image = imageViewport.getImage();
-              referencedImage.setRenderedImage(image);
+    final Viewport2D viewport = this.viewport;
+    if (this.layer != null) {
+      try (
+        final ImageViewport imageViewport = new ImageViewport(viewport)) {
+        final ViewRenderer view = imageViewport.newViewRenderer();
+        if (view.isViewValid()) {
+          view.setCancellable(cancellable);
+          view.renderLayer(this.layer);
+          if (this.showAreaBoundingBox) {
+            final BoundingBox areaBoundingBox = view.getAreaBoundingBox();
+            if (!areaBoundingBox.isEmpty()) {
+              final Polygon viewportPolygon = view.bboxEdit(editor -> editor.expandPercent(0.1))
+                .toPolygon(0);
+              final Polygon areaPolygon = areaBoundingBox
+                .bboxEdit(editor -> editor.expandDelta(imageViewport.getUnitsPerPixel()))
+                .toPolygon(0);
+              final Geometry drawPolygon = viewportPolygon.difference(areaPolygon);
+              view.drawGeometry(drawPolygon, STYLE_AREA);
             }
           }
+          if (!cancellable.isCancelled()) {
+            return imageViewport.getGeoreferencedImage();
+          }
+        }
+      } catch (final Throwable t) {
+        if (!cancellable.isCancelled()) {
+          Logs.error(this, "Unable to paint", t);
         }
       }
-      return referencedImage;
-    } catch (final Throwable t) {
-      if (!cancellable.isCancelled()) {
-        Logs.error(this, "Unable to paint", t);
-      }
-      return null;
+
     }
+    return EMPTY_IMAGE;
   }
 
   @Override

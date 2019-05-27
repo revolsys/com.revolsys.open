@@ -16,12 +16,13 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.swing.map.Graphics2DViewport;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.ViewportCacheBoundingBox;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewport;
 import com.revolsys.swing.parallel.Invoke;
 
 public class SinglePage extends Graphics2DViewport implements Pageable, Printable {
@@ -29,10 +30,11 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
   public static void print() {
     final Project project = Project.get();
     final Viewport2D viewport = project.getViewport();
-    final double viewWidth = viewport.getViewWidthPixels();
-    final double viewHeight = viewport.getViewHeightPixels();
-    final BoundingBox boundingBox = viewport.getBoundingBox();
-    final double scaleForVisible = viewport.getScaleForVisible();
+    final ViewportCacheBoundingBox cacheBoundingBox = viewport.getCacheBoundingBox();
+    final BoundingBox boundingBox = cacheBoundingBox.getBoundingBox();
+    final int viewWidth = cacheBoundingBox.getViewWidthPixels();
+    final int viewHeight = cacheBoundingBox.getViewHeightPixels();
+    final double scaleForVisible = cacheBoundingBox.getScale();
 
     final PrinterJob job = PrinterJob.getPrinterJob();
 
@@ -106,22 +108,12 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
   }
 
   @Override
-  protected double getPixelsPerYUnit(final double viewHeight, final double mapHeight) {
-    return -viewHeight / mapHeight;
-  }
-
-  @Override
   public Printable getPrintable(final int pageIndex) {
     if (pageIndex == 0) {
       return this;
     } else {
       return null;
     }
-  }
-
-  @Override
-  public double getScaleForVisible() {
-    return this.scaleForVisible;
   }
 
   @Override
@@ -136,7 +128,7 @@ public class SinglePage extends Graphics2DViewport implements Pageable, Printabl
     throws PrinterException {
     if (pageIndex == 0) {
       final Graphics2DViewRenderer view = newViewRenderer(graphics);
-
+      view.setScaleForVisible(this.scaleForVisible);
       final int translateX = (int)pageFormat.getImageableX();
       final int translateY = (int)pageFormat.getImageableY();
       graphics.translate(translateX - 1, translateY - 1);

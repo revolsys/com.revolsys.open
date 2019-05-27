@@ -167,7 +167,7 @@ public class PdfTextStyleRenderer extends TextStyleViewRenderer {
               contentStream.setNonStrokingColor(this.style.getTextFill());
 
               contentStream.beginText();
-              final PDFont pdfFont = this.view.getViewport()
+              final PDFont pdfFont = this.view
                 .getFont("/org/apache/pdfbox/resources/ttf/ArialMT.ttf");
 
               contentStream.setFont(pdfFont, font.getSize2D());

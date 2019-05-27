@@ -51,41 +51,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     });
   }
 
-  /**
-   * Get the bounding box for the dimensions of the viewport at the specified
-   * scale, centred at the x, y model coordinates.
-   *
-   * @param x The model x coordinate.
-   * @param y The model y coordinate.
-   * @param scale The scale.
-   * @return The bounding box.
-   */
-  public BoundingBox getBoundingBox(final double x, final double y, final double scale) {
-    final double width = getModelWidth(scale);
-    final double height = getModelHeight(scale);
-
-    final double x1 = x - width / 2;
-    final double y1 = y - height / 2;
-    final double x2 = x1 + width;
-    final double y2 = y1 + height;
-    final BoundingBox boundingBox = getGeometryFactory().newBoundingBox(x1, y1, x2, y2);
-    return boundingBox;
-  }
-
-  public double getMaxScale() {
-    final BoundingBox areaBoundingBox = getGeometryFactory().getAreaBoundingBox();
-    final Quantity<Length> areaWidth = areaBoundingBox.getWidthLength();
-    final Quantity<Length> areaHeight = areaBoundingBox.getHeightLength();
-
-    final Quantity<Length> viewWidth = getViewWidthLength();
-    final Quantity<Length> viewHeight = getViewHeightLength();
-
-    final double maxHorizontalScale = getScale(viewWidth, areaWidth);
-    final double maxVerticalScale = getScale(viewHeight, areaHeight);
-    final double maxScale = Math.max(maxHorizontalScale, maxVerticalScale);
-    return maxScale;
-  }
-
   public double getModelHeight(final double scale) {
     final Unit<Length> scaleUnit = getScaleUnit(scale);
 
@@ -94,65 +59,10 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     return height;
   }
 
-  public <Q extends Quantity<Q>> Unit<Q> getModelToScreenUnit(final Unit<Q> modelUnit) {
-    final double viewWidth = getViewWidthPixels();
-    final double modelWidth = getModelWidth();
-    return modelUnit.multiply(viewWidth).divide(modelWidth);
-  }
-
-  public double getModelWidth(final double scale) {
-    final Unit<Length> scaleUnit = getScaleUnit(scale);
-
-    final Quantity<Length> viewWidth = getViewWidthLength();
-    final double width = QuantityType.doubleValue(viewWidth, scaleUnit);
-    return width;
-  }
-
   public Unit<Length> getScaleUnit(final double scale) {
     final Unit<Length> lengthUnit = getGeometryFactory().getHorizontalLengthUnit();
     final Unit<Length> scaleUnit = lengthUnit.divide(scale);
     return scaleUnit;
-  }
-
-  public <Q extends Quantity<Q>> Unit<Q> getScreenToModelUnit(final Unit<Q> modelUnit) {
-    final double viewWidth = getViewWidthPixels();
-    final double modelWidth = getModelWidth();
-    return modelUnit.multiply(modelWidth).divide(viewWidth);
-  }
-
-  public BoundingBox getValidBoundingBox(final BoundingBox boundingBox) {
-    BoundingBox validBoundingBox = boundingBox;
-    final double viewAspectRatio = getViewAspectRatio();
-    double modelWidth = validBoundingBox.getWidth();
-    double modelHeight = validBoundingBox.getHeight();
-
-    /*
-     * If the new bounding box has a zero width and height, expand it by 50 view
-     * units.
-     */
-    if (modelWidth == 0 && modelHeight == 0) {
-      final double delta = getModelUnitsPerViewUnit() * 50;
-      validBoundingBox = validBoundingBox.bboxEdit(editor -> editor.expandDelta(delta));
-      modelWidth = validBoundingBox.getWidth();
-      modelHeight = validBoundingBox.getHeight();
-    }
-    final double newModelAspectRatio = modelWidth / modelHeight;
-    double modelUnitsPerViewUnit;
-    if (viewAspectRatio <= newModelAspectRatio) {
-      modelUnitsPerViewUnit = modelWidth / getViewWidthPixels();
-    } else {
-      modelUnitsPerViewUnit = modelHeight / getViewHeightPixels();
-    }
-    final double logUnits = Math.log10(Math.abs(modelUnitsPerViewUnit));
-    if (logUnits < 0 && Math.abs(Math.floor(logUnits)) > this.maxDecimalDigits) {
-      modelUnitsPerViewUnit = 2 * Math.pow(10, -this.maxDecimalDigits);
-      final double minModelWidth = getViewWidthPixels() * modelUnitsPerViewUnit;
-      final double minModelHeight = getViewHeightPixels() * modelUnitsPerViewUnit;
-      final double deltaX = (minModelWidth - modelWidth) / 2;
-      final double deltaY = (minModelHeight - modelHeight) / 2;
-      validBoundingBox = validBoundingBox.bboxEdit(editor -> editor.expandDelta(deltaX, deltaY));
-    }
-    return validBoundingBox;
   }
 
   public boolean isComponentResizing() {
