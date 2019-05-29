@@ -65,10 +65,6 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     return this.layerResolution;
   }
 
-  public double getViewResolution() {
-    return this.viewResolution;
-  }
-
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object newValue = event.getNewValue();

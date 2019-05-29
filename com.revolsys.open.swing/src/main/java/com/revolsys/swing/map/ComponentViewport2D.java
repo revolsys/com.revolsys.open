@@ -6,7 +6,6 @@ import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 import javax.swing.JComponent;
@@ -19,7 +18,6 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-import com.revolsys.util.QuantityType;
 import com.revolsys.value.GlobalBooleanValue;
 
 public class ComponentViewport2D extends Viewport2D implements PropertyChangeListener {
@@ -49,14 +47,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
         }
       }
     });
-  }
-
-  public double getModelHeight(final double scale) {
-    final Unit<Length> scaleUnit = getScaleUnit(scale);
-
-    final Quantity<Length> viewHeight = getViewHeightLength();
-    final double height = QuantityType.doubleValue(viewHeight, scaleUnit);
-    return height;
   }
 
   public Unit<Length> getScaleUnit(final double scale) {

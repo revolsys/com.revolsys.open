@@ -29,7 +29,6 @@ import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 
-import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;
 
 public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportProxy {
@@ -88,7 +87,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return transform;
   }
 
-  /** The current bounding box of the project. */
   private BoundingBox boundingBox = BoundingBox.empty();
 
   private GeometryFactory geometryFactory = GeometryFactory.floating3d(3857);
@@ -98,10 +96,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   private boolean initialized = false;
 
   private AffineTransform modelToScreenTransform;
-
-  private double originX;
-
-  private double originY;
 
   private double pixelsPerXUnit;
 
@@ -264,14 +258,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return getBoundingBox().getWidthLength();
   }
 
-  public double getOriginX() {
-    return this.originX;
-  }
-
-  public double getOriginY() {
-    return this.originY;
-  }
-
   public double getPixelSizeMetres() {
     return PIXEL_SIZE_METRES;
   }
@@ -363,15 +349,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     } else {
       return viewWidthPixels / viewHeightPixels;
     }
-  }
-
-  public Quantity<Length> getViewHeightLength() {
-    double width = getViewHeightPixels();
-    if (width < 0) {
-      width = 0;
-    }
-    final double pixelSizeMetres = getPixelSizeMetres();
-    return Quantities.getQuantity(width * pixelSizeMetres, Units.METRE);
   }
 
   public double getViewHeightPixels() {
@@ -474,12 +451,11 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     final double mapHeight = boundingBox.getHeight();
     this.pixelsPerYUnit = -viewHeight / mapHeight;
 
-    this.originX = boundingBox.getMinX();
-    this.originY = boundingBox.getMaxY();
+    final double originX = boundingBox.getMinX();
+    final double originY = boundingBox.getMaxY();
     modelToScreenTransform
       .concatenate(AffineTransform.getScaleInstance(this.pixelsPerXUnit, this.pixelsPerYUnit));
-    modelToScreenTransform
-      .concatenate(AffineTransform.getTranslateInstance(-this.originX, -this.originY));
+    modelToScreenTransform.concatenate(AffineTransform.getTranslateInstance(-originX, -originY));
     return modelToScreenTransform;
   }
 
@@ -582,6 +558,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   private synchronized void setBoundingBoxInternal(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
+    this.cacheBoundingBox.cancel();
     this.cacheBoundingBox = new ViewportCacheBoundingBox(this);
   }
 

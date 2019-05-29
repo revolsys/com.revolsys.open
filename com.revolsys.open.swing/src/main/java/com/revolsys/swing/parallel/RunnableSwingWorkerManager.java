@@ -6,6 +6,31 @@ import java.util.Queue;
 
 public class RunnableSwingWorkerManager {
 
+  private class RunnableSwingWorkerProcess extends AbstractSwingWorker<Void, Void> {
+
+    @Override
+    protected Void handleBackground() {
+      final Queue<Runnable> tasks = RunnableSwingWorkerManager.this.tasks;
+      do {
+        final Runnable task;
+        synchronized (tasks) {
+          task = tasks.poll();
+          if (task == null) {
+            RunnableSwingWorkerManager.this.process = null;
+            return null;
+          }
+        }
+
+        task.run();
+      } while (true);
+    }
+
+    @Override
+    public String toString() {
+      return RunnableSwingWorkerManager.this.description;
+    }
+  }
+
   private String description;
 
   private RunnableSwingWorkerProcess process;
@@ -32,18 +57,8 @@ public class RunnableSwingWorkerManager {
 
   private void executeTasks() {
     if (this.process == null) {
-      this.process = new RunnableSwingWorkerProcess(this);
+      this.process = new RunnableSwingWorkerProcess();
       Invoke.worker(this.process);
-    }
-  }
-
-  public Runnable getNextTask() {
-    synchronized (this.tasks) {
-      final Runnable task = this.tasks.poll();
-      if (task == null) {
-        this.process = null;
-      }
-      return task;
     }
   }
 

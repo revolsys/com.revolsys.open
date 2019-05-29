@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,7 +99,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   protected BoundingBox boundingBox = BoundingBox.empty();
 
-  private ViewportCacheBoundingBox cacheBoundingBox;
+  protected ViewportCacheBoundingBox cacheBoundingBox;
 
   private Cancellable cancellable = Cancellable.FALSE;
 
@@ -291,6 +292,15 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
   @Override
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
+  }
+
+  public <V> V getCachedItem(final Layer layer, final Object key) {
+    return this.cacheBoundingBox.getCachedItem(layer, key);
+  }
+
+  public <V> V getCachedItemBackground(final String taskName, final Layer layer, final Object key,
+    final Supplier<V> constructor) {
+    return this.cacheBoundingBox.getCachedItem(layer, key, constructor);
   }
 
   public <G extends Geometry> G getGeometry(final G geometry) {

@@ -26,6 +26,8 @@ public class SaveAsGeoreferencedImage {
       try (
         ImageViewport imageViewport = new ImageViewport(project, width, height, boundingBox)) {
         final Graphics2DViewRenderer view = imageViewport.newViewRenderer();
+        view.setBackgroundDrawingEnabled(false);
+        view.setShowHiddenRecords(true);
         view.renderLayer(project.getBaseMapLayers());
         view.renderLayer(project);
 

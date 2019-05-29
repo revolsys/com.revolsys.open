@@ -128,15 +128,10 @@ public class SaveAsPdf {
 
       final Viewport2D viewport = project.getViewport();
       final ViewportCacheBoundingBox cacheBoundingBox = viewport.getCacheBoundingBox();
-      BoundingBox boundingBox = cacheBoundingBox.getBoundingBox();
+      final BoundingBox boundingBox = cacheBoundingBox.getBoundingBox();
       final int width = cacheBoundingBox.getViewWidthPixels();
       final int height = cacheBoundingBox.getViewHeightPixels();
 
-      final int srid = boundingBox.getHorizontalCoordinateSystemId();
-      if (srid == 3857) {
-        boundingBox = boundingBox.bboxEdit(editor -> editor.setGeometryFactory(
-          cacheBoundingBox.getGeometryFactory().getGeographicGeometryFactory()));
-      }
       final PDRectangle pageSize = new PDRectangle(width, height);
       final PDPage page = new PDPage(pageSize);
 
@@ -154,7 +149,6 @@ public class SaveAsPdf {
       final PDMetadata metadata = new PDMetadata(document);
       catalog.setMetadata(metadata);
 
-      // jempbox version
       final XMPMetadata xmpMetadata = XMPMetadata.createXMPMetadata();
       final DublinCoreSchema dcSchema = xmpMetadata.createAndAddDublinCoreSchema();
 

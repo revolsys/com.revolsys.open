@@ -23,12 +23,16 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
+import javax.swing.SwingWorker;
 
 import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.logging.Logs;
 import org.w3c.dom.Document;
 
 import com.revolsys.awt.ResetAffineTransform;
@@ -46,6 +50,7 @@ import com.revolsys.record.Record;
 import com.revolsys.swing.Fonts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.ViewportCacheBoundingBox;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.shape.LineStringShape;
 import com.revolsys.swing.map.layer.record.renderer.shape.PolygonShape;
@@ -61,6 +66,8 @@ import com.revolsys.swing.map.layer.record.style.marker.SvgMarker;
 import com.revolsys.swing.map.layer.record.style.marker.TextMarker;
 import com.revolsys.swing.map.view.TextStyleViewRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.swing.parallel.AbstractSwingWorker;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 
@@ -285,9 +292,9 @@ public class Graphics2DViewRenderer extends ViewRenderer {
     }
   }
 
-  public static final AffineTransform IDENTITY_TRANSFORM = new AffineTransform();;
+  public static final AffineTransform IDENTITY_TRANSFORM = new AffineTransform();
 
-  protected AffineTransform canvasModelTransform = IDENTITY_TRANSFORM;
+  protected AffineTransform canvasModelTransform = IDENTITY_TRANSFORM;;
 
   protected AffineTransform canvasOriginalTransform = IDENTITY_TRANSFORM;
 
@@ -831,6 +838,43 @@ public class Graphics2DViewRenderer extends ViewRenderer {
       } finally {
         graphics.setPaint(paint);
       }
+    }
+  }
+
+  @Override
+  public <V> V getCachedItemBackground(final String taskName, final Layer layer, final Object key,
+    final Supplier<V> constructor) {
+    if (isBackgroundDrawingEnabled()) {
+      final Supplier<Future<V>> futureConstructor = () -> {
+        final SwingWorker<V, Void> worker = new AbstractSwingWorker<V, Void>() {
+          @Override
+          public String getTaskTitle() {
+            return taskName;
+          }
+
+          @Override
+          protected V handleBackground() {
+            try {
+              return constructor.get();
+            } catch (final Throwable t) {
+              if (!isCancelled()) {
+                Logs.error(this, t);
+              }
+            }
+            return null;
+          }
+
+          @Override
+          protected void handleDone(final V result) {
+            layer.firePropertyChange("redraw", false, true);
+          }
+        };
+        Invoke.worker(worker);
+        return worker;
+      };
+      return this.cacheBoundingBox.getCachedItemFuture(layer, key, futureConstructor);
+    } else {
+      return this.cacheBoundingBox.getCachedItem(layer, key, constructor);
     }
   }
 

@@ -52,6 +52,18 @@ public interface Buffers {
     return (short)(ch & 0xFF);
   }
 
+  static long getUnsignedInt(final ByteBuffer buffer) throws IOException {
+    return Integer.toUnsignedLong(buffer.getInt());
+  }
+
+  static long getUnsignedLong(final ByteBuffer buffer) throws IOException {
+    return buffer.getLong();
+  }
+
+  static int getUnsignedShort(final ByteBuffer buffer) throws IOException {
+    return Short.toUnsignedInt(buffer.getShort());
+  }
+
   static String getUsAsciiString(final ByteBuffer buffer, final int byteCount) throws IOException {
     return getString(buffer, byteCount, StandardCharsets.US_ASCII);
   }

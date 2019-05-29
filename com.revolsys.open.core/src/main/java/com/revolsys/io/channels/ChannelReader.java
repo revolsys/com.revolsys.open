@@ -300,6 +300,22 @@ public class ChannelReader implements BaseCloseable {
     }
   }
 
+  public ByteBuffer readByteByteBuffer(final long offset, final Integer size) {
+    final long position = position();
+    final ByteBuffer buffer = ByteBuffer.allocateDirect(size);
+    seek(offset);
+    do {
+      try {
+        this.channel.read(buffer);
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    } while (buffer.hasRemaining());
+    seek(position);
+    buffer.flip();
+    return null;
+  }
+
   private ByteBuffer readTempBytes(final int count) {
     final ByteBuffer buffer = this.buffer;
     final ByteBuffer tempBuffer = this.tempBuffer;

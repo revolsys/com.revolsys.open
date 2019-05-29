@@ -13,7 +13,6 @@ import com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServer;
 import com.revolsys.swing.map.layer.bing.Bing;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLayer;
-import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.revolsys.swing.map.layer.grid.GridLayerRenderer;
 import com.revolsys.swing.map.layer.mapguide.MapGuideWebServer;
@@ -34,7 +33,6 @@ import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.marker.MarkerLibrary;
 import com.revolsys.swing.map.layer.record.style.marker.TextMarker;
 import com.revolsys.swing.map.layer.webmercatortilecache.WebMercatorTileCache;
-import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.ServiceInitializer;
@@ -89,12 +87,6 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
       OpenStreetMapApiLayer::newLayer);
 
     MapObjectFactoryRegistry.newFactory("gridLayer", "Grid Layer", GridLayer::newLayer);
-
-    MapObjectFactoryRegistry.newFactory("wikipedia", "Wikipedia Articles",
-      WikipediaBoundingBoxLayerWorker::newLayer);
-
-    MapObjectFactoryRegistry.newFactory("geoname", "Geoname.org",
-      GeoNamesBoundingBoxLayerWorker::newLayer);
 
     MapObjectFactoryRegistry.newFactory("geoReferencedImageLayer", "Geo-referenced Image Layer",
       GeoreferencedImageLayer::newLayer);
