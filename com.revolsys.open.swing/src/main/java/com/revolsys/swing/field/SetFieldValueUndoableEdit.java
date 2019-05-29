@@ -2,7 +2,8 @@ package com.revolsys.swing.field;
 
 import javax.swing.JComponent;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.UndoManager;
 

@@ -3,7 +3,8 @@ package com.revolsys.gis.elevation.gridded.esriascii;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.elevation.gridded.GriddedElevationModel;
 import com.revolsys.gis.elevation.gridded.GriddedElevationModelWriter;

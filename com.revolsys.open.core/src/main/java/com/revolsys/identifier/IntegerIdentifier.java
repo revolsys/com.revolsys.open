@@ -3,7 +3,8 @@ package com.revolsys.identifier;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.util.number.Integers;
 
 public final class IntegerIdentifier extends Number implements Identifier, Comparable<Object> {

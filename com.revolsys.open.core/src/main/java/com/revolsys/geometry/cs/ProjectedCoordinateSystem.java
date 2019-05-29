@@ -10,7 +10,8 @@ import java.util.TreeMap;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.BoundingBox;

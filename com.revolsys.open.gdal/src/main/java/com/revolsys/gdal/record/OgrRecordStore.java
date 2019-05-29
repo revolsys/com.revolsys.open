@@ -23,10 +23,10 @@ import org.gdal.ogr.Layer;
 import org.gdal.ogr.ogr;
 import org.gdal.ogr.ogrConstants;
 import org.gdal.osr.SpatialReference;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.gdal.Gdal;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;

@@ -12,10 +12,11 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;

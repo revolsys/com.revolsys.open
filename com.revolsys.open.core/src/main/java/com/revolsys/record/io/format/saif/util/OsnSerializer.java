@@ -34,8 +34,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.EnumerationDataType;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.EnumerationDataType;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;

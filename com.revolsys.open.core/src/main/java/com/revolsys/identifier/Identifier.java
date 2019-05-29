@@ -9,9 +9,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.Record;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.number.Numbers;

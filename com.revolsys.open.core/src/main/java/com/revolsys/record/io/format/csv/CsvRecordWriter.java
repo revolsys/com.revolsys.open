@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

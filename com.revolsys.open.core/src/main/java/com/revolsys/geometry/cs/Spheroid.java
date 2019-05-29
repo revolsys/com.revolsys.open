@@ -2,7 +2,8 @@ package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.util.number.Doubles;
 
 public class Spheroid implements Serializable {

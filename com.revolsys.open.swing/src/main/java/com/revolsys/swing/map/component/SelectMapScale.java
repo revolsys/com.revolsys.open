@@ -14,7 +14,8 @@ import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;

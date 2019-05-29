@@ -23,8 +23,9 @@ package com.revolsys.record.io.format.shp;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;

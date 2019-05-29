@@ -13,7 +13,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;

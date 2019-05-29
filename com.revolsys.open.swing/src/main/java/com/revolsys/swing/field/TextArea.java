@@ -6,8 +6,9 @@ import java.awt.event.FocusListener;
 
 import javax.swing.JTextArea;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Exceptions;

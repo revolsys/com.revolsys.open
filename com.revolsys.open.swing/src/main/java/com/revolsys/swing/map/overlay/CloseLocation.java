@@ -1,7 +1,8 @@
 package com.revolsys.swing.map.overlay;
 
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.collection.list.Lists;
-import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;

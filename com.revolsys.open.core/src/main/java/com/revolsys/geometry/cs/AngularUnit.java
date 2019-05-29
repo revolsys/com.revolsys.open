@@ -5,7 +5,7 @@ import java.io.Serializable;
 import javax.measure.Unit;
 import javax.measure.quantity.Angle;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 import si.uom.NonSI;
 import si.uom.SI;

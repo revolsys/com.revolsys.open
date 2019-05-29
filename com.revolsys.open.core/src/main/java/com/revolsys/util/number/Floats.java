@@ -1,7 +1,8 @@
 package com.revolsys.util.number;
 
-import com.revolsys.datatype.AbstractDataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.AbstractDataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.util.DoubleFormatUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;

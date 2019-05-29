@@ -4,8 +4,9 @@ import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;

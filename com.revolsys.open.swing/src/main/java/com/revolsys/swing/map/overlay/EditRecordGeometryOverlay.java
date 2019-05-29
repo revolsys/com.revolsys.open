@@ -27,10 +27,11 @@ import java.util.TreeMap;
 import javax.swing.JOptionPane;
 import javax.swing.undo.UndoableEdit;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

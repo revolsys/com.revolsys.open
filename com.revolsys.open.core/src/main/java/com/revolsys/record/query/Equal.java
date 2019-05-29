@@ -1,6 +1,7 @@
 package com.revolsys.record.query;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.record.Record;
 
 public class Equal extends BinaryCondition {

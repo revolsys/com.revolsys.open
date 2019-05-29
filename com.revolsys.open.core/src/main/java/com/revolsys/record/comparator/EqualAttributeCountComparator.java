@@ -3,7 +3,8 @@ package com.revolsys.record.comparator;
 import java.util.Comparator;
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.CompareUtil;

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
 
 public class Projection implements Serializable, Comparable<Projection> {
   public static final String ALBERS_EQUAL_AREA = "Albers_Equal_Area";

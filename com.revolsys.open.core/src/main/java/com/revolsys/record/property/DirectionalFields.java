@@ -11,10 +11,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.jeometry.common.data.type.DataType;
+
 import java.util.Set;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;

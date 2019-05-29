@@ -3,8 +3,9 @@ package com.revolsys.record.io.format.esri.gdb.xml.type;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 

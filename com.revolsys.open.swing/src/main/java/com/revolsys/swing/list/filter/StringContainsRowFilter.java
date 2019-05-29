@@ -3,7 +3,8 @@ package com.revolsys.swing.list.filter;
 import javax.swing.ListModel;
 import javax.swing.RowFilter;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.util.Property;
 
 public class StringContainsRowFilter extends RowFilter<ListModel, Integer> {

@@ -43,10 +43,10 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.LruMap;
-import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;

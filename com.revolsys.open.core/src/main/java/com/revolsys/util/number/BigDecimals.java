@@ -2,8 +2,8 @@ package com.revolsys.util.number;
 
 import java.math.BigDecimal;
 
-import com.revolsys.datatype.AbstractDataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.AbstractDataType;
+import org.jeometry.common.data.type.DataTypes;
 
 public class BigDecimals extends AbstractDataType {
   public static boolean equalsNotNull(final BigDecimal number1, final BigDecimal number2) {

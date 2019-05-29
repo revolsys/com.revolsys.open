@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.identifier.Identifiable;

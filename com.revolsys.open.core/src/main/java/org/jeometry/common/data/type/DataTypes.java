@@ -1,4 +1,4 @@
-package com.revolsys.datatype;
+package org.jeometry.common.data.type;
 
 import java.awt.Color;
 import java.io.File;

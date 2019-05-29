@@ -24,9 +24,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.jeometry.common.data.type.DataType;
+
 import java.util.Set;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.io.PathUtil;
 import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;

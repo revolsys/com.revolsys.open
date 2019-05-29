@@ -7,9 +7,10 @@ import java.awt.event.FocusListener;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.awt.WebColors;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;

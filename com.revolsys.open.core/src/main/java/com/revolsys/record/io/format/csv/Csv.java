@@ -14,7 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;

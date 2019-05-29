@@ -35,8 +35,9 @@ package com.revolsys.geometry.model;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;

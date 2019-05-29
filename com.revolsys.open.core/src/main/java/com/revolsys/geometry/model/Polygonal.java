@@ -38,7 +38,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.function.Function;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 public interface Polygonal extends Geometry {

@@ -3,9 +3,10 @@ package com.revolsys.io.connection;
 import java.io.File;
 import java.util.Map;
 
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;

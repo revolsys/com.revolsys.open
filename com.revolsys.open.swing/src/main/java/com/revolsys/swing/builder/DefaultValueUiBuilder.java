@@ -4,7 +4,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.swing.SwingUtil;
 
 public class DefaultValueUiBuilder implements ValueUiBuilder {

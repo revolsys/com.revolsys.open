@@ -3,7 +3,8 @@ package com.revolsys.swing.action.enablecheck;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.util.Property;
 
 public class ObjectPropertyEnableCheck extends AbstractEnableCheck {

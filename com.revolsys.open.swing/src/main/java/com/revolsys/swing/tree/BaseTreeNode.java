@@ -24,13 +24,14 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.beans.ClassRegistry;
 import com.revolsys.beans.NonWeakListener;
 import com.revolsys.collection.NameProxy;
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.iterator.IteratorEnumeration;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.menu.MenuFactory;

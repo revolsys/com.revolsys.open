@@ -1,6 +1,7 @@
 package com.revolsys.record.code;
 
-import com.revolsys.datatype.AbstractDataType;
+import org.jeometry.common.data.type.AbstractDataType;
+
 import com.revolsys.util.Strings;
 
 public class CodeDataType extends AbstractDataType {

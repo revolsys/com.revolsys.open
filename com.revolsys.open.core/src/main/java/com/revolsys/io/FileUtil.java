@@ -48,7 +48,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;

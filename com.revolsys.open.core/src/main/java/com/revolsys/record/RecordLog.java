@@ -3,9 +3,10 @@ package com.revolsys.record;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.map.ThreadSharedProperties;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;

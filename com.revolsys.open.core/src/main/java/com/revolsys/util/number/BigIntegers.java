@@ -2,8 +2,8 @@ package com.revolsys.util.number;
 
 import java.math.BigInteger;
 
-import com.revolsys.datatype.AbstractDataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.AbstractDataType;
+import org.jeometry.common.data.type.DataTypes;
 
 public class BigIntegers extends AbstractDataType {
   public static boolean equalsNotNull(final BigInteger number1, final BigInteger number2) {

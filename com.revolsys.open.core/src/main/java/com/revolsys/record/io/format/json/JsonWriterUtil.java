@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.list.Lists;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.StringPrinter;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.number.Numbers;

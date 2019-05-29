@@ -6,7 +6,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Map;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.record.Record;
 import com.revolsys.util.Dates;
 import com.revolsys.util.Property;

@@ -29,7 +29,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;

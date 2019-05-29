@@ -1,6 +1,7 @@
 package com.revolsys.record.io.format.esri.gdb.xml.type;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;

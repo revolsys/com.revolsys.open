@@ -21,8 +21,9 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
 
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.awt.WebColors;
-import com.revolsys.datatype.DataType;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.AbstractRecordQueryField;

@@ -28,8 +28,9 @@ import javax.measure.quantity.Length;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.coordinates.PointWithOrientation;

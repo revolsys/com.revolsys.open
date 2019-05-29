@@ -6,7 +6,8 @@ import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JTabbedPane;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.swing.Icons;
 import com.revolsys.util.Property;
 

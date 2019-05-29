@@ -17,9 +17,10 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.esri.filegdb.jni.EsriFileGdb;
 import com.revolsys.esri.filegdb.jni.Geodatabase;
 import com.revolsys.esri.filegdb.jni.Row;

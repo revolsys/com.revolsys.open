@@ -1,7 +1,7 @@
 package com.revolsys.util.number;
 
-import com.revolsys.datatype.AbstractDataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.AbstractDataType;
+import org.jeometry.common.data.type.DataTypes;
 
 public class Shorts extends AbstractDataType {
   public static short add(final short left, final Number right) {

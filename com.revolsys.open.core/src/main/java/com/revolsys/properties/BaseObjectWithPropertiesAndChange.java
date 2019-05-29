@@ -3,9 +3,10 @@ package com.revolsys.properties;
 import java.beans.PropertyChangeSupport;
 import java.util.Map;
 
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.datatype.DataType;
 import com.revolsys.util.Property;
 
 public class BaseObjectWithPropertiesAndChange extends BaseObjectWithProperties

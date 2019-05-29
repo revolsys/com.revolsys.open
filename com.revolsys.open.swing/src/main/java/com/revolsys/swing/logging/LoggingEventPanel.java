@@ -27,8 +27,8 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.impl.ThrowableProxy;
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
+import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.dnd.ClipboardUtil;

@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;

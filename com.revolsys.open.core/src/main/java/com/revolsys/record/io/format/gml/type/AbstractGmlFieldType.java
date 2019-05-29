@@ -1,6 +1,7 @@
 package com.revolsys.record.io.format.gml.type;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.io.format.xml.XsiConstants;
 

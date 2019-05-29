@@ -2,7 +2,8 @@ package com.revolsys.gis.data.query;
 
 import java.util.Arrays;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.io.PathName;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;

@@ -1,6 +1,7 @@
 package com.revolsys.record.query;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;

@@ -2,7 +2,8 @@ package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class Area implements Serializable {

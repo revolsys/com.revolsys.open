@@ -2,9 +2,8 @@ package com.revolsys.gis.postgresql.type;
 
 import java.sql.SQLException;
 
+import org.jeometry.common.data.type.DataTypes;
 import org.postgresql.util.PGobject;
-
-import com.revolsys.datatype.DataTypes;
 
 public class PostgreSQLTidWrapper extends PGobject {
   private static final long serialVersionUID = 0L;

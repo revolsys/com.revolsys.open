@@ -4,8 +4,9 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;

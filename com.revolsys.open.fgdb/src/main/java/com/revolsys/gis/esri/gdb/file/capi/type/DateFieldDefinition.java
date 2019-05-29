@@ -2,7 +2,8 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import java.util.Date;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;

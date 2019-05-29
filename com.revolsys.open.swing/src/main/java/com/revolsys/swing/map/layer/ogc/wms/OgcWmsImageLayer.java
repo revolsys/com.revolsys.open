@@ -4,8 +4,9 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;

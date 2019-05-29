@@ -3,8 +3,9 @@ package com.revolsys.record.io;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataType;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.record.ArrayRecord;

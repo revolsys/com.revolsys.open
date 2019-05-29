@@ -12,9 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;

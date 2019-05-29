@@ -38,8 +38,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.model.segment.MultiPolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPolygonVertex;

@@ -2,8 +2,9 @@ package com.revolsys.record.io.format.gpx;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;

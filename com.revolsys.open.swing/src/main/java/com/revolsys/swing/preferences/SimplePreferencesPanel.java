@@ -3,7 +3,8 @@ package com.revolsys.swing.preferences;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.swing.field.Field;
 
 public class SimplePreferencesPanel extends AbstractPreferencesPanel {

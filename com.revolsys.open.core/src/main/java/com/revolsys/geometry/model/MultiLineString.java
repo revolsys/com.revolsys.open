@@ -42,8 +42,9 @@ import java.util.function.Function;
 import javax.measure.Unit;
 import javax.measure.quantity.Area;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.segment.MultiLineStringSegment;
 import com.revolsys.geometry.model.segment.Segment;

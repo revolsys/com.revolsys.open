@@ -19,8 +19,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.datatype.DataType;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Strings;
 

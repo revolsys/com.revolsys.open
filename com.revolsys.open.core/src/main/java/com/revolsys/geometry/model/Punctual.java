@@ -35,7 +35,7 @@ package com.revolsys.geometry.model;
 
 import java.util.List;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 
 /**
  * Identifies {@link Geometry} subclasses which

@@ -23,8 +23,8 @@ package com.revolsys.record.io.format.shp;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 
 public class ShapefileConstants {
   public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<>();

@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
 
 public class JdbcDecimalFieldDefinition extends JdbcFieldDefinition {
   public JdbcDecimalFieldDefinition(final String dbName, final String name, final int sqlType,

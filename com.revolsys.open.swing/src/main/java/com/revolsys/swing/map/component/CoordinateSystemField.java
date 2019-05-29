@@ -8,7 +8,8 @@ import java.util.function.Consumer;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.HorizontalCoordinateSystem;
 import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;

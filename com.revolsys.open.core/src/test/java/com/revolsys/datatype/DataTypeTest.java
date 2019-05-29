@@ -2,6 +2,8 @@ package com.revolsys.datatype;
 
 import java.util.Arrays;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.junit.Assert;
 import org.junit.Test;
 

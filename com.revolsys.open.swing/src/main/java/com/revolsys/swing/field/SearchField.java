@@ -5,9 +5,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import org.jdesktop.swingx.JXSearchField;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.OS;
 

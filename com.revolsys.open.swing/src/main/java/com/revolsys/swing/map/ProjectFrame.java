@@ -38,8 +38,9 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.set.Sets;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;

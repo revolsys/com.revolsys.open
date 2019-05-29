@@ -10,10 +10,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.IntHashMap;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;

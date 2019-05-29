@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.oracle.recordstore.esri.ArcSdeConstants;

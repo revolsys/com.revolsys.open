@@ -7,7 +7,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.logging.Logs;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;

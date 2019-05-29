@@ -5,7 +5,8 @@ import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.record.Record;
 
 public class RecordListCellRenderer extends DefaultListCellRenderer {

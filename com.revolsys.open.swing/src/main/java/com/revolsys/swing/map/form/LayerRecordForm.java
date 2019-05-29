@@ -48,12 +48,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;

@@ -33,10 +33,10 @@ import javax.swing.border.BevelBorder;
 import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.JXBusyLabel;
+import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.index.quadtree.GeometrySegmentQuadTree;
 import com.revolsys.geometry.index.quadtree.GeometryVertexQuadTree;

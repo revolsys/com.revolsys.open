@@ -14,7 +14,8 @@ import java.util.TreeSet;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.io.PathNameProxy;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.tsv.Tsv;

@@ -10,7 +10,8 @@ import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.swing.SortOrder;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.record.comparator.RecordFieldComparator;

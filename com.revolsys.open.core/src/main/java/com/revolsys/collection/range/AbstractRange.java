@@ -3,8 +3,9 @@ package com.revolsys.collection.range;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.collection.list.Lists;
-import com.revolsys.datatype.DataType;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.number.Numbers;
 

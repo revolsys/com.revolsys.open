@@ -2,8 +2,9 @@ package com.revolsys.util;
 
 import java.util.Comparator;
 
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.datatype.DataTypes;
 
 public class CompareUtil {
   public static <T> int compare(final Comparable<T> object1, final T object2) {

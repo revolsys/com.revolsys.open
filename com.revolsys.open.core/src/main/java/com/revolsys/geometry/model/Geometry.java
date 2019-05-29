@@ -51,9 +51,10 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypeProxy;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypeProxy;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.algorithm.Centroid;
 import com.revolsys.geometry.algorithm.ConvexHull;
 import com.revolsys.geometry.algorithm.InteriorPointArea;

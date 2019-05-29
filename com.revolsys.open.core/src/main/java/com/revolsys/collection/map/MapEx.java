@@ -6,8 +6,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.identifier.Identifier;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;

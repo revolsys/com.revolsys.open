@@ -8,14 +8,15 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypeProxy;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypeProxy;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.identifier.Identifier;

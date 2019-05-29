@@ -22,14 +22,14 @@ import java.util.function.Consumer;
 import javax.swing.JComponent;
 
 import org.apache.commons.beanutils.MethodUtils;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import com.revolsys.beans.NonWeakListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.beans.ProxyPropertyChangeListener;
 import com.revolsys.beans.WeakPropertyChangeListener;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;

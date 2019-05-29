@@ -34,9 +34,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 

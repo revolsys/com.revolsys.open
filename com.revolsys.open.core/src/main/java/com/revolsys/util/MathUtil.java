@@ -20,8 +20,9 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Random;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.math.Angle;
 import com.revolsys.util.number.Doubles;

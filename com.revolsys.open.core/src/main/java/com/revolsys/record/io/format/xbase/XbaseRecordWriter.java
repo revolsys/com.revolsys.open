@@ -14,8 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.io.AbstractRecordWriter;

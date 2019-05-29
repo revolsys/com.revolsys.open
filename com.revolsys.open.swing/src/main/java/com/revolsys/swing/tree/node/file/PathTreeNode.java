@@ -21,7 +21,8 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileConnectionManager;

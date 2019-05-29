@@ -1,6 +1,7 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.swing.map.layer.record.LayerRecord;

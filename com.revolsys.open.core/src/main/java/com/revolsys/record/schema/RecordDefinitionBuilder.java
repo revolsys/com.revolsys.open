@@ -1,6 +1,7 @@
 package com.revolsys.record.schema;
 
-import com.revolsys.datatype.DataType;
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 
