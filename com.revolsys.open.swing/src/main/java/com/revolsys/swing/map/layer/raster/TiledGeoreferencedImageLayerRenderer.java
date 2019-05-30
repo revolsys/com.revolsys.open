@@ -44,14 +44,16 @@ public class TiledGeoreferencedImageLayerRenderer<T extends GeoreferencedImageMa
       final double resolution = getLayerResolution();
       final int width = (int)Math.round(boundingBox.getWidth() / resolution);
       final int height = (int)Math.round(boundingBox.getHeight() / resolution);
-      try (
-        final ImageViewport imageViewport = new ImageViewport(layer.getProject(), width, height,
-          boundingBox)) {
-        final Graphics2DViewRenderer imageView = imageViewport.newViewRenderer();
-        super.renderTiles(imageView, cancellable, mapTiles);
-        final GeoreferencedImage mergedImage = imageViewport.getGeoreferencedImage();
-        final GeoreferencedImage projectedImage = mergedImage.imageToCs(view);
-        view.drawImage(projectedImage, false);
+      if (width > 0 && height > 0) {
+        try (
+          final ImageViewport imageViewport = new ImageViewport(layer.getProject(), width, height,
+            boundingBox)) {
+          final Graphics2DViewRenderer imageView = imageViewport.newViewRenderer();
+          super.renderTiles(imageView, cancellable, mapTiles);
+          final GeoreferencedImage mergedImage = imageViewport.getGeoreferencedImage();
+          final GeoreferencedImage projectedImage = mergedImage.imageToCs(view);
+          view.drawImage(projectedImage, false);
+        }
       }
     } else {
       super.renderTiles(view, cancellable, mapTiles);

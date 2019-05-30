@@ -38,6 +38,8 @@ public class WebMercatorTileCacheLayer
   public WebMercatorTileCacheLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
+    setGeometryFactory(GeometryFactory.worldMercator());
+    setBoundingBox(getGeometryFactory().getAreaBoundingBox());
   }
 
   @Override
@@ -49,11 +51,6 @@ public class WebMercatorTileCacheLayer
       }
     }
     return false;
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    return MAX_BOUNDING_BOX;
   }
 
   public WebMercatorTileCacheClient getClient() {

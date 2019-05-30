@@ -24,6 +24,8 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
 import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
@@ -33,6 +35,21 @@ import com.revolsys.webservice.WebServiceResource;
 
 public class ArcGisRestServerTileCacheLayer
   extends AbstractTiledImageLayer<ArcGisRestServerTileCacheMapTile> {
+
+  static {
+    MenuFactory.addMenuInitializer(ArcGisRestServerTileCacheLayer.class, menu -> {
+
+      menu.addGroup(3, "server");
+
+      Menus.<ArcGisRestServerTileCacheLayer> addCheckboxMenuItem(menu, "server",
+        "Project image on Server", "", ArcGisRestServerTileCacheLayer::isExportTilesAllowed,
+        ArcGisRestServerTileCacheLayer::toggleUseServerExport,
+        ArcGisRestServerTileCacheLayer::isUseServerExport, true);
+
+    });
+  }
+
+  private boolean useServerExport = true;
 
   private String username;
 
@@ -192,6 +209,10 @@ public class ArcGisRestServerTileCacheLayer
               Logs.info(this, this.url + " does not contain a tileInfo definition.");
               return false;
             } else {
+              if (this.useServerExport && !this.mapService.isExportTilesAllowed()) {
+                this.useServerExport = false;
+              }
+
               final GeometryFactory geometryFactory = tileInfo.getGeometryFactory();
               setGeometryFactory(geometryFactory);
               final BoundingBox boundingBox = this.mapService.getFullExtent();
@@ -213,6 +234,17 @@ public class ArcGisRestServerTileCacheLayer
         return true;
       }
     }
+  }
+
+  public boolean isExportTilesAllowed() {
+    if (this.mapService == null) {
+      return false;
+    }
+    return this.mapService.isExportTilesAllowed();
+  }
+
+  public boolean isUseServerExport() {
+    return this.useServerExport;
   }
 
   @Override
@@ -278,6 +310,17 @@ public class ArcGisRestServerTileCacheLayer
     this.username = username;
   }
 
+  public void setUseServerExport(final boolean useServerExport) {
+    final boolean oldValue = this.useServerExport;
+    this.useServerExport = useServerExport;
+    firePropertyChange("useServerExport", oldValue, useServerExport);
+  }
+
+  public void toggleUseServerExport() {
+    final boolean useServerExport = isUseServerExport();
+    setUseServerExport(!useServerExport);
+  }
+
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
@@ -289,6 +332,7 @@ public class ArcGisRestServerTileCacheLayer
       addToMap(map, "username", this.username);
       addToMap(map, "password", PasswordUtil.encrypt(this.password));
     }
+    addToMap(map, "useServerExport", this.useServerExport, false);
     return map;
   }
 
