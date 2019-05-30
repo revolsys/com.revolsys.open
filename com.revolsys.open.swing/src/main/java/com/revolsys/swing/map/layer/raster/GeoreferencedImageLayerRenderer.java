@@ -21,7 +21,7 @@ public class GeoreferencedImageLayerRenderer
     final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
-        final GeoreferencedImage image = layer.getImage();
+        GeoreferencedImage image = layer.getImage();
         if (image != null) {
           BoundingBox boundingBox = layer.getBoundingBox();
           if (boundingBox == null || boundingBox.isEmpty()) {
@@ -29,16 +29,11 @@ public class GeoreferencedImageLayerRenderer
           }
           if (!view.isCancelled()) {
             final GeometryFactory viewGeometryFactory = view.getGeometryFactory();
-            if (image.isSameCoordinateSystem(viewGeometryFactory)) {
-              view.drawImage(image, true, layer.getOpacity() / 255.0,
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            } else {
-              final GeoreferencedImage projectedImage = image.imageToCs(viewGeometryFactory);
-              view.drawImage(projectedImage, false, layer.getOpacity() / 255.0,
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            final double alpha = layer.getOpacity() / 255.0;
+            if (!image.isSameCoordinateSystem(viewGeometryFactory)) {
+              image = image.imageToCs(viewGeometryFactory);
             }
-          }
-          if (!view.isCancelled()) {
+            view.drawImage(image, false, alpha, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             view.drawDifferentCoordinateSystem(boundingBox);
           }
         }
