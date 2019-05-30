@@ -31,6 +31,7 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
   BingLayer() {
     super("bing");
     setIcon("bing");
+    setGeometryFactory(GeometryFactory.worldMercator());
   }
 
   public BingLayer(final Map<String, ? extends Object> properties) {
@@ -73,7 +74,8 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
     final List<BingMapTile> tiles = new ArrayList<>();
     try {
       final double metresPerPixel = view.getMetresPerPixel();
-      final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
+      final BingClient client = this.client;
+      final int zoomLevel = client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(view);
       final BoundingBox geographicBoundingBox = view.getBoundingBox()
         .bboxToCs(GEOMETRY_FACTORY)
@@ -84,14 +86,16 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
       final double maxY = geographicBoundingBox.getMaxY();
 
       // Tiles start at the North-West corner of the map
-      final int minTileY = this.client.getTileY(zoomLevel, maxY);
-      final int maxTileY = this.client.getTileY(zoomLevel, minY);
-      final int minTileX = this.client.getTileX(zoomLevel, minX);
-      final int maxTileX = this.client.getTileX(zoomLevel, maxX);
+      final int minTileY = client.getTileY(zoomLevel, maxY);
+      final int maxTileY = client.getTileY(zoomLevel, minY);
+      final int minTileX = client.getTileX(zoomLevel, minX);
+      final int maxTileX = client.getTileX(zoomLevel, maxX);
 
       for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
         for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-          final BingMapTile tile = new BingMapTile(this, zoomLevel, resolution, tileX, tileY);
+          final String quadKey = client.getQuadKey(zoomLevel, tileX, tileY);
+          final BoundingBox boundingBox = client.getBoundingBox(zoomLevel, tileX, tileY);
+          final BingMapTile tile = new BingMapTile(this, boundingBox, quadKey, resolution);
           tiles.add(tile);
         }
       }
