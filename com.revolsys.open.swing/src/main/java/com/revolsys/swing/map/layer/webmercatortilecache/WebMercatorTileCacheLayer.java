@@ -33,13 +33,13 @@ public class WebMercatorTileCacheLayer
 
   public WebMercatorTileCacheLayer() {
     super("webMercatorTileCacheLayer");
+    setGeometryFactory(GeometryFactory.worldMercator());
   }
 
   public WebMercatorTileCacheLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
     setGeometryFactory(GeometryFactory.worldMercator());
-    setBoundingBox(getGeometryFactory().getAreaBoundingBox());
   }
 
   @Override

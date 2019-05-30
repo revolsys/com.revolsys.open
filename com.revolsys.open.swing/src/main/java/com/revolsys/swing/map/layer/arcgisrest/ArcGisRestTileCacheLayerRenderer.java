@@ -25,15 +25,17 @@ public class ArcGisRestTileCacheLayerRenderer
     } else {
       final ArcGisRestServerTileCacheLayer restLayer = (ArcGisRestServerTileCacheLayer)getLayer();
       final MapService mapService = restLayer.getMapService();
-      if (mapService.isExportTilesAllowed()) {
-        super.render(view, layer);
-        if (1 == 1) {
+      if (mapService.isExportTilesAllowed() && restLayer.isUseServerExport()) {
+        try {
           final BoundingBox boundingBox = view.getBoundingBox();
-          final BufferedImage image = mapService.getExportImage(boundingBox,
-            (int)view.getViewWidthPixels(), (int)view.getViewHeightPixels());
+          final int width = (int)view.getViewWidthPixels();
+          final int height = (int)view.getViewHeightPixels();
+          final BufferedImage image = mapService.getExportImage(boundingBox, width, height);
           final BufferedGeoreferencedImage georeferencedImage = new BufferedGeoreferencedImage(
             boundingBox, image);
           view.drawImage(georeferencedImage, false);
+        } catch (final Exception e) {
+          super.render(view, layer);
         }
       } else {
         super.render(view, layer);

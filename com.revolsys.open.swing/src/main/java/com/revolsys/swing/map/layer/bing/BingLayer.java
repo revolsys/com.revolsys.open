@@ -37,6 +37,7 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
   public BingLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
+    setGeometryFactory(GeometryFactory.worldMercator());
   }
 
   @Override
