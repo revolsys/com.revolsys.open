@@ -466,17 +466,15 @@ public class Graphics2DViewRenderer extends ViewRenderer {
             final int imageScreenHeight = (int)Math.ceil(imageModelHeight * scaleFactor);
 
             if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-              if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-                final double scaleX = (double)imageScreenWidth / imageWidth;
-                final double scaleY = (double)imageScreenHeight / imageHeight;
-                final AffineTransform imageTransform = new AffineTransform(scaleX, 0, 0, scaleY,
-                  screenX, screenY);
-                if (useTransform) {
-                  imageTransform.concatenate(geoTransform);
-                }
-
-                this.graphics.drawRenderedImage(renderedImage, imageTransform);
+              final double scaleX = (double)imageScreenWidth / imageWidth;
+              final double scaleY = (double)imageScreenHeight / imageHeight;
+              final AffineTransform imageTransform = new AffineTransform(scaleX, 0, 0, scaleY,
+                screenX, screenY);
+              if (useTransform) {
+                imageTransform.concatenate(geoTransform);
               }
+
+              this.graphics.drawRenderedImage(renderedImage, imageTransform);
             }
           }
         }, viewBoundingBox, viewWidth, viewHeight, useTransform);

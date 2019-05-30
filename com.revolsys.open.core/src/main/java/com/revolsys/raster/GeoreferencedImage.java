@@ -143,11 +143,17 @@ public interface GeoreferencedImage
   default void drawImage(final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
     final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
     final boolean useTransform) {
-    final BoundingBox imageBoundingBox = getBoundingBox();
-    if (viewBoundingBox.bboxIntersects(imageBoundingBox) && viewWidth > 0 && viewHeight > 0) {
-      final RenderedImage renderedImage = getRenderedImage();
-      drawRenderedImage(renderer, renderedImage, viewBoundingBox, viewWidth, viewHeight,
-        useTransform);
+    if (viewBoundingBox.bboxIntersects(this) && viewWidth > 0 && viewHeight > 0) {
+      if (isSameCoordinateSystem(viewBoundingBox)) {
+        final RenderedImage renderedImage = getRenderedImage();
+        drawRenderedImage(renderer, renderedImage, viewBoundingBox, viewWidth, viewHeight,
+          useTransform);
+      } else {
+        final GeoreferencedImage image = imageToCs(viewBoundingBox);
+        if (image != null) {
+          image.drawImage(renderer, viewBoundingBox, viewWidth, viewHeight, useTransform);
+        }
+      }
     }
   }
 

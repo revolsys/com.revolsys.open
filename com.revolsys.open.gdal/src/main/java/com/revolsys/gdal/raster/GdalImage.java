@@ -15,6 +15,8 @@ import com.revolsys.gdal.Gdal;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.AbstractGeoreferencedImage;
+import com.revolsys.raster.BufferedGeoreferencedImage;
+import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 
 public class GdalImage extends AbstractGeoreferencedImage {
@@ -50,19 +52,21 @@ public class GdalImage extends AbstractGeoreferencedImage {
       final Dataset dataset = getDataset();
 
       final BoundingBox imageBoundingBox = getBoundingBox();
-      final BoundingBox clipBoundingBox = viewBoundingBox.bboxIntersection(imageBoundingBox);
+      final BoundingBox viewImageClipBbox = viewBoundingBox.bboxIntersection(imageBoundingBox);
+      final BoundingBox imageViewClipBbox = imageBoundingBox.bboxIntersection(viewBoundingBox);
       final double scaleFactor = viewWidth / viewBoundingBox.getWidth();
 
-      final double clipModelWidth = clipBoundingBox.getWidth();
+      final double clipModelWidth = viewImageClipBbox.getWidth();
       final int targetWidth = (int)Math.ceil(clipModelWidth * scaleFactor);
 
-      final double clipModelHeight = clipBoundingBox.getHeight();
+      final double clipModelHeight = viewImageClipBbox.getHeight();
       final int targetHeight = (int)Math.ceil(clipModelHeight * scaleFactor);
 
       int bestOverviewIdx = -1;
 
       int srcWidth = getImageWidth();
-      final double clipResolution = Math.abs(clipBoundingBox.getHeight() / targetHeight);
+      int srcHeight = getImageHeight();
+      final double clipResolution = Math.abs(imageViewClipBbox.getHeight() / targetHeight);
       final List<Dimension> overviewSizes = getOverviewSizes();
       for (int i = 0; i < overviewSizes.size(); i++) {
         final Dimension overviewSize = overviewSizes.get(i);
@@ -74,22 +78,42 @@ public class GdalImage extends AbstractGeoreferencedImage {
           if (overviewResolution <= clipResolution) {
             bestOverviewIdx = i;
             srcWidth = width;
+            srcHeight = height;
           }
         }
       }
 
-      final double scale = srcWidth / imageBoundingBox.getWidth();
-      final int clipXoff = (int)Math
-        .floor((clipBoundingBox.getMinX() - imageBoundingBox.getMinX()) * scale);
-      final int clipYoff = (int)Math
-        .floor((imageBoundingBox.getMaxY() - clipBoundingBox.getMaxY()) * scale);
-      final int clipWidth = (int)Math.ceil(clipModelWidth * scale);
-      final int clipHeight = (int)Math.ceil(clipModelHeight * scale);
+      final double scaleX = srcWidth / imageBoundingBox.getWidth();
+      final double scaleY = srcHeight / imageBoundingBox.getHeight();
+      final double minX = imageBoundingBox.getMinX();
+      final double maxY = imageBoundingBox.getMaxY();
+
+      final int clipXoff = (int)Math.max(0,
+        Math.floor((imageViewClipBbox.getMinX() - imageBoundingBox.getMinX()) * scaleX));
+      final int clipYoff = (int)Math.max(0,
+        Math.floor((maxY - imageViewClipBbox.getMaxY()) * scaleY));
+      final int clipWidth = (int)Math.min(srcWidth, Math.ceil(clipModelWidth * scaleX));
+      final int clipHeight = (int)Math.min(srcHeight, Math.ceil(clipModelHeight * scaleY));
       final BufferedImage bufferedImage = Gdal.getBufferedImage(dataset, bestOverviewIdx, clipXoff,
         clipYoff, clipWidth, clipHeight, targetWidth, targetHeight);
 
-      super.drawRenderedImage(renderer, bufferedImage, clipBoundingBox, viewBoundingBox, viewWidth,
-        useTransform);
+      if (isSameCoordinateSystem(viewBoundingBox)) {
+        super.drawRenderedImage(renderer, bufferedImage, imageViewClipBbox, viewBoundingBox,
+          viewWidth, useTransform);
+      } else {
+        final double newMinX = minX + clipXoff / scaleX;
+        final double newMaxY = maxY - clipYoff / scaleY;
+        final double newMaxX = newMinX + clipWidth / scaleX;
+        final double newMinY = newMaxY - clipHeight / scaleY;
+        final BoundingBox newBoundingBox = getGeometryFactory().newBoundingBox(newMinX, newMinY,
+          newMaxX, newMaxY);
+        final BufferedImage image = new BufferedImage(targetWidth, targetHeight,
+          BufferedImage.TYPE_INT_ARGB);
+        image.getGraphics().drawImage(bufferedImage, 0, 0, targetWidth, targetHeight, null);
+
+        final GeoreferencedImage newImage = new BufferedGeoreferencedImage(newBoundingBox, image);
+        newImage.drawImage(renderer, viewBoundingBox, viewWidth, viewHeight, useTransform);
+      }
 
     } catch (final Throwable e) {
       e.printStackTrace();
