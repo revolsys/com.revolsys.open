@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.util.WrappedException;
 
 public class JsonMapWriter extends AbstractMapWriter {
   private final boolean indent;

@@ -19,7 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -243,7 +244,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   public void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
     final GeoreferencedImage imageSelected = this.imageSelected.getResource();
     if (imageSelected != null) {
-      GeoreferencedImageLayerRenderer.render(viewport, graphics, imageSelected, false);
+      viewport.drawImage(imageSelected, false);
     }
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     final MapPanel map = getMap();

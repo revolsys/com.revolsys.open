@@ -5,11 +5,13 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.jeometry.common.io.PathNameProxy;
+import org.jeometry.common.logging.Logs;
+
 import java.util.Set;
 import java.util.TreeMap;
 
-import com.revolsys.io.PathNameProxy;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.util.Counter;

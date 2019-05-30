@@ -13,7 +13,8 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 

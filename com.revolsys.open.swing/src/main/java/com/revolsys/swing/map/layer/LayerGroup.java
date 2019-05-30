@@ -20,6 +20,8 @@ import javax.swing.filechooser.FileFilter;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
@@ -29,12 +31,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
-import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.Paths;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jeometry.common.io.PathName;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -23,7 +24,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.ArrayRecord;

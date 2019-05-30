@@ -21,7 +21,7 @@ import javax.swing.tree.TreePath;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.node.ListTreeNode;
@@ -33,7 +33,7 @@ public class LayerRendererTreeNode extends ListTreeNode
     super(renderer);
     setName(renderer.getName());
     setIcon(renderer.getIcon());
-    if (renderer instanceof AbstractMultipleRenderer) {
+    if (renderer instanceof AbstractMultipleRecordLayerRenderer) {
       setAllowsChildren(true);
     } else {
       setAllowsChildren(false);
@@ -44,7 +44,7 @@ public class LayerRendererTreeNode extends ListTreeNode
   public int addChild(final int index, final Object object) {
     if (object instanceof AbstractRecordLayerRenderer) {
       final AbstractRecordLayerRenderer child = (AbstractRecordLayerRenderer)object;
-      final AbstractMultipleRenderer renderer = getMutiRenderer();
+      final AbstractMultipleRecordLayerRenderer renderer = getMutiRenderer();
       if (renderer != null) {
         renderer.addRenderer(index, child);
         return index;
@@ -58,7 +58,7 @@ public class LayerRendererTreeNode extends ListTreeNode
   public int addChild(final Object object) {
     if (object instanceof AbstractRecordLayerRenderer) {
       final AbstractRecordLayerRenderer child = (AbstractRecordLayerRenderer)object;
-      final AbstractMultipleRenderer renderer = getMutiRenderer();
+      final AbstractMultipleRecordLayerRenderer renderer = getMutiRenderer();
       if (renderer != null) {
         renderer.addRenderer(child);
         return getChildCount();
@@ -82,10 +82,10 @@ public class LayerRendererTreeNode extends ListTreeNode
     return icon;
   }
 
-  public AbstractMultipleRenderer getMutiRenderer() {
+  public AbstractMultipleRecordLayerRenderer getMutiRenderer() {
     final LayerRenderer<?> renderer = getRenderer();
-    if (renderer instanceof AbstractMultipleRenderer) {
-      return (AbstractMultipleRenderer)renderer;
+    if (renderer instanceof AbstractMultipleRecordLayerRenderer) {
+      return (AbstractMultipleRecordLayerRenderer)renderer;
     } else {
       return null;
     }
@@ -111,8 +111,8 @@ public class LayerRendererTreeNode extends ListTreeNode
     final TreePath childPath, final Object child) {
     final LayerRenderer<?> renderer = getRenderer();
 
-    if (renderer instanceof AbstractMultipleRenderer) {
-      final AbstractMultipleRenderer multiRenderer = (AbstractMultipleRenderer)renderer;
+    if (renderer instanceof AbstractMultipleRecordLayerRenderer) {
+      final AbstractMultipleRecordLayerRenderer multiRenderer = (AbstractMultipleRecordLayerRenderer)renderer;
       if (super.isDndDropSupported(support, dropPath, childPath, child)) {
         if (child instanceof AbstractRecordLayerRenderer) {
           final AbstractRecordLayerRenderer childRenderer = (AbstractRecordLayerRenderer)child;
@@ -142,8 +142,8 @@ public class LayerRendererTreeNode extends ListTreeNode
   protected List<BaseTreeNode> loadChildrenDo() {
     final LayerRenderer<?> renderer = getRenderer();
 
-    if (renderer instanceof AbstractMultipleRenderer) {
-      final AbstractMultipleRenderer multiRenderer = (AbstractMultipleRenderer)renderer;
+    if (renderer instanceof AbstractMultipleRecordLayerRenderer) {
+      final AbstractMultipleRecordLayerRenderer multiRenderer = (AbstractMultipleRecordLayerRenderer)renderer;
       final List<BaseTreeNode> nodes = new ArrayList<>();
       for (final LayerRenderer<?> childRenderer : multiRenderer.getRenderers()) {
         final LayerRendererTreeNode node = new LayerRendererTreeNode(childRenderer);
@@ -202,7 +202,7 @@ public class LayerRendererTreeNode extends ListTreeNode
   public boolean removeChild(final Object object) {
     if (object instanceof AbstractRecordLayerRenderer) {
       final AbstractRecordLayerRenderer child = (AbstractRecordLayerRenderer)object;
-      final AbstractMultipleRenderer renderer = getMutiRenderer();
+      final AbstractMultipleRecordLayerRenderer renderer = getMutiRenderer();
       if (renderer != null) {
         if (renderer.removeRenderer(child) != -1) {
           return true;

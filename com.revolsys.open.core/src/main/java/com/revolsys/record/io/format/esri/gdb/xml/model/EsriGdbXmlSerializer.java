@@ -16,8 +16,8 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.record.io.format.xml.XmlConstants;
 import com.revolsys.record.io.format.xml.XmlWriter;

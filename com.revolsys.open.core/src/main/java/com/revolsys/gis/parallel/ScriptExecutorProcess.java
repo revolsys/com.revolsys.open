@@ -14,12 +14,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.MapContext;
+import org.jeometry.common.logging.Logs;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;

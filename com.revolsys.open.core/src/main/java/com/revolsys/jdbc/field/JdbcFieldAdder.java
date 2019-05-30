@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.io.PathName;
 
-import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;

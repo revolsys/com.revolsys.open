@@ -11,6 +11,10 @@ import javax.measure.Unit;
 import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
 
+import org.jeometry.coordinatesystem.operation.ChainedCoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.UnitConverstionOperation;
+
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;

@@ -29,6 +29,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
 import org.apache.pdfbox.pdmodel.graphics.PDLineDashPattern;
 import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
@@ -51,7 +52,6 @@ import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 import tec.uom.se.quantity.Quantities;

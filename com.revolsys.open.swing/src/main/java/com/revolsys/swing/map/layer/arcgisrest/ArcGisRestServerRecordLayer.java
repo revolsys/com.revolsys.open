@@ -10,12 +10,13 @@ import java.util.function.Consumer;
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
@@ -26,7 +27,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.FilterMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
@@ -42,8 +43,6 @@ import com.revolsys.util.Property;
 import tec.uom.se.quantity.Quantities;
 
 public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
-  public static final String J_TYPE = "arcGisRestServerRecordLayer";
-
   private static final Map<String, List<Double>> LINE_STYLE_PATTERNS = Maps
     .<String, List<Double>> buildHash() //
     .add("esriSLSDash", GeometryStyle.DASH_5) //
@@ -82,7 +81,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   private String password;
 
   public ArcGisRestServerRecordLayer() {
-    super(J_TYPE);
+    super(ArcGisRestServer.J_TYPE_RECORD);
     setReadOnly(true);
   }
 
@@ -97,7 +96,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     setProperties(properties);
   }
 
-  private void addTextRenderer(final AbstractMultipleRenderer renderers,
+  private void addTextRenderer(final AbstractMultipleRecordLayerRenderer renderers,
     final MapEx labelProperties) {
     final TextStyle textStyle = new TextStyle();
     final String alignment = labelProperties.getString("labelPlacement");

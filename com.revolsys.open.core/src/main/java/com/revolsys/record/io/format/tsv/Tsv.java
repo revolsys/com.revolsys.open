@@ -6,6 +6,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapWriter;
@@ -22,7 +24,6 @@ import com.revolsys.record.io.format.csv.CsvRecordReader;
 import com.revolsys.record.io.format.csv.CsvRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.WrappedException;
 
 public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final String DESCRIPTION = "Tab-Separated Values";

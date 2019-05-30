@@ -4,9 +4,9 @@ import javax.xml.namespace.QName;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public final class GpxConstants {

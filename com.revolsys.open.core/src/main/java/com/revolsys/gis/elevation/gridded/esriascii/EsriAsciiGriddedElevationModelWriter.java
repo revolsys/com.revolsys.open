@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Floats;
+import org.jeometry.common.number.Integers;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.elevation.gridded.GriddedElevationModel;
@@ -11,10 +15,6 @@ import com.revolsys.gis.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
-import com.revolsys.util.number.Doubles;
-import com.revolsys.util.number.Floats;
-import com.revolsys.util.number.Integers;
 
 public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<GriddedElevationModel>
   implements GriddedElevationModelWriter {

@@ -8,17 +8,19 @@ import java.util.function.Predicate;
 
 import javax.swing.JOptionPane;
 
+import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.raster.MappedLocation;
@@ -36,38 +38,38 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public class GeoreferencedImageLayer extends AbstractLayer {
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(GeoreferencedImageLayer.class);
-    menu.addGroup(0, "table");
-    menu.addGroup(2, "edit");
+    MenuFactory.addMenuInitializer(GeoreferencedImageLayer.class, (menu) -> {
+      menu.addGroup(0, "table");
+      menu.addGroup(2, "edit");
 
-    final Predicate<GeoreferencedImageLayer> notReadOnly = ((Predicate<GeoreferencedImageLayer>)GeoreferencedImageLayer::isReadOnly)
-      .negate();
-    final Predicate<GeoreferencedImageLayer> editable = GeoreferencedImageLayer::isEditable;
+      final Predicate<GeoreferencedImageLayer> notReadOnly = ((Predicate<GeoreferencedImageLayer>)GeoreferencedImageLayer::isReadOnly)
+        .negate();
+      final Predicate<GeoreferencedImageLayer> editable = GeoreferencedImageLayer::isEditable;
 
-    Menus.<GeoreferencedImageLayer> addMenuItem(menu, "table", "View Tie-Points", "table_go",
-      GeoreferencedImageLayer::showTableView, false);
+      Menus.<GeoreferencedImageLayer> addMenuItem(menu, "table", "View Tie-Points", "table_go",
+        GeoreferencedImageLayer::showTableView, false);
 
-    Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
-      notReadOnly, GeoreferencedImageLayer::toggleEditable, editable, true);
+      Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
+        notReadOnly, GeoreferencedImageLayer::toggleEditable, editable, true);
 
-    Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Show Original Image",
-      (String)null, editable.and(GeoreferencedImageLayer::isHasTransform),
-      GeoreferencedImageLayer::toggleShowOriginalImage,
-      GeoreferencedImageLayer::isShowOriginalImage, true);
+      Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Show Original Image",
+        (String)null, editable.and(GeoreferencedImageLayer::isHasTransform),
+        GeoreferencedImageLayer::toggleShowOriginalImage,
+        GeoreferencedImageLayer::isShowOriginalImage, true);
 
-    Menus.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Fit to Screen", "arrow_out",
-      editable, GeoreferencedImageLayer::fitToViewport, true);
+      Menus.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Fit to Screen", "arrow_out",
+        editable, GeoreferencedImageLayer::fitToViewport, true);
 
-    menu.deleteMenuItem("refresh", "Refresh");
+      menu.deleteMenuItem("refresh", "Refresh");
+    });
   }
 
-  public static GeoreferencedImageLayer newLayer(final Map<String, ? extends Object> properties) {
-    return new GeoreferencedImageLayer(properties);
+  public static GeoreferencedImageLayer newLayer(final Map<String, ? extends Object> config) {
+    return new GeoreferencedImageLayer(config);
   }
 
   private GeoreferencedImage image;
@@ -80,13 +82,13 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
   private String url;
 
-  public GeoreferencedImageLayer(final Map<String, ? extends Object> properties) {
+  public GeoreferencedImageLayer(final Map<String, ? extends Object> config) {
     super("geoReferencedImageLayer");
-    setProperties(properties);
+    setProperties(config);
     setSelectSupported(false);
     setQuerySupported(false);
     setRenderer(new GeoreferencedImageLayerRenderer(this));
-    final int opacity = Maps.getInteger(properties, "opacity", 255);
+    final int opacity = Maps.getInteger(config, "opacity", 255);
     setOpacity(opacity);
     setIcon(Icons.getIcon("picture"));
   }
@@ -97,7 +99,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       final Resource imageResource = Resource.getResource(this.url);
       if (imageResource.exists()) {
         try {
-          image = GeoreferencedImageReadFactory.loadGeoreferencedImage(imageResource);
+          image = GeoreferencedImage.newGeoreferencedImage(imageResource);
           if (image == null) {
             Logs.error(GeoreferencedImageLayer.class, "Cannot load image: " + this.url);
           }
@@ -125,7 +127,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public synchronized BoundingBox fitToViewport() {
     final Project project = getProject();
     if (project == null || this.image == null || !isInitialized()) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       final BoundingBox oldValue = this.image.getBoundingBox();
       final BoundingBox viewBoundingBox = project.getViewBoundingBox();
@@ -136,9 +138,11 @@ public class GeoreferencedImageLayer extends AbstractLayer {
         final double imageRatio = this.image.getImageAspectRatio();
         BoundingBox boundingBox;
         if (viewRatio > imageRatio) {
-          boundingBox = viewBoundingBox.expandPercent(-1 + imageRatio / viewRatio, 0.0);
+          boundingBox = viewBoundingBox
+            .bboxEdit(editor -> editor.expandPercent(-1 + imageRatio / viewRatio, 0.0));
         } else if (viewRatio < imageRatio) {
-          boundingBox = viewBoundingBox.expandPercent(0.0, -1 + viewRatio / imageRatio);
+          boundingBox = viewBoundingBox
+            .bboxEdit(editor -> editor.expandPercent(0.0, -1 + viewRatio / imageRatio));
         } else {
           boundingBox = viewBoundingBox;
         }
@@ -153,7 +157,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public BoundingBox getBoundingBox() {
     final GeoreferencedImage image = getImage();
     if (image == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       BoundingBox boundingBox = image.getBoundingBox();
       if (boundingBox.isEmpty()) {
@@ -174,7 +178,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
-      return new BoundingBoxDoubleGf(getGeometryFactory());
+      return getGeometryFactory().bboxEmpty();
     }
   }
 
@@ -230,9 +234,11 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public TabbedValuePanel newPropertiesPanel() {
     final TabbedValuePanel propertiesPanel = super.newPropertiesPanel();
     final TiePointsPanel tiePointsPanel = newTableViewComponent(null);
-    Borders.titled(tiePointsPanel, "Tie Points");
+    if (tiePointsPanel != null) {
+      Borders.titled(tiePointsPanel, "Tie Points");
 
-    propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
+      propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
+    }
     return propertiesPanel;
   }
 
@@ -261,7 +267,11 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
   @Override
   protected TiePointsPanel newTableViewComponent(final Map<String, Object> config) {
-    return new TiePointsPanel(this);
+    if (getImage() == null) {
+      return null;
+    } else {
+      return new TiePointsPanel(this);
+    }
   }
 
   @Override
@@ -285,7 +295,6 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (this.image != null) {
-      System.out.println(boundingBox);
       this.image.setBoundingBox(boundingBox);
     }
   }
@@ -335,6 +344,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     if (image == null) {
       setExists(false);
     } else {
+      final GeometryFactory geometryFactory = image.getGeometryFactory();
+      setGeometryFactory(geometryFactory);
       setExists(true);
       Property.addListener(image, this);
     }
@@ -404,7 +415,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public Point targetPointToSourcePixel(Point targetPoint) {
     final GeoreferencedImage image = getImage();
     final BoundingBox boundingBox = getBoundingBox();
-    targetPoint = targetPoint.convertGeometry(boundingBox.getGeometryFactory(), 2);
+    targetPoint = targetPoint.convertPoint2d(boundingBox.getGeometryFactory());
     final double modelX = targetPoint.getX();
     final double modelY = targetPoint.getY();
     final double modelDeltaX = modelX - boundingBox.getMinX();
@@ -456,7 +467,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     final Project project = getProject();
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
-    BoundingBox boundingBox = layerBoundingBox;
+    final BoundingBoxEditor boundingBox = layerBoundingBox.bboxEditor();
     final AffineTransform transform = this.image.getAffineTransformation(layerBoundingBox);
     if (!transform.isIdentity()) {
       final GeoreferencedImage image = getImage();
@@ -467,10 +478,13 @@ public class GeoreferencedImageLayer extends AbstractLayer {
         true, 0, height, width, height, width, 0, 0, 0, 0, height);
       final LineString line = layerBoundingBox.getGeometryFactory()
         .lineString(2, targetCoordinates);
-      boundingBox = boundingBox.expandToInclude(line);
+      boundingBox.addGeometry(line);
     }
-    boundingBox = boundingBox.convert(geometryFactory).expandPercent(0.1).clipToCoordinateSystem();
-
-    project.setViewBoundingBox(boundingBox);
+    final BoundingBox boundingBox1 = boundingBox //
+      .setGeometryFactory(geometryFactory) //
+      .expandPercent(0.1) //
+      .clipToCoordinateSystem() //
+      .newBoundingBox();
+    project.setViewBoundingBox(boundingBox1);
   }
 }

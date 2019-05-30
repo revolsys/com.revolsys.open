@@ -1,15 +1,10 @@
 package com.revolsys.swing.map.layer.webmercatortilecache;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-
-import javax.imageio.ImageIO;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.raster.BufferedImages;
 import com.revolsys.util.Property;
 
 public class WebMercatorTileCacheClient {
@@ -39,16 +34,6 @@ public class WebMercatorTileCacheClient {
       .bboxToCs(GeometryFactory.worldMercator());
   }
 
-  protected BufferedImage getImage(final String url) {
-    try {
-      final URLConnection connection = new URL(url).openConnection();
-      final InputStream in = connection.getInputStream();
-      return ImageIO.read(in);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to download image from: " + url, e);
-    }
-  }
-
   public double getLatitude(final int zoomLevel, final int tileY) {
     final double n = Math.PI - 2.0 * Math.PI * tileY / Math.pow(2.0, zoomLevel);
     return Math.toDegrees(Math.atan(Math.sinh(n)));
@@ -61,12 +46,12 @@ public class WebMercatorTileCacheClient {
   public BufferedImage getMapImage(final int zoomLevel, final double longitude,
     final double latitude) {
     final String url = getMapUrl(zoomLevel, longitude, latitude);
-    return getImage(url);
+    return BufferedImages.readImageIo(url);
   }
 
   public BufferedImage getMapImage(final int zoomLevel, final int tileX, final int tileY) {
     final String url = getMapUrl(zoomLevel, tileX, tileY);
-    return getImage(url);
+    return BufferedImages.readImageIo(url);
   }
 
   public String getMapUrl(final int zoomLevel, final double longitude, final double latitude) {

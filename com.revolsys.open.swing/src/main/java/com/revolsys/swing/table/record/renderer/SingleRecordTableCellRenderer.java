@@ -11,11 +11,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
+import org.jeometry.common.number.BigDecimals;
 
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
-import com.revolsys.util.number.BigDecimals;
 
 public class SingleRecordTableCellRenderer implements TableCellRenderer {
   private final JLabel labelComponent = new JLabel();

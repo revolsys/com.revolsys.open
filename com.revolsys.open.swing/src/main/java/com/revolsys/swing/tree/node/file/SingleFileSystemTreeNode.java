@@ -7,8 +7,9 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.swing.tree.BaseTreeNode;
-import com.revolsys.util.WrappedException;
 
 public class SingleFileSystemTreeNode extends PathTreeNode {
 

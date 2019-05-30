@@ -61,12 +61,6 @@ public interface ArcGisRestServer {
         return new ArcGisRestServerRecordLayer(config);
       });
 
-    // TODO remove
-    MapObjectFactoryRegistry.newFactory("arcGisRest", "Arc GIS REST Server Tile Cache Layer",
-      (config) -> {
-        return new ArcGisRestServerTileCacheLayer(config);
-      });
-
     MapObjectFactoryRegistry.newFactory("arcGisRestServerTileLayer",
       "Arc GIS REST Server Tile Cache Layer", (config) -> {
         return new ArcGisRestServerTileCacheLayer(config);

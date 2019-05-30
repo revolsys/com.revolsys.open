@@ -10,6 +10,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateSystemParser;
@@ -19,7 +21,6 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 

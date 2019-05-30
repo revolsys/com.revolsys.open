@@ -5,10 +5,11 @@ import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JMenuItem;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
-import com.revolsys.util.Exceptions;
 
 public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
   implements ComponentFactory<JMenuItem> {

@@ -17,10 +17,11 @@ import java.util.function.Supplier;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class Invoke {

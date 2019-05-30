@@ -21,6 +21,7 @@ import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.exception.WrappedException;
 
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.SwingUtil;
@@ -33,7 +34,6 @@ import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.table.TablePanel;
-import com.revolsys.util.WrappedException;
 
 public abstract class AbstractUpdateField extends JDialog {
   private static final long serialVersionUID = 1L;

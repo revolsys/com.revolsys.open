@@ -14,9 +14,9 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumnModel;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.swing.SwingUtil;

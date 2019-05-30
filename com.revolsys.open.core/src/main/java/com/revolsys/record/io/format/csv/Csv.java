@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.WrappedException;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.IteratorMapReader;
@@ -30,7 +31,6 @@ import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final char FIELD_SEPARATOR = ',';

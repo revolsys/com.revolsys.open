@@ -23,10 +23,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;

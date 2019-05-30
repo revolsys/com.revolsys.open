@@ -2,8 +2,9 @@ package com.revolsys.parallel;
 
 import java.util.concurrent.Callable;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.util.Exceptions;
 
 public class SingleThreadExecutor implements BaseCloseable {
   private static ThreadLocal<Boolean> IS_THREAD = new ThreadLocal<>();

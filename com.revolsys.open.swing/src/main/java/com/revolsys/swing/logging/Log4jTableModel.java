@@ -19,8 +19,8 @@ import org.apache.logging.log4j.core.impl.ThrowableProxy;
 import org.apache.logging.log4j.message.Message;
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jeometry.common.logging.Logs;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.dnd.ClipboardUtil;

@@ -9,7 +9,7 @@ import java.awt.Insets;
 
 import javax.swing.border.AbstractBorder;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 
 public class TitledBorder extends AbstractBorder {
 

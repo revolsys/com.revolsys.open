@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.logging.Logs;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,19 +30,14 @@ import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.DomUtil;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeSupportProxy
@@ -69,13 +64,13 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     };
   }
 
-  private BoundingBox boundingBox = BoundingBox.EMPTY;
+  private BoundingBox boundingBox = BoundingBox.empty();
 
   private int[] dpi;
 
   private File file;
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private boolean hasChanges;
 
@@ -87,15 +82,22 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   private List<Dimension> overviewSizes = new ArrayList<>();
 
-  private final Map<CoordinateSystem, GeoreferencedImage> projectedImages = new HashMap<>();
-
   private RenderedImage renderedImage;
 
-  private double resolution;
+  private double resolutionX;
+
+  private double resolutionY;
 
   private final PropertyChangeArrayList<MappedLocation> tiePoints = new PropertyChangeArrayList<>();
 
+  private String worldFileExtension = "tfw";
+
   public AbstractGeoreferencedImage() {
+  }
+
+  public AbstractGeoreferencedImage(final String worldFileExtension) {
+    this();
+    this.worldFileExtension = worldFileExtension;
   }
 
   protected void addOverviewSize(final int width, final int height) {
@@ -194,30 +196,16 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     return this.dpi;
   }
 
-  public File getFile() {
+  public synchronized File getFile() {
+    if (this.file == null) {
+      this.file = Resource.getOrDownloadFile(this.imageResource);
+    }
     return this.file;
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
-  }
-
-  @Override
-  public GeoreferencedImage getImage(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getHorizontalCoordinateSystem();
-    synchronized (this.projectedImages) {
-      if (coordinateSystem.equals(getHorizontalCoordinateSystem())) {
-        return this;
-      } else {
-        GeoreferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
-        if (projectedImage == null) {
-          projectedImage = getImage(geometryFactory, this.resolution);
-          this.projectedImages.put(coordinateSystem, projectedImage);
-        }
-        return projectedImage;
-      }
-    }
   }
 
   @Override
@@ -256,8 +244,13 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   }
 
   @Override
-  public double getResolution() {
-    return this.resolution;
+  public double getResolutionX() {
+    return this.resolutionX;
+  }
+
+  @Override
+  public double getResolutionY() {
+    return this.resolutionY;
   }
 
   @Override
@@ -267,7 +260,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   @Override
   public String getWorldFileExtension() {
-    return "tfw";
+    return this.worldFileExtension;
   }
 
   @Override
@@ -285,7 +278,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
     final String extension = resource.getFileNameExtension();
     final Resource auxFile = resource.newResourceChangeExtension(extension + ".aux.xml");
-    if (auxFile.exists() && auxFile.getLastModified() > modifiedTime) {
+    if (auxFile != null && auxFile.exists() && auxFile.getLastModified() > modifiedTime) {
       loadWorldFileX();
       final int[] dpi = getDpi();
 
@@ -308,19 +301,15 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
               srid = DomUtil.getInteger(sridElement);
             }
           }
+          GeometryFactory geometryFactory = GeometryFactory.floating2d(srid);
           if (srid == 0) {
             final NodeList srsList = doc.getElementsByTagName("SRS");
             for (int i = 0; i < srsList.getLength() && srid == 0; i++) {
               final Node srsNode = srsList.item(i);
               final String srsWkt = srsNode.getTextContent();
-              final CoordinateSystem coordinateSystem = EsriCoordinateSystems
-                .getCoordinateSystem(srsWkt);
-              if (coordinateSystem != null) {
-                srid = coordinateSystem.getCoordinateSystemId();
-              }
+              geometryFactory = GeometryFactory.floating2d(srsWkt);
             }
           }
-          final GeometryFactory geometryFactory = GeometryFactory.floating(srid, 2);
           setGeometryFactory(geometryFactory);
 
           final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc, "SourceGCPs");
@@ -331,7 +320,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
               && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
-              final Point sourcePixel = new PointDouble(imageX, imageY);
+              final Point sourcePixel = new PointDoubleXY(imageX, imageY);
 
               final double x = targetControlPoints.get(i);
               final double y = targetControlPoints.get(i + 1);
@@ -356,10 +345,11 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     loadMetaDataFromImage();
     final long modifiedTime = loadSettings();
     loadAuxXmlFile(modifiedTime);
+    final boolean hasBoundingBox = hasBoundingBox();
     if (!hasGeometryFactory()) {
       loadProjectionFile();
     }
-    if (!hasBoundingBox()) {
+    if (!hasBoundingBox) {
       loadWorldFile();
     }
   }
@@ -369,19 +359,24 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   protected void loadProjectionFile() {
     final Resource resource = getImageResource();
-    final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+    final GeometryFactory geometryFactory = GeometryFactory.floating2d(resource);
     setGeometryFactory(geometryFactory);
   }
 
   protected long loadSettings() {
     final Resource resource = getImageResource();
     final Resource settingsFile = resource.newResourceAddExtension("rgobject");
-    if (settingsFile.exists()) {
+    if (settingsFile != null && settingsFile.exists()) {
       try {
-        final Map<String, Object> settings = Json.toMap(settingsFile);
+        Map<String, Object> settings;
+      try {
+          settings = Json.toMap(settingsFile);
+        } catch (final Throwable e) {
+          settings = new LinkedHashMapEx();
+        }
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {
-          final BoundingBox boundingBox = BoundingBox.newBoundingBox(boundingBoxWkt);
+          final BoundingBox boundingBox = BoundingBox.bboxNew(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
             setBoundingBox(boundingBox);
           }
@@ -422,7 +417,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   @SuppressWarnings("unused")
   protected void loadWorldFile(final Resource worldFile) {
-    if (worldFile.exists()) {
+    if (worldFile != null && worldFile.exists()) {
       try {
         try (
           final BufferedReader reader = worldFile.newBufferedReader()) {
@@ -433,7 +428,8 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
           // Top left
           final double x1 = Double.parseDouble(reader.readLine());
           final double y1 = Double.parseDouble(reader.readLine());
-          setResolution(pixelWidth);
+          setResolutionX(pixelWidth);
+          setResolutionY(pixelHeight);
           // TODO rotation using a warp filter
           setBoundingBox(x1, y1, pixelWidth, pixelHeight);
         }
@@ -485,7 +481,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     try {
       final Resource resource = this.imageResource;
       final Resource rgResource = resource.newResourceAddExtension("rgobject");
-      MapObjectFactory.write(rgResource, this);
+      this.writeToFile(rgResource);
       setHasChanges(false);
       return true;
     } catch (final Throwable e) {
@@ -499,6 +495,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     if (!DataType.equal(boundingBox, this.boundingBox)) {
       setGeometryFactory(boundingBox.getGeometryFactory());
       this.boundingBox = boundingBox;
+      updateResolution();
       setHasChanges(true);
     }
   }
@@ -511,6 +508,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory.convertAxisCount(2);
+      this.boundingBox = this.boundingBox.bboxToCs(this.geometryFactory);
       for (final MappedLocation mappedLocation : this.tiePoints) {
         mappedLocation.setGeometryFactory(geometryFactory);
       }
@@ -525,15 +523,16 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   protected void setImageHeight(final int imageHeight) {
     this.imageHeight = imageHeight;
+    updateResolution();
   }
 
   protected void setImageResource(final Resource imageResource) {
     this.imageResource = imageResource;
-    this.file = SpringUtil.getOrDownloadFile(this.imageResource);
   }
 
   protected void setImageWidth(final int imageWidth) {
     this.imageWidth = imageWidth;
+    updateResolution();
   }
 
   protected void setOverviewSizes(final List<Dimension> overviewSizes) {
@@ -543,10 +542,18 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   @Override
   public void setRenderedImage(final RenderedImage renderedImage) {
     this.renderedImage = renderedImage;
+    if (renderedImage != null) {
+      this.imageWidth = renderedImage.getWidth();
+      this.imageHeight = renderedImage.getHeight();
+    }
   }
 
-  protected void setResolution(final double resolution) {
-    this.resolution = resolution;
+  protected void setResolutionX(final double resolutionX) {
+    this.resolutionX = resolutionX;
+  }
+
+  protected void setResolutionY(final double resolutionY) {
+    this.resolutionY = resolutionY;
   }
 
   @Override
@@ -585,6 +592,17 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
       return super.toString();
     } else {
       return this.imageResource.toString();
+    }
+  }
+
+  private void updateResolution() {
+    if (!this.boundingBox.isBboxEmpty()) {
+      if (this.imageWidth > 0) {
+        setResolutionX(this.boundingBox.getWidth() / this.imageWidth);
+      }
+      if (this.imageHeight > 0) {
+        setResolutionY(this.boundingBox.getHeight() / this.imageHeight);
+      }
     }
   }
 }

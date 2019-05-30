@@ -11,8 +11,9 @@ import java.util.function.Consumer;
 import javax.swing.Icon;
 import javax.swing.SwingWorker;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.LruMap;
-import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;

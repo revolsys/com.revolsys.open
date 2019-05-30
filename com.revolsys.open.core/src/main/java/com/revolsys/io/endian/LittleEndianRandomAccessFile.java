@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import com.revolsys.util.WrappedException;
+import org.jeometry.common.exception.WrappedException;
 
 public class LittleEndianRandomAccessFile implements EndianInputOutput {
 

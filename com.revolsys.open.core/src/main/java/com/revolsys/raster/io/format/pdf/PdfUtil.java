@@ -14,11 +14,12 @@ import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.cos.COSObject;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.util.Property;
 
 public class PdfUtil {
@@ -67,7 +68,9 @@ public class PdfUtil {
       final float y2 = getFloat(bbox, 3);
       final float x = Math.min(x1, x2);
       final float y = Math.min(y1, y2);
-      return new Rectangle2D.Float(x, y, Math.abs(x1 - x2), Math.abs(y1 - y2));
+      float width = Math.abs(x1 - x2);
+      float height = Math.abs(y1 - y2);
+      return new Rectangle2D.Float(x, y, width, height);
     }
   }
 
@@ -155,34 +158,48 @@ public class PdfUtil {
         if (PdfUtil.hasNameValue(measure, "Subtype", "GEO")) {
           final COSDictionary gcs = PdfUtil.getDictionary(measure, "GCS");
           if (gcs != null) {
-            GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+            GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
             final int srid = gcs.getInt("EPSG");
             if (srid == -1) {
               final String wkt = gcs.getString("WKT");
               if (Property.hasValue(wkt)) {
-                geometryFactory = GeometryFactory.getFactory(wkt);
+                geometryFactory = GeometryFactory.floating3d(wkt);
               }
             } else {
-              geometryFactory = GeometryFactory.floating3(srid);
+              geometryFactory = GeometryFactory.floating3d(srid);
             }
             final GeometryFactory geoGeometryFactory = geometryFactory
               .getGeographicGeometryFactory();
 
-            BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
+            final BoundingBoxEditor boundingBox = geometryFactory.bboxEditor();
             final COSArray geoPoints = PdfUtil.findArray(measure, "GPTS");
 
-            for (int i = 0; i < geoPoints.size(); i++) {
-              final float lat = PdfUtil.getFloat(geoPoints, i++);
-              final float lon = PdfUtil.getFloat(geoPoints, i);
-              final Point geoPoint = geoGeometryFactory.point(lon, lat);
-              boundingBox = boundingBox.expandToInclude(geoPoint);
+            if (geometryFactory.isProjected()) {
+              final CoordinatesOperation projection = geometryFactory
+                .getCoordinatesOperation(geoGeometryFactory);
+              final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+              for (int i = 0; i < geoPoints.size(); i++) {
+                final float lon = PdfUtil.getFloat(geoPoints, i);
+                final float lat = PdfUtil.getFloat(geoPoints, i++);
+                point.setPoint(lon, lat);
+                projection.perform(point);
+                final double x = point.x;
+                final double y = point.y;
+                boundingBox.addPoint(x, y);
+              }
+            } else {
+              for (int i = 0; i < geoPoints.size(); i++) {
+                final float lon = PdfUtil.getFloat(geoPoints, i);
+                final float lat = PdfUtil.getFloat(geoPoints, i++);
+                boundingBox.addPoint(lon, lat);
+              }
             }
-            return boundingBox;
+            return boundingBox.newBoundingBox();
           }
         }
       }
     }
-    return BoundingBox.EMPTY;
+    return BoundingBox.empty();
   }
 
   public static boolean hasNameValue(final COSDictionary dictionary, final String key,

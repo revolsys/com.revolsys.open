@@ -10,12 +10,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.number.Numbers;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.record.Record;
 import com.revolsys.util.CompareUtil;
-import com.revolsys.util.number.Numbers;
 
 public interface Identifier {
   Identifier NULL = new SingleIdentifier(null);

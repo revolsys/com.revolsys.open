@@ -8,10 +8,10 @@ import javax.swing.JTextArea;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.Exceptions;
 
 public class TextArea extends JTextArea implements Field, FocusListener {
   private static final long serialVersionUID = 1L;

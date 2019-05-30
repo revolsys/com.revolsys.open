@@ -40,6 +40,7 @@ import javax.measure.quantity.Length;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -52,7 +53,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;

@@ -6,18 +6,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.Reader;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;
 import com.revolsys.spring.resource.FileSystemResource;
-import com.revolsys.util.number.Doubles;
 
 public class TinProcess extends BaseInOutProcess<Record, Record> {
   private BoundingBox boundingBox;

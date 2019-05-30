@@ -11,10 +11,11 @@ import java.util.TreeMap;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.Parent;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.util.Property;
 

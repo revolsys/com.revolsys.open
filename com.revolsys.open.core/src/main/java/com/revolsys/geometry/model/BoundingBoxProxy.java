@@ -2,7 +2,13 @@ package com.revolsys.geometry.model;
 
 import java.util.function.BiFunction;
 
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
+
 public interface BoundingBoxProxy extends GeometryFactoryProxy {
+  default BoundingBoxEditor bboxEditor() {
+    return new BoundingBoxEditor(this);
+  }
+
   /**
    *  Check if the region defined by <code>other</code>
    *  overlaps (intersects) the region of this <code>BoundingBox</code>.

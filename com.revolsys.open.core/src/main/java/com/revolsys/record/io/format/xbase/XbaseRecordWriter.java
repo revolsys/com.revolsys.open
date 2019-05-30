@@ -16,18 +16,18 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.endian.ResourceEndianOutput;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 /**
  * <p>Xbase attributes suffer a number of limitations:</p>

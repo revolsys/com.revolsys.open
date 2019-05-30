@@ -1,6 +1,7 @@
 package com.revolsys.jdbc.io;
 
-import com.revolsys.io.PathName;
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public class JdbcRecordDefinition extends RecordDefinitionImpl {

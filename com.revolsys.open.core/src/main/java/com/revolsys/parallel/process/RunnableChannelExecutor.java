@@ -13,9 +13,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.logging.Logs;
 import org.springframework.beans.factory.BeanNameAware;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.NamedThreadFactory;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.channel.Channel;

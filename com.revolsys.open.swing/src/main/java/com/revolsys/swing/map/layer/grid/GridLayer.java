@@ -4,13 +4,14 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;

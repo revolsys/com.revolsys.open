@@ -2,9 +2,10 @@ package com.revolsys.geometry.model.util;
 
 import java.util.Arrays;
 
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+
 import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.CoordinatesOperationPoint;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;

@@ -34,6 +34,8 @@ package com.revolsys.geometry.model.prep;
 
 import java.util.List;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -43,7 +45,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
-import com.revolsys.util.WrappedException;
 
 /**
  * A prepared version for {@link Lineal} geometries.

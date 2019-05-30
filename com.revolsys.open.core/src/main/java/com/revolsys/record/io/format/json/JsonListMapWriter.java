@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.WrappedException;
 
 public class JsonListMapWriter extends AbstractMapWriter {
 

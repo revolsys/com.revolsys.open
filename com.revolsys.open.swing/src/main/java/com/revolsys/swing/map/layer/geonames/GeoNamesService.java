@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.schema.RecordDefinition;

@@ -27,7 +27,7 @@ public class GeometryTestUtil {
     double x;
     double y;
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    if (coordinateSystem == null || geometryFactory.isGeographics()) {
+    if (coordinateSystem == null || geometryFactory.isGeographic()) {
       x = -123.123456;
       y = 52.123456;
     } else {

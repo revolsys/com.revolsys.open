@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.record.io.format.esri.rest.map.TileInfo;
@@ -21,23 +23,37 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceConnectionManager;
 import com.revolsys.webservice.WebServiceResource;
 
-public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
+public class ArcGisRestServerTileCacheLayer
+  extends AbstractTiledImageLayer<ArcGisRestServerTileCacheMapTile> {
+
+  static {
+    MenuFactory.addMenuInitializer(ArcGisRestServerTileCacheLayer.class, menu -> {
+
+      menu.addGroup(3, "server");
+
+      Menus.<ArcGisRestServerTileCacheLayer> addCheckboxMenuItem(menu, "server",
+        "Project image on Server", "", ArcGisRestServerTileCacheLayer::isExportTilesAllowed,
+        ArcGisRestServerTileCacheLayer::toggleUseServerExport,
+        ArcGisRestServerTileCacheLayer::isUseServerExport, true);
+
+    });
+  }
+
+  private boolean useServerExport = true;
+
   private String username;
 
   private String password;
-
-  private GeometryFactory geometryFactory;
 
   private final Object initSync = new Object();
 
@@ -96,19 +112,19 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
-    final List<MapTile> tiles = new ArrayList<>();
+  public List<ArcGisRestServerTileCacheMapTile> getOverlappingMapTiles(final Viewport2D view) {
+    final List<ArcGisRestServerTileCacheMapTile> tiles = new ArrayList<>();
     final MapService mapService = getMapService();
     if (mapService != null) {
       if (!isHasError()) {
         try {
-          final double metresPerPixel = viewport.getUnitsPerPixel();
-          final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
+          final double viewResolution = view.getUnitsPerPixel();
+          final int zoomLevel = mapService.getZoomLevel(viewResolution);
           final double resolution = mapService.getResolution(zoomLevel);
           if (resolution > 0) {
-            final BoundingBox viewBoundingBox = viewport.getBoundingBox();
+            final BoundingBox viewBoundingBox = view.getBoundingBox();
             final BoundingBox maxBoundingBox = getBoundingBox();
-            final BoundingBox boundingBox = viewBoundingBox.bboxToCs(this.geometryFactory)
+            final BoundingBox boundingBox = viewBoundingBox.bboxToCs(this)
               .bboxIntersection(maxBoundingBox);
             final double minX = boundingBox.getMinX();
             final double minY = boundingBox.getMinY();
@@ -138,12 +154,12 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public double getResolution(final Viewport2D viewport) {
+  public double getResolution(final Viewport2D view) {
     final MapService mapService = getMapService();
     if (mapService == null) {
       return 0;
     } else {
-      final double metresPerPixel = viewport.getUnitsPerPixel();
+      final double metresPerPixel = view.getUnitsPerPixel();
       final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
       return mapService.getResolution(zoomLevel);
     }
@@ -193,7 +209,12 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
               Logs.info(this, this.url + " does not contain a tileInfo definition.");
               return false;
             } else {
-              this.geometryFactory = tileInfo.getGeometryFactory();
+              if (this.useServerExport && !this.mapService.isExportTilesAllowed()) {
+                this.useServerExport = false;
+              }
+
+              final GeometryFactory geometryFactory = tileInfo.getGeometryFactory();
+              setGeometryFactory(geometryFactory);
               final BoundingBox boundingBox = this.mapService.getFullExtent();
               setBoundingBox(boundingBox);
               return true;
@@ -215,14 +236,36 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     }
   }
 
+  public boolean isExportTilesAllowed() {
+    if (this.mapService == null) {
+      return false;
+    }
+    return this.mapService.isExportTilesAllowed();
+  }
+
+  public boolean isUseServerExport() {
+    return this.useServerExport;
+  }
+
   @Override
   protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);
 
     final String url = getUrl();
-    SwingUtil.addLabelledReadOnlyTextField(panel, "URL", url);
-    GroupLayouts.makeColumns(panel, 2, true);
+    if (Property.hasValue(url)) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "URL", url);
+    }
+    if (this.mapService != null) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Service URL", this.mapService.getServiceUrl());
+    }
+    SwingUtil.addLabelledReadOnlyTextField(panel, "Service Path", this.servicePath);
+    GroupLayouts.makeColumns(panel, panel.getComponentCount() / 2, true);
     return panel;
+  }
+
+  @Override
+  protected ArcGisRestTileCacheLayerRenderer newRenderer() {
+    return new ArcGisRestTileCacheLayerRenderer(this);
   }
 
   @Override
@@ -267,6 +310,17 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     this.username = username;
   }
 
+  public void setUseServerExport(final boolean useServerExport) {
+    final boolean oldValue = this.useServerExport;
+    this.useServerExport = useServerExport;
+    firePropertyChange("useServerExport", oldValue, useServerExport);
+  }
+
+  public void toggleUseServerExport() {
+    final boolean useServerExport = isUseServerExport();
+    setUseServerExport(!useServerExport);
+  }
+
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
@@ -278,6 +332,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
       addToMap(map, "username", this.username);
       addToMap(map, "password", PasswordUtil.encrypt(this.password));
     }
+    addToMap(map, "useServerExport", this.useServerExport, false);
     return map;
   }
 

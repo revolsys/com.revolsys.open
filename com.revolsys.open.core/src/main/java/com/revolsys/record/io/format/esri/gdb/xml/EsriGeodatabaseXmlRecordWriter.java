@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
@@ -20,7 +22,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathUtil;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
@@ -31,7 +32,6 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Dates;
-import com.revolsys.util.number.Doubles;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   implements EsriGeodatabaseXmlConstants {

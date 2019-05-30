@@ -3,8 +3,8 @@ package com.revolsys.gis.data.query;
 import java.util.Arrays;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 
-import com.revolsys.io.PathName;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;

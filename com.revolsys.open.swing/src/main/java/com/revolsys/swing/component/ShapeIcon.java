@@ -10,7 +10,7 @@ import java.awt.geom.GeneralPath;
 
 import javax.swing.Icon;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
 
 public class ShapeIcon implements Icon {
 

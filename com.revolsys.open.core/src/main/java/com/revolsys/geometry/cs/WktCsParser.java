@@ -10,10 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Integers;
+
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.number.Doubles;
-import com.revolsys.util.number.Integers;
 
 public class WktCsParser {
   public static CoordinateSystem read(final String wkt) {

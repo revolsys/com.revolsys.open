@@ -1,20 +1,28 @@
 package com.revolsys.raster.io.format.tiff;
 
-import java.awt.image.RenderedImage;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.media.jai.JAI;
-import javax.media.jai.OperationRegistry;
-
-import org.libtiff.jai.codec.XTIFF;
-import org.libtiff.jai.codec.XTIFFDirectory;
-import org.libtiff.jai.codec.XTIFFField;
-import org.libtiff.jai.codecimpl.XTIFFCodec;
-import org.libtiff.jai.operator.XTIFFDescriptor;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.common.ImageMetadata.ImageMetadataItem;
+import org.apache.commons.imaging.common.bytesource.ByteSource;
+import org.apache.commons.imaging.common.bytesource.ByteSourceFile;
+import org.apache.commons.imaging.common.bytesource.ByteSourceInputStream;
+import org.apache.commons.imaging.formats.tiff.TiffField;
+import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
+import org.apache.commons.imaging.formats.tiff.TiffImageMetadata.TiffMetadataItem;
+import org.apache.commons.imaging.formats.tiff.TiffImageParser;
+import org.apache.commons.imaging.formats.tiff.constants.GeoTiffTagConstants;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.IntHashMap;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.Axis;
@@ -27,13 +35,10 @@ import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.epsg.EpsgAuthority;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.logging.Logs;
-import com.revolsys.raster.JaiGeoreferencedImage;
+import com.revolsys.raster.AbstractGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
-import com.sun.media.jai.codec.ImageCodec;
 
-@SuppressWarnings("deprecation")
-public class TiffImage extends JaiGeoreferencedImage {
+public class TiffImage extends AbstractGeoreferencedImage {
   /** ProjFalseEastingGeoKey (3082) */
   private static final int FALSE_EASTING_KEY = 3082;
 
@@ -68,22 +73,6 @@ public class TiffImage extends JaiGeoreferencedImage {
   private static final int TAG_X_RESOLUTION = 282;
 
   private static final int TAG_Y_RESOLUTION = 283;
-
-  static {
-    try {
-      final OperationRegistry reg = JAI.getDefaultInstance().getOperationRegistry();
-      ImageCodec.unregisterCodec("tiff");
-      reg.unregisterOperationDescriptor("tiff");
-
-      ImageCodec.registerCodec(new XTIFFCodec());
-      final XTIFFDescriptor descriptor = new XTIFFDescriptor();
-
-      reg.registerDescriptor(descriptor);
-
-    } catch (final Throwable t) {
-    }
-  }
-
   static {
     PROJECTION_NAMES.put(1, "Transverse_Mercator");
     // CT_TransvMercator_Modified_Alaska = 2
@@ -123,56 +112,14 @@ public class TiffImage extends JaiGeoreferencedImage {
     // LambertConicConformal.class);
   }
 
-  private static void addGeoKey(final Map<Integer, Object> geoKeys, final XTIFFDirectory dir,
-    final int keyId, final int tiffTag, final int valueCount, final int valueOrOffset) {
-    int type = XTIFFField.TIFF_SHORT;
-    Object value = null;
-    if (tiffTag > 0) {
-      // Values are in another tag:
-      final XTIFFField values = dir.getField(tiffTag);
-      if (values != null) {
-        type = values.getType();
-        if (type == XTIFFField.TIFF_ASCII) {
-          final String string = values.getAsString(0)
-            .substring(valueOrOffset, valueOrOffset + valueCount - 1);
-          value = string;
-        } else if (type == XTIFFField.TIFF_DOUBLE) {
-          final double number = values.getAsDouble(valueOrOffset);
-          value = number;
-        }
-      } else {
-        throw new IllegalArgumentException("GeoTIFF tag not found");
-      }
-    } else {
-      // value is SHORT, stored in valueOrOffset
-      type = XTIFFField.TIFF_SHORT;
-      value = (short)valueOrOffset;
-    }
-
-    geoKeys.put(keyId, value);
-  }
-
-  private static Map<Integer, Object> getGeoKeys(final XTIFFDirectory dir) {
-    final Map<Integer, Object> geoKeys = new LinkedHashMap<>();
-
-    final XTIFFField geoKeyTag = dir.getField(XTIFF.TIFFTAG_GEO_KEY_DIRECTORY);
-
-    if (geoKeyTag != null) {
-      final char[] keys = geoKeyTag.getAsChars();
-      for (int i = 4; i < keys.length; i += 4) {
-        final int keyId = keys[i];
-        final int tiffTag = keys[i + 1];
-        final int valueCount = keys[i + 2];
-        final int valueOrOffset = keys[i + 3];
-        addGeoKey(geoKeys, dir, keyId, tiffTag, valueCount, valueOrOffset);
-      }
-
-    }
-    return geoKeys;
-  }
-
   public TiffImage(final Resource imageResource) {
-    super(imageResource);
+    super("tfw");
+    setImageResource(imageResource);
+
+    readImage();
+
+    loadImageMetaData();
+    postConstruct();
   }
 
   private void addDoubleParameter(final Map<String, Object> parameters, final String name,
@@ -180,6 +127,14 @@ public class TiffImage extends JaiGeoreferencedImage {
     final Double value = getDouble(geoKeys, key);
     if (value != null) {
       parameters.put(name, value);
+    }
+  }
+
+  @Override
+  public void cancelChanges() {
+    if (getImageResource() != null) {
+      loadImageMetaData();
+      setHasChanges(false);
     }
   }
 
@@ -192,14 +147,66 @@ public class TiffImage extends JaiGeoreferencedImage {
     }
   }
 
-  private double getFieldAsDouble(final XTIFFDirectory directory, final int fieldIndex,
-    final double defaultValue) {
-    final XTIFFField field = directory.getField(fieldIndex);
+  private double getDouble(final TiffImageMetadata metaData, final int tag,
+    final double defaultValue) throws ImageReadException {
+    final TiffField field = getTiffField(metaData, tag);
     if (field == null) {
       return defaultValue;
     } else {
-      return field.getAsDouble(0);
+      return field.getDoubleValue();
     }
+  }
+
+  private Map<Integer, Object> getGeoKeys(final TiffImageMetadata metaData)
+    throws ImageReadException {
+    final Map<Integer, Object> geoKeys = new LinkedHashMap<>();
+
+    final TiffField keysField = metaData
+      .findField(GeoTiffTagConstants.EXIF_TAG_GEO_KEY_DIRECTORY_TAG);
+    final TiffField asciiParamsField = metaData
+      .findField(GeoTiffTagConstants.EXIF_TAG_GEO_ASCII_PARAMS_TAG);
+    final TiffField doubleParamsField = metaData
+      .findField(GeoTiffTagConstants.EXIF_TAG_GEO_DOUBLE_PARAMS_TAG);
+
+    double[] doubleParams;
+    if (doubleParamsField == null) {
+      doubleParams = new double[0];
+    } else {
+      doubleParams = doubleParamsField.getDoubleArrayValue();
+    }
+    String asciiParams;
+    if (asciiParamsField == null) {
+      asciiParams = "";
+    } else {
+      asciiParams = asciiParamsField.getStringValue();
+    }
+
+    if (keysField != null) {
+      final int[] keys = keysField.getIntArrayValue();
+      for (int i = 4; i < keys.length; i += 4) {
+        final int keyId = keys[i];
+        final int tiffTag = keys[i + 1];
+        final int valueCount = keys[i + 2];
+        final int valueOrOffset = keys[i + 3];
+
+        Object value = null;
+        switch (tiffTag) {
+          case 34736: // DOUBLE
+            value = doubleParams[valueOrOffset];
+          break;
+          case 34737: // ASCII
+            value = asciiParams.substring(valueOrOffset, valueOrOffset + valueCount - 1);
+          break;
+
+          default:
+            value = (short)valueOrOffset;
+          break;
+        }
+        geoKeys.put(keyId, value);
+      }
+
+    }
+    return geoKeys;
   }
 
   private int getInteger(final Map<Integer, Object> map, final int key, final int defaultValue) {
@@ -228,29 +235,43 @@ public class TiffImage extends JaiGeoreferencedImage {
     }
   }
 
+  private TiffField getTiffField(final TiffImageMetadata metaData, final int tag) {
+    for (final ImageMetadataItem item : metaData.getItems()) {
+      if (item instanceof TiffMetadataItem) {
+        final TiffMetadataItem tiffItem = (TiffMetadataItem)item;
+        final TiffField field = tiffItem.getTiffField();
+        if (field.getTag() == tag) {
+          return field;
+        }
+      }
+    }
+    return null;
+  }
+
   @Override
   public String getWorldFileExtension() {
     return "tfw";
   }
 
-  private boolean loadGeoTiffMetaData(final XTIFFDirectory directory) {
+  @SuppressWarnings("unused")
+  private boolean loadGeoTiffMetaData(final TiffImageMetadata metaData) throws ImageReadException {
     try {
-      final int xResolution = (int)getFieldAsDouble(directory, TAG_X_RESOLUTION, 1);
-      final int yResolution = (int)getFieldAsDouble(directory, TAG_Y_RESOLUTION, 1);
+      final int xResolution = (int)getDouble(metaData, TAG_X_RESOLUTION, 1);
+      final int yResolution = (int)getDouble(metaData, TAG_Y_RESOLUTION, 1);
       setDpi(xResolution, yResolution);
     } catch (final Throwable e) {
       Logs.error(this, e);
     }
     GeometryFactory geometryFactory = null;
-    final Map<Integer, Object> geoKeys = getGeoKeys(directory);
-    int coordinateSystemId = getInteger(geoKeys, PROJECTED_COORDINATE_SYSTEM_ID, 0);
+    final Map<Integer, Object> geoKeys = getGeoKeys(metaData);
+    int coordinateSystemId = Maps.getInteger(geoKeys, PROJECTED_COORDINATE_SYSTEM_ID, 0);
     if (coordinateSystemId == 0) {
-      coordinateSystemId = getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
+      coordinateSystemId = Maps.getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
       if (coordinateSystemId != 0) {
         geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
       }
     } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
-      final int geoSrid = getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
+      final int geoSrid = Maps.getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
       if (geoSrid != 0) {
         if (geoSrid > 0 && geoSrid < 32767) {
           final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
@@ -292,50 +313,50 @@ public class TiffImage extends JaiGeoreferencedImage {
       setGeometryFactory(geometryFactory);
     }
 
-    final XTIFFField tiePoints = directory.getField(XTIFF.TIFFTAG_GEO_TIEPOINTS);
+    final TiffField tiePoints = metaData.findField(GeoTiffTagConstants.EXIF_TAG_MODEL_TIEPOINT_TAG);
     if (tiePoints == null) {
-      final XTIFFField geoTransform = directory.getField(XTIFF.TIFFTAG_GEO_TRANS_MATRIX);
+      final TiffField geoTransform = metaData
+        .findField(GeoTiffTagConstants.EXIF_TAG_MODEL_TRANSFORMATION_TAG);
       if (geoTransform == null) {
         return false;
       } else {
-        final double x1 = geoTransform.getAsDouble(3);
-        final double y1 = geoTransform.getAsDouble(7);
-        final double pixelWidth = geoTransform.getAsDouble(0);
-        final double pixelHeight = geoTransform.getAsDouble(5);
-        final double xRotation = geoTransform.getAsDouble(4);
-        final double yRotation = geoTransform.getAsDouble(1);
-        setResolution(pixelWidth);
+        final double[] geoTransformValues = geoTransform.getDoubleArrayValue();
+        final double pixelWidth = geoTransformValues[0];
+        final double yRotation = geoTransformValues[1];
+        final double x1 = geoTransformValues[3];
+        final double xRotation = geoTransformValues[4];
+        final double pixelHeight = geoTransformValues[5];
+        final double y1 = geoTransformValues[7];
+        setResolutionX(pixelWidth);
+        setResolutionY(pixelHeight);
         // TODO rotation
         setBoundingBox(x1, y1, pixelWidth, pixelHeight);
         return true;
       }
     } else {
-      final XTIFFField pixelScale = directory.getField(XTIFF.TIFFTAG_GEO_PIXEL_SCALE);
+      final TiffField pixelScale = metaData
+        .findField(GeoTiffTagConstants.EXIF_TAG_MODEL_PIXEL_SCALE_TAG);
       if (pixelScale == null) {
         return false;
       } else {
-        final double rasterXOffset = tiePoints.getAsDouble(0);
-        final double rasterYOffset = tiePoints.getAsDouble(1);
+        final double[] tiePointValues = tiePoints.getDoubleArrayValue();
+        final double rasterXOffset = tiePointValues[0];
+        final double rasterYOffset = tiePointValues[1];
         if (rasterXOffset != 0 && rasterYOffset != 0) {
           // These should be 0, not sure what to do if they are not
           throw new IllegalArgumentException(
             "Exepectig 0 for the raster x,y tie points in a GeoTIFF");
         }
-        // double rasterZOffset = fieldModelTiePoints.getAsDouble(2);
-        // setTopLeftRasterPoint(new PointDouble(
-        // rasterXOffset,
-        // rasterYOffset));
 
         // Top left corner of image in model coordinates
-        final double x1 = tiePoints.getAsDouble(3);
-        final double y1 = tiePoints.getAsDouble(4);
-        // double modelZOffset = fieldModelTiePoints.getAsDouble(5);
-        // setTopLeftModelPoint(new PointDouble(
-        // modelXOffset,
-        // modelYOffset));
-        final double pixelWidth = pixelScale.getAsDouble(0);
-        final double pixelHeight = pixelScale.getAsDouble(1);
-        setResolution(pixelWidth);
+        final double x1 = tiePointValues[3];
+        final double y1 = tiePointValues[4];
+
+        final double[] pixelScaleValues = pixelScale.getDoubleArrayValue();
+        final double pixelWidth = pixelScaleValues[0];
+        final double pixelHeight = pixelScaleValues[1];
+        setResolutionX(pixelWidth);
+        setResolutionY(pixelHeight);
         setBoundingBox(x1, y1, pixelWidth, -pixelHeight);
         return true;
       }
@@ -344,14 +365,39 @@ public class TiffImage extends JaiGeoreferencedImage {
 
   @Override
   protected void loadMetaDataFromImage() {
-    final RenderedImage image = getRenderedImage();
-    final Object tiffDirectory = image.getProperty("tiff.directory");
-    if (tiffDirectory == null) {
-      throw new IllegalArgumentException("This is not a (geo)tiff file. Missing TIFF directory.");
+    try {
+      final ByteSource byteSource = newByteSource();
+      final TiffImageParser imageParser = new TiffImageParser();
+      final TiffImageMetadata metaData = (TiffImageMetadata)imageParser.getMetadata(byteSource);
+      loadGeoTiffMetaData(metaData);
+    } catch (ImageReadException | IOException e) {
+      throw Exceptions.wrap("Unable to open:" + getImageResource(), e);
+    }
+
+  }
+
+  private ByteSource newByteSource() {
+    ByteSource byteSource;
+    final Resource imageResource = getImageResource();
+    if (imageResource.isFile()) {
+      byteSource = new ByteSourceFile(imageResource.getFile());
     } else {
-      if (!(tiffDirectory instanceof XTIFFDirectory)
-        || !loadGeoTiffMetaData((XTIFFDirectory)tiffDirectory)) {
-      }
+      final String filename = imageResource.getFilename();
+      final InputStream in = imageResource.getInputStream();
+      byteSource = new ByteSourceInputStream(in, filename);
+    }
+    return byteSource;
+  }
+
+  private void readImage() {
+    final Map<String, Object> params = Collections.emptyMap();
+    try {
+      final ByteSource byteSource = newByteSource();
+      final TiffImageParser imageParser = new TiffImageParser();
+      final BufferedImage bufferedImage = imageParser.getBufferedImage(byteSource, params);
+      setRenderedImage(bufferedImage);
+    } catch (ImageReadException | IOException e) {
+      throw Exceptions.wrap("Unable to open:" + getImageResource(), e);
     }
   }
 }

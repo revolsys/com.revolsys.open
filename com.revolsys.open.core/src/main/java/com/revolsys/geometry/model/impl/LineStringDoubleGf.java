@@ -32,7 +32,8 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

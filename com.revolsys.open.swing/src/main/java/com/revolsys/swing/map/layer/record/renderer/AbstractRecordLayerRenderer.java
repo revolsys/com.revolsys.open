@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -24,7 +26,6 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.filter.MultipleAttributeValuesFilter;
@@ -263,8 +264,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   public void delete() {
     final LayerRenderer<?> parent = getParent();
-    if (parent instanceof AbstractMultipleRenderer) {
-      final AbstractMultipleRenderer multiple = (AbstractMultipleRenderer)parent;
+    if (parent instanceof AbstractMultipleRecordLayerRenderer) {
+      final AbstractMultipleRecordLayerRenderer multiple = (AbstractMultipleRecordLayerRenderer)parent;
       multiple.removeRenderer(this);
     }
   }
@@ -366,8 +367,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
-  protected void replace(final AbstractLayer layer, final AbstractMultipleRenderer parent,
-    final AbstractMultipleRenderer newRenderer) {
+  protected void replace(final AbstractLayer layer, final AbstractMultipleRecordLayerRenderer parent,
+    final AbstractMultipleRecordLayerRenderer newRenderer) {
     if (parent == null) {
       if (isEditing()) {
         newRenderer.setEditing(true);
@@ -389,7 +390,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   @Override
   public void setName(final String name) {
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     String newName = name;
     if (parent != null) {
       int i = 1;
@@ -429,15 +430,15 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     return map;
   }
 
-  protected void wrap(final AbstractLayer layer, final AbstractMultipleRenderer parent,
-    final AbstractMultipleRenderer newRenderer) {
+  protected void wrap(final AbstractLayer layer, final AbstractMultipleRecordLayerRenderer parent,
+    final AbstractMultipleRecordLayerRenderer newRenderer) {
     newRenderer.addRenderer(this.clone());
     replace(layer, parent, newRenderer);
   }
 
   public FilterMultipleRenderer wrapWithFilterStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
@@ -445,7 +446,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   public MultipleRecordRenderer wrapWithMultipleStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
@@ -453,7 +454,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   public ScaleMultipleRenderer wrapWithScaleStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;

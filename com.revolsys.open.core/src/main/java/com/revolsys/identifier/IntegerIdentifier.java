@@ -4,8 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jeometry.common.data.type.DataType;
-
-import com.revolsys.util.number.Integers;
+import org.jeometry.common.number.Integers;
 
 public final class IntegerIdentifier extends Number implements Identifier, Comparable<Object> {
   private static final long serialVersionUID = 1L;

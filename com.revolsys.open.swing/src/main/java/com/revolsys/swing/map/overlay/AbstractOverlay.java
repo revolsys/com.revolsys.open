@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 import javax.swing.undo.UndoableEdit;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.Maps;
@@ -57,7 +58,6 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public class AbstractOverlay extends JComponent implements PropertyChangeListener,
   BaseMouseListener, BaseMouseMotionListener, MouseWheelListener, KeyListener, FocusListener {

@@ -10,11 +10,11 @@ import java.util.Map.Entry;
 import javax.annotation.PreDestroy;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 
 public interface ObjectWithProperties {

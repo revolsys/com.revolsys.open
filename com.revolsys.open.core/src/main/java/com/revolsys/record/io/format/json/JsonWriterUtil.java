@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.number.Numbers;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.StringPrinter;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.number.Numbers;
 
 public final class JsonWriterUtil {
   public static void charSequence(final Writer out, final CharSequence string) throws IOException {

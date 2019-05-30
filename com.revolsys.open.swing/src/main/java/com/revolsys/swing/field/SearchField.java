@@ -7,8 +7,8 @@ import java.awt.event.FocusListener;
 import org.jdesktop.swingx.JXSearchField;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.OS;
 
 public class SearchField extends JXSearchField implements FocusListener, Field {

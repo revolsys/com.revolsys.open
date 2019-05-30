@@ -9,8 +9,8 @@ import javax.swing.event.ListSelectionListener;
 
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
+import org.jeometry.common.awt.WebColors;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;

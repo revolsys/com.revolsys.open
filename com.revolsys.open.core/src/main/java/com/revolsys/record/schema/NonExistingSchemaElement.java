@@ -1,6 +1,6 @@
 package com.revolsys.record.schema;
 
-import com.revolsys.io.PathName;
+import org.jeometry.common.io.PathName;
 
 class NonExistingSchemaElement extends AbstractRecordStoreSchemaElement {
   public NonExistingSchemaElement(final PathName pathName) {

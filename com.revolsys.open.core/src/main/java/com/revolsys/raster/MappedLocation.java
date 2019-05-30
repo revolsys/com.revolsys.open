@@ -12,7 +12,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.map.MapSerializer;
 
 public class MappedLocation extends AbstractPropertyChangeSupportProxy
@@ -24,7 +24,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
 
   public static Point toImagePoint(final BoundingBox boundingBox, Point modelPoint,
     final int imageWidth, final int imageHeight) {
-    modelPoint = modelPoint.convertGeometry(boundingBox.getGeometryFactory(), 2);
+    modelPoint = modelPoint.convertPoint2d(boundingBox.getGeometryFactory());
     final double modelX = modelPoint.getX();
     final double modelY = modelPoint.getY();
     final double modelDeltaX = modelX - boundingBox.getMinX();
@@ -38,7 +38,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
 
     final double imageX = imageWidth * xRatio;
     final double imageY = imageHeight * yRatio;
-    return new PointDouble(imageX, imageY);
+    return new PointDoubleXY(imageX, imageY);
   }
 
   public static double[] toModelCoordinates(final GeoreferencedImage image,
@@ -69,7 +69,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
     return targetCoordinates;
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+  private GeometryFactory geometryFactory = GeometryFactory.floating2d(0);
 
   private Point sourcePixel;
 
@@ -77,17 +77,17 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
 
   public MappedLocation(final int sourcePixelX, final int sourcePixelY,
     final GeometryFactory geometryFactory, final double x, final double y) {
-    this(new PointDouble(2, sourcePixelX, sourcePixelY), geometryFactory.point(x, y));
+    this(new PointDoubleXY( sourcePixelX, sourcePixelY), geometryFactory.point(x, y));
   }
 
   public MappedLocation(final int sourcePixelX, final int sourcePixelY, final Point targetPoint) {
-    this(new PointDouble(2, sourcePixelX, sourcePixelY), targetPoint);
+    this(new PointDoubleXY( sourcePixelX, sourcePixelY), targetPoint);
   }
 
   public MappedLocation(final Map<String, Object> map) {
     final double sourceX = Maps.getDouble(map, "sourceX", 0.0);
     final double sourceY = Maps.getDouble(map, "sourceY", 0.0);
-    this.sourcePixel = new PointDouble(sourceX, sourceY);
+    this.sourcePixel = new PointDoubleXY(sourceX, sourceY);
     this.targetPoint = this.geometryFactory.geometry((String)map.get("target"));
   }
 
@@ -142,8 +142,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
   public Point getTargetPixel(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight) {
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final Point targetPointCoordinates = (Point)this.targetPoint.convertGeometry(geometryFactory,
-      2);
+    final Point targetPointCoordinates = this.targetPoint.convertPoint2d(geometryFactory);
     return targetPointToPixel(boundingBox, targetPointCoordinates, imageWidth, imageHeight);
   }
 

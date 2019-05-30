@@ -1,5 +1,7 @@
 package com.revolsys.logging;
 
+import org.jeometry.common.logging.Logs;
+
 public class LoggingRunnable implements Runnable {
   private final Runnable runnable;
 

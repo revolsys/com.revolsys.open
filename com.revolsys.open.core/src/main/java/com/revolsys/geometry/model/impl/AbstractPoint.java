@@ -32,8 +32,9 @@
  */
 package com.revolsys.geometry.model.impl;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.WrappedException;
 
 /**
  * Represents a single point.

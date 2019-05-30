@@ -21,11 +21,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public interface Paths {
   static void createDirectories(final Path path) {

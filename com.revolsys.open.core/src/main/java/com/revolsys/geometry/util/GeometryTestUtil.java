@@ -2,6 +2,7 @@ package com.revolsys.geometry.util;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
@@ -14,7 +15,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.util.number.Doubles;
 
 public class GeometryTestUtil {
 

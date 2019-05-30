@@ -35,6 +35,8 @@ package com.revolsys.geometry.model.prep;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.geometry.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.geometry.model.BoundingBox;
@@ -49,7 +51,6 @@ import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
 import com.revolsys.geometry.operation.predicate.RectangleContains;
 import com.revolsys.geometry.operation.predicate.RectangleIntersects;
-import com.revolsys.util.WrappedException;
 
 /**
  * A prepared version for {@link MultiPolygonal} geometries.

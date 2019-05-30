@@ -11,8 +11,8 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jeometry.common.logging.Logs;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.table.highlighter.OutsideBorderHighlighter;
 import com.revolsys.util.function.Function2;
 

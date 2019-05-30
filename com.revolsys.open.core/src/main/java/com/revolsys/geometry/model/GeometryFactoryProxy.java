@@ -1,8 +1,9 @@
 package com.revolsys.geometry.model;
 
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 
 public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
@@ -42,6 +43,15 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
       return geometryFactory.getAreaBoundingBox();
     }
     return BoundingBox.empty();
+  }
+
+  default int getAxisCount() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      return 2;
+    } else {
+      return geometryFactory.getAxisCount();
+    }
   }
 
   default CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
@@ -157,6 +167,13 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
     } else {
       final GeometryFactory geometryFactory = proxy.getGeometryFactory();
       return isSameCoordinateSystem(geometryFactory);
+    }
+  }
+
+  default void writePrjFile(final Object target) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory != null) {
+      geometryFactory.writePrjFile(target);
     }
   }
 }

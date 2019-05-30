@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.comparator.StringNumberComparator;
@@ -24,7 +25,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;

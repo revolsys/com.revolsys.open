@@ -31,9 +31,8 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.OperationNotSupportedException;
 
+import org.jeometry.common.logging.Logs;
 import org.springframework.util.StringUtils;
-
-import com.revolsys.logging.Logs;
 
 /**
  * Simple implementation of a JNDI naming context. Only supports binding plain

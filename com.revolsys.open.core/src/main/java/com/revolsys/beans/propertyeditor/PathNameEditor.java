@@ -2,7 +2,7 @@ package com.revolsys.beans.propertyeditor;
 
 import java.beans.PropertyEditorSupport;
 
-import com.revolsys.io.PathName;
+import org.jeometry.common.io.PathName;
 
 public class PathNameEditor extends PropertyEditorSupport {
 

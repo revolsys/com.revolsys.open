@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 
+import org.jeometry.common.exception.WrappedException;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
@@ -21,7 +22,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.util.Base64;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.WrappedException;
 
 public class UrlResource extends AbstractResource {
 

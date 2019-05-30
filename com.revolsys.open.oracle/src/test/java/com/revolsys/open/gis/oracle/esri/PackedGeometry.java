@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.WrappedException;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -12,7 +13,6 @@ import com.revolsys.oracle.recordstore.esri.ArcSdeConstants;
 import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.oracle.recordstore.esri.PackedCoordinateUtil;
 import com.revolsys.record.io.format.wkt.WktWriter;
-import com.revolsys.util.WrappedException;
 
 public class PackedGeometry {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3005, 1.0, 1.0);

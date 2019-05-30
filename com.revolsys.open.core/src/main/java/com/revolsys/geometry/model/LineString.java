@@ -45,12 +45,13 @@ import javax.measure.quantity.Length;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
@@ -70,7 +71,6 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;
@@ -886,7 +886,7 @@ public interface LineString extends Lineal {
       double distanceAlong = 0;
       Side side = null;
       final double resolutionXy;
-      if (geometryFactory.isGeographics()) {
+      if (geometryFactory.isGeographic()) {
         resolutionXy = 0.0000001;
       } else {
         resolutionXy = 0.001;
@@ -1043,7 +1043,7 @@ public interface LineString extends Lineal {
     if (!isEmpty() && !point.isEmpty()) {
       double closestDistance = Double.MAX_VALUE;
       final double resolutionXy;
-      if (geometryFactory.isGeographics()) {
+      if (geometryFactory.isGeographic()) {
         resolutionXy = 0.0000001;
       } else {
         resolutionXy = 0.001;

@@ -14,10 +14,11 @@ import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.io.map.MapWriter;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.util.Exceptions;
 
 /**
  * <p>

@@ -1,5 +1,7 @@
 package com.revolsys.geometry.cs.projection;
 
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+
 public abstract class AbstractCoordinatesProjection implements CoordinatesProjection {
 
   private final CoordinatesOperation inverseOperation = new InverseOperation(this);

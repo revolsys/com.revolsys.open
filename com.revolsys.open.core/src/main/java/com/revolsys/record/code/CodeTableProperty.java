@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.ListIdentifier;
 import com.revolsys.identifier.SingleIdentifier;
-import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
 import com.revolsys.record.comparator.RecordFieldComparator;

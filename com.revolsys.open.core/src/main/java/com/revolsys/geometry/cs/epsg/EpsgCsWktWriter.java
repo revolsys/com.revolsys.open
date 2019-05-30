@@ -4,6 +4,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map.Entry;
 
+import org.jeometry.common.number.Numbers;
+
 import com.revolsys.geometry.cs.AngularUnit;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -14,7 +16,6 @@ import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Projection;
 import com.revolsys.geometry.cs.Spheroid;
-import com.revolsys.util.number.Numbers;
 
 public class EpsgCsWktWriter {
 

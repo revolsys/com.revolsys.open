@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.WrappedException;
-import com.revolsys.util.number.Doubles;
 
 public final class JsonWriter implements BaseCloseable {
 

@@ -3,9 +3,10 @@ package com.revolsys.swing.map.layer.record.table;
 import java.text.Collator;
 import java.util.Comparator;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;

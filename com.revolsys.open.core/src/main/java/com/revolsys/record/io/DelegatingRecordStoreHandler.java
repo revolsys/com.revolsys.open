@@ -6,7 +6,8 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.record.schema.RecordStore;
 
 public class DelegatingRecordStoreHandler implements InvocationHandler {

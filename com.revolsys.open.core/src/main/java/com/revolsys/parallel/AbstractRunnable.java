@@ -8,7 +8,7 @@ import java.awt.Window;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
 
 public abstract class AbstractRunnable implements Runnable {
   private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);

@@ -1,11 +1,12 @@
 package com.revolsys.gis.parallel;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;

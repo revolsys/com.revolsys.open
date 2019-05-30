@@ -37,8 +37,9 @@ import java.util.Arrays;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -50,7 +51,6 @@ import com.revolsys.geometry.util.NumberUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 /**
  * Represents a single point.
@@ -193,7 +193,7 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
-  default Point convertPoint2d(final GeometryFactory geometryFactory) {
+  default Point convertPoint2d(final GeometryFactoryProxy geometryFactory) {
     if (isEmpty()) {
       return this;
     } else {

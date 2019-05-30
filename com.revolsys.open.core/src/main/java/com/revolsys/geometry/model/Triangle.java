@@ -3,14 +3,37 @@ package com.revolsys.geometry.model;
 import com.revolsys.geometry.util.Triangles;
 
 public interface Triangle extends LinearRing {
+
+  static boolean containsPoint(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3, final double x, final double y) {
+    final double y2y3 = y2 - y3;
+    final double xx3 = x - x3;
+    final double x3x2 = x3 - x2;
+    final double yy3 = y - y3;
+    final double x1x3 = x1 - x3;
+    final double y1y3 = y1 - y3;
+    final double a = (y2y3 * xx3 + x3x2 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
+    if (0 <= a && a <= 1) {
+      final double y3y1 = y3 - y1;
+      final double b = (y3y1 * xx3 + x1x3 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
+      if (0 <= b && b <= 1) {
+        final double c = 1 - a - b;
+        if (-0.001 < c && c < 1.001) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /**
-   * Computes the 2D area of this triangle. The area value is always
-   * non-negative.
-   *
-   * @return the area of this triangle
-   *
-   * @see #signedArea()
-   */
+  * Computes the 2D area of this triangle. The area value is always
+  * non-negative.
+  *
+  * @return the area of this triangle
+  *
+  * @see #signedArea()
+  */
   default double area() {
     final double x1 = getX(0);
     final double y1 = getY(0);

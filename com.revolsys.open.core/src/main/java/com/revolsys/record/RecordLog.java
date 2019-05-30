@@ -5,14 +5,14 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;

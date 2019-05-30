@@ -2,7 +2,6 @@ package com.revolsys.raster;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -11,18 +10,21 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.logging.Logs;
 import com.revolsys.math.matrix.Matrix;
 import com.revolsys.spring.resource.Resource;
 
 public interface GeoreferencedImage
-  extends GeometryFactoryProxy, MapSerializer, PropertyChangeListener {
+  extends BoundingBoxProxy, MapSerializer, PropertyChangeListener {
   static double[] calculateLSM(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight, final List<MappedLocation> mappings) {
     final Matrix A = getAMatrix(mappings, imageHeight);
@@ -106,27 +108,52 @@ public interface GeoreferencedImage
     return IoFactory.isAvailable(GeoreferencedImageReadFactory.class, path);
   }
 
+  static GeoreferencedImage newGeoreferencedImage(final Object source) {
+    final Resource resource = Resource.getResource(source);
+    final GeoreferencedImageReadFactory factory = IoFactory
+      .factory(GeoreferencedImageReadFactory.class, resource);
+    if (factory == null) {
+      return null;
+    } else {
+      final GeoreferencedImage reader = factory.readGeoreferencedImage(resource);
+      return reader;
+    }
+  }
+
   void addTiePointsForBoundingBox();
 
   default void cancelChanges() {
   }
 
+  default void copyModelPoint(final CoordinatesOperationPoint point, final double imageX,
+    final double imageY) {
+    final BoundingBox boundingBox = getBoundingBox();
+    final double resolutionX = getResolutionX();
+    final double resolutionY = getResolutionY();
+    final double x = boundingBox.getMinX() + imageX * resolutionX;
+    final double y = boundingBox.getMaxY() - imageY * resolutionY;
+    point.setPoint(x, y);
+  }
+
   void deleteTiePoint(MappedLocation tiePoint);
 
   default void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
-    final int viewWidth, final int viewHeight, final boolean useTransform,
-    final Object interpolationMethod) {
-    final BoundingBox imageBoundingBox = getBoundingBox();
-    if (viewBoundingBox.bboxIntersects(imageBoundingBox) && viewWidth > 0 && viewHeight > 0) {
-      final RenderedImage renderedImage = getRenderedImage();
-      drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth, viewHeight,
-        useTransform, interpolationMethod);
+    final int viewWidth, final int viewHeight, final boolean useTransform) {
+    if (viewBoundingBox.bboxIntersects(this) && viewWidth > 0 && viewHeight > 0) {
+      if (isSameCoordinateSystem(viewBoundingBox)) {
+        final RenderedImage renderedImage = getRenderedImage();
+        drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth, viewHeight,
+          useTransform);
+      } else {
+        final GeoreferencedImage image = imageToCs(viewBoundingBox);
+        image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, useTransform);
+      }
     }
   }
 
   default void drawRenderedImage(final RenderedImage renderedImage, BoundingBox imageBoundingBox,
     final Graphics2D graphics, final BoundingBox viewBoundingBox, final int viewWidth,
-    final boolean useTransform, final Object interpolationMethod) {
+    final boolean useTransform) {
     if (renderedImage != null) {
       final int imageWidth = renderedImage.getWidth();
       final int imageHeight = renderedImage.getHeight();
@@ -134,7 +161,6 @@ public interface GeoreferencedImage
 
         final GeometryFactory viewGeometryFactory = viewBoundingBox.getGeometryFactory();
         imageBoundingBox = imageBoundingBox.bboxToCs(viewGeometryFactory);
-        final AffineTransform transform = graphics.getTransform();
         try {
           final double scaleFactor = viewWidth / viewBoundingBox.getWidth();
 
@@ -153,37 +179,20 @@ public interface GeoreferencedImage
           final int imageScreenHeight = (int)Math.ceil(imageModelHeight * scaleFactor);
 
           if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-            if (interpolationMethod != null) {
-              graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-            }
             if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-
-              graphics.translate(screenX, screenY);
-              if (renderedImage instanceof BufferedImage && !useTransform) {
-                final BufferedImage bufferedImage = (BufferedImage)renderedImage;
-                try {
-                  graphics.drawImage(bufferedImage, 0, 0, imageScreenWidth, imageScreenHeight,
-                    null);
-                } catch (final Throwable e) {
-                  Logs.error(this, imageScreenWidth + "x" + imageScreenHeight, e);
-                }
-              } else {
-                final double scaleX = (double)imageScreenWidth / imageWidth;
-                final double scaleY = (double)imageScreenHeight / imageHeight;
-                final AffineTransform imageTransform = new AffineTransform(scaleX, 0, 0, scaleY, 0,
-                  0);
-                if (useTransform) {
-                  final AffineTransform geoTransform = getAffineTransformation(imageBoundingBox);
-                  imageTransform.concatenate(geoTransform);
-                }
-                graphics.drawRenderedImage(renderedImage, imageTransform);
+              final double scaleX = (double)imageScreenWidth / imageWidth;
+              final double scaleY = (double)imageScreenHeight / imageHeight;
+              final AffineTransform imageTransform = new AffineTransform(scaleX, 0, 0, scaleY,
+                screenX, screenY);
+              if (useTransform) {
+                final AffineTransform geoTransform = getAffineTransformation(imageBoundingBox);
+                imageTransform.concatenate(geoTransform);
               }
+              graphics.drawRenderedImage(renderedImage, imageTransform);
             }
           }
         } catch (final Throwable e) {
           e.printStackTrace();
-        } finally {
-          graphics.setTransform(transform);
         }
       }
     }
@@ -191,10 +200,10 @@ public interface GeoreferencedImage
 
   default void drawRenderedImage(final RenderedImage renderedImage, final Graphics2D graphics,
     final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
-    final boolean useTransform, final Object interpolationMethod) {
+    final boolean useTransform) {
     final BoundingBox imageBoundingBox = getBoundingBox();
     drawRenderedImage(renderedImage, imageBoundingBox, graphics, viewBoundingBox, viewWidth,
-      useTransform, interpolationMethod);
+      useTransform);
   }
 
   default AffineTransform getAffineTransformation(final BoundingBox boundingBox) {
@@ -223,8 +232,6 @@ public interface GeoreferencedImage
     return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX, translateY);
   }
 
-  BoundingBox getBoundingBox();
-
   default BufferedImage getBufferedImage() {
     final RenderedImage renderedImage = getRenderedImage();
     if (renderedImage == null) {
@@ -246,9 +253,7 @@ public interface GeoreferencedImage
 
   int[] getDpi();
 
-  GeoreferencedImage getImage(final GeometryFactory geometryFactory);
-
-  default GeoreferencedImage getImage(final GeometryFactory geometryFactory,
+  default GeoreferencedImage getImage(final GeometryFactoryProxy geometryFactory,
     final double resolution) {
     final int imageSrid = getHorizontalCoordinateSystemId();
     if (imageSrid > 0 && imageSrid != geometryFactory.getHorizontalCoordinateSystemId()) {
@@ -284,7 +289,9 @@ public interface GeoreferencedImage
 
   RenderedImage getRenderedImage();
 
-  double getResolution();
+  double getResolutionX();
+
+  double getResolutionY();
 
   List<MappedLocation> getTiePoints();
 
@@ -296,6 +303,14 @@ public interface GeoreferencedImage
 
   default boolean hasGeometryFactory() {
     return getGeometryFactory().getHorizontalCoordinateSystemId() > 0;
+  }
+
+  default GeoreferencedImage imageToCs(final GeometryFactoryProxy geometryFactory) {
+    if (isSameCoordinateSystem(geometryFactory)) {
+      return this;
+    } else {
+      return new ImageProjector(this, geometryFactory).newImage();
+    }
   }
 
   boolean isHasChanages();
@@ -331,4 +346,32 @@ public interface GeoreferencedImage
   void setRenderedImage(final RenderedImage image);
 
   void setTiePoints(final List<MappedLocation> tiePoints);
+
+  default void toImagePoint(final CoordinatesOperationPoint point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    final double resolutionX = getResolutionX();
+    final double resolutionY = getResolutionY();
+    final BoundingBox boundingBox = getBoundingBox();
+    final double imageX = (x - boundingBox.getMinX()) / resolutionX;
+    final double imageY = (boundingBox.getMaxY() - y) / resolutionY;
+    point.setPoint(imageX, imageY);
+  }
+
+  default void writeImage(final Object target) {
+    writeImage(target, MapEx.EMPTY);
+  }
+
+  default void writeImage(final Object target, final MapEx properties) {
+    try (
+      GeoreferencedImageWriter writer = GeoreferencedImageWriter.newGeoreferencedImageWriter(target,
+        properties)) {
+      if (writer == null) {
+        throw new IllegalArgumentException("No image writer exists for " + target);
+      } else {
+        writer.write(this);
+      }
+    }
+
+  }
 }

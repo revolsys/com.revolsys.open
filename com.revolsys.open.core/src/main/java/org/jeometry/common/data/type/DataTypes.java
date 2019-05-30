@@ -20,7 +20,18 @@ import java.util.UUID;
 import javax.measure.Quantity;
 import javax.xml.namespace.QName;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.BigDecimals;
+import org.jeometry.common.number.BigIntegers;
+import org.jeometry.common.number.Bytes;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Floats;
+import org.jeometry.common.number.Integers;
+import org.jeometry.common.number.Longs;
+import org.jeometry.common.number.Shorts;
+
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -37,22 +48,12 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.RecordDataType;
 import com.revolsys.record.code.CodeDataType;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Dates;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.number.BigDecimals;
-import com.revolsys.util.number.BigIntegers;
-import com.revolsys.util.number.Bytes;
-import com.revolsys.util.number.Doubles;
-import com.revolsys.util.number.Floats;
-import com.revolsys.util.number.Integers;
-import com.revolsys.util.number.Longs;
-import com.revolsys.util.number.Shorts;
 
 // TODO manage data types by classloader and allow unloading of registered classes.
 public final class DataTypes {

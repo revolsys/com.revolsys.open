@@ -1,8 +1,8 @@
 package com.revolsys.record.io.format.moep;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 
-import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 

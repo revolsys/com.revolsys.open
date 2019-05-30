@@ -8,14 +8,14 @@ import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -25,7 +25,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.swing.Icons;
@@ -34,7 +33,6 @@ import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
-import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
@@ -359,16 +357,8 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
     if (this.cachedImage == null || !this.cachedImage.getBoundingBox().equals(viewBoundingBox)) {
       try (
         final ImageViewport imageViewport = new ImageViewport(viewport)) {
-
-        final BufferedImage image = imageViewport.getImage();
-        final Graphics2D graphics = (Graphics2D)image.getGraphics();
-
-        this.image.drawImage(graphics, viewBoundingBox, viewport.getViewWidthPixels(),
-          viewport.getViewHeightPixels(), !this.layer.isShowOriginalImage(),
-          RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        GeoreferencedImageLayerRenderer.render(imageViewport, graphics, this.image,
-          !this.layer.isShowOriginalImage());
-        this.cachedImage = new BufferedGeoreferencedImage(imageViewport.getBoundingBox(), image);
+        imageViewport.drawImage(this.image, !this.layer.isShowOriginalImage());
+        this.cachedImage = imageViewport.getGeoreferencedImage();
       }
     }
     return this.cachedImage;
@@ -978,11 +968,10 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         }
 
         final GeoreferencedImage cachedImage = getCachedImage(boundingBox);
-        GeoreferencedImageLayerRenderer.renderAlpha(viewport, graphics, cachedImage, false,
-          layer.getOpacity() / 255.0);
+        viewport.drawImage(cachedImage, false, layer.getOpacity() / 255.0,
+          RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        GeoreferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, graphics,
-          imageBoundingBox);
+        viewport.drawDifferentCoordinateSystem(imageBoundingBox);
 
         if (outlineBoundingBox != null && !outlineBoundingBox.isEmpty()) {
           final Polygon imageBoundary = outlineBoundingBox.convert(getViewportGeometryFactory())

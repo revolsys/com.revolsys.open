@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractIoFactory;
@@ -29,7 +31,6 @@ import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class Json extends AbstractIoFactory implements MapReaderFactory, MapWriterFactory {

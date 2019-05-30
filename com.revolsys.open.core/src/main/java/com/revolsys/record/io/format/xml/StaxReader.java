@@ -18,10 +18,10 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.apache.commons.io.input.XmlStreamReader;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class StaxReader extends StreamReaderDelegate implements BaseCloseable {

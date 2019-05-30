@@ -5,8 +5,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.io.FileUtil;
-import com.revolsys.logging.Logs;
 import com.revolsys.util.OS;
 
 public class ClasspathNativeLibraryUtil {

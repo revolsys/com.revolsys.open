@@ -3,8 +3,9 @@ package com.revolsys.record.io.format.xbase;
 import java.io.IOException;
 import java.util.List;
 
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.io.EndianInput;
-import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 

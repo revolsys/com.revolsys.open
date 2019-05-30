@@ -8,8 +8,9 @@ import java.awt.Graphics2D;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import com.revolsys.awt.WebColors;
-import com.revolsys.logging.Logs;
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 

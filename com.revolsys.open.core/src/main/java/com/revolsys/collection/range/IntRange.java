@@ -1,6 +1,6 @@
 package com.revolsys.collection.range;
 
-import com.revolsys.util.number.Integers;
+import org.jeometry.common.number.Integers;
 
 /**
  *

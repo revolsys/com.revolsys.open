@@ -6,12 +6,12 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.jeometry.common.logging.Logs;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLErrorCodesFactory;
 
 import com.revolsys.jdbc.io.DataSourceImpl;
-import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.Function2;
 

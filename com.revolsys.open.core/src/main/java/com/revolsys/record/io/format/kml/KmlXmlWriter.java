@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -18,7 +20,6 @@ import com.revolsys.io.StringBuilderWriter;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.number.Doubles;
 
 public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
   public static void append(final StringBuilder buffer, final Geometry geometry) {

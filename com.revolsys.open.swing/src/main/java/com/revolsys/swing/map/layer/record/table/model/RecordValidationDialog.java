@@ -26,9 +26,9 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
+import org.jeometry.common.awt.WebColors;
 import org.jdesktop.swingx.decorator.Highlighter;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;

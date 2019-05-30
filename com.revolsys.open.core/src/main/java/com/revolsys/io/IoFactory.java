@@ -1,8 +1,13 @@
 package com.revolsys.io;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,14 +17,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.io.file.FileNameExtensionFilter;
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.file.Paths;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.record.Available;
 import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.spring.resource.GzipResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 import com.revolsys.util.UrlUtil;
@@ -28,6 +41,18 @@ public interface IoFactory extends Available {
   @SuppressWarnings("unchecked")
   static <C extends IoFactory> List<C> factories(final Class<C> factoryClass) {
     return Lists.<C> toArray((Set<C>)IoFactoryRegistry.factoriesByClass.get(factoryClass));
+  }
+
+  static List<IoFactory> factoriesByFileExtension(String fileExtension) {
+    if (fileExtension != null) {
+      fileExtension = fileExtension.toLowerCase();
+      final Set<IoFactory> factories = IoFactoryRegistry.factoriesByFileExtension
+        .get(fileExtension);
+      if (factories != null) {
+        return Lists.toArray(factories);
+      }
+    }
+    return Collections.emptyList();
   }
 
   /**
@@ -52,10 +77,12 @@ public interface IoFactory extends Available {
   @SuppressWarnings("unchecked")
   static <F extends IoFactory> F factoryByFileExtension(final Class<F> factoryClass,
     String fileExtension) {
-    fileExtension = fileExtension.toLowerCase();
-    if (Property.hasValue(fileExtension)) {
-      return (F)Maps.getMap(IoFactoryRegistry.factoryByClassAndFileExtension, factoryClass,
-        fileExtension);
+    if (fileExtension != null) {
+      fileExtension = fileExtension.toLowerCase();
+      if (Property.hasValue(fileExtension)) {
+        return (F)Maps.getMap(IoFactoryRegistry.factoryByClassAndFileExtension, factoryClass,
+          fileExtension);
+      }
     }
     return null;
   }
@@ -65,6 +92,20 @@ public interface IoFactory extends Available {
     for (final String fileExtension : FileUtil.getFileNameExtensions(fileName)) {
       final C factory = factoryByFileExtension(factoryClass, fileExtension);
       if (factory != null) {
+        return factory;
+      }
+    }
+    if (fileName.endsWith(".zip")) {
+      final C factory = factoryByFileName(factoryClass,
+        fileName.substring(0, fileName.length() - 4));
+      if (factory != null && factory.isReadFromZipFileSupported()) {
+        return factory;
+      }
+    }
+    if (fileName.endsWith(".gz")) {
+      final C factory = factoryByFileName(factoryClass,
+        fileName.substring(0, fileName.length() - 3));
+      if (factory != null && factory.isReadFromZipFileSupported()) {
         return factory;
       }
     }
@@ -155,6 +196,33 @@ public interface IoFactory extends Available {
     return Lists.toArray(IoFactoryRegistry.mediaTypesByClass.get(factoryClass));
   }
 
+  public static ChannelReader newChannelReader(final Resource resource) {
+    final ReadableByteChannel channel = newReadableByteChannel(resource);
+    if (channel == null) {
+      return null;
+    } else {
+      return new ChannelReader(channel);
+    }
+  }
+
+  public static ChannelReader newChannelReader(final Resource resource, final ByteBuffer buffer) {
+    final ReadableByteChannel channel = newReadableByteChannel(resource);
+    if (channel == null) {
+      return null;
+    } else {
+      return new ChannelReader(channel, buffer);
+    }
+  }
+
+  public static ChannelReader newChannelReader(final Resource resource, final int bufferSize) {
+    final ReadableByteChannel channel = newReadableByteChannel(resource);
+    if (channel == null) {
+      return null;
+    } else {
+      return new ChannelReader(channel, bufferSize);
+    }
+  }
+
   public static FileNameExtensionFilter newFileFilter(final IoFactory factory) {
     final List<String> fileExtensions = factory.getFileExtensions();
     String description = factory.getName();
@@ -189,6 +257,31 @@ public interface IoFactory extends Available {
     return filters;
   }
 
+  public static ReadableByteChannel newReadableByteChannel(final Resource resource) {
+    final String fileExtension = resource.getFileNameExtension();
+    try {
+      if (fileExtension.equals("zip")) {
+        final ZipInputStream in = resource.newBufferedInputStream(ZipInputStream::new);
+        final String baseName = resource.getBaseName();
+        for (ZipEntry zipEntry = in.getNextEntry(); zipEntry != null; zipEntry = in
+          .getNextEntry()) {
+          if (zipEntry.getName().equals(baseName)) {
+            return Channels.newChannel(in);
+          }
+        }
+        throw new IllegalArgumentException("Cannot find " + baseName + " in " + resource);
+      } else if (fileExtension.equals("gz")) {
+        final InputStream in = resource.newBufferedInputStream();
+        final GZIPInputStream gzIn = new GZIPInputStream(in);
+        return Channels.newChannel(gzIn);
+      } else {
+        return resource.newReadableByteChannel();
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Unable to open: " + resource, e);
+    }
+  }
+
   public static void sortFilters(final List<FileNameExtensionFilter> filters) {
     Collections.sort(filters, new Comparator<FileNameExtensionFilter>() {
       @Override
@@ -197,6 +290,16 @@ public interface IoFactory extends Available {
         return filter1.getDescription().compareTo(filter2.getDescription());
       }
     });
+  }
+
+  default void addFileFilters(final List<FileNameExtensionFilter> filters) {
+    for (final String fileExtension : getFileExtensions()) {
+      final String description = getName() + " (" + fileExtension + ")";
+      final FileNameExtensionFilter filter = new FileNameExtensionFilter(description,
+        fileExtension);
+      filters.add(filter);
+
+    }
   }
 
   default String getFileExtension(final String mediaType) {
@@ -217,10 +320,36 @@ public interface IoFactory extends Available {
 
   String getName();
 
+  default Resource getZipResource(final Object source) {
+    Resource resource = Resource.getResource(source);
+    if (isReadFromZipFileSupported()) {
+      final String filename = resource.getFilename();
+      if (filename.endsWith(".zip")) {
+        final String baseName = filename.substring(0, filename.length() - 4);
+        final String url = "jar:" + resource.getUri() + "!/" + baseName;
+        final UrlResource urlResource = new UrlResource(url);
+        if (urlResource.exists()) {
+          resource = urlResource;
+        } else {
+          return null;
+        }
+      } else if (filename.endsWith(".gz")) {
+        return new GzipResource(resource);
+      } else if (filename.endsWith(getFileExtensions().get(0) + "z")) {
+        return new GzipResource(resource);
+      }
+    }
+    return resource;
+  }
+
   default void init() {
   }
 
   default boolean isReadFromDirectorySupported() {
+    return false;
+  }
+
+  default boolean isReadFromZipFileSupported() {
     return false;
   }
 

@@ -19,6 +19,7 @@ import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
@@ -28,7 +29,6 @@ import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public class SelectMapUnitsPerPixel extends JComboBox
   implements ItemListener, PropertyChangeListener, ActionListener {
@@ -158,7 +158,7 @@ public class SelectMapUnitsPerPixel extends JComboBox
           model = PROJECTED_MODEL;
         } else {
           final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-          if (geometryFactory.isGeographics()) {
+          if (geometryFactory.isGeographic()) {
             model = GEOGRAPHIC_MODEL;
           } else {
             model = PROJECTED_MODEL;

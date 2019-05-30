@@ -23,7 +23,7 @@ package com.revolsys.io.endian;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.revolsys.util.WrappedException;
+import org.jeometry.common.exception.WrappedException;
 
 public class EndianOutputStream extends OutputStream implements EndianOutput {
   private final OutputStream out;

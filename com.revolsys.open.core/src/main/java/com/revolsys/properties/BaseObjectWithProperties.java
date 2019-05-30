@@ -2,10 +2,11 @@ package com.revolsys.properties;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.util.Exceptions;
 
 public class BaseObjectWithProperties implements ObjectWithProperties {
   private MapEx properties = new LinkedHashMapEx();

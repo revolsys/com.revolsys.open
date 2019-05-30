@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -13,8 +16,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.WrappedException;
-import com.revolsys.util.number.Doubles;
 
 public class WktWriter {
 

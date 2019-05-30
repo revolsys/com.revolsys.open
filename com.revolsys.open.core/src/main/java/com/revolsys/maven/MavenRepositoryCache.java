@@ -9,15 +9,17 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.logging.Logs;
+
 import java.util.TreeMap;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Hex;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public class MavenRepositoryCache extends MavenRepository {
   private List<MavenRepository> repositories = new ArrayList<>();

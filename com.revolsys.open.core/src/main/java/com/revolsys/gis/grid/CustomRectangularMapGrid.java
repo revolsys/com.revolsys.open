@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
@@ -12,7 +14,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.number.Doubles;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   private static final double DEFAULT_TILE_SIZE = 1000;

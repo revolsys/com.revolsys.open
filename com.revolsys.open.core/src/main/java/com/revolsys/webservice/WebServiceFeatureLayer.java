@@ -3,8 +3,9 @@ package com.revolsys.webservice;
 import java.util.Collections;
 import java.util.List;
 
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.io.PathName;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;

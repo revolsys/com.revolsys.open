@@ -6,7 +6,7 @@ import java.util.Queue;
 
 public class RunnableSwingWorkerManager {
 
-  private final String description;
+  private String description;
 
   private RunnableSwingWorkerProcess process;
 
@@ -56,6 +56,10 @@ public class RunnableSwingWorkerManager {
     synchronized (this.tasks) {
       this.tasks.removeAll(tasks);
     }
+  }
+
+  public void setDescription(final String description) {
+    this.description = description;
   }
 
   @Override

@@ -34,6 +34,7 @@ import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -51,7 +52,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;

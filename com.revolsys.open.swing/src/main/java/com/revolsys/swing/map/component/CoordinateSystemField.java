@@ -9,12 +9,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.HorizontalCoordinateSystem;
 import com.revolsys.geometry.cs.HorizontalCoordinateSystemProxy;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.epsg.EpsgId;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.swing.component.BasePanel;

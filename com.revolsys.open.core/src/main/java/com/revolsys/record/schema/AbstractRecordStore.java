@@ -13,12 +13,13 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;

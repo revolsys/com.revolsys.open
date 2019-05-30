@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.WrappedException;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
@@ -26,7 +27,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
-import com.revolsys.util.WrappedException;
 
 public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 

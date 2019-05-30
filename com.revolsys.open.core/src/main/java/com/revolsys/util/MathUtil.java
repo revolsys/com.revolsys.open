@@ -22,10 +22,10 @@ import java.util.Random;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.math.Angle;
-import com.revolsys.util.number.Doubles;
 
 /**
  * The MathUtil class is a utility class for handling integer, percent and

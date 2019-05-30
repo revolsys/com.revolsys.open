@@ -2,6 +2,8 @@ package com.revolsys.util;
 
 import java.io.UnsupportedEncodingException;
 
+import org.jeometry.common.exception.Exceptions;
+
 /**
  * <p>
  * Encodes and decodes to and from Base64 notation.

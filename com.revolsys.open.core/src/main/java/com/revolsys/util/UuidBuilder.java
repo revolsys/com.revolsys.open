@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.identifier.Identifier;
 

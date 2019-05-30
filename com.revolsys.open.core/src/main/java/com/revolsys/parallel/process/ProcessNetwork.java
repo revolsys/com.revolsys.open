@@ -13,13 +13,13 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.logging.Logs;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.TargetBeanProcess;

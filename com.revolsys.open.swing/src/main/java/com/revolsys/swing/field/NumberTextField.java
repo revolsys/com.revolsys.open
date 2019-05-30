@@ -9,18 +9,18 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jdesktop.swingx.JXTextField;
+import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.BigDecimals;
+import org.jeometry.common.number.Numbers;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.BigDecimals;
-import com.revolsys.util.number.Numbers;
 
 public class NumberTextField extends JXTextField implements Field, DocumentListener, FocusListener {
   private static final long serialVersionUID = 1L;

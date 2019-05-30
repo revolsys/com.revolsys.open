@@ -1,5 +1,7 @@
 package com.revolsys.geometry.model.segment;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.HCoordinate;
@@ -20,7 +22,6 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public interface LineSegment extends LineString {
   public static int addEndPointIntersection(final double[] coordinates, final int intersectionCount,

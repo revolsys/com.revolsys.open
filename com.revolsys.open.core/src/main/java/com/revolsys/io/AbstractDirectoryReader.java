@@ -35,8 +35,9 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.PostConstruct;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.io.filter.ExtensionFilenameFilter;
-import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 

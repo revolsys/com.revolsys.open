@@ -5,9 +5,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.WrappedException;
 
 public class CsvWriter implements BaseCloseable {
   /** The writer */

@@ -22,13 +22,14 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordIo;
@@ -51,7 +52,6 @@ import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.FunctionChildrenTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
 

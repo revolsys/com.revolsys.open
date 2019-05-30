@@ -425,6 +425,37 @@ public interface Maps {
     }
   }
 
+  static <K> Integer getInteger(final Map<K, ? extends Object> map, final K name) {
+    final Object value = get(map, name);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.intValue();
+    } else {
+      final String stringValue = value.toString();
+      if (Property.hasValue(stringValue)) {
+        try {
+          return Integer.valueOf(stringValue);
+        } catch (final NumberFormatException e) {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
+  }
+
+  static <K> int getInteger(final Map<K, ? extends Object> object, final K name,
+    final int defaultValue) {
+    final Integer value = getInteger(object, name);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
   static Integer getInteger(final Map<String, ? extends Object> map, final String name) {
     final Object value = get(map, name);
     if (value == null) {

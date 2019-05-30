@@ -1,5 +1,7 @@
 package com.revolsys.swing.map;
 
+import java.awt.AlphaComposite;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -10,6 +12,7 @@ import java.beans.PropertyChangeSupport;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,6 +20,7 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
+import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.awt.CloseableAffineTransform;
@@ -28,10 +32,12 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
@@ -52,6 +58,10 @@ import tec.uom.se.unit.Units;
 public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportProxy {
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.DEFAULT.geometry();
+
+  private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle
+    .line(WebColors.Red, 1)
+    .setLineDashArray(Arrays.asList(10));
 
   public static double getScale(final Quantity<Length> viewWidth,
     final Quantity<Length> modelWidth) {
@@ -184,6 +194,17 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     setBoundingBox(boundingBox);
   }
 
+  public void drawDifferentCoordinateSystem(final BoundingBox boundingBox) {
+    if (!isSameCoordinateSystem(boundingBox)) {
+      final LinearRing ring = boundingBox.getBoundingBox()
+        .toLinearRing(this.geometryFactory, 50, 50);
+      try (
+        BaseCloseable transformCloseable = setUseModelCoordinates(true)) {
+        drawGeometryOutline(ring, STYLE_DIFFERENT_COORDINATE_SYSTEM);
+      }
+    }
+  }
+
   public void drawGeometry(final Geometry geometry, final GeometryStyle style) {
     final Graphics2D graphics = getGraphics();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -194,6 +215,43 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final Graphics2D graphics = getGraphics();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     GeometryStyleRecordLayerRenderer.renderGeometryOutline(this, graphics, geometry, style);
+  }
+
+  public void drawImage(final GeoreferencedImage image, final boolean useTransform) {
+    drawImage(image, useTransform, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+  }
+
+  public void drawImage(final GeoreferencedImage image, final boolean useTransform,
+    final double alpha, final Object interpolationMethod) {
+    final Graphics2D graphics = getGraphics();
+    if (image != null && graphics != null) {
+      final Composite composite = graphics.getComposite();
+      try (
+        BaseCloseable transformCloseable = setUseModelCoordinates(graphics, false)) {
+        AlphaComposite alphaComposite = AlphaComposite.SrcOver;
+        if (alpha < 1) {
+          alphaComposite = alphaComposite.derive((float)alpha);
+        }
+        graphics.setComposite(alphaComposite);
+        drawImage(image, useTransform, interpolationMethod);
+      } finally {
+        graphics.setComposite(composite);
+      }
+    }
+  }
+
+  public void drawImage(final GeoreferencedImage image, final boolean useTransform,
+    final Object interpolationMethod) {
+    final Graphics2D graphics = getGraphics();
+    if (image != null && graphics != null) {
+      if (interpolationMethod != null) {
+        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+      }
+      final BoundingBox viewBoundingBox = getBoundingBox();
+      final int viewWidth = getViewWidthPixels();
+      final int viewHeight = getViewHeightPixels();
+      image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, useTransform);
+    }
   }
 
   public void drawText(final LayerRecord object, final Geometry geometry, final TextStyle style) {

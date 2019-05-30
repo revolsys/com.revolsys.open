@@ -5,23 +5,24 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.logging.Logs;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
-public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
-  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
+public class WebMercatorTileCacheLayer
+  extends AbstractTiledImageLayer<WebMercatorTileCacheMapTile> {
+  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(EpsgId.WGS84);
 
   private static final BoundingBox MAX_BOUNDING_BOX = GEOMETRY_FACTORY.newBoundingBox(-180, -85,
     180, 85);
@@ -32,11 +33,13 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
 
   public WebMercatorTileCacheLayer() {
     super("webMercatorTileCacheLayer");
+    setGeometryFactory(GeometryFactory.worldMercator());
   }
 
   public WebMercatorTileCacheLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
+    setGeometryFactory(GeometryFactory.worldMercator());
   }
 
   @Override
@@ -50,23 +53,18 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
     return false;
   }
 
-  @Override
-  public BoundingBox getBoundingBox() {
-    return MAX_BOUNDING_BOX;
-  }
-
   public WebMercatorTileCacheClient getClient() {
     return this.client;
   }
 
   @Override
-  public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
-    final List<MapTile> tiles = new ArrayList<>();
+  public List<WebMercatorTileCacheMapTile> getOverlappingMapTiles(final Viewport2D view) {
+    final List<WebMercatorTileCacheMapTile> tiles = new ArrayList<>();
     try {
-      final double metresPerPixel = viewport.getUnitsPerPixel();
+      final double metresPerPixel = view.getUnitsPerPixel();
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
       final double resolution = this.client.getResolution(zoomLevel);
-      final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
+      final BoundingBox geographicBoundingBox = view.getBoundingBox()
         .bboxToCs(GEOMETRY_FACTORY)
         .bboxIntersection(MAX_BOUNDING_BOX);
       final double minX = geographicBoundingBox.getMinX();
@@ -95,8 +93,8 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public double getResolution(final Viewport2D viewport) {
-    final double metresPerPixel = viewport.getUnitsPerPixel();
+  public double getResolution(final Viewport2D view) {
+    final double metresPerPixel = view.getUnitsPerPixel();
     final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
     return this.client.getResolution(zoomLevel);
   }

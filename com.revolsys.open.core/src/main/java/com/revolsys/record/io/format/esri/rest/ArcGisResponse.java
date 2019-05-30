@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -14,7 +16,6 @@ import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 import com.revolsys.webservice.AbstractWebService;

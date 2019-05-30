@@ -1,5 +1,8 @@
 package com.revolsys.gis.esri.gdb.file;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.beans.ObjectException;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.esri.filegdb.jni.EnumRows;
@@ -9,12 +12,10 @@ import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.ValueHolderWrapper;
 

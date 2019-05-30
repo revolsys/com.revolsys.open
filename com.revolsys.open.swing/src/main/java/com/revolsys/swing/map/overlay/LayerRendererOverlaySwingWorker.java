@@ -2,8 +2,9 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.image.BufferedImage;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.Layer;

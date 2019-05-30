@@ -30,12 +30,12 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Numbers;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
-import com.revolsys.util.number.Doubles;
-import com.revolsys.util.number.Numbers;
 
 /**
  * <p>

@@ -6,11 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
-import com.revolsys.util.WrappedException;
 
 public class ResourceEndianOutput implements EndianOutput {
   private final File file;

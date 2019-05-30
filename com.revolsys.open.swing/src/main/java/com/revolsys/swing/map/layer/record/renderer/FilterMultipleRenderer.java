@@ -8,10 +8,11 @@ import java.util.Map.Entry;
 
 import javax.swing.Icon;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -23,7 +24,7 @@ import com.revolsys.util.Cancellable;
 /**
  * For each object render using the first renderer that matches the filter.
  */
-public class FilterMultipleRenderer extends AbstractMultipleRenderer {
+public class FilterMultipleRenderer extends AbstractMultipleRecordLayerRenderer {
 
   private static final Icon ICON = Icons.getIcon("style_filter");
 

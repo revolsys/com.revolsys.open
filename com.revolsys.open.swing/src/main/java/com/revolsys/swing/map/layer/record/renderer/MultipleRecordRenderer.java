@@ -6,9 +6,10 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -22,7 +23,7 @@ import com.revolsys.util.Cancellable;
  * Use all the specified renderers to render the layer. All features are
  * rendered using the first renderer, then the second etc.
  */
-public class MultipleRecordRenderer extends AbstractMultipleRenderer {
+public class MultipleRecordRenderer extends AbstractMultipleRecordLayerRenderer {
   private static final Icon ICON = Icons.getIcon("style_multiple");
 
   public MultipleRecordRenderer(final AbstractRecordLayer layer) {

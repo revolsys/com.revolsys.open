@@ -15,20 +15,30 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
+
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactory;
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.predicate.Predicates;
-import com.revolsys.util.Exceptions;
+import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public interface Resource extends org.springframework.core.io.Resource {
   static String CLASSPATH_URL_PREFIX = "classpath:";
@@ -55,6 +65,14 @@ public interface Resource extends org.springframework.core.io.Resource {
   static Resource getBaseResource(final String childPath) {
     final Resource baseResource = getBaseResource();
     return baseResource.newChildResource(childPath);
+  }
+
+  static File getOrDownloadFile(final Resource resource) {
+    if (resource == null) {
+      return null;
+    } else {
+      return resource.getOrDownloadFile();
+    }
   }
 
   static Resource getResource(final Object source) {
@@ -106,6 +124,18 @@ public interface Resource extends org.springframework.core.io.Resource {
       }
     }
     return null;
+  }
+
+  static GeoreferencedImage newGeoreferencedImage(final Object source) {
+    final Resource resource = Resource.getResource(source);
+    final GeoreferencedImageReadFactory factory = IoFactory
+      .factory(GeoreferencedImageReadFactory.class, resource);
+    if (factory == null) {
+      return null;
+    } else {
+      final GeoreferencedImage reader = factory.readGeoreferencedImage(resource);
+      return reader;
+    }
   }
 
   static Resource setBaseResource(final Resource baseResource) {
@@ -221,6 +251,36 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
+  default File getOrDownloadFile() {
+    try {
+      return getFile();
+    } catch (final Throwable e) {
+      if (exists()) {
+        final String baseName = getBaseName();
+        final String fileNameExtension = getFileNameExtension();
+        final File file = FileUtil.newTempFile(baseName, "." + fileNameExtension);
+        try (
+          InputStream inputStream = getInputStream()) {
+          FileUtil.copy(inputStream, file);
+        } catch (final IOException e1) {
+          throw Exceptions.wrap("Error downloading: " + this, e1);
+        }
+        return file;
+      } else {
+        throw new IllegalArgumentException("Cannot get File for resource " + this, e);
+      }
+    }
+  }
+
+  default <R> R getOrDownloadFile(final Function<File, R> factory) {
+    final File file = getOrDownloadFile();
+    if (file == null) {
+      return null;
+    } else {
+      return factory.apply(file);
+    }
+  }
+
   default Resource getParent() {
     return null;
   }
@@ -260,6 +320,11 @@ public interface Resource extends org.springframework.core.io.Resource {
     return new BufferedInputStream(in);
   }
 
+  default <IS, IS2 extends IS> IS newBufferedInputStream(final Function<InputStream, IS2> factory) {
+    final InputStream out = newBufferedInputStream();
+    return factory.apply(out);
+  }
+
   default OutputStream newBufferedOutputStream() {
     final OutputStream out = newOutputStream();
     return new BufferedOutputStream(out);
@@ -268,6 +333,32 @@ public interface Resource extends org.springframework.core.io.Resource {
   default BufferedReader newBufferedReader() {
     final Reader in = newReader();
     return new BufferedReader(in);
+  }
+
+  default ChannelReader newChannelReader() {
+    return newChannelReader(8192, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelReader newChannelReader(final ByteBuffer byteBuffer) {
+    final ReadableByteChannel in = newReadableByteChannel();
+    if (in == null) {
+      return null;
+    } else {
+      return new ChannelReader(in, byteBuffer);
+    }
+  }
+
+  default ChannelReader newChannelReader(final int capacity) {
+    return newChannelReader(capacity, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelReader newChannelReader(final int capacity, final ByteOrder byteOrder) {
+    final ReadableByteChannel in = newReadableByteChannel();
+    if (in == null) {
+      return null;
+    } else {
+      return new ChannelReader(in, capacity, byteOrder);
+    }
   }
 
   default Resource newChildResource(final CharSequence childPath) {
@@ -302,6 +393,15 @@ public interface Resource extends org.springframework.core.io.Resource {
   default PrintWriter newPrintWriter() {
     final Writer writer = newWriter();
     return new PrintWriter(writer);
+  }
+
+  default ReadableByteChannel newReadableByteChannel() {
+    final InputStream in = newInputStream();
+    if (in == null) {
+      return null;
+    } else {
+      return Channels.newChannel(in);
+    }
   }
 
   default Reader newReader() {

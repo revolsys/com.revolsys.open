@@ -10,12 +10,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.io.format.RasterWriter;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.WrappedException;
 
 public class UsgsDemGeoreferencedImage extends BufferedGeoreferencedImage {
 

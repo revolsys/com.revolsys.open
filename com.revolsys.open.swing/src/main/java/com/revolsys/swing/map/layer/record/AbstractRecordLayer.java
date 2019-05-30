@@ -37,6 +37,8 @@ import javax.swing.undo.UndoableEdit;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -57,10 +59,8 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.PathName;
-import com.revolsys.io.file.FileNameExtensionFilter;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -103,7 +103,7 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.component.MergeRecordsDialog;
-import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MultipleRecordRenderer;
@@ -508,9 +508,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public int addRenderer(final LayerRenderer<?> child, final int index) {
     final AbstractRecordLayerRenderer oldRenderer = getRenderer();
-    AbstractMultipleRenderer rendererGroup;
-    if (oldRenderer instanceof AbstractMultipleRenderer) {
-      rendererGroup = (AbstractMultipleRenderer)oldRenderer;
+    AbstractMultipleRecordLayerRenderer rendererGroup;
+    if (oldRenderer instanceof AbstractMultipleRecordLayerRenderer) {
+      rendererGroup = (AbstractMultipleRecordLayerRenderer)oldRenderer;
     } else {
       final AbstractRecordLayer layer = oldRenderer.getLayer();
       rendererGroup = new MultipleRecordRenderer(layer);

@@ -21,11 +21,11 @@ import javax.sql.DataSource;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;

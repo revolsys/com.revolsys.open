@@ -1,5 +1,7 @@
 package com.revolsys.geometry.model.coordinates;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.algorithm.RobustDeterminant;
@@ -9,7 +11,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
-import com.revolsys.util.number.Doubles;
 
 public class CoordinatesUtil {
 

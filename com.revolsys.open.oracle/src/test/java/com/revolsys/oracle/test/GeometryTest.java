@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,7 +13,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.util.GeometryTestUtil;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;

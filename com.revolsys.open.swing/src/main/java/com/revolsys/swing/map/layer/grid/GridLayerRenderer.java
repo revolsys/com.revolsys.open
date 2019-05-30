@@ -8,7 +8,8 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;

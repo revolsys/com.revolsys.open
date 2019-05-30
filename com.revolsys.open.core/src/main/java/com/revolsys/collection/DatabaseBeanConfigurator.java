@@ -8,11 +8,11 @@ import javax.sql.DataSource;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.logging.Logs;
 import com.revolsys.spring.config.BeanConfigurrer;
 import com.revolsys.util.Property;
 

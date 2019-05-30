@@ -3,7 +3,8 @@ package com.revolsys.swing.map.overlay;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.swing.map.Viewport2D;

@@ -23,6 +23,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -31,7 +32,6 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.FieldSupport;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.Exceptions;
 
 public class ValueField extends JPanel implements Field {
   private static final long serialVersionUID = 1L;

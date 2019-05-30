@@ -5,9 +5,10 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -20,7 +21,7 @@ import com.revolsys.util.Cancellable;
  * Use the first renderer which is visible at the current scale, ignore all
  * others. Changes when the scale changes.
  */
-public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
+public class ScaleMultipleRenderer extends AbstractMultipleRecordLayerRenderer {
   private static final Icon ICON = Icons.getIcon("style_scale");
 
   private transient long lastScale = 0;

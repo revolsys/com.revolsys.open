@@ -9,10 +9,11 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
 import com.revolsys.record.io.format.esri.rest.map.FeatureService;

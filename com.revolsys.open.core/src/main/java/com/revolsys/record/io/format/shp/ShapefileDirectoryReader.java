@@ -6,8 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.io.AbstractDirectoryReader;
-import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;

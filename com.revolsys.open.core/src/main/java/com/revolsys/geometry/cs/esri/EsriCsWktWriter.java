@@ -6,6 +6,8 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Map.Entry;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.geometry.cs.AngularUnit;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.Datum;
@@ -15,7 +17,6 @@ import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Projection;
 import com.revolsys.geometry.cs.Spheroid;
-import com.revolsys.util.WrappedException;
 
 public class EsriCsWktWriter {
 

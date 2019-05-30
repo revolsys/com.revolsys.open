@@ -54,6 +54,9 @@ import javax.measure.quantity.Length;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypeProxy;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.geometry.algorithm.Centroid;
 import com.revolsys.geometry.algorithm.ConvexHull;
@@ -80,7 +83,7 @@ import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
+import com.revolsys.util.function.BiConsumerDouble;
 
 /**
  * A representation of a planar, linear vector geometry.
@@ -198,7 +201,7 @@ import com.revolsys.util.number.Doubles;
  *
  *@version 1.7
  */
-public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, GeometryFactoryProxy,
+public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, BoundingBoxProxy,
   Serializable, DataTypeProxy, Shape {
 
   /**
@@ -395,6 +398,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   <V extends Geometry> V appendVertex(Point newPoint, int... geometryId);
+
+  default void applyCoordinatesOperation(final CoordinatesOperation operation,
+    final BiConsumerDouble action) {
+    final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+    for (final Vertex vertex : vertices()) {
+      point.setPoint(vertex);
+      operation.perform(point);
+      point.apply2d(action);
+    }
+  }
 
   @SuppressWarnings("unchecked")
   default <GIN extends Geometry, GRET extends Geometry> GRET applyGeometry(
@@ -1165,10 +1178,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return 0.0;
   }
 
-  default int getAxisCount() {
-    return getGeometryFactory().getAxisCount();
-  }
-
   /**
    * Returns the boundary, or an empty geometry of appropriate dimension
    * if this <code>Geometry</code>  is empty.
@@ -1207,6 +1216,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    *@return the boundingBox of this <code>Geometry</code>.
    *@return an empty BoundingBox if this Geometry is empty
    */
+  @Override
   default BoundingBox getBoundingBox() {
     return newBoundingBox();
   }
@@ -1373,6 +1383,11 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     } else {
       return 1;
     }
+  }
+
+  @Override
+  default GeometryFactory getGeometryFactory() {
+    return GeometryFactory.DEFAULT_2D;
   }
 
   /**

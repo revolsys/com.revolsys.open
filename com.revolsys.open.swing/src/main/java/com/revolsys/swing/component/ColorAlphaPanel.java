@@ -14,7 +14,8 @@ import javax.swing.colorchooser.ColorSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.swing.layout.GroupLayouts;
 
 public class ColorAlphaPanel extends AbstractColorChooserPanel implements ChangeListener {

@@ -39,6 +39,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.set.Sets;
 import com.revolsys.geometry.model.BoundingBox;
@@ -47,7 +48,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
-import com.revolsys.logging.Logs;
 import com.revolsys.process.JavaProcess;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;

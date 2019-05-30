@@ -11,6 +11,8 @@ import org.gdal.ogr.FieldDefn;
 import org.gdal.ogr.GeomFieldDefn;
 import org.gdal.ogr.Layer;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Integers;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -20,14 +22,12 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.number.Integers;
 
 public class OgrRecordWriter extends AbstractRecordWriter {
   private DataSource dataSource;

@@ -72,7 +72,8 @@ public class OgcWmsImageLayerRenderer extends AbstractLayerRenderer<OgcWmsImageL
         } else if (this.image != null) {
           final Graphics2D graphics = viewport.getGraphics();
           if (graphics != null) {
-            GeoreferencedImageLayerRenderer.render(viewport, graphics, this.image, false);
+            final GeoreferencedImage image1 = this.image;
+            viewport.drawImage(image1, false);
           }
         }
       }

@@ -3,8 +3,9 @@ package com.revolsys.gis.postgresql.type;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.io.endian.EndianInputStream;
-import com.revolsys.util.Exceptions;
 
 public abstract class ValueGetter {
   protected static class BigEndian extends ValueGetter {

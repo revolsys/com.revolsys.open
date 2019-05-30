@@ -9,8 +9,9 @@ import java.awt.print.PrinterJob;
 import javax.print.PrintService;
 import javax.swing.Icon;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.map.Viewport2D;

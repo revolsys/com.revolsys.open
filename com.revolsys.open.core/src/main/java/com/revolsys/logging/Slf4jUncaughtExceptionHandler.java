@@ -2,6 +2,8 @@ package com.revolsys.logging;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
+import org.jeometry.common.logging.Logs;
+
 public class Slf4jUncaughtExceptionHandler implements UncaughtExceptionHandler {
   static {
     Thread.setDefaultUncaughtExceptionHandler(new Slf4jUncaughtExceptionHandler());

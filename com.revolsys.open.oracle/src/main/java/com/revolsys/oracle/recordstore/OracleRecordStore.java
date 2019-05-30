@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
@@ -29,7 +30,6 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
-import com.revolsys.logging.Logs;
 import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryRecordStoreExtension;
 import com.revolsys.oracle.recordstore.field.OracleBlobFieldAdder;

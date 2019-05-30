@@ -2,11 +2,12 @@ package com.revolsys.webservice;
 
 import java.io.File;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.io.connection.ConnectionRegistryManager;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 

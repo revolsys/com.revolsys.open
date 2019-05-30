@@ -7,7 +7,8 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.swing.WindowManager;
 import com.revolsys.swing.parallel.Invoke;
 

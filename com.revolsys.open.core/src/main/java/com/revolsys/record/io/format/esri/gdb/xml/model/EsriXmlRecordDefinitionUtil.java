@@ -6,13 +6,13 @@ import java.util.List;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;

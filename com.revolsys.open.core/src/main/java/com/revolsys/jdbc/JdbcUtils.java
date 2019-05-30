@@ -20,17 +20,17 @@ import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
-import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;

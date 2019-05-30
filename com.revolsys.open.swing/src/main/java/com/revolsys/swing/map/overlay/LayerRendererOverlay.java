@@ -3,6 +3,7 @@ package com.revolsys.swing.map.overlay;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
@@ -21,8 +22,7 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
-import com.revolsys.swing.map.layer.raster.TiledImageLayerRenderer;
+import com.revolsys.swing.map.layer.raster.TiledGeoreferencedImageLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -110,7 +110,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
       final String propertyName = e.getPropertyName();
       if (!IGNORE_PROPERTY_NAMES.contains(propertyName)) {
         if (this.layer instanceof Project) {
-          if (TiledImageLayerRenderer.TILES_LOADED.equals(propertyName)) {
+          if (TiledGeoreferencedImageLayerRenderer.TILES_LOADED.equals(propertyName)) {
             return;
           }
         }
@@ -144,7 +144,14 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
   }
 
   private void render(final Graphics2D graphics) {
-    GeoreferencedImageLayerRenderer.render(this.viewport, graphics, this.image, false);
+    if (this.image != null && graphics != null) {
+      final BoundingBox viewBoundingBox = this.viewport.getBoundingBox();
+      final int viewWidth = this.viewport.getViewWidthPixels();
+      final int viewHeight = this.viewport.getViewHeightPixels();
+      graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+        RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      this.image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, false);
+    }
   }
 
   public void setImage(final LayerRendererOverlaySwingWorker imageWorker) {

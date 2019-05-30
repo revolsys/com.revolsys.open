@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import com.revolsys.util.Exceptions;
+import org.jeometry.common.exception.Exceptions;
 
 /**
  *  Useful string utilities

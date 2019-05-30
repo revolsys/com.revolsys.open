@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
@@ -22,7 +23,6 @@ import com.revolsys.identifier.Identifiable;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.ListIdentifier;
 import com.revolsys.identifier.TypedIdentifier;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;

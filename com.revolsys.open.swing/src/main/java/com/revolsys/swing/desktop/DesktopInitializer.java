@@ -10,7 +10,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.preferences.PreferencesDialog;

@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.mapguide;
 
-import com.revolsys.io.PathName;
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.record.io.format.mapguide.FeatureLayer;
 import com.revolsys.swing.map.layer.AbstractLayer;

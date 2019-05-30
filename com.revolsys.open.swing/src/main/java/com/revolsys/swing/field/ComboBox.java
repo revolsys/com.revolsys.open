@@ -20,8 +20,8 @@ import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Strings;
 
 public class ComboBox<T> extends JComboBox<T> implements Field, KeyListener {

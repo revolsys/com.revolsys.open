@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.io.PathName;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.ResultPager;
@@ -13,7 +14,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;

@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
@@ -33,7 +34,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.ResourceEndianOutput;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xbase.XBaseFieldDefinition;
 import com.revolsys.record.io.format.xbase.XbaseRecordWriter;

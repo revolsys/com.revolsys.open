@@ -7,11 +7,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.io.PathName;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.io.PathName;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;

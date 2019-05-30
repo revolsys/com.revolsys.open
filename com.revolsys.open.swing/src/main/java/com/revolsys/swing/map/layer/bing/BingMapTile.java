@@ -2,19 +2,20 @@ package com.revolsys.swing.map.layer.bing;
 
 import java.awt.image.BufferedImage;
 
-import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.swing.map.layer.raster.GeoreferencedImageMapTile;
 
-public class BingMapTile extends MapTile {
+public class BingMapTile extends GeoreferencedImageMapTile {
 
   private final BingLayer layer;
 
   private final String quadKey;
 
-  public BingMapTile(final BingLayer layer, final int zoomLevel, final double resolution,
-    final int tileX, final int tileY) {
-    super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256, resolution);
+  public BingMapTile(final BingLayer layer, final BoundingBox boundingBox, final String quadKey,
+    final double resolution) {
+    super(boundingBox, 256, 256, resolution);
     this.layer = layer;
-    this.quadKey = layer.getClient().getQuadKey(zoomLevel, tileX, tileY);
+    this.quadKey = quadKey;
   }
 
   @Override
@@ -41,14 +42,15 @@ public class BingMapTile extends MapTile {
 
   @Override
   public BufferedImage loadBuffferedImage() {
+    BingLayer layer = this.layer;
     try {
-      final BingClient client = this.layer.getClient();
-      final ImagerySet imagerySet = this.layer.getImagerySet();
-      final MapLayer mapLayer = this.layer.getMapLayer();
+      final BingClient client = layer.getClient();
+      final ImagerySet imagerySet = layer.getImagerySet();
+      final MapLayer mapLayer = layer.getMapLayer();
       final BufferedImage image = client.getMapImage(imagerySet, mapLayer, this.quadKey);
       return image;
     } catch (final Throwable t) {
-      this.layer.setError(t);
+      layer.setError(t);
       return null;
     }
   }

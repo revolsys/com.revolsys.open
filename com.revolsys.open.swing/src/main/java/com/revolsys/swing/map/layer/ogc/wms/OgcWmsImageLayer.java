@@ -5,17 +5,17 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceConnectionManager;
 

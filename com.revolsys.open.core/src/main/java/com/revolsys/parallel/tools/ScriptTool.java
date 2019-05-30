@@ -25,6 +25,7 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.jeometry.common.logging.Logs;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.MethodInvocationException;
 import org.springframework.beans.PropertyAccessException;
@@ -36,7 +37,6 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
 import com.revolsys.collection.map.ThreadSharedProperties;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.ManifestUtil;

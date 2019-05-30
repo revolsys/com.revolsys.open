@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -18,7 +20,6 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 public class OpenStreetMapApiLayer extends AbstractRecordLayer {
 

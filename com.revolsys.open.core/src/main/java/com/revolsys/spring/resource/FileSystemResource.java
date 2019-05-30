@@ -27,11 +27,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
+import org.jeometry.common.exception.WrappedException;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import com.revolsys.util.WrappedException;
 
 /**
  * {@link Resource} implementation for {@code java.io.File} handles.

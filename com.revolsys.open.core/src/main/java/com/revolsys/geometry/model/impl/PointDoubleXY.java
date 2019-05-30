@@ -1,8 +1,9 @@
 package com.revolsys.geometry.model.impl;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.number.Doubles;
 
 public class PointDoubleXY extends AbstractPoint {
   private static final long serialVersionUID = 1L;

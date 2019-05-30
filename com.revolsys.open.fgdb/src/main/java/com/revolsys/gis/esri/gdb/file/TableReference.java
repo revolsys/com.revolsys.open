@@ -3,11 +3,12 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.esri.filegdb.jni.EnumRows;
 import com.revolsys.esri.filegdb.jni.Geodatabase;
 import com.revolsys.esri.filegdb.jni.Table;
-import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.util.CloseableValueHolder;
 import com.revolsys.util.ValueHolder;
 import com.revolsys.util.ValueWrapper;

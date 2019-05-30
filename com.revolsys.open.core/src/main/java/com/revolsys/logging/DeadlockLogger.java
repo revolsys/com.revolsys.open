@@ -7,6 +7,8 @@ import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 
+import org.jeometry.common.logging.Logs;
+
 public class DeadlockLogger implements Runnable {
   private static final int WAIT_TIME = 60000;
 

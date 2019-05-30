@@ -5,8 +5,8 @@ import java.awt.Component;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jeometry.common.awt.WebColors;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.record.Record;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.table.record.RecordRowTable;

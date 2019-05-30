@@ -1,5 +1,7 @@
 package com.revolsys.geometry.cs.projection;
 
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+
 public class DegreesToRadiansOperation implements CoordinatesOperation {
   public static final DegreesToRadiansOperation INSTANCE = new DegreesToRadiansOperation();
 

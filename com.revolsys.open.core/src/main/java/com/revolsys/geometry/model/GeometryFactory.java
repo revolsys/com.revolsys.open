@@ -44,6 +44,8 @@ import java.util.Set;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.IntHashMap;
@@ -56,10 +58,10 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
@@ -79,7 +81,6 @@ import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 /**
  * Supplies a set of utility methods for building Geometry objects from lists
@@ -317,6 +318,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return fixed(coordinateSystemId, 0.0, 0.0);
   }
 
+  public static GeometryFactory floating3d(final int srid) {
+    return fixed(srid, 0.0, 0.0);
+  }
+
+  public static GeometryFactory floating3d(final String wkt) {
+    return floating(wkt, 3);
+  }
+
   public static GeometryFactory get(final Object factory) {
     if (factory instanceof GeometryFactory) {
       return (GeometryFactory)factory;
@@ -458,6 +467,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         }
       }
     }
+  }
+
+  public BoundingBoxEditor bboxEditor() {
+    return new BoundingBoxEditor(this);
   }
 
   public BoundingBox bboxEmpty() {
@@ -843,6 +856,16 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  @Override
+  public BoundingBox getAreaBoundingBox() {
+    if (this.coordinateSystem == null) {
+      return BoundingBox.empty();
+    } else {
+      return this.coordinateSystem.getAreaBoundingBox();
+    }
+  }
+
+  @Override
   public int getAxisCount() {
     return this.axisCount;
   }
@@ -1107,7 +1130,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return getScale(0) == 0;
   }
 
-  public boolean isGeographics() {
+  public boolean isGeographic() {
     return this.coordinateSystem instanceof GeographicCoordinateSystem;
   }
 

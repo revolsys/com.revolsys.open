@@ -9,12 +9,12 @@ import java.util.Map.Entry;
 
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.MapContext;
+import org.jeometry.common.io.PathName;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
-import com.revolsys.io.PathName;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.ArrayRecord;

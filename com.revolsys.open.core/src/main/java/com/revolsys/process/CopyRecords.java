@@ -3,9 +3,10 @@ package com.revolsys.process;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathName;
-import com.revolsys.logging.Logs;
 import com.revolsys.parallel.process.AbstractProcess;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;

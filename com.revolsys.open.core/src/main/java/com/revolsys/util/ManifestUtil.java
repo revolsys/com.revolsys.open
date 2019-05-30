@@ -6,10 +6,12 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
+
+import org.jeometry.common.logging.Logs;
+
 import java.util.jar.Manifest;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.logging.Logs;
 
 public class ManifestUtil {
 

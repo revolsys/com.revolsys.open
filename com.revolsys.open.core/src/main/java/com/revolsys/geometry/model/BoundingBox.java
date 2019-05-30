@@ -16,10 +16,13 @@ import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -28,15 +31,12 @@ import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.function.Consumer3;
-import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;
@@ -479,8 +479,8 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
     return !(x1 > maxX || x2 < minX || y1 > maxY || y2 < minY);
   }
 
-  default BoundingBox bboxToCs(final GeometryFactory geometryFactory) {
-    return convert(geometryFactory);
+  default BoundingBox bboxToCs(final GeometryFactoryProxy geometryFactory) {
+    return convert(geometryFactory.getGeometryFactory());
   }
 
   default String bboxToEWkt() {
@@ -1038,6 +1038,7 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
     return aspectRatio;
   }
 
+  @Override
   int getAxisCount();
 
   default Point getBottomLeftPoint() {
@@ -1448,6 +1449,10 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
     return false;
   }
 
+  default boolean isBboxEmpty() {
+    return isEmpty();
+  }
+
   default boolean isWithinDistance(final BoundingBox boundingBox, final double maxDistance) {
     final double distance = boundingBox.distance(boundingBox);
     if (distance < maxDistance) {
@@ -1520,6 +1525,128 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
       } else {
         return geometryFactory.polygon(geometryFactory.linearRing(2, minX, minY, minX, maxY, maxX,
           maxY, maxX, minY, minX, minY));
+      }
+    }
+  }
+
+  default LinearRing toLinearRing() {
+    final double minX = getMinX();
+    final double minY = getMinY();
+    final double maxX = getMaxX();
+    final double maxY = getMaxY();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.linearRing(2, //
+      minX, minY, //
+      maxX, minY, //
+      maxX, maxY, //
+      minX, maxY, //
+      minX, minY //
+    );
+  }
+
+  default LinearRing toLinearRing(GeometryFactory geometryFactory, int numX, int numY) {
+    if (isEmpty()) {
+      return geometryFactory.linearRing();
+    } else {
+      final GeometryFactory factory = getGeometryFactory();
+      if (geometryFactory == null) {
+        if (factory == null) {
+          geometryFactory = GeometryFactory.floating2d(0);
+        } else {
+          geometryFactory = factory;
+        }
+      }
+      if (numX == 0 && numY == 0) {
+        return toLinearRing();
+      } else {
+        try {
+          double minStep = 0.00001;
+          if (factory.isProjected()) {
+            minStep = 1;
+          } else {
+            minStep = 0.00001;
+          }
+
+          double xStep;
+          final double width = getWidth();
+          if (!Double.isFinite(width)) {
+            return geometryFactory.linearRing();
+          } else if (numX <= 1) {
+            numX = 1;
+            xStep = width;
+          } else {
+            xStep = width / numX;
+            if (xStep < minStep) {
+              xStep = minStep;
+            }
+            numX = Math.max(1, (int)Math.ceil(width / xStep));
+          }
+
+          double yStep;
+          if (numY <= 1) {
+            numY = 1;
+            yStep = getHeight();
+          } else {
+            yStep = getHeight() / numY;
+            if (yStep < minStep) {
+              yStep = minStep;
+            }
+            numY = Math.max(1, (int)Math.ceil(getHeight() / yStep));
+          }
+
+          final double minX = getMinX();
+          final double maxX = getMaxX();
+          final double minY = getMinY();
+          final double maxY = getMaxY();
+          final int coordinateCount = 1 + 2 * (numX + numY);
+          final double[] coordinates = new double[coordinateCount * 2];
+          int i = 0;
+
+          coordinates[i++] = minX;
+          coordinates[i++] = minY;
+          for (int j = 1; j < numX; j++) {
+            final double x = minX + j * xStep;
+            coordinates[i++] = x;
+            coordinates[i++] = minY;
+          }
+          coordinates[i++] = maxX;
+          coordinates[i++] = minY;
+
+          for (int j = 1; j < numY; j++) {
+            final double y = minY + j * yStep;
+            coordinates[i++] = maxX;
+            coordinates[i++] = y;
+          }
+          coordinates[i++] = maxX;
+          coordinates[i++] = maxY;
+
+          for (int j = numX - 1; j > 0; j--) {
+            final double x = minX + j * xStep;
+            coordinates[i++] = x;
+            coordinates[i++] = maxY;
+          }
+
+          coordinates[i++] = minX;
+          coordinates[i++] = maxY;
+
+          for (int j = numY - 1; j > 0; j--) {
+            final double y = minY + j * yStep;
+            coordinates[i++] = minX;
+            coordinates[i++] = y;
+          }
+          coordinates[i++] = minX;
+          coordinates[i++] = minY;
+
+          final LinearRing ring = factory.linearRing(2, coordinates);
+          if (geometryFactory == null) {
+            return ring;
+          } else {
+            return ring.as2d(geometryFactory);
+          }
+        } catch (final IllegalArgumentException e) {
+          Logs.error(this, "Unable to convert to linearRing: " + this, e);
+          return geometryFactory.linearRing();
+        }
       }
     }
   }

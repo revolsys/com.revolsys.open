@@ -32,6 +32,8 @@
  */
 package com.revolsys.geometry.geomgraph;
 
+import org.jeometry.common.exception.WrappedException;
+
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.geomgraph.index.MonotoneChainEdge;
 import com.revolsys.geometry.model.BoundingBox;
@@ -41,7 +43,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.util.WrappedException;
 
 /**
  * @version 1.7

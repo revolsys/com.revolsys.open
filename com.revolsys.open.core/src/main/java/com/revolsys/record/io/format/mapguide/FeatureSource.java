@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -16,7 +17,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Debug;

@@ -1,6 +1,6 @@
 package com.revolsys.collection.range;
 
-import com.revolsys.util.number.Numbers;
+import org.jeometry.common.number.Numbers;
 
 public class LongPaddedRange extends AbstractRange<String> {
   private byte digitCount;

@@ -13,7 +13,8 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import com.revolsys.awt.WebColors;
+import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
@@ -374,7 +375,7 @@ public class GeometryStyle extends MarkerStyle {
     firePropertyChange("lineCompOp", oldValue, this.lineCompOp);
   }
 
-  public void setLineDashArray(final List<?> lineDashArray) {
+  public GeometryStyle setLineDashArray(final List<?> lineDashArray) {
     final Object oldValue = this.lineDashArray;
     final List<Double> dashArray = new ArrayList<>();
     if (lineDashArray != null) {
@@ -389,6 +390,7 @@ public class GeometryStyle extends MarkerStyle {
     }
     this.lineDashArray = Collections.unmodifiableList(dashArray);
     firePropertyChange("lineDashArray", oldValue, this.lineDashArray);
+    return this;
   }
 
   public void setLineDashOffset(final double lineDashOffset) {

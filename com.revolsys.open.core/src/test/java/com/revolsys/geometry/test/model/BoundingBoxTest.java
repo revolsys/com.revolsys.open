@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.measure.Unit;
 
+import org.jeometry.common.number.Doubles;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,7 +20,6 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.test.TestConstants;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.QuantityType;
-import com.revolsys.util.number.Doubles;
 
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;

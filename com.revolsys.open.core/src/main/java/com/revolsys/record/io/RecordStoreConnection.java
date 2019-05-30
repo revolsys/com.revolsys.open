@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.connection.AbstractConnection;
@@ -11,7 +13,6 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.Function2;
 

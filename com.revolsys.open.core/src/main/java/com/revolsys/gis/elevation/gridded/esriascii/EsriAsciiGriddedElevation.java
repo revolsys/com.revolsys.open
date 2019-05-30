@@ -3,6 +3,10 @@ package com.revolsys.gis.elevation.gridded.esriascii;
 import java.io.BufferedReader;
 import java.util.Map;
 
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.BigDecimals;
+import org.jeometry.common.number.Floats;
+
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -14,9 +18,6 @@ import com.revolsys.gis.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.Readers;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
-import com.revolsys.util.number.BigDecimals;
-import com.revolsys.util.number.Floats;
 
 public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
   implements GriddedElevationModelFactory, GriddedElevationModelWriterFactory {

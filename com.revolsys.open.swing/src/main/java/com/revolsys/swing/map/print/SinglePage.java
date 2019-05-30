@@ -13,8 +13,9 @@ import java.awt.print.PrinterJob;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.GraphicsViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;

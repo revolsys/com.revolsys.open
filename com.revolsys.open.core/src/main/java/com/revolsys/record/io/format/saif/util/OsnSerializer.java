@@ -36,13 +36,13 @@ import java.util.Set;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.EnumerationDataType;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.io.FileUtil;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.saif.SaifConstants;
 import com.revolsys.record.schema.RecordDefinition;

@@ -14,8 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jeometry.common.data.type.DataTypes;
-
-import com.revolsys.logging.Logs;
+import org.jeometry.common.logging.Logs;
 
 public interface Dates {
   String DATE_TIME_NANOS_PATTERN = "\\s*(\\d{4})-(\\d{2})-(\\d{2})(?:[\\sT]+(\\d{2})\\:(\\d{2})\\:(\\d{2})(?:\\.(\\d{1,9}))?)?\\s*";

@@ -9,9 +9,8 @@ import org.apache.batik.ext.awt.RenderingHintsKeyExt;
 import org.apache.batik.transcoder.SVGAbstractTranscoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderOutput;
+import org.jeometry.common.logging.Logs;
 import org.w3c.dom.Document;
-
-import com.revolsys.logging.Logs;
 
 public class Graphics2DTranscoder extends SVGAbstractTranscoder {
   private final Graphics2D graphics;

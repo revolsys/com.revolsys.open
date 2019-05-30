@@ -11,10 +11,11 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.IoFactory;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;

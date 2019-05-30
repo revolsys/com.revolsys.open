@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.WrappedException;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.WrappedException;
 
 public class CsvMapWriter extends AbstractMapWriter {
   private List<String> fieldNames;

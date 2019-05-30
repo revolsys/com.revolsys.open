@@ -13,16 +13,16 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.logging.Logs;
-import com.revolsys.raster.JaiGeoreferencedImage;
+import com.revolsys.raster.AbstractGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 
-public class PdfImage extends JaiGeoreferencedImage {
+public class PdfImage extends AbstractGeoreferencedImage {
 
   public PdfImage(final Resource imageResource) {
+    super("pfw");
     setImageResource(imageResource);
     setRenderedImage(newBufferedImage());
     if (!hasGeometryFactory()) {
@@ -34,18 +34,20 @@ public class PdfImage extends JaiGeoreferencedImage {
   }
 
   @Override
-  public String getWorldFileExtension() {
-    return "pfw";
+  public void cancelChanges() {
+    if (getImageResource() != null) {
+      loadImageMetaData();
+      setHasChanges(false);
+    }
   }
 
   protected BufferedImage newBufferedImage() {
     final Resource imageResource = getImageResource();
     try {
-      final File file = SpringUtil.getOrDownloadFile(imageResource);
+      final File file = Resource.getOrDownloadFile(imageResource);
       // TODO password support
       final PDDocument document = PDDocument.load(file);
 
-      @SuppressWarnings("unchecked")
       final PDPageTree pages = document.getDocumentCatalog().getPages();
       final int pageCount = pages.getCount();
       if (pageCount == 0) {
@@ -81,7 +83,8 @@ public class PdfImage extends JaiGeoreferencedImage {
           }
           final BoundingBox boundingBox = PdfUtil.getViewportBoundingBox(viewport);
           setBoundingBox(boundingBox);
-          setResolution(boundingBox.getWidth() / image.getWidth());
+          setResolutionX(boundingBox.getWidth() / image.getWidth());
+          setResolutionY(boundingBox.getHeight() / image.getHeight());
         }
         return image;
       }
