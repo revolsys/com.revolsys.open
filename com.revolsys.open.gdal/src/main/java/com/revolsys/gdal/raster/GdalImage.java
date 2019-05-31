@@ -107,11 +107,8 @@ public class GdalImage extends AbstractGeoreferencedImage {
         final double newMinY = newMaxY - clipHeight / scaleY;
         final BoundingBox newBoundingBox = getGeometryFactory().newBoundingBox(newMinX, newMinY,
           newMaxX, newMaxY);
-        final BufferedImage image = new BufferedImage(targetWidth, targetHeight,
-          BufferedImage.TYPE_INT_ARGB);
-        image.getGraphics().drawImage(bufferedImage, 0, 0, targetWidth, targetHeight, null);
-
-        final GeoreferencedImage newImage = new BufferedGeoreferencedImage(newBoundingBox, image);
+        final GeoreferencedImage newImage = new BufferedGeoreferencedImage(newBoundingBox,
+          bufferedImage);
         newImage.drawImage(renderer, viewBoundingBox, viewWidth, viewHeight, useTransform);
       }
 

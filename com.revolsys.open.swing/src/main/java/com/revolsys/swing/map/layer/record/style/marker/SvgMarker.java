@@ -83,7 +83,7 @@ public class SvgMarker extends AbstractMarker {
       try {
         final Document document = getDocument();
         icon = new SvgIcon(document, 16, 16);
-        this.icon = new WeakReference<Icon>(icon);
+        this.icon = new WeakReference<>(icon);
       } catch (final TranscoderException e) {
       }
     }

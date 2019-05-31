@@ -21,7 +21,9 @@ import com.revolsys.spring.resource.Resource;
 
 public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory {
   public static final String GPX_NS = "gpx";
+
   public static final String GPX_NS_URI = "http://www.topografix.com/GPX/1/1";
+
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(EpsgId.WGS84);
 
   public Gpx() {

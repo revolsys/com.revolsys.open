@@ -16,12 +16,12 @@ public class PdfImageFactory extends AbstractIoFactory
   }
 
   @Override
-  public GeoreferencedImage readGeoreferencedImage(final Resource resource) {
-    return new PdfImage(resource);
+  public GeoreferencedImageWriter newGeoreferencedImageWriter(final Resource resource) {
+    return new PdfImageWriter(resource);
   }
 
   @Override
-  public GeoreferencedImageWriter newGeoreferencedImageWriter(final Resource resource) {
-    return new PdfImageWriter(resource);
+  public GeoreferencedImage readGeoreferencedImage(final Resource resource) {
+    return new PdfImage(resource);
   }
 }

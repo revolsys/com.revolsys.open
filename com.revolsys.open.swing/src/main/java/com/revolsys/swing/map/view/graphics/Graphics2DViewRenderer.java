@@ -844,7 +844,7 @@ public class Graphics2DViewRenderer extends ViewRenderer {
     final Supplier<V> constructor) {
     if (isBackgroundDrawingEnabled()) {
       final Supplier<Future<V>> futureConstructor = () -> {
-        final SwingWorker<V, Void> worker = new AbstractSwingWorker<V, Void>() {
+        final SwingWorker<V, Void> worker = new AbstractSwingWorker<>() {
           @Override
           public String getTaskTitle() {
             return taskName;

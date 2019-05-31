@@ -513,6 +513,7 @@ public interface BoundingBox
     return !(x1 > maxX || x2 < minX || y1 > maxY || y2 < minY);
   }
 
+  @Override
   default BoundingBox bboxToCs(final GeometryFactoryProxy geometryFactory) {
     if (geometryFactory == null || isEmpty()) {
       return this;

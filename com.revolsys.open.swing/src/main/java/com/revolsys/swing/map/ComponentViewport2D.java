@@ -24,8 +24,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
   private final JComponent component;
 
-  private int maxDecimalDigits;
-
   private int maxIntegerDigits;
 
   private final GlobalBooleanValue componentResizing = new GlobalBooleanValue(false);
@@ -96,8 +94,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
       final double maxLog = Math
         .abs(Math.max(Math.max(logMinX, logMinY), Math.max(logMaxX, logMaxY)));
       this.maxIntegerDigits = (int)Math.floor(maxLog + 1);
-      this.maxDecimalDigits = 15 - this.maxIntegerDigits;
-
       final BoundingBox boundingBox = getBoundingBox();
       if (Property.hasValue(boundingBox)) {
         final BoundingBox newBoundingBox = boundingBox.bboxToCs(geometryFactory);

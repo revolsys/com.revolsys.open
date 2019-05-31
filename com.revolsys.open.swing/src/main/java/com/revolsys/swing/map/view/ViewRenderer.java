@@ -439,7 +439,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
   }
 
   public double getScale() {
-    return getScale();
+    return this.scale;
   }
 
   public double getScaleForVisible() {

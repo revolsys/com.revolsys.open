@@ -17,13 +17,13 @@ public class TiffImageFactory extends AbstractIoFactory
   }
 
   @Override
-  public GeoreferencedImage readGeoreferencedImage(final Resource resource) {
-    return new TiffImage(resource);
+  public GeoreferencedImageWriter newGeoreferencedImageWriter(final Resource resource) {
+    return new TiffGeoreferencedImageWriter(resource);
   }
 
   @Override
-  public GeoreferencedImageWriter newGeoreferencedImageWriter(final Resource resource) {
-    return new TiffGeoreferencedImageWriter(resource);
+  public GeoreferencedImage readGeoreferencedImage(final Resource resource) {
+    return new TiffImage(resource);
   }
 
 }

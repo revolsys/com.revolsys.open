@@ -58,6 +58,8 @@ public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
 
   boolean isVisible();
 
+  boolean isVisible(final ViewRenderer view);
+
   Form newStylePanel();
 
   default void refresh() {
@@ -76,6 +78,4 @@ public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
   void setParent(LayerRenderer<?> parent);
 
   void setVisible(boolean visible);
-
-  boolean isVisible(final ViewRenderer view);
 }

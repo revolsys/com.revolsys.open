@@ -177,7 +177,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   @Override
   public boolean isVisible(final ViewRenderer view) {
     final double scaleForVisible = view.getScaleForVisible();
-     return isVisible(scaleForVisible);
+    return isVisible(scaleForVisible);
   }
 
   @Override

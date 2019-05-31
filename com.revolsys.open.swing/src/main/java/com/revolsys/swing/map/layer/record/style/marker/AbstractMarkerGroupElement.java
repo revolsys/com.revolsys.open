@@ -6,7 +6,8 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.AbstractNameTitle;
 
-public abstract class AbstractMarkerGroupElement extends AbstractNameTitle implements MapSerializer {
+public abstract class AbstractMarkerGroupElement extends AbstractNameTitle
+  implements MapSerializer {
 
   private MarkerGroup parent;
 
@@ -25,10 +26,6 @@ public abstract class AbstractMarkerGroupElement extends AbstractNameTitle imple
     super(name, title);
   }
 
-  public MarkerGroup getParent() {
-    return this.parent;
-  }
-
   public MarkerLibrary getMarkerLibrary() {
     final MarkerGroup parent = getParent();
     if (parent == null) {
@@ -36,6 +33,10 @@ public abstract class AbstractMarkerGroupElement extends AbstractNameTitle imple
     } else {
       return parent.getMarkerLibrary();
     }
+  }
+
+  public MarkerGroup getParent() {
+    return this.parent;
   }
 
   public abstract String getTypeName();

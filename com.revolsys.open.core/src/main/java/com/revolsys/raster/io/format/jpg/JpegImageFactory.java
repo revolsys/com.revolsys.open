@@ -21,14 +21,14 @@ public class JpegImageFactory extends AbstractIoFactory
   }
 
   @Override
-  public GeoreferencedImage readGeoreferencedImage(final Resource resource) {
-    return new ImageIoGeoreferencedImage(resource, FILE_EXTENSION_WORLD_FILE);
-  }
-
-  @Override
   public GeoreferencedImageWriter newGeoreferencedImageWriter(final Resource resource) {
     return new ImageIoGeoreferencedImageWriter(resource, "JPEG",
       JpegImageFactory.FILE_EXTENSION_WORLD_FILE);
+  }
+
+  @Override
+  public GeoreferencedImage readGeoreferencedImage(final Resource resource) {
+    return new ImageIoGeoreferencedImage(resource, FILE_EXTENSION_WORLD_FILE);
   }
 
 }

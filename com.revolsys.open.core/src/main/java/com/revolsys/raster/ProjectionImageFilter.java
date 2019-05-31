@@ -153,38 +153,6 @@ public class ProjectionImageFilter extends WholeImageFilter {
     return this.destWidth;
   }
 
-  private int getValueBiCubic(final int imageWidth, final int[] inPixels, final int inLength,
-    final boolean[] cubicHasRow, final int[] cubicParams, final int[] cubicParamsByte,
-    final int[] cubicResult, final int gridX, final int gridY, final double xPercent,
-    final double yPercent) {
-    int rowOffset = (gridY - 1) * imageWidth;
-    for (int cubicRow = 0; cubicRow < 4; cubicRow++) {
-      if (rowOffset >= 0 && rowOffset < inLength) {
-        final int cellRgb = inPixels[rowOffset + gridX];
-        for (int cubicCol = 0; cubicCol < 4; cubicCol++) {
-          final int imageCol = gridX + cubicCol - 1;
-          if (imageCol >= 0 && imageCol < imageWidth) {
-            cubicParams[cubicRow] = inPixels[rowOffset + gridX + cubicCol - 1];
-          } else {
-            cubicParams[cubicRow] = cellRgb;
-          }
-        }
-        cubicHasRow[cubicRow] = true;
-      } else {
-        cubicHasRow[cubicRow] = false;
-      }
-      cubicResult[cubicRow] = cubic(cubicParams, cubicParamsByte, xPercent);
-      rowOffset += imageWidth;
-    }
-    for (int cubicRow = 0; cubicRow < 4; cubicRow++) {
-      if (cubicRow != 1 && !cubicHasRow[cubicRow]) {
-        cubicResult[cubicRow] = cubicResult[1];
-      }
-    }
-    final int rgb = cubic(cubicResult, cubicParamsByte, yPercent);
-    return rgb;
-  }
-
   @Override
   protected void transformSpace(final Rectangle rect) {
     super.transformSpace(rect);

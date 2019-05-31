@@ -51,6 +51,17 @@ public enum TiffProjectionParameterName {
     return valueByParameterName.get(parameterName);
   }
 
+  public static Map<ParameterName, ParameterValue> getProjectionParameters(
+    final Map<Integer, Object> geoKeys) {
+    final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
+    for (final TiffProjectionParameterName tiffParam : values()) {
+      final int code = tiffParam.getCode();
+      final ParameterName parameterName = tiffParam.getParameterName();
+      TiffImage.addDoubleParameter(parameters, parameterName, geoKeys, code);
+    }
+    return parameters;
+  }
+
   private int code;
 
   private ParameterName parameterName;
@@ -66,16 +77,5 @@ public enum TiffProjectionParameterName {
 
   public ParameterName getParameterName() {
     return this.parameterName;
-  }
-
-  public static Map<ParameterName, ParameterValue> getProjectionParameters(
-    final Map<Integer, Object> geoKeys) {
-    final Map<ParameterName, ParameterValue> parameters = new LinkedHashMap<>();
-    for (final TiffProjectionParameterName tiffParam : values()) {
-      final int code = tiffParam.getCode();
-      final ParameterName parameterName = tiffParam.getParameterName();
-      TiffImage.addDoubleParameter(parameters, parameterName, geoKeys, code);
-    }
-    return parameters;
   }
 }

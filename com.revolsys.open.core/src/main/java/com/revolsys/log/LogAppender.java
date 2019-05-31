@@ -1,7 +1,6 @@
 package com.revolsys.log;
 
 import java.io.File;
-import java.nio.file.Path;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -106,15 +105,6 @@ public class LogAppender {
     return logger;
   }
 
-  private static FileAppender newFileAppender(final File file, final String pattern) {
-    final PatternLayout layout = newLayout(pattern);
-    return FileAppender.newBuilder() //
-      .withLayout(layout)//
-      .withName("file")
-      .withFileName(file.getAbsolutePath())
-      .build();
-  }
-
   static FileAppender newFileAppender(final File file, final String pattern, final boolean append) {
     final PatternLayout layout = newLayout(pattern);
     return FileAppender.newBuilder() //
@@ -122,15 +112,6 @@ public class LogAppender {
       .withName("file")
       .withFileName(file.getAbsolutePath())
       .withAppend(append)
-      .build();
-  }
-
-  private static FileAppender newFileAppender(final Path file, final String pattern) {
-    final PatternLayout layout = newLayout(pattern);
-    return FileAppender.newBuilder() //
-      .withLayout(layout)//
-      .withName("file")
-      .withFileName(file.toString())
       .build();
   }
 

@@ -28,19 +28,6 @@ public class CancelIterable<T> implements Iterator<T>, Iterable<T> {
     this.iterator = iterator;
   }
 
-  @Override
-  public boolean hasNext() {
-    if (cancellable.isCancelled()) {
-      close();
-      return false;
-    } else if (iterator.hasNext()) {
-      return true;
-    } else {
-      close();
-      return false;
-    }
-  }
-
   private void close() {
     if (this.iterator instanceof AutoCloseable) {
       final AutoCloseable closeable = (AutoCloseable)this.iterator;
@@ -52,18 +39,31 @@ public class CancelIterable<T> implements Iterator<T>, Iterable<T> {
   }
 
   @Override
-  public T next() {
-    try {
-      return iterator.next();
-    } catch (NoSuchElementException e) {
+  public boolean hasNext() {
+    if (this.cancellable.isCancelled()) {
       close();
-      throw e;
+      return false;
+    } else if (this.iterator.hasNext()) {
+      return true;
+    } else {
+      close();
+      return false;
     }
   }
 
   @Override
   public Iterator<T> iterator() {
     return this;
+  }
+
+  @Override
+  public T next() {
+    try {
+      return this.iterator.next();
+    } catch (final NoSuchElementException e) {
+      close();
+      throw e;
+    }
   }
 
   @Override
