@@ -367,7 +367,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
-  protected void replace(final AbstractLayer layer, final AbstractMultipleRecordLayerRenderer parent,
+  protected void replace(final AbstractLayer layer,
+    final AbstractMultipleRecordLayerRenderer parent,
     final AbstractMultipleRecordLayerRenderer newRenderer) {
     if (parent == null) {
       if (isEditing()) {

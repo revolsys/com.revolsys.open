@@ -9,11 +9,10 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.logging.Logs;
-
-import java.util.TreeMap;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.spring.resource.FileSystemResource;

@@ -42,7 +42,7 @@ public class BingMapTile extends GeoreferencedImageMapTile {
 
   @Override
   public BufferedImage loadBuffferedImage() {
-    BingLayer layer = this.layer;
+    final BingLayer layer = this.layer;
     try {
       final BingClient client = layer.getClient();
       final ImagerySet imagerySet = layer.getImagerySet();

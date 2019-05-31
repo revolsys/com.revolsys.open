@@ -289,10 +289,12 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     }
   }
 
+  @Override
   public Point getBottomLeftPoint() {
     return getGeometryFactory().point(getMinX(), getMinY());
   }
 
+  @Override
   public Point getBottomRightPoint() {
     return getGeometryFactory().point(getMaxX(), getMinY());
   }

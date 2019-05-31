@@ -16,11 +16,6 @@ import com.revolsys.util.function.BiConsumerDouble;
 
 public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumerDouble {
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
-
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_2D;
 
   public BoundingBoxEditor() {

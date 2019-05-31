@@ -22,7 +22,7 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.raster.TiledGeoreferencedImageLayerRenderer;
+import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -110,7 +110,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
       final String propertyName = e.getPropertyName();
       if (!IGNORE_PROPERTY_NAMES.contains(propertyName)) {
         if (this.layer instanceof Project) {
-          if (TiledGeoreferencedImageLayerRenderer.TILES_LOADED.equals(propertyName)) {
+          if (AbstractTiledLayerRenderer.TILES_LOADED.equals(propertyName)) {
             return;
           }
         }

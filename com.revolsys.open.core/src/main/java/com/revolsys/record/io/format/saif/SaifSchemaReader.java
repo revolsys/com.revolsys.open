@@ -31,6 +31,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.jeometry.common.data.type.CollectionDataType;
 import org.jeometry.common.data.type.DataType;
@@ -38,9 +40,6 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.data.type.EnumerationDataType;
 import org.jeometry.common.data.type.SimpleDataType;
 import org.jeometry.common.io.PathName;
-
-import java.util.Set;
-import java.util.TreeSet;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.saif.util.CsnIterator;

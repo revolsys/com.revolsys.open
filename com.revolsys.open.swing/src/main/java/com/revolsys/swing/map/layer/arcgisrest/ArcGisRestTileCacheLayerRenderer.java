@@ -8,7 +8,6 @@ import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
 import com.revolsys.swing.map.layer.raster.TiledGeoreferencedImageLayerRenderer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.util.Cancellable;
@@ -31,8 +30,8 @@ public class ArcGisRestTileCacheLayerRenderer
       if (mapService.isExportTilesAllowed() && restLayer.isUseServerExport()) {
         try {
           final BoundingBox boundingBox = viewport.getBoundingBox();
-          int width = viewport.getViewWidthPixels();
-          int height = viewport.getViewHeightPixels();
+          final int width = viewport.getViewWidthPixels();
+          final int height = viewport.getViewHeightPixels();
           final BufferedImage image = mapService.getExportImage(boundingBox, width, height);
           final BufferedGeoreferencedImage georeferencedImage = new BufferedGeoreferencedImage(
             boundingBox, image);

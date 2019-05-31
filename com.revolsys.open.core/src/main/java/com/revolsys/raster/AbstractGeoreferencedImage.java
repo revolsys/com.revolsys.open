@@ -369,7 +369,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     if (settingsFile != null && settingsFile.exists()) {
       try {
         Map<String, Object> settings;
-      try {
+        try {
           settings = Json.toMap(settingsFile);
         } catch (final Throwable e) {
           settings = new LinkedHashMapEx();

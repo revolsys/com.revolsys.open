@@ -161,7 +161,7 @@ public class MapService extends ArcGisRestAbstractLayerService {
         return BufferedImages.readImageIo(url);
       } catch (final WrappedException e) {
         if (Exceptions.isException(e, FileNotFoundException.class)) {
-        return null;
+          return null;
         } else if (!retry) {
           throw Exceptions.wrap(e);
         }

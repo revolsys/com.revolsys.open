@@ -76,7 +76,7 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
     final List<BingMapTile> tiles = new ArrayList<>();
     try {
       final double metresPerPixel = view.getUnitsPerPixel();
-      BingClient client = this.client;
+      final BingClient client = this.client;
       final int zoomLevel = client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(view);
       final BoundingBox geographicBoundingBox = view.getBoundingBox()

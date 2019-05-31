@@ -3,10 +3,9 @@ package com.revolsys.collection.map;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.jeometry.common.logging.Logs;
-
-import java.util.Properties;
 
 import com.revolsys.spring.resource.Resource;
 
