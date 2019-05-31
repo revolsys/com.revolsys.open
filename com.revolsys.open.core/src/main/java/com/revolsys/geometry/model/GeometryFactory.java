@@ -1018,6 +1018,19 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
 
   public abstract GeometryFactory convertCoordinateSystem(final CoordinateSystem coordinateSystem);
 
+  public GeometryFactory convertCoordinateSystem(final GeometryFactoryProxy geometryFactory) {
+    if (geometryFactory != null && geometryFactory != this) {
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem == null) {
+        final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+        return convertSrid(coordinateSystemId);
+      } else {
+        return convertCoordinateSystem(coordinateSystem);
+      }
+    }
+    return this;
+  }
+
   public GeometryFactory convertScales(final double... scales) {
     return this.instances.fixed(this.axisCount, scales);
   }

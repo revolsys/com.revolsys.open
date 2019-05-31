@@ -100,25 +100,30 @@ public class FileRecordLayer extends ListRecordLayer {
             final Map<String, Object> properties = getProperties();
             reader.setProperties(properties);
             final RecordDefinition recordDefinition = reader.getRecordDefinition();
+
             setRecordDefinition(recordDefinition);
             if (recordDefinition == null) {
               Logs.error(this, "No record definition found for: " + this.url);
               return false;
             } else {
-              GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+              final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+              GeometryFactory setGeometryFactory = setGeometryFactoryPrompt(geometryFactory);
+              if (setGeometryFactory != geometryFactory) {
+                recordDefinition.setGeometryFactory(setGeometryFactory);
+              }
+
               clearRecords();
               try (
                 BaseCloseable eventsDisabled = eventsDisabled()) {
                 for (final Record record : reader) {
                   final Geometry geometry = record.getGeometry();
                   if (geometry != null) {
-                    if (geometryFactory == null
-                      || !geometryFactory.isHasHorizontalCoordinateSystem()) {
-                      final GeometryFactory geometryFactory2 = geometry.getGeometryFactory();
-                      if (geometryFactory2.isHasHorizontalCoordinateSystem()) {
+                    if (!setGeometryFactory.isHasHorizontalCoordinateSystem()) {
+                      if (geometry.isHasHorizontalCoordinateSystem()) {
+                        final GeometryFactory geometryFactory2 = geometry.getGeometryFactory();
                         setGeometryFactory(geometryFactory2);
-                        geometryFactory = geometryFactory2;
-                        recordDefinition.setGeometryFactory(geometryFactory2);
+                        setGeometryFactory = geometryFactory2;
+                        recordDefinition.setGeometryFactory(setGeometryFactory);
                       }
                     }
                   }

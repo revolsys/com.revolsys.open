@@ -1,13 +1,16 @@
 package com.revolsys.swing.map.component;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.function.Consumer;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
@@ -105,30 +108,45 @@ public class GeometryFactoryField extends BaseComboBox<Integer> implements ItemL
   public static void selectHorizontalGeometryFactory(final String title,
     final GeometryFactoryProxy defaultGeometryFactory, final Consumer<GeometryFactory> action) {
     Invoke.later(() -> {
-      final Project project = Project.get();
-      final MapPanel mapPanel = project.getMapPanel();
-      int coordinateSystemId = -1;
-      if (defaultGeometryFactory != null) {
-        coordinateSystemId = defaultGeometryFactory.getCoordinateSystemId();
-      }
-      if (coordinateSystemId <= 0) {
-        coordinateSystemId = mapPanel.getCoordinateSystemId();
-      }
       final GeometryFactoryField coordinateSystemField = new GeometryFactoryField(
         "coordinateSystem");
-      if (coordinateSystemId > 0) {
-        coordinateSystemField.setSelectedItem(coordinateSystemId);
+
+      final ValueField valueField = new ValueField(new BorderLayout());
+      valueField.setTitle("Select Coordinate System");
+
+      {
+        final JPanel titlePanel = new JPanel(new VerticalLayout(3));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
+        titlePanel.add(new JLabel(title));
+        valueField.add(titlePanel, BorderLayout.NORTH);
       }
-      final JPanel fieldPanel = new BasePanel(new JLabel("Coordinate System"),
-        coordinateSystemField);
-      GroupLayouts.makeColumns(fieldPanel, 2, true);
-      final ValueField valueField = new ValueField(fieldPanel);
-      valueField.add(fieldPanel);
+
+      {
+        final Project project = Project.get();
+        final MapPanel mapPanel = project.getMapPanel();
+        int coordinateSystemId = -1;
+        if (defaultGeometryFactory != null) {
+          coordinateSystemId = defaultGeometryFactory.getCoordinateSystemId();
+        }
+        if (coordinateSystemId <= 0) {
+          coordinateSystemId = mapPanel.getCoordinateSystemId();
+        }
+        if (coordinateSystemId > 0) {
+          coordinateSystemField.setSelectedItem(coordinateSystemId);
+        }
+        final JPanel fieldPanel = new BasePanel(new JLabel("Coordinate System"),
+          coordinateSystemField);
+        fieldPanel.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 5));
+        GroupLayouts.makeColumns(fieldPanel, 2, true);
+
+        valueField.add(fieldPanel, BorderLayout.CENTER);
+      }
+
       valueField.showDialog();
       if (valueField.isSaved()) {
         final GeometryFactory geometryFactory = coordinateSystemField.getGeometryFactory();
         if (geometryFactory != null) {
-          Invoke.background(title, () -> action.accept(geometryFactory));
+          action.accept(geometryFactory);
         }
       }
     });

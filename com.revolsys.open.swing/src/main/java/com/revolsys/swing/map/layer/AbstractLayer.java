@@ -72,6 +72,7 @@ import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.ProjectFramePanel;
+import com.revolsys.swing.map.component.GeometryFactoryField;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
@@ -203,6 +204,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   private boolean visible = new Preferences("com.revolsys.gis")
     .getBoolean(PREFERENCE_NEW_LAYERS_VISIBLE, false);
+
+  private GeometryFactory selectedGeometryFactory;
 
   protected AbstractLayer(final String type) {
     this.type = type;
@@ -479,6 +482,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     } else {
       return geometryFactory.bboxEmpty();
     }
+  }
+
+  public GeometryFactory getSelectedGeometryFactory() {
+    return this.selectedGeometryFactory;
   }
 
   protected String getSettingsFileName() {
@@ -951,7 +958,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   }
 
   protected void setBoundingBox(final BoundingBox boundingBox) {
-    this.boundingBox = boundingBox;
+    if (boundingBox.isHasHorizontalCoordinateSystem() || !this.isHasHorizontalCoordinateSystem()) {
+      this.boundingBox = boundingBox;
+    } else {
+      this.boundingBox = getGeometryFactory().newBoundingBox(boundingBox);
+    }
   }
 
   @Override
@@ -993,6 +1004,29 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       }
       return geometryFactory;
     }
+  }
+
+  protected final GeometryFactory setGeometryFactoryPrompt(final GeometryFactory geometryFactory) {
+    // Set the geometry factory even if it has no coordinate system
+    setGeometryFactory(geometryFactory);
+    // Then request the user to select the coordinate system
+    if (geometryFactory == null || !geometryFactory.isHasHorizontalCoordinateSystem()) {
+      GeometryFactory referenceGeometryFactory;
+      if (this.selectedGeometryFactory == null) {
+        referenceGeometryFactory = geometryFactory;
+      } else {
+        referenceGeometryFactory = geometryFactory
+          .convertCoordinateSystem(this.selectedGeometryFactory);
+      }
+      final String title = "Layer: " + getPath();
+      GeometryFactoryField.promptGeometryFactory(title, referenceGeometryFactory, factory -> {
+        final GeometryFactory selectedGeometryFactory = referenceGeometryFactory
+          .convertCoordinateSystem(factory);
+        this.selectedGeometryFactory = selectedGeometryFactory;
+        setGeometryFactory(selectedGeometryFactory);
+      });
+    }
+    return getGeometryFactory();
   }
 
   public void setIcon(final Icon icon) {
@@ -1174,6 +1208,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     firePropertyChange("selectable", oldValue, selectable);
   }
 
+  public void setSelectedGeometryFactory(final GeometryFactory selectedGeometryFactory) {
+    this.selectedGeometryFactory = selectedGeometryFactory;
+  }
+
   public void setSelectSupported(final boolean selectSupported) {
     this.selectSupported = selectSupported;
   }
@@ -1258,6 +1296,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     addToMap(map, "maximumScale", this.maximumScale);
     addToMap(map, "minimumScale", this.minimumScale);
     addToMap(map, "style", this.renderer);
+    addToMap(map, "selectedGeometryFactory", this.selectedGeometryFactory);
     addToMap(map, "pluginConfig", this.pluginConfigByName);
     final Map<String, Object> properties = (Map<String, Object>)toMapValue(getProperties());
     if (properties != null) {

@@ -154,16 +154,6 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
   }
 
   @Override
-  public BoundingBox getBoundingBox() {
-    final GriddedElevationModel elevationModel = getElevationModel();
-    if (elevationModel == null) {
-      return BoundingBox.empty();
-    } else {
-      return elevationModel.getBoundingBox();
-    }
-  }
-
-  @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
@@ -184,16 +174,6 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
 
   public GriddedElevationModel getElevationModel() {
     return this.elevationModel;
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    if (this.elevationModel == null) {
-      final BoundingBox boundingBox = getBoundingBox();
-      return boundingBox.getGeometryFactory();
-    } else {
-      return this.elevationModel.getGeometryFactory();
-    }
   }
 
   @Override
@@ -348,6 +328,7 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
 
   @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
+    super.setBoundingBox(boundingBox);
     if (this.elevationModel != null) {
       this.elevationModel.setBoundingBox(boundingBox);
     }
@@ -360,6 +341,10 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
     if (elevationModel == null) {
       setExists(false);
     } else {
+      final GeometryFactory geometryFactory = elevationModel.getGeometryFactory();
+      setGeometryFactoryPrompt(geometryFactory);
+      final BoundingBox boundingBox = elevationModel.getBoundingBox();
+      super.setBoundingBox(boundingBox);
       setExists(true);
       Property.addListener(elevationModel, this);
     }
