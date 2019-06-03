@@ -567,6 +567,28 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public GeometryFactory convertCoordinateSystem(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem == this.coordinateSystem) {
+      return this;
+    } else {
+      final int axisCount = getAxisCount();
+      return GeometryFactory.fixed(coordinateSystem, axisCount, this.scales);
+    }
+  }
+
+  public GeometryFactory convertCoordinateSystem(final GeometryFactoryProxy geometryFactory) {
+    if (geometryFactory != null && geometryFactory != this) {
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem == null) {
+        final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+        return convertSrid(coordinateSystemId);
+      } else {
+        return convertCoordinateSystem(coordinateSystem);
+      }
+    }
+    return this;
+  }
+
   public GeometryFactory convertScales(final double... scales) {
     final int coordinateSystemId = getCoordinateSystemId();
     final int axisCount = getAxisCount();
@@ -1552,6 +1574,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public double makeZPreciseFloor(final double value) {
     return makePreciseFloor(2, value);
+  }
+
+  public BoundingBox newBoundingBox(final BoundingBox boundingBox) {
+    final int axisCount = this.axisCount;
+    final double[] bounds = boundingBox.getMinMaxValues(axisCount);
+    return newBoundingBox(axisCount, bounds);
   }
 
   public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,

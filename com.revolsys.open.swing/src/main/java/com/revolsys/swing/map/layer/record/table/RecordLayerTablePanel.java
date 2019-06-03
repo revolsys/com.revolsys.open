@@ -2,11 +2,13 @@ package com.revolsys.swing.map.layer.record.table;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -23,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellEditor;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -35,6 +38,9 @@ import com.revolsys.swing.action.ConsumerAction;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
+import com.revolsys.swing.component.ProgressMonitor;
+import com.revolsys.swing.dnd.ClipboardUtil;
+import com.revolsys.swing.dnd.transferable.StringTransferable;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -92,6 +98,10 @@ public class RecordLayerTablePanel extends TablePanel
     final MenuFactory headerMenu = getHeaderMenu();
     SetRecordsFieldValue.addMenuItem(headerMenu);
     FieldCalculator.addMenuItem(headerMenu);
+    headerMenu.addMenuItem("field", "Copy Raw Values", "page_white_copy",
+      () -> actionCopyColumnValues(false));
+    headerMenu.addMenuItem("field", "Copy Display Values", "page_white_copy",
+      () -> actionCopyColumnValues(true));
 
     final LayerRecordMenu menu = this.layer.getRecordMenu();
 
@@ -112,6 +122,37 @@ public class RecordLayerTablePanel extends TablePanel
       .getViewport()
       .addPropertyChangeListener("boundingBox", this.viewportListener);
     this.tableModel.refresh();
+  }
+
+  private void actionCopyColumnValues(final boolean showDisplayValues) {
+    final Consumer<ProgressMonitor> action = monitor -> {
+      final int columnIndex = TablePanel.getEventColumn();
+      final StringBuilder result = new StringBuilder();
+      final Consumer<String> valueAction = value -> {
+        result.append(value);
+        result.append('\n');
+        monitor.addProgress();
+      };
+      if (showDisplayValues) {
+        this.tableModel.forEachColumnDisplayValue(monitor, columnIndex, valueAction);
+      } else {
+        this.tableModel.forEachColumnValue(monitor, columnIndex, value -> {
+          if (value == null) {
+            valueAction.accept("");
+          } else {
+            final String string = DataTypes.toString(value);
+            valueAction.accept(string);
+          }
+        });
+      }
+
+      if (!monitor.isCancelled()) {
+        ClipboardUtil
+          .setContents(new StringTransferable(DataFlavor.stringFlavor, result.toString()));
+      }
+    };
+    final int rowCount = this.tableModel.getRowCount();
+    ProgressMonitor.background(this, "Copy Values", "", action, rowCount);
   }
 
   private void actionExportRecords() {

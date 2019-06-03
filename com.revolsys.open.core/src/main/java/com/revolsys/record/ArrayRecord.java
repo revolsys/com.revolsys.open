@@ -102,7 +102,11 @@ public class ArrayRecord extends BaseRecord {
     if (index < 0) {
       return null;
     } else {
-      return (T)this.values[index];
+      try {
+        return (T)this.values[index];
+      } catch (final ArrayIndexOutOfBoundsException e) {
+        return null;
+      }
     }
   }
 

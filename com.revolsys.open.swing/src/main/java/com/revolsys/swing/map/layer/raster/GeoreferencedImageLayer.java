@@ -345,7 +345,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       setExists(false);
     } else {
       final GeometryFactory geometryFactory = image.getGeometryFactory();
-      setGeometryFactory(geometryFactory);
+      setGeometryFactoryPrompt(geometryFactory);
       setExists(true);
       Property.addListener(image, this);
     }
