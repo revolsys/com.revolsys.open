@@ -121,11 +121,6 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
   }
 
   @Override
-  public int getScreenResolution() {
-    return 72;
-  }
-
-  @Override
   public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
     return false;
   }

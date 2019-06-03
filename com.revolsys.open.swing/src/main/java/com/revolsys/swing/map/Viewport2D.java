@@ -4,7 +4,6 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -51,7 +50,6 @@ import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 
-import systems.uom.common.USCustomary;
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;
 
@@ -62,6 +60,8 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle
     .line(WebColors.Red, 1)
     .setLineDashArray(Arrays.asList(10));
+
+  public static final double PIXEL_SIZE_METRES = 2.5e-4;
 
   public static double getScale(final Quantity<Length> viewWidth,
     final Quantity<Length> modelWidth) {
@@ -412,10 +412,6 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return this.scale;
   }
 
-  public double getScaleForUnitsPerPixel(final double unitsPerPixel) {
-    return unitsPerPixel * getScreenResolution() / 0.0254;
-  }
-
   /**
    * Get the scale which dictates if a layer or renderer is visible. This is used when printing
    * to ensure the same layers and renderers are used for printing as is shown on the screen.
@@ -430,19 +426,12 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return this.scales;
   }
 
-  public int getScreenResolution() {
-    final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-    final int screenResolution = defaultToolkit.getScreenResolution();
-    return 96;
-  }
-
   public AffineTransform getScreenToModelTransform() {
     return this.screenToModelTransform;
   }
 
   public Unit<Length> getScreenUnit() {
-    final int screenResolution = getScreenResolution();
-    return USCustomary.INCH.divide(screenResolution);
+    return Units.METRE.multiply(PIXEL_SIZE_METRES);
   }
 
   public double getUnitsPerPixel() {
@@ -450,7 +439,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   }
 
   public double getUnitsPerPixel(final double scale) {
-    return scale * 0.0254 / getScreenResolution();
+    return scale * PIXEL_SIZE_METRES;
   }
 
   public double getViewAspectRatio() {

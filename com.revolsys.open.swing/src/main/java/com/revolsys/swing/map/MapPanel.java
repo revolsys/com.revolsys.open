@@ -1177,7 +1177,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public void setUnitsPerPixel(final double unitsPerPixel) {
     if (this.viewport != null) {
-      double scale = this.viewport.getScaleForUnitsPerPixel(unitsPerPixel);
+      double scale = unitsPerPixel / Viewport2D.PIXEL_SIZE_METRES;
       scale = Doubles.makePrecise(10.0, scale);
       final double oldUnitsPerPixel = getUnitsPerPixel();
       if (!MathUtil.precisionEqual(unitsPerPixel, oldUnitsPerPixel, 10000000.0)) {
