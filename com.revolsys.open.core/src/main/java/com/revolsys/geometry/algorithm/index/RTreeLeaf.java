@@ -91,7 +91,6 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
           updateEnvelope();
           return true;
         } else {
-          System.err.println();
         }
       }
     }
