@@ -195,6 +195,10 @@ public class ProcessNetwork {
     return this.threadGroup;
   }
 
+  public boolean hasProcess() {
+    return !this.processes.isEmpty();
+  }
+
   @PostConstruct
   public void init() {
     if (this.parent == null) {

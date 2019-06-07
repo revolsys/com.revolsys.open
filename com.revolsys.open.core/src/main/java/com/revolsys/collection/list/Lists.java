@@ -442,6 +442,13 @@ public interface Lists {
     return list;
   }
 
+  public static <V> List<V> toList(final Supplier<List<V>> constructor,
+    final Iterable<? extends V> values) {
+    final List<V> list = constructor.get();
+    addAll(list, values);
+    return list;
+  }
+
   static String toString(final Object value) {
     final Collection<?> collection;
     if (value instanceof Collection) {
