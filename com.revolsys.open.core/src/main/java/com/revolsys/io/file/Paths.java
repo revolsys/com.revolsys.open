@@ -66,6 +66,13 @@ public interface Paths {
 
   Set<OpenOption> OPEN_OPTIONS_READ_SET = Sets.newHash(StandardOpenOption.READ);
 
+  static Path addExtension(final Path path, final String extension) {
+    final String fileName = getFileName(path);
+    final String newFileName = fileName + "." + extension;
+    final Path parent = path.getParent();
+    return parent.resolve(newFileName);
+  }
+
   static Path createDirectories(final Path path) {
     try {
       return Files.createDirectories(path, FILE_ATTRIBUTES_NONE);

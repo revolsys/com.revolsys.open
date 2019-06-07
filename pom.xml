@@ -359,14 +359,9 @@
         <version>${org.apache.log4j.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-slf4j-impl</artifactId>
-        <version>${org.apache.log4j.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.docx4j</groupId>
-        <artifactId>docx4j</artifactId>
-        <version>6.1.0</version>
+        <artifactId>docx4j-JAXB-MOXy</artifactId>
+        <version>8.1.0</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
@@ -552,7 +547,6 @@
     <org.jeometry.version>TRUNK-SNAPSHOT</org.jeometry.version>
     <org.springframework.version>5.1.6.RELEASE</org.springframework.version>
     <org.springframework.security.version>5.1.5.RELEASE</org.springframework.security.version>
-    <org.docx4java.version>6.1.0</org.docx4java.version>
     <org.apache.xmlgraphics.batik.version>1.11</org.apache.xmlgraphics.batik.version>
     <gpg.skip>true</gpg.skip>
     <github.global.server>github</github.global.server>

@@ -1,5 +1,7 @@
 package com.revolsys.record.schema;
 
+import java.util.Collection;
+
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
 
@@ -20,6 +22,18 @@ public class RecordDefinitionBuilder {
   public RecordDefinitionBuilder(final RecordDefinitionProxy recordDefinition) {
     this(recordDefinition.getPathName());
     for (final FieldDefinition fieldDefinition : recordDefinition.getFieldDefinitions()) {
+      addField(fieldDefinition);
+    }
+    this.recordDefinition.setIdFieldNames(recordDefinition.getIdFieldNames());
+    this.recordDefinition.setGeometryFieldName(recordDefinition.getGeometryFieldName());
+    this.recordDefinition.setGeometryFactory(recordDefinition.getGeometryFactory());
+  }
+
+  public RecordDefinitionBuilder(final RecordDefinitionProxy recordDefinition,
+    final Collection<String> fieldNames) {
+    this(recordDefinition.getPathName());
+    for (final String fieldName : fieldNames) {
+      final FieldDefinition fieldDefinition = recordDefinition.getFieldDefinition(fieldName);
       addField(fieldDefinition);
     }
     this.recordDefinition.setIdFieldNames(recordDefinition.getIdFieldNames());

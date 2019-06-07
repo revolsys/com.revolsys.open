@@ -1,5 +1,6 @@
 package com.revolsys.record.schema;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -193,6 +194,17 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
     } else {
       final String idFieldName = getIdFieldName();
       return fieldName.equals(idFieldName);
+    }
+  }
+
+  default RecordDefinition newRecordDefinition(final Collection<String> fieldNames) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return new RecordDefinitionBuilder(recordDefinition, fieldNames)//
+        .getRecordDefinition()//
+      ;
     }
   }
 

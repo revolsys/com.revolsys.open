@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -125,12 +126,13 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   }
 
   @Override
-  public void exportRecords(final Query query, final Object target) {
+  public void exportRecords(final Query query, final Collection<String> fieldNames,
+    final Object target) {
     final Condition filter = query.getWhereCondition();
     final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
     final AbstractRecordLayer layer = getLayer();
     final Iterable<LayerRecord> records = new ListByIndexIterator<>(this.records);
-    layer.exportRecords(records, filter, orderBy, target);
+    layer.exportRecords(records, filter, fieldNames, orderBy, target);
   }
 
   protected void fireRecordUpdated(final int index) {

@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
@@ -79,9 +80,10 @@ public class ModeAllPaged extends ModeAbstractCached {
   }
 
   @Override
-  public void exportRecords(final Query query, final Object target) {
+  public void exportRecords(final Query query, final Collection<String> fieldNames,
+    final Object target) {
     final AbstractRecordLayer layer = getLayer();
-    layer.exportRecords(query, target);
+    layer.exportRecords(query, fieldNames, target);
   }
 
   protected boolean filterTestModified(final Condition filter, final LayerRecord modifiedRecord) {

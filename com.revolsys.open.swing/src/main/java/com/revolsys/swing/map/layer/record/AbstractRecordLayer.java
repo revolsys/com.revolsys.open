@@ -794,22 +794,25 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void exportRecords(final Iterable<LayerRecord> records,
-    final Predicate<? super LayerRecord> filter, final Map<? extends CharSequence, Boolean> orderBy,
-    final Object target) {
+    final Predicate<? super LayerRecord> filter, final Collection<String> fieldNames,
+    final Map<? extends CharSequence, Boolean> orderBy, final Object target) {
     if (Property.hasValue(records) && target != null) {
       final List<LayerRecord> exportRecords = Lists.toArray(records);
 
       Records.filterAndSort(exportRecords, filter, orderBy);
 
       if (!exportRecords.isEmpty()) {
-        final RecordDefinition recordDefinition = getRecordDefinition();
-        RecordIo.copyRecords(recordDefinition, exportRecords, target);
+        final RecordDefinition recordDefinition = newRecordDefinition(fieldNames);
+        if (recordDefinition != null) {
+          RecordIo.copyRecords(recordDefinition, exportRecords, target);
+        }
       }
     }
   }
 
-  public void exportRecords(final Query query, final Object target) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
+  public void exportRecords(final Query query, final Collection<String> fieldNames,
+    final Object target) {
+    final RecordDefinition recordDefinition = newRecordDefinition(fieldNames);
     if (recordDefinition != null) {
       try (
         RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, target)) {

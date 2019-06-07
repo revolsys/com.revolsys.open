@@ -6,6 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.beans.PropertyChangeSupport;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
@@ -17,29 +19,44 @@ import javax.swing.JProgressBar;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.logging.Logs;
 
-import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Cancellable;
 
-public class ProgressMonitor extends JDialog implements WindowListener {
+public class ProgressMonitor extends JDialog implements Cancellable, WindowListener {
   private static final long serialVersionUID = -5843323756390303783L;
 
   public static void background(final Component component, final String title, final String note,
-    final boolean canCancel, final Consumer<ProgressMonitor> task) {
-    final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, canCancel);
-    Invoke.background(title, () -> {
-      task.accept(progressMonitor);
-      return null;
-    }, result -> progressMonitor.setVisible(false));
-    progressMonitor.setVisible(true);
+    final Consumer<ProgressMonitor> task, final int max) {
+    Invoke.later(() -> {
+      final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, true,
+        max);
+      Invoke.background(title, () -> {
+        try {
+          task.accept(progressMonitor);
+        } catch (final Exception e) {
+          Logs.error(ProgressMonitor.class, e);
+        }
+        return null;
+      }, r -> {
+        progressMonitor.done = true;
+        progressMonitor.setVisible(false);
+      });
+      if (!progressMonitor.done) {
+        progressMonitor.setVisible(true);
+      }
+    });
   }
 
   public static void ui(final Component component, final String title, final String note,
     final boolean canCancel, final Consumer<ProgressMonitor> task) {
     final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, canCancel);
-    Invoke.workerDone(title, () -> task.accept(progressMonitor));
+    Invoke.workerDone(title, () -> {
+      task.accept(progressMonitor);
+    });
     progressMonitor.setVisible(true);
   }
 
@@ -53,14 +70,23 @@ public class ProgressMonitor extends JDialog implements WindowListener {
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
+  private final AtomicInteger counter = new AtomicInteger();
+
+  private int step;
+
+  private boolean done;
+
+  private final int max;
+
   private ProgressMonitor(final Component component, final String title, final String note,
     final boolean canCancel) {
-    this(component, title, note, canCancel, 0, 0);
+    this(component, title, note, canCancel, 0);
   }
 
   private ProgressMonitor(final Component component, final String title, final String note,
-    final boolean canCancel, final int min, final int max) {
+    final boolean canCancel, final int max) {
     super(SwingUtil.getWindowAncestor(component), title, ModalityType.APPLICATION_MODAL);
+    this.max = max;
     setMinimumSize(new Dimension(title.length() * 20, 100));
     setLayout(new VerticalLayout(5));
     getRootPane().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -70,8 +96,10 @@ public class ProgressMonitor extends JDialog implements WindowListener {
     if (max <= 0) {
       this.progressBar.setIndeterminate(true);
     } else {
-      this.progressBar.setMinimum(min);
-      this.progressBar.setMaximum(min);
+      final int progressMax = Math.min(max, 100);
+      this.progressBar.setMinimum(0);
+      this.progressBar.setMaximum(progressMax);
+      this.step = Math.floorDiv(max, progressMax);
     }
     final String cancelText = UIManager.getString("OptionPane.cancelButtonText");
     final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -85,6 +113,13 @@ public class ProgressMonitor extends JDialog implements WindowListener {
     setResizable(false);
   }
 
+  public void addProgress() {
+    final int count = this.counter.incrementAndGet();
+    if (this.max <= 100 || count % this.step == 0) {
+      Invoke.later(() -> this.progressBar.setValue(this.progressBar.getValue() + 1));
+    }
+  }
+
   public void cancel() {
     this.cancelled = true;
     this.propertyChangeSupport.firePropertyChange("cancelled", false, true);
@@ -94,17 +129,18 @@ public class ProgressMonitor extends JDialog implements WindowListener {
     return this.propertyChangeSupport;
   }
 
+  @Override
   public boolean isCancelled() {
     return this.cancelled;
+  }
+
+  public boolean isDone() {
+    return this.done;
   }
 
   public void setNote(final String note) {
     this.noteLabel.setText(note);
     pack();
-  }
-
-  public void setProgress(final int newValue) {
-    this.progressBar.setValue(newValue);
   }
 
   public void setVisible(final Window window) {

@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 
 import javax.swing.Icon;
@@ -16,7 +17,7 @@ public interface TableRecordsMode {
   default void deactivate() {
   }
 
-  void exportRecords(final Query query, final Object target);
+  void exportRecords(final Query query, final Collection<String> fieldNames, final Object target);
 
   void forEachRecord(Query query, final Consumer<? super LayerRecord> action);
 

@@ -43,9 +43,12 @@ public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFac
     final String fileExtension = Maps.getString(properties, "fileExtension", defaultFileExtension);
     final Supplier<RecordReader> factory = () -> {
       final RecordReader reader;
-      if ("zip".equals(fileExtension)) {
+      if ("zip".equalsIgnoreCase(fileExtension)) {
         final String baseFileExtension = (String)properties.get("baseFileExtension");
-        final String baseName = (String)properties.get("baseName");
+        String baseName = (String)properties.get("baseName");
+        if (!Property.hasValue(baseName)) {
+          baseName = (String)properties.get("baseFileName");
+        }
         if (Property.hasValue(baseName)) {
           reader = RecordReader.newZipRecordReader(source, baseName, baseFileExtension);
         } else {

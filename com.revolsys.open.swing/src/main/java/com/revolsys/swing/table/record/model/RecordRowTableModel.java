@@ -196,6 +196,10 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return null;
   }
 
+  public List<String> getFieldNames() {
+    return this.fieldNames;
+  }
+
   @Override
   public Object getPrototypeValue(final int columnIndex) {
     FieldDefinition fieldDefinition = getColumnFieldDefinition(columnIndex);

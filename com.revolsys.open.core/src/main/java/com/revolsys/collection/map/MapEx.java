@@ -24,8 +24,25 @@ public interface MapEx extends MapDefault<String, Object> {
     }
   };
 
+  static MapEx asEx(final Map<String, ? extends Object> map) {
+    if (map instanceof MapEx) {
+      return (MapEx)map;
+    } else {
+      return new LinkedHashMapEx();
+    }
+  }
+
   default MapEx add(final String key, final Object value) {
     put(key, value);
+    return this;
+  }
+
+  default MapEx addAll(final Map<String, ? extends Object> map) {
+    for (final Entry<String, ? extends Object> entry : map.entrySet()) {
+      final String key = entry.getKey();
+      final Object value = entry.getValue();
+      add(key, value);
+    }
     return this;
   }
 

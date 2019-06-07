@@ -46,6 +46,7 @@ import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.filter.RecordRowPredicateRowFilter;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
+import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
 public class RecordLayerTableModel extends RecordRowTableModel
@@ -149,7 +150,38 @@ public class RecordLayerTableModel extends RecordRowTableModel
     final TableRecordsMode tableRecordsMode = getTableRecordsMode();
     if (tableRecordsMode != null) {
       final Query query = getFilterQuery();
-      tableRecordsMode.exportRecords(query, target);
+      final List<String> fieldNames = getFieldNames();
+      tableRecordsMode.exportRecords(query, fieldNames, target);
+    }
+  }
+
+  public void forEachColumnDisplayValue(final Cancellable cancellable, final int columnIndex,
+    final Consumer<String> action) {
+    forEachColumnValue(cancellable, columnIndex, value -> {
+      final String displayValue = toCopyValue(0, columnIndex, value);
+      if (displayValue == null) {
+        action.accept("");
+      } else {
+        action.accept(displayValue);
+      }
+    });
+  }
+
+  public void forEachColumnValue(final Cancellable cancellable, final int columnIndex,
+    final Consumer<Object> action) {
+    final String fieldName = getColumnFieldName(columnIndex);
+    final TableRecordsMode tableRecordsMode = getTableRecordsMode();
+    if (tableRecordsMode != null && fieldName != null) {
+      final Query query = getFilterQuery();
+      query.setFieldNames(fieldName);
+      try (
+        BaseCloseable eventsDisabled = this.layer.eventsDisabled()) {
+        query.setCancellable(cancellable);
+        tableRecordsMode.forEachRecord(query, record -> {
+          final Object value = record.getValue(fieldName);
+          action.accept(value);
+        });
+      }
     }
   }
 
