@@ -6,6 +6,7 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
@@ -16,6 +17,83 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 
 public class ImageProjector {
+
+  private static interface Grid {
+    double getValue(int x, int y);
+  }
+
+  private class SourceXGrid implements Grid {
+    private final double[] percents = new double[ImageProjector.this.gridWidth + 1];
+
+    private SourceXGrid() {
+      final double max = ImageProjector.this.gridWidth;
+      for (int i = 0; i < this.percents.length; i++) {
+        this.percents[i] = i / max;
+      }
+    }
+
+    @Override
+    public double getValue(final int x, final int y) {
+      return this.percents[x];
+    }
+
+    @Override
+    public String toString() {
+      return Arrays.toString(this.percents);
+    }
+  }
+
+  private class SourceYGrid implements Grid {
+    private final double[] percents = new double[ImageProjector.this.gridHeight + 1];
+
+    private SourceYGrid() {
+      final double max = ImageProjector.this.gridHeight;
+      for (int i = 0; i < this.percents.length; i++) {
+        this.percents[i] = i / max;
+      }
+    }
+
+    @Override
+    public double getValue(final int x, final int y) {
+      return this.percents[y];
+    }
+
+    @Override
+    public String toString() {
+      return Arrays.toString(this.percents);
+    }
+  }
+
+  private class TargetGrid implements Grid {
+    private final double[][] percentRows;
+
+    private TargetGrid() {
+      final double[][] grid = new double[ImageProjector.this.gridHeight + 1][];
+      for (int i = 0; i < grid.length; i++) {
+        grid[i] = new double[ImageProjector.this.gridWidth + 1];
+      }
+      this.percentRows = grid;
+    }
+
+    @Override
+    public double getValue(final int x, final int y) {
+      return this.percentRows[y][x];
+    }
+
+    private void setValue(final int x, final int y, final double value) {
+      this.percentRows[y][x] = value;
+    }
+
+    @Override
+    public String toString() {
+      final StringBuilder string = new StringBuilder();
+      for (final double[] percents : this.percentRows) {
+        string.append(percents);
+        string.append("\n");
+      }
+      return string.toString();
+    }
+  }
 
   private static int[] gauss(final double[][] matrix) {
     final int[] indeces = {
@@ -67,6 +145,14 @@ public class ImageProjector {
     return max;
   }
 
+  private static double[][] newGrid(final int gridWidth, final int gridHeight) {
+    final double[][] grid = new double[gridHeight + 1][];
+    for (int i = 0; i <= gridHeight; i++) {
+      grid[i] = new double[gridWidth + 1];
+    }
+    return grid;
+  }
+
   private static double[] solve(final double[][] matrix, final int[] indices, final double[] b) {
     final double[] x = new double[3];
     for (int k = 0; k < 2; k++) {
@@ -112,11 +198,50 @@ public class ImageProjector {
 
   private final int step = 50;
 
+  private final SourceXGrid sourceXGrid;
+
+  private final SourceYGrid sourceYGrid;
+
+  private final TargetGrid targetXGrid;
+
+  private final TargetGrid targetYGrid;
+
+  private final int gridWidth;
+
+  private final int gridHeight;
+
   public ImageProjector(final GeoreferencedImage sourceImage,
     final GeometryFactoryProxy targetGeometryFactory) {
     this.sourceImage = sourceImage;
     this.sourceBufferdImage = sourceImage.getBufferedImage();
     setTargetGeometryFactory(targetGeometryFactory);
+    final int imageWidth = this.sourceImage.getImageWidth();
+    final int imageHeight = this.sourceImage.getImageHeight();
+    final BoundingBox sourceBoundingBox = sourceImage.getBoundingBox();
+    final double sourceWidth = sourceBoundingBox.getWidth();
+    final double sourceHeight = sourceBoundingBox.getHeight();
+    this.gridWidth = (int)Math.ceil(imageWidth / (double)this.step);
+    this.gridHeight = (int)Math.ceil(imageHeight / (double)this.step);
+    this.sourceXGrid = new SourceXGrid();
+    this.sourceYGrid = new SourceYGrid();
+    this.targetXGrid = new TargetGrid();
+    this.targetYGrid = new TargetGrid();
+    final CoordinatesOperationPoint point = this.point;
+    final double minX = sourceBoundingBox.getMinX();
+    final double minY = sourceBoundingBox.getMinY();
+    for (int gridY = 0; gridY <= this.gridHeight; gridY++) {
+      final double yPercent = this.sourceYGrid.getValue(0, gridY);
+      final double sourceY = minY + gridY * yPercent;
+      for (int gridX = 0; gridX <= this.gridWidth; gridX++) {
+        final double xPercent = this.sourceXGrid.getValue(gridX, gridY);
+        final double sourceX = minX + gridX * xPercent;
+        point.setPoint(sourceX, sourceY);
+        this.operation.perform(point);
+        this.targetImage.toImagePoint(point);
+        final double targetImageX = point.x;
+        final double targetImageY = point.y;
+      }
+    }
   }
 
   public void drawImage(final Graphics2D graphics) {
