@@ -9,6 +9,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
+
 class ImageProjectorTriangle implements Shape {
 
   protected final double[] xCoordinates;
@@ -241,6 +244,17 @@ class ImageProjectorTriangle implements Shape {
     final double width = r.getWidth();
     final double height = r.getHeight();
     return intersects(x, y, width, height);
+  }
+
+  public void setCorner(final int i, final GeoreferencedImage sourceImage, final double imageX,
+    final double imageY, final CoordinatesOperationPoint point,
+    final CoordinatesOperation operation, final BufferedGeoreferencedImage targetImage) {
+    sourceImage.copyModelPoint(point, imageX, imageY);
+    operation.perform(point);
+    targetImage.toImagePoint(point);
+    final double targetImageX = point.x;
+    final double targetImageY = point.y;
+    setPoint(i, targetImageX, targetImageY);
   }
 
   public void setCorners(final double x1, final double y1, final double x2, final double y2,

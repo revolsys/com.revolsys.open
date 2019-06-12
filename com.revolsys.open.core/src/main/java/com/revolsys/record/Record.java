@@ -219,6 +219,26 @@ public interface Record
     return -1;
   }
 
+  default int compareValue(final Record record, final CharSequence fieldName) {
+    if (record != null) {
+      final Object value = record.getValue(fieldName);
+      return compareValue(fieldName, value);
+    }
+    return -1;
+  }
+
+  default int compareValue(final Record record, final CharSequence fieldName,
+    final boolean nullsFirst) {
+    final Comparable<Object> value1 = getValue(fieldName);
+    Object value2;
+    if (record == null) {
+      value2 = null;
+    } else {
+      value2 = record.getValue(fieldName);
+    }
+    return CompareUtil.compare(value1, value2, nullsFirst);
+  }
+
   default boolean contains(final Iterable<? extends Record> records) {
     for (final Record record : records) {
       if (isSame(record)) {

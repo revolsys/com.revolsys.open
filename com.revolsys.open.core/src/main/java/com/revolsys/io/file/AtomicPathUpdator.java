@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.util.Cancellable;
 
 public class AtomicPathUpdator implements BaseCloseable {
   private static final CopyOption[] MOVE_OPTIONS = {
@@ -25,9 +26,14 @@ public class AtomicPathUpdator implements BaseCloseable {
 
   private boolean cancelled = false;
 
-  public AtomicPathUpdator(final Path directory, final String fileName) {
+  private final Cancellable cancellable;
+
+  public AtomicPathUpdator(final Cancellable cancellable, final Path directory,
+    final String fileName) {
+    this.cancellable = cancellable;
     try {
       this.targetDirectory = directory;
+      Paths.createDirectories(this.targetDirectory);
       this.fileName = fileName;
       this.tempDirectory = Files.createTempDirectory(fileName);
       this.path = this.tempDirectory.resolve(fileName);
@@ -36,11 +42,15 @@ public class AtomicPathUpdator implements BaseCloseable {
     }
   }
 
+  public AtomicPathUpdator(final Path directory, final String fileName) {
+    this(null, directory, fileName);
+  }
+
   @Override
   public void close() {
     final Path tempDirectory = this.tempDirectory;
     try {
-      if (!this.cancelled) {
+      if (!isCancelled()) {
         try {
           Files.walk(tempDirectory).forEach(tempPath -> {
             if (!tempPath.equals(tempDirectory)) {
@@ -70,8 +80,12 @@ public class AtomicPathUpdator implements BaseCloseable {
     return this.path;
   }
 
+  public Path getTargetDirectory() {
+    return this.targetDirectory;
+  }
+
   public boolean isCancelled() {
-    return this.cancelled;
+    return this.cancelled || this.cancellable != null && this.cancellable.isCancelled();
   }
 
   public boolean isTargetExists() {
