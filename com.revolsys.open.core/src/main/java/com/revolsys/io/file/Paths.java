@@ -89,11 +89,7 @@ public interface Paths {
 
   static Path createParentDirectories(final Path path) {
     final Path parent = path.getParent();
-    try {
-      return Files.createDirectories(parent, FILE_ATTRIBUTES_NONE);
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
-    }
+    return createDirectories(parent);
   }
 
   static boolean deleteDirectories(final Path path) {

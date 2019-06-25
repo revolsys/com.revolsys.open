@@ -267,22 +267,24 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         this.threadLoading.set(Boolean.TRUE);
         this.loading = true;
         try {
-          final RecordDefinition recordDefinition = this.recordStore
-            .getRecordDefinition(this.typePath);
-          final Query query = new Query(recordDefinition);
-          query.setFieldNames(recordDefinition.getFieldNames());
-          for (final String order : this.orderBy) {
-            query.addOrderBy(order);
-          }
-          try (
-            Reader<Record> reader = this.recordStore.getRecords(query)) {
-            final List<Record> codes = reader.toList();
-            final CategoryLabelCountMap statistics = this.recordStore.getStatistics();
-            if (statistics != null) {
-              statistics.getLabelCountMap("query").addCount(this.typePath, -codes.size());
+          if (this.recordStore != null) {
+            final RecordDefinition recordDefinition = this.recordStore
+              .getRecordDefinition(this.typePath);
+            final Query query = new Query(recordDefinition);
+            query.setFieldNames(recordDefinition.getFieldNames());
+            for (final String order : this.orderBy) {
+              query.addOrderBy(order);
             }
-            Collections.sort(codes, new RecordFieldComparator(this.orderBy));
-            addValues(codes);
+            try (
+              Reader<Record> reader = this.recordStore.getRecords(query)) {
+              final List<Record> codes = reader.toList();
+              final CategoryLabelCountMap statistics = this.recordStore.getStatistics();
+              if (statistics != null) {
+                statistics.getLabelCountMap("query").addCount(this.typePath, -codes.size());
+              }
+              Collections.sort(codes, new RecordFieldComparator(this.orderBy));
+              addValues(codes);
+            }
           }
         } finally {
           this.loading = false;

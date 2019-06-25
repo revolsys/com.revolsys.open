@@ -17,6 +17,7 @@ import com.revolsys.geometry.graph.attribute.NodeProperties;
 import com.revolsys.record.Record;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
@@ -24,7 +25,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
   private final Set<String> equalExcludeFieldNames = new HashSet<>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
 
-  private LabelCountMap splitStatistics;
+  private LabelCounters splitStatistics;
 
   @Override
   public void accept(final Edge<Record> edge) {

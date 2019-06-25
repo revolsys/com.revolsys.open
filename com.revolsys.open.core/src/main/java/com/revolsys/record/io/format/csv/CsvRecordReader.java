@@ -116,7 +116,8 @@ public class CsvRecordReader extends AbstractRecordReader {
     if (in == null) {
       throw new NoSuchElementException();
     } else {
-      this.sb.setLength(0);
+      StringBuilder sb = this.sb;
+      sb.setLength(0);
       final List<String> values = new ArrayList<>();
       boolean inQuotes = false;
       boolean hadQuotes = false;
@@ -124,17 +125,26 @@ public class CsvRecordReader extends AbstractRecordReader {
         final int character = in.read();
         switch (character) {
           case -1:
-            return returnEof(values, hadQuotes);
+            if (values.isEmpty()) {
+              if (sb.length() > 0) {
+                values.add(sb.toString());
+              } else {
+                throw new NoSuchElementException();
+              }
+            } else {
+              addValue(values, hadQuotes);
+            }
+            return values;
           case '"':
-            if (!hadQuotes && this.sb.length() > 0) {
-              this.sb.append('"');
+            if (!hadQuotes && sb.length() > 0) {
+              sb.append('"');
             } else {
               hadQuotes = true;
               if (inQuotes) {
                 in.mark(1);
                 final int nextCharacter = in.read();
                 if ('"' == nextCharacter) {
-                  this.sb.append('"');
+                  sb.append('"');
                 } else {
                   inQuotes = false;
                   in.reset();
@@ -146,11 +156,11 @@ public class CsvRecordReader extends AbstractRecordReader {
           break;
           case '\n':
             if (inQuotes) {
-              this.sb.append('\n');
+              sb.append('\n');
             } else {
               if (values.isEmpty()) {
-                if (this.sb.length() > 0) {
-                  values.add(this.sb.toString());
+                if (sb.length() > 0) {
+                  values.add(sb.toString());
                   return values;
                 } else {
                   // skip empty lines
@@ -168,11 +178,11 @@ public class CsvRecordReader extends AbstractRecordReader {
             if (nextCharacter == '\n') {
             } else {
               if (inQuotes) {
-                this.sb.append('\n');
+                sb.append('\n');
               } else {
                 if (values.isEmpty()) {
-                  if (this.sb.length() > 0) {
-                    values.add(this.sb.toString());
+                  if (sb.length() > 0) {
+                    values.add(sb.toString());
                     return values;
                   } else {
                     // skip empty lines
@@ -187,13 +197,13 @@ public class CsvRecordReader extends AbstractRecordReader {
           default:
             if (character == fieldSeparator) {
               if (inQuotes) {
-                this.sb.append(fieldSeparator);
+                sb.append(fieldSeparator);
               } else {
                 addValue(values, hadQuotes);
                 hadQuotes = false;
               }
             } else {
-              this.sb.append((char)character);
+              sb.append((char)character);
             }
           break;
         }

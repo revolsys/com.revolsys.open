@@ -1,17 +1,14 @@
 package com.revolsys.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class TotalCounter implements Counter {
+public class NegativeCounter implements Counter {
 
   private final String name;
 
-  private List<Counter> counters = new ArrayList<>();
+  private final Counter counter;
 
-  public TotalCounter(final String name, final List<Counter> counters) {
+  public NegativeCounter(final String name, final Counter counter) {
     this.name = name;
-    this.counters = counters;
+    this.counter = counter;
   }
 
   @Override
@@ -36,11 +33,7 @@ public class TotalCounter implements Counter {
 
   @Override
   public long get() {
-    long count = 0;
-    for (final Counter counter : this.counters) {
-      count += counter.get();
-    }
-    return count;
+    return -this.counter.get();
   }
 
   @Override

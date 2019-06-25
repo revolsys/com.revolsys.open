@@ -11,11 +11,12 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
   implements RecordDefinitionFactory {
 
-  private LabelCountMap labelCountMap = new LabelCountMap();
+  private LabelCounters labelCountMap = new LabelCountMap();
 
   private final Map<String, RecordDefinition> typePathRecordDefinitionMap = new HashMap<>();
 
@@ -36,7 +37,7 @@ public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
     return recordDefinition;
   }
 
-  public LabelCountMap getStatistics() {
+  public LabelCounters getStatistics() {
     return this.labelCountMap;
   }
 
@@ -60,7 +61,7 @@ public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
     return record;
   }
 
-  public void setStatistics(final LabelCountMap labelCountMap) {
+  public void setStatistics(final LabelCounters labelCountMap) {
     if (this.labelCountMap != labelCountMap) {
       this.labelCountMap = labelCountMap;
       labelCountMap.connect();

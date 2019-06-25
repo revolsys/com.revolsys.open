@@ -7,14 +7,14 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.file.Paths;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.record.Record;
-import com.revolsys.util.count.LabelCountMap;
 import com.revolsys.util.count.LabelCountWriter;
+import com.revolsys.util.count.LabelCounters;
 
 public class FileGdbWriterProcess extends WriterProcess {
 
   private final Path path;
 
-  private LabelCountMap counts;
+  private LabelCounters counts;
 
   private final FileGdbRecordStore recordStore;
 
@@ -51,7 +51,7 @@ public class FileGdbWriterProcess extends WriterProcess {
     }
   }
 
-  public FileGdbWriterProcess setCounts(final LabelCountMap counts) {
+  public FileGdbWriterProcess setCounts(final LabelCounters counts) {
     this.counts = counts;
     return this;
   }

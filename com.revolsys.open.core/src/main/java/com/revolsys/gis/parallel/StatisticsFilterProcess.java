@@ -2,13 +2,13 @@ package com.revolsys.gis.parallel;
 
 import com.revolsys.parallel.process.FilterProcess;
 import com.revolsys.record.Record;
-import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class StatisticsFilterProcess extends FilterProcess<Record> {
 
-  private LabelCountMap acceptStatistics;
+  private LabelCounters acceptStatistics;
 
-  private LabelCountMap rejectStatistics;
+  private LabelCounters rejectStatistics;
 
   @Override
   protected void destroy() {
@@ -20,11 +20,11 @@ public class StatisticsFilterProcess extends FilterProcess<Record> {
     }
   }
 
-  public LabelCountMap getAcceptStatistics() {
+  public LabelCounters getAcceptStatistics() {
     return this.acceptStatistics;
   }
 
-  public LabelCountMap getRejectStatistics() {
+  public LabelCounters getRejectStatistics() {
     return this.rejectStatistics;
   }
 
@@ -52,11 +52,11 @@ public class StatisticsFilterProcess extends FilterProcess<Record> {
     }
   }
 
-  public void setAcceptStatistics(final LabelCountMap acceptStatistics) {
+  public void setAcceptStatistics(final LabelCounters acceptStatistics) {
     this.acceptStatistics = acceptStatistics;
   }
 
-  public void setRejectStatistics(final LabelCountMap rejectStatistics) {
+  public void setRejectStatistics(final LabelCounters rejectStatistics) {
     this.rejectStatistics = rejectStatistics;
   }
 

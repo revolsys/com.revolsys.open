@@ -8,17 +8,17 @@ import org.springframework.beans.factory.BeanNameAware;
 
 import com.revolsys.record.Record;
 
-public class LabalCountIterable implements Iterable<Record>, BeanNameAware {
+public class LabelCountIterable implements Iterable<Record>, BeanNameAware {
   private Iterable<Record> iterable;
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
   private String statsName;
 
-  public LabalCountIterable() {
+  public LabelCountIterable() {
   }
 
-  public LabalCountIterable(final Iterable<Record> iterable) {
+  public LabelCountIterable(final Iterable<Record> iterable) {
     setIterable(iterable);
   }
 
@@ -29,7 +29,7 @@ public class LabalCountIterable implements Iterable<Record>, BeanNameAware {
   /**
    * @return the stats
    */
-  public LabelCountMap getStatistics() {
+  public LabelCounters getStatistics() {
     return this.labelCountMap;
   }
 
@@ -66,7 +66,7 @@ public class LabalCountIterable implements Iterable<Record>, BeanNameAware {
   /**
    * @param stats the stats to set
    */
-  public void setStatistics(final LabelCountMap labelCountMap) {
+  public void setStatistics(final LabelCounters labelCountMap) {
     this.labelCountMap = labelCountMap;
   }
 

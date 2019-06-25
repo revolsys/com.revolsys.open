@@ -27,6 +27,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class JdbcQueryIterator extends AbstractIterator<Record> implements RecordReader {
   public static Record getNextRecord(final JdbcRecordStore recordStore,
@@ -84,7 +85,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
   private PreparedStatement statement;
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
   public JdbcQueryIterator(final JdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
@@ -101,7 +102,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     this.query = query;
     this.labelCountMap = query.getStatistics();
     if (this.labelCountMap == null) {
-      this.labelCountMap = (LabelCountMap)properties.get(LabelCountMap.class.getName());
+      this.labelCountMap = (LabelCounters)properties.get(LabelCountMap.class.getName());
     }
   }
 

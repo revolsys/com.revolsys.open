@@ -299,6 +299,16 @@ public class RangeSet extends AbstractSet<Object>
     return DataType.equal(value1, value2);
   }
 
+  @Override
+  public boolean equals(final Object o) {
+    if (o instanceof RangeSet) {
+      final RangeSet range2 = (RangeSet)o;
+      return this.ranges.equals(range2.ranges);
+    } else {
+      return false;
+    }
+  }
+
   public Object getEndValue(final End end) {
     if (!isEmpty()) {
       if (End.isFrom(end)) {

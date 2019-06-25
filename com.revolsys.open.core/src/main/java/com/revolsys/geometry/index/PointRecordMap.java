@@ -48,8 +48,10 @@ public class PointRecordMap {
   }
 
   public void addAll(final Iterable<? extends Record> records) {
-    for (final Record record : records) {
-      addRecord(record);
+    if (records != null) {
+      for (final Record record : records) {
+        addRecord(record);
+      }
     }
   }
 

@@ -24,6 +24,7 @@ import com.revolsys.record.RecordLog;
 import com.revolsys.record.filter.RecordGeometryFilter;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
@@ -33,7 +34,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
   private static final String EDGE_PROCESSED = EqualTypeAndLineEdgeCleanupVisitor.class.getName()
     + ".processed";
 
-  private LabelCountMap duplicateStatistics;
+  private LabelCounters duplicateStatistics;
 
   private Set<String> equalExcludeFieldNames = new HashSet<>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));

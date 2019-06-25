@@ -17,15 +17,19 @@
 package com.revolsys.spring.resource;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
@@ -329,8 +333,6 @@ public class PathResource extends AbstractResource implements WritableResource {
     return Files.isWritable(this.path) && !Files.isDirectory(this.path);
   }
 
-  // implementation of WritableResource
-
   /**
    * This implementation returns the underlying File's timestamp.
    * @see com.revolsys.nio.file.Files#getLastModifiedTime(PathUtil, com.revolsys.nio.file.LinkOption...)
@@ -347,6 +349,8 @@ public class PathResource extends AbstractResource implements WritableResource {
   public OutputStream newOutputStream() {
     return getOutputStream();
   }
+
+  // implementation of WritableResource
 
   @Override
   public OutputStream newOutputStreamAppend() {
@@ -390,6 +394,21 @@ public class PathResource extends AbstractResource implements WritableResource {
       }
     } catch (final FileSystemException e) {
       throw Exceptions.wrap("Error opening file: " + getPath(), e);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  @Override
+  public Writer newWriter() {
+    return newWriter(StandardCharsets.UTF_8);
+  }
+
+  @Override
+  public Writer newWriter(final Charset charset) {
+    try {
+      final File file = getFile();
+      return new FileWriter(file, charset);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

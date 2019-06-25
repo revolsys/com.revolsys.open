@@ -7,7 +7,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 
 public class LabelCountWriter extends AbstractRecordWriter {
-  private LabelCountMap counts;
+  private LabelCounters counts;
 
   private Writer<Record> writer;
 
@@ -32,7 +32,7 @@ public class LabelCountWriter extends AbstractRecordWriter {
   /**
    * @return the counts
    */
-  public LabelCountMap getCounts() {
+  public LabelCounters getCounts() {
     return this.counts;
   }
 
@@ -51,7 +51,7 @@ public class LabelCountWriter extends AbstractRecordWriter {
   /**
    * @param labelCountMap the labelCountMap to set
    */
-  public LabelCountWriter setCounts(final LabelCountMap labelCountMap) {
+  public LabelCountWriter setCounts(final LabelCounters labelCountMap) {
     this.counts = labelCountMap;
     return this;
   }

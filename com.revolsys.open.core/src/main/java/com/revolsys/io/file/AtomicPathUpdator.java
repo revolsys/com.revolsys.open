@@ -33,7 +33,6 @@ public class AtomicPathUpdator implements BaseCloseable {
     this.cancellable = cancellable;
     try {
       this.targetDirectory = directory;
-      Paths.createDirectories(this.targetDirectory);
       this.fileName = fileName;
       this.tempDirectory = Files.createTempDirectory(fileName);
       this.path = this.tempDirectory.resolve(fileName);
@@ -52,20 +51,14 @@ public class AtomicPathUpdator implements BaseCloseable {
     try {
       if (!isCancelled()) {
         try {
-          Files.walk(tempDirectory).forEach(tempPath -> {
-            if (!tempPath.equals(tempDirectory)) {
-              final Path relativePath = tempDirectory.relativize(tempPath);
-              final Path targetPath = this.targetDirectory.resolve(relativePath);
-              Paths.createParentDirectories(targetPath);
-              final Path oldPath = Paths.addExtension(targetPath, "old");
-              move(targetPath, oldPath);
-              move(tempPath, targetPath);
-              try {
-                Files.deleteIfExists(oldPath);
-              } catch (final IOException e) {
-                throw Exceptions.wrap("Error deleting file: " + oldPath, e);
-              }
-            }
+          Files.list(tempDirectory).forEach(tempPath -> {
+            final Path relativePath = tempDirectory.relativize(tempPath);
+            final Path targetPath = this.targetDirectory.resolve(relativePath);
+            final Path oldPath = Paths.addExtension(targetPath, "old");
+            Paths.deleteDirectories(oldPath);
+            move(targetPath, oldPath);
+            move(tempPath, targetPath);
+            Paths.deleteDirectories(oldPath);
           });
         } catch (final IOException e) {
           throw Exceptions.wrap(e);
@@ -82,6 +75,10 @@ public class AtomicPathUpdator implements BaseCloseable {
 
   public Path getTargetDirectory() {
     return this.targetDirectory;
+  }
+
+  public Path getTargetPath() {
+    return this.targetDirectory.resolve(this.fileName);
   }
 
   public boolean isCancelled() {

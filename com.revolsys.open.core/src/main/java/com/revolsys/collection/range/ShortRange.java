@@ -2,7 +2,7 @@ package com.revolsys.collection.range;
 
 import org.jeometry.common.number.Shorts;
 
-public class ShortRange extends AbstractRange<Short> {
+public class ShortRange extends AbstractNumberRange<Short> {
   private short from;
 
   private short to;
@@ -42,6 +42,17 @@ public class ShortRange extends AbstractRange<Short> {
   @Override
   public Short getTo() {
     return this.to;
+  }
+
+  @Override
+  protected AbstractNumberRange<?> newNumberRange(final long from, final long to) {
+    if (from < Integer.MIN_VALUE || to > Integer.MAX_VALUE) {
+      return new LongRange(from, to);
+    } else if (from < Short.MIN_VALUE || to > Short.MAX_VALUE) {
+      return new IntRange((int)from, (int)to);
+    } else {
+      return new ShortRange((short)from, (short)to);
+    }
   }
 
   @Override

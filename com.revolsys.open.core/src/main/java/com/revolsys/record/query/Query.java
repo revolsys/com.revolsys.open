@@ -33,7 +33,7 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
-import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class Query extends BaseObjectWithProperties implements Cloneable, CancellableProxy {
   private static void addFilter(final Query query, final RecordDefinition recordDefinition,
@@ -173,7 +173,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   private String sql;
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
   private PathName typeName;
 
@@ -376,7 +376,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.sql;
   }
 
-  public LabelCountMap getStatistics() {
+  public LabelCounters getStatistics() {
     return this.labelCountMap;
   }
 
@@ -518,7 +518,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public Query setStatistics(final LabelCountMap labelCountMap) {
+  public Query setStatistics(final LabelCounters labelCountMap) {
     this.labelCountMap = labelCountMap;
     return this;
   }

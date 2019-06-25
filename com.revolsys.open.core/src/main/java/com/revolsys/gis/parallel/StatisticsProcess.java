@@ -4,10 +4,11 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class StatisticsProcess extends BaseInOutProcess<Record, Record> {
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
   @Override
   protected void postRun(final Channel<Record> in, final Channel<Record> out) {

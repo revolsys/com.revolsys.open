@@ -27,12 +27,13 @@ import com.revolsys.record.Record;
 import com.revolsys.record.filter.RecordGeometryFilter;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
   implements ObjectProcessor<RecordGraph> {
 
-  private LabelCountMap duplicateStatistics;
+  private LabelCounters duplicateStatistics;
 
   private Set<String> equalExcludeFieldNames = new HashSet<>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));

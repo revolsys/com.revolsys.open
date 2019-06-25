@@ -48,6 +48,7 @@ import com.revolsys.transaction.Transactionable;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.CategoryLabelCountMap;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFactory, Transactionable,
   BaseCloseable, ObjectWithProperties {
@@ -421,7 +422,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   CategoryLabelCountMap getStatistics();
 
-  default LabelCountMap getStatistics(final String name) {
+  default LabelCounters getStatistics(final String name) {
     final CategoryLabelCountMap statistics = getStatistics();
     if (statistics == null) {
       return null;
@@ -677,7 +678,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   default void setStatistics(final String name, final LabelCountMap labelCountMap) {
     final CategoryLabelCountMap categoryLabelCountMap = getStatistics();
     if (categoryLabelCountMap != null) {
-      categoryLabelCountMap.setLabelCountMap(name, labelCountMap);
+      categoryLabelCountMap.setLabelCounters(name, labelCountMap);
     }
   }
 
