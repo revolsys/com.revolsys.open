@@ -771,10 +771,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     deleteRecordsPost(recordsDeleted, recordsSelected);
   }
 
-  public void deleteRecords(final LayerRecord... records) {
-    deleteRecords(Arrays.asList(records));
-  }
-
   protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted,
     final List<LayerRecord> recordsSelected) {
     if (!recordsSelected.isEmpty()) {

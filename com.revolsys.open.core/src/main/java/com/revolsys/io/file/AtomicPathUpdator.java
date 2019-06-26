@@ -13,7 +13,7 @@ import com.revolsys.util.Cancellable;
 
 public class AtomicPathUpdator implements BaseCloseable {
   private static final CopyOption[] MOVE_OPTIONS = {
-    StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING
+    StandardCopyOption.REPLACE_EXISTING
   };
 
   private final Path targetDirectory;
