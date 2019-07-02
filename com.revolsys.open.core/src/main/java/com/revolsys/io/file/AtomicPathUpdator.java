@@ -30,11 +30,21 @@ public class AtomicPathUpdator implements BaseCloseable {
 
   public AtomicPathUpdator(final Cancellable cancellable, final Path directory,
     final String fileName) {
+    this(null, cancellable, directory, fileName);
+  }
+
+  public AtomicPathUpdator(final Path baseTempDirectory, final Cancellable cancellable,
+    final Path directory, final String fileName) {
     this.cancellable = cancellable;
     try {
       this.targetDirectory = directory;
       this.fileName = fileName;
-      this.tempDirectory = Files.createTempDirectory(fileName);
+      if (baseTempDirectory == null) {
+        this.tempDirectory = Files.createTempDirectory(fileName);
+      } else {
+        this.tempDirectory = Files.createTempDirectory(baseTempDirectory, fileName);
+
+      }
       this.path = this.tempDirectory.resolve(fileName);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
