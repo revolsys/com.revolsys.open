@@ -43,7 +43,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
     return recordDefinition;
   }
 
-  private List<LayerRecord> records = new ArrayList<>();
+  protected List<LayerRecord> records = new ArrayList<>();
 
   public ListRecordLayer(final Map<String, ? extends Object> properties) {
     this("recordListLayer");

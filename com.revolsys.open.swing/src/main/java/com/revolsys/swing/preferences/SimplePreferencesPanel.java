@@ -2,10 +2,10 @@ package com.revolsys.swing.preferences;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.jeometry.common.data.type.DataType;
+import java.util.function.Function;
 
 import com.revolsys.swing.field.Field;
+import com.revolsys.util.PreferenceKey;
 
 public class SimplePreferencesPanel extends AbstractPreferencesPanel {
   private static final long serialVersionUID = 1L;
@@ -16,21 +16,9 @@ public class SimplePreferencesPanel extends AbstractPreferencesPanel {
     super(title, null);
   }
 
-  public void addPreference(final String applicationName, final String path,
-    final String propertyName, final DataType valueClass, final Object defaultValue) {
-    final Preference preference = new Preference(applicationName, path, propertyName, valueClass,
-      defaultValue);
-    if (!this.preferences.contains(preference)) {
-      this.preferences.add(preference);
-      addField(preference.getField());
-    }
-  }
-
-  public Preference addPreference(final String applicationName, final String path,
-    final String propertyName, final DataType valueClass, final Object defaultValue,
-    final Field field) {
-    final Preference preference = new Preference(applicationName, path, propertyName, valueClass,
-      defaultValue, field);
+  public Preference addPreference(final String applicationName, final PreferenceKey preferenceKey,
+    final Function<Preference, Field> fieldFactory) {
+    final Preference preference = new Preference(applicationName, preferenceKey, fieldFactory);
     if (this.preferences.contains(preference)) {
       for (final Preference preference2 : this.preferences) {
         if (preference2.equals(preference)) {

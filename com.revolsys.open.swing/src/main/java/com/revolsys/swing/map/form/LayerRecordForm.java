@@ -15,7 +15,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,6 +52,7 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
@@ -608,7 +608,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     final LayerRecord record = getRecord();
     if (record != null) {
       final AbstractRecordLayer layer = getLayer();
-      layer.deleteRecord(record);
+      layer.deleteRecordWithConfirm(record);
     }
   }
 

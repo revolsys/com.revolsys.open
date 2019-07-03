@@ -1,6 +1,6 @@
 package com.revolsys.properties;
 
-import java.beans.PropertyChangeSupport;
+import com.revolsys.beans.PropertyChangeSupport;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;

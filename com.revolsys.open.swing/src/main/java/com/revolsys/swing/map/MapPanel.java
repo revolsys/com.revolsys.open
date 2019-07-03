@@ -92,6 +92,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
 import com.revolsys.value.GlobalBooleanValue;
 
@@ -118,6 +119,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       }
     }
   }
+
+  private final Preferences preferences;
 
   private ComboBox<Layer> baseMapLayerField;
 
@@ -196,8 +199,9 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private final BasePanel layeredPanel;
 
-  public MapPanel(final Project project) {
+  public MapPanel(final Preferences preferences, final Project project) {
     super(new BorderLayout());
+    this.preferences = preferences;
     this.project = project;
     this.selectedRecordsIndex = new LayerRecordQuadTree(project.getGeometryFactory());
 
@@ -629,6 +633,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public Cursor getOverlayActionCursor(final String name) {
     return Maps.get(this.overlayActionCursors, name, AbstractOverlay.DEFAULT_CURSOR);
+  }
+
+  public Preferences getPreferences() {
+    return this.preferences;
   }
 
   public SwingWorkerProgressBar getProgressBar() {

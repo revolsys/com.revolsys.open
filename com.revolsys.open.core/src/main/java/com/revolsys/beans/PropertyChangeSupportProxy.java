@@ -2,7 +2,6 @@ package com.revolsys.beans;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
 import com.revolsys.util.Property;
 

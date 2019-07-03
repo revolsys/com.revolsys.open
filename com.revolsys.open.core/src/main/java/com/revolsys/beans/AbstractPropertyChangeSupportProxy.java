@@ -1,6 +1,6 @@
 package com.revolsys.beans;
 
-import java.beans.PropertyChangeSupport;
+import com.revolsys.beans.PropertyChangeSupport;
 
 import org.jeometry.common.exception.Exceptions;
 

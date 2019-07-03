@@ -7,7 +7,6 @@ import java.awt.TextArea;
 import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.net.URL;
@@ -37,6 +36,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -74,12 +74,11 @@ import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.preferences.PreferencesDialog;
+import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.OS;
 import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
@@ -94,11 +93,15 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   public static final String PLUGIN_TABLE_VIEW = "tableView";
 
-  public static final String PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW = "newLayersShowTableView";
-
-  public static final String PREFERENCE_NEW_LAYERS_VISIBLE = "newLayersVisible";
-
   public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer";
+
+  public static final PreferenceKey PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW = new PreferenceKey(
+    PREFERENCE_PATH, "newLayersShowTableView", DataTypes.BOOLEAN, false)//
+      .setCategoryTitle("Layers");
+
+  public static final PreferenceKey PREFERENCE_NEW_LAYERS_VISIBLE = new PreferenceKey(
+    PREFERENCE_PATH, "newLayersVisible", DataTypes.BOOLEAN, false)//
+      .setCategoryTitle("Layers");
 
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
@@ -123,20 +126,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
     Menus.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information", exists,
       AbstractLayer::showProperties, false);
 
-    final PreferencesDialog preferencesDialog = PreferencesDialog.get();
-    preferencesDialog.addPreference("Layers", "com.revolsys.gis", PREFERENCE_PATH,
-      PREFERENCE_NEW_LAYERS_VISIBLE, DataTypes.BOOLEAN, false);
-    preferencesDialog.addPreference("Layers", "com.revolsys.gis", PREFERENCE_PATH,
-      PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, DataTypes.BOOLEAN, false);
+    PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE);
+    PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW);
   }
 
   public static boolean isShowNewLayerTableView() {
-
-    final PreferenceKey PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW = new PreferenceKey(PREFERENCE_PATH,
-      "newLayersShowTableView");
-
-    return new Preferences("com.revolsys.gis").getBoolean(PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW,
-      false);
+    return Preferences.getValue("com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW);
   }
 
   public static void menuItemPathAddLayer(final String menuGroup, final String menuName,
@@ -151,7 +146,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
       .setIconName(iconName, "add");
   }
 
-  private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
+  protected PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
 
   private BoundingBox boundingBox = BoundingBox.empty();
 
@@ -205,8 +200,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   private String type;
 
-  private boolean visible = OS.getPreferenceBoolean("com.revolsys.gis", PREFERENCE_PATH,
-    PREFERENCE_NEW_LAYERS_VISIBLE, false);
+  private boolean visible = Preferences.getValue("com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE);
 
   protected AbstractLayer(final String type) {
     this.type = type;

@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.overlay;
 
-import java.beans.PropertyChangeSupport;
+import com.revolsys.beans.PropertyChangeSupport;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 

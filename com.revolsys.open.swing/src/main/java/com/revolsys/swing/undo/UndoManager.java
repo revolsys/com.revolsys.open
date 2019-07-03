@@ -3,7 +3,7 @@ package com.revolsys.swing.undo;
 import java.awt.Component;
 import java.awt.Event;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeSupport;
+import com.revolsys.beans.PropertyChangeSupport;
 
 import javax.swing.ActionMap;
 import javax.swing.InputMap;

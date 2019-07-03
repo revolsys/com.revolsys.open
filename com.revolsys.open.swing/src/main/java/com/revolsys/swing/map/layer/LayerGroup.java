@@ -765,8 +765,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layer = null;
     }
     if (layer != null) {
-      layer.setProperty("showTableView", OS.getPreferenceBoolean("com.revolsys.gis",
-        PREFERENCE_PATH, PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false));
+      layer.setProperty("showTableView", isShowNewLayerTableView());
       if (index == -1) {
         addLayer(layer);
       } else {

@@ -1,7 +1,7 @@
 package com.revolsys.io.file;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeSupport;
+import com.revolsys.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLStreamHandler;

@@ -6,7 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.beans.PropertyChangeSupport;
+import com.revolsys.beans.PropertyChangeSupport;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 

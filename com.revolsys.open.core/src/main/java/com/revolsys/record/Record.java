@@ -135,10 +135,6 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     return false;
   }
 
-  default void delete() {
-    getRecordDefinition().deleteRecord(this);
-  }
-
   default double distance(final Geometry geometry) {
     final Geometry recordGeometry = getGeometry();
     if (Property.isEmpty(geometry) || Property.isEmpty(recordGeometry)) {

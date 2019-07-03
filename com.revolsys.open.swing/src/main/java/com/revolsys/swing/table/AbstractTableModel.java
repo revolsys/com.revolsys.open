@@ -1,6 +1,6 @@
 package com.revolsys.swing.table;
 
-import java.beans.PropertyChangeSupport;
+import com.revolsys.beans.PropertyChangeSupport;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;

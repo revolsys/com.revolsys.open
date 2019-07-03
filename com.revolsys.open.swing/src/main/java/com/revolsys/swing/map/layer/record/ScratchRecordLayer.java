@@ -20,7 +20,11 @@ public class ScratchRecordLayer extends ListRecordLayer {
       menu.deleteMenuItem("edit", "Cancel Changes");
 
       Menus.addMenuItem(menu, "edit", "Delete All Records", "table:delete",
-        ScratchRecordLayer::isCanDeleteRecords, ScratchRecordLayer::clearRecords, true);
+        ScratchRecordLayer::isCanDeleteRecords, layer -> {
+          if (layer.confirmDeleteRecords(layer.records)) {
+            layer.clearRecords();
+          }
+        }, true);
     });
   }
 
@@ -58,6 +62,11 @@ public class ScratchRecordLayer extends ListRecordLayer {
     setRecordDefinition(recordDefinition);
 
     return super.initializeDo();
+  }
+
+  @Override
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    super.setGeometryFactory(geometryFactory);
   }
 
   public void setGeometryTypeName(final String geometryTypeName) {

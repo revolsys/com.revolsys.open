@@ -2,7 +2,7 @@ package com.revolsys.collection;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import com.revolsys.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
 

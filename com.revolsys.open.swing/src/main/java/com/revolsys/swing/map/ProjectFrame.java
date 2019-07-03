@@ -83,6 +83,7 @@ import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.ProjectTreeNode;
 import com.revolsys.swing.tree.node.record.RecordStoreConnectionTrees;
 import com.revolsys.util.OS;
+import com.revolsys.util.Preferences;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.webservice.WebServiceConnectionManager;
@@ -161,6 +162,10 @@ public class ProjectFrame extends BaseFrame {
   private JSplitPane topBottomSplit;
 
   private Path projectPath;
+
+  private final String applicationId = "com.revolsys.gis";
+
+  private final Preferences preferences = new Preferences(this.applicationId);
 
   public ProjectFrame(final String title, final Path projectPath) {
     this(title, projectPath, true);
@@ -413,6 +418,23 @@ public class ProjectFrame extends BaseFrame {
     return this.projectPath;
   }
 
+  // public void expandConnectionManagers(final PropertyChangeEvent event) {
+  // final Object newValue = event.getNewValue();
+  // if (newValue instanceof ConnectionRegistry) {
+  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
+  // final ConnectionRegistryManager<?> connectionManager =
+  // registry.getConnectionManager();
+  // if (connectionManager != null) {
+  // final List<?> connectionRegistries =
+  // connectionManager.getConnectionRegistries();
+  // if (connectionRegistries != null) {
+  // final ObjectTree tree = catalogPanel.getTree();
+  // tree.expandPath(connectionRegistries, connectionManager, registry);
+  // }
+  // }
+  // }
+  // }
+
   private List<String> getRecentProjectPaths() {
     final List<String> recentProjects = OS.getPreference("com.revolsys.gis",
       "/com/revolsys/gis/project", "recentProjects", new ArrayList<String>());
@@ -439,23 +461,6 @@ public class ProjectFrame extends BaseFrame {
       return (BaseTreeNode)treePath.getLastPathComponent();
     }
   }
-
-  // public void expandConnectionManagers(final PropertyChangeEvent event) {
-  // final Object newValue = event.getNewValue();
-  // if (newValue instanceof ConnectionRegistry) {
-  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
-  // final ConnectionRegistryManager<?> connectionManager =
-  // registry.getConnectionManager();
-  // if (connectionManager != null) {
-  // final List<?> connectionRegistries =
-  // connectionManager.getConnectionRegistries();
-  // if (connectionRegistries != null) {
-  // final ObjectTree tree = catalogPanel.getTree();
-  // tree.expandPath(connectionRegistries, connectionManager, registry);
-  // }
-  // }
-  // }
-  // }
 
   @Override
   protected void initUi() {
@@ -578,7 +583,7 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected MapPanel newMapPanel() {
-    this.mapPanel = new MapPanel(this.project);
+    this.mapPanel = new MapPanel(this.preferences, this.project);
     if (OS.isMac()) {
       // Make border on right/bottom to match the JTabbedPane UI on a mac
       this.mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 9, 9));
@@ -594,8 +599,9 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory tools = newMenuTools();
 
     if (OS.isWindows()) {
-      tools.addMenuItem("options", "Options...", "Options...", (String)null,
-        PreferencesDialog.get()::showPanel);
+      tools.addMenuItem("options", "Options...", "Options...", (String)null, () -> {
+        new PreferencesDialog().showPanel();
+      });
     }
     addMenu(menuBar, tools);
     return menuBar;

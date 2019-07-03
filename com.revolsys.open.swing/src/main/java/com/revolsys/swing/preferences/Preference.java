@@ -1,15 +1,17 @@
 package com.revolsys.swing.preferences;
 
-import java.beans.PropertyChangeSupport;
+import java.util.function.Function;
 
 import javax.swing.JComponent;
 
 import org.jeometry.common.data.type.DataType;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
-import com.revolsys.util.OS;
+import com.revolsys.util.PreferenceKey;
+import com.revolsys.util.Preferences;
 
 public class Preference implements PropertyChangeSupportProxy {
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
@@ -20,9 +22,7 @@ public class Preference implements PropertyChangeSupportProxy {
 
   private final JComponent fieldComponent;
 
-  private final String path;
-
-  private final String propertyName;
+  private final PreferenceKey preference;
 
   private Object savedValue;
 
@@ -30,27 +30,22 @@ public class Preference implements PropertyChangeSupportProxy {
 
   private final DataType dataType;
 
-  public Preference(final String applicationName, final String path, final String propertyName,
-    final DataType dataType, final Object defaultValue) {
-    this(applicationName, path, propertyName, dataType, defaultValue, (JComponent)null);
-  }
+  private final Preferences preferences;
 
-  public Preference(final String applicationName, final String path, final String propertyName,
-    final DataType dataType, final Object defaultValue, final Field field) {
-    this(applicationName, path, propertyName, dataType, defaultValue, (JComponent)field);
-  }
-
-  public Preference(final String applicationName, final String path, final String propertyName,
-    final DataType dataType, final Object defaultValue, final JComponent field) {
+  public Preference(final String applicationName, final PreferenceKey preference,
+    final Function<Preference, Field> fieldFactory) {
     this.applicationName = applicationName;
-    this.path = path;
-    this.propertyName = propertyName;
-    this.dataType = dataType;
-    this.savedValue = OS.getPreference(applicationName, path, propertyName, defaultValue);
-    if (field == null) {
-      this.fieldComponent = SwingUtil.newField(dataType, propertyName, defaultValue);
+    this.preferences = new Preferences(applicationName);
+    this.preference = preference;
+
+    this.dataType = preference.getDataType();
+    final Object defaultValue = preference.getDefaultValue();
+    this.savedValue = this.preferences.getValue(preference);
+    final String propertyName = preference.getName();
+    if (fieldFactory == null) {
+      this.fieldComponent = SwingUtil.newField(this.dataType, propertyName, defaultValue);
     } else {
-      this.fieldComponent = field;
+      this.fieldComponent = (JComponent)fieldFactory.apply(this);
     }
     this.field = (Field)this.fieldComponent;
     cancelChanges();
@@ -68,10 +63,8 @@ public class Preference implements PropertyChangeSupportProxy {
     } else if (object instanceof Preference) {
       final Preference other = (Preference)object;
       if (DataType.equal(other.applicationName, this.applicationName)) {
-        if (DataType.equal(other.path, this.path)) {
-          if (DataType.equal(other.propertyName, this.propertyName)) {
-            return true;
-          }
+        if (DataType.equal(other.preference, this.preference)) {
+          return true;
         }
       }
     }
@@ -90,17 +83,9 @@ public class Preference implements PropertyChangeSupportProxy {
     return this.fieldComponent;
   }
 
-  public String getPath() {
-    return this.path;
-  }
-
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
     return this.propertyChangeSupport;
-  }
-
-  public String getPropertyName() {
-    return this.propertyName;
   }
 
   public Object getSavedValue() {
@@ -122,11 +107,8 @@ public class Preference implements PropertyChangeSupportProxy {
     if (this.applicationName != null) {
       result = prime * result + this.applicationName.hashCode();
     }
-    if (this.path != null) {
-      result = prime * result + this.path.hashCode();
-    }
-    if (this.propertyName != null) {
-      result = prime * result + this.propertyName.hashCode();
+    if (this.preference != null) {
+      result = prime * result + this.preference.hashCode();
     }
     return result;
   }
@@ -138,9 +120,10 @@ public class Preference implements PropertyChangeSupportProxy {
   public void saveChanges() {
     final Object oldValue = this.savedValue;
     final Object value = this.field.getFieldValue();
-    OS.setPreference(this.applicationName, this.path, this.propertyName, value);
+    this.preferences.setValue(this.preference, value);
     this.savedValue = value;
-    firePropertyChange(this.propertyName, oldValue, value);
+    final String name = this.preference.getName();
+    firePropertyChange(name, oldValue, value);
 
   }
 }

@@ -91,6 +91,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.RecordReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
+import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.swing.map.MapPanel;
@@ -124,10 +125,13 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Label;
+import com.revolsys.util.PreferenceKey;
+import com.revolsys.util.Preferences;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.ShortCounter;
@@ -137,6 +141,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public static final String ALL = "All";
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
+
+  public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer/record";
+
+  public static final PreferenceKey PREFERENCE_CONFIRM_DELETE_RECORDS = new PreferenceKey(
+    PREFERENCE_PATH, "confirmDeleteRecords", DataTypes.BOOLEAN, false)//
+      .setCategoryTitle("Layers");
 
   public static final String RECORD_CACHE_MODIFIED = "recordCacheModified";
 
@@ -190,8 +200,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       AbstractRecordLayer::addNewRecord, false);
 
     Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
-      hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords),
-      AbstractRecordLayer::deleteSelectedRecords, true);
+      hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords), layer -> {
+        final List<LayerRecord> selectedRecords = layer.getSelectedRecords();
+        layer.deleteRecordsWithConfirm(selectedRecords);
+      }, true);
 
     Menus.addMenuItem(menu, "edit", "Merge Selected Records", "table_row_merge",
       AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false);
@@ -205,6 +217,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
       AbstractRecordLayer::isHasGeometry,
       (final AbstractRecordLayer layer) -> layer.showProperties("Style"), false);
+
+    PreferenceFields.addField("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
   }
 
   public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
@@ -361,6 +375,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private Set<String> userReadOnlyFieldNames = new LinkedHashSet<>();
 
   private String where;
+
+  private Boolean confirmDeleteRecords;
 
   protected AbstractRecordLayer(final String type) {
     super(type);
@@ -687,6 +703,28 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return clone;
   }
 
+  protected boolean confirmDeleteRecords(final Collection<? extends LayerRecord> records) {
+    return confirmDeleteRecords("", records);
+  }
+
+  protected boolean confirmDeleteRecords(final String suffix,
+    final Collection<? extends LayerRecord> records) {
+    final int recordCount = records.size();
+    boolean confirmDelete;
+    if (this.confirmDeleteRecords == null) {
+      confirmDelete = Preferences.getValue("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
+    } else {
+      confirmDelete = this.confirmDeleteRecords;
+    }
+    if (confirmDelete) {
+      final int confirm = JOptionPane.showConfirmDialog(getMapPanel(),
+        "Delete " + recordCount + " records" + suffix + "? This action cannot be undone.",
+        "Delete Records" + suffix, JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+      return confirm == JOptionPane.YES_OPTION;
+    }
+    return true;
+  }
+
   public void copyRecordGeometry(final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
     if (geometry != null) {
@@ -804,10 +842,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     deleteRecordsPost(recordsDeleted, recordsSelected);
   }
 
-  public void deleteRecords(final LayerRecord... records) {
-    deleteRecords(Arrays.asList(records));
-  }
-
   protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted,
     final List<LayerRecord> recordsSelected) {
     if (!recordsSelected.isEmpty()) {
@@ -821,9 +855,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public void deleteSelectedRecords() {
-    final List<LayerRecord> selectedRecords = getSelectedRecords();
-    deleteRecords(selectedRecords);
+  public void deleteRecordsWithConfirm(final Collection<? extends LayerRecord> records) {
+    if (confirmDeleteRecords(records)) {
+      deleteRecords(records);
+    }
+  }
+
+  public void deleteRecordWithConfirm(final LayerRecord record) {
+    final List<LayerRecord> records = Collections.singletonList(record);
+    deleteRecordsWithConfirm(records);
   }
 
   public void exportRecords(final Iterable<LayerRecord> records,
@@ -977,6 +1017,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public Collection<Class<?>> getChildClasses() {
     return Collections.<Class<?>> singleton(AbstractRecordLayerRenderer.class);
+  }
+
+  public Boolean getConfirmDeleteRecords() {
+    if (this.confirmDeleteRecords == null) {
+      return Preferences.getValue("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
+    } else {
+      return this.confirmDeleteRecords;
+    }
   }
 
   @Override
@@ -1806,7 +1854,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         menu.addComponentFactory("record", editMenu);
       }
       menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
-        this::deleteRecord);
+        this::deleteRecordWithConfirm);
 
       menu.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
         LayerRecord::revertChanges);
@@ -2245,6 +2293,19 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     parent.add(filterPanel);
     return filterPanel;
+  }
+
+  @Override
+  protected ValueField newPropertiesTabGeneralPanelGeneral(final BasePanel parent) {
+    final ValueField panel = super.newPropertiesTabGeneralPanelGeneral(parent);
+
+    final Field confirmDeleteField = (Field)SwingUtil.addObjectField(panel, this,
+      "confirmDeleteRecords", DataTypes.BOOLEAN);
+    Property.addListener(confirmDeleteField, "confirmDeleteRecords", this.beanPropertyListener);
+
+    GroupLayouts.makeColumns(panel, 2, true);
+
+    return panel;
   }
 
   @SuppressWarnings("unchecked")
@@ -2765,6 +2826,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void setCanPasteRecords(final boolean canPasteRecords) {
     this.canPasteRecords = canPasteRecords;
+  }
+
+  public void setConfirmDeleteRecords(final Boolean confirmDeleteRecords) {
+    this.confirmDeleteRecords = confirmDeleteRecords;
   }
 
   @Override
@@ -3293,6 +3358,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     addToMap(map, "fieldNamesSets", getFieldNamesSets());
     addToMap(map, "fieldColumnWidths", getFieldColumnWidths());
     addToMap(map, "useFieldTitles", this.useFieldTitles);
+    addToMap(map, "confirmDeleteRecords", this.confirmDeleteRecords, null);
     map.remove("filter");
     String where;
     if (Property.isEmpty(this.filter)) {
