@@ -95,8 +95,8 @@ public abstract class AbstractUpdateField extends JDialog {
       final int confirm = JOptionPane.showConfirmDialog(this,
         "<html>Update <b style='color:#32CD32'>" + this.recordCountString
           + "</b> records? This may take a long time or fail if there are many records.</html>",
-        "Update Records?", JOptionPane.OK_CANCEL_OPTION);
-      if (confirm != JOptionPane.OK_OPTION) {
+        "Update Records?", JOptionPane.YES_NO_OPTION);
+      if (confirm != JOptionPane.YES_OPTION) {
         setVisible(false);
         return;
       }

@@ -235,7 +235,7 @@ public class FieldNamesSetPanel extends ValueField
     } else {
       final int result = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
         "Delete field set " + fieldSetName + ".", "Delete Field Set", JOptionPane.YES_NO_OPTION);
-      if (result == JOptionPane.OK_OPTION) {
+      if (result == JOptionPane.YES_OPTION) {
         for (int i = 0; i < this.fieldNamesSetNamesModel.size(); i++) {
           final String name2 = this.fieldNamesSetNamesModel.get(i);
           if (fieldSetName.equalsIgnoreCase(name2)) {

@@ -318,8 +318,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   public void deleteWithConfirm() {
     final int confirm = JOptionPane.showConfirmDialog(getMapPanel(),
       "Delete the layer and any child layers? This action cannot be undone.", "Delete Layer",
-      JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
-    if (confirm == JOptionPane.OK_OPTION) {
+      JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+    if (confirm == JOptionPane.YES_OPTION) {
       delete();
     }
   }

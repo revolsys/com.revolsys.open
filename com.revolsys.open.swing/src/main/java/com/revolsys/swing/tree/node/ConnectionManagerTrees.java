@@ -36,8 +36,8 @@ public class ConnectionManagerTrees {
     if (!connection.isReadOnly()) {
       final int confirm = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
         "Delete connection '" + connection.getName() + "'? This action cannot be undone.",
-        "Delete Connection", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
-      if (confirm == JOptionPane.OK_OPTION) {
+        "Delete Connection", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+      if (confirm == JOptionPane.YES_OPTION) {
         connection.deleteConnection();
       }
     }
