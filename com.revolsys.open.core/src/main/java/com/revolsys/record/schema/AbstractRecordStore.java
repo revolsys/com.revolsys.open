@@ -78,8 +78,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   public void addCodeTable(final CodeTable codeTable) {
     final String idFieldName = codeTable.getIdFieldName();
     addCodeTable(idFieldName, codeTable);
-    final List<String> fieldAliases = codeTable.getFieldNameAliases();
-    for (final String alias : fieldAliases) {
+    final List<String> fieldNameAliases = codeTable.getFieldNameAliases();
+    for (final String alias : fieldNameAliases) {
       addCodeTable(alias, codeTable);
     }
     final String codeTableName = codeTable.getName();

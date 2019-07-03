@@ -8,8 +8,6 @@ import java.util.Set;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.jeometry.common.exception.Exceptions;
@@ -23,56 +21,6 @@ import com.revolsys.collection.set.Sets;
 import com.revolsys.util.Property;
 
 public class Logs {
-
-  public static void addAppender(final Class<?> loggerName, final Appender appender) {
-    if (!appender.isStarted()) {
-      appender.start();
-    }
-    final org.apache.logging.log4j.core.Logger logger = getLog4jCoreLogger(loggerName);
-    logger.addAppender(appender);
-  }
-
-  public static void addAppender(final Class<?> loggerName, final String pattern) {
-    final PatternLayout layout = newLayout(pattern);
-    final Appender appender = ConsoleAppender.createDefaultAppenderForLayout(layout);
-    addAppender(loggerName, appender);
-  }
-
-  public static void addAppender(final String loggerName, final Appender appender) {
-    if (!appender.isStarted()) {
-      appender.start();
-    }
-    final org.apache.logging.log4j.core.Logger logger = getLog4jCoreLogger(loggerName);
-    logger.addAppender(appender);
-  }
-
-  public static void addAppender(final String loggerName, final String pattern) {
-    final PatternLayout layout = newLayout(pattern);
-    final Appender appender = ConsoleAppender.createDefaultAppenderForLayout(layout);
-    addAppender(loggerName, appender);
-  }
-
-  public static void addRootAppender(final Appender appender) {
-    final org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger)LogManager
-      .getRootLogger();
-    if (!appender.isStarted()) {
-      appender.start();
-    }
-    logger.addAppender(appender);
-  }
-
-  public static void addRootAppender(final String pattern) {
-    final PatternLayout layout = newLayout(pattern);
-    final Appender appender = ConsoleAppender.createDefaultAppenderForLayout(layout);
-    addRootAppender(appender);
-  }
-
-  public static FileAppender addRootFileAppender(final File logFile, final String pattern,
-    final boolean append) {
-    final FileAppender appender = newFileAppender(logFile, pattern, append);
-    addRootAppender(appender);
-    return appender;
-  }
 
   public static void debug(final Class<?> clazz, final String message) {
     final String name = clazz.getName();
@@ -317,24 +265,6 @@ public class Logs {
     return PatternLayout.newBuilder() //
       .withPattern(pattern)//
       .build();
-  }
-
-  public static void removeAllAppenders() {
-    final org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger)LogManager
-      .getRootLogger();
-    removeAllAppenders(logger);
-  }
-
-  public static void removeAllAppenders(final org.apache.logging.log4j.core.Logger logger) {
-    for (final Appender appender : logger.getAppenders().values()) {
-      logger.removeAppender(appender);
-    }
-  }
-
-  public static void removeRootAppender(final Appender appender) {
-    final org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger)LogManager
-      .getRootLogger();
-    logger.removeAppender(appender);
   }
 
   public static void setLevel(final String name, final org.slf4j.event.Level level) {

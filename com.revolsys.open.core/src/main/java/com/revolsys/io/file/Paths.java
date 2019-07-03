@@ -97,7 +97,7 @@ public interface Paths {
   }
 
   static Path get(final String first, final String... more) {
-    return java.nio.file.Paths.get(first, more);
+    return Path.of(first, more);
   }
 
   static String getBaseName(final java.nio.file.Path path) {

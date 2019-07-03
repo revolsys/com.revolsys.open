@@ -37,6 +37,7 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
 import com.revolsys.collection.map.ThreadSharedProperties;
+import com.revolsys.log.LogAppender;
 import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.ManifestUtil;
@@ -302,7 +303,7 @@ public class ScriptTool {
           .build();
         rootLogger.addAppender(appender);
       } catch (final Exception e) {
-        Logs.addRootAppender("%p\t%m%n");
+        LogAppender.addRootAppender("%p\t%m%n");
         Logs.error(this, "Cannot find log file " + this.logFile, e);
       }
 

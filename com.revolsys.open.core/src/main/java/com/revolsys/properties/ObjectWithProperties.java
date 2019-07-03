@@ -45,6 +45,28 @@ public interface ObjectWithProperties {
     }
   }
 
+  static void setProperties(final Object object, final Map<String, ? extends Object> properties) {
+    if (properties != null) {
+      if (object instanceof ObjectWithProperties) {
+        final ObjectWithProperties objectWithProperties = (ObjectWithProperties)object;
+        objectWithProperties.setProperties(properties);
+      } else if (object != null) {
+        for (final Entry<String, ? extends Object> entry : properties.entrySet()) {
+          final String name = entry.getKey();
+          final Object value = entry.getValue();
+          setProperty(object, name, value);
+        }
+      }
+    }
+  }
+
+  static void setProperty(final Object object, final String name, final Object value) {
+    try {
+      Property.setSimple(object, name, value);
+    } catch (final Throwable e) {
+    }
+  }
+
   @SuppressWarnings("unchecked")
   default <V extends ObjectWithProperties> V addProperty(final String name, final Object value) {
     setProperty(name, value);

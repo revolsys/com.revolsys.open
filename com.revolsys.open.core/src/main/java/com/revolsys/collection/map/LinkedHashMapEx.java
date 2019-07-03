@@ -21,4 +21,8 @@ public class LinkedHashMapEx extends LinkedHashMap<String, Object> implements Ma
   public LinkedHashMapEx(final Map<? extends String, ? extends Object> m) {
     super(m);
   }
+
+  public LinkedHashMapEx(final String key, final Object value) {
+    add(key, value);
+  }
 }

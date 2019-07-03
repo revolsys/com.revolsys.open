@@ -376,7 +376,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private String where;
 
-  private Boolean confirmDeleteRecords;
+  private boolean confirmDeleteRecords;
 
   protected AbstractRecordLayer(final String type) {
     super(type);
@@ -710,13 +710,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected boolean confirmDeleteRecords(final String suffix,
     final Collection<? extends LayerRecord> records) {
     final int recordCount = records.size();
-    boolean confirmDelete;
-    if (this.confirmDeleteRecords == null) {
-      confirmDelete = Preferences.getValue("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
-    } else {
-      confirmDelete = this.confirmDeleteRecords;
-    }
-    if (confirmDelete) {
+    final boolean globalConfirmDeleteRecords = Preferences.getValue("com.revolsys.gis",
+      PREFERENCE_CONFIRM_DELETE_RECORDS);
+    if (globalConfirmDeleteRecords || this.confirmDeleteRecords) {
       final int confirm = JOptionPane.showConfirmDialog(getMapPanel(),
         "Delete " + recordCount + " records" + suffix + "? This action cannot be undone.",
         "Delete Records" + suffix, JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -1020,14 +1016,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public Collection<Class<?>> getChildClasses() {
     return Collections.<Class<?>> singleton(AbstractRecordLayerRenderer.class);
-  }
-
-  public Boolean getConfirmDeleteRecords() {
-    if (this.confirmDeleteRecords == null) {
-      return Preferences.getValue("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
-    } else {
-      return this.confirmDeleteRecords;
-    }
   }
 
   @Override
@@ -2040,6 +2028,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return true;
   }
 
+  public boolean isConfirmDeleteRecords() {
+    return this.confirmDeleteRecords;
+  }
+
   public boolean isDeleted(final LayerRecord record) {
     return internalIsDeleted(record);
   }
@@ -2831,7 +2823,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.canPasteRecords = canPasteRecords;
   }
 
-  public void setConfirmDeleteRecords(final Boolean confirmDeleteRecords) {
+  public void setConfirmDeleteRecords(final boolean confirmDeleteRecords) {
     this.confirmDeleteRecords = confirmDeleteRecords;
   }
 
@@ -3361,7 +3353,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     addToMap(map, "fieldNamesSets", getFieldNamesSets());
     addToMap(map, "fieldColumnWidths", getFieldColumnWidths());
     addToMap(map, "useFieldTitles", this.useFieldTitles);
-    addToMap(map, "confirmDeleteRecords", this.confirmDeleteRecords, null);
+    addToMap(map, "confirmDeleteRecords", this.confirmDeleteRecords, false);
     map.remove("filter");
     String where;
     if (Property.isEmpty(this.filter)) {

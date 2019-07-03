@@ -1,6 +1,5 @@
 package com.revolsys.record.schema;
 
-import java.io.Closeable;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -22,6 +21,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
@@ -47,7 +47,7 @@ import com.revolsys.util.count.CategoryLabelCountMap;
 import com.revolsys.util.count.LabelCountMap;
 
 public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFactory, Transactionable,
-  Closeable, ObjectWithProperties {
+  BaseCloseable, ObjectWithProperties {
 
   static boolean isRecordStore(final Path path) {
     for (final RecordStoreFactory recordStoreFactory : IoFactory
