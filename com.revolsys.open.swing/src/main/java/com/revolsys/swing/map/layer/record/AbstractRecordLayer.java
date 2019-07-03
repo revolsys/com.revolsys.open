@@ -855,15 +855,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public void deleteRecordsWithConfirm(final Collection<? extends LayerRecord> records) {
+  public boolean deleteRecordsWithConfirm(final Collection<? extends LayerRecord> records) {
     if (confirmDeleteRecords(records)) {
       deleteRecords(records);
+      return true;
+    } else {
+      return false;
     }
   }
 
-  public void deleteRecordWithConfirm(final LayerRecord record) {
+  public boolean deleteRecordWithConfirm(final LayerRecord record) {
     final List<LayerRecord> records = Collections.singletonList(record);
-    deleteRecordsWithConfirm(records);
+    return deleteRecordsWithConfirm(records);
   }
 
   public void exportRecords(final Iterable<LayerRecord> records,
